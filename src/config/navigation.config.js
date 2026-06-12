@@ -6,6 +6,51 @@
  */
 import { CANONICAL_ROUTES } from './routes.config';
 
+export const APP_SHELL_NAV_ITEMS = Object.freeze([
+  {
+    id: 'emergency_whiteboard',
+    featureId: 'emergency_whiteboard',
+    path: CANONICAL_ROUTES.emergencyWorkspace,
+    activePaths: [CANONICAL_ROUTES.emergencyWorkspace, '/workspace/emergency', '/workspace/emergency/whiteboard'],
+  },
+  {
+    id: 'ems_pipeline',
+    featureId: 'ems_pipeline',
+    path: CANONICAL_ROUTES.emergencyEms,
+    activePaths: [CANONICAL_ROUTES.emergencyEms, '/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
+  },
+  {
+    id: 'referral_intelligence',
+    featureId: 'referral_intelligence',
+    path: '/emergency/referrals',
+    activePaths: ['/emergency/referrals', '/workspace/emergency/referrals'],
+  },
+  {
+    id: 'capacity_intelligence',
+    featureId: 'capacity_intelligence',
+    path: '/emergency/capacity',
+    activePaths: ['/emergency/capacity', '/workspace/emergency/capacity', '/workspace/emergency/boarding'],
+  },
+  {
+    id: 'clinical_calculator_hub',
+    featureId: 'clinical_calculator_hub',
+    path: CANONICAL_ROUTES.emergencyTools,
+    activePaths: [CANONICAL_ROUTES.emergencyTools, CANONICAL_ROUTES.calculators],
+  },
+  {
+    id: 'shift_summary',
+    featureId: 'shift_summary',
+    path: '/emergency/shift',
+    activePaths: ['/emergency/shift', '/workspace/emergency/shift-summary', '/workspace/emergency/shift'],
+  },
+  {
+    id: 'emergency_settings',
+    featureId: 'emergency_settings',
+    path: CANONICAL_ROUTES.settings,
+    activePaths: [CANONICAL_ROUTES.settings, CANONICAL_ROUTES.settingsFeatures, '/emergency/settings'],
+  },
+]);
+
 export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',

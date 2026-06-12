@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Navigate,
+  Link,
   useNavigate,
   useLocation,
   useParams,
@@ -21,7 +22,6 @@ import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
 import { TenantContextProvider } from './contexts/TenantContext';
-import { EmergencyDepartmentProvider } from './contexts/EmergencyDepartmentContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionGate from './components/PermissionGate';
@@ -32,8 +32,7 @@ import QueueIntelligencePanel from './components/QueueIntelligencePanel';
 import ReferralPanel from './components/ReferralPanel';
 import ShiftSummary from './components/ShiftSummary';
 import AppShell from './layout/AppShell';
-import AuthShell from './layout/AuthShell';
-import { PublicShell } from './layout/PublicShell';
+import { PatientState } from '../types/emergency';
 import { createDevAuthSession, isDevAuthBypassEnabled } from './auth/devAuthBypass';
 import { useNotificationActions } from './hooks/useNotificationActions';
 import { useFeature } from './hooks/useFeature';
@@ -485,7 +484,15 @@ function AppShellPage({ children }) {
   const { signOut, user, isDevAuthBypass } = useUser();
   const { conversations, activeConversationId, selectConversation, addConversation } =
     useConversation();
+  const emergencyPatientCount = useEmergencyStore((state) => state.patients.length);
+  const isEmergencyHydrating = useEmergencyStore((state) => state.isHydrating);
+  const hasEmergencyHydrated = useEmergencyStore((state) => state.hasHydrated);
+  const ensureEmergencyHydrated = useEmergencyStore((state) => state.ensureHydrated);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    ensureEmergencyHydrated();
+  }, [ensureEmergencyHydrated]);
 
   const handleSignOut = () => {
     signOut();
@@ -502,6 +509,23 @@ function AppShellPage({ children }) {
     navigate({ pathname: '/assistant', search: '' }, { replace: true });
   };
 
+  const shellContent =
+    isEmergencyHydrating || !hasEmergencyHydrated || emergencyPatientCount === 0 ? (
+      <section className="ed-route-panel" aria-busy="true" aria-labelledby="emergency-loading-title">
+        <header className="ed-route-panel__header">
+          <span>Emergency OS</span>
+          <h1 id="emergency-loading-title">Loading Emergency OS</h1>
+          <p>Hydrating patients, staff, capacity, EMS, referrals, and alerts.</p>
+        </header>
+        <div className="page-loader">
+          <div className="page-loader-spinner" aria-hidden />
+          <div className="page-loader-label">Preparing emergency workspace...</div>
+        </div>
+      </section>
+    ) : (
+      children
+    );
+
   return (
     <AppShell
       isAuthed={true}
@@ -514,7 +538,7 @@ function AppShellPage({ children }) {
       isDevAuthBypass={isDevAuthBypass}
       devAuthBannerLabel={user?.devAuthLabel || 'Platform Access'}
     >
-      {children}
+      {shellContent}
     </AppShell>
   );
 }
@@ -547,9 +571,61 @@ function FutureReleaseStub({ label = 'This module' }) {
     <section className="ed-route-panel ed-route-panel--future" aria-labelledby="future-release-title">
       <header className="ed-route-panel__header">
         <span>Emergency OS</span>
-        <h1 id="future-release-title">{label} — Coming in a future release</h1>
-        <p>This module is parked while the Emergency OS workflow remains the active shell.</p>
+        <h1 id="future-release-title">{label}</h1>
+        <p>This module is available in a future release.</p>
       </header>
+    </section>
+  );
+}
+
+const SETTINGS_TABS = Object.freeze([
+  { label: 'General', to: '/settings' },
+  { label: 'Features', to: '/settings/features' },
+  { label: 'Thresholds', to: '/settings#thresholds' },
+  { label: 'Staff', to: '/settings#staff' },
+  { label: 'Integrations', to: '/settings#integrations' },
+]);
+
+function SettingsTabs({ active = 'General' }) {
+  return (
+    <nav className="ed-route-panel__tabs" aria-label="Settings tabs">
+      {SETTINGS_TABS.map((tab) => (
+        <Link
+          key={tab.label}
+          to={tab.to}
+          aria-current={tab.label === active ? 'page' : undefined}
+        >
+          {tab.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function SettingsRoute() {
+  return (
+    <section className="ed-route-panel" aria-labelledby="settings-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS Admin</span>
+        <h1 id="settings-title">Settings</h1>
+        <p>General, features, thresholds, staff, and integration settings for the ED workspace.</p>
+      </header>
+      <SettingsTabs active="General" />
+      <EmergencySettings />
+    </section>
+  );
+}
+
+function SettingsFeaturesRoute() {
+  return (
+    <section className="ed-route-panel" aria-labelledby="settings-features-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS Admin</span>
+        <h1 id="settings-features-title">Feature Management</h1>
+        <p>Enable, disable, and review feature availability across the Emergency OS shell.</p>
+      </header>
+      <SettingsTabs active="Features" />
+      <FeatureManagement />
     </section>
   );
 }
@@ -603,8 +679,8 @@ function WorkspaceRouteRedirect() {
   if (workspaceId === 'emergency') {
     const routeMap = {
       whiteboard: '/emergency',
-      queues: '/emergency/queues',
-      queue: '/emergency/queues',
+      queues: '/emergency',
+      queue: '/emergency',
       ems: '/emergency/ems',
       referrals: '/emergency/referrals',
       capacity: '/emergency/capacity',
@@ -641,6 +717,17 @@ function EmergencyQueueRoute() {
 function EmergencyCapacityRoute() {
   const capacity = useEmergencyStore((state) => state.capacity);
   const queues = useEmergencyStore((state) => state.queues);
+  const rooms = useEmergencyStore((state) => state.rooms);
+  const patients = useEmergencyStore((state) => state.patients);
+  const boardingPatients = patients.filter(
+    (patient) =>
+      patient.state === PatientState.Admission ||
+      patient.flags.some((flag) => flag.type === 'PendingAdmission')
+  );
+  const dischargePipeline = patients.filter((patient) => patient.state === PatientState.Disposition);
+  const patientByRoomId = new Map(
+    patients.filter((patient) => patient.roomId).map((patient) => [patient.roomId, patient])
+  );
 
   return (
     <section className="ed-route-panel" aria-labelledby="emergency-capacity-title">
@@ -691,12 +778,279 @@ function EmergencyCapacityRoute() {
             </article>
           ))}
       </div>
+
+      <section className="ed-route-panel__list" aria-label="Room grid">
+        <header>
+          <strong>Room Grid</strong>
+          <small>
+            {capacity.availableRoomCount} available · {capacity.currentOccupancy} occupied
+          </small>
+        </header>
+        {rooms.map((room) => {
+          const patient = patientByRoomId.get(room.id);
+          return (
+            <article key={room.id}>
+              <div>
+                <strong>{room.name}</strong>
+                <span>
+                  {room.type} · {room.status}
+                  {patient ? ` · ${patient.firstName} ${patient.lastName}` : ''}
+                </span>
+              </div>
+              <small>{room.isIsolationCapable ? 'Isolation capable' : 'Standard'}</small>
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="ed-route-panel__list" aria-label="Boarding patients">
+        <header>
+          <strong>Boarding List</strong>
+          <small>{boardingPatients.length} patients</small>
+        </header>
+        {boardingPatients.length ? (
+          boardingPatients.map((patient) => (
+            <article key={patient.id}>
+              <div>
+                <strong>
+                  {patient.firstName} {patient.lastName}
+                </strong>
+                <span>
+                  {patient.mrn} · {patient.chiefComplaint}
+                </span>
+              </div>
+              <small>{patient.state}</small>
+            </article>
+          ))
+        ) : (
+          <article>
+            <div>
+              <strong>No boarding patients</strong>
+              <span>Admission queue is clear.</span>
+            </div>
+          </article>
+        )}
+      </section>
+
+      <section className="ed-route-panel__list" aria-label="Discharge pipeline">
+        <header>
+          <strong>Discharge Pipeline</strong>
+          <small>{dischargePipeline.length} disposition patients</small>
+        </header>
+        {dischargePipeline.length ? (
+          dischargePipeline.map((patient) => (
+            <article key={patient.id}>
+              <div>
+                <strong>
+                  {patient.firstName} {patient.lastName}
+                </strong>
+                <span>
+                  {patient.mrn} · {patient.chiefComplaint}
+                </span>
+              </div>
+              <small>Disposition</small>
+            </article>
+          ))
+        ) : (
+          <article>
+            <div>
+              <strong>No disposition patients</strong>
+              <span>Discharge pipeline is clear.</span>
+            </div>
+          </article>
+        )}
+      </section>
     </section>
   );
 }
 
+const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
+  ['/auth', '/emergency'],
+  ['/dashboard', '/emergency'],
+  ['/home', '/emergency'],
+  ['/assistant', '/emergency'],
+  ['/chat', '/emergency'],
+  ['/ai', '/emergency'],
+  ['/copilot', '/emergency'],
+  ['/emergency/whiteboard', '/emergency'],
+  ['/emergency/patients', '/emergency'],
+  ['/emergency/queue', '/emergency'],
+  ['/emergency/queues', '/emergency'],
+  ['/emergency/analytics', '/emergency/capacity'],
+  ['/emergency/boarding', '/emergency/capacity'],
+  ['/emergency/command-center', '/emergency'],
+  ['/emergency/copilot', '/emergency'],
+  ['/emergency/settings', '/settings'],
+  ['/workspace', '/emergency'],
+  ['/workspace/emergency', '/emergency'],
+  ['/workspace/emergency/whiteboard', '/emergency'],
+  ['/workspace/emergency/patients', '/emergency'],
+  ['/workspace/emergency/queue', '/emergency'],
+  ['/workspace/emergency/queues', '/emergency'],
+  ['/workspace/emergency/ems', '/emergency/ems'],
+  ['/workspace/emergency/referrals', '/emergency/referrals'],
+  ['/workspace/emergency/capacity', '/emergency/capacity'],
+  ['/workspace/emergency/boarding', '/emergency/capacity'],
+  ['/workspace/emergency/tools', '/emergency/tools'],
+  ['/workspace/emergency/shift-summary', '/emergency/shift'],
+  ['/workspace/emergency/shift', '/emergency/shift'],
+  ['/workspace/emergency/settings', '/settings'],
+  ['/workspace/emergency/copilot', '/emergency'],
+  ['/workspace/emergency/command-center', '/emergency'],
+  ['/tools', '/emergency/tools'],
+  ['/tools/calculators', '/emergency/tools'],
+  ['/tools/calculators/:slug', '/emergency/tools'],
+  ['/all-tools', '/emergency/tools'],
+  ['/clinical-tools', '/emergency/tools'],
+  ['/catalog', '/emergency/tools'],
+  ['/calculators', '/emergency/tools'],
+  ['/patients', '/emergency'],
+  ['/patients/*', '/emergency'],
+  ['/settings/general', '/settings'],
+  ['/settings/thresholds', '/settings'],
+  ['/settings/staff', '/settings'],
+  ['/settings/integrations', '/settings'],
+]);
+
+const FUTURE_RELEASE_ROUTES = Object.freeze([
+  ['Executive Command Center', '/executive'],
+  ['Capability Discovery', '/discover'],
+  ['Recommendations', '/recommendations'],
+  ['Automation Audit', '/automation-audit'],
+  ['Automation Analytics', '/automation-analytics'],
+  ['Workspace Directory', '/workspaces'],
+  ['Search', '/search'],
+  ['Knowledge Hub', '/knowledge-hub'],
+  ['Timeline', '/timeline'],
+  ['Digital Twin', '/digital-twin'],
+  ['Operations', '/operations'],
+  ['Digital Twin Intelligence', '/digital-twin-intelligence'],
+  ['Workflows', '/workflows'],
+  ['Workflow Mining', '/workflow-mining'],
+  ['Workspace Dependency Graph', '/workspace-dependency-graph'],
+  ['Assets', '/assets'],
+  ['Integrations', '/integrations'],
+  ['Integrations', '/integrations/*'],
+  ['Operations', '/operations/*'],
+  ['Artifacts', '/artifacts'],
+  ['AI Models', '/ai-models'],
+  ['Memory', '/memory'],
+  ['AI Memory', '/ai-memory'],
+  ['Training', '/training'],
+  ['AI Evaluation', '/ai-evaluation'],
+  ['AI Command Center', '/ai-command-center'],
+  ['Platform Learning Engine', '/platform-learning-engine'],
+  ['CareDroid Brain', '/brain'],
+  ['Business Brain', '/business-brain'],
+  ['Live Map', '/live-map'],
+  ['Medical IoT', '/medical-iot'],
+  ['Hospital Map', '/hospital-map'],
+  ['Device Fleet', '/devices'],
+  ['Documentation', '/documentation'],
+  ['Knowledge Graph', '/knowledge-graph'],
+  ['Predictive Analytics', '/predictive-analytics'],
+  ['Clinical Decision Support', '/clinical-decision-support'],
+  ['Competencies', '/competencies'],
+  ['Credentials', '/credentials'],
+  ['Simulation', '/simulation'],
+  ['Simulation Outcomes', '/simulation/outcomes'],
+  ['Simulation Scenario', '/simulation/*'],
+  ['Laboratory', '/laboratory'],
+  ['3D Viewer', '/3d-viewer'],
+  ['Protocols', '/protocols'],
+  ['Research', '/research'],
+  ['Clinical Tools', '/tools/*'],
+  ['Fleet Command', '/fleet/command'],
+  ['Fleet Map', '/fleet/map'],
+  ['Fleet Predictive Maintenance', '/fleet/predictive-maintenance'],
+  ['Fleet Route Optimizer', '/fleet/route-optimizer'],
+  ['Fleet', '/fleet/*'],
+  ['Clinical Alerts', '/clinical/alerts'],
+  ['Profile', '/profile'],
+  ['Profile', '/profile/*'],
+  ['Customer Portal', '/customer-portal'],
+  ['Knowledge Base', '/knowledge-base'],
+  ['Marketplace', '/marketplace'],
+  ['Enterprise Readiness', '/enterprise-readiness'],
+  ['Platform Admin', '/platform-admin'],
+  ['Billing', '/billing'],
+  ['Usage', '/usage'],
+  ['Organization', '/organization'],
+  ['Organization', '/organization/*'],
+  ['Tenant Admin', '/tenant-admin'],
+  ['Tenant Admin', '/tenant-admin/*'],
+  ['Organization Settings', '/settings/organization'],
+  ['Organization Packs', '/settings/organization/packs'],
+  ['Organization Assets', '/settings/organization/assets'],
+  ['Platform Analytics', '/platform-analytics'],
+  ['Customer Success', '/customer-success'],
+  ['Organization Intelligence', '/organization-intelligence'],
+  ['Success Center', '/success-center'],
+  ['Departments', '/departments'],
+  ['Service Lines', '/service-lines'],
+  ['Notifications', '/notifications'],
+  ['Notification Preferences', '/notification-preferences'],
+  ['Two-Factor Setup', '/two-factor-setup'],
+  ['Biometric Setup', '/biometric-setup'],
+  ['Welcome', '/welcome'],
+  ['Onboarding', '/onboarding'],
+  ['Products', '/products'],
+  ['Products', '/products/*'],
+  ['Asset Packs', '/asset-packs'],
+  ['Plans', '/plans'],
+  ['Specialties', '/specialties'],
+  ['Specialties', '/specialties/*'],
+  ['Care Pathways', '/care-pathways'],
+  ['Care Pathways', '/care-pathways/*'],
+  ['Agents', '/agents'],
+  ['Maturity Assessment', '/maturity-assessment'],
+  ['Outcomes', '/outcomes'],
+  ['Value Tracking', '/value-tracking'],
+  ['Product Intelligence', '/product-intelligence'],
+  ['Expansion Opportunities', '/expansion-opportunities'],
+  ['Integrations Marketplace', '/integrations-marketplace'],
+  ['Integration Readiness', '/integration-readiness'],
+  ['Configuration Studio', '/configuration-studio'],
+  ['Solution Builder', '/solution-builder'],
+  ['Consent', '/consent'],
+  ['Consent History', '/consent-history'],
+  ['Consent', '/consent/*'],
+  ['Privacy Policy', '/privacy'],
+  ['Privacy Policy', '/legal/privacy'],
+  ['Privacy', '/privacy/*'],
+  ['Terms of Service', '/terms'],
+  ['GDPR Notice', '/gdpr'],
+  ['HIPAA Notice', '/hipaa'],
+  ['Help Center', '/help'],
+  ['Version', '/version'],
+  ['Shared Tool Session', '/shared/tools/:shareId'],
+  ['Team Management', '/team'],
+  ['AI Governance', '/ai-governance'],
+  ['Security', '/security'],
+  ['Regulatory', '/regulatory'],
+  ['Equity', '/equity'],
+  ['Human Review', '/human-review'],
+  ['System Health', '/system-health'],
+  ['SaaS Health', '/saas-health'],
+  ['Feature Flags', '/feature-flags'],
+  ['Plugins', '/plugins'],
+  ['Dependency Map', '/dependency-map'],
+  ['Dependency Graph', '/dependency-graph'],
+  ['Governance Registry', '/governance-registry'],
+  ['Data Lineage', '/data-lineage'],
+  ['Self Diagnostics', '/self-diagnostics'],
+  ['Review', '/review'],
+  ['Review', '/review/*'],
+  ['Audit', '/audit'],
+  ['Audit', '/audit/*'],
+  ['Analytics', '/analytics'],
+  ['Costs', '/costs'],
+  ['Governance', '/governance'],
+  ['Governance', '/governance/*'],
+]);
+
 // ==================== ROUTING ====================
-function AppRoutes() {
+export function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
   const [isChecking, setIsChecking] = useState(true);
 
@@ -735,7 +1089,7 @@ function AppRoutes() {
         <PermissionGate
           permission={permission}
           requireAll={requireAllPermissions}
-          fallback={<Navigate to="/tools" replace />}
+          fallback={<Navigate to="/emergency/tools" replace />}
         >
           {resolvedElement}
         </PermissionGate>
@@ -756,25 +1110,12 @@ function AppRoutes() {
       publicOnly: true,
     },
     {
-      path: '/auth',
-      element: <Navigate to="/emergency" replace />,
-      publicOnly: true,
-    },
-    {
       path: '/auth-callback',
-      element: (
-        <AuthShell>
-          <AuthCallback />
-        </AuthShell>
-      ),
+      element: <AuthCallback />,
     },
     {
       path: '/auth/callback',
-      element: (
-        <AuthShell>
-          <LegacyOAuthCallbackRedirect />
-        </AuthShell>
-      ),
+      element: <LegacyOAuthCallbackRedirect />,
     },
     ...AUTH_PATH_ALIASES.map((path) => ({
       path,
@@ -784,15 +1125,6 @@ function AppRoutes() {
     {
       path: '/emergency',
       element: <EmergencyWhiteboard />,
-      requiresAuth: true,
-    },
-    {
-      path: '/emergency/queues',
-      element: (
-        <FeatureRouteGuard feature="queue_intelligence">
-          <EmergencyQueueRoute />
-        </FeatureRouteGuard>
-      ),
       requiresAuth: true,
     },
     {
@@ -823,24 +1155,6 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
-      path: '/emergency/shift',
-      element: (
-        <FeatureRouteGuard feature="shift_summary">
-          <ShiftSummary />
-        </FeatureRouteGuard>
-      ),
-      requiresAuth: true,
-    },
-    {
-      path: '/emergency/copilot',
-      element: (
-        <FeatureRouteGuard feature="ed_copilot">
-          <EmergencyCopilotRedirect />
-        </FeatureRouteGuard>
-      ),
-      requiresAuth: true,
-    },
-    {
       path: '/emergency/tools',
       element: (
         <FeatureRouteGuard feature="clinical_calculator_hub">
@@ -850,120 +1164,29 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
-      path: '/emergency/whiteboard',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/emergency/patients',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/emergency/queue',
-      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/emergency/analytics',
+      path: '/emergency/shift',
       element: (
-        <FeatureRouteGuard feature="shift_analytics">
-          <EmergencyAnalytics />
+        <FeatureRouteGuard feature="shift_summary">
+          <ShiftSummary />
         </FeatureRouteGuard>
       ),
       requiresAuth: true,
     },
     {
-      path: '/emergency/boarding',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
+      path: '/settings',
+      element: <SettingsRoute />,
       requiresAuth: true,
     },
     {
-      path: '/emergency/command-center',
-      element: (
-        <FeatureRouteGuard feature="ed_copilot">
-          <EmergencyCopilotRedirect />
-        </FeatureRouteGuard>
-      ),
+      path: '/settings/features',
+      element: <SettingsFeaturesRoute />,
       requiresAuth: true,
     },
-    {
-      path: '/emergency/settings',
-      element: <EmergencySettings />,
+    ...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
-    },
-    {
-      path: '/emergency/*',
-      element: <FutureReleaseStub label="Emergency OS module" />,
-      requiresAuth: true,
-    },
-
-    {
-      path: '/dashboard',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/executive',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/discover',
-      element: <CapabilityDiscovery />,
-      requiresAuth: true,
-    },
-    {
-      path: '/recommendations',
-      element: <RecommendationsPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/automation-audit',
-      element: <AutomationAuditTrail />,
-      requiresAuth: true,
-    },
-    {
-      path: '/automation-analytics',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace/emergency/whiteboard',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace/emergency/queue',
-      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace/emergency/queues',
-      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace/emergency/copilot',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace/emergency/settings',
-      element: <FutureReleaseStub label="Emergency OS settings" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspaces',
-      element: <FutureReleaseStub label="Emergency OS directory" />,
-      requiresAuth: true,
-    },
+    })),
     {
       path: '/workspace/:workspaceId',
       element: <WorkspaceRouteRedirect />,
@@ -974,1378 +1197,14 @@ function AppRoutes() {
       element: <WorkspaceRouteRedirect />,
       requiresAuth: true,
     },
-    {
-      path: '/search',
-      element: <SearchResultsPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/knowledge-hub',
-      element: <HealthcareKnowledgeHubPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/timeline',
-      element: <ClinicalTimelinePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/digital-twin',
-      element: <FutureReleaseStub label="Digital twin" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/operations',
-      element: <FutureReleaseStub label="Operations" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/digital-twin-intelligence',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workflows',
-      element: <WorkflowBuilderPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/department-intelligence',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workflow-mining',
-      element: <WorkflowMiningEnginePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/workspace-dependency-graph',
-      element: <WorkspaceDependencyGraphPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/assets',
-      element: <AssetLibraryPage />,
-      requiresAuth: true,
-    },
-    ...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({
+    ...FUTURE_RELEASE_ROUTES.map(([label, path]) => ({
       path,
-      element: <LegacyProtectedRouteRedirect to={to} />,
+      element: <FutureReleaseStub label={label} />,
       requiresAuth: true,
     })),
-    {
-      path: '/assistant',
-      element: (
-        <FeatureRouteGuard feature="ed_copilot">
-          <EmergencyCopilotRedirect />
-        </FeatureRouteGuard>
-      ),
-      requiresAuth: true,
-    },
-    {
-      path: '/patients',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/patients/import',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/labs/import',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/medications/import',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/observations/import',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/workspace',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.READ_PHI,
-    },
-    {
-      path: '/patients/:patientId/summary',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/timeline',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.READ_PHI,
-    },
-    {
-      path: '/patients/:patientId/events',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/risk-history',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.READ_PHI,
-    },
-    {
-      path: '/patients/:patientId/care-plan',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.READ_PHI,
-    },
-    {
-      path: '/patients/:patientId/consent',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_CONSENT,
-    },
-    {
-      path: '/patients/:patientId/source-data',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: Permission.READ_PHI,
-    },
-    {
-      path: '/patients/:patientId/review',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_REVIEW_QUEUE],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/privacy',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_PRIVACY_CENTER],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/workflows',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/workflows/:workflowId',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/documentation',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/patients/:patientId/documentation/:documentId',
-      element: <LegacyProtectedRouteRedirect to="/emergency" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/integrations',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_INTEGRATIONS,
-    },
-    {
-      path: '/integrations/fhir',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: Permission.VIEW_INTEGRATIONS,
-    },
-    {
-      path: '/integrations/hl7',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: Permission.VIEW_INTEGRATIONS,
-    },
-    {
-      path: '/integrations/source-provenance',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_INTEGRATIONS,
-    },
-    {
-      path: '/operations/observability',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/operations/deployments',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_OPERATIONS,
-    },
-    {
-      path: '/operations/service-health',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_OPERATIONS,
-    },
-    {
-      path: '/operations/incidents',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_INCIDENTS,
-    },
-    {
-      path: '/artifacts',
-      element: <Artifacts />,
-      requiresAuth: true,
-    },
-    {
-      path: '/ai-models',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/memory',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-    },
-    {
-      path: '/ai-memory',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-    },
-    {
-      path: '/training',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_ANALYTICS],
-    },
-    {
-      path: '/ai-evaluation',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/ai-command-center',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/platform-learning-engine',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/brain',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/business-brain',
-      element: <EmergencyCopilotRedirect />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/live-map',
-      element: <FutureReleaseStub label="Live map" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
-    },
-    {
-      path: '/medical-iot',
-      element: <FutureReleaseStub label="Medical IoT" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
-    },
-    {
-      path: '/hospital-map',
-      element: <FutureReleaseStub label="Hospital map" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
-    },
-    {
-      path: '/devices',
-      element: <FutureReleaseStub label="Device fleet" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
-    },
-
-    // Clinical tools: canonical routes render their product pages directly.
-    {
-      path: '/tools',
-      element: <ToolsOverview />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/catalog',
-      element: <ClinicalToolCatalog />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/tools/drug-checker',
-      element: <DrugChecker />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/lab-interpreter',
-      element: <LabInterpreter />,
-      requiresAuth: true,
-    },
-    ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
-      path,
-      element: <Calculators initialCalculatorId={calculatorSlug} />,
-      requiresAuth: true,
-    })),
-    ...LEGACY_CALCULATOR_ROUTE_ALIASES.map(({ path, to }) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to={to} />,
-      requiresAuth: true,
-    })),
-    {
-      path: '/tools/calculators',
-      element: <ToolsOverview />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/calculators/:slug',
-      element: <Calculators />,
-      requiresAuth: true,
-    },
-    {
-      path: '/documentation',
-      element: <ClinicalDocumentationAssistant />,
-      requiresAuth: true,
-    },
-    {
-      path: '/knowledge-graph',
-      element: <ClinicalKnowledgeGraph />,
-      requiresAuth: true,
-    },
-    {
-      path: '/predictive-analytics',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/clinical-decision-support',
-      element: <ClinicalDecisionSupport />,
-      requiresAuth: true,
-    },
-    {
-      path: '/competencies',
-      element: <Competencies />,
-      requiresAuth: true,
-    },
-    {
-      path: '/credentials',
-      element: <Credentials />,
-      requiresAuth: true,
-    },
-    {
-      path: '/simulation',
-      element: <FutureReleaseStub label="Simulation" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/simulation/outcomes',
-      element: <FutureReleaseStub label="Simulation outcomes" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/simulation/sepsis-deterioration',
-      element: <FutureReleaseStub label="Simulation scenario" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/simulation/:scenarioId',
-      element: <FutureReleaseStub label="Simulation scenario" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/laboratory',
-      element: <FutureReleaseStub label="Laboratory" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/3d-viewer',
-      element: <Medical3DViewer />,
-      requiresAuth: true,
-    },
-    {
-      path: '/protocols',
-      element: <Protocols />,
-      requiresAuth: true,
-    },
-    {
-      path: '/research',
-      element: <ResearchEvidenceHub />,
-      requiresAuth: true,
-      permission: Permission.USE_AI_CHAT,
-    },
-    {
-      path: '/tools/protocols',
-      element: <Protocols />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/diagnosis',
-      element: <DiagnosisAssistant />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/procedures',
-      element: <ProcedureGuide />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/ambient-scribe',
-      element: <AmbientScribe />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/calculator-recommender',
-      element: <CalculatorRecommender />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/cardiology/:toolId',
-      element: <CardiologyAssistantPage />,
-      requiresAuth: true,
-      permission: Permission.USE_AI_CHAT,
-    },
-    {
-      path: '/tools/workflow-builder-ai',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/clinical-reasoning-engine',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/why-engine',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/audit-trail-ai',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.VIEW_AUDIT_LOGS, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/soap-builder',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/clinical-dictation',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/discharge-summary-ai',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/referral-ai',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/prior-auth-ai',
-      element: <PlatformSystemPage />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/pulmonology/:toolId',
-      element: <PulmonologyAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/nephrology/:toolId',
-      element: <NephrologyAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/gastroenterology/:toolId',
-      element: <GastroenterologyAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/endocrine/:toolId',
-      element: <EndocrineMetabolicAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/neurology/:toolId',
-      element: <NeurologyAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/pediatrics-obgyn/:toolId',
-      element: <PediatricsObgynAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/psychiatry/:toolId',
-      element: <PsychiatryAssistantPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/guideline-rag',
-      element: <GuidelineRag />,
-      requiresAuth: true,
-      permission: Permission.USE_AI_CHAT,
-    },
-    {
-      path: '/tools/differential-ai',
-      element: <DifferentialAi />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/timeline-ai',
-      element: <TimelineAi />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/patient-summary-ai',
-      element: <PatientSummaryAi />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/order-set-ai',
-      element: <OrderSetAi />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/ai-explainability',
-      element: <AiExplainability />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/tools/clinical-audit',
-      element: <ClinicalAudit />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-
-    {
-      path: '/fleet/command',
-      element: <FutureReleaseStub label="Fleet command" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/fleet/map',
-      element: <FutureReleaseStub label="Fleet map" />,
-      requiresAuth: true,
-      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
-    },
-    {
-      path: '/fleet/predictive-maintenance',
-      element: <FutureReleaseStub label="Fleet predictive maintenance" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/fleet/route-optimizer',
-      element: <FutureReleaseStub label="Fleet route optimizer" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tools/*',
-      element: <ToolNotFound />,
-      requiresAuth: true,
-    },
-    {
-      path: '/fleet/*',
-      element: <FutureReleaseStub label="Fleet" />,
-      requiresAuth: true,
-    },
-
-    // Clinical Intelligence routes
-    {
-      path: '/clinical/alerts',
-      element: <ClinicalAlertsPage />,
-      requiresAuth: true,
-    },
-
-    {
-      path: '/profile',
-      element: <Profile />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/settings',
-      element: <ProfileSettings />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/activity',
-      element: <ProfileActivity />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/preferences',
-      element: <ProfilePreferences />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/tool-preferences',
-      element: <ProfileToolPreferences />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/workspaces',
-      element: <ProfileWorkspaces />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile/security',
-      element: <ProfileSecurity />,
-      requiresAuth: true,
-    },
-    {
-      path: '/profile-settings',
-      element: <Navigate to="/profile/settings" replace />,
-      requiresAuth: true,
-    },
-    {
-      path: '/settings',
-      element: <EmergencySettings />,
-      requiresAuth: true,
-    },
-    {
-      path: '/settings/features',
-      element: <FeatureManagement />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/customer-portal',
-      element: <CustomerPortalPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/knowledge-base',
-      element: <KnowledgeBasePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/marketplace',
-      element: <MarketplacePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/enterprise-readiness',
-      element: <EnterpriseReadinessPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/platform-admin',
-      element: <PlatformAdminPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/billing',
-      element: <BillingPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/usage',
-      element: <UsagePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/organization',
-      element: <OrganizationDashboard />,
-      requiresAuth: true,
-    },
-    {
-      path: '/organization/settings',
-      element: <OrganizationSettings />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tenant-admin',
-      element: <TenantAdministrationCenter />,
-      requiresAuth: true,
-    },
-    {
-      path: '/tenant-admin/workspaces',
-      element: <TenantAdministrationCenter />,
-      requiresAuth: true,
-    },
-    {
-      path: '/settings/organization',
-      element: <OrganizationSettings />,
-      requiresAuth: true,
-    },
-    {
-      path: '/settings/organization/packs',
-      element: <PackMarketplace />,
-      requiresAuth: true,
-    },
-    {
-      path: '/settings/organization/assets',
-      element: <AssetLifecycleAdmin />,
-      requiresAuth: true,
-    },
-    {
-      path: '/platform-analytics',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/customer-success',
-      element: <CustomerSuccessDashboard />,
-      requiresAuth: true,
-    },
-    {
-      path: '/organization-intelligence',
-      element: <OrganizationIntelligenceProfile />,
-      requiresAuth: true,
-    },
-    {
-      path: '/success-center',
-      element: <SuccessCenterPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/departments',
-      element: <DepartmentsPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/service-lines',
-      element: <ServiceLinesPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/notifications',
-      element: <NotificationCenterPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/notification-preferences',
-      element: <NotificationPreferences />,
-      requiresAuth: true,
-    },
-
-    {
-      path: '/two-factor-setup',
-      element: <TwoFactorSetup />,
-      requiresAuth: true,
-    },
-    {
-      path: '/biometric-setup',
-      element: <BiometricSetup />,
-      requiresAuth: true,
-    },
-    {
-      path: '/welcome',
-      element: <Welcome />,
-      requiresAuth: true,
-    },
-    {
-      path: '/onboarding',
-      element: <OrganizationOnboardingPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/products',
-      element: <ProductsIndexPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/products/:slug',
-      element: <ProductDetailPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/asset-packs',
-      element: <PackMarketplace />,
-      requiresAuth: true,
-    },
-    {
-      path: '/plans',
-      element: <CommercialPlansPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/specialties',
-      element: <SpecialtiesIndexPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/specialties/:slug',
-      element: <SpecialtyDetailPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/care-pathways',
-      element: <CarePathwaysIndexPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/care-pathways/:slug',
-      element: <CarePathwayDetailPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/agents',
-      element: <AgentsRegistryPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/maturity-assessment',
-      element: <MaturityAssessmentPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/outcomes',
-      element: <OutcomesDashboardPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/value-tracking',
-      element: <ValueTrackingPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/product-intelligence',
-      element: <ProductIntelligenceLayerPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/expansion-opportunities',
-      element: <CustomerExpansionOpportunitiesPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/integrations-marketplace',
-      element: <IntegrationsMarketplacePage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/integration-readiness',
-      element: <IntegrationReadinessPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/configuration-studio',
-      element: <ConfigurationStudioPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/solution-builder',
-      element: <HospitalSolutionBuilderPage />,
-      requiresAuth: true,
-    },
-
-    {
-      path: '/consent',
-      element: <ConsentFlow />,
-      requiresAuth: true,
-    },
-    {
-      path: '/consent-history',
-      element: <ConsentHistory />,
-      requiresAuth: true,
-    },
-
-    {
-      path: '/privacy',
-      element: (
-        <PublicShell>
-          <PrivacyPolicy />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/legal/privacy',
-      element: (
-        <PublicShell>
-          <PrivacyPolicy />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/privacy/access-log',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_PHI_ACCESS_LOGS,
-    },
-    {
-      path: '/privacy/requests',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_PRIVACY_CENTER,
-    },
-    {
-      path: '/consent/:patientId',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_CONSENT,
-    },
-    {
-      path: '/terms',
-      element: (
-        <PublicShell>
-          <TermsOfService />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/gdpr',
-      element: (
-        <PublicShell>
-          <GDPRNotice />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/hipaa',
-      element: (
-        <PublicShell>
-          <HIPAANotice />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/help',
-      element: (
-        <PublicShell>
-          <HelpCenter />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/version',
-      element: (
-        <PublicShell>
-          <Version />
-        </PublicShell>
-      ),
-    },
-    {
-      path: '/shared/tools/:shareId',
-      element: (
-        <PublicShell>
-          <SharedToolSession />
-        </PublicShell>
-      ),
-    },
-
-    {
-      path: '/team',
-      element: <TeamManagement />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_USERS,
-    },
-    {
-      path: '/ai-governance',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_GOVERNANCE,
-    },
-    {
-      path: '/security',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AI_SECURITY,
-    },
-    {
-      path: '/regulatory',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_REGULATORY,
-    },
-    {
-      path: '/equity',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_EQUITY_METRICS,
-    },
-    {
-      path: '/human-review',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_REVIEW_QUEUE,
-    },
-    {
-      path: '/system-health',
-      element: <SystemHealth />,
-      requiresAuth: true,
-      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/saas-health',
-      element: <SaasHealthCenter />,
-      requiresAuth: true,
-      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/feature-flags',
-      element: <FeatureFlagCenter />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/plugins',
-      element: <PluginMarketplace />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/dependency-map',
-      element: <DependencyMap />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/dependency-graph',
-      element: <DependencyGraph />,
-      requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
-    },
-    {
-      path: '/governance-registry',
-      element: <GovernanceRegistry />,
-      requiresAuth: true,
-      permission: Permission.VIEW_GOVERNANCE,
-    },
-    {
-      path: '/data-lineage',
-      element: <DataLineageExplorer />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-    {
-      path: '/self-diagnostics',
-      element: <PlatformSelfDiagnostics />,
-      requiresAuth: true,
-      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/review',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_REVIEW_QUEUE,
-    },
-    {
-      path: '/review/clinical',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_CLINICAL_AI,
-    },
-    {
-      path: '/review/documentation',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_DOCUMENTATION,
-    },
-    {
-      path: '/review/privacy',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_PRIVACY_REQUESTS,
-    },
-    {
-      path: '/review/governance',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_GOVERNANCE,
-    },
-    {
-      path: '/audit',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-    {
-      path: '/audit/ai',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-    {
-      path: '/audit/phi',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_PHI_AUDIT,
-    },
-    {
-      path: '/audit/integrations',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-    {
-      path: '/audit/policy',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
-    {
-      path: '/analytics',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/costs',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/governance',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_GOVERNANCE,
-    },
-    {
-      path: '/governance/clinical',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_GOVERNANCE,
-    },
-    {
-      path: '/governance/clinical/policies',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_CLINICAL_POLICY,
-    },
-    {
-      path: '/governance/clinical/release-gates',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.APPROVE_CLINICAL_POLICY,
-    },
-    {
-      path: '/governance/clinical/safety-findings',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_SAFETY_FINDINGS,
-    },
-    {
-      path: '/governance/ai-security',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_AI_SECURITY,
-    },
-    {
-      path: '/governance/ai-security/prompt-firewall',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_AI_SECURITY,
-    },
-    {
-      path: '/governance/ai-security/model-access',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_AI_SECURITY,
-    },
-    {
-      path: '/governance/ai-security/incidents',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_AI_SECURITY_INCIDENTS,
-    },
-    {
-      path: '/governance/regulatory',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_REGULATORY,
-    },
-    {
-      path: '/governance/regulatory/capabilities',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_REGULATORY,
-    },
-    {
-      path: '/governance/regulatory/intended-use',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_REGULATORY,
-    },
-    {
-      path: '/governance/regulatory/evidence',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.APPROVE_REGULATORY,
-    },
-    {
-      path: '/governance/equity',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_EQUITY_METRICS,
-    },
-    {
-      path: '/governance/equity/metrics',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_EQUITY_METRICS,
-    },
-    {
-      path: '/governance/equity/cohorts',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_EQUITY_COHORTS,
-    },
-    {
-      path: '/governance/equity/findings',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_BIAS_FINDINGS,
-    },
-    {
-      path: '/governance/equity/reports',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.EXPORT_EQUITY_REPORTS,
-    },
-    {
-      path: '/governance/validation',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_VALIDATION,
-    },
-    {
-      path: '/governance/validation/scenarios',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_VALIDATION,
-    },
-    {
-      path: '/governance/validation/synthetic-patients',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_VALIDATION,
-    },
-    {
-      path: '/governance/validation/runs',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.RUN_VALIDATION,
-    },
-    {
-      path: '/governance/validation/release-gates',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.APPROVE_VALIDATION,
-    },
-    {
-      path: '/governance/ai',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_GOVERNANCE,
-    },
-    {
-      path: '/governance/model-usage',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS,
-    },
-    {
-      path: '/governance/costs',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: [Permission.MANAGE_SUBSCRIPTIONS, Permission.VIEW_ANALYTICS],
-      requireAllPermissions: true,
-    },
-    {
-      path: '/governance/clinical-safety',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.REVIEW_SAFETY_FINDINGS,
-    },
-    {
-      path: '/governance/consent',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.MANAGE_CONSENT,
-    },
-    {
-      path: '/governance/privacy',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_PRIVACY_CENTER,
-    },
-
     {
       path: '*',
-      element: (
-        <ToolNotFound
-          title="Page not found"
-          description="The requested route does not exist in this workspace."
-        />
-      ),
+      element: <Navigate to="/emergency" replace />,
       requiresAuth: true,
     },
   ];
@@ -2375,17 +1234,15 @@ function App() {
                         <WhiteLabelProvider>
                           <ConversationProvider>
                             <SystemConfigProvider>
-                              <EmergencyDepartmentProvider>
-                                <OfflineProvider>
-                                  <ErrorBoundary>
-                                    <Suspense fallback={<PageLoader />}>
-                                      <AppRoutes />
-                                    </Suspense>
-                                    <FeatureFlagSyncToasts />
-                                    <NotificationToasts />
-                                  </ErrorBoundary>
-                                </OfflineProvider>
-                              </EmergencyDepartmentProvider>
+                              <OfflineProvider>
+                                <ErrorBoundary>
+                                  <Suspense fallback={<PageLoader />}>
+                                    <AppRoutes />
+                                  </Suspense>
+                                  <FeatureFlagSyncToasts />
+                                  <NotificationToasts />
+                                </ErrorBoundary>
+                              </OfflineProvider>
                             </SystemConfigProvider>
                           </ConversationProvider>
                         </WhiteLabelProvider>

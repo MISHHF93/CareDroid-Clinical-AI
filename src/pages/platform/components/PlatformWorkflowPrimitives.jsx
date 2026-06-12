@@ -2,7 +2,7 @@ import ApiStateBanner from '../../../components/ApiStateBanner';
 
 export function PlatformPageShell({ eyebrow, title, summary, error, children }) {
   return (
-    <main className="platform-system-page" aria-labelledby="platform-workflow-title">
+    <section className="platform-system-page" aria-labelledby="platform-workflow-title">
       <section className="platform-system-hero">
         <div>
           <p className="platform-system-eyebrow">{eyebrow}</p>
@@ -12,7 +12,7 @@ export function PlatformPageShell({ eyebrow, title, summary, error, children }) 
       </section>
       <ApiStateBanner error={error} />
       {children}
-    </main>
+    </section>
   );
 }
 

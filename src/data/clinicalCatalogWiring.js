@@ -354,31 +354,31 @@ export const NLU_HUB_ONLY_TOOL_IDS = Object.freeze(
     .filter((toolId) => !BUILTIN_CALC_ID_TO_REGISTRY_ID[toolId])
 );
 
-/** Workspace presets from WorkspaceCreationModal.jsx */
+/** Workspace presets used by workspace-aware catalog tests. */
 export const workspaceTemplateCatalog = [
   {
     id: 'workspace-emergency',
     name: 'Emergency Medicine workspace',
     toolIds: ['drug-check', 'sofa-score', 'lab-interp', 'protocols', 'calc-gfr'],
-    source: 'WorkspaceCreationModal.jsx',
+    source: 'clinicalCatalogWiring.js',
   },
   {
     id: 'workspace-icu',
     name: 'ICU / Critical Care workspace',
     toolIds: ['sofa-score', 'lab-interp', 'drug-check', 'calc-gfr', 'protocols'],
-    source: 'WorkspaceCreationModal.jsx',
+    source: 'clinicalCatalogWiring.js',
   },
   {
     id: 'workspace-ambulatory',
     name: 'Ambulatory Care workspace',
     toolIds: ['diagnosis', 'drug-check', 'protocols', 'calc-bmi', 'calc-chads2vasc'],
-    source: 'WorkspaceCreationModal.jsx',
+    source: 'clinicalCatalogWiring.js',
   },
   {
     id: 'workspace-oncology',
     name: 'Oncology workspace',
     toolIds: ['drug-check', 'lab-interp', 'protocols', 'calculators'],
-    source: 'WorkspaceCreationModal.jsx',
+    source: 'clinicalCatalogWiring.js',
   },
 ];
 

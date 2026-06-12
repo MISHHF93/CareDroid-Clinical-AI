@@ -224,7 +224,7 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/audit/my-logs': {
     strategy: 'expose-recommended',
     reason: 'User activity',
-    clientHint: 'profile / AuditLogs.jsx',
+    clientHint: 'Profile / Settings audit activity',
   },
   'GET /api/audit/phi-access': { strategy: 'deferred', reason: 'Compliance officer view' },
 

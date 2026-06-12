@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../../../lib/features/featureRegistry';
 import { useFeatureStore } from '../../../store/featureStore';
+import { FEATURE_TOGGLE_BACKEND_QUEUE } from '../../data/featureToggleBackendQueue';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
 import './FeatureManagement.css';
 
@@ -166,6 +167,19 @@ const BACKEND_SURFACING_QUEUE = [
       ['Download format and audit event verified', false],
     ],
   },
+  ...FEATURE_TOGGLE_BACKEND_QUEUE.map((item) => ({
+    featureId: item.category === 'clinical' ? 'clinical_calculator_hub' : 'emergency_whiteboard',
+    method: item.method,
+    path: item.path,
+    surfacesIn: item.targetSurface,
+    effort: 'Medium',
+    checklist: [
+      ['Backend endpoint exists', true],
+      ['Data-layer owner identified', true],
+      [item.reason, false],
+      ['Feature surface reviewed', false],
+    ],
+  })),
 ];
 
 const SECTION_ORDER = ['Operational', 'Clinical', 'AI', 'Backend', 'Admin'];
@@ -426,7 +440,7 @@ export default function FeatureManagement() {
   };
 
   return (
-    <main className="feature-toggle-panel" aria-label="Feature management">
+    <section className="feature-toggle-panel" aria-label="Feature management">
       <header className="feature-toggle-panel__header">
         <div>
           <span className="feature-toggle-panel__eyebrow">Emergency OS</span>
@@ -481,7 +495,7 @@ export default function FeatureManagement() {
               .join(', ');
             return (
               <article
-                key={row.feature.id}
+                key={`${row.feature.id}-${row.method}-${row.path}`}
                 className={[
                   'feature-toggle-panel__surfacing-card',
                   row.enabled ? 'feature-toggle-panel__surfacing-card--enabled' : '',
@@ -726,6 +740,6 @@ export default function FeatureManagement() {
           </section>
         </div>
       ) : null}
-    </main>
+    </section>
   );
 }

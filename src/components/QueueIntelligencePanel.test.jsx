@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { selectQueueBottleneckAlert, useEmergencyStore } from '../../store/emergencyStore';
 
 import './QueueIntelligencePanel.css';
 
@@ -55,7 +55,7 @@ describe('QueueIntelligencePanel', () => {
     await waitFor(() => {
       expect(screen.getByText(/Bottleneck: Waiting — 3 patients, avg 45min/i)).toBeInTheDocument();
     });
-    expect(useEmergencyStore.getState().bottleneckAlert).toMatchObject({
+    expect(selectQueueBottleneckAlert(useEmergencyStore.getState())).toMatchObject({
       queue: 'Waiting',
       severity: 'Red',
     });

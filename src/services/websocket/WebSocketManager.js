@@ -38,7 +38,6 @@ class WebSocketManager {
         this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
-          console.log('[WebSocket] Connected');
           this.isConnected = true;
           this.isConnecting = false;
           this.reconnectAttempts = 0;
@@ -58,7 +57,6 @@ class WebSocketManager {
         };
 
         this.ws.onclose = () => {
-          console.log('[WebSocket] Disconnected');
           this.isConnected = false;
           this.isConnecting = false;
           this.stopHeartbeat();
@@ -183,7 +181,6 @@ class WebSocketManager {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = this.reconnectDelay * this.reconnectAttempts;
-      console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
       setTimeout(() => {
         this.connect(token).catch((error) => {

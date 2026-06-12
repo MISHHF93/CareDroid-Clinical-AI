@@ -5,6 +5,8 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../../config/backendApiCapabilities';
+import { makeDisabledCapabilityResponse } from '../../services/disabledBackendMocks';
+import { reportApiError } from '../../services/apiErrorHandling';
 
 /**
  * TeamManagement Page Component
@@ -32,15 +34,31 @@ export const TeamManagement = () => {
 
   const requireTeamApi = () => {
     if (teamApiEnabled) return true;
+    const fallback = makeDisabledCapabilityResponse('teamManagement', '/api/team/users', {
+      users: [],
+    });
     setError(UNSUPPORTED_CAPABILITY_MESSAGE);
+    reportApiError({
+      title: 'Team management unavailable',
+      message: fallback.message,
+      endpoint: fallback.endpoint,
+    });
     return false;
   };
 
   const fetchUsers = async () => {
     if (!teamApiEnabled) {
+      const fallback = makeDisabledCapabilityResponse('teamManagement', '/api/team/users', {
+        users: [],
+      });
       setLoading(false);
       setError(UNSUPPORTED_CAPABILITY_MESSAGE);
       setUsers([]);
+      reportApiError({
+        title: 'Team users API unavailable',
+        message: fallback.message,
+        endpoint: fallback.endpoint,
+      });
       return;
     }
 
@@ -59,6 +77,12 @@ export const TeamManagement = () => {
       setError(null);
     } catch (err) {
       setError(err.message);
+      reportApiError({
+        title: 'Team users load failed',
+        message: err.message,
+        error: err,
+        endpoint: '/api/team/users',
+      });
     } finally {
       setLoading(false);
     }
@@ -119,6 +143,12 @@ export const TeamManagement = () => {
       setSelectedUser(null);
     } catch (err) {
       setError(err.message);
+      reportApiError({
+        title: 'Team user update failed',
+        message: err.message,
+        error: err,
+        endpoint: `/api/team/users/${selectedUser.id}`,
+      });
     }
   };
 
@@ -144,6 +174,12 @@ export const TeamManagement = () => {
       setUsers(prev => prev.filter(u => u.id !== userId));
     } catch (err) {
       setError(err.message);
+      reportApiError({
+        title: 'Team user delete failed',
+        message: err.message,
+        error: err,
+        endpoint: `/api/team/users/${userId}`,
+      });
     }
   };
 
@@ -171,6 +207,12 @@ export const TeamManagement = () => {
       fetchUsers();
     } catch (err) {
       setError(err.message);
+      reportApiError({
+        title: 'Team invitation failed',
+        message: err.message,
+        error: err,
+        endpoint: '/api/team/invite',
+      });
     }
   };
 

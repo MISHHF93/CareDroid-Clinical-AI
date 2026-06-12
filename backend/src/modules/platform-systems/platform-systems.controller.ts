@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Optional,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -27,6 +28,285 @@ export class PlatformSystemsController {
     private readonly platformSystemsService: PlatformSystemsService,
     @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
   ) {}
+
+  private emergencyPatients: Record<string, any>[] = [
+    {
+      id: 'pt-001',
+      mrn: 'MRN-100001',
+      firstName: 'Maya',
+      lastName: 'Singh',
+      dob: '1978-04-18',
+      age: 48,
+      sex: 'Female',
+      arrivalTime: '2026-06-10T18:08:00-04:00',
+      triageTime: null,
+      lastAssessedTime: '2026-06-10T18:14:00-04:00',
+      chiefComplaint: 'Chest pain',
+      complaintCategory: 'Cardiac',
+      state: 'Assessment',
+      priority: 'P2',
+      vitals: {
+        hr: 104,
+        bpSystolic: 148,
+        bpDiastolic: 88,
+        spo2: 97,
+        temp: 36.8,
+        rr: 20,
+        gcs: 15,
+        pain: 5,
+        recordedAt: '2026-06-10T18:14:00-04:00',
+      },
+      assignedStaffId: 'staff-priya-nair',
+      roomId: 'room-assessment-1',
+      flags: [
+        {
+          type: 'HighRisk',
+          reason: 'High priority chest pain under assessment.',
+          detectedAt: '2026-06-10T18:10:00-04:00',
+          severity: 'Warning',
+        },
+      ],
+      timeline: [
+        {
+          id: 'event-pt-001-arrival',
+          patientId: 'pt-001',
+          type: 'Arrival',
+          timestamp: '2026-06-10T18:08:00-04:00',
+          summary: 'Arrived with exertional chest pain.',
+        },
+      ],
+      notes: [],
+    },
+  ];
+
+  private emergencyStaff: Record<string, any>[] = [
+    {
+      id: 'staff-priya-nair',
+      firstName: 'Priya',
+      lastName: 'Nair',
+      role: 'Attending',
+      status: 'OnShift',
+      shiftId: 'shift-evening-2026-06-10',
+      assignedPatientIds: ['pt-001'],
+      currentRoomId: 'room-assessment-1',
+    },
+  ];
+
+  private emergencyRooms: Record<string, any>[] = [
+    {
+      id: 'room-assessment-1',
+      name: 'Assessment 1',
+      type: 'Assessment',
+      status: 'Occupied',
+      currentPatientId: 'pt-001',
+      isIsolationCapable: false,
+    },
+    {
+      id: 'room-resus-1',
+      name: 'Resus 1',
+      type: 'Resuscitation',
+      status: 'Available',
+      currentPatientId: null,
+      isIsolationCapable: true,
+    },
+  ];
+
+  private emergencyShift: Record<string, any> = {
+    id: 'shift-evening-2026-06-10',
+    name: 'Evening ED Shift',
+    startTime: '2026-06-10T15:00:00-04:00',
+    endTime: '2026-06-10T23:00:00-04:00',
+    status: 'Active',
+    chargeStaffId: 'staff-priya-nair',
+    staffIds: ['staff-priya-nair'],
+    handoffNotes: [],
+  };
+
+  private emergencyEmsUnits: Record<string, any>[] = [
+    {
+      id: 'ems-unit-22',
+      callSign: 'TPS Medic 22',
+      agency: 'Toronto Paramedic Services',
+      status: 'Inbound',
+      crewStaffIds: [],
+      activeArrivalId: 'ems-arrival-001',
+      lastKnownLocation: 'Bay Street',
+    },
+  ];
+
+  private emergencyEmsArrivals: Record<string, any>[] = [
+    {
+      id: 'ems-arrival-001',
+      unitId: 'ems-unit-22',
+      unitName: 'TPS Medic 22',
+      crewNames: ['A. Gomez', 'L. Patel'],
+      patientAge: 68,
+      patientSex: 'Male',
+      chiefComplaint: 'Shortness of breath',
+      eta: 7,
+      severity: 'High',
+      dispatchTime: '2026-06-10T18:04:00-04:00',
+      estimatedArrivalTime: '2026-06-10T18:18:00-04:00',
+      notes: 'COPD history, oxygen started en route.',
+      status: 'Inbound',
+      prearrivalComplaint: 'Respiratory distress',
+      priority: 'P2',
+    },
+  ];
+
+  private emergencyReferrals: Record<string, any>[] = [
+    {
+      id: 'ref-pt-001-cardiology',
+      patientId: 'pt-001',
+      requestingStaffId: 'staff-priya-nair',
+      targetDepartment: 'Cardiology',
+      urgency: 'Urgent',
+      reason: 'Chest pain with elevated risk features.',
+      clinicalSummary: 'Serial ECG and troponin pathway requested.',
+      status: 'Sent',
+      requestedAt: '2026-06-10T18:20:00-04:00',
+      workflow: 'Referral',
+    },
+  ];
+
+  @Get('patients')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get Emergency OS patients for the active tenant workspace' })
+  getEmergencyPatients() {
+    return this.emergencyPatients;
+  }
+
+  @Get('patients/:patientId')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get one Emergency OS patient by id' })
+  getEmergencyPatient(@Param('patientId') patientId: string) {
+    return this.emergencyPatients.find((patient) => patient.id === patientId) || null;
+  }
+
+  @Post('patients')
+  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
+  @ApiOperation({ summary: 'Create an Emergency OS intake patient' })
+  createEmergencyPatient(@Body() body: Record<string, any>) {
+    const now = new Date().toISOString();
+    const patientId = body.id || `pt-${Date.now()}`;
+    const patient = {
+      id: patientId,
+      mrn: body.mrn || `MRN-${Math.floor(100000 + Math.random() * 900000)}`,
+      firstName: body.firstName || 'New',
+      lastName: body.lastName || 'Patient',
+      dob: body.dob || '1980-01-01',
+      age: body.age || 46,
+      sex: body.sex || 'Unknown',
+      arrivalTime: body.arrivalTime || now,
+      triageTime: body.triageTime || null,
+      lastAssessedTime: body.lastAssessedTime || null,
+      chiefComplaint: body.chiefComplaint || body.complaint || 'Unspecified complaint',
+      complaintCategory: body.complaintCategory || body.chiefComplaint || 'General',
+      state: body.state || 'Triage',
+      priority: body.priority || 'P3',
+      vitals: body.vitals || {
+        hr: null,
+        bpSystolic: null,
+        bpDiastolic: null,
+        spo2: null,
+        temp: null,
+        rr: null,
+        gcs: null,
+        pain: null,
+        recordedAt: now,
+      },
+      assignedStaffId: body.assignedStaffId || null,
+      roomId: body.roomId || null,
+      flags: body.flags || [],
+      timeline: [
+        {
+          id: `event-${Date.now()}`,
+          patientId,
+          type: 'Arrival',
+          timestamp: now,
+          summary: 'Created through Emergency OS intake API.',
+        },
+      ],
+      notes: body.notes || [],
+    };
+    this.emergencyPatients = [...this.emergencyPatients, patient];
+    return patient;
+  }
+
+  @Patch('patients/:patientId')
+  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
+  @ApiOperation({ summary: 'Patch an Emergency OS patient' })
+  updateEmergencyPatient(
+    @Param('patientId') patientId: string,
+    @Body() body: Record<string, any>,
+  ) {
+    let updatedPatient: Record<string, any> | null = null;
+    this.emergencyPatients = this.emergencyPatients.map((patient) => {
+      if (patient.id !== patientId) return patient;
+      updatedPatient = { ...patient, ...body, id: patient.id };
+      return updatedPatient;
+    });
+    return updatedPatient;
+  }
+
+  @Get('staff')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get Emergency OS staff roster' })
+  getEmergencyStaff() {
+    return this.emergencyStaff;
+  }
+
+  @Get('rooms')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get Emergency OS room grid' })
+  getEmergencyRooms() {
+    return this.emergencyRooms;
+  }
+
+  @Get('shift')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get active Emergency OS shift' })
+  getEmergencyShift() {
+    return this.emergencyShift;
+  }
+
+  @Get('ems')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get Emergency OS EMS unit and arrival state' })
+  getEmergencyEms() {
+    return {
+      units: this.emergencyEmsUnits,
+      arrivals: this.emergencyEmsArrivals,
+    };
+  }
+
+  @Get('referrals')
+  @Permissions(Permission.READ_PHI)
+  @ApiOperation({ summary: 'Get Emergency OS referrals' })
+  getEmergencyReferrals() {
+    return this.emergencyReferrals;
+  }
+
+  @Post('referrals')
+  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
+  @ApiOperation({ summary: 'Create an Emergency OS referral' })
+  createEmergencyReferral(@Body() body: Record<string, any>) {
+    const now = new Date().toISOString();
+    const referral = {
+      id: body.id || `ref-${body.patientId || 'patient'}-${Date.now()}`,
+      patientId: body.patientId,
+      requestingStaffId: body.requestingStaffId || 'staff-priya-nair',
+      targetDepartment: body.targetDepartment || 'Other',
+      urgency: body.urgency || 'Routine',
+      reason: body.reason || 'Referral requested from Emergency OS.',
+      clinicalSummary: body.clinicalSummary || body.reason || 'Clinical summary pending.',
+      status: body.status || 'Sent',
+      requestedAt: body.requestedAt || now,
+      workflow: body.workflow || 'Referral',
+    };
+    this.emergencyReferrals = [...this.emergencyReferrals, referral];
+    return referral;
+  }
 
   @Get('platform-systems/capabilities/:capabilityId')
   @Permissions(Permission.USE_AI_CHAT)

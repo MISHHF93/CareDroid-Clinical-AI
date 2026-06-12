@@ -108,8 +108,6 @@ export class ChatService {
   }
 
   async processQuery(patientId: string, message: string, context?: any): Promise<QueryResponse> {
-    console.log(`💬 Processing query for patient ${patientId}: "${message}"`);
-
     const response = await this.generateAIResponse(message, context);
 
     return {

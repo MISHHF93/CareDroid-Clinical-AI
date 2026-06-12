@@ -55,7 +55,7 @@ export default function GovernanceRegistry() {
   );
 
   return (
-    <main className="governance-registry" aria-labelledby="governance-registry-title">
+    <section className="governance-registry" aria-labelledby="governance-registry-title">
       <header className="governance-registry-hero">
         <p className="governance-registry-eyebrow">Platform Governance Registry</p>
         <h1 id="governance-registry-title">Platform Governance Registry</h1>
@@ -172,6 +172,6 @@ export default function GovernanceRegistry() {
           {!rows.length && <p>No assets match the current governance registry filters.</p>}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

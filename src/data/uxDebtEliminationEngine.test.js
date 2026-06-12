@@ -21,7 +21,6 @@ function currentSourceSnapshot() {
     appShellJsx: read('layout/AppShell.jsx'),
     appShellCss: read('layout/AppShell.css'),
     quickCommandCss: read('components/QuickCommandLauncher.css'),
-    sidebarJsx: read('components/Sidebar.jsx'),
     drawerJsx: read('components/ui/Drawer.jsx'),
   };
 }
@@ -77,10 +76,9 @@ describe('UX Debt Elimination Engine', () => {
       responsiveViewports: [{ width: 390 }],
       manualQaSections: [],
       sourceSnapshot: {
-        appShellJsx: '<Sidebar /><nav className="app-shell-bottom-nav" />',
+        appShellJsx: '<aside className="ed-nav-rail" /><nav className="app-shell-bottom-nav" />',
         appShellCss: '.app-shell-bottom-nav { min-height: var(--app-bottom-nav-height, 56px); }',
         quickCommandCss: 'bottom: var(--app-bottom-nav-height, 56px);',
-        sidebarJsx: '<aside />',
         drawerJsx: '<div className="drawer" />',
       },
     });

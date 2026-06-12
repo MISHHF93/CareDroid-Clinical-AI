@@ -3,6 +3,7 @@
  */
 
 import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { reportApiError } from './apiErrorHandling';
 
 /**
  * @param {Record<string, string|number|undefined>} [query]
@@ -30,6 +31,12 @@ export async function fetchProtocols(query = {}) {
     const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
     return { ok: true, items, total: data?.total ?? items.length, fromServer: true };
   } catch (error) {
+    reportApiError({
+      title: 'Protocols load failed',
+      message: 'Unable to load protocol reference data.',
+      error,
+      endpoint: path,
+    });
     return {
       ok: false,
       items: [],
@@ -48,6 +55,12 @@ export async function fetchProtocolCategories() {
     const categories = Array.isArray(data) ? data : [];
     return { ok: true, categories };
   } catch (error) {
+    reportApiError({
+      title: 'Protocol categories load failed',
+      message: 'Unable to load protocol categories.',
+      error,
+      endpoint: '/api/protocols/categories',
+    });
     return { ok: false, categories: [], error: getApiErrorMessage(error) };
   }
 }
@@ -77,10 +90,65 @@ export async function fetchDrugs(query = {}) {
     const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
     return { ok: true, items, total: data?.total ?? items.length };
   } catch (error) {
+    reportApiError({
+      title: 'Drug list load failed',
+      message: 'Unable to load drug reference data.',
+      error,
+      endpoint: path,
+    });
     return {
       ok: false,
       items: [],
       error: getApiErrorMessage(error),
     };
+  }
+}
+
+/**
+ * @returns {Promise<import('../../types/api').DrugCategoriesResponse>}
+ */
+export async function fetchDrugCategories() {
+  try {
+    const { response, data } = await apiFetchJson('/api/drugs/categories');
+    if (!response.ok) {
+      return { ok: false, categories: [], error: getApiErrorMessage(null, response) };
+    }
+    const categories = Array.isArray(data) ? data : Array.isArray(data?.categories) ? data.categories : [];
+    return { ok: true, categories };
+  } catch (error) {
+    reportApiError({
+      title: 'Drug categories load failed',
+      message: 'Unable to load drug categories.',
+      error,
+      endpoint: '/api/drugs/categories',
+    });
+    return { ok: false, categories: [], error: getApiErrorMessage(error) };
+  }
+}
+
+/**
+ * @param {string} drugId
+ * @returns {Promise<import('../../types/api').DrugDetailResponse>}
+ */
+export async function fetchDrugById(drugId) {
+  if (!drugId) {
+    return { ok: false, drug: null, error: 'Drug ID is required.' };
+  }
+
+  const endpoint = `/api/drugs/${encodeURIComponent(drugId)}`;
+  try {
+    const { response, data } = await apiFetchJson(endpoint);
+    if (!response.ok) {
+      return { ok: false, drug: null, error: getApiErrorMessage(null, response) };
+    }
+    return { ok: true, drug: data || null };
+  } catch (error) {
+    reportApiError({
+      title: 'Drug detail load failed',
+      message: 'Unable to load drug details.',
+      error,
+      endpoint,
+    });
+    return { ok: false, drug: null, error: getApiErrorMessage(error) };
   }
 }

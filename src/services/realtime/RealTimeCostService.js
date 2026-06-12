@@ -36,8 +36,6 @@ class RealTimeCostService {
     this.wsManager.subscribe('TRENDING_TOOLS', (payload) => {
       this.handleTrendingTools(payload);
     });
-
-    console.log('[RealTimeCostService] Initialized');
   }
 
   /**

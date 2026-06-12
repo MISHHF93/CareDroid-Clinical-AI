@@ -310,7 +310,7 @@ function buildAssetChecks() {
 
   return [
     check({
-      id: 'assets-public-shell',
+      id: 'assets-public-app',
       category: SELF_DIAGNOSTIC_CATEGORIES.ASSETS,
       label: 'Required public shell assets are declared',
       status: requiredPublicAssets.length >= 5 ? SELF_DIAGNOSTIC_STATUS.HEALTHY : SELF_DIAGNOSTIC_STATUS.WARNING,

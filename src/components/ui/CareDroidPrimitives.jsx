@@ -16,7 +16,7 @@ export function PageShell({
   className = '',
   headerClassName = '',
   contentClassName = '',
-  as: Element = 'main',
+  as: Element = 'section',
   ...props
 }) {
   return (

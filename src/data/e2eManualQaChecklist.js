@@ -5,8 +5,8 @@
 
 export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
   {
-    id: 'auth-shell',
-    title: 'Authentication & shell',
+    id: 'auth-appshell',
+    title: 'Authentication & AppShell',
     items: [
       {
         id: 'login-dashboard',

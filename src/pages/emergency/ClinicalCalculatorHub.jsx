@@ -426,7 +426,7 @@ export default function ClinicalCalculatorHub() {
   };
 
   return (
-    <main className="clinical-calculator-hub">
+    <section className="clinical-calculator-hub">
       <section className="clinical-calculator-hub__header" aria-labelledby="clinical-tools-title">
         <div>
           <span className="clinical-calculator-hub__eyebrow">Emergency OS</span>
@@ -570,6 +570,6 @@ export default function ClinicalCalculatorHub() {
           </div>
         )}
       </section>
-    </main>
+    </section>
   );
 }

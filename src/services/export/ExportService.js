@@ -9,6 +9,9 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../../config/backendApiCapabilities';
+import { makeDisabledCapabilityResponse } from '../disabledBackendMocks';
+import { reportApiError } from '../apiErrorHandling';
+import logger from '../../utils/logger';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -107,7 +110,12 @@ class ExportService {
       const csvContent = this.convertToCSV(data);
       return this.downloadFile(csvContent, filename, 'text/csv');
     } catch (error) {
-      console.error('[ExportService] CSV export error:', error);
+      reportApiError({
+        title: 'CSV export failed',
+        message: 'Unable to create the local CSV export.',
+        error,
+        endpoint: 'local:export/csv',
+      });
       throw error;
     }
   }
@@ -117,6 +125,7 @@ class ExportService {
    */
   async exportToPDF(data, filename = 'cost-report.pdf', options = {}) {
     if (!isBackendCapabilityEnabled('exportsPdf')) {
+      // TODO(backend): Replace this local JSON export with POST /api/exports/pdf.
       const jsonName = filename.replace(/\.pdf$/i, '.json') || 'export.json';
       return this.downloadFile(JSON.stringify(data, null, 2), jsonName, 'application/json');
     }
@@ -152,7 +161,12 @@ class ExportService {
       const blob = await response.blob();
       return this.downloadBlob(blob, filename);
     } catch (error) {
-      console.error('[ExportService] PDF export error:', error);
+      reportApiError({
+        title: 'PDF export failed',
+        message: 'Unable to export PDF from the server.',
+        error,
+        endpoint: '/api/exports/pdf',
+      });
       throw error;
     }
   }
@@ -162,6 +176,7 @@ class ExportService {
    */
   async exportToExcel(data, filename = 'cost-report.xlsx', options = {}) {
     if (!isBackendCapabilityEnabled('exportsExcel')) {
+      // TODO(backend): Replace this local CSV export with POST /api/exports/excel.
       const csvName = filename.replace(/\.xlsx$/i, '.csv') || 'export.csv';
       return this.exportToCSV(data, csvName);
     }
@@ -197,7 +212,12 @@ class ExportService {
       const blob = await response.blob();
       return this.downloadBlob(blob, filename);
     } catch (error) {
-      console.error('[ExportService] Excel export error:', error);
+      reportApiError({
+        title: 'Excel export failed',
+        message: 'Unable to export Excel from the server.',
+        error,
+        endpoint: '/api/exports/excel',
+      });
       throw error;
     }
   }
@@ -215,21 +235,37 @@ class ExportService {
       throw new Error(`Format not supported by template: ${format}`);
     }
 
+    const payload = {
+      templateId,
+      dateRange: {
+        startDate: dateRange.start.toISOString(),
+        endDate: dateRange.end.toISOString(),
+      },
+      metrics: template.metrics,
+      format,
+      options,
+    };
+
     if (!isBackendCapabilityEnabled('reportsGenerate')) {
-      throw new Error('Scheduled reports are not available on this server.');
+      // TODO(backend): Replace with POST /api/reports/generate when the reports backend ships.
+      const fallback = makeDisabledCapabilityResponse('reportsGenerate', '/api/reports/generate', {
+        report: {
+          ...payload,
+          generatedAt: new Date().toISOString(),
+          source: 'local-mock',
+        },
+      });
+      logger.info('Report generation backend unavailable — exporting local mock report');
+      reportApiError({
+        title: 'Report generation unavailable',
+        message: fallback.message,
+        endpoint: '/api/reports/generate',
+      });
+      const filename = `${templateId}-${Date.now()}.json`;
+      return this.downloadFile(JSON.stringify(fallback.data.report, null, 2), filename, 'application/json');
     }
 
     try {
-      const payload = {
-        templateId,
-        dateRange: {
-          startDate: dateRange.start.toISOString(),
-          endDate: dateRange.end.toISOString(),
-        },
-        metrics: template.metrics,
-        format,
-        options,
-      };
 
       const response = await fetch(
         `${this.apiBaseUrl}/reports/generate`,
@@ -253,7 +289,12 @@ class ExportService {
       const blob = await response.blob();
       return this.downloadBlob(blob, filename);
     } catch (error) {
-      console.error('[ExportService] Report generation error:', error);
+      reportApiError({
+        title: 'Report generation failed',
+        message: 'Unable to generate the report from the server.',
+        error,
+        endpoint: '/api/reports/generate',
+      });
       throw error;
     }
   }
@@ -262,10 +303,6 @@ class ExportService {
    * Schedule recurring report
    */
   async scheduleReport(templateId, schedule, recipients, format = 'pdf') {
-    if (!isBackendCapabilityEnabled('reportsSchedule')) {
-      throw new Error(UNSUPPORTED_CAPABILITY_MESSAGE);
-    }
-
     // schedule: { frequency: 'daily'|'weekly'|'monthly', dayOfWeek?: 0-6, dayOfMonth?: 1-31, time: '09:00' }
     // recipients: email addresses
     const scheduledReport = {
@@ -278,6 +315,23 @@ class ExportService {
       createdAt: new Date(),
       nextRun: this.calculateNextRun(schedule),
     };
+
+    if (!isBackendCapabilityEnabled('reportsSchedule')) {
+      // TODO(backend): Replace with POST /api/reports/schedule when durable schedules are available.
+      const fallback = {
+        ...scheduledReport,
+        status: 'backend-unavailable',
+        unavailable: true,
+        message: UNSUPPORTED_CAPABILITY_MESSAGE,
+      };
+      this.scheduledReports.push(fallback);
+      reportApiError({
+        title: 'Scheduled reports unavailable',
+        message: fallback.message,
+        endpoint: '/api/reports/schedule',
+      });
+      return fallback;
+    }
 
     try {
       const response = await fetch(
@@ -300,7 +354,12 @@ class ExportService {
       this.scheduledReports.push(saved);
       return saved;
     } catch (error) {
-      console.error('[ExportService] Schedule creation error:', error);
+      reportApiError({
+        title: 'Schedule creation failed',
+        message: 'Unable to create the scheduled report on the server.',
+        error,
+        endpoint: '/api/reports/schedule',
+      });
       throw error;
     }
   }
@@ -352,7 +411,13 @@ class ExportService {
    */
   async cancelScheduledReport(reportId) {
     if (!isBackendCapabilityEnabled('reportsSchedule')) {
-      return false;
+      this.scheduledReports = this.scheduledReports.filter((r) => r.id !== reportId);
+      return {
+        ok: false,
+        success: false,
+        unavailable: true,
+        message: UNSUPPORTED_CAPABILITY_MESSAGE,
+      };
     }
 
     try {
@@ -373,10 +438,15 @@ class ExportService {
         return true;
       }
     } catch (error) {
-      console.error('[ExportService] Cancel error:', error);
+      reportApiError({
+        title: 'Scheduled report cancellation failed',
+        message: 'Unable to cancel the scheduled report on the server.',
+        error,
+        endpoint: `/api/reports/schedule/${reportId}`,
+      });
     }
 
-    return false;
+    return { ok: false, success: false };
   }
 
   /**

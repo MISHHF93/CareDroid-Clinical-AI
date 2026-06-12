@@ -6,6 +6,8 @@
 import { resolveApiRoot } from '../../config/api.config';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import { recordAutomationBlocked } from '../automationAuditLogger';
+import { makeNotificationSendDisabledResponse } from '../disabledBackendMocks';
+import { reportApiError } from '../apiErrorHandling';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -47,7 +49,12 @@ class NotificationService {
         this.preferences = { ...this.preferences, ...prefs };
       }
     } catch (error) {
-      console.warn('[NotificationService] Failed to load preferences:', error);
+      reportApiError({
+        title: 'Notification preferences load failed',
+        message: 'Unable to load notification preferences.',
+        error,
+        endpoint: '/api/notifications/preferences',
+      });
     }
   }
 
@@ -157,7 +164,12 @@ class NotificationService {
         await this.sendNotification(notification);
       }
     } catch (error) {
-      console.error('[NotificationService] Queue processing error:', error);
+      reportApiError({
+        title: 'Notification queue processing failed',
+        message: 'Unable to process the notification queue.',
+        error,
+        endpoint: 'local:notification-queue',
+      });
     } finally {
       this.isProcessing = false;
     }
@@ -178,10 +190,12 @@ class NotificationService {
         const result = await this.sendViaChannel(channel, notification);
         results.channels[channel] = result;
       } catch (error) {
-        console.error(
-          `[NotificationService] Error sending via ${channel}:`,
-          error
-        );
+        reportApiError({
+          title: 'Notification delivery failed',
+          message: `Unable to send notification through ${channel}.`,
+          error,
+          endpoint: `/api/notifications/send/${channel}`,
+        });
         results.channels[channel] = { success: false, error: error.message };
       }
     }
@@ -207,6 +221,7 @@ class NotificationService {
   async sendViaChannel(channel, notification) {
     if (!isBackendCapabilityEnabled('notificationSendChannel')) {
       const error = new Error(`Server send channel "${channel}" is not available.`);
+      const fallback = makeNotificationSendDisabledResponse(channel);
       await recordAutomationBlocked({
         triggerFired: 'Queue-style notification send requested',
         conditionsEvaluated: [{ label: 'Notification send-channel backend capability enabled', result: false }],
@@ -215,7 +230,13 @@ class NotificationService {
         backendEndpoint: `/api/notifications/send/${channel}`,
         reason: error.message,
       });
-      throw error;
+      reportApiError({
+        title: 'Notification channel unavailable',
+        message: fallback.message,
+        error,
+        endpoint: `/api/notifications/send/${channel}`,
+      });
+      return fallback;
     }
 
     const payload = this.buildChannelPayload(channel, notification);
@@ -364,7 +385,12 @@ class NotificationService {
         return true;
       }
     } catch (error) {
-      console.error('[NotificationService] Preference update error:', error);
+      reportApiError({
+        title: 'Notification preference update failed',
+        message: 'Unable to update notification preferences.',
+        error,
+        endpoint: '/api/notifications/preferences',
+      });
     }
 
     return false;

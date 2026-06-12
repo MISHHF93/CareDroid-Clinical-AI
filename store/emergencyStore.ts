@@ -97,7 +97,6 @@ type EmergencySettingsState = {
     reassessmentIntervals: Record<string, number>;
   };
   alertRules: Record<string, { enabled: boolean; severity: PatientFlagSeverity | Alert['severity'] }>;
-  featureFlags: Record<string, boolean>;
 };
 
 const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
@@ -122,12 +121,6 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
     Referral: { enabled: true, severity: 'Warning' },
     Queue: { enabled: true, severity: 'Warning' },
     System: { enabled: true, severity: 'Info' },
-  },
-  featureFlags: {
-    simulationMode: false,
-    emsModule: true,
-    referralModule: true,
-    analytics: true,
   },
 };
 type ShiftStartInput = {
@@ -170,6 +163,9 @@ interface EmergencyStoreState {
   realtimeConnection: RealtimeConnectionState;
   emergencyAnalytics: EmergencyAnalyticsState;
   emergencySettings: EmergencySettingsState;
+  isHydrating: boolean;
+  hasHydrated: boolean;
+  ensureHydrated: () => void;
   addPatient: (patient: Patient) => void;
   updatePatient: (id: string, patch: PatientPatch) => void;
   dischargePatient: (id: string, options?: MovePatientStateOptions) => void;
@@ -1649,6 +1645,56 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     data: undefined,
   },
   emergencySettings: DEFAULT_EMERGENCY_SETTINGS,
+  isHydrating: false,
+  hasHydrated: true,
+
+  ensureHydrated: () => {
+    const state = get();
+    if (state.patients.length > 0) {
+      if (!state.hasHydrated || state.isHydrating) {
+        set({ hasHydrated: true, isHydrating: false });
+      }
+      return;
+    }
+
+    set({ isHydrating: true });
+    const referrals = syncReferralsFromPatients(mockPatients, []);
+    const derived = deriveOperationalState(
+      mockPatients,
+      mockRooms,
+      referrals,
+      mockEMSArrivals,
+      DEFAULT_EMERGENCY_SETTINGS
+    );
+    const alerts = deriveAlerts({
+      patients: mockPatients,
+      capacity: derived.capacity,
+      emsArrivals: mockEMSArrivals,
+      referrals,
+      queues: derived.queues,
+      bottleneckAlert: null,
+    });
+
+    set({
+      patients: mockPatients,
+      staff: mockStaff,
+      rooms: mockRooms,
+      queues: derived.queues,
+      capacity: derived.capacity,
+      activeShift: mockActiveShift,
+      emsUnits: mockEMSUnits,
+      emsArrivals: mockEMSArrivals,
+      referrals,
+      alerts,
+      selectedPatientId: mockPatients[0]?.id || null,
+      activeQueueFilter: null,
+      whiteboardSearchQuery: '',
+      bottleneckAlert: null,
+      emergencySettings: DEFAULT_EMERGENCY_SETTINGS,
+      isHydrating: false,
+      hasHydrated: true,
+    });
+  },
 
   addPatient: (patient) =>
     set((state) => {
@@ -2632,10 +2678,6 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           ...state.emergencySettings.alertRules,
           ...(patch.alertRules || {}),
         },
-        featureFlags: {
-          ...state.emergencySettings.featureFlags,
-          ...(patch.featureFlags || {}),
-        },
       };
       return {
         emergencySettings,
@@ -2726,22 +2768,372 @@ setToolRegistryStoreReader(() => useEmergencyStore.getState());
 
 export const emergencyStoreApi = useEmergencyStore;
 
-export const selectFilteredPatients = (state: EmergencyStoreState): Patient[] => {
-  const query = state.whiteboardSearchQuery.trim().toLowerCase();
-  const queue = state.activeQueueFilter
-    ? state.queues.find((candidate) => candidate.type === state.activeQueueFilter)
+const isHighRiskPatient = (patient: Patient): boolean =>
+  hasPatientFlag(patient, 'HighRisk') ||
+  hasPatientFlag(patient, 'DeteriorationRisk') ||
+  patient.priority === Priority.P1 ||
+  patient.priority === Priority.P2;
+
+const patientMatchesWhiteboardFilter = (patient: Patient, filterType: QueueType | null): boolean => {
+  if (!filterType) return true;
+  if (filterType === 'Provider') {
+    return patient.state === PatientState.Assessment || patient.state === PatientState.Orders;
+  }
+  if (filterType === 'Assessment') {
+    return [PatientState.Assessment, PatientState.Orders, PatientState.Results].includes(patient.state);
+  }
+  if (filterType === 'Referral') return Boolean(patient.referral);
+  if (filterType === 'Reassessment') {
+    return hasPatientFlag(patient, 'ReassessmentDue') || hasPatientFlag(patient, 'ScoreReassessmentRecommended');
+  }
+  if (filterType === 'HighRisk') return isHighRiskPatient(patient);
+  if (filterType === 'EMS') return hasPatientFlag(patient, 'EMSArrival') || Boolean(patient.emsArrival);
+  if (filterType === 'Boarding') return patient.state === PatientState.Admission || hasPatientFlag(patient, 'PendingAdmission');
+  return patient.state === filterType;
+};
+
+const queueHealthForWait = (averageWaitMinutes: number): 'green' | 'yellow' | 'red' => {
+  if (averageWaitMinutes > 40) return 'red';
+  if (averageWaitMinutes >= 20) return 'yellow';
+  return 'green';
+};
+
+let activePatientsInput: Patient[] | null = null;
+let activePatientsOutput: Patient[] = [];
+export const selectActivePatients = (state: EmergencyStoreState): Patient[] => {
+  if (state.patients === activePatientsInput) return activePatientsOutput;
+  activePatientsInput = state.patients;
+  activePatientsOutput = state.patients.filter(isActivePatient);
+  return activePatientsOutput;
+};
+
+export const selectSelectedPatient = (state: EmergencyStoreState): Patient | null =>
+  state.selectedPatientId
+    ? state.patients.find((patient) => patient.id === state.selectedPatientId) || null
     : null;
-  return state.patients.filter((patient) => {
-    if (queue && !queue.patientIds.includes(patient.id)) return false;
+
+let filteredPatientsInputs: {
+  patients: Patient[] | null;
+  activeQueueFilter: QueueType | null;
+  whiteboardSearchQuery: string;
+  backendQuery: string;
+  backendResults: PatientBackendSearchState['results'] | null;
+} = {
+  patients: null,
+  activeQueueFilter: null,
+  whiteboardSearchQuery: '',
+  backendQuery: '',
+  backendResults: null,
+};
+let filteredPatientsOutput: Patient[] = [];
+export const selectFilteredPatients = (state: EmergencyStoreState): Patient[] => {
+  if (
+    state.patients === filteredPatientsInputs.patients &&
+    state.activeQueueFilter === filteredPatientsInputs.activeQueueFilter &&
+    state.whiteboardSearchQuery === filteredPatientsInputs.whiteboardSearchQuery &&
+    state.patientBackendSearch.query === filteredPatientsInputs.backendQuery &&
+    state.patientBackendSearch.results === filteredPatientsInputs.backendResults
+  ) {
+    return filteredPatientsOutput;
+  }
+
+  filteredPatientsInputs = {
+    patients: state.patients,
+    activeQueueFilter: state.activeQueueFilter,
+    whiteboardSearchQuery: state.whiteboardSearchQuery,
+    backendQuery: state.patientBackendSearch.query,
+    backendResults: state.patientBackendSearch.results,
+  };
+
+  const query = state.whiteboardSearchQuery.trim().toLowerCase();
+  const backendMatchedPatientIds =
+    state.patientBackendSearch.query === state.whiteboardSearchQuery.trim()
+      ? new Set((state.patientBackendSearch.results || []).map((result) => result.patientId))
+      : new Set<string>();
+
+  filteredPatientsOutput = state.patients
+    .filter((patient) => isActivePatient(patient))
+    .filter((patient) => patientMatchesWhiteboardFilter(patient, state.activeQueueFilter))
+    .filter((patient) => {
     if (!query) return true;
     const name = `${patient.firstName} ${patient.lastName}`.toLowerCase();
     return (
+      backendMatchedPatientIds.has(patient.id) ||
       name.includes(query) ||
       patient.mrn.toLowerCase().includes(query) ||
       patient.chiefComplaint.toLowerCase().includes(query) ||
       patient.complaintCategory.toLowerCase().includes(query)
     );
-  });
+    })
+    .sort((a, b) => {
+      const p1Delta = Number(b.priority === Priority.P1) - Number(a.priority === Priority.P1);
+      if (p1Delta !== 0) return p1Delta;
+      return minutesSince(b.arrivalTime) - minutesSince(a.arrivalTime);
+    });
+  return filteredPatientsOutput;
+};
+
+let whiteboardFilterCountsInput: Patient[] | null = null;
+let whiteboardFilterCountsOutput: Record<string, number> = {};
+export const selectWhiteboardFilterCounts = (state: EmergencyStoreState): Record<string, number> => {
+  if (state.patients === whiteboardFilterCountsInput) return whiteboardFilterCountsOutput;
+  whiteboardFilterCountsInput = state.patients;
+  const activePatients = selectActivePatients(state);
+  whiteboardFilterCountsOutput = {
+    All: activePatients.length,
+    Waiting: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'Waiting')).length,
+    Assessment: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'Assessment')).length,
+    HighRisk: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'HighRisk')).length,
+    EMS: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'EMS')).length,
+    Boarding: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'Boarding')).length,
+  };
+  return whiteboardFilterCountsOutput;
+};
+
+let whiteboardStatsInputs: { patients: Patient[] | null; capacity: CapacitySnapshot | null } = {
+  patients: null,
+  capacity: null,
+};
+let whiteboardStatsOutput: Array<{ label: string; value: string | number }> = [];
+export const selectWhiteboardStats = (state: EmergencyStoreState): Array<{ label: string; value: string | number }> => {
+  if (state.patients === whiteboardStatsInputs.patients && state.capacity === whiteboardStatsInputs.capacity) {
+    return whiteboardStatsOutput;
+  }
+  whiteboardStatsInputs = { patients: state.patients, capacity: state.capacity };
+  const activePatients = selectActivePatients(state);
+  whiteboardStatsOutput = [
+    { label: 'Total Active', value: activePatients.length },
+    { label: 'Avg Wait', value: `${state.capacity.averageWaitMinutes}m` },
+    { label: 'High Risk', value: activePatients.filter(isHighRiskPatient).length },
+    {
+      label: 'Boarding',
+      value: activePatients.filter((patient) => patientMatchesWhiteboardFilter(patient, 'Boarding')).length,
+    },
+    { label: 'Capacity', value: `${state.capacity.occupancyPercent}%` },
+  ];
+  return whiteboardStatsOutput;
+};
+
+let queueCountsInput: Queue[] | null = null;
+let queueCountsOutput: Record<string, number> = {};
+export const selectQueueCounts = (state: EmergencyStoreState): Record<string, number> => {
+  if (state.queues === queueCountsInput) return queueCountsOutput;
+  queueCountsInput = state.queues;
+  queueCountsOutput = Object.fromEntries(state.queues.map((queue) => [queue.type, queue.patientIds.length]));
+  return queueCountsOutput;
+};
+
+let queuePanelRowsInput: Queue[] | null = null;
+let queuePanelRowsOutput: Array<{
+  type: QueueType;
+  name: string;
+  count: number;
+  averageWaitMinutes: number;
+  oldestWaitMinutes: number;
+  updatedAt?: string;
+  health: 'green' | 'yellow' | 'red';
+}> = [];
+export const selectQueuePanelRows = (
+  state: EmergencyStoreState
+): Array<{
+  type: QueueType;
+  name: string;
+  count: number;
+  averageWaitMinutes: number;
+  oldestWaitMinutes: number;
+  updatedAt?: string;
+  health: 'green' | 'yellow' | 'red';
+}> =>
+  {
+  if (state.queues === queuePanelRowsInput) return queuePanelRowsOutput;
+  queuePanelRowsInput = state.queues;
+  queuePanelRowsOutput = state.queues.map((queue) => ({
+    type: queue.type,
+    name: queue.name,
+    count: queue.patientIds.length,
+    averageWaitMinutes: queue.averageWaitMinutes,
+    oldestWaitMinutes: queue.longestWaitMinutes,
+    updatedAt: queue.updatedAt,
+    health: queueHealthForWait(queue.averageWaitMinutes),
+  }));
+  return queuePanelRowsOutput;
+};
+
+export const selectQueueOverallHealthScore = (state: EmergencyStoreState): number => {
+  const queueRows = selectQueuePanelRows(state);
+  const overallAverage = queueRows.length
+    ? Math.round(queueRows.reduce((sum, queue) => sum + queue.averageWaitMinutes, 0) / queueRows.length)
+    : 0;
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      100 -
+        queueRows.reduce((sum, queue) => {
+          if (queue.health === 'red') return sum + 12;
+          if (queue.health === 'yellow') return sum + 6;
+          return sum;
+        }, 0) -
+        Math.max(0, overallAverage - 20)
+    )
+  );
+};
+
+let queueBottleneckInputs: {
+  queues: Queue[] | null;
+  bottleneckAlert: BottleneckAlert | null;
+} = {
+  queues: null,
+  bottleneckAlert: null,
+};
+let queueBottleneckOutput: BottleneckAlert | null = null;
+export const selectQueueBottleneckAlert = (state: EmergencyStoreState): BottleneckAlert | null => {
+  if (
+    state.queues === queueBottleneckInputs.queues &&
+    state.bottleneckAlert === queueBottleneckInputs.bottleneckAlert
+  ) {
+    return queueBottleneckOutput;
+  }
+  queueBottleneckInputs = {
+    queues: state.queues,
+    bottleneckAlert: state.bottleneckAlert,
+  };
+
+  const queueRows = selectQueuePanelRows(state);
+  const activeQueues = queueRows.filter((queue) => queue.count > 0);
+  if (!activeQueues.length) {
+    queueBottleneckOutput = null;
+    return queueBottleneckOutput;
+  }
+
+  const highestCount = Math.max(...activeQueues.map((queue) => queue.count));
+  const longestWait = Math.max(...activeQueues.map((queue) => queue.oldestWaitMinutes));
+  const queue = activeQueues.find(
+    (candidate) => candidate.count === highestCount && candidate.oldestWaitMinutes === longestWait
+  );
+  if (!queue || queue.count < 2 || queue.oldestWaitMinutes < 20) {
+    queueBottleneckOutput = null;
+    return queueBottleneckOutput;
+  }
+
+  const downstreamByQueue: Partial<Record<QueueType, QueueType>> = {
+    Waiting: 'Triage',
+    Triage: 'Provider',
+    Provider: 'Results',
+    Results: 'Referral',
+    Referral: 'Admission',
+    Admission: 'Discharge',
+    Reassessment: 'Provider',
+  };
+  const downstreamType = downstreamByQueue[queue.type];
+  if (!downstreamType) {
+    queueBottleneckOutput = null;
+    return queueBottleneckOutput;
+  }
+
+  const downstreamQueue = queueRows.find((candidate) => candidate.type === downstreamType);
+  if (!downstreamQueue || downstreamQueue.count > 0) {
+    queueBottleneckOutput = null;
+    return queueBottleneckOutput;
+  }
+
+  const nextAlert: BottleneckAlert = {
+    queue: queue.type,
+    reason: `${queue.count} patients, avg ${queue.averageWaitMinutes}min`,
+    severity: queue.averageWaitMinutes > 40 || queue.count >= 4 ? 'Red' : 'Yellow',
+    detectedAt: new Date().toISOString(),
+  };
+  if (
+    state.bottleneckAlert?.queue === nextAlert.queue &&
+    state.bottleneckAlert.reason === nextAlert.reason &&
+    state.bottleneckAlert.severity === nextAlert.severity
+  ) {
+    queueBottleneckOutput = state.bottleneckAlert;
+    return queueBottleneckOutput;
+  }
+  queueBottleneckOutput = nextAlert;
+  return queueBottleneckOutput;
+};
+
+let reassessmentQueueInput: Patient[] | null = null;
+let reassessmentQueueOutput: Array<{
+  patientId: string;
+  patientName: string;
+  state: PatientState;
+  priority: Priority;
+  waitingMinutes: number;
+  vitalsAgeMinutes: number;
+  reasons: string[];
+  flaggedAt: string;
+}> = [];
+export const selectReassessmentQueue = (
+  state: EmergencyStoreState
+): Array<{
+  patientId: string;
+  patientName: string;
+  state: PatientState;
+  priority: Priority;
+  waitingMinutes: number;
+  vitalsAgeMinutes: number;
+  reasons: string[];
+  flaggedAt: string;
+}> =>
+  {
+  if (state.patients === reassessmentQueueInput) return reassessmentQueueOutput;
+  reassessmentQueueInput = state.patients;
+  reassessmentQueueOutput = selectActivePatients(state)
+    .filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'))
+    .map((patient) => {
+      const reassessmentFlags = patient.flags.filter((flag) => flag.type === 'ReassessmentDue');
+      return {
+        patientId: patient.id,
+        patientName: patient.name || `${patient.firstName} ${patient.lastName}`,
+        state: patient.state,
+        priority: patient.priority,
+        waitingMinutes: minutesSince(patient.arrivalTime),
+        vitalsAgeMinutes: minutesSince(patient.vitalsUpdatedAt || patient.vitals?.recordedAt || null),
+        reasons: reassessmentFlags.map((flag) => flag.reason),
+        flaggedAt: reassessmentFlags[0]?.detectedAt || new Date().toISOString(),
+      };
+    });
+  return reassessmentQueueOutput;
+};
+
+export const selectReassessmentCount = (state: EmergencyStoreState): number =>
+  selectActivePatients(state).filter(
+    (patient) =>
+      hasPatientFlag(patient, 'ReassessmentDue') || hasPatientFlag(patient, 'ScoreReassessmentRecommended')
+  ).length;
+
+let activeAlertsInput: Alert[] | null = null;
+let activeAlertsOutput: Alert[] = [];
+export const selectActiveAlerts = (state: EmergencyStoreState): Alert[] => {
+  if (state.alerts === activeAlertsInput) return activeAlertsOutput;
+  activeAlertsInput = state.alerts;
+  activeAlertsOutput = state.alerts.filter((alert) => !alert.dismissedAt);
+  return activeAlertsOutput;
+};
+
+let edQueueHealthInput: Queue[] | null = null;
+let edQueueHealthOutput: Array<{
+  queueType: QueueType;
+  count: number;
+  averageWait: number;
+  health: 'green' | 'yellow' | 'red';
+}> = [];
+export const selectEdQueueHealth = (
+  state: EmergencyStoreState
+): Array<{ queueType: QueueType; count: number; averageWait: number; health: 'green' | 'yellow' | 'red' }> =>
+  {
+  if (state.queues === edQueueHealthInput) return edQueueHealthOutput;
+  edQueueHealthInput = state.queues;
+  edQueueHealthOutput = selectQueuePanelRows(state).map((queue) => ({
+    queueType: queue.type,
+    count: queue.count,
+    averageWait: queue.averageWaitMinutes,
+    health: queueHealthForWait(queue.averageWaitMinutes),
+  }));
+  return edQueueHealthOutput;
 };
 
 export type { EmergencyStoreState, PatientPatch };

@@ -10,6 +10,8 @@ import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
+import { makeNotificationStreamDisabledResponse } from './disabledBackendMocks';
+import { reportApiError } from './apiErrorHandling';
 import logger from '../utils/logger';
 
 const NOTIFICATION_ICON = '/logo.svg';
@@ -338,7 +340,9 @@ export const NotificationService = {
   subscribeToNotifications(onNotification, onError) {
     if (!isBackendCapabilityEnabled('notificationStream')) {
       logger.info('Notification stream API not available — skipping SSE subscription');
+      const unavailableResponse = makeNotificationStreamDisabledResponse();
       const error = new Error('Real-time notification stream is not available on this server.');
+      error.unavailableResponse = unavailableResponse;
       void recordAutomationBlocked({
         triggerFired: 'Notification stream subscription requested',
         conditionsEvaluated: [{ label: 'Notification stream backend capability enabled', result: false }],
@@ -346,6 +350,12 @@ export const NotificationService = {
         toolCalled: 'notifications',
         backendEndpoint: '/api/notifications/stream',
         reason: error.message,
+      });
+      reportApiError({
+        title: 'Notification stream unavailable',
+        message: unavailableResponse.message,
+        error,
+        endpoint: '/api/notifications/stream',
       });
       onError?.(error);
       return null;

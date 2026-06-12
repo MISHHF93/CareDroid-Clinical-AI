@@ -616,7 +616,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '1. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.',
     '2. **AI agents / platform APIs** — `platformAssetsApi.js` / `productCatalogApi.js` not in `frontendApiCallsInventory`. Class: **wire**.',
-    '3. **Chart/export components** (`VitalsTrendChart`, `DrugInteractionHeatmap`, `DataDisplay`, etc.) — barrel export only. Class: **quarantine** or **wire**.',
+    '3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
     '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
     '',
   ];

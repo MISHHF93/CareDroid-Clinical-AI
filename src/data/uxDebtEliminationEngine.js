@@ -112,7 +112,7 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.NAVIGATION,
       count: navItems.length,
-      sources: ['src/config/navigation.config.js', 'src/components/Sidebar.jsx', 'src/layout/AppShell.jsx'],
+      sources: ['src/config/navigation.config.js', 'src/layout/AppShell.jsx'],
     },
     {
       type: UX_SURFACE_TYPES.ROUTES,
@@ -137,7 +137,7 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.DRAWERS,
       count: 2,
-      sources: ['src/components/Sidebar.jsx', 'src/components/ui/Drawer.jsx'],
+      sources: ['src/layout/AppShell.jsx', 'src/components/ui/Drawer.jsx'],
     },
     {
       type: UX_SURFACE_TYPES.TABLES,
@@ -255,19 +255,18 @@ function sourceSnapshotFindings(sourceSnapshot = {}) {
   const appShellJsx = sourceSnapshot.appShellJsx || '';
   const appShellCss = sourceSnapshot.appShellCss || '';
   const quickCommandCss = sourceSnapshot.quickCommandCss || '';
-  const sidebarJsx = sourceSnapshot.sidebarJsx || '';
   const drawerJsx = sourceSnapshot.drawerJsx || '';
 
-  if (appShellJsx.includes('<Sidebar') && appShellJsx.includes('app-shell-bottom-nav')) {
+  if (appShellJsx.includes('ed-nav-rail') && appShellJsx.includes('app-shell-bottom-nav')) {
     findings.push(
       issue({
         id: 'conflicting-sidebar-bottom-nav',
         classification: UX_DEBT_CLASSIFICATIONS.CONFLICTING_UX,
         surface: UX_SURFACE_TYPES.NAVIGATION,
         severity: 'critical',
-        title: 'Sidebar and bottom navigation can render from the same shell',
-        evidence: 'AppShell contains both <Sidebar> and app-shell-bottom-nav.',
-        recommendation: 'Use the sidebar/drawer as canonical navigation and keep bottom nav disabled.',
+        title: 'Navigation rail and bottom navigation can render from the same shell',
+        evidence: 'AppShell contains both ed-nav-rail and app-shell-bottom-nav.',
+        recommendation: 'Use the AppShell navigation rail as canonical navigation and keep bottom nav disabled.',
       })
     );
   }
@@ -314,30 +313,16 @@ function sourceSnapshotFindings(sourceSnapshot = {}) {
     );
   }
 
-  if (appShellJsx && !appShellJsx.includes('aria-controls="app-sidebar-nav"')) {
+  if (appShellJsx && !appShellJsx.includes('aria-label="Emergency OS navigation"')) {
     findings.push(
       issue({
-        id: 'a11y-menu-button-controls',
+        id: 'a11y-nav-rail-label',
         classification: UX_DEBT_CLASSIFICATIONS.ACCESSIBILITY_ISSUE,
         surface: UX_SURFACE_TYPES.NAVIGATION,
         severity: 'high',
-        title: 'Mobile menu button is not linked to the navigation drawer',
-        evidence: 'Missing aria-controls="app-sidebar-nav".',
-        recommendation: 'Link the menu button to the drawer with aria-controls and aria-expanded.',
-      })
-    );
-  }
-
-  if (sidebarJsx && !sidebarJsx.includes("setAttribute('inert'")) {
-    findings.push(
-      issue({
-        id: 'a11y-closed-drawer-inert',
-        classification: UX_DEBT_CLASSIFICATIONS.ACCESSIBILITY_ISSUE,
-        surface: UX_SURFACE_TYPES.DRAWERS,
-        severity: 'high',
-        title: 'Closed compact drawer may remain focusable',
-        evidence: 'Sidebar.jsx does not set inert on the closed compact drawer.',
-        recommendation: 'Keep closed drawer content inert and aria-hidden until opened.',
+        title: 'AppShell navigation rail lacks an accessible label',
+        evidence: 'Missing aria-label="Emergency OS navigation".',
+        recommendation: 'Keep the AppShell rail labelled so collapsed icon navigation is announced.',
       })
     );
   }
@@ -452,12 +437,12 @@ export function buildUxDebtAudit({
     auditedSurfaces,
     findings,
     automatedChecks: [
-      'No AppShell bottom navigation when Sidebar/drawer exists.',
+      'No AppShell bottom navigation when the canonical rail exists.',
       'No obsolete bottom-nav spacing tokens in authenticated shell CSS.',
       'Canonical route paths are unique.',
       'Navigation labels do not point to conflicting destinations.',
       'High-volume hub routes are flagged as hidden UX for grouping/deep-link review.',
-      'Compact drawer and generic Drawer retain accessibility semantics.',
+      'AppShell rail and generic Drawer retain accessibility semantics.',
       'Canonical routes are compared against responsive smoke coverage.',
     ],
   };

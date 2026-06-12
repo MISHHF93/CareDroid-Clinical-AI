@@ -7,6 +7,7 @@ import { OrganizationMembershipRole } from '../organizations/entities/organizati
 import { WorkspaceMembershipRole } from '../workspaces/entities/workspace-membership.entity';
 import { SKIP_TENANT_ISOLATION_KEY, TENANT_SCOPE_KEY } from './tenant-scope.decorator';
 import { extractTenantScopeFromRequest, isTenantBootstrapPath } from './tenant-scope.utils';
+import { TenantContextService } from './tenant-context.service';
 import { TenantAdminScope, TenantContextRequest, TenantScopePolicy } from './tenant-context.types';
 
 const DEFAULT_POLICY: TenantScopePolicy = {
@@ -25,9 +26,12 @@ const WORKSPACE_ADMIN_ROLES = new Set<string>([
 
 @Injectable()
 export class TenantIsolationGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly tenantContextService: TenantContextService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     if (context.getType() !== 'http') return true;
 
     const request = context.switchToHttp().getRequest<TenantContextRequest>();
@@ -39,6 +43,13 @@ export class TenantIsolationGuard implements CanActivate {
 
     // Global guards run before route AuthGuard. Method-level usage enforces after auth.
     if (!request.user) return true;
+
+    if (!request.tenantContext) {
+      request.tenantContext = await this.tenantContextService.resolveForRequest(
+        request.user,
+        request.headers,
+      );
+    }
 
     const policy =
       this.reflector.getAllAndOverride<TenantScopePolicy>(TENANT_SCOPE_KEY, [
@@ -87,9 +98,14 @@ export class TenantIsolationGuard implements CanActivate {
 
     const role = request.tenantContext?.role || request.user?.role;
     const workspacePermissions = new Set(request.tenantContext?.workspacePermissions || []);
+    const tenantAdmin =
+      request.tenantContext?.role === UserRole.ADMIN ||
+      ORG_ADMIN_ROLES.has(String(request.tenantContext?.organizationRole || '')) ||
+      WORKSPACE_ADMIN_ROLES.has(String(request.tenantContext?.workspaceRole || ''));
     const hasAllPermissions = requiredPermissions.every((permission) => {
       const normalized = permission as Permission;
       return (
+        tenantAdmin ||
         workspacePermissions.has(permission) ||
         (Boolean(role) && hasPermissionWithHierarchy(role as UserRole, normalized))
       );

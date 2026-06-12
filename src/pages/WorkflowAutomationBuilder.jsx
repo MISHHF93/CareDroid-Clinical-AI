@@ -49,7 +49,7 @@ export default function WorkflowAutomationBuilder() {
   };
 
   return (
-    <main className="automation-builder">
+    <section className="automation-builder">
       <header className="automation-hero">
         <div>
           <p className="automation-eyebrow">Workflow Automation Builder</p>
@@ -138,6 +138,6 @@ export default function WorkflowAutomationBuilder() {
           </section>
         </section>
       </section>
-    </main>
+    </section>
   );
 }

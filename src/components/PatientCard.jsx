@@ -628,7 +628,29 @@ export function PatientDetailPanel() {
     return () => window.removeEventListener('keydown', handlePatientDetailShortcut);
   }, [activeShift.chargeStaffId, filteredPatientsForShortcuts, patient, selectPatient]);
 
-  if (!patient) return null;
+  if (!patient) {
+    return (
+      <aside className="patient-detail patient-detail--empty" aria-label="Patient detail panel">
+        <header className="patient-detail__header">
+          <div className="patient-detail__identity">
+            <span>Patient unavailable</span>
+            <h2>No patient selected</h2>
+            <p>This patient is no longer in the active Emergency OS store.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => selectPatient(null)}
+            aria-label="Close patient details"
+          >
+            <X size={18} aria-hidden />
+          </button>
+        </header>
+        <div className="patient-detail__empty" role="status">
+          Select another patient from the whiteboard or clear the active filters.
+        </div>
+      </aside>
+    );
+  }
 
   const previousVitals = latestPreviousVitals(patient);
   const savedScores = getSavedScores(patient);

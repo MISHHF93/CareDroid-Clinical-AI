@@ -30,8 +30,6 @@ function check(id, category, title, passed, evidence, fix) {
 export function buildAccessibilityAudit(sourceSnapshot = {}) {
   const appShellJsx = sourceSnapshot.appShellJsx || '';
   const appShellCss = sourceSnapshot.appShellCss || '';
-  const sidebarJsx = sourceSnapshot.sidebarJsx || '';
-  const sidebarCss = sourceSnapshot.sidebarCss || '';
   const themeSurfacesCss = sourceSnapshot.themeSurfacesCss || '';
   const themeTokensCss = sourceSnapshot.themeTokensCss || '';
   const designTokensCss = sourceSnapshot.designTokensCss || '';
@@ -43,34 +41,34 @@ export function buildAccessibilityAudit(sourceSnapshot = {}) {
       'keyboard-skip-link',
       ACCESSIBILITY_AUDIT_CATEGORIES.KEYBOARD_NAVIGATION,
       'Authenticated shell exposes a skip link to main content',
-      has(appShellJsx, 'href="#main-content"') && has(appShellCss, '.app-skip-link:focus'),
+      has(appShellJsx, 'href="#main-content"') && has(appShellCss, '.ed-skip-link:focus'),
       '`AppShell` renders a skip link before navigation.',
       'Add a visible-on-focus skip link before the sidebar.'
     ),
     check(
-      'keyboard-drawer-escape',
+      'keyboard-overlay-escape',
       ACCESSIBILITY_AUDIT_CATEGORIES.KEYBOARD_NAVIGATION,
-      'Compact navigation drawer closes with Escape and restores focus',
-      has(appShellJsx, 'useDrawerFocus') && has(appShellJsx, "e.key === 'Escape'"),
-      '`useDrawerFocus` and Escape handling are wired in `AppShell`.',
-      'Keep drawer focus management and Escape close handling.'
+      'Shell overlays close with Escape',
+      has(appShellJsx, "event.key === 'Escape'") || has(appShellJsx, "event.key === \"Escape\""),
+      '`AppShell` closes open menus and palettes on Escape.',
+      'Keep Escape handling on AppShell overlays.'
     ),
     check(
       'screen-reader-icon-buttons',
       ACCESSIBILITY_AUDIT_CATEGORIES.SCREEN_READERS,
-      'Icon-only sidebar buttons expose accessible names',
-      has(sidebarJsx, 'aria-label={item.label}') &&
-        has(sidebarJsx, 'aria-label="Start a new chat"') &&
-        has(sidebarJsx, 'aria-label="Sign out"'),
-      'Collapsed nav, new chat, and sign out controls have explicit labels.',
+      'Icon-only shell controls expose accessible names',
+      has(appShellJsx, 'aria-label={isNew ? `${item.label}. New.` : item.label}') &&
+        has(appShellJsx, 'aria-label={`${activeAlerts.length} unread alerts`}') &&
+        has(appShellJsx, "aria-label={isCopilotCollapsed ? 'Expand ED Copilot' : 'Collapse ED Copilot'}"),
+      'Collapsed rail, alert bell, and Copilot toggle have explicit labels.',
       'Do not rely on `title` as the accessible name for icon-only controls.'
     ),
     check(
       'screen-reader-status',
       ACCESSIBILITY_AUDIT_CATEGORIES.SCREEN_READERS,
       'Non-text health state is announced',
-      has(sidebarJsx, 'role="status"') && has(sidebarJsx, 'aria-label={`System status: ${healthStatus}`}'),
-      'Sidebar health dot has a status role and text alternative.',
+      has(appShellJsx, 'role="status"') && has(appShellJsx, 'aria-label={realtimeStatusLabel(connection)}'),
+      'Realtime connection state has a status role and text alternative.',
       'Add a screen-reader label to non-text status indicators.'
     ),
     check(
@@ -114,9 +112,10 @@ export function buildAccessibilityAudit(sourceSnapshot = {}) {
       ACCESSIBILITY_AUDIT_CATEGORIES.TOUCH_TARGETS,
       'Shared controls meet 44px target floor',
       has(designTokensCss, '--touch-target-min: 44px') &&
-        has(sidebarCss, 'min-height: var(--app-min-touch-target, 44px)') &&
+        has(appShellCss, '.ed-nav-rail__item') &&
+        has(appShellCss, 'height: 44px') &&
         has(responsiveUxCss, 'min-height: var(--app-min-touch-target, 44px)'),
-      'Design tokens, responsive UX, and sidebar controls enforce 44px minimum targets.',
+      'Design tokens, responsive UX, and AppShell rail controls enforce 44px minimum targets.',
       'Apply the touch target token to primary buttons, nav items, and form controls.'
     ),
   ];

@@ -1,6 +1,6 @@
 import './observability/datadog';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
@@ -58,6 +58,8 @@ function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFac
 }
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
   // Initialize Sentry for error tracking BEFORE creating the app
   initSentry();
 
@@ -174,16 +176,16 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`\n🚀 CareDroid Backend running on: http://localhost:${port}`);
-  console.log(`📚 Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
-  console.log(`📊 Prometheus metrics at: http://localhost:${port}/api/metrics`);
-  console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔒 TLS 1.3: ENFORCED (only TLS 1.3+ allowed)`);
-  console.log(`\n📈 Monitoring Stack (when docker-compose running):`);
-  console.log(`   - Grafana dashboards: http://localhost:3001`);
-  console.log(`   - Prometheus: http://localhost:9090`);
-  console.log(`   - Kibana logs: http://localhost:5601`);
-  console.log(`   - Sentry errors: http://localhost:9000`);
+  logger.log(`CareDroid Backend running on: http://localhost:${port}`);
+  logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
+  logger.log(`Prometheus metrics at: http://localhost:${port}/api/metrics`);
+  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log('TLS 1.3: ENFORCED (only TLS 1.3+ allowed)');
+  logger.log('Monitoring Stack when docker-compose is running:');
+  logger.log('Grafana dashboards: http://localhost:3001');
+  logger.log('Prometheus: http://localhost:9090');
+  logger.log('Kibana logs: http://localhost:5601');
+  logger.log('Sentry errors: http://localhost:9000');
 }
 
 bootstrap();

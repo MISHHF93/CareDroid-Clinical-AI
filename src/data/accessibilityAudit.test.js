@@ -14,8 +14,6 @@ function buildCurrentSourceSnapshot() {
   return {
     appShellJsx: readSource('../layout/AppShell.jsx'),
     appShellCss: readSource('../layout/AppShell.css'),
-    sidebarJsx: readSource('../components/Sidebar.jsx'),
-    sidebarCss: readSource('../components/Sidebar.css'),
     themeSurfacesCss: readSource('../styles/theme-surfaces.css'),
     themeTokensCss: readSource('../styles/theme-tokens.css'),
     designTokensCss: readSource('../styles/design-tokens.css'),

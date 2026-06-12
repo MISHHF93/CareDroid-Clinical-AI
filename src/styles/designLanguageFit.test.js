@@ -6,8 +6,6 @@ import { describe, expect, it } from 'vitest';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
 const responsiveCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
-const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
-const workspaceSwitcherCss = readFileSync(join(__dirname, '../components/WorkspaceSwitcher.css'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
 const primitivesSource = readFileSync(
@@ -19,11 +17,6 @@ const primitivesCss = readFileSync(
   'utf8'
 );
 const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
-const modalCss = readFileSync(join(__dirname, '../components/ui/Modal.css'), 'utf8');
-const emergencyBannerCss = readFileSync(
-  join(__dirname, '../components/alerts/EmergencyBanner.css'),
-  'utf8'
-);
 const notificationToastCss = readFileSync(
   join(__dirname, '../components/notifications/NotificationToast.css'),
   'utf8'
@@ -53,28 +46,21 @@ describe('CareDroid design language fit contract', () => {
     expect(responsiveCss).toMatch(/\.app-shell :is\(:focus-visible\)[\s\S]*outline:/);
   });
 
-  it('keeps the sidebar toggle fitted in the header and centered when collapsed', () => {
-    expect(sidebarCss).toMatch(/\.sidebar-header[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\) auto/);
-    expect(sidebarCss).toMatch(/\.sidebar-toggle[\s\S]*width:\s*var\(--app-icon-button-size/);
-    expect(sidebarCss).toMatch(/\.sidebar-toggle[\s\S]*height:\s*var\(--app-icon-button-size/);
-    expect(sidebarCss).toMatch(/\.sidebar-collapsed \.sidebar-header[\s\S]*justify-items:\s*center/);
-    expect(sidebarCss).toMatch(/\.sidebar-collapsed \.sidebar-logo[\s\S]*display:\s*none/);
+  it('keeps the AppShell rail and header controls fitted in the viewport', () => {
+    expect(appShellCss).toMatch(/\.ed-nav-rail\s*\{[\s\S]*width:\s*var\(--ed-rail-width/);
+    expect(appShellCss).toMatch(/\.ed-nav-rail__item\s*\{[\s\S]*height:\s*44px/);
+    expect(appShellCss).toMatch(/\.ed-os-header\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.ed-os-header__left,[\s\S]*\.ed-os-header__right\s*\{[\s\S]*min-width:\s*0/);
   });
 
   it('fits workspace dropdown and compact shell controls inside mobile viewports', () => {
-    expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher\s*\{[\s\S]*grid-template-columns:\s*auto minmax\(0,\s*1fr\)/);
-    expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher\s*\{[\s\S]*max-width:\s*min\(100%,\s*22\.5rem\)/);
-    expect(workspaceSwitcherCss).toMatch(
-      /\.workspace-switcher--compact[\s\S]*calc\(100vw - \(\(var\(--app-icon-button-size/
-    );
-    expect(appShellCss).toMatch(/\.app-shell-menu-btn[\s\S]*width:\s*var\(--app-icon-button-size/);
-    expect(appShellCss).toMatch(
-      /\.app-shell--compact \.app-shell-workspace-bar[\s\S]*padding-inline:\s*calc\(var\(--app-icon-button-size/
-    );
+    expect(appShellCss).toMatch(/\.ed-nav-rail__item\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.ed-icon-button\s*\{[\s\S]*min-width:\s*32px/);
+    expect(appShellCss).toMatch(/@media \(max-width: 1024px\)[\s\S]*\.ed-icon-button[\s\S]*min-width:\s*44px/);
   });
 
   it('uses one navigation system without a conflicting bottom nav', () => {
-    expect(appShellJsx).toContain('<Sidebar');
+    expect(appShellJsx).toContain('className="ed-nav-rail"');
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
     expect(appShellJsx).not.toContain('PRIMARY_MOBILE_NAV_ITEMS.map');
   });
@@ -104,11 +90,9 @@ describe('CareDroid design language fit contract', () => {
 
   it('uses tokenized overlay layers instead of hardcoded high z-index values', () => {
     expect(drawerCss).toContain('z-index: var(--z-drawer');
-    expect(modalCss).toContain('z-index: var(--z-modal');
-    expect(emergencyBannerCss).toContain('z-index: var(--z-toast');
     expect(notificationToastCss).toContain('z-index: var(--z-toast');
 
-    [drawerCss, modalCss, emergencyBannerCss, notificationToastCss].forEach((css) => {
+    [drawerCss, notificationToastCss].forEach((css) => {
       expect(css).not.toMatch(/z-index:\s*(9998|9999|10000|99999|2000)\b/);
     });
   });

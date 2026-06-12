@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  APP_SHELL_NAV_ITEMS,
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
@@ -14,21 +15,14 @@ const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8')
 
 const visibleLinkInventory = [
   ['Home welcome CTA', 'App.jsx', '/auth'],
-  ['Home dev bypass', 'App.jsx', '/dashboard'],
+  ['Home dev bypass', 'App.jsx', '/emergency'],
   ['Auth back link', 'pages/Auth.jsx', '/'],
-  ['Primary Dashboard nav', 'config/navigation.config.js', '/dashboard'],
-  ['Primary Assistant nav', 'config/navigation.config.js', '/assistant'],
-  ['Primary Tools nav', 'config/navigation.config.js', '/tools'],
-  ['Primary Operations nav', 'config/navigation.config.js', '/operations'],
-  ['Calculators app route', 'App.jsx', '/tools/calculators'],
-  ['Operations Digital Twin nav', 'config/navigation.config.js', '/digital-twin'],
-  ['Operations Hospital Map nav', 'config/navigation.config.js', '/hospital-map'],
-  ['Operations Medical IoT nav', 'config/navigation.config.js', '/medical-iot'],
-  ['Operations Fleet nav', 'config/navigation.config.js', '/fleet/map'],
-  ['Advanced Developer Catalog nav', 'config/navigation.config.js', '/tools/catalog'],
-  ['Profile settings assistant link', 'pages/ProfileSettings.jsx', '/assistant'],
-  ['Settings back link', 'pages/Settings.jsx', '/assistant'],
-  ['OAuth callback success', 'pages/AuthCallback.jsx', '/dashboard'],
+  ['Primary Emergency nav', 'config/navigation.config.js', '/emergency'],
+  ['Primary Tools nav', 'config/navigation.config.js', '/emergency/tools'],
+  ['Primary EMS nav', 'config/navigation.config.js', '/emergency/ems'],
+  ['Primary Referrals nav', 'config/navigation.config.js', '/emergency/referrals'],
+  ['Primary Capacity nav', 'config/navigation.config.js', '/emergency/capacity'],
+  ['Primary Shift nav', 'config/navigation.config.js', '/emergency/shift'],
 ];
 
 const canonicalRoutes = new Set([
@@ -36,6 +30,12 @@ const canonicalRoutes = new Set([
   '/auth',
   '/dashboard',
   '/assistant',
+  '/emergency',
+  '/emergency/tools',
+  '/emergency/ems',
+  '/emergency/referrals',
+  '/emergency/capacity',
+  '/emergency/shift',
   '/tools',
   '/operations',
   '/digital-twin',
@@ -51,7 +51,7 @@ const canonicalRoutes = new Set([
 ]);
 
 const userFacingLinkFiles = [
-  'components/Sidebar.jsx',
+  'layout/AppShell.jsx',
   'pages/Auth.jsx',
   'pages/AuthCallback.jsx',
   'pages/Profile.jsx',
@@ -63,6 +63,7 @@ const userFacingLinkFiles = [
 ];
 
 const navigationConfigPaths = [
+  ...APP_SHELL_NAV_ITEMS,
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
   ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
@@ -78,12 +79,10 @@ describe('section link inventory and route flattening', () => {
     }
   });
 
-  it('keeps Developer Catalog / Source Audit gated away from normal clinician links', () => {
-    expect(read('config/navigation.config.js')).toContain("permission: 'CONFIGURE_SYSTEM'");
-    expect(read('config/navigation.config.js')).toContain('showInMobile: false');
-    expect(read('App.jsx')).toContain('permission: Permission.CONFIGURE_SYSTEM');
+  it('keeps developer catalog aliases away from normal clinician links', () => {
+    expect(read('App.jsx')).toContain("['/catalog', '/emergency/tools']");
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
-    expect(read('components/Sidebar.jsx')).not.toContain("navigate('/tools/catalog')");
+    expect(read('layout/AppShell.jsx')).not.toContain("navigate('/tools/catalog')");
   });
 
   it('keeps user-facing calculator registry paths on plural canonical routes', () => {
@@ -97,23 +96,13 @@ describe('section link inventory and route flattening', () => {
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
-    const routes = read('config/routes.config.js');
-    expect(app).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
-    expect(routes).toContain("export const HOME_ROUTE_ALIASES = Object.freeze(['/home'])");
-    expect(routes).toContain(
-      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
-    );
-    expect(routes).toMatch(
-      /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
-    );
-    expect(routes).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])");
-    expect(routes).toContain(
-      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
-    );
-    expect(routes).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');
-    expect(app).toMatch(/path:\s*'\/operations'[\s\S]*<Operations \/>[\s\S]*requiresAuth:\s*true/);
-    expect(app).not.toContain('FLEET_MAP_ROUTE_ALIASES.map');
-    expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
+    expect(app).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(app).toContain("['/home', '/emergency']");
+    expect(app).toContain("['/chat', '/emergency']");
+    expect(app).toContain("['/tools/calculators/:slug', '/emergency/tools']");
+    expect(app).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
+    expect(app).not.toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
+    expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");
   });

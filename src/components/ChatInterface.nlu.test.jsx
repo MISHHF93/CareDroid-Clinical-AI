@@ -2,11 +2,12 @@
  * ChatInterface — NLU/chat integration (Vitest + clinicalChatService mocks).
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChatInterface from './ChatInterface';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { useFeatureStore } from '../../store/featureStore';
 
 vi.mock('./ChatInterface.css', () => ({}));
 vi.mock('./ToolPanel', () => ({ default: () => <div data-testid="tool-panel" /> }));
@@ -20,9 +21,11 @@ vi.mock('./ConfidenceBadge', () => ({ default: () => null }));
 
 const sendClinicalChatMessage = vi.fn();
 const mapChatResponseToAssistantMessage = vi.fn();
-const setWhiteboardFilter = vi.fn();
-const flagPatientForReassessment = vi.fn();
 let activeWorkspaceId = 'medical-iot';
+let setQueueFilterSpy;
+let setWhiteboardSearchQuerySpy;
+let addFlagSpy;
+const originalFeatureState = useFeatureStore.getState();
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: (...args) => sendClinicalChatMessage(...args),
@@ -44,68 +47,22 @@ vi.mock('../contexts/WorkspaceContext', () => ({
   }),
 }));
 
-vi.mock('../contexts/EmergencyDepartmentContext', () => ({
-  getQueueForPatientState: (state) => {
-    if (state === 'Triage') return 'Triage';
-    if (state === 'Waiting') return 'Waiting';
-    if (state === 'Assessment') return 'Provider';
-    return state;
-  },
-  useEmergencyDepartment: () => ({
-    patients: [
-      {
-        id: 'tor-uc-001',
-        name: 'Maya Chen',
-        location: 'Bed 1',
-        arrivalTime: new Date(Date.now() - 45 * 60000).toISOString(),
-        complaint: 'Chest pain',
-        state: 'Waiting',
-        priority: 'CTAS 2',
-        assignedTo: 'Dr. Singh',
-      },
-      {
-        id: 'tor-uc-004',
-        name: 'Noah Williams',
-        location: 'Bed 4',
-        arrivalTime: new Date(Date.now() - 12 * 60000).toISOString(),
-        complaint: 'Abdominal pain',
-        state: 'Assessment',
-        priority: 'CTAS 3',
-        assignedTo: 'NP Carter',
-      },
-    ],
-    queueCounts: {
-      Waiting: 1,
-      Triage: 0,
-      Provider: 1,
-    },
-    capacitySnapshot: {
-      score: 'Yellow',
-      currentOccupancy: 2,
-      maxCapacity: 30,
-      occupancyPercent: 7,
-      boardingCount: 0,
-      reassessmentQueueLength: 1,
-    },
-    reassessmentQueue: [
-      {
-        patientId: 'tor-uc-001',
-        patientName: 'Maya Chen',
-        reasons: ['Waiting state over 45 minutes'],
-      },
-    ],
-    setWhiteboardFilter,
-    flagPatientForReassessment,
-  }),
-}));
-
 describe('ChatInterface NLU integration', () => {
   const onAppendMessage = vi.fn();
 
   beforeEach(() => {
     HTMLElement.prototype.scrollTo = vi.fn();
     activeWorkspaceId = 'medical-iot';
+    act(() => {
+      useFeatureStore.setState(originalFeatureState, true);
+    });
     vi.clearAllMocks();
+    setQueueFilterSpy = vi.spyOn(useEmergencyStore.getState(), 'setQueueFilter');
+    setWhiteboardSearchQuerySpy = vi.spyOn(
+      useEmergencyStore.getState(),
+      'setWhiteboardSearchQuery'
+    );
+    addFlagSpy = vi.spyOn(useEmergencyStore.getState(), 'addFlag');
     sendClinicalChatMessage.mockResolvedValue({
       ok: true,
       message: { content: 'Assistant reply' },
@@ -114,7 +71,15 @@ describe('ChatInterface NLU integration', () => {
       role: 'assistant',
       content: 'Assistant reply',
     });
-    flagPatientForReassessment.mockReturnValue({ ok: true, message: 'Flag applied' });
+  });
+
+  afterEach(() => {
+    setQueueFilterSpy?.mockRestore();
+    setWhiteboardSearchQuerySpy?.mockRestore();
+    addFlagSpy?.mockRestore();
+    act(() => {
+      useFeatureStore.setState(originalFeatureState, true);
+    });
   });
 
   it('renders composer and sends message via clinicalChatService', async () => {
@@ -180,10 +145,11 @@ describe('ChatInterface NLU integration', () => {
     });
 
     const payload = sendClinicalChatMessage.mock.calls[0][0];
+    const emergencyState = useEmergencyStore.getState();
     expect(payload.workspaceContext.edCopilot).toMatchObject({
       enabled: true,
-      patientCount: 2,
-      capacitySnapshot: expect.objectContaining({ score: 'Yellow' }),
+      patientCount: emergencyState.patients.length,
+      capacitySnapshot: expect.objectContaining({ score: emergencyState.capacity.score }),
     });
     expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never recommend autonomous actions/i);
     expect(payload.messages[0].content).toMatch(/You are the ED Copilot for a busy Emergency Department/i);
@@ -198,12 +164,15 @@ describe('ChatInterface NLU integration', () => {
     expect(payload.messages[0].content).toMatch(/User intent detected: FILTER_COMPLAINT/);
     expect(payload.messages[0].content).toMatch(/include JSON: \{"action":"\.\.\.","params":\{\.\.\.\}\}/);
     expect(payload.workspaceContext.edCopilot.queueHealth[0]).toHaveProperty('health');
-    expect(payload.workspaceContext.edCopilot.flaggedReassessments).toHaveLength(1);
-    expect(setWhiteboardFilter).toHaveBeenCalledWith({ queue: null, complaint: 'chest' });
+    expect(payload.workspaceContext.edCopilot.flaggedReassessments.length).toBeGreaterThan(0);
+    expect(setQueueFilterSpy).toHaveBeenCalledWith(null);
+    expect(setWhiteboardSearchQuerySpy).toHaveBeenCalledWith('chest');
   });
 
   it('renders reassessment action JSON as a confirmable card', async () => {
     const user = userEvent.setup();
+    const patient = useEmergencyStore.getState().patients[0];
+    const patientName = `${patient.firstName} ${patient.lastName}`;
 
     render(
       <ChatInterface
@@ -212,7 +181,7 @@ describe('ChatInterface NLU integration', () => {
             id: 'assistant-action-1',
             role: 'assistant',
             content:
-              'I suggest flagging Maya Chen for reassessment.\n\n```json\n{"action":"FLAG_PATIENT","patientId":"tor-uc-001","flag":"ReassessmentDue"}\n```',
+              `I suggest flagging ${patientName} for reassessment.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
           },
         ]}
         onAppendMessage={onAppendMessage}
@@ -220,12 +189,41 @@ describe('ChatInterface NLU integration', () => {
     );
 
     expect(screen.getByText(/suggested action/i)).toBeInTheDocument();
-    expect(flagPatientForReassessment).not.toHaveBeenCalled();
+    expect(addFlagSpy).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: /apply/i }));
 
-    expect(flagPatientForReassessment).toHaveBeenCalledWith('tor-uc-001', 'ReassessmentDue');
+    expect(addFlagSpy).toHaveBeenCalledWith(
+      patient.id,
+      expect.objectContaining({ type: 'ReassessmentDue' })
+    );
     expect(screen.getByText(/applied/i)).toBeInTheDocument();
+  });
+
+  it('hides Copilot action cards when copilot_tool_actions is disabled', () => {
+    const patient = useEmergencyStore.getState().patients[0];
+    act(() => {
+      useFeatureStore.setState((state) => ({
+        flags: { ...state.flags, copilot_tool_actions: false },
+        overrides: { ...state.overrides, copilot_tool_actions: false },
+      }));
+    });
+
+    render(
+      <ChatInterface
+        messages={[
+          {
+            id: 'assistant-action-disabled',
+            role: 'assistant',
+            content:
+              `Action suggestion.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+      />,
+    );
+
+    expect(screen.queryByText(/suggested action/i)).not.toBeInTheDocument();
   });
 
   it('parses suggested action JSON with params and dismisses the card', async () => {
@@ -251,7 +249,7 @@ describe('ChatInterface NLU integration', () => {
     await user.click(screen.getByRole('button', { name: /dismiss/i }));
 
     expect(screen.queryByText(/suggested action/i)).not.toBeInTheDocument();
-    expect(flagPatientForReassessment).not.toHaveBeenCalled();
+    expect(addFlagSpy).not.toHaveBeenCalled();
   });
 
   it('does not auto-apply reassessment whiteboard actions from assistant responses', async () => {
@@ -288,7 +286,7 @@ describe('ChatInterface NLU integration', () => {
       expect(sendClinicalChatMessage).toHaveBeenCalled();
     });
 
-    expect(flagPatientForReassessment).not.toHaveBeenCalled();
+    expect(addFlagSpy).not.toHaveBeenCalled();
     const payload = sendClinicalChatMessage.mock.calls[0][0];
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
       intent: 'ACTION_FLAG',
@@ -323,6 +321,41 @@ describe('ChatInterface NLU integration', () => {
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
       intent: 'QUERY_EMS',
     });
+  });
+
+  it('removes EMS Copilot commands and context when ems_pipeline is disabled', async () => {
+    activeWorkspaceId = 'emergency';
+    act(() => {
+      useFeatureStore.setState((state) => ({
+        flags: { ...state.flags, ems_pipeline: false },
+        overrides: { ...state.overrides, ems_pipeline: false },
+      }));
+    });
+    const user = userEvent.setup();
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: /ems update/i })).not.toBeInTheDocument();
+    await user.type(screen.getByRole('textbox'), "What's the EMS situation");
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+
+    const payload = sendClinicalChatMessage.mock.calls[0][0];
+    expect(payload.workspaceContext.aiRequest.enabledFeatures.ems_pipeline).toBe(false);
+    expect(payload.workspaceContext.edCopilot.detectedIntent).toBeUndefined();
+    expect(payload.workspaceContext.edCopilot.emsPressure).toBeNull();
+    expect(payload.workspaceContext.edCopilot.systemPrompt).not.toMatch(/EMS pressure/i);
   });
 
   it('launches calculator locally for ED Copilot run score commands', async () => {

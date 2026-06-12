@@ -69,7 +69,7 @@ export default function ResearchEvidenceHub() {
   };
 
   return (
-    <main className="research-hub-page">
+    <section className="research-hub-page">
       <section className="research-hub-hero" aria-labelledby="research-hub-title">
         <div>
           <p className="research-hub-eyebrow">{snapshot.safetyLabel}</p>
@@ -289,6 +289,6 @@ export default function ResearchEvidenceHub() {
           </p>
         )}
       </section>
-    </main>
+    </section>
   );
 }

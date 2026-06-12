@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiFetch } from '../../services/apiClient';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
+import { makeBulkSyncDisabledResponse } from '../../services/disabledBackendMocks';
+import { reportApiError } from '../../services/apiErrorHandling';
 import './OfflineSupport.css';
 import logger from '../../utils/logger';
 
@@ -325,7 +327,18 @@ export const useOfflineStatus = () => {
     try {
       // Example: Sync conversations
       if (!isBackendCapabilityEnabled('bulkSync')) {
-        logger.info('Bulk sync API not available — skipping download sync');
+        const fallback = makeBulkSyncDisabledResponse(syncStats.total || 0);
+        logger.info('Bulk sync API not available — keeping offline changes queued');
+        reportApiError({
+          title: 'Offline sync queued',
+          message: fallback.message,
+          endpoint: '/api/sync',
+        });
+        setSyncStats((prev) => ({
+          ...prev,
+          total: fallback.total,
+          synced: fallback.synced,
+        }));
         return;
       }
 
@@ -356,7 +369,7 @@ export const useOfflineStatus = () => {
       setIsSyncing(false);
       setSyncProgress(0);
     }
-  }, [isOnline, isSyncing, cacheData]);
+  }, [isOnline, isSyncing, cacheData, syncStats.total]);
 
   return {
     isOnline,

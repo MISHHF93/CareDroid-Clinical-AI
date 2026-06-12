@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useEmergencyStore } from '../../../store/emergencyStore';
+import { useFeatureStore } from '../../../store/featureStore';
 import {
   fetchIntegrationStatuses,
-  fetchOrganizationFeatureFlags,
   fetchProtocolsAdmin,
   saveAlertRuleSettings,
   saveDepartmentSettings,
   saveStaffSettings,
   saveThresholdSettings,
   testIntegrationConnection,
-  updateOrganizationFeatureFlag,
   updateProtocolAdmin,
 } from '../../services/emergencySettingsApi';
 import './EmergencySettings.css';
@@ -19,12 +18,12 @@ const ROOM_STATUSES = ['Available', 'Occupied', 'Cleaning', 'Blocked', 'Reserved
 const STAFF_ROLES = ['Attending', 'Resident', 'Nurse', 'TriageNurse', 'ChargeNurse', 'Paramedic', 'Technician', 'Clerk', 'Consultant', 'Administrator'];
 const STAFF_STATUSES = ['OnShift', 'Break', 'Unavailable', 'OffShift'];
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
-const FEATURE_FLAG_IDS = {
-  simulationMode: 'simulation-suite',
-  emsModule: 'fleet-command',
-  referralModule: 'referral-ai',
-  analytics: 'operational-analytics',
-};
+const FEATURE_FLAG_ROWS = [
+  ['simulation_engine', 'Simulation Mode'],
+  ['ems_pipeline', 'EMS Module'],
+  ['referral_intelligence', 'Referral Module'],
+  ['shift_analytics', 'Analytics'],
+];
 
 function statusTone(status = '') {
   const lower = String(status).toLowerCase();
@@ -64,12 +63,21 @@ export default function EmergencySettings() {
   const upsertRoom = useEmergencyStore((state) => state.upsertRoom);
   const deactivateRoom = useEmergencyStore((state) => state.deactivateRoom);
   const upsertStaffMember = useEmergencyStore((state) => state.upsertStaffMember);
+  const initializeFlags = useFeatureStore((state) => state.initializeFlags);
+  const toggleFeature = useFeatureStore((state) => state.toggleFeature);
+  const isFeatureEnabled = useFeatureStore((state) => state.isEnabled);
+  const featureLoading = useFeatureStore((state) => state.loading);
+  const featureFlags = useFeatureStore((state) => state.flags);
+  const featureOverrides = useFeatureStore((state) => state.overrides);
+  const featureTier = useFeatureStore((state) => state.tier);
 
   const [localRooms, setLocalRooms] = useState(rooms);
   const [capacityTarget, setCapacityTarget] = useState(settings.departmentCapacityTarget);
   const [thresholds, setThresholds] = useState(settings.thresholds);
   const [alertRules, setAlertRules] = useState(settings.alertRules);
-  const [featureFlags, setFeatureFlags] = useState(settings.featureFlags);
+  const [featureDrafts, setFeatureDrafts] = useState(() =>
+    Object.fromEntries(FEATURE_FLAG_ROWS.map(([featureId]) => [featureId, isFeatureEnabled(featureId)]))
+  );
   const [localStaff, setLocalStaff] = useState(staff);
   const [integrations, setIntegrations] = useState([]);
   const [protocols, setProtocols] = useState([]);
@@ -77,6 +85,14 @@ export default function EmergencySettings() {
 
   useEffect(() => setLocalRooms(rooms), [rooms]);
   useEffect(() => setLocalStaff(staff), [staff]);
+  useEffect(() => {
+    initializeFlags();
+  }, [initializeFlags]);
+  useEffect(() => {
+    setFeatureDrafts(
+      Object.fromEntries(FEATURE_FLAG_ROWS.map(([featureId]) => [featureId, isFeatureEnabled(featureId)]))
+    );
+  }, [featureFlags, featureOverrides, featureTier, isFeatureEnabled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -88,17 +104,6 @@ export default function EmergencySettings() {
     });
     fetchProtocolsAdmin().then((result) => {
       if (!cancelled && result.ok) setProtocols(asArray(result.data));
-    });
-    fetchOrganizationFeatureFlags().then((result) => {
-      if (cancelled || !result.ok) return;
-      const backendFlags = Array.isArray(result.data?.flags) ? result.data.flags : [];
-      setFeatureFlags((current) => ({
-        ...current,
-        simulationMode: backendFlags.find((flag) => flag.id === FEATURE_FLAG_IDS.simulationMode)?.state !== 'disabled',
-        emsModule: backendFlags.find((flag) => flag.id === FEATURE_FLAG_IDS.emsModule)?.state !== 'disabled',
-        referralModule: backendFlags.find((flag) => flag.id === FEATURE_FLAG_IDS.referralModule)?.state !== 'disabled',
-        analytics: backendFlags.find((flag) => flag.id === FEATURE_FLAG_IDS.analytics)?.state !== 'disabled',
-      }));
     });
     return () => {
       cancelled = true;
@@ -139,17 +144,11 @@ export default function EmergencySettings() {
 
   const saveFeatureFlags = async () => {
     const results = await Promise.all(
-      Object.entries(featureFlags).map(([key, enabled]) =>
-        updateOrganizationFeatureFlag({
-          scope: 'tenant',
-          flagId: FEATURE_FLAG_IDS[key],
-          state: enabled ? 'enabled' : 'disabled',
-        })
+      Object.entries(featureDrafts).map(([featureId, enabled]) =>
+        toggleFeature(featureId, Boolean(enabled), { changedBy: 'Emergency Settings' })
       )
     );
-    const failed = results.find((result) => !result.ok);
-    setStatus(failed ? failed.message : 'Feature flags saved.');
-    if (!failed) saveEmergencySettings({ featureFlags });
+    setStatus(results.every(Boolean) ? 'Feature flags saved.' : 'Some feature flags were not changed.');
   };
 
   const addRoom = () => {
@@ -182,7 +181,7 @@ export default function EmergencySettings() {
   };
 
   return (
-    <main className="emergency-settings" aria-label="Emergency OS settings">
+    <section className="emergency-settings" aria-label="Emergency OS settings">
       <header className="emergency-settings__hero">
         <div>
           <span>Emergency OS Admin</span>
@@ -331,19 +330,19 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Feature Flags" subtitle="Tenant feature flags when organization context is available." action={<button type="button" onClick={saveFeatureFlags}>Save Feature Flags</button>}>
+      <Section title="Feature Flags" subtitle="Tenant feature flags managed by the shared feature store." action={<button type="button" onClick={saveFeatureFlags} disabled={featureLoading}>Save Feature Flags</button>}>
         <div className="emergency-settings__rules">
-          {Object.entries(featureFlags).map(([flag, enabled]) => (
-            <article key={flag}>
+          {FEATURE_FLAG_ROWS.map(([featureId, label]) => (
+            <article key={featureId}>
               <label>
-                <input type="checkbox" checked={enabled} onChange={(event) => setFeatureFlags((current) => ({ ...current, [flag]: event.target.checked }))} />
-                {flag.replace(/([A-Z])/g, ' $1')}
+                <input type="checkbox" checked={Boolean(featureDrafts[featureId])} onChange={(event) => setFeatureDrafts((current) => ({ ...current, [featureId]: event.target.checked }))} />
+                {label}
               </label>
-              <small>{FEATURE_FLAG_IDS[flag]}</small>
+              <small>{featureId}</small>
             </article>
           ))}
         </div>
       </Section>
-    </main>
+    </section>
   );
 }

@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { selectSelectedPatient, useEmergencyStore } from '../../store/emergencyStore';
 import { buildClinicalDecisionSupportPlan, DEFAULT_SYMPTOMS } from '../data/clinicalDecisionSupportEngine';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
@@ -9,12 +10,27 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './ClinicalDecisionSupport.css';
 
-const DEFAULT_PATIENT_CONTEXT = Object.freeze({
-  age: '57',
-  sex: 'not specified',
-  vitals: 'tachycardia, no hypotension documented',
-  history: 'hypertension, diabetes, prior smoking',
-});
+function formatPatientVitals(patient) {
+  const vitals = patient?.vitals || {};
+  return [
+    vitals.hr ? `HR ${vitals.hr}` : '',
+    vitals.bpSystolic || vitals.bpDiastolic ? `BP ${vitals.bpSystolic || '?'}/${vitals.bpDiastolic || '?'}` : '',
+    vitals.rr ? `RR ${vitals.rr}` : '',
+    vitals.spo2 ? `SpO2 ${vitals.spo2}` : '',
+    vitals.temp ? `Temp ${vitals.temp}` : '',
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function buildPatientContext(patient) {
+  return {
+    age: patient?.age != null ? String(patient.age) : '',
+    sex: patient?.sex || 'not specified',
+    vitals: formatPatientVitals(patient) || 'No current vitals in Emergency OS store',
+    history: patient?.history || patient?.chiefComplaint || 'No additional history in Emergency OS store',
+  };
+}
 
 function RecommendationList({ title, items }) {
   return (
@@ -30,8 +46,15 @@ function RecommendationList({ title, items }) {
 export default function ClinicalDecisionSupport() {
   const { user } = useUser();
   const { activeWorkspaceId, workspaces } = useWorkspace();
-  const [symptoms, setSymptoms] = useState(DEFAULT_SYMPTOMS);
-  const [patientContext, setPatientContext] = useState(DEFAULT_PATIENT_CONTEXT);
+  const selectedPatient = useEmergencyStore(selectSelectedPatient);
+  const selectedPatientContext = useMemo(() => buildPatientContext(selectedPatient), [selectedPatient]);
+  const [symptoms, setSymptoms] = useState(selectedPatient?.chiefComplaint || DEFAULT_SYMPTOMS);
+  const [patientContext, setPatientContext] = useState(selectedPatientContext);
+
+  useEffect(() => {
+    setPatientContext(selectedPatientContext);
+    setSymptoms(selectedPatient?.chiefComplaint || DEFAULT_SYMPTOMS);
+  }, [selectedPatient?.chiefComplaint, selectedPatientContext]);
   const profile = useMemo(
     () => buildUserToolProfile({ user, activeWorkspaceId }),
     [activeWorkspaceId, user]
@@ -60,7 +83,7 @@ export default function ClinicalDecisionSupport() {
   );
 
   return (
-    <main className="cds-page">
+    <section className="cds-page">
       <section className="cds-hero" aria-labelledby="cds-title">
         <div className="cds-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.stethoscope} size={34} />
@@ -228,6 +251,6 @@ export default function ClinicalDecisionSupport() {
           <RecommendationList title="Limitations" items={plan.explainability.limitations} />
         </div>
       </section>
-    </main>
+    </section>
   );
 }

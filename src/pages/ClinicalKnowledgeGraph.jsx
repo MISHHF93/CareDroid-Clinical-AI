@@ -55,7 +55,7 @@ export default function ClinicalKnowledgeGraph() {
   };
 
   return (
-    <main className="knowledge-graph-page">
+    <section className="knowledge-graph-page">
       <section className="knowledge-graph-hero" aria-labelledby="knowledge-graph-title">
         <div>
           <p className="knowledge-graph-eyebrow">Artifact intelligence graph</p>
@@ -290,6 +290,6 @@ export default function ClinicalKnowledgeGraph() {
           </article>
         </section>
       </section>
-    </main>
+    </section>
   );
 }

@@ -74,7 +74,7 @@ export default function DependencyGraph() {
   const summary = graph.summary || {};
 
   return (
-    <main className="dependency-graph">
+    <section className="dependency-graph">
       <header className="dependency-graph-hero">
         <p className="dependency-graph-eyebrow">Asset Dependency Graph</p>
         <h1>Asset Dependency Graph</h1>
@@ -152,6 +152,6 @@ export default function DependencyGraph() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

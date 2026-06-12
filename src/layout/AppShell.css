@@ -214,6 +214,35 @@
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border-default) 40%, transparent);
 }
 
+.ed-os-wordmark,
+.ed-shift-clock {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ed-os-wordmark {
+  padding: 0;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 900;
+}
+
+.ed-shift-clock {
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+.ed-os-wordmark:hover,
+.ed-os-wordmark:focus-visible,
+.ed-shift-clock:hover,
+.ed-shift-clock:focus-visible {
+  color: var(--status-info);
+  outline: 2px solid color-mix(in srgb, var(--status-info) 55%, transparent);
+  outline-offset: 3px;
+}
+
 .ed-shift-control {
   position: relative;
   display: inline-flex;
@@ -675,7 +704,7 @@
 }
 
 .capacity-detail-panel {
-  position: absolute;
+  position: fixed;
   inset-block-start: var(--ed-header-height, 48px);
   inset-block-end: 0;
   inset-inline-end: 0;
@@ -691,15 +720,21 @@
   opacity: 0;
   pointer-events: none;
   transform: translateX(100%);
+  visibility: hidden;
   transition:
     opacity 160ms var(--ease-smooth, ease),
-    transform 160ms var(--ease-smooth, ease);
+    transform 160ms var(--ease-smooth, ease),
+    visibility 0ms linear 160ms;
 }
 
 .capacity-detail-panel--open {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(0);
+  visibility: visible;
+  transition:
+    opacity 160ms var(--ease-smooth, ease),
+    transform 160ms var(--ease-smooth, ease);
 }
 
 .capacity-detail-panel--yellow {
@@ -1207,7 +1242,7 @@
 
 .ed-alert-toast-stack {
   position: fixed;
-  inset-inline-end: var(--space-4);
+  inset-inline-end: calc(var(--ed-copilot-width) + var(--space-4));
   inset-block-end: var(--space-4);
   z-index: var(--z-toast, 1200);
   display: grid;
@@ -1215,11 +1250,16 @@
   width: min(420px, calc(100vw - 32px));
 }
 
+.ed-os-shell--copilot-collapsed .ed-alert-toast-stack {
+  inset-inline-end: calc(var(--ed-copilot-collapsed-width) + var(--space-4));
+}
+
 .ed-alert-toast {
   --ed-alert-toast-tone: var(--status-critical);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
   gap: var(--space-2);
+  min-width: 0;
   padding: var(--space-3);
   border: 1px solid color-mix(in srgb, var(--ed-alert-toast-tone) 52%, var(--color-border-default));
   border-left: 5px solid var(--ed-alert-toast-tone);
@@ -1227,6 +1267,10 @@
   background: color-mix(in srgb, var(--ed-alert-toast-tone) 16%, var(--color-elevated));
   color: var(--color-text-primary);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+}
+
+.ed-alert-toast > * {
+  min-width: 0;
 }
 
 .ed-alert-toast--info {
@@ -1255,7 +1299,15 @@
 .ed-alert-toast > div:last-child {
   display: inline-flex;
   align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--space-1);
+  max-width: 100%;
+}
+
+.ed-alert-toast > div:last-child button {
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 .ed-icon-button__count {
@@ -1713,6 +1765,31 @@
   color: var(--color-text-secondary);
 }
 
+.ed-route-panel__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ed-route-panel__tabs a {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.ed-route-panel__tabs a[aria-current='page'],
+.ed-route-panel__tabs a:hover,
+.ed-route-panel__tabs a:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info) 55%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-surface));
+  color: var(--color-text-primary);
+}
+
 .ed-route-panel__metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1984,21 +2061,17 @@
 
   .ed-nav-rail__items {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
     gap: 0;
     padding: 0;
   }
 
   .ed-nav-rail__item {
-    display: none;
+    display: flex;
     height: 64px;
     min-height: 44px;
     border-left: 0;
     border-top: 3px solid transparent;
-  }
-
-  .ed-nav-rail__item:nth-child(-n + 5) {
-    display: flex;
   }
 
   .ed-nav-rail__item--active {

@@ -72,7 +72,7 @@ export default function Patients() {
   };
 
   return (
-    <main className="operating-workspace" aria-labelledby="patients-title">
+    <section className="operating-workspace" aria-labelledby="patients-title">
       <section className="operating-hero">
         <div className="operating-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.users} size={28} />
@@ -112,6 +112,6 @@ export default function Patients() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

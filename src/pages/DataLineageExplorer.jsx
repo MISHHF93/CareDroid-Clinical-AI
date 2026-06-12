@@ -102,7 +102,7 @@ export default function DataLineageExplorer() {
   );
 
   return (
-    <main className="data-lineage-page">
+    <section className="data-lineage-page">
       <section className="data-lineage-hero">
         <div>
           <p>Data Lineage Explorer</p>
@@ -156,6 +156,6 @@ export default function DataLineageExplorer() {
           <FlowCard key={flow.id} flow={flow} />
         ))}
       </section>
-    </main>
+    </section>
   );
 }

@@ -1,6 +1,8 @@
 // Offline database using LocalStorage with sync queue
 import { apiFetchJson } from '../services/apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { makeBulkSyncDisabledResponse } from '../services/disabledBackendMocks';
+import { reportApiError } from '../services/apiErrorHandling';
 import logger from '../utils/logger';
 
 class OfflineDB {
@@ -133,7 +135,13 @@ class OfflineDB {
   async syncItem(item) {
     if (!isBackendCapabilityEnabled('bulkSync')) {
       logger.info('[OfflineDB] Bulk sync API not available — keeping item in queue');
-      return null;
+      const fallback = makeBulkSyncDisabledResponse(1);
+      reportApiError({
+        title: 'Bulk sync unavailable',
+        message: fallback.message,
+        endpoint: '/api/sync',
+      });
+      return fallback;
     }
 
     const { response, data } = await apiFetchJson('/api/sync', {

@@ -8,6 +8,8 @@ import { apiFetch } from './apiClient';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
+import { makeDisabledCapabilityResponse } from './disabledBackendMocks';
+import { reportApiError } from './apiErrorHandling';
 import logger from '../utils/logger';
 
 class SyncService {
@@ -149,6 +151,10 @@ class SyncService {
     if (messages.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
       logger.info('Skipping message sync — chat persistence API not available on server');
+      const fallback = makeDisabledCapabilityResponse('chatPersistence', '/api/chat/messages', {
+        synced: 0,
+        queued: messages.length,
+      });
       await recordAutomationBlocked({
         triggerFired: 'Offline message sync requested',
         conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
@@ -157,7 +163,12 @@ class SyncService {
         backendEndpoint: '/api/chat/messages',
         reason: 'Chat persistence API is not available on this server.',
       });
-      return;
+      reportApiError({
+        title: 'Chat message sync unavailable',
+        message: fallback.message,
+        endpoint: '/api/chat/messages',
+      });
+      return fallback;
     }
 
     logger.info(`Syncing ${messages.length} messages`);
@@ -216,6 +227,10 @@ class SyncService {
     if (conversations.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
       logger.info('Skipping conversation sync — chat persistence API not available on server');
+      const fallback = makeDisabledCapabilityResponse('chatPersistence', '/api/chat/conversations', {
+        synced: 0,
+        queued: conversations.length,
+      });
       await recordAutomationBlocked({
         triggerFired: 'Offline conversation sync requested',
         conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
@@ -224,7 +239,12 @@ class SyncService {
         backendEndpoint: '/api/chat/conversations',
         reason: 'Chat persistence API is not available on this server.',
       });
-      return;
+      reportApiError({
+        title: 'Chat conversation sync unavailable',
+        message: fallback.message,
+        endpoint: '/api/chat/conversations',
+      });
+      return fallback;
     }
 
     logger.info(`Syncing ${conversations.length} conversations`);

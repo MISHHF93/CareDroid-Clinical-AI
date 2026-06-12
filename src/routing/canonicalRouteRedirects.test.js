@@ -2,189 +2,72 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
+import { CANONICAL_APP_ROUTE_TREE } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
-const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
-function expectRoute(path, component) {
-  expect(appSource).toMatch(
-    new RegExp(`path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<${component}\\s*\\/>`)
-  );
+function expectRoutePath(path) {
+  expect(appSource).toContain(`path: '${path}'`);
 }
 
-function expectGeneratedRedirect(path, to) {
-  expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
-    expect.arrayContaining([expect.objectContaining({ path, to })])
-  );
-}
-
-describe('canonical route redirects', () => {
-  it('bypasses auth aliases and sends visitors straight to the Emergency Whiteboard', () => {
-    expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/workspace/emergency" replace />');
-    expect(appSource).not.toContain('AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname)');
-    expect(appSource).not.toContain("search.set('mode', 'signup')");
+describe('canonical route tree', () => {
+  it('exports the clean Emergency OS route tree', () => {
+    expect(CANONICAL_APP_ROUTE_TREE).toEqual([
+      { path: '/', type: 'redirect', to: '/emergency' },
+      { path: '/emergency', type: 'page', componentKey: 'EmergencyWhiteboard' },
+      { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
+      { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
+      { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
+      { path: '/emergency/tools', type: 'page', componentKey: 'ClinicalCalculatorHub' },
+      { path: '/emergency/shift', type: 'page', componentKey: 'ShiftSummary' },
+      { path: '/settings', type: 'page', componentKey: 'Settings' },
+      { path: '/settings/features', type: 'page', componentKey: 'FeatureTogglePanel' },
+      { path: '*', type: 'redirect', to: '/emergency' },
+    ]);
   });
 
-  it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
-    expectRoute('/dashboard', 'CommandDashboard');
-    expectGeneratedRedirect('/home', '/dashboard');
-    expectGeneratedRedirect('/chat', '/assistant');
-    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
-    expectRoute('/discover', 'CapabilityDiscovery');
-    expectRoute('/workflows', 'WorkflowBuilderPage');
-    expectGeneratedRedirect('/automation', '/workflows');
-    expect(routeConfigSource).toContain(
-      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
-    );
-    expectRoute('/operations', 'Operations');
-    expectGeneratedRedirect('/operations-center', '/operations');
-    expect(appSource).not.toContain('DigitalOperationsCenter');
-    expect(routeConfigSource).toContain(
-      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
-    );
-    expect(appSource).not.toContain(
-      'path: \'/dashboard\', element: <LegacyProtectedRouteRedirect to="/home" />'
-    );
-    expect(appSource).not.toContain(
-      "path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>"
-    );
+  it('mounts only canonical ED and settings page routes as primary pages', () => {
+    for (const route of CANONICAL_APP_ROUTE_TREE.filter((item) => item.type === 'page')) {
+      expectRoutePath(route.path);
+    }
+
+    expect(appSource).toContain('element: <EmergencyWhiteboard />');
+    expect(appSource).toContain('<EMSPipeline />');
+    expect(appSource).toContain('<ReferralPanel />');
+    expect(appSource).toContain('<EmergencyCapacityRoute />');
+    expect(appSource).toContain('<ClinicalCalculatorHub />');
+    expect(appSource).toContain('<ShiftSummary />');
+    expect(appSource).toContain('element: <SettingsRoute />');
+    expect(appSource).toContain('element: <SettingsFeaturesRoute />');
   });
 
-  it('gives the fleet area an explicit canonical live-map redirect', () => {
-    expectGeneratedRedirect('/fleet', '/fleet/map');
-    expect(routeConfigSource).toMatch(
-      /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
-    );
-    expectRoute('/fleet/command', 'FleetDashboard');
+  it('redirects duplicates and legacy aliases to canonical routes', () => {
+    expect(appSource).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(appSource).toContain("['/dashboard', '/emergency']");
+    expect(appSource).toContain("['/assistant', '/emergency']");
+    expect(appSource).toContain("['/emergency/queues', '/emergency']");
+    expect(appSource).toContain("['/tools/calculators/:slug', '/emergency/tools']");
+    expect(appSource).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
   });
 
-  it('keeps Medical IoT as a first-class authenticated dashboard route', () => {
-    expectRoute('/medical-iot', 'MedicalIotDashboard');
-    expect(appSource).not.toContain('to="/fleet/medical-iot"');
-    expect(appSource).not.toContain('to="/tools/catalog?tool=medical-iot-dashboard"');
+  it('renders non-canonical modules as AppShell future-release stubs', () => {
+    expect(appSource).toContain('const FUTURE_RELEASE_ROUTES = Object.freeze([');
+    expect(appSource).toContain("['Operations', '/operations']");
+    expect(appSource).toContain("['Privacy Policy', '/privacy']");
+    expect(appSource).toContain("['Clinical Tools', '/tools/*']");
+    expect(appSource).toContain('...FUTURE_RELEASE_ROUTES.map(([label, path]) => ({');
+    expect(appSource).toContain('<FutureReleaseStub label={label} />');
+    expect(appSource).toContain('This module is available in a future release.');
   });
 
-  it('keeps Hospital Map as a first-class authenticated operations route', () => {
-    expectRoute('/hospital-map', 'HospitalMapDashboard');
-    expect(appSource).not.toContain('to="/tools/catalog?tool=hospital-map"');
-  });
-
-  it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
-    expectRoute('/tools', 'ToolsOverview');
-    expectGeneratedRedirect('/catalog', '/tools');
-    expect(routeConfigSource).toContain(
-      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
-    );
-    expect(appSource).toContain("path: '/tools/catalog'");
-    expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
-  });
-
-  it('keeps /privacy as the public privacy policy while governance privacy remains protected', () => {
-    expect(appSource).toMatch(
-      /path:\s*'\/privacy'[\s\S]*?<PublicShell>[\s\S]*?<PrivacyPolicy\s*\/>[\s\S]*?<\/PublicShell>/
-    );
-    expect(appSource).toMatch(
-      /path:\s*'\/governance\/privacy'[\s\S]*?<PlatformGovernanceWorkspace\s*\/>[\s\S]*?requiresAuth:\s*true[\s\S]*?permission:\s*Permission\.VIEW_PRIVACY_CENTER/
-    );
-  });
-
-  it('redirects legacy audit-log entry points to the canonical audit route', () => {
-    expectGeneratedRedirect('/audit-logs', '/audit');
-    expect(routeConfigSource).toContain(
-      "export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs'])"
-    );
-  });
-
-  it('registers profile tool preferences without redirecting canonical tool routes', () => {
-    expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
-    expectRoute('/analytics', 'AnalyticsDashboard');
-    expectRoute('/billing', 'BillingPage');
-    expectRoute('/tenant-admin', 'TenantAdministrationCenter');
-    expectRoute('/usage', 'UsagePage');
-    expectRoute('/feature-flags', 'FeatureFlagCenter');
-    expectRoute('/plugins', 'PluginMarketplace');
-    expectRoute('/dependency-map', 'DependencyMap');
-    expectRoute('/dependency-graph', 'DependencyGraph');
-    expectRoute('/data-lineage', 'DataLineageExplorer');
-    expectRoute('/self-diagnostics', 'PlatformSelfDiagnostics');
-    expectRoute('/platform-learning-engine', 'PlatformLearningEngine');
-    expectGeneratedRedirect('/platform-learning', '/platform-learning-engine');
-    expectRoute('/brain', 'CareDroidBrainDashboard');
-    expectRoute('/ai-evaluation', 'AiEvaluationDashboard');
-    expectGeneratedRedirect('/ai/evaluation', '/ai-evaluation');
-    expect(appSource).toContain("path: '/tools'");
-    expectRoute('/tools/calculators', 'ToolsOverview');
-    expect(appSource).toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).not.toContain('to="/profile/preferences?tool-preferences"');
-  });
-
-  it('renders product tool pages directly instead of redirecting them through assistant', () => {
-    expectRoute('/tools/drug-checker', 'DrugChecker');
-    expectRoute('/tools/lab-interpreter', 'LabInterpreter');
-    expect(appSource).toContain("path: '/tools/ambient-scribe'");
-    expectRoute('/tools/ambient-scribe', 'AmbientScribe');
-    expect(appSource).toContain("path: '/tools/patient-summary-ai'");
-    expectRoute('/tools/patient-summary-ai', 'PatientSummaryAi');
-    expect(appSource).not.toContain('function AssistantToolRedirect');
-  });
-
-  it('keeps products, asset packs, and configuration studio as first-class routes', () => {
-    expectRoute('/products', 'ProductsIndexPage');
-    expectRoute('/asset-packs', 'PackMarketplace');
-    expectRoute('/departments', 'DepartmentsPage');
-    expectRoute('/service-lines', 'ServiceLinesPage');
-    expectRoute('/integration-readiness', 'IntegrationReadinessPage');
-    expectRoute('/solution-builder', 'HospitalSolutionBuilderPage');
-    expectRoute('/value-tracking', 'ValueTrackingPage');
-    expectRoute('/customer-success', 'CustomerSuccessDashboard');
-    expectRoute('/organization-intelligence', 'OrganizationIntelligenceProfile');
-    expectRoute('/configuration-studio', 'ConfigurationStudioPage');
-    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])
-    );
-  });
-
-  it('wires simulation, laboratory, and 3D viewer canonical routes with aliases', () => {
-    expectRoute('/clinical-decision-support', 'ClinicalDecisionSupport');
-    expectRoute('/protocols', 'Protocols');
-    expectRoute('/research', 'ResearchEvidenceHub');
-    expectRoute('/documentation', 'ClinicalDocumentationAssistant');
-    expectRoute('/knowledge-graph', 'ClinicalKnowledgeGraph');
-    expectRoute('/predictive-analytics', 'PredictiveAnalyticsDashboard');
-    expectRoute('/competencies', 'Competencies');
-    expectRoute('/credentials', 'Credentials');
-    expectRoute('/simulation', 'MedicalSimulationSuite');
-    expectRoute('/simulation/outcomes', 'SimulationOutcomes');
-    expectRoute('/simulation/:scenarioId', 'SimulationScenarioPlayer');
-    expectRoute('/laboratory', 'LaboratoryDashboard');
-    expectRoute('/3d-viewer', 'Medical3DViewer');
-    expectGeneratedRedirect('/medical-simulation', '/simulation');
-    expectGeneratedRedirect('/lab', '/laboratory');
-    expectGeneratedRedirect('/anatomy-viewer', '/3d-viewer');
-    expect(routeConfigSource).toContain("export const SIMULATION_ROUTE_ALIASES = Object.freeze(['/medical-simulation'])");
-    expect(routeConfigSource).toContain("export const LABORATORY_ROUTE_ALIASES = Object.freeze(['/lab'])");
-    expect(routeConfigSource).toContain("export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer'])");
-  });
-
-  it('normalizes auth aliases to the Emergency Whiteboard instead of rendering an auth page', () => {
-    expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*?element:\s*<Navigate to="\/workspace\/emergency" replace \/>[\s\S]*?publicOnly:\s*true/
-    );
+  it('keeps auth callbacks deep-linkable and catches all unknown routes', () => {
+    expectRoutePath('/auth-callback');
+    expectRoutePath('/auth/callback');
     expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');
-    expect(appSource).toContain('element: <AuthPathRedirect />');
-  });
-
-  it('redirects legacy singular calculator paths to plural canonical calculator routes', () => {
-    expect(appSource).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
-    expect(appSource).not.toContain("path: '/tools/calculator/sofa', element: <AppShellPage>");
-  });
-
-  it('does not register blank or null route elements', () => {
-    expect(appSource).not.toMatch(/element:\s*null/);
-    expect(appSource).not.toMatch(/element:\s*undefined/);
     expect(appSource).toContain("path: '*'");
+    expect(appSource).toContain('element: <Navigate to="/emergency" replace />');
+    expect(appSource).not.toContain('Page not found');
+    expect(appSource).not.toContain('<ToolNotFound');
   });
 });

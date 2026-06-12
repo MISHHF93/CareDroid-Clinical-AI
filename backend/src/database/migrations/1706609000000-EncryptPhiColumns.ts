@@ -255,8 +255,6 @@ export class EncryptPhiColumns1706609000000 implements MigrationInterface {
         );
       }
     }
-
-    console.log('✅ Migration complete: Encrypted PHI columns added');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -298,7 +296,5 @@ export class EncryptPhiColumns1706609000000 implements MigrationInterface {
         }
       }
     }
-
-    console.log('✅ Migration rolled back: Encrypted PHI columns removed');
   }
 }

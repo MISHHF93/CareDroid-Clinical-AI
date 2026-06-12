@@ -54,6 +54,6 @@ describe('build and service config consistency', () => {
   it('keeps provider API keys out of browser config', () => {
     expect(read('.env.example')).not.toContain('VITE_ANTHROPIC_API_KEY=');
     expect(read('src/config/appConfig.js')).not.toContain('VITE_ANTHROPIC_API_KEY');
-    expect(read('src/services/openaiService.ts')).toContain('API_ROUTES.chat.message');
+    expect(read('src/services/clinicalChatService.js')).toContain('/api/chat/message');
   });
 });

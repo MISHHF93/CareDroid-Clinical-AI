@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { Drawer } from '../components/ui/Drawer';
+import FeatureGate from '../components/FeatureGate';
+import { useFeature } from '../hooks/useFeature';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useTheme } from '../contexts/ThemeContext';
 import { Permission, useUser } from '../contexts/UserContext';
@@ -72,6 +74,7 @@ const Settings = () => {
   const { preference, resolvedTheme, setPreference } = useTheme();
   const { user, authToken, isAuthenticated, isLoading: authLoading, hasPermission } = useUser();
   const { success, error } = useNotificationActions();
+  const { enabled: auditLogEnabled } = useFeature('audit_log');
   const accountEmail = user?.email || '';
   const canLoadBilling = Boolean(isAuthenticated || authToken || user);
   const canViewPlatformAdmin = [
@@ -141,6 +144,12 @@ const Settings = () => {
 
   useEffect(() => {
     let cancelled = false;
+    if (!auditLogEnabled) {
+      setAuditLogState({ status: 'idle', message: '', logs: [] });
+      return () => {
+        cancelled = true;
+      };
+    }
     setAuditLogState((current) => ({ ...current, status: 'loading', message: '' }));
     fetchMyAuditLogs(20).then((result) => {
       if (cancelled) return;
@@ -157,7 +166,7 @@ const Settings = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [auditLogEnabled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -486,42 +495,44 @@ const Settings = () => {
             </div>
           </section>
 
-          <section className="settings-billing-card" aria-labelledby="settings-audit-log-title">
-            <div className="settings-billing-card__header">
-              <div>
-                <h3 id="settings-audit-log-title">Audit Log</h3>
-                <p>
-                  Last 20 current-user audit events from the protected backend audit trail,
-                  including Emergency OS sync events when available.
-                </p>
+          <FeatureGate feature="audit_log">
+            <section className="settings-billing-card" aria-labelledby="settings-audit-log-title">
+              <div className="settings-billing-card__header">
+                <div>
+                  <h3 id="settings-audit-log-title">Audit Log</h3>
+                  <p>
+                    Last 20 current-user audit events from the protected backend audit trail,
+                    including Emergency OS sync events when available.
+                  </p>
+                </div>
+                <span className="settings-billing-card__badge">Audit</span>
               </div>
-              <span className="settings-billing-card__badge">Audit</span>
-            </div>
 
-            {auditLogState.status === 'loading' ? (
-              <div className="settings-billing-empty">Loading audit events...</div>
-            ) : auditLogState.status === 'error' ? (
-              <div className="settings-billing-empty">{auditLogState.message}</div>
-            ) : auditLogState.logs.length ? (
-              <div className="settings-audit-log-list">
-                {auditLogState.logs.slice(0, 20).map((log) => (
-                  <article key={log.id || `${log.action}-${log.timestamp}`} className="settings-audit-log-item">
-                    <div>
-                      <strong>{log.action || 'audit_event'}</strong>
-                      <span>{log.resource || 'No resource recorded'}</span>
-                    </div>
-                    <time dateTime={log.timestamp || log.createdAt}>
-                      {log.timestamp || log.createdAt
-                        ? new Date(log.timestamp || log.createdAt).toLocaleString()
-                        : 'No timestamp'}
-                    </time>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="settings-billing-empty">No audit events returned by the backend.</div>
-            )}
-          </section>
+              {auditLogState.status === 'loading' ? (
+                <div className="settings-billing-empty">Loading audit events...</div>
+              ) : auditLogState.status === 'error' ? (
+                <div className="settings-billing-empty">{auditLogState.message}</div>
+              ) : auditLogState.logs.length ? (
+                <div className="settings-audit-log-list">
+                  {auditLogState.logs.slice(0, 20).map((log) => (
+                    <article key={log.id || `${log.action}-${log.timestamp}`} className="settings-audit-log-item">
+                      <div>
+                        <strong>{log.action || 'audit_event'}</strong>
+                        <span>{log.resource || 'No resource recorded'}</span>
+                      </div>
+                      <time dateTime={log.timestamp || log.createdAt}>
+                        {log.timestamp || log.createdAt
+                          ? new Date(log.timestamp || log.createdAt).toLocaleString()
+                          : 'No timestamp'}
+                      </time>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="settings-billing-empty">No audit events returned by the backend.</div>
+              )}
+            </section>
+          </FeatureGate>
 
           <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">
             <div className="settings-billing-card__header">

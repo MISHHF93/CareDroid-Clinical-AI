@@ -13,7 +13,7 @@ export default function Competencies() {
   const snapshot = useMemo(() => buildCompetencyCredentialingSnapshot(profile), [profile]);
 
   return (
-    <main className="credentialing-page">
+    <section className="credentialing-page">
       <section className="credentialing-hero" aria-labelledby="competencies-title">
         <div className="credentialing-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.trophy} size={34} />
@@ -108,6 +108,6 @@ export default function Competencies() {
           </ul>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

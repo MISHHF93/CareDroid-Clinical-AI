@@ -45,7 +45,7 @@ export default function AiModelsPage() {
   const highRiskCount = models.filter((model) => ['critical', 'high'].includes(model.riskLevel)).length;
 
   return (
-    <main className="ai-models-page" aria-labelledby="ai-models-title">
+    <section className="ai-models-page" aria-labelledby="ai-models-title">
       <section className="ai-models-hero">
         <div className="ai-models-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.sparkles} size={28} />
@@ -156,6 +156,6 @@ export default function AiModelsPage() {
           </article>
         ))}
       </section>
-    </main>
+    </section>
   );
 }

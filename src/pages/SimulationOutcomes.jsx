@@ -15,7 +15,7 @@ export default function SimulationOutcomes() {
   const recommended = outcomes.recommendedPractice.map(getSimulationScenarioById).filter(Boolean);
 
   return (
-    <main className="ops-demo-page simulation-outcomes">
+    <section className="ops-demo-page simulation-outcomes">
       <section className="ops-demo-hero" aria-labelledby="simulation-outcomes-title">
         <div className="ops-demo-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.barChart} size={34} />
@@ -134,6 +134,6 @@ export default function SimulationOutcomes() {
           </div>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

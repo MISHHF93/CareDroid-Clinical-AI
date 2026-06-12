@@ -21,7 +21,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   emergencyWorkspace: '/emergency',
   emergencyPatients: '/emergency',
   emergencyEms: '/emergency/ems',
-  emergencyOperations: '/emergency/queues',
+  emergencyOperations: '/emergency',
   emergencyAnalytics: '/emergency/analytics',
   emergencyCopilot: '/emergency/copilot',
   emergencyTools: '/emergency/tools',
@@ -122,6 +122,19 @@ export const CANONICAL_ROUTES = Object.freeze({
   welcome: '/welcome',
   onboarding: '/onboarding',
 });
+
+export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
+  { path: '/', type: 'redirect', to: '/emergency' },
+  { path: '/emergency', type: 'page', componentKey: 'EmergencyWhiteboard' },
+  { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
+  { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
+  { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
+  { path: '/emergency/tools', type: 'page', componentKey: 'ClinicalCalculatorHub' },
+  { path: '/emergency/shift', type: 'page', componentKey: 'ShiftSummary' },
+  { path: '/settings', type: 'page', componentKey: 'Settings' },
+  { path: '/settings/features', type: 'page', componentKey: 'FeatureTogglePanel' },
+  { path: '*', type: 'redirect', to: '/emergency' },
+]);
 
 export const AUTH_PATH_ALIASES = Object.freeze([
   '/login',

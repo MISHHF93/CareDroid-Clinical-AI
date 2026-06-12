@@ -14,6 +14,8 @@ const ALLOWED_OVERFLOW_ANCESTORS = [
   '.tool-card-table-wrap',
   '.cost-chart',
   '.dashboard-recs-row',
+  '.journey-timeline__scroller',
+  '.patient-detail__data-tabs',
 ];
 
 /**
@@ -70,6 +72,8 @@ export async function measurePageOverflow(page) {
             : el.tagName.toLowerCase();
         offenders.push({
           selector: `${el.tagName.toLowerCase()}${id}${cls}`,
+          text: el.textContent?.trim().slice(0, 80) || '',
+          ariaLabel: el.getAttribute('aria-label') || '',
           overflowPx: Math.round(overflowRight),
           left: Math.round(rect.left),
           width: Math.round(rect.width),

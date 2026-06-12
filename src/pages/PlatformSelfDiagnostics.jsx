@@ -21,8 +21,8 @@ function DiagnosticCard({ item }) {
       <p>{item.detail}</p>
       {item.evidence.length > 0 && (
         <ul aria-label={`${item.label} evidence`}>
-          {item.evidence.map((entry) => (
-            <li key={entry}>{entry}</li>
+          {item.evidence.map((entry, index) => (
+            <li key={`${item.id}-${index}-${entry}`}>{entry}</li>
           ))}
         </ul>
       )}
@@ -65,7 +65,7 @@ export default function PlatformSelfDiagnostics() {
   }, [categoryFilter, diagnostics.byStatus]);
 
   return (
-    <main className="self-diagnostics-page">
+    <section className="self-diagnostics-page">
       <section className="self-diagnostics-hero">
         <div>
           <p>Platform Self-Diagnostics</p>
@@ -126,6 +126,6 @@ export default function PlatformSelfDiagnostics() {
         <StatusSection title="Warning" checks={filteredByStatus.warning} />
         <StatusSection title="Healthy" checks={filteredByStatus.healthy} />
       </div>
-    </main>
+    </section>
   );
 }

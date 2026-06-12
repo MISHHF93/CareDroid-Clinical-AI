@@ -14,8 +14,6 @@ const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
-const authShellCss = readFileSync(join(__dirname, '../layout/AuthShell.css'), 'utf8');
-const publicShellCss = readFileSync(join(__dirname, '../layout/PublicShell.css'), 'utf8');
 const quickCommandCss = readFileSync(
   join(__dirname, '../components/QuickCommandLauncher.css'),
   'utf8'
@@ -89,21 +87,19 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('uses the main shell scrollport plus local scroll helpers', () => {
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*height:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*flex:\s*0 0 auto/
-    );
+    expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(indexCss).toMatch(/\.app-local-scroll-y\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/\.app-local-scroll-x\s*\{[\s\S]*overflow-x:\s*auto/);
   });
 
-  it('keeps auth and public shells as route-level scrollports under the locked root', () => {
-    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*scroll-padding-block/);
-    expect(publicShellCss).toMatch(/\.public-shell\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(publicShellCss).toMatch(/\.public-shell\s*\{[\s\S]*overflow-x:\s*clip/);
+  it('keeps public and auth routes inside the shared AppShell scrollport', () => {
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*min-height:\s*0/);
+    expect(appShellCss).not.toContain('.auth-shell');
+    expect(appShellCss).not.toContain('.public-shell');
   });
 
   it('keeps overlay bodies locally scrollable without becoming page scroll owners', () => {

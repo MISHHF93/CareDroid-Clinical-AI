@@ -149,7 +149,7 @@ function extractOwner(block, fallback = 'GeneratedRoute') {
     .map((match) => match[1])
     .filter(
       (name) =>
-        !['AppShellPage', 'AuthShell', 'PublicShell', 'PermissionGate', 'Route'].includes(name)
+        !['AppShellPage', 'PermissionGate', 'Route'].includes(name)
     );
   return components.at(-1) || fallback;
 }

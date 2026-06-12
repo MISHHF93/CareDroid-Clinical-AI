@@ -4,10 +4,12 @@ import { apiAxios } from '../services/apiClient';
 import './BiometricSetup.css';
 import appConfig from '../config/appConfig';
 import logger from '../utils/logger';
+import { reportApiError } from '../services/apiErrorHandling';
 
 const BiometricSetup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [configLoading, setConfigLoading] = useState(false);
   const [error, setError] = useState(null);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricType, setBiometricType] = useState(null);
@@ -50,16 +52,30 @@ const BiometricSetup = () => {
       return;
     }
     try {
-      const result = await biometricApi.NativeBiometric.isAvailable();
-      setBiometricAvailable(result.isAvailable);
-      setBiometricType(result.biometryType); // 'fingerprint', 'face', 'iris'
+      const token = localStorage.getItem('caredroid_access_token');
+      const [deviceResult, serverResponse] = await Promise.all([
+        biometricApi.NativeBiometric.isAvailable(),
+        apiAxios.get('/api/auth/biometric/available', {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+      const serverAvailable = serverResponse.data?.serverSupport !== false;
+      setBiometricAvailable(Boolean(deviceResult.isAvailable && serverAvailable));
+      setBiometricType(deviceResult.biometryType); // 'fingerprint', 'face', 'iris'
     } catch (err) {
       logger.error('Biometric not available', { err });
+      reportApiError({
+        title: 'Biometric availability check failed',
+        message: 'Unable to verify biometric support with the backend.',
+        error: err,
+        endpoint: '/api/auth/biometric/available',
+      });
       setBiometricAvailable(false);
     }
   };
 
   const loadBiometricConfig = async () => {
+    setConfigLoading(true);
     try {
       const token = localStorage.getItem('caredroid_access_token');
       const response = await apiAxios.get('/api/auth/biometric/config', {
@@ -78,6 +94,14 @@ const BiometricSetup = () => {
       setStats(statsResponse.data.stats);
     } catch (err) {
       logger.error('Failed to load biometric config', { err });
+      reportApiError({
+        title: 'Biometric config load failed',
+        message: 'Unable to load biometric device configuration.',
+        error: err,
+        endpoint: '/api/auth/biometric/config',
+      });
+    } finally {
+      setConfigLoading(false);
     }
   };
 
@@ -123,6 +147,12 @@ const BiometricSetup = () => {
       loadBiometricConfig();
     } catch (err) {
       logger.error('Failed to enroll biometric', { err });
+      reportApiError({
+        title: 'Biometric enrollment failed',
+        message: 'Unable to enable biometric authentication.',
+        error: err,
+        endpoint: '/api/auth/biometric/enroll',
+      });
       setError(err.response?.data?.message || 'Failed to enable biometric authentication');
     } finally {
       setLoading(false);
@@ -167,6 +197,12 @@ const BiometricSetup = () => {
       alert('Biometric authentication test passed!');
     } catch (err) {
       logger.error('Biometric test failed', { err });
+      reportApiError({
+        title: 'Biometric verification failed',
+        message: 'Unable to verify biometric authentication.',
+        error: err,
+        endpoint: '/api/auth/biometric/verify',
+      });
       setError('Biometric authentication failed');
     } finally {
       setLoading(false);
@@ -189,7 +225,7 @@ const BiometricSetup = () => {
       const token = localStorage.getItem('caredroid_access_token');
       const deviceId = await getDeviceId();
 
-      await apiAxios.delete(`/api/auth/biometric/disable/${deviceId}`, {
+      await apiAxios.delete(`/api/auth/biometric/delete/${deviceId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -205,6 +241,12 @@ const BiometricSetup = () => {
       loadBiometricConfig();
     } catch (err) {
       logger.error('Failed to disable biometric', { err });
+      reportApiError({
+        title: 'Biometric disable failed',
+        message: 'Unable to delete biometric device configuration.',
+        error: err,
+        endpoint: '/api/auth/biometric/delete/:deviceId',
+      });
       setError('Failed to disable biometric authentication');
     } finally {
       setLoading(false);
@@ -293,6 +335,13 @@ const BiometricSetup = () => {
             </div>
           )}
         </div>
+
+        {configLoading && (
+          <div className="biometric-stats" role="status" aria-live="polite">
+            <h3>Loading biometric settings...</h3>
+            <p>Checking enrolled devices and usage statistics.</p>
+          </div>
+        )}
 
         {stats && (
           <div className="biometric-stats">

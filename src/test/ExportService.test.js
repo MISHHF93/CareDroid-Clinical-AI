@@ -13,6 +13,10 @@ vi.mock('../config/backendApiCapabilities', () => ({
     'This feature is not available on the server yet. Use on-device export, chat, or try again after an update.',
 }));
 
+vi.mock('../services/apiErrorHandling', () => ({
+  reportApiError: vi.fn(),
+}));
+
 describe('ExportService', () => {
   let service;
 
@@ -183,18 +187,24 @@ describe('ExportService', () => {
   });
 
   describe('Report Generation', () => {
-    it('should reject generateReport when server reports API is unavailable', async () => {
+    it('should export a local mock report when server reports API is unavailable', async () => {
       await service.initialize('test-token');
+      const downloadSpy = vi.spyOn(service, 'downloadFile').mockImplementation(() => true);
 
       const dateRange = {
         start: new Date('2024-01-01'),
         end: new Date('2024-01-31'),
       };
 
-      await expect(service.generateReport('cost_summary', dateRange, 'pdf')).rejects.toThrow(
-        /not available on this server/i,
-      );
+      await service.generateReport('cost_summary', dateRange, 'pdf');
+
       expect(global.fetch).not.toHaveBeenCalled();
+      expect(downloadSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"source": "local-mock"'),
+        expect.stringMatching(/^cost_summary-\d+\.json$/),
+        'application/json',
+      );
+      downloadSpy.mockRestore();
     });
 
     it('should reject invalid template', async () => {
@@ -229,18 +239,21 @@ describe('ExportService', () => {
       );
     });
 
-    it('should not call network when reportsSchedule capability is disabled', async () => {
+    it('should create a typed local schedule fallback when reportsSchedule capability is disabled', async () => {
       capabilityEnabled.mockImplementation((cap) => cap === 'reportsGenerate');
 
-      await expect(
-        service.scheduleReport(
-          'cost_summary',
-          { frequency: 'daily', time: '09:00' },
-          ['user@example.com'],
-        ),
-      ).rejects.toThrow(/not available on the server/i);
+      const scheduled = await service.scheduleReport(
+        'cost_summary',
+        { frequency: 'daily', time: '09:00' },
+        ['user@example.com'],
+      );
 
       expect(global.fetch).not.toHaveBeenCalled();
+      expect(scheduled).toMatchObject({
+        templateId: 'cost_summary',
+        status: 'backend-unavailable',
+        unavailable: true,
+      });
     });
 
     it('should schedule report', async () => {

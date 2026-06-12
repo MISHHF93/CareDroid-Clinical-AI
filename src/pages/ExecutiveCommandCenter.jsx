@@ -438,7 +438,7 @@ export default function ExecutiveCommandCenter() {
   };
 
   return (
-    <main className="executive-command-center" id="executive-command-center-main">
+    <section className="executive-command-center" id="executive-command-center-main">
       <section className="executive-hero" aria-labelledby="executive-command-center-title">
         <div>
           <p className="executive-eyebrow">Hospital leadership dashboard</p>
@@ -694,6 +694,6 @@ export default function ExecutiveCommandCenter() {
           )}
         </ExecutivePanel>
       </section>
-    </main>
+    </section>
   );
 }

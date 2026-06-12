@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Grid3X3, List, Plus, Search } from 'lucide-react';
-import { PatientState, Priority } from '../../types/emergency';
-import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  getPatientFlagType,
+  selectActivePatients,
+  selectFilteredPatients,
+  selectWhiteboardFilterCounts,
+  selectWhiteboardStats,
+  useEmergencyStore,
+} from '../../store/emergencyStore';
 import PatientCard, { PatientDetailPanel } from './PatientCard';
 import NewPatientIntake from './NewPatientIntake';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
@@ -11,12 +17,6 @@ import ClinicalScoreCalculator, {
   createClinicalScoreNote,
 } from './ClinicalScoreCalculator';
 import './EmergencyWhiteboard.css';
-
-const ACTIVE_STATES = new Set(
-  Object.values(PatientState).filter(
-    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
-  )
-);
 
 const FILTERS = [
   { label: 'All', id: 'All', type: null },
@@ -31,49 +31,6 @@ function waitMinutes(arrivalTime) {
   const arrivedAt = new Date(arrivalTime).getTime();
   if (!Number.isFinite(arrivedAt)) return 0;
   return Math.max(0, Math.round((Date.now() - arrivedAt) / 60000));
-}
-
-function averageWait(patients) {
-  if (!patients.length) return 0;
-  const total = patients.reduce((sum, patient) => sum + waitMinutes(patient.arrivalTime), 0);
-  return Math.round(total / patients.length);
-}
-
-function isHighRisk(patient) {
-  return (
-    hasPatientFlag(patient, 'HighRisk') ||
-    hasPatientFlag(patient, 'DeteriorationRisk') ||
-    patient.priority === Priority.P1 ||
-    patient.priority === Priority.P2
-  );
-}
-
-function matchesFilter(patient, filterType) {
-  if (!filterType) return true;
-  if (filterType === 'Waiting') return patient.state === PatientState.Waiting;
-  if (filterType === 'Triage') return patient.state === PatientState.Triage;
-  if (filterType === 'Provider') {
-    return patient.state === PatientState.Assessment || patient.state === PatientState.Orders;
-  }
-  if (filterType === 'Assessment') {
-    return [PatientState.Assessment, PatientState.Orders, PatientState.Results].includes(
-      patient.state
-    );
-  }
-  if (filterType === 'Results') return patient.state === PatientState.Results;
-  if (filterType === 'Referral') return Boolean(patient.referral);
-  if (filterType === 'Admission') return patient.state === PatientState.Admission;
-  if (filterType === 'Discharge') return patient.state === PatientState.Discharge;
-  if (filterType === 'Reassessment') {
-    return (
-      hasPatientFlag(patient, 'ReassessmentDue') ||
-      hasPatientFlag(patient, 'ScoreReassessmentRecommended')
-    );
-  }
-  if (filterType === 'HighRisk') return isHighRisk(patient);
-  if (filterType === 'EMS') return hasPatientFlag(patient, 'EMSArrival');
-  if (filterType === 'Boarding') return hasPatientFlag(patient, 'PendingAdmission');
-  return true;
 }
 
 function formatWait(minutes) {
@@ -105,9 +62,12 @@ function isEditableShortcutTarget(target) {
 
 export default function EmergencyWhiteboard() {
   const patients = useEmergencyStore((state) => state.patients);
+  const activePatients = useEmergencyStore(selectActivePatients);
+  const filteredPatients = useEmergencyStore(selectFilteredPatients);
+  const filterCounts = useEmergencyStore(selectWhiteboardFilterCounts);
+  const stats = useEmergencyStore(selectWhiteboardStats);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
-  const capacity = useEmergencyStore((state) => state.capacity);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const whiteboardSearchQuery = useEmergencyStore((state) => state.whiteboardSearchQuery);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
@@ -134,66 +94,6 @@ export default function EmergencyWhiteboard() {
   );
   const gridRef = useRef(null);
 
-  const activePatients = useMemo(
-    () => patients.filter((patient) => ACTIVE_STATES.has(patient.state)),
-    [patients]
-  );
-  const backendMatchedPatientIds = useMemo(() => {
-    if (patientBackendSearch.query !== whiteboardSearchQuery.trim()) return new Set();
-    return new Set((patientBackendSearch.results || []).map((result) => result.patientId));
-  }, [patientBackendSearch.query, patientBackendSearch.results, whiteboardSearchQuery]);
-
-  const filteredPatients = useMemo(() => {
-    const basePatients = activePatients.filter((patient) =>
-      matchesFilter(patient, activeQueueFilter)
-    );
-    const query = whiteboardSearchQuery.trim().toLowerCase();
-    const searchedPatients = query
-      ? basePatients.filter((patient) => {
-          const name = `${patient.firstName} ${patient.lastName}`.toLowerCase();
-          return (
-            backendMatchedPatientIds.has(patient.id) ||
-            name.includes(query) ||
-            patient.mrn.toLowerCase().includes(query) ||
-            patient.chiefComplaint.toLowerCase().includes(query) ||
-            patient.complaintCategory.toLowerCase().includes(query)
-          );
-        })
-      : basePatients;
-
-    return [...searchedPatients].sort((a, b) => {
-      const p1Delta = Number(b.priority === Priority.P1) - Number(a.priority === Priority.P1);
-      if (p1Delta !== 0) return p1Delta;
-      return waitMinutes(b.arrivalTime) - waitMinutes(a.arrivalTime);
-    });
-  }, [activePatients, activeQueueFilter, backendMatchedPatientIds, whiteboardSearchQuery]);
-
-  const filterCounts = useMemo(
-    () =>
-      FILTERS.reduce(
-        (counts, filter) => ({
-          ...counts,
-          [filter.id]: activePatients.filter((patient) => matchesFilter(patient, filter.type))
-            .length,
-        }),
-        {}
-      ),
-    [activePatients]
-  );
-
-  const stats = useMemo(
-    () => [
-      { label: 'Total Active', value: activePatients.length },
-      { label: 'Avg Wait', value: `${averageWait(activePatients)}m` },
-      { label: 'High Risk', value: activePatients.filter(isHighRisk).length },
-      {
-        label: 'Boarding',
-        value: activePatients.filter((patient) => matchesFilter(patient, 'Boarding')).length,
-      },
-      { label: 'Capacity', value: `${capacity.occupancyPercent}%` },
-    ],
-    [activePatients, capacity.occupancyPercent]
-  );
   const calculatorPatient = calculatorLaunch
     ? patients.find((patient) => patient.id === calculatorLaunch.patientId)
     : null;

@@ -14,7 +14,7 @@ export default function Credentials() {
   const cmeProgress = Math.round((snapshot.summary.cmeCreditsEarned / snapshot.summary.cmeCreditsTarget) * 100);
 
   return (
-    <main className="credentialing-page">
+    <section className="credentialing-page">
       <section className="credentialing-hero" aria-labelledby="credentials-title">
         <div className="credentialing-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.clipboardList} size={34} />
@@ -109,6 +109,6 @@ export default function Credentials() {
           </ul>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

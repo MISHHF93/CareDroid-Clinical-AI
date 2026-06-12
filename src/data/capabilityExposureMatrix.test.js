@@ -83,7 +83,7 @@ describe('capabilityExposureMatrix', () => {
       frontendRouteStatus: 'protected',
       surfaceType: 'visible-ui',
     });
-    expect(profile.currentFrontendSurface).toMatch(/ProfileSettings\.jsx saves through profileApi\.js PATCH/i);
+    expect(profile.currentFrontendSurface).toMatch(/Profile\.jsx and Settings render backend-backed profile/i);
     expect(outreach).toMatchObject({
       commandOrApiRoute: 'POST /api/chat/message',
       exposureStatus: 'exposed',

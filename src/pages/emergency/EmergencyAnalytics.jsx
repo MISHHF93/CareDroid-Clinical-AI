@@ -40,7 +40,7 @@ export default function EmergencyAnalytics() {
   }, [loadEmergencyAnalytics]);
 
   return (
-    <main className="emergency-analytics" aria-label="Emergency operational analytics">
+    <section className="emergency-analytics" aria-label="Emergency operational analytics">
       <header className="emergency-analytics__header">
         <div>
           <span>Operational Command</span>
@@ -128,6 +128,6 @@ export default function EmergencyAnalytics() {
           </div>
         </ChartCard>
       </div>
-    </main>
+    </section>
   );
 }

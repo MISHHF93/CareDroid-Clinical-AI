@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import WorkspaceHome from './WorkspaceHome';
-import { EmergencyDepartmentProvider } from '../contexts/EmergencyDepartmentContext';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
@@ -39,30 +38,28 @@ function LocationProbe() {
 function renderWorkspace(route = '/workspace/emergency') {
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <EmergencyDepartmentProvider>
-        <Routes>
-          <Route
-            path="/workspace/:workspaceId"
-            element={
-              <>
-                <WorkspaceHome />
-                <LocationProbe />
-              </>
-            }
-          />
-          <Route
-            path="/workspace/:workspaceId/:subpage"
-            element={
-              <>
-                <WorkspaceHome />
-                <LocationProbe />
-              </>
-            }
-          />
-          <Route path="/assistant" element={<LocationProbe />} />
-          <Route path="/profile/workspaces" element={<LocationProbe />} />
-        </Routes>
-      </EmergencyDepartmentProvider>
+      <Routes>
+        <Route
+          path="/workspace/:workspaceId"
+          element={
+            <>
+              <WorkspaceHome />
+              <LocationProbe />
+            </>
+          }
+        />
+        <Route
+          path="/workspace/:workspaceId/:subpage"
+          element={
+            <>
+              <WorkspaceHome />
+              <LocationProbe />
+            </>
+          }
+        />
+        <Route path="/assistant" element={<LocationProbe />} />
+        <Route path="/profile/workspaces" element={<LocationProbe />} />
+      </Routes>
     </MemoryRouter>
   );
 }

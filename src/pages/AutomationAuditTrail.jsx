@@ -130,7 +130,7 @@ export default function AutomationAuditTrail() {
   }, [tenantId, tenants]);
 
   return (
-    <main className="automation-audit-page">
+    <section className="automation-audit-page">
       <header className="automation-audit-hero">
         <div>
           <p className="automation-audit-eyebrow">Automation Audit Trail</p>
@@ -198,6 +198,6 @@ export default function AutomationAuditTrail() {
           <p className="automation-audit-empty">No automation audit entries exist for this tenant.</p>
         )}
       </section>
-    </main>
+    </section>
   );
 }

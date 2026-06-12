@@ -50,8 +50,6 @@ export const initSentry = (): void => {
       return event;
     },
   });
-
-  console.log(`[Sentry] Initialized with DSN: ${dsn} | Environment: ${environment}`);
 };
 
 export default Sentry;

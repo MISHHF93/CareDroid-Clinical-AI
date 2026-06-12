@@ -119,7 +119,7 @@ export default function ClinicalDocumentationAssistant() {
   };
 
   return (
-    <main className="documentation-assistant-page">
+    <section className="documentation-assistant-page">
       <section className="documentation-assistant-hero" aria-labelledby="documentation-title">
         <div>
           <p className="documentation-assistant-eyebrow">Draft only - clinician review required</p>
@@ -260,6 +260,6 @@ export default function ClinicalDocumentationAssistant() {
           )}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

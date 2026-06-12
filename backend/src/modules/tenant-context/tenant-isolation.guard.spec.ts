@@ -14,7 +14,12 @@ describe('TenantIsolationGuard', () => {
         return undefined;
       }),
     };
-    return new TenantIsolationGuard(reflector as any);
+    const tenantContextService = {
+      resolveForRequest: jest.fn(async () => {
+        throw new ForbiddenException('Tenant context is required for this request.');
+      }),
+    };
+    return new TenantIsolationGuard(reflector as any, tenantContextService as any);
   };
 
   const buildContext = (request: any) =>
@@ -40,7 +45,7 @@ describe('TenantIsolationGuard', () => {
     isDemoTenant: false,
   };
 
-  it('denies tenant A from accessing tenant B organization data', () => {
+  it('denies tenant A from accessing tenant B organization data', async () => {
     const guard = buildGuard({ level: 'organization', requireOrganizationId: true });
     const request = {
       user: { id: 'user-1', role: UserRole.PHYSICIAN },
@@ -51,10 +56,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations/org-b',
     };
 
-    expect(() => guard.canActivate(buildContext(request))).toThrow(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  it('rejects authenticated tenant-scoped requests when tenant context is missing', () => {
+  it('rejects authenticated tenant-scoped requests when tenant context is missing', async () => {
     const guard = buildGuard({ level: 'tenant' });
     const request = {
       user: { id: 'user-1', role: UserRole.PHYSICIAN },
@@ -63,10 +68,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/ai/usage',
     };
 
-    expect(() => guard.canActivate(buildContext(request))).toThrow(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  it('denies workspace mismatch for workspace-scoped APIs', () => {
+  it('denies workspace mismatch for workspace-scoped APIs', async () => {
     const guard = buildGuard({
       level: 'workspace',
       requireOrganizationId: true,
@@ -81,10 +86,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/workspaces/workspace-b/tools',
     };
 
-    expect(() => guard.canActivate(buildContext(request))).toThrow(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  it('allows required permissions from workspace effective permissions', () => {
+  it('allows required permissions from workspace effective permissions', async () => {
     const guard = buildGuard({
       level: 'workspace',
       requireWorkspaceId: true,
@@ -103,10 +108,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/ai/query',
     };
 
-    expect(guard.canActivate(buildContext(request))).toBe(true);
+    await expect(guard.canActivate(buildContext(request))).resolves.toBe(true);
   });
 
-  it('denies admin-scoped access for non-admin tenant members', () => {
+  it('denies admin-scoped access for non-admin tenant members', async () => {
     const guard = buildGuard({
       level: 'organization',
       requireOrganizationId: true,
@@ -121,10 +126,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations/org-a',
     };
 
-    expect(() => guard.canActivate(buildContext(request))).toThrow(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  it('allows admin-scoped access for permitted organization admins', () => {
+  it('allows admin-scoped access for permitted organization admins', async () => {
     const guard = buildGuard({
       level: 'organization',
       requireOrganizationId: true,
@@ -142,10 +147,10 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations/org-a',
     };
 
-    expect(guard.canActivate(buildContext(request))).toBe(true);
+    await expect(guard.canActivate(buildContext(request))).resolves.toBe(true);
   });
 
-  it('allows explicitly skipped bootstrap routes', () => {
+  it('allows explicitly skipped bootstrap routes', async () => {
     const guard = buildGuard({ level: 'tenant' }, true);
     const request = {
       user: { id: 'user-1', role: UserRole.PHYSICIAN },
@@ -154,6 +159,6 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations',
     };
 
-    expect(guard.canActivate(buildContext(request))).toBe(true);
+    await expect(guard.canActivate(buildContext(request))).resolves.toBe(true);
   });
 });

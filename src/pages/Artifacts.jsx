@@ -414,7 +414,7 @@ export default function Artifacts() {
   };
 
   return (
-    <main className="artifacts-page" aria-labelledby="artifacts-title">
+    <section className="artifacts-page" aria-labelledby="artifacts-title">
       <section className="artifacts-hero">
         <div className="artifacts-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.clipboardList} size={28} />
@@ -756,6 +756,6 @@ export default function Artifacts() {
           )}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

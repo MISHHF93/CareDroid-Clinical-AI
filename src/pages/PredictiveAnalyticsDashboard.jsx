@@ -53,7 +53,7 @@ export default function PredictiveAnalyticsDashboard() {
   };
 
   return (
-    <main className="predictive-analytics-page">
+    <section className="predictive-analytics-page">
       <section className="predictive-analytics-hero" aria-labelledby="predictive-analytics-title">
         <div>
           <p className="predictive-analytics-eyebrow">{summary.predictionLabel}</p>
@@ -177,6 +177,6 @@ export default function PredictiveAnalyticsDashboard() {
           </p>
         )}
       </section>
-    </main>
+    </section>
   );
 }

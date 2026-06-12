@@ -5,6 +5,8 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../../config/backendApiCapabilities';
+import { makeDisabledCapabilityResponse } from '../../services/disabledBackendMocks';
+import { reportApiError } from '../../services/apiErrorHandling';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ToolResultShare.css';
@@ -94,6 +96,16 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
 
   const handleEmailShare = async () => {
     if (!emailShareAvailable) {
+      const fallback = makeDisabledCapabilityResponse(
+        'toolsShareResults',
+        '/api/tools/share-results',
+        { delivery: 'local-link', shareId: null, url: createResultShareLink() }
+      );
+      reportApiError({
+        title: 'Tool result email share unavailable',
+        message: `${fallback.message} Use Share Link or Export instead.`,
+        endpoint: fallback.endpoint,
+      });
       setFeedback({
         text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use “Share Link” or “Export” instead.`,
         variant: 'error',

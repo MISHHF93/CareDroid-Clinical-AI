@@ -52,10 +52,11 @@ function defaultEnabledForFeature(feature: Feature, tier: FeatureTier): boolean 
   if (feature.tier === 'core') return true;
   if (!isFeatureAvailableForTier(feature, tier)) return false;
   if (feature.id === 'simulation_engine') return isDevelopmentMode();
+  if (feature.tier === 'professional' && isDevelopmentMode()) return true;
   return feature.defaultEnabled;
 }
 
-function buildDefaultFlags(tier: FeatureTier): FeatureFlags {
+export function buildDefaultFlags(tier: FeatureTier): FeatureFlags {
   return Object.fromEntries(
     FEATURE_REGISTRY.map((feature) => [feature.id, defaultEnabledForFeature(feature, tier)]),
   );

@@ -156,7 +156,7 @@ export class SubscriptionsService {
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        break;
     }
   }
 

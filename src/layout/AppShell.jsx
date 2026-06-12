@@ -24,12 +24,17 @@ import { calculateEMSPressureScore, isEMSPressureElevated } from '../components/
 import ReassessmentDrawer from '../components/ReassessmentDrawer';
 import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
-import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  hasPatientFlag,
+  selectActiveAlerts,
+  selectActivePatients,
+  selectReassessmentCount,
+  useEmergencyStore,
+} from '../../store/emergencyStore';
 import { useFeatureStore } from '../../store/featureStore';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 import { PatientState } from '../../types/emergency';
 import { movePatientToState as movePatientWithJourneyRules } from '../../engine/journeyEngine';
-import { REASSESSMENT_FLAG_TYPES } from '../../engine/reassessmentEngine';
 import {
   initializeEmergencySimulation,
   isEmergencySimulationAvailable,
@@ -37,22 +42,9 @@ import {
   SIMULATION_STATUS_EVENT,
 } from '../../engine/simulation';
 import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staffManagement';
-import {
-  emergencyPermissionsForUser,
-  emergencyRoleForUser,
-} from '../utils/emergencyRolePermissions';
+import { emergencyPermissionsForUser, emergencyRoleForUser } from '../utils/emergencyRolePermissions';
+import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 import './AppShell.css';
-
-const SIDEBAR_ORDER = [
-  'emergency_whiteboard',
-  'queue_intelligence',
-  'ems_pipeline',
-  'referral_intelligence',
-  'capacity_intelligence',
-  'clinical_calculator_hub',
-  'shift_summary',
-  'emergency_settings',
-];
 
 const SIDEBAR_ICON_COMPONENTS = {
   analytics: BarChart3,
@@ -66,29 +58,20 @@ const SIDEBAR_ICON_COMPONENTS = {
   whiteboard: LayoutDashboard,
 };
 
-const SIDEBAR_ACTIVE_PATHS = {
-  emergency_whiteboard: ['/emergency', '/workspace/emergency', '/workspace/emergency/whiteboard'],
-  queue_intelligence: ['/emergency/queues', '/workspace/emergency/queues', '/workspace/emergency/waiting-room'],
-  ems_pipeline: ['/emergency/ems', '/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
-  referral_intelligence: ['/emergency/referrals', '/workspace/emergency/referrals'],
-  capacity_intelligence: ['/emergency/capacity', '/workspace/emergency/capacity', '/workspace/emergency/boarding'],
-  clinical_calculator_hub: ['/emergency/tools', '/tools/calculators'],
-  shift_summary: ['/emergency/shift', '/workspace/emergency/shift-summary', '/workspace/emergency/shift'],
-  emergency_settings: ['/settings', '/settings/features', '/emergency/settings'],
-};
-
 export function buildSidebarItems(isEnabled) {
-  return SIDEBAR_ORDER.map((featureId) => FEATURE_REGISTRY_BY_ID[featureId])
-    .filter((feature) => feature?.sidebarIcon && isEnabled(feature.id))
-    .map((feature) => ({
-      id: feature.id,
-      featureId: feature.id,
+  return APP_SHELL_NAV_ITEMS.map((item) => {
+    const feature = FEATURE_REGISTRY_BY_ID[item.featureId];
+    if (!feature?.sidebarIcon || !isEnabled(feature.id)) return null;
+    return {
+      id: item.id,
+      featureId: item.featureId,
       label: feature.label,
-      path: feature.sidebarRoute || '/emergency',
+      path: item.path,
       icon: SIDEBAR_ICON_COMPONENTS[feature.sidebarIcon] || LayoutDashboard,
-      activePaths: SIDEBAR_ACTIVE_PATHS[feature.id] || [feature.sidebarRoute || '/emergency'],
+      activePaths: item.activePaths,
       tier: feature.tier,
-    }));
+    };
+  }).filter(Boolean);
 }
 
 const ACTIVE_PATIENT_STATES = new Set(
@@ -228,10 +211,6 @@ function minutesSince(timestamp, now) {
 
 function patientName(patient) {
   return patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown patient';
-}
-
-function hasReassessmentManagedFlag(patient) {
-  return REASSESSMENT_FLAG_TYPES.some((flagType) => hasPatientFlag(patient, flagType));
 }
 
 function capacityToneClass(riskLevel) {
@@ -410,7 +389,8 @@ function CapacityHistorySparkline({ history = [] }) {
                     : level === 'yellow'
                       ? 'var(--status-warning)'
                       : 'var(--status-stable)';
-              return <circle cx={props.cx} cy={props.cy} r={3.5} fill={fill} />;
+              const dotKey = props.payload?.label || props.index || `${props.cx}-${props.cy}`;
+              return <circle key={dotKey} cx={props.cx} cy={props.cy} r={3.5} fill={fill} />;
             }}
           />
         </LineChart>
@@ -855,11 +835,6 @@ function StaffManagementPanel({ open, workloads, rebalanceSuggestion }) {
   );
 }
 
-function isAlertActive(alert) {
-  if (alert.dismissedAt) return false;
-  return true;
-}
-
 function alertToneClass(severity) {
   return String(severity || 'Info').toLowerCase();
 }
@@ -1042,6 +1017,7 @@ const AppShell = ({
   const { user, authToken } = useUser();
   const { messages, addMessage } = useConversation();
   const patients = useEmergencyStore((state) => state.patients);
+  const activePatients = useEmergencyStore(selectActivePatients);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const loadBackendStaffProfile = useEmergencyStore((state) => state.loadBackendStaffProfile);
@@ -1051,7 +1027,7 @@ const AppShell = ({
   const startRealtime = useEmergencyStore((state) => state.startRealtime);
   const stopRealtime = useEmergencyStore((state) => state.stopRealtime);
   const capacity = useEmergencyStore((state) => state.capacity);
-  const alerts = useEmergencyStore((state) => state.alerts);
+  const activeAlerts = useEmergencyStore(selectActiveAlerts);
   const updateAlerts = useEmergencyStore((state) => state.updateAlerts);
   const dismissAlert = useEmergencyStore((state) => state.dismissAlert);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
@@ -1067,17 +1043,9 @@ const AppShell = ({
   const featureTier = useFeatureStore((state) => state.tier);
   const isFeatureEnabled = useFeatureStore((state) => state.isEnabled);
   const toggleFeature = useFeatureStore((state) => state.toggleFeature);
-  const reassessmentCount = useEmergencyStore(
-    (state) =>
-      state.patients.filter(
-        (patient) => ACTIVE_PATIENT_STATES.has(patient.state) && hasReassessmentManagedFlag(patient)
-      ).length
-  );
+  const reassessmentCount = useEmergencyStore(selectReassessmentCount);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
-  const activePatientCount = useMemo(
-    () => patients.filter((patient) => ACTIVE_PATIENT_STATES.has(patient.state)).length,
-    [patients]
-  );
+  const activePatientCount = activePatients.length;
   const [clock, setClock] = useState(() => new Date());
   const isCopilotCollapsed = !copilotOpen;
   const [isReassessmentDrawerOpen, setIsReassessmentDrawerOpen] = useState(false);
@@ -1164,16 +1132,48 @@ const AppShell = ({
     return () => window.clearInterval(timer);
   }, [updateAlerts]);
 
-  const closeAllPanels = useCallback(() => {
-    setIsCommandPaletteOpen(false);
-    setIsShortcutReferenceOpen(false);
-    setIsReassessmentDrawerOpen(false);
-    setIsAlertDrawerOpen(false);
-    setIsStaffPanelOpen(false);
-    setIsCapacityDetailOpen(false);
-    selectPatient(null);
+  const closeTopmostPanel = useCallback(() => {
+    if (isShortcutReferenceOpen) {
+      setIsShortcutReferenceOpen(false);
+      return true;
+    }
+    if (isCommandPaletteOpen) {
+      setIsCommandPaletteOpen(false);
+      return true;
+    }
+    if (isCapacityDetailOpen) {
+      setIsCapacityDetailOpen(false);
+      return true;
+    }
+    if (isAlertDrawerOpen) {
+      setIsAlertDrawerOpen(false);
+      return true;
+    }
+    if (isReassessmentDrawerOpen) {
+      setIsReassessmentDrawerOpen(false);
+      return true;
+    }
+    if (isStaffPanelOpen) {
+      setIsStaffPanelOpen(false);
+      return true;
+    }
+    if (selectedPatientId) {
+      selectPatient(null);
+      return true;
+    }
+
     window.dispatchEvent(new CustomEvent('ed:close-overlays'));
-  }, [selectPatient]);
+    return false;
+  }, [
+    isAlertDrawerOpen,
+    isCapacityDetailOpen,
+    isCommandPaletteOpen,
+    isReassessmentDrawerOpen,
+    isShortcutReferenceOpen,
+    isStaffPanelOpen,
+    selectPatient,
+    selectedPatientId,
+  ]);
 
   useEffect(() => {
     const handleGlobalShortcut = (event) => {
@@ -1181,7 +1181,7 @@ const AppShell = ({
 
       if (event.key === 'Escape') {
         event.preventDefault();
-        closeAllPanels();
+        closeTopmostPanel();
         return;
       }
 
@@ -1240,7 +1240,7 @@ const AppShell = ({
 
     window.addEventListener('keydown', handleGlobalShortcut);
     return () => window.removeEventListener('keydown', handleGlobalShortcut);
-  }, [closeAllPanels, navigate, toggleCopilot]);
+  }, [closeTopmostPanel, navigate, toggleCopilot]);
 
   const handleAppendMessage = useCallback(
     (_conversationId, message) => {
@@ -1289,10 +1289,6 @@ const AppShell = ({
     () => getStaffRebalanceSuggestion(staffWorkloads),
     [staffWorkloads]
   );
-  const activeAlerts = useMemo(
-    () => alerts.filter((alert) => isAlertActive(alert)),
-    [alerts]
-  );
   const hasCriticalAlert = activeAlerts.some((alert) => alert.severity === 'Critical');
   const hasWarningAlert = activeAlerts.some((alert) => alert.severity === 'Warning');
   const handleAlertAction = useCallback(
@@ -1331,7 +1327,7 @@ const AppShell = ({
       }
 
       if (alert.actionType === 'OPEN_QUEUE') {
-        navigate('/emergency/queues');
+        navigate('/emergency');
         setIsAlertDrawerOpen(false);
       }
     },
@@ -1648,10 +1644,22 @@ const AppShell = ({
       <div className="ed-os-shell__workspace">
         <header className="ed-os-header" aria-label="Emergency OS header">
           <div className="ed-os-header__left">
-            <strong className="ed-os-wordmark">Emergency OS</strong>
-            <time className="ed-shift-clock" dateTime={clock.toISOString()}>
-              {formatShiftClock(clock)}
-            </time>
+            <button
+              type="button"
+              className="ed-os-wordmark"
+              onClick={() => navigate('/emergency')}
+              aria-label="Go to Emergency Whiteboard"
+            >
+              Emergency OS
+            </button>
+            <button
+              type="button"
+              className="ed-shift-clock"
+              onClick={() => navigate('/emergency/shift')}
+              aria-label={`Open shift summary. Current time ${formatShiftClock(clock)}`}
+            >
+              <time dateTime={clock.toISOString()}>{formatShiftClock(clock)}</time>
+            </button>
             <ShiftControls
               activeShift={activeShift}
               staff={staff}

@@ -54,10 +54,19 @@ export const DRUG_REFERENCE_TOOLS = Object.freeze([
   },
 ]);
 
-export function builtDrugReferenceToolNames() {
-  return DRUG_REFERENCE_TOOLS.filter((tool) => tool.status === 'built').map((tool) => tool.name);
+const DRUG_REFERENCE_FEATURE_BY_ID = Object.freeze({
+  'drug-check': 'clinical_calculator_hub',
+  'pediatric-dose-safety-checker': 'clinical_calculator_hub',
+});
+
+export function builtDrugReferenceToolNames(isFeatureEnabled = () => true) {
+  return DRUG_REFERENCE_TOOLS.filter((tool) => {
+    if (tool.status !== 'built') return false;
+    const featureId = DRUG_REFERENCE_FEATURE_BY_ID[tool.id];
+    return !featureId || isFeatureEnabled(featureId);
+  }).map((tool) => tool.name);
 }
 
-export function drugReferenceToolListForCopilot() {
-  return builtDrugReferenceToolNames().join(', ') || 'None currently available';
+export function drugReferenceToolListForCopilot(isFeatureEnabled = () => true) {
+  return builtDrugReferenceToolNames(isFeatureEnabled).join(', ') || 'None currently available';
 }

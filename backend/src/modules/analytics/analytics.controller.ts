@@ -93,18 +93,6 @@ export class AnalyticsController {
 
   @Post('crashes')
   async submitCrashReport(@Body() report: CrashReportDto): Promise<{ id: string; status: string }> {
-    console.log(`🚨 Crash Report ${report.id}`);
-    console.log(`   Error: ${report.error.name} - ${report.error.message}`);
-    console.log(`   Session: ${report.sessionId}`);
-    console.log(`   Environment: ${report.environment}`);
-
-    if (report.breadcrumbs.length > 0) {
-      console.log(`   Breadcrumbs:`);
-      report.breadcrumbs.slice(-5).forEach((crumb) => {
-        console.log(`     - ${crumb}`);
-      });
-    }
-
     return {
       id: report.id,
       status: 'submitted',

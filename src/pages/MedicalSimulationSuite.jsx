@@ -57,7 +57,7 @@ export default function MedicalSimulationSuite() {
   );
 
   return (
-    <main className="ops-demo-page simulation-suite">
+    <section className="ops-demo-page simulation-suite">
       <section className="ops-demo-hero" aria-labelledby="simulation-title">
         <div className="ops-demo-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.training} size={34} />
@@ -207,6 +207,6 @@ export default function MedicalSimulationSuite() {
           </div>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

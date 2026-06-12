@@ -11,7 +11,12 @@ import {
   UserCheck,
   Users,
 } from 'lucide-react';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import {
+  selectQueueBottleneckAlert,
+  selectQueueOverallHealthScore,
+  selectQueuePanelRows,
+  useEmergencyStore,
+} from '../../store/emergencyStore';
 import './QueueIntelligencePanel.css';
 
 const QUEUE_CONFIG = [
@@ -35,12 +40,6 @@ const DOWNSTREAM_QUEUE = {
   Discharge: null,
   Reassessment: 'Provider',
 };
-
-function healthForWait(avgWait) {
-  if (avgWait > 40) return 'red';
-  if (avgWait >= 20) return 'yellow';
-  return 'green';
-}
 
 function formatWait(minutes) {
   if (!minutes) return '0m';
@@ -71,89 +70,37 @@ function suggestedAction(queueType) {
   return 'Consider reviewing queue ownership';
 }
 
-function detectBottleneck(queueRows) {
-  const activeQueues = queueRows.filter((queue) => queue.count > 0);
-  if (!activeQueues.length) return null;
-
-  const highestCount = Math.max(...activeQueues.map((queue) => queue.count));
-  const longestWait = Math.max(...activeQueues.map((queue) => queue.oldestWaitMinutes));
-  const queue = activeQueues.find(
-    (candidate) => candidate.count === highestCount && candidate.oldestWaitMinutes === longestWait
-  );
-  if (!queue || queue.count < 2 || queue.oldestWaitMinutes < 20) return null;
-
-  const downstreamType = DOWNSTREAM_QUEUE[queue.type];
-  if (!downstreamType) return null;
-
-  const downstreamQueue = queueRows.find((candidate) => candidate.type === downstreamType);
-  if (!downstreamQueue || downstreamQueue.count > 0) return null;
-
-  const severity = queue.averageWaitMinutes > 40 || queue.count >= 4 ? 'Red' : 'Yellow';
-
-  return {
-    queue: queue.type,
-    reason: `${queue.count} patients, avg ${queue.averageWaitMinutes}min`,
-    severity,
-    detectedAt: new Date().toISOString(),
-  };
-}
-
 export default function QueueIntelligencePanel({ collapsed, onCollapsedChange }) {
   const queues = useEmergencyStore((state) => state.queues);
+  const storeQueueRows = useEmergencyStore(selectQueuePanelRows);
+  const overallHealthScore = useEmergencyStore(selectQueueOverallHealthScore);
+  const nextBottleneckAlert = useEmergencyStore(selectQueueBottleneckAlert);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
-  const bottleneckAlert = useEmergencyStore((state) => state.bottleneckAlert);
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
-  const setBottleneckAlert = useEmergencyStore((state) => state.setBottleneckAlert);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
+  const bottleneckAlert = nextBottleneckAlert;
 
   const queueRows = useMemo(
     () =>
       QUEUE_CONFIG.map((config) => {
-        const queue = queues.find((candidate) => candidate.type === config.type);
+        const queue = storeQueueRows.find((candidate) => candidate.type === config.type);
         return {
           ...config,
-          count: queue?.patientIds.length || 0,
+          name: queue?.name || config.name,
+          count: queue?.count || 0,
           averageWaitMinutes: queue?.averageWaitMinutes || 0,
-          oldestWaitMinutes: queue?.longestWaitMinutes || 0,
+          oldestWaitMinutes: queue?.oldestWaitMinutes || 0,
           updatedAt: queue?.updatedAt,
-          health: healthForWait(queue?.averageWaitMinutes || 0),
+          health: queue?.health || 'green',
         };
       }),
-    [queues]
+    [storeQueueRows]
   );
-  const overallAverage = queueRows.length
-    ? Math.round(
-        queueRows.reduce((sum, queue) => sum + queue.averageWaitMinutes, 0) / queueRows.length
-      )
-    : 0;
-  const overallHealthScore = Math.max(
-    0,
-    Math.min(
-      100,
-      100 -
-        queueRows.reduce((sum, queue) => {
-          if (queue.health === 'red') return sum + 12;
-          if (queue.health === 'yellow') return sum + 6;
-          return sum;
-        }, 0) -
-        Math.max(0, overallAverage - 20)
-    )
-  );
-
-  useEffect(() => {
-    const runDetection = () => {
-      setBottleneckAlert(detectBottleneck(queueRows));
-    };
-
-    runDetection();
-    const intervalId = window.setInterval(runDetection, 60_000);
-    return () => window.clearInterval(intervalId);
-  }, [queueRows, setBottleneckAlert]);
 
   useEffect(() => {
     void loadEmergencyAnalytics({ force: true });
-  }, [loadEmergencyAnalytics, queues]);
+  }, [loadEmergencyAnalytics, storeQueueRows]);
 
   return (
     <aside

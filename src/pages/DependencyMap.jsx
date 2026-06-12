@@ -53,7 +53,7 @@ export default function DependencyMap() {
   const statuses = [...new Set(dependencyMap.dependencies.map((dependency) => dependency.status).filter(Boolean))];
 
   return (
-    <main className="dependency-map">
+    <section className="dependency-map">
       <header className="dependency-map-hero">
         <div>
           <p className="dependency-map-eyebrow">Dependency Map</p>
@@ -140,6 +140,6 @@ export default function DependencyMap() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

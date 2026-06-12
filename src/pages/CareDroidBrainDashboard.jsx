@@ -114,7 +114,7 @@ export default function CareDroidBrainDashboard() {
   const domains = brain.domains;
 
   return (
-    <main className="brain-page">
+    <section className="brain-page">
       <section className="brain-hero" aria-labelledby="brain-title">
         <div>
           <p className="brain-eyebrow">CareDroid Brain Layer</p>
@@ -165,6 +165,6 @@ export default function CareDroidBrainDashboard() {
         <KnowledgeSection title="Asset Knowledge" domain={domains.assetKnowledge} />
         <KnowledgeSection title="Automation Knowledge" domain={domains.automationKnowledge} />
       </div>
-    </main>
+    </section>
   );
 }

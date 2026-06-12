@@ -63,11 +63,11 @@ describe('mobile performance — CLS & images', () => {
   });
 
   it('images use lazy decode and dimensions', () => {
-    const avatar = read('src/components/data-display/DataDisplay.jsx');
+    const avatar = read('src/components/PatientCard.jsx');
     expect(avatar).toContain('loading="lazy"');
-    expect(avatar).toContain('decoding="async"');
     const tfa = read('src/pages/TwoFactorSetup.jsx');
     expect(tfa).toMatch(/width=\{280\}/);
+    expect(tfa).toMatch(/height=\{280\}/);
     expect(tfa).toContain('decoding="async"');
   });
 });

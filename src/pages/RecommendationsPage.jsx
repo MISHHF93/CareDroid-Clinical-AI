@@ -240,7 +240,7 @@ export default function RecommendationsPage() {
   };
 
   return (
-    <main className="recommendations-page">
+    <section className="recommendations-page">
       <header className="recommendations-hero">
         <div>
           <p className="recommendations-eyebrow">{workspaceExperience.operatingLabel} · Recommendation engine</p>
@@ -324,6 +324,6 @@ export default function RecommendationsPage() {
           );
         })}
       </div>
-    </main>
+    </section>
   );
 }

@@ -46,10 +46,10 @@ describe('compact UX/UI flattening contracts', () => {
 
   it('keeps /tools canonical and removes duplicate developer catalog shortcuts', () => {
     const toolsOverview = read('pages/tools/ToolsOverview.jsx');
-    const sidebar = read('components/Sidebar.jsx');
+    const appShell = read('layout/AppShell.jsx');
     expect(toolsOverview).not.toContain("navigate('/tools/catalog')");
-    expect(sidebar).not.toContain("navigate('/tools/catalog')");
-    expect(sidebar).not.toContain('Browse All Tools');
+    expect(appShell).not.toContain("navigate('/tools/catalog')");
+    expect(appShell).not.toContain('Browse All Tools');
   });
 
   it('uses compact cards and panels across dashboard, tools, calculators, chat, maps, and IoT', () => {

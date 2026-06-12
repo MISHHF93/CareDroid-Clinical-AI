@@ -1,218 +1,77 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import AppShell from './AppShell';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 
-const mocks = vi.hoisted(() => ({
-  userIdentity: {
-    preferences: { density: 'standard', compactMode: false },
-    saasProfile: { density: 'standard', compactMode: false },
-  },
-}));
-
-vi.mock('../contexts/ThemeContext', () => ({
-  useTheme: () => ({
-    preference: 'system',
-    resolvedTheme: 'light',
-    setPreference: vi.fn(),
-  }),
-}));
-
-vi.mock('../contexts/WorkspaceContext', () => ({
-  useWorkspace: () => ({
-    activeWorkspace: { id: 'emergency', name: 'Emergency' },
-  }),
-}));
-
-vi.mock('../contexts/UserIdentityContext', () => ({
-  useUserIdentity: () => mocks.userIdentity,
-}));
-
-vi.mock('../components/WorkspaceSwitcher', () => ({
-  default: () => <div data-testid="workspace-switcher">Workspace</div>,
-}));
-
-vi.mock('../components/QuickCommandLauncher', () => ({
-  default: () => null,
-}));
-
-vi.mock('../components/Sidebar', async () => {
-  const React = await import('react');
-  const MockSidebar = React.forwardRef(function MockSidebar({ layoutCompact, mobileNavOpen }, ref) {
-    return (
-      <aside
-        ref={ref}
-        id="app-sidebar-nav"
-        className={[
-          'sidebar',
-          layoutCompact ? 'sidebar--compact' : '',
-          layoutCompact && mobileNavOpen ? 'sidebar--open' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        aria-hidden={layoutCompact && !mobileNavOpen ? 'true' : undefined}
-        data-testid="app-sidebar"
-      >
-        {(!layoutCompact || mobileNavOpen) && (
-          <>
-            <nav aria-label="Primary navigation">
-              {['Whiteboard', 'Patients', 'EMS', 'Operations', 'Copilot', 'Profile'].map((label) => (
-                <button key={label} type="button">
-                  {label}
-                </button>
-              ))}
-            </nav>
-          </>
-        )}
-      </aside>
-    );
-  });
-
-  return {
-    default: MockSidebar,
-  };
-});
-
-function setViewportWidth(width) {
-  window.matchMedia = vi.fn().mockImplementation((query) => ({
-    matches: query.includes('max-width: 900px') ? width <= 900 : false,
-    media: query,
-    onchange: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }));
-}
-
-function renderShell(width, initialPath = '/dashboard') {
-  setViewportWidth(width);
-  return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <AppShell isAuthed conversations={[]} activeConversation={null}>
-        <section data-testid="main-page">Dashboard content</section>
-      </AppShell>
-    </MemoryRouter>
-  );
-}
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
+const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
+const navigationConfig = readFileSync(join(__dirname, '../config/navigation.config.js'), 'utf8');
 
 describe('AppShell navigation surfaces', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.userIdentity = {
-      preferences: { density: 'standard', compactMode: false },
-      saasProfile: { density: 'standard', compactMode: false },
-    };
+  it('renders one AppShell rail and no legacy sidebar or bottom navigation', () => {
+    expect(appShellJsx.match(/className="ed-nav-rail"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/aria-label="Emergency OS navigation"/g)).toHaveLength(1);
+    expect(appShellJsx).not.toContain('<Sidebar');
+    expect(appShellJsx).not.toContain('app-shell-bottom-nav');
+    expect(appShellCss).not.toContain('app-shell-bottom-nav');
   });
 
-  it('shows sidebar and hides bottom nav on desktop', () => {
-    const { container } = renderShell(1280);
-
-    expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /open quick command/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/command center/i);
-    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/whiteboard/i);
-    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/caredroid frontend os/i);
-    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/emergency/i);
-    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/dashboard/i);
-    expect(screen.queryByRole('button', { name: /open notifications/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /open profile/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /open settings/i })).not.toBeInTheDocument();
-    expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
+  it('keeps nav items in the canonical AppShell config array', () => {
+    expect(navigationConfig).toContain('export const APP_SHELL_NAV_ITEMS');
+    expect(appShellJsx).toContain('APP_SHELL_NAV_ITEMS.map');
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureId)).toEqual([
+      'emergency_whiteboard',
+      'ems_pipeline',
+      'referral_intelligence',
+      'capacity_intelligence',
+      'clinical_calculator_hub',
+      'shift_summary',
+      'emergency_settings',
+    ]);
   });
 
-  it('uses compact drawer mode without bottom nav on tablet', () => {
-    const { container } = renderShell(768);
-
-    expect(screen.getByTestId('app-sidebar')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/whiteboard/i);
-    expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
-    expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
-  });
-
-  it('applies compact density from user preference at the shell boundary', () => {
-    mocks.userIdentity = {
-      preferences: { density: 'compact', compactMode: true },
-      saasProfile: { density: 'compact', compactMode: true },
-    };
-
-    const { container } = renderShell(1280);
-
-    expect(container.firstElementChild).toHaveClass('app-shell--density-compact');
-    expect(container.firstElementChild).toHaveAttribute('data-density', 'compact');
-  });
-
-  it('opens one mobile drawer navigation without duplicate bottom destinations', () => {
-    const { container } = renderShell(390);
-
-    fireEvent.click(screen.getByRole('button', { name: /open navigation menu/i }));
-
-    const sidebar = screen.getByTestId('app-sidebar');
-    expect(sidebar).not.toHaveAttribute('aria-hidden');
-    expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
-
-    const nav = within(sidebar).getByRole('navigation', { name: /primary navigation/i });
-    for (const name of [
-      /^whiteboard$/i,
-      /^patients$/i,
-      /^ems$/i,
-      /^operations$/i,
-      /^copilot$/i,
-      /^profile$/i,
-    ]) {
-      expect(screen.getAllByRole('button', { name })).toHaveLength(1);
-      expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
+  it('keeps each rail item wired to a route and active path list', () => {
+    for (const item of APP_SHELL_NAV_ITEMS) {
+      expect(item.path, item.id).toMatch(/^\//);
+      expect(item.activePaths.length, item.id).toBeGreaterThan(0);
+      expect(item.activePaths.every((path) => path.startsWith('/')), item.id).toBe(true);
     }
+    expect(appShellJsx).toContain('<Link');
+    expect(appShellJsx).toContain('to={item.path}');
+    expect(appShellJsx).toContain("isActive ? 'ed-nav-rail__item--active' : ''");
+    expect(appShellJsx).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(appShellJsx).toContain('title={isNew ? `${item.label} - New` : item.label}');
   });
 
-  it.each([320, 390, 412, 768, 1024, 1440])(
-    'renders one navigation system without bottom nav at %ipx',
-    (width) => {
-      const { container } = renderShell(width);
-
-      expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
-      expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
-
-      if (width <= 900) {
-        expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: /open navigation menu/i }));
-      }
-
-      expect(screen.getAllByRole('navigation', { name: /primary navigation/i })).toHaveLength(1);
-    }
-  );
-
-  it('renders dashboard content without a bottom tab bar when sidebar exists', () => {
-    const { container } = renderShell(1280, '/dashboard');
-
-    expect(screen.getByTestId('main-page')).toBeInTheDocument();
-    expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
-    expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
-    expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
-    expect(screen.queryByRole('navigation', { name: /page continuations/i })).not.toBeInTheDocument();
+  it('renders required header and content regions once', () => {
+    expect(appShellJsx.match(/<header className="ed-os-header"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
+    expect(appShellJsx).toContain('aria-label="Go to Emergency Whiteboard"');
+    expect(appShellJsx).toContain("onClick={() => navigate('/emergency')}");
+    expect(appShellJsx).toContain('aria-label={`Open shift summary. Current time ${formatShiftClock(clock)}`}');
+    expect(appShellJsx).toContain("onClick={() => navigate('/emergency/shift')}");
+    expect(appShellJsx).toContain('<CapacityBadge');
+    expect(appShellJsx).toContain('<StaffAvatar');
   });
 
-  it('adds continuation paths to authenticated content pages', () => {
-    renderShell(1280, '/profile');
-
-    const continuations = screen.getByRole('navigation', { name: /page continuations/i });
-    expect(within(continuations).getByRole('heading', { name: /related assets/i })).toBeInTheDocument();
-    expect(within(continuations).getByRole('heading', { name: /recommended next actions/i })).toBeInTheDocument();
-    expect(within(continuations).getByRole('heading', { name: /recent activity/i })).toBeInTheDocument();
-    expect(within(continuations).getByRole('heading', { name: /back to workspace/i })).toBeInTheDocument();
-    expect(within(continuations).getByRole('link', { name: /back to emergency/i })).toHaveAttribute(
-      'href',
-      '/workspace/emergency'
+  it('keeps tablet bottom tabs complete and clickable at 1024px', () => {
+    expect(appShellCss).toMatch(
+      /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__items\s*\{[\s\S]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(44px,\s*1fr\)\)/
     );
+    expect(appShellCss).toMatch(
+      /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__item\s*\{[\s\S]*display:\s*flex/
+    );
+    expect(appShellCss).not.toContain('.ed-nav-rail__item:nth-child(-n + 5)');
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(7);
   });
 
-  it('renders an environment banner in authenticated non-production shells', () => {
-    renderShell(1280, '/dashboard');
-
-    expect(screen.getByText(/development/i).closest('[role="status"]')).toBeInTheDocument();
-    expect(screen.getByText(/environment/i)).toBeInTheDocument();
+  it('closes only the topmost AppShell panel on Escape', () => {
+    expect(appShellJsx).toContain('const closeTopmostPanel = useCallback');
+    expect(appShellJsx).toContain("if (event.key === 'Escape')");
+    expect(appShellJsx).toContain('closeTopmostPanel();');
+    expect(appShellJsx).not.toContain('closeAllPanels();');
   });
 });

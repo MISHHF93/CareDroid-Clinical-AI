@@ -8,7 +8,6 @@ const srcRoot = join(__dirname, '..');
 const themeTokensCss = readFileSync(join(__dirname, 'theme-tokens.css'), 'utf8');
 const themeBridgeCss = readFileSync(join(__dirname, 'theme-legacy-bridge.css'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
-const authShellCss = readFileSync(join(srcRoot, 'layout/AuthShell.css'), 'utf8');
 const commandDashboardCss = readFileSync(join(srcRoot, 'pages/CommandDashboard.css'), 'utf8');
 const medicalIotCss = readFileSync(join(srcRoot, 'pages/MedicalIotDashboard.css'), 'utf8');
 const chartCss = readFileSync(join(srcRoot, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
@@ -65,7 +64,6 @@ describe('theme color system revamp', () => {
   it('keeps key layout surfaces token-driven without legacy dominant blue/green backgrounds', () => {
     const keyCss = [
       appShellCss,
-      authShellCss,
       commandDashboardCss,
       medicalIotCss,
       chartCss,

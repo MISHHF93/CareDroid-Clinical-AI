@@ -98,7 +98,7 @@ export default function PlatformSystemPage({ pack }) {
     'Launchable platform systems that add patient context, interoperability, documentation support, auditability, cost controls, and explainability to the tool roadmap.';
 
   return (
-    <main className="platform-system-page" aria-labelledby="platform-system-title">
+    <section className="platform-system-page" aria-labelledby="platform-system-title">
       <section className="platform-system-hero">
         <div>
           <p className="platform-system-eyebrow">
@@ -200,7 +200,7 @@ export default function PlatformSystemPage({ pack }) {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }
 

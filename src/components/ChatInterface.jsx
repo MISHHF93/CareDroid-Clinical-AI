@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ToolPanel from './ToolPanel';
 import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
@@ -11,12 +11,16 @@ import {
 } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useFeature } from '../hooks/useFeature';
-import {
-  getQueueForPatientState,
-  useEmergencyDepartment,
-} from '../contexts/EmergencyDepartmentContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  createPatientFlag,
+  hasPatientFlag,
+  selectEdQueueHealth,
+  selectQueueBottleneckAlert,
+  selectReassessmentCount,
+  selectReassessmentQueue,
+  useEmergencyStore,
+} from '../../store/emergencyStore';
 import { buildEMSPressureCopilotContext, calculateEMSPressureScore } from './EMSPressureScore';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import {
@@ -33,37 +37,31 @@ function waitMinutes(arrivalTime) {
   return Math.max(0, Math.round((Date.now() - arrivedAt) / 60000));
 }
 
-function queueHealth(avgWait) {
-  if (avgWait > 60) return 'red';
-  if (avgWait > 30) return 'yellow';
-  return 'green';
-}
-
-function buildEdQueueHealth(patients = [], queueCounts = {}) {
-  return Object.entries(queueCounts).map(([queueType, count]) => {
-    const queuedPatients = patients.filter(
-      (patient) => getQueueForPatientState(patient.state) === queueType
-    );
-    const averageWait = queuedPatients.length
-      ? Math.round(
-          queuedPatients.reduce((sum, patient) => sum + waitMinutes(patient.arrivalTime), 0) /
-            queuedPatients.length
-        )
-      : 0;
-
-    return {
-      queueType,
-      count,
-      averageWait,
-      health: queueHealth(averageWait),
-    };
-  });
-}
-
 function patientDisplayName(patient) {
   if (!patient) return 'Unknown patient';
   if (patient.name) return patient.name;
   return [patient.firstName, patient.lastName].filter(Boolean).join(' ') || patient.id;
+}
+
+function staffDisplayName(staff) {
+  if (!staff) return '';
+  return staff.name || [staff.firstName, staff.lastName].filter(Boolean).join(' ') || staff.id;
+}
+
+function patientLocation(patient, rooms) {
+  return patient.location || rooms.find((room) => room.id === patient.roomId)?.name || 'Unassigned';
+}
+
+function buildCopilotPatient(patient, rooms, staff) {
+  const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
+  return {
+    ...patient,
+    name: patientDisplayName(patient),
+    location: patientLocation(patient, rooms),
+    complaint: patient.complaint || patient.chiefComplaint,
+    assignedTo: assignedStaff ? staffDisplayName(assignedStaff) : patient.assignedTo || null,
+    vitalsUpdatedAt: patient.vitalsUpdatedAt || patient.vitals?.recordedAt,
+  };
 }
 
 function isActivePatient(patient) {
@@ -117,7 +115,7 @@ function intentParams(detectedIntent) {
   return params;
 }
 
-function detectEdCopilotIntent(message, patients = []) {
+function detectEdCopilotIntent(message, patients = [], enabledFeatures = {}) {
   const normalized = normalizeCommandText(message);
   const lower = normalized.toLowerCase();
 
@@ -125,7 +123,7 @@ function detectEdCopilotIntent(message, patients = []) {
     return { intent: 'QUERY_LONGEST_WAIT' };
   }
 
-  if (/\bcapacity\b/.test(lower)) {
+  if (enabledFeatures.capacity_intelligence && /\bcapacity\b/.test(lower)) {
     return { intent: 'QUERY_CAPACITY' };
   }
 
@@ -164,7 +162,7 @@ function detectEdCopilotIntent(message, patients = []) {
     };
   }
 
-  if (/\b(ems|ambulance|ambulances)\b/.test(lower)) {
+  if (enabledFeatures.ems_pipeline && /\b(ems|ambulance|ambulances)\b/.test(lower)) {
     return { intent: 'QUERY_EMS' };
   }
 
@@ -259,10 +257,21 @@ function buildRequestedEdCopilotSystemPrompt({
   emsPressure,
   referrals,
   detectedIntent,
+  enabledFeatures = {},
+  drugReferenceTools = 'None currently available',
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskCount = activePatients.filter(isHighRiskPatient).length;
   const bottleneck = bottleneckAlert?.queue || bottleneckAlert?.reason || 'None';
+  const enabledToolLines = [
+    enabledFeatures.capacity_intelligence ? `Capacity: ${capacity.score} (${capacity.label})` : null,
+    `High risk: ${highRiskCount}`,
+    `Reassessment queue: ${reassessmentCount}`,
+    enabledFeatures.ems_pipeline ? `EMS pressure: ${emsPressure.score}` : null,
+    enabledFeatures.referral_intelligence ? `Active referrals: ${activeReferralCount(referrals)}` : null,
+    `Bottleneck: ${bottleneck || 'None'}`,
+    enabledFeatures.clinical_calculator_hub ? `Drug reference tools available: ${drugReferenceTools}` : null,
+  ].filter(Boolean);
 
   return [
     'You are the ED Copilot for a busy Emergency Department.',
@@ -271,13 +280,7 @@ function buildRequestedEdCopilotSystemPrompt({
     '',
     'Current department snapshot:',
     `Active patients: ${activePatients.length}`,
-    `Capacity: ${capacity.score} (${capacity.label})`,
-    `High risk: ${highRiskCount}`,
-    `Reassessment queue: ${reassessmentCount}`,
-    `EMS pressure: ${emsPressure.score}`,
-    `Active referrals: ${activeReferralCount(referrals)}`,
-    `Bottleneck: ${bottleneck || 'None'}`,
-    `Drug reference tools available: ${drugReferenceToolListForCopilot()}`,
+    ...enabledToolLines,
     '',
     'Patients:',
     formatBriefPatientList(activePatients),
@@ -437,21 +440,24 @@ function renderMessageContent(content) {
 }
 
 const QUICK_ACTIONS = [
-  'Who needs attention?',
-  'Capacity status',
-  'EMS update',
-  'Reassessment queue',
+  { label: 'Who needs attention?' },
+  { label: 'Capacity status', featureId: 'capacity_intelligence' },
+  { label: 'EMS update', featureId: 'ems_pipeline' },
+  { label: 'Reassessment queue' },
 ];
 
 const COMMAND_PALETTE_OPTIONS = [
-  'Who needs attention?',
-  'Who has been waiting the longest?',
-  'Show me all chest pain patients',
-  "What's our capacity",
-  "What's the EMS situation",
-  'Any high risk patients',
-  'Reassessment queue',
+  { label: 'Who needs attention?' },
+  { label: 'Who has been waiting the longest?' },
+  { label: 'Show me all chest pain patients' },
+  { label: "What's our capacity", featureId: 'capacity_intelligence' },
+  { label: "What's the EMS situation", featureId: 'ems_pipeline' },
+  { label: 'Any high risk patients' },
+  { label: 'Reassessment queue' },
 ];
+
+const isFeatureActionVisible = (action, enabledFeatures) =>
+  !action.featureId || Boolean(enabledFeatures[action.featureId]);
 
 function CopilotActionCard({ action, status, onApply, onDismiss }) {
   if (!action) return null;
@@ -509,6 +515,10 @@ const ChatInterface = ({
   const shouldStickToBottomRef = useRef(true);
   const { error: notifyError } = useNotificationActions();
   const { enabled: copilotToolActionsEnabled } = useFeature('copilot_tool_actions');
+  const { enabled: emsPipelineEnabled } = useFeature('ems_pipeline');
+  const { enabled: referralIntelligenceEnabled } = useFeature('referral_intelligence');
+  const { enabled: capacityIntelligenceEnabled } = useFeature('capacity_intelligence');
+  const { enabled: clinicalCalculatorHubEnabled } = useFeature('clinical_calculator_hub');
   const {
     activeWorkspace,
     activeWorkspaceId,
@@ -517,24 +527,118 @@ const ChatInterface = ({
     recommendedAIAgents,
     recommendedAssetPacks,
   } = useWorkspace();
-  const {
-    patients,
-    queueCounts,
-    capacitySnapshot,
-    reassessmentQueue,
-    setWhiteboardFilter,
-    flagPatientForReassessment,
-  } = useEmergencyDepartment();
   const emergencyPatients = useEmergencyStore((state) => state.patients);
   const emergencyStaff = useEmergencyStore((state) => state.staff);
+  const emergencyRooms = useEmergencyStore((state) => state.rooms);
+  const edQueueHealth = useEmergencyStore(selectEdQueueHealth);
+  const reassessmentQueue = useEmergencyStore(selectReassessmentQueue);
+  const reassessmentCount = useEmergencyStore(selectReassessmentCount);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const emergencyCapacity = useEmergencyStore((state) => state.capacity);
   const emergencyReferrals = useEmergencyStore((state) => state.referrals);
-  const bottleneckAlert = useEmergencyStore((state) => state.bottleneckAlert);
+  const bottleneckAlert = useEmergencyStore(selectQueueBottleneckAlert);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
+  const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const addFlag = useEmergencyStore((state) => state.addFlag);
   const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
   const isEmergencyCopilot = activeWorkspaceId === 'emergency';
-  const edQueueHealth = isEmergencyCopilot ? buildEdQueueHealth(patients, queueCounts) : [];
+  const enabledCopilotFeatures = useMemo(
+    () => ({
+      ems_pipeline: emsPipelineEnabled,
+      referral_intelligence: referralIntelligenceEnabled,
+      capacity_intelligence: capacityIntelligenceEnabled,
+      clinical_calculator_hub: clinicalCalculatorHubEnabled,
+      copilot_tool_actions: copilotToolActionsEnabled,
+    }),
+    [
+      capacityIntelligenceEnabled,
+      clinicalCalculatorHubEnabled,
+      copilotToolActionsEnabled,
+      emsPipelineEnabled,
+      referralIntelligenceEnabled,
+    ]
+  );
+  const copilotFeatureEnabled = useCallback(
+    (featureId) => Boolean(enabledCopilotFeatures[featureId]),
+    [enabledCopilotFeatures]
+  );
+  const visibleQuickActions = useMemo(
+    () => QUICK_ACTIONS.filter((action) => isFeatureActionVisible(action, enabledCopilotFeatures)),
+    [enabledCopilotFeatures]
+  );
+  const visibleCommandPaletteOptions = useMemo(
+    () => COMMAND_PALETTE_OPTIONS.filter((action) => isFeatureActionVisible(action, enabledCopilotFeatures)),
+    [enabledCopilotFeatures]
+  );
+  const patients = useMemo(
+    () =>
+      emergencyPatients.map((patient) =>
+        buildCopilotPatient(patient, emergencyRooms, emergencyStaff)
+      ),
+    [emergencyPatients, emergencyRooms, emergencyStaff]
+  );
+  const capacitySnapshot = emergencyCapacity;
+  const setWhiteboardFilter = useCallback(
+    (filter = {}) => {
+      if (Object.prototype.hasOwnProperty.call(filter, 'queue')) {
+        setQueueFilter(filter.queue || null);
+      }
+      if (Object.prototype.hasOwnProperty.call(filter, 'complaint')) {
+        setWhiteboardSearchQuery(filter.complaint || '');
+      }
+    },
+    [setQueueFilter, setWhiteboardSearchQuery]
+  );
+  const flagPatientForReassessment = useCallback(
+    (target, reason = 'ED Copilot manual reassessment flag') => {
+      const normalizedTarget = String(target || '')
+        .trim()
+        .toLowerCase();
+      const patient = patients.find((candidate) => {
+        const fields = [
+          candidate.id,
+          candidate.name,
+          candidate.location,
+          candidate.location?.replace(/^bed\s*/i, ''),
+        ];
+        return fields.some(
+          (field) =>
+            String(field || '')
+              .trim()
+              .toLowerCase() === normalizedTarget
+        );
+      });
+
+      if (!patient) {
+        return {
+          ok: false,
+          message: `No patient matched ${target}.`,
+        };
+      }
+
+      const flag = createPatientFlag('ReassessmentDue', { reason });
+      addFlag(patient.id, flag);
+
+      return {
+        ok: true,
+        patient,
+        flag: {
+          patientId: patient.id,
+          patientName: patient.name,
+          state: patient.state,
+          priority: patient.priority,
+          waitingMinutes: waitMinutes(patient.arrivalTime),
+          vitalsAgeMinutes: waitMinutes(patient.vitalsUpdatedAt || patient.vitals?.recordedAt),
+          reasons: [reason],
+          flaggedAt: flag.detectedAt,
+          manual: true,
+        },
+        message: `${patient.name} flagged for reassessment.`,
+      };
+    },
+    [addFlag, patients]
+  );
   const emsPressure = calculateEMSPressureScore(emsArrivals);
   const staffRebalanceSuggestion = getStaffRebalanceSuggestion(
     buildStaffWorkloads(emergencyStaff, emergencyPatients, activeShift)
@@ -545,27 +649,28 @@ const ChatInterface = ({
         systemPrompt: buildEdCopilotSystemPrompt({
           patients: emergencyPatients,
           capacity: emergencyCapacity,
-          reassessmentCount: emergencyPatients.filter(
-            (patient) =>
-              isActivePatient(patient) &&
-              (hasPatientFlag(patient, 'ReassessmentDue') ||
-                hasPatientFlag(patient, 'ScoreReassessmentRecommended'))
-          ).length,
-          queueHealth: edQueueHealth,
+          reassessmentCount,
+          queueHealth: isEmergencyCopilot ? edQueueHealth : [],
           reassessmentQueue,
           bottleneckAlert,
-          emsPressure,
-          referrals: emergencyReferrals,
+          emsPressure: emsPipelineEnabled ? emsPressure : { score: 0 },
+          referrals: referralIntelligenceEnabled ? emergencyReferrals : [],
           staffRebalanceSuggestion,
+          enabledFeatures: enabledCopilotFeatures,
+          drugReferenceTools: drugReferenceToolListForCopilot(copilotFeatureEnabled),
         }),
         patientCount: patients.length,
-        capacitySnapshot,
-        queueHealth: edQueueHealth,
+        capacitySnapshot: capacityIntelligenceEnabled ? capacitySnapshot : null,
+        queueHealth: isEmergencyCopilot ? edQueueHealth : [],
         bottleneckAlert,
-        emsPressure,
-        emsPressureContext: buildEMSPressureCopilotContext(emsPressure),
+        emsPressure: emsPipelineEnabled ? emsPressure : null,
+        emsPressureContext: emsPipelineEnabled ? buildEMSPressureCopilotContext(emsPressure) : null,
         flaggedReassessments: reassessmentQueue,
         staffRebalanceSuggestion,
+        enabledFeatures: enabledCopilotFeatures,
+        availableTools: {
+          drugReference: drugReferenceToolListForCopilot(copilotFeatureEnabled),
+        },
         patients: patients.map((patient) => ({
           id: patient.id,
           name: patient.name,
@@ -715,7 +820,11 @@ const ChatInterface = ({
       timestamp: new Date(),
     };
     const detectedCommandIntent = isEmergencyCopilot
-      ? detectEdCopilotIntent(outgoingText, useEmergencyStore.getState().patients)
+      ? detectEdCopilotIntent(
+          outgoingText,
+          useEmergencyStore.getState().patients,
+          enabledCopilotFeatures
+        )
       : null;
 
     shouldStickToBottomRef.current = true;
@@ -735,12 +844,7 @@ const ChatInterface = ({
         ? (() => {
             const emergencyState = useEmergencyStore.getState();
             const currentEmsPressure = calculateEMSPressureScore(emergencyState.emsArrivals);
-            const reassessmentCount = emergencyState.patients.filter(
-              (patient) =>
-                isActivePatient(patient) &&
-                (hasPatientFlag(patient, 'ReassessmentDue') ||
-                  hasPatientFlag(patient, 'ScoreReassessmentRecommended'))
-            ).length;
+            const reassessmentCount = selectReassessmentCount(emergencyState);
             const currentStaffRebalanceSuggestion = getStaffRebalanceSuggestion(
               buildStaffWorkloads(
                 emergencyState.staff,
@@ -752,11 +856,13 @@ const ChatInterface = ({
               patients: emergencyState.patients,
               capacity: emergencyState.capacity,
               reassessmentCount,
-              bottleneckAlert: emergencyState.bottleneckAlert,
-              emsPressure: currentEmsPressure,
-              referrals: emergencyState.referrals,
+              bottleneckAlert: selectQueueBottleneckAlert(emergencyState),
+              emsPressure: emsPipelineEnabled ? currentEmsPressure : { score: 0 },
+              referrals: referralIntelligenceEnabled ? emergencyState.referrals : [],
               detectedIntent: detectedCommandIntent,
               staffRebalanceSuggestion: currentStaffRebalanceSuggestion,
+              enabledFeatures: enabledCopilotFeatures,
+              drugReferenceTools: drugReferenceToolListForCopilot(copilotFeatureEnabled),
             });
 
             return buildCopilotMessages({
@@ -790,6 +896,7 @@ const ChatInterface = ({
                 aiRequest: {
                   requestType: 'COPILOT_CHAT',
                   toolsEnabled: copilotToolActionsEnabled,
+                  enabledFeatures: enabledCopilotFeatures,
                 },
               }
             : {}),
@@ -810,9 +917,11 @@ const ChatInterface = ({
 
       const assistantMessage = mapChatResponseToAssistantMessage(data);
       const pendingAction =
-        parseCopilotActionSuggestion(assistantMessage.content) ||
-        actionSuggestionFromWhiteboardAction(assistantMessage.metadata?.whiteboardAction);
-      if (pendingAction) {
+        copilotToolActionsEnabled
+          ? parseCopilotActionSuggestion(assistantMessage.content) ||
+            actionSuggestionFromWhiteboardAction(assistantMessage.metadata?.whiteboardAction)
+          : null;
+      if (copilotToolActionsEnabled && pendingAction) {
         assistantMessage.metadata = {
           ...assistantMessage.metadata,
           pendingAction,
@@ -823,6 +932,7 @@ const ChatInterface = ({
         applyWhiteboardAction(assistantMessage.metadata?.whiteboardAction);
       }
       if (
+        clinicalCalculatorHubEnabled &&
         detectedCommandIntent?.intent === 'LAUNCH_CALCULATOR' &&
         detectedCommandIntent.patientId &&
         !assistantMessage.metadata?.whiteboardAction
@@ -946,7 +1056,7 @@ const ChatInterface = ({
                     gap: '10px',
                   }}
                 />
-                {actionSuggestion && (
+                {copilotToolActionsEnabled && actionSuggestion && (
                   <CopilotActionCard
                     action={actionSuggestion}
                     status={actionDecisions[actionKey]}
@@ -1042,28 +1152,28 @@ const ChatInterface = ({
 
       <div className="chat-interface__input-area">
         <div className="chat-interface__quick-actions" aria-label="Copilot quick actions">
-          {QUICK_ACTIONS.map((action) => (
+          {visibleQuickActions.map((action) => (
             <button
-              key={action}
+              key={action.label}
               type="button"
-              onClick={() => handleQuickSend(action)}
+              onClick={() => handleQuickSend(action.label)}
               disabled={isLoading}
             >
-              {action}
+              {action.label}
             </button>
           ))}
         </div>
         {isCommandPaletteOpen && (
           <div className="chat-interface__command-palette" role="menu" aria-label="Command palette">
             <span>Command palette</span>
-            {COMMAND_PALETTE_OPTIONS.map((command) => (
+            {visibleCommandPaletteOptions.map((command) => (
               <button
-                key={command}
+                key={command.label}
                 type="button"
                 role="menuitem"
-                onClick={() => handleCommandSelect(command)}
+                onClick={() => handleCommandSelect(command.label)}
               >
-                {command}
+                {command.label}
               </button>
             ))}
           </div>
@@ -1075,6 +1185,7 @@ const ChatInterface = ({
             onFocus={keepComposerVisible}
             onChange={handleComposerChange}
             onKeyDown={handleKeyPress}
+            aria-label="Ask ED Copilot"
             placeholder='Ask ED Copilot, or type "/" for commands'
             disabled={isLoading}
             className="chat-interface__textarea"

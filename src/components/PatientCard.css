@@ -41,6 +41,20 @@
     0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
+.patient-detail--empty {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.patient-detail__empty {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: var(--space-4);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
 .patient-card--p1 {
   border-left-color: var(--priority-p1);
   background:

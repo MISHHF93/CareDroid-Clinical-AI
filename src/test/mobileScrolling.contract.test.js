@@ -13,8 +13,6 @@ const srcRoot = dirname(__dirname);
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeSurfacesCss = readFileSync(join(srcRoot, 'styles/theme-surfaces.css'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
-const authShellCss = readFileSync(join(srcRoot, 'layout/AuthShell.css'), 'utf8');
-const sidebarCss = readFileSync(join(srcRoot, 'components/Sidebar.css'), 'utf8');
 const quickCommandCss = readFileSync(join(srcRoot, 'components/QuickCommandLauncher.css'), 'utf8');
 const drawerCss = readFileSync(join(srcRoot, 'components/ui/Drawer.css'), 'utf8');
 const chatInterfaceCss = readFileSync(join(srcRoot, 'components/ChatInterface.css'), 'utf8');
@@ -45,35 +43,21 @@ describe('mobile scrolling contracts', () => {
     expect(indexCss).toMatch(
       /html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/
     );
-    expect(appShellCss).toMatch(
-      /\.app-shell--nav-open \.app-shell-main-wrap[\s\S]*touch-action:\s*none/
-    );
+    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps normal pages in the main scrollport while preserving chat as a local viewport', () => {
-    expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.app-shell-main-wrap\s*\{[\s\S]*height:\s*100%/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(
-      /\.app-shell-main-content\s*\{[\s\S]*-webkit-overflow-scrolling:\s*touch/
-    );
-    expect(appShellCss).toMatch(
-      /\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/
-    );
-    expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*height:\s*calc/);
+    expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__messages\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__textarea\s*\{[\s\S]*overflow-y:\s*auto/);
   });
 
-  it('keeps sidebar scroll internal and closed drawers unable to block touch', () => {
-    expect(sidebarCss).toMatch(/\.sidebar\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(sidebarCss).toMatch(/\.sidebar-content\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(sidebarCss).toMatch(/\.sidebar-content\s*\{[\s\S]*overflow-x:\s*clip/);
-    expect(sidebarCss).toMatch(
-      /@media \(max-width: 900px\)[\s\S]*\.sidebar\s*\{[\s\S]*pointer-events:\s*none/
-    );
-    expect(sidebarCss).toMatch(/\.sidebar\.sidebar--open\s*\{[\s\S]*pointer-events:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-nav-backdrop\s*\{[\s\S]*pointer-events:\s*auto/);
+  it('keeps the AppShell navigation rail and overlays from creating extra page scroll owners', () => {
+    expect(appShellCss).toMatch(/\.ed-nav-rail\s*\{[\s\S]*height:\s*100%/);
+    expect(appShellCss).toMatch(/\.ed-nav-rail__items\s*\{[\s\S]*flex-direction:\s*column/);
+    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(quickCommandCss).toMatch(/\.quick-command\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay-open\s*\{[\s\S]*pointer-events:\s*auto/);
@@ -89,9 +73,8 @@ describe('mobile scrolling contracts', () => {
     }
   });
 
-  it('allows auth, tools, and calculator pages to grow beyond mobile viewport height', () => {
-    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*height:\s*auto/);
-    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*overflow-y:\s*auto/);
+  it('allows tools and calculator pages to grow inside the shared AppShell main region', () => {
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
     expect(layoutVisibilityCss).toMatch(/\.tools-overview[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.calculators-content[\s\S]*overflow-x:\s*clip/);
     expect(toolsOverviewCss).not.toMatch(/\.tools-overview\s*\{[^}]*height:\s*100vh/);
@@ -104,10 +87,7 @@ describe('mobile scrolling contracts', () => {
     expect(drawerWidth, `${width}px drawer should fit viewport`).toBeLessThanOrEqual(width);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
-    expect(appShellCss).toMatch(
-      /@media \(max-width: 900px\)[\s\S]*\.app-shell-main-wrap[\s\S]*margin-left:\s*0/
-    );
     expect(appShellCss).not.toContain('app-shell-bottom-nav');
-    expect(sidebarCss).toContain('width: var(--sidebar-drawer-max-width, min(280px, 88vw))');
+    expect(appShellCss).toMatch(/@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail/);
   });
 });

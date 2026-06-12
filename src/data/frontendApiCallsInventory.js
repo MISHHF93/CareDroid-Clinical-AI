@@ -42,9 +42,9 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'compliance-consent-get', method: 'GET', path: '/api/compliance/consent', client: 'complianceApi.js', capability: 'complianceConsent' },
   { id: 'compliance-consent-post', method: 'POST', path: '/api/compliance/consent', client: 'complianceApi.js', capability: 'complianceConsent' },
 
-  { id: 'audit-logs', method: 'GET', path: '/api/audit/logs', client: 'AuditLogs.jsx' },
-  { id: 'audit-verify', method: 'GET', path: '/api/audit/verify-integrity', client: 'AuditLogs.jsx' },
-  { id: 'audit-statistics', method: 'GET', path: '/api/audit/statistics', client: 'AuditLogs.jsx' },
+  { id: 'audit-logs', method: 'GET', path: '/api/audit/logs', client: 'Settings.jsx / Profile.jsx' },
+  { id: 'audit-verify', method: 'GET', path: '/api/audit/verify-integrity', client: 'auditApi.js' },
+  { id: 'audit-statistics', method: 'GET', path: '/api/audit/statistics', client: 'auditApi.js' },
   { id: 'audit-sync', method: 'POST', path: '/api/audit/sync', client: 'syncService.js', capability: 'auditSync' },
 
   { id: 'notifications-list', method: 'GET', path: '/api/notifications', client: 'NotificationService.js', capability: 'notificationsRest' },
@@ -78,9 +78,8 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'medical-device-alerts', method: 'GET', path: '/api/alerts/devices', client: 'medicalIotService.js', capability: 'deviceAlerting' },
 
   { id: 'clinical-alerts-list', method: 'GET', path: '/api/clinical/alerts', client: 'clinicalAlertsApi.js / ClinicalAlertsPage.jsx', capability: 'clinicalAlerts' },
-  { id: 'clinical-alerts-ack', method: 'POST', path: '/api/clinical/alerts/:id/acknowledge', client: 'clinicalAlertsApi.js / clinicalAlertNotifications.js', capability: 'clinicalAlerts' },
-  { id: 'clinical-alerts-dismiss', method: 'POST', path: '/api/clinical/alerts/:id/dismiss', client: 'clinicalAlertsApi.js / clinicalAlertNotifications.js', capability: 'clinicalAlerts' },
-  { id: 'clinical-alerts-stream', method: 'GET', path: '/api/clinical/alerts/stream', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlertsStream', notes: 'WebSocket stream not implemented — gated off' },
+  { id: 'clinical-alerts-ack', method: 'POST', path: '/api/clinical/alerts/:id/acknowledge', client: 'clinicalAlertsApi.js / ClinicalAlertsPage.jsx', capability: 'clinicalAlerts' },
+  { id: 'clinical-alerts-dismiss', method: 'POST', path: '/api/clinical/alerts/:id/dismiss', client: 'clinicalAlertsApi.js / ClinicalAlertsPage.jsx', capability: 'clinicalAlerts' },
 
   { id: 'ambient-scribe-generate', method: 'POST', path: '/api/clinical-intelligence/ambient-scribe/generate', client: 'clinicalIntelligenceApi.js / AmbientScribe.jsx', capability: 'clinicalIntelligence' },
   { id: 'guideline-rag-query', method: 'POST', path: '/api/clinical-intelligence/guideline-rag/query', client: 'clinicalIntelligenceApi.js / GuidelineRag.jsx', capability: 'clinicalIntelligence' },
@@ -188,7 +187,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'platform-digital-twin-summary', method: 'GET', path: '/api/platform/digital-twin', client: 'platformAssetsApi.js / DigitalTwinIntelligence.jsx', capability: 'platformAssets' },
   { id: 'platform-organization-analytics', method: 'GET', path: '/api/platform/organizations/:organizationId/analytics', client: 'platformAssetsApi.js / OrganizationPages.jsx', capability: 'platformAssets' },
   { id: 'users-profile', method: 'GET', path: '/api/users/profile', client: 'UserContext.jsx / syncService.js', capability: 'userProfile' },
-  { id: 'users-profile-update', method: 'PATCH', path: '/api/users/profile', client: 'profileApi.js / ProfileSettings.jsx', capability: 'userProfile' },
+  { id: 'users-profile-update', method: 'PATCH', path: '/api/users/profile', client: 'UserContext.jsx / syncService.js', capability: 'userProfile' },
   { id: 'profile-me', method: 'GET', path: '/api/profile/me', client: 'userIdentityApi.js / UserIdentityContext.jsx', capability: 'operationalProfile' },
   { id: 'profile-me-update', method: 'PATCH', path: '/api/profile/me', client: 'userIdentityApi.js / UserIdentityContext.jsx', capability: 'operationalProfile' },
   { id: 'profile-preferences', method: 'GET', path: '/api/profile/me/preferences', client: 'userIdentityApi.js / ProfilePreferences.jsx', capability: 'operationalProfile' },

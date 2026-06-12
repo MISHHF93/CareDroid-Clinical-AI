@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -391,7 +392,7 @@ export default function NewPatientIntake({ open, onClose }) {
     onClose?.();
   };
 
-  return (
+  const intakeDialog = (
     <div
       className="new-patient-intake"
       role="dialog"
@@ -429,7 +430,7 @@ export default function NewPatientIntake({ open, onClose }) {
           ))}
         </nav>
 
-        <main className="new-patient-intake__content">
+        <section className="new-patient-intake__content">
           {step === 0 ? (
             <section className="new-patient-intake__section">
               <h3>Identity</h3>
@@ -691,7 +692,7 @@ export default function NewPatientIntake({ open, onClose }) {
               </button>
             </section>
           ) : null}
-        </main>
+        </section>
 
         <footer className="new-patient-intake__footer">
           <button
@@ -717,4 +718,6 @@ export default function NewPatientIntake({ open, onClose }) {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(intakeDialog, document.body) : intakeDialog;
 }

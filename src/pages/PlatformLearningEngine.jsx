@@ -95,7 +95,7 @@ export default function PlatformLearningEngine() {
   );
 
   return (
-    <main className="learning-page">
+    <section className="learning-page">
       <section className="learning-hero" aria-labelledby="platform-learning-title">
         <div>
           <p className="learning-eyebrow">Platform learning engine</p>
@@ -177,6 +177,6 @@ export default function PlatformLearningEngine() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }
