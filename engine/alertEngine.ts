@@ -9,6 +9,7 @@ import {
   type Queue,
   type Referral,
 } from '../types/emergency';
+import { getLongWaitPatients } from '../src/utils/longWaitRescue';
 
 export interface AlertEngineInputs {
   patients: Patient[];
@@ -24,6 +25,18 @@ export type AlertDispatchInput = Omit<Alert, 'id' | 'createdAt' | 'type' | 'seve
 
 const ACTIVE_EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff']);
 const REFERRAL_ACCEPTANCE_CLOSED_STATUSES = new Set(['Accepted', 'Completed', 'Declined']);
+const REFERRAL_RESPONSE_STATUSES = new Set([
+  'Acknowledged',
+  'Accepted',
+  'Declined',
+  'InfoRequested',
+  'TransportArranged',
+  'PatientDeparted',
+  'Completed',
+]);
+const ACTIVE_REASSESSMENT_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
+const REASSESSMENT_REMINDER_WARNING_WINDOW_MS = 2 * 60 * 1000;
+const REASSESSMENT_REMINDER_OVERDUE_MS = 10 * 60 * 1000;
 const DEFAULT_TOAST_SECONDS: Record<AlertSeverity, number | undefined> = {
   Info: 5,
   Warning: 5,
@@ -102,7 +115,7 @@ export function dispatch(alert: AlertDispatchInput): Alert {
 }
 
 export function isDerivedAlertId(alertId: string): boolean {
-  return /^alert-(reassessment|capacity|ems|referral|queue|bottleneck)-/.test(alertId);
+  return /^alert-(reassessment|capacity|ems|referral|long-wait|queue|bottleneck)-/.test(alertId);
 }
 
 function deriveReassessmentAlerts(patients: Patient[], now: Date): Alert[] {
@@ -123,6 +136,56 @@ function deriveReassessmentAlerts(patients: Patient[], now: Date): Alert[] {
         now
       )
     );
+}
+
+function roomLabel(patient: Patient): string {
+  return patient.location || patient.roomId || 'No room';
+}
+
+function reassessmentReminderStage(
+  reminder: NonNullable<Patient['reassessmentReminders']>[number],
+  now: Date
+): 'upcoming' | 'due' | 'overdue' | null {
+  if (!ACTIVE_REASSESSMENT_REMINDER_STATUSES.has(reminder.status)) return null;
+  const dueAt = new Date(reminder.dueAt).getTime();
+  const nowMs = now.getTime();
+  if (!Number.isFinite(dueAt)) return null;
+  if (nowMs >= dueAt + REASSESSMENT_REMINDER_OVERDUE_MS) return 'overdue';
+  if (nowMs >= dueAt) return 'due';
+  if (dueAt - nowMs <= REASSESSMENT_REMINDER_WARNING_WINDOW_MS) return 'upcoming';
+  return null;
+}
+
+function deriveReassessmentReminderAlerts(patients: Patient[], now: Date): Alert[] {
+  return patients.flatMap((patient) =>
+    (patient.reassessmentReminders || []).flatMap((reminder) => {
+      const stage = reassessmentReminderStage(reminder, now);
+      if (!stage) return [];
+      const title =
+        stage === 'upcoming'
+          ? `Recheck due in 2min - ${patientName(patient)}`
+          : stage === 'due'
+            ? `Recheck due now - ${patientName(patient)}`
+            : `Recheck overdue - ${patientName(patient)}`;
+      return [
+        makeAlert(
+          {
+            id: `alert-reassessment-reminder-${stage}-${reminder.id}`,
+            type: 'Reassessment',
+            severity: stage === 'overdue' ? 'Critical' : 'Warning',
+            title,
+            message: `${patient.chiefComplaint || patient.complaintCategory} - ${roomLabel(patient)}${reminder.note ? ` - ${reminder.note}` : ''}`,
+            patientId: patient.id,
+            reminderId: reminder.id,
+            actionLabel: 'Go to Patient',
+            actionType: 'REASSESSMENT_REMINDER',
+            autoDismissAfter: undefined,
+          },
+          now
+        ),
+      ];
+    })
+  );
 }
 
 function capacitySeverity(capacity: CapacitySnapshot): AlertSeverity | null {
@@ -181,8 +244,38 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
     const elapsed = minutesSince(referral.requestedAt, now);
     const patientLabel = patientName(patientById.get(referral.patientId));
     const isAwaitingAcceptance = !REFERRAL_ACCEPTANCE_CLOSED_STATUSES.has(referral.status);
+    const isUnacknowledged =
+      referral.status === 'Sent' && !referral.respondedAt && !REFERRAL_RESPONSE_STATUSES.has(referral.status);
+    const warningThreshold =
+      referral.urgency === 'Emergent' ? 10 : referral.urgency === 'Urgent' ? 15 : null;
+    const criticalThreshold =
+      referral.urgency === 'Emergent' ? 20 : referral.urgency === 'Urgent' ? 30 : null;
 
-    if (referral.status === 'Sent' && !referral.respondedAt && elapsed >= 15) {
+    if (referral.status === 'Sent') {
+      alerts.push(
+        makeAlert(
+          {
+            id: `alert-referral-sent-${referral.id}`,
+            type: 'Referral',
+            severity: referral.urgency === 'Emergent' ? 'Warning' : 'Info',
+            title: `Referral sent to ${referral.targetDepartment}`,
+            message: `${patientLabel} referral is awaiting ${referral.targetDepartment} acknowledgement.`,
+            patientId: referral.patientId,
+            actionLabel: 'View Patient',
+            actionType: 'VIEW_PATIENT',
+            autoDismissAfter: referral.urgency === 'Routine' ? 5 : undefined,
+          },
+          now
+        )
+      );
+    }
+
+    if (
+      isUnacknowledged &&
+      warningThreshold !== null &&
+      elapsed >= warningThreshold &&
+      (criticalThreshold === null || elapsed < criticalThreshold)
+    ) {
       alerts.push(
         makeAlert(
           {
@@ -190,28 +283,28 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
             type: 'Referral',
             severity: 'Warning',
             title: 'Referral unacknowledged',
-            message: `${patientLabel} to ${referral.targetDepartment} has not been acknowledged after ${elapsed}m.`,
+            message: `${referral.targetDepartment} - ${patientLabel} - ${elapsed}m unacknowledged.`,
             patientId: referral.patientId,
-            actionLabel: 'View Referral',
-            actionType: 'OPEN_REFERRALS',
+            actionLabel: 'View Patient',
+            actionType: 'VIEW_PATIENT',
           },
           now
         )
       );
     }
 
-    if (referral.urgency === 'Urgent' && isAwaitingAcceptance && elapsed >= 30) {
+    if (isUnacknowledged && criticalThreshold !== null && elapsed >= criticalThreshold) {
       alerts.push(
         makeAlert(
           {
-            id: `alert-referral-urgent-${referral.id}`,
+            id: `alert-referral-critical-unacknowledged-${referral.id}`,
             type: 'Referral',
-            severity: 'Warning',
+            severity: 'Critical',
             title: 'Referral escalation required',
-            message: `${patientLabel} to ${referral.targetDepartment} has waited ${elapsed}m without acceptance.`,
+            message: `${referral.targetDepartment} - ${patientLabel} has waited ${elapsed}m without acknowledgement. Charge nurse notified.`,
             patientId: referral.patientId,
-            actionLabel: 'View Referral',
-            actionType: 'OPEN_REFERRALS',
+            actionLabel: 'View Patient',
+            actionType: 'VIEW_PATIENT',
           },
           now
         )
@@ -222,14 +315,15 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
       alerts.push(
         makeAlert(
           {
-            id: `alert-referral-emergent-${referral.id}`,
+            id: `alert-referral-emergent-pager-${referral.id}`,
             type: 'Referral',
             severity: 'Critical',
-            title: 'Emergent referral not accepted',
-            message: `${patientLabel} to ${referral.targetDepartment} has waited ${elapsed}m without acceptance.`,
+            title: 'Emergent referral pager escalation',
+            message: `${patientLabel} to ${referral.targetDepartment} has not been accepted after ${elapsed}m. On-call pager escalation attempt recorded.`,
             patientId: referral.patientId,
-            actionLabel: 'View Referral',
-            actionType: 'OPEN_REFERRALS',
+            actionLabel: 'View Patient',
+            actionType: 'VIEW_PATIENT',
+            autoDismissAfter: undefined,
           },
           now
         )
@@ -238,6 +332,58 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
   });
 
   return alerts;
+}
+
+function deriveLongWaitAlerts(patients: Patient[], now: Date): Alert[] {
+  return getLongWaitPatients(patients, now).map(({ patient, status }) => {
+    const patientLabel = patientName(patient);
+    const base = {
+      type: 'Reassessment' as const,
+      patientId: patient.id,
+      actionLabel: 'View Patient',
+      actionType: 'VIEW_PATIENT',
+    };
+
+    if (status.phase === 'lwbs') {
+      return makeAlert(
+        {
+          ...base,
+          id: `alert-long-wait-lwbs-${patient.id}`,
+          severity: 'Critical',
+          title: 'LWBS risk - waiting patient',
+          message: `${patientLabel} has waited ${status.waitMinutes}m (${patient.priority} limit ${status.thresholdMinutes}m). Full team notification required.`,
+          autoDismissAfter: undefined,
+        },
+        now
+      );
+    }
+
+    if (status.phase === 'critical') {
+      return makeAlert(
+        {
+          ...base,
+          id: `alert-long-wait-critical-${patient.id}`,
+          severity: 'Critical',
+          title: 'Critical long wait breach',
+          message: `${patientLabel} has waited ${status.waitMinutes}m (${patient.priority} limit ${status.thresholdMinutes}m). Charge nurse and physician notification required.`,
+          autoDismissAfter: undefined,
+        },
+        now
+      );
+    }
+
+    return makeAlert(
+      {
+        ...base,
+        id: `alert-long-wait-warning-${patient.id}`,
+        severity: 'Warning',
+        title: 'Wait time approaching limit',
+        message: `${patientLabel} has waited ${status.waitMinutes}m (${patient.priority} limit ${status.thresholdMinutes}m). Assigned RN reminder sent.`,
+        autoDismissAfter: undefined,
+      },
+      now
+    );
+  });
 }
 
 function deriveQueueAlerts(queues: Queue[], bottleneckAlert: BottleneckAlert | null, now: Date): Alert[] {
@@ -285,9 +431,11 @@ export function deriveAlerts(
 ): Alert[] {
   const nextAlerts = [
     ...deriveReassessmentAlerts(inputs.patients, now),
+    ...deriveReassessmentReminderAlerts(inputs.patients, now),
     ...deriveCapacityAlerts(inputs.capacity, now),
     ...deriveEMSAlerts(inputs.emsArrivals, now),
     ...deriveReferralAlerts(inputs.referrals, inputs.patients, now),
+    ...deriveLongWaitAlerts(inputs.patients, now),
     ...deriveQueueAlerts(inputs.queues, inputs.bottleneckAlert, now),
   ].map((alert) => preserveAlertState(alert, previousAlerts));
 

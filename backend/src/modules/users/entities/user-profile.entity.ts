@@ -10,7 +10,6 @@ import {
   BeforeUpdate,
   AfterLoad,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity('user_profiles')
 export class UserProfile {
@@ -114,9 +113,9 @@ export class UserProfile {
   medicationsDecrypted?: string;
 
   // Relations
-  @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
+  @OneToOne('User', (user: any) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 
   /**
    * BeforeInsert hook: Encrypt PHI fields before saving to database

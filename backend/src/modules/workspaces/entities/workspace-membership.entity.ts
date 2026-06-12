@@ -8,8 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { Workspace } from './workspace.entity';
 
 export enum WorkspaceMembershipRole {
   OWNER = 'owner',
@@ -70,13 +68,13 @@ export class WorkspaceMembership {
   @Column({ type: 'datetime', nullable: true })
   lastAccessedAt: Date;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.memberships, { onDelete: 'CASCADE' })
+  @ManyToOne('Workspace', (workspace: any) => workspace.memberships, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'workspaceId' })
-  workspace: Workspace;
+  workspace: any;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 
   @CreateDateColumn()
   createdAt: Date;

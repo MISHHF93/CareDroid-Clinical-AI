@@ -27,8 +27,9 @@ export function staffRoleLabel(role) {
 }
 
 export function workloadTone(assignedCount) {
-  if (assignedCount >= 5) return 'red';
-  if (assignedCount >= 3) return 'yellow';
+  if (assignedCount === 0) return 'gray';
+  if (assignedCount >= 6) return 'red';
+  if (assignedCount >= 4) return 'yellow';
   return 'green';
 }
 
@@ -49,6 +50,7 @@ export function buildStaffWorkloads(staff = [], patients = [], activeShift = nul
   }, new Map());
 
   return onShiftStaff(staff, activeShift).map((member) => {
+    const assignedPatients = activePatients.filter((patient) => patient.assignedStaffId === member.id);
     const assignedCount = counts.get(member.id) || 0;
     return {
       ...member,
@@ -56,6 +58,7 @@ export function buildStaffWorkloads(staff = [], patients = [], activeShift = nul
       initials: staffInitials(member),
       roleLabel: staffRoleLabel(member.role),
       assignedCount,
+      assignedPatients,
       workloadTone: workloadTone(assignedCount),
       workloadPercent: Math.min(100, Math.round((assignedCount / 6) * 100)),
     };
@@ -70,13 +73,19 @@ export function getStaffRebalanceSuggestion(workloads = []) {
   if (average <= 0) return null;
 
   const busiest = [...workloads].sort((a, b) => b.assignedCount - a.assignedCount)[0];
-  if (!busiest || busiest.assignedCount < average * 2) return null;
+  const hasCapacityReceiver = workloads.some(
+    (member) => member.id !== busiest?.id && member.assignedCount <= 3
+  );
+  const isTwoTimesAverage = busiest && busiest.assignedCount >= average * 2;
+  const isOverloadedWithAvailablePeer =
+    busiest && busiest.assignedCount >= 6 && hasCapacityReceiver;
+  if (!busiest || (!isTwoTimesAverage && !isOverloadedWithAvailablePeer)) return null;
 
   return {
     staffId: busiest.id,
     name: busiest.displayName,
     assignedCount: busiest.assignedCount,
     teamAverage: Number(average.toFixed(1)),
-    message: `Consider rebalancing — ${busiest.displayName} has ${busiest.assignedCount} patients vs team avg of ${average.toFixed(1)}`,
+    message: `Imbalance detected - ${busiest.displayName} has ${busiest.assignedCount} patients vs team average of ${average.toFixed(1)}`,
   };
 }

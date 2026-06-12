@@ -1,0 +1,115 @@
+.escalate-button {
+  position: relative;
+}
+
+.escalate-button__trigger,
+.escalate-button__confirm button,
+.escalate-button__cancel-active {
+  border: 1px solid color-mix(in srgb, var(--status-critical) 54%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-critical) 24%, var(--color-surface));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 950;
+}
+
+.escalate-button__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+}
+
+.escalate-button--card {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 7;
+}
+
+.escalate-button--card .escalate-button__trigger {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  background: var(--status-critical);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--status-critical) 34%, transparent);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.patient-card:hover .escalate-button--card .escalate-button__trigger,
+.patient-card:focus-within .escalate-button--card .escalate-button__trigger,
+.escalate-button--card.escalate-button--confirming .escalate-button__trigger {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.escalate-button--detail {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-2);
+}
+
+.escalate-button--detail .escalate-button__trigger {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 var(--space-4);
+  background: var(--status-critical);
+  text-transform: uppercase;
+}
+
+.escalate-button__confirm {
+  display: grid;
+  gap: var(--space-2);
+  min-width: min(360px, calc(100vw - var(--space-6)));
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-critical) 62%, var(--color-border-default));
+  border-left: 4px solid var(--status-critical);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-elevated));
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+}
+
+.escalate-button--card .escalate-button__confirm {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-2));
+}
+
+.escalate-button__confirm strong {
+  color: var(--color-text-primary);
+}
+
+.escalate-button__confirm span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.escalate-button__confirm div {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.escalate-button__confirm button,
+.escalate-button__cancel-active {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+}
+
+.escalate-button__cancel-active {
+  background: color-mix(in srgb, var(--status-critical) 12%, var(--color-surface));
+}
+
+@media (hover: none), (pointer: coarse) {
+  .escalate-button--card .escalate-button__trigger {
+    opacity: 1;
+    transform: none;
+  }
+}

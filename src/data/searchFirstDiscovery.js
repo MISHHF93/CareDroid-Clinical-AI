@@ -299,6 +299,98 @@ const NAVIGATION_DESTINATION_ALIASES = Object.freeze({
   agents: ['ai agents', 'copilot agents'],
 });
 
+const EMERGENCY_OS_DESTINATIONS = Object.freeze([
+  {
+    id: 'emergency-whiteboard',
+    title: 'Emergency Whiteboard',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
+    aliases: ['whiteboard', 'board', 'patient flow', 'operational screen'],
+  },
+  {
+    id: 'emergency-patients',
+    title: 'Patients',
+    path: CANONICAL_ROUTES.emergencyPatients,
+    aliases: ['patients', 'patient list', 'patient snapshots'],
+  },
+  {
+    id: 'emergency-ems',
+    title: 'EMS',
+    path: CANONICAL_ROUTES.emergencyEms,
+    aliases: ['ems', 'ambulance', 'pre-arrival', 'offload'],
+  },
+  {
+    id: 'emergency-intake',
+    title: 'Smart Intake',
+    path: CANONICAL_ROUTES.emergencyIntake,
+    aliases: ['intake', 'arrival', 'ocr', 'identity', 'registration'],
+  },
+  {
+    id: 'emergency-queues',
+    title: 'Queues',
+    path: CANONICAL_ROUTES.emergencyQueues,
+    aliases: ['queues', 'queue intelligence', 'waiting', 'who next'],
+  },
+  {
+    id: 'emergency-reassessment',
+    title: 'Reassessment',
+    path: CANONICAL_ROUTES.emergencyReassessment,
+    aliases: ['reassessment', 'reassessment due', 'safety review'],
+  },
+  {
+    id: 'emergency-capacity',
+    title: 'Capacity',
+    path: CANONICAL_ROUTES.emergencyCapacity,
+    aliases: ['capacity', 'rooms', 'occupancy', 'pressure'],
+  },
+  {
+    id: 'emergency-boarding',
+    title: 'Boarding',
+    path: CANONICAL_ROUTES.emergencyBoarding,
+    aliases: ['boarding', 'boarders', 'admission pending'],
+  },
+  {
+    id: 'emergency-referrals',
+    title: 'Referrals',
+    path: CANONICAL_ROUTES.emergencyReferrals,
+    aliases: ['referrals', 'consults', 'transfer', 'specialty'],
+  },
+  {
+    id: 'emergency-copilot',
+    title: 'ED Copilot',
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    aliases: ['copilot', 'assistant', 'ai', 'chat'],
+  },
+  {
+    id: 'emergency-analytics',
+    title: 'Analytics',
+    path: CANONICAL_ROUTES.emergencyAnalytics,
+    aliases: ['analytics', 'metrics', 'throughput', 'trends'],
+  },
+  {
+    id: 'emergency-settings',
+    title: 'Settings',
+    path: CANONICAL_ROUTES.emergencySettings,
+    aliases: ['settings', 'thresholds', 'staff', 'configuration'],
+  },
+]);
+
+function emergencyOsDestinationEntries() {
+  return EMERGENCY_OS_DESTINATIONS.map((destination) => ({
+    id: `emergency-os:${destination.id}`,
+    sourceId: destination.id,
+    kind: 'destination',
+    category: 'emergency-os',
+    type: 'navigation',
+    title: destination.title,
+    label: destination.title,
+    description: `Open ${destination.title} in CareDroid Emergency OS.`,
+    path: destination.path,
+    workspaceIds: ['emergency'],
+    aliases: unique([destination.id, ...(destination.aliases || [])]),
+    assistantPrompt: `Open or explain the ${destination.title} Emergency OS workflow.`,
+  }));
+}
+
 function navigationDestinationEntries({
   destinations = QUICK_COMMAND_DESTINATION_ITEMS,
   navigationPermissions = [],
@@ -624,6 +716,7 @@ export function buildSearchFirstDiscoveryEntries({
   includeContextualDestinations = false,
 } = {}) {
   const entries = [
+    ...emergencyOsDestinationEntries(),
     ...workspaceEntries(),
     ...dashboardEntries(),
     ...navigationDestinationEntries({ navigationPermissions, includeContextualDestinations }),

@@ -8,6 +8,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
 const navigationConfig = readFileSync(join(__dirname, '../config/navigation.config.js'), 'utf8');
+const commandPaletteSource = readFileSync(join(__dirname, '../components/CommandPalette.jsx'), 'utf8');
+
+const PRIMARY_EMERGENCY_OS_PATHS = [
+  '/emergency/whiteboard',
+  '/emergency/patients',
+  '/emergency/ems',
+  '/emergency/intake',
+  '/emergency/queues',
+  '/emergency/reassessment',
+  '/emergency/capacity',
+  '/emergency/boarding',
+  '/emergency/referrals',
+  '/emergency/copilot',
+  '/emergency/analytics',
+  '/emergency/settings',
+];
 
 describe('AppShell navigation surfaces', () => {
   it('renders one AppShell rail and no legacy sidebar or bottom navigation', () => {
@@ -23,11 +39,16 @@ describe('AppShell navigation surfaces', () => {
     expect(appShellJsx).toContain('APP_SHELL_NAV_ITEMS.map');
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureId)).toEqual([
       'emergency_whiteboard',
+      'emergency_patients',
       'ems_pipeline',
-      'referral_intelligence',
+      'smart_intake',
+      'queue_intelligence',
+      'reassessment_engine',
       'capacity_intelligence',
-      'clinical_calculator_hub',
-      'shift_summary',
+      'boarding_intelligence',
+      'referral_intelligence',
+      'ed_copilot',
+      'emergency_analytics',
       'emergency_settings',
     ]);
   });
@@ -45,14 +66,21 @@ describe('AppShell navigation surfaces', () => {
     expect(appShellJsx).toContain('title={isNew ? `${item.label} - New` : item.label}');
   });
 
+  it('keeps every primary Emergency OS route reachable from the command palette', () => {
+    expect(commandPaletteSource).toContain('const EMERGENCY_OS_ROUTE_COMMANDS');
+    for (const path of PRIMARY_EMERGENCY_OS_PATHS) {
+      expect(commandPaletteSource, path).toContain(`path: '${path}'`);
+    }
+  });
+
   it('renders required header and content regions once', () => {
     expect(appShellJsx.match(/<header className="ed-os-header"/g)).toHaveLength(1);
     expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
     expect(appShellJsx).toContain('aria-label="Go to Emergency Whiteboard"');
-    expect(appShellJsx).toContain("onClick={() => navigate('/emergency')}");
+    expect(appShellJsx).toContain("onClick={() => navigate('/emergency/whiteboard')}");
     expect(appShellJsx).toContain('aria-label={`Open shift summary. Current time ${formatShiftClock(clock)}`}');
-    expect(appShellJsx).toContain("onClick={() => navigate('/emergency/shift')}");
+    expect(appShellJsx).toContain("onClick={() => navigate('/emergency/analytics?view=shift')}");
     expect(appShellJsx).toContain('<CapacityBadge');
     expect(appShellJsx).toContain('<StaffAvatar');
   });
@@ -65,7 +93,7 @@ describe('AppShell navigation surfaces', () => {
       /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__item\s*\{[\s\S]*display:\s*flex/
     );
     expect(appShellCss).not.toContain('.ed-nav-rail__item:nth-child(-n + 5)');
-    expect(APP_SHELL_NAV_ITEMS).toHaveLength(7);
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(12);
   });
 
   it('closes only the topmost AppShell panel on Escape', () => {

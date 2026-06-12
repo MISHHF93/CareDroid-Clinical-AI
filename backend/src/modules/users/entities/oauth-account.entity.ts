@@ -6,7 +6,6 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 export enum OAuthProvider {
   GOOGLE = 'google',
@@ -43,7 +42,7 @@ export class OAuthAccount {
   createdAt: Date;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.oauthAccounts, { onDelete: 'CASCADE' })
+  @ManyToOne('User', (user: any) => user.oauthAccounts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 }

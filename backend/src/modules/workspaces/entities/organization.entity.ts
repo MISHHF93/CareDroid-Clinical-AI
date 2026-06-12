@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { OrganizationType } from '../../platform-assets/enums/platform-asset.enums';
-import { Workspace } from './workspace.entity';
 
 @Entity('organizations')
 export class Organization {
@@ -32,8 +31,8 @@ export class Organization {
   @Column({ type: 'simple-json', nullable: true })
   settings: Record<string, any>;
 
-  @OneToMany(() => Workspace, (workspace) => workspace.organization)
-  workspaces: Workspace[];
+  @OneToMany('Workspace', (workspace: any) => workspace.organization)
+  workspaces: any[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -11,11 +11,14 @@ import {
 import PatientCard, { PatientDetailPanel } from './PatientCard';
 import NewPatientIntake from './NewPatientIntake';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
+import WhoNextPanel from './WhoNextPanel';
+import CrisisMode from './CrisisMode';
 import ClinicalScoreCalculator, {
   CALCULATOR_BY_SUGGESTION_ID,
   createClinicalScoreEvent,
   createClinicalScoreNote,
 } from './ClinicalScoreCalculator';
+import { longWaitStatus } from '../utils/longWaitRescue';
 import './EmergencyWhiteboard.css';
 
 const FILTERS = [
@@ -86,6 +89,9 @@ export default function EmergencyWhiteboard() {
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [calculatorLaunch, setCalculatorLaunch] = useState(null);
   const [keyboardPatientId, setKeyboardPatientId] = useState(null);
+  const [highlightedPatientId, setHighlightedPatientId] = useState(null);
+  const [crisisModeVisible, setCrisisModeVisible] = useState(false);
+  const [listSort, setListSort] = useState('default');
   const [isStoreInitializing, setIsStoreInitializing] = useState(true);
   const [gridScrollTop, setGridScrollTop] = useState(0);
   const [gridViewportHeight, setGridViewportHeight] = useState(720);
@@ -93,12 +99,21 @@ export default function EmergencyWhiteboard() {
     typeof window !== 'undefined' && window.innerWidth <= 1180 ? 2 : 3
   );
   const gridRef = useRef(null);
+  const reopenIntakeTimerRef = useRef(null);
 
   const calculatorPatient = calculatorLaunch
     ? patients.find((patient) => patient.id === calculatorLaunch.patientId)
     : null;
   const shouldVirtualizeGrid =
     viewMode === 'grid' && filteredPatients.length > VIRTUALIZED_GRID_THRESHOLD;
+  const listPatients = useMemo(() => {
+    if (listSort !== 'wait-desc') return filteredPatients;
+    return [...filteredPatients].sort(
+      (a, b) =>
+        waitMinutes(b.arrivalTime) - waitMinutes(a.arrivalTime) ||
+        patientName(a).localeCompare(patientName(b))
+    );
+  }, [filteredPatients, listSort]);
   const virtualizedGrid = useMemo(() => {
     if (!shouldVirtualizeGrid) {
       return {
@@ -160,6 +175,10 @@ export default function EmergencyWhiteboard() {
   useEffect(() => {
     const handleOpenIntake = () => setNewPatientOpen(true);
     const handleCloseOverlays = () => {
+      if (reopenIntakeTimerRef.current) {
+        window.clearTimeout(reopenIntakeTimerRef.current);
+        reopenIntakeTimerRef.current = null;
+      }
       setNewPatientOpen(false);
       setCalculatorLaunch(null);
     };
@@ -182,8 +201,35 @@ export default function EmergencyWhiteboard() {
       window.removeEventListener('ed:open-intake', handleOpenIntake);
       window.removeEventListener('ed:close-overlays', handleCloseOverlays);
       window.removeEventListener('ed:open-calculator', handleOpenCalculator);
+      if (reopenIntakeTimerRef.current) {
+        window.clearTimeout(reopenIntakeTimerRef.current);
+      }
     };
   }, [selectPatient, selectedPatientId]);
+
+  useEffect(() => {
+    if (!highlightedPatientId) return undefined;
+
+    const patientIndex = filteredPatients.findIndex((patient) => patient.id === highlightedPatientId);
+    if (viewMode === 'grid' && gridRef.current && patientIndex >= 0) {
+      const rowIndex = Math.floor(patientIndex / gridColumnCount);
+      gridRef.current.scrollTo({
+        top: Math.max(0, rowIndex * VIRTUALIZED_CARD_ROW_HEIGHT - 12),
+        behavior: 'smooth',
+      });
+    }
+
+    const scrollTimer = window.setTimeout(() => {
+      document
+        .querySelector(`[data-patient-card-id="${highlightedPatientId}"]`)
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 80);
+    const clearTimer = window.setTimeout(() => setHighlightedPatientId(null), 2800);
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(clearTimer);
+    };
+  }, [filteredPatients, gridColumnCount, highlightedPatientId, viewMode]);
 
   const moveKeyboardSelection = (direction) => {
     if (!filteredPatients.length) return;
@@ -216,6 +262,16 @@ export default function EmergencyWhiteboard() {
     }
 
     const key = event.key.toLowerCase();
+    if (event.shiftKey && key === 'p') {
+      event.preventDefault();
+      window.dispatchEvent(
+        new CustomEvent('ed:open-pediatric-drug-calculator', {
+          detail: { patientId: keyboardPatientId || selectedPatientId || null },
+        })
+      );
+      return;
+    }
+
     if (/^[1-6]$/.test(event.key)) {
       event.preventDefault();
       const filter = FILTERS[Number(event.key) - 1];
@@ -280,9 +336,24 @@ export default function EmergencyWhiteboard() {
     );
   };
 
+  const handleQuickIntakeAdded = (patientId) => {
+    setHighlightedPatientId(patientId);
+    setKeyboardPatientId(patientId);
+    setNewPatientOpen(false);
+    if (reopenIntakeTimerRef.current) {
+      window.clearTimeout(reopenIntakeTimerRef.current);
+    }
+    reopenIntakeTimerRef.current = window.setTimeout(() => {
+      reopenIntakeTimerRef.current = null;
+      setNewPatientOpen(true);
+    }, 850);
+  };
+
   return (
     <section
-      className="ed-whiteboard"
+      className={['ed-whiteboard', crisisModeVisible ? 'ed-whiteboard--crisis-mode' : '']
+        .filter(Boolean)
+        .join(' ')}
       aria-labelledby="ed-whiteboard-title"
       tabIndex={0}
       onKeyDown={handleWhiteboardShortcut}
@@ -365,7 +436,13 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : null}
 
-      <NewPatientIntake open={newPatientOpen} onClose={() => setNewPatientOpen(false)} />
+      <CrisisMode onVisibilityChange={setCrisisModeVisible} />
+
+      <NewPatientIntake
+        open={newPatientOpen}
+        onClose={() => setNewPatientOpen(false)}
+        onPatientAdded={handleQuickIntakeAdded}
+      />
       {calculatorLaunch && calculatorPatient ? (
         <ClinicalScoreCalculator
           key={`${calculatorLaunch.patientId}-${calculatorLaunch.calculatorId}`}
@@ -429,6 +506,7 @@ export default function EmergencyWhiteboard() {
                   key={patient.id}
                   patient={patient}
                   keyboardSelected={patient.id === keyboardPatientId}
+                  highlighted={patient.id === highlightedPatientId}
                   onKeyboardFocus={() => setKeyboardPatientId(patient.id)}
                 />
               ))}
@@ -449,28 +527,44 @@ export default function EmergencyWhiteboard() {
                     <th>Name</th>
                     <th>Complaint</th>
                     <th>State</th>
-                    <th>Wait</th>
+                    <th>
+                      <button
+                        type="button"
+                        className="ed-whiteboard__sort-button"
+                        onClick={() => setListSort((current) => (current === 'wait-desc' ? 'default' : 'wait-desc'))}
+                        aria-pressed={listSort === 'wait-desc'}
+                      >
+                        Wait {listSort === 'wait-desc' ? 'desc' : ''}
+                      </button>
+                    </th>
                     <th>Staff</th>
                     <th>Room</th>
                     <th>Flags</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPatients.map((patient) => {
+                  {listPatients.map((patient) => {
                     const assignedStaff = staff.find(
                       (candidate) => candidate.id === patient.assignedStaffId
                     );
                     const assignedRoom = rooms.find((candidate) => candidate.id === patient.roomId);
+                    const waitStatus = longWaitStatus(patient);
                     return (
                       <tr
                         key={patient.id}
                         data-patient-card-id={patient.id}
                         tabIndex={0}
-                        className={
+                        className={[
                           patient.id === keyboardPatientId
                             ? 'ed-whiteboard__row--keyboard-selected'
-                            : ''
-                        }
+                            : '',
+                          patient.id === highlightedPatientId ? 'ed-whiteboard__row--highlighted' : '',
+                          waitStatus.phase !== 'none'
+                            ? `ed-whiteboard__row--long-wait-${waitStatus.phase}`
+                            : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
                         onFocus={() => setKeyboardPatientId(patient.id)}
                         onClick={() => selectPatient(patient.id)}
                         onKeyDown={(event) => {
@@ -493,7 +587,20 @@ export default function EmergencyWhiteboard() {
                         </td>
                         <td>{patient.complaintCategory}</td>
                         <td>{patient.state}</td>
-                        <td>{formatWait(waitMinutes(patient.arrivalTime))}</td>
+                        <td>
+                          <span
+                            className={[
+                              'ed-whiteboard__wait',
+                              waitStatus.phase !== 'none'
+                                ? `ed-whiteboard__wait--${waitStatus.phase}`
+                                : '',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')}
+                          >
+                            {formatWait(waitMinutes(patient.arrivalTime))}
+                          </span>
+                        </td>
                         <td>{staffName(assignedStaff)}</td>
                         <td>{assignedRoom?.name || patient.roomId || 'No room'}</td>
                         <td>
@@ -521,6 +628,7 @@ export default function EmergencyWhiteboard() {
             <PatientDetailPanel />
           </div>
         ) : null}
+        {!selectedPatientId ? <WhoNextPanel variant="floating" /> : null}
       </div>
     </section>
   );

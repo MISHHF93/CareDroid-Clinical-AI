@@ -1,0 +1,324 @@
+.workload-balance-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 82;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(480px, 100vw);
+  border-left: 1px solid var(--color-border-default);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: -24px 0 64px rgba(0, 0, 0, 0.48);
+}
+
+.workload-balance-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-elevated);
+}
+
+.workload-balance-panel__header span {
+  color: var(--status-info);
+  font-size: var(--font-size-xs);
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.workload-balance-panel__header h2,
+.workload-balance-panel__body h3,
+.workload-balance-panel__body p {
+  margin: 0;
+}
+
+.workload-balance-panel__header h2 {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-2xl);
+}
+
+.workload-balance-panel__header > button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.workload-balance-panel__body {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+.workload-balance-panel__imbalance,
+.workload-balance-panel__suggestions,
+.workload-staff-row {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-elevated);
+}
+
+.workload-balance-panel__imbalance {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-left: 4px solid var(--status-warning);
+}
+
+.workload-balance-panel__imbalance strong {
+  line-height: 1.35;
+}
+
+.workload-balance-panel button,
+.workload-patient-row select {
+  font: inherit;
+}
+
+.workload-balance-panel button {
+  border: 1px solid color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-surface));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.workload-balance-panel button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.workload-balance-panel__imbalance button {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+}
+
+.workload-balance-panel__suggestions {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-left: 4px solid var(--status-info);
+}
+
+.workload-balance-panel__suggestions h3 {
+  font-size: var(--font-size-base);
+}
+
+.workload-balance-panel__suggestions article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.workload-balance-panel__suggestions span {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+}
+
+.workload-balance-panel__suggestions button,
+.workload-patient-row button {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+}
+
+.workload-balance-panel__staff-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.workload-staff-row {
+  overflow: hidden;
+}
+
+.workload-staff-row__summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.workload-staff-row__summary img,
+.workload-staff-row__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 18%, var(--color-surface));
+  color: var(--color-text-primary);
+  font-weight: 950;
+  object-fit: cover;
+}
+
+.workload-staff-row__identity {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.workload-staff-row__identity strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workload-staff-row__identity small {
+  justify-self: start;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--status-info) 32%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.workload-staff-row__count {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xl);
+}
+
+.workload-staff-row__bar {
+  grid-column: 2 / -1;
+  height: 9px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-border-default) 78%, transparent);
+}
+
+.workload-staff-row__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 180ms var(--ease-smooth, ease);
+}
+
+.workload-staff-row__bar--gray > span {
+  background: var(--color-text-muted);
+}
+
+.workload-staff-row__bar--green > span {
+  background: var(--status-stable);
+}
+
+.workload-staff-row__bar--yellow > span {
+  background: var(--status-warning);
+}
+
+.workload-staff-row__bar--red > span {
+  background: var(--status-critical);
+}
+
+.workload-staff-row__compact-list {
+  display: block;
+  padding: 0 var(--space-3) var(--space-3) calc(36px + var(--space-5));
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+}
+
+.workload-staff-row__patients {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3) calc(36px + var(--space-5));
+}
+
+.workload-staff-row__patients p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.workload-patient-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.workload-patient-row strong,
+.workload-patient-row span {
+  display: block;
+}
+
+.workload-patient-row span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+}
+
+.workload-patient-row label {
+  display: grid;
+  gap: 4px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 850;
+}
+
+.workload-patient-row select {
+  min-width: 168px;
+  height: 34px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+}
+
+.workload-patient-row__option--capacity {
+  color: var(--status-stable);
+}
+
+.workload-patient-row__option--overloaded {
+  color: var(--status-critical);
+}
+
+.workload-balance-panel__toast {
+  position: absolute;
+  inset-inline: var(--space-4);
+  inset-block-end: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-stable) 48%, var(--color-border-default));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-stable) 18%, var(--color-elevated));
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 950;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36);
+}
+
+@media (max-width: 640px) {
+  .workload-patient-row,
+  .workload-balance-panel__suggestions article {
+    grid-template-columns: 1fr;
+  }
+
+  .workload-staff-row__patients,
+  .workload-staff-row__compact-list {
+    padding-left: var(--space-3);
+  }
+}

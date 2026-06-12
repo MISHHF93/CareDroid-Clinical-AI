@@ -1,4 +1,4 @@
-import type { AIRequestType } from './client';
+import type { AIRequestType } from './types';
 import type { PatientState, Priority } from '../../types/emergency';
 
 export type CapacityBand = 'Green' | 'Yellow' | 'Orange' | 'Red';

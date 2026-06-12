@@ -1,14 +1,11 @@
 import React from 'react';
-import { useSystemConfig } from '../contexts/SystemConfigContext';
 import Alert from './ui/Alert';
 import './ApiConfigDegradedBanner.css';
 
 /**
  * Shown when system config could not be loaded from the API (defaults in use).
  */
-export default function ApiConfigDegradedBanner() {
-  const { configDegraded, error, loading, refresh } = useSystemConfig();
-
+export default function ApiConfigDegradedBanner({ configDegraded, error, loading, refresh }) {
   if (loading || !configDegraded) return null;
 
   return (

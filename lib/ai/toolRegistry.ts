@@ -1,4 +1,4 @@
-import type { AIRequestType, ToolDefinition } from './client';
+import type { AIRequestType, ToolDefinition } from './types';
 import type {
   AlertSeverity,
   Patient,

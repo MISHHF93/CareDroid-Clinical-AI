@@ -25,6 +25,8 @@ import {
   type PatientFlagSeverity,
   type PatientFlagType,
   type Queue,
+  type ReassessmentReminder,
+  type VitalsAlert,
   type QueueType,
   type Referral,
   type ReferralStatus,
@@ -48,10 +50,32 @@ import {
   buildLocalEmergencyAnalytics,
   fetchEmergencyOperationalAnalytics,
 } from '../src/services/emergencyAnalyticsApi';
+import { evaluateVitalsAlerts } from '../src/utils/vitalsAlertPipeline';
+import { isCriticalEMSArrival, resolveCriticalChecklistConfig } from '../config/criticalChecklists';
+import {
+  LONG_WAIT_PHASE_RANK,
+  isLongWaitRescueReason,
+  longWaitSeverityForPhase,
+  longWaitStatus,
+} from '../src/utils/longWaitRescue';
 
 type PatientPatch = Partial<Omit<Patient, 'id'>>;
 type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 'severity'>>;
 type PatientFlagInput = PatientFlag | PatientFlagType;
+type EscalationInput = {
+  staffId: string;
+  staffName: string;
+  timestamp?: string;
+};
+type CrisisStaffingRequest = {
+  id: string;
+  requestedAt: string;
+  requestedByStaffId: string;
+  reason: string;
+  capacityScore: number;
+  capacityRiskLevel: CapacityRiskLevel;
+  status: 'Open' | 'Acknowledged' | 'Closed';
+};
 type PatientBackendDetailStatus = 'idle' | 'loading' | 'ready' | 'error';
 type PatientBackendDetailsEntry = {
   patientId: string;
@@ -121,6 +145,7 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
     Referral: { enabled: true, severity: 'Warning' },
     Queue: { enabled: true, severity: 'Warning' },
     System: { enabled: true, severity: 'Info' },
+    CAPACITY_CRISIS: { enabled: true, severity: 'Critical' },
   },
 };
 type ShiftStartInput = {
@@ -133,6 +158,30 @@ type ShiftStartInput = {
 type MovePatientStateOptions = {
   flags?: PatientFlag[];
   timelineEvent?: JourneyEvent;
+};
+type StaffAssignmentOptions = {
+  actorStaffId?: string;
+  actorName?: string;
+  fromStaffName?: string;
+  toStaffName?: string;
+  reason?: string;
+};
+type ReassessmentReminderInput = {
+  scheduledBy: string;
+  dueAt: string;
+  note?: string;
+};
+type ReassessmentReminderCompletionInput = {
+  completedBy: string;
+  timestamp?: string;
+};
+type CriticalChecklistCheckInput = {
+  itemId: string;
+  label: string;
+  checked: boolean;
+  staffId: string;
+  staffName: string;
+  timestamp?: string;
 };
 type ReferralCreateInput = Pick<
   Referral,
@@ -152,6 +201,7 @@ interface EmergencyStoreState {
   emsUnits: EMSUnit[];
   emsArrivals: EMSArrival[];
   referrals: Referral[];
+  staffingRequests: CrisisStaffingRequest[];
   alerts: Alert[];
   selectedPatientId: string | null;
   copilotOpen: boolean;
@@ -170,11 +220,24 @@ interface EmergencyStoreState {
   updatePatient: (id: string, patch: PatientPatch) => void;
   dischargePatient: (id: string, options?: MovePatientStateOptions) => void;
   movePatientToState: (id: string, state: PatientState, options?: MovePatientStateOptions) => void;
-  assignStaff: (patientId: string, staffId: string) => void;
+  assignStaff: (patientId: string, staffId: string, options?: StaffAssignmentOptions) => void;
   assignRoom: (patientId: string, roomId: string) => void;
   addFlag: (patientId: string, flag: PatientFlagInput, details?: PatientFlagDetails) => void;
   removeFlag: (patientId: string, flag: PatientFlagType) => void;
+  escalatePatient: (patientId: string, input: EscalationInput) => void;
+  cancelEscalation: (patientId: string, input: EscalationInput) => void;
+  scheduleReassessmentReminder: (
+    patientId: string,
+    input: ReassessmentReminderInput
+  ) => ReassessmentReminder | null;
+  snoozeReassessmentReminder: (patientId: string, reminderId: string, minutes?: number) => void;
+  completeReassessmentReminder: (
+    patientId: string,
+    reminderId: string,
+    input: ReassessmentReminderCompletionInput
+  ) => void;
   addVitals: (patientId: string, vitals: Vitals) => void;
+  acknowledgeVitalsAlert: (patientId: string, alertId: string, acknowledgedBy: string) => void;
   addNote: (patientId: string, note: Note) => void;
   updateCapacity: () => void;
   selectPatient: (id: string | null) => void;
@@ -195,12 +258,19 @@ interface EmergencyStoreState {
   dispatchAlert: (alert: AlertDispatchInput) => Alert;
   updateAlerts: () => void;
   dismissAlert: (alertId: string) => void;
+  requestAdditionalStaff: (input: {
+    requestedByStaffId: string;
+    reason: string;
+    capacityScore?: number;
+    capacityRiskLevel?: CapacityRiskLevel;
+  }) => CrisisStaffingRequest;
   createReferral: (input: ReferralCreateInput) => void;
   updateReferralStatus: (referralId: string, status: ReferralStatus, responseNote?: string) => void;
   addEMSArrival: (arrival: EMSArrival) => void;
   updateEMSArrival: (id: string, patch: Partial<EMSArrival>) => void;
   updateEMSUnit: (id: string, patch: Partial<EMSUnit>) => void;
   prepareEMSBay: (arrivalId: string) => void;
+  checkCriticalEMSChecklistItem: (arrivalId: string, input: CriticalChecklistCheckInput) => void;
   convertEMSArrivalToPatient: (arrivalId: string) => void;
   setRealtimeConnection: (status: Partial<RealtimeConnectionState>) => void;
   handleRealtimeEvent: (event: RealtimeEventEnvelope) => void;
@@ -287,6 +357,107 @@ const minutesSince = (timestamp: string | null, now = new Date()): number => {
   return Math.max(0, Math.round((now.getTime() - then) / 60000));
 };
 
+const ACTIVE_REASSESSMENT_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
+
+const hasDueReassessmentReminder = (patient: Patient, now = new Date()): boolean =>
+  (patient.reassessmentReminders || []).some((reminder) => {
+    if (!ACTIVE_REASSESSMENT_REMINDER_STATUSES.has(reminder.status)) return false;
+    const dueAt = new Date(reminder.dueAt).getTime();
+    return Number.isFinite(dueAt) && now.getTime() >= dueAt;
+  });
+
+const ensureReminderReassessmentFlags = (patients: Patient[], now = new Date()): Patient[] => {
+  let changed = false;
+  const nextPatients = patients.map((patient) => {
+    if (!hasDueReassessmentReminder(patient, now) || hasPatientFlag(patient, 'ReassessmentDue')) {
+      return patient;
+    }
+    changed = true;
+    const flag = createPatientFlag('ReassessmentDue', {
+      reason: 'Scheduled recheck reminder due',
+      severity: 'Warning',
+      detectedAt: now.toISOString(),
+    });
+    return {
+      ...patient,
+      flags: [...patient.flags, flag],
+      timeline: [
+        ...patient.timeline,
+        makeEvent(
+          patient.id,
+          'FlagAdded',
+          'Scheduled recheck reminder moved patient to reassessment queue.',
+          now.toISOString(),
+          {
+            metadata: {
+              flagType: 'ReassessmentDue',
+              reason: 'Scheduled recheck reminder due',
+            },
+          }
+        ),
+      ],
+    };
+  });
+  return changed ? nextPatients : patients;
+};
+
+const isGeneratedLongWaitFlag = (flag: PatientFlag): boolean =>
+  (getPatientFlagType(flag) === 'LongWait' || getPatientFlagType(flag) === 'ReassessmentDue') &&
+  isLongWaitRescueReason(typeof flag === 'string' ? '' : flag.reason);
+
+const ensureLongWaitRescueFlags = (patients: Patient[], now = new Date()): Patient[] => {
+  let changed = false;
+  const nextPatients = patients.map((patient) => {
+    const status = longWaitStatus(patient, now);
+    const existingGenerated = patient.flags.filter(isGeneratedLongWaitFlag);
+    if (status.phase === 'none') {
+      if (!existingGenerated.length) return patient;
+      changed = true;
+      return {
+        ...patient,
+        flags: patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)),
+      };
+    }
+
+    const severity = longWaitSeverityForPhase(status.phase);
+    const expectedFlags = [
+      createPatientFlag('LongWait', {
+        reason: status.reason,
+        detectedAt: now.toISOString(),
+        severity,
+      }),
+      createPatientFlag('ReassessmentDue', {
+        reason: status.reason,
+        detectedAt: now.toISOString(),
+        severity,
+      }),
+    ];
+    const currentManagedFlags = patient.flags.filter(isGeneratedLongWaitFlag);
+    const isCurrent =
+      currentManagedFlags.length === expectedFlags.length &&
+      expectedFlags.every((expected) =>
+        currentManagedFlags.some(
+          (flag) =>
+            getPatientFlagType(flag) === expected.type &&
+            flag.reason === expected.reason &&
+            flag.severity === expected.severity
+        )
+      );
+    if (isCurrent) return patient;
+
+    changed = true;
+    return {
+      ...patient,
+      flags: [...patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)), ...expectedFlags],
+    };
+  });
+  return changed ? nextPatients : patients;
+};
+
+const isScheduledReminderFlag = (flag: PatientFlag): boolean =>
+  getPatientFlagType(flag) === 'ReassessmentDue' &&
+  (typeof flag === 'string' ? false : flag.reason === 'Scheduled recheck reminder due');
+
 const makeEvent = (
   patientId: string,
   type: JourneyEvent['type'],
@@ -321,6 +492,7 @@ const DEFAULT_FLAG_SEVERITY: Record<PatientFlagType, PatientFlagSeverity> = {
   PendingAdmission: 'Info',
   EMSArrival: 'Info',
   Isolation: 'Warning',
+  DeterioratingNeuro: 'Critical',
   ScoreReassessmentRecommended: 'Warning',
 };
 
@@ -332,6 +504,7 @@ const DEFAULT_FLAG_REASON: Record<PatientFlagType, string> = {
   PendingAdmission: 'Admission pending',
   EMSArrival: 'EMS arrival',
   Isolation: 'Isolation precautions',
+  DeterioratingNeuro: 'Deteriorating neuro status',
   ScoreReassessmentRecommended: 'Score reassessment recommended',
 };
 
@@ -677,6 +850,64 @@ const deriveOperationalState = (
   queues: computeQueues(patients, referrals, settings),
   capacity: computeCapacity(patients, rooms, emsArrivals, settings),
 });
+
+const CRITICAL_ROOM_PRIORITY: Room['type'][] = [
+  'Resuscitation',
+  'Assessment',
+  'Triage',
+  'Observation',
+  'Isolation',
+  'Waiting',
+];
+
+function findHighestPriorityAvailableRoom(rooms: Room[]): Room | undefined {
+  for (const roomType of CRITICAL_ROOM_PRIORITY) {
+    const room = rooms.find((candidate) => candidate.status === 'Available' && candidate.type === roomType);
+    if (room) return room;
+  }
+  return rooms.find((candidate) => candidate.status === 'Available');
+}
+
+function ensureCriticalEMSPreparedState(
+  emsArrivals: EMSArrival[],
+  rooms: Room[],
+  arrivalId?: string
+): { emsArrivals: EMSArrival[]; rooms: Room[] } {
+  let nextRooms = rooms;
+  const nextArrivals = emsArrivals.map((arrival) => {
+    if (arrivalId && arrival.id !== arrivalId) return arrival;
+    if (arrival.patientId || ['Complete', 'Cancelled'].includes(arrival.status)) return arrival;
+    if (!isCriticalEMSArrival(arrival)) return arrival;
+
+    const checklistConfig = resolveCriticalChecklistConfig(arrival);
+    if (!checklistConfig) return arrival;
+
+    const existingRoom = arrival.preparedRoomId
+      ? nextRooms.find((room) => room.id === arrival.preparedRoomId)
+      : undefined;
+    const assignedRoom = existingRoom || findHighestPriorityAvailableRoom(nextRooms);
+    if (assignedRoom && !existingRoom) {
+      nextRooms = nextRooms.map((room): Room =>
+        room.id === assignedRoom.id ? { ...room, status: 'Reserved' } : room
+      );
+    }
+
+    return {
+      ...arrival,
+      preparedRoomId: assignedRoom?.id || arrival.preparedRoomId,
+      criticalChecklist: {
+        type: checklistConfig.type,
+        title: checklistConfig.title,
+        triggeredAt: arrival.criticalChecklist?.triggeredAt || new Date().toISOString(),
+        assignedRoomId: assignedRoom?.id || arrival.criticalChecklist?.assignedRoomId,
+        assignedRoomName: assignedRoom?.name || arrival.criticalChecklist?.assignedRoomName,
+        completions: arrival.criticalChecklist?.completions || [],
+      },
+    };
+  });
+
+  return { emsArrivals: nextArrivals, rooms: nextRooms };
+}
 
 let operationalRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 let emergencyRealtimeUnsubscribe: (() => void) | null = null;
@@ -1618,6 +1849,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
   emsUnits: mockEMSUnits,
   emsArrivals: mockEMSArrivals,
   referrals: mockReferrals,
+  staffingRequests: [],
   alerts: initialAlerts,
   selectedPatientId: 'pt-001',
   copilotOpen: true,
@@ -1790,17 +2022,38 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       };
     }),
 
-  assignStaff: (patientId, staffId) =>
+  assignStaff: (patientId, staffId, options = {}) =>
     set((state) => {
       const previousStaffId =
         state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ?? null;
+      const fromStaffName =
+        options.fromStaffName ||
+        state.staff.find((member) => member.id === previousStaffId)?.displayName ||
+        previousStaffId ||
+        'Unassigned';
+      const toStaffName =
+        options.toStaffName ||
+        state.staff.find((member) => member.id === staffId)?.displayName ||
+        staffId;
+      const summary =
+        previousStaffId && previousStaffId !== staffId
+          ? `Reassigned from ${fromStaffName} to ${toStaffName}.`
+          : `Assigned to ${toStaffName}.`;
       const patients = updatePatients(state.patients, patientId, (patient) => ({
         ...patient,
         assignedStaffId: staffId,
         timeline: [
           ...patient.timeline,
-          actionEvent(patient.id, 'StaffAssignment', `Assigned staff ${staffId}.`, {
-            actorStaffId: staffId,
+          actionEvent(patient.id, 'StaffAssignment', summary, {
+            actorStaffId: options.actorStaffId || staffId,
+            metadata: {
+              fromStaffId: previousStaffId,
+              toStaffId: staffId,
+              fromStaffName,
+              toStaffName,
+              actorName: options.actorName,
+              reason: options.reason || 'Workload rebalance',
+            },
           }),
         ],
       }));
@@ -1902,40 +2155,434 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       };
     }),
 
-  addVitals: (patientId, nextVitals) =>
+  escalatePatient: (patientId, input) =>
     set((state) => {
-      const patients = updatePatients(state.patients, patientId, (patient) => ({
-        ...patient,
-        vitals: nextVitals,
-        lastAssessedTime: nextVitals.recordedAt,
+      const timestamp = input.timestamp || new Date().toISOString();
+      const patient = state.patients.find((candidate) => candidate.id === patientId);
+      if (!patient) return state;
+      const staffName = input.staffName || input.staffId || 'staff';
+      const reason = `Manual escalation by ${staffName}`;
+      const roomName =
+        patient.location ||
+        state.rooms.find((room) => room.id === patient.roomId)?.name ||
+        patient.roomId ||
+        'No bed';
+      const bedLabel =
+        /^bed\b/i.test(String(roomName)) || roomName === 'No bed' ? roomName : `Bed ${roomName}`;
+      const patientLabel = patient.name || `${patient.firstName} ${patient.lastName}`;
+      const nextFlags = [
+        createPatientFlag('HighRisk', { reason, severity: 'Critical', detectedAt: timestamp }),
+        createPatientFlag('DeteriorationRisk', { reason, severity: 'Critical', detectedAt: timestamp }),
+        createPatientFlag('ReassessmentDue', { reason, severity: 'Critical', detectedAt: timestamp }),
+      ];
+      const nextAlert = normalizeAlert(
+        {
+          id: `alert-escalation-${patient.id}`,
+          type: 'System',
+          severity: 'Critical',
+          title: `ESCALATION — ${patientLabel}`,
+          message: `Bed ${roomName} · ${patient.chiefComplaint || patient.complaintCategory} · Escalated by ${staffName}`,
+          patientId: patient.id,
+          actionLabel: 'View Patient',
+          actionType: 'VIEW_PATIENT',
+        },
+        new Date(timestamp)
+      );
+      const patients = updatePatients(state.patients, patientId, (current) => {
+        const existingTypes = new Set(current.flags.map((flag) => getPatientFlagType(flag)));
+        return {
+          ...current,
+          flags: [
+            ...current.flags.filter((flag) => !['HighRisk', 'DeteriorationRisk', 'ReassessmentDue'].includes(getPatientFlagType(flag))),
+            ...nextFlags.filter((flag) => !existingTypes.has(flag.type) || ['HighRisk', 'DeteriorationRisk', 'ReassessmentDue'].includes(flag.type)),
+          ],
+          timeline: [
+            ...current.timeline,
+            makeEvent(current.id, 'ESCALATION', `Manual escalation by ${staffName}.`, timestamp, {
+              id: `evt-${current.id}-escalation-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+              by: input.staffId,
+              actorStaffId: input.staffId,
+              staffId: input.staffId,
+              reason: 'Manual',
+              metadata: {
+                reason: 'Manual',
+                staffName,
+              },
+            }),
+          ],
+        };
+      });
+      const alerts = [
+        nextAlert,
+        ...state.alerts.filter((alert) => alert.id !== nextAlert.id),
+      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return {
+        patients,
+        alerts,
+        activeQueueFilter: 'Reassessment',
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+      };
+    }),
+
+  cancelEscalation: (patientId, input) =>
+    set((state) => {
+      const timestamp = input.timestamp || new Date().toISOString();
+      const patient = state.patients.find((candidate) => candidate.id === patientId);
+      if (!patient) return state;
+      const latestEscalation = [...patient.timeline]
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .find((event) => event.type === 'ESCALATION');
+      const cancellingStaff = state.staff.find((member) => member.id === input.staffId);
+      const isCharge =
+        input.staffId === state.activeShift.chargeStaffId ||
+        /charge/i.test(String(cancellingStaff?.role || cancellingStaff?.roleLabel || ''));
+      const escalatedBy = latestEscalation?.by || latestEscalation?.staffId || latestEscalation?.actorStaffId;
+      if (!latestEscalation || (escalatedBy !== input.staffId && !isCharge)) return state;
+      const staffName = input.staffName || input.staffId || 'staff';
+      const patients = updatePatients(state.patients, patientId, (current) => ({
+        ...current,
+        flags: current.flags.filter(
+          (flag) => !['HighRisk', 'DeteriorationRisk', 'ReassessmentDue'].includes(getPatientFlagType(flag))
+        ),
         timeline: [
-          ...patient.timeline,
-          actionEvent(patient.id, 'VitalsUpdated', 'Updated patient vitals.', {
+          ...current.timeline,
+          makeEvent(current.id, 'ESCALATION_CANCELLED', `Escalation cancelled by ${staffName}.`, timestamp, {
+            id: `evt-${current.id}-escalation-cancelled-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            by: input.staffId,
+            actorStaffId: input.staffId,
+            staffId: input.staffId,
+            reason: 'Manual cancellation',
             metadata: {
-              previousHr: patient.vitals.hr,
-              previousBpSystolic: patient.vitals.bpSystolic,
-              previousBpDiastolic: patient.vitals.bpDiastolic,
-              previousSpo2: patient.vitals.spo2,
-              previousTemp: patient.vitals.temp,
-              previousRr: patient.vitals.rr,
-              previousGcs: patient.vitals.gcs,
-              previousPain: patient.vitals.pain,
-              hr: nextVitals.hr,
-              bpSystolic: nextVitals.bpSystolic,
-              bpDiastolic: nextVitals.bpDiastolic,
-              spo2: nextVitals.spo2,
-              temp: nextVitals.temp,
-              rr: nextVitals.rr,
-              gcs: nextVitals.gcs,
-              pain: nextVitals.pain,
+              reason: 'Manual cancellation',
+              staffName,
             },
           }),
         ],
       }));
+      const alerts = state.alerts.map((alert) =>
+        alert.id === `alert-escalation-${patientId}` && !alert.dismissedAt
+          ? { ...alert, dismissedAt: timestamp }
+          : alert
+      );
+
       return {
         patients,
+        alerts,
         ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
+    }),
+
+  scheduleReassessmentReminder: (patientId, input) => {
+    const reminder: ReassessmentReminder = {
+      id: `recheck-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      patientId,
+      scheduledBy: input.scheduledBy,
+      scheduledAt: new Date().toISOString(),
+      dueAt: input.dueAt,
+      note: input.note?.trim() || undefined,
+      status: 'pending',
+    };
+    let created = false;
+    set((state) => {
+      const patients = updatePatients(state.patients, patientId, (patient) => {
+        created = true;
+        return {
+          ...patient,
+          reassessmentReminders: [...(patient.reassessmentReminders || []), reminder],
+          timeline: [
+            ...patient.timeline,
+            makeEvent(
+              patient.id,
+              'ReassessmentReminderScheduled',
+              `Scheduled recheck for ${new Date(reminder.dueAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}${reminder.note ? `: ${reminder.note}` : '.'}`,
+              reminder.scheduledAt,
+              {
+                actorStaffId: input.scheduledBy,
+                metadata: {
+                  reminderId: reminder.id,
+                  dueAt: reminder.dueAt,
+                  note: reminder.note || null,
+                },
+              }
+            ),
+          ],
+        };
+      });
+      return { patients };
+    });
+    return created ? reminder : null;
+  },
+
+  snoozeReassessmentReminder: (patientId, reminderId, minutes = 10) =>
+    set((state) => {
+      const now = new Date();
+      const dueAt = new Date(now.getTime() + minutes * 60 * 1000).toISOString();
+      const alerts = state.alerts.map((alert) =>
+        alert.reminderId === reminderId && !alert.dismissedAt
+          ? { ...alert, dismissedAt: now.toISOString() }
+          : alert
+      );
+      const patients = updatePatients(state.patients, patientId, (patient) => {
+        const reassessmentReminders = (patient.reassessmentReminders || []).map((reminder) =>
+          reminder.id === reminderId
+            ? { ...reminder, status: 'snoozed', dueAt, snoozedUntil: dueAt }
+            : reminder
+        );
+        const hasOtherDueReminder = hasDueReassessmentReminder(
+          { ...patient, reassessmentReminders },
+          now
+        );
+        return {
+          ...patient,
+          reassessmentReminders,
+          flags: hasOtherDueReminder ? patient.flags : patient.flags.filter((flag) => !isScheduledReminderFlag(flag)),
+          timeline: [
+            ...patient.timeline,
+            makeEvent(
+              patient.id,
+              'ReassessmentReminderSnoozed',
+              `Snoozed recheck reminder ${minutes} minutes.`,
+              now.toISOString(),
+              {
+                metadata: {
+                  reminderId,
+                  snoozedMinutes: minutes,
+                  dueAt,
+                },
+              }
+            ),
+          ],
+        };
+      });
+      return {
+        patients,
+        alerts,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+      };
+    }),
+
+  completeReassessmentReminder: (patientId, reminderId, input) =>
+    set((state) => {
+      const timestamp = input.timestamp || new Date().toISOString();
+      const alerts = state.alerts.map((alert) =>
+        alert.reminderId === reminderId && !alert.dismissedAt
+          ? { ...alert, dismissedAt: timestamp }
+          : alert
+      );
+      const patients = updatePatients(state.patients, patientId, (patient) => {
+        const reminders = patient.reassessmentReminders || [];
+        if (!reminders.some((reminder) => reminder.id === reminderId)) return patient;
+        const reassessmentReminders = reminders.map((reminder) =>
+          reminder.id === reminderId
+            ? { ...reminder, status: 'completed', completedAt: timestamp }
+            : reminder
+        );
+        const hasOtherDueReminder = hasDueReassessmentReminder(
+          { ...patient, reassessmentReminders },
+          new Date(timestamp)
+        );
+        return {
+          ...patient,
+          reassessmentReminders,
+          flags: hasOtherDueReminder ? patient.flags : patient.flags.filter((flag) => !isScheduledReminderFlag(flag)),
+          timeline: [
+            ...patient.timeline,
+            makeEvent(
+              patient.id,
+              'ReassessmentReminderCompleted',
+              'Completed scheduled recheck reminder.',
+              timestamp,
+              {
+                actorStaffId: input.completedBy,
+                metadata: {
+                  reminderId,
+                  completedAt: timestamp,
+                },
+              }
+            ),
+          ],
+        };
+      });
+      return {
+        patients,
+        alerts,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+      };
+    }),
+
+  addVitals: (patientId, nextVitals) =>
+    set((state) => {
+      const timestamp = nextVitals.recordedAt || new Date().toISOString();
+      const patient = state.patients.find((candidate) => candidate.id === patientId);
+      if (!patient) return state;
+      const triggeredAlerts = evaluateVitalsAlerts(nextVitals, patient.vitals);
+      const patientLabel = patient.name || `${patient.firstName} ${patient.lastName}`;
+      const roomName =
+        patient.location ||
+        state.rooms.find((room) => room.id === patient.roomId)?.name ||
+        patient.roomId ||
+        'No bed';
+      const bedLabel =
+        /^bed\b/i.test(String(roomName)) || roomName === 'No bed' ? roomName : `Bed ${roomName}`;
+      const vitalsAlerts: VitalsAlert[] = triggeredAlerts.map((alert, index) => ({
+        id: `vitals-alert-${patientId}-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`,
+        patientId,
+        severity: alert.severity,
+        status: 'active',
+        vital: alert.vital,
+        value: alert.value,
+        unit: alert.unit,
+        reason: alert.reason,
+        recordedAt: timestamp,
+      }));
+      const criticalAlerts = vitalsAlerts.filter((alert) => alert.severity === 'critical');
+      const warningAlerts = vitalsAlerts.filter((alert) => alert.severity === 'warning');
+      const criticalSummary = criticalAlerts.map((alert) => `${alert.vital} ${alert.value}${alert.unit}`).join(', ');
+      const warningSummary = warningAlerts.map((alert) => `${alert.vital} ${alert.value}${alert.unit}`).join(', ');
+      const criticalReason = criticalSummary ? `Critical vitals: ${criticalSummary}` : 'Critical vitals';
+      const warningReason = warningSummary ? `Abnormal vitals: ${warningSummary}` : 'Abnormal vitals';
+      const nextAlertRecords = [
+        ...criticalAlerts.map((alert) =>
+          normalizeAlert(
+            {
+              id: `alert-vitals-critical-${alert.id}`,
+              type: 'System',
+              severity: 'Critical',
+              title: `CRITICAL: ${alert.vital} ${alert.value}${alert.unit} - ${patientLabel} ${bedLabel}`,
+              message: `${patientLabel} requires immediate reassessment. ${criticalReason}`,
+              patientId,
+              actionLabel: 'Go to Patient',
+              actionType: 'VITALS_CRITICAL',
+              autoDismissAfter: undefined,
+            },
+            new Date(timestamp)
+          )
+        ),
+        ...warningAlerts.map((alert) =>
+          normalizeAlert(
+            {
+              id: `alert-vitals-warning-${alert.id}`,
+              type: 'Reassessment',
+              severity: 'Warning',
+              title: `Vitals warning - ${patientLabel}`,
+              message: `${warningReason}. Assigned clinician notified.`,
+              patientId,
+              actionLabel: 'Go to Patient',
+              actionType: 'VITALS_WARNING',
+              autoDismissAfter: 30,
+            },
+            new Date(timestamp)
+          )
+        ),
+      ];
+      const patients = updatePatients(state.patients, patientId, (current) => {
+        const existingFlagTypes = new Set(current.flags.map((flag) => getPatientFlagType(flag)));
+        const pipelineFlags: PatientFlag[] = [];
+        if (criticalAlerts.length) {
+          if (!existingFlagTypes.has('HighRisk')) {
+            pipelineFlags.push(createPatientFlag('HighRisk', { reason: criticalReason, severity: 'Critical', detectedAt: timestamp }));
+          }
+          if (!existingFlagTypes.has('DeteriorationRisk')) {
+            pipelineFlags.push(createPatientFlag('DeteriorationRisk', { reason: criticalReason, severity: 'Critical', detectedAt: timestamp }));
+          }
+          if (!existingFlagTypes.has('ReassessmentDue')) {
+            pipelineFlags.push(createPatientFlag('ReassessmentDue', { reason: criticalReason, severity: 'Critical', detectedAt: timestamp }));
+          }
+          if (criticalAlerts.some((alert) => alert.vital === 'GCS') && !existingFlagTypes.has('DeterioratingNeuro')) {
+            pipelineFlags.push(createPatientFlag('DeterioratingNeuro', { reason: 'GCS drop of 2+ points', severity: 'Critical', detectedAt: timestamp }));
+          }
+        } else if (warningAlerts.length && !existingFlagTypes.has('ReassessmentDue')) {
+          pipelineFlags.push(createPatientFlag('ReassessmentDue', { reason: warningReason, severity: 'Warning', detectedAt: timestamp }));
+        }
+
+        return {
+          ...current,
+          vitals: nextVitals,
+          vitalsUpdatedAt: timestamp,
+          lastAssessedTime: timestamp,
+          flags: [...current.flags, ...pipelineFlags],
+          vitalsAlerts: [...(current.vitalsAlerts || []), ...vitalsAlerts],
+          timeline: [
+            ...current.timeline,
+            actionEvent(current.id, 'VitalsUpdated', 'Updated patient vitals.', {
+              metadata: {
+                previousHr: current.vitals.hr,
+                previousBpSystolic: current.vitals.bpSystolic,
+                previousBpDiastolic: current.vitals.bpDiastolic,
+                previousSpo2: current.vitals.spo2,
+                previousTemp: current.vitals.temp,
+                previousRr: current.vitals.rr,
+                previousGcs: current.vitals.gcs,
+                previousPain: current.vitals.pain,
+                hr: nextVitals.hr,
+                bpSystolic: nextVitals.bpSystolic,
+                bpDiastolic: nextVitals.bpDiastolic,
+                spo2: nextVitals.spo2,
+                temp: nextVitals.temp,
+                rr: nextVitals.rr,
+                gcs: nextVitals.gcs,
+                pain: nextVitals.pain,
+              },
+            }),
+            ...vitalsAlerts.map((alert) =>
+              makeEvent(
+                current.id,
+                'VitalsAlertFired',
+                `${alert.severity.toUpperCase()} vitals alert: ${alert.reason}.`,
+                timestamp,
+                {
+                  metadata: {
+                    alertId: alert.id,
+                    severity: alert.severity,
+                    vital: alert.vital,
+                    value: alert.value,
+                    unit: alert.unit,
+                  },
+                }
+              )
+            ),
+          ],
+        };
+      });
+      const alerts = [...nextAlertRecords, ...state.alerts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      return {
+        patients,
+        alerts,
+        ...(criticalAlerts.length || warningAlerts.length ? { activeQueueFilter: 'Reassessment' as QueueType } : {}),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+      };
+    }),
+
+  acknowledgeVitalsAlert: (patientId, alertId, acknowledgedBy) =>
+    set((state) => {
+      const timestamp = new Date().toISOString();
+      const patients = updatePatients(state.patients, patientId, (patient) => ({
+        ...patient,
+        vitalsAlerts: (patient.vitalsAlerts || []).map((alert) =>
+          alert.id === alertId
+            ? { ...alert, status: 'addressed', acknowledgedAt: timestamp, acknowledgedBy }
+            : alert
+        ),
+        timeline: [
+          ...patient.timeline,
+          makeEvent(patient.id, 'VitalsAlertAddressed', 'Vitals alert marked addressed.', timestamp, {
+            actorStaffId: acknowledgedBy,
+            metadata: {
+              alertId,
+            },
+          }),
+        ],
+      }));
+      const alerts = state.alerts.map((alert) =>
+        alert.id.includes(alertId) && !alert.dismissedAt ? { ...alert, dismissedAt: timestamp } : alert
+      );
+      return { patients, alerts };
     }),
 
   addNote: (patientId, noteToAdd) =>
@@ -2228,13 +2875,28 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
 
   updateAlerts: () =>
     set((state) => {
+      const now = new Date();
+      const patients = ensureLongWaitRescueFlags(
+        ensureReminderReassessmentFlags(state.patients, now),
+        now
+      );
+      const operational =
+        patients === state.patients
+          ? null
+          : deriveOperationalState(
+              patients,
+              state.rooms,
+              state.referrals,
+              state.emsArrivals,
+              state.emergencySettings
+            );
       const derivedAlerts = deriveAlerts(
         {
-          patients: state.patients,
-          capacity: state.capacity,
+          patients,
+          capacity: operational?.capacity || state.capacity,
           emsArrivals: state.emsArrivals,
           referrals: state.referrals,
-          queues: state.queues,
+          queues: operational?.queues || state.queues,
           bottleneckAlert: state.bottleneckAlert,
         },
         state.alerts
@@ -2245,6 +2907,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       );
 
       return {
+        ...(patients === state.patients ? {} : { patients }),
+        ...(operational || {}),
         alerts: [...derivedAlerts, ...manualAlerts].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ),
@@ -2259,6 +2923,23 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           : alert
       ),
     })),
+
+  requestAdditionalStaff: (input) => {
+    const state = get();
+    const request: CrisisStaffingRequest = {
+      id: `staffing-request-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      requestedAt: new Date().toISOString(),
+      requestedByStaffId: input.requestedByStaffId,
+      reason: input.reason,
+      capacityScore: input.capacityScore ?? state.capacity.score,
+      capacityRiskLevel: input.capacityRiskLevel ?? state.capacity.riskLevel,
+      status: 'Open',
+    };
+    set((current) => ({
+      staffingRequests: [request, ...current.staffingRequests],
+    }));
+    return request;
+  },
 
   createReferral: (input) =>
     set((state) => {
@@ -2297,11 +2978,36 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           ),
         ],
       }));
+      const operational = deriveOperationalState(
+        patients,
+        state.rooms,
+        referrals,
+        state.emsArrivals,
+        state.emergencySettings
+      );
+      const derivedAlerts = deriveAlerts(
+        {
+          patients,
+          capacity: operational.capacity,
+          emsArrivals: state.emsArrivals,
+          referrals,
+          queues: operational.queues,
+          bottleneckAlert: state.bottleneckAlert,
+        },
+        state.alerts
+      );
+      const derivedIds = new Set(derivedAlerts.map((alert) => alert.id));
+      const manualAlerts = state.alerts.filter(
+        (alert) => !derivedIds.has(alert.id) && !isDerivedAlertId(alert.id)
+      );
 
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
+        ...operational,
+        alerts: [...derivedAlerts, ...manualAlerts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
       };
     }),
 
@@ -2314,7 +3020,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       const timestampPatch: Partial<Referral> = {};
       if (nextStatus === 'Sent' || nextStatus === 'TransferRequested') timestampPatch.requestedAt = now;
       if (
-        ['Acknowledged', 'Accepted', 'Declined', 'TransportArranged', 'PatientDeparted'].includes(
+        ['Acknowledged', 'Accepted', 'Declined', 'InfoRequested', 'TransportArranged', 'PatientDeparted'].includes(
           nextStatus
         )
       ) {
@@ -2352,19 +3058,46 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           ),
         ],
       }));
+      const operational = deriveOperationalState(
+        patients,
+        state.rooms,
+        referrals,
+        state.emsArrivals,
+        state.emergencySettings
+      );
+      const derivedAlerts = deriveAlerts(
+        {
+          patients,
+          capacity: operational.capacity,
+          emsArrivals: state.emsArrivals,
+          referrals,
+          queues: operational.queues,
+          bottleneckAlert: state.bottleneckAlert,
+        },
+        state.alerts
+      );
+      const derivedIds = new Set(derivedAlerts.map((alert) => alert.id));
+      const manualAlerts = state.alerts.filter(
+        (alert) => !derivedIds.has(alert.id) && !isDerivedAlertId(alert.id)
+      );
 
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
+        ...operational,
+        alerts: [...derivedAlerts, ...manualAlerts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
       };
     }),
 
   addEMSArrival: (arrival) =>
     set((state) => {
-      const emsArrivals = [...state.emsArrivals, arrival];
+      const prepared = ensureCriticalEMSPreparedState([...state.emsArrivals, arrival], state.rooms, arrival.id);
+      const emsArrivals = prepared.emsArrivals;
       return {
         emsArrivals,
+        rooms: prepared.rooms,
         emsUnits: state.emsUnits.some((unit) => unit.id === arrival.unitId)
           ? state.emsUnits.map((unit) =>
               unit.id === arrival.unitId
@@ -2382,18 +3115,26 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
                 activeArrivalId: arrival.id,
               },
             ],
-        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals, state.emergencySettings),
+        ...deriveOperationalState(state.patients, prepared.rooms, state.referrals, emsArrivals, state.emergencySettings),
       };
     }),
 
   updateEMSArrival: (id, patch) =>
     set((state) => {
-      const emsArrivals = state.emsArrivals.map((arrival) =>
+      const patchedArrivals = state.emsArrivals.map((arrival) =>
         arrival.id === id ? { ...arrival, ...patch } : arrival
       );
+      const prepared = ensureCriticalEMSPreparedState(patchedArrivals, state.rooms, id);
       return {
-        emsArrivals,
-        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals, state.emergencySettings),
+        emsArrivals: prepared.emsArrivals,
+        rooms: prepared.rooms,
+        ...deriveOperationalState(
+          state.patients,
+          prepared.rooms,
+          state.referrals,
+          prepared.emsArrivals,
+          state.emergencySettings
+        ),
       };
     }),
 
@@ -2422,9 +3163,46 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           candidate.id === arrivalId
             ? { ...candidate, preparedRoomId: preferredRoom.id }
             : candidate
+        ).map((candidate) =>
+          candidate.id === arrivalId && candidate.criticalChecklist
+            ? {
+                ...candidate,
+                criticalChecklist: {
+                  ...candidate.criticalChecklist,
+                  assignedRoomId: preferredRoom.id,
+                  assignedRoomName: preferredRoom.name,
+                },
+              }
+            : candidate
         ),
       };
     }),
+
+  checkCriticalEMSChecklistItem: (arrivalId, input) =>
+    set((state) => ({
+      emsArrivals: state.emsArrivals.map((arrival) => {
+        if (arrival.id !== arrivalId || !arrival.criticalChecklist) return arrival;
+        const completions = arrival.criticalChecklist.completions.filter(
+          (completion) => completion.itemId !== input.itemId
+        );
+        if (input.checked) {
+          completions.push({
+            itemId: input.itemId,
+            label: input.label,
+            checkedByStaffId: input.staffId,
+            checkedByStaffName: input.staffName,
+            checkedAt: input.timestamp || new Date().toISOString(),
+          });
+        }
+        return {
+          ...arrival,
+          criticalChecklist: {
+            ...arrival.criticalChecklist,
+            completions,
+          },
+        };
+      }),
+    })),
 
   convertEMSArrivalToPatient: (arrivalId) =>
     set((state) => {
@@ -2438,6 +3216,17 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       const patientId = `ems-patient-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const patientVitals =
         arrival.vitals || vitals(now, null, null, null, null, null, null, null, null);
+      const criticalChecklist = arrival.criticalChecklist
+        ? {
+            ...arrival.criticalChecklist,
+            savedToPatientAt: now,
+          }
+        : undefined;
+      const checklistConfig = arrival.criticalChecklist
+        ? resolveCriticalChecklistConfig(arrival)
+        : null;
+      const checklistTotal = checklistConfig?.items.length || 0;
+      const checklistComplete = criticalChecklist?.completions.length || 0;
       const patient: Patient = {
         id: patientId,
         mrn: `MRN-EMS-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -2470,12 +3259,30 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
               },
             }
           ),
+          ...(criticalChecklist
+            ? [
+                actionEvent(
+                  patientId,
+                  'EMSCriticalChecklistSaved',
+                  `Critical EMS checklist saved: ${checklistComplete}/${checklistTotal} complete.`,
+                  {
+                    metadata: {
+                      emsArrivalId: arrival.id,
+                      checklistType: criticalChecklist.type,
+                      completedItems: checklistComplete,
+                      totalItems: checklistTotal,
+                    },
+                  }
+                ),
+              ]
+            : []),
         ],
         emsArrival: {
           ...arrival,
           patientId,
           status: 'Handoff',
           arrivedAt: arrival.arrivedAt || now,
+          criticalChecklist,
         },
         notes: [
           {
@@ -2487,6 +3294,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
             createdAt: now,
           },
         ],
+        criticalChecklist,
       };
       const patients = [...state.patients, patient];
       const rooms: Room[] = state.rooms.map((room): Room => {
@@ -2497,7 +3305,13 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       });
       const emsArrivals = state.emsArrivals.map((candidate) =>
         candidate.id === arrivalId
-          ? { ...candidate, patientId, status: 'Handoff', arrivedAt: candidate.arrivedAt || now }
+          ? {
+              ...candidate,
+              patientId,
+              status: 'Handoff',
+              arrivedAt: candidate.arrivedAt || now,
+              criticalChecklist,
+            }
           : candidate
       );
       const emsUnits = state.emsUnits.map((unit) =>
@@ -2866,6 +3680,22 @@ export const selectFilteredPatients = (state: EmergencyStoreState): Patient[] =>
     );
     })
     .sort((a, b) => {
+      if (state.activeQueueFilter === 'Waiting') {
+        const priorityRank: Record<Priority, number> = {
+          [Priority.P1]: 0,
+          [Priority.P2]: 1,
+          [Priority.P3]: 2,
+          [Priority.P4]: 3,
+          [Priority.P5]: 4,
+        };
+        const priorityDelta = priorityRank[a.priority] - priorityRank[b.priority];
+        if (priorityDelta !== 0) return priorityDelta;
+        const aStatus = longWaitStatus(a);
+        const bStatus = longWaitStatus(b);
+        const longWaitPhaseDelta =
+          (LONG_WAIT_PHASE_RANK[bStatus.phase] || 0) - (LONG_WAIT_PHASE_RANK[aStatus.phase] || 0);
+        return longWaitPhaseDelta || bStatus.waitMinutes - aStatus.waitMinutes;
+      }
       const p1Delta = Number(b.priority === Priority.P1) - Number(a.priority === Priority.P1);
       if (p1Delta !== 0) return p1Delta;
       return minutesSince(b.arrivalTime) - minutesSince(a.arrivalTime);
@@ -3085,17 +3915,24 @@ export const selectReassessmentQueue = (
     .filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'))
     .map((patient) => {
       const reassessmentFlags = patient.flags.filter((flag) => flag.type === 'ReassessmentDue');
+      const longWait = longWaitStatus(patient);
       return {
         patientId: patient.id,
         patientName: patient.name || `${patient.firstName} ${patient.lastName}`,
         state: patient.state,
         priority: patient.priority,
-        waitingMinutes: minutesSince(patient.arrivalTime),
+        waitingMinutes: longWait.waitMinutes || minutesSince(patient.arrivalTime),
         vitalsAgeMinutes: minutesSince(patient.vitalsUpdatedAt || patient.vitals?.recordedAt || null),
         reasons: reassessmentFlags.map((flag) => flag.reason),
         flaggedAt: reassessmentFlags[0]?.detectedAt || new Date().toISOString(),
+        longWaitPhase: longWait.phase,
       };
-    });
+    })
+    .sort(
+      (a, b) =>
+        (LONG_WAIT_PHASE_RANK[b.longWaitPhase] || 0) - (LONG_WAIT_PHASE_RANK[a.longWaitPhase] || 0) ||
+        new Date(b.flaggedAt).getTime() - new Date(a.flaggedAt).getTime()
+    );
   return reassessmentQueueOutput;
 };
 

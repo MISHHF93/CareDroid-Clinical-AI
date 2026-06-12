@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Save, X } from 'lucide-react';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import { useFeature } from '../hooks/useFeature';
@@ -53,13 +53,19 @@ function patientName(patient) {
   return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || 'Pending patient';
 }
 
-function createInitialValues(calculatorId, patient) {
+function createInitialValues(calculatorId, patient, autoScorePrefill = null) {
+  const requiredAssessmentValues = Object.fromEntries(
+    (autoScorePrefill?.requiresAssessment || []).map((fieldId) => [fieldId, ''])
+  );
+  const autoValues = autoScorePrefill?.values || {};
   if (calculatorId === 'qsofa') {
     return {
       alteredMentation: 0,
       rr22: typeof patient?.vitals?.rr === 'number' && patient.vitals.rr >= 22 ? 1 : 0,
       sbp100:
         typeof patient?.vitals?.bpSystolic === 'number' && patient.vitals.bpSystolic <= 100 ? 1 : 0,
+      ...requiredAssessmentValues,
+      ...autoValues,
     };
   }
 
@@ -71,11 +77,13 @@ function createInitialValues(calculatorId, patient) {
       age: Number.isFinite(age) && age >= 65 ? 2 : Number.isFinite(age) && age >= 45 ? 1 : 0,
       riskFactors: 0,
       troponin: 0,
+      ...requiredAssessmentValues,
+      ...autoValues,
     };
   }
 
   const fields = calculatorId === 'nihss' ? NIHSS_FIELDS : HEART_FIELDS;
-  return Object.fromEntries(fields.map((field) => [field.id, 0]));
+  return { ...Object.fromEntries(fields.map((field) => [field.id, 0])), ...requiredAssessmentValues, ...autoValues };
 }
 
 function fieldsForCalculator(calculatorId) {
@@ -198,17 +206,34 @@ export function createClinicalScoreNote(patientId, score, authorStaffId, timesta
   };
 }
 
-export default function ClinicalScoreCalculator({ calculatorId, patient, onClose, onSaveScore }) {
+export default function ClinicalScoreCalculator({
+  calculatorId,
+  patient,
+  onClose,
+  onSaveScore,
+  autoScorePrefill = null,
+}) {
   const { enabled: scoreAiAssistEnabled } = useFeature('score_ai_assist');
-  const [values, setValues] = useState(() => createInitialValues(calculatorId, patient));
+  const [values, setValues] = useState(() => createInitialValues(calculatorId, patient, autoScorePrefill));
+  const [reviewedFields, setReviewedFields] = useState({});
   const [assistText, setAssistText] = useState('');
   const [assistError, setAssistError] = useState('');
   const [assistLoading, setAssistLoading] = useState(false);
+  const assessmentFieldRef = useRef(null);
   const fields = fieldsForCalculator(calculatorId);
   const total = useMemo(() => totalScore(values), [values]);
   const interpretation = interpretScore(calculatorId, total);
   const maxValue = maxForCalculator(calculatorId);
   const label = CALCULATOR_LABEL[calculatorId] || 'Clinical Score';
+
+  useEffect(() => {
+    setValues(createInitialValues(calculatorId, patient, autoScorePrefill));
+    setReviewedFields({});
+  }, [autoScorePrefill, calculatorId, patient]);
+
+  useEffect(() => {
+    assessmentFieldRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const handleEscape = (event) => {
@@ -229,6 +254,7 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
       interpretation: interpretation.band,
       recommendation: interpretation.recommendation,
       values,
+      autoScorePrefill,
     });
     onClose?.();
   };
@@ -270,6 +296,21 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
     }
   };
 
+  const fieldMeta = (fieldId) => autoScorePrefill?.fields?.[fieldId] || null;
+  const fieldClassName = (field) => {
+    const meta = fieldMeta(field.id);
+    return [
+      meta?.status ? `clinical-score-modal__field--${meta.status}` : '',
+      reviewedFields[field.id] ? 'clinical-score-modal__field--reviewed' : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  };
+  const fieldRef = (field) =>
+    autoScorePrefill?.requiresAssessment?.[0] === field.id ? { ref: assessmentFieldRef } : {};
+  const markReviewed = (fieldId) =>
+    setReviewedFields((current) => ({ ...current, [fieldId]: true }));
+
   const renderFieldControl = (field) => {
     if (calculatorId === 'qsofa') {
       const isActive = Number(values[field.id] || 0) === 1;
@@ -278,12 +319,14 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
           type="button"
           className={`clinical-score-modal__toggle${isActive ? ' clinical-score-modal__toggle--active' : ''}`}
           aria-pressed={isActive}
-          aria-label={`${field.label}: ${isActive ? 'Yes' : 'No'}`}
-          onClick={() =>
-            setValues((current) => ({ ...current, [field.id]: current[field.id] ? 0 : 1 }))
-          }
+          aria-label={`${field.label}: ${values[field.id] === '' ? 'Requires assessment' : isActive ? 'Yes' : 'No'}`}
+          onClick={() => {
+            setValues((current) => ({ ...current, [field.id]: current[field.id] ? 0 : 1 }));
+            markReviewed(field.id);
+          }}
+          {...fieldRef(field)}
         >
-          {isActive ? 'Yes' : 'No'}
+          {values[field.id] === '' ? 'Assess' : isActive ? 'Yes' : 'No'}
         </button>
       );
     }
@@ -291,10 +334,16 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
     return (
       <select
         value={values[field.id] ?? 0}
-        onChange={(event) =>
-          setValues((current) => ({ ...current, [field.id]: Number(event.target.value) }))
-        }
+        onChange={(event) => {
+          setValues((current) => ({
+            ...current,
+            [field.id]: event.target.value === '' ? '' : Number(event.target.value),
+          }));
+          markReviewed(field.id);
+        }}
+        {...fieldRef(field)}
       >
+        {values[field.id] === '' ? <option value="">Requires assessment</option> : null}
         {Array.from({ length: maxValue + 1 }, (_, value) => (
           <option key={value} value={value}>
             {value}
@@ -320,12 +369,22 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
 
         <div className="clinical-score-modal__body">
           <div className="clinical-score-modal__fields">
-            {fields.map((field) => (
-              <label key={field.id}>
-                <span>{field.label}</span>
+            {fields.map((field) => {
+              const meta = fieldMeta(field.id);
+              return (
+              <label key={field.id} className={fieldClassName(field)}>
+                <span>
+                  {field.label}
+                  {meta?.status === 'prefilled' ? <em>Auto-filled</em> : null}
+                  {meta?.status === 'requires-assessment' ? <em>Requires assessment</em> : null}
+                  {meta?.status === 'needs-confirmation' ? <em>Confirm</em> : null}
+                  {reviewedFields[field.id] ? <em>Physician reviewed</em> : null}
+                </span>
                 {renderFieldControl(field)}
+                {meta?.source ? <small>{meta.source}</small> : null}
               </label>
-            ))}
+              );
+            })}
           </div>
 
           <aside className="clinical-score-modal__result">
@@ -340,10 +399,11 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
             ) : null}
             {assistText ? <small>{assistText}</small> : null}
             {assistError ? <small>{assistError}</small> : null}
-            {calculatorId === 'heart' ? (
+            {autoScorePrefill ? (
+              <small>{autoScorePrefill.bannerSummary}</small>
+            ) : calculatorId === 'heart' ? (
               <small>Age field is pre-filled from the linked patient when available.</small>
-            ) : null}
-            {calculatorId === 'qsofa' ? (
+            ) : calculatorId === 'qsofa' ? (
               <small>RR and SBP are pre-filled from current patient vitals when available.</small>
             ) : null}
           </aside>

@@ -1,12 +1,21 @@
 import './observability/datadog';
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
+import mongoose from 'mongoose';
 import { AppModule } from './app.module';
+import capacityRoutes from './api/capacity.routes';
+import copilotRoutes from './api/copilot.routes';
+import emsRoutes from './api/ems.routes';
+import { registerEMSWebSocketSupport } from './api/ems.socket';
+import reassessmentRoutes from './api/reassessment.routes';
+import smartIntakeRoutes from './api/smart-intake.routes';
+import { reassessmentScheduler } from './scheduler/reassessment.scheduler';
+import { ocrService } from './services/ocr.service';
 import { initSentry } from './config/sentry.config';
 import { SWAGGER_DOCS_PATH } from './server-routes';
 import {
@@ -17,6 +26,32 @@ import {
 
 function shouldServeFrontendAssets() {
   return process.env.NODE_ENV === 'production' && !process.env.JEST_WORKER_ID;
+}
+
+async function registerEmergencyMongooseRuntime(app: INestApplication, logger: Logger) {
+  if (process.env.ENABLE_MONGOOSE_EMERGENCY_OS !== 'true') return;
+
+  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_MONGO_URI;
+  if (!mongoUri) {
+    logger.warn(
+      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose Emergency OS routes.',
+    );
+    return;
+  }
+
+  await mongoose.connect(mongoUri);
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.use('/api/capacity', capacityRoutes);
+  expressApp.use('/api/copilot', copilotRoutes);
+  expressApp.use('/api/ems', emsRoutes);
+  expressApp.use('/api/emergency/intake', smartIntakeRoutes);
+  expressApp.use('/api/reassessment', reassessmentRoutes);
+  registerEMSWebSocketSupport(expressApp, app.getHttpServer());
+  reassessmentScheduler.start();
+  await ocrService.initialize();
+  logger.log(
+    'Mongoose Emergency OS routes mounted at /api/capacity, /api/copilot, /api/ems, /api/emergency/intake, /api/reassessment',
+  );
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
@@ -154,6 +189,8 @@ async function bootstrap() {
 
   // API prefix (health and root endpoints will be at /)
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
+
+  await registerEmergencyMongooseRuntime(app, logger);
 
   // Swagger documentation
   const config = new DocumentBuilder()

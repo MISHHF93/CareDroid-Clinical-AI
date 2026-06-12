@@ -41,6 +41,28 @@
     0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
+.patient-card--highlighted {
+  animation:
+    patient-card-fade-up 180ms var(--ease-smooth, ease) both,
+    patient-card-quick-intake-highlight 1.8s ease-out both;
+}
+
+.patient-card--long-wait-warning {
+  border-left-color: var(--status-warning);
+  box-shadow: inset 16px 0 28px color-mix(in srgb, var(--status-warning) 14%, transparent);
+}
+
+.patient-card--long-wait-critical,
+.patient-card--long-wait-lwbs {
+  border-left-color: var(--status-critical);
+  box-shadow:
+    inset 16px 0 28px color-mix(in srgb, var(--status-critical) 16%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--status-critical) 42%, transparent);
+  animation:
+    patient-card-fade-up 180ms var(--ease-smooth, ease) both,
+    patient-card-long-wait-pulse 1.3s ease-in-out infinite;
+}
+
 .patient-detail--empty {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -53,6 +75,185 @@
   padding: var(--space-4);
   color: var(--color-text-secondary);
   text-align: center;
+}
+
+.patient-detail__auto-score-banner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  border-left: 4px solid var(--status-info);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--color-text-primary);
+}
+
+.patient-detail__auto-score-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-info) 18%, var(--color-surface));
+  color: var(--status-info);
+}
+
+.patient-detail__auto-score-banner strong,
+.patient-detail__auto-score-banner p {
+  margin: 0;
+}
+
+.patient-detail__auto-score-banner strong {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 950;
+}
+
+.patient-detail__auto-score-banner p {
+  margin-top: 2px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.patient-detail__recheck-complete-prompt,
+.patient-detail__recheck-form {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 var(--space-4) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-warning) 12%, var(--color-elevated));
+}
+
+.patient-detail__recheck-complete-prompt {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+
+.patient-detail__recheck-complete-prompt p {
+  margin: 2px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.patient-detail__recheck-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.patient-detail__recheck-options button,
+.patient-detail__recheck-complete-prompt button,
+.patient-detail__recheck-form button {
+  min-height: 34px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__recheck-options .patient-detail__recheck-option--active {
+  border-color: var(--status-warning);
+  background: color-mix(in srgb, var(--status-warning) 18%, var(--color-surface));
+}
+
+.patient-detail__recheck-form label {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.patient-detail__recheck-form input {
+  min-height: 36px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 0 var(--space-2);
+  font: inherit;
+}
+
+.patient-detail__vitals-alerts {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.patient-detail__vitals-alert {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-elevated);
+}
+
+.patient-detail__vitals-alert--critical {
+  border-color: color-mix(in srgb, var(--status-critical) 56%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 14%, var(--color-elevated));
+}
+
+.patient-detail__vitals-alert--warning {
+  border-color: color-mix(in srgb, #f97316 54%, var(--color-border-default));
+  background: color-mix(in srgb, #f97316 14%, var(--color-elevated));
+}
+
+.patient-detail__vitals-alert strong,
+.patient-detail__vitals-alert span {
+  display: block;
+}
+
+.patient-detail__vitals-alert span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.patient-detail__vitals-alert button {
+  min-height: 34px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__auto-score-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.patient-detail__auto-score-actions button {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__auto-score-actions button:first-child {
+  border-color: color-mix(in srgb, var(--status-info) 46%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-surface));
 }
 
 .patient-card--p1 {
@@ -105,6 +306,20 @@
   animation: patient-card-reassessment-pulse 1.4s ease-in-out infinite;
 }
 
+.patient-card--recheck-due {
+  animation: patient-card-recheck-pulse 1.2s ease-in-out infinite;
+  border-color: var(--status-warning);
+}
+
+.patient-card--vitals-watch {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--status-warning) 22%, transparent);
+}
+
+.patient-card--vitals-warning {
+  border-color: color-mix(in srgb, #f97316 56%, var(--color-border-default));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f97316 28%, transparent);
+}
+
 .patient-card--deterioration::after {
   position: absolute;
   inset: 0;
@@ -114,6 +329,38 @@
     0 0 22px color-mix(in srgb, var(--status-critical) 18%, transparent);
   content: '';
   pointer-events: none;
+}
+
+.patient-card--escalated {
+  border-color: color-mix(in srgb, var(--status-critical) 72%, var(--color-border-default));
+  border-left-color: var(--status-critical);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--status-critical) 42%, transparent),
+    0 0 26px color-mix(in srgb, var(--status-critical) 32%, transparent);
+  animation:
+    patient-card-fade-up 180ms var(--ease-smooth, ease) both,
+    patient-card-escalation-pulse 900ms ease-out 3;
+}
+
+.patient-card__escalated-badge,
+.patient-detail__escalated-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-critical) 58%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: var(--status-critical);
+  color: white;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.patient-detail__escalated-badge {
+  margin-left: var(--space-2);
+  vertical-align: middle;
 }
 
 @keyframes patient-card-reassessment-pulse {
@@ -127,6 +374,17 @@
   }
 }
 
+@keyframes patient-card-recheck-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-warning) 34%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-warning) 30%, transparent);
+  }
+}
+
 @keyframes patient-card-fade-up {
   from {
     opacity: 0;
@@ -136,6 +394,56 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes patient-card-quick-intake-highlight {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px transparent,
+      0 0 0 0 transparent;
+  }
+
+  18%,
+  70% {
+    border-color: var(--status-stable);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--status-stable) 48%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--status-stable) 20%, transparent),
+      0 16px 34px rgba(0, 0, 0, 0.34);
+  }
+}
+
+@keyframes patient-card-long-wait-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 16px 0 28px color-mix(in srgb, var(--status-critical) 16%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--status-critical) 36%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      inset 16px 0 32px color-mix(in srgb, var(--status-critical) 22%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--status-critical) 26%, transparent),
+      0 16px 34px rgba(0, 0, 0, 0.34);
+  }
+}
+
+@keyframes patient-card-escalation-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--status-critical) 36%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--status-critical) 0%, transparent);
+  }
+
+  45% {
+    box-shadow:
+      inset 0 0 0 2px color-mix(in srgb, var(--status-critical) 76%, transparent),
+      0 0 0 5px color-mix(in srgb, var(--status-critical) 28%, transparent),
+      0 18px 38px rgba(0, 0, 0, 0.36);
   }
 }
 
@@ -308,9 +616,42 @@
   color: var(--status-info);
 }
 
+.patient-card__lwbs-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-critical) 22%, var(--color-elevated));
+  color: var(--status-critical);
+  font-size: var(--font-size-xs);
+  font-weight: 950;
+  line-height: 1;
+}
+
 .patient-card__referral-badge {
   background: color-mix(in srgb, #8b5cf6 18%, var(--color-elevated));
   color: #c4b5fd;
+}
+
+.patient-card__referral-badge--sent {
+  background: color-mix(in srgb, var(--status-warning) 18%, var(--color-elevated));
+  color: var(--status-warning);
+}
+
+.patient-card__referral-badge--acknowledged {
+  background: color-mix(in srgb, var(--status-info) 16%, var(--color-elevated));
+  color: var(--status-info);
+}
+
+.patient-card__referral-badge--accepted {
+  background: color-mix(in srgb, var(--status-stable) 16%, var(--color-elevated));
+  color: var(--status-stable);
+}
+
+.patient-card__referral-badge--overdue {
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-elevated));
+  color: var(--status-critical);
 }
 
 .patient-card__referral-status {
@@ -400,6 +741,11 @@
   color: var(--status-warning);
 }
 
+.patient-card__vital--warning-alert {
+  color: #f97316;
+  font-weight: 950;
+}
+
 .patient-card__vital--critical {
   color: var(--status-critical);
 }
@@ -430,8 +776,16 @@
   font-weight: 900;
 }
 
-.patient-card__wait--long {
+.patient-card__wait--warning {
+  color: var(--status-warning);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.patient-card__wait--critical {
   color: var(--status-critical);
+  font-size: 14px;
+  font-weight: 1000;
 }
 
 .patient-card__staff {
@@ -577,6 +931,10 @@
 
 .staff-selector__workload--green span {
   background: var(--status-stable);
+}
+
+.staff-selector__workload--gray span {
+  background: var(--color-text-muted);
 }
 
 .staff-selector__workload--yellow span {
@@ -875,6 +1233,17 @@
 
 .patient-detail__staff-assignment {
   gap: var(--space-2);
+}
+
+.patient-detail__pediatric-drugs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 36px;
+  border-color: color-mix(in srgb, var(--status-critical) 38%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 12%, var(--color-elevated));
+  color: var(--color-text-primary);
 }
 
 .patient-detail__assigned-staff {
@@ -1451,6 +1820,11 @@
 }
 
 .patient-detail__referral-chip--sent {
+  background: color-mix(in srgb, var(--status-warning) 14%, var(--color-elevated));
+  color: var(--status-warning);
+}
+
+.patient-detail__referral-chip--acknowledged {
   background: color-mix(in srgb, var(--status-info) 14%, var(--color-elevated));
   color: var(--status-info);
 }
@@ -1458,6 +1832,163 @@
 .patient-detail__referral-chip--accepted {
   background: color-mix(in srgb, var(--status-stable) 16%, var(--color-elevated));
   color: var(--status-stable);
+}
+
+.patient-detail__referral-chip--overdue {
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-elevated));
+  color: var(--status-critical);
+}
+
+.patient-detail__referral-status-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.patient-detail__referral-status-actions button {
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__referral-status-banner,
+.patient-detail__fast-referral {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-elevated);
+}
+
+.patient-detail__referral-status-banner {
+  border-color: color-mix(in srgb, var(--status-warning) 38%, var(--color-border-default));
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+}
+
+.patient-detail__referral-status-banner--acknowledged {
+  border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 9%, var(--color-elevated));
+}
+
+.patient-detail__referral-status-banner--accepted {
+  border-color: color-mix(in srgb, var(--status-stable) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-stable) 10%, var(--color-elevated));
+}
+
+.patient-detail__referral-status-banner--overdue {
+  border-color: color-mix(in srgb, var(--status-critical) 52%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 12%, var(--color-elevated));
+  color: var(--status-critical);
+}
+
+.patient-detail__fast-referral {
+  border-left: 4px solid var(--status-info);
+}
+
+.patient-detail__fast-referral-header {
+  display: grid;
+  gap: 2px;
+}
+
+.patient-detail__fast-referral-header strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.patient-detail__fast-referral-header span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.patient-detail__fast-referral fieldset {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.patient-detail__fast-referral legend,
+.patient-detail__fast-referral label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+}
+
+.patient-detail__fast-referral-buttons,
+.patient-detail__fast-referral-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.patient-detail__fast-referral button {
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__fast-referral-selected {
+  border-color: var(--status-info) !important;
+  background: color-mix(in srgb, var(--status-info) 16%, var(--color-surface)) !important;
+}
+
+.patient-detail__fast-referral-urgency--routine {
+  color: var(--color-text-secondary);
+}
+
+.patient-detail__fast-referral-urgency--urgent {
+  border-color: color-mix(in srgb, var(--status-warning) 38%, var(--color-border-default));
+  color: var(--status-warning);
+}
+
+.patient-detail__fast-referral-urgency--emergent {
+  border-color: color-mix(in srgb, var(--status-critical) 46%, var(--color-border-default));
+  color: var(--status-critical);
+}
+
+.patient-detail__fast-referral label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.patient-detail__fast-referral textarea {
+  min-height: 132px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  resize: vertical;
+}
+
+.patient-detail__fast-referral-footer {
+  justify-content: flex-end;
+}
+
+.patient-detail__fast-referral-footer button:last-child {
+  border-color: color-mix(in srgb, var(--status-info) 48%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 20%, var(--color-surface));
 }
 
 .patient-detail__referral div {

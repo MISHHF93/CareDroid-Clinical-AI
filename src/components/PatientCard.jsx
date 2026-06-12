@@ -13,6 +13,7 @@ import {
   Activity,
   AlertTriangle,
   Ambulance,
+  Baby,
   Bed,
   Clock3,
   DoorOpen,
@@ -20,6 +21,7 @@ import {
   ShieldAlert,
   UserRoundCheck,
   X,
+  Zap,
 } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
@@ -30,6 +32,8 @@ import {
 } from '../../engine/journeyEngine';
 import JourneyTimeline from './JourneyTimeline';
 import FeatureGate from './FeatureGate';
+import WhoNextPanel from './WhoNextPanel';
+import EscalateButton from './EscalateButton';
 import { useUser } from '../contexts/UserContext';
 import ClinicalScoreCalculator, {
   createClinicalScoreEvent,
@@ -40,6 +44,10 @@ import ProtocolSuggestion, {
   getProtocolSuggestions,
 } from './ProtocolSuggestion';
 import { formatScoreAge, getRecentSavedScores, getSavedScores } from '../utils/clinicalScoreEvents';
+import { getAutoScorePrefill } from '../utils/autoScorePopulator';
+import { activeReassessmentReminders, hasDueReassessmentReminder, reminderStage } from '../utils/reassessmentScheduler';
+import { activeVitalsAlerts, formatVitalsAlert } from '../utils/vitalsAlertPipeline';
+import { longWaitStatus } from '../utils/longWaitRescue';
 import {
   emergencyPermissionsForUser,
   emergencyRoleForUser,
@@ -54,6 +62,7 @@ const FLAG_ICONS = {
   PendingAdmission: Bed,
   EMSArrival: Ambulance,
   Isolation: AlertTriangle,
+  DeterioratingNeuro: AlertTriangle,
   ScoreReassessmentRecommended: Clock3,
 };
 
@@ -65,6 +74,7 @@ const ALL_FLAGS = [
   'PendingAdmission',
   'EMSArrival',
   'Isolation',
+  'DeterioratingNeuro',
   'ScoreReassessmentRecommended',
 ];
 
@@ -74,6 +84,34 @@ const SCORE_OPTIONS = [
   { id: 'qsofa', label: 'qSOFA' },
   { id: 'nihss', label: 'NIHSS' },
 ];
+const REFERRAL_DEPARTMENTS = [
+  'Cardiology',
+  'Neurology',
+  'Psychiatry',
+  'Internal Medicine',
+  'Surgery',
+  'ICU',
+  'Other',
+];
+const REFERRAL_URGENCY_OPTIONS = [
+  { id: 'Routine', label: 'Routine' },
+  { id: 'Urgent', label: 'Urgent' },
+  { id: 'Emergent', label: 'Emergent' },
+];
+
+function autoScoreDismissKey(patientId, calculatorId) {
+  return `caredroid.ed.autoScore.${patientId}.${calculatorId}.dismissed`;
+}
+
+function hasActiveEscalation(patient) {
+  const events = [...(patient?.timeline || [])].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+  const latestEscalation = events.find((event) => event.type === 'ESCALATION');
+  const latestCancel = events.find((event) => event.type === 'ESCALATION_CANCELLED');
+  if (!latestEscalation) return false;
+  return !latestCancel || new Date(latestEscalation.timestamp).getTime() > new Date(latestCancel.timestamp).getTime();
+}
 
 const BACKEND_DATA_FEATURE_BY_TAB = {
   medications: 'medication_history',
@@ -87,12 +125,16 @@ const BACKEND_DATA_FEATURE_BY_TAB = {
 
 const CATEGORY_CLASS = {
   'Chest Pain': 'cardiac',
+  Breathing: 'respiratory',
   Respiratory: 'respiratory',
   'Infectious Respiratory': 'respiratory',
+  'Neuro/Stroke': 'neuro',
   Neurologic: 'neuro',
   Orthopedic: 'ortho',
   Musculoskeletal: 'ortho',
   Trauma: 'ortho',
+  'OB/Gyn': 'abdominal',
+  Pediatric: 'default',
   'Abdominal Pain': 'abdominal',
   Allergy: 'allergy',
 };
@@ -194,6 +236,98 @@ function isActiveReferral(referral) {
   return referral && !ACTIVE_REFERRAL_TERMINAL_STATUSES.has(referral.status);
 }
 
+function minutesSinceTimestamp(timestamp) {
+  const parsed = new Date(timestamp).getTime();
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.max(0, Math.round((Date.now() - parsed) / 60000));
+}
+
+function referralAgeLabel(timestamp) {
+  const minutes = minutesSinceTimestamp(timestamp);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}min ago`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m ago` : `${hours}h ago`;
+}
+
+function referralEscalationStage(referral) {
+  if (!referral || referral.status !== 'Sent') return 'normal';
+  const elapsed = minutesSinceTimestamp(referral.requestedAt);
+  if (referral.urgency === 'Emergent') {
+    if (elapsed >= 20) return 'critical';
+    if (elapsed >= 10) return 'overdue';
+  }
+  if (referral.urgency === 'Urgent') {
+    if (elapsed >= 30) return 'critical';
+    if (elapsed >= 15) return 'overdue';
+  }
+  return 'normal';
+}
+
+function referralStatusTone(referral) {
+  if (referralEscalationStage(referral) !== 'normal') return 'overdue';
+  if (referral.status === 'Sent') return 'sent';
+  if (referral.status === 'Acknowledged' || referral.status === 'InfoRequested') return 'acknowledged';
+  if (referral.status === 'Accepted') return 'accepted';
+  return referral.status.toLowerCase();
+}
+
+function latestReferralForPatient(referrals, patientId) {
+  return referrals
+    .filter((referral) => referral.patientId === patientId && isActiveReferral(referral))
+    .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())[0];
+}
+
+function referralBadgeText(referral) {
+  if (!referral) return '';
+  if (referralEscalationStage(referral) !== 'normal') return 'Overdue';
+  if (referral.status === 'Sent') return 'Sent';
+  if (referral.status === 'Acknowledged' || referral.status === 'InfoRequested') return 'Acknowledged';
+  if (referral.status === 'Accepted') return 'Accepted';
+  return referral.status;
+}
+
+function latestVitalsSummary(vitals = {}) {
+  return [
+    vitals.hr != null ? `HR ${vitals.hr}` : null,
+    vitals.bpSystolic != null ? `BP ${vitals.bpSystolic}/${vitals.bpDiastolic ?? '--'}` : null,
+    vitals.spo2 != null ? `SpO2 ${vitals.spo2}%` : null,
+    vitals.temp != null ? `Temp ${vitals.temp}` : null,
+    vitals.rr != null ? `RR ${vitals.rr}` : null,
+    vitals.gcs != null ? `GCS ${vitals.gcs}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ') || 'not recorded';
+}
+
+function lastSentence(text = '') {
+  const sentences = String(text)
+    .trim()
+    .split(/(?<=[.!?])\s+/)
+    .filter(Boolean);
+  return sentences.at(-1) || '';
+}
+
+function buildFastReferralSummary(patient, savedScores = []) {
+  const recentPhysicianNote = [...(patient.notes || [])]
+    .reverse()
+    .find((note) => /clinical|physician|provider|handoff/i.test(`${note.type} ${note.body}`));
+  const scores = savedScores.length
+    ? savedScores
+        .slice(0, 3)
+        .map((score) => `${score.toolName || score.scoreId}: ${score.score ?? score.total ?? score.result ?? 'saved'}`)
+        .join('; ')
+    : 'none saved';
+  return [
+    `${patientName(patient)}, ${patient.age}, ${patient.sex}.`,
+    `Presenting with ${patient.chiefComplaint || patient.complaintCategory}.`,
+    `Vitals: ${latestVitalsSummary(patient.vitals)}.`,
+    lastSentence(recentPhysicianNote?.body) || 'No recent physician note documented.',
+    `Relevant scores: ${scores}.`,
+  ].join(' ');
+}
+
 function categoryClass(category) {
   return CATEGORY_CLASS[category] || 'default';
 }
@@ -205,20 +339,19 @@ function transitionErrorMessage(error) {
 function vitalTone(label, value) {
   if (value === null || value === undefined) return 'muted';
   if (label === 'HR') {
-    if (value < 45 || value >= 120) return 'critical';
-    if (value < 55 || value >= 105) return 'warning';
+    if (value < 40 || value > 150) return 'critical';
+    if ((value >= 40 && value <= 50) || (value >= 120 && value <= 150)) return 'warning';
   }
   if (label === 'BP') {
-    if (value.systolic < 90 || value.systolic >= 180 || value.diastolic >= 120) return 'critical';
-    if (value.systolic < 100 || value.systolic >= 160 || value.diastolic >= 100) return 'warning';
+    if (value.systolic < 80) return 'critical';
+    if ((value.systolic >= 80 && value.systolic <= 90) || (value.systolic >= 180 && value.systolic <= 200)) return 'warning';
   }
   if (label === 'SpO2') {
-    if (value < 92) return 'critical';
-    if (value < 95) return 'warning';
+    if (value < 88) return 'critical';
+    if (value <= 93) return 'warning';
   }
   if (label === 'Temp') {
-    if (value >= 39 || value < 35.5) return 'critical';
-    if (value >= 38 || value < 36) return 'warning';
+    if (value > 38.5 || value < 35) return 'warning';
   }
   return 'normal';
 }
@@ -523,6 +656,11 @@ export function PatientDetailPanel() {
   const addNote = useEmergencyStore((state) => state.addNote);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const assignRoom = useEmergencyStore((state) => state.assignRoom);
+  const createReferral = useEmergencyStore((state) => state.createReferral);
+  const updateReferralStatus = useEmergencyStore((state) => state.updateReferralStatus);
+  const scheduleReassessmentReminder = useEmergencyStore((state) => state.scheduleReassessmentReminder);
+  const completeReassessmentReminder = useEmergencyStore((state) => state.completeReassessmentReminder);
+  const acknowledgeVitalsAlert = useEmergencyStore((state) => state.acknowledgeVitalsAlert);
   const patientBackendEntry = useEmergencyStore((state) =>
     selectedPatientId ? state.patientBackendDetails[selectedPatientId] : null
   );
@@ -533,8 +671,18 @@ export function PatientDetailPanel() {
   const [selectedFlag, setSelectedFlag] = useState('ReassessmentDue');
   const [transitionError, setTransitionError] = useState('');
   const [staffSelectorOpen, setStaffSelectorOpen] = useState(false);
+  const [scheduleRecheckOpen, setScheduleRecheckOpen] = useState(false);
+  const [recheckMinutes, setRecheckMinutes] = useState(30);
+  const [customRecheckMinutes, setCustomRecheckMinutes] = useState('');
+  const [recheckNote, setRecheckNote] = useState('');
+  const [completionPromptReminderId, setCompletionPromptReminderId] = useState('');
   const [scoreCalculatorId, setScoreCalculatorId] = useState('');
+  const [dismissedAutoScoreBanners, setDismissedAutoScoreBanners] = useState({});
   const [clinicalDataTab, setClinicalDataTab] = useState('medications');
+  const [fastReferralOpen, setFastReferralOpen] = useState(false);
+  const [fastReferralDepartment, setFastReferralDepartment] = useState('Cardiology');
+  const [fastReferralUrgency, setFastReferralUrgency] = useState('Urgent');
+  const [fastReferralSummary, setFastReferralSummary] = useState('');
   const filteredPatientsForShortcuts = useMemo(() => {
     const query = whiteboardSearchQuery.trim().toLowerCase();
     const queue = activeQueueFilter
@@ -561,8 +709,17 @@ export function PatientDetailPanel() {
     setNoteText('');
     setVitalsOpen(false);
     setTransitionError('');
+    setScheduleRecheckOpen(false);
+    setRecheckMinutes(30);
+    setCustomRecheckMinutes('');
+    setRecheckNote('');
+    setCompletionPromptReminderId('');
     setScoreCalculatorId('');
     setClinicalDataTab('medications');
+    setFastReferralOpen(false);
+    setFastReferralDepartment('Cardiology');
+    setFastReferralUrgency('Urgent');
+    setFastReferralSummary('');
   }, [patient?.id, patient?.vitals]);
 
   useEffect(() => {
@@ -675,6 +832,7 @@ export function PatientDetailPanel() {
   const activeReferrals = referrals
     .filter((referral) => referral.patientId === patient.id && isActiveReferral(referral))
     .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
+  const latestActiveReferral = activeReferrals[0] || null;
   const referralHistoryLast12Months = referrals.filter((referral) => {
     if (referral.patientId !== patient.id) return false;
     const requestedAt = new Date(referral.requestedAt).getTime();
@@ -707,6 +865,67 @@ export function PatientDetailPanel() {
     patient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'system';
   const staffWorkloads = buildStaffWorkloads(staff, patients, activeShift);
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
+  const isEscalated = hasActiveEscalation(patient);
+  const autoScorePrefill = getAutoScorePrefill(patient, {
+    medications,
+    labs,
+    documents: backendDocuments,
+    observations,
+  });
+  const autoScoreKey = autoScorePrefill
+    ? autoScoreDismissKey(patient.id, autoScorePrefill.calculatorId)
+    : '';
+  const autoScoreDismissed =
+    Boolean(autoScoreKey && dismissedAutoScoreBanners[autoScoreKey]) ||
+    (typeof sessionStorage !== 'undefined' && autoScoreKey
+      ? sessionStorage.getItem(autoScoreKey) === 'true'
+      : false);
+  const activeScorePrefill =
+    scoreCalculatorId && scoreCalculatorId === autoScorePrefill?.calculatorId ? autoScorePrefill : null;
+  const patientVitalsAlerts = activeVitalsAlerts(patient, ['critical', 'warning']);
+  const activeDueReminder = activeReassessmentReminders(patient).find((reminder) => {
+    const stage = reminderStage(reminder);
+    return stage === 'due' || stage === 'overdue';
+  });
+  const completionPromptReminder =
+    activeReassessmentReminders(patient).find(
+      (reminder) => reminder.id === completionPromptReminderId
+    ) || null;
+
+  const promptReminderCompletionIfDue = () => {
+    if (activeDueReminder) {
+      setCompletionPromptReminderId(activeDueReminder.id);
+    }
+  };
+
+  const handleScheduleRecheck = (event) => {
+    event.preventDefault();
+    const minutes = recheckMinutes === 'custom' ? Number(customRecheckMinutes) : Number(recheckMinutes);
+    if (!Number.isFinite(minutes) || minutes <= 0) return;
+    const scheduledBy = patient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'system';
+    scheduleReassessmentReminder(patient.id, {
+      scheduledBy,
+      dueAt: new Date(Date.now() + minutes * 60 * 1000).toISOString(),
+      note: recheckNote,
+    });
+    setScheduleRecheckOpen(false);
+    setRecheckMinutes(30);
+    setCustomRecheckMinutes('');
+    setRecheckNote('');
+  };
+
+  const markReminderComplete = () => {
+    if (!completionPromptReminder) return;
+    completeReassessmentReminder(patient.id, completionPromptReminder.id, {
+      completedBy: noteAuthorFallback,
+      timestamp: new Date().toISOString(),
+    });
+    setCompletionPromptReminderId('');
+  };
+
+  const acknowledgePatientVitalsAlert = (alertId) => {
+    acknowledgeVitalsAlert(patient.id, alertId, noteAuthorFallback);
+  };
 
   const submitVitals = (event) => {
     event.preventDefault();
@@ -722,6 +941,7 @@ export function PatientDetailPanel() {
       recordedAt: new Date().toISOString(),
     });
     setVitalsOpen(false);
+    promptReminderCompletionIfDue();
   };
 
   const submitNote = (event) => {
@@ -736,6 +956,7 @@ export function PatientDetailPanel() {
       createdAt: new Date().toISOString(),
     });
     setNoteText('');
+    promptReminderCompletionIfDue();
   };
 
   const handleMoveToNextState = () => {
@@ -780,8 +1001,30 @@ export function PatientDetailPanel() {
     addNote(patient.id, createClinicalScoreNote(patient.id, score, authorStaffId, timestamp));
   };
 
-  const handleNewReferral = () => {
-    navigate(`/emergency/referrals?patientId=${encodeURIComponent(patient.id)}&new=1`);
+  const openFastReferral = () => {
+    setFastReferralSummary(buildFastReferralSummary(patient, savedScores));
+    setFastReferralOpen((open) => !open);
+  };
+
+  const regenerateFastReferralSummary = () => {
+    setFastReferralSummary(buildFastReferralSummary(patient, savedScores));
+  };
+
+  const submitFastReferral = (event) => {
+    event.preventDefault();
+    const summary = fastReferralSummary.trim() || buildFastReferralSummary(patient, savedScores);
+    createReferral({
+      patientId: patient.id,
+      requestingStaffId: noteAuthorFallback,
+      targetDepartment: fastReferralDepartment,
+      urgency: fastReferralUrgency,
+      reason: patient.chiefComplaint || patient.complaintCategory || 'Specialist referral requested',
+      clinicalSummary: summary,
+      status: 'Sent',
+      workflow: 'Referral',
+    });
+    setFastReferralOpen(false);
+    setFastReferralSummary('');
   };
 
   const handleOpenClinicalTools = () => {
@@ -792,6 +1035,27 @@ export function PatientDetailPanel() {
     navigate(`/emergency/tools?${params.toString()}`);
   };
 
+  const handleOpenPediatricDrugs = () => {
+    window.dispatchEvent(
+      new CustomEvent('ed:open-pediatric-drug-calculator', {
+        detail: { patientId: patient.id },
+      })
+    );
+  };
+
+  const handleOpenAutoScore = () => {
+    if (!autoScorePrefill?.calculatorId) return;
+    setScoreCalculatorId(autoScorePrefill.calculatorId);
+  };
+
+  const handleDismissAutoScore = () => {
+    if (!autoScoreKey) return;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(autoScoreKey, 'true');
+    }
+    setDismissedAutoScoreBanners((current) => ({ ...current, [autoScoreKey]: true }));
+  };
+
   return (
     <aside className="patient-detail" aria-label="Patient detail panel">
       <header className="patient-detail__header">
@@ -800,6 +1064,7 @@ export function PatientDetailPanel() {
           <h2>{patientName(patient)}</h2>
           <p>
             DOB {patient.dob} · {patient.age}/{patient.sex}
+            {isEscalated ? <strong className="patient-detail__escalated-badge">ESCALATED</strong> : null}
           </p>
         </div>
         <button
@@ -810,6 +1075,41 @@ export function PatientDetailPanel() {
           <X size={18} aria-hidden />
         </button>
       </header>
+
+      {autoScorePrefill && !autoScoreDismissed ? (
+        <section className="patient-detail__auto-score-banner" role="status">
+          <div className="patient-detail__auto-score-icon" aria-hidden>
+            <Zap size={18} />
+          </div>
+          <div>
+            <strong>{autoScorePrefill.bannerTitle}</strong>
+            <p>{autoScorePrefill.bannerSummary}</p>
+          </div>
+          <div className="patient-detail__auto-score-actions">
+            <button type="button" onClick={handleOpenAutoScore}>
+              Open {autoScorePrefill.label}
+            </button>
+            <button type="button" onClick={handleDismissAutoScore}>
+              Dismiss
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {completionPromptReminder ? (
+        <section className="patient-detail__recheck-complete-prompt" role="status">
+          <div>
+            <strong>Complete the recheck reminder?</strong>
+            <p>{completionPromptReminder.note || 'Scheduled reassessment reminder is due.'}</p>
+          </div>
+          <button type="button" onClick={markReminderComplete}>
+            Mark complete
+          </button>
+          <button type="button" onClick={() => setCompletionPromptReminderId('')}>
+            Dismiss
+          </button>
+        </section>
+      ) : null}
 
       <section className="patient-detail__priority-state">
         <label>
@@ -838,6 +1138,18 @@ export function PatientDetailPanel() {
           ) : null}
         </div>
       </section>
+
+      {patient.age < 18 ? (
+        <section className="patient-detail__section patient-detail__pediatric-drugs">
+          <div className="patient-detail__section-heading">
+            <span>Pediatric emergency dosing</span>
+          </div>
+          <button type="button" onClick={handleOpenPediatricDrugs}>
+            <Baby size={15} aria-hidden />
+            Open pediatric drug calculator
+          </button>
+        </section>
+      ) : null}
 
       <section className="patient-detail__section patient-detail__staff-assignment">
         <div className="patient-detail__section-heading">
@@ -887,6 +1199,7 @@ export function PatientDetailPanel() {
         <ClinicalScoreCalculator
           calculatorId={scoreCalculatorId}
           patient={patient}
+          autoScorePrefill={activeScorePrefill}
           onClose={() => setScoreCalculatorId('')}
           onSaveScore={handleScoreSave}
         />
@@ -913,6 +1226,26 @@ export function PatientDetailPanel() {
             </button>
           ) : null}
         </div>
+        {patientVitalsAlerts.length ? (
+          <div className="patient-detail__vitals-alerts" aria-label="Vitals alert">
+            {patientVitalsAlerts.map((alert) => (
+              <article
+                key={alert.id}
+                className={`patient-detail__vitals-alert patient-detail__vitals-alert--${alert.severity}`}
+              >
+                <div>
+                  <strong>
+                    {formatVitalsAlert(alert)} - {alert.severity} - recorded {formatScoreAge(alert.recordedAt)} ago
+                  </strong>
+                  <span>{alert.reason}</span>
+                </div>
+                <button type="button" onClick={() => acknowledgePatientVitalsAlert(alert.id)}>
+                  Addressed
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : null}
         <div className="patient-detail__vitals">
           {vitalItems(patient.vitals, previousVitals).map((item) => (
             <div
@@ -1337,9 +1670,9 @@ export function PatientDetailPanel() {
       <section className="patient-detail__section">
         <div className="patient-detail__section-heading">
           <span>Active Referrals</span>
-          <button type="button" onClick={handleNewReferral}>
+          <button type="button" onClick={openFastReferral}>
             <FilePlus2 size={13} aria-hidden />
-            New Referral
+            Refer
           </button>
         </div>
         <p className="patient-detail__referral-history">
@@ -1354,11 +1687,9 @@ export function PatientDetailPanel() {
                   <span>{referral.reason}</span>
                 </div>
                 <span
-                  className={`patient-detail__referral-chip patient-detail__referral-chip--${referral.status.toLowerCase()}`}
+                  className={`patient-detail__referral-chip patient-detail__referral-chip--${referralStatusTone(referral)}`}
                 >
-                  {referral.status === 'Acknowledged' || referral.status === 'Draft'
-                    ? 'Pending'
-                    : referral.status}
+                  {referralBadgeText(referral)}
                 </span>
                 <dl className="patient-detail__referral">
                   <div>
@@ -1376,6 +1707,38 @@ export function PatientDetailPanel() {
                     </div>
                   ) : null}
                 </dl>
+                <div className="patient-detail__referral-status-actions">
+                  {referral.status === 'Sent' ? (
+                    <button
+                      type="button"
+                      onClick={() => updateReferralStatus(referral.id, 'Acknowledged', 'Receiving service acknowledged referral.')}
+                    >
+                      Acknowledge
+                    </button>
+                  ) : null}
+                  {!['Accepted', 'Completed', 'Declined'].includes(referral.status) ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => updateReferralStatus(referral.id, 'Accepted', 'Referral accepted by receiving service.')}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateReferralStatus(referral.id, 'InfoRequested', 'Receiving service requested more information.')}
+                      >
+                        Request info
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateReferralStatus(referral.id, 'Declined', 'Referral declined by receiving service.')}
+                      >
+                        Decline
+                      </button>
+                    </>
+                  ) : null}
+                </div>
               </article>
             ))
           ) : (
@@ -1384,7 +1747,17 @@ export function PatientDetailPanel() {
         </div>
       </section>
 
+      <WhoNextPanel variant="detail" selectedPatientId={patient.id} />
+
       <div className="patient-detail__actions">
+        <EscalateButton patient={patient} variant="detail" />
+        <button type="button" onClick={openFastReferral}>
+          <FilePlus2 size={14} aria-hidden />
+          Refer
+        </button>
+        <button type="button" onClick={() => setScheduleRecheckOpen((open) => !open)}>
+          Schedule Recheck
+        </button>
         {emergencyPermissions.canAssignStaff ? (
           <label>
             Assign Staff
@@ -1459,11 +1832,121 @@ export function PatientDetailPanel() {
           </button>
         ) : null}
       </div>
+      {latestActiveReferral ? (
+        <section
+          className={`patient-detail__referral-status-banner patient-detail__referral-status-banner--${referralStatusTone(latestActiveReferral)}`}
+          role="status"
+        >
+          Referral sent to {latestActiveReferral.targetDepartment} · {latestActiveReferral.urgency} ·{' '}
+          {referralAgeLabel(latestActiveReferral.requestedAt)}
+        </section>
+      ) : null}
+      {fastReferralOpen ? (
+        <form className="patient-detail__fast-referral" onSubmit={submitFastReferral}>
+          <div className="patient-detail__fast-referral-header">
+            <strong>Fast Referral</strong>
+            <span>Send and track without leaving this patient record.</span>
+          </div>
+          <fieldset>
+            <legend>To</legend>
+            <div className="patient-detail__fast-referral-buttons">
+              {REFERRAL_DEPARTMENTS.map((department) => (
+                <button
+                  key={department}
+                  type="button"
+                  className={fastReferralDepartment === department ? 'patient-detail__fast-referral-selected' : ''}
+                  onClick={() => setFastReferralDepartment(department)}
+                  aria-pressed={fastReferralDepartment === department}
+                >
+                  {department}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Urgency</legend>
+            <div className="patient-detail__fast-referral-buttons">
+              {REFERRAL_URGENCY_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={[
+                    'patient-detail__fast-referral-urgency',
+                    `patient-detail__fast-referral-urgency--${option.id.toLowerCase()}`,
+                    fastReferralUrgency === option.id ? 'patient-detail__fast-referral-selected' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => setFastReferralUrgency(option.id)}
+                  aria-pressed={fastReferralUrgency === option.id}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <label>
+            Clinical summary
+            <textarea
+              value={fastReferralSummary}
+              onChange={(event) => setFastReferralSummary(event.target.value)}
+            />
+          </label>
+          <div className="patient-detail__fast-referral-footer">
+            <button type="button" onClick={regenerateFastReferralSummary}>
+              Regenerate
+            </button>
+            <button type="submit">Send referral</button>
+          </div>
+        </form>
+      ) : null}
+      {scheduleRecheckOpen ? (
+        <form className="patient-detail__recheck-form" onSubmit={handleScheduleRecheck}>
+          <strong>Recheck in:</strong>
+          <div className="patient-detail__recheck-options" role="radiogroup" aria-label="Recheck interval">
+            {[
+              [15, '15 min'],
+              [30, '30 min'],
+              [60, '1 hour'],
+              ['custom', 'Custom'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={recheckMinutes === value ? 'patient-detail__recheck-option--active' : ''}
+                onClick={() => setRecheckMinutes(value)}
+                aria-pressed={recheckMinutes === value}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {recheckMinutes === 'custom' ? (
+            <label>
+              Custom minutes
+              <input
+                value={customRecheckMinutes}
+                inputMode="numeric"
+                onChange={(event) => setCustomRecheckMinutes(event.target.value)}
+              />
+            </label>
+          ) : null}
+          <label>
+            Optional note
+            <input
+              value={recheckNote}
+              placeholder="Recheck BP after metoprolol"
+              onChange={(event) => setRecheckNote(event.target.value)}
+            />
+          </label>
+          <button type="submit">Set reminder</button>
+        </form>
+      ) : null}
     </aside>
   );
 }
 
-function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
+function PatientCard({ patient, keyboardSelected = false, highlighted = false, onKeyboardFocus }) {
   const { user } = useUser();
   const emergencyPermissions = emergencyPermissionsForUser(user);
   const [staffMenuOpen, setStaffMenuOpen] = useState(false);
@@ -1481,17 +1964,26 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
   );
   const staffWorkloads = buildStaffWorkloads(allStaff, patients, activeShift);
   const wait = waitMinutes(patient.arrivalTime);
-  const isLongWait = wait > 60;
-  const isWaitOverTarget = wait > 45;
+  const longWait = longWaitStatus(patient);
+  const isWaitWarning = longWait.phase === 'warning';
+  const isWaitCritical = longWait.phase === 'critical';
+  const isLwbsRisk = longWait.phase === 'lwbs';
+  const isWaitOverTarget = longWait.phase !== 'none';
   const priority = priorityTone(patient.priority);
   const hasReassessment =
     hasPatientFlag(patient, 'ReassessmentDue') ||
     hasPatientFlag(patient, 'ScoreReassessmentRecommended');
+  const hasDueReminder = hasDueReassessmentReminder(patient);
+  const cardVitalsAlerts = activeVitalsAlerts(patient);
+  const hasWarningVitals = cardVitalsAlerts.some((alert) => alert.severity === 'warning');
+  const hasWatchVitals = cardVitalsAlerts.some((alert) => alert.severity === 'watch');
   const hasDeterioration = hasPatientFlag(patient, 'DeteriorationRisk');
+  const isEscalated = hasActiveEscalation(patient);
   const hasEmsArrival = hasPatientFlag(patient, 'EMSArrival') || Boolean(patient.emsArrival);
   const activeReferralCount = referrals.filter(
     (referral) => referral.patientId === patient.id && isActiveReferral(referral)
   ).length;
+  const latestReferral = latestReferralForPatient(referrals, patient.id);
   const scoreBadges = getRecentSavedScores(patient).slice(0, 3);
   const allergyCount = backendCount(patientBackendEntry, 'allergies');
   const medicationCount = backendCount(patientBackendEntry, 'medications');
@@ -1514,8 +2006,16 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
         'patient-card',
         `patient-card--${priority}`,
         keyboardSelected ? 'patient-card--keyboard-selected' : '',
+        highlighted ? 'patient-card--highlighted' : '',
         hasReassessment ? 'patient-card--reassessment' : '',
+        hasDueReminder ? 'patient-card--recheck-due' : '',
+        hasWarningVitals ? 'patient-card--vitals-warning' : '',
+        hasWatchVitals ? 'patient-card--vitals-watch' : '',
+        isWaitWarning ? 'patient-card--long-wait-warning' : '',
+        isWaitCritical ? 'patient-card--long-wait-critical' : '',
+        isLwbsRisk ? 'patient-card--long-wait-lwbs' : '',
         hasDeterioration ? 'patient-card--deterioration' : '',
+        isEscalated ? 'patient-card--escalated' : '',
         hasEmsArrival ? 'patient-card--ems' : '',
       ]
         .filter(Boolean)
@@ -1540,12 +2040,18 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
           <span className="patient-card__demographics">
             {patient.age}/{patient.sex[0] || 'U'}
           </span>
-          {activeReferralCount ? (
-            <span className="patient-card__referral-badge">
-              {activeReferralCount} referral{activeReferralCount === 1 ? '' : 's'}
+          {latestReferral ? (
+            <span
+              className={`patient-card__referral-badge patient-card__referral-badge--${referralStatusTone(latestReferral)}`}
+              title={`${latestReferral.targetDepartment} · ${latestReferral.urgency}`}
+            >
+              {referralBadgeText(latestReferral)}
+              {activeReferralCount > 1 ? ` +${activeReferralCount - 1}` : ''}
             </span>
           ) : null}
           {hasEmsArrival ? <span className="patient-card__ems-badge">EMS</span> : null}
+          {isEscalated ? <span className="patient-card__escalated-badge">ESCALATED</span> : null}
+          {isLwbsRisk ? <span className="patient-card__lwbs-badge">LWBS RISK</span> : null}
         </div>
       </div>
 
@@ -1563,7 +2069,14 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
         {vitalItems(patient.vitals).map((item) => (
           <span
             key={item.label}
-            className={`patient-card__vital patient-card__vital--${vitalTone(item.label, item.value)}`}
+            className={[
+              `patient-card__vital patient-card__vital--${vitalTone(item.label, item.value)}`,
+              cardVitalsAlerts.some((alert) => alert.vital === item.label && alert.severity === 'warning')
+                ? 'patient-card__vital--warning-alert'
+                : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
           >
             {item.label} {item.display}
           </span>
@@ -1575,7 +2088,8 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
           className={[
             'patient-card__wait',
             isWaitOverTarget ? 'patient-card__wait--elevated' : '',
-            isLongWait ? 'patient-card__wait--long' : '',
+            isWaitWarning ? 'patient-card__wait--warning' : '',
+            isWaitCritical || isLwbsRisk ? 'patient-card__wait--critical' : '',
           ]
             .filter(Boolean)
             .join(' ')}
@@ -1661,6 +2175,7 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
           <small>{backendLoadLabel(patientBackendEntry)}</small>
         </div>
       ) : null}
+      <EscalateButton patient={patient} variant="card" />
     </article>
   );
 }

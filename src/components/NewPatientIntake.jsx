@@ -1,27 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { CheckCircle2, X } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { createClinicalScoreEvent, createClinicalScoreNote } from './ClinicalScoreCalculator';
-import ProtocolSuggestion, { createProtocolLaunchEvent } from './ProtocolSuggestion';
-import { getSuggestedToolsForComplaint } from '../utils/clinicalToolSuggestions';
-import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { TriageSuggestionEngine } from '../../engine/triageEngine';
 import './NewPatientIntake.css';
 
 const COMPLAINT_CATEGORIES = [
-  'Chest Pain',
-  'Shortness of Breath',
-  'Stroke',
-  'Sepsis',
-  'Abdominal Pain',
-  'Trauma',
-  'Psychiatric',
-  'Pediatric',
-  'Other',
+  { value: 'Chest Pain', label: 'Chest pain', icon: '🫀' },
+  { value: 'Breathing', label: 'Breathing', icon: '🫁' },
+  { value: 'Neuro/Stroke', label: 'Neuro/Stroke', icon: '🧠' },
+  { value: 'Sepsis', label: 'Sepsis', icon: '🩸' },
+  { value: 'Trauma', label: 'Trauma', icon: '🤕' },
+  { value: 'OB/Gyn', label: 'OB/Gyn', icon: '🤰' },
+  { value: 'Pediatric', label: 'Pediatric', icon: '🧒' },
+  { value: 'Other', label: 'Other', icon: '📋' },
 ];
 
-const SEX_OPTIONS = ['Female', 'Male', 'Intersex', 'Unknown', 'Unspecified'];
+const SEX_OPTIONS = [
+  { value: 'Male', label: 'M' },
+  { value: 'Female', label: 'F' },
+  { value: 'Unspecified', label: 'Other' },
+];
 
 const CTAS_LABELS = {
   [Priority.P1]: 'CTAS 1 · Resuscitation',
@@ -35,21 +35,15 @@ const INITIAL_IDENTITY = {
   firstName: '',
   lastName: '',
   dob: '',
-  sex: 'Unknown',
+  sex: '',
 };
 
 const INITIAL_VITALS = {
   hr: '',
   bpSystolic: '',
-  bpDiastolic: '',
   spo2: '',
   temp: '',
-  rr: '',
-  gcs: '',
-  pain: '',
 };
-
-const STEPS = ['Identity', 'Chief Complaint', 'Vitals', 'Triage Priority', 'Confirm & Add'];
 
 export function generateMrn() {
   return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -70,7 +64,7 @@ export function calculateAge(dob) {
 }
 
 function parseNumber(value) {
-  if (value === '') return null;
+  if (value === '' || value === null || value === undefined) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -79,241 +73,152 @@ export function vitalTone(field, value) {
   const numericValue = parseNumber(value);
   if (numericValue === null) return 'empty';
 
-  if (field === 'hr') {
-    if (numericValue < 50 || numericValue > 120) return 'abnormal';
-  }
-  if (field === 'bpSystolic') {
-    if (numericValue < 90 || numericValue > 180) return 'abnormal';
-  }
-  if (field === 'bpDiastolic') {
-    if (numericValue > 110 || numericValue < 50) return 'abnormal';
-  }
-  if (field === 'spo2') {
-    if (numericValue < 94) return 'abnormal';
-  }
-  if (field === 'temp') {
-    if (numericValue > 38.5 || numericValue < 35.5) return 'abnormal';
-  }
-  if (field === 'rr') {
-    if (numericValue < 10 || numericValue > 24) return 'abnormal';
-  }
-  if (field === 'gcs') {
-    if (numericValue < 15) return 'abnormal';
-  }
-  if (field === 'pain') {
-    if (numericValue >= 8) return 'abnormal';
-  }
-
+  if (field === 'hr' && (numericValue < 50 || numericValue > 120)) return 'abnormal';
+  if (field === 'bpSystolic' && (numericValue < 90 || numericValue > 180)) return 'abnormal';
+  if (field === 'spo2' && numericValue < 94) return 'abnormal';
+  if (field === 'temp' && (numericValue > 38.5 || numericValue < 35.5)) return 'abnormal';
   return 'normal';
 }
 
-export function suggestPriority(complaintCategory, vitals, complaintText = '') {
-  const hr = parseNumber(vitals.hr);
-  const spo2 = parseNumber(vitals.spo2);
-  const sbp = parseNumber(vitals.bpSystolic);
-  const dbp = parseNumber(vitals.bpDiastolic);
-  const gcs = parseNumber(vitals.gcs);
-  const temp = parseNumber(vitals.temp);
-  const rr = parseNumber(vitals.rr);
-  const pain = parseNumber(vitals.pain);
-  const complaint = `${complaintCategory} ${complaintText}`.toLowerCase();
-  const hasDiaphoresis = /\b(diaphoresis|diaphoretic|sweat|sweating|clammy)\b/.test(complaint);
-  const hasSevereTrauma = /\b(major|severe|penetrating|unstable|ejected|fall|polytrauma)\b/.test(
-    complaint
-  );
-  const hasSuicidalRisk = /\b(suicidal|suicide|self[-\s]?harm|overdose)\b/.test(complaint);
-
-  if (
-    (typeof spo2 === 'number' && spo2 < 90) ||
-    (typeof hr === 'number' && (hr < 40 || hr > 150)) ||
-    (typeof sbp === 'number' && sbp < 90) ||
-    (typeof rr === 'number' && (rr < 8 || rr > 32)) ||
-    (typeof gcs === 'number' && gcs <= 8)
-  ) {
-    return Priority.P1;
-  }
-
-  if (complaintCategory === 'Chest Pain' && hasDiaphoresis) return Priority.P2;
-  if (complaintCategory === 'Stroke') return Priority.P2;
-  if (complaintCategory === 'Trauma' && hasSevereTrauma) return Priority.P2;
-  if (complaintCategory === 'Psychiatric' && hasSuicidalRisk) return Priority.P2;
-  if (
-    complaintCategory === 'Sepsis' &&
-    ((typeof temp === 'number' && temp > 38.5) ||
-      (typeof sbp === 'number' && sbp <= 100) ||
-      (typeof rr === 'number' && rr >= 22) ||
-      (typeof gcs === 'number' && gcs < 15))
-  ) {
-    return Priority.P2;
-  }
-
-  if (
-    ['Chest Pain', 'Shortness of Breath', 'Sepsis'].includes(complaintCategory) ||
-    (typeof spo2 === 'number' && spo2 < 94) ||
-    (typeof hr === 'number' && hr > 120) ||
-    (typeof sbp === 'number' && sbp > 180) ||
-    (typeof dbp === 'number' && dbp > 120) ||
-    (typeof temp === 'number' && temp > 38.5) ||
-    (typeof rr === 'number' && rr > 24) ||
-    (typeof gcs === 'number' && gcs < 15) ||
-    (typeof pain === 'number' && pain >= 9)
-  ) {
-    return Priority.P2;
-  }
-
-  if (['Abdominal Pain', 'Trauma', 'Psychiatric', 'Pediatric'].includes(complaintCategory)) {
-    return Priority.P3;
-  }
-
-  if (complaintCategory === 'Other') return Priority.P4;
-  return Priority.P3;
+export function suggestPriority(complaintCategory = 'Other', vitals = {}, complaintText = '') {
+  return TriageSuggestionEngine.suggest({
+    complaintCategory,
+    complaintText,
+    vitals,
+  }).suggestedPriority;
 }
 
 function normalizeVitals(vitals, recordedAt) {
   return {
     hr: parseNumber(vitals.hr),
     bpSystolic: parseNumber(vitals.bpSystolic),
-    bpDiastolic: parseNumber(vitals.bpDiastolic),
+    bpDiastolic: null,
     spo2: parseNumber(vitals.spo2),
     temp: parseNumber(vitals.temp),
-    rr: parseNumber(vitals.rr),
-    gcs: parseNumber(vitals.gcs),
-    pain: parseNumber(vitals.pain),
+    rr: null,
+    gcs: null,
+    pain: null,
     recordedAt,
   };
+}
+
+function hasEnteredVitals(vitals) {
+  return Object.values(vitals).some((value) => String(value).trim());
 }
 
 function fieldLabel(field) {
   const labels = {
     hr: 'HR',
     bpSystolic: 'SBP',
-    bpDiastolic: 'DBP',
     spo2: 'SpO2',
-    temp: 'Temp (°C)',
-    rr: 'RR',
-    gcs: 'GCS',
-    pain: 'Pain',
+    temp: 'Temp',
   };
   return labels[field] || field;
 }
 
-function canContinue(step, identity, age, complaintCategory, complaintText) {
-  if (step === 0) {
-    return Boolean(
-      identity.firstName.trim() && identity.lastName.trim() && identity.dob && age !== null
-    );
-  }
-  if (step === 1) {
-    return Boolean(complaintCategory && complaintText.trim());
-  }
-  return true;
-}
-
-function parseAiChipLabels(text = '') {
-  return String(text)
-    .split(/\n|,/)
-    .map((line) => line.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
-    .filter(Boolean)
-    .slice(0, 4);
-}
-
-export default function NewPatientIntake({ open, onClose }) {
+export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const addPatient = useEmergencyStore((state) => state.addPatient);
-  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
-  const [step, setStep] = useState(0);
+  const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const complaintRef = useRef(null);
   const [identity, setIdentity] = useState(INITIAL_IDENTITY);
   const [mrn, setMrn] = useState(() => generateMrn());
-  const [complaintCategory, setComplaintCategory] = useState('');
+  const [complaintCategory, setComplaintCategory] = useState('Other');
   const [complaintText, setComplaintText] = useState('');
   const [vitals, setVitals] = useState(INITIAL_VITALS);
-  const [vitalsSkipped, setVitalsSkipped] = useState(false);
   const [priorityOverride, setPriorityOverride] = useState('');
-  const [launchedProtocols, setLaunchedProtocols] = useState([]);
-  const [savedScores, setSavedScores] = useState([]);
-  const [aiIntakeChips, setAiIntakeChips] = useState([]);
-  const [aiIntakeLoading, setAiIntakeLoading] = useState(false);
+  const [priorityPickerOpen, setPriorityPickerOpen] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const age = useMemo(() => calculateAge(identity.dob), [identity.dob]);
-  const suggestedPriority = useMemo(
-    () => suggestPriority(complaintCategory, vitals, complaintText),
+  const autoSuggestion = useMemo(
+    () =>
+      TriageSuggestionEngine.suggest({
+        complaintCategory,
+        complaintText,
+        vitals,
+      }),
     [complaintCategory, complaintText, vitals]
   );
-  const selectedPriority = priorityOverride || suggestedPriority;
-  const suggestedTools = useMemo(
-    () => getSuggestedToolsForComplaint(complaintCategory),
-    [complaintCategory]
+  const triageSuggestion = useMemo(
+    () =>
+      TriageSuggestionEngine.suggest({
+        complaintCategory,
+        complaintText,
+        vitals,
+        overridePriority: priorityOverride || null,
+      }),
+    [complaintCategory, complaintText, priorityOverride, vitals]
   );
-  const canAdvance = canContinue(step, identity, age, complaintCategory, complaintText);
-  const draftPatient = useMemo(
-    () => ({
-      mrn,
-      firstName: identity.firstName,
-      lastName: identity.lastName,
-      vitals: normalizeVitals(vitalsSkipped ? INITIAL_VITALS : vitals, new Date().toISOString()),
-    }),
-    [identity.firstName, identity.lastName, mrn, vitals, vitalsSkipped]
+  const selectedPriority = triageSuggestion.suggestedPriority;
+  const nameEntered = Boolean(identity.firstName.trim() || identity.lastName.trim());
+  const complaintEntered = Boolean(complaintText.trim());
+  const canSubmit = nameEntered && complaintEntered;
+  const dirty = Boolean(
+    nameEntered ||
+      identity.dob ||
+      identity.sex ||
+      complaintText.trim() ||
+      complaintCategory !== 'Other' ||
+      priorityOverride ||
+      hasEnteredVitals(vitals)
   );
 
+  const resetDraft = () => {
+    setIdentity(INITIAL_IDENTITY);
+    setMrn(generateMrn());
+    setComplaintCategory('Other');
+    setComplaintText('');
+    setVitals(INITIAL_VITALS);
+    setPriorityOverride('');
+    setPriorityPickerOpen(false);
+    setSubmitAttempted(false);
+  };
+
   useEffect(() => {
-    if (step !== 1 || !complaintCategory || complaintText.trim().length < 3) return undefined;
-    let cancelled = false;
-    setAiIntakeLoading(true);
-    const timer = window.setTimeout(async () => {
-      try {
-        const response = await sendClinicalChatMessage({
-          message: `For intake complaint "${complaintText.trim()}" in category "${complaintCategory}", suggest protocol chips for human triage review. Keep it concise.`,
-          requestType: 'INTAKE_SUGGESTION',
-          workspaceContext: {
-            workspaceId: 'emergency',
-            workspaceKey: 'emergency',
-            aiRequest: {
-              requestType: 'INTAKE_SUGGESTION',
-              complaint: complaintText.trim(),
-              patientContext: pendingPatientForTools(),
-            },
-          },
-        });
-        if (cancelled || !response.ok) return;
-        setAiIntakeChips(parseAiChipLabels(response.data.response));
-      } finally {
-        if (!cancelled) setAiIntakeLoading(false);
-      }
-    }, 700);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [complaintCategory, complaintText, step]);
+    if (!open) return undefined;
+    const focusTimer = window.setTimeout(() => complaintRef.current?.focus(), 0);
+    return () => window.clearTimeout(focusTimer);
+  }, [open]);
 
   if (!open) return null;
 
-  const resetAndClose = () => {
-    setStep(0);
-    setIdentity(INITIAL_IDENTITY);
-    setMrn(generateMrn());
-    setComplaintCategory('');
-    setComplaintText('');
-    setVitals(INITIAL_VITALS);
-    setVitalsSkipped(false);
-    setPriorityOverride('');
-    setLaunchedProtocols([]);
-    setSavedScores([]);
-    onClose();
+  const requestClose = () => {
+    if (dirty && !window.confirm('Discard this quick intake draft?')) return;
+    resetDraft();
+    onClose?.();
+  };
+
+  const handleCategoryClick = (category) => {
+    setComplaintCategory(category);
+    complaintRef.current?.focus();
+  };
+
+  const handleSexKeyDown = (event, optionIndex) => {
+    if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
+    event.preventDefault();
+    const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1;
+    const nextIndex = (optionIndex + direction + SEX_OPTIONS.length) % SEX_OPTIONS.length;
+    setIdentity((current) => ({ ...current, sex: SEX_OPTIONS[nextIndex].value }));
+    document.querySelector(`[data-sex-option="${SEX_OPTIONS[nextIndex].value}"]`)?.focus();
+  };
+
+  const handlePrioritySelect = (priority) => {
+    setPriorityOverride(priority === autoSuggestion.suggestedPriority ? '' : priority);
+    setPriorityPickerOpen(false);
   };
 
   const addToDepartment = () => {
+    setSubmitAttempted(true);
+    if (!canSubmit) {
+      complaintRef.current?.focus();
+      return;
+    }
+
     const now = new Date().toISOString();
     const patientId = `intake-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const protocolEvents = launchedProtocols.map((suggestion) =>
-      createProtocolLaunchEvent(patientId, complaintCategory, suggestion, now)
-    );
-    const scoreEvents = savedScores.map((score) =>
-      createClinicalScoreEvent(patientId, score, now, 'system-intake')
-    );
-    const scoreNotes = savedScores.map((score) =>
-      createClinicalScoreNote(patientId, score, 'system-intake', now)
-    );
+    const vitalsEntered = hasEnteredVitals(vitals);
+    const normalizedVitals = normalizeVitals(vitalsEntered ? vitals : INITIAL_VITALS, now);
     const patient = {
       id: patientId,
       mrn,
@@ -321,16 +226,16 @@ export default function NewPatientIntake({ open, onClose }) {
       lastName: identity.lastName.trim(),
       dob: identity.dob,
       age: age ?? 0,
-      sex: identity.sex,
+      sex: identity.sex || 'Unspecified',
       arrivalTime: now,
       triageTime: now,
-      lastAssessedTime: vitalsSkipped ? null : now,
+      lastAssessedTime: vitalsEntered ? now : null,
       chiefComplaint: complaintText.trim(),
       complaint: complaintText.trim(),
       complaintCategory,
       state: PatientState.Triage,
       priority: selectedPriority,
-      vitals: normalizeVitals(vitalsSkipped ? INITIAL_VITALS : vitals, now),
+      vitals: normalizedVitals,
       assignedStaffId: null,
       roomId: null,
       flags: [],
@@ -340,7 +245,7 @@ export default function NewPatientIntake({ open, onClose }) {
           patientId,
           type: 'Arrival',
           timestamp: now,
-          summary: 'Manual patient intake started from Emergency Whiteboard.',
+          summary: 'Quick intake created from Emergency Whiteboard.',
         },
         {
           id: `evt-${patientId}-triage`,
@@ -349,46 +254,42 @@ export default function NewPatientIntake({ open, onClose }) {
           timestamp: now,
           summary: `Patient added to Triage with ${selectedPriority} priority.`,
           metadata: {
-            suggestedPriority,
-            priorityOverride: priorityOverride || null,
-            vitalsSkipped,
+            suggestedPriority: autoSuggestion.suggestedPriority,
+            selectedPriority,
+            confidence: autoSuggestion.confidence,
+            ruleTriggered: autoSuggestion.ruleTriggered,
+            suggestionReason: autoSuggestion.reason,
+            override: triageSuggestion.override,
+            quickIntake: true,
+            vitalsEntered,
           },
         },
-        ...protocolEvents,
-        ...scoreEvents,
+        ...(triageSuggestion.override
+          ? [
+              {
+                id: `evt-${patientId}-triage-override`,
+                patientId,
+                type: 'Triage',
+                timestamp: now,
+                summary: `Priority override applied: ${selectedPriority} selected instead of ${autoSuggestion.suggestedPriority}.`,
+                metadata: {
+                  suggestedPriority: autoSuggestion.suggestedPriority,
+                  selectedPriority,
+                  ruleTriggered: autoSuggestion.ruleTriggered,
+                  override: true,
+                },
+              },
+            ]
+          : []),
       ],
-      notes: scoreNotes,
+      notes: [],
     };
 
     addPatient(patient);
     setQueueFilter(null);
-    selectPatient(patientId);
-    resetAndClose();
-  };
-
-  const pendingPatientForTools = () => ({
-    mrn,
-    firstName: identity.firstName,
-    lastName: identity.lastName,
-    age: age ?? null,
-    sex: identity.sex,
-    complaintCategory,
-    chiefComplaint: complaintText,
-    vitals: normalizeVitals(vitalsSkipped ? INITIAL_VITALS : vitals, new Date().toISOString()),
-  });
-
-  const openComplaintTools = (toolId = '') => {
-    const params = new URLSearchParams();
-    if (complaintCategory) params.set('complaint', complaintCategory);
-    if (toolId) params.set('tool', toolId);
-    window.dispatchEvent(
-      new CustomEvent('ed:open-clinical-tools', {
-        detail: {
-          search: params.toString(),
-          pendingPatient: pendingPatientForTools(),
-        },
-      })
-    );
+    setWhiteboardSearchQuery('');
+    onPatientAdded?.(patientId);
+    resetDraft();
     onClose?.();
   };
 
@@ -398,324 +299,201 @@ export default function NewPatientIntake({ open, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="new-patient-title"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          requestClose();
+        }
+      }}
     >
-      <div className="new-patient-intake__panel">
+      <form
+        className="new-patient-intake__panel"
+        onSubmit={(event) => {
+          event.preventDefault();
+          addToDepartment();
+        }}
+      >
         <header className="new-patient-intake__header">
           <div>
-            <span>Manual intake</span>
-            <h2 id="new-patient-title">New Patient</h2>
+            <span>Quick intake</span>
+            <h2 id="new-patient-title">Add walk-in to Triage</h2>
           </div>
-          <button type="button" onClick={resetAndClose} aria-label="Close new patient intake">
+          <button type="button" onClick={requestClose} aria-label="Close quick intake">
             <X size={18} aria-hidden />
           </button>
         </header>
 
-        <nav className="new-patient-intake__steps" aria-label="New patient intake steps">
-          {STEPS.map((label, index) => (
-            <button
-              key={label}
-              type="button"
-              className={[
-                'new-patient-intake__step',
-                step === index ? 'new-patient-intake__step--active' : '',
-                step > index ? 'new-patient-intake__step--complete' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onClick={() => setStep(index)}
-            >
-              <span>{index + 1}</span>
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        <section className="new-patient-intake__content">
-          {step === 0 ? (
-            <section className="new-patient-intake__section">
-              <h3>Identity</h3>
-              <div className="new-patient-intake__grid">
-                <label>
-                  First name
-                  <input
-                    value={identity.firstName}
-                    onChange={(event) =>
-                      setIdentity((current) => ({ ...current, firstName: event.target.value }))
-                    }
-                  />
-                </label>
-                <label>
-                  Last name
-                  <input
-                    value={identity.lastName}
-                    onChange={(event) =>
-                      setIdentity((current) => ({ ...current, lastName: event.target.value }))
-                    }
-                  />
-                </label>
-                <label>
-                  DOB
-                  <input
-                    type="date"
-                    value={identity.dob}
-                    onChange={(event) =>
-                      setIdentity((current) => ({ ...current, dob: event.target.value }))
-                    }
-                  />
-                </label>
-                <label>
-                  Sex
-                  <select
-                    value={identity.sex}
-                    onChange={(event) =>
-                      setIdentity((current) => ({ ...current, sex: event.target.value }))
-                    }
-                  >
-                    {SEX_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <div className="new-patient-intake__identity-summary">
-                <span>
-                  Age <strong>{age ?? '--'}</strong>
-                </span>
-                <span>
-                  MRN <strong>{mrn}</strong>
-                </span>
-              </div>
-            </section>
-          ) : null}
-
-          {step === 1 ? (
-            <section className="new-patient-intake__section">
-              <h3>Chief Complaint</h3>
-              <div className="new-patient-intake__complaints">
-                {COMPLAINT_CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className={
-                      complaintCategory === category ? 'new-patient-intake__complaint--active' : ''
-                    }
-                    onClick={() => setComplaintCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="new-patient-intake__clinical-tools"
-                onClick={() => openComplaintTools()}
-              >
-                Open Clinical Tools for {complaintCategory}
-              </button>
-              {complaintCategory ? (
-                <div className="new-patient-intake__tool-banner">
-                  <span>
-                    {aiIntakeLoading ? 'AI reviewing intake...' : `Suggested tools for ${complaintCategory}:`}
-                  </span>
-                  <div>
-                    {aiIntakeChips.map((label) => (
-                      <button key={`ai-${label}`} type="button" onClick={() => openComplaintTools(label)}>
-                        {label}
-                      </button>
-                    ))}
-                    {suggestedTools.map((tool) => (
-                      <button key={tool.id} type="button" onClick={() => openComplaintTools(tool.id)}>
-                        {tool.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              <ProtocolSuggestion
-                complaintCategory={complaintCategory}
-                patient={draftPatient}
-                onLaunch={(suggestion) =>
-                  setLaunchedProtocols((current) =>
-                    current.some((item) => item.id === suggestion.id)
-                      ? current
-                      : [...current, suggestion]
-                  )
-                }
-                onSaveScore={(score) =>
-                  setSavedScores((current) => [
-                    ...current.filter((item) => item.calculatorId !== score.calculatorId),
-                    score,
-                  ])
-                }
+        <div className="new-patient-intake__content">
+          <section className="new-patient-intake__complaint-column" aria-labelledby="complaint-heading">
+            <div className="new-patient-intake__section-heading">
+              <h3 id="complaint-heading">Complaint</h3>
+              <span>Touch category, then type</span>
+            </div>
+            <div className="new-patient-intake__complaints" aria-label="Complaint categories">
+              {COMPLAINT_CATEGORIES.map((category) => (
+                <button
+                  key={category.value}
+                  type="button"
+                  tabIndex={-1}
+                  className={
+                    complaintCategory === category.value ? 'new-patient-intake__complaint--active' : ''
+                  }
+                  aria-pressed={complaintCategory === category.value}
+                  onClick={() => handleCategoryClick(category.value)}
+                >
+                  <span aria-hidden>{category.icon}</span>
+                  <strong>{category.label}</strong>
+                </button>
+              ))}
+            </div>
+            <label className="new-patient-intake__complaint-field">
+              Free-text complaint <small>Required</small>
+              <input
+                ref={complaintRef}
+                value={complaintText}
+                placeholder="e.g. chest pressure, cough, ankle injury..."
+                autoComplete="off"
+                onChange={(event) => setComplaintText(event.target.value)}
+                aria-invalid={submitAttempted && !complaintEntered}
               />
-              <label className="new-patient-intake__wide-field">
-                Specific complaint description
-                <textarea
-                  value={complaintText}
-                  placeholder="Briefly describe onset, symptoms, mechanism, or presenting concern..."
-                  onChange={(event) => setComplaintText(event.target.value)}
+            </label>
+          </section>
+
+          <section className="new-patient-intake__identity-column" aria-labelledby="identity-heading">
+            <div className="new-patient-intake__section-heading">
+              <h3 id="identity-heading">Identity</h3>
+              <span>MRN auto-generated</span>
+            </div>
+            <div className="new-patient-intake__name-row">
+              <label>
+                First name <small>Required name</small>
+                <input
+                  value={identity.firstName}
+                  autoComplete="given-name"
+                  onChange={(event) =>
+                    setIdentity((current) => ({ ...current, firstName: event.target.value }))
+                  }
+                  aria-invalid={submitAttempted && !nameEntered}
                 />
               </label>
-            </section>
-          ) : null}
-
-          {step === 2 ? (
-            <section className="new-patient-intake__section">
-              <h3>Vitals</h3>
-              <div className="new-patient-intake__vitals">
-                {Object.entries(vitals).map(([field, value]) => {
-                  const tone = vitalTone(field, value);
+              <label>
+                Last name
+                <input
+                  value={identity.lastName}
+                  autoComplete="family-name"
+                  onChange={(event) =>
+                    setIdentity((current) => ({ ...current, lastName: event.target.value }))
+                  }
+                  aria-invalid={submitAttempted && !nameEntered}
+                />
+              </label>
+            </div>
+            <label className="new-patient-intake__dob-field">
+              DOB <small>{age === null ? 'Age --' : `Age ${age}`}</small>
+              <input
+                type="date"
+                value={identity.dob}
+                onChange={(event) =>
+                  setIdentity((current) => ({ ...current, dob: event.target.value }))
+                }
+              />
+            </label>
+            <div className="new-patient-intake__sex-group" role="group" aria-label="Sex">
+              <span>Sex</span>
+              <div>
+                {SEX_OPTIONS.map((option, index) => {
+                  const selected = identity.sex === option.value;
+                  const tabbable = selected || (!identity.sex && index === 0);
                   return (
-                    <label
-                      key={field}
-                      className={`new-patient-intake__vital new-patient-intake__vital--${tone}`}
+                    <button
+                      key={option.value}
+                      type="button"
+                      data-sex-option={option.value}
+                      tabIndex={tabbable ? 0 : -1}
+                      aria-pressed={selected}
+                      className={selected ? 'new-patient-intake__sex--active' : ''}
+                      onClick={() => setIdentity((current) => ({ ...current, sex: option.value }))}
+                      onKeyDown={(event) => handleSexKeyDown(event, index)}
                     >
-                      {fieldLabel(field)}
-                      <input
-                        value={value}
-                        inputMode="decimal"
-                        disabled={vitalsSkipped}
-                        onChange={(event) => {
-                          setVitalsSkipped(false);
-                          setVitals((current) => ({ ...current, [field]: event.target.value }));
-                        }}
-                      />
-                      <small>{tone === 'empty' ? 'Not entered' : tone}</small>
-                    </label>
+                      {option.label}
+                    </button>
                   );
                 })}
               </div>
-              <button
-                type="button"
-                className="new-patient-intake__skip"
-                onClick={() => {
-                  setVitalsSkipped(true);
-                  setVitals(INITIAL_VITALS);
-                  setStep(3);
-                }}
-              >
-                Skip vitals, not yet taken
-              </button>
-            </section>
-          ) : null}
+            </div>
+            <div className="new-patient-intake__mrn" aria-label={`MRN ${mrn}`}>
+              <span>MRN</span>
+              <strong>{mrn}</strong>
+              <small>Not editable</small>
+            </div>
+          </section>
+        </div>
 
-          {step === 3 ? (
-            <section className="new-patient-intake__section">
-              <h3>Triage Priority</h3>
-              <div className="new-patient-intake__priority-suggestion">
-                <span>Suggested priority</span>
-                <strong>{CTAS_LABELS[suggestedPriority]}</strong>
-                <small>Based on complaint category and entered vitals.</small>
-              </div>
-              <div className="new-patient-intake__priority-options">
+        <section className="new-patient-intake__vitals-strip" aria-label="Optional vitals">
+          <div className="new-patient-intake__vitals-heading">
+            <span>Vitals</span>
+            <small>Optional</small>
+          </div>
+          {Object.entries(vitals).map(([field, value]) => {
+            const tone = vitalTone(field, value);
+            return (
+              <label key={field} className={`new-patient-intake__vital new-patient-intake__vital--${tone}`}>
+                {fieldLabel(field)}
+                <input
+                  value={value}
+                  inputMode="decimal"
+                  placeholder="Optional"
+                  onChange={(event) =>
+                    setVitals((current) => ({ ...current, [field]: event.target.value }))
+                  }
+                />
+              </label>
+            );
+          })}
+        </section>
+
+        <footer className="new-patient-intake__footer">
+          <div className="new-patient-intake__priority-panel">
+            <button
+              type="button"
+              tabIndex={-1}
+              className={`new-patient-intake__ctas new-patient-intake__ctas--${selectedPriority.toLowerCase()}`}
+              aria-expanded={priorityPickerOpen}
+              onClick={() => setPriorityPickerOpen((current) => !current)}
+            >
+              <span>{triageSuggestion.override ? 'Staff override CTAS' : 'Auto-suggested CTAS'}</span>
+              <strong>{CTAS_LABELS[selectedPriority]}</strong>
+              <small>{triageSuggestion.reason}</small>
+            </button>
+            {priorityPickerOpen ? (
+              <div className="new-patient-intake__priority-options" aria-label="Override CTAS priority">
                 {Object.values(Priority).map((priority) => (
                   <button
                     key={priority}
                     type="button"
-                    className={
-                      selectedPriority === priority ? 'new-patient-intake__priority--active' : ''
-                    }
-                    onClick={() => setPriorityOverride(priority)}
+                    className={[
+                      priority === autoSuggestion.suggestedPriority
+                        ? 'new-patient-intake__priority--suggested'
+                        : '',
+                      priority === selectedPriority ? 'new-patient-intake__priority--selected' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => handlePrioritySelect(priority)}
                   >
                     <strong>{priority}</strong>
                     <span>{CTAS_LABELS[priority]}</span>
                   </button>
                 ))}
               </div>
-              {priorityOverride ? (
-                <button
-                  type="button"
-                  className="new-patient-intake__clear-override"
-                  onClick={() => setPriorityOverride('')}
-                >
-                  Use suggested priority instead
-                </button>
-              ) : null}
-            </section>
-          ) : null}
-
-          {step === 4 ? (
-            <section className="new-patient-intake__section">
-              <h3>Confirm & Add</h3>
-              <div className="new-patient-intake__summary">
-                <div>
-                  <span>Patient</span>
-                  <strong>
-                    {identity.firstName} {identity.lastName}
-                  </strong>
-                  <small>
-                    {age ?? '--'} / {identity.sex} · {mrn}
-                  </small>
-                </div>
-                <div>
-                  <span>Complaint</span>
-                  <strong>{complaintCategory}</strong>
-                  <small>{complaintText}</small>
-                </div>
-                <div>
-                  <span>Vitals</span>
-                  <strong>{vitalsSkipped ? 'Skipped' : 'Entered'}</strong>
-                  <small>
-                    HR {vitals.hr || '--'} · BP {vitals.bpSystolic || '--'}/
-                    {vitals.bpDiastolic || '--'} · SpO2 {vitals.spo2 || '--'}
-                  </small>
-                </div>
-                <div>
-                  <span>Priority</span>
-                  <strong>{CTAS_LABELS[selectedPriority]}</strong>
-                  <small>Patient will appear in Triage.</small>
-                </div>
-                <div>
-                  <span>Launched Protocols</span>
-                  <strong>{launchedProtocols.length || 'None'}</strong>
-                  <small>
-                    {launchedProtocols.length
-                      ? launchedProtocols.map((protocol) => protocol.label).join(', ')
-                      : 'No complaint protocol launched yet.'}
-                  </small>
-                </div>
-                <div>
-                  <span>Saved Scores</span>
-                  <strong>{savedScores.length || 'None'}</strong>
-                  <small>
-                    {savedScores.length
-                      ? savedScores.map((score) => `${score.label} ${score.total}`).join(', ')
-                      : 'No score saved yet.'}
-                  </small>
-                </div>
-              </div>
-              <button type="button" className="new-patient-intake__add" onClick={addToDepartment}>
-                <CheckCircle2 size={18} aria-hidden />
-                Add to Department
-              </button>
-            </section>
-          ) : null}
-        </section>
-
-        <footer className="new-patient-intake__footer">
-          <button
-            type="button"
-            onClick={() => setStep((current) => Math.max(0, current - 1))}
-            disabled={step === 0}
-          >
-            <ChevronLeft size={16} aria-hidden />
-            Back
+            ) : null}
+          </div>
+          <button type="submit" className="new-patient-intake__add" disabled={!canSubmit}>
+            <CheckCircle2 size={20} aria-hidden />
+            Add to Department
           </button>
-          {step < STEPS.length - 1 ? (
-            <button
-              type="button"
-              className="new-patient-intake__next"
-              onClick={() => setStep((current) => Math.min(STEPS.length - 1, current + 1))}
-              disabled={!canAdvance}
-            >
-              Next
-              <ChevronRight size={16} aria-hidden />
-            </button>
-          ) : null}
         </footer>
-      </div>
+      </form>
     </div>
   );
 

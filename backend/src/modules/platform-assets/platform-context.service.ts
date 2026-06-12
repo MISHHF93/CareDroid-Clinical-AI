@@ -3,10 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from '../product-catalog/entities/product.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
+import { UserWorkspaceState } from '../workspaces/entities/user-workspace-state.entity';
+import {
+  WorkspaceMembership,
+  WorkspaceMembershipStatus,
+} from '../workspaces/entities/workspace-membership.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
 import { PlatformAssetsService } from './platform-assets.service';
-import { WorkspacesService } from '../workspaces/workspaces.service';
 import { User } from '../users/entities/user.entity';
 import { EntitlementService } from './entitlement.service';
 import { normalizeLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
@@ -16,13 +20,16 @@ export class PlatformContextService {
   constructor(
     private readonly platformAssetsService: PlatformAssetsService,
     private readonly entitlementService: EntitlementService,
-    private readonly workspacesService: WorkspacesService,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
     @InjectRepository(OrganizationMembership)
-    private readonly membershipRepository: Repository<OrganizationMembership>,
+    private readonly organizationMembershipRepository: Repository<OrganizationMembership>,
+    @InjectRepository(WorkspaceMembership)
+    private readonly workspaceMembershipRepository: Repository<WorkspaceMembership>,
+    @InjectRepository(UserWorkspaceState)
+    private readonly workspaceStateRepository: Repository<UserWorkspaceState>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
@@ -36,12 +43,12 @@ export class PlatformContextService {
       organization = await this.organizationRepository.findOne({
         where: { id: profile.organizationId },
       });
-      membership = await this.membershipRepository.findOne({
+      membership = await this.organizationMembershipRepository.findOne({
         where: { organizationId: profile.organizationId, userId: user.id },
       });
     }
 
-    const workspaceState = await this.workspacesService.listForUser(user);
+    const workspaceState = await this.listWorkspaceStateForUser(user);
     const activeWorkspace = workspaceState.workspaces.find(
       (w: { id: string }) => w.id === workspaceState.activeWorkspaceId,
     );
@@ -148,6 +155,64 @@ export class PlatformContextService {
       workspace: workspaceState,
       legacyToolAliases: enabledToolIds,
       strictSaasEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+    };
+  }
+
+  private async listWorkspaceStateForUser(user: User) {
+    const memberships = await this.workspaceMembershipRepository.find({
+      where: { userId: user.id, status: WorkspaceMembershipStatus.ACTIVE },
+      relations: ['workspace'],
+      order: { createdAt: 'ASC' },
+    });
+    const state = await this.workspaceStateRepository.findOne({ where: { userId: user.id } });
+    const activeMembership =
+      memberships.find((workspaceMembership) => workspaceMembership.workspaceId === state?.activeWorkspaceId) ||
+      memberships[0];
+
+    return {
+      workspaces: memberships
+        .map((workspaceMembership) => workspaceMembership.workspace)
+        .filter(Boolean)
+        .map((workspace) => {
+          const settings = workspace.settings || {};
+          return {
+            id: workspace.id,
+            type: workspace.type,
+            name: workspace.name,
+            slug: workspace.slug,
+            organizationId: workspace.organizationId,
+            parentWorkspaceId: workspace.parentWorkspaceId,
+            branding: workspace.branding || { displayName: workspace.name },
+            settings,
+            workspaceProfile: settings.workspaceProfile,
+            defaultDashboardWidgets: settings.workspaceProfile?.defaultDashboardWidgets || [],
+            defaultFilters: settings.workspaceProfile?.defaultFilters || {},
+            restrictedAssets: settings.workspaceProfile?.restrictedAssets || [],
+            createdAt: workspace.createdAt,
+            updatedAt: workspace.updatedAt,
+          };
+        }),
+      memberships: memberships.map((workspaceMembership) => ({
+        id: workspaceMembership.id,
+        workspaceId: workspaceMembership.workspaceId,
+        userId: workspaceMembership.userId,
+        role: workspaceMembership.role,
+        permissions: workspaceMembership.permissions || [],
+        teams: workspaceMembership.teams || [],
+        department: workspaceMembership.department,
+        status: workspaceMembership.status,
+        joinedAt: workspaceMembership.joinedAt,
+        lastAccessedAt: workspaceMembership.lastAccessedAt,
+      })),
+      activeWorkspaceId: activeMembership?.workspaceId || null,
+      recentWorkspaceIds: state?.recentWorkspaceIds || [],
+      effectivePermissions: activeMembership?.permissions || [],
+      linkedTeams:
+        activeMembership?.teams?.map((team) => ({
+          teamId: team,
+          name: team,
+          role: activeMembership.role,
+        })) || [],
     };
   }
 }

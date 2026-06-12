@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   AlertTriangle,
+  Activity,
+  Baby,
   BarChart3,
   Bell,
   Bot,
@@ -20,8 +22,11 @@ import {
 } from 'lucide-react';
 import ChatInterface from '../components/ChatInterface';
 import CommandPalette from '../components/CommandPalette';
+import EMSCriticalBroadcast, { EMSCriticalCountdownBadge } from '../components/EMSCriticalBroadcast';
 import { calculateEMSPressureScore, isEMSPressureElevated } from '../components/EMSPressureScore';
+import PediatricDrugCalculator from '../components/PediatricDrugCalculator';
 import ReassessmentDrawer from '../components/ReassessmentDrawer';
+import WorkloadBalancePanel from '../components/WorkloadBalancePanel';
 import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
 import {
@@ -42,6 +47,7 @@ import {
   SIMULATION_STATUS_EVENT,
 } from '../../engine/simulation';
 import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staffManagement';
+import { pendingReminderCountForStaff } from '../utils/reassessmentScheduler';
 import { emergencyPermissionsForUser, emergencyRoleForUser } from '../utils/emergencyRolePermissions';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 import './AppShell.css';
@@ -51,7 +57,9 @@ const SIDEBAR_ICON_COMPONENTS = {
   capacity: Gauge,
   calculators: Stethoscope,
   ems: Truck,
+  intake: ClipboardList,
   operations: ClipboardList,
+  pulse: Activity,
   referrals: Share2,
   settings: Settings,
   shift: CalendarClock,
@@ -90,8 +98,10 @@ const SHORTCUT_GROUPS = [
       ['C', 'Toggle Copilot panel'],
       ['E', 'Go to EMS panel'],
       ['R', 'Open reassessment drawer'],
+      ['Shift + H', 'Open shift handoff brief'],
       ['Shift + S', 'Open shift summary'],
       ['Shift + C', 'Open capacity detail'],
+      ['Shift + P', 'Open pediatric drug calculator'],
       ['?', 'Open shortcut reference'],
     ],
   },
@@ -118,6 +128,7 @@ const SHORTCUT_GROUPS = [
 ];
 
 const SIDEBAR_NEW_FEATURES_KEY = 'caredroid.emergency.sidebarNewFeatures.v1';
+const CHARGE_NURSE_PULSE_DEFAULT_KEY = 'caredroid.ed.departmentPulse.chargeDefaultSeen';
 
 function readSessionFeatureSet() {
   if (typeof sessionStorage === 'undefined') return new Set();
@@ -144,7 +155,7 @@ function isEditableShortcutTarget(target) {
 
 function isNavItemActive(item, pathname) {
   return item.activePaths.some((activePath) => {
-    if (activePath === '/emergency' || activePath === '/workspace/emergency') {
+    if (activePath === '/emergency/whiteboard') {
       return pathname === activePath;
     }
 
@@ -672,7 +683,7 @@ function CapacityDetailPanel({ open, onClose }) {
   );
 }
 
-function StaffAvatar({ user, onClick, expanded }) {
+function StaffAvatar({ user, onClick, expanded, reminderCount = 0 }) {
   const initials = useMemo(() => {
     const name = user?.fullName || user?.name || user?.email || 'ED';
     return name
@@ -692,6 +703,7 @@ function StaffAvatar({ user, onClick, expanded }) {
       aria-label={user?.fullName || user?.name || 'Current staff member'}
     >
       {user?.avatarUrl ? <img src={user.avatarUrl} alt="" loading="lazy" /> : initials || 'ED'}
+      {reminderCount > 0 ? <span className="ed-staff-avatar__badge">{reminderCount}</span> : null}
     </button>
   );
 }
@@ -793,48 +805,6 @@ function ShiftControls({ activeShift, staff, clock, canManageShift, onStartShift
   );
 }
 
-function StaffManagementPanel({ open, workloads, rebalanceSuggestion }) {
-  if (!open) return null;
-
-  return (
-    <section className="ed-staff-panel" aria-label="On-shift staff">
-      <header>
-        <span>Staff Management</span>
-        <strong>{workloads.length} on shift</strong>
-      </header>
-
-      {rebalanceSuggestion ? (
-        <div className="ed-staff-panel__rebalance" role="status">
-          {rebalanceSuggestion.message}
-        </div>
-      ) : null}
-
-      <div className="ed-staff-panel__list">
-        {workloads.map((member) => (
-          <article key={member.id} className="ed-staff-panel__row">
-            {member.avatarUrl ? (
-              <img className="ed-staff-panel__avatar" src={member.avatarUrl} alt="" loading="lazy" />
-            ) : (
-              <span className="ed-staff-panel__avatar">{member.initials}</span>
-            )}
-            <div className="ed-staff-panel__identity">
-              <strong>{member.displayName}</strong>
-              <span className="ed-staff-panel__role-badge">{member.roleLabel}</span>
-            </div>
-            <strong className="ed-staff-panel__count">{member.assignedCount}</strong>
-            <div
-              className={`ed-staff-panel__bar ed-staff-panel__bar--${member.workloadTone}`}
-              aria-label={`${member.assignedCount} assigned patients`}
-            >
-              <span style={{ width: `${Math.max(8, member.workloadPercent)}%` }} />
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function alertToneClass(severity) {
   return String(severity || 'Info').toLowerCase();
 }
@@ -898,7 +868,7 @@ function AlertDrawer({ open, alerts, onClose, onDismiss, onAction }) {
   );
 }
 
-function AlertToastStack({ alerts, onDismiss, onAction }) {
+function AlertToastStack({ alerts, onDismiss, onAction, onSnoozeReminder }) {
   const [hiddenToastIds, setHiddenToastIds] = useState(() => new Set());
   const toastAlerts = useMemo(
     () => alerts.filter((alert) => !hiddenToastIds.has(alert.id)).slice(0, 3),
@@ -907,11 +877,11 @@ function AlertToastStack({ alerts, onDismiss, onAction }) {
 
   useEffect(() => {
     const timers = toastAlerts
-      .filter((alert) => alert.severity !== 'Critical')
+      .filter((alert) => alert.severity !== 'Critical' && alert.autoDismissAfter != null)
       .map((alert) =>
         window.setTimeout(() => {
           setHiddenToastIds((current) => new Set(current).add(alert.id));
-        }, (alert.autoDismissAfter || 5) * 1000)
+        }, alert.autoDismissAfter * 1000)
       );
 
     return () => timers.forEach((timer) => window.clearTimeout(timer));
@@ -933,19 +903,30 @@ function AlertToastStack({ alerts, onDismiss, onAction }) {
           <div>
             {alert.patientId ? (
               <button type="button" onClick={() => onAction(alert)}>
-                View Patient
+                {alert.actionType === 'REASSESSMENT_REMINDER' ? 'Go to Patient' : 'View Patient'}
+              </button>
+            ) : null}
+            {alert.actionType === 'REASSESSMENT_REMINDER' && alert.patientId && alert.reminderId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onSnoozeReminder(alert.patientId, alert.reminderId, 10);
+                  setHiddenToastIds((current) => new Set(current).add(alert.id));
+                }}
+              >
+                Snooze 10min
               </button>
             ) : null}
             <button
               type="button"
               onClick={() => {
-                if (alert.severity === 'Critical') {
+                if (alert.severity === 'Critical' || alert.actionType === 'REASSESSMENT_REMINDER') {
                   onDismiss(alert.id);
                   return;
                 }
                 setHiddenToastIds((current) => new Set(current).add(alert.id));
               }}
-              aria-label="Dismiss alert toast"
+              aria-label="Acknowledge alert toast"
             >
               <X size={14} aria-hidden />
             </button>
@@ -953,6 +934,62 @@ function AlertToastStack({ alerts, onDismiss, onAction }) {
         </article>
       ))}
     </div>
+  );
+}
+
+function CriticalVitalsBanner({ alert, audioEnabled, onDismiss, onAction }) {
+  const [canDismiss, setCanDismiss] = useState(false);
+
+  useEffect(() => {
+    setCanDismiss(false);
+    if (!alert) return undefined;
+    const timer = window.setTimeout(() => setCanDismiss(true), 5000);
+    return () => window.clearTimeout(timer);
+  }, [alert?.id]);
+
+  useEffect(() => {
+    if (!alert || !audioEnabled) return;
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.frequency.value = 880;
+      gain.gain.value = 0.08;
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      window.setTimeout(() => {
+        oscillator.stop();
+        context.close();
+      }, 420);
+    } catch (_error) {
+      // Audio can be blocked by browser autoplay policy; visual escalation still fires.
+    }
+  }, [alert, audioEnabled]);
+
+  if (!alert) return null;
+
+  return (
+    <section className="ed-critical-vitals-banner" role="alert" aria-live="assertive">
+      <div>
+        <AlertTriangle size={34} aria-hidden />
+        <div>
+          <strong>{alert.title}</strong>
+          <p>{alert.message}</p>
+          {!canDismiss ? <span>Action required - acknowledgement unlocks in 5 seconds.</span> : null}
+        </div>
+      </div>
+      <div className="ed-critical-vitals-banner__actions">
+        <button type="button" onClick={() => onAction(alert)}>
+          Go to Patient
+        </button>
+        <button type="button" disabled={!canDismiss} onClick={() => onDismiss(alert.id)}>
+          {canDismiss ? 'Acknowledge' : 'Locked'}
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -1022,14 +1059,16 @@ const AppShell = ({
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const loadBackendStaffProfile = useEmergencyStore((state) => state.loadBackendStaffProfile);
   const startShift = useEmergencyStore((state) => state.startShift);
-  const endShift = useEmergencyStore((state) => state.endShift);
+  const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const realtimeConnection = useEmergencyStore((state) => state.realtimeConnection);
   const startRealtime = useEmergencyStore((state) => state.startRealtime);
   const stopRealtime = useEmergencyStore((state) => state.stopRealtime);
   const capacity = useEmergencyStore((state) => state.capacity);
+  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const activeAlerts = useEmergencyStore(selectActiveAlerts);
   const updateAlerts = useEmergencyStore((state) => state.updateAlerts);
   const dismissAlert = useEmergencyStore((state) => state.dismissAlert);
+  const snoozeReassessmentReminder = useEmergencyStore((state) => state.snoozeReassessmentReminder);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
@@ -1054,6 +1093,8 @@ const AppShell = ({
   const [isCapacityDetailOpen, setIsCapacityDetailOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutReferenceOpen, setIsShortcutReferenceOpen] = useState(false);
+  const [pediatricDrugPatientId, setPediatricDrugPatientId] = useState(null);
+  const [isPediatricDrugCalculatorOpen, setIsPediatricDrugCalculatorOpen] = useState(false);
   const [sidebarMenu, setSidebarMenu] = useState(null);
   const longPressTimerRef = useRef(null);
   const suppressSidebarClickRef = useRef(false);
@@ -1063,6 +1104,15 @@ const AppShell = ({
     () => isEmergencySimulationAvailable() && isEmergencySimulationRunning()
   );
   const routeNotice = location.state?.edNotice;
+  const pediatricDrugPatient = useMemo(
+    () =>
+      pediatricDrugPatientId
+        ? patients.find((patient) => patient.id === pediatricDrugPatientId) || null
+        : selectedPatientId
+          ? patients.find((patient) => patient.id === selectedPatientId) || null
+          : null,
+    [patients, pediatricDrugPatientId, selectedPatientId]
+  );
   const sidebarItems = useMemo(
     () => buildSidebarItems(isFeatureEnabled),
     [featureFlags, featureOverrides, featureTier, isFeatureEnabled]
@@ -1133,6 +1183,10 @@ const AppShell = ({
   }, [updateAlerts]);
 
   const closeTopmostPanel = useCallback(() => {
+    if (isPediatricDrugCalculatorOpen) {
+      setIsPediatricDrugCalculatorOpen(false);
+      return true;
+    }
     if (isShortcutReferenceOpen) {
       setIsShortcutReferenceOpen(false);
       return true;
@@ -1168,12 +1222,23 @@ const AppShell = ({
     isAlertDrawerOpen,
     isCapacityDetailOpen,
     isCommandPaletteOpen,
+    isPediatricDrugCalculatorOpen,
     isReassessmentDrawerOpen,
     isShortcutReferenceOpen,
     isStaffPanelOpen,
     selectPatient,
     selectedPatientId,
   ]);
+
+  const openPediatricDrugCalculator = useCallback(
+    (patientId = null) => {
+      const targetPatientId = patientId || selectedPatientId || null;
+      setPediatricDrugPatientId(targetPatientId);
+      if (targetPatientId) selectPatient(targetPatientId);
+      setIsPediatricDrugCalculatorOpen(true);
+    },
+    [selectPatient, selectedPatientId]
+  );
 
   useEffect(() => {
     const handleGlobalShortcut = (event) => {
@@ -1204,7 +1269,12 @@ const AppShell = ({
       }
 
       if (event.shiftKey && key === 's') {
-        run(() => navigate('/emergency/shift'));
+        run(() => navigate('/emergency/analytics?view=shift'));
+        return;
+      }
+
+      if (event.shiftKey && key === 'h') {
+        run(() => navigate('/emergency/analytics?handoff=1'));
         return;
       }
 
@@ -1213,11 +1283,16 @@ const AppShell = ({
         return;
       }
 
+      if (event.shiftKey && key === 'p') {
+        run(() => openPediatricDrugCalculator());
+        return;
+      }
+
       if (event.shiftKey) return;
 
       if (key === 'n') {
         run(() => {
-          navigate('/emergency');
+          navigate('/emergency/intake');
           window.setTimeout(() => window.dispatchEvent(new CustomEvent('ed:open-intake')), 50);
         });
         return;
@@ -1234,13 +1309,16 @@ const AppShell = ({
       }
 
       if (key === 'r') {
-        run(() => setIsReassessmentDrawerOpen(true));
+        run(() => {
+          navigate('/emergency/reassessment');
+          setIsReassessmentDrawerOpen(true);
+        });
       }
     };
 
     window.addEventListener('keydown', handleGlobalShortcut);
     return () => window.removeEventListener('keydown', handleGlobalShortcut);
-  }, [closeTopmostPanel, navigate, toggleCopilot]);
+  }, [closeTopmostPanel, navigate, openPediatricDrugCalculator, toggleCopilot]);
 
   const handleAppendMessage = useCallback(
     (_conversationId, message) => {
@@ -1285,12 +1363,29 @@ const AppShell = ({
     }),
     [currentStaffProfile, emergencyRole, user]
   );
+  const currentStaffReminderCount = useMemo(
+    () => pendingReminderCountForStaff(patients, currentStaffProfile?.id),
+    [currentStaffProfile?.id, patients]
+  );
+  const isChargeNurseProfile = /charge\s*nurse|chargenurse/i.test(
+    String(currentStaffProfile?.role || currentStaffProfile?.roleLabel || user?.role || '')
+  );
+  useEffect(() => {
+    if (!isChargeNurseProfile || location.pathname !== '/emergency/whiteboard') return;
+    if (typeof sessionStorage !== 'undefined') {
+      if (sessionStorage.getItem(CHARGE_NURSE_PULSE_DEFAULT_KEY) === 'true') return;
+      sessionStorage.setItem(CHARGE_NURSE_PULSE_DEFAULT_KEY, 'true');
+    }
+    navigate('/emergency/analytics', { replace: true });
+  }, [isChargeNurseProfile, location.pathname, navigate]);
   const staffRebalanceSuggestion = useMemo(
     () => getStaffRebalanceSuggestion(staffWorkloads),
     [staffWorkloads]
   );
   const hasCriticalAlert = activeAlerts.some((alert) => alert.severity === 'Critical');
   const hasWarningAlert = activeAlerts.some((alert) => alert.severity === 'Warning');
+  const criticalVitalsAlert = activeAlerts.find((alert) => alert.actionType === 'VITALS_CRITICAL');
+  const vitalsAudioEnabled = Boolean(emergencySettings.alertRules?.VitalsAudio?.enabled);
   const handleAlertAction = useCallback(
     (alert) => {
       if (typeof alert.actionFn === 'function') {
@@ -1327,7 +1422,7 @@ const AppShell = ({
       }
 
       if (alert.actionType === 'OPEN_QUEUE') {
-        navigate('/emergency');
+        navigate('/emergency/queues');
         setIsAlertDrawerOpen(false);
       }
     },
@@ -1335,11 +1430,10 @@ const AppShell = ({
   );
 
   const handleEndShift = useCallback(
-    (endedAt) => {
-      endShift(endedAt);
-      navigate('/emergency/shift');
+    () => {
+      navigate('/emergency/analytics?handoff=1');
     },
-    [endShift, navigate]
+    [navigate]
   );
 
   const patientForCommand = useCallback(
@@ -1380,7 +1474,7 @@ const AppShell = ({
       if (!command?.type) return;
 
       if (command.type === 'OPEN_INTAKE') {
-        navigate('/emergency');
+        navigate('/emergency/intake');
         window.setTimeout(() => window.dispatchEvent(new CustomEvent('ed:open-intake')), 50);
       }
 
@@ -1396,7 +1490,7 @@ const AppShell = ({
         setQueueFilter(null);
         setWhiteboardSearchQuery(command.value || '');
         if (patient?.id) selectPatient(patient.id);
-        navigate('/emergency');
+        navigate('/emergency/patients');
       }
 
       if (command.type === 'OPEN_ROUTE') {
@@ -1416,6 +1510,16 @@ const AppShell = ({
       }
 
       if (command.type === 'OPEN_CALCULATOR') {
+        if (command.calculatorId === 'pediatric-dose-safety-checker') {
+          const patient = command.patientId
+            ? patientForCommand(command.patientId)
+            : selectedPatientId
+              ? patientForCommand(selectedPatientId)
+              : null;
+          openPediatricDrugCalculator(patient?.id || null);
+          setIsCommandPaletteOpen(false);
+          return;
+        }
         const patient = command.patientId
           ? patientForCommand(command.patientId)
           : selectedPatientId
@@ -1428,24 +1532,33 @@ const AppShell = ({
         navigate(`/emergency/tools${params.toString() ? `?${params.toString()}` : ''}`);
       }
 
+      if (command.type === 'OPEN_PEDIATRIC_DRUGS') {
+        const patient = command.patientId
+          ? patientForCommand(command.patientId)
+          : selectedPatientId
+            ? patientForCommand(selectedPatientId)
+            : null;
+        openPediatricDrugCalculator(patient?.id || null);
+      }
+
       if (command.type === 'OPEN_CAPACITY') {
         setIsCapacityDetailOpen(true);
       }
 
       if (command.type === 'OPEN_REASSESSMENT_QUEUE') {
-        navigate('/emergency');
+        navigate('/emergency/reassessment');
         setIsReassessmentDrawerOpen(true);
       }
 
       if (command.type === 'CLEAR_FILTERS') {
         setQueueFilter(null);
         setWhiteboardSearchQuery('');
-        navigate('/emergency');
+        navigate('/emergency/whiteboard');
       }
 
       if (command.type === 'VIEW_PATIENT') {
         if (command.patientId) selectPatient(command.patientId);
-        navigate('/emergency');
+        navigate('/emergency/patients');
       }
 
       setIsCommandPaletteOpen(false);
@@ -1453,6 +1566,7 @@ const AppShell = ({
     [
       navigate,
       findPatientByValue,
+      openPediatricDrugCalculator,
       patientForCommand,
       selectPatient,
       selectedPatientId,
@@ -1463,10 +1577,23 @@ const AppShell = ({
   );
 
   useEffect(() => {
+    const handlePediatricDrugLaunch = (event) => {
+      openPediatricDrugCalculator(event.detail?.patientId || event.detail?.target || null);
+    };
+    window.addEventListener('ed:open-pediatric-drug-calculator', handlePediatricDrugLaunch);
+    return () =>
+      window.removeEventListener('ed:open-pediatric-drug-calculator', handlePediatricDrugLaunch);
+  }, [openPediatricDrugCalculator]);
+
+  useEffect(() => {
     const handleCalculatorLaunch = (event) => {
       const calculatorId =
         event.detail?.calculatorId || event.detail?.toolId || event.detail?.value || '';
       if (!calculatorId) return;
+      if (calculatorId === 'pediatric-dose-safety-checker') {
+        openPediatricDrugCalculator(event.detail?.patientId || event.detail?.target || null);
+        return;
+      }
       const requestedPatientId = event.detail?.patientId || event.detail?.target || null;
       const patient = requestedPatientId
         ? patientForCommand(requestedPatientId)
@@ -1482,7 +1609,7 @@ const AppShell = ({
 
     window.addEventListener('ed:open-calculator', handleCalculatorLaunch);
     return () => window.removeEventListener('ed:open-calculator', handleCalculatorLaunch);
-  }, [navigate, patientForCommand, selectPatient, selectedPatientId]);
+  }, [navigate, openPediatricDrugCalculator, patientForCommand, selectPatient, selectedPatientId]);
 
   useEffect(() => {
     const handleClinicalToolsLaunch = (event) => {
@@ -1617,6 +1744,15 @@ const AppShell = ({
               </Link>
             );
           })}
+          <button
+            type="button"
+            className="ed-nav-rail__item ed-nav-rail__item--button"
+            aria-label="Pediatric drug calculator"
+            title="Pediatric drug calculator"
+            onClick={() => openPediatricDrugCalculator()}
+          >
+            <Baby size={21} strokeWidth={2.1} aria-hidden />
+          </button>
         </nav>
         {sidebarMenu ? (
           <div
@@ -1647,15 +1783,15 @@ const AppShell = ({
             <button
               type="button"
               className="ed-os-wordmark"
-              onClick={() => navigate('/emergency')}
+              onClick={() => navigate('/emergency/whiteboard')}
               aria-label="Go to Emergency Whiteboard"
             >
-              Emergency OS
+              CareDroid Emergency OS
             </button>
             <button
               type="button"
               className="ed-shift-clock"
-              onClick={() => navigate('/emergency/shift')}
+              onClick={() => navigate('/emergency/analytics?view=shift')}
               aria-label={`Open shift summary. Current time ${formatShiftClock(clock)}`}
             >
               <time dateTime={clock.toISOString()}>{formatShiftClock(clock)}</time>
@@ -1681,6 +1817,7 @@ const AppShell = ({
               expanded={isCapacityDetailOpen}
               onClick={() => setIsCapacityDetailOpen((open) => !open)}
             />
+            <EMSCriticalCountdownBadge />
           </div>
 
           <div className="ed-os-header__right">
@@ -1715,12 +1852,17 @@ const AppShell = ({
               <StaffAvatar
                 user={headerUser}
                 expanded={isStaffPanelOpen}
+                reminderCount={currentStaffReminderCount}
                 onClick={() => setIsStaffPanelOpen((open) => !open)}
               />
-              <StaffManagementPanel
+              <WorkloadBalancePanel
                 open={isStaffPanelOpen}
+                activeShift={activeShift}
                 workloads={staffWorkloads}
                 rebalanceSuggestion={staffRebalanceSuggestion}
+                currentStaffProfile={currentStaffProfile}
+                onAssignStaff={assignStaff}
+                onClose={() => setIsStaffPanelOpen(false)}
               />
             </div>
           </div>
@@ -1737,11 +1879,24 @@ const AppShell = ({
           alerts={activeAlerts}
           onDismiss={dismissAlert}
           onAction={handleAlertAction}
+          onSnoozeReminder={snoozeReassessmentReminder}
         />
+        <CriticalVitalsBanner
+          alert={criticalVitalsAlert}
+          audioEnabled={vitalsAudioEnabled}
+          onDismiss={dismissAlert}
+          onAction={handleAlertAction}
+        />
+        <EMSCriticalBroadcast />
         <CommandPalette
           open={isCommandPaletteOpen}
           onClose={() => setIsCommandPaletteOpen(false)}
           onExecute={executeCommand}
+        />
+        <PediatricDrugCalculator
+          open={isPediatricDrugCalculatorOpen}
+          patient={pediatricDrugPatient}
+          onClose={() => setIsPediatricDrugCalculatorOpen(false)}
         />
         <KeyboardShortcutReference
           open={isShortcutReferenceOpen}

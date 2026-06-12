@@ -12,6 +12,10 @@
   isolation: isolate;
 }
 
+.ed-whiteboard--crisis-mode {
+  grid-template-rows: 48px auto 64px minmax(0, 1fr);
+}
+
 .ed-whiteboard::before {
   position: absolute;
   inset: 0;
@@ -171,6 +175,10 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
 }
 
+.ed-whiteboard--crisis-mode .ed-whiteboard__live-banner {
+  inset-block-start: 148px;
+}
+
 .ed-whiteboard__filters::-webkit-scrollbar {
   display: none;
 }
@@ -221,6 +229,10 @@
   color: var(--color-background);
 }
 
+.ed-whiteboard__row--highlighted {
+  animation: ed-whiteboard-row-highlight 1.8s ease-out both;
+}
+
 .ed-whiteboard__view-toggle {
   display: inline-flex;
   flex: 0 0 auto;
@@ -230,6 +242,19 @@
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
   background: var(--color-elevated);
+}
+
+@keyframes ed-whiteboard-row-highlight {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+
+  18%,
+  70% {
+    background: color-mix(in srgb, var(--status-stable) 18%, var(--color-elevated));
+    box-shadow: inset 4px 0 0 var(--status-stable);
+  }
 }
 
 .ed-whiteboard__view-toggle button {
@@ -408,6 +433,24 @@
   text-transform: uppercase;
 }
 
+.ed-whiteboard__sort-button {
+  min-height: 26px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.ed-whiteboard__sort-button:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--status-info);
+  outline-offset: 2px;
+}
+
 .ed-whiteboard__list td {
   height: 42px;
   padding: var(--space-2);
@@ -432,6 +475,16 @@
   box-shadow: inset 3px 0 0 var(--status-info);
 }
 
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-warning td {
+  background: color-mix(in srgb, var(--status-warning) 8%, var(--color-surface));
+}
+
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-critical td,
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-lwbs td {
+  background: color-mix(in srgb, var(--status-critical) 10%, var(--color-surface));
+  box-shadow: inset 3px 0 0 var(--status-critical);
+}
+
 .ed-whiteboard__list td strong {
   display: block;
   color: var(--color-text-primary);
@@ -444,6 +497,24 @@
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
+}
+
+.ed-whiteboard__wait {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  font-weight: 850;
+}
+
+.ed-whiteboard__wait--warning {
+  color: var(--status-warning);
+  font-weight: 950;
+}
+
+.ed-whiteboard__wait--critical,
+.ed-whiteboard__wait--lwbs {
+  color: var(--status-critical);
+  font-weight: 1000;
 }
 
 .ed-whiteboard__priority {

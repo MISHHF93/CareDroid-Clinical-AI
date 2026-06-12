@@ -101,7 +101,7 @@ describe('deriveAlerts referral intelligence rules', () => {
     const alerts = deriveAlerts(
       {
         ...baseInputs,
-        referrals: [referral({ id: 'ref-unacknowledged' })],
+        referrals: [referral({ id: 'ref-unacknowledged', urgency: 'Urgent' })],
       },
       [],
       now
@@ -112,7 +112,7 @@ describe('deriveAlerts referral intelligence rules', () => {
         expect.objectContaining({
           id: 'alert-referral-unacknowledged-ref-unacknowledged',
           severity: 'Warning',
-          actionType: 'OPEN_REFERRALS',
+          actionType: 'VIEW_PATIENT',
         }),
       ])
     );
@@ -126,7 +126,7 @@ describe('deriveAlerts referral intelligence rules', () => {
           referral({
             id: 'ref-urgent',
             urgency: 'Urgent',
-            status: 'Acknowledged',
+            status: 'Sent',
             requestedAt: '2026-06-11T11:29:00.000Z',
           }),
           referral({
@@ -144,13 +144,67 @@ describe('deriveAlerts referral intelligence rules', () => {
     expect(alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: 'alert-referral-urgent-ref-urgent',
-          severity: 'Warning',
+          id: 'alert-referral-critical-unacknowledged-ref-urgent',
+          severity: 'Critical',
           title: 'Referral escalation required',
         }),
         expect.objectContaining({
-          id: 'alert-referral-emergent-ref-emergent',
+          id: 'alert-referral-emergent-pager-ref-emergent',
           severity: 'Critical',
+        }),
+      ])
+    );
+  });
+});
+
+describe('deriveAlerts reassessment reminder rules', () => {
+  it('creates persistent upcoming and overdue recheck alerts', () => {
+    const reminderPatient: Patient = {
+      ...patient,
+      id: 'pt-reminder',
+      reassessmentReminders: [
+        {
+          id: 'reminder-upcoming',
+          patientId: 'pt-reminder',
+          scheduledBy: 'staff-rn',
+          scheduledAt: '2026-06-11T11:20:00.000Z',
+          dueAt: '2026-06-11T12:01:30.000Z',
+          note: 'Recheck BP after metoprolol',
+          status: 'pending',
+        },
+        {
+          id: 'reminder-overdue',
+          patientId: 'pt-reminder',
+          scheduledBy: 'staff-rn',
+          scheduledAt: '2026-06-11T11:20:00.000Z',
+          dueAt: '2026-06-11T11:45:00.000Z',
+          status: 'pending',
+        },
+      ],
+    };
+
+    const alerts = deriveAlerts(
+      {
+        ...baseInputs,
+        patients: [reminderPatient],
+      },
+      [],
+      now
+    );
+
+    expect(alerts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'alert-reassessment-reminder-upcoming-reminder-upcoming',
+          severity: 'Warning',
+          autoDismissAfter: undefined,
+          actionType: 'REASSESSMENT_REMINDER',
+          reminderId: 'reminder-upcoming',
+        }),
+        expect.objectContaining({
+          id: 'alert-reassessment-reminder-overdue-reminder-overdue',
+          severity: 'Critical',
+          reminderId: 'reminder-overdue',
         }),
       ])
     );

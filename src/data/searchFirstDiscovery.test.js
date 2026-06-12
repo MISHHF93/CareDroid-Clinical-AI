@@ -5,6 +5,36 @@ import {
 } from './searchFirstDiscovery';
 
 describe('search-first discovery index', () => {
+  it('indexes every primary Emergency OS route as a searchable destination', () => {
+    const primaryEmergencyOsPaths = [
+      '/emergency/whiteboard',
+      '/emergency/patients',
+      '/emergency/ems',
+      '/emergency/intake',
+      '/emergency/queues',
+      '/emergency/reassessment',
+      '/emergency/capacity',
+      '/emergency/boarding',
+      '/emergency/referrals',
+      '/emergency/copilot',
+      '/emergency/analytics',
+      '/emergency/settings',
+    ];
+    const entries = buildSearchFirstDiscoveryEntries();
+    const emergencyOsPaths = new Set(
+      entries
+        .filter((entry) => entry.category === 'emergency-os')
+        .map((entry) => entry.path)
+    );
+
+    expect([...emergencyOsPaths].sort()).toEqual([...primaryEmergencyOsPaths].sort());
+    expect(buildSearchFirstResults({ query: 'boarding boarders' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'emergency-boarding', path: '/emergency/boarding' }),
+      ])
+    );
+  });
+
   it('indexes assets, workflows, simulations, protocols, AI, operations, commercial capabilities, and workspaces', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const kinds = new Set(entries.map((entry) => entry.kind));

@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 export enum AuditAction {
   LOGIN = 'login',
@@ -85,7 +84,7 @@ export class AuditLog {
   integrityVerified: boolean; // Flag to indicate if hash chain is valid
 
   // Relations
-  @ManyToOne(() => User, (user) => user.auditLogs, { onDelete: 'SET NULL' })
+  @ManyToOne('User', (user: any) => user.auditLogs, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 }

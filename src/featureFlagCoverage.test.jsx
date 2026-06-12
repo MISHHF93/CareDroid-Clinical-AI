@@ -18,10 +18,15 @@ describe('feature flag UI coverage', () => {
     expect(sidebarItems.map((item) => item.featureId)).toEqual(
       expect.arrayContaining([
         'emergency_whiteboard',
+        'emergency_patients',
+        'smart_intake',
+        'queue_intelligence',
+        'reassessment_engine',
         'referral_intelligence',
         'capacity_intelligence',
-        'clinical_calculator_hub',
-        'shift_summary',
+        'boarding_intelligence',
+        'ed_copilot',
+        'emergency_analytics',
         'emergency_settings',
       ])
     );
@@ -50,10 +55,9 @@ describe('feature flag UI coverage', () => {
     const appSource = readSource('App.jsx');
 
     expect(appSource).toContain('<FeatureRouteGuard feature="ems_pipeline">');
+    expect(appSource).toContain('<FeatureRouteGuard feature="queue_intelligence">');
     expect(appSource).toContain('<FeatureRouteGuard feature="referral_intelligence">');
     expect(appSource).toContain('<FeatureRouteGuard feature="capacity_intelligence">');
-    expect(appSource).toContain('<FeatureRouteGuard feature="clinical_calculator_hub">');
-    expect(appSource).toContain('<FeatureRouteGuard feature="shift_summary">');
   });
 
   it('guards patient detail backend sections and calculator cards', () => {
@@ -83,9 +87,14 @@ describe('feature flag UI coverage', () => {
 
   it('keeps requested feature ids registered for gated surfaces', () => {
     expect(FEATURE_REGISTRY_BY_ID.ems_pipeline.sidebarRoute).toBe('/emergency/ems');
+    expect(FEATURE_REGISTRY_BY_ID.smart_intake.sidebarRoute).toBe('/emergency/intake');
+    expect(FEATURE_REGISTRY_BY_ID.queue_intelligence.sidebarRoute).toBe('/emergency/queues');
+    expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');
     expect(FEATURE_REGISTRY_BY_ID.capacity_intelligence.sidebarRoute).toBe('/emergency/capacity');
-    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/tools');
+    expect(FEATURE_REGISTRY_BY_ID.boarding_intelligence.sidebarRoute).toBe('/emergency/boarding');
+    expect(FEATURE_REGISTRY_BY_ID.emergency_analytics.sidebarRoute).toBe('/emergency/analytics');
+    expect(FEATURE_REGISTRY_BY_ID.emergency_settings.sidebarRoute).toBe('/emergency/settings');
     expect(FEATURE_REGISTRY_BY_ID.vitals_history_chart).toBeTruthy();
     expect(FEATURE_REGISTRY_BY_ID.lab_results_panel).toBeTruthy();
     expect(FEATURE_REGISTRY_BY_ID.medication_history).toBeTruthy();

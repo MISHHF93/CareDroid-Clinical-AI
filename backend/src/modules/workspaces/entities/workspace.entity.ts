@@ -9,8 +9,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Organization } from './organization.entity';
-import { WorkspaceMembership } from './workspace-membership.entity';
 
 export enum WorkspaceType {
   PERSONAL = 'personal',
@@ -61,15 +59,15 @@ export class Workspace {
   @Column({ type: 'simple-json', nullable: true })
   settings: Record<string, any>;
 
-  @ManyToOne(() => Organization, (organization) => organization.workspaces, {
+  @ManyToOne('Organization', (organization: any) => organization.workspaces, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'organizationId' })
-  organization: Organization;
+  organization: any;
 
-  @OneToMany(() => WorkspaceMembership, (membership) => membership.workspace)
-  memberships: WorkspaceMembership[];
+  @OneToMany('WorkspaceMembership', (membership: any) => membership.workspace)
+  memberships: any[];
 
   @CreateDateColumn()
   createdAt: Date;

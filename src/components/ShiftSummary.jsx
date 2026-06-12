@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Copy, Download, Printer, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Copy, Download, Printer } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import { exportEmergencyShiftReport } from '../services/emergencyAnalyticsApi';
+import { recordEmergencyActivity, syncEmergencyAuditEvent } from '../services/emergencyStaffingApi';
+import { longWaitShiftMetrics } from '../utils/longWaitRescue';
 import './ShiftSummary.css';
 
 const QUEUE_BREACH_THRESHOLDS = {
@@ -25,6 +28,11 @@ const QUEUE_BREACH_THRESHOLDS = {
   HighRisk: 15,
   Boarding: 60,
 };
+const ACTIVE_PATIENT_STATES = new Set(
+  Object.values(PatientState).filter(
+    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
+  )
+);
 
 function toMs(value) {
   const ms = new Date(value).getTime();
@@ -54,6 +62,152 @@ function formatMinutes(minutes) {
 
 function formatHours(hours) {
   return `${Number(hours || 0).toFixed(1)}h`;
+}
+
+function patientName(patient) {
+  return patient?.name || `${patient.firstName} ${patient.lastName}`;
+}
+
+function roomLabel(patient) {
+  return patient.location || patient.roomId || 'No bed';
+}
+
+function flagLabel(flag) {
+  return typeof flag === 'string' ? flag : `${flag.type}${flag.reason ? `: ${flag.reason}` : ''}`;
+}
+
+function vitalsText(vitals = {}) {
+  return [
+    vitals.hr != null ? `HR ${vitals.hr}` : null,
+    vitals.bpSystolic != null ? `BP ${vitals.bpSystolic}/${vitals.bpDiastolic ?? '--'}` : null,
+    vitals.spo2 != null ? `SpO2 ${vitals.spo2}%` : null,
+    vitals.temp != null ? `Temp ${vitals.temp}C` : null,
+    vitals.rr != null ? `RR ${vitals.rr}` : null,
+    vitals.gcs != null ? `GCS ${vitals.gcs}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ') || 'No vitals recorded';
+}
+
+function backendArray(entry, key) {
+  const data = entry?.data;
+  if (!data) return [];
+  const direct = data[key];
+  if (Array.isArray(direct)) return direct;
+  if (Array.isArray(data.patient?.[key])) return data.patient[key];
+  if (Array.isArray(data.bundle?.[key])) return data.bundle[key];
+  return [];
+}
+
+function activeReminderText(reminder) {
+  const dueAt = reminder.dueAt
+    ? new Date(reminder.dueAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : 'time not set';
+  return `${dueAt}${reminder.note ? ` - ${reminder.note}` : ''}`;
+}
+
+function formatEmsArrival(arrival, now) {
+  const etaMinutes = minutesBetween(now.toISOString(), arrival.estimatedArrivalTime);
+  const etaText = etaMinutes === null ? 'ETA unknown' : `ETA ${etaMinutes}m`;
+  return `${arrival.unitName}: ${arrival.prearrivalComplaint || arrival.notes || 'EMS patient'} (${etaText})`;
+}
+
+function latestPhysicianPlan(notes = []) {
+  const physicianNote = [...notes]
+    .reverse()
+    .find((note) => /physician|provider|attending|plan/i.test(`${note.type} ${note.body}`));
+  return physicianNote?.body || notes.at(-1)?.body || 'No plan documented in recent notes.';
+}
+
+function recentNotes(patient, now = new Date()) {
+  const cutoff = now.getTime() - 4 * 60 * 60 * 1000;
+  return (patient.notes || []).filter((note) => {
+    const createdAt = new Date(note.createdAt).getTime();
+    return Number.isFinite(createdAt) && createdAt >= cutoff;
+  });
+}
+
+function buildHandoffContext({ patients, referrals, patientBackendDetails, emsArrivals, metrics }) {
+  const now = new Date();
+  const activePatients = patients.filter((patient) => ACTIVE_PATIENT_STATES.has(patient.state));
+  const activeReferrals = referrals.filter(
+    (referral) => !['Completed', 'Declined'].includes(referral.status)
+  );
+  const cards = activePatients.map((patient) => {
+    const notes = recentNotes(patient, now);
+    const backendEntry = patientBackendDetails[patient.id];
+    const orders = backendArray(backendEntry, 'orders').filter(
+      (order) => !/completed|cancelled|resulted/i.test(String(order.status || ''))
+    );
+    const labs = backendArray(backendEntry, 'labs');
+    const patientReferrals = activeReferrals.filter((referral) => referral.patientId === patient.id);
+    return {
+      patientId: patient.id,
+      name: patientName(patient),
+      bed: roomLabel(patient),
+      priority: patient.priority,
+      state: patient.state,
+      complaint: patient.chiefComplaint || patient.complaintCategory || 'Unspecified complaint',
+      history: patient.complaint || patient.chiefComplaint || 'No brief history documented.',
+      vitals: vitalsText(patient.vitals),
+      vitalsRecordedAt: patient.vitals?.recordedAt || patient.vitalsUpdatedAt,
+      flags: (patient.flags || []).map(flagLabel),
+      openOrders: orders.map((order) => order.name || order.type || order.id).filter(Boolean),
+      results: labs.slice(0, 4).map((lab) => lab.name || lab.test || lab.result || lab.id).filter(Boolean),
+      activeReferrals: patientReferrals.map(
+        (referral) => `${referral.targetDepartment} ${referral.status} - ${referral.reason}`
+      ),
+      reminders: (patient.reassessmentReminders || [])
+        .filter((reminder) => reminder.status !== 'completed')
+        .map(activeReminderText),
+      recentNotes: notes.map((note) => `${note.type}: ${note.body}`),
+      plan: latestPhysicianPlan(notes),
+      criticalEvents: (patient.timeline || [])
+        .filter((event) => {
+          const timestamp = new Date(event.timestamp).getTime();
+          return (
+            Number.isFinite(timestamp) &&
+            timestamp >= now.getTime() - 12 * 60 * 60 * 1000 &&
+            /ESCALATION|VitalsAlert|FlagAdded|ReassessmentReminder/i.test(event.type)
+          );
+        })
+        .map((event) => event.summary),
+    };
+  });
+
+  return {
+    generatedAt: now.toISOString(),
+    metrics,
+    activePatientCount: activePatients.length,
+    dischargedCount: metrics.stats.dischargeCount,
+    admittedCount: metrics.stats.admissionCount,
+    patients: cards,
+    pendingActions: cards.flatMap((card) => [
+      ...card.activeReferrals.map((item) => `Referral pending - ${item} - ${card.name}`),
+      ...card.openOrders.map((item) => `Order pending - ${item} - ${card.name}`),
+      ...card.reminders.map((item) => `Recheck reminder due ${item} - ${card.name}`),
+    ]),
+    ems: emsArrivals
+      .filter((arrival) => ['Inbound', 'Arrived', 'Handoff'].includes(arrival.status))
+      .map((arrival) => formatEmsArrival(arrival, now)),
+  };
+}
+
+function buildPlainTextHandoff(narrative, cards) {
+  const cardText = cards
+    .map(
+      (card) => [
+        `${card.name} | ${card.bed} | ${card.priority} | ${card.state}`,
+        `Complaint: ${card.complaint}`,
+        `Vitals: ${card.vitals}`,
+        `Flags: ${card.flags.join('; ') || 'None'}`,
+        `Orders/results: ${[...card.openOrders, ...card.results].join('; ') || 'None listed'}`,
+        `Plan: ${card.plan}`,
+        `Reminders/referrals: ${[...card.reminders, ...card.activeReferrals].join('; ') || 'None'}`,
+      ].join('\n')
+    )
+    .join('\n\n');
+  return `${narrative || 'AI narrative not generated yet.'}\n\nPER-PATIENT HANDOFF CARDS\n\n${cardText}`;
 }
 
 function latestEvent(patient, predicate) {
@@ -159,6 +313,7 @@ function buildShiftMetrics({ patients, queues, capacity, referrals, activeShift 
   const referralsSent = referrals.filter((referral) =>
     ['Sent', 'Acknowledged', 'Accepted', 'Declined', 'Completed'].includes(referral.status)
   ).length;
+  const longWaitQuality = longWaitShiftMetrics(shiftPatients, now);
 
   return {
     shiftStart,
@@ -203,16 +358,37 @@ function buildShiftMetrics({ patients, queues, capacity, referrals, activeShift 
           (event.metadata?.flagType === 'ReassessmentDue' || /ReassessmentDue/i.test(event.summary))
       ),
     },
+    quality: {
+      longestWaitMinutes: longWaitQuality.longestWaitMinutes,
+      waitTargetExceeded: longWaitQuality.exceededTargetCount,
+      nearLwbsEvents: longWaitQuality.nearLwbsCount,
+    },
   };
 }
 
-function buildHandoffPrompt(metrics) {
+function buildHandoffPrompt(handoffContext) {
   return [
-    'Generate a concise ED shift handoff brief for human review.',
-    'Use the shift data below. Include operational status, queue pressure, capacity events, clinical events, referrals, reassessments, and recommended watch items.',
+    'Generate a 400-500 word ED department handoff narrative for human review.',
+    'Use this exact structure:',
+    'Department handoff - [Date] [Time]',
+    'Shift summary: X patients active, Y discharged, Z admitted.',
+    '',
+    'HIGH PRIORITY:',
+    '[Patient summaries, 2 sentences max each]',
+    '',
+    'STABLE PATIENTS:',
+    '[Brief grouped summary]',
+    '',
+    'PENDING ACTIONS:',
+    '- [Referral/order/recheck/lab/action] - [Patient]',
+    '',
+    'EMS:',
+    '[Active inbound units or none]',
+    '',
+    'Include all active flags, pending orders, active referrals, reassessment reminders, and critical events from the shift.',
     'Do not make autonomous clinical decisions. Frame recommendations as suggestions.',
     '',
-    JSON.stringify(metrics, null, 2),
+    JSON.stringify(handoffContext, null, 2),
   ].join('\n');
 }
 
@@ -263,12 +439,16 @@ function CapacityEventList({ title, events }) {
 }
 
 export default function ShiftSummary() {
-  const { authToken } = useUser();
+  const location = useLocation();
+  const { authToken, user } = useUser();
   const patients = useEmergencyStore((state) => state.patients);
   const queues = useEmergencyStore((state) => state.queues);
   const capacity = useEmergencyStore((state) => state.capacity);
   const referrals = useEmergencyStore((state) => state.referrals);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const patientBackendDetails = useEmergencyStore((state) => state.patientBackendDetails);
   const activeShift = useEmergencyStore((state) => state.activeShift);
+  const endShift = useEmergencyStore((state) => state.endShift);
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const [handoffBrief, setHandoffBrief] = useState('');
@@ -276,10 +456,27 @@ export default function ShiftSummary() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
   const [copied, setCopied] = useState(false);
+  const [acceptedPatientIds, setAcceptedPatientIds] = useState(() => new Set());
+  const [saveStatus, setSaveStatus] = useState('');
+  const [handoffComplete, setHandoffComplete] = useState(false);
   const metrics = useMemo(
     () => buildShiftMetrics({ patients, queues, capacity, referrals, activeShift }),
     [activeShift, capacity, patients, queues, referrals]
   );
+  const handoffContext = useMemo(
+    () =>
+      buildHandoffContext({
+        patients,
+        referrals,
+        patientBackendDetails,
+        emsArrivals,
+        metrics,
+      }),
+    [emsArrivals, metrics, patientBackendDetails, patients, referrals]
+  );
+  const handoffCards = handoffContext.patients;
+  const allPatientsAccepted =
+    handoffCards.length > 0 && handoffCards.every((card) => acceptedPatientIds.has(card.patientId));
   const backendShift = emergencyAnalytics.data?.shift || {};
 
   useEffect(() => {
@@ -311,7 +508,7 @@ export default function ShiftSummary() {
 
     try {
       const response = await sendClinicalChatMessage({
-        message: `${buildHandoffPrompt(metrics)}\n\nWrite approximately 300 words.`,
+        message: buildHandoffPrompt(handoffContext),
         authToken,
         requestType: 'HANDOFF_BRIEF',
         workspaceContext: {
@@ -320,8 +517,8 @@ export default function ShiftSummary() {
           workspaceKey: 'emergency',
           aiRequest: {
             requestType: 'HANDOFF_BRIEF',
-            shiftSummary: {
-              ...metrics,
+            handoffBrief: {
+              ...handoffContext,
               backendAnalytics: emergencyAnalytics.data || null,
               analyticsSource: emergencyAnalytics.source,
             },
@@ -338,9 +535,82 @@ export default function ShiftSummary() {
   };
 
   const copyHandoff = async () => {
-    await navigator.clipboard?.writeText(handoffBrief);
+    await navigator.clipboard?.writeText(buildPlainTextHandoff(handoffBrief, handoffCards));
     setCopied(true);
   };
+
+  const saveShiftRecord = async () => {
+    setSaveStatus('Saving handoff to shift record...');
+    const plainText = buildPlainTextHandoff(handoffBrief, handoffCards);
+    const activity = await recordEmergencyActivity({
+      category: 'workspace',
+      label: 'Emergency shift handoff brief saved',
+      route: '/emergency/shift',
+      metadata: {
+        shiftId: activeShift.id,
+        requestType: 'HANDOFF_BRIEF',
+        acceptedPatientIds: [...acceptedPatientIds],
+        activePatientCount: handoffCards.length,
+        plainText,
+        backendPersistence: 'activity-log',
+      },
+    });
+    await syncEmergencyAuditEvent({
+      action: 'clinical_data_access',
+      resourceType: 'shift-handoff',
+      resourceId: activeShift.id,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        acceptedBy: user?.id || user?.email || 'oncoming-staff',
+        activePatientCount: handoffCards.length,
+      },
+    });
+    setSaveStatus(activity.ok ? 'Shift handoff saved.' : activity.message || 'Backend save unavailable.');
+  };
+
+  const toggleAccepted = (patientId, checked) => {
+    setAcceptedPatientIds((current) => {
+      const next = new Set(current);
+      if (checked) next.add(patientId);
+      else next.delete(patientId);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (!allPatientsAccepted || handoffComplete) return;
+    const timestamp = new Date().toISOString();
+    setHandoffComplete(true);
+    endShift(timestamp);
+    void recordEmergencyActivity({
+      category: 'workspace',
+      label: 'Emergency shift handoff completed',
+      route: '/emergency/shift',
+      metadata: {
+        shiftId: activeShift.id,
+        handoffCompletedAt: timestamp,
+        acceptedBy: user?.id || user?.email || 'oncoming-staff',
+        acceptedPatientIds: [...acceptedPatientIds],
+        backendPersistence: 'activity-log',
+      },
+    });
+    void syncEmergencyAuditEvent({
+      action: 'security_event',
+      resourceType: 'shift-handoff',
+      resourceId: activeShift.id,
+      timestamp,
+      metadata: {
+        acceptedBy: user?.id || user?.email || 'oncoming-staff',
+        status: 'complete',
+      },
+    });
+  }, [acceptedPatientIds, activeShift.id, allPatientsAccepted, endShift, handoffComplete, user]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('handoff') !== '1' || handoffBrief || isGenerating) return;
+    void generateHandoffBrief();
+  }, [location.search]);
 
   return (
     <section className="shift-summary" aria-label="Shift summary view">
@@ -402,6 +672,9 @@ export default function ShiftSummary() {
             value={backendShift.lwbsCount ?? metrics.stats.lwbsCount}
             helper={<TrendHelper trend={backendShift.comparison?.lwbsCount} />}
           />
+          <StatCard label="Longest wait this shift" value={formatMinutes(metrics.quality.longestWaitMinutes)} />
+          <StatCard label="Patients over wait target" value={metrics.quality.waitTargetExceeded} />
+          <StatCard label="Near-LWBS events" value={metrics.quality.nearLwbsEvents} />
         </div>
       </section>
 
@@ -475,32 +748,115 @@ export default function ShiftSummary() {
 
       {handoffError ? <p className="shift-summary__error">{handoffError}</p> : null}
 
-      {handoffBrief ? (
-        <div className="shift-summary__modal-backdrop" role="presentation">
-          <section className="shift-summary__modal" aria-label="Print-ready handoff brief">
-            <header>
-              <div>
-                <span>Generated Handoff</span>
-                <h2>Shift Handoff Brief</h2>
-              </div>
-              <button type="button" onClick={() => setHandoffBrief('')} aria-label="Close handoff brief">
-                <X size={17} aria-hidden />
-              </button>
-            </header>
-            <pre>{handoffBrief}</pre>
-            <footer>
-              <button type="button" onClick={copyHandoff}>
-                <Copy size={16} aria-hidden />
-                {copied ? 'Copied' : 'Copy to Clipboard'}
-              </button>
-              <button type="button" onClick={() => window.print()}>
-                <Printer size={16} aria-hidden />
-                Print
-              </button>
-            </footer>
-          </section>
+      <section className="shift-summary__section shift-handoff-brief" aria-label="Shift handoff brief">
+        <div className="shift-summary__section-heading">
+          <div>
+            <span>Structured handoff</span>
+            <h2>Shift Handoff Brief</h2>
+          </div>
+          <strong>{handoffCards.length} active patients</strong>
         </div>
-      ) : null}
+
+        <div className="shift-handoff-brief__actions">
+          <button
+            type="button"
+            onClick={generateHandoffBrief}
+            disabled={isGenerating}
+            aria-label="Regenerate shift handoff narrative"
+          >
+            {isGenerating ? 'Generating...' : 'Generate Handoff Brief'}
+          </button>
+          <button type="button" onClick={copyHandoff} disabled={!handoffBrief}>
+            <Copy size={16} aria-hidden />
+            {copied ? 'Copied' : 'Copy to Clipboard'}
+          </button>
+          <button type="button" onClick={() => window.print()}>
+            <Printer size={16} aria-hidden />
+            Print
+          </button>
+          <button type="button" onClick={saveShiftRecord} disabled={!handoffBrief}>
+            Save to shift record
+          </button>
+        </div>
+
+        {saveStatus ? <p className="shift-summary__inline-note">{saveStatus}</p> : null}
+        {handoffComplete ? (
+          <p className="shift-handoff-brief__complete" role="status">
+            Handoff complete. Previous nurse shift ended and audit trail recorded.
+          </p>
+        ) : null}
+
+        <article className="shift-handoff-brief__narrative">
+          <div className="shift-summary__section-heading">
+            <span>Format 1</span>
+            <strong>AI Narrative Brief</strong>
+          </div>
+          {handoffBrief ? (
+            <pre>{handoffBrief}</pre>
+          ) : (
+            <p>
+              Generate a 400-500 word department handoff narrative with high priority patients,
+              stable patient groups, pending actions, and EMS context.
+            </p>
+          )}
+        </article>
+
+        <div className="shift-handoff-brief__cards" aria-label="Per-patient handoff cards">
+          <div className="shift-summary__section-heading">
+            <span>Format 2</span>
+            <strong>Per-patient handoff cards</strong>
+          </div>
+          {handoffCards.map((card) => (
+            <details key={card.patientId} className="shift-handoff-card">
+              <summary>
+                <span>
+                  <strong>{card.name}</strong>
+                  <small>{card.bed}</small>
+                </span>
+                <span>{card.priority}</span>
+                <span>{card.state}</span>
+              </summary>
+              <div className="shift-handoff-card__body">
+                <p>
+                  <strong>Chief complaint/history:</strong> {card.complaint}. {card.history}
+                </p>
+                <p>
+                  <strong>Current vitals:</strong> {card.vitals}
+                </p>
+                <p>
+                  <strong>Active orders/results:</strong>{' '}
+                  {[...card.openOrders, ...card.results].join('; ') || 'None listed'}
+                </p>
+                <p>
+                  <strong>Plan/next steps:</strong> {card.plan}
+                </p>
+                <p>
+                  <strong>Flags/reminders:</strong>{' '}
+                  {[...card.flags, ...card.reminders].join('; ') || 'None'}
+                </p>
+                {card.activeReferrals.length ? (
+                  <p>
+                    <strong>Active referrals:</strong> {card.activeReferrals.join('; ')}
+                  </p>
+                ) : null}
+                {card.criticalEvents.length ? (
+                  <p>
+                    <strong>Critical events:</strong> {card.criticalEvents.join('; ')}
+                  </p>
+                ) : null}
+                <label className="shift-handoff-card__accepted">
+                  <input
+                    type="checkbox"
+                    checked={acceptedPatientIds.has(card.patientId)}
+                    onChange={(event) => toggleAccepted(card.patientId, event.target.checked)}
+                  />
+                  Handover accepted
+                </label>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
     </section>
   );
 }

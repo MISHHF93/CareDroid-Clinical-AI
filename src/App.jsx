@@ -30,7 +30,6 @@ import EmergencyWhiteboard from './components/EmergencyWhiteboard';
 import EMSPipeline from './components/EMSPipeline';
 import QueueIntelligencePanel from './components/QueueIntelligencePanel';
 import ReferralPanel from './components/ReferralPanel';
-import ShiftSummary from './components/ShiftSummary';
 import AppShell from './layout/AppShell';
 import { PatientState } from '../types/emergency';
 import { createDevAuthSession, isDevAuthBypassEnabled } from './auth/devAuthBypass';
@@ -304,10 +303,8 @@ const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'))
 const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
-const ClinicalCalculatorHub = lazyWithRetry(
-  () => import('./pages/emergency/ClinicalCalculatorHub')
-);
 const EmergencyAnalytics = lazyWithRetry(() => import('./pages/emergency/EmergencyAnalytics'));
+const SmartIntake = lazyWithRetry(() => import('./pages/emergency/SmartIntake'));
 const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
 const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
 const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
@@ -356,7 +353,7 @@ const PageLoader = () => (
   </div>
 );
 
-logger.info('App.jsx loaded - Medical AI Chat Application');
+logger.info('App.jsx loaded - CareDroid Emergency OS');
 
 function NotificationToasts() {
   const { notifications, removeNotification } = useNotifications();
@@ -395,10 +392,10 @@ export function WelcomePage() {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Platform access started with API support.'
-          : 'Platform access started with local UI data while backend APIs are unavailable.'
+          ? 'Emergency OS access started with API support.'
+          : 'Emergency OS access started with local UI data while backend APIs are unavailable.'
       );
-      navigate('/dashboard', { replace: true });
+      navigate('/emergency/whiteboard', { replace: true });
     } catch (err) {
       logger.error('Platform access failed from welcome page', { err });
       error('Platform access failed', 'Unable to start the platform access session.');
@@ -551,7 +548,7 @@ function LegacyOAuthCallbackRedirect() {
 
 /** Auth entry aliases are bypassed for the public platform build. */
 function AuthPathRedirect() {
-  return <Navigate to="/emergency" replace />;
+  return <Navigate to="/emergency/whiteboard" replace />;
 }
 
 /** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
@@ -566,24 +563,12 @@ function LegacyProtectedRouteRedirect({ to, state }) {
   );
 }
 
-function FutureReleaseStub({ label = 'This module' }) {
-  return (
-    <section className="ed-route-panel ed-route-panel--future" aria-labelledby="future-release-title">
-      <header className="ed-route-panel__header">
-        <span>Emergency OS</span>
-        <h1 id="future-release-title">{label}</h1>
-        <p>This module is available in a future release.</p>
-      </header>
-    </section>
-  );
-}
-
 const SETTINGS_TABS = Object.freeze([
-  { label: 'General', to: '/settings' },
-  { label: 'Features', to: '/settings/features' },
-  { label: 'Thresholds', to: '/settings#thresholds' },
-  { label: 'Staff', to: '/settings#staff' },
-  { label: 'Integrations', to: '/settings#integrations' },
+  { label: 'General', to: '/emergency/settings' },
+  { label: 'Features', to: '/emergency/settings#features' },
+  { label: 'Thresholds', to: '/emergency/settings#thresholds' },
+  { label: 'Staff', to: '/emergency/settings#staff' },
+  { label: 'Integrations', to: '/emergency/settings#integrations' },
 ]);
 
 function SettingsTabs({ active = 'General' }) {
@@ -637,7 +622,7 @@ function FeatureRouteGuard({ feature, children }) {
   const label = featureDefinition?.label || feature;
   return (
     <Navigate
-      to="/emergency"
+      to="/emergency/whiteboard"
       replace
       state={{
         edNotice: {
@@ -658,7 +643,7 @@ function EmergencyCopilotRedirect() {
 
   return (
     <LegacyProtectedRouteRedirect
-      to="/emergency"
+      to="/emergency/whiteboard"
       state={{
         edNotice: {
           title: 'ED Copilot is open in the right panel',
@@ -672,30 +657,33 @@ function EmergencyCopilotRedirect() {
 
 function WorkspaceRouteRedirect() {
   const { workspaceId, subpage } = useParams();
-  const workspaceLabel = workspaceId
-    ? `${workspaceId.charAt(0).toUpperCase()}${workspaceId.slice(1).replace(/-/g, ' ')} module`
-    : 'Emergency OS module';
 
   if (workspaceId === 'emergency') {
     const routeMap = {
-      whiteboard: '/emergency',
-      queues: '/emergency',
-      queue: '/emergency',
+      whiteboard: '/emergency/whiteboard',
+      patients: '/emergency/patients',
+      queues: '/emergency/queues',
+      queue: '/emergency/queues',
+      reassessment: '/emergency/reassessment',
       ems: '/emergency/ems',
       referrals: '/emergency/referrals',
       capacity: '/emergency/capacity',
-      boarding: '/emergency/capacity',
+      boarding: '/emergency/boarding',
       analytics: '/emergency/analytics',
+      pulse: '/emergency/pulse',
+      'department-pulse': '/emergency/pulse',
       'shift-summary': '/emergency/shift',
       shift: '/emergency/shift',
-      'command-center': '/emergency',
-      copilot: '/emergency',
+      intake: '/emergency/intake',
+      'smart-intake': '/emergency/intake',
+      'command-center': '/emergency/whiteboard',
+      copilot: '/emergency/copilot',
     };
 
-    return <LegacyProtectedRouteRedirect to={routeMap[subpage] || '/emergency'} />;
+    return <LegacyProtectedRouteRedirect to={routeMap[subpage] || '/emergency/whiteboard'} />;
   }
 
-  return <FutureReleaseStub label={workspaceLabel} />;
+  return <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />;
 }
 
 function EmergencyQueueRoute() {
@@ -865,38 +853,46 @@ function EmergencyCapacityRoute() {
 }
 
 const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
-  ['/auth', '/emergency'],
-  ['/dashboard', '/emergency'],
-  ['/home', '/emergency'],
-  ['/assistant', '/emergency'],
-  ['/chat', '/emergency'],
-  ['/ai', '/emergency'],
-  ['/copilot', '/emergency'],
-  ['/emergency/whiteboard', '/emergency'],
-  ['/emergency/patients', '/emergency'],
-  ['/emergency/queue', '/emergency'],
-  ['/emergency/queues', '/emergency'],
-  ['/emergency/analytics', '/emergency/capacity'],
-  ['/emergency/boarding', '/emergency/capacity'],
-  ['/emergency/command-center', '/emergency'],
-  ['/emergency/copilot', '/emergency'],
-  ['/emergency/settings', '/settings'],
-  ['/workspace', '/emergency'],
-  ['/workspace/emergency', '/emergency'],
-  ['/workspace/emergency/whiteboard', '/emergency'],
-  ['/workspace/emergency/patients', '/emergency'],
-  ['/workspace/emergency/queue', '/emergency'],
-  ['/workspace/emergency/queues', '/emergency'],
+  ['/auth', '/emergency/whiteboard'],
+  ['/dashboard', '/emergency/whiteboard'],
+  ['/home', '/emergency/whiteboard'],
+  ['/workspace', '/emergency/whiteboard'],
+  ['/app', '/emergency/whiteboard'],
+  ['/whiteboard', '/emergency/whiteboard'],
+  ['/ems', '/emergency/ems'],
+  ['/intake', '/emergency/intake'],
+  ['/queues', '/emergency/queues'],
+  ['/queue', '/emergency/queues'],
+  ['/reassessment', '/emergency/reassessment'],
+  ['/capacity', '/emergency/capacity'],
+  ['/boarding', '/emergency/boarding'],
+  ['/referrals', '/emergency/referrals'],
+  ['/analytics', '/emergency/analytics'],
+  ['/assistant', '/emergency/copilot'],
+  ['/chat', '/emergency/copilot'],
+  ['/ai', '/emergency/copilot'],
+  ['/copilot', '/emergency/copilot'],
+  ['/emergency/smart-intake', '/emergency/intake'],
+  ['/emergency/queue', '/emergency/queues'],
+  ['/emergency/command-center', '/emergency/whiteboard'],
+  ['/workspace/emergency/pulse', '/emergency/pulse'],
+  ['/workspace/emergency/charge-nurse', '/emergency/pulse'],
+  ['/workspace/emergency', '/emergency/whiteboard'],
+  ['/workspace/emergency/whiteboard', '/emergency/whiteboard'],
+  ['/workspace/emergency/intake', '/emergency/intake'],
+  ['/workspace/emergency/patients', '/emergency/patients'],
+  ['/workspace/emergency/queue', '/emergency/queues'],
+  ['/workspace/emergency/queues', '/emergency/queues'],
   ['/workspace/emergency/ems', '/emergency/ems'],
   ['/workspace/emergency/referrals', '/emergency/referrals'],
   ['/workspace/emergency/capacity', '/emergency/capacity'],
-  ['/workspace/emergency/boarding', '/emergency/capacity'],
+  ['/workspace/emergency/boarding', '/emergency/boarding'],
   ['/workspace/emergency/tools', '/emergency/tools'],
   ['/workspace/emergency/shift-summary', '/emergency/shift'],
   ['/workspace/emergency/shift', '/emergency/shift'],
-  ['/workspace/emergency/settings', '/settings'],
-  ['/workspace/emergency/copilot', '/emergency'],
-  ['/workspace/emergency/command-center', '/emergency'],
+  ['/workspace/emergency/settings', '/emergency/settings'],
+  ['/workspace/emergency/copilot', '/emergency/copilot'],
+  ['/workspace/emergency/command-center', '/emergency/whiteboard'],
   ['/tools', '/emergency/tools'],
   ['/tools/calculators', '/emergency/tools'],
   ['/tools/calculators/:slug', '/emergency/tools'],
@@ -904,12 +900,13 @@ const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
   ['/clinical-tools', '/emergency/tools'],
   ['/catalog', '/emergency/tools'],
   ['/calculators', '/emergency/tools'],
-  ['/patients', '/emergency'],
-  ['/patients/*', '/emergency'],
-  ['/settings/general', '/settings'],
-  ['/settings/thresholds', '/settings'],
-  ['/settings/staff', '/settings'],
-  ['/settings/integrations', '/settings'],
+  ['/patients', '/emergency/patients'],
+  ['/patients/*', '/emergency/patients'],
+  ['/settings', '/emergency/settings'],
+  ['/settings/general', '/emergency/settings'],
+  ['/settings/thresholds', '/emergency/settings'],
+  ['/settings/staff', '/emergency/settings'],
+  ['/settings/integrations', '/emergency/settings'],
 ]);
 
 const FUTURE_RELEASE_ROUTES = Object.freeze([
@@ -1079,7 +1076,7 @@ export function AppRoutes() {
     requireAllPermissions = false,
   }) => {
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/emergency" replace />;
+      return <Navigate to="/emergency/whiteboard" replace />;
     }
 
     let resolvedElement = element;
@@ -1089,7 +1086,7 @@ export function AppRoutes() {
         <PermissionGate
           permission={permission}
           requireAll={requireAllPermissions}
-          fallback={<Navigate to="/emergency/tools" replace />}
+          fallback={<Navigate to="/emergency/whiteboard" replace />}
         >
           {resolvedElement}
         </PermissionGate>
@@ -1106,7 +1103,7 @@ export function AppRoutes() {
   const routes = [
     {
       path: '/',
-      element: <Navigate to="/emergency" replace />,
+      element: <Navigate to="/emergency/whiteboard" replace />,
       publicOnly: true,
     },
     {
@@ -1124,6 +1121,16 @@ export function AppRoutes() {
     })),
     {
       path: '/emergency',
+      element: <Navigate to="/emergency/whiteboard" replace />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/whiteboard',
+      element: <EmergencyWhiteboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/patients',
       element: <EmergencyWhiteboard />,
       requiresAuth: true,
     },
@@ -1134,6 +1141,30 @@ export function AppRoutes() {
           <EMSPipeline />
         </FeatureRouteGuard>
       ),
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/pulse',
+      element: <LegacyProtectedRouteRedirect to="/emergency/analytics" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/intake',
+      element: <SmartIntake />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/queues',
+      element: (
+        <FeatureRouteGuard feature="queue_intelligence">
+          <EmergencyQueueRoute />
+        </FeatureRouteGuard>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/reassessment',
+      element: <EmergencyWhiteboard />,
       requiresAuth: true,
     },
     {
@@ -1155,31 +1186,47 @@ export function AppRoutes() {
       requiresAuth: true,
     },
     {
-      path: '/emergency/tools',
+      path: '/emergency/boarding',
       element: (
-        <FeatureRouteGuard feature="clinical_calculator_hub">
-          <ClinicalCalculatorHub />
+        <FeatureRouteGuard feature="capacity_intelligence">
+          <EmergencyCapacityRoute />
         </FeatureRouteGuard>
       ),
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/copilot',
+      element: <EmergencyCopilotRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/analytics',
+      element: <EmergencyAnalytics />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/tools',
+      element: <LegacyProtectedRouteRedirect to="/emergency/copilot" />,
       requiresAuth: true,
     },
     {
       path: '/emergency/shift',
-      element: (
-        <FeatureRouteGuard feature="shift_summary">
-          <ShiftSummary />
-        </FeatureRouteGuard>
-      ),
+      element: <LegacyProtectedRouteRedirect to="/emergency/analytics" />,
       requiresAuth: true,
     },
     {
-      path: '/settings',
+      path: '/emergency/settings',
       element: <SettingsRoute />,
       requiresAuth: true,
     },
     {
+      path: '/settings',
+      element: <LegacyProtectedRouteRedirect to="/emergency/settings" />,
+      requiresAuth: true,
+    },
+    {
       path: '/settings/features',
-      element: <SettingsFeaturesRoute />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/settings" />,
       requiresAuth: true,
     },
     ...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({
@@ -1197,14 +1244,14 @@ export function AppRoutes() {
       element: <WorkspaceRouteRedirect />,
       requiresAuth: true,
     },
-    ...FUTURE_RELEASE_ROUTES.map(([label, path]) => ({
+    ...FUTURE_RELEASE_ROUTES.map(([, path]) => ({
       path,
-      element: <FutureReleaseStub label={label} />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />,
       requiresAuth: true,
     })),
     {
       path: '*',
-      element: <Navigate to="/emergency" replace />,
+      element: <Navigate to="/emergency/whiteboard" replace />,
       requiresAuth: true,
     },
   ];

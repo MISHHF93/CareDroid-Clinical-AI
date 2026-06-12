@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ClinicalScoreCalculator from './ClinicalScoreCalculator';
+import { getAutoScorePrefill } from '../utils/autoScorePopulator';
 
 import './ClinicalScoreCalculator.css';
 
@@ -61,6 +62,44 @@ describe('ClinicalScoreCalculator Emergency OS modal', () => {
     expect(screen.getByText(/High risk for sepsis/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /RR ≥22: Yes/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /SBP ≤100: Yes/i })).toBeInTheDocument();
+  });
+
+  it('uses AutoScorePopulator values and focuses HEART fields requiring physician judgment', async () => {
+    const autoScorePrefill = getAutoScorePrefill(
+      {
+        ...patient,
+        age: 58,
+        complaintCategory: 'Chest Pain',
+        chiefComplaint: 'Chest pain',
+        notes: [{ body: 'Known diabetes, hypertension, and smoker.' }],
+      },
+      {
+        labs: [
+          {
+            name: 'Troponin I',
+            value: '42',
+            unit: 'ng/L',
+            referenceRange: '0-14',
+          },
+        ],
+      }
+    );
+
+    render(
+      <ClinicalScoreCalculator
+        calculatorId="heart"
+        patient={patient}
+        autoScorePrefill={autoScorePrefill}
+        onClose={() => {}}
+        onSaveScore={() => {}}
+      />
+    );
+
+    expect(screen.getByLabelText(/Age/i)).toHaveValue('1');
+    expect(screen.getByLabelText(/Risk factors/i)).toHaveValue('2');
+    expect(screen.getByLabelText(/Troponin/i)).toHaveValue('1');
+    expect(screen.getByText(/Troponin I 42 ng\/L, ref 0-14/i)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText(/History/i)).toHaveFocus());
   });
 
   it('closes from Escape key', () => {

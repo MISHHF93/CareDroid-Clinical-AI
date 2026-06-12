@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 @Entity('two_factor_auth')
 export class TwoFactor {
@@ -36,7 +35,7 @@ export class TwoFactor {
   updatedAt: Date;
 
   // Relations
-  @OneToOne(() => User, (user) => user.twoFactor, { onDelete: 'CASCADE' })
+  @OneToOne('User', (user: any) => user.twoFactor, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 }

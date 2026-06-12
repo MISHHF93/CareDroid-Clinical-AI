@@ -42,6 +42,7 @@ export type PatientFlagType =
   | 'PendingAdmission'
   | 'EMSArrival'
   | 'Isolation'
+  | 'DeterioratingNeuro'
   | 'ScoreReassessmentRecommended';
 
 export type PatientFlagSeverity = 'Info' | 'Warning' | 'Critical';
@@ -94,7 +95,16 @@ export type JourneyEventType =
   | 'FlagRemoved'
   | 'ProtocolLaunched'
   | 'SCORE'
-  | 'ClinicalScoreSaved';
+  | 'ClinicalScoreSaved'
+  | 'ReassessmentReminderScheduled'
+  | 'ReassessmentReminderSnoozed'
+  | 'ReassessmentReminderCompleted'
+  | 'VitalsAlertFired'
+  | 'VitalsAlertAddressed'
+  | 'EMSCriticalBroadcast'
+  | 'EMSCriticalChecklistSaved'
+  | 'ESCALATION'
+  | 'ESCALATION_CANCELLED';
 
 export interface JourneyEvent {
   id: EntityId;
@@ -107,6 +117,8 @@ export interface JourneyEvent {
   toState?: PatientState;
   staffId?: EntityId;
   actorStaffId?: EntityId;
+  by?: EntityId;
+  reason?: string;
   note?: string;
   summary: string;
   metadata?: Record<string, string | number | boolean | null>;
@@ -130,6 +142,7 @@ export type ReferralStatus =
   | 'Sent'
   | 'Acknowledged'
   | 'Accepted'
+  | 'InfoRequested'
   | 'TransferRequested'
   | 'TransportArranged'
   | 'PatientDeparted'
@@ -167,6 +180,33 @@ export interface Referral {
 export type EMSArrivalStatus = 'Inbound' | 'Arrived' | 'Handoff' | 'Complete' | 'Cancelled';
 export type EMSSeverity = 'Low' | 'Moderate' | 'High' | 'Critical';
 
+export type CriticalChecklistType =
+  | 'stemi'
+  | 'stroke'
+  | 'trauma'
+  | 'anaphylaxis'
+  | 'ob'
+  | 'pediatric-arrest'
+  | 'respiratory-failure';
+
+export interface CriticalChecklistCompletion {
+  itemId: EntityId;
+  label: string;
+  checkedByStaffId: EntityId;
+  checkedByStaffName: string;
+  checkedAt: ISODateString;
+}
+
+export interface CriticalChecklistRecord {
+  type: CriticalChecklistType;
+  title: string;
+  triggeredAt: ISODateString;
+  assignedRoomId?: EntityId;
+  assignedRoomName?: string;
+  completions: CriticalChecklistCompletion[];
+  savedToPatientAt?: ISODateString;
+}
+
 export interface EMSArrival {
   id: EntityId;
   patientId?: EntityId;
@@ -190,6 +230,7 @@ export interface EMSArrival {
   prearrivalComplaint: string;
   priority: Priority;
   handoffSummary?: string;
+  criticalChecklist?: CriticalChecklistRecord;
 }
 
 export interface Patient {
@@ -216,10 +257,13 @@ export interface Patient {
   assignedTo?: string | null;
   roomId: EntityId | null;
   flags: PatientFlag[];
+  reassessmentReminders?: ReassessmentReminder[];
+  vitalsAlerts?: VitalsAlert[];
   timeline: JourneyEvent[];
   referral?: Referral;
   emsArrival?: EMSArrival;
   notes: Note[];
+  criticalChecklist?: CriticalChecklistRecord;
 }
 
 export const QueueType = Object.freeze({
@@ -266,7 +310,14 @@ export interface BottleneckAlert {
 
 export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
 
-export type AlertType = 'Reassessment' | 'Capacity' | 'EMS' | 'Referral' | 'Queue' | 'System';
+export type AlertType =
+  | 'Reassessment'
+  | 'Capacity'
+  | 'EMS'
+  | 'Referral'
+  | 'Queue'
+  | 'System'
+  | 'CAPACITY_CRISIS';
 
 export interface Alert {
   id: EntityId;
@@ -275,12 +326,45 @@ export interface Alert {
   title: string;
   message: string;
   patientId?: EntityId;
+  reminderId?: EntityId;
   actionLabel?: string;
   actionFn?: () => void;
   actionType?: string;
   createdAt: ISODateString;
   dismissedAt?: ISODateString;
   autoDismissAfter?: number;
+}
+
+export type ReassessmentReminderStatus = 'pending' | 'completed' | 'snoozed';
+
+export interface ReassessmentReminder {
+  id: EntityId;
+  patientId: EntityId;
+  scheduledBy: EntityId;
+  scheduledAt: ISODateString;
+  dueAt: ISODateString;
+  note?: string;
+  status: ReassessmentReminderStatus;
+  completedAt?: ISODateString;
+  snoozedUntil?: ISODateString;
+  lastAlertStage?: 'upcoming' | 'due' | 'overdue';
+}
+
+export type VitalsAlertSeverity = 'critical' | 'warning' | 'watch';
+export type VitalsAlertStatus = 'active' | 'addressed';
+
+export interface VitalsAlert {
+  id: EntityId;
+  patientId: EntityId;
+  severity: VitalsAlertSeverity;
+  status: VitalsAlertStatus;
+  vital: string;
+  value: number;
+  unit: string;
+  reason: string;
+  recordedAt: ISODateString;
+  acknowledgedAt?: ISODateString;
+  acknowledgedBy?: EntityId;
 }
 
 export type StaffRole =

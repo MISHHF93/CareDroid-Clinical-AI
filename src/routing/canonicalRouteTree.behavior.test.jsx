@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -178,12 +178,12 @@ describe('canonical route tree behavior', () => {
     useFeatureStore.setState(originalFeatureState, true);
   });
 
-  it('/emergency renders store patients, stats, filters, intake, and patient detail', async () => {
+  it('/emergency/whiteboard renders store patients, stats, filters, intake, and patient detail', async () => {
     const user = userEvent.setup();
     const patient = firstVisiblePatient();
     const patientButtonName = `Open details for ${patient.firstName} ${patient.lastName}`;
 
-    renderRoute('/emergency');
+    renderRoute('/emergency/whiteboard');
 
     expect(await screen.findByRole('heading', { name: 'Emergency Whiteboard' })).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: patientButtonName })).toBeInTheDocument();
@@ -192,8 +192,8 @@ describe('canonical route tree behavior', () => {
     expect(screen.getByText('Capacity')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /New Patient/i }));
-    expect(await screen.findByRole('heading', { name: 'New Patient' })).toBeInTheDocument();
-    await user.click(screen.getByLabelText(/Close new patient intake/i));
+    expect(await screen.findByRole('heading', { name: 'Add walk-in to Triage' })).toBeInTheDocument();
+    await user.click(screen.getByLabelText(/Close quick intake/i));
 
     await user.click(await screen.findByRole('button', { name: patientButtonName }));
     expect(await screen.findByRole('complementary', { name: /Patient detail panel/i })).toBeInTheDocument();
@@ -252,64 +252,38 @@ describe('canonical route tree behavior', () => {
     expect(screen.getAllByText(/Disposition|No disposition patients/i).length).toBeGreaterThan(0);
   });
 
-  it('/emergency/tools renders launchable calculators and saves a score to the selected patient timeline', async () => {
-    const user = userEvent.setup();
-    const patient = useEmergencyStore.getState().patients[0];
-    useEmergencyStore.getState().selectPatient(patient.id);
-    const initialTimelineLength = patient.timeline.length;
+  it('/emergency/queues renders queue intelligence from store state', async () => {
+    renderRoute('/emergency/queues');
 
-    renderRoute('/emergency/tools');
-
-    expect(await screen.findByRole('heading', { name: 'Clinical Tools' }, { timeout: 5_000 })).toBeInTheDocument();
-    const launchButtons = await screen.findAllByRole('button', { name: 'Launch' });
-    expect(launchButtons.length).toBeGreaterThanOrEqual(3);
-
-    await user.click(launchButtons[0]);
-    expect(await screen.findByRole('button', { name: /Mock Calculator Result/i })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /Mock Calculator Result/i }));
-    await user.click(screen.getByRole('button', { name: /Save Score to Patient/i }));
-
-    const updatedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
-    expect(updatedPatient.timeline.length).toBeGreaterThan(initialTimelineLength);
-  }, 15_000);
-
-  it('/emergency/tools receives patient links launched from PatientDetailPanel', async () => {
-    const user = userEvent.setup();
-    const patient = firstVisiblePatient();
-
-    renderRoute('/emergency');
-    await user.click(await screen.findByRole('button', { name: `Open details for ${patient.firstName} ${patient.lastName}` }));
-    await user.click(await screen.findByRole('button', { name: /Run Score/i }));
-
-    expect(await screen.findByRole('heading', { name: 'Clinical Tools' }, { timeout: 5_000 })).toBeInTheDocument();
-    expect(screen.getAllByText(new RegExp(`${patient.firstName} ${patient.lastName}`)).length).toBeGreaterThan(0);
-  }, 15_000);
-
-  it('/emergency/shift renders store-computed stats and calls the AI handoff client', async () => {
-    const user = userEvent.setup();
-
-    renderRoute('/emergency/shift');
-
-    expect(await screen.findByRole('heading', { name: 'Shift Summary' })).toBeInTheDocument();
-    expect(screen.getByText('Total patients seen')).toBeInTheDocument();
-    expect(screen.getByText('Avg door-to-triage')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /Generate Handoff Brief/i }));
-    await waitFor(() => expect(sendClinicalChatMessage).toHaveBeenCalled());
-    expect(await screen.findByText('AI generated handoff brief.')).toBeInTheDocument();
+    expect((await screen.findAllByRole('heading', { name: 'Queue Intelligence' })).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Live waiting, triage, provider, referral/i)).toBeInTheDocument();
   });
 
-  it('/settings renders tabs and feature toggle panel route renders', async () => {
-    const user = userEvent.setup();
+  it('/emergency/reassessment keeps reassessment workflow inside the whiteboard shell', async () => {
+    renderRoute('/emergency/reassessment');
 
-    renderRoute('/settings');
+    expect(await screen.findByRole('heading', { name: 'Emergency Whiteboard' })).toBeInTheDocument();
+  });
+
+  it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
+    renderRoute('/emergency/boarding');
+
+    expect(await screen.findByRole('heading', { name: 'Capacity Detail' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /Boarding patients/i })).toBeInTheDocument();
+  });
+
+  it('/emergency/analytics renders the Emergency OS analytics route', async () => {
+    renderRoute('/emergency/analytics');
+
+    expect(await screen.findByRole('heading', { name: 'Emergency Analytics' })).toBeInTheDocument();
+  });
+
+  it('/emergency/settings renders settings inside the primary Emergency OS route family', async () => {
+    renderRoute('/emergency/settings');
 
     expect((await screen.findAllByRole('heading', { name: 'Settings' })).length).toBeGreaterThan(0);
     expect(screen.getByRole('navigation', { name: /Settings tabs/i })).toBeInTheDocument();
     const featuresTab = screen.getByRole('link', { name: 'Features' });
-    expect(featuresTab).toHaveAttribute('href', '/settings/features');
-
-    await user.click(featuresTab);
-    expect((await screen.findAllByRole('heading', { name: 'Feature Management' }, { timeout: 5_000 })).length).toBeGreaterThan(0);
-  }, 15_000);
+    expect(featuresTab).toHaveAttribute('href', '/emergency/settings#features');
+  });
 });

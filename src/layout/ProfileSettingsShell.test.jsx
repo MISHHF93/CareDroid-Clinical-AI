@@ -11,14 +11,18 @@ const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8'
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 
 const CANONICAL_APP_SHELL_ROUTES = [
-  ['/emergency', '<EmergencyWhiteboard />'],
+  ['/emergency/whiteboard', '<EmergencyWhiteboard />'],
+  ['/emergency/patients', '<EmergencyWhiteboard />'],
   ['/emergency/ems', '<EMSPipeline />'],
-  ['/emergency/referrals', '<ReferralPanel />'],
+  ['/emergency/intake', '<SmartIntake />'],
+  ['/emergency/queues', '<EmergencyQueueRoute />'],
+  ['/emergency/reassessment', '<EmergencyWhiteboard />'],
   ['/emergency/capacity', '<EmergencyCapacityRoute />'],
-  ['/emergency/tools', '<ClinicalCalculatorHub />'],
-  ['/emergency/shift', '<ShiftSummary />'],
-  ['/settings', '<SettingsRoute />'],
-  ['/settings/features', '<SettingsFeaturesRoute />'],
+  ['/emergency/boarding', '<EmergencyCapacityRoute />'],
+  ['/emergency/referrals', '<ReferralPanel />'],
+  ['/emergency/copilot', '<EmergencyCopilotRedirect />'],
+  ['/emergency/analytics', '<EmergencyAnalytics />'],
+  ['/emergency/settings', '<SettingsRoute />'],
 ];
 
 function routeBlockFor(path) {

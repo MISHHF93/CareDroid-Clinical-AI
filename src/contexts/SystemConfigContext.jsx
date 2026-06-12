@@ -145,7 +145,12 @@ export function SystemConfigProvider({ children }) {
 
   return (
     <SystemConfigContext.Provider value={value}>
-      <ApiConfigDegradedBanner />
+      <ApiConfigDegradedBanner
+        configDegraded={configDegraded}
+        error={error}
+        loading={loading}
+        refresh={loadSystemConfig}
+      />
       {children}
     </SystemConfigContext.Provider>
   );

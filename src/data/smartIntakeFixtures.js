@@ -1,0 +1,52 @@
+export const SMART_INTAKE_DEMO = Object.freeze({
+  sessionId: 'demo-smart-intake-001',
+  steps: Object.freeze([
+    'Start Intake',
+    'Capture Inputs',
+    'Review OCR',
+    'Match Patient',
+    'Verify Fields',
+    'Create/Link/Unknown Patient',
+    'Send to Triage',
+  ]),
+  extractedFields: Object.freeze([
+    { field: 'firstName', extracted: 'Mei', existing: 'May', status: 'conflicting', source: 'Health card OCR' },
+    { field: 'lastName', extracted: 'Chen', existing: 'Chen', status: 'verified', source: 'Manual entry' },
+    { field: 'dateOfBirth', extracted: '1958-04-12', existing: '1958-04-12', status: 'verified', source: 'ID scan' },
+    { field: 'sex', extracted: 'Female', existing: 'Female', status: 'verified', source: 'Manual entry' },
+    { field: 'phone', extracted: '416-555-0134', existing: '416-555-0177', status: 'conflicting', source: 'Referral letter' },
+    { field: 'healthCardNumber', extracted: 'HC-9922-441', existing: '', status: 'unverified', source: 'OCR result' },
+    { field: 'address', extracted: '22 Queen St W', existing: '19 King Ave', status: 'conflicting', source: 'OCR result' },
+    { field: 'allergy', extracted: 'Penicillin - rash', existing: '', status: 'unverified', source: 'Allergy card' },
+    { field: 'medication', extracted: 'Metformin 500mg BID', existing: '', status: 'unverified', source: 'Medication list' },
+  ]),
+  candidates: Object.freeze([
+    {
+      patientId: 'pt-001',
+      displayName: 'Mei Chen',
+      matchScore: 91,
+      matchedFields: ['lastName', 'dateOfBirth', 'sex'],
+      conflictingFields: ['firstName', 'phone', 'address'],
+      recommendedAction: 'link_after_staff_confirmation',
+    },
+    {
+      patientId: 'pt-044',
+      displayName: 'May Cheng',
+      matchScore: 68,
+      matchedFields: ['dateOfBirth', 'phone'],
+      conflictingFields: ['lastName', 'address'],
+      recommendedAction: 'possible_duplicate_review',
+    },
+  ]),
+  warnings: Object.freeze([
+    'High-confidence duplicate requires staff confirmation before creating a new record.',
+    'Health card number is unverified and cannot be written to the patient record yet.',
+    'Address conflict requires approve, reject, or edit before verification is complete.',
+  ]),
+  auditLog: Object.freeze([
+    'Document uploaded',
+    'OCR extracted',
+    'Candidate match generated',
+    'Duplicate warning shown',
+  ]),
+});

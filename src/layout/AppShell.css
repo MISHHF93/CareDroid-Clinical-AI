@@ -78,10 +78,19 @@
   border-left: 3px solid transparent;
   color: var(--color-text-muted);
   text-decoration: none;
+  cursor: pointer;
   transition:
     border-color 140ms var(--ease-smooth, ease),
     color 140ms var(--ease-smooth, ease),
     background 140ms var(--ease-smooth, ease);
+}
+
+.ed-nav-rail__item--button {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background: transparent;
+  font: inherit;
 }
 
 .ed-nav-rail__item--appearing {
@@ -1250,6 +1259,74 @@
   width: min(420px, calc(100vw - 32px));
 }
 
+.ed-critical-vitals-banner {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--status-critical) 28%, rgba(0, 0, 0, 0.82));
+  color: var(--color-text-primary);
+  backdrop-filter: blur(5px);
+}
+
+.ed-critical-vitals-banner > div:first-child {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  width: min(760px, 100%);
+  padding: var(--space-6);
+  border: 2px solid var(--status-critical);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-elevated));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6);
+}
+
+.ed-critical-vitals-banner svg {
+  color: var(--status-critical);
+}
+
+.ed-critical-vitals-banner strong {
+  display: block;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.ed-critical-vitals-banner p,
+.ed-critical-vitals-banner span {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: 850;
+}
+
+.ed-critical-vitals-banner__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  width: min(760px, 100%);
+  margin-top: var(--space-4);
+}
+
+.ed-critical-vitals-banner__actions button {
+  min-height: 46px;
+  border: 1px solid color-mix(in srgb, var(--status-critical) 64%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-surface));
+  color: var(--color-text-primary);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.ed-critical-vitals-banner__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .ed-os-shell--copilot-collapsed .ed-alert-toast-stack {
   inset-inline-end: calc(var(--ed-copilot-collapsed-width) + var(--space-4));
 }
@@ -1483,6 +1560,7 @@
 
 .ed-staff-avatar {
   appearance: none;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1497,6 +1575,23 @@
   font-weight: 800;
   cursor: pointer;
   overflow: hidden;
+}
+
+.ed-staff-avatar__badge {
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-end: -4px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-pill);
+  background: var(--status-warning);
+  color: #111827;
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1;
 }
 
 .ed-staff-avatar img {

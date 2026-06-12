@@ -15,14 +15,20 @@ const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8')
 
 const visibleLinkInventory = [
   ['Home welcome CTA', 'App.jsx', '/auth'],
-  ['Home dev bypass', 'App.jsx', '/emergency'],
+  ['Home dev bypass', 'App.jsx', '/emergency/whiteboard'],
   ['Auth back link', 'pages/Auth.jsx', '/'],
-  ['Primary Emergency nav', 'config/navigation.config.js', '/emergency'],
-  ['Primary Tools nav', 'config/navigation.config.js', '/emergency/tools'],
+  ['Primary Whiteboard nav', 'config/navigation.config.js', '/emergency/whiteboard'],
+  ['Primary Patients nav', 'config/navigation.config.js', '/emergency/patients'],
   ['Primary EMS nav', 'config/navigation.config.js', '/emergency/ems'],
-  ['Primary Referrals nav', 'config/navigation.config.js', '/emergency/referrals'],
+  ['Primary Intake nav', 'config/navigation.config.js', '/emergency/intake'],
+  ['Primary Queues nav', 'config/navigation.config.js', '/emergency/queues'],
+  ['Primary Reassessment nav', 'config/navigation.config.js', '/emergency/reassessment'],
   ['Primary Capacity nav', 'config/navigation.config.js', '/emergency/capacity'],
-  ['Primary Shift nav', 'config/navigation.config.js', '/emergency/shift'],
+  ['Primary Boarding nav', 'config/navigation.config.js', '/emergency/boarding'],
+  ['Primary Referrals nav', 'config/navigation.config.js', '/emergency/referrals'],
+  ['Primary Copilot nav', 'config/navigation.config.js', '/emergency/copilot'],
+  ['Primary Analytics nav', 'config/navigation.config.js', '/emergency/analytics'],
+  ['Primary Settings nav', 'config/navigation.config.js', '/emergency/settings'],
 ];
 
 const canonicalRoutes = new Set([
@@ -30,24 +36,19 @@ const canonicalRoutes = new Set([
   '/auth',
   '/dashboard',
   '/assistant',
-  '/emergency',
-  '/emergency/tools',
+  '/app',
+  '/emergency/whiteboard',
+  '/emergency/patients',
   '/emergency/ems',
-  '/emergency/referrals',
+  '/emergency/intake',
+  '/emergency/queues',
+  '/emergency/reassessment',
   '/emergency/capacity',
-  '/emergency/shift',
-  '/tools',
-  '/operations',
-  '/digital-twin',
-  '/live-map',
-  '/hospital-map',
-  '/medical-iot',
-  '/fleet/map',
-  '/devices',
-  '/tools/catalog',
-  '/tools/calculators',
-  '/settings',
-  '/system-health',
+  '/emergency/boarding',
+  '/emergency/referrals',
+  '/emergency/copilot',
+  '/emergency/analytics',
+  '/emergency/settings',
 ]);
 
 const userFacingLinkFiles = [
@@ -97,8 +98,8 @@ describe('section link inventory and route flattening', () => {
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
     expect(app).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
-    expect(app).toContain("['/home', '/emergency']");
-    expect(app).toContain("['/chat', '/emergency']");
+    expect(app).toContain("['/home', '/emergency/whiteboard']");
+    expect(app).toContain("['/chat', '/emergency/copilot']");
     expect(app).toContain("['/tools/calculators/:slug', '/emergency/tools']");
     expect(app).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
     expect(app).not.toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');

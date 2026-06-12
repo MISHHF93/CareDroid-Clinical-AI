@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 export enum SubscriptionTier {
   FREE = 'free',
@@ -84,7 +83,7 @@ export class Subscription {
   updatedAt: Date;
 
   // Relations
-  @OneToOne(() => User, (user) => user.subscription, { onDelete: 'CASCADE' })
+  @OneToOne('User', (user: any) => user.subscription, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: any;
 }

@@ -8,7 +8,95 @@ import './CommandPalette.css';
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
 const HUB_CALCULATORS = buildBuiltinHubCalculatorCards();
 
+const EMERGENCY_OS_ROUTE_COMMANDS = [
+  {
+    id: 'open-whiteboard',
+    label: 'Open Whiteboard',
+    hint: 'W',
+    keywords: ['whiteboard', 'board', 'patient flow', 'operational screen'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/whiteboard' }),
+  },
+  {
+    id: 'open-patients',
+    label: 'Open Patients',
+    hint: 'P',
+    keywords: ['patients', 'patient list', 'snapshots'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/patients' }),
+  },
+  {
+    id: 'open-ems',
+    label: 'Open EMS',
+    hint: 'E',
+    keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/ems' }),
+  },
+  {
+    id: 'open-intake',
+    label: 'Open Smart Intake',
+    hint: 'I',
+    keywords: ['intake', 'arrival', 'identity', 'registration', 'ocr'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/intake' }),
+  },
+  {
+    id: 'open-queues',
+    label: 'Open Queues',
+    hint: 'Q',
+    keywords: ['queues', 'queue intelligence', 'waiting', 'who next'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/queues' }),
+  },
+  {
+    id: 'open-reassessment',
+    label: 'Open Reassessment',
+    hint: 'R',
+    keywords: ['reassessment', 'due', 'safety', 'review'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/reassessment' }),
+  },
+  {
+    id: 'open-capacity',
+    label: 'Open Capacity',
+    hint: 'C',
+    keywords: ['capacity', 'rooms', 'pressure', 'occupancy'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/capacity' }),
+  },
+  {
+    id: 'open-boarding',
+    label: 'Open Boarding',
+    hint: 'B',
+    keywords: ['boarding', 'admission pending', 'boarders'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/boarding' }),
+  },
+  {
+    id: 'open-referrals',
+    label: 'Open Referrals',
+    hint: 'Ref',
+    keywords: ['referrals', 'consults', 'transfer', 'specialty'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/referrals' }),
+  },
+  {
+    id: 'open-copilot',
+    label: 'Open ED Copilot',
+    hint: 'AI',
+    keywords: ['copilot', 'assistant', 'ai', 'chat'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/copilot' }),
+  },
+  {
+    id: 'open-analytics',
+    label: 'Open Analytics',
+    hint: 'A',
+    keywords: ['analytics', 'throughput', 'metrics', 'trends'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/analytics' }),
+  },
+  {
+    id: 'open-settings',
+    label: 'Open Settings',
+    hint: 'S',
+    keywords: ['settings', 'thresholds', 'staff', 'configuration'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/settings' }),
+  },
+];
+
 const BASE_COMMANDS = [
+  ...EMERGENCY_OS_ROUTE_COMMANDS,
   {
     id: 'new-patient',
     label: 'New Patient',
@@ -24,13 +112,6 @@ const BASE_COMMANDS = [
     build: (query) => ({ type: 'FIND_PATIENT', value: extractValue(query, /^find(?:\s+patient)?\s*/i) }),
   },
   {
-    id: 'open-ems',
-    label: 'EMS Pipeline',
-    hint: 'E',
-    keywords: ['pre-arrival', 'ambulance', 'pipeline'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/ems' }),
-  },
-  {
     id: 'new-referral',
     label: 'New Referral',
     hint: 'R',
@@ -41,25 +122,19 @@ const BASE_COMMANDS = [
     }),
   },
   {
-    id: 'clinical-tools',
-    label: 'Clinical Tools',
-    hint: 'T',
-    keywords: ['calculator', 'calculators', 'scores', 'tools', 'stethoscope'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/tools' }),
-  },
-  {
-    id: 'drug-references',
-    label: 'Drug References',
-    hint: 'D',
-    keywords: ['drugs', 'dose', 'dosing', 'antibiotic', 'antidote', 'reversal', 'medications'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/tools?category=Reference' }),
-  },
-  {
     id: 'pediatric-emergency-drugs',
     label: 'Pediatric Emergency Drug Calculator',
     hint: 'Dose',
-    keywords: ['dose pediatric', 'broselow', 'resuscitation drugs', 'rsi dose'],
-    build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'pediatric-dose-safety-checker' }),
+    keywords: [
+      'peds',
+      'pediatric',
+      'dose pediatric',
+      'broselow',
+      'resuscitation drugs',
+      'rsi dose',
+      'child dose',
+    ],
+    build: () => ({ type: 'OPEN_PEDIATRIC_DRUGS' }),
   },
   {
     id: 'heart',
@@ -88,13 +163,6 @@ const BASE_COMMANDS = [
     hint: 'C',
     keywords: ['capacity', 'pressure'],
     build: () => ({ type: 'OPEN_CAPACITY' }),
-  },
-  {
-    id: 'shift-summary',
-    label: 'Shift Summary',
-    hint: '⇧S',
-    keywords: ['handoff', 'summary'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/shift' }),
   },
   {
     id: 'clear-filters',
@@ -406,9 +474,11 @@ export default function CommandPalette({ open, onClose, onExecute }) {
             hint: tool.id === 'pediatric-dose-safety-checker' ? 'Dose' : 'Open',
             keywords: tool.keywords,
             build: () =>
-              tool.launchMode === 'route'
-                ? { type: 'OPEN_ROUTE', path: tool.path }
-                : { type: 'OPEN_CALCULATOR', calculatorId: tool.id },
+              tool.id === 'pediatric-dose-safety-checker'
+                ? { type: 'OPEN_PEDIATRIC_DRUGS' }
+                : tool.launchMode === 'route'
+                  ? { type: 'OPEN_ROUTE', path: tool.path }
+                  : { type: 'OPEN_CALCULATOR', calculatorId: tool.id },
           });
         });
     }

@@ -130,10 +130,62 @@
   background: var(--color-elevated);
 }
 
+.clinical-score-modal__field--prefilled {
+  border-color: color-mix(in srgb, var(--status-info) 46%, var(--color-border-default)) !important;
+  background: color-mix(in srgb, var(--status-info) 11%, var(--color-elevated)) !important;
+}
+
+.clinical-score-modal__field--requires-assessment {
+  border-color: color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default)) !important;
+}
+
+.clinical-score-modal__field--needs-confirmation {
+  border-color: color-mix(in srgb, var(--status-warning) 52%, var(--color-border-default)) !important;
+  background: color-mix(in srgb, var(--status-warning) 10%, var(--color-elevated)) !important;
+}
+
+.clinical-score-modal__field--reviewed {
+  border-color: color-mix(in srgb, var(--status-stable) 56%, var(--color-border-default)) !important;
+  background: color-mix(in srgb, var(--status-stable) 12%, var(--color-elevated)) !important;
+}
+
 .clinical-score-modal__fields span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: 900;
+}
+
+.clinical-score-modal__fields span em {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--status-info);
+  font-style: normal;
+  font-size: var(--font-size-xs);
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.clinical-score-modal__field--requires-assessment span em {
+  color: var(--status-warning);
+}
+
+.clinical-score-modal__field--needs-confirmation span em {
+  color: var(--status-warning);
+}
+
+.clinical-score-modal__field--reviewed span em {
+  color: var(--status-stable);
+}
+
+.clinical-score-modal__fields label small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
 }
 
 .clinical-score-modal__fields select,

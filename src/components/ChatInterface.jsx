@@ -11,6 +11,7 @@ import {
 } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useFeature } from '../hooks/useFeature';
+import { useUser } from '../contexts/UserContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import {
   createPatientFlag,
@@ -27,8 +28,11 @@ import {
   buildStaffWorkloads,
   getStaffRebalanceSuggestion,
 } from '../utils/staffManagement';
+import { formatActiveVitalsForCopilot } from '../utils/vitalsAlertPipeline';
 import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
 import { drugReferenceToolListForCopilot } from '../utils/drugReferenceTools';
+import { formatWhoNextForCopilot, getWhoNextRecommendation } from '../utils/whoNext';
+import { formatLongestWaitBroadcast, formatLongWaitForCopilot } from '../utils/longWaitRescue';
 import './ChatInterface.css';
 
 function waitMinutes(arrivalTime) {
@@ -249,6 +253,29 @@ function formatBriefPatientList(patients = []) {
     .join('\n');
 }
 
+function formatActiveEscalationsForCopilot(patients = [], staff = []) {
+  const staffById = new Map(staff.map((member) => [member.id, staffDisplayName(member)]));
+  return patients
+    .map((patient) => {
+      const events = [...(patient.timeline || [])].sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      const latestEscalation = events.find((event) => event.type === 'ESCALATION');
+      const latestCancel = events.find((event) => event.type === 'ESCALATION_CANCELLED');
+      if (!latestEscalation) return null;
+      if (
+        latestCancel &&
+        new Date(latestCancel.timestamp).getTime() >= new Date(latestEscalation.timestamp).getTime()
+      ) {
+        return null;
+      }
+      const staffId = latestEscalation.by || latestEscalation.staffId || latestEscalation.actorStaffId;
+      const staffName = latestEscalation.metadata?.staffName || staffById.get(staffId) || staffId || 'staff';
+      return `CRITICAL: ${patientDisplayName(patient)} just escalated by ${staffName}. Prioritize immediately.`;
+    })
+    .filter(Boolean);
+}
+
 function buildRequestedEdCopilotSystemPrompt({
   patients,
   capacity,
@@ -259,10 +286,15 @@ function buildRequestedEdCopilotSystemPrompt({
   detectedIntent,
   enabledFeatures = {},
   drugReferenceTools = 'None currently available',
+  staff = [],
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskCount = activePatients.filter(isHighRiskPatient).length;
   const bottleneck = bottleneckAlert?.queue || bottleneckAlert?.reason || 'None';
+  const activeEscalations = formatActiveEscalationsForCopilot(activePatients, staff);
+  const activeVitalsAlerts = formatActiveVitalsForCopilot(activePatients);
+  const activeLongWaitAlerts = formatLongWaitForCopilot(activePatients);
+  const longestWaitBroadcast = formatLongestWaitBroadcast(activePatients);
   const enabledToolLines = [
     enabledFeatures.capacity_intelligence ? `Capacity: ${capacity.score} (${capacity.label})` : null,
     `High risk: ${highRiskCount}`,
@@ -280,6 +312,10 @@ function buildRequestedEdCopilotSystemPrompt({
     '',
     'Current department snapshot:',
     `Active patients: ${activePatients.length}`,
+    ...activeEscalations,
+    ...activeVitalsAlerts,
+    ...activeLongWaitAlerts,
+    longestWaitBroadcast ? `⏱ ${longestWaitBroadcast}` : null,
     ...enabledToolLines,
     '',
     'Patients:',
@@ -504,6 +540,7 @@ const ChatInterface = ({
   onTrackEvent,
   authToken,
 }) => {
+  const { user } = useUser();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState(null);
@@ -530,6 +567,7 @@ const ChatInterface = ({
   const emergencyPatients = useEmergencyStore((state) => state.patients);
   const emergencyStaff = useEmergencyStore((state) => state.staff);
   const emergencyRooms = useEmergencyStore((state) => state.rooms);
+  const patientBackendDetails = useEmergencyStore((state) => state.patientBackendDetails);
   const edQueueHealth = useEmergencyStore(selectEdQueueHealth);
   const reassessmentQueue = useEmergencyStore(selectReassessmentQueue);
   const reassessmentCount = useEmergencyStore(selectReassessmentCount);
@@ -648,6 +686,7 @@ const ChatInterface = ({
         enabled: true,
         systemPrompt: buildEdCopilotSystemPrompt({
           patients: emergencyPatients,
+          staff: emergencyStaff,
           capacity: emergencyCapacity,
           reassessmentCount,
           queueHealth: isEmergencyCopilot ? edQueueHealth : [],
@@ -666,6 +705,7 @@ const ChatInterface = ({
         emsPressure: emsPipelineEnabled ? emsPressure : null,
         emsPressureContext: emsPipelineEnabled ? buildEMSPressureCopilotContext(emsPressure) : null,
         flaggedReassessments: reassessmentQueue,
+        activeEscalations: formatActiveEscalationsForCopilot(emergencyPatients, emergencyStaff),
         staffRebalanceSuggestion,
         enabledFeatures: enabledCopilotFeatures,
         availableTools: {
@@ -683,6 +723,14 @@ const ChatInterface = ({
         })),
         safetyBoundary:
           'Decision support only. Never make autonomous clinical decisions; all actions require human review.',
+        whoNext: getWhoNextRecommendation({
+          patients: emergencyPatients,
+          rooms: emergencyRooms,
+          staff: emergencyStaff,
+          activeShift,
+          user,
+          backendDetailsByPatientId: patientBackendDetails,
+        }),
       }
     : null;
 
@@ -854,6 +902,7 @@ const ChatInterface = ({
             );
             const systemPrompt = buildRequestedEdCopilotSystemPrompt({
               patients: emergencyState.patients,
+              staff: emergencyState.staff,
               capacity: emergencyState.capacity,
               reassessmentCount,
               bottleneckAlert: selectQueueBottleneckAlert(emergencyState),
@@ -916,6 +965,22 @@ const ChatInterface = ({
       }
 
       const assistantMessage = mapChatResponseToAssistantMessage(data);
+      if (isEmergencyCopilot) {
+        const emergencyState = useEmergencyStore.getState();
+        const whoNextLine = formatWhoNextForCopilot(
+          getWhoNextRecommendation({
+            patients: emergencyState.patients,
+            rooms: emergencyState.rooms,
+            staff: emergencyState.staff,
+            activeShift: emergencyState.activeShift,
+            user,
+            backendDetailsByPatientId: emergencyState.patientBackendDetails,
+          })
+        );
+        if (whoNextLine && !String(assistantMessage.content || '').startsWith('Suggested next:')) {
+          assistantMessage.content = `${whoNextLine}\n\n${assistantMessage.content || ''}`;
+        }
+      }
       const pendingAction =
         copilotToolActionsEnabled
           ? parseCopilotActionSuggestion(assistantMessage.content) ||
