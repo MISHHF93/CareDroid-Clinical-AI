@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Grid3X3, List, Plus, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bot, BrainCircuit, Calculator, Grid3X3, List, Plus, Search, Sparkles } from 'lucide-react';
 import {
   getPatientFlagType,
+  hasPatientFlag,
+  selectActiveAlerts,
   selectActivePatients,
   selectFilteredPatients,
   selectWhiteboardFilterCounts,
@@ -47,6 +50,16 @@ function patientName(patient) {
   return `${patient.firstName} ${patient.lastName}`;
 }
 
+function highRiskPatients(patients) {
+  return patients.filter(
+    (patient) =>
+      patient.priority === 'P1' ||
+      patient.priority === 'P2' ||
+      hasPatientFlag(patient, 'HighRisk') ||
+      hasPatientFlag(patient, 'DeteriorationRisk')
+  );
+}
+
 function staffName(staff) {
   return staff ? `${staff.firstName} ${staff.lastName}` : 'Unassigned';
 }
@@ -68,13 +81,16 @@ export default function EmergencyWhiteboard({
   subtitle = null,
   defaultViewMode = 'grid',
 }) {
+  const navigate = useNavigate();
   const patients = useEmergencyStore((state) => state.patients);
   const activePatients = useEmergencyStore(selectActivePatients);
   const filteredPatients = useEmergencyStore(selectFilteredPatients);
   const filterCounts = useEmergencyStore(selectWhiteboardFilterCounts);
   const stats = useEmergencyStore(selectWhiteboardStats);
+  const activeAlerts = useEmergencyStore(selectActiveAlerts);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const whiteboardSearchQuery = useEmergencyStore((state) => state.whiteboardSearchQuery);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
@@ -108,6 +124,18 @@ export default function EmergencyWhiteboard({
   const calculatorPatient = calculatorLaunch
     ? patients.find((patient) => patient.id === calculatorLaunch.patientId)
     : null;
+  const commandHighRiskPatients = useMemo(() => highRiskPatients(activePatients), [activePatients]);
+  const aiFocusPatient = commandHighRiskPatients[0] || activePatients[0] || null;
+  const activeEmsArrivals = emsArrivals.filter(
+    (arrival) => !arrival.patientId && !['Complete', 'Cancelled'].includes(arrival.status)
+  );
+  const criticalAlerts = activeAlerts.filter((alert) => alert.severity === 'Critical').length;
+  const aiCoverageSummary = [
+    `${activePatients.length} live patients`,
+    `${commandHighRiskPatients.length} high risk`,
+    `${activeEmsArrivals.length} EMS inbound`,
+    `${criticalAlerts} critical alerts`,
+  ].join(' · ');
   const shouldVirtualizeGrid =
     viewMode === 'grid' && filteredPatients.length > VIRTUALIZED_GRID_THRESHOLD;
   const listPatients = useMemo(() => {
@@ -217,10 +245,12 @@ export default function EmergencyWhiteboard({
     const patientIndex = filteredPatients.findIndex((patient) => patient.id === highlightedPatientId);
     if (viewMode === 'grid' && gridRef.current && patientIndex >= 0) {
       const rowIndex = Math.floor(patientIndex / gridColumnCount);
-      gridRef.current.scrollTo({
-        top: Math.max(0, rowIndex * VIRTUALIZED_CARD_ROW_HEIGHT - 12),
-        behavior: 'smooth',
-      });
+      const top = Math.max(0, rowIndex * VIRTUALIZED_CARD_ROW_HEIGHT - 12);
+      if (typeof gridRef.current.scrollTo === 'function') {
+        gridRef.current.scrollTo({ top, behavior: 'smooth' });
+      } else {
+        gridRef.current.scrollTop = top;
+      }
     }
 
     const scrollTimer = window.setTimeout(() => {
@@ -353,6 +383,20 @@ export default function EmergencyWhiteboard({
     }, 850);
   };
 
+  const openCopilotWithPrompt = (prompt) => {
+    const params = new URLSearchParams({ prompt });
+    navigate(`/emergency/copilot?${params.toString()}`);
+  };
+
+  const openPatientAiLayer = () => {
+    if (!aiFocusPatient) {
+      openCopilotWithPrompt('Review the empty ED board and suggest setup checks for patient intake, EMS readiness, and staffing.');
+      return;
+    }
+    selectPatient(aiFocusPatient.id);
+    setHighlightedPatientId(aiFocusPatient.id);
+  };
+
   return (
     <section
       className={['ed-whiteboard', crisisModeVisible ? 'ed-whiteboard--crisis-mode' : '']
@@ -441,6 +485,50 @@ export default function EmergencyWhiteboard({
       ) : null}
 
       <CrisisMode onVisibilityChange={setCrisisModeVisible} />
+
+      <section className="ed-whiteboard__ai-command" aria-label="ED AI command node">
+        <div className="ed-whiteboard__ai-command-main">
+          <span className="ed-whiteboard__ai-command-icon" aria-hidden>
+            <BrainCircuit size={18} />
+          </span>
+          <div>
+            <strong>ED AI Command Node</strong>
+            <p>{aiCoverageSummary}</p>
+          </div>
+        </div>
+        <div className="ed-whiteboard__ai-command-actions">
+          <button
+            type="button"
+            onClick={() =>
+              openCopilotWithPrompt(
+                `Summarize current ED command priorities for charge review. Context: ${aiCoverageSummary}. Focus on peak-hour throughput, high-risk patients, EMS arrivals, reassessments, and bottlenecks.`
+              )
+            }
+          >
+            <Bot size={14} aria-hidden />
+            ED Copilot
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openCopilotWithPrompt(
+                `Identify which patients need attention first. Context: ${aiCoverageSummary}. Prioritize P1/P2, critical alerts, long waits, reassessment due, and EMS transitions.`
+              )
+            }
+          >
+            <Sparkles size={14} aria-hidden />
+            Who Next
+          </button>
+          <button type="button" onClick={openPatientAiLayer} disabled={!activePatients.length}>
+            <BrainCircuit size={14} aria-hidden />
+            Patient AI
+          </button>
+          <button type="button" onClick={() => navigate('/tools/calculators?context=emergency-dashboard')}>
+            <Calculator size={14} aria-hidden />
+            Calculators
+          </button>
+        </div>
+      </section>
 
       <NewPatientIntake
         open={newPatientOpen}

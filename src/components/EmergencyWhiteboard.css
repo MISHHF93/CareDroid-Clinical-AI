@@ -1,7 +1,7 @@
 .ed-whiteboard {
   position: relative;
   display: grid;
-  grid-template-rows: 48px 64px minmax(0, 1fr);
+  grid-template-rows: 48px 72px 64px minmax(0, 1fr);
   width: 100%;
   min-width: 0;
   height: 100%;
@@ -13,7 +13,7 @@
 }
 
 .ed-whiteboard--crisis-mode {
-  grid-template-rows: 48px auto 64px minmax(0, 1fr);
+  grid-template-rows: 48px auto 72px 64px minmax(0, 1fr);
 }
 
 .ed-whiteboard::before {
@@ -173,6 +173,97 @@
   font-size: var(--font-size-sm);
   font-weight: 900;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+}
+
+.ed-whiteboard__ai-command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 72px;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--status-info) 24%, var(--color-border-subtle));
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--status-info) 16%, transparent), transparent 18rem),
+    color-mix(in srgb, var(--bg-base) 88%, var(--status-info) 5%);
+}
+
+.ed-whiteboard__ai-command-main {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.ed-whiteboard__ai-command-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-elevated));
+  color: var(--status-info);
+}
+
+.ed-whiteboard__ai-command-main strong,
+.ed-whiteboard__ai-command-main p {
+  margin: 0;
+}
+
+.ed-whiteboard__ai-command-main strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 950;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ed-whiteboard__ai-command-main p {
+  margin-top: 2px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ed-whiteboard__ai-command-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ed-whiteboard__ai-command-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-info) 38%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ed-whiteboard__ai-command-actions button:hover,
+.ed-whiteboard__ai-command-actions button:focus-visible {
+  border-color: var(--status-info);
+  background: color-mix(in srgb, var(--status-info) 18%, var(--color-elevated));
+  outline: none;
+}
+
+.ed-whiteboard__ai-command-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .ed-whiteboard--crisis-mode .ed-whiteboard__live-banner {
@@ -597,7 +688,11 @@
 
 @media (max-width: 1024px) {
   .ed-whiteboard {
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+  }
+
+  .ed-whiteboard--crisis-mode {
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
   }
 
   .ed-whiteboard__body {
@@ -614,6 +709,27 @@
     height: auto;
     flex-wrap: wrap;
     padding-block: var(--space-2);
+  }
+
+  .ed-whiteboard__ai-command {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .ed-whiteboard__ai-command-main p {
+    white-space: normal;
+  }
+
+  .ed-whiteboard__ai-command-actions {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ed-whiteboard__ai-command-actions::-webkit-scrollbar {
+    display: none;
   }
 
   .ed-whiteboard__filter,
@@ -644,6 +760,10 @@
 @media (max-width: 720px) {
   .ed-whiteboard__body {
     padding: var(--space-2);
+  }
+
+  .ed-whiteboard__ai-command-actions button {
+    flex: 0 0 auto;
   }
 
   .ed-whiteboard__grid {

@@ -47,6 +47,11 @@ describe('single AppShell contract', () => {
     expect(appShellJsx).toContain('<StaffAvatar');
   });
 
+  it('passes dashboard prompt deep links into the persistent ED Copilot', () => {
+    expect(appShellJsx).toContain("params.get('prompt')");
+    expect(appShellJsx).toContain('prefillText={copilotPrefillText}');
+  });
+
   it('main content owns scrolling inside the shell viewport', () => {
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
