@@ -2,12 +2,17 @@
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: 240px;
+  width: 100%;
   min-width: 0;
   min-height: 0;
   height: 100%;
-  border-right: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle) 86%, transparent);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 90%, var(--status-info) 4%) 0%, var(--color-surface) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 5%, transparent),
+    0 16px 34px rgba(0, 0, 0, 0.16);
   overflow: hidden;
   transition: width 180ms var(--ease-smooth, ease);
 }
@@ -22,14 +27,15 @@
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
-  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-2);
+  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--bg-surface) 78%, transparent);
 }
 
 .queue-intel__collapse {
   position: absolute;
   inset-block-start: 10px;
-  inset-inline-end: -15px;
+  inset-inline-end: 8px;
   z-index: 4;
   display: inline-flex;
   align-items: center;
@@ -45,7 +51,7 @@
 }
 
 .queue-intel--collapsed .queue-intel__collapse {
-  inset-inline-end: 7px;
+  inset-inline-end: 6px;
 }
 
 .queue-intel__header h2 {
@@ -66,7 +72,7 @@
   align-content: start;
   gap: var(--space-1);
   min-height: 0;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-3);
   overflow-y: auto;
 }
 
@@ -118,7 +124,7 @@
   padding: var(--space-2);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  background: transparent;
+  background: color-mix(in srgb, var(--color-elevated) 42%, transparent);
   color: var(--color-text-secondary);
   font: inherit;
   text-align: left;
@@ -226,6 +232,7 @@
   gap: var(--space-2);
   padding: var(--space-2);
   border-top: 1px solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--bg-surface) 64%, transparent);
 }
 
 .queue-intel__performance {
@@ -321,4 +328,37 @@
 
 .queue-intel--collapsed .queue-intel__health {
   display: none;
+}
+
+@media (max-width: 1024px) {
+  .queue-intel {
+    grid-template-rows: auto minmax(0, auto);
+    height: auto;
+    max-height: 220px;
+  }
+
+  .queue-intel--collapsed {
+    width: 100%;
+    max-height: 52px;
+  }
+
+  .queue-intel__rows {
+    grid-template-columns: repeat(4, minmax(118px, 1fr));
+    overflow: auto;
+  }
+
+  .queue-intel__performance,
+  .queue-intel__footer {
+    display: none;
+  }
+
+  .queue-intel--collapsed .queue-intel__header div {
+    display: block;
+  }
+}
+
+@media (max-width: 720px) {
+  .queue-intel__rows {
+    grid-template-columns: repeat(2, minmax(132px, 1fr));
+  }
 }
