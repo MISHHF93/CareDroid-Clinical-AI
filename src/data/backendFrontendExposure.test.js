@@ -14,6 +14,11 @@ import {
   runBackendFrontendExposureScan,
 } from './backendFrontendExposure';
 import { findBackendRoute, BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
+import {
+  BACKEND_ROUTE_EXPOSURE_POLICY,
+  OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY,
+  getOptionalRuntimeBackendRoutes,
+} from './backendRouteExposurePolicy';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_EXECUTOR_NLU_TOOL_IDS } from '../config/backendApiCapabilities';
 
@@ -110,6 +115,8 @@ describe('backendFrontendExposure scan', () => {
       ['PATCH', '/api/profile/me/preferences'],
       ['GET', '/api/profile/me/activity'],
       ['GET', '/api/profile/me/security'],
+      ['GET', '/api/profile/me/workspaces'],
+      ['PATCH', '/api/profile/me/workspaces/active'],
       ['GET', '/api/workspaces'],
       ['POST', '/api/workspaces'],
       ['POST', '/api/workspaces/active'],
@@ -126,6 +133,40 @@ describe('backendFrontendExposure scan', () => {
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
     }
   });
+
+  it('classifies optional Mongoose Emergency OS routes separately from always-mounted Nest routes', () => {
+    const optionalRoutes = getOptionalRuntimeBackendRoutes();
+
+    expect(optionalRoutes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          method: 'POST',
+          path: '/api/emergency/intake/sessions',
+          runtime: 'mongoose-emergency-os',
+        }),
+      ])
+    );
+    expect(OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toMatchObject({
+      strategy: 'optional-runtime',
+    });
+    expect(BACKEND_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toBeUndefined();
+  });
+
+  it('gates optional Emergency OS frontend calls when the optional runtime is disabled', () => {
+    const scan = runBackendFrontendExposureScan();
+    const smartIntake = scan.analyzed.find((row) => row.id === 'emergency-smart-intake-session-create');
+
+    expect(FRONTEND_API_CALLS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'emergency-smart-intake-session-create',
+          capability: 'emergencySmartIntake',
+        }),
+        expect.objectContaining({ id: 'emergency-referral-create', capability: 'emergencyReferralPersistence' }),
+      ])
+    );
+    expect(smartIntake?.exposure).toBe('gated-stub');
+  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
 
   it('covers memory dashboard and memory fabric client calls', () => {
     const memoryCalls = [

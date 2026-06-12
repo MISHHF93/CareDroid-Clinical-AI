@@ -3,7 +3,9 @@
  * Comprehensive test suite for notification system
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import NotificationService from '../services/notifications/NotificationService';
+import NotificationService, {
+  LEGACY_NOTIFICATION_SERVICE_STATUS,
+} from '../services/notifications/NotificationService';
 
 describe('NotificationService', () => {
   let service;
@@ -23,6 +25,14 @@ describe('NotificationService', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('is retained as a legacy queue-style compatibility client', () => {
+    expect(LEGACY_NOTIFICATION_SERVICE_STATUS).toMatchObject({
+      activeClient: false,
+      replacement: 'src/services/NotificationService.js',
+      blockedCapability: 'notificationSendChannel',
+    });
   });
 
   describe('Cost Alerts', () => {

@@ -1,5 +1,5 @@
 .ed-os-shell {
-  --ed-rail-width: 56px;
+  --ed-rail-width: 60px;
   --ed-header-height: 48px;
   --ed-copilot-width: 380px;
   --ed-copilot-collapsed-width: 44px;
@@ -64,7 +64,7 @@
   align-items: stretch;
   gap: var(--space-1);
   width: 100%;
-  padding: var(--space-2) 0;
+  padding: var(--space-2) 4px;
 }
 
 .ed-nav-rail__item {
@@ -74,8 +74,10 @@
   justify-content: center;
   width: 100%;
   min-width: 0;
-  height: 44px;
+  min-height: 44px;
+  border: 1px solid transparent;
   border-left: 3px solid transparent;
+  border-radius: 14px;
   color: var(--color-text-muted);
   text-decoration: none;
   cursor: pointer;
@@ -86,9 +88,8 @@
 }
 
 .ed-nav-rail__item--button {
-  border-top: 0;
-  border-right: 0;
-  border-bottom: 0;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
   background: transparent;
   font: inherit;
 }
@@ -99,12 +100,15 @@
 
 .ed-nav-rail__item:hover,
 .ed-nav-rail__item:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info) 26%, transparent);
   color: var(--color-text-secondary);
   background: color-mix(in srgb, var(--status-info) 10%, transparent);
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .ed-nav-rail__item--active {
+  border-color: color-mix(in srgb, var(--status-info) 28%, transparent);
   border-left-color: var(--status-info);
   color: var(--status-info);
   background: color-mix(in srgb, var(--status-info) 14%, var(--bg-base));
@@ -228,19 +232,6 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-}
-
-.ed-os-wordmark {
-  padding: 0;
-  color: var(--color-text-primary);
-  font: inherit;
-  font-weight: 900;
-}
-
-.ed-shift-clock {
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  font-family: var(--font-mono);
 }
 
 .ed-os-wordmark:hover,

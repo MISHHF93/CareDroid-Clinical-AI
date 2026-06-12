@@ -5,11 +5,11 @@
  * @see docs/orphaned-backend-functions.md
  */
 
-import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
+import { BACKEND_HTTP_ROUTES, OPTIONAL_RUNTIME_BACKEND_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { findBackendRoute } from './backendHttpRouteInventory';
 
-/** @typedef {'backend-only'|'expose-recommended'|'deferred'} ExposureStrategy */
+/** @typedef {'backend-only'|'expose-recommended'|'deferred'|'optional-runtime'} ExposureStrategy */
 
 /**
  * @type {Readonly<Record<string, { strategy: ExposureStrategy, reason: string, clientHint?: string }>>}
@@ -282,6 +282,19 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   ...BASE_BACKEND_ROUTE_EXPOSURE_POLICY,
 });
 
+export const OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY = Object.freeze(
+  Object.fromEntries(
+    OPTIONAL_RUNTIME_BACKEND_ROUTES.map((route) => [
+      routePolicyKey(route.method, route.path),
+      {
+        strategy: 'optional-runtime',
+        reason: `${route.runtime} route mounted only when ${route.mountFlag}=true and MongoDB is configured.`,
+        clientHint: route.controller,
+      },
+    ])
+  )
+);
+
 export function routePolicyKey(method, path) {
   return `${method.toUpperCase()} ${path}`;
 }
@@ -321,6 +334,13 @@ export function getBackendRouteExposureGaps() {
   }
 
   return gaps;
+}
+
+export function getOptionalRuntimeBackendRoutes() {
+  return OPTIONAL_RUNTIME_BACKEND_ROUTES.map((route) => ({
+    ...route,
+    policy: OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)],
+  }));
 }
 
 /**

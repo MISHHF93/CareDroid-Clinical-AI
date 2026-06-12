@@ -848,6 +848,152 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/metrics', controller: 'MetricsController' },
 ]);
 
+/** @typedef {BackendHttpRoute & { runtime: 'mongoose-emergency-os', mountFlag: string }} OptionalRuntimeBackendRoute */
+
+/** @type {readonly OptionalRuntimeBackendRoute[]} */
+export const OPTIONAL_RUNTIME_BACKEND_ROUTES = Object.freeze([
+  {
+    method: 'GET',
+    path: '/api/capacity/dashboard',
+    controller: 'ExpressCapacityRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/copilot/query',
+    controller: 'ExpressCopilotRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/ems/alert',
+    controller: 'ExpressEmsRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/ems/status/:emsUnitId',
+    controller: 'ExpressEmsRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/ems/arrive/:emsUnitId',
+    controller: 'ExpressEmsRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'GET',
+    path: '/api/ems/incoming',
+    controller: 'ExpressEmsRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'GET',
+    path: '/api/reassessment/due',
+    controller: 'ExpressReassessmentRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/reassessment/:patientId/reassess',
+    controller: 'ExpressReassessmentRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/reassessment/:patientId/dismiss',
+    controller: 'ExpressReassessmentRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/sessions',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/manual-entry',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/documents',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/ocr-results',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/ems-evidence',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/match',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/verify-field',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/link-patient',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/create-patient',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/continue-unknown',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/intake/:sessionId/reconcile-unknown',
+    controller: 'ExpressSmartIntakeRoutes',
+    runtime: 'mongoose-emergency-os',
+    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
+  },
+]);
+
 /**
  * @param {string} path
  */

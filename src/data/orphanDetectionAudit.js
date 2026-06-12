@@ -49,7 +49,7 @@ const MERGE_DUPLICATES = Object.freeze([
     primary: 'src/services/NotificationService.js',
     duplicate: 'src/services/notifications/NotificationService.js',
     route: '—',
-    note: 'Duplicate notification service paths',
+    note: 'Nested service is legacy queue-style compatibility only; active app client is src/services/NotificationService.js.',
   },
 ]);
 

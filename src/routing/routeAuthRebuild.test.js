@@ -23,19 +23,23 @@ describe('canonical route/auth architecture', () => {
 
   it('uses redirects for auth aliases and login aliases', () => {
     expect(routeConfigSource).toContain(
-      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
+      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/assistant', '/chat', '/ai', '/copilot'])"
     );
     expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
   });
 
   it('normalizes legacy tools and product aliases into Emergency OS redirects', () => {
-    expect(routeConfigSource).toContain(
-      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
-    );
+    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze([");
+    expect(routeConfigSource).toContain("'/tools',");
+    expect(routeConfigSource).toContain("'/all-tools',");
+    expect(routeConfigSource).toContain("'/clinical-tools',");
+    expect(routeConfigSource).toContain("'/catalog',");
     expect(routeConfigSource).toContain(
       "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
     );
-    expect(appSource).toContain("['/tools', '/emergency/copilot']");
+    expect(routeConfigSource).toMatch(
+      /id:\s*'tools'[\s\S]*path:\s*CANONICAL_ROUTES\.emergencyCopilot[\s\S]*aliases:\s*TOOLS_ROUTE_ALIASES/
+    );
     expect(appSource).toContain("path: '/emergency/tools'");
     expect(appSource).toContain('<LegacyProtectedRouteRedirect to="/emergency/copilot" />');
     expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');

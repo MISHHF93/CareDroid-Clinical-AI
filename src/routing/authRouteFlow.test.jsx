@@ -19,6 +19,12 @@ describe('auth canonical flow wiring', () => {
     expect(appSource).not.toContain('buildAuthRedirectSearch(location)');
     expect(appSource).not.toContain("pathname: '/auth'");
     expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
+    expect(appSource).toMatch(
+      /path:\s*'\/auth-callback'[\s\S]*element:\s*<AuthCallback \/>[\s\S]*shell:\s*false/
+    );
+    expect(appSource).toMatch(
+      /path:\s*'\/auth\/callback'[\s\S]*element:\s*<LegacyOAuthCallbackRedirect \/>[\s\S]*shell:\s*false/
+    );
   });
 
   it('redirects duplicate calculators route aliases to canonical /tools/calculators', () => {

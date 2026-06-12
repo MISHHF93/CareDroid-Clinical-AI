@@ -111,7 +111,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'calculators',
-    sidebarRoute: '/emergency/tools',
+    sidebarRoute: '/emergency/copilot',
     relatedTools: ['calculators'],
   }),
 

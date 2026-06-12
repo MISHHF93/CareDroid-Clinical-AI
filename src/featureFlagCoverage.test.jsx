@@ -88,6 +88,7 @@ describe('feature flag UI coverage', () => {
   it('keeps requested feature ids registered for gated surfaces', () => {
     expect(FEATURE_REGISTRY_BY_ID.ems_pipeline.sidebarRoute).toBe('/emergency/ems');
     expect(FEATURE_REGISTRY_BY_ID.smart_intake.sidebarRoute).toBe('/emergency/intake');
+    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/copilot');
     expect(FEATURE_REGISTRY_BY_ID.queue_intelligence.sidebarRoute).toBe('/emergency/queues');
     expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');

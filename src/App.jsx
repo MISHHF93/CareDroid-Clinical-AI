@@ -1203,6 +1203,7 @@ export function AppRoutes() {
     element,
     requiresAuth,
     publicOnly,
+    shell = true,
     permission,
     requireAllPermissions = false,
   }) => {
@@ -1224,7 +1225,7 @@ export function AppRoutes() {
       );
     }
 
-    if (requiresAuth || !publicOnly) {
+    if (shell && (requiresAuth || !publicOnly)) {
       return <AppShellPage>{resolvedElement}</AppShellPage>;
     }
 
@@ -1240,10 +1241,12 @@ export function AppRoutes() {
     {
       path: '/auth-callback',
       element: <AuthCallback />,
+      shell: false,
     },
     {
       path: '/auth/callback',
       element: <LegacyOAuthCallbackRedirect />,
+      shell: false,
     },
     ...AUTH_PATH_ALIASES.map((path) => ({
       path,
