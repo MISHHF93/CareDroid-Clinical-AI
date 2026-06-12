@@ -33,7 +33,8 @@ describe('workspace subpage routes', () => {
 
   it('keeps automation analytics as a future-release redirect into Emergency OS', () => {
     expect(appSource).toContain("['Automation Analytics', '/automation-analytics']");
-    expect(appSource).toContain('...FUTURE_RELEASE_ROUTES.map(([, path]) => ({');
+    expect(appSource).toContain('.filter(([, path]) => !ACTIVE_RELEASE_ROUTE_PATHS.has(path))');
+    expect(appSource).toContain('.map(([, path]) => ({');
     expect(appSource).toContain('<LegacyProtectedRouteRedirect to="/emergency/whiteboard" />');
   });
 });

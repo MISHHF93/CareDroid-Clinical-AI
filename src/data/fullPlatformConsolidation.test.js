@@ -31,9 +31,9 @@ const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.js'),
 const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 'utf8');
 
 const REQUIRED_AUTH_SNIPPETS = Object.freeze([
-  "path: '/auth'",
   'AUTH_PATH_ALIASES.map',
-  'element: <Navigate to="/workspace/emergency" replace />',
+  'LEGACY_EMERGENCY_ROUTE_REDIRECTS.map',
+  'element: <Navigate to="/emergency/whiteboard" replace />',
 ]);
 
 const REQUIRED_ROUTES = Object.freeze([
@@ -119,18 +119,28 @@ const REQUIRED_BACKEND_ROUTES = Object.freeze([
   ['GET', '/api/profile/me/workspaces'],
 ]);
 
+function routeSurfaceDeclares(route) {
+  return (
+    appSource.includes(`path: '${route}'`) ||
+    appSource.includes(`'${route}'`) ||
+    routeConfigSource.includes(`'${route}'`)
+  );
+}
+
 describe('full platform consolidation contract', () => {
   it('bypasses /auth with direct open access and no team verification wrapper', () => {
     for (const snippet of REQUIRED_AUTH_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
+    expect(routeConfigSource).toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
 
     expect(authSource).toContain('Enter Platform');
     expect(authSource).toContain('directSignInSection');
     expect(userContextSource).toContain('OPEN_ACCESS_USER');
     expect(userContextSource).toContain("authMode: 'open-access'");
     expect(appSource).not.toContain('<TenantRequired>');
-    expect(appShellSource).toContain('app-shell-dev-mode-banner');
+    expect(appShellSource).toContain('isDevAuthBypass');
+    expect(appShellSource).toContain('ed-os-banner');
     expect(devAuthSource).toContain('AUTH_CONFIG.demo.exposed');
     expect(authConfigSource).toContain('ENV_CONFIG.demoMode');
     expect(authConfigSource).toContain('showDemoAuth');
@@ -140,20 +150,20 @@ describe('full platform consolidation contract', () => {
 
   it('declares the unified clinical operating-system route surface once', () => {
     for (const route of REQUIRED_ROUTES) {
-      expect(appSource, route).toContain(`path: '${route}'`);
+      expect(routeSurfaceDeclares(route), route).toBe(true);
     }
 
     expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
-    expect(routeConfigSource).toContain(
-      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
-    );
-    expect(routeConfigSource).toContain(
-      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
-    );
+    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/assistant', '/chat', '/ai', '/copilot'])");
+    expect(routeConfigSource).toContain("'/tools'");
+    expect(routeConfigSource).toContain("'/all-tools'");
+    expect(routeConfigSource).toContain("'/clinical-tools'");
+    expect(routeConfigSource).toContain("'/catalog'");
     expect(routeConfigSource).toContain(
       "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
     );
-    expect(routeConfigSource).toContain("export const HOME_ROUTE_ALIASES = Object.freeze(['/home'])");
+    expect(routeConfigSource).toContain("'/dashboard'");
+    expect(routeConfigSource).toContain("'/home'");
     expect(routeConfigSource).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
@@ -230,9 +240,7 @@ describe('full platform consolidation contract', () => {
     expect(themeTokensCss).toContain("html[data-theme='dark']");
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(
-      /\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/
-    );
+    expect(appShellCss).toMatch(/\.ed-os-main,\s*[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 });

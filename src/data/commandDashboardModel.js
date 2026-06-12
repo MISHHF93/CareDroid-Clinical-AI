@@ -48,7 +48,7 @@ export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
   {
     id: 'open-knowledge-graph',
     title: 'Open knowledge graph',
-    prompt: 'Open the Artifact Knowledge Graph and show graph relationships for this case.',
+    prompt: 'Open the Clinical Knowledge Graph and show graph relationships for this case.',
     toolId: REGISTRY.clinicalKnowledgeGraph,
     description: 'Explore assets, packs, products, roles, routes, workflows, agents, and integration relationships.',
   },

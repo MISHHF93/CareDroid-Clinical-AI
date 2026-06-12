@@ -91,35 +91,82 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              if (id.includes('recharts')) {
+            const normalizedId = id.replaceAll('\\', '/');
+
+            if (normalizedId.includes('node_modules')) {
+              if (normalizedId.includes('recharts')) {
                 return 'vendor-charts';
               }
-              if (id.includes('dexie')) {
+              if (normalizedId.includes('dexie')) {
                 return 'vendor-idb';
               }
-              if (id.includes('firebase')) {
+              if (normalizedId.includes('firebase')) {
                 return 'vendor-firebase';
               }
-              if (id.includes('lucide-react')) {
+              if (normalizedId.includes('lucide-react')) {
                 return 'vendor-icons';
               }
               return 'vendor';
             }
 
-            if (id.includes('pages/tools/Calculators')) {
+            if (normalizedId.includes('/src/pages/tools/mentalHealthCalculators')) {
+              return 'calculators-mental-health';
+            }
+            if (
+              normalizedId.includes('/src/pages/tools/pr4aCalculators') ||
+              normalizedId.includes('/src/pages/tools/pr8ClinicalBatchCalculators') ||
+              normalizedId.includes('/src/pages/tools/sourceBackedClinicalCalculators') ||
+              normalizedId.includes('/src/pages/tools/abcd2Calculator') ||
+              normalizedId.includes('/src/pages/tools/nextWaveCalculators')
+            ) {
+              return 'calculators-general-clinical';
+            }
+            if (normalizedId.includes('/src/pages/tools/emergencyCriticalCareCalculators')) {
+              return 'calculators-emergency-critical-care';
+            }
+            if (normalizedId.includes('/src/pages/tools/cardiologyCalculators')) {
+              return 'calculators-cardiology';
+            }
+            if (normalizedId.includes('/src/pages/tools/pulmonologyCalculators')) {
+              return 'calculators-pulmonology';
+            }
+            if (normalizedId.includes('/src/pages/tools/nephrologyCalculators')) {
+              return 'calculators-nephrology';
+            }
+            if (normalizedId.includes('/src/pages/tools/endocrineMetabolicCalculators')) {
+              return 'calculators-endocrine-metabolic';
+            }
+            if (normalizedId.includes('/src/pages/tools/neurologyCalculators')) {
+              return 'calculators-neurology';
+            }
+            if (normalizedId.includes('/src/pages/tools/pediatricsObgynCalculators')) {
+              return 'calculators-pediatrics-obgyn';
+            }
+            if (normalizedId.includes('/src/pages/tools/psychiatryScreeningCalculators')) {
+              return 'calculators-psychiatry-screening';
+            }
+            if (normalizedId.includes('/src/pages/tools/hospitalOperationsCalculators')) {
+              return 'calculators-hospital-operations';
+            }
+            if (normalizedId.includes('/src/pages/tools/hepatologyGiCalculators')) {
+              return 'calculators-hepatology-gi';
+            }
+            if (normalizedId.includes('pages/tools/Calculators')) {
               return 'calculators';
             }
-            if (id.includes('ClinicalToolCatalog')) {
+            if (normalizedId.includes('ClinicalToolCatalog')) {
               return 'clinical-catalog';
             }
-            if (id.includes('pages/Dashboard')) {
+            if (normalizedId.includes('pages/Dashboard')) {
               return 'dashboard';
             }
-            if (id.includes('AnalyticsDashboard') || id.includes('CostAnalyticsDashboard')) {
+            if (
+              normalizedId.includes('AnalyticsDashboard') ||
+              normalizedId.includes('CostAnalyticsDashboard')
+            ) {
               return 'analytics';
             }
-            if (id.includes('components/charts/')) {
+            if (normalizedId.includes('components/charts/')) {
               return 'charts';
             }
           },

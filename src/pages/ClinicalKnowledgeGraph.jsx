@@ -58,8 +58,8 @@ export default function ClinicalKnowledgeGraph() {
     <section className="knowledge-graph-page">
       <section className="knowledge-graph-hero" aria-labelledby="knowledge-graph-title">
         <div>
-          <p className="knowledge-graph-eyebrow">Artifact intelligence graph</p>
-          <h1 id="knowledge-graph-title">Artifact Knowledge Graph</h1>
+          <p className="knowledge-graph-eyebrow">Clinical intelligence graph</p>
+          <h1 id="knowledge-graph-title">Clinical Knowledge Graph</h1>
           <p>
             Explore how assets, packs, products, workspaces, organizations, roles, routes,
             simulations, workflows, AI agents, and integrations connect across CareDroid.

@@ -537,7 +537,7 @@ export function buildResponsiveQaPages() {
     ['protocols', 'Protocol and Clinical Pathway Library', '/protocols', 'clinical'],
     ['research', 'Research and Evidence Hub', '/research', 'clinical'],
     ['documentation', 'Clinical Documentation Assistant', '/documentation', 'clinical'],
-    ['knowledge-graph', 'Artifact Knowledge Graph', '/knowledge-graph', 'clinical'],
+    ['knowledge-graph', 'Clinical Knowledge Graph', '/knowledge-graph', 'clinical'],
     ['predictive-analytics', 'Predictive Analytics Dashboard', '/predictive-analytics', 'analytics'],
     ['clinical-decision-support', 'Clinical Decision Support Engine', '/clinical-decision-support', 'clinical'],
     ['competencies', 'Competency Platform', '/competencies', 'simulation'],

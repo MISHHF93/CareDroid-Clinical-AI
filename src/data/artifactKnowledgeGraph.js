@@ -838,7 +838,7 @@ export function buildKnowledgeGraphAiPrompt(node, neighbors = []) {
     .map(({ edge, node: relatedNode }) => `${edge.type} ${relatedNode.label}`)
     .join('; ');
   return [
-    `Open the Artifact Knowledge Graph and explain the selected node: ${selectedNode.label}.`,
+    `Open the Clinical Knowledge Graph and explain the selected node: ${selectedNode.label}.`,
     `Type: ${selectedNode.type}.`,
     `Summary: ${selectedNode.summary}`,
     `Relationships: ${neighborText || 'No direct relationships'}.`,

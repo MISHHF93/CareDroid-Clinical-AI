@@ -11,6 +11,36 @@ import { AssetPack } from './entities/asset-pack.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { RoleProfile } from './entities/role-profile.entity';
 
+type SeedPlatformAsset = (typeof SEED_PLATFORM_ASSETS)[number];
+
+const SEED_ASSET_SYNC_FIELDS: Array<keyof PlatformAsset> = [
+  'assetType',
+  'title',
+  'description',
+  'category',
+  'clinicalSpecialty',
+  'route',
+  'launchType',
+  'permissionPolicy',
+  'organizationTypes',
+  'roleProfiles',
+  'intendedRoles',
+  'workspaceTags',
+  'specialties',
+  'primaryDepartment',
+  'secondaryDepartments',
+  'recommendedRoles',
+  'requiredPermissions',
+  'riskLevel',
+  'backendStatus',
+  'demoStatus',
+  'governance',
+  'pricingTier',
+  'packIds',
+  'dependencies',
+  'catalogVersion',
+];
+
 @Injectable()
 export class PlatformAssetsSeedService implements OnModuleInit {
   private readonly logger = new Logger(PlatformAssetsSeedService.name);
@@ -33,7 +63,7 @@ export class PlatformAssetsSeedService implements OnModuleInit {
     const assetCount = await this.assetRepository.count();
     if (assetCount > 0) {
       await this.backfillSeedPacks();
-      await this.backfillMissingSeedAssets();
+      await this.backfillSeedAssets();
       return;
     }
     this.logger.log('Seeding platform assets, packs, and role profiles…');
@@ -86,16 +116,29 @@ export class PlatformAssetsSeedService implements OnModuleInit {
     );
   }
 
-  private async backfillMissingSeedAssets() {
+  private async backfillSeedAssets() {
     let inserted = 0;
+    let repaired = 0;
     for (const asset of SEED_PLATFORM_ASSETS) {
       const existing = await this.assetRepository.findOne({ where: { id: asset.id } });
-      if (existing) continue;
-      await this.saveSeedAsset(asset);
-      inserted += 1;
+      if (!existing) {
+        await this.saveSeedAsset(asset);
+        inserted += 1;
+        continue;
+      }
+
+      const repairedAsset = this.mergeSeedAsset(existing, asset);
+      this.assetRegistryService.validateAsset(repairedAsset);
+      if (this.seedAssetChanged(existing, repairedAsset)) {
+        await this.assetRepository.save(repairedAsset);
+        repaired += 1;
+      }
     }
     if (inserted) {
       this.logger.log(`Backfilled ${inserted} missing platform asset registry rows`);
+    }
+    if (repaired) {
+      this.logger.log(`Repaired ${repaired} stale platform asset registry rows`);
     }
   }
 
@@ -160,8 +203,8 @@ export class PlatformAssetsSeedService implements OnModuleInit {
     }
   }
 
-  private async saveSeedAsset(asset: (typeof SEED_PLATFORM_ASSETS)[number]) {
-    const row = this.assetRepository.create({
+  private createSeedAssetRow(asset: SeedPlatformAsset) {
+    return this.assetRepository.create({
       id: asset.id,
       assetType: asset.assetType,
       title: asset.title,
@@ -190,6 +233,30 @@ export class PlatformAssetsSeedService implements OnModuleInit {
       dependencies: asset.dependencies,
       catalogVersion: asset.catalogVersion,
     });
+  }
+
+  private mergeSeedAsset(existing: PlatformAsset, asset: SeedPlatformAsset) {
+    const seedRow = this.createSeedAssetRow(asset);
+    return this.assetRepository.create({
+      ...existing,
+      ...seedRow,
+      lifecycle: existing.lifecycle || seedRow.lifecycle,
+      packIds: [...new Set([...(existing.packIds || []), ...(seedRow.packIds || [])])],
+      dependencies: [
+        ...new Set([...(existing.dependencies || []), ...(seedRow.dependencies || [])]),
+      ],
+    });
+  }
+
+  private seedAssetChanged(existing: PlatformAsset, repaired: PlatformAsset) {
+    return SEED_ASSET_SYNC_FIELDS.some(
+      (field) =>
+        JSON.stringify(existing[field] ?? null) !== JSON.stringify(repaired[field] ?? null),
+    );
+  }
+
+  private async saveSeedAsset(asset: SeedPlatformAsset) {
+    const row = this.createSeedAssetRow(asset);
     this.assetRegistryService.validateAsset(row);
     await this.assetRepository.save(row);
   }

@@ -941,7 +941,7 @@ Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 an
   },
   {
     toolId: NLU.pediatricDoseSafetyChecker,
-    toolName: 'Pediatric Emergency Drug Calculator',
+    toolName: 'Pediatric Dose Safety Checker',
     category: 'calculator',
     description:
       'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts.',
@@ -2429,14 +2429,14 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
   },
   {
     toolId: NLU.clinicalKnowledgeGraph,
-    toolName: 'Artifact Knowledge Graph',
+    toolName: 'Clinical Knowledge Graph',
     category: 'reference',
     description:
       'Graph explorer connecting assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations with relationship search and explainability.',
     path: TOOL_LAUNCH_PATHS.knowledgeGraph,
     sidebarToolId: REGISTRY.clinicalKnowledgeGraph,
     chatSeed:
-      'Open the Artifact Knowledge Graph. Search and explain relationships across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
+      'Open the Clinical Knowledge Graph. Search and explain relationships across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
     backendExecutable: false,
   },
   {
@@ -3299,7 +3299,7 @@ export const builtinUiCalculators = [
   },
   {
     id: 'pediatric-dose-safety-checker',
-    name: 'Pediatric Emergency Drug Calculator',
+    name: 'Pediatric Dose Safety Checker',
     description:
       'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts.',
     path: '/tools/calculators/pediatric-dose-safety-checker',

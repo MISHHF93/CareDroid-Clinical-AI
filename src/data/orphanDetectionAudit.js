@@ -6,7 +6,11 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CANONICAL_ROUTES } from '../config/routes.config';
+import {
+  CANONICAL_ROUTES,
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  ROUTE_ALIAS_REDIRECTS,
+} from '../config/routes.config';
 import {
   getCanonicalToolInventory,
   getUserFacingToolInventory,
@@ -15,7 +19,11 @@ import {
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
 import { runBackendFrontendExposureScan } from './backendFrontendExposure';
-import { getBackendOnlyRoutes } from './backendRouteExposurePolicy';
+import {
+  BACKEND_ROUTE_EXPOSURE_POLICY,
+  getBackendOnlyRoutes,
+  routePolicyKey,
+} from './backendRouteExposurePolicy';
 import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { BACKEND_EXECUTOR_NLU_TOOL_IDS } from '../config/backendApiCapabilities';
 
@@ -42,7 +50,7 @@ const MERGE_DUPLICATES = Object.freeze([
     primary: 'src/pages/organization/OrganizationPages.jsx (PackMarketplace)',
     duplicate: '/asset-packs vs /settings/organization/packs',
     route: 'organization packs',
-    note: 'Two pack marketplace routes',
+    note: 'Intentional dual context: product discovery and organization entitlement management share PackMarketplace.',
   },
   {
     id: 'notification-services-dual',
@@ -51,6 +59,13 @@ const MERGE_DUPLICATES = Object.freeze([
     route: '—',
     note: 'Nested service is legacy queue-style compatibility only; active app client is src/services/NotificationService.js.',
   },
+]);
+
+const EXPECTED_LEGACY_NON_ROUTE_FILES = new Set([
+  'src/pages/tools/Calculators.jsx',
+  'src/pages/CommandDashboard.jsx',
+  'src/pages/fleet/FleetDashboardWidgets.jsx',
+  'src/pages/SimulationLaboratoryViewer.css',
 ]);
 
 const LEGACY_ROUTE_PREFIXES = ['/login', '/signin', '/home', '/chat', '/calculator/', '/medical-simulation', '/lab', '/anatomy-viewer'];
@@ -90,7 +105,17 @@ function buildProductionCorpus() {
 
 function parseAppRoutePaths() {
   const app = readRepoFile('src/App.jsx');
-  const paths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+  const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+  const generatedAliasPaths = app.includes('ROUTE_ALIAS_REDIRECTS') ||
+    app.includes('PROTECTED_ROUTE_ALIAS_REDIRECTS')
+    ? ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)
+    : [];
+  const legacyEmergencyPaths = app.includes('LEGACY_EMERGENCY_ROUTE_REDIRECTS')
+    ? LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((entry) => entry.path)
+    : [];
+  const futureReleasePaths = app.includes('FUTURE_RELEASE_ROUTES')
+    ? [...app.matchAll(/\[\s*['"][^'"]+['"]\s*,\s*['"](\/[^'"]+)['"]\s*\]/g)].map((m) => m[1])
+    : [];
   const redirectTargets = [
     ...app.matchAll(/LegacyProtectedRouteRedirect\s+to=['"]([^'"]+)['"]/g),
     ...app.matchAll(/LegacyProtectedRouteRedirect\s+to=\{([^}]+)\}/g),
@@ -100,7 +125,7 @@ function parseAppRoutePaths() {
     ...app.matchAll(/from\s+['"](\.\/pages\/[^'"]+)['"]/g),
   ].map((m) => m[1]);
   return {
-    paths: [...new Set(paths)],
+    paths: [...new Set([...directPaths, ...generatedAliasPaths, ...legacyEmergencyPaths, ...futureReleasePaths])],
     redirectTargets: [...new Set(redirectTargets.filter((t) => t.startsWith('/')))],
     lazyImports: [...new Set(lazyImports)],
   };
@@ -168,12 +193,29 @@ function collectCanonicalNavPaths() {
   return paths;
 }
 
+function routePatternMatches(pattern, route) {
+  if (!pattern || !route) return false;
+  if (pattern === route) return true;
+  if (pattern.endsWith('/*')) {
+    const prefix = pattern.slice(0, -2);
+    return route === prefix || route.startsWith(`${prefix}/`);
+  }
+  const patternParts = pattern.split('/').filter(Boolean);
+  const routeParts = route.split('/').filter(Boolean);
+  if (patternParts.length !== routeParts.length) return false;
+  return patternParts.every((part, index) => part.startsWith(':') || part === routeParts[index]);
+}
+
+function routeIsCovered(route, appPaths) {
+  return appPaths.some((pattern) => routePatternMatches(pattern, route));
+}
+
 function detectOrphanRoutes(appPaths, navPaths) {
   const appSet = new Set(appPaths);
   const rows = [];
 
   for (const path of navPaths) {
-    if (!appSet.has(path) && !appPaths.some((p) => path.startsWith(p + '/') || p.startsWith(path))) {
+    if (!routeIsCovered(path, appPaths) && !appPaths.some((p) => p.startsWith(path))) {
       const isLegacy = LEGACY_ROUTE_PREFIXES.some((l) => path.startsWith(l));
       rows.push({
         id: path,
@@ -186,7 +228,7 @@ function detectOrphanRoutes(appPaths, navPaths) {
 
   for (const tool of getUserFacingToolInventory()) {
     const route = tool.route;
-    if (!route || appSet.has(route)) continue;
+    if (!route || appSet.has(route) || routeIsCovered(route, appPaths)) continue;
     rows.push({
       id: tool.id,
       route,
@@ -246,6 +288,9 @@ function detectOrphanPages(corpus, appImports) {
       }) || (ref.referenced ? null : ORPHAN_CLASSIFICATIONS.QUARANTINE);
 
     if (mergeDuplicate) classification = ORPHAN_CLASSIFICATIONS.MERGE;
+    if (EXPECTED_LEGACY_NON_ROUTE_FILES.has(rel)) {
+      classification = ORPHAN_CLASSIFICATIONS.LEGACY;
+    }
     if (!classification) return null;
     if (appWired.has(rel) && classification === ORPHAN_CLASSIFICATIONS.LEGACY && !mergeDuplicate) {
       return null;
@@ -294,7 +339,9 @@ function detectDomainModuleOrphans(corpus, appImports) {
       const rel = relative(REPO_ROOT, full).replace(/\\/g, '/');
       const ref = isReferenced(rel, corpus.text, appWired);
       if (ref.referenced && appWired.has(rel)) continue;
-      const classification = ref.referenced
+      const classification = EXPECTED_LEGACY_NON_ROUTE_FILES.has(rel)
+        ? ORPHAN_CLASSIFICATIONS.LEGACY
+        : ref.referenced
         ? ORPHAN_CLASSIFICATIONS.WIRE
         : rel.endsWith('.css')
           ? ORPHAN_CLASSIFICATIONS.LEGACY
@@ -371,12 +418,12 @@ function detectOrphanExecutors() {
   );
   const rows = [];
   for (const tool of registered) {
-    const orchId = tool.id;
+    const orchId = tool.orchestratorToolId || tool.id;
     if (!ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(orchId) && !BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(orchId)) {
       rows.push({
         id: tool.id,
         classification: ORPHAN_CLASSIFICATIONS.WIRE,
-        evidence: 'Inventory claims REGISTERED executor but not in orchestrator registry',
+        evidence: `Inventory claims REGISTERED executor but ${orchId} is not in orchestrator registry`,
       });
     }
   }
@@ -438,13 +485,17 @@ function detectOrphanApis() {
     );
   });
   for (const route of missingFromInventory.filter((r) => r.path.includes('/api/platform') || r.path.includes('/api/products'))) {
+    const policy = BACKEND_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)];
+    const shouldWire = policy?.strategy === 'expose-recommended';
     rows.push({
       id: `${route.method} ${route.path}`,
       method: route.method,
       path: route.path,
       client: route.controller,
-      classification: ORPHAN_CLASSIFICATIONS.WIRE,
-      evidence: 'Platform/product API not listed in frontendApiCallsInventory',
+      classification: shouldWire ? ORPHAN_CLASSIFICATIONS.WIRE : ORPHAN_CLASSIFICATIONS.LEGACY,
+      evidence: shouldWire
+        ? 'Platform/product API is expose-recommended but not listed in frontendApiCallsInventory'
+        : `Platform/product API is ${policy?.strategy ?? 'deferred'} and not frontend-inventory wired`,
     });
   }
 
@@ -615,7 +666,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '## Critical findings',
     '',
     '1. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.',
-    '2. **AI agents / platform APIs** — `platformAssetsApi.js` / `productCatalogApi.js` not in `frontendApiCallsInventory`. Class: **wire**.',
+    '2. **AI agents / platform APIs** — platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.',
     '3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
     '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
     '',

@@ -13,7 +13,7 @@ const fleetDashboardCss = readFileSync(join(__dirname, 'FleetDashboard.css'), 'u
 const pmCss = readFileSync(join(__dirname, 'PredictiveMaintenance.css'), 'utf8');
 const roCss = readFileSync(join(__dirname, 'RouteOptimizer.css'), 'utf8');
 const analyticsCss = readFileSync(join(__dirname, '../AnalyticsDashboard.css'), 'utf8');
-const auditCss = readFileSync(join(__dirname, '../AuditLogs.css'), 'utf8');
+const settingsCss = readFileSync(join(__dirname, '../Settings.css'), 'utf8');
 const costCss = readFileSync(join(__dirname, '../CostAnalyticsDashboard.css'), 'utf8');
 const catalogCss = readFileSync(join(__dirname, '../tools/ClinicalToolCatalog.css'), 'utf8');
 
@@ -68,10 +68,11 @@ describe('Admin dashboards & catalog tables', () => {
     expect(analyticsCss).toContain('overflow-x: clip');
   });
 
-  it('scrolls audit logs table horizontally without breaking page', () => {
-    expect(auditCss).toMatch(/\.logs-table-container[\s\S]*overflow-x:\s*auto/);
-    expect(auditCss).toMatch(/\.logs-table thead[\s\S]*position:\s*sticky/);
-    expect(auditCss).toContain('overflow-x: clip');
+  it('keeps settings audit log cards wrapped without breaking page width', () => {
+    expect(settingsCss).toContain('overflow-x: clip');
+    expect(settingsCss).toMatch(/\.settings-audit-log-item[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*auto/);
+    expect(settingsCss).toMatch(/\.settings-audit-log-item strong[\s\S]*overflow-wrap:\s*anywhere/);
+    expect(settingsCss).toMatch(/\.settings-audit-log-item span,[\s\S]*\.settings-audit-log-item time[\s\S]*overflow-wrap:\s*anywhere/);
   });
 
   it('makes cost analytics chart host scrollable and cards wrap', () => {

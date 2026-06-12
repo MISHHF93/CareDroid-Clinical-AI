@@ -107,6 +107,16 @@ const SHORTCUT_GROUPS = [
 
 const SIDEBAR_NEW_FEATURES_KEY = 'caredroid.emergency.sidebarNewFeatures.v1';
 const CHARGE_NURSE_PULSE_DEFAULT_KEY = 'caredroid.ed.departmentPulse.chargeDefaultSeen';
+const AI_AGENT_PREFILL_LABELS = Object.freeze({
+  'agent-clinical': 'Clinical AI',
+  'agent-emergency': 'Emergency AI',
+  'agent-lab': 'Laboratory AI',
+  'agent-operations': 'Operations AI',
+  'agent-fleet': 'Fleet AI',
+  'agent-education': 'Education AI',
+  'agent-research': 'Research AI',
+  'agent-governance': 'Governance AI',
+});
 
 function readSessionFeatureSet() {
   if (typeof sessionStorage === 'undefined') return new Set();
@@ -1089,6 +1099,15 @@ const AppShell = ({
     const params = new URLSearchParams(location.search);
     const prompt = params.get('prompt');
     if (prompt) return prompt;
+    const agent = params.get('agent');
+    if (agent) {
+      const agentLabel = AI_AGENT_PREFILL_LABELS[agent] || agent;
+      return [
+        `Use ${agentLabel} (${agent}) for this ED Copilot conversation.`,
+        'Keep output concise, source-aware, human-reviewed, and scoped to Emergency Department operations.',
+        'Do not make autonomous clinical decisions.',
+      ].join(' ');
+    }
     const tool = params.get('tool') || params.get('calc');
     if (!tool) return '';
     const patientId = params.get('patientId');

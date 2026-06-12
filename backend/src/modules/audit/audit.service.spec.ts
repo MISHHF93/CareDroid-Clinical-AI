@@ -5,6 +5,11 @@ import { AuditLog, AuditAction } from './entities/audit-log.entity';
 
 describe('AuditService', () => {
   let service: AuditService;
+  let mockUpdateQueryBuilder: {
+    update: jest.Mock;
+    set: jest.Mock;
+    execute: jest.Mock;
+  };
 
   const mockAuditRepository = {
     create: jest.fn(),
@@ -46,6 +51,12 @@ describe('AuditService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAuditRepository.find.mockResolvedValue([]);
+    mockUpdateQueryBuilder = {
+      update: jest.fn().mockReturnThis(),
+      set: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue({}),
+    };
+    mockAuditRepository.createQueryBuilder.mockReturnValue(mockUpdateQueryBuilder);
   });
 
   it('should be defined', () => {
@@ -425,7 +436,6 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       const result = await service.verifyIntegrity();
 
@@ -464,7 +474,6 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       const result = await service.verifyIntegrity();
 
@@ -502,7 +511,6 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       const result = await service.verifyIntegrity();
 
@@ -541,11 +549,12 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       await service.verifyIntegrity();
 
-      expect(mockAuditRepository.update).toHaveBeenCalledWith({}, { integrityVerified: false });
+      expect(mockUpdateQueryBuilder.update).toHaveBeenCalledWith(AuditLog);
+      expect(mockUpdateQueryBuilder.set).toHaveBeenCalledWith({ integrityVerified: false });
+      expect(mockUpdateQueryBuilder.execute).toHaveBeenCalled();
     });
 
     it('should mark all logs as verified when chain is valid', async () => {
@@ -566,12 +575,13 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       const result = await service.verifyIntegrity();
 
       if (result.isValid) {
-        expect(mockAuditRepository.update).toHaveBeenCalledWith({}, { integrityVerified: true });
+        expect(mockUpdateQueryBuilder.update).toHaveBeenCalledWith(AuditLog);
+        expect(mockUpdateQueryBuilder.set).toHaveBeenCalledWith({ integrityVerified: true });
+        expect(mockUpdateQueryBuilder.execute).toHaveBeenCalled();
       }
     });
 
@@ -604,7 +614,6 @@ describe('AuditService', () => {
       ];
 
       mockAuditRepository.find.mockResolvedValue(logs);
-      mockAuditRepository.update.mockResolvedValue({});
 
       const result = await service.verifyIntegrity();
 

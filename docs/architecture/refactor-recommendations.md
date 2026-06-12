@@ -2,7 +2,7 @@
 
 Generated: 2026-06-12
 
-Mode: recommendations only. No source code was changed for this investigation pass.
+Mode: recommendations plus low-risk cleanup. The duplicate legacy Android Retrofit interface was removed; remaining native API contract drift is still quarantined.
 
 ## Ranking Key
 
@@ -21,7 +21,7 @@ Mode: recommendations only. No source code was changed for this investigation pa
 | Pilot can confuse demo/local mode with production connectivity. | `ENABLE_MONGOOSE_EMERGENCY_OS` gates backend Emergency routes; many integrations return demo/readiness data; frontend still renders from local store. | Add a readiness/status surface for backend mode, Mongo availability, demo auth, FHIR/HL7 status, Firebase, AI provider, Stripe, and notification channel readiness before customer use. |
 | First customer workflow is not verified end-to-end against backend. | New patient/reassessment/discharge flows are store-first; backend endpoints exist but are not consistently consumed. | Run and codify a customer walkthrough: login -> create patient -> triage -> whiteboard -> reassessment -> discharge. Treat failures as release blockers. |
 | Live integration claims would be misleading. | FHIR/HL7/EHR/IoT/fleet endpoints are demo/readiness contracts, not live connectors. | Hide or label live integrations as demo/readiness-only for pilot materials. |
-| Native Android API contract is stale. | Android Retrofit client references routes that do not match current Nest APIs. | Quarantine native Android from pilot scope or update its API contract before demoing mobile. |
+| Native Android API contract is stale. | The duplicate legacy Retrofit interface was removed, but the remaining Android Retrofit client still references routes that do not match current Nest APIs. | Quarantine native Android from pilot scope or update its API contract before demoing mobile. |
 
 ## P1 - Blocks Workflow
 
@@ -57,7 +57,7 @@ Mode: recommendations only. No source code was changed for this investigation pa
 | Platform marketplace/commercial modules are broad. | Product catalog, marketplace, governance, success, commercial pages exist beyond ED pilot scope. | Keep outside pilot; revisit after first customer workflow is reliable. |
 | Integration readiness is mostly static/demo. | FHIR/HL7/EHR/provincial/IoT connectors are placeholders or demo contracts. | Convert to tenant connector records with explicit status, credentials, last test, last sync, and no-writeback policy. |
 | Observability stack is rich but optional. | Sentry/Datadog/Prometheus configured, not guaranteed enabled locally. | Add pilot deployment checklist for telemetry activation. |
-| Android native app may be valuable later. | Native codebase exists but API contract is stale. | Rebuild native API layer after web pilot stabilizes. |
+| Android native app may be valuable later. | Native codebase exists; duplicate API service was removed, but the remaining API contract is stale and local compile is blocked until `ANDROID_HOME`/`local.properties` is configured. | Rebuild native API layer after web pilot stabilizes. |
 
 ## Recommended Normalization Order
 

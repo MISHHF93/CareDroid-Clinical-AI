@@ -2152,7 +2152,7 @@ const toolRegistry = [
   },
   {
     id: 'pediatric-dose-safety-checker',
-    name: 'Pediatric Emergency Drug Calculator',
+    name: 'Pediatric Dose Safety Checker',
     path: '/tools/calculators/pediatric-dose-safety-checker',
     panelTool: 'calculators',
     initialCalc: 'pediatric-dose-safety-checker',
@@ -3859,7 +3859,7 @@ const toolRegistry = [
   },
   {
     id: 'clinical-knowledge-graph',
-    name: 'Artifact Knowledge Graph',
+    name: 'Clinical Knowledge Graph',
     path: '/knowledge-graph',
     color: '#14B8A6',
     description:

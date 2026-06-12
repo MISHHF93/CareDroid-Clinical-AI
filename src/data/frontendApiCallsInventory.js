@@ -257,8 +257,10 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'subscriptions-checkout', method: 'POST', path: '/api/subscriptions/create-checkout', client: 'subscriptionApi.js' },
   { id: 'subscriptions-portal', method: 'POST', path: '/api/subscriptions/portal', client: 'subscriptionApi.js' },
 
+  { id: 'products-list', method: 'GET', path: '/api/products', client: 'productCatalogApi.js / CommercialPages.jsx' },
   { id: 'product-pack-map', method: 'GET', path: '/api/products/pack-map', client: 'productCatalogApi.js / CommercialPages.jsx' },
   { id: 'product-builder', method: 'GET', path: '/api/products/builder', client: 'productCatalogApi.js / CommercialPages.jsx' },
+  { id: 'product-detail', method: 'GET', path: '/api/products/:slug', client: 'productCatalogApi.js / CommercialPages.jsx' },
   { id: 'product-builder-detail', method: 'GET', path: '/api/products/:slug/builder', client: 'productCatalogApi.js / CommercialPages.jsx' },
   { id: 'product-assets-list', method: 'GET', path: '/api/products/:slug/assets', client: 'productCatalogApi.js / CommercialPages.jsx' },
   { id: 'asset-packs-list', method: 'GET', path: '/api/asset-packs', client: 'productCatalogApi.js / OrganizationPages.jsx' },

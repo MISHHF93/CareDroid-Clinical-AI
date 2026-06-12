@@ -6,6 +6,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildAssetInventoryProjection } from './assetInventory';
 import { getUserFacingToolInventory } from './toolInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -236,6 +237,20 @@ function rolePacksForAsset(assetId, packIds, packs, assetToRolePacks) {
   return [...roles];
 }
 
+function routeGroupForBacklogTool(tool) {
+  const route = tool.route || '';
+  if (route.startsWith('/tools/calculators')) return 'calculator tools';
+  const toolArea = route.match(/^\/tools\/([^/?]+)/)?.[1];
+  if (toolArea && toolArea !== 'catalog') return `${toolArea} tools`;
+  if (route.startsWith('/patients')) return 'patient workflow';
+  if (route.startsWith('/governance')) return 'governance workflow';
+  if (route.startsWith('/operations')) return 'operations workflow';
+  if (route.startsWith('/settings')) return 'settings / organization';
+  if (route.startsWith('/tools/catalog')) return 'tool catalog';
+  if (route.startsWith('/assistant')) return 'assistant workflow';
+  return route ? 'other routed tools' : 'unrouted tools';
+}
+
 export function buildProductPackagingAudit() {
   const { packs, packByAsset } = parseAssetPacks();
   const { profiles, assetToRolePacks } = parseRoleProfiles();
@@ -278,9 +293,21 @@ export function buildProductPackagingAudit() {
     };
   });
 
-  const inventoryOnly = getUserFacingToolInventory()
+  const userFacingInventory = getUserFacingToolInventory();
+  const mountedAssetIds = new Set(buildAssetInventoryProjection().map((asset) => asset.id));
+  const backendSeedBacklog = userFacingInventory
     .filter((t) => !packByAsset.has(t.id))
-    .map((t) => ({ id: t.id, label: t.label, route: t.route }));
+    .map((t) => ({ id: t.id, label: t.label, route: t.route, mounted: mountedAssetIds.has(t.id) }));
+  const unmountedInventory = backendSeedBacklog.filter((t) => !t.mounted);
+  const backendSeedBacklogByRouteGroup = Object.entries(
+    backendSeedBacklog.reduce((acc, tool) => {
+      const group = routeGroupForBacklogTool(tool);
+      acc[group] = (acc[group] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .map(([group, count]) => ({ group, count }))
+    .sort((a, b) => b.count - a.count || a.group.localeCompare(b.group));
 
   const nonCompliant = assetRows.filter((r) => !r.compliant);
   const specialtyGaps = assetRows.filter((r) => r.violations.includes('missing-specialty-pack'));
@@ -299,14 +326,19 @@ export function buildProductPackagingAudit() {
       nonCompliantAssets: nonCompliant.length,
       specialtyGaps: specialtyGaps.length,
       roleGaps: roleGaps.length,
-      inventoryOnlyCount: inventoryOnly.length,
+      frontendMountedRegistryTools: userFacingInventory.filter((t) => mountedAssetIds.has(t.id)).length,
+      backendSeedBacklogCount: backendSeedBacklog.length,
+      inventoryOnlyCount: unmountedInventory.length,
       solutionPacksDefined: solutionPackChecks.filter((p) => p.packExists).length,
     },
     nonCompliant,
     specialtyGaps,
     roleGaps,
-    inventoryOnly: inventoryOnly.slice(0, 50),
-    inventoryOnlyTotal: inventoryOnly.length,
+    backendSeedBacklog: backendSeedBacklog.slice(0, 50),
+    backendSeedBacklogTotal: backendSeedBacklog.length,
+    backendSeedBacklogByRouteGroup,
+    inventoryOnly: unmountedInventory.slice(0, 50),
+    inventoryOnlyTotal: unmountedInventory.length,
   };
 }
 
@@ -342,7 +374,9 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     `| Packaging violations (seeded assets) | ${audit.summary.nonCompliantAssets} |`,
     `| Missing specialty mapping | ${audit.summary.specialtyGaps} |`,
     `| Missing role mapping | ${audit.summary.roleGaps} |`,
-    `| User-facing registry tools not seeded as assets | ${audit.summary.inventoryOnlyCount} |`,
+    `| User-facing registry tools frontend-mounted | ${audit.summary.frontendMountedRegistryTools} |`,
+    `| Frontend-mounted registry tools awaiting backend seed rows | ${audit.summary.backendSeedBacklogCount} |`,
+    `| User-facing registry tools without mounted asset projection | ${audit.summary.inventoryOnlyCount} |`,
     `| Nine solution packs present in seed | ${audit.summary.solutionPacksDefined}/9 |`,
     '',
     '### Strategy verdict',
@@ -351,9 +385,12 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
       ? '**PASS (seed catalog):** All seeded platform assets have solution pack, specialty, role, and organization-type coverage.'
       : `**PARTIAL:** ${audit.summary.nonCompliantAssets} seeded asset(s) fail one or more packaging dimensions — see violations below.`,
     '',
-    audit.summary.inventoryOnlyCount > 0
-      ? `**Inventory gap:** ${audit.summary.inventoryOnlyCount} user-facing tools exist only in \`toolInventory.js\` and are not yet productized into \`platform_assets\`.`
+    audit.summary.backendSeedBacklogCount > 0
+      ? `**Backend seed backlog:** ${audit.summary.backendSeedBacklogCount} user-facing tools are covered by the frontend mounted asset projection but are not yet direct backend \`platform_assets\` seed rows.`
       : '',
+    audit.summary.inventoryOnlyCount > 0
+      ? `**Projection gap:** ${audit.summary.inventoryOnlyCount} user-facing tools are missing from both backend seed packs and the frontend mounted asset projection.`
+      : '**Projection coverage:** All user-facing registry tools have mounted asset projection coverage.',
     '',
     '## Nine solution packs (generated catalog)',
     '',
@@ -435,18 +472,38 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
 
   lines.push(
     '',
-    '## Registry tools not productized (sample)',
+    '## Frontend-mounted registry tools awaiting backend seed rows (sample)',
     '',
-    `Total: ${audit.inventoryOnlyTotal} user-facing tools without a \`platform_assets\` row.`,
+    '### Backlog by route area',
+    '',
+    '| Route area | Count |',
+    '| --- | ---: |'
+  );
+  for (const row of audit.backendSeedBacklogByRouteGroup) {
+    lines.push(`| ${escapeCell(row.group)} | ${row.count} |`);
+  }
+
+  lines.push(
+    '',
+    '### Sample rows',
+    '',
+    `Total: ${audit.backendSeedBacklogTotal} user-facing tools have frontend mounted asset projection coverage but are not direct backend \`platform_assets\` seed rows.`,
     ''
   );
+  if (audit.backendSeedBacklog.length) {
+    audit.backendSeedBacklog.forEach((t) => {
+      lines.push(`- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}${t.mounted ? ' — mounted projection OK' : ''}`);
+    });
+    if (audit.backendSeedBacklogTotal > audit.backendSeedBacklog.length) {
+      lines.push(`- … and ${audit.backendSeedBacklogTotal - audit.backendSeedBacklog.length} more`);
+    }
+  }
+
   if (audit.inventoryOnly.length) {
+    lines.push('', '### Registry tools missing mounted projection', '');
     audit.inventoryOnly.forEach((t) => {
       lines.push(`- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}`);
     });
-    if (audit.inventoryOnlyTotal > audit.inventoryOnly.length) {
-      lines.push(`- … and ${audit.inventoryOnlyTotal - audit.inventoryOnly.length} more`);
-    }
   }
 
   lines.push(
@@ -457,7 +514,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '2. **Specialty pack** — Add asset id to `SEED_SPECIALTIES[].assetIds` for each relevant specialty slug.',
     '3. **Role pack** — Add to `SEED_ROLE_PROFILES[].preferredAssetIds` and/or pack `targetRoles` for role targeting.',
     '4. **Organization type** — Ensure at least one containing pack lists the tenant segment in `organizationTypes`.',
-    '5. **Inventory backlog** — Backfill `platform_assets` from `toolInventory.js` before claiming full SaaS productization.',
+    '5. **Backend seed backlog** — Promote high-value mounted projection rows into backend `platform_assets` seed rows when they need entitlement enforcement, billing, or marketplace ownership.',
     '',
     '## Appendix',
     '',

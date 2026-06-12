@@ -197,7 +197,7 @@ export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
 ]);
 export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center']);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
-export const HOME_ROUTE_ALIASES = Object.freeze(['/dashboard', '/home', '/workspace', '/app', '/whiteboard']);
+export const HOME_ROUTE_ALIASES = Object.freeze(['/home', '/workspace', '/app', '/whiteboard']);
 export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
 
 export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([

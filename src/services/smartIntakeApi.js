@@ -1,8 +1,14 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
+const SMART_INTAKE_UNAVAILABLE_MESSAGE = 'Backend Smart Intake endpoint is not available yet.';
 
 async function postJson(path, body) {
+  if (!isBackendCapabilityEnabled('emergencySmartIntake')) {
+    throw new Error(SMART_INTAKE_UNAVAILABLE_MESSAGE);
+  }
+
   const response = await apiFetch(path, {
     method: 'POST',
     headers: jsonHeaders,

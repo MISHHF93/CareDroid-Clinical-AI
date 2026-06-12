@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-06-05T05:41:18.516Z
+**Generated:** 2026-06-12T21:17:42.291Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -10,9 +10,13 @@
 | POST | `/api/chat/analyze-vitals` | ChatController | clinicalChatService.js | ✅ |
 | POST | `/api/chat/messages` | — | syncService.js | ⚠️ gated |
 | POST | `/api/chat/conversations` | — | syncService.js | ⚠️ gated |
+| GET | `/api/settings/features` | SettingsFeaturesController | emergencySettingsApi.js / featureStore.ts | ✅ |
+| PATCH | `/api/settings/features` | SettingsFeaturesController | emergencySettingsApi.js / featureStore.ts | ✅ |
 | GET | `/api/protocols` | ProtocolController | clinicalContentApi.js | ✅ |
 | GET | `/api/protocols/categories` | ProtocolController | clinicalContentApi.js | ✅ |
 | GET | `/api/drugs` | DrugController | clinicalContentApi.js | ✅ |
+| GET | `/api/drugs/categories` | DrugController | clinicalContentApi.js | ✅ |
+| GET | `/api/drugs/:id` | DrugController | clinicalContentApi.js | ✅ |
 | GET | `/api/tools` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | GET | `/api/tools/available` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | GET | `/api/tools/:id` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
@@ -24,9 +28,12 @@
 | POST | `/api/tools/share-results` | — | ToolResultShare.jsx | ⚠️ gated |
 | GET | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
 | POST | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
-| GET | `/api/audit/logs` | AuditController | AuditLogs.jsx | ✅ |
-| GET | `/api/audit/verify-integrity` | AuditController | AuditLogs.jsx | ✅ |
-| GET | `/api/audit/statistics` | AuditController | AuditLogs.jsx | ✅ |
+| DELETE | `/api/compliance/delete-account` | ComplianceController | complianceApi.js | ✅ |
+| GET | `/api/audit/logs` | AuditController | Settings.jsx / Profile.jsx | ✅ |
+| GET | `/api/audit/my-logs` | AuditController | auditApi.js / ProfileActivity.jsx | ✅ |
+| GET | `/api/audit/phi-access` | AuditController | auditApi.js / PatientDetailPanel | ✅ |
+| GET | `/api/audit/verify-integrity` | AuditController | auditApi.js | ✅ |
+| GET | `/api/audit/statistics` | AuditController | auditApi.js | ✅ |
 | POST | `/api/audit/sync` | AuditController | syncService.js | ✅ |
 | GET | `/api/notifications` | NotificationController | NotificationService.js | ✅ |
 | GET | `/api/notifications/unread/count` | NotificationController | NotificationService.js | ✅ |
@@ -49,15 +56,34 @@
 | POST | `/api/sync` | — | offline.js / OfflineSupport.jsx | ⚠️ gated |
 | GET | `/api/fleet/vehicles/live` | FleetController | fleetTelemetryService.js | ✅ |
 | GET | `/api/fleet/routes/active` | FleetController | fleetTelemetryService.js | ✅ |
+| GET | `/api/fleet/alerts` | FleetController | fleetTelemetryService.js | ✅ |
+| GET | `/api/fleet/snapshot` | FleetController | emergencyTransportApi.js | ✅ |
 | GET | `/api/hospital-map/floors` | HospitalMapController | hospitalMapService.js | ✅ |
 | GET | `/api/hospital-map/devices` | HospitalMapController | hospitalMapService.js | ✅ |
 | GET | `/api/devices/live` | TelemetryController | medicalIotService.js | ✅ |
 | GET | `/api/telemetry/live` | TelemetryController | medicalIotService.js | ✅ |
 | GET | `/api/alerts/devices` | TelemetryController | medicalIotService.js | ✅ |
 | GET | `/api/clinical/alerts` | ClinicalAlertsController | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ✅ |
-| POST | `/api/clinical/alerts/:id/acknowledge` | ClinicalAlertsController | clinicalAlertsApi.js / clinicalAlertNotifications.js | ✅ |
-| POST | `/api/clinical/alerts/:id/dismiss` | ClinicalAlertsController | clinicalAlertsApi.js / clinicalAlertNotifications.js | ✅ |
-| GET | `/api/clinical/alerts/stream` | — | clinicalAlertNotifications.js | ⚠️ gated |
+| POST | `/api/clinical/alerts/:id/acknowledge` | ClinicalAlertsController | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ✅ |
+| POST | `/api/clinical/alerts/:id/dismiss` | ClinicalAlertsController | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ✅ |
+| GET | `/api/clinical/alerts/stream` | — | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ⚠️ gated |
+| GET | `/api/emergency/analytics` | — | emergencyAnalyticsApi.js | ⚠️ gated |
+| GET | `/api/emergency/capacity/history` | — | emergencyAnalyticsApi.js | ⚠️ gated |
+| GET | `/api/emergency/queues/analytics` | — | emergencyAnalyticsApi.js | ⚠️ gated |
+| GET | `/api/emergency/shift/report/export` | — | emergencyAnalyticsApi.js | ⚠️ gated |
+| POST | `/api/referrals` | PlatformSystemsController | emergencyTransportApi.js | ✅ |
+| GET | `/api/emergency/patients/:patientId/referrals` | — | emergencyTransportApi.js | ⚠️ gated |
+| PATCH | `/api/emergency/transfers/:referralId/status` | — | emergencyTransportApi.js | ⚠️ gated |
+| GET | `/api/emergency/diversion/status` | — | emergencyTransportApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/sessions` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/manual-entry` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/documents` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/ocr-results` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/match` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/verify-field` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/link-patient` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/create-patient` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/:sessionId/continue-unknown` | — | smartIntakeApi.js | ⚠️ gated |
 | POST | `/api/clinical-intelligence/ambient-scribe/generate` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / AmbientScribe.jsx | ✅ |
 | POST | `/api/clinical-intelligence/guideline-rag/query` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / GuidelineRag.jsx | ✅ |
 | POST | `/api/clinical-intelligence/differential-ai/generate` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / DifferentialAi.jsx | ✅ |
@@ -80,24 +106,29 @@
 | GET | `/api/ehr-audit/summary` | EhrAuditController | platformGovernanceApi.js / PlatformGovernanceWorkspace.jsx | ✅ |
 | GET | `/health` | AppController | systemHealthService.js / SystemHealth.jsx | ✅ |
 | GET | `/api/system-health` | ObservabilityController | systemHealthService.js / SystemHealth.jsx | ✅ |
+| GET | `/api/saas-health` | SaasHealthController | saasHealthApi.js / SaasHealthCenter.jsx | ✅ |
 | GET | `/api/platform-systems/packs/:pack` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
+| GET | `/api/dependency-graph` | ProductCatalogController | productCatalogApi.js / DependencyGraph.jsx | ✅ |
 | GET | `/api/integrations/fhir/connections` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/integrations/fhir/connections` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/integrations/fhir/:connectionId/test` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/integrations/fhir/:connectionId/sync` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | GET | `/api/integrations/hl7/interfaces` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/integrations/hl7/interfaces/:interfaceId/test-message` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| POST | `/api/patients/import/ehr` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| POST | `/api/patients/:patientId/import/labs` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| POST | `/api/patients/:patientId/import/medications` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| POST | `/api/patients/:patientId/import/observations` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/workspace` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/summary` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/timeline` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
+| POST | `/api/patients/import/ehr` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
+| POST | `/api/patients/:patientId/import/labs` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
+| POST | `/api/patients/:patientId/import/medications` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
+| POST | `/api/patients/:patientId/import/observations` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
+| GET | `/api/patients/:patientId/workspace` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientCard.jsx / EmergencyWhiteboard.jsx | ✅ |
+| GET | `/api/patients/:patientId/summary` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
+| GET | `/api/patients/:patientId/timeline` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
+| GET | `/api/patients/:patientId/source-data` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel / PatientCard.jsx | ✅ |
+| GET | `/api/patients/:patientId/review-items` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel | ✅ |
+| GET | `/api/privacy/patient/:patientId/access-log` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel | ✅ |
 | POST | `/api/patients/:patientId/events` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/risk-scores` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
+| GET | `/api/patients/:patientId/risk-scores` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
 | POST | `/api/patients/:patientId/risk-scores` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/care-plan` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
+| GET | `/api/patients/:patientId/care-plan` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
 | POST | `/api/clinical-intelligence/calculator-recommender/suggest` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/clinical-intelligence/workflow-builder/generate` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/clinical-intelligence/reasoning/analyze` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
@@ -135,15 +166,36 @@
 | POST | `/api/auth/biometric/verify` | BiometricController | BiometricSetup.jsx | ✅ |
 | DELETE | `/api/auth/biometric/disable/:deviceId` | BiometricController | BiometricSetup.jsx | ✅ |
 | GET | `/api/config/system` | AppController | configService.js | ✅ |
+| GET | `/api/tenant/context` | TenantContextController | TenantContext.jsx | ✅ |
+| GET | `/api/tenant/isolation-audit` | TenantContextController | tenantIsolationApi.js / Settings.jsx | ✅ |
 | GET | `/api/ai/remaining-queries` | AiController | configService.js | ✅ |
+| GET | `/api/platform/assets` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/governance-registry` | PlatformAssetsController | platformAssetsApi.js / GovernanceRegistry.jsx | ✅ |
+| PATCH | `/api/platform/assets/:assetId/lifecycle` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/context` | PlatformAssetsController | platformAssetsApi.js / UserIdentityContext.jsx | ✅ |
+| GET | `/api/platform/packs` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/role-profiles` | PlatformAssetsController | platformAssetsApi.js / ProfileSettings.jsx | ✅ |
+| GET | `/api/platform/departments` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/departments/:departmentId` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/service-lines` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/service-lines/:serviceLineId` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/marketplace/packs` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/marketplace/packs/:packId` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/platform/users/me/assets` | PlatformAssetsController | platformAssetsApi.js / ProfileToolPreferences.jsx | ✅ |
+| GET | `/api/platform/users/me/recommendations` | PlatformAssetsController | platformAssetsApi.js / CommandDashboard.jsx | ✅ |
+| PATCH | `/api/platform/me/role-profile` | PlatformAssetsController | platformAssetsApi.js / ProfileSettings.jsx | ✅ |
+| GET | `/api/platform/digital-twin` | PlatformAssetsController | platformAssetsApi.js / DigitalTwinIntelligence.jsx | ✅ |
+| GET | `/api/platform/organizations/:organizationId/analytics` | PlatformAssetsController | platformAssetsApi.js / OrganizationPages.jsx | ✅ |
 | GET | `/api/users/profile` | UsersController | UserContext.jsx / syncService.js | ✅ |
-| PATCH | `/api/users/profile` | UsersController | profileApi.js / ProfileSettings.jsx | ✅ |
+| PATCH | `/api/users/profile` | UsersController | UserContext.jsx / syncService.js | ✅ |
 | GET | `/api/profile/me` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
 | PATCH | `/api/profile/me` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
 | GET | `/api/profile/me/preferences` | UserProfileController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
 | PATCH | `/api/profile/me/preferences` | UserProfileController | userIdentityApi.js / ProfilePreferences.jsx | ✅ |
 | GET | `/api/profile/me/activity` | UserProfileController | userIdentityApi.js / ProfileActivity.jsx | ✅ |
 | GET | `/api/profile/me/security` | UserProfileController | userIdentityApi.js / ProfileSecurity.jsx | ✅ |
+| GET | `/api/profile/me/workspaces` | UserProfileController | userIdentityApi.js / ProfileWorkspaces.jsx | ✅ |
+| PATCH | `/api/profile/me/workspaces/active` | UserProfileController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
 | GET | `/api/workspaces` | WorkspacesController | userIdentityApi.js / UserIdentityContext.jsx | ✅ |
 | POST | `/api/workspaces` | WorkspacesController | userIdentityApi.js / ProfileWorkspaces.jsx | ✅ |
 | POST | `/api/workspaces/active` | WorkspacesController | userIdentityApi.js / Sidebar.jsx | ✅ |
@@ -158,6 +210,8 @@
 | POST | `/api/memory/short` | MemoryController | memoryApi.js / MemoryDashboard.jsx | ✅ |
 | POST | `/api/memory/long` | MemoryController | memoryApi.js | ✅ |
 | POST | `/api/memory/clinical` | MemoryController | memoryApi.js | ✅ |
+| GET | `/api/memory/fabric/context` | MemoryController | memoryApi.js / UserIdentityContext.jsx | ✅ |
+| POST | `/api/memory/fabric/signals` | MemoryController | memoryApi.js / UserIdentityContext.jsx | ✅ |
 | GET | `/api/training/dashboard` | TrainingController | trainingApi.js / TrainingDashboard.jsx | ✅ |
 | GET | `/api/training/pipeline` | TrainingController | trainingApi.js | ✅ |
 | GET | `/api/training/runs` | TrainingController | trainingApi.js | ✅ |
@@ -169,15 +223,49 @@
 | GET | `/api/cost-optimizer/dashboard` | CostOptimizerController | aiCommandCenterApi.js / AiCommandCenterDashboard.jsx | ✅ |
 | GET | `/api/subscriptions/current` | SubscriptionsController | configService.js / subscriptionApi.js | ✅ |
 | GET | `/api/subscriptions/plans` | SubscriptionsController | configService.js / subscriptionApi.js | ✅ |
+| GET | `/api/subscriptions/lifecycle` | SubscriptionsController | subscriptionApi.js | ✅ |
+| POST | `/api/subscriptions/entitlements/resolve` | SubscriptionsController | subscriptionApi.js | ✅ |
+| GET | `/api/subscriptions/billing` | SubscriptionsController | subscriptionApi.js | ✅ |
+| GET | `/api/subscriptions/usage` | SubscriptionsController | subscriptionApi.js / usageMeteringService.js | ✅ |
+| GET | `/api/subscriptions/usage/metering` | SubscriptionsController | subscriptionApi.js / usageMeteringService.js | ✅ |
+| POST | `/api/subscriptions/usage/events` | SubscriptionsController | subscriptionApi.js / usageMeteringService.js | ✅ |
 | POST | `/api/subscriptions/create-checkout` | SubscriptionsController | subscriptionApi.js | ✅ |
 | POST | `/api/subscriptions/portal` | SubscriptionsController | subscriptionApi.js | ✅ |
+| GET | `/api/products` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/products/pack-map` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/products/builder` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/products/:slug` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/products/:slug/builder` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/products/:slug/assets` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/asset-packs` | ProductCatalogController | productCatalogApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/commercial-plans` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/commercial-plans/:id` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/specialties` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/specialties/:slug` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/care-pathways` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/care-pathways/:slug` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/agents` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/integrations-marketplace` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/integration-readiness` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| POST | `/api/solution-builder/recommendations` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| POST | `/api/solution-builder/apply` | ProductCatalogController | productCatalogApi.js / CommercialPages.jsx | ✅ |
+| GET | `/api/organizations/:organizationId/outcomes` | ProductCatalogController | productCatalogApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/organizations/:organizationId/value-tracking` | ProductCatalogController | productCatalogApi.js / OrganizationPages.jsx | ✅ |
+| PATCH | `/api/organizations/:organizationId/configuration` | ProductCatalogController | productCatalogApi.js / OrganizationPages.jsx | ✅ |
+| POST | `/api/organizations/:organizationId/integrations/request` | ProductCatalogController | productCatalogApi.js / OrganizationPages.jsx | ✅ |
+| GET | `/api/automation-audit` | AutomationAuditController | automationAuditApi.js / AutomationAuditTrail.jsx | ✅ |
+| POST | `/api/automation-audit` | AutomationAuditController | automationAuditApi.js / WorkflowAutomationBuilder.jsx | ✅ |
+| GET | `/api/white-label/:tenantId` | WhiteLabelController | whiteLabelApi.js / WhiteLabelContext.jsx | ✅ |
 | POST | `/api/auth/login` | AuthController | Auth.jsx | ✅ |
 | POST | `/api/auth/register` | AuthController | Auth.jsx | ✅ |
 | POST | `/api/auth/verify-2fa` | AuthController | Auth.jsx | ✅ |
 | POST | `/api/auth/magic-link` | AuthController | Auth.jsx | ✅ |
 | POST | `/api/auth/dev-session` | AuthController | Auth.jsx | ✅ |
+| GET | `/api/auth/identity-providers` | AuthController | enterpriseIdentityApi.js / Settings.jsx | ✅ |
 | GET | `/api/auth/biometric/config` | BiometricController | BiometricSetup.jsx | ✅ |
 | POST | `/api/auth/biometric/enroll` | BiometricController | BiometricSetup.jsx | ✅ |
+| GET | `/api/auth/biometric/available` | BiometricController | BiometricSetup.jsx | ✅ |
+| DELETE | `/api/auth/biometric/delete/:deviceId` | BiometricController | BiometricSetup.jsx | ✅ |
 | GET | `/api/two-factor/generate` | TwoFactorController | TwoFactorSetup.jsx | ✅ |
 | POST | `/api/two-factor/enable` | TwoFactorController | TwoFactorSetup.jsx | ✅ |
 | GET | `/api/two-factor/status` | TwoFactorController | TwoFactorSettings.jsx | ✅ |
@@ -189,6 +277,10 @@
 
 - `GET /health`
 - `GET /api/config/system`
+- `GET /api/settings/features`
+- `PATCH /api/settings/features`
+- `GET /api/tenant/context`
+- `GET /api/tenant/isolation-audit`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/dev-session`
@@ -199,14 +291,10 @@
 - `GET /api/auth/linkedin`
 - `GET /api/auth/linkedin/callback`
 - `POST /api/auth/magic-link`
+- `GET /api/auth/identity-providers`
 - `GET /api/auth/oidc`
 - `GET /api/auth/saml`
 - `GET /api/auth/me`
-- `POST /api/auth/biometric/enroll`
-- `POST /api/auth/biometric/verify`
-- `GET /api/auth/biometric/config`
-- `GET /api/auth/biometric/stats`
-- `DELETE /api/auth/biometric/disable/:deviceId`
 
-_…and 339 more in src/data/backendHttpRouteInventory.js_
+_…and 396 more in src/data/backendHttpRouteInventory.js_
 

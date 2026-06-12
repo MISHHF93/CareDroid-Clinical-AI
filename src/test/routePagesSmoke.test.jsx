@@ -200,7 +200,7 @@ vi.mock('../data/artifactKnowledgeGraph', () => {
       'LAUNCHED_FROM',
       'PART_OF',
     ],
-    buildKnowledgeGraphAiPrompt: () => 'Open the Artifact Knowledge Graph.',
+    buildKnowledgeGraphAiPrompt: () => 'Open the Clinical Knowledge Graph.',
     createArtifactKnowledgeGraphService: () => ({
       buildSnapshot: () => ({
         nodes: [node],

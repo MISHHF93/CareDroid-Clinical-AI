@@ -1,6 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+const EMERGENCY_OS_MONGOOSE_ROUTE_GROUPS = Object.freeze([
+  '/api/capacity',
+  '/api/copilot',
+  '/api/ems',
+  '/api/emergency/intake',
+  '/api/reassessment',
+]);
+
 @Controller()
 export class AppController {
   constructor(private readonly configService: ConfigService) {}
@@ -21,6 +29,10 @@ export class AppController {
     const ragConfig = this.configService.get<any>('rag') || {};
     const environmentConfig = this.configService.get<any>('environment') || {};
     const deploymentConfig = this.configService.get<any>('deployment') || {};
+    const emergencyMongooseEnabled = process.env.ENABLE_MONGOOSE_EMERGENCY_OS === 'true';
+    const emergencyMongoConfigured = Boolean(
+      process.env.MONGODB_URI || process.env.DATABASE_MONGO_URI,
+    );
 
     return {
       environment: {
@@ -46,6 +58,17 @@ export class AppController {
       session: {
         idleTimeoutMs: sessionConfig.idleTimeout || 1800000, // 30 min
         absoluteTimeoutMs: sessionConfig.absoluteTimeout || 28800000, // 8 hours
+      },
+      emergencyOs: {
+        defaultNestSurface: 'partial',
+        conditionalRuntime: 'mongoose',
+        configuredForMount: emergencyMongooseEnabled && emergencyMongoConfigured,
+        status: emergencyMongooseEnabled
+          ? emergencyMongoConfigured
+            ? 'configured'
+            : 'missing-mongo-uri'
+          : 'disabled',
+        routeGroups: EMERGENCY_OS_MONGOOSE_ROUTE_GROUPS,
       },
     };
   }

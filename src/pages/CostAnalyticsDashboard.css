@@ -82,6 +82,9 @@
 
 /* Cost Summary Cards */
 .cost-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 1rem;
   min-width: 0;
   max-width: 100%;
 }
@@ -159,6 +162,14 @@
 }
 
 /* ROI Metrics */
+.roi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .roi-metric {
   display: flex;
   flex-direction: column;

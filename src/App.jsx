@@ -67,6 +67,7 @@ const {
   WorkflowMiningEnginePage,
   WorkspaceDependencyGraphPage,
   AssetLibraryPage,
+  DepartmentIntelligencePage,
 } = {
   SearchResultsPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.SearchResultsPage }))
@@ -92,21 +93,41 @@ const {
   AssetLibraryPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.AssetLibraryPage }))
   ),
+  DepartmentIntelligencePage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.DepartmentIntelligencePage }))
+  ),
 };
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const RecommendationsPage = lazyWithRetry(() => import('./pages/RecommendationsPage'));
+const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
+const ExecutiveCommandCenter = lazyWithRetry(() => import('./pages/ExecutiveCommandCenter'));
 const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
+const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCenterDashboard'));
+const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
+const AnalyticsDashboard = lazyWithRetry(() => import('./pages/AnalyticsDashboard'));
+const CareDroidBrainDashboard = lazyWithRetry(() => import('./pages/CareDroidBrainDashboard'));
+const CostAnalyticsDashboard = lazyWithRetry(() => import('./pages/CostAnalyticsDashboard'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
+const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const ResearchEvidenceHub = lazyWithRetry(() => import('./pages/ResearchEvidenceHub'));
+const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
 const ClinicalDocumentationAssistant = lazyWithRetry(
   () => import('./pages/ClinicalDocumentationAssistant')
 );
 const ClinicalKnowledgeGraph = lazyWithRetry(() => import('./pages/ClinicalKnowledgeGraph'));
+const PredictiveAnalyticsDashboard = lazyWithRetry(
+  () => import('./pages/PredictiveAnalyticsDashboard')
+);
 const ClinicalDecisionSupport = lazyWithRetry(() => import('./pages/ClinicalDecisionSupport'));
+const DigitalTwinIntelligence = lazyWithRetry(() => import('./pages/DigitalTwinIntelligence'));
 const Competencies = lazyWithRetry(() => import('./pages/Competencies'));
 const Credentials = lazyWithRetry(() => import('./pages/Credentials'));
+const MedicalSimulationSuite = lazyWithRetry(() => import('./pages/MedicalSimulationSuite'));
+const SimulationScenarioPlayer = lazyWithRetry(() => import('./pages/SimulationScenarioPlayer'));
+const SimulationOutcomes = lazyWithRetry(() => import('./pages/SimulationOutcomes'));
+const LaboratoryDashboard = lazyWithRetry(() => import('./pages/LaboratoryDashboard'));
 const Medical3DViewer = lazyWithRetry(() => import('./pages/Medical3DViewer'));
 const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
 const PlatformGovernanceWorkspace = lazyWithRetry(
@@ -147,6 +168,7 @@ const {
   AssetLifecycleAdmin,
   CustomerSuccessDashboard,
   OrganizationIntelligenceProfile,
+  PlatformAnalyticsPage,
   DepartmentsPage,
   ServiceLinesPage,
   TenantAdministrationCenter,
@@ -172,6 +194,11 @@ const {
   CustomerSuccessDashboard: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({
       default: m.CustomerSuccessDashboard,
+    }))
+  ),
+  PlatformAnalyticsPage: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.PlatformAnalyticsPage,
     }))
   ),
   OrganizationIntelligenceProfile: lazyWithRetry(() =>
@@ -299,7 +326,19 @@ const TeamManagement = lazyWithRetry(() =>
 );
 const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
+const Operations = lazyWithRetry(() => import('./pages/Operations'));
+const DigitalOperationsCenter = lazyWithRetry(() => import('./pages/DigitalOperationsCenter'));
+const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
+const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
+const DeviceFleetManagement = lazyWithRetry(() => import('./pages/DeviceFleetManagement'));
+const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
+const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
+const FleetLiveMap = lazyWithRetry(() => import('./pages/fleet/FleetLiveMap'));
+const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
+const RouteOptimizer = lazyWithRetry(() => import('./pages/fleet/RouteOptimizer'));
+const AiModelsPage = lazyWithRetry(() => import('./pages/AiModelsPage'));
 const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
+const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'));
 const EmergencyAnalytics = lazyWithRetry(() => import('./pages/emergency/EmergencyAnalytics'));
 const SmartIntake = lazyWithRetry(() => import('./pages/emergency/SmartIntake'));
@@ -1116,6 +1155,127 @@ const FUTURE_RELEASE_ROUTES = Object.freeze([
   ['Governance', '/governance/*'],
 ]);
 
+const ACTIVE_RELEASE_ROUTE_PATHS = new Set([
+  '/executive',
+  '/discover',
+  '/recommendations',
+  '/dashboard',
+  '/operations',
+  '/operations-center',
+  '/workflows',
+  '/workflow-mining',
+  '/workspace-dependency-graph',
+  '/artifacts',
+  '/ai-command-center',
+  '/ai-evaluation',
+  '/ai-models',
+  '/analytics',
+  '/brain',
+  '/costs',
+  '/digital-twin',
+  '/digital-twin-intelligence',
+  '/memory',
+  '/training',
+  '/live-map',
+  '/medical-iot',
+  '/hospital-map',
+  '/devices',
+  '/protocols',
+  '/research',
+  '/documentation',
+  '/knowledge-graph',
+  '/predictive-analytics',
+  '/clinical-decision-support',
+  '/competencies',
+  '/credentials',
+  '/simulation',
+  '/simulation/*',
+  '/simulation/outcomes',
+  '/laboratory',
+  '/3d-viewer',
+  '/tools/ambient-scribe',
+  '/tools/guideline-rag',
+  '/tools/differential-ai',
+  '/tools/timeline-ai',
+  '/tools/patient-summary-ai',
+  '/tools/order-set-ai',
+  '/tools/ai-explainability',
+  '/tools/clinical-audit',
+  '/tools/cardiology',
+  '/tools/pulmonology',
+  '/tools/nephrology',
+  '/tools/gastroenterology',
+  '/tools/endocrine-metabolic',
+  '/tools/neurology',
+  '/tools/pediatrics-obgyn',
+  '/tools/psychiatry',
+  '/tools/catalog',
+  '/fleet/command',
+  '/fleet/map',
+  '/fleet/predictive-maintenance',
+  '/fleet/route-optimizer',
+  '/profile',
+  '/profile/activity',
+  '/profile/preferences',
+  '/profile/tool-preferences',
+  '/profile/workspaces',
+  '/profile/security',
+  '/profile/settings',
+  '/profile-settings',
+  '/customer-portal',
+  '/knowledge-hub',
+  '/knowledge-base',
+  '/marketplace',
+  '/enterprise-readiness',
+  '/platform-admin',
+  '/billing',
+  '/usage',
+  '/organization',
+  '/organization/settings',
+  '/settings/organization',
+  '/settings/organization/packs',
+  '/settings/organization/assets',
+  '/platform-analytics',
+  '/department-intelligence',
+  '/customer-success',
+  '/organization-intelligence',
+  '/success-center',
+  '/departments',
+  '/service-lines',
+  '/tenant-admin',
+  '/notifications',
+  '/notification-preferences',
+  '/two-factor-setup',
+  '/biometric-setup',
+  '/products',
+  '/asset-packs',
+  '/plans',
+  '/specialties',
+  '/care-pathways',
+  '/agents',
+  '/maturity-assessment',
+  '/outcomes',
+  '/value-tracking',
+  '/product-intelligence',
+  '/expansion-opportunities',
+  '/integrations-marketplace',
+  '/integration-readiness',
+  '/configuration-studio',
+  '/solution-builder',
+  '/consent',
+  '/consent-history',
+  '/team',
+  '/system-health',
+  '/saas-health',
+  '/feature-flags',
+  '/plugins',
+  '/dependency-map',
+  '/dependency-graph',
+  '/governance-registry',
+  '/data-lineage',
+  '/self-diagnostics',
+]);
+
 // ==================== ROUTING ====================
 export function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
@@ -1334,8 +1494,681 @@ export function AppRoutes() {
     },
     {
       path: '/protocols',
-      element: <LegacyToolRouteRedirect toolId="protocols" />,
+      element: <Protocols />,
       requiresAuth: true,
+    },
+    {
+      path: '/research',
+      element: <ResearchEvidenceHub />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/ambient-scribe',
+      element: <AmbientScribe />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/guideline-rag',
+      element: <GuidelineRag />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/differential-ai',
+      element: <DifferentialAi />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/timeline-ai',
+      element: <TimelineAi />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/patient-summary-ai',
+      element: <PatientSummaryAi />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/order-set-ai',
+      element: <OrderSetAi />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/ai-explainability',
+      element: <AiExplainability />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/clinical-audit',
+      element: <ClinicalAudit />,
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/tools/cardiology',
+      element: <CardiologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/cardiology/:toolId',
+      element: <CardiologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/pulmonology',
+      element: <PulmonologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/pulmonology/:toolId',
+      element: <PulmonologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/nephrology',
+      element: <NephrologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/nephrology/:toolId',
+      element: <NephrologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/gastroenterology',
+      element: <GastroenterologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/gastroenterology/:toolId',
+      element: <GastroenterologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/endocrine-metabolic',
+      element: <EndocrineMetabolicAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/endocrine-metabolic/:toolId',
+      element: <EndocrineMetabolicAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/neurology',
+      element: <NeurologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/neurology/:toolId',
+      element: <NeurologyAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/pediatrics-obgyn',
+      element: <PediatricsObgynAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/pediatrics-obgyn/:toolId',
+      element: <PediatricsObgynAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/psychiatry',
+      element: <PsychiatryAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/psychiatry/:toolId',
+      element: <PsychiatryAssistantPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/executive',
+      element: <ExecutiveCommandCenter />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/discover',
+      element: <CapabilityDiscovery />,
+      requiresAuth: true,
+    },
+    {
+      path: '/recommendations',
+      element: <RecommendationsPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/dashboard',
+      element: <CommandDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/operations',
+      element: <Operations />,
+      requiresAuth: true,
+    },
+    {
+      path: '/operations-center',
+      element: <DigitalOperationsCenter />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workflows',
+      element: <WorkflowBuilderPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workflow-mining',
+      element: <WorkflowMiningEnginePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace-dependency-graph',
+      element: <WorkspaceDependencyGraphPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/artifacts',
+      element: <Artifacts />,
+      requiresAuth: true,
+    },
+    {
+      path: '/ai-command-center',
+      element: <AiCommandCenterDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/ai-evaluation',
+      element: <AiEvaluationDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/ai-models',
+      element: <AiModelsPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/analytics',
+      element: <AnalyticsDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/brain',
+      element: <CareDroidBrainDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/costs',
+      element: <CostAnalyticsDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/digital-twin',
+      element: <DigitalTwinIntelligence />,
+      requiresAuth: true,
+    },
+    {
+      path: '/digital-twin-intelligence',
+      element: <DigitalTwinIntelligence />,
+      requiresAuth: true,
+    },
+    {
+      path: '/documentation',
+      element: <ClinicalDocumentationAssistant />,
+      requiresAuth: true,
+    },
+    {
+      path: '/knowledge-graph',
+      element: <ClinicalKnowledgeGraph />,
+      requiresAuth: true,
+    },
+    {
+      path: '/predictive-analytics',
+      element: <PredictiveAnalyticsDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/clinical-decision-support',
+      element: <ClinicalDecisionSupport />,
+      requiresAuth: true,
+    },
+    {
+      path: '/competencies',
+      element: <Competencies />,
+      requiresAuth: true,
+    },
+    {
+      path: '/credentials',
+      element: <Credentials />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation',
+      element: <MedicalSimulationSuite />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation/:scenarioId',
+      element: <SimulationScenarioPlayer />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation/outcomes',
+      element: <SimulationOutcomes />,
+      requiresAuth: true,
+    },
+    {
+      path: '/memory',
+      element: <MemoryDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/training',
+      element: <TrainingDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/laboratory',
+      element: <LaboratoryDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/3d-viewer',
+      element: <Medical3DViewer />,
+      requiresAuth: true,
+    },
+    {
+      path: '/live-map',
+      element: <LiveTrackingMap />,
+      requiresAuth: true,
+    },
+    {
+      path: '/hospital-map',
+      element: <HospitalMapDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/medical-iot',
+      element: <MedicalIotDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/devices',
+      element: <DeviceFleetManagement />,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/command',
+      element: <FleetDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/map',
+      element: <FleetLiveMap />,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/predictive-maintenance',
+      element: <PredictiveMaintenance />,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/route-optimizer',
+      element: <RouteOptimizer />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/catalog',
+      element: <ClinicalToolCatalog />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/profile',
+      element: <Profile />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/activity',
+      element: <ProfileActivity />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/preferences',
+      element: <ProfilePreferences />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/tool-preferences',
+      element: <ProfileToolPreferences />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/workspaces',
+      element: <ProfileWorkspaces />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/security',
+      element: <ProfileSecurity />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/settings',
+      element: <ProfileSettings />,
+      requiresAuth: true,
+    },
+    {
+      path: '/profile-settings',
+      element: <LegacyProtectedRouteRedirect to="/profile/settings" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/customer-portal',
+      element: <CustomerPortalPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/knowledge-hub',
+      element: <HealthcareKnowledgeHubPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/knowledge-base',
+      element: <KnowledgeBasePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/marketplace',
+      element: <MarketplacePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/enterprise-readiness',
+      element: <EnterpriseReadinessPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/platform-admin',
+      element: <PlatformAdminPage />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/billing',
+      element: <BillingPage />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_SUBSCRIPTIONS,
+    },
+    {
+      path: '/usage',
+      element: <UsagePage />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/organization',
+      element: <OrganizationDashboard />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/organization/settings',
+      element: <LegacyProtectedRouteRedirect to="/settings/organization" />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/settings/organization',
+      element: <OrganizationSettings />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/settings/organization/packs',
+      element: <PackMarketplace />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/settings/organization/assets',
+      element: <AssetLifecycleAdmin />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/platform-analytics',
+      element: <PlatformAnalyticsPage />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/department-intelligence',
+      element: <DepartmentIntelligencePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/customer-success',
+      element: <CustomerSuccessDashboard />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/organization-intelligence',
+      element: <OrganizationIntelligenceProfile />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_ORGANIZATION,
+    },
+    {
+      path: '/success-center',
+      element: <SuccessCenterPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/departments',
+      element: <DepartmentsPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/service-lines',
+      element: <ServiceLinesPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tenant-admin',
+      element: <TenantAdministrationCenter />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_USERS,
+    },
+    {
+      path: '/notifications',
+      element: <NotificationCenterPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/notification-preferences',
+      element: <NotificationPreferences />,
+      requiresAuth: true,
+    },
+    {
+      path: '/two-factor-setup',
+      element: <TwoFactorSetup />,
+      requiresAuth: true,
+    },
+    {
+      path: '/biometric-setup',
+      element: <BiometricSetup />,
+      requiresAuth: true,
+    },
+    {
+      path: '/products',
+      element: <ProductsIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/products/:productId',
+      element: <ProductDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/asset-packs',
+      element: <PackMarketplace />,
+      requiresAuth: true,
+    },
+    {
+      path: '/plans',
+      element: <CommercialPlansPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/specialties',
+      element: <SpecialtiesIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/specialties/:specialtyId',
+      element: <SpecialtyDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/care-pathways',
+      element: <CarePathwaysIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/care-pathways/:pathwayId',
+      element: <CarePathwayDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/agents',
+      element: <AgentsRegistryPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/maturity-assessment',
+      element: <MaturityAssessmentPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/outcomes',
+      element: <OutcomesDashboardPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/value-tracking',
+      element: <ValueTrackingPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/product-intelligence',
+      element: <ProductIntelligenceLayerPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/expansion-opportunities',
+      element: <CustomerExpansionOpportunitiesPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/integrations-marketplace',
+      element: <IntegrationsMarketplacePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/integration-readiness',
+      element: <IntegrationReadinessPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/configuration-studio',
+      element: <ConfigurationStudioPage />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/solution-builder',
+      element: <HospitalSolutionBuilderPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/consent',
+      element: <ConsentFlow />,
+      requiresAuth: true,
+    },
+    {
+      path: '/consent-history',
+      element: <ConsentHistory />,
+      requiresAuth: true,
+    },
+    {
+      path: '/team',
+      element: <TeamManagement />,
+      requiresAuth: true,
+      permission: Permission.MANAGE_USERS,
+    },
+    {
+      path: '/system-health',
+      element: <SystemHealth />,
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/saas-health',
+      element: <SaasHealthCenter />,
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/feature-flags',
+      element: <FeatureFlagCenter />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/plugins',
+      element: <PluginMarketplace />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/dependency-map',
+      element: <DependencyMap />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/dependency-graph',
+      element: <DependencyGraph />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/governance-registry',
+      element: <GovernanceRegistry />,
+      requiresAuth: true,
+      permission: Permission.VIEW_GOVERNANCE,
+    },
+    {
+      path: '/data-lineage',
+      element: <DataLineageExplorer />,
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/self-diagnostics',
+      element: <PlatformSelfDiagnostics />,
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
     },
     ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({
       path,
@@ -1357,11 +2190,13 @@ export function AppRoutes() {
       element: <WorkspaceRouteRedirect />,
       requiresAuth: true,
     },
-    ...FUTURE_RELEASE_ROUTES.map(([, path]) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />,
-      requiresAuth: true,
-    })),
+    ...FUTURE_RELEASE_ROUTES
+      .filter(([, path]) => !ACTIVE_RELEASE_ROUTE_PATHS.has(path))
+      .map(([, path]) => ({
+        path,
+        element: <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />,
+        requiresAuth: true,
+      })),
     {
       path: '*',
       element: <Navigate to="/emergency/whiteboard" replace />,

@@ -19,11 +19,11 @@ const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Whiteboard', '/workspace/emergency'],
-      ['Patients', '/workspace/emergency/patients'],
-      ['EMS', '/workspace/emergency/ems'],
-      ['Operations', '/workspace/emergency/flow'],
-      ['Copilot', '/workspace/emergency/command-center'],
+      ['Whiteboard', '/emergency/whiteboard'],
+      ['Patients', '/emergency/patients'],
+      ['EMS', '/emergency/ems'],
+      ['Operations', '/emergency/queues'],
+      ['Copilot', '/emergency/copilot'],
       ['Profile', '/profile'],
     ]);
     expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(6);
@@ -134,11 +134,11 @@ describe('primaryNavigation', () => {
 
   it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
-      '/workspace/emergency',
-      '/workspace/emergency/patients',
-      '/workspace/emergency/ems',
-      '/workspace/emergency/flow',
-      '/workspace/emergency/command-center',
+      '/emergency/whiteboard',
+      '/emergency/patients',
+      '/emergency/ems',
+      '/emergency/queues',
+      '/emergency/copilot',
       '/profile',
     ]);
   });

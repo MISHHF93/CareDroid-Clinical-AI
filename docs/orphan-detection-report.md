@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-06-05 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-06-12 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,238 +15,71 @@ Generated: 2026-06-05 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 349 |
-| App.jsx routes | 212 |
-| Orphan / gap routes | 181 |
-| Orphan pages | 27 |
+| Total orphan findings | 298 |
+| App.jsx routes | 279 |
+| Orphan / gap routes | 9 |
+| Orphan pages | 38 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 3 |
-| Orphan services | 0 |
-| Executor contract gaps | 3 |
-| API orphans / stubs | 132 |
-| Weakly linked markdown | 3 |
-| **wire** | 216 |
-| **merge** | 1 |
-| **quarantine** | 4 |
-| **legacy** | 128 |
+| Orphan services | 1 |
+| Executor contract gaps | 0 |
+| API orphans / stubs | 137 |
+| Weakly linked markdown | 110 |
+| **wire** | 0 |
+| **merge** | 0 |
+| **quarantine** | 109 |
+| **legacy** | 189 |
 
 ## Merge candidates (explicit)
 
 | ID | Primary | Duplicate | Note |
 |----|---------|-----------|------|
-| dashboard-dual-home | src/pages/CommandDashboard.jsx | src/pages/Dashboard.jsx | Assistant chat (Dashboard.jsx) vs command home (CommandDashboard.jsx); naming collision |
-| pack-marketplace-dual | src/pages/organization/OrganizationPages.jsx (PackMarketplace) | /asset-packs vs /settings/organization/packs | Two pack marketplace routes |
-| notification-services-dual | src/services/NotificationService.js | src/services/notifications/NotificationService.js | Duplicate notification service paths |
+| dashboard-dual-home | src/pages/CommandDashboard.jsx | removed: src/pages/Dashboard.jsx | Former assistant page duplicate removed; ED Copilot now lives in src/components/ChatInterface.jsx. |
+| pack-marketplace-dual | src/pages/organization/OrganizationPages.jsx (PackMarketplace) | /asset-packs vs /settings/organization/packs | Intentional dual context: product discovery and organization entitlement management share PackMarketplace. |
+| notification-services-dual | src/services/NotificationService.js | src/services/notifications/NotificationService.js | Nested service is legacy queue-style compatibility only; active app client is src/services/NotificationService.js. |
 
 ## Critical findings
 
-1. **`src/pages/Onboarding.jsx`** — deprecated redirect; not mounted (org onboarding uses `CommercialPages`). Class: **quarantine**.
-2. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.
-3. **AI agents / platform APIs** — `platformAssetsApi.js` / `productCatalogApi.js` not in `frontendApiCallsInventory`. Class: **wire**.
-4. **Chart/export components** (`VitalsTrendChart`, `DrugInteractionHeatmap`, `DataDisplay`, etc.) — barrel export only. Class: **quarantine** or **wire**.
-5. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.
+1. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.
+2. **AI agents / platform APIs** — platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.
+3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.
+4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.
 
 ## Orphan routes
 
 | Route | Class | Evidence |
 | --- | --- | --- |
-| /chat | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /copilot | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /all-tools | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /clinical-tools | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /catalog | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /calculators | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /medical-simulation | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /anatomy-viewer | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /maps | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /live-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/live-map | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /audit-logs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /tools/calculators/aa-gradient | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/abcd2 | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/acs-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/adjusted-body-weight | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/aki-staging-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/anion-gap | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/apache-ii | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/apgar-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/apri | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/ascvd-risk | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/asthma-exacerbation-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/asthma-severity-score | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/atrial-fibrillation-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/audit-c | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bed-occupancy-calculator | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bisap-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bishop-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bmi | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bode-index | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bsa | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/braden-scale | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/bun-creatinine-ratio | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/cage | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/centor-mcisaac | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/chads2vasc | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/chads2 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/child-pugh | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/ckd-staging | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/cognitive-screening-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/columbia-suicide-severity-workflow | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/copd-gold-assessment | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/copd-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/corrected-calcium | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/corrected-sodium | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/creatinine-clearance-cg | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/curb-65 | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/diabetes-care-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/dka-pathway-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/duke-treadmill-score | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/ecg-interpretation-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/gfr | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/egfr-ckd-epi | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/electrolyte-disorder-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/epworth-sleepiness-scale | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/fena | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/fenton-growth-chart-helper | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/feurea | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/fib4 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/four-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/framingham-risk | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/free-water-deficit | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/gad7 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/gestational-age-calculator | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/gi-bleed-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/gcs | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/glasgow-blatchford-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/has-bled | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/hcm-sudden-death-risk | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/headache-red-flag-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/heart-failure-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/heart-failure-staging | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/heart-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/homa-ir | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/hunt-hess-scale | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/ich-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/ideal-body-weight | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/kfre | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/liver-disease-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/maddrey-discriminant-function | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/mdq | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/meld | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/meld-na | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/mental-health-screening-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/metabolic-syndrome-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/mews | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/mmse | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/moca-placeholder-workflow | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/modified-rankin-scale | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/morse-fall-scale | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/neonatal-assessment-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/neonatal-bilirubin-risk-helper | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/neuro-exam-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/news2 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/nihss-summary-view | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/ob-triage-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/osmolal-gap | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/oxygen-escalation-helper | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/pancreatitis-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pao2-fio2-ratio | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pcl5 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pediatric-bp-percentile | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pediatric-dose-safety-checker | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pediatric-gcs | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/pediatric-sepsis-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pews | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/phq9 | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pneumonia-severity-index | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/pregnancy-due-date-calculator | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/pregnancy-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/qsofa | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/ranson-criteria | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/rass | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/resource-utilization-index | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/revised-trauma-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/reynolds-risk-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/rockall-score | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/rox-index | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/seizure-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/serum-osmolality | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/shock-index | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/sofa | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/staffing-ratio-calculator | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/stemi-pathway-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/stop-bang | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/stroke-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/substance-use-screening-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/suicide-risk-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/thyroid-disorder-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/timi-ua-nstemi | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/turnaround-time-calculator | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/vertigo-hints-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/calculators/waist-hip-ratio | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/arrhythmia-risk-classifier | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/cardiac-telemetry-analyzer | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/cardiology-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/ecg-trend-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/cardiology/remote-cardiology-monitoring-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/behavioral-analytics-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/cirrhosis-monitoring-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/ckd-progression-predictor | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/continuous-glucose-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/crisis-escalation-audit-log | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/dialysis-readiness-helper | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/dialysis-utilization-tracker | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/eeg-trend-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/electrolyte-trend-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/endocrine-monitoring-system | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/endoscopy-workflow-assistant | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/fluid-balance-monitor | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/gi-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/gi-surveillance-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/glucose-telemetry-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/growth-trend-analytics | wire | toolInventory route not registered in App.jsx |
-| /tools/gastroenterology/hepatic-trend-analytics | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/insulin-trend-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/maternal-monitoring-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/endocrine/metabolic-analytics | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/neonatal-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/neuro-monitoring-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/neuro-telemetry-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/neurology-timeline-ai | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/pediatric-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/pediatrics-obgyn/perinatal-risk-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/population-screening-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/psychiatry-monitoring-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/pulmonary-trend-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/nephrology/renal-monitoring-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/respiratory-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/respiratory-telemetry-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/psychiatry/screening-trend-engine | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/sleep-apnea-analytics | wire | toolInventory route not registered in App.jsx |
-| /tools/neurology/stroke-command-center | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/ventilator-monitoring-dashboard | wire | toolInventory route not registered in App.jsx |
-| /tools/pulmonology/ventilator-support-assistant | wire | toolInventory route not registered in App.jsx |
-| /workspace | legacy | Redirect or alias route in App.jsx |
-| /home | legacy | Redirect or alias route in App.jsx |
 | /laboratory | legacy | Redirect or alias route in App.jsx |
+| /login | legacy | Redirect or alias route in App.jsx |
+| /signin | legacy | Redirect or alias route in App.jsx |
+| /home | legacy | Redirect or alias route in App.jsx |
+| /workspace | legacy | Redirect or alias route in App.jsx |
+| /chat | legacy | Redirect or alias route in App.jsx |
+| /medical-simulation | legacy | Redirect or alias route in App.jsx |
+| /lab | legacy | Redirect or alias route in App.jsx |
+| /anatomy-viewer | legacy | Redirect or alias route in App.jsx |
 
 ## Orphan pages
 
 | Page file | Class | Evidence |
 | --- | --- | --- |
-| src/pages/AuditLogs.jsx | legacy | import:src/pages/AuditLogs.jsx |
-| src/pages/Dashboard.jsx | merge | App.jsx import |
-| src/pages/fleet/FleetDashboardWidgets.jsx | legacy | import:FleetDashboardWidgets |
+| src/pages/Auth.jsx | legacy | import:src/pages/Auth.jsx |
+| src/pages/AutomationAnalytics.jsx | legacy | import:AutomationAnalytics |
+| src/pages/commercial/CommercialPageShell.jsx | legacy | import:CommercialPageShell |
+| src/pages/emergency/DepartmentPulse.jsx | legacy | import:pages/emergency/DepartmentPulse |
+| src/pages/fleet/FleetDashboardWidgets.jsx | legacy | import:src/pages/fleet/FleetDashboardWidgets.jsx |
 | src/pages/fleet/FleetPageChrome.jsx | legacy | import:./pages/fleet/FleetPageChrome |
 | src/pages/fleet/PredictiveMaintenanceWidgets.jsx | legacy | import:PredictiveMaintenanceWidgets |
 | src/pages/fleet/RouteOptimizerWidgets.jsx | legacy | import:RouteOptimizerWidgets |
 | src/pages/legal/index.js | legacy | import:index |
-| src/pages/Onboarding.jsx | quarantine | import:src/pages/Onboarding.jsx |
+| src/pages/Patients.jsx | legacy | import:src/pages/Patients.jsx |
 | src/pages/platform/components/PlatformWorkflowPrimitives.jsx | legacy | import:PlatformWorkflowPrimitives |
+| src/pages/PlatformLearningEngine.jsx | legacy | import:PlatformLearningEngine |
+| src/pages/Settings.jsx | legacy | import:src/pages/Settings.jsx |
 | src/pages/team/index.js | legacy | import:index |
 | src/pages/tools/abcd2Calculator.jsx | legacy | import:abcd2Calculator |
+| src/pages/tools/calculatorPrimitives.jsx | legacy | import:calculatorPrimitives |
+| src/pages/tools/Calculators.jsx | legacy | import:src/pages/tools/Calculators.jsx |
 | src/pages/tools/cardiologyCalculators.jsx | legacy | import:cardiologyCalculators |
 | src/pages/tools/emergencyCriticalCareCalculators.jsx | legacy | import:emergencyCriticalCareCalculators |
 | src/pages/tools/endocrineMetabolicCalculators.jsx | legacy | import:endocrineMetabolicCalculators |
@@ -262,7 +95,12 @@ Generated: 2026-06-05 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/tools/psychiatryScreeningCalculators.jsx | legacy | import:psychiatryScreeningCalculators |
 | src/pages/tools/pulmonologyCalculators.jsx | legacy | import:pulmonologyCalculators |
 | src/pages/tools/sourceBackedClinicalCalculators.jsx | legacy | import:sourceBackedClinicalCalculators |
+| src/pages/tools/ToolNotFound.jsx | legacy | import:./pages/tools/ToolNotFound |
 | src/pages/tools/ToolPageLayout.jsx | legacy | import:src/pages/tools/ToolPageLayout.jsx |
+| src/pages/tools/ToolsAreaFallback.jsx | legacy | import:ToolsAreaFallback |
+| src/pages/tools/ToolsOverview.jsx | legacy | import:src/pages/tools/ToolsOverview.jsx |
+| src/pages/WorkflowAutomationBuilder.jsx | legacy | import:WorkflowAutomationBuilder |
+| src/pages/WorkspaceHome.jsx | legacy | import:src/pages/WorkspaceHome |
 
 ## Orphan components
 
@@ -288,15 +126,13 @@ _None detected._
 
 ## Orphan services
 
-_None detected._
+| Service | Class | Evidence |
+| --- | --- | --- |
+| src/services/emergencyRealtimeService.js | quarantine | No production import of service module |
 
 ## Orphan executors
 
-| Tool ID | Class | Evidence |
-| --- | --- | --- |
-| sofa-score | wire | Inventory claims REGISTERED executor but not in orchestrator registry |
-| drug-check | wire | Inventory claims REGISTERED executor but not in orchestrator registry |
-| lab-interp | wire | Inventory claims REGISTERED executor but not in orchestrator registry |
+_None detected._
 
 ## Orphan APIs
 
@@ -313,6 +149,22 @@ _None detected._
 | team-invite | legacy | Gated stub — intentional no-op until backend exists |
 | bulk-sync | legacy | Gated stub — intentional no-op until backend exists |
 | clinical-alerts-stream | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-analytics | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-capacity-history | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-queue-analytics | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-shift-report-export | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-referral-history | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-transfer-status | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-diversion-status | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-session-create | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-manual-entry | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-document | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-ocr | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-match | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-verify-field | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-link-patient | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-create-patient | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-continue-unknown | legacy | Gated stub — intentional no-op until backend exists |
 | exports-pdf | legacy | Gated stub — intentional no-op until backend exists |
 | exports-excel | legacy | Gated stub — intentional no-op until backend exists |
 | reports-generate | legacy | Gated stub — intentional no-op until backend exists |
@@ -326,8 +178,6 @@ _None detected._
 | GET /api/auth/oidc | legacy | Backend-only route (no SPA client) |
 | GET /api/auth/saml | legacy | Backend-only route (no SPA client) |
 | GET /api/auth/me | legacy | Backend-only route (no SPA client) |
-| DELETE /api/auth/biometric/delete/:deviceId | legacy | Backend-only route (no SPA client) |
-| GET /api/auth/biometric/available | legacy | Backend-only route (no SPA client) |
 | GET /api/workspaces/:workspaceId | legacy | Backend-only route (no SPA client) |
 | GET /api/workspaces/:workspaceId/members | legacy | Backend-only route (no SPA client) |
 | POST /api/workspaces/:workspaceId/invitations | legacy | Backend-only route (no SPA client) |
@@ -339,40 +189,17 @@ _None detected._
 | PATCH /api/organizations/:organizationId | legacy | Backend-only route (no SPA client) |
 | GET /api/organizations/current | legacy | Backend-only route (no SPA client) |
 | POST /api/organizations/onboarding | legacy | Backend-only route (no SPA client) |
-| GET /api/organizations/:organizationId/outcomes | legacy | Backend-only route (no SPA client) |
-| PATCH /api/organizations/:organizationId/configuration | legacy | Backend-only route (no SPA client) |
-| POST /api/organizations/:organizationId/integrations/request | legacy | Backend-only route (no SPA client) |
-| GET /api/products | legacy | Backend-only route (no SPA client) |
-| GET /api/products/pack-map | legacy | Backend-only route (no SPA client) |
-| GET /api/products/:slug | legacy | Backend-only route (no SPA client) |
-| GET /api/products/:slug/assets | legacy | Backend-only route (no SPA client) |
-| GET /api/commercial-plans | legacy | Backend-only route (no SPA client) |
-| GET /api/commercial-plans/:id | legacy | Backend-only route (no SPA client) |
-| GET /api/specialties | legacy | Backend-only route (no SPA client) |
-| GET /api/specialties/:slug | legacy | Backend-only route (no SPA client) |
-| GET /api/care-pathways | legacy | Backend-only route (no SPA client) |
-| GET /api/care-pathways/:slug | legacy | Backend-only route (no SPA client) |
-| GET /api/agents | legacy | Backend-only route (no SPA client) |
-| GET /api/integrations-marketplace | legacy | Backend-only route (no SPA client) |
+| GET /api/specialties/:slug/assets | legacy | Backend-only route (no SPA client) |
 | GET /api/maturity-assessments/questionnaire | legacy | Backend-only route (no SPA client) |
 | POST /api/maturity-assessments | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/context | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/users/me/assets | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/users/me/recommendations | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/hidden-assets | legacy | Backend-only route (no SPA client) |
-| PATCH /api/platform/me/role-profile | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/assets | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/packs | legacy | Backend-only route (no SPA client) |
+| GET /api/platform/assets/:assetId | legacy | Backend-only route (no SPA client) |
 | GET /api/platform/packs/:packId | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/role-profiles | legacy | Backend-only route (no SPA client) |
 | GET /api/platform/role-profiles/:id | legacy | Backend-only route (no SPA client) |
 | GET /api/platform/organizations/:organizationId/entitlements | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/organizations/:organizationId/packs/:packId/install | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/organizations/:organizationId/packs/:packId/remove | legacy | Backend-only route (no SPA client) |
-| PATCH /api/platform/assets/:assetId/lifecycle | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/digital-twin | legacy | Backend-only route (no SPA client) |
-| GET /api/platform/organizations/:organizationId/analytics | legacy | Backend-only route (no SPA client) |
 | GET /api/activity/me | legacy | Backend-only route (no SPA client) |
 | GET /api/activity/me/summary | legacy | Backend-only route (no SPA client) |
 | GET /api/activity/workspaces/:workspaceId | legacy | Backend-only route (no SPA client) |
@@ -388,6 +215,15 @@ _None detected._
 | GET /api/subscriptions/config | legacy | Backend-only route (no SPA client) |
 | POST /api/subscriptions/webhook | legacy | Backend-only route (no SPA client) |
 | POST /api/chat/message-3d | legacy | Backend-only route (no SPA client) |
+| GET /api/patients | legacy | Backend-only route (no SPA client) |
+| GET /api/patients/:patientId | legacy | Backend-only route (no SPA client) |
+| POST /api/patients | legacy | Backend-only route (no SPA client) |
+| PATCH /api/patients/:patientId | legacy | Backend-only route (no SPA client) |
+| GET /api/staff | legacy | Backend-only route (no SPA client) |
+| GET /api/rooms | legacy | Backend-only route (no SPA client) |
+| GET /api/shift | legacy | Backend-only route (no SPA client) |
+| GET /api/ems | legacy | Backend-only route (no SPA client) |
+| GET /api/referrals | legacy | Backend-only route (no SPA client) |
 | POST /api/tools/execute | legacy | Backend-only route (no SPA client) |
 | POST /api/tool-calling/execute | legacy | Backend-only route (no SPA client) |
 | GET /api/tool-calling/catalog | legacy | Backend-only route (no SPA client) |
@@ -396,42 +232,101 @@ _None detected._
 | POST /api/cost-optimizer/route | legacy | Backend-only route (no SPA client) |
 | GET /api/evaluation/metrics | legacy | Backend-only route (no SPA client) |
 | GET /api/evaluation/runs | legacy | Backend-only route (no SPA client) |
-| GET /api/drugs/categories | legacy | Backend-only route (no SPA client) |
-| GET /api/drugs/:id | legacy | Backend-only route (no SPA client) |
-| GET /api/products | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/products/pack-map | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/products/:slug | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/products/:slug/assets | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/context | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/users/me/assets | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/users/me/recommendations | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform/users/me/pinned-assets | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform/users/me/hidden-assets | wire | Platform/product API not listed in frontendApiCallsInventory |
-| PATCH /api/platform/me/role-profile | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/assets | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/packs | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/packs/:packId | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/role-profiles | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/role-profiles/:id | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/organizations/:organizationId/entitlements | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform/organizations/:organizationId/packs/:packId/install | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform/organizations/:organizationId/packs/:packId/remove | wire | Platform/product API not listed in frontendApiCallsInventory |
-| PATCH /api/platform/assets/:assetId/lifecycle | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/digital-twin | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform/organizations/:organizationId/analytics | wire | Platform/product API not listed in frontendApiCallsInventory |
-| GET /api/platform-governance/consent/:patientId | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform-governance/consent/:patientId/:scope | wire | Platform/product API not listed in frontendApiCallsInventory |
-| POST /api/platform-governance/gate/evaluate | wire | Platform/product API not listed in frontendApiCallsInventory |
+| POST /api/drugs | legacy | Backend-only route (no SPA client) |
+| PUT /api/drugs/:id | legacy | Backend-only route (no SPA client) |
+| DELETE /api/drugs/:id | legacy | Backend-only route (no SPA client) |
+| GET /api/protocols/:id | legacy | Backend-only route (no SPA client) |
+| POST /api/protocols | legacy | Backend-only route (no SPA client) |
+| PUT /api/protocols/:id | legacy | Backend-only route (no SPA client) |
+| DELETE /api/protocols/:id | legacy | Backend-only route (no SPA client) |
+| POST /api/compliance/export | legacy | Backend-only route (no SPA client) |
+| POST /api/health | legacy | Backend-only route (no SPA client) |
+| POST /api/ai/query | legacy | Backend-only route (no SPA client) |
+| POST /api/ai/structured | legacy | Backend-only route (no SPA client) |
+| GET /api/ai/usage | legacy | Backend-only route (no SPA client) |
+| GET /api/audit/events | legacy | Backend-only route (no SPA client) |
+| GET /api/audit/events/:eventId | legacy | Backend-only route (no SPA client) |
+| POST /api/audit/export | legacy | Backend-only route (no SPA client) |
+| GET /api/audit/integrity/status | legacy | Backend-only route (no SPA client) |
+| POST /api/audit/integrity/verify | legacy | Backend-only route (no SPA client) |
+| GET /api/audit/patients/:patientId/access | legacy | Backend-only route (no SPA client) |
+| POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/packs/:packId | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/role-profiles/:id | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/organizations/:organizationId/entitlements | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform/organizations/:organizationId/packs/:packId/install | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform/organizations/:organizationId/packs/:packId/remove | legacy | Platform/product API is deferred and not frontend-inventory wired |
 
-_… and 12 more API rows._
+_… and 17 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/asset-pack-productization-plan.md | quarantine | No inbound links from README, src, or other docs |
-| docs/navigation-reduction-plan.md | quarantine | No inbound links from README, src, or other docs |
-| docs/saas-bottleneck-implementation-audit.md | legacy | No inbound links from README, src, or other docs |
+| docs/dashboard-context-note-audit.md | quarantine | No inbound links from README, src, or other docs |
+| docs/dashboard-to-asset-compression-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/dead-end-elimination-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/demo-live-state-reconciliation.md | legacy | No inbound links from README, src, or other docs |
+| docs/department-asset-mapping-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/department-performance-intelligence-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/digital-twin-intelligence-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/door-to-doctor-intelligence.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ed-ai-copilot-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ed-automation-marketplace-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ed-onboarding-experience.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ed-roi-calculator-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ed-workflow-command-center.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-analytics-mvp.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-capacity-intelligence-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-command-center-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-copilot-everywhere.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-demo-environment.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-demo-mode.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-department-operating-system-final.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-department-operating-system-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-escalation-engine.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-flow-intelligence-platform.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-kpi-layer.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-mvp-packaging-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-os-first-customer-execution-sequence.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-patient-path.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-progressive-disclosure.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-queue-intelligence-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-simulation-scenarios.md | quarantine | No inbound links from README, src, or other docs |
+| docs/emergency-workspace-flattening-audit.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ems-offload-command-center.md | quarantine | No inbound links from README, src, or other docs |
+| docs/ems-prearrival-workspace-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/enterprise-identity-layer.md | quarantine | No inbound links from README, src, or other docs |
+| docs/enterprise-readiness-center-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/entropy-reduction-audit.md | quarantine | No inbound links from README, src, or other docs |
+| docs/environment-management.md | quarantine | No inbound links from README, src, or other docs |
+| docs/executive-command-center-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/feature-flag-platform-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/first-customer-path.md | quarantine | No inbound links from README, src, or other docs |
+| docs/first-ed-customer-readiness-audit.md | quarantine | No inbound links from README, src, or other docs |
+| docs/frontend-entropy-compression-final.md | quarantine | No inbound links from README, src, or other docs |
+| docs/frontend-flattening-master-audit.md | quarantine | No inbound links from README, src, or other docs |
+| docs/frontend-normalization-final-pass.md | quarantine | No inbound links from README, src, or other docs |
+| docs/frontend-operating-system-refactor.md | quarantine | No inbound links from README, src, or other docs |
+| docs/healthcare-integration-automation-report.md | legacy | No inbound links from README, src, or other docs |
+| docs/healthcare-knowledge-hub-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/hospital-readiness-assessment-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/hospital-solution-builder.md | quarantine | No inbound links from README, src, or other docs |
+| docs/information-architecture-refactor.md | quarantine | No inbound links from README, src, or other docs |
+| docs/integration-readiness-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/marketplace-foundation-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/mobile-first-recovery-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/navigation-anxiety-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/navigation-compression-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/nested-frontend-detection-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/onboarding-wizard-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/one-action-principle-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/one-screen-emergency-workflow.md | quarantine | No inbound links from README, src, or other docs |
+
+_… and 50 more doc files._
 
 ## Appendix
 

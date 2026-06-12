@@ -32,6 +32,19 @@ const SYSTEM_CONFIG_DEFAULTS = {
     idleTimeoutMs: 1800000,
     absoluteTimeoutMs: 28800000,
   },
+  emergencyOs: {
+    defaultNestSurface: 'partial',
+    conditionalRuntime: 'mongoose',
+    configuredForMount: false,
+    status: 'unknown',
+    routeGroups: [
+      '/api/capacity',
+      '/api/copilot',
+      '/api/ems',
+      '/api/emergency/intake',
+      '/api/reassessment',
+    ],
+  },
 };
 
 const AI_USAGE_DEFAULTS = {
@@ -64,10 +77,22 @@ async function fetchConfigEndpoint(path, defaults) {
   }
 }
 
+function mergeSystemConfig(data = {}) {
+  return {
+    ...SYSTEM_CONFIG_DEFAULTS,
+    ...data,
+    environment: { ...SYSTEM_CONFIG_DEFAULTS.environment, ...(data.environment || {}) },
+    deployment: { ...SYSTEM_CONFIG_DEFAULTS.deployment, ...(data.deployment || {}) },
+    rag: { ...SYSTEM_CONFIG_DEFAULTS.rag, ...(data.rag || {}) },
+    session: { ...SYSTEM_CONFIG_DEFAULTS.session, ...(data.session || {}) },
+    emergencyOs: { ...SYSTEM_CONFIG_DEFAULTS.emergencyOs, ...(data.emergencyOs || {}) },
+  };
+}
+
 class ConfigService {
   async getSystemConfig() {
     const result = await fetchConfigEndpoint(API_ROUTES.config.system, SYSTEM_CONFIG_DEFAULTS);
-    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
+    return { ...mergeSystemConfig(result.data), _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
   async getAIRemainingQueries() {

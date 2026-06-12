@@ -449,8 +449,8 @@ export const capabilityExposureMatrix = Object.freeze([
   },
   {
     capability: 'Native Android API contract',
-    backendSourceFile: 'android/app/src/main/kotlin/com/caredroid/clinical/data/remote/api/CareDroidApiService.kt; android/app/src/main/kotlin/com/caredroid/clinical/network/ApiService.kt',
-    commandOrApiRoute: 'Stale Retrofit routes include auth refresh/logout/password routes, POST /api/chat, /api/chat/conversations*, bare POST /api/tools/{id}, GET /api/health, GET /api/config, GET /api/system/config, and other non-inventory paths.',
+    backendSourceFile: 'android/app/src/main/kotlin/com/caredroid/clinical/data/remote/api/CareDroidApiService.kt',
+    commandOrApiRoute: 'Stale Retrofit routes include auth refresh/logout/password routes, POST /api/chat, /api/chat/conversations*, bare POST /api/tools/{id}, GET /api/health, GET /api/config, and other non-inventory paths. The duplicate legacy Retrofit interface under android/app/src/main/kotlin/com/caredroid/clinical/network was removed.',
     currentFrontendSurface: 'Native Android Retrofit services and Compose navigation',
     exposureStatus: 'stale',
     userFacingProblem: 'Native clients can call routes that do not exist in the current Nest backend contract or skip the /execute tool path.',

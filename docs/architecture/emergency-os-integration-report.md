@@ -1,8 +1,8 @@
 # Emergency OS Integration Report
 
-Generated: 2026-06-12T02:34:02.555Z
+Generated: 2026-06-12T21:37:03.803Z
 
-Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 backend endpoint declarations and 1239 frontend API references.
+Scanned 2274 text/code files. Resolved 5689 relative import edges. Found 281 backend endpoint declarations and 1307 frontend API references.
 
 ## Workflow Coverage
 
@@ -40,11 +40,11 @@ Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 bac
 - Patient Journey events are authoritative in the frontend store, but not yet the single persisted backend event stream for every workflow.
 - Real-time support exists through `src/services/emergencyRealtimeService.js` and EMS socket support, but the frontend defaults to polling/no endpoint unless realtime env vars are configured.
 - Several active workflows consume local store projections before backend data: queues, boarding, referrals, and parts of analytics.
-- Several backend Emergency OS endpoints are mounted only in the conditional Mongoose runtime and therefore are not guaranteed in the default NestJS API surface.
+- Several backend Emergency OS endpoints are mounted only in the conditional Mongoose runtime and therefore are not guaranteed in the default NestJS API surface; `/api/config/system` exposes `emergencyOs` readiness so support surfaces can show that state.
 
 ## Recommended Next Safe Steps
 
-- Promote Emergency OS backend endpoints into the default Nest module or add a runtime health indicator that reports whether Mongoose Emergency OS endpoints are active.
+- Promote Emergency OS backend endpoints into the default Nest module, or surface `config.system.emergencyOs` in the System Health UI so tenants can see when conditional Mongoose routes are configured.
 - Add dedicated frontend API clients for `/api/ems`, `/api/reassessment`, `/api/capacity/dashboard`, and `/api/copilot/query` or remove unused endpoints if the Nest APIs replace them.
 - Replace local queue/referral/boarding derivations with Journey event-backed selectors once backend event persistence is available.
 - Move legacy platform pages/services into `future-modules` only after backend module imports and test imports have been rewritten.

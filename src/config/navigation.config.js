@@ -181,6 +181,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     label: 'Clinical Tools',
     mobileLabel: 'Tools',
     path: CANONICAL_ROUTES.emergencyCopilot,
+    showInSidebar: false,
+    showInMobile: false,
     matchPaths: [CANONICAL_ROUTES.emergencyCopilot, '/emergency/tools', '/tools/calculators'],
     matchPrefixes: ['/tools/calculators/'],
   },
@@ -914,6 +916,7 @@ export function primaryNavPathMatches(item, pathname) {
   if (item.excludePrefixes?.some((prefix) => normalized.startsWith(prefix))) {
     return false;
   }
+  if (item.path === normalized) return true;
   if (item.matchPaths?.includes(normalized)) return true;
   return Boolean(item.matchPrefixes?.some((prefix) => normalized.startsWith(prefix)));
 }

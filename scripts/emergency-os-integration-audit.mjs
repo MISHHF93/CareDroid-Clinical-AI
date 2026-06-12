@@ -300,36 +300,40 @@ function extractNestEndpoints(rel, content) {
 function statusForWorkflow(workflow, sourceByRel) {
   const app = sourceByRel.get('src/App.jsx') || '';
   const nav = sourceByRel.get('src/config/navigation.config.js') || '';
-  const command = sourceByRel.get('src/components/CommandPalette.jsx') || '';
+  const command = [
+    sourceByRel.get('src/components/CommandPalette.jsx') || '',
+    sourceByRel.get('src/config/commandPalette.config.js') || '',
+  ].join('\n');
   const search = sourceByRel.get('src/data/searchFirstDiscovery.js') || '';
-  const key = routeKey(workflow.route);
+  const keys = routeKeys(workflow.route);
+  const routeUsesKey = (source) => keys.some((key) => source.includes(`CANONICAL_ROUTES.${key}`));
   return {
     route: app.includes(`path: '${workflow.route}'`) || app.includes(`to="/${workflow.route.slice(1)}"`),
-    sidebar: nav.includes(`path: '${workflow.route}'`) || nav.includes(workflow.route) || nav.includes(`CANONICAL_ROUTES.${key}`),
-    command: command.includes(`path: '${workflow.route}'`),
-    search: search.includes(`path: CANONICAL_ROUTES.${key}`) || search.includes(`path: '${workflow.route}'`) || search.includes(workflow.route),
+    sidebar: nav.includes(`path: '${workflow.route}'`) || nav.includes(workflow.route) || routeUsesKey(nav),
+    command: command.includes(`path: '${workflow.route}'`) || routeUsesKey(command),
+    search: keys.some((key) => search.includes(`path: CANONICAL_ROUTES.${key}`)) || search.includes(`path: '${workflow.route}'`) || search.includes(workflow.route),
     pageExists: workflow.page.includes('#') || sourceByRel.has(workflow.page),
     store: sourceByRel.has(workflow.store),
     journey: sourceByRel.has(workflow.journey),
   };
 }
 
-function routeKey(route) {
+function routeKeys(route) {
   const keyByRoute = {
-    '/emergency/whiteboard': 'emergencyWhiteboard',
-    '/emergency/patients': 'emergencyPatients',
-    '/emergency/ems': 'emergencyEms',
-    '/emergency/intake': 'emergencyIntake',
-    '/emergency/queues': 'emergencyQueues',
-    '/emergency/reassessment': 'emergencyReassessment',
-    '/emergency/capacity': 'emergencyCapacity',
-    '/emergency/boarding': 'emergencyBoarding',
-    '/emergency/referrals': 'emergencyReferrals',
-    '/emergency/copilot': 'emergencyCopilot',
-    '/emergency/analytics': 'emergencyAnalytics',
-    '/emergency/settings': 'emergencySettings',
+    '/emergency/whiteboard': ['emergencyWhiteboard', 'emergencyWorkspace'],
+    '/emergency/patients': ['emergencyPatients'],
+    '/emergency/ems': ['emergencyEms'],
+    '/emergency/intake': ['emergencyIntake', 'emergencySmartIntake'],
+    '/emergency/queues': ['emergencyQueues'],
+    '/emergency/reassessment': ['emergencyReassessment'],
+    '/emergency/capacity': ['emergencyCapacity'],
+    '/emergency/boarding': ['emergencyBoarding'],
+    '/emergency/referrals': ['emergencyReferrals'],
+    '/emergency/copilot': ['emergencyCopilot'],
+    '/emergency/analytics': ['emergencyAnalytics'],
+    '/emergency/settings': ['emergencySettings'],
   };
-  return keyByRoute[route] || '';
+  return keyByRoute[route] || [];
 }
 
 function classifyFile(rel, importedByCount, content) {
@@ -641,11 +645,11 @@ function main() {
       '- Patient Journey events are authoritative in the frontend store, but not yet the single persisted backend event stream for every workflow.',
       '- Real-time support exists through `src/services/emergencyRealtimeService.js` and EMS socket support, but the frontend defaults to polling/no endpoint unless realtime env vars are configured.',
       '- Several active workflows consume local store projections before backend data: queues, boarding, referrals, and parts of analytics.',
-      '- Several backend Emergency OS endpoints are mounted only in the conditional Mongoose runtime and therefore are not guaranteed in the default NestJS API surface.',
+      '- Several backend Emergency OS endpoints are mounted only in the conditional Mongoose runtime and therefore are not guaranteed in the default NestJS API surface; `/api/config/system` exposes `emergencyOs` readiness so support surfaces can show that state.',
       '',
       '## Recommended Next Safe Steps',
       '',
-      '- Promote Emergency OS backend endpoints into the default Nest module or add a runtime health indicator that reports whether Mongoose Emergency OS endpoints are active.',
+      '- Promote Emergency OS backend endpoints into the default Nest module, or surface `config.system.emergencyOs` in the System Health UI so tenants can see when conditional Mongoose routes are configured.',
       '- Add dedicated frontend API clients for `/api/ems`, `/api/reassessment`, `/api/capacity/dashboard`, and `/api/copilot/query` or remove unused endpoints if the Nest APIs replace them.',
       '- Replace local queue/referral/boarding derivations with Journey event-backed selectors once backend event persistence is available.',
       '- Move legacy platform pages/services into `future-modules` only after backend module imports and test imports have been rewritten.',

@@ -1,61 +1,42 @@
 # Unmounted Components Report
 
-Generated: 2026-06-12T02:34:02.555Z
+Generated: 2026-06-12T21:37:03.803Z
 
-Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 backend endpoint declarations and 1239 frontend API references.
+Scanned 2274 text/code files. Resolved 5689 relative import edges. Found 281 backend endpoint declarations and 1307 frontend API references.
 
 Files below are unmounted, orphan candidates, duplicate/future artifacts, or tests/support files according to import reachability and path classification.
 
-## Pilot Readiness Addendum
-
-Focused Emergency OS findings from the revenue-readiness pass:
-
-| File / symbol | Status | Classification | Pilot decision |
-| --- | --- | --- | --- |
-| `src/pages/emergency/DepartmentPulse.jsx` / `DepartmentPulse` | Exists and is test-imported, but no active route mounts it. `/emergency/pulse` redirects to `/emergency/analytics`. | Component Not Mounted, Legacy Artifact | Keep archived/review unless charge-nurse pulse becomes a pilot workflow. |
-| `src/pages/WorkspaceHome.jsx` / `WorkspaceHome` | Legacy workspace page; active workspace routes redirect into canonical `/emergency/*`. | Legacy Artifact | Future-module review. Do not expose in pilot. |
-| `src/components/ShiftSummary.jsx` / `ShiftSummary` | Only production path was legacy `WorkspaceHome`; active shift actions route to analytics. | Component Not Mounted | Wire into analytics later or archive/review. |
-| `src/components/QuickCommandLauncher.jsx` | Duplicate launcher; active shell uses `CommandPalette`. | Duplicate Logic, Legacy Artifact | Keep out of active pilot shell. |
-| `src/pages/tools/*` tool pages | Many are exported/tested but no longer mounted by active router. Calculators and DrugChecker are embedded through ED Copilot. | Future Module, Legacy Artifact | Keep only embedded calculator/drug-check flow active for pilot. |
-| `src/navigation/registryToolLaunch.js` | Still has legacy launch plans for `/assistant`, `/tools/catalog`, and `/tools/calculators`. | Legacy Redirect Risk | Route-level redirects protect users; registry alignment remains recommended before public launch. |
-
-Safe route-render fixes applied in this pass:
-
-- `/emergency/patients` now renders `EmergencyPatientsRoute`.
-- `/emergency/reassessment` now renders `EmergencyReassessmentRoute`.
-- `/emergency/boarding` now renders `EmergencyCapacityRoute` with `variant="boarding"`.
-
 | File |Imported By |Imports |Classification |
 | --- | --- | --- | --- |
-| backend/src/models/Patient.ts | 6 | 0 | Connected Emergency OS |
+| backend/src/models/Patient.ts | 7 | 0 | Connected Emergency OS |
 | backend/src/models/PatientJourney.ts | 0 | 0 | Connected Emergency OS |
-| backend/src/models/SmartIntake.ts | 2 | 0 | Connected Emergency OS |
+| backend/src/models/SmartIntake.ts | 5 | 0 | Connected Emergency OS |
 | backend/src/modules/platform-systems/platform-systems.service.ts | 6 | 1 | Connected Emergency OS |
 | backend/src/services/capacity.service.ts | 2 | 1 | Connected Emergency OS |
 | backend/src/services/copilot.service.ts | 1 | 4 | Connected Emergency OS |
 | backend/src/services/ems.service.ts | 2 | 1 | Connected Emergency OS |
 | backend/src/services/reassessment.service.ts | 3 | 1 | Connected Emergency OS |
-| backend/src/services/smart-intake.service.ts | 1 | 2 | Connected Emergency OS |
-| src/App.jsx | 4 | 152 | Connected Emergency OS |
+| backend/src/services/smart-intake.service.ts | 1 | 6 | Connected Emergency OS |
+| src/App.jsx | 4 | 177 | Connected Emergency OS |
 | src/components/ChatInterface.jsx | 2 | 21 | Connected Emergency OS |
-| src/components/CommandPalette.jsx | 1 | 4 | Connected Emergency OS |
+| src/components/CommandPalette.jsx | 1 | 5 | Connected Emergency OS |
 | src/components/EmergencyWhiteboard.jsx | 3 | 9 | Connected Emergency OS |
-| src/components/EMSCriticalBroadcast.jsx | 1 | 5 | Connected Emergency OS |
+| src/components/EMSCriticalBroadcast.jsx | 2 | 5 | Connected Emergency OS |
 | src/components/EMSPipeline.jsx | 2 | 4 | Connected Emergency OS |
 | src/components/EMSPressureScore.jsx | 4 | 2 | Connected Emergency OS |
 | src/components/JourneyTimeline.jsx | 1 | 3 | Connected Emergency OS |
 | src/components/NewPatientIntake.jsx | 2 | 4 | Connected Emergency OS |
-| src/components/PatientCard.jsx | 2 | 18 | Connected Emergency OS |
+| src/components/PatientCard.jsx | 3 | 19 | Connected Emergency OS |
 | src/components/QueueIntelligencePanel.jsx | 3 | 2 | Connected Emergency OS |
 | src/components/ReassessmentDrawer.jsx | 1 | 4 | Connected Emergency OS |
 | src/components/ReferralPanel.jsx | 2 | 4 | Connected Emergency OS |
 | src/components/WhoNextPanel.jsx | 2 | 5 | Connected Emergency OS |
 | src/config/navigation.config.js | 15 | 1 | Connected Emergency OS |
-| src/config/routes.config.js | 27 | 0 | Connected Emergency OS |
+| src/config/routes.config.js | 31 | 0 | Connected Emergency OS |
 | src/data/searchFirstDiscovery.js | 4 | 11 | Connected Emergency OS |
-| src/layout/AppShell.jsx | 2 | 20 | Connected Emergency OS |
+| src/layout/AppShell.jsx | 2 | 22 | Connected Emergency OS |
 | src/pages/emergency/EmergencyAnalytics.jsx | 1 | 2 | Connected Emergency OS |
-| src/pages/emergency/SmartIntake.jsx | 1 | 3 | Connected Emergency OS |
+| src/pages/emergency/SmartIntake.jsx | 1 | 5 | Connected Emergency OS |
 | src/services/boardingIntelligenceEngine.js | 7 | 0 | Connected Emergency OS |
 | src/services/clinicalChatService.js | 21 | 3 | Connected Emergency OS |
 | src/services/emergencyAnalyticsApi.js | 2 | 2 | Connected Emergency OS |
@@ -66,10 +47,13 @@ Safe route-render fixes applied in this pass:
 | src/services/smartIntakeApi.js | 1 | 1 | Connected Emergency OS |
 | src/utils/reassessmentScheduler.js | 3 | 0 | Connected Emergency OS |
 | backend/src/fixtures/smart-intake.fixtures.ts | 0 | 1 | Duplicate or Legacy |
-| backend/src/main.ts | 0 | 12 | Duplicate or Legacy |
+| backend/src/main.ts | 0 | 13 | Duplicate or Legacy |
 | backend/src/modules/live-tracking/device-live-tracking.controller.ts | 0 | 1 | Duplicate or Legacy |
 | backend/src/modules/live-tracking/hospital-live-tracking.controller.ts | 0 | 1 | Duplicate or Legacy |
 | docs/architecture/component-dependency-map.md | 0 | 0 | Duplicate or Legacy |
+| docs/architecture/layout-normalization-report.md | 0 | 0 | Duplicate or Legacy |
+| docs/architecture/layout-routing-consolidation-report.md | 0 | 0 | Duplicate or Legacy |
+| docs/architecture/page-layout-map.md | 0 | 0 | Duplicate or Legacy |
 | docs/architecture/unmounted-components-report.md | 0 | 0 | Duplicate or Legacy |
 | docs/component-consolidation-report.md | 0 | 0 | Duplicate or Legacy |
 | docs/component-density-optimization-report.md | 0 | 0 | Duplicate or Legacy |
@@ -85,7 +69,7 @@ Safe route-render fixes applied in this pass:
 | backend/src/modules/audit/audit.module.ts | 24 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/audit/audit.service.spec.ts | 0 | 2 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/audit/audit.service.ts | 42 | 1 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/audit/entities/audit-log.entity.ts | 46 | 1 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/audit/entities/audit-log.entity.ts | 46 | 0 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/automation-audit/automation-audit.controller.spec.ts | 0 | 2 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/automation-audit/automation-audit.controller.ts | 2 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/automation-audit/automation-audit.module.ts | 4 | 3 | Future Module / Legacy Platform Artifact |
@@ -112,20 +96,20 @@ Safe route-render fixes applied in this pass:
 | backend/src/modules/platform-assets/asset-recommendation.service.ts | 2 | 4 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/asset-registry.schema.ts | 4 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/asset-registry.service.spec.ts | 0 | 6 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/asset-registry.service.ts | 6 | 3 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/asset-registry.service.ts | 7 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/automation-commercialization.spec.ts | 0 | 1 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/customer-success.service.spec.ts | 0 | 9 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/customer-success.service.ts | 3 | 8 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/data/platform-asset-seed.data.ts | 12 | 3 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/data/platform-asset-seed.data.ts | 13 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/department-asset-mapping.service.spec.ts | 0 | 9 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/department-asset-mapping.service.ts | 5 | 8 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/department-taxonomy.ts | 9 | 2 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/digital-twin.service.spec.ts | 0 | 1 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/digital-twin.service.ts | 3 | 2 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/entities/asset-pack.entity.ts | 20 | 1 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/entities/asset-pack.entity.ts | 21 | 1 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/entities/organization-entitlement.entity.ts | 13 | 1 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/entities/platform-asset.entity.ts | 24 | 1 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/entities/role-profile.entity.ts | 6 | 0 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/entities/platform-asset.entity.ts | 25 | 1 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/entities/role-profile.entity.ts | 7 | 0 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/entitlement.service.spec.ts | 0 | 8 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/entitlement.service.ts | 10 | 14 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/enums/platform-asset.enums.ts | 42 | 0 | Future Module / Legacy Platform Artifact |
@@ -135,12 +119,13 @@ Safe route-render fixes applied in this pass:
 | backend/src/modules/platform-assets/organization-analytics.service.ts | 3 | 7 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-assets.controller.spec.ts | 0 | 1 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-assets.controller.ts | 2 | 16 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/platform-assets.module.ts | 6 | 29 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/platform-assets.seed.service.ts | 1 | 5 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/platform-assets.module.ts | 6 | 30 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/platform-assets.seed.service.spec.ts | 0 | 6 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/platform-assets.seed.service.ts | 2 | 5 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-assets.service.spec.ts | 0 | 9 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-assets.service.ts | 20 | 9 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/platform-context.service.spec.ts | 0 | 9 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/platform-assets/platform-context.service.ts | 5 | 9 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/platform-context.service.spec.ts | 0 | 11 | Future Module / Legacy Platform Artifact |
+| backend/src/modules/platform-assets/platform-context.service.ts | 5 | 10 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-governance-registry.service.spec.ts | 0 | 2 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/platform-governance-registry.service.ts | 3 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/platform-assets/service-line-architecture.service.spec.ts | 0 | 4 | Future Module / Legacy Platform Artifact |
@@ -183,10 +168,6 @@ Safe route-render fixes applied in this pass:
 | backend/src/modules/user-profile/user-profile.controller.ts | 1 | 3 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/user-profile/user-profile.module.ts | 2 | 13 | Future Module / Legacy Platform Artifact |
 | backend/src/modules/user-profile/user-profile.service.ts | 2 | 12 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/user-profile/workspace.service.ts | 2 | 2 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/users/dto/update-profile.dto.ts | 1 | 0 | Future Module / Legacy Platform Artifact |
-| backend/src/modules/users/entities/user-profile.entity.ts | 33 | 1 | Future Module / Legacy Platform Artifact |
-| docs/frontend-page-normalization-audit.md | 0 | 0 | Future Module / Legacy Platform Artifact |
 
 ## Safe Cleanup Applied
 

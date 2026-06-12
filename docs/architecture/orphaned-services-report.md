@@ -1,8 +1,8 @@
 # Orphaned Services Report
 
-Generated: 2026-06-12T02:34:02.555Z
+Generated: 2026-06-12T21:37:03.803Z
 
-Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 backend endpoint declarations and 1239 frontend API references.
+Scanned 2274 text/code files. Resolved 5689 relative import edges. Found 281 backend endpoint declarations and 1307 frontend API references.
 
 ## Frontend API Clients and Consumers
 
@@ -45,11 +45,12 @@ Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 bac
 | src/services/clinicalToolsApi.test.js | /api/tools, /api/tools/catalog/executors, /api/tools/lab-interpreter/validate, /api/tools/sofa-calculator, /api/tools/statistics |
 | src/services/complianceApi.js | /api/compliance/consent, /api/compliance/delete-account, /api/compliance/export |
 | src/services/complianceApi.test.js | /api/compliance/consent |
+| src/services/configService.js | /api/capacity, /api/copilot, /api/emergency/intake, /api/ems, /api/reassessment |
 | src/services/disabledBackendMocks.js | /api/notifications/stream |
 | src/services/emergencyAnalyticsApi.js | /api/emergency/analytics, /api/emergency/capacity/history, /api/emergency/queues/analytics, /api/emergency/shift/report/export |
 | src/services/emergencySettingsApi.js | /api/integrations/fhir/connections, /api/integrations/hl7/interfaces, /api/protocols, /api/settings/features |
 | src/services/emergencyStaffingApi.js | /api/activity, /api/audit/sync, /api/auth/me, /api/notifications/preferences, /api/profile/me |
-| src/services/emergencyTransportApi.js | /api/emergency/diversion/status, /api/emergency/referrals, /api/fleet/snapshot |
+| src/services/emergencyTransportApi.js | /api/emergency/diversion/status, /api/fleet/snapshot, /api/referrals |
 | src/services/enterpriseIdentityApi.js | /api/auth/identity-providers |
 | src/services/enterpriseIdentityApi.test.js | /api/auth/identity-providers |
 | src/services/export/ExportService.js | /api/exports/excel, /api/exports/pdf, /api/reports/generate, /api/reports/schedule, /api/reports/schedule/${reportId} |
@@ -59,9 +60,9 @@ Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 bac
 | src/services/medicalIotService.js | /api/alerts/devices, /api/devices/live, /api/medical-iot/snapshot, /api/telemetry/live |
 | src/services/memoryApi.js | /api/memory/clinical, /api/memory/dashboard, /api/memory/fabric/context, /api/memory/fabric/signals, /api/memory/long, /api/memory/short |
 | src/services/memoryApi.test.js | /api/memory/fabric/context, /api/memory/fabric/signals |
-| src/services/notifications/NotificationService.js | /api/notifications/preferences, /api/notifications/send/${channel} |
+| src/services/notifications/NotificationService.js | /api/notifications/preferences, /api/notifications/send/${channel}, /api/notifications/send/:channel |
 | src/services/NotificationService.js | /api/notifications/${notificationId}, /api/notifications/${notificationId}/read, /api/notifications/devices, /api/notifications/devices/register, /api/notifications/preferences, /api/notifications/preferences/toggle-all, /api/notifications/read-all, /api/notifications/stream, /api/notifications/stream?token=${token}, /api/notifications/test, /api/notifications/unread/count, /api/notifications?limit=${limit} |
-| src/services/patientManagementApi.js | /api/patients/import/ehr |
+| src/services/patientManagementApi.js | /api/patients, /api/patients/import/ehr |
 | src/services/platformAssetsApi.js | /api/organizations, /api/organizations/${organizationId}, /api/organizations/${organizationId}/engine, /api/organizations/${organizationId}/feature-flags, /api/organizations/${organizationId}/settings, /api/organizations/${organizationId}/tenant-admin, /api/organizations/current, /api/organizations/current/engine, /api/platform/assets/${assetId}/lifecycle, /api/platform/context, /api/platform/digital-twin${qs}, /api/platform/me/role-profile, /api/platform/organizations/${organizationId}/analytics, /api/platform/organizations/${organizationId}/customer-success${qs}, /api/platform/organizations/${organizationId}/packs/${packId}/install, /api/platform/organizations/${organizationId}/packs/${packId}/remove, /api/platform/role-profiles, /api/platform/users/me/assets, /api/platform/users/me/recommendations?limit=${limit} |
 | src/services/platformAssetsApi.test.js | /api/organizations/org-1/tenant-admin, /api/platform/assets/agent-clinical/lifecycle, /api/platform/assets?assetType=workflow&lifecycle=beta, /api/platform/departments/emergency?organizationId=org-1, /api/platform/departments?organizationId=org-1, /api/platform/governance-registry?query=qsofa&riskLevel=clinical-decision-support&assetType=calculator, /api/platform/marketplace/packs/icu-pack?organizationId=org-1, /api/platform/marketplace/packs?organizationId=org-1&organizationType=hospital, /api/platform/organizations/org-1/customer-success?period=week, /api/platform/service-lines/emergency-medicine?organizationId=org-1, /api/platform/service-lines?organizationId=org-1 |
 | src/services/platformGovernanceApi.js | /api/ai-governance/summary, /api/audit/integrity/status, /api/audit/patients/${patientId}/access, /api/audit/runs/demo-run, /api/consent/${patientId}, /api/consent/demo-patient, /api/ehr-audit/summary, /api/equity/summary, /api/governance/ai-security/incidents, /api/governance/ai-security/summary, /api/governance/clinical/policies, /api/governance/clinical/readiness, /api/governance/equity/cohorts, /api/governance/equity/metrics, /api/governance/equity/summary, /api/governance/regulatory/capabilities, /api/governance/regulatory/evidence/clinical-governance, /api/governance/validation/release-gates/clinical-governance, /api/governance/validation/runs/demo-run, /api/governance/validation/scenarios, /api/human-review/items, /api/interoperability/summary, /api/operations/deployments/current, /api/operations/incidents, /api/operations/observability/summary, /api/operations/service-health, /api/patients/${patientId}/review-items, /api/patients/${patientId}/source-data, /api/privacy/access-log, /api/privacy/patient/${patientId}/access-log, /api/privacy/requests, /api/privacy/summary, /api/regulatory/summary, /api/review/items, /api/security/evaluate, /api/security/summary, /api/source-provenance/synthetic-source, /api/system-health |
@@ -84,15 +85,15 @@ Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 bac
 
 | Method |Endpoint |Backend File |Consumer Status |
 | --- | --- | --- | --- |
-| GET | /api/capacity/dashboard | backend/src/api/capacity.routes.ts | No active frontend consumer found |
-| POST | /api/copilot/query | backend/src/api/copilot.routes.ts | No active frontend consumer found |
-| POST | /api/ems/alert | backend/src/api/ems.routes.ts | No active frontend consumer found |
-| PATCH | /api/ems/status/:emsUnitId | backend/src/api/ems.routes.ts | No active frontend consumer found |
-| POST | /api/ems/arrive/:emsUnitId | backend/src/api/ems.routes.ts | No active frontend consumer found |
-| GET | /api/ems/incoming | backend/src/api/ems.routes.ts | No active frontend consumer found |
-| GET | /api/reassessment/due | backend/src/api/reassessment.routes.ts | No active frontend consumer found |
-| POST | /api/reassessment/:patientId/reassess | backend/src/api/reassessment.routes.ts | No active frontend consumer found |
-| POST | /api/reassessment/:patientId/dismiss | backend/src/api/reassessment.routes.ts | No active frontend consumer found |
+| GET | /api/capacity/dashboard | backend/src/api/capacity.routes.ts | Consumed or partially matched |
+| POST | /api/copilot/query | backend/src/api/copilot.routes.ts | Consumed or partially matched |
+| POST | /api/ems/alert | backend/src/api/ems.routes.ts | Consumed or partially matched |
+| PATCH | /api/ems/status/:emsUnitId | backend/src/api/ems.routes.ts | Consumed or partially matched |
+| POST | /api/ems/arrive/:emsUnitId | backend/src/api/ems.routes.ts | Consumed or partially matched |
+| GET | /api/ems/incoming | backend/src/api/ems.routes.ts | Consumed or partially matched |
+| GET | /api/reassessment/due | backend/src/api/reassessment.routes.ts | Consumed or partially matched |
+| POST | /api/reassessment/:patientId/reassess | backend/src/api/reassessment.routes.ts | Consumed or partially matched |
+| POST | /api/reassessment/:patientId/dismiss | backend/src/api/reassessment.routes.ts | Consumed or partially matched |
 | POST | /api/emergency/intake/sessions | backend/src/api/smart-intake.routes.ts | Consumed or partially matched |
 | POST | /api/emergency/intake/:id/manual-entry | backend/src/api/smart-intake.routes.ts | Consumed or partially matched |
 | POST | /api/emergency/intake/:id/documents | backend/src/api/smart-intake.routes.ts | Consumed or partially matched |

@@ -21,6 +21,11 @@ describe('configService', () => {
 
     const result = await configService.getSystemConfig();
     expect(result.rag.enabled).toBe(false);
+    expect(result.emergencyOs).toMatchObject({
+      conditionalRuntime: 'mongoose',
+      configuredForMount: false,
+      status: 'unknown',
+    });
     expect(result._meta.fromDefaults).toBe(true);
     expect(result._meta.ok).toBe(false);
   });
@@ -33,6 +38,7 @@ describe('configService', () => {
 
     const result = await configService.getSystemConfig();
     expect(result.rag.enabled).toBe(true);
+    expect(result.emergencyOs.status).toBe('unknown');
     expect(result._meta.ok).toBe(true);
     expect(result._meta.fromDefaults).toBe(false);
   });

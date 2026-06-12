@@ -69,7 +69,7 @@ function implementationChecks() {
   const seededAssetsFullyPackaged =
     packagingAudit.summary.seededAssetCount > 0 &&
     packagingAudit.summary.nonCompliantAssets === 0;
-  const inventoryBackfillComplete = packagingAudit.summary.inventoryOnlyCount === 0;
+  const inventoryBackfillComplete = packagingAudit.summary.backendSeedBacklogCount === 0;
 
   const strictBackend = hasAll('backend/src/modules/platform-assets/platform-assets.service.ts', [
     'isStrictSaasEntitlementsEnabled',
@@ -142,8 +142,9 @@ function implementationChecks() {
   ]);
 
   const centralizedLaunch = hasAll('src/navigation/registryToolLaunch.js', [
-    'isAssetEntitled',
-    'isLaunchAllowedForWorkspace',
+    'resolveRegistryToolLaunchAccess',
+    'resolveAssetAccessState',
+    'ASSET_ACCESS_STATES.ALLOWED',
     'entitlement=denied',
   ]);
 
@@ -179,8 +180,8 @@ function implementationChecks() {
       'All user-facing inventory tools are platform assets',
       'Phase 1',
       inventoryBackfillComplete ? AUDIT_STATUSES.PASS : AUDIT_STATUSES.PARTIAL,
-      `${packagingAudit.summary.inventoryOnlyCount} user-facing registry tools remain inventory-only`,
-      'Backfill `platform_assets` from `toolInventory.js` until this reaches zero or documented exemptions exist.',
+      `${packagingAudit.summary.backendSeedBacklogCount} frontend-mounted registry tools await backend seed rows; ${packagingAudit.summary.inventoryOnlyCount} lack mounted projection`,
+      'Promote high-value mounted projection rows into backend `platform_assets` when they need entitlement enforcement, billing, or marketplace ownership.',
     ),
     check(
       'strict-backend-entitlements',
@@ -227,7 +228,7 @@ function implementationChecks() {
       'Registry launch path checks entitlement and workspace scope',
       'Phase 3',
       statusFromBoolean(centralizedLaunch),
-      '`registryToolLaunch.js` gates launch through entitlement and workspace checks',
+      '`registryToolLaunch.js` gates launch through `resolveRegistryToolLaunchAccess` / `resolveAssetAccessState` and redirects denied launches',
       'Audit direct `navigate(asset.route)` product surfaces and replace bypasses.',
     ),
     check(

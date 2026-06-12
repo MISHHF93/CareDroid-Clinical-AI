@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-06-05 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-06-12 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 
@@ -12,16 +12,16 @@ Identify competing sources of truth that cause drift, double registration, or am
 |--------|------:|
 | Audit sections | 11 |
 | Duplicate findings documented | 35 |
-| CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | 25 |
+| CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | 27 |
 | POST executor ids (frontend) | drug-interactions, lab-interpreter, sofa-calculator |
 | REGISTRY_ID_TO_ORCHESTRATOR_TOOL entries | 3 |
 
 ### Top consolidation priorities
 
 1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.
-2. **Inventories** — `toolInventory.js` is the SPA launch authority; sync `platform_assets` seed from it.
+2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.js` mounts it into product/pack/workspace/role metadata.
 3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.
-4. **Dashboards** — Rename `Dashboard.jsx` → `AssistantPage.jsx`; keep `CommandDashboard` as home.
+4. **Dashboards** — Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.
 5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.
 6. **Pack routes** — One pack marketplace URL under organization settings.
 
@@ -32,7 +32,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 | Routes | `src/config/routes.config.js` | App.jsx (paths only), TOOL_LAUNCH_PATHS |
 | Router mount | `src/App.jsx` | — |
 | Layouts | `src/layout/AppShell.jsx` | Page-level shells |
-| Sidebar | `src/components/Sidebar.jsx` + `navigation.config.js` | Inline nav arrays |
+| AppShell rail | `src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` | Inline nav arrays |
 | Navigation | `src/config/navigation.config.js` | `primaryNavigation.js` (shim only) |
 | Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |
 | Tool ids / NLU | `src/data/clinicalToolIdContract.js` | Random string ids in components |
@@ -40,13 +40,13 @@ Identify competing sources of truth that cause drift, double registration, or am
 | Calculator hub | `src/data/calculatorHubManifest.js` | Calculators.jsx card arrays |
 | Calculator routes | `src/routes/clinicalToolRoutes.js` | App.jsx one-off paths |
 | Command home | `src/pages/CommandDashboard.jsx` + `commandDashboardModel.js` | platformOperatingSystem tiles |
-| Assistant UI | `src/pages/Dashboard.jsx` (rename recommended) | — |
+| Assistant UI | `src/components/ChatInterface.jsx` (ED Copilot panel) | Removed `Dashboard.jsx` assistant page |
 | Auth | `src/config/auth.config.js` + `routes.config.js` | Inline token keys |
 | API paths | `src/config/api.config.js` | Hard-coded `/api/...` strings |
 | Workspace (server) | `GET/POST /api/workspaces` | localStorage-only gating |
 | Workspace (UX) | `src/data/workspaceArchitecture.js` via `workspace.config.js` | Duplicate CARE_WORKSPACES |
 | Asset entitlements | `backend/.../platform-asset-seed.data.ts` + DB | `buildAssetRegistry()` demo |
-| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` | Empty packIds in assetInventory |
+| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.js` | Empty pack/product projections |
 | Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | — |
 | Executors | `backend/.../tool-orchestrator.registry.ts` | Extra REGISTERED lists in frontend |
 
@@ -61,31 +61,29 @@ Identify competing sources of truth that cause drift, double registration, or am
 |-----------|-----------|------|--------|----------------|
 | Canonical route map vs tool launch paths | routes.config.js → CANONICAL_ROUTES; clinicalToolIdContract.js → TOOL_LAUNCH_PATHS | Drift when adding fleet/simulation paths to one file only | merge | Import CANONICAL_ROUTES into clinicalToolIdContract (or shared routes module); deprecate overlapping TOOL_LAUNCH_PATHS keys. |
 | App.jsx inline route table | src/App.jsx routes[] (~212 paths); routes.config.js | New routes added only in App.jsx bypass alias + nav contracts | wire | Keep App.jsx as renderer; validate every `path:` exists in CANONICAL_ROUTES or ROUTE_ALIAS_GROUPS via routeHealth tests. |
-| Calculator deep links | clinicalToolRoutes.js → CALCULATOR_ROUTE_DEFS; App.jsx CALCULATOR_ROUTE_DEFS.map; toolInventory per-tool `route` | Slug/path mismatch between hub and inventory | merge | Canonical: `toolInventory.js` records; project routes via `clinicalToolRoutes.js` only. |
-| Pack marketplace URLs | /asset-packs; /settings/organization/packs | Split analytics and bookmarks | merge | Canonical: `/settings/organization/packs`; redirect `/asset-packs` → settings path. |
+| Calculator deep links | clinicalToolRoutes.js → CALCULATOR_ROUTE_DEFS; App.jsx LegacyCalculatorRouteRedirect for /tools/calculators; toolInventory per-tool `route` | Slug/path mismatch between hub and inventory | merge | Canonical: `clinicalToolRoutes.js` indexes calculator slugs; App.jsx keeps one Copilot redirect surface for calculator paths. |
+| Pack marketplace URLs | /asset-packs; /settings/organization/packs | Same component is mounted in product discovery and organization-admin contexts | legacy | Keep `/asset-packs` as product/pack discovery and `/settings/organization/packs` as organization entitlement management; both must share `PackMarketplace` and route-health coverage. |
 | Workflow surfaces | /automation → WorkflowAutomationBuilder; /workflows → WorkflowBuilderPage (PlatformOS) | Two workflow UIs under different nav ids | merge | Pick one workflow builder (Platform OS `WorkflowBuilderPage` or legacy `WorkflowAutomationBuilder`); alias the other route. |
 | Operations entry points | /operations; /operations-center; WORKSPACE_ROUTE_SHORTCUTS.commandCenter → /dashboard | Ops vs command center naming confusion | legacy | Canonical ops hub: `CANONICAL_ROUTES.operations`; document /operations-center as digital ops center alias. |
 
 ## Layouts
 
-**Canonical:** `src/layout/AppShell.jsx` (authenticated chrome)
-
-**Secondary (allowed):** AuthShell / PublicShell for unauthenticated surfaces
+**Canonical:** `src/layout/AppShell.jsx` (shared app chrome)
 
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Shell variants | AppShell.jsx; AuthShell.jsx; PublicShell.jsx; PageContainer.jsx | Low — intentional separation | legacy | Canonical shell: AppShell; use PageContainer inside pages for content width. Do not add fourth shell without ADR. |
-| Ops demo layout class | .ops-demo-page on simulation/lab/3D pages; PageContainer layout tokens | Parallel layout CSS systems | merge | Migrate ops-demo pages to PageContainer + shared design tokens from layout.config.js. |
+| Shell variants | AppShell.jsx | Resolved — AppShell owns route chrome. | done | Canonical shell: AppShell; use shared CareDroid primitives inside pages for content width only. |
+| Ops demo layout class | .ops-demo-page on simulation/lab/3D pages | Parallel layout CSS systems | merge | Migrate ops-demo pages to shared design tokens and CareDroid primitives. |
 
 ## Sidebars
 
-**Canonical:** `src/components/Sidebar.jsx` + `PRIMARY_SIDEBAR_NAV_ITEMS` from navigation.config.js
+**Canonical:** `src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` from navigation.config.js
 
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Sidebar nav item sources | PRIMARY_SIDEBAR_NAV_ITEMS; OPERATIONS_SIDEBAR_NAV_ITEMS; PRIMARY_MOBILE_NAV_ITEMS; AppShell mobile drawer (same config) | Operations tools appear in two trees | wire | Canonical: PRIMARY_SIDEBAR_NAV_ITEMS; operations extension via OPERATIONS_SIDEBAR_NAV_ITEMS only on ops routes. |
+| Sidebar nav item sources | APP_SHELL_NAV_ITEMS; PRIMARY_SIDEBAR_NAV_ITEMS; QUICK_COMMAND_DESTINATION_ITEMS | Route surfaces can drift if they bypass navigation.config.js | done | Canonical AppShell rail: APP_SHELL_NAV_ITEMS; other navigation projections must derive from navigation.config.js. |
 | Tool list in sidebar | sidebarToolPresentation.js; historical getSidebarToolRegistryProjection in tests | Tests may reference removed sidebar tool partition API | legacy | Canonical tool sidebar data: getUserFacingToolRegistryProjection + sidebarToolPresentation. |
 
 ## Navigation
@@ -132,7 +130,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Home vs assistant | CommandDashboard (/dashboard); Dashboard (/assistant) | Name collision; different purposes | merge | Rename Dashboard.jsx → AssistantPage.jsx; canonical home: CommandDashboard. |
+| Home vs assistant | CommandDashboard (/dashboard); ChatInterface ED Copilot panel | Resolved — former Dashboard.jsx assistant page was removed. | legacy | Keep /dashboard owned by CommandDashboard and /assistant as an ED Copilot alias into the shell. |
 | Platform dashboard registry | platformOperatingSystem.js PLATFORM_DASHBOARDS; commandDashboardModel widgets | Demo OS dashboards vs command dashboard tiles | wire | Canonical command UX: commandDashboardModel; platformOperatingSystem for Platform OS pages only. |
 | Domain dashboards (15+ pages) | AnalyticsDashboard; CostAnalyticsDashboard; AiCommandCenterDashboard; MemoryDashboard; TrainingDashboard; LaboratoryDashboard; MedicalIotDashboard; HospitalMapDashboard; FleetDashboard; DigitalOperationsCenter; OutcomesDashboardPage | Overlapping KPIs across ops/analytics pages | wire | Map each dashboard to one asset id in platform_assets; link from command dashboard via assetRecommendation. |
 
@@ -169,8 +167,8 @@ Identify competing sources of truth that cause drift, double registration, or am
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Dual registry (tools vs assets) | toolInventory.js (~291 user-facing); SEED_PLATFORM_ASSETS (~59) | Pack gating incomplete for most tools | wire | Canonical launch: toolInventory; canonical entitlement: platform_assets. Sync seed from inventory build. |
-| Frontend projections | assetInventory.js; assetAccess.js; assetEntitlements.js; buildAssetRegistry() demo | packIds empty in assetInventory projection | merge | Canonical client context: UserIdentityContext + platformAssetsApi GET /api/platform/context; deprecate buildAssetRegistry(). |
+| Dual registry (tools vs assets) | toolInventory.js user-facing launch rows; SEED_PLATFORM_ASSETS; assetInventory.js mounted projection | Manual projection drift if backend seed and frontend launch metadata diverge | wire | Canonical launch: toolInventory; canonical entitlement: platform_assets; canonical frontend mount: assetInventory projection. |
+| Frontend projections | assetInventory.js; assetAccess.js; assetEntitlements.js; buildAssetRegistry() demo | Projection must continue to include pack/product/workspace/role metadata for every user-facing asset | wire | Canonical client context: UserIdentityContext + platformAssetsApi GET /api/platform/context; assetInventory derives offline/demo metadata when backend context is unavailable. |
 | Duplicate asset packs | emergency-medicine pack; emergency-department-pack (same assetIds) | Duplicate SKUs and entitlements | merge | Merge to one ED pack id; keep other slug as alias in product catalog. |
 | Product catalog vs platform assets | product-catalog Product entities; platform_assets; solution packs docs | Commercial product id ≠ asset id | wire | Canonical commercial: Product maps to packIds; assets remain operational unit. |
 
@@ -192,7 +190,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 | toolsOverview | /tools |
 | toolsCatalog | /tools/catalog |
 | calculatorsHub | /tools/calculators |
-| operationsCenter | /operations-center |
+| operationsCenter | /operations |
 | protocols | /protocols |
 | research | /research |
 | documentation | /documentation |
@@ -206,6 +204,8 @@ Identify competing sources of truth that cause drift, double registration, or am
 | simulationOutcomes | /simulation/outcomes |
 | laboratory | /laboratory |
 | medical3dViewer | /3d-viewer |
+| artifacts | /artifacts |
+| aiEvaluation | /ai-evaluation |
 | aiGovernance | /ai-governance |
 | aiSecurity | /security |
 | liveTrackingMap | /live-map |
@@ -219,44 +219,29 @@ Identify competing sources of truth that cause drift, double registration, or am
 
 - `/`
 - `/auth/callback`
-- `/workspace`
-- `/workspaces`
-- `/home`
-- `/patients`
-- `/patients/import`
-- `/integrations`
-- `/integrations/fhir`
-- `/integrations/hl7`
-- `/integrations/source-provenance`
-- `/operations/observability`
-- `/operations/deployments`
-- `/operations/service-health`
-- `/operations/incidents`
-- `/artifacts`
-- `/memory`
-- `/ai-memory`
-- `/training`
-- `/ai/evaluation`
+- `/emergency`
+- `/emergency/pulse`
+- `/emergency/shift`
 - `/ai-command-center`
-- `/simulation/sepsis-deterioration`
+- `/analytics`
+- `/costs`
+- `/memory`
+- `/training`
 - `/fleet/predictive-maintenance`
 - `/fleet/route-optimizer`
-- `/fleet/*`
-- `/clinical/alerts`
 - `/profile/activity`
 - `/profile/preferences`
 - `/profile/workspaces`
 - `/profile/security`
 - `/profile-settings`
-- `/organization`
-- `/settings/organization`
-- `/settings/organization/packs`
-- `/settings/organization/assets`
-- `/asset-packs`
-- `/platform-analytics`
+- `/organization/settings`
 - `/notification-preferences`
 - `/two-factor-setup`
 - `/biometric-setup`
+- `/consent`
+- `/consent-history`
+- `/team`
+- `*`
 
 _Many are dynamic tool routes, org/commercial pages, or profile subpaths — extend CANONICAL_ROUTES or document as extensions._
 

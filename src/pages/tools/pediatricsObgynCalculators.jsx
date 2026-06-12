@@ -402,7 +402,7 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
     <div className="calculator-interface calculator-interface--pediatric-dose-safety-checker">
       <div className="calculator-inputs">
         <CalcPanelTitle icon={getCalculatorSubIcon('pediatric-dose-safety-checker')}>
-          <span id="pediatric-dose-safety-checker-form-title">Pediatric Emergency Drug Calculator</span>
+          <span id="pediatric-dose-safety-checker-form-title">Pediatric Dose Safety Checker</span>
         </CalcPanelTitle>
         <DecisionSupportNotice>
           Weight-based ED reference for common pediatric emergency drugs. Prefer measured weight. If unavailable,
@@ -656,7 +656,7 @@ const configBySlug = {
   },
   'pediatric-dose-safety-checker': {
     slug: 'pediatric-dose-safety-checker',
-    title: 'Pediatric Emergency Drug Calculator',
+    title: 'Pediatric Dose Safety Checker',
     notice: 'Weight-based ED reference for common pediatric emergency drugs.',
     dosingPlaceholder: false,
     initial: { medicationName: '', weightKg: '', governedProtocol: '' },

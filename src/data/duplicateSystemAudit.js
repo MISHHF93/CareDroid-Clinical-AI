@@ -87,9 +87,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         name: 'Pack marketplace URLs',
         instances: ['/asset-packs', '/settings/organization/packs'],
         overlap: 2,
-        risk: 'Split analytics and bookmarks',
-        action: 'merge',
-        recommendation: 'Canonical: `/settings/organization/packs`; redirect `/asset-packs` → settings path.',
+        risk: 'Same component is mounted in product discovery and organization-admin contexts',
+        action: 'legacy',
+        recommendation:
+          'Keep `/asset-packs` as product/pack discovery and `/settings/organization/packs` as organization entitlement management; both must share `PackMarketplace` and route-health coverage.',
       },
       {
         name: 'Workflow surfaces',

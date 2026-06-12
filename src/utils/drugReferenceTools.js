@@ -10,7 +10,7 @@ export const DRUG_REFERENCE_TOOLS = Object.freeze([
   },
   {
     id: 'pediatric-dose-safety-checker',
-    name: 'Pediatric Emergency Drug Calculator',
+    name: 'Pediatric Dose Safety Checker',
     description: 'Weight or age-based ED quick reference for resuscitation drugs and fluid bolus volumes.',
     status: 'built',
     launchMode: 'calculator',

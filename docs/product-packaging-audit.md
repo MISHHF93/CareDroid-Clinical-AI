@@ -1,6 +1,6 @@
 # Product Packaging Audit
 
-Generated: 2026-06-05 (regenerate with `npm run product-packaging-audit:write-docs`)
+Generated: 2026-06-12 (regenerate with `npm run product-packaging-audit:write-docs`)
 
 ## Productization model
 
@@ -24,14 +24,17 @@ Commercial **products** (`product-catalog`) map 1:1 to solution pack ids for the
 | Packaging violations (seeded assets) | 0 |
 | Missing specialty mapping | 0 |
 | Missing role mapping | 0 |
-| User-facing registry tools not seeded as assets | 245 |
+| User-facing registry tools frontend-mounted | 291 |
+| Frontend-mounted registry tools awaiting backend seed rows | 245 |
+| User-facing registry tools without mounted asset projection | 0 |
 | Nine solution packs present in seed | 9/9 |
 
 ### Strategy verdict
 
 **PASS (seed catalog):** All seeded platform assets have solution pack, specialty, role, and organization-type coverage.
 
-**Inventory gap:** 245 user-facing tools exist only in `toolInventory.js` and are not yet productized into `platform_assets`.
+**Backend seed backlog:** 245 user-facing tools are covered by the frontend mounted asset projection but are not yet direct backend `platform_assets` seed rows.
+**Projection coverage:** All user-facing registry tools have mounted asset projection coverage.
 
 ## Nine solution packs (generated catalog)
 
@@ -138,60 +141,94 @@ _None — all seeded assets satisfy four dimensions._
 | telemetry-monitoring | hospital-operations, medical-iot-pack | operations | administrator; pack:medical-iot-pack→biomedical engineer; pack:medical-iot-pack→administrator | hospital, health_system, academic_medical_center | OK |
 | timeline-ai | ai-workflow-pack | platform | pack:ai-workflow-pack→physician; pack:ai-workflow-pack→hospitalist | hospital, academic_medical_center | OK |
 
-## Registry tools not productized (sample)
+## Frontend-mounted registry tools awaiting backend seed rows (sample)
 
-Total: 245 user-facing tools without a `platform_assets` row.
+### Backlog by route area
 
-- **A-a Gradient** (`aa-gradient`) — /tools/calculators/aa-gradient
-- **ABCD² score** (`abcd2`) — /tools/calculators/abcd2
-- **ACS Workflow Assistant** (`acs-workflow-assistant`) — /tools/cardiology/acs-workflow-assistant
-- **Adjusted Body Weight** (`adjusted-body-weight`) — /tools/calculators/adjusted-body-weight
-- **AKI Staging Assistant** (`aki-staging-assistant`) — /tools/nephrology/aki-staging-assistant
-- **Anion Gap** (`anion-gap`) — /tools/calculators/anion-gap
-- **Apgar score** (`apgar-score`) — /tools/calculators/apgar-score
-- **APRI** (`apri`) — /tools/calculators/apri
-- **ASCVD 10-year risk** (`ascvd-risk`) — /tools/calculators/ascvd-risk
-- **Asthma Exacerbation Assistant** (`asthma-exacerbation-assistant`) — /tools/pulmonology/asthma-exacerbation-assistant
-- **Asthma Severity Score** (`asthma-severity-score`) — /tools/calculators/asthma-severity-score
-- **Atrial Fibrillation Assistant** (`atrial-fibrillation-assistant`) — /tools/cardiology/atrial-fibrillation-assistant
-- **AUDIT-C** (`audit-c`) — /tools/calculators/audit-c
-- **Bed Occupancy Calculator** (`bed-occupancy-calculator`) — /tools/calculators/bed-occupancy-calculator
-- **BISAP score** (`bisap-score`) — /tools/calculators/bisap-score
-- **Bishop score** (`bishop-score`) — /tools/calculators/bishop-score
-- **BMI** (`calc-bmi`) — /tools/calculators/bmi
-- **BODE Index** (`bode-index`) — /tools/calculators/bode-index
-- **Body Surface Area** (`bsa`) — /tools/calculators/bsa
-- **Braden scale** (`braden-scale`) — /tools/calculators/braden-scale
-- **BUN/Creatinine Ratio** (`bun-creatinine-ratio`) — /tools/calculators/bun-creatinine-ratio
-- **CAGE** (`cage`) — /tools/calculators/cage
-- **Canadian C-Spine Rule** (`canadian-c-spine`) — /tools/calculators
-- **Centor / McIsaac** (`centor-mcisaac`) — /tools/calculators/centor-mcisaac
-- **CHA₂DS₂-VASc** (`calc-chads2vasc`) — /tools/calculators/chads2vasc
-- **CHADS2** (`chads2`) — /tools/calculators/chads2
-- **Child-Pugh** (`child-pugh`) — /tools/calculators/child-pugh
-- **CKD staging (KDIGO)** (`ckd-staging`) — /tools/calculators/ckd-staging
-- **Cognitive Screening Assistant** (`cognitive-screening-assistant`) — /tools/psychiatry/cognitive-screening-assistant
-- **Columbia Suicide Severity Workflow** (`columbia-suicide-severity-workflow`) — /tools/calculators/columbia-suicide-severity-workflow
-- **COPD GOLD** (`copd-gold`) — /tools/calculators
-- **COPD GOLD Assessment** (`copd-gold-assessment`) — /tools/calculators/copd-gold-assessment
-- **COPD Workflow Assistant** (`copd-workflow-assistant`) — /tools/pulmonology/copd-workflow-assistant
-- **Corrected Calcium** (`corrected-calcium`) — /tools/calculators/corrected-calcium
-- **Corrected Sodium** (`corrected-sodium`) — /tools/calculators/corrected-sodium
-- **Creatinine Clearance (Cockcroft-Gault)** (`creatinine-clearance-cg`) — /tools/calculators/creatinine-clearance-cg
-- **Diabetes Care Assistant** (`diabetes-care-assistant`) — /tools/endocrine/diabetes-care-assistant
-- **DKA Pathway Assistant** (`dka-pathway-assistant`) — /tools/endocrine/dka-pathway-assistant
-- **Duke Treadmill Score** (`duke-treadmill-score`) — /tools/calculators/duke-treadmill-score
-- **eGFR (CKD-EPI)** (`calc-gfr`) — /tools/calculators/gfr
-- **eGFR CKD-EPI 2021** (`egfr-ckd-epi`) — /tools/calculators/egfr-ckd-epi
-- **Electrolyte Disorder Assistant** (`electrolyte-disorder-assistant`) — /tools/nephrology/electrolyte-disorder-assistant
-- **Epworth Sleepiness Scale** (`epworth-sleepiness-scale`) — /tools/calculators/epworth-sleepiness-scale
-- **FeNa** (`fena`) — /tools/calculators/fena
-- **Fenton Growth Chart Helper** (`fenton-growth-chart-helper`) — /tools/calculators/fenton-growth-chart-helper
-- **FeUrea** (`feurea`) — /tools/calculators/feurea
-- **FIB-4** (`fib4`) — /tools/calculators/fib4
-- **Fluid Resuscitation Calculator Plugin** (`plugin-fluid-resuscitation-calculator`) — /tools/catalog
-- **FOUR Score** (`four-score`) — /tools/calculators/four-score
-- **Framingham CHD risk** (`framingham-risk`) — /tools/calculators/framingham-risk
+| Route area | Count |
+| --- | ---: |
+| calculator tools | 96 |
+| other routed tools | 32 |
+| governance workflow | 16 |
+| neurology tools | 10 |
+| patient workflow | 10 |
+| endocrine tools | 9 |
+| pediatrics-obgyn tools | 9 |
+| psychiatry tools | 9 |
+| pulmonology tools | 9 |
+| gastroenterology tools | 8 |
+| nephrology tools | 8 |
+| cardiology tools | 7 |
+| assistant workflow | 5 |
+| operations workflow | 3 |
+| diagnosis tools | 2 |
+| audit-trail-ai tools | 1 |
+| clinical-dictation tools | 1 |
+| clinical-reasoning-engine tools | 1 |
+| discharge-summary-ai tools | 1 |
+| guideline-rag tools | 1 |
+| prior-auth-ai tools | 1 |
+| procedures tools | 1 |
+| referral-ai tools | 1 |
+| soap-builder tools | 1 |
+| tool catalog | 1 |
+| why-engine tools | 1 |
+| workflow-builder-ai tools | 1 |
+
+### Sample rows
+
+Total: 245 user-facing tools have frontend mounted asset projection coverage but are not direct backend `platform_assets` seed rows.
+
+- **A-a Gradient** (`aa-gradient`) — /tools/calculators/aa-gradient — mounted projection OK
+- **ABCD² score** (`abcd2`) — /tools/calculators/abcd2 — mounted projection OK
+- **ACS Workflow Assistant** (`acs-workflow-assistant`) — /tools/cardiology/acs-workflow-assistant — mounted projection OK
+- **Adjusted Body Weight** (`adjusted-body-weight`) — /tools/calculators/adjusted-body-weight — mounted projection OK
+- **AKI Staging Assistant** (`aki-staging-assistant`) — /tools/nephrology/aki-staging-assistant — mounted projection OK
+- **Anion Gap** (`anion-gap`) — /tools/calculators/anion-gap — mounted projection OK
+- **Apgar score** (`apgar-score`) — /tools/calculators/apgar-score — mounted projection OK
+- **APRI** (`apri`) — /tools/calculators/apri — mounted projection OK
+- **ASCVD 10-year risk** (`ascvd-risk`) — /tools/calculators/ascvd-risk — mounted projection OK
+- **Asthma Exacerbation Assistant** (`asthma-exacerbation-assistant`) — /tools/pulmonology/asthma-exacerbation-assistant — mounted projection OK
+- **Asthma Severity Score** (`asthma-severity-score`) — /tools/calculators/asthma-severity-score — mounted projection OK
+- **Atrial Fibrillation Assistant** (`atrial-fibrillation-assistant`) — /tools/cardiology/atrial-fibrillation-assistant — mounted projection OK
+- **AUDIT-C** (`audit-c`) — /tools/calculators/audit-c — mounted projection OK
+- **Bed Occupancy Calculator** (`bed-occupancy-calculator`) — /tools/calculators/bed-occupancy-calculator — mounted projection OK
+- **BISAP score** (`bisap-score`) — /tools/calculators/bisap-score — mounted projection OK
+- **Bishop score** (`bishop-score`) — /tools/calculators/bishop-score — mounted projection OK
+- **BMI** (`calc-bmi`) — /tools/calculators/bmi — mounted projection OK
+- **BODE Index** (`bode-index`) — /tools/calculators/bode-index — mounted projection OK
+- **Body Surface Area** (`bsa`) — /tools/calculators/bsa — mounted projection OK
+- **Braden scale** (`braden-scale`) — /tools/calculators/braden-scale — mounted projection OK
+- **BUN/Creatinine Ratio** (`bun-creatinine-ratio`) — /tools/calculators/bun-creatinine-ratio — mounted projection OK
+- **CAGE** (`cage`) — /tools/calculators/cage — mounted projection OK
+- **Canadian C-Spine Rule** (`canadian-c-spine`) — /tools/calculators — mounted projection OK
+- **Centor / McIsaac** (`centor-mcisaac`) — /tools/calculators/centor-mcisaac — mounted projection OK
+- **CHA₂DS₂-VASc** (`calc-chads2vasc`) — /tools/calculators/chads2vasc — mounted projection OK
+- **CHADS2** (`chads2`) — /tools/calculators/chads2 — mounted projection OK
+- **Child-Pugh** (`child-pugh`) — /tools/calculators/child-pugh — mounted projection OK
+- **CKD staging (KDIGO)** (`ckd-staging`) — /tools/calculators/ckd-staging — mounted projection OK
+- **Cognitive Screening Assistant** (`cognitive-screening-assistant`) — /tools/psychiatry/cognitive-screening-assistant — mounted projection OK
+- **Columbia Suicide Severity Workflow** (`columbia-suicide-severity-workflow`) — /tools/calculators/columbia-suicide-severity-workflow — mounted projection OK
+- **COPD GOLD** (`copd-gold`) — /tools/calculators — mounted projection OK
+- **COPD GOLD Assessment** (`copd-gold-assessment`) — /tools/calculators/copd-gold-assessment — mounted projection OK
+- **COPD Workflow Assistant** (`copd-workflow-assistant`) — /tools/pulmonology/copd-workflow-assistant — mounted projection OK
+- **Corrected Calcium** (`corrected-calcium`) — /tools/calculators/corrected-calcium — mounted projection OK
+- **Corrected Sodium** (`corrected-sodium`) — /tools/calculators/corrected-sodium — mounted projection OK
+- **Creatinine Clearance (Cockcroft-Gault)** (`creatinine-clearance-cg`) — /tools/calculators/creatinine-clearance-cg — mounted projection OK
+- **Diabetes Care Assistant** (`diabetes-care-assistant`) — /tools/endocrine/diabetes-care-assistant — mounted projection OK
+- **DKA Pathway Assistant** (`dka-pathway-assistant`) — /tools/endocrine/dka-pathway-assistant — mounted projection OK
+- **Duke Treadmill Score** (`duke-treadmill-score`) — /tools/calculators/duke-treadmill-score — mounted projection OK
+- **eGFR (CKD-EPI)** (`calc-gfr`) — /tools/calculators/gfr — mounted projection OK
+- **eGFR CKD-EPI 2021** (`egfr-ckd-epi`) — /tools/calculators/egfr-ckd-epi — mounted projection OK
+- **Electrolyte Disorder Assistant** (`electrolyte-disorder-assistant`) — /tools/nephrology/electrolyte-disorder-assistant — mounted projection OK
+- **Epworth Sleepiness Scale** (`epworth-sleepiness-scale`) — /tools/calculators/epworth-sleepiness-scale — mounted projection OK
+- **FeNa** (`fena`) — /tools/calculators/fena — mounted projection OK
+- **Fenton Growth Chart Helper** (`fenton-growth-chart-helper`) — /tools/calculators/fenton-growth-chart-helper — mounted projection OK
+- **FeUrea** (`feurea`) — /tools/calculators/feurea — mounted projection OK
+- **FIB-4** (`fib4`) — /tools/calculators/fib4 — mounted projection OK
+- **Fluid Resuscitation Calculator Plugin** (`plugin-fluid-resuscitation-calculator`) — /tools/catalog — mounted projection OK
+- **FOUR Score** (`four-score`) — /tools/calculators/four-score — mounted projection OK
+- **Framingham CHD risk** (`framingham-risk`) — /tools/calculators/framingham-risk — mounted projection OK
 - … and 195 more
 
 ## Remediation playbook
@@ -200,7 +237,7 @@ Total: 245 user-facing tools without a `platform_assets` row.
 2. **Specialty pack** — Add asset id to `SEED_SPECIALTIES[].assetIds` for each relevant specialty slug.
 3. **Role pack** — Add to `SEED_ROLE_PROFILES[].preferredAssetIds` and/or pack `targetRoles` for role targeting.
 4. **Organization type** — Ensure at least one containing pack lists the tenant segment in `organizationTypes`.
-5. **Inventory backlog** — Backfill `platform_assets` from `toolInventory.js` before claiming full SaaS productization.
+5. **Backend seed backlog** — Promote high-value mounted projection rows into backend `platform_assets` seed rows when they need entitlement enforcement, billing, or marketplace ownership.
 
 ## Appendix
 

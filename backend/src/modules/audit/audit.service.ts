@@ -147,10 +147,18 @@ export class AuditService {
 
     // Update integrityVerified flag for all logs
     if (isValid) {
-      await this.auditRepository.update({}, { integrityVerified: true });
+      await this.auditRepository
+        .createQueryBuilder()
+        .update(AuditLog)
+        .set({ integrityVerified: true })
+        .execute();
     } else {
       // Mark all logs as unverified if chain is broken
-      await this.auditRepository.update({}, { integrityVerified: false });
+      await this.auditRepository
+        .createQueryBuilder()
+        .update(AuditLog)
+        .set({ integrityVerified: false })
+        .execute();
     }
 
     return {

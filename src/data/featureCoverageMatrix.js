@@ -619,7 +619,7 @@ export function getFeatureCoverageDocument() {
     '',
     '### Backend/frontend contract inventory gaps',
     '',
-    '- `platformAssetsApi.js` and `productCatalogApi.js` calls are **not** listed in `frontendApiCallsInventory.js` (under-reported in exposure audits).',
+    '- `platformAssetsApi.js` and `productCatalogApi.js` calls are now represented in `frontendApiCallsInventory.js`; current exposure audits should not treat them as under-reported.',
     '- Many operational APIs (hospital-map, fleet, telemetry) are wired in UI but backed by **demo/static** data.',
     '',
     '## Role profile reference (seed)',

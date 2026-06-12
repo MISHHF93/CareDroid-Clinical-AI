@@ -17,7 +17,7 @@ import { TenantContextProvider } from '../contexts/TenantContext';
 import { AppRoutes } from '../App';
 
 vi.mock('../components/ChatInterface', () => ({
-  default: () => <div data-testid="copilot-chat">Copilot chat</div>,
+  default: ({ prefillText = '' }) => <div data-testid="copilot-chat">{prefillText || 'Copilot chat'}</div>,
 }));
 
 vi.mock('../components/EMSPipeline', () => ({
@@ -79,5 +79,13 @@ describe('canonical App routes deep links', () => {
     expect(screen.getByRole('navigation', { name: /settings tabs/i })).toBeInTheDocument();
     expect(screen.getByRole('complementary', { name: /emergency os navigation/i })).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
+  });
+
+  it('preserves assistant agent launch context through the ED Copilot alias', async () => {
+    render(<AppRouteHarness initialPath="/assistant?agent=agent-emergency" />);
+
+    expect(await screen.findByTestId('copilot-chat')).toHaveTextContent(
+      /Use Emergency AI \(agent-emergency\)/
+    );
   });
 });

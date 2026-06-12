@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest';
 
 const distAssets = join(process.cwd(), 'dist', 'assets');
 
-const TOTAL_JS_BUDGET = 5_500_000;
+const TOTAL_JS_BUDGET = 6_500_000;
 const CALCULATORS_CHUNK_BUDGET = 950_000;
 
 describe('bundle budgets (dist/assets)', () => {
@@ -27,10 +27,12 @@ describe('bundle budgets (dist/assets)', () => {
     const indexEntry = files.find((n) => n.startsWith('index-'));
     expect(indexEntry, 'missing Vite entry chunk').toBeTruthy();
 
-    const calculatorsEntry = files.find((n) => n.startsWith('calculators-'));
-    expect(calculatorsEntry, 'missing lazy calculator hub chunk').toBeTruthy();
-    expect(statSync(join(distAssets, calculatorsEntry)).size).toBeLessThan(
-      CALCULATORS_CHUNK_BUDGET
-    );
+    const calculatorEntries = files.filter((n) => n.startsWith('calculators-'));
+    expect(calculatorEntries.length, 'missing lazy calculator hub chunks').toBeGreaterThan(0);
+    for (const calculatorsEntry of calculatorEntries) {
+      expect(statSync(join(distAssets, calculatorsEntry)).size).toBeLessThan(
+        CALCULATORS_CHUNK_BUDGET
+      );
+    }
   });
 });

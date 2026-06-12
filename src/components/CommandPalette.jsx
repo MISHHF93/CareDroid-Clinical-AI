@@ -37,7 +37,7 @@ const BASE_COMMANDS = [
   },
   {
     id: 'pediatric-emergency-drugs',
-    label: 'Pediatric Emergency Drug Calculator',
+    label: 'Pediatric Dose Safety Checker',
     hint: 'Dose',
     keywords: [
       'peds',

@@ -132,7 +132,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the sepsis protocol?',
-          conversationId: 'test-conv-1',
+          conversationId: 1,
         })
         .expect(201);
 
@@ -186,7 +186,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the sepsis protocol?',
-          conversationId: 'test-conv-2',
+          conversationId: 2,
         })
         .expect(201);
 
@@ -227,7 +227,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the cardiac arrest protocol?',
-          conversationId: 'test-conv-3',
+          conversationId: 3,
         })
         .expect(201);
 
@@ -268,7 +268,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the treatment for rare condition X?',
-          conversationId: 'test-conv-4',
+          conversationId: 4,
         })
         .expect(201);
 
@@ -315,7 +315,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the standard ACLS protocol?',
-          conversationId: 'test-conv-5',
+          conversationId: 5,
         })
         .expect(201);
 
@@ -344,7 +344,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the protocol for alien abduction injuries?',
-          conversationId: 'test-conv-6',
+          conversationId: 6,
         })
         .expect(201);
 
@@ -363,7 +363,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is hypertension?',
-          conversationId: 'test-conv-7',
+          conversationId: 7,
         })
         .expect(201);
 
@@ -404,7 +404,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Audit test query for RAG',
-          conversationId: 'test-conv-8',
+          conversationId: 8,
         })
         .expect(201);
 
@@ -460,7 +460,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the dosage of aspirin?',
-          conversationId: 'test-conv-9',
+          conversationId: 9,
         })
         .expect(201);
 
@@ -499,7 +499,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the ACLS protocol?',
-          conversationId: 'test-conv-10',
+          conversationId: 10,
         })
         .expect(201);
 
@@ -518,7 +518,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Tell me about diabetes management',
-          conversationId: 'test-conv-11',
+          conversationId: 11,
         })
         .expect(201);
 
@@ -555,7 +555,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'How do you manage diabetes?',
-          conversationId: 'test-conv-12',
+          conversationId: 12,
         })
         .expect(201);
 

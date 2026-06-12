@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-06-04T22:52:23.315Z
+**Generated:** 2026-06-12T21:17:52.844Z
 
 > **Source:** `src/data/toolContractMatrix.js` (derived from `backendFrontendToolContract.js`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -28,11 +28,11 @@
 
 | Classification | Count |
 |----------------|------:|
-| user-facing and wired | 167 |
-| backend-only/internal | 185 |
-| user-facing but missing frontend route | 8 |
+| user-facing and wired | 239 |
+| backend-only/internal | 179 |
+| user-facing but missing frontend route | 2 |
 | frontend-visible but backend missing | 0 |
-| planned/unsupported | 16 |
+| planned/unsupported | 32 |
 
 ## Status definitions
 
@@ -64,7 +64,7 @@
 | ai-artifacts | /artifacts | src/pages/Artifacts.jsx | yes | ai-artifacts | ai-artifacts | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | ai-command-center | /ai-command-center | src/pages/AiCommandCenterDashboard.jsx | yes | ai-command-center | ai-command-center | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | ai-cost-optimization | /costs | src/pages/CostAnalyticsDashboard.jsx | yes | ai-cost-optimization | ai-cost-optimization | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
-| ai-evaluation | /ai/evaluation | src/pages/AiEvaluationDashboard.jsx | yes | ai-evaluation | ai-evaluation | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
+| ai-evaluation | /ai-evaluation | src/pages/AiEvaluationDashboard.jsx | yes | ai-evaluation | ai-evaluation | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | ai-gateway | /assistant | src/pages/Assistant.jsx | yes | ai-gateway | ai-gateway | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | ai-governance | /ai-governance | src/pages/platform/PlatformGovernanceWorkspace.jsx | yes | ai-governance | ai-governance | no | /api/ai-governance/summary | — | src/services/platformGovernanceApi.js | frontend-only |
 | ai-memory | /ai-memory | src/pages/MemoryDashboard.jsx | yes | ai-memory | ai-memory | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
@@ -129,8 +129,8 @@
 | dialysis-utilization-tracker | /tools/nephrology/dialysis-utilization-tracker | src/pages/tools/NephrologyAssistantPage.jsx | yes | dialysis-utilization-tracker | dialysis-utilization-tracker | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | differential-ai | /tools/differential-ai | src/pages/tools/DifferentialAi.jsx | yes | differential-ai | differential-ai | no | /api/clinical-intelligence/differential-ai/generate | DifferentialAiRequestDto (`symptoms`, `labs?`, `history?`, `demographics?`) → DifferentialAiResponseDto (`runId`, `rankedDifferentials`, `suggestedCalculators`, `explainability`) | src/services/clinicalIntelligenceApi.js | frontend-only |
 | differential-diagnosis | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | diagnosis | differential-diagnosis | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
-| digital-operations-center | /operations-center | src/pages/DigitalOperationsCenter.jsx | yes | digital-operations-center | digital-operations-center | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/hospitalMapService.js | frontend-only |
-| dispatch-ai | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | dispatch-ai | dispatch-ai | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
+| digital-operations-center | /operations | src/pages/Operations.jsx | yes | digital-operations-center | digital-operations-center | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/hospitalMapService.js | frontend-only |
+| dispatch-ai | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | dispatch-ai | dispatch-ai | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | dka-pathway-assistant | /tools/endocrine/dka-pathway-assistant | src/pages/tools/EndocrineMetabolicAssistantPage.jsx | yes | dka-pathway-assistant | dka-pathway-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | dose-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | dose-calculator | dose-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | drug-interactions | /tools/drug-checker | src/pages/tools/DrugChecker.jsx | yes | drug-check | drug-interactions | drug-interactions | /api/tools/drug-interactions/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.js | fully wired |
@@ -295,7 +295,7 @@
 | medical-iot-dashboard | /medical-iot | src/pages/MedicalIotDashboard.jsx | yes | medical-iot-dashboard | — | no | — | — | src/services/medicalIotService.js | frontend-only |
 | order-set-ai | /tools/order-set-ai | src/pages/tools/OrderSetAi.jsx | yes | order-set-ai | — | no | /api/clinical-intelligence/order-set-ai/generate | OrderSetAiRequestDto (`clinicalScenario`, `diagnosis?`, `patientContext?`, `constraints?`) → OrderSetAiResponseDto (`runId`, `orderBundles`, `protocolPathways`, `explainability`, `safety`) | src/services/clinicalIntelligenceApi.js | frontend-only |
 | patient-summary-ai | /tools/patient-summary-ai | src/pages/tools/PatientSummaryAi.jsx | yes | patient-summary-ai | — | no | /api/clinical-intelligence/patient-summary-ai/generate | PatientSummaryAiRequestDto (`patientContext?`, `problems?`, `medications?`, `labs?`, `alerts?`, `riskFactors?`, `notes?`) → PatientSummaryAiResponseDto (`runId`, `activeProblems`, `medications`, `recentLabs`, `alerts`, `riskFactors`, `safety`) | src/services/clinicalIntelligenceApi.js | frontend-only |
-| telemetry-monitoring | /hospital-map | src/pages/HospitalMapDashboard.jsx | yes | telemetry-monitoring | — | no | — | — | src/services/hospitalMapService.js | frontend-only |
+| telemetry-monitoring | /medical-iot | src/pages/HospitalMapDashboard.jsx | yes | telemetry-monitoring | — | no | — | — | src/services/hospitalMapService.js | frontend-only |
 | timeline-ai | /tools/timeline-ai | src/pages/tools/TimelineAi.jsx | yes | timeline-ai | — | no | /api/clinical-intelligence/timeline-ai/generate | TimelineAiRequestDto (`patientContext?`, `encounters`, `focus?`) → TimelineAiResponseDto (`runId`, `timeline`, `trends`, `abnormalProgression`, `safety`) | src/services/clinicalIntelligenceApi.js | frontend-only |
 | tools-list-api | — | src/pages/tools/ClinicalToolCatalog.jsx | — | — | — | n/a | GET /api/tools | — | src/services/clinicalToolsApi.js (`fetchBackendClinicalTools`) | fully wired |
 | tools-share-results | — | src/components/tools/ToolResultShare.jsx | — | — | — | no | POST /api/tools/share-results | — (undocumented) | src/components/tools/ToolResultShare.jsx (`apiFetch`) | frontend-only |

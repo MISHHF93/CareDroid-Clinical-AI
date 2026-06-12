@@ -235,7 +235,7 @@ vi.mock('../data/artifactKnowledgeGraph', () => {
   return {
     ARTIFACT_KNOWLEDGE_GRAPH_NODE_TYPES: nodeTypes,
     ARTIFACT_KNOWLEDGE_GRAPH_RELATIONSHIPS: relationshipTypes,
-    buildKnowledgeGraphAiPrompt: (node) => `Open the Artifact Knowledge Graph and explain ${node.label}.`,
+    buildKnowledgeGraphAiPrompt: (node) => `Open the Clinical Knowledge Graph and explain ${node.label}.`,
     createArtifactKnowledgeGraphService: () => ({ buildSnapshot }),
   };
 });
@@ -308,7 +308,7 @@ describe('ClinicalKnowledgeGraph', () => {
       expect(sendClinicalChatMessage).toHaveBeenCalledWith(
         expect.objectContaining({
           tool: 'artifact-knowledge-graph',
-          message: expect.stringMatching(/Artifact Knowledge Graph/i),
+          message: expect.stringMatching(/Clinical Knowledge Graph/i),
         })
       );
     });

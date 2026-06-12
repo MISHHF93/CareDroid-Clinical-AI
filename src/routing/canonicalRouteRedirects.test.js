@@ -64,11 +64,16 @@ describe('canonical route tree', () => {
     );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/dashboard', to: '/emergency/whiteboard' }),
         expect.objectContaining({ path: '/assistant', to: '/emergency/copilot' }),
         expect.objectContaining({ path: '/tools', to: '/emergency/copilot' }),
       ])
     );
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/dashboard' }),
+      ])
+    );
+    expect(appSource).toContain("path: '/dashboard'");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     expect(appSource).toContain("path: '/tools/drug-checker'");
@@ -76,12 +81,14 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({');
   });
 
-  it('redirects non-canonical modules back to the Emergency OS whiteboard', () => {
+  it('keeps unsupported future modules on the Emergency OS whiteboard fallback', () => {
     expect(appSource).toContain('const FUTURE_RELEASE_ROUTES = Object.freeze([');
-    expect(appSource).toContain("['Operations', '/operations']");
+    expect(appSource).toContain('const ACTIVE_RELEASE_ROUTE_PATHS = new Set([');
+    expect(appSource).toContain("path: '/operations'");
     expect(appSource).toContain("['Privacy Policy', '/privacy']");
     expect(appSource).toContain("['Clinical Tools', '/tools/*']");
-    expect(appSource).toContain('...FUTURE_RELEASE_ROUTES.map(([, path]) => ({');
+    expect(appSource).toContain('.filter(([, path]) => !ACTIVE_RELEASE_ROUTE_PATHS.has(path))');
+    expect(appSource).toContain('.map(([, path]) => ({');
     expect(appSource).toContain('element: <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />');
     expect(appSource).not.toContain('<FutureReleaseStub');
   });

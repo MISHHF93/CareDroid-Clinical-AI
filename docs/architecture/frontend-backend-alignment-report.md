@@ -1,8 +1,8 @@
 # Frontend Backend Alignment Report
 
-Generated: 2026-06-12T02:34:02.555Z
+Generated: 2026-06-12T21:37:03.803Z
 
-Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 backend endpoint declarations and 1239 frontend API references.
+Scanned 2274 text/code files. Resolved 5689 relative import edges. Found 281 backend endpoint declarations and 1307 frontend API references.
 
 | Module |UI Route |Route |Sidebar |Command Palette |Search |Live Backend Data |Backend Endpoints |
 | --- | --- | --- | --- | --- | --- | --- | --- |
