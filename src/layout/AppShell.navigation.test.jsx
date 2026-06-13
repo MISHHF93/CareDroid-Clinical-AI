@@ -17,6 +17,7 @@ const commandPaletteSource = readFileSync(
 const PRIMARY_EMERGENCY_OS_PATHS = [
   '/emergency/whiteboard',
   '/emergency/patients',
+  '/emergency/journey',
   '/emergency/ems',
   '/emergency/intake',
   '/emergency/queues',
@@ -24,8 +25,11 @@ const PRIMARY_EMERGENCY_OS_PATHS = [
   '/emergency/capacity',
   '/emergency/boarding',
   '/emergency/referrals',
+  '/emergency/provincial-health',
+  '/emergency/integrations',
   '/emergency/copilot',
   '/emergency/analytics',
+  '/ai-governance',
   '/emergency/settings',
 ];
 
@@ -47,6 +51,7 @@ describe('AppShell navigation surfaces', () => {
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureId)).toEqual([
       'emergency_whiteboard',
       'emergency_patients',
+      'patient_journey',
       'ems_pipeline',
       'smart_intake',
       'queue_intelligence',
@@ -54,8 +59,11 @@ describe('AppShell navigation surfaces', () => {
       'capacity_intelligence',
       'boarding_intelligence',
       'referral_intelligence',
+      'provincial_health',
+      'integration_hub',
       'ed_copilot',
       'emergency_analytics',
+      'ai_governance',
       'emergency_settings',
     ]);
   });
@@ -102,7 +110,7 @@ describe('AppShell navigation surfaces', () => {
       /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__item\s*\{[\s\S]*display:\s*flex/
     );
     expect(appShellCss).not.toContain('.ed-nav-rail__item:nth-child(-n + 5)');
-    expect(APP_SHELL_NAV_ITEMS).toHaveLength(12);
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(16);
   });
 
   it('closes only the topmost AppShell panel on Escape', () => {

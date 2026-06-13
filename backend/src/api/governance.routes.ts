@@ -3,6 +3,14 @@ import { aiGovernanceService } from '../services/ai-governance.service';
 
 const router = Router();
 
+router.get('/registry', (_req, res) => {
+  res.json(aiGovernanceService.getRegistrySnapshot());
+});
+
+router.get('/safety-rules', (_req, res) => {
+  res.json(aiGovernanceService.getRegistrySnapshot().safetyRules);
+});
+
 router.get('/compliance', async (req, res) => {
   try {
     const days = Number(req.query.days || 30);

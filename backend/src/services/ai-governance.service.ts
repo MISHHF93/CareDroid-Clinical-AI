@@ -8,34 +8,35 @@
  * - FDA Software as a Medical Device (SaMD) framework
  */
 
-import mongoose from 'mongoose';
+import { Injectable } from '@nestjs/common';
 import {
   AIConfigRegistry,
   AISafetyRules,
+  type AIServiceConfig,
   PromptTemplateRegistry,
 } from '../config/ai-governance.registry';
 
 export interface AIInteractionAudit {
   id: string;
-  timestamp: Date;
+  timestamp: string;
   userId: string;
   userRole: string;
   serviceName: string;
-  input: any;
-  output: any;
+  input: unknown;
+  output: unknown;
   confidence?: number;
   safetyCheckPassed: boolean;
   safetyViolation?: string;
   humanReviewed: boolean;
   reviewedBy?: string;
-  reviewedAt?: Date;
+  reviewedAt?: string;
   outcome?: string;
   latencyMs: number;
   costCents?: number;
 }
 
 export interface AIComplianceReport {
-  period: { start: Date; end: Date };
+  period: { start: string; end: string };
   totalInteractions: number;
   interactionsByService: Record<string, number>;
   safetyViolations: number;
@@ -43,28 +44,79 @@ export interface AIComplianceReport {
   humanReviewRate: number;
   estimatedCost: number;
   topUsers: Array<{ userId: string; count: number }>;
+  storageMode: 'in-memory-audit-fixture';
+  serviceCount: number;
+  promptTemplateCount: number;
 }
 
-function getMongoDb() {
-  return mongoose.connection.db || null;
+export interface AIGovernanceRegistrySnapshot {
+  services: Readonly<Record<string, AIServiceConfig>>;
+  promptTemplates: typeof PromptTemplateRegistry;
+  safetyRules: typeof AISafetyRules;
+  storageMode: 'in-memory-audit-fixture';
+  governanceFrameworks: string[];
 }
 
+const SEEDED_AUDIT_TRAIL: AIInteractionAudit[] = [
+  {
+    id: 'ai_audit_seed_copilot_001',
+    timestamp: '2026-06-12T08:00:00.000Z',
+    userId: 'charge-nurse-demo',
+    userRole: 'charge_nurse',
+    serviceName: 'copilot',
+    input: { query: 'Which patients are overdue for reassessment?' },
+    output: { summary: 'Three patients require human review before operational action.' },
+    safetyCheckPassed: true,
+    humanReviewed: true,
+    reviewedBy: 'charge-nurse-demo',
+    reviewedAt: '2026-06-12T08:01:00.000Z',
+    latencyMs: 420,
+    costCents: 2,
+  },
+  {
+    id: 'ai_audit_seed_triage_001',
+    timestamp: '2026-06-12T09:30:00.000Z',
+    userId: 'triage-nurse-demo',
+    userRole: 'nurse',
+    serviceName: 'triageSupport',
+    input: { chiefComplaint: 'Chest pain', dps: 2 },
+    output: { suggestion: 'Maintain high priority; physician review required.' },
+    safetyCheckPassed: true,
+    humanReviewed: true,
+    reviewedBy: 'triage-nurse-demo',
+    reviewedAt: '2026-06-12T09:31:00.000Z',
+    latencyMs: 310,
+    costCents: 1,
+  },
+];
+
+@Injectable()
 export class AIGovernanceService {
-  private auditTrail: AIInteractionAudit[] = [];
+  private readonly auditTrail: AIInteractionAudit[] = [...SEEDED_AUDIT_TRAIL];
+
+  getRegistrySnapshot(): AIGovernanceRegistrySnapshot {
+    return {
+      services: AIConfigRegistry,
+      promptTemplates: PromptTemplateRegistry,
+      safetyRules: AISafetyRules,
+      storageMode: 'in-memory-audit-fixture',
+      governanceFrameworks: [
+        'NIST AI RMF',
+        'WHO AI healthcare guidance',
+        'HIPAA Security Rule',
+        'FDA SaMD',
+      ],
+    };
+  }
 
   async logInteraction(audit: Omit<AIInteractionAudit, 'id' | 'timestamp'>): Promise<void> {
     const fullAudit: AIInteractionAudit = {
       id: `ai_audit_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       ...audit,
     };
 
     this.auditTrail.push(fullAudit);
-
-    const db = getMongoDb();
-    if (db) {
-      await db.collection('ai_audit_logs').insertOne(fullAudit);
-    }
 
     if (!audit.safetyCheckPassed && audit.safetyViolation) {
       await this.escalateSafetyViolation(fullAudit);
@@ -73,7 +125,7 @@ export class AIGovernanceService {
 
   checkSafetyViolation(
     serviceName: string,
-    _input: any,
+    _input: unknown,
     suggestedAction: any,
   ): { safe: boolean; violation?: string } {
     const config = AIConfigRegistry[serviceName];
@@ -100,11 +152,11 @@ export class AIGovernanceService {
   }
 
   async generateComplianceReport(startDate: Date, endDate: Date): Promise<AIComplianceReport> {
-    const persistedAudits = await this.readPersistedAudits(startDate, endDate);
-    const memoryAudits = this.auditTrail.filter(
-      (audit) => audit.timestamp >= startDate && audit.timestamp <= endDate,
-    );
-    const relevantAudits = this.mergeAudits([...persistedAudits, ...memoryAudits]);
+    const memoryAudits = this.auditTrail.filter((audit) => {
+      const timestamp = new Date(audit.timestamp);
+      return timestamp >= startDate && timestamp <= endDate;
+    });
+    const relevantAudits = this.mergeAudits(memoryAudits);
     const interactionsByService: Record<string, number> = {};
 
     for (const audit of relevantAudits) {
@@ -132,7 +184,7 @@ export class AIGovernanceService {
       .slice(0, 10);
 
     return {
-      period: { start: startDate, end: endDate },
+      period: { start: startDate.toISOString(), end: endDate.toISOString() },
       totalInteractions: relevantAudits.length,
       interactionsByService,
       safetyViolations,
@@ -140,24 +192,17 @@ export class AIGovernanceService {
       humanReviewRate,
       estimatedCost: totalCost / 100,
       topUsers,
+      storageMode: 'in-memory-audit-fixture',
+      serviceCount: Object.keys(AIConfigRegistry).length,
+      promptTemplateCount: Object.keys(PromptTemplateRegistry).length,
     };
   }
 
   async getSafetyViolations(limit = 50): Promise<AIInteractionAudit[]> {
-    const db = getMongoDb();
-    if (!db) {
-      return this.auditTrail
-        .filter((audit) => !audit.safetyCheckPassed)
-        .slice(-limit)
-        .reverse();
-    }
-
-    return (await db
-      .collection('ai_audit_logs')
-      .find({ safetyCheckPassed: false })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .toArray()) as unknown as AIInteractionAudit[];
+    return this.auditTrail
+      .filter((audit) => !audit.safetyCheckPassed)
+      .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+      .slice(0, limit);
   }
 
   validatePromptTemplate(templateId: string): { valid: boolean; issues: string[] } {
@@ -194,16 +239,6 @@ export class AIGovernanceService {
       }),
       {} as Record<string, { valid: boolean; issues: string[] }>,
     );
-  }
-
-  private async readPersistedAudits(startDate: Date, endDate: Date): Promise<AIInteractionAudit[]> {
-    const db = getMongoDb();
-    if (!db) return [];
-
-    return (await db
-      .collection('ai_audit_logs')
-      .find({ timestamp: { $gte: startDate, $lte: endDate } })
-      .toArray()) as unknown as AIInteractionAudit[];
   }
 
   private mergeAudits(audits: AIInteractionAudit[]): AIInteractionAudit[] {

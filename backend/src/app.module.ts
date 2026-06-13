@@ -76,6 +76,7 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
 import { ProductCatalogModule } from './modules/product-catalog/product-catalog.module';
 import { TenantContextModule } from './modules/tenant-context/tenant-context.module';
 import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
+import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -211,6 +212,7 @@ function resolveDatabaseClient() {
     ProductCatalogModule,
     TenantContextModule,
     AutomationAuditModule,
+    EmergencyOsModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

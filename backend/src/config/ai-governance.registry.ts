@@ -8,6 +8,9 @@ export interface AIServiceConfig {
   provider: 'openai' | 'anthropic' | 'aws_bedrock' | 'azure_openai' | 'local';
   model: string;
   purpose: string;
+  owner: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  regulatoryCategory: 'informational' | 'clinical_decision_support' | 'identity_resolution';
   requiresHumanReview: boolean;
   maxTokens: number;
   temperature: number;
@@ -27,16 +30,19 @@ export interface AIPromptTemplate {
   template: string;
   variables: string[];
   validationRules: string[];
-  lastValidated: Date;
+  lastValidated: string;
 }
 
-export const AIConfigRegistry: Record<string, AIServiceConfig> = {
+export const AIConfigRegistry: Readonly<Record<string, AIServiceConfig>> = Object.freeze({
   copilot: {
     name: 'ED Copilot',
     provider: 'anthropic',
     model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
     purpose:
       'Operational assistant for ED workflow - answers queries about wait times, reassessments, bottlenecks, capacity, EMS, boarding, and queues',
+    owner: 'Clinical Informatics',
+    riskLevel: 'medium',
+    regulatoryCategory: 'informational',
     requiresHumanReview: true,
     maxTokens: Number(process.env.AI_MAX_TOKENS || 2000),
     temperature: Number(process.env.AI_TEMPERATURE || 0.3),
@@ -55,6 +61,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'anthropic',
     model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
     purpose: 'Generate clinical handover summaries from patient data',
+    owner: 'Clinical Operations',
+    riskLevel: 'medium',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 4000,
     temperature: 0.2,
@@ -72,6 +81,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'rule-based',
     purpose: 'Detect clinical deterioration and trigger appropriate protocols',
+    owner: 'Quality and Safety',
+    riskLevel: 'high',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: false,
     maxTokens: 0,
     temperature: 0,
@@ -88,6 +100,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'xgboost-custom',
     purpose: 'Predict patient deterioration risk from operational and clinical signals',
+    owner: 'Quality and Safety',
+    riskLevel: 'high',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 0,
     temperature: 0,
@@ -104,6 +119,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'heuristic-readiness',
     purpose: 'Predict discharge readiness and timing',
+    owner: 'Patient Flow',
+    riskLevel: 'medium',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 0,
     temperature: 0,
@@ -120,6 +138,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'ensemble-xgboost',
     purpose: 'Predict hospital admission before physician evaluation',
+    owner: 'Patient Flow',
+    riskLevel: 'medium',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 0,
     temperature: 0,
@@ -136,6 +157,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'anthropic',
     model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
     purpose: 'Assist nurse triage with acuity considerations for human review',
+    owner: 'Emergency Nursing',
+    riskLevel: 'high',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 1000,
     temperature: 0.1,
@@ -153,6 +177,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'azure_openai',
     model: 'gpt-4o',
     purpose: 'Generate draft SOAP notes from patient encounter audio',
+    owner: 'Clinical Documentation Improvement',
+    riskLevel: 'medium',
+    regulatoryCategory: 'clinical_decision_support',
     requiresHumanReview: true,
     maxTokens: 4000,
     temperature: 0.3,
@@ -169,6 +196,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'local-entity-extraction',
     purpose: 'Extract patient characteristics from clinical notes',
+    owner: 'Clinical Data Platform',
+    riskLevel: 'low',
+    regulatoryCategory: 'informational',
     requiresHumanReview: false,
     maxTokens: 512,
     temperature: 0,
@@ -182,6 +212,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     provider: 'local',
     model: 'local-deterministic-embedding',
     purpose: 'Match incoming patients to existing records using embeddings',
+    owner: 'Registration and Privacy',
+    riskLevel: 'high',
+    regulatoryCategory: 'identity_resolution',
     requiresHumanReview: true,
     maxTokens: 8191,
     temperature: 0,
@@ -193,9 +226,9 @@ export const AIConfigRegistry: Record<string, AIServiceConfig> = {
     fallbackEnabled: true,
     auditLevel: 'full',
   },
-};
+});
 
-export const PromptTemplateRegistry: Record<string, AIPromptTemplate> = {
+export const PromptTemplateRegistry: Readonly<Record<string, AIPromptTemplate>> = Object.freeze({
   copilot_query: {
     id: 'copilot_query_v1',
     name: 'ED Copilot - Query Response',
@@ -224,7 +257,7 @@ Include "Human review required" in your response.`,
       'userRole',
     ],
     validationRules: ['No clinical advice', 'Must include disclaimer'],
-    lastValidated: new Date('2026-06-12'),
+    lastValidated: '2026-06-12T00:00:00.000Z',
   },
   handover_summary: {
     id: 'handover_summary_v1',
@@ -259,7 +292,7 @@ This is AI-generated and requires human review.`,
       'pendingTasks',
     ],
     validationRules: ['Must use SBAR format', 'Must include disclaimer'],
-    lastValidated: new Date('2026-06-12'),
+    lastValidated: '2026-06-12T00:00:00.000Z',
   },
   ambient_soap: {
     id: 'ambient_soap_v1',
@@ -279,11 +312,11 @@ PLAN: (treatment plan, orders)
 This is AI-generated and requires clinician review and sign-off.`,
     variables: ['transcript', 'encounterType'],
     validationRules: ['Must include all SOAP sections', 'Must include disclaimer'],
-    lastValidated: new Date('2026-06-12'),
+    lastValidated: '2026-06-12T00:00:00.000Z',
   },
-};
+});
 
-export const AISafetyRules = {
+export const AISafetyRules = Object.freeze({
   cannotLowerPriorityFor: {
     dpsScores: [1, 2],
     conditions: ['stroke', 'sepsis', 'chest_pain'],
@@ -307,4 +340,4 @@ export const AISafetyRules = {
     clerk: { requestsPerMinute: 10 },
     ems: { requestsPerMinute: 20 },
   },
-};
+});

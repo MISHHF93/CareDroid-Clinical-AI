@@ -213,6 +213,13 @@ interface EmergencyStoreState {
   toggleCopilot: () => void;
   addAlert: (alert: Alert) => void;
   setCapacity: (capacity: CapacitySnapshot) => void;
+  hydrateFromApi: (payload: Partial<{
+    patients: Patient[];
+    staff: Staff[];
+    rooms: Room[];
+    alerts: Alert[];
+    capacity: CapacitySnapshot;
+  }>) => void;
 }
 
 const initialCapacity = buildCapacitySnapshot(SEED_PATIENTS, SEED_ROOMS);
@@ -333,6 +340,18 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   addAlert: (alert) => set((state) => ({ alerts: [alert, ...state.alerts] })),
 
   setCapacity: (capacity) => set({ capacity }),
+
+  hydrateFromApi: (payload) => set((state) => {
+    const patients = payload.patients || state.patients;
+    const rooms = payload.rooms || state.rooms;
+    return {
+      patients,
+      rooms,
+      staff: payload.staff || state.staff,
+      alerts: payload.alerts || state.alerts,
+      capacity: payload.capacity || buildCapacitySnapshot(patients, rooms),
+    };
+  }),
 }));
 
 export type { EmergencyStoreState };

@@ -16,6 +16,13 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyPatients }),
   },
   {
+    id: 'open-journey',
+    label: 'Open Patient Journey',
+    hint: 'J',
+    keywords: ['journey', 'patient journey', 'flow events', 'state transitions'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyJourney }),
+  },
+  {
     id: 'open-ems',
     label: 'Open EMS',
     hint: 'E',
@@ -65,6 +72,20 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyReferrals }),
   },
   {
+    id: 'open-provincial-health',
+    label: 'Open Provincial Health',
+    hint: 'PH',
+    keywords: ['provincial health', 'ohip', 'hie', 'external records', 'medications', 'allergies'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyProvincialHealth }),
+  },
+  {
+    id: 'open-integrations',
+    label: 'Open Integration Hub',
+    hint: 'Hub',
+    keywords: ['integrations', 'integration hub', 'fhir', 'hl7', 'iot', 'devices'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyIntegrations }),
+  },
+  {
     id: 'open-copilot',
     label: 'Open ED Copilot',
     hint: 'AI',
@@ -77,6 +98,13 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
     hint: 'A',
     keywords: ['analytics', 'throughput', 'metrics', 'trends'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyAnalytics }),
+  },
+  {
+    id: 'open-ai-governance',
+    label: 'Open AI Governance',
+    hint: 'G',
+    keywords: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.aiGovernance }),
   },
   {
     id: 'open-settings',

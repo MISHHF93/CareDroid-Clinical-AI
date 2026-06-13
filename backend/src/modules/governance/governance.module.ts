@@ -1,9 +1,10 @@
-import { Controller, Get, Injectable, Module, UseGuards } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
+import { AIGovernanceService } from '../../services/ai-governance.service';
 
 @Injectable()
 export class ModelRegistryService {
@@ -162,10 +163,115 @@ export class GovernanceController {
   }
 }
 
+function resolveDateWindow(daysQuery?: string) {
+  const parsedDays = Number(daysQuery || 30);
+  const days = Number.isFinite(parsedDays) && parsedDays > 0 ? parsedDays : 30;
+  const endDate = new Date();
+  const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+
+  return { startDate, endDate };
+}
+
+function resolveLimit(limitQuery?: string) {
+  const parsedLimit = Number(limitQuery || 50);
+  return Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
+}
+
+class AIGovernanceEndpointBase {
+  constructor(protected readonly aiGovernance: AIGovernanceService) {}
+
+  getRegistry() {
+    return this.aiGovernance.getRegistrySnapshot();
+  }
+
+  getSafetyRules() {
+    return this.aiGovernance.getRegistrySnapshot().safetyRules;
+  }
+
+  async getComplianceReport(days?: string) {
+    const { startDate, endDate } = resolveDateWindow(days);
+    return this.aiGovernance.generateComplianceReport(startDate, endDate);
+  }
+
+  async getViolations(limit?: string) {
+    const violations = await this.aiGovernance.getSafetyViolations(resolveLimit(limit));
+    return { violations };
+  }
+
+  validatePrompts() {
+    return this.aiGovernance.validateAllPromptTemplates();
+  }
+}
+
+@Controller('v1/governance')
+export class AIGovernanceV1Controller extends AIGovernanceEndpointBase {
+  constructor(aiGovernance: AIGovernanceService) {
+    super(aiGovernance);
+  }
+
+  @Get('registry')
+  getRegistry() {
+    return super.getRegistry();
+  }
+
+  @Get('safety-rules')
+  getSafetyRules() {
+    return super.getSafetyRules();
+  }
+
+  @Get('compliance')
+  getComplianceReport(@Query('days') days?: string) {
+    return super.getComplianceReport(days);
+  }
+
+  @Get('violations')
+  getViolations(@Query('limit') limit?: string) {
+    return super.getViolations(limit);
+  }
+
+  @Get('validate-prompts')
+  validatePrompts() {
+    return super.validatePrompts();
+  }
+}
+
+@Controller('emergency/governance')
+export class EmergencyAIGovernanceController extends AIGovernanceEndpointBase {
+  constructor(aiGovernance: AIGovernanceService) {
+    super(aiGovernance);
+  }
+
+  @Get('registry')
+  getRegistry() {
+    return super.getRegistry();
+  }
+
+  @Get('safety-rules')
+  getSafetyRules() {
+    return super.getSafetyRules();
+  }
+
+  @Get('compliance')
+  getComplianceReport(@Query('days') days?: string) {
+    return super.getComplianceReport(days);
+  }
+
+  @Get('violations')
+  getViolations(@Query('limit') limit?: string) {
+    return super.getViolations(limit);
+  }
+
+  @Get('validate-prompts')
+  validatePrompts() {
+    return super.validatePrompts();
+  }
+}
+
 @Module({
   imports: [PlatformGovernanceModule],
-  controllers: [GovernanceController],
+  controllers: [GovernanceController, AIGovernanceV1Controller, EmergencyAIGovernanceController],
   providers: [
+    AIGovernanceService,
     ModelRegistryService,
     ApprovalWorkflowService,
     RiskClassificationService,
@@ -176,6 +282,7 @@ export class GovernanceController {
     ApprovalWorkflowService,
     RiskClassificationService,
     GovernanceAuditService,
+    AIGovernanceService,
   ],
 })
 export class GovernanceModule {}

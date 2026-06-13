@@ -8,6 +8,7 @@ import {
   Vitals,
 } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { createSmartIntakePatient } from '../services/emergencyOsApi';
 
 type QuickIntakeProps = {
   onClose: () => void;
@@ -130,6 +131,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const [vitalsForm, setVitalsForm] = useState({ hr: '', sbp: '', spo2: '', temp: '' });
   const [priorityOverride, setPriorityOverride] = useState<Priority | null>(null);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const age = useMemo(() => calculateAge(dob), [dob]);
   const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);
@@ -160,8 +163,9 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
     if (!hasDraft || window.confirm('Discard this intake?')) onClose();
   };
 
-  const submit = (event?: FormEvent) => {
+  const submit = async (event?: FormEvent) => {
     event?.preventDefault();
+    if (submitting) return;
     const now = new Date().toISOString();
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
@@ -186,9 +190,20 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       timeline: [],
     };
 
-    addPatient(patient);
-    onAdded(patient);
-    onClose();
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const response = await createSmartIntakePatient(patient);
+      const persistedPatient = response?.data?.patient || patient;
+      addPatient(persistedPatient);
+      onAdded(persistedPatient);
+      onClose();
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Unable to save intake to the Emergency OS API.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
@@ -379,17 +394,17 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>First</span>
-                <input value={firstName} onChange={(event) => setFirstName(event.target.value)} style={inputStyle} />
+              <input value={firstName} onChange={(event) => setFirstName(event.target.value)} disabled={submitting} style={inputStyle} />
               </label>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Last</span>
-                <input value={lastName} onChange={(event) => setLastName(event.target.value)} style={inputStyle} />
+              <input value={lastName} onChange={(event) => setLastName(event.target.value)} disabled={submitting} style={inputStyle} />
               </label>
             </div>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>DOB {dob ? `(Age ${age})` : ''}</span>
-              <input type="date" value={dob} onChange={(event) => setDob(event.target.value)} style={inputStyle} />
+              <input type="date" value={dob} onChange={(event) => setDob(event.target.value)} disabled={submitting} style={inputStyle} />
             </label>
 
             <div>
@@ -515,21 +530,28 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             ) : null}
           </div>
 
+          {submitError ? (
+            <div role="alert" style={{ color: '#FCA5A5', fontSize: 12, flex: '1 1 auto' }}>
+              {submitError}
+            </div>
+          ) : null}
+
           <button
             type="submit"
+            disabled={submitting}
             style={{
               height: 48,
               border: 0,
               borderRadius: 12,
-              background: '#2563EB',
+              background: submitting ? '#1E3A8A' : '#2563EB',
               color: '#F9FAFB',
-              cursor: 'pointer',
+              cursor: submitting ? 'progress' : 'pointer',
               fontWeight: 800,
               padding: '0 18px',
               minWidth: 170,
             }}
           >
-            Add to Department
+            {submitting ? 'Saving...' : 'Add to Department'}
           </button>
         </footer>
       </form>

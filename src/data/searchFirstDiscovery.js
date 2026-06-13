@@ -23,7 +23,6 @@ const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
   '/laboratory',
   '/research',
   '/governance',
-  '/ai-governance',
 ]);
 
 function hasActiveWorkspaceScope(entry) {
@@ -313,6 +312,12 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['patients', 'patient list', 'patient snapshots'],
   },
   {
+    id: 'emergency-journey',
+    title: 'Patient Journey',
+    path: CANONICAL_ROUTES.emergencyJourney,
+    aliases: ['journey', 'patient journey', 'flow events', 'state transitions'],
+  },
+  {
     id: 'emergency-ems',
     title: 'EMS',
     path: CANONICAL_ROUTES.emergencyEms,
@@ -355,6 +360,18 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['referrals', 'consults', 'transfer', 'specialty'],
   },
   {
+    id: 'emergency-provincial-health',
+    title: 'Provincial Health',
+    path: CANONICAL_ROUTES.emergencyProvincialHealth,
+    aliases: ['provincial health', 'ohip', 'hie', 'external records', 'medications', 'allergies'],
+  },
+  {
+    id: 'emergency-integrations',
+    title: 'Integration Hub',
+    path: CANONICAL_ROUTES.emergencyIntegrations,
+    aliases: ['integrations', 'integration hub', 'fhir', 'hl7', 'iot', 'devices'],
+  },
+  {
     id: 'emergency-copilot',
     title: 'ED Copilot',
     path: CANONICAL_ROUTES.emergencyCopilot,
@@ -365,6 +382,12 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     title: 'Analytics',
     path: CANONICAL_ROUTES.emergencyAnalytics,
     aliases: ['analytics', 'metrics', 'throughput', 'trends'],
+  },
+  {
+    id: 'ai-governance',
+    title: 'AI Governance',
+    path: CANONICAL_ROUTES.aiGovernance,
+    aliases: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
   },
   {
     id: 'emergency-settings',

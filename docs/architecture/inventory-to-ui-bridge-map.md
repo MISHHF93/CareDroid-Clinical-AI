@@ -1,0 +1,27 @@
+# Inventory To UI Bridge Map
+
+Generated: 2026-06-13
+
+This map records how each Emergency OS inventory item is now bridged into a visible UI workflow.
+
+| Module | Frontend route | Page file | Components | Hooks | API client | Backend endpoint | Service | Data source | UI render location | Status before | Status after | Remaining gaps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Emergency Whiteboard | `/emergency/whiteboard` | `src/pages/emergency/index.tsx` | `PatientCard`, `QuickIntake` | `useEmergencyWhiteboard` | `emergencyOsApi.js` | `/api/emergency/whiteboard` | `EmergencyWhiteboardService` | Backend fixture | Whiteboard stats/grid | Inventory listed active UI but backend source not canonical | Bridged to API response and store hydration | Durable patient database |
+| Patients | `/emergency/patients` | `src/App.jsx` | `PatientsRoute`, `PatientGrid` | `useEmergencyPatients` | `emergencyOsApi.js` | `/api/emergency/patients` | `EmergencyPatientService` | Backend fixture | Dedicated patient census route | Alias to whiteboard | Dedicated API-consuming route | CRUD persistence |
+| Patient Journey Engine | `/emergency/journey` | `src/App.jsx` | `JourneyRoute` | `usePatientJourney` | `emergencyOsApi.js` | `/api/emergency/journey` | `PatientJourneyService` | Patient timelines | Journey event list | Engine existed without active page/API | Active route renders journey events | Event persistence |
+| EMS Intake | `/emergency/ems` | `src/App.jsx` | `EMSRoute`, `PatientGrid` | `useEMSIntake` | `emergencyOsApi.js` | `/api/emergency/ems` | `EMSIntakeService` | EMS fixture | EMS metrics/cards | Store/optional backend split | API response drives EMS page | Live EMS integration |
+| Smart Intake | `/emergency/intake` | `src/App.jsx`, `QuickIntake.tsx` | `SmartIntakeRoute`, `QuickIntake` | `useSmartIntake` | `emergencyOsApi.js` | `/api/emergency/intake` | `SmartIntakeService` | Fixture plus POST-created patients | Intake route/modal | Local-only intake | API status and create workflow | OCR/MPI persistence |
+| Queue Intelligence | `/emergency/queues` | `src/App.jsx` | `QueueRoute` | `useEmergencyQueues` | `emergencyOsApi.js` | `/api/emergency/queues` | `QueueIntelligenceService` | Derived fixture patients | Queue rows | Store-derived | API-derived queue rows | SLA event records |
+| Reassessment Engine | `/emergency/reassessment` | `src/App.jsx` | `ReassessmentRoute` | `useReassessmentQueue` | `emergencyOsApi.js` | `/api/emergency/reassessment` | `ReassessmentService` | Reassessment flags | Reassessment page | Store flags only | API queue plus metrics | Completion rate |
+| Capacity Intelligence | `/emergency/capacity` | `src/App.jsx` | `CapacityRoute` | `useCapacityStatus` | `emergencyOsApi.js` | `/api/emergency/capacity` | `CapacityService` | Rooms/patients | Capacity route | Store-derived | API capacity and recommendations | Bed feed |
+| Boarding Intelligence | `/emergency/boarding` | `src/App.jsx` | `BoardingRoute` | `useBoardingStatus` | `emergencyOsApi.js` | `/api/emergency/boarding` | `BoardingService` | Boarder derivation | Boarding route | Local capacity variant | API boarding metrics/cards | Inpatient bed API |
+| Referral Intelligence | `/emergency/referrals` | `src/App.jsx` | `ReferralsRoute` | `useReferrals` | `emergencyOsApi.js` | `/api/emergency/referrals` | `ReferralService` | Patient risk/state derivation | Referral cards | Mismatched local/platform API | API referral candidates | Status persistence |
+| Provincial Health Connector | `/emergency/provincial-health` | `src/App.jsx` | `ProvincialHealthRoute` | `useProvincialHealth` | `emergencyOsApi.js` | `/api/emergency/provincial-health` | `ProvincialHealthService` | Placeholder records | Provincial route | Missing | Explicit unavailable placeholder UI | Real provincial adapter |
+| IoT/Integration Hub placeholders | `/emergency/integrations` | `src/App.jsx` | `IntegrationsRoute` | `useIntegrationHub` | `emergencyOsApi.js` | `/api/emergency/integrations` | `IntegrationHubService` | Placeholder sources | Integration Hub route | Demo/disconnected | Explicit placeholder hub UI | Live gateway/connectors |
+| ED Copilot | `/emergency/copilot` | `src/App.jsx`, `CopilotPanel.tsx` | `CopilotRoute`, `CopilotPanel` | `useEDCopilot` | `emergencyOsApi.js`, `clinicalChatService.js` | `/api/emergency/copilot` | `EDCopilotService` | Context fixture | Copilot page/panel | Chat only | Context route plus chat panel | Provider/auth availability |
+| Analytics | `/emergency/analytics` | `src/App.jsx` | `AnalyticsRoute` | `useEmergencyAnalytics` | `emergencyOsApi.js` | `/api/emergency/analytics` | `EmergencyAnalyticsService` | Derived fixture KPIs | Analytics metrics | Local/disabled aggregate API | API metrics visible | KPI persistence |
+| Settings | `/emergency/settings` | `src/App.jsx` | `EmergencySettingsRoute` | `useEmergencySettings` | `emergencyOsApi.js` | `/api/emergency/settings` | `EmergencySettingsService` | Settings fixture | Settings cards | Static local cards | API-backed module and thresholds | Write persistence |
+
+## Bridge Rule
+
+No active Emergency OS inventory item remains only listed in documentation: every item above has a route, hook, API client call, backend endpoint, service, and visible UI render. Placeholder inventory is rendered with explicit unavailable/demo status rather than hidden as real integration behavior.

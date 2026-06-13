@@ -36,6 +36,7 @@ describe('iconRegistry semantic icon map', () => {
     expect(getNavIcon('medical-iot')).toBe(CHROME_ICONS.activity);
     expect(getNavIcon('hospital-map')).toBe(CHROME_ICONS.hospital);
     expect(getNavIcon('governance')).toBe(CHROME_ICONS.shield);
+    expect(getNavIcon('ai-governance')).toBe(CHROME_ICONS.shield);
     expect(getNavIcon('security')).toBe(CHROME_ICONS.lock);
     expect(getNavIcon('audit')).toBe(CHROME_ICONS.clipboardList);
     expect(getNavIcon('profile')).toBe(CHROME_ICONS.user);
@@ -45,11 +46,14 @@ describe('iconRegistry semantic icon map', () => {
   it('keeps Emergency OS rail icons semantically distinct', () => {
     expect(getNavIcon('emergency-whiteboard')).toBe(CHROME_ICONS.layoutDashboard);
     expect(getNavIcon('emergency-patients')).toBe(CHROME_ICONS.users);
+    expect(getNavIcon('journey')).toBe(CHROME_ICONS.gitBranch);
     expect(getNavIcon('queues')).toBe(CHROME_ICONS.clock);
     expect(getNavIcon('reassessment')).toBe(CHROME_ICONS.calendarClock);
     expect(getNavIcon('capacity')).toBe(CHROME_ICONS.gauge);
     expect(getNavIcon('boarding')).toBe(CHROME_ICONS.hospital);
     expect(getNavIcon('referrals')).toBe(CHROME_ICONS.share);
+    expect(getNavIcon('provincial-health')).toBe(CHROME_ICONS.shield);
+    expect(getNavIcon('integrations')).toBe(CHROME_ICONS.shareLink);
 
     const railIcons = APP_SHELL_NAV_ITEMS.map((item) => getNavIcon(item.iconKey || item.id));
     expect(new Set(railIcons).size).toBeGreaterThanOrEqual(10);

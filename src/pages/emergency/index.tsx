@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PatientFlag, PatientState, Priority, type Patient } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
 
@@ -78,8 +79,12 @@ function StatCard({ value, label }: { value: string | number; label: string }) {
 }
 
 export default function EmergencyWhiteboard() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const capacity = useEmergencyStore((state) => state.capacity);
+  const storePatients = useEmergencyStore((state) => state.patients);
+  const storeCapacity = useEmergencyStore((state) => state.capacity);
+  const whiteboard = useEmergencyWhiteboard();
+  const whiteboardPayload = (whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null)?.data;
+  const patients = whiteboardPayload?.patients || storePatients;
+  const capacity = whiteboardPayload?.capacity || storeCapacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
   const [toast, setToast] = useState('');
@@ -189,12 +194,23 @@ export default function EmergencyWhiteboard() {
       {showIntake ? (
         <QuickIntake
           onClose={() => setShowIntake(false)}
-          onAdded={() => {
-            setToast('Patient added to whiteboard');
+          onAdded={(patient) => {
+            setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
             window.setTimeout(() => setToast(''), 2400);
             setActiveFilter('All');
+            whiteboard.refresh();
           }}
         />
+      ) : null}
+
+      {whiteboard.loading && !patients.length ? (
+        <div style={{ padding: 16, color: '#9CA3AF' }}>Loading Emergency Whiteboard from `/api/emergency/whiteboard`...</div>
+      ) : null}
+
+      {whiteboard.error ? (
+        <div role="alert" style={{ margin: 16, padding: 12, border: '1px solid #7F1D1D', borderRadius: 12, background: '#450A0A', color: '#FCA5A5' }}>
+          {whiteboard.error}. Showing the last local Emergency OS state.
+        </div>
       ) : null}
 
       {toast ? (
@@ -218,7 +234,7 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : null}
 
-      {visiblePatients.length > 0 ? (
+      {!whiteboard.loading && visiblePatients.length > 0 ? (
         <div
           style={{
             display: 'grid',
@@ -231,7 +247,7 @@ export default function EmergencyWhiteboard() {
             <PatientCard key={patient.id} patient={patient} />
           ))}
         </div>
-      ) : (
+      ) : !whiteboard.loading ? (
         <div
           style={{
             minHeight: 360,
@@ -246,7 +262,7 @@ export default function EmergencyWhiteboard() {
         >
           Department Clear
         </div>
-      )}
+      ) : null}
     </section>
   );
 }

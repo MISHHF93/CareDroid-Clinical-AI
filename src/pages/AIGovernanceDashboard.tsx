@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AIConfigRegistry, AISafetyRules } from '../config/ai.config';
-import { fetchEmergencyGovernanceCompliance } from '../services/emergencyGovernanceApi';
+import {
+  LOCAL_AI_GOVERNANCE_REGISTRY,
+  fetchAIGovernanceRegistry,
+  fetchEmergencyGovernanceCompliance,
+  validateEmergencyGovernancePrompts,
+} from '../services/emergencyGovernanceApi';
 
 interface ComplianceReport {
   period: { start: string; end: string };
@@ -10,6 +14,37 @@ interface ComplianceReport {
   averageLatencyMs: number;
   humanReviewRate: number;
   estimatedCost: number;
+  storageMode?: string;
+  serviceCount?: number;
+  promptTemplateCount?: number;
+}
+
+interface AIServiceConfig {
+  name: string;
+  provider: string;
+  model: string;
+  purpose: string;
+  owner?: string;
+  riskLevel?: 'low' | 'medium' | 'high';
+  regulatoryCategory?: string;
+  requiresHumanReview: boolean;
+  auditLevel: 'none' | 'basic' | 'full';
+  safetyConstraints: string[];
+}
+
+interface GovernanceRegistry {
+  services: Record<string, AIServiceConfig>;
+  safetyRules: {
+    cannotLowerPriorityFor: {
+      dpsScores: number[];
+      conditions: string[];
+      abnormalVitals?: string[];
+    };
+    requiredDisclaimers: string[];
+    rateLimits: Record<string, { requestsPerMinute: number }>;
+  };
+  storageMode?: string;
+  governanceFrameworks?: string[];
 }
 
 const emptyReport: ComplianceReport = {
@@ -43,23 +78,39 @@ function SummaryCard({
 
 export default function AIGovernanceDashboard() {
   const [report, setReport] = useState<ComplianceReport>(emptyReport);
+  const [registry, setRegistry] = useState<GovernanceRegistry>(
+    LOCAL_AI_GOVERNANCE_REGISTRY as GovernanceRegistry
+  );
+  const [promptValidation, setPromptValidation] = useState<Record<string, { valid: boolean; issues: string[] }>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let alive = true;
 
-    async function fetchReport() {
+    async function fetchDashboard() {
       try {
-        const result = await fetchEmergencyGovernanceCompliance(30);
+        const [complianceResult, registryResult, validationResult] = await Promise.all([
+          fetchEmergencyGovernanceCompliance(30),
+          fetchAIGovernanceRegistry(),
+          validateEmergencyGovernancePrompts(),
+        ]);
         if (!alive) return;
-        if (!result.ok) {
-          setError(result.message || 'AI governance compliance report is unavailable.');
+        if (!complianceResult.ok) {
+          setError(complianceResult.message || 'AI governance compliance report is unavailable.');
           setReport(emptyReport);
-          return;
+        } else {
+          setReport({ ...emptyReport, ...complianceResult.data });
+          setError('');
         }
-        setReport({ ...emptyReport, ...result.data });
-        setError('');
+        if (registryResult.ok && registryResult.data) {
+          setRegistry(registryResult.data);
+        } else {
+          setRegistry(LOCAL_AI_GOVERNANCE_REGISTRY as GovernanceRegistry);
+        }
+        if (validationResult.ok && validationResult.data) {
+          setPromptValidation(validationResult.data);
+        }
       } catch (err) {
         if (!alive) return;
         setError(err instanceof Error ? err.message : 'AI governance compliance report is unavailable.');
@@ -68,7 +119,7 @@ export default function AIGovernanceDashboard() {
       }
     }
 
-    void fetchReport();
+    void fetchDashboard();
     return () => {
       alive = false;
     };
@@ -76,13 +127,15 @@ export default function AIGovernanceDashboard() {
 
   const serviceEntries = useMemo(
     () =>
-      Object.entries(AIConfigRegistry).map(([id, config]) => ({
+      Object.entries(registry.services).map(([id, config]) => ({
         id,
         ...config,
         interactions: report.interactionsByService[id] || 0,
       })),
-    [report.interactionsByService],
+    [registry.services, report.interactionsByService],
   );
+
+  const validationIssues = Object.values(promptValidation).flatMap((result) => result.issues || []);
 
   return (
     <main style={{ padding: 24, color: '#F9FAFB', minHeight: '100%' }}>
@@ -92,7 +145,10 @@ export default function AIGovernanceDashboard() {
         </p>
         <h1 style={{ margin: '6px 0 0', fontSize: 26 }}>AI Governance Dashboard</h1>
         <p style={{ color: '#9CA3AF', maxWidth: 760 }}>
-          Enterprise oversight for AI usage, safety constraints, human review, and audit posture. Live metrics use the canonical Emergency governance route when the optional runtime is enabled.
+          Enterprise oversight for AI usage, safety constraints, human review, and audit posture. Live metrics use the formal governance API with a labeled local fallback for offline development.
+        </p>
+        <p style={{ color: '#6B7280', marginTop: 8, fontSize: 12 }}>
+          Registry source: {registry.storageMode || report.storageMode || 'api'} | Frameworks: {(registry.governanceFrameworks || []).join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}
         </p>
       </header>
 
@@ -113,7 +169,14 @@ export default function AIGovernanceDashboard() {
         <SummaryCard label="Human Review Rate" value={`${Math.round(report.humanReviewRate * 100)}%`} />
         <SummaryCard label="Avg Latency" value={`${Math.round(report.averageLatencyMs)}ms`} />
         <SummaryCard label="Estimated Cost" value={`$${report.estimatedCost.toFixed(2)}`} />
+        <SummaryCard label="Governed Services" value={serviceEntries.length} />
       </section>
+
+      {!loading && !serviceEntries.length ? (
+        <div style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF', marginBottom: 24 }}>
+          No AI governance registry entries are available.
+        </div>
+      ) : null}
 
       <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14, marginBottom: 24 }}>
         <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
@@ -133,7 +196,10 @@ export default function AIGovernanceDashboard() {
               </div>
               <p style={{ color: '#9CA3AF', margin: '8px 0' }}>{service.purpose}</p>
               <div style={{ color: '#CBD5E1', fontSize: 13 }}>
-                Provider: {service.provider} | Model: {service.model} | Audit: {service.auditLevel} | Interactions: {service.interactions}
+                Provider: {service.provider} | Model: {service.model} | Owner: {service.owner || 'Clinical Informatics'} | Risk: {service.riskLevel || 'medium'} | Audit: {service.auditLevel} | Interactions: {service.interactions}
+              </div>
+              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 8 }}>
+                Safety constraints: {service.safetyConstraints.join('; ')}
               </div>
             </article>
           ))}
@@ -148,12 +214,12 @@ export default function AIGovernanceDashboard() {
           <div>
             <h3 style={{ marginTop: 0 }}>Cannot Lower Priority For</h3>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {AISafetyRules.cannotLowerPriorityFor.dpsScores.map((score) => (
+              {registry.safetyRules.cannotLowerPriorityFor.dpsScores.map((score) => (
                 <span key={score} style={{ background: '#7F1D1D', color: '#FECACA', padding: '4px 8px', borderRadius: 999 }}>
                   DPS {score}
                 </span>
               ))}
-              {AISafetyRules.cannotLowerPriorityFor.conditions.map((condition) => (
+              {registry.safetyRules.cannotLowerPriorityFor.conditions.map((condition) => (
                 <span key={condition} style={{ background: '#7F1D1D', color: '#FECACA', padding: '4px 8px', borderRadius: 999 }}>
                   {condition}
                 </span>
@@ -163,7 +229,7 @@ export default function AIGovernanceDashboard() {
           <div>
             <h3>Required Disclaimers</h3>
             <ul style={{ color: '#CBD5E1' }}>
-              {AISafetyRules.requiredDisclaimers.map((disclaimer) => (
+              {registry.safetyRules.requiredDisclaimers.map((disclaimer) => (
                 <li key={disclaimer}>{disclaimer}</li>
               ))}
             </ul>
@@ -171,13 +237,25 @@ export default function AIGovernanceDashboard() {
           <div>
             <h3>Rate Limits</h3>
             <div style={{ display: 'grid', gap: 6, color: '#CBD5E1' }}>
-              {Object.entries(AISafetyRules.rateLimits).map(([role, limits]) => (
+              {Object.entries(registry.safetyRules.rateLimits).map(([role, limits]) => (
                 <div key={role} style={{ display: 'flex', justifyContent: 'space-between', maxWidth: 360 }}>
                   <span>{role}</span>
                   <span>{limits.requestsPerMinute} requests/minute</span>
                 </div>
               ))}
             </div>
+          </div>
+          <div>
+            <h3>Prompt Validation</h3>
+            {validationIssues.length ? (
+              <ul style={{ color: '#FCA5A5' }}>
+                {validationIssues.map((issue) => (
+                  <li key={issue}>{issue}</li>
+                ))}
+              </ul>
+            ) : (
+              <p style={{ color: '#34D399' }}>All registered prompt templates include required variables and human-review language.</p>
+            )}
           </div>
         </div>
       </section>
