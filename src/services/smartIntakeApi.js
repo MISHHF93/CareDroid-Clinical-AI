@@ -5,7 +5,7 @@ const jsonHeaders = { 'Content-Type': 'application/json' };
 const SMART_INTAKE_UNAVAILABLE_MESSAGE = 'Backend Smart Intake endpoint is not available yet.';
 
 async function postJson(path, body) {
-  if (!isBackendCapabilityEnabled('emergencySmartIntake')) {
+  if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
     throw new Error(SMART_INTAKE_UNAVAILABLE_MESSAGE);
   }
 
@@ -22,7 +22,7 @@ async function postJson(path, body) {
 }
 
 async function getJson(path) {
-  if (!isBackendCapabilityEnabled('emergencySmartIntake')) {
+  if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
     throw new Error(SMART_INTAKE_UNAVAILABLE_MESSAGE);
   }
 

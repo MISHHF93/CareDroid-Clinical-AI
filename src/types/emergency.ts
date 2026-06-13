@@ -56,6 +56,54 @@ export interface Note {
 export interface JourneyEvent {
   id: string; from?: PatientState; to: PatientState
   timestamp: string; staffId: string; note?: string
+  type?:
+    | 'Intake'
+    | 'StateChange'
+    | 'Triage'
+    | 'QueueMovement'
+    | 'RoomAssignment'
+    | 'StaffAssignment'
+    | 'VitalsUpdated'
+    | 'FlagAdded'
+    | 'FlagRemoved'
+    | 'AlertCreated'
+    | 'DispositionUpdated'
+  summary?: string
+  actorStaffId?: string
+  metadata?: Record<string, string | number | boolean | null | undefined>
+}
+
+export type WorkflowActionType =
+  | 'patient_created'
+  | 'journey_state_changed'
+  | 'clinician_assigned'
+  | 'reassessment_created'
+  | 'reassessment_completed'
+  | 'ems_arrival_created'
+  | 'ems_converted_to_patient'
+  | 'capacity_score_changed'
+  | 'boarding_started'
+  | 'referral_created'
+  | 'copilot_used'
+  | 'provincial_data_viewed'
+  | 'integration_event_received';
+
+export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
+export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';
+
+export interface WorkflowActionLog {
+  id: string;
+  type: WorkflowActionType;
+  title: string;
+  summary: string;
+  timestamp: string;
+  actorStaffId?: string;
+  actorName?: string;
+  patientId?: string;
+  source: string;
+  severity: WorkflowActionSeverity;
+  status: WorkflowActionStatus;
+  metadata: Record<string, string | number | boolean | null>;
 }
 
 export interface Alert {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fetchProtocols, fetchDrugs } from './clinicalContentApi';
+import { fetchProtocolById, fetchProtocols, fetchDrugs } from './clinicalContentApi';
 
 vi.mock('./apiClient', () => ({
   apiFetchJson: vi.fn(),
@@ -33,6 +33,27 @@ describe('clinicalContentApi', () => {
     expect(res.ok).toBe(false);
     expect(res.items).toEqual([]);
     expect(res.error).toBeTruthy();
+  });
+
+  it('fetchProtocolById calls protocol detail endpoint', async () => {
+    vi.mocked(apiFetchJson).mockResolvedValue({
+      response: { ok: true, status: 200 },
+      data: { id: 'sepsis', name: 'Sepsis Management' },
+    });
+
+    const res = await fetchProtocolById('sepsis');
+
+    expect(res.ok).toBe(true);
+    expect(res.protocol).toEqual({ id: 'sepsis', name: 'Sepsis Management' });
+    expect(apiFetchJson).toHaveBeenCalledWith('/api/protocols/sepsis');
+  });
+
+  it('fetchProtocolById validates required id before calling the API', async () => {
+    const res = await fetchProtocolById('');
+
+    expect(res.ok).toBe(false);
+    expect(res.error).toBe('Protocol ID is required.');
+    expect(apiFetchJson).not.toHaveBeenCalled();
   });
 
   it('fetchDrugs calls /api/drugs', async () => {

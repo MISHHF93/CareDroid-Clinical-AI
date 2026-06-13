@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { buildBuiltinHubCalculatorCards } from '../data/calculatorHubManifest';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { DRUG_REFERENCE_TOOLS } from '../utils/drugReferenceTools';
 import './CommandPalette.css';
 
@@ -16,6 +19,7 @@ const BASE_COMMANDS = [
     label: 'New Patient',
     hint: 'N',
     keywords: ['intake', 'arrival', 'register'],
+    requiredAction: EMERGENCY_ACTIONS.createPatient,
     build: () => ({ type: 'OPEN_INTAKE' }),
   },
   {
@@ -30,6 +34,7 @@ const BASE_COMMANDS = [
     label: 'New Referral',
     hint: 'R',
     keywords: ['consult', 'referrals', 'referral for patient'],
+    requiredAction: EMERGENCY_ACTIONS.manageReferral,
     build: (query) => ({
       type: 'OPEN_REFERRAL',
       value: extractValue(query, /^referral\s+for\s*/i),
@@ -132,6 +137,7 @@ const BASE_COMMANDS = [
     label: 'Flag [patient]',
     hint: '!',
     keywords: ['reassessment', 'risk'],
+    requiredAction: EMERGENCY_ACTIONS.manageFlags,
     build: (query) => ({ type: 'OPEN_FLAG_DIALOG', value: extractValue(query, /^flag\s*/i) }),
   },
 ];
@@ -202,6 +208,23 @@ function isActivePatient(patient) {
   return patient.state !== 'Discharge' && patient.state !== 'Deceased';
 }
 
+function commandAllowed(command, query, emergencyRole) {
+  if (command.requiredAction && !emergencyRole.can(command.requiredAction)) return false;
+  const payload = command.build(query);
+  if (payload.path && !emergencyRole.canAccessRoute(payload.path)) return false;
+  if (payload.type === 'OPEN_INTAKE') return emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  if (payload.type === 'OPEN_REFERRAL') return emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
+  if (payload.type === 'OPEN_FLAG_DIALOG') return emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
+  if (payload.type === 'OPEN_CAPACITY') return emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity);
+  if (payload.type === 'OPEN_REASSESSMENT_QUEUE') {
+    return emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment);
+  }
+  if (payload.type === 'OPEN_CALCULATOR' || payload.type === 'OPEN_PEDIATRIC_DRUGS') {
+    return emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools);
+  }
+  return true;
+}
+
 function patientSearchScore(patient, query) {
   const normalizedQuery = String(query || '').trim().toLowerCase();
   if (!normalizedQuery) return -1;
@@ -223,6 +246,7 @@ function patientSearchScore(patient, query) {
 }
 
 export default function CommandPalette({ open, onClose, onExecute }) {
+  const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const patientBackendSearch = useEmergencyStore((state) => state.patientBackendSearch);
@@ -274,6 +298,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .sort((a, b) => b.score - a.score)
         .slice(0, 5)
         .forEach(({ patient }) => {
+          if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)) return;
           dynamicCommands.push({
             id: `patient-${patient.id}`,
             patientId: patient.id,
@@ -295,6 +320,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
     ) {
       patientBackendSearch.results.slice(0, 5).forEach((result) => {
         if (!result.patientId || backendMatchedIds.has(result.patientId)) return;
+        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)) return;
         backendMatchedIds.add(result.patientId);
         dynamicCommands.unshift({
           id: `backend-patient-${result.patientId}`,
@@ -317,6 +343,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .filter((patient) => patientName(patient).toLowerCase().includes(findValue.toLowerCase()))
         .slice(0, 5)
         .forEach((patient) => {
+          if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients)) return;
           dynamicCommands.push({
             id: `find-${patient.id}`,
             patientId: patient.id,
@@ -339,6 +366,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         )
         .slice(0, 5)
         .forEach((patient) => {
+          if (!emergencyRole.can(EMERGENCY_ACTIONS.manageReferral)) return;
           dynamicCommands.push({
             id: `referral-${patient.id}`,
             patientId: patient.id,
@@ -359,6 +387,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .filter((patient) => patientName(patient).toLowerCase().includes(flagValue.toLowerCase()))
         .slice(0, 5)
         .forEach((patient) => {
+          if (!emergencyRole.can(EMERGENCY_ACTIONS.manageFlags)) return;
           dynamicCommands.push({
             id: `flag-${patient.id}`,
             patientId: patient.id,
@@ -390,6 +419,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .sort((a, b) => b.score - a.score)
         .slice(0, 6)
         .forEach(({ calculator }) => {
+          if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) return;
           dynamicCommands.push({
             id: `run-${calculator.id}`,
             label: `Run ${calculator.name}`,
@@ -417,6 +447,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .slice(0, 4)
         .forEach(({ tool }) => {
           if (tool.status === 'coming-soon') return;
+          if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) return;
           dynamicCommands.push({
             id: `drug-ref-${tool.id}`,
             label: /^dose\s+/i.test(query) && tool.id === 'pediatric-dose-safety-checker'
@@ -434,16 +465,17 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         });
     }
 
-    const scored = BASE_COMMANDS.map((command) => ({
+    const allowedBaseCommands = BASE_COMMANDS.filter((command) => commandAllowed(command, query, emergencyRole));
+    const scored = allowedBaseCommands.map((command) => ({
       ...command,
       score: scoreCommand(command, query),
     })).filter((command) => !query.trim() || command.score >= 0);
 
     if (!query.trim()) {
       const recentCommands = recentCommandIds
-        .map((id) => BASE_COMMANDS.find((command) => command.id === id))
+        .map((id) => allowedBaseCommands.find((command) => command.id === id))
         .filter(Boolean);
-      return recentCommands.length ? recentCommands : BASE_COMMANDS.slice(0, 6);
+      return recentCommands.length ? recentCommands : allowedBaseCommands.slice(0, 6);
     }
 
     const mergedCommands = [...dynamicCommands, ...scored.sort((a, b) => b.score - a.score)];
@@ -454,7 +486,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
           list.findIndex((candidate) => candidate.patientId === command.patientId) === index
       )
       .slice(0, 8);
-  }, [patientBackendSearch.query, patientBackendSearch.results, patients, query, recentCommandIds]);
+  }, [emergencyRole, patientBackendSearch.query, patientBackendSearch.results, patients, query, recentCommandIds]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -470,6 +502,10 @@ export default function CommandPalette({ open, onClose, onExecute }) {
     writeRecentCommands(nextRecent);
 
     if (payload.type === 'OPEN_FLAG_DIALOG') {
+      if (!emergencyRole.can(EMERGENCY_ACTIONS.manageFlags)) {
+        setInlineMessage(`${emergencyRole.roleLabel} cannot apply patient flags.`);
+        return;
+      }
       const patient = payload.patientId
         ? patients.find((candidate) => candidate.id === payload.patientId)
         : findPatient(payload.value, patients);
@@ -513,6 +549,10 @@ export default function CommandPalette({ open, onClose, onExecute }) {
 
   const applyFlag = () => {
     if (!flagTarget) return;
+    if (!emergencyRole.can(EMERGENCY_ACTIONS.manageFlags)) {
+      setInlineMessage(`${emergencyRole.roleLabel} cannot apply patient flags.`);
+      return;
+    }
     addFlag(flagTarget.id, selectedFlag);
     onExecute({ type: 'VIEW_PATIENT', patientId: flagTarget.id });
     setFlagTarget(null);

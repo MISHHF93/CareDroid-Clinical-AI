@@ -53,6 +53,7 @@
     "qa:responsive": "node scripts/run-responsive-qa.mjs",
     "qa:responsive:retry": "node scripts/retry-responsive-qa-failures.mjs",
     "qa:responsive:report": "node scripts/write-responsive-qa-report.mjs",
+    "qa:page-screenshots": "node scripts/capture-emergency-page-screenshots.mjs",
     "test:responsive-regression": "vitest run src/test/routePagesSmoke.test.jsx src/test/responsiveRegression.coverage.test.js src/pages/tools/ClinicalToolCatalog.launchButtons.test.jsx src/pages/tools/Calculators.formSmoke.test.jsx src/layout/AppShell.navigation.test.jsx src/pages/tools/ClinicalToolCatalog.responsive.test.js src/pages/tools/Calculators.responsive.test.js src/pages/fleet/fleet.responsive.test.js src/styles/responsiveUx.test.js src/layout/AppShell.layout.test.js",
     "test:mobile-performance": "vitest run src/styles/mobilePerformance.test.js",
     "qa:responsive:chromium": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",
@@ -85,7 +86,8 @@
     "plans:write-backlog": "node scripts/write-plan-implementation-backlog.mjs",
     "plans:scan-battery": "node scripts/run-plan-scan-battery.mjs",
     "plans:write-progress": "node scripts/write-plan-progress-dashboard.mjs",
-    "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.js"
+    "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.js",
+    "migrate:unified": "node scripts/run-unified-migration.js"
   },
   "dependencies": {
     "@capacitor/android": "^5.6.0",

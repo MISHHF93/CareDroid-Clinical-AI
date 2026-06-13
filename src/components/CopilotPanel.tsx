@@ -168,6 +168,7 @@ export function CopilotPanel() {
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
   const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
+  const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: 'copilot-welcome',
@@ -207,6 +208,20 @@ export function CopilotPanel() {
     };
     const history = messages;
     const systemPrompt = buildDepartmentPrompt({ patients, capacity, alerts });
+    recordWorkflowAction({
+      type: 'copilot_used',
+      title: 'Copilot used',
+      summary: `ED Copilot prompt submitted: ${text.slice(0, 80)}${text.length > 80 ? '...' : ''}`,
+      actorStaffId: 'current-user',
+      source: 'ed-copilot-panel',
+      metadata: {
+        promptLength: text.length,
+        activePatientCount: activePatients.length,
+        capacityScore: capacity.score,
+        capacityBand: capacity.band,
+        reassessmentQueueCount: reassessmentCount,
+      },
+    });
 
     setInput('');
     setLoading(true);

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
   FederatedLearningService,
   HybridDigitalTwinService,
@@ -20,8 +20,9 @@ import {
   ReassessmentService,
   ReferralService,
   SmartIntakeService,
+  WorkflowActionLogService,
 } from './emergency-os.services';
-import type { EmergencyPatient } from './emergency-os.types';
+import type { EmergencyOsSettingsPatch, EmergencyPatient } from './emergency-os.types';
 
 @Controller('emergency')
 export class EmergencyOsController {
@@ -41,6 +42,7 @@ export class EmergencyOsController {
     private readonly copilotService: EDCopilotService,
     private readonly analyticsService: EmergencyAnalyticsService,
     private readonly settingsService: EmergencySettingsService,
+    private readonly workflowActionLogService: WorkflowActionLogService,
     private readonly realTimeSimulationService: RealTimeSimulationService,
     private readonly federatedLearningService: FederatedLearningService,
     private readonly hybridDigitalTwinService: HybridDigitalTwinService,
@@ -66,6 +68,16 @@ export class EmergencyOsController {
     return this.journeyService.getJourney();
   }
 
+  @Get('workflow-logs')
+  getWorkflowLogs() {
+    return this.workflowActionLogService.getEnvelope();
+  }
+
+  @Get('patients/:patientId/workflow-logs')
+  getPatientWorkflowLogs(@Param('patientId') patientId: string) {
+    return this.workflowActionLogService.getEnvelope(patientId);
+  }
+
   @Get('ems')
   getEMS() {
     return this.emsIntakeService.getEMSIntake();
@@ -79,6 +91,52 @@ export class EmergencyOsController {
   @Post('intake')
   createIntakePatient(@Body() dto: Partial<EmergencyPatient>) {
     return this.smartIntakeService.createFromIntake(dto);
+  }
+
+  @Post('intake/vertical-slice')
+  createSmartIntakeVerticalSlice(
+    @Body()
+    dto: Partial<EmergencyPatient> & { patient?: Partial<EmergencyPatient>; staffId?: string },
+  ) {
+    const slice = this.smartIntakeService.createVerticalSlice({
+      ...(dto.patient || dto),
+      staffId: dto.staffId,
+    });
+    const whiteboard = this.whiteboardService.getWhiteboard().data;
+    const queueMetrics = this.queueService.getQueues().data;
+    const reassessment = this.reassessmentService.getReassessmentQueue().data;
+    const capacity = this.capacityService.getCapacity().data;
+
+    return {
+      module: 'Smart Intake Vertical Slice',
+      generatedAt: new Date().toISOString(),
+      source: 'backend-fixture',
+      status: 'active',
+      data: {
+        ...slice,
+        whiteboard,
+        queueMetrics,
+        reassessment,
+        capacity,
+        validation: {
+          patientCreated: whiteboard.patients.some((patient) => patient.id === slice.patient.id),
+          encounterCreated: slice.encounter.patientId === slice.patient.id,
+          movedToArrival: slice.transitions.some((event) => event.to === 'Arrival'),
+          movedToTriage: slice.patient.state === 'Triage',
+          visibleOnWhiteboard: whiteboard.patients.some(
+            (patient) => patient.id === slice.patient.id,
+          ),
+          visibleInQueueMetrics: queueMetrics.queues.some((queue) =>
+            queue.patients.some((patient) => patient.id === slice.patient.id),
+          ),
+          reassessmentTriggered: slice.reassessmentTriggered,
+          visibleInReassessment: reassessment.patients.some(
+            (patient) => patient.id === slice.patient.id,
+          ),
+          capacityUpdated: Boolean(capacity.capacity.updatedAt),
+        },
+      },
+    };
   }
 
   @Get('queues')
@@ -129,6 +187,11 @@ export class EmergencyOsController {
   @Get('settings')
   getSettings() {
     return this.settingsService.getSettings();
+  }
+
+  @Patch('settings')
+  updateSettings(@Body() dto: EmergencyOsSettingsPatch) {
+    return this.settingsService.updateSettings(dto);
   }
 
   @Post('simulation/update-live')

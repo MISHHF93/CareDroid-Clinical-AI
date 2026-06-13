@@ -21,8 +21,10 @@ import ragConfig from './config/rag.config';
 import anomalyDetectionConfig from './config/anomaly-detection.config';
 import nluConfig from './config/nlu.config';
 import firebaseConfig from './config/firebase.config';
-import environmentConfig from './config/environment.config';
-import { envValidationSchema } from './config/env.validation';
+import environmentConfig, {
+  envValidationSchema,
+  getEnvironmentConfig,
+} from './config/environment.config';
 
 // Modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -83,19 +85,21 @@ import { LoggerModule } from './modules/common/logger.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 
 function resolveDatabaseClient() {
-  const configuredClient = (process.env.DATABASE_CLIENT || '').toLowerCase();
+  const config = getEnvironmentConfig();
+  const configuredClient = config.database.sql.client;
   if (configuredClient) return configuredClient;
 
   const hasExplicitPostgresConfig = [
-    process.env.DATABASE_URL,
-    process.env.DATABASE_HOST,
-    process.env.DATABASE_USER,
-    process.env.DATABASE_PASSWORD,
-    process.env.DATABASE_NAME,
+    config.database.sql.url,
+    config.database.sql.host !== 'localhost' ? config.database.sql.host : '',
+    config.database.sql.username !== 'postgres' ? config.database.sql.username : '',
+    config.database.sql.password !== 'postgres' ? config.database.sql.password : '',
+    config.database.sql.databaseName !== 'caredroid' ? config.database.sql.databaseName : '',
   ].some(Boolean);
 
-  const nodeEnv = process.env.NODE_ENV || 'development';
-  return nodeEnv === 'development' && !hasExplicitPostgresConfig ? 'sqlite' : 'postgres';
+  return config.server.nodeEnv === 'development' && !hasExplicitPostgresConfig
+    ? 'sqlite'
+    : 'postgres';
 }
 
 @Module({
@@ -132,11 +136,12 @@ function resolveDatabaseClient() {
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: () => {
+        const config = getEnvironmentConfig();
         const client = resolveDatabaseClient();
         if (client === 'sqlite') {
           return {
             type: 'sqlite',
-            database: process.env.SQLITE_PATH || 'caredroid.dev.sqlite',
+            database: config.database.sql.sqlitePath,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
             synchronize: true,
             logging: false,

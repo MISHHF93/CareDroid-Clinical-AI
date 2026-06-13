@@ -4,141 +4,41 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { CopilotPanel } from './CopilotPanel';
 import PatientDetailPanel from './PatientDetailPanel';
+import CommandPalette from './CommandPalette';
+import EMSCriticalBroadcast from './EMSCriticalBroadcast';
+import ReassessmentDrawer from './ReassessmentDrawer';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
-import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { getVisibleNavigation } from '../config/unified-navigation.config';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { PatientFlag } from '../types/emergency';
 
 type AppShellProps = {
   children: ReactNode;
 };
 
-type Command = {
-  label: string;
-  action: () => void;
+type CommandAction = {
+  type: string;
+  path?: string;
+  patientId?: string;
+  value?: string;
+  calculatorId?: string;
 };
-
-function CommandPalette({ commands, onClose }: { commands: Command[]; onClose: () => void }) {
-  const [query, setQuery] = useState('');
-  const filteredCommands = useMemo(
-    () => commands.filter((command) => command.label.toLowerCase().includes(query.trim().toLowerCase())),
-    [commands, query],
-  );
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Command palette"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 500,
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        paddingTop: 88,
-        background: 'rgba(0,0,0,0.48)',
-      }}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div
-        style={{
-          width: 520,
-          maxWidth: 'calc(100vw - 32px)',
-          background: '#111827',
-          border: '1px solid #1F2937',
-          borderRadius: 14,
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-          overflow: 'hidden',
-        }}
-      >
-        <input
-          autoFocus
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') onClose();
-          }}
-          placeholder="Type a command..."
-          aria-label="Command search"
-          style={{
-            width: '100%',
-            boxSizing: 'border-box',
-            border: 0,
-            borderBottom: '1px solid #1F2937',
-            background: '#0B1120',
-            color: '#F9FAFB',
-            padding: '14px 16px',
-            fontSize: 15,
-            outline: 'none',
-          }}
-        />
-        <div style={{ maxHeight: 360, overflowY: 'auto', padding: 8 }}>
-          {filteredCommands.map((command) => (
-            <button
-              key={command.label}
-              type="button"
-              onClick={() => {
-                command.action();
-                onClose();
-              }}
-              style={{
-                width: '100%',
-                border: '1px solid transparent',
-                borderRadius: 10,
-                background: 'transparent',
-                color: '#F9FAFB',
-                padding: '10px 12px',
-                textAlign: 'left',
-                cursor: 'pointer',
-                fontSize: 14,
-              }}
-              onMouseEnter={(event) => {
-                event.currentTarget.style.background = '#1C2333';
-                event.currentTarget.style.borderColor = '#374151';
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.style.background = 'transparent';
-                event.currentTarget.style.borderColor = 'transparent';
-              }}
-            >
-              {command.label}
-            </button>
-          ))}
-          {!filteredCommands.length ? (
-            <div style={{ color: '#9CA3AF', padding: '12px 14px', fontSize: 13 }}>No commands found.</div>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
+  const emergencyRole = useEmergencyRolePermissions();
   const [showPalette, setShowPalette] = useState(false);
-
-  const commands = useMemo<Command[]>(
-    () => [
-      {
-        label: 'new patient',
-        action: () => {
-          navigate('/emergency/whiteboard');
-          document.dispatchEvent(new Event('open-intake'));
-        },
-      },
-      ...EMERGENCY_OS_ROUTE_COMMANDS.map((command) => ({
-        label: command.label.toLowerCase(),
-        action: () => {
-          const action = command.build();
-          if (action.type === 'OPEN_ROUTE') navigate(action.path);
-        },
-      })),
-    ],
-    [navigate],
+  const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const patients = useEmergencyStore((state) => state.patients);
+  const reassessmentCount = patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length;
+  const visibleNavigationItems = useMemo(
+    () => getVisibleNavigation(emergencyRole.role),
+    [emergencyRole.role],
   );
 
   useEffect(() => {
@@ -167,25 +67,79 @@ export function AppShell({ children }: AppShellProps) {
         e.preventDefault();
         document.dispatchEvent(new Event('open-command-palette'));
       }
-      if (e.key === 'n' && !e.metaKey && !e.ctrlKey) {
+      if (e.key === 'n' && !e.metaKey && !e.ctrlKey && emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) {
         document.dispatchEvent(new Event('open-intake'));
       }
     };
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [emergencyRole]);
 
   useEffect(() => {
     const openPalette = () => setShowPalette(true);
     const closePanels = () => setShowPalette(false);
+    const openReassessmentDrawer = () => setShowReassessmentDrawer(true);
     document.addEventListener('open-command-palette', openPalette);
+    document.addEventListener('open-reassessment-drawer', openReassessmentDrawer);
     document.addEventListener('close-all-panels', closePanels);
     return () => {
       document.removeEventListener('open-command-palette', openPalette);
+      document.removeEventListener('open-reassessment-drawer', openReassessmentDrawer);
       document.removeEventListener('close-all-panels', closePanels);
     };
   }, []);
+
+  const handleCommandExecute = (action: CommandAction) => {
+    switch (action.type) {
+      case 'OPEN_INTAKE':
+        if (!emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) break;
+        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        document.dispatchEvent(new Event('open-intake'));
+        break;
+      case 'OPEN_ROUTE':
+        if (action.path) navigate(emergencyRole.canAccessRoute(action.path) ? action.path : emergencyRole.nearestRoute(action.path));
+        break;
+      case 'VIEW_PATIENT':
+      case 'FIND_PATIENT':
+        if (action.patientId) selectPatient(action.patientId);
+        else if (action.value) navigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
+        else navigate(CANONICAL_ROUTES.emergencyPatients);
+        break;
+      case 'OPEN_REFERRAL': {
+        if (!emergencyRole.can(EMERGENCY_ACTIONS.manageReferral)) break;
+        const params = new URLSearchParams();
+        if (action.patientId) params.set('patientId', action.patientId);
+        if (action.value) params.set('patientSearch', action.value);
+        params.set('new', '1');
+        navigate(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
+        break;
+      }
+      case 'OPEN_PEDIATRIC_DRUGS':
+        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) break;
+        navigate(`${CANONICAL_ROUTES.emergencyTools}?tool=pediatric-dose-safety-checker`);
+        break;
+      case 'OPEN_CALCULATOR':
+        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) break;
+        navigate(`${CANONICAL_ROUTES.emergencyTools}${action.calculatorId ? `?tool=${action.calculatorId}` : ''}`);
+        break;
+      case 'OPEN_CAPACITY':
+        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) break;
+        navigate(CANONICAL_ROUTES.emergencyCapacity);
+        break;
+      case 'OPEN_REASSESSMENT_QUEUE':
+        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment)) break;
+        setShowReassessmentDrawer(true);
+        break;
+      case 'CLEAR_FILTERS':
+        document.dispatchEvent(new Event('clear-whiteboard-filters'));
+        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        break;
+      default:
+        break;
+    }
+    setShowPalette(false);
+  };
 
   return (
     <div
@@ -198,14 +152,26 @@ export function AppShell({ children }: AppShellProps) {
         overflow: 'hidden',
       }}
     >
-      <Sidebar />
+      <Sidebar navigationItems={visibleNavigationItems} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header />
         <main style={{ flex: 1, overflow: 'auto' }}>{children}</main>
       </div>
       <PatientDetailPanel />
-      <CopilotPanel />
-      {showPalette ? <CommandPalette commands={commands} onClose={() => setShowPalette(false)} /> : null}
+      {emergencyRole.can(EMERGENCY_ACTIONS.useCopilot) ? <CopilotPanel /> : null}
+      <EMSCriticalBroadcast />
+      {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment) ? (
+        <ReassessmentDrawer
+          open={showReassessmentDrawer}
+          count={reassessmentCount}
+          onClose={() => setShowReassessmentDrawer(false)}
+        />
+      ) : null}
+      <CommandPalette
+        open={showPalette}
+        onClose={() => setShowPalette(false)}
+        onExecute={handleCommandExecute}
+      />
     </div>
   );
 }

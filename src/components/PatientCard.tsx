@@ -56,6 +56,7 @@ export default function PatientCard({ patient }: PatientCardProps) {
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
   const staff = useEmergencyStore((store) => store.staff);
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
+  const patientName = `${patient.firstName} ${patient.lastName}`.trim();
   const vitals = patient.vitals[0];
   const minutesWaiting = waitMinutes(patient.arrivalTime);
   const hasReassessmentDue = patient.flags.includes(PatientFlag.ReassessmentDue);
@@ -91,7 +92,7 @@ export default function PatientCard({ patient }: PatientCardProps) {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <div style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {patient.firstName} {patient.lastName}
+          {patientName}
         </div>
         <div style={{ background: '#1C2333', color: '#9CA3AF', borderRadius: 999, padding: '2px 8px', fontSize: 11, flex: '0 0 auto' }}>
           {patient.age}/{patient.sex}
@@ -127,6 +128,17 @@ export default function PatientCard({ patient }: PatientCardProps) {
           <div style={{ width: 24, height: 24, borderRadius: 999, background: '#1C2333', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>
             {staffInitials(assignedStaff?.name)}
           </div>
+          <button
+            type="button"
+            className="patient-card__timeline-button"
+            aria-label={`Open timeline for ${patientName}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              selectPatient(patient.id);
+            }}
+          >
+            Timeline
+          </button>
         </div>
       </div>
 

@@ -1,4 +1,8 @@
-import { Patient, IPatient, IPatientIdentifier } from '../models/Patient';
+import {
+  UnifiedPatient as Patient,
+  type IPatientIdentifier,
+  type IUnifiedPatient as IPatient,
+} from '../models/unified-patient.model';
 import { ExtractedDemographics, PatientMatchCandidate } from '../models/SmartIntake';
 
 function normalize(value: unknown): string {

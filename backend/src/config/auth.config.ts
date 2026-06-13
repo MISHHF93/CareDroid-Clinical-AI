@@ -1,12 +1,17 @@
 import { registerAs } from '@nestjs/config';
+import { getEnvironmentConfig } from './environment.config';
 
-export const jwtConfig = registerAs('jwt', () => ({
-  secret: process.env.JWT_SECRET || 'CHANGE_ME_IN_PRODUCTION',
-  accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
-  refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY || '30d',
-  issuer: 'caredroid-api',
-  audience: 'caredroid-app',
-}));
+export const jwtConfig = registerAs('jwt', () => {
+  const config = getEnvironmentConfig();
+
+  return {
+    secret: config.auth.jwtSecret,
+    accessTokenExpiry: config.auth.jwtAccessExpiry,
+    refreshTokenExpiry: config.auth.jwtRefreshExpiry,
+    issuer: 'caredroid-api',
+    audience: 'caredroid-app',
+  };
+});
 
 export const oauthConfig = registerAs('oauth', () => ({
   google: {

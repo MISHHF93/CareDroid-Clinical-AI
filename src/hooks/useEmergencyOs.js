@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { buildEmergencyScenarioModuleEnvelope } from '../data/edScenarioFixtures';
 import {
   aggregateFederatedLearningRound,
   compareRealTimeSimulationInterventions,
@@ -13,6 +14,7 @@ import {
   fetchEmergencyPatients,
   fetchEmergencyQueues,
   fetchEmergencySettings,
+  fetchEmergencyWorkflowLogs,
   fetchEmergencyWhiteboard,
   fetchFederatedLearningDashboard,
   fetchFederatedLearningGlobalModel,
@@ -46,15 +48,29 @@ function hasHydrationPayload(payload) {
   return Boolean(payload.patients || payload.rooms || payload.staff || payload.alerts || payload.capacity);
 }
 
-function useEmergencyModule(fetcher) {
+function useEmergencyModule(fetcher, scenarioModule) {
   const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const scenarioEnvelope = useMemo(
+    () => (scenarioModule && activeScenarioId ? buildEmergencyScenarioModuleEnvelope(scenarioModule, activeScenarioId) : null),
+    [activeScenarioId, scenarioModule]
+  );
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError('');
+    if (scenarioEnvelope) {
+      setData(scenarioEnvelope);
+      const hydrationPayload = pickHydrationPayload(scenarioEnvelope);
+      if (hasHydrationPayload(hydrationPayload)) {
+        hydrateFromApi(hydrationPayload);
+      }
+      setLoading(false);
+      return scenarioEnvelope;
+    }
     try {
       const envelope = await fetcher();
       setData(envelope);
@@ -70,12 +86,23 @@ function useEmergencyModule(fetcher) {
     } finally {
       setLoading(false);
     }
-  }, [fetcher, hydrateFromApi]);
+  }, [fetcher, hydrateFromApi, scenarioEnvelope]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError('');
+    if (scenarioEnvelope) {
+      setData(scenarioEnvelope);
+      const hydrationPayload = pickHydrationPayload(scenarioEnvelope);
+      if (hasHydrationPayload(hydrationPayload)) {
+        hydrateFromApi(hydrationPayload);
+      }
+      setLoading(false);
+      return () => {
+        cancelled = true;
+      };
+    }
     fetcher()
       .then((envelope) => {
         if (cancelled) return;
@@ -96,7 +123,7 @@ function useEmergencyModule(fetcher) {
     return () => {
       cancelled = true;
     };
-  }, [fetcher, hydrateFromApi]);
+  }, [fetcher, hydrateFromApi, scenarioEnvelope]);
 
   const isEmpty = useMemo(() => {
     const payload = data?.data;
@@ -107,20 +134,21 @@ function useEmergencyModule(fetcher) {
   return { data, loading, error, isEmpty, refresh };
 }
 
-export const useEmergencyWhiteboard = () => useEmergencyModule(fetchEmergencyWhiteboard);
-export const useEmergencyPatients = () => useEmergencyModule(fetchEmergencyPatients);
-export const usePatientJourney = () => useEmergencyModule(fetchPatientJourney);
-export const useEMSIntake = () => useEmergencyModule(fetchEMSIntake);
+export const useEmergencyWhiteboard = () => useEmergencyModule(fetchEmergencyWhiteboard, 'whiteboard');
+export const useEmergencyPatients = () => useEmergencyModule(fetchEmergencyPatients, 'patients');
+export const usePatientJourney = () => useEmergencyModule(fetchPatientJourney, 'journey');
+export const useEMSIntake = () => useEmergencyModule(fetchEMSIntake, 'ems');
 export const useSmartIntake = () => useEmergencyModule(fetchSmartIntake);
-export const useEmergencyQueues = () => useEmergencyModule(fetchEmergencyQueues);
-export const useReassessmentQueue = () => useEmergencyModule(fetchReassessmentQueue);
-export const useCapacityStatus = () => useEmergencyModule(fetchCapacityStatus);
-export const useBoardingStatus = () => useEmergencyModule(fetchBoardingStatus);
+export const useEmergencyQueues = () => useEmergencyModule(fetchEmergencyQueues, 'queues');
+export const useReassessmentQueue = () => useEmergencyModule(fetchReassessmentQueue, 'reassessment');
+export const useCapacityStatus = () => useEmergencyModule(fetchCapacityStatus, 'capacity');
+export const useBoardingStatus = () => useEmergencyModule(fetchBoardingStatus, 'boarding');
 export const useReferrals = () => useEmergencyModule(fetchReferrals);
-export const useProvincialHealth = () => useEmergencyModule(fetchProvincialHealth);
+export const useProvincialHealth = () => useEmergencyModule(fetchProvincialHealth, 'provincialHealth');
 export const useIntegrationHub = () => useEmergencyModule(fetchIntegrationHub);
-export const useEDCopilot = () => useEmergencyModule(fetchEDCopilot);
-export const useEmergencyAnalytics = () => useEmergencyModule(fetchEmergencyAnalytics);
+export const useEDCopilot = () => useEmergencyModule(fetchEDCopilot, 'copilot');
+export const useEmergencyWorkflowLogs = () => useEmergencyModule(fetchEmergencyWorkflowLogs);
+export const useEmergencyAnalytics = () => useEmergencyModule(fetchEmergencyAnalytics, 'analytics');
 export const useEmergencySettings = () => useEmergencyModule(fetchEmergencySettings);
 
 function useEmergencyModuleActions(fetcher, actions) {

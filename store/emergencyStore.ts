@@ -35,6 +35,10 @@ import {
   type Shift,
   type Staff,
   type Vitals,
+  type WorkflowActionLog,
+  type WorkflowActionSeverity,
+  type WorkflowActionStatus,
+  type WorkflowActionType,
 } from '../types/emergency';
 import {
   createEmergencyPatientRecord,
@@ -60,6 +64,12 @@ import {
   longWaitSeverityForPhase,
   longWaitStatus,
 } from '../src/utils/longWaitRescue';
+import {
+  ED_SCENARIO_DEMO_MODES,
+  buildRootEmergencyScenarioState,
+  getInitialEdScenarioId,
+  persistEdScenarioId,
+} from '../src/data/edScenarioFixtures';
 
 type PatientPatch = Partial<Omit<Patient, 'id'>>;
 type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 'severity'>>;
@@ -113,7 +123,25 @@ type EmergencyAnalyticsState = {
   message?: string;
   data?: any;
 };
+type EmergencyModuleSetting = {
+  id: string;
+  label: string;
+  enabled: boolean;
+};
 type EmergencySettingsState = {
+  tenantName: string;
+  tenantMode?: string;
+  demoMode?: Record<string, any>;
+  defaultWorkspace: string;
+  enabledModules: EmergencyModuleSetting[];
+  aiSettings: Record<string, string | boolean>;
+  integrationSettings: Record<string, string | boolean>;
+  provincialHealthSettings: Record<string, string | boolean>;
+  notificationSettings: Record<string, string | number | boolean>;
+  reassessmentThresholds: Record<string, number>;
+  capacityThresholds: Record<string, number>;
+  emsThresholds: Record<string, number | boolean>;
+  boardingThresholds: Record<string, number>;
   departmentCapacityTarget: number;
   thresholds: {
     waitWarningMinutes: number;
@@ -126,6 +154,78 @@ type EmergencySettingsState = {
 };
 
 const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
+  tenantName: 'CareDroid Emergency Department',
+  defaultWorkspace: 'emergency-whiteboard',
+  enabledModules: [
+    { id: 'whiteboard', label: 'Emergency Whiteboard', enabled: true },
+    { id: 'patients', label: 'Patients', enabled: true },
+    { id: 'journey', label: 'Patient Journey Engine', enabled: true },
+    { id: 'ems', label: 'EMS Intake', enabled: true },
+    { id: 'smartIntake', label: 'Smart Intake', enabled: true },
+    { id: 'queues', label: 'Queue Intelligence', enabled: true },
+    { id: 'reassessment', label: 'Reassessment Engine', enabled: true },
+    { id: 'capacity', label: 'Capacity Intelligence', enabled: true },
+    { id: 'boarding', label: 'Boarding Intelligence', enabled: true },
+    { id: 'referrals', label: 'Referral Intelligence', enabled: true },
+    { id: 'provincialHealth', label: 'Provincial Health Connector', enabled: false },
+    { id: 'integrations', label: 'IoT/Integration Hub', enabled: true },
+    { id: 'copilot', label: 'ED Copilot', enabled: true },
+    { id: 'analytics', label: 'Analytics', enabled: true },
+    { id: 'settings', label: 'Settings', enabled: true },
+  ],
+  aiSettings: {
+    enabled: true,
+    provider: 'CareDroid demo router',
+    model: 'clinical-command-preview',
+    triageAssistEnabled: true,
+    summarizationEnabled: true,
+    humanReviewRequired: true,
+  },
+  integrationSettings: {
+    ehrEnabled: false,
+    fhirEndpoint: 'https://fhir.demo.local/R4',
+    hl7InterfaceId: 'hl7-demo',
+    deviceTelemetryEnabled: false,
+  },
+  provincialHealthSettings: {
+    connectorEnabled: false,
+    jurisdiction: 'Ontario',
+    lookupMode: 'manual-review',
+    healthCardValidation: true,
+  },
+  notificationSettings: {
+    inAppEnabled: true,
+    emailEnabled: false,
+    smsEnabled: false,
+    escalationMinutes: 10,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '06:00',
+  },
+  reassessmentThresholds: {
+    P1: 15,
+    P2: 30,
+    P3: 60,
+    P4: 120,
+    P5: 180,
+    overdueGraceMinutes: 10,
+  },
+  capacityThresholds: {
+    departmentCapacityTarget: 30,
+    warningPercent: 80,
+    criticalPercent: 90,
+    maxWaitingPatients: 12,
+  },
+  emsThresholds: {
+    offloadTargetMinutes: 15,
+    criticalEtaMinutes: 8,
+    autoCreateArrival: true,
+  },
+  boardingThresholds: {
+    escalationMinutes: 180,
+    criticalMinutes: 240,
+    maxBoarders: 6,
+    inpatientNotifyMinutes: 120,
+  },
   departmentCapacityTarget: 30,
   thresholds: {
     waitWarningMinutes: 45,
@@ -150,6 +250,59 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
     CAPACITY_CRISIS: { enabled: true, severity: 'Critical' },
   },
 };
+
+const mergeEmergencySettingsState = (
+  base: EmergencySettingsState,
+  patch: Partial<EmergencySettingsState> = {}
+): EmergencySettingsState => ({
+  ...base,
+  ...patch,
+  enabledModules: patch.enabledModules || base.enabledModules,
+  aiSettings: {
+    ...base.aiSettings,
+    ...(patch.aiSettings || {}),
+  },
+  integrationSettings: {
+    ...base.integrationSettings,
+    ...(patch.integrationSettings || {}),
+  },
+  provincialHealthSettings: {
+    ...base.provincialHealthSettings,
+    ...(patch.provincialHealthSettings || {}),
+  },
+  notificationSettings: {
+    ...base.notificationSettings,
+    ...(patch.notificationSettings || {}),
+  },
+  reassessmentThresholds: {
+    ...base.reassessmentThresholds,
+    ...(patch.reassessmentThresholds || {}),
+  },
+  capacityThresholds: {
+    ...base.capacityThresholds,
+    ...(patch.capacityThresholds || {}),
+  },
+  emsThresholds: {
+    ...base.emsThresholds,
+    ...(patch.emsThresholds || {}),
+  },
+  boardingThresholds: {
+    ...base.boardingThresholds,
+    ...(patch.boardingThresholds || {}),
+  },
+  thresholds: {
+    ...base.thresholds,
+    ...(patch.thresholds || {}),
+    reassessmentIntervals: {
+      ...base.thresholds.reassessmentIntervals,
+      ...(patch.thresholds?.reassessmentIntervals || {}),
+    },
+  },
+  alertRules: {
+    ...base.alertRules,
+    ...(patch.alertRules || {}),
+  },
+});
 type ShiftStartInput = {
   startTime: string;
   endTime?: string;
@@ -197,6 +350,8 @@ type ReferralCreateInput = Pick<
   status?: Extract<ReferralStatus, 'Draft' | 'Sent' | 'TransferRequested'>;
   workflow?: Referral['workflow'];
 };
+type WorkflowActionInput = Omit<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'> &
+  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'>>;
 
 const syncPatientCreateToBackend = (patient: Patient) => {
   void createEmergencyPatientRecord(patient).then((result) => {
@@ -220,11 +375,16 @@ interface EmergencyStoreState {
   rooms: Room[];
   queues: Queue[];
   capacity: CapacitySnapshot;
+  activeScenarioId: string;
+  activeScenario: any;
+  availableScenarios: any[];
+  scenarioData: any;
   activeShift: Shift;
   emsUnits: EMSUnit[];
   emsArrivals: EMSArrival[];
   referrals: Referral[];
   staffingRequests: CrisisStaffingRequest[];
+  workflowLogs: WorkflowActionLog[];
   alerts: Alert[];
   selectedPatientId: string | null;
   copilotOpen: boolean;
@@ -239,7 +399,7 @@ interface EmergencyStoreState {
   isHydrating: boolean;
   hasHydrated: boolean;
   ensureHydrated: () => void;
-  addPatient: (patient: Patient) => void;
+  addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
   updatePatient: (id: string, patch: PatientPatch) => void;
   dischargePatient: (id: string, options?: MovePatientStateOptions) => void;
   movePatientToState: (id: string, state: PatientState, options?: MovePatientStateOptions) => void;
@@ -296,12 +456,14 @@ interface EmergencyStoreState {
   checkCriticalEMSChecklistItem: (arrivalId: string, input: CriticalChecklistCheckInput) => void;
   completeCriticalEMSChecklist: (arrivalId: string, input: CriticalChecklistCompletionInput) => void;
   convertEMSArrivalToPatient: (arrivalId: string) => void;
+  recordWorkflowAction: (input: WorkflowActionInput) => WorkflowActionLog;
   setRealtimeConnection: (status: Partial<RealtimeConnectionState>) => void;
   handleRealtimeEvent: (event: RealtimeEventEnvelope) => void;
   pollRealtimeFallback: () => Promise<void>;
   startRealtime: () => void;
   stopRealtime: () => void;
   loadEmergencyAnalytics: (options?: { force?: boolean }) => Promise<EmergencyAnalyticsState>;
+  setActiveScenario: (scenarioId: string) => void;
   saveEmergencySettings: (patch: Partial<EmergencySettingsState>) => void;
   upsertRoom: (room: Partial<Room> & { id?: string }) => void;
   deactivateRoom: (roomId: string) => void;
@@ -507,6 +669,152 @@ const actionEvent = (
     id: `evt-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     ...extra,
   });
+
+const WORKFLOW_EVENT_TYPE_MAP: Partial<Record<JourneyEvent['type'], WorkflowActionType>> = {
+  Arrival: 'patient_created',
+  EncounterCreated: 'patient_created',
+  StateChange: 'journey_state_changed',
+  StaffAssignment: 'clinician_assigned',
+  ReassessmentReminderScheduled: 'reassessment_created',
+  ReassessmentReminderCompleted: 'reassessment_completed',
+  ReferralCreated: 'referral_created',
+};
+
+const WORKFLOW_TITLES: Record<WorkflowActionType, string> = {
+  patient_created: 'Patient created',
+  journey_state_changed: 'Journey state changed',
+  clinician_assigned: 'Clinician assigned',
+  reassessment_created: 'Reassessment created',
+  reassessment_completed: 'Reassessment completed',
+  ems_arrival_created: 'EMS arrival created',
+  ems_converted_to_patient: 'EMS converted to patient',
+  capacity_score_changed: 'Capacity score changed',
+  boarding_started: 'Boarding started',
+  referral_created: 'Referral created',
+  copilot_used: 'Copilot used',
+  provincial_data_viewed: 'Provincial data viewed',
+  integration_event_received: 'Integration event received',
+};
+
+const WORKFLOW_WARNING_TYPES = new Set<WorkflowActionType>([
+  'capacity_score_changed',
+  'boarding_started',
+  'ems_arrival_created',
+  'integration_event_received',
+]);
+
+const createWorkflowLog = (input: WorkflowActionInput): WorkflowActionLog => {
+  const timestamp = input.timestamp || new Date().toISOString();
+  return {
+    id:
+      input.id ||
+      `workflow-${input.type}-${input.patientId || input.source || 'global'}-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`,
+    type: input.type,
+    title: input.title || WORKFLOW_TITLES[input.type],
+    summary: input.summary,
+    timestamp,
+    actorStaffId: input.actorStaffId,
+    actorName: input.actorName,
+    patientId: input.patientId,
+    source: input.source || 'emergency-os-store',
+    severity: input.severity || (WORKFLOW_WARNING_TYPES.has(input.type) ? 'Warning' : 'Info'),
+    status: input.status || 'recorded',
+    metadata: input.metadata || {},
+  };
+};
+
+const syncWorkflowLog = (log: WorkflowActionLog): void => {
+  void recordEmergencyActivity({
+    category: 'workflow',
+    label: log.title,
+    route: log.patientId ? `/emergency/patients/${log.patientId}` : '/emergency/settings#audit',
+    occurredAt: log.timestamp,
+    metadata: {
+      ...log.metadata,
+      workflowLogId: log.id,
+      workflowActionType: log.type,
+      patientId: log.patientId || null,
+      source: log.source,
+      severity: log.severity,
+      status: log.status,
+      actorStaffId: log.actorStaffId || null,
+    },
+  });
+  void syncEmergencyAuditEvent({
+    action: 'clinical_data_access',
+    resourceType: 'emergency-workflow-action',
+    resourceId: log.id,
+    timestamp: log.timestamp,
+    metadata: {
+      type: log.type,
+      patientId: log.patientId || null,
+      source: log.source,
+      severity: log.severity,
+      status: log.status,
+    },
+  });
+};
+
+const appendWorkflowLogs = (
+  existingLogs: WorkflowActionLog[],
+  inputs: Array<WorkflowActionInput | null | undefined>
+): WorkflowActionLog[] => {
+  const logs = inputs.filter(Boolean).map((input) => createWorkflowLog(input as WorkflowActionInput));
+  logs.forEach(syncWorkflowLog);
+  if (!logs.length) return existingLogs;
+  const existingIds = new Set(existingLogs.map((log) => log.id));
+  return [...logs.filter((log) => !existingIds.has(log.id)), ...existingLogs].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+};
+
+export const workflowLogFromJourneyEvent = (
+  event: JourneyEvent,
+  options: { patient?: Patient; staff?: Staff[]; source?: string } = {}
+): WorkflowActionLog | null => {
+  const type = WORKFLOW_EVENT_TYPE_MAP[event.type];
+  if (!type) return null;
+  const actorStaffId = event.actorStaffId || event.staffId || event.by;
+  const actor = options.staff?.find((member) => member.id === actorStaffId);
+  return createWorkflowLog({
+    id: `workflow-from-${event.id}`,
+    type,
+    title: WORKFLOW_TITLES[type],
+    summary: event.summary || event.note || WORKFLOW_TITLES[type],
+    timestamp: event.timestamp,
+    actorStaffId,
+    actorName: actor?.displayName || actor?.name,
+    patientId: event.patientId || options.patient?.id,
+    source: options.source || 'patient-timeline',
+    severity: type === 'boarding_started' ? 'Warning' : 'Info',
+    status: type === 'reassessment_completed' ? 'completed' : 'recorded',
+    metadata: {
+      ...(event.metadata || {}),
+      journeyEventId: event.id,
+      fromState: event.fromState || event.from || null,
+      toState: event.toState || event.to || null,
+    },
+  });
+};
+
+export const selectWorkflowLogs = (state: Pick<EmergencyStoreState, 'workflowLogs'>): WorkflowActionLog[] =>
+  [...state.workflowLogs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+export const selectPatientWorkflowTimeline = (
+  state: Pick<EmergencyStoreState, 'patients' | 'staff' | 'workflowLogs'>,
+  patientId: string
+): WorkflowActionLog[] => {
+  const patient = state.patients.find((candidate) => candidate.id === patientId);
+  const timelineLogs = (patient?.timeline || [])
+    .map((event) => workflowLogFromJourneyEvent(event, { patient, staff: state.staff }))
+    .filter(Boolean) as WorkflowActionLog[];
+  const patientLogs = state.workflowLogs.filter((log) => log.patientId === patientId);
+  const byId = new Map<string, WorkflowActionLog>();
+  [...patientLogs, ...timelineLogs].forEach((log) => byId.set(log.id, log));
+  return [...byId.values()].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+};
 
 const DEFAULT_FLAG_SEVERITY: Record<PatientFlagType, PatientFlagSeverity> = {
   ReassessmentDue: 'Warning',
@@ -1856,36 +2164,55 @@ const mockActiveShift: Shift = {
   handoffNotes: [],
 };
 
-const mockReferrals = syncReferralsFromPatients(mockPatients, []);
+const initialRootScenarioState = buildRootEmergencyScenarioState(getInitialEdScenarioId());
+const initialPatients = initialRootScenarioState.patients || mockPatients;
+const initialStaff = initialRootScenarioState.staff || mockStaff;
+const initialRooms = initialRootScenarioState.rooms || mockRooms;
+const initialEMSArrivals = initialRootScenarioState.emsArrivals || mockEMSArrivals;
+const initialEMSUnits = initialRootScenarioState.emsUnits || mockEMSUnits;
+const initialActiveShift = initialRootScenarioState.activeShift || mockActiveShift;
+const mockReferrals = syncReferralsFromPatients(initialPatients, initialRootScenarioState.referrals || []);
 const initialDerived = deriveOperationalState(
-  mockPatients,
-  mockRooms,
+  initialPatients,
+  initialRooms,
   mockReferrals,
-  mockEMSArrivals,
+  initialEMSArrivals,
   DEFAULT_EMERGENCY_SETTINGS
 );
 const initialAlerts = deriveAlerts({
-  patients: mockPatients,
+  patients: initialPatients,
   capacity: initialDerived.capacity,
-  emsArrivals: mockEMSArrivals,
+  emsArrivals: initialEMSArrivals,
   referrals: mockReferrals,
   queues: initialDerived.queues,
   bottleneckAlert: null,
 });
+const initialWorkflowLogs = mockPatients
+  .flatMap((patient) =>
+    patient.timeline
+      .map((event) => workflowLogFromJourneyEvent(event, { patient, staff: mockStaff, source: 'seed-timeline' }))
+      .filter(Boolean)
+  )
+  .sort((a, b) => new Date((b as WorkflowActionLog).timestamp).getTime() - new Date((a as WorkflowActionLog).timestamp).getTime()) as WorkflowActionLog[];
 
 export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
-  patients: mockPatients,
-  staff: mockStaff,
-  rooms: mockRooms,
+  patients: initialPatients,
+  staff: initialStaff,
+  rooms: initialRooms,
   queues: initialDerived.queues,
   capacity: initialDerived.capacity,
-  activeShift: mockActiveShift,
-  emsUnits: mockEMSUnits,
-  emsArrivals: mockEMSArrivals,
+  activeScenarioId: initialRootScenarioState.activeScenarioId,
+  activeScenario: initialRootScenarioState.activeScenario,
+  availableScenarios: ED_SCENARIO_DEMO_MODES,
+  scenarioData: initialRootScenarioState.scenarioData,
+  activeShift: initialActiveShift,
+  emsUnits: initialEMSUnits,
+  emsArrivals: initialEMSArrivals,
   referrals: mockReferrals,
   staffingRequests: [],
+  workflowLogs: initialWorkflowLogs,
   alerts: initialAlerts,
-  selectedPatientId: 'pt-001',
+  selectedPatientId: initialPatients[0]?.id || 'pt-001',
   copilotOpen: true,
   activeQueueFilter: null,
   whiteboardSearchQuery: '',
@@ -1904,13 +2231,16 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     message: 'Real-time disconnected.',
     updatedAt: undefined,
   },
-  emergencyAnalytics: {
+  emergencyAnalytics: initialRootScenarioState.emergencyAnalytics || {
     status: 'idle',
     source: 'client-fallback',
     message: '',
     data: undefined,
   },
-  emergencySettings: DEFAULT_EMERGENCY_SETTINGS,
+  emergencySettings: mergeEmergencySettingsState(
+    DEFAULT_EMERGENCY_SETTINGS,
+    initialRootScenarioState.emergencySettings
+  ),
   isHydrating: false,
   hasHydrated: true,
 
@@ -1924,53 +2254,157 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     }
 
     set({ isHydrating: true });
-    const referrals = syncReferralsFromPatients(mockPatients, []);
+    const scenarioState = buildRootEmergencyScenarioState(get().activeScenarioId || getInitialEdScenarioId());
+    const patients = scenarioState.patients || mockPatients;
+    const rooms = scenarioState.rooms || mockRooms;
+    const emsArrivals = scenarioState.emsArrivals || mockEMSArrivals;
+    const referrals = syncReferralsFromPatients(patients, scenarioState.referrals || []);
     const derived = deriveOperationalState(
-      mockPatients,
-      mockRooms,
+      patients,
+      rooms,
       referrals,
-      mockEMSArrivals,
+      emsArrivals,
       DEFAULT_EMERGENCY_SETTINGS
     );
     const alerts = deriveAlerts({
-      patients: mockPatients,
+      patients,
       capacity: derived.capacity,
-      emsArrivals: mockEMSArrivals,
+      emsArrivals,
       referrals,
       queues: derived.queues,
       bottleneckAlert: null,
     });
 
     set({
-      patients: mockPatients,
-      staff: mockStaff,
-      rooms: mockRooms,
+      patients,
+      staff: scenarioState.staff || mockStaff,
+      rooms,
       queues: derived.queues,
       capacity: derived.capacity,
-      activeShift: mockActiveShift,
-      emsUnits: mockEMSUnits,
-      emsArrivals: mockEMSArrivals,
+      activeScenarioId: scenarioState.activeScenarioId,
+      activeScenario: scenarioState.activeScenario,
+      scenarioData: scenarioState.scenarioData,
+      activeShift: scenarioState.activeShift || mockActiveShift,
+      emsUnits: scenarioState.emsUnits || mockEMSUnits,
+      emsArrivals,
       referrals,
+      workflowLogs: initialWorkflowLogs,
       alerts,
-      selectedPatientId: mockPatients[0]?.id || null,
+      selectedPatientId: patients[0]?.id || null,
       activeQueueFilter: null,
       whiteboardSearchQuery: '',
       bottleneckAlert: null,
-      emergencySettings: DEFAULT_EMERGENCY_SETTINGS,
+      emergencyAnalytics: scenarioState.emergencyAnalytics || get().emergencyAnalytics,
+      emergencySettings: mergeEmergencySettingsState(
+        DEFAULT_EMERGENCY_SETTINGS,
+        scenarioState.emergencySettings
+      ),
       isHydrating: false,
       hasHydrated: true,
     });
   },
 
-  addPatient: (patient) => {
-    syncPatientCreateToBackend(patient);
+  setActiveScenario: (scenarioId) => {
+    const scenarioState = buildRootEmergencyScenarioState(scenarioId);
+    persistEdScenarioId(scenarioState.activeScenarioId);
+    const patients = scenarioState.patients || mockPatients;
+    const rooms = scenarioState.rooms || mockRooms;
+    const emsArrivals = scenarioState.emsArrivals || mockEMSArrivals;
+    const referrals = syncReferralsFromPatients(patients, scenarioState.referrals || []);
+    const derived = deriveOperationalState(
+      patients,
+      rooms,
+      referrals,
+      emsArrivals,
+      DEFAULT_EMERGENCY_SETTINGS
+    );
+    const alerts = deriveAlerts({
+      patients,
+      capacity: derived.capacity,
+      emsArrivals,
+      referrals,
+      queues: derived.queues,
+      bottleneckAlert: null,
+    });
+
+    set({
+      patients,
+      staff: scenarioState.staff || mockStaff,
+      rooms,
+      queues: derived.queues,
+      capacity: derived.capacity,
+      activeScenarioId: scenarioState.activeScenarioId,
+      activeScenario: scenarioState.activeScenario,
+      scenarioData: scenarioState.scenarioData,
+      activeShift: scenarioState.activeShift || mockActiveShift,
+      emsUnits: scenarioState.emsUnits || mockEMSUnits,
+      emsArrivals,
+      referrals,
+      alerts,
+      selectedPatientId: patients[0]?.id || null,
+      activeQueueFilter: null,
+      whiteboardSearchQuery: '',
+      bottleneckAlert: null,
+      emergencyAnalytics: scenarioState.emergencyAnalytics,
+      emergencySettings: mergeEmergencySettingsState(
+        DEFAULT_EMERGENCY_SETTINGS,
+        scenarioState.emergencySettings
+      ),
+      isHydrating: false,
+      hasHydrated: true,
+    });
+  },
+
+  addPatient: (patient, options = {}) => {
+    if (options.syncToBackend !== false) {
+      syncPatientCreateToBackend(patient);
+    }
     set((state) => {
       const patients = [...state.patients, patient];
       const referrals = syncReferralsFromPatients(patients, state.referrals);
+      const operational = deriveOperationalState(
+        patients,
+        state.rooms,
+        referrals,
+        state.emsArrivals,
+        state.emergencySettings
+      );
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
+        ...operational,
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'patient_created',
+            title: 'Patient created',
+            summary: `${patient.firstName} ${patient.lastName}`.trim()
+              ? `Created patient ${`${patient.firstName} ${patient.lastName}`.trim()}.`
+              : `Created patient ${patient.mrn}.`,
+            patientId: patient.id,
+            actorStaffId: patient.assignedStaffId || undefined,
+            source: options.syncToBackend === false ? 'local-emergency-store' : 'emergency-store-backend-sync',
+            metadata: {
+              mrn: patient.mrn,
+              state: patient.state,
+              priority: patient.priority,
+            },
+          },
+          operational.capacity.score !== state.capacity.score
+            ? {
+                type: 'capacity_score_changed',
+                title: 'Capacity score changed',
+                summary: `Capacity score changed from ${state.capacity.score} to ${operational.capacity.score}.`,
+                source: 'capacity-engine',
+                severity: operational.capacity.riskLevel === 'Red' ? 'Critical' : 'Warning',
+                metadata: {
+                  fromScore: state.capacity.score,
+                  toScore: operational.capacity.score,
+                  riskLevel: operational.capacity.riskLevel,
+                  reason: 'patient_created',
+                },
+              }
+            : null,
+        ]),
       };
     });
   },
@@ -2032,6 +2466,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       );
 
       const referrals = syncReferralsFromPatients(patients, state.referrals);
+      const operational = deriveOperationalState(patients, rooms, referrals, state.emsArrivals, state.emergencySettings);
 
       return {
         patients,
@@ -2039,7 +2474,37 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         staff,
         selectedPatientId: state.selectedPatientId === id ? null : state.selectedPatientId,
         referrals,
-        ...deriveOperationalState(patients, rooms, referrals, state.emsArrivals, state.emergencySettings),
+        ...operational,
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          patient
+            ? {
+                type: 'journey_state_changed',
+                title: 'Journey state changed',
+                summary: `Moved patient from ${patient.state} to ${PatientState.Discharge}.`,
+                patientId: id,
+                source: 'patient-journey-engine',
+                metadata: {
+                  fromState: patient.state,
+                  toState: PatientState.Discharge,
+                },
+              }
+            : null,
+          operational.capacity.score !== state.capacity.score
+            ? {
+                type: 'capacity_score_changed',
+                title: 'Capacity score changed',
+                summary: `Capacity score changed from ${state.capacity.score} to ${operational.capacity.score}.`,
+                source: 'capacity-engine',
+                severity: operational.capacity.riskLevel === 'Red' ? 'Critical' : 'Warning',
+                metadata: {
+                  fromScore: state.capacity.score,
+                  toScore: operational.capacity.score,
+                  riskLevel: operational.capacity.riskLevel,
+                  reason: 'patient_discharged',
+                },
+              }
+            : null,
+        ]),
       };
     });
   },
@@ -2050,6 +2515,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       flags: options.flags,
     });
     set((state) => {
+      const beforePatient = state.patients.find((candidate) => candidate.id === id);
       const patients = updatePatients(state.patients, id, (patient) => ({
         ...patient,
         state: nextState,
@@ -2065,9 +2531,54 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
             }),
         ],
       }));
+      const operational = deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings);
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+        ...operational,
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          beforePatient
+            ? {
+                type: 'journey_state_changed',
+                title: 'Journey state changed',
+                summary: `Moved patient from ${beforePatient.state} to ${nextState}.`,
+                patientId: id,
+                source: 'patient-journey-engine',
+                metadata: {
+                  fromState: beforePatient.state,
+                  toState: nextState,
+                },
+              }
+            : null,
+          beforePatient && nextState === PatientState.Admission && beforePatient.state !== PatientState.Admission
+            ? {
+                type: 'boarding_started',
+                title: 'Boarding started',
+                summary: 'Patient moved to Admission boarding state.',
+                patientId: id,
+                source: 'boarding-intelligence',
+                severity: 'Warning',
+                metadata: {
+                  fromState: beforePatient.state,
+                  toState: nextState,
+                },
+              }
+            : null,
+          operational.capacity.score !== state.capacity.score
+            ? {
+                type: 'capacity_score_changed',
+                title: 'Capacity score changed',
+                summary: `Capacity score changed from ${state.capacity.score} to ${operational.capacity.score}.`,
+                source: 'capacity-engine',
+                severity: operational.capacity.riskLevel === 'Red' ? 'Critical' : 'Warning',
+                metadata: {
+                  fromScore: state.capacity.score,
+                  toScore: operational.capacity.score,
+                  riskLevel: operational.capacity.riskLevel,
+                  reason: 'journey_state_changed',
+                },
+              }
+            : null,
+        ]),
       };
     });
   },
@@ -2124,6 +2635,24 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         patients,
         staff,
         ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'clinician_assigned',
+            title: 'Clinician assigned',
+            summary,
+            patientId,
+            actorStaffId: options.actorStaffId || staffId,
+            actorName: options.actorName,
+            source: 'staff-assignment',
+            metadata: {
+              fromStaffId: previousStaffId,
+              toStaffId: staffId,
+              fromStaffName,
+              toStaffName,
+              reason: options.reason || 'Workload rebalance',
+            },
+          },
+        ]),
       };
     }),
 
@@ -2320,6 +2849,21 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         patients,
         alerts,
         ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'reassessment_completed',
+            title: 'Reassessment completed',
+            summary: 'Completed scheduled reassessment.',
+            patientId,
+            actorStaffId: input.completedBy,
+            source: 'reassessment-engine',
+            status: 'completed',
+            metadata: {
+              reminderId,
+              completedAt: timestamp,
+            },
+          },
+        ]),
       };
     }),
 
@@ -2362,7 +2906,30 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           ],
         };
       });
-      return { patients };
+      return {
+        patients,
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          created
+            ? {
+                type: 'reassessment_created',
+                title: 'Reassessment created',
+                summary: `Scheduled reassessment for ${new Date(reminder.dueAt).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}.`,
+                patientId,
+                actorStaffId: input.scheduledBy,
+                source: 'reassessment-engine',
+                status: 'pending',
+                metadata: {
+                  reminderId: reminder.id,
+                  dueAt: reminder.dueAt,
+                  note: reminder.note || null,
+                },
+              }
+            : null,
+        ]),
+      };
     });
     return created ? reminder : null;
   },
@@ -2660,19 +3227,41 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       }
 
       operationalRefreshTimer = setTimeout(() => {
-        useEmergencyStore.setState((latestState) => ({
-          capacity: computeCapacity(
+        useEmergencyStore.setState((latestState) => {
+          const capacity = computeCapacity(
             latestState.patients,
             latestState.rooms,
             latestState.emsArrivals,
             latestState.emergencySettings
-          ),
-          queues: computeQueues(
+          );
+          const queues = computeQueues(
             latestState.patients,
             latestState.referrals,
             latestState.emergencySettings
-          ),
-        }));
+          );
+          return {
+            capacity,
+            queues,
+            workflowLogs:
+              capacity.score !== latestState.capacity.score
+                ? appendWorkflowLogs(latestState.workflowLogs, [
+                    {
+                      type: 'capacity_score_changed',
+                      title: 'Capacity score changed',
+                      summary: `Capacity score changed from ${latestState.capacity.score} to ${capacity.score}.`,
+                      source: 'capacity-engine',
+                      severity: capacity.riskLevel === 'Red' ? 'Critical' : 'Warning',
+                      metadata: {
+                        fromScore: latestState.capacity.score,
+                        toScore: capacity.score,
+                        riskLevel: capacity.riskLevel,
+                        reason: 'manual_capacity_refresh',
+                      },
+                    },
+                  ])
+                : latestState.workflowLogs,
+          };
+        });
         operationalRefreshTimer = null;
       }, 100);
 
@@ -3058,6 +3647,25 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         alerts: [...derivedAlerts, ...manualAlerts].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'referral_created',
+            title: 'Referral created',
+            summary: `${referral.status === 'Draft' ? 'Drafted' : 'Sent'} ${referral.targetDepartment} referral.`,
+            patientId: referral.patientId,
+            actorStaffId: referral.requestingStaffId,
+            source: 'referral-intelligence',
+            status: referral.status === 'Draft' ? 'pending' : 'recorded',
+            severity: referral.urgency === 'Emergent' ? 'Critical' : referral.urgency === 'Urgent' ? 'Warning' : 'Info',
+            metadata: {
+              referralId: referral.id,
+              targetDepartment: referral.targetDepartment,
+              urgency: referral.urgency,
+              status: referral.status,
+              workflow: referral.workflow || 'Referral',
+            },
+          },
+        ]),
       };
     }),
 
@@ -3166,6 +3774,22 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
               },
             ],
         ...deriveOperationalState(state.patients, prepared.rooms, state.referrals, emsArrivals, state.emergencySettings),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'ems_arrival_created',
+            title: 'EMS arrival created',
+            summary: `${arrival.unitName} inbound: ${arrival.chiefComplaint}.`,
+            source: 'ems-pipeline',
+            severity: arrival.severity === 'Critical' ? 'Critical' : arrival.severity === 'High' ? 'Warning' : 'Info',
+            metadata: {
+              emsArrivalId: arrival.id,
+              unitId: arrival.unitId,
+              severity: arrival.severity,
+              eta: arrival.eta,
+              status: arrival.status,
+            },
+          },
+        ]),
       };
     }),
 
@@ -3394,8 +4018,47 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         selectedPatientId: patientId,
         activeQueueFilter: null,
         ...deriveOperationalState(patients, rooms, referrals, emsArrivals, state.emergencySettings),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'ems_converted_to_patient',
+            title: 'EMS converted to patient',
+            summary: `${arrival.unitName} converted to Emergency OS patient.`,
+            patientId,
+            source: 'ems-pipeline',
+            severity: arrival.severity === 'Critical' ? 'Critical' : arrival.severity === 'High' ? 'Warning' : 'Info',
+            metadata: {
+              emsArrivalId: arrival.id,
+              unitId: arrival.unitId,
+              status: 'Handoff',
+            },
+          },
+          {
+            type: 'patient_created',
+            title: 'Patient created',
+            summary: `Created patient from ${arrival.unitName} EMS handoff.`,
+            patientId,
+            source: 'ems-pipeline',
+            metadata: {
+              mrn: patient.mrn,
+              emsArrivalId: arrival.id,
+              state: patient.state,
+              priority: patient.priority,
+            },
+          },
+        ]),
       };
     }),
+
+  recordWorkflowAction: (input) => {
+    const log = createWorkflowLog(input);
+    syncWorkflowLog(log);
+    set((state) => ({
+      workflowLogs: [log, ...state.workflowLogs.filter((candidate) => candidate.id !== log.id)].sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      ),
+    }));
+    return log;
+  },
 
   setRealtimeConnection: (status) =>
     set((state) => ({
@@ -3410,6 +4073,19 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     const type = realtimeEventType(event?.type);
     const payload = event?.payload || {};
     const state = get();
+    state.recordWorkflowAction({
+      type: 'integration_event_received',
+      title: 'Integration event received',
+      summary: `Received ${type || 'integration'} event.`,
+      patientId: realtimePatientId(payload) || payload.patient?.id || payload.patientId,
+      source: 'emergency-realtime',
+      severity: /alert|critical|ems/i.test(type) ? 'Warning' : 'Info',
+      metadata: {
+        integrationEventType: type,
+        receivedAt: event?.receivedAt || null,
+        hasPayload: Boolean(payload && Object.keys(payload).length),
+      },
+    });
 
     if (['patient_updated', 'patient_update', 'patient_changed'].includes(type)) {
       const patientId = realtimePatientId(payload);
@@ -3503,6 +4179,19 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     const current = get().emergencyAnalytics;
     if (!options.force && current.status === 'ready' && current.loadedAt) return current;
 
+    const scenarioAnalytics = get().scenarioData?.analytics;
+    if (scenarioAnalytics) {
+      const nextState: EmergencyAnalyticsState = {
+        status: 'ready',
+        source: 'client-fallback',
+        loadedAt: new Date().toISOString(),
+        message: `Scenario fixture: ${get().activeScenario?.label || get().activeScenarioId}`,
+        data: scenarioAnalytics,
+      };
+      set({ emergencyAnalytics: nextState });
+      return nextState;
+    }
+
     set((state) => ({
       emergencyAnalytics: {
         ...state.emergencyAnalytics,
@@ -3546,6 +4235,39 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
       const emergencySettings: EmergencySettingsState = {
         ...state.emergencySettings,
         ...patch,
+        enabledModules: patch.enabledModules || state.emergencySettings.enabledModules,
+        aiSettings: {
+          ...state.emergencySettings.aiSettings,
+          ...(patch.aiSettings || {}),
+        },
+        integrationSettings: {
+          ...state.emergencySettings.integrationSettings,
+          ...(patch.integrationSettings || {}),
+        },
+        provincialHealthSettings: {
+          ...state.emergencySettings.provincialHealthSettings,
+          ...(patch.provincialHealthSettings || {}),
+        },
+        notificationSettings: {
+          ...state.emergencySettings.notificationSettings,
+          ...(patch.notificationSettings || {}),
+        },
+        reassessmentThresholds: {
+          ...state.emergencySettings.reassessmentThresholds,
+          ...(patch.reassessmentThresholds || {}),
+        },
+        capacityThresholds: {
+          ...state.emergencySettings.capacityThresholds,
+          ...(patch.capacityThresholds || {}),
+        },
+        emsThresholds: {
+          ...state.emergencySettings.emsThresholds,
+          ...(patch.emsThresholds || {}),
+        },
+        boardingThresholds: {
+          ...state.emergencySettings.boardingThresholds,
+          ...(patch.boardingThresholds || {}),
+        },
         thresholds: {
           ...state.emergencySettings.thresholds,
           ...(patch.thresholds || {}),
@@ -4042,5 +4764,14 @@ export const selectEdQueueHealth = (
   }));
   return edQueueHealthOutput;
 };
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('ed:scenario-selected', (event) => {
+    const scenarioId = (event as CustomEvent<{ scenarioId?: string }>).detail?.scenarioId;
+    if (scenarioId && useEmergencyStore.getState().activeScenarioId !== scenarioId) {
+      useEmergencyStore.getState().setActiveScenario(scenarioId);
+    }
+  });
+}
 
 export type { EmergencyStoreState, PatientPatch };

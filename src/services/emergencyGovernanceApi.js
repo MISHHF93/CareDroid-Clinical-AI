@@ -2,8 +2,10 @@ import { apiFetchJson, getApiErrorMessage } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { AIConfigRegistry, AISafetyRules } from '../config/ai.config';
 
+const EMERGENCY_GOVERNANCE_API_ROOT = '/api/emergency/governance';
+
 async function guardedJson(path, options = {}) {
-  if (!isBackendCapabilityEnabled('aiGovernance')) {
+  if (!isBackendCapabilityEnabled('emergencyGovernance')) {
     return { ok: false, data: null, message: 'Backend AI governance endpoint is not available yet.' };
   }
 
@@ -32,25 +34,25 @@ export const LOCAL_AI_GOVERNANCE_REGISTRY = Object.freeze({
 });
 
 export function fetchAIGovernanceRegistry() {
-  return guardedJson('/api/v1/governance/registry');
+  return guardedJson(`${EMERGENCY_GOVERNANCE_API_ROOT}/registry`);
 }
 
 export function fetchAIGovernanceSafetyRules() {
-  return guardedJson('/api/v1/governance/safety-rules');
+  return guardedJson(`${EMERGENCY_GOVERNANCE_API_ROOT}/safety-rules`);
 }
 
 export function fetchEmergencyGovernanceCompliance(days = 30) {
   const params = new URLSearchParams({ days: String(days) });
-  return guardedJson(`/api/v1/governance/compliance?${params.toString()}`);
+  return guardedJson(`${EMERGENCY_GOVERNANCE_API_ROOT}/compliance?${params.toString()}`);
 }
 
 export function fetchEmergencyGovernanceViolations(limit = 50) {
   const params = new URLSearchParams({ limit: String(limit) });
-  return guardedJson(`/api/v1/governance/violations?${params.toString()}`);
+  return guardedJson(`${EMERGENCY_GOVERNANCE_API_ROOT}/violations?${params.toString()}`);
 }
 
 export function validateEmergencyGovernancePrompts() {
-  return guardedJson('/api/v1/governance/validate-prompts');
+  return guardedJson(`${EMERGENCY_GOVERNANCE_API_ROOT}/validate-prompts`);
 }
 
 export default Object.freeze({

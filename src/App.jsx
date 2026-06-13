@@ -1,5 +1,5 @@
-import { useMemo, useRef } from 'react';
-import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo } from 'react';
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -16,22 +16,26 @@ import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { NotificationToastContainer } from './components/notifications/NotificationToast';
 import { AppShell } from './components/AppShell';
-import EmergencyWhiteboard from './pages/emergency';
+import EmergencyWhiteboard from './components/EmergencyWhiteboard';
+import SmartIntake from './pages/emergency/SmartIntake';
+import EmergencyAnalytics from './pages/emergency/EmergencyAnalytics';
+import EmergencySettings from './pages/emergency/EmergencySettings';
+import ClinicalCalculatorHub from './pages/emergency/ClinicalCalculatorHub';
 import AIGovernanceDashboard from './pages/AIGovernanceDashboard';
-import QuickIntake from './components/QuickIntake';
+import EMSPipeline from './components/EMSPipeline';
 import PatientCard from './components/PatientCard';
+import ReferralPanel from './components/ReferralPanel';
 import { useEmergencyStore } from './store/emergencyStore';
 import { PatientFlag, PatientState } from './types/emergency';
 import { CANONICAL_ROUTES, LEGACY_EMERGENCY_ROUTE_REDIRECTS } from './config/routes.config';
+import { EMERGENCY_ACTIONS } from './config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import {
   useBoardingStatus,
   useCapacityStatus,
   useEDCopilot,
-  useEMSIntake,
-  useEmergencyAnalytics,
   useEmergencyPatients,
   useEmergencyQueues,
-  useEmergencySettings,
   useFederatedLearning,
   useHybridDigitalTwin,
   useIntegrationHub,
@@ -39,8 +43,6 @@ import {
   useProvincialHealth,
   useRealTimeSimulation,
   useReassessmentQueue,
-  useReferrals,
-  useSmartIntake,
 } from './hooks/useEmergencyOs';
 
 function EmergencyRoutePage({ eyebrow, title, description, children }) {
@@ -58,6 +60,64 @@ function EmergencyRoutePage({ eyebrow, title, description, children }) {
       {children}
     </section>
   );
+}
+
+function EmergencyAccessDenied({ requestedPath }) {
+  const emergencyRole = useEmergencyRolePermissions();
+  const fallbackPath = emergencyRole.nearestRoute(requestedPath);
+
+  return (
+    <section style={{ minHeight: '100%', display: 'grid', placeItems: 'center', padding: 24, background: '#0A0E1A' }}>
+      <div
+        role="alert"
+        style={{
+          maxWidth: 560,
+          border: '1px solid #7F1D1D',
+          borderRadius: 16,
+          background: '#111827',
+          color: '#F9FAFB',
+          padding: 24,
+          boxShadow: '0 24px 70px rgba(0,0,0,0.32)',
+        }}
+      >
+        <span style={{ color: '#FCA5A5', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Access denied
+        </span>
+        <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>Emergency OS page unavailable</h1>
+        <p style={{ color: '#9CA3AF', lineHeight: 1.5 }}>
+          {emergencyRole.roleLabel} does not have access to this Emergency OS page.
+        </p>
+        <Link
+          to={fallbackPath}
+          style={{
+            display: 'inline-flex',
+            marginTop: 10,
+            borderRadius: 10,
+            background: '#2563EB',
+            color: '#F9FAFB',
+            padding: '10px 13px',
+            textDecoration: 'none',
+            fontWeight: 700,
+          }}
+        >
+          Go to permitted Emergency OS page
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyRouteGuard({ path, children }) {
+  const emergencyRole = useEmergencyRolePermissions();
+  if (!emergencyRole.canAccessRoute(path)) {
+    return <EmergencyAccessDenied requestedPath={path} />;
+  }
+  return children;
+}
+
+function EmergencyDefaultRedirect() {
+  const emergencyRole = useEmergencyRolePermissions();
+  return <Navigate to={emergencyRole.defaultRoute || emergencyRole.allowedRoutes[0] || CANONICAL_ROUTES.emergencyWhiteboard} replace />;
 }
 
 function MetricGrid({ metrics }) {
@@ -179,42 +239,6 @@ function isHighRisk(patient) {
 
 function isBoarding(patient) {
   return patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission);
-}
-
-function SmartIntakeRoute() {
-  const navigate = useNavigate();
-  const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const addedPatientRef = useRef(false);
-  const smartIntake = useSmartIntake();
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Arrival"
-      title="Smart Intake"
-      description="Backend-backed quick intake, identity review, duplicate check, and provincial-unavailable fallback workflow."
-    >
-      <ApiStateBanner moduleState={smartIntake} />
-      <MetricGrid
-        metrics={[
-          { label: 'Identity review steps', value: smartIntake.data?.data?.identityReview?.length ?? 0, color: '#60A5FA' },
-          { label: 'Recent intakes', value: smartIntake.data?.data?.recentPatients?.length ?? 0 },
-          { label: 'Mode', value: smartIntake.data?.data?.mode || 'quick-intake', color: '#10B981' },
-        ]}
-      />
-      <QuickIntake
-        onClose={() => {
-          if (!addedPatientRef.current) navigate(CANONICAL_ROUTES.emergencyWhiteboard);
-        }}
-        onAdded={(patient) => {
-          addedPatientRef.current = true;
-          selectPatient(patient.id);
-          smartIntake.refresh();
-          navigate(CANONICAL_ROUTES.emergencyPatients);
-        }}
-      />
-      <DataSourceNote moduleState={smartIntake} />
-    </EmergencyRoutePage>
-  );
 }
 
 function PatientsRoute() {
@@ -364,36 +388,6 @@ function QueueRoute() {
   );
 }
 
-function EMSRoute() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const rooms = useEmergencyStore((state) => state.rooms);
-  const ems = useEMSIntake();
-  const emsArrivals = ems.data?.data?.arrivals || [];
-  const emsPatients = emsArrivals.length
-    ? emsArrivals.map((arrival) => arrival.patient).filter(Boolean)
-    : patients.filter((patient) => patient.flags.includes(PatientFlag.EMSArrival) || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint));
-  const availableResusRooms = rooms.filter((room) => room.type === 'Resus' && room.status === 'Available').length;
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="EMS"
-      title="EMS Pipeline"
-      description="Inbound and recently converted EMS arrivals using the active Emergency OS patient model."
-    >
-      <ApiStateBanner moduleState={ems} />
-      <MetricGrid
-        metrics={[
-          { label: 'EMS-linked patients', value: emsPatients.length, color: '#60A5FA' },
-          { label: 'Available resus rooms', value: ems.data?.data?.availableResusRooms ?? availableResusRooms, color: availableResusRooms ? '#10B981' : '#EF4444' },
-          { label: 'High-risk inbound', value: emsPatients.filter(isHighRisk).length, color: '#EF4444' },
-        ]}
-      />
-      <PatientGrid patients={emsPatients} emptyMessage="No EMS arrivals are active in the current Emergency OS store." />
-      <DataSourceNote moduleState={ems} />
-    </EmergencyRoutePage>
-  );
-}
-
 function ReassessmentRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const reassessment = useReassessmentQueue();
@@ -440,42 +434,6 @@ function BoardingRoute() {
       />
       <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
       <DataSourceNote moduleState={boarding} />
-    </EmergencyRoutePage>
-  );
-}
-
-function ReferralsRoute() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const referrals = useReferrals();
-  const referralRows = referrals.data?.data?.referrals || [];
-  const referralCandidates = referralRows.length
-    ? referralRows.map((referral) => referral.patient).filter(Boolean)
-    : patients.filter((patient) => patient.state === PatientState.Disposition || isBoarding(patient) || isHighRisk(patient));
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Transfers"
-      title="Referrals"
-      description="Referral and transfer candidates from the active Emergency OS patient list."
-    >
-      <ApiStateBanner moduleState={referrals} />
-      {referralRows.length ? (
-        <div style={{ display: 'grid', gap: 10 }}>
-          {referralRows.map((referral) => (
-            <article key={referral.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-              <div>
-                <strong style={{ color: '#F9FAFB' }}>{referral.specialty}</strong>
-                <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                  {referral.patient.firstName} {referral.patient.lastName} | {referral.patient.chiefComplaint}
-                </p>
-              </div>
-              <span style={{ color: '#60A5FA', fontSize: 12 }}>{referral.status}</span>
-            </article>
-          ))}
-        </div>
-      ) : null}
-      <PatientGrid patients={referralCandidates} emptyMessage="No referral or transfer candidates are currently flagged." />
-      <DataSourceNote moduleState={referrals} />
     </EmergencyRoutePage>
   );
 }
@@ -527,6 +485,22 @@ function CapacityRoute() {
 function ProvincialHealthRoute() {
   const provincialHealth = useProvincialHealth();
   const records = provincialHealth.data?.data?.records || [];
+  const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
+
+  useEffect(() => {
+    if (!provincialHealth.data || provincialHealth.loading || provincialHealth.error) return;
+    recordWorkflowAction({
+      type: 'provincial_data_viewed',
+      title: 'Provincial data viewed',
+      summary: `Viewed ${records.length} provincial health placeholder record${records.length === 1 ? '' : 's'}.`,
+      source: 'provincial-health-route',
+      metadata: {
+        recordCount: records.length,
+        connectorStatus: provincialHealth.data?.data?.connectorStatus || 'unavailable',
+        jurisdiction: provincialHealth.data?.data?.jurisdiction || null,
+      },
+    });
+  }, [provincialHealth.data, provincialHealth.error, provincialHealth.loading, recordWorkflowAction, records.length]);
 
   return (
     <EmergencyRoutePage
@@ -564,6 +538,37 @@ function IntegrationsRoute() {
   const integrations = useIntegrationHub();
   const sources = integrations.data?.data?.sources || [];
   const reviewQueue = integrations.data?.data?.reviewQueue || [];
+  const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
+  const latestSource = sources.find((source) => source.lastEventAt) || sources[0];
+  const sourceCount = sources.length;
+  const latestSourceId = latestSource?.id || null;
+  const latestEventAt = latestSource?.lastEventAt || null;
+
+  useEffect(() => {
+    if (!integrations.data || integrations.loading || integrations.error) return;
+    recordWorkflowAction({
+      type: 'integration_event_received',
+      title: 'Integration event received',
+      summary: `Integration Hub received ${sourceCount} source status record${sourceCount === 1 ? '' : 's'}.`,
+      source: 'integration-hub-route',
+      severity: reviewQueue.length ? 'Warning' : 'Info',
+      metadata: {
+        sourceCount,
+        reviewQueueCount: reviewQueue.length,
+        latestSourceId,
+        latestEventAt,
+      },
+    });
+  }, [
+    integrations.data,
+    integrations.error,
+    integrations.loading,
+    latestEventAt,
+    latestSourceId,
+    recordWorkflowAction,
+    reviewQueue.length,
+    sourceCount,
+  ]);
 
   return (
     <EmergencyRoutePage
@@ -597,37 +602,8 @@ function IntegrationsRoute() {
   );
 }
 
-function AnalyticsRoute() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const capacity = useEmergencyStore((state) => state.capacity);
-  const analytics = useEmergencyAnalytics();
-  const apiMetrics = analytics.data?.data;
-  const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
-  const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Analytics"
-      title="Emergency Analytics"
-      description="Operational snapshot from the normalized Emergency OS analytics endpoint."
-    >
-      <ApiStateBanner moduleState={analytics} />
-      <MetricGrid
-        metrics={[
-          { label: 'Active census', value: apiMetrics?.activeCensus ?? activePatients.length },
-          { label: 'Waiting', value: apiMetrics?.waiting ?? waitingPatients.length, color: '#F59E0B' },
-          { label: 'High risk', value: apiMetrics?.highRisk ?? activePatients.filter(isHighRisk).length, color: '#EF4444' },
-          { label: 'Boarding', value: apiMetrics?.boarding ?? activePatients.filter(isBoarding).length, color: '#F97316' },
-          { label: 'Reassessment due', value: apiMetrics?.reassessmentDue ?? capacity.reassessmentDue, color: '#EF4444' },
-          { label: 'Avg wait', value: `${apiMetrics?.averageWaitMinutes ?? 0}m`, color: '#60A5FA' },
-        ]}
-      />
-      <DataSourceNote moduleState={analytics} />
-    </EmergencyRoutePage>
-  );
-}
-
 function RealTimeSimulationRoute() {
+  const emergencyRole = useEmergencyRolePermissions();
   const simulation = useRealTimeSimulation();
   const payload = simulation.data?.data || {};
   const status = payload.currentStatus || {};
@@ -635,6 +611,7 @@ function RealTimeSimulationRoute() {
   const forecast = payload.fourHourForecast || [];
   const lastEvaluation = simulation.lastActionResult?.data?.evaluation;
   const lastComparison = simulation.lastActionResult?.data?.rankedInterventions;
+  const canRunSimulation = emergencyRole.can(EMERGENCY_ACTIONS.runSimulation);
 
   return (
     <EmergencyRoutePage
@@ -646,7 +623,7 @@ function RealTimeSimulationRoute() {
       <ActionStatus moduleState={simulation} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         <ActionButton
-          disabled={simulation.actionLoading}
+          disabled={simulation.actionLoading || !canRunSimulation}
           onClick={() =>
             simulation.updateLiveState({
               census: 58,
@@ -663,12 +640,12 @@ function RealTimeSimulationRoute() {
           Fuse Surge State
         </ActionButton>
         <ActionButton
-          disabled={simulation.actionLoading}
+          disabled={simulation.actionLoading || !canRunSimulation}
           onClick={() => simulation.evaluateIntervention({ type: 'open_fast_track', intensity: 1 })}
         >
           Evaluate Fast Track
         </ActionButton>
-        <ActionButton disabled={simulation.actionLoading} onClick={() => simulation.compareInterventions({})}>
+        <ActionButton disabled={simulation.actionLoading || !canRunSimulation} onClick={() => simulation.compareInterventions({})}>
           Rank Interventions
         </ActionButton>
       </div>
@@ -731,11 +708,13 @@ function RealTimeSimulationRoute() {
 }
 
 function FederatedLearningRoute() {
+  const emergencyRole = useEmergencyRolePermissions();
   const federated = useFederatedLearning();
   const payload = federated.data?.data || {};
   const performance = payload.modelPerformance || {};
   const hospitals = payload.hospitals || [];
   const contributions = payload.hospitalContributions || [];
+  const canManageFederated = emergencyRole.can(EMERGENCY_ACTIONS.manageFederatedLearning);
 
   return (
     <EmergencyRoutePage
@@ -747,13 +726,13 @@ function FederatedLearningRoute() {
       <ActionStatus moduleState={federated} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         <ActionButton
-          disabled={federated.actionLoading}
+          disabled={federated.actionLoading || !canManageFederated}
           onClick={() => federated.registerHospital({ hospitalId: 'demo-ed-north', name: 'Demo ED North', region: 'Ontario', sampleCapacity: 1200 })}
         >
           Register Hospital
         </ActionButton>
         <ActionButton
-          disabled={federated.actionLoading}
+          disabled={federated.actionLoading || !canManageFederated}
           onClick={() =>
             federated.submitModelUpdate({
               hospitalId: 'demo-ed-north',
@@ -766,7 +745,7 @@ function FederatedLearningRoute() {
         >
           Submit Local Update
         </ActionButton>
-        <ActionButton disabled={federated.actionLoading} onClick={() => federated.aggregateRound()}>
+        <ActionButton disabled={federated.actionLoading || !canManageFederated} onClick={() => federated.aggregateRound()}>
           Aggregate FedAvg
         </ActionButton>
       </div>
@@ -816,11 +795,13 @@ function FederatedLearningRoute() {
 }
 
 function HybridDigitalTwinRoute() {
+  const emergencyRole = useEmergencyRolePermissions();
   const twin = useHybridDigitalTwin();
   const payload = twin.data?.data || {};
   const twinState = payload.twin || {};
   const metrics = twin.lastActionResult?.data?.metrics || twin.lastActionResult?.data?.scenario?.metrics || payload.currentMetrics || {};
   const eventTrace = twin.lastActionResult?.data?.eventTrace || twin.lastActionResult?.data?.scenario?.eventTrace || twinState.lastEventTrace || [];
+  const canRunTwin = emergencyRole.can(EMERGENCY_ACTIONS.runDigitalTwin);
 
   return (
     <EmergencyRoutePage
@@ -832,16 +813,16 @@ function HybridDigitalTwinRoute() {
       <ActionStatus moduleState={twin} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         <ActionButton
-          disabled={twin.actionLoading}
+          disabled={twin.actionLoading || !canRunTwin}
           onClick={() => twin.initializeTwin({ twinId: 'ed-hybrid-des-abm-ui', census: 52, waitingPatients: 16, boardingCount: 7 })}
         >
           Initialize Twin
         </ActionButton>
-        <ActionButton disabled={twin.actionLoading} onClick={() => twin.simulateTwin({ horizonMinutes: 240, includeTrace: true })}>
+        <ActionButton disabled={twin.actionLoading || !canRunTwin} onClick={() => twin.simulateTwin({ horizonMinutes: 240, includeTrace: true })}>
           Run DES-ABM
         </ActionButton>
         <ActionButton
-          disabled={twin.actionLoading}
+          disabled={twin.actionLoading || !canRunTwin}
           onClick={() =>
             twin.evaluateScenario({
               interventions: [{ type: 'increase_staff', intensity: 1 }, { type: 'split_flow_triage', intensity: 1 }],
@@ -930,39 +911,6 @@ function CopilotRoute() {
   );
 }
 
-function EmergencySettingsRoute() {
-  const settings = useEmergencySettings();
-  const enabledModules = settings.data?.data?.enabledModules || ['Thresholds', 'Staffing Defaults', 'Module Toggles', 'Integrations', 'AI Governance'];
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Configuration"
-      title="Emergency OS Settings"
-      description="Operational configuration entry point for thresholds, staffing defaults, modules, integrations, and AI governance."
-    >
-      <ApiStateBanner moduleState={settings} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-        {enabledModules.map((item) => (
-          <article key={item} style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-            <strong style={{ color: '#F9FAFB' }}>{item}</strong>
-            <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
-              Managed from `/api/emergency/settings`.
-            </p>
-          </article>
-        ))}
-      </div>
-      <MetricGrid
-        metrics={[
-          { label: 'Reassessment threshold', value: `${settings.data?.data?.thresholds?.reassessmentMinutes ?? 30}m`, color: '#60A5FA' },
-          { label: 'Long wait threshold', value: `${settings.data?.data?.thresholds?.longWaitMinutes ?? 60}m`, color: '#F59E0B' },
-          { label: 'Capacity red score', value: settings.data?.data?.thresholds?.capacityRedScore ?? 85, color: '#EF4444' },
-        ]}
-      />
-      <DataSourceNote moduleState={settings} />
-    </EmergencyRoutePage>
-  );
-}
-
 function RootLayout() {
   return (
     <AppShell>
@@ -974,29 +922,30 @@ function RootLayout() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route path="/" element={<EmergencyDefaultRedirect />} />
       <Route element={<RootLayout />}>
-        <Route path="/emergency" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path={CANONICAL_ROUTES.emergencyWhiteboard} element={<EmergencyWhiteboard />} />
-        <Route path={CANONICAL_ROUTES.emergencyPatients} element={<PatientsRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyJourney} element={<JourneyRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyEms} element={<EMSRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyIntake} element={<SmartIntakeRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyQueues} element={<QueueRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyReassessment} element={<ReassessmentRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyCapacity} element={<CapacityRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyBoarding} element={<BoardingRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyReferrals} element={<ReferralsRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyProvincialHealth} element={<ProvincialHealthRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyIntegrations} element={<IntegrationsRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<CopilotRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyAnalytics} element={<AnalyticsRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencySimulation} element={<RealTimeSimulationRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyFederatedLearning} element={<FederatedLearningRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyDigitalTwin} element={<HybridDigitalTwinRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<AIGovernanceDashboard />} />
-        <Route path={CANONICAL_ROUTES.aiGovernance} element={<AIGovernanceDashboard />} />
-        <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencySettingsRoute />} />
+        <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
+        <Route path={CANONICAL_ROUTES.emergencyWhiteboard} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}><EmergencyWhiteboard /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyPatients} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}><PatientsRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyJourney} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyJourney}><JourneyRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyEms} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}><EMSPipeline /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyIntake} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}><SmartIntake /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyQueues} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}><QueueRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyReassessment} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}><ReassessmentRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyCapacity} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}><CapacityRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyBoarding} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}><BoardingRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyReferrals} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReferrals}><ReferralPanel /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyProvincialHealth} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyProvincialHealth}><ProvincialHealthRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyIntegrations} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntegrations}><IntegrationsRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}><CopilotRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyAnalytics} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}><EmergencyAnalytics /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencySimulation} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySimulation}><RealTimeSimulationRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyFederatedLearning} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyFederatedLearning}><FederatedLearningRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyDigitalTwin} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDigitalTwin}><HybridDigitalTwinRoute /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyTools} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><ClinicalCalculatorHub /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAiGovernance}><AIGovernanceDashboard /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.aiGovernance} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.aiGovernance}><AIGovernanceDashboard /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}><EmergencySettings /></EmergencyRouteGuard>} />
       </Route>
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
         <Route key={`${path}-${to}`} path={path} element={<Navigate to={to} replace />} />
@@ -1007,7 +956,7 @@ export function AppRoutes() {
       <Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyTools} replace />} />
       <Route path="/assistant" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/chat" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/ai" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />

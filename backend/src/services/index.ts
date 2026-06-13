@@ -1,28 +1,68 @@
-export { aiGovernanceService, AIGovernanceService } from './ai-governance.service';
 export {
   aiCallInterrogationService,
-  AICallInterrogationService,
-} from './ai-call-interrogation.service';
-export { boardingService, BoardingService } from './boarding.service';
-export { capacityService, CapacityService } from './capacity.service';
-export { copilotService, CopilotService } from './copilot.service';
-export {
+  aiGovernanceService,
+  boardingService,
+  capacityService,
+  checkServiceHealth,
+  clinicalProtocolService,
+  consentService,
+  copilotService,
+  deteriorationPredictionV3Service,
   dischargePredictionService,
-  DischargePredictionService,
-} from './discharge-prediction.service';
+  emergencyOsServiceRegistry,
+  emsService,
+  erPulseHandoverService,
+  federatedEMSService,
+  hybridDigitalTwinService,
+  incidentReportingService,
+  initializeAllServices,
+  iotDigitalTwinService,
+  lmecsService,
+  mohFhirService,
+  mpiService,
+  ocrService,
+  organizationalDigitalTwinService,
+  patientJourneyService,
+  queueIntelligenceService,
+  reassessmentService,
+  realTimeSimulationService,
+  REQUIRED_SERVICE_NAMES,
+  smartIntakeService,
+  surgeCapacityService,
+  wearableRPMService,
+  type EmergencyOsServiceName,
+  type InitializeAllServicesSummary,
+  type ServiceHealthStatus,
+  type ServiceHealthSummary,
+  type ServiceInitializationResult,
+} from './service-registry';
+
+export { AICallInterrogationService } from './ai-call-interrogation.service';
+export { AIGovernanceService } from './ai-governance.service';
+export { BoardingService } from './boarding.service';
+export { CapacityService } from './capacity.service';
+export { ClinicalProtocolService } from './clinical-protocol.service';
+export { ConsentService } from './consent.service';
+export { CopilotService } from './copilot.service';
+export { DeteriorationPredictionV3Service } from './deterioration-prediction-v3.service';
+export { DischargePredictionService } from './discharge-prediction.service';
 export { edgeAIAmbulanceService, EdgeAIAmbulanceService } from './edge-ai-ambulance.service';
-export { emsService, EMSService } from './ems.service';
-export { federatedEMSService, FederatedEMSService } from './federated-ems.service';
+export { EMSService } from './ems.service';
+export { FederatedEMSService } from './federated-ems.service';
 export { fhirService, FHIRService } from './fhir.service';
-export { lmecsService, LMECSService } from './lmecs.service';
-export { mpiService, MPIService } from './mpi.service';
-export { ocrService, OCRService } from './ocr.service';
+export { IncidentReportingService } from './incident-reporting.service';
+export { IoTDigitalTwinService } from './iot-digital-twin.service';
+export { LMECSService } from './lmecs.service';
+export { MOHFHIRService } from './moh-fhir.service';
+export { MPIService } from './mpi.service';
+export { OCRService } from './ocr.service';
 export {
   organizationalDigitalTwin,
   OrganizationalDigitalTwin,
 } from './organizational-digital-twin.service';
-export { reassessmentService, ReassessmentService } from './reassessment.service';
-export { erPulseHandoverService, ERPulseHandoverService } from './smart-handover-v2.service';
-export { smartIntakeService, SmartIntakeService } from './smart-intake.service';
-export { surgeCapacityService, SurgeCapacityService } from './surge-capacity.service';
+export { ReassessmentService } from './reassessment.service';
+export { ERPulseHandoverService } from './smart-handover-v2.service';
+export { SmartIntakeService } from './smart-intake.service';
+export { SurgeCapacityService } from './surge-capacity.service';
 export { textMiningService, TextMiningService } from './text-mining.service';
+export { WearableRPMService } from './wearable-rpm.service';

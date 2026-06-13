@@ -1,4 +1,7 @@
-import { Patient, type IPatientIdentifier } from '../models/Patient';
+import {
+  UnifiedPatient as Patient,
+  type IPatientIdentifier,
+} from '../models/unified-patient.model';
 import { fhirService } from './fhir.service';
 import { mpiService } from './mpi.service';
 import { ocrService } from './ocr.service';

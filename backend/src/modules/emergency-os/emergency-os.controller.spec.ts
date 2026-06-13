@@ -21,6 +21,7 @@ import {
   ReassessmentService,
   ReferralService,
   SmartIntakeService,
+  WorkflowActionLogService,
 } from './emergency-os.services';
 
 describe('EmergencyOsController', () => {
@@ -31,6 +32,7 @@ describe('EmergencyOsController', () => {
       controllers: [EmergencyOsController],
       providers: [
         EmergencyWhiteboardService,
+        WorkflowActionLogService,
         EmergencyPatientService,
         PatientJourneyService,
         EMSIntakeService,
@@ -99,6 +101,143 @@ describe('EmergencyOsController', () => {
       controller.getPatients().data.patients.some((patient) => patient.mrn === 'ED-TEST-1'),
     ).toBe(true);
     expect(controller.getAnalytics().data.activeCensus).toBeGreaterThan(0);
+  });
+
+  it('exposes normalized workflow action logs for admin and patient timeline views', () => {
+    const created = controller.createIntakePatient({
+      id: 'workflow-log-patient-1',
+      mrn: 'ED-WF-1',
+      firstName: 'Workflow',
+      lastName: 'Patient',
+      chiefComplaint: 'Workflow logging validation',
+      complaintCategory: 'Other',
+    });
+    controller.getProvincialHealth();
+    controller.getIntegrations();
+    controller.getCopilot();
+
+    const logs = controller.getWorkflowLogs().data.logs;
+    expect(logs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'patient_created',
+          patientId: created.data.patient.id,
+          title: 'Patient created',
+          timestamp: expect.any(String),
+          source: expect.any(String),
+          severity: expect.any(String),
+          status: expect.any(String),
+          metadata: expect.any(Object),
+        }),
+        expect.objectContaining({ type: 'provincial_data_viewed' }),
+        expect.objectContaining({ type: 'integration_event_received' }),
+        expect.objectContaining({ type: 'copilot_used' }),
+      ]),
+    );
+    expect(controller.getPatientWorkflowLogs(created.data.patient.id).data.logs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'patient_created',
+          patientId: created.data.patient.id,
+        }),
+      ]),
+    );
+  });
+
+  it('returns and updates the cohesive Emergency OS settings contract', () => {
+    const settings = controller.getSettings();
+
+    expect(settings.data).toMatchObject({
+      tenantName: expect.any(String),
+      defaultWorkspace: expect.any(String),
+      enabledModules: expect.arrayContaining([
+        expect.objectContaining({ id: 'reassessment', enabled: true }),
+      ]),
+      aiSettings: expect.any(Object),
+      integrationSettings: expect.any(Object),
+      provincialHealthSettings: expect.any(Object),
+      notificationSettings: expect.any(Object),
+      reassessmentThresholds: expect.any(Object),
+      capacityThresholds: expect.any(Object),
+      emsThresholds: expect.any(Object),
+      boardingThresholds: expect.any(Object),
+    });
+
+    const updated = controller.updateSettings({
+      tenantName: 'North Command ED',
+      capacityThresholds: { departmentCapacityTarget: 42, warningPercent: 76 },
+      reassessmentThresholds: { P2: 25 },
+      emsThresholds: { offloadTargetMinutes: 12 },
+    });
+
+    expect(updated.data).toMatchObject({
+      tenantName: 'North Command ED',
+      departmentCapacityTarget: 42,
+      capacityThresholds: expect.objectContaining({
+        departmentCapacityTarget: 42,
+        warningPercent: 76,
+      }),
+      thresholds: expect.objectContaining({
+        capacityWarningPercent: 76,
+        emsOffloadTargetMinutes: 12,
+        reassessmentIntervals: expect.objectContaining({ P2: 25 }),
+      }),
+    });
+    expect(controller.getSettings().data.tenantName).toBe('North Command ED');
+  });
+
+  it('runs the Smart Intake vertical slice through whiteboard, queues, reassessment, and capacity', () => {
+    const result = controller.createSmartIntakeVerticalSlice({
+      id: 'slice-patient-001',
+      mrn: 'ED-SLICE-001',
+      firstName: 'Slice',
+      lastName: 'Patient',
+      chiefComplaint: 'Chest pressure with abnormal heart rate',
+      complaintCategory: 'Cardiac',
+      priority: 'P2',
+      vitals: [
+        {
+          hr: 128,
+          sbp: 148,
+          dbp: 92,
+          spo2: 96,
+          temp: 36.8,
+          rr: 18,
+          gcs: 15,
+          pain: 7,
+          recordedAt: new Date().toISOString(),
+          recordedBy: 'test',
+        },
+      ],
+    });
+
+    expect(result.data.patient).toMatchObject({
+      id: 'slice-patient-001',
+      state: 'Triage',
+      flags: expect.arrayContaining(['HighRisk', 'ReassessmentDue']),
+    });
+    expect(result.data.encounter).toMatchObject({
+      patientId: 'slice-patient-001',
+      source: 'smart-intake',
+      status: 'active',
+    });
+    expect(result.data.validation).toMatchObject({
+      patientCreated: true,
+      encounterCreated: true,
+      movedToArrival: true,
+      movedToTriage: true,
+      visibleOnWhiteboard: true,
+      visibleInQueueMetrics: true,
+      reassessmentTriggered: true,
+      visibleInReassessment: true,
+      capacityUpdated: true,
+    });
+    expect(
+      result.data.queueMetrics.queues
+        .find((queue) => queue.label === 'Triage')
+        ?.patients.some((patient) => patient.id === 'slice-patient-001'),
+    ).toBe(true);
+    expect(result.data.capacity.capacity.reassessmentDue).toBeGreaterThan(0);
   });
 
   it('evaluates deterministic real-time simulation interventions', () => {

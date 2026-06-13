@@ -5,6 +5,7 @@ import {
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
 } from '../config/routes.config';
+import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
 
 const appSource = readFileSync(join(__dirname, '..', 'App.jsx'), 'utf8');
 const redirectsByPath = Object.fromEntries(
@@ -23,20 +24,9 @@ describe('canonical route/auth architecture', () => {
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
     expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
-    expect(CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)).toEqual([
-      '/emergency/whiteboard',
-      '/emergency/patients',
-      '/emergency/ems',
-      '/emergency/intake',
-      '/emergency/queues',
-      '/emergency/reassessment',
-      '/emergency/capacity',
-      '/emergency/boarding',
-      '/emergency/referrals',
-      '/emergency/copilot',
-      '/emergency/analytics',
-      '/emergency/settings',
-    ]);
+    expect(CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)).toEqual(
+      EMERGENCY_PAGE_ALL_RENDER_PATHS
+    );
   });
 
   it('uses redirects for retired assistant and login aliases', () => {

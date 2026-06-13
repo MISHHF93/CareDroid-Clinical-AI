@@ -30,5 +30,7 @@ dist-ssr
 /playwright-report/
 /qa/playwright-responsive-report.json
 /qa/responsive-qa-summary.json
+/qa/page-screenshots/
+/qa/screenshot-backend.sqlite*
 /e2e/.auth/qa-user.json
 .vercel

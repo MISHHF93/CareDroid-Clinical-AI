@@ -3,23 +3,10 @@ import {
   buildSearchFirstDiscoveryEntries,
   buildSearchFirstResults,
 } from './searchFirstDiscovery';
+import { EMERGENCY_PAGE_PRIMARY_PATHS } from './emergencyPageRenderInventory';
 
 describe('search-first discovery index', () => {
   it('indexes every primary Emergency OS route as a searchable destination', () => {
-    const primaryEmergencyOsPaths = [
-      '/emergency/whiteboard',
-      '/emergency/patients',
-      '/emergency/ems',
-      '/emergency/intake',
-      '/emergency/queues',
-      '/emergency/reassessment',
-      '/emergency/capacity',
-      '/emergency/boarding',
-      '/emergency/referrals',
-      '/emergency/copilot',
-      '/emergency/analytics',
-      '/emergency/settings',
-    ];
     const entries = buildSearchFirstDiscoveryEntries();
     const emergencyOsPaths = new Set(
       entries
@@ -27,7 +14,7 @@ describe('search-first discovery index', () => {
         .map((entry) => entry.path)
     );
 
-    expect([...emergencyOsPaths].sort()).toEqual([...primaryEmergencyOsPaths].sort());
+    expect([...emergencyOsPaths].sort()).toEqual([...EMERGENCY_PAGE_PRIMARY_PATHS].sort());
     expect(buildSearchFirstResults({ query: 'boarding boarders' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'emergency-boarding', path: '/emergency/boarding' }),
@@ -40,7 +27,7 @@ describe('search-first discovery index', () => {
     const paths = new Set(entries.map((entry) => entry.path));
     const kinds = new Set(entries.map((entry) => entry.kind));
 
-    expect([...paths].every((path) => path.startsWith('/emergency/'))).toBe(true);
+    expect([...paths].sort()).toEqual([...EMERGENCY_PAGE_PRIMARY_PATHS].sort());
     expect([...kinds]).toEqual(['destination']);
   });
 

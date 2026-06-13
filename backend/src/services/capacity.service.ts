@@ -1,4 +1,4 @@
-import { Patient } from '../models/Patient';
+import { UnifiedPatient as Patient } from '../models/unified-patient.model';
 
 interface CapacityMetrics {
   active_patients: number;

@@ -13,9 +13,12 @@ const reassessmentErrorStatus = (error: any) => {
 router.get('/due', async (_req, res) => {
   try {
     const patients = await reassessmentService.getPatientsNeedingReassessment();
-    res.json({ count: patients.length, patients });
-  } catch (_error) {
-    res.status(500).json({ error: 'Failed to fetch reassessment due patients' });
+    return res.json({ count: patients.length, patients });
+  } catch (error: any) {
+    console.error('[EmergencyOS][ReassessmentDue] Failed to fetch reassessment patients', error);
+    return res.status(500).json({
+      error: error.message || 'Failed to fetch reassessment due patients',
+    });
   }
 });
 
@@ -53,8 +56,8 @@ router.post('/:patientId/dismiss', async (req, res) => {
       return res.status(400).json({ error: 'reason and clinician are required' });
     }
 
-    await reassessmentService.dismissReassessment(patientId, reason, clinician);
-    return res.json({ message: 'Reassessment dismissed' });
+    const patient = await reassessmentService.dismissReassessment(patientId, reason, clinician);
+    return res.json({ message: 'Reassessment dismissed', patient });
   } catch (error: any) {
     return res
       .status(reassessmentErrorStatus(error))

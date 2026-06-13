@@ -52,6 +52,26 @@ vi.mock('../services/emergencyTransportApi', () => ({
 }));
 
 vi.mock('../services/emergencySettingsApi', () => ({
+  fetchEmergencyOsSettings: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      data: {
+        tenantName: 'CareDroid ED',
+        defaultWorkspace: 'emergency-whiteboard',
+        enabledModules: [{ id: 'whiteboard', label: 'Emergency Whiteboard', enabled: true }],
+      },
+    },
+  }),
+  saveEmergencyOsSettings: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      data: {
+        tenantName: 'CareDroid ED',
+        defaultWorkspace: 'emergency-whiteboard',
+        enabledModules: [{ id: 'whiteboard', label: 'Emergency Whiteboard', enabled: true }],
+      },
+    },
+  }),
   fetchSettingsFeatureFlags: vi.fn().mockResolvedValue({ ok: false, message: 'Local test flags.' }),
   subscribeToSettingsFeatureChanges: vi.fn(() => () => {}),
   updateSettingsFeatureFlag: vi.fn().mockResolvedValue({ ok: true }),
@@ -132,22 +152,22 @@ describe('canonical route tree behavior', () => {
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
     renderRoute('/emergency/patients');
 
-    expect(await screen.findByText('Total')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /\+ New Patient/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Emergency Patients' })).toBeInTheDocument();
+    expect(screen.getByText('Total patients')).toBeInTheDocument();
   });
 
   it('/emergency/ems renders the active EMS summary route', async () => {
     renderRoute('/emergency/ems');
 
     expect(await screen.findByRole('heading', { name: 'EMS Pipeline' })).toBeInTheDocument();
-    expect(screen.getByText('EMS-linked patients')).toBeInTheDocument();
-    expect(screen.getByText('Available resus rooms')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Backend EMS Unit Visibility' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Incoming' })).toBeInTheDocument();
   });
 
   it('/emergency/intake renders Smart Intake inside the route tree', async () => {
     renderRoute('/emergency/intake');
 
-    expect(await screen.findByRole('heading', { name: 'Quick Intake' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Smart Intake/i })).toBeInTheDocument();
   });
 
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
@@ -202,7 +222,8 @@ describe('canonical route tree behavior', () => {
     renderRoute('/emergency/settings');
 
     expect(await screen.findByRole('heading', { name: 'Emergency OS Settings' })).toBeInTheDocument();
-    expect(screen.getByText('Module Toggles')).toBeInTheDocument();
+    expect(screen.getByText('Identity and Modules')).toBeInTheDocument();
+    expect(screen.getByText('Workflow Action Audit')).toBeInTheDocument();
   });
 
   it('redirects retired platform roots to the Emergency OS whiteboard', async () => {

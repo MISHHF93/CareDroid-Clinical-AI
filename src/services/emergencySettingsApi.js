@@ -2,13 +2,21 @@ import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { getTenantContext } from './tenantContextStore';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
+export const EMERGENCY_SETTINGS_ENDPOINT = '/api/emergency/settings';
+
 async function guardedJson(capability, path, options = {}) {
   if (!isBackendCapabilityEnabled(capability)) {
     return { ok: false, data: null, message: 'Backend endpoint not available yet.' };
   }
 
   try {
-    const response = await apiFetch(path, options);
+    const response = await apiFetch(path, {
+      ...options,
+      headers: {
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(options.headers || {}),
+      },
+    });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
       return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
@@ -40,6 +48,51 @@ async function requestSettingsJson(path, options = {}) {
 
 function organizationId() {
   return getTenantContext()?.organizationId || '';
+}
+
+/**
+ * @typedef {{
+ *   id: string,
+ *   label: string,
+ *   enabled: boolean,
+ * }} EmergencyModuleSetting
+ *
+ * @typedef {{
+ *   tenantName: string,
+ *   defaultWorkspace: string,
+ *   enabledModules: EmergencyModuleSetting[],
+ *   aiSettings: Record<string, string|boolean>,
+ *   integrationSettings: Record<string, string|boolean>,
+ *   provincialHealthSettings: Record<string, string|boolean>,
+ *   notificationSettings: Record<string, string|number|boolean>,
+ *   reassessmentThresholds: Record<string, number>,
+ *   capacityThresholds: Record<string, number>,
+ *   emsThresholds: Record<string, number|boolean>,
+ *   boardingThresholds: Record<string, number>,
+ *   thresholds: {
+ *     waitWarningMinutes: number,
+ *     waitCriticalMinutes: number,
+ *     capacityWarningPercent: number,
+ *     emsOffloadTargetMinutes: number,
+ *     reassessmentIntervals: Record<string, number>,
+ *   },
+ *   departmentCapacityTarget: number,
+ *   alertRules: Record<string, { enabled: boolean, severity: string }>,
+ * }} EmergencyOsSettings
+ */
+
+export function fetchEmergencyOsSettings() {
+  return guardedJson('emergencyDepartmentSettings', EMERGENCY_SETTINGS_ENDPOINT);
+}
+
+/**
+ * @param {Partial<EmergencyOsSettings>} payload
+ */
+export function saveEmergencyOsSettings(payload) {
+  return guardedJson('emergencyDepartmentSettings', EMERGENCY_SETTINGS_ENDPOINT, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 }
 
 function saveTenantEmergencySettings(section, payload) {

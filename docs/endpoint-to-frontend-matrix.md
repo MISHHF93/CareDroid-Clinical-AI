@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-06-13T00:33:00.250Z
+**Generated:** 2026-06-13T12:48:08.950Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -14,6 +14,7 @@
 | PATCH | `/api/settings/features` | SettingsFeaturesController | emergencySettingsApi.js / featureStore.ts | ✅ |
 | GET | `/api/protocols` | ProtocolController | clinicalContentApi.js | ✅ |
 | GET | `/api/protocols/categories` | ProtocolController | clinicalContentApi.js | ✅ |
+| GET | `/api/protocols/:id` | ProtocolController | clinicalContentApi.js / Protocols.jsx | ✅ |
 | GET | `/api/drugs` | DrugController | clinicalContentApi.js | ✅ |
 | GET | `/api/drugs/categories` | DrugController | clinicalContentApi.js | ✅ |
 | GET | `/api/drugs/:id` | DrugController | clinicalContentApi.js | ✅ |
@@ -28,6 +29,7 @@
 | POST | `/api/tools/share-results` | — | ToolResultShare.jsx | ⚠️ gated |
 | GET | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
 | POST | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
+| POST | `/api/compliance/export` | ComplianceController | complianceApi.js / Settings.jsx | ✅ |
 | DELETE | `/api/compliance/delete-account` | ComplianceController | complianceApi.js | ✅ |
 | GET | `/api/audit/logs` | AuditController | Settings.jsx / Profile.jsx | ✅ |
 | GET | `/api/audit/my-logs` | AuditController | auditApi.js / ProfileActivity.jsx | ✅ |
@@ -67,7 +69,37 @@
 | POST | `/api/clinical/alerts/:id/acknowledge` | ClinicalAlertsController | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ✅ |
 | POST | `/api/clinical/alerts/:id/dismiss` | ClinicalAlertsController | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ✅ |
 | GET | `/api/clinical/alerts/stream` | — | clinicalAlertsApi.js / ClinicalAlertsPage.jsx | ⚠️ gated |
-| GET | `/api/emergency/analytics` | — | emergencyAnalyticsApi.js | ⚠️ gated |
+| GET | `/api/emergency/whiteboard` | EmergencyOsController | emergencyOsApi.js / useEmergencyWhiteboard | ✅ |
+| GET | `/api/emergency/patients` | EmergencyOsController | emergencyOsApi.js / useEmergencyPatients | ✅ |
+| POST | `/api/emergency/patients` | EmergencyOsController | emergencyOsApi.js / createEmergencyPatient | ✅ |
+| GET | `/api/emergency/journey` | EmergencyOsController | emergencyOsApi.js / usePatientJourney | ✅ |
+| GET | `/api/emergency/ems` | EmergencyOsController | emergencyOsApi.js / useEMSIntake | ✅ |
+| GET | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / useSmartIntake | ✅ |
+| POST | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / QuickIntake | ✅ |
+| POST | `/api/emergency/intake/vertical-slice` | EmergencyOsController | emergencyOsApi.js / NewPatientIntake | ✅ |
+| GET | `/api/emergency/queues` | EmergencyOsController | emergencyOsApi.js / useEmergencyQueues | ✅ |
+| GET | `/api/emergency/reassessment` | EmergencyOsController | emergencyOsApi.js / useReassessmentQueue | ✅ |
+| GET | `/api/emergency/capacity` | EmergencyOsController | emergencyOsApi.js / useCapacityStatus | ✅ |
+| GET | `/api/emergency/boarding` | EmergencyOsController | emergencyOsApi.js / useBoardingStatus | ✅ |
+| GET | `/api/emergency/referrals` | EmergencyOsController | emergencyOsApi.js / useReferrals | ✅ |
+| GET | `/api/emergency/provincial-health` | EmergencyOsController | emergencyOsApi.js / useProvincialHealth | ✅ |
+| GET | `/api/emergency/integrations` | EmergencyOsController | emergencyOsApi.js / useIntegrationHub | ✅ |
+| GET | `/api/emergency/copilot` | EmergencyOsController | emergencyOsApi.js / useEDCopilot | ✅ |
+| GET | `/api/emergency/settings` | EmergencyOsController | emergencyOsApi.js / useEmergencySettings | ✅ |
+| GET | `/api/emergency/analytics` | EmergencyOsController | emergencyAnalyticsApi.js | ✅ |
+| POST | `/api/emergency/simulation/update-live` | EmergencyOsController | emergencyOsApi.js / useRealTimeSimulation | ✅ |
+| POST | `/api/emergency/simulation/evaluate` | EmergencyOsController | emergencyOsApi.js / useRealTimeSimulation | ✅ |
+| POST | `/api/emergency/simulation/compare` | EmergencyOsController | emergencyOsApi.js / useRealTimeSimulation | ✅ |
+| GET | `/api/emergency/simulation/recommendations` | EmergencyOsController | emergencyOsApi.js / useRealTimeSimulation | ✅ |
+| POST | `/api/emergency/federated-learning/register` | EmergencyOsController | emergencyOsApi.js / useFederatedLearning | ✅ |
+| POST | `/api/emergency/federated-learning/update` | EmergencyOsController | emergencyOsApi.js / useFederatedLearning | ✅ |
+| POST | `/api/emergency/federated-learning/aggregate` | EmergencyOsController | emergencyOsApi.js / useFederatedLearning | ✅ |
+| GET | `/api/emergency/federated-learning/global-model/:hospitalId` | EmergencyOsController | emergencyOsApi.js / useFederatedLearning | ✅ |
+| GET | `/api/emergency/federated-learning/dashboard` | EmergencyOsController | emergencyOsApi.js / useFederatedLearning | ✅ |
+| POST | `/api/emergency/digital-twin/initialize` | EmergencyOsController | emergencyOsApi.js / useHybridDigitalTwin | ✅ |
+| POST | `/api/emergency/digital-twin/simulate` | EmergencyOsController | emergencyOsApi.js / useHybridDigitalTwin | ✅ |
+| GET | `/api/emergency/digital-twin/state` | EmergencyOsController | emergencyOsApi.js / useHybridDigitalTwin | ✅ |
+| POST | `/api/emergency/digital-twin/scenario` | EmergencyOsController | emergencyOsApi.js / useHybridDigitalTwin | ✅ |
 | GET | `/api/emergency/capacity/history` | — | emergencyAnalyticsApi.js | ⚠️ gated |
 | GET | `/api/emergency/queues/analytics` | — | emergencyAnalyticsApi.js | ⚠️ gated |
 | GET | `/api/emergency/shift/report/export` | — | emergencyAnalyticsApi.js | ⚠️ gated |
@@ -94,6 +126,11 @@
 | GET | `/api/clinical-intelligence/clinical-audit/execution-logs` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / ClinicalAudit.jsx | ✅ |
 | GET | `/api/platform-systems/capabilities/:capabilityId` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
 | GET | `/api/ai-governance/summary` | GovernanceController | platformGovernanceApi.js / PlatformGovernanceWorkspace.jsx | ✅ |
+| GET | `/api/emergency/governance/registry` | EmergencyAIGovernanceController | emergencyGovernanceApi.js / AIGovernanceDashboard.tsx | ✅ |
+| GET | `/api/emergency/governance/safety-rules` | EmergencyAIGovernanceController | emergencyGovernanceApi.js | ✅ |
+| GET | `/api/emergency/governance/compliance` | EmergencyAIGovernanceController | emergencyGovernanceApi.js / AIGovernanceDashboard.tsx | ✅ |
+| GET | `/api/emergency/governance/violations` | EmergencyAIGovernanceController | emergencyGovernanceApi.js | ✅ |
+| GET | `/api/emergency/governance/validate-prompts` | EmergencyAIGovernanceController | emergencyGovernanceApi.js / AIGovernanceDashboard.tsx | ✅ |
 | GET | `/api/security/summary` | LlmSecurityController | platformGovernanceApi.js / PlatformGovernanceWorkspace.jsx | ✅ |
 | POST | `/api/security/evaluate` | LlmSecurityController | platformGovernanceApi.js / PlatformGovernanceWorkspace.jsx | ✅ |
 | GET | `/api/interoperability/summary` | InteroperabilityController | platformGovernanceApi.js / PlatformGovernanceWorkspace.jsx | ✅ |
@@ -119,10 +156,10 @@
 | POST | `/api/patients/:patientId/import/labs` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/patients/:patientId/import/medications` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
 | POST | `/api/patients/:patientId/import/observations` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PlatformSystemPage.jsx | ✅ |
-| GET | `/api/patients/:patientId/workspace` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientCard.jsx / EmergencyWhiteboard.jsx | ✅ |
+| GET | `/api/patients/:patientId/workspace` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientCard.tsx / EmergencyWhiteboard.jsx | ✅ |
 | GET | `/api/patients/:patientId/summary` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
 | GET | `/api/patients/:patientId/timeline` | PlatformSystemsController | platformSystemsApi.js / patientManagementApi.js / PatientDetailPanel | ✅ |
-| GET | `/api/patients/:patientId/source-data` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel / PatientCard.jsx | ✅ |
+| GET | `/api/patients/:patientId/source-data` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel / PatientCard.tsx | ✅ |
 | GET | `/api/patients/:patientId/review-items` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel | ✅ |
 | GET | `/api/privacy/patient/:patientId/access-log` | PlatformSystemsController | patientManagementApi.js / PatientDetailPanel | ✅ |
 | POST | `/api/patients/:patientId/events` | PlatformSystemsController | platformSystemsApi.js / PlatformSystemPage.jsx | ✅ |
@@ -279,22 +316,22 @@
 - `GET /api/config/system`
 - `GET /api/settings/features`
 - `PATCH /api/settings/features`
-- `GET /api/tenant/context`
-- `GET /api/tenant/isolation-audit`
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/dev-session`
-- `POST /api/auth/verify-2fa`
-- `GET /api/auth/verify-email`
-- `GET /api/auth/google`
-- `GET /api/auth/google/callback`
-- `GET /api/auth/linkedin`
-- `GET /api/auth/linkedin/callback`
-- `POST /api/auth/magic-link`
-- `GET /api/auth/identity-providers`
-- `GET /api/auth/oidc`
-- `GET /api/auth/saml`
-- `GET /api/auth/me`
+- `GET /api/emergency/whiteboard`
+- `GET /api/emergency/patients`
+- `POST /api/emergency/patients`
+- `GET /api/emergency/journey`
+- `GET /api/emergency/ems`
+- `GET /api/emergency/intake`
+- `POST /api/emergency/intake`
+- `POST /api/emergency/intake/vertical-slice`
+- `GET /api/emergency/queues`
+- `GET /api/emergency/reassessment`
+- `GET /api/emergency/capacity`
+- `GET /api/emergency/boarding`
+- `GET /api/emergency/referrals`
+- `GET /api/emergency/provincial-health`
+- `GET /api/emergency/integrations`
+- `GET /api/emergency/copilot`
 
-_…and 399 more in src/data/backendHttpRouteInventory.js_
+_…and 452 more in src/data/backendHttpRouteInventory.js_
 

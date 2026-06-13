@@ -34,6 +34,7 @@ import {
   ReassessmentService,
   ReferralService,
   SmartIntakeService,
+  WorkflowActionLogService,
 } from './emergency-os.services';
 
 @Module({
@@ -47,6 +48,7 @@ import {
   ],
   providers: [
     EmergencyWhiteboardService,
+    WorkflowActionLogService,
     EmergencyPatientService,
     PatientJourneyService,
     EMSIntakeService,

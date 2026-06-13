@@ -1,16 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-const EMERGENCY_OS_MONGOOSE_ROUTE_GROUPS = Object.freeze([
-  '/api/emergency/boarding',
-  '/api/emergency/capacity',
-  '/api/emergency/copilot',
-  '/api/emergency/ems',
-  '/api/emergency/governance',
-  '/api/emergency/intake',
-  '/api/emergency/reassessment',
-  '/api/emergency/surge',
-]);
+import { getRouteList } from './api/routes-registry';
 
 @Controller()
 export class AppController {
@@ -32,10 +22,9 @@ export class AppController {
     const ragConfig = this.configService.get<any>('rag') || {};
     const environmentConfig = this.configService.get<any>('environment') || {};
     const deploymentConfig = this.configService.get<any>('deployment') || {};
-    const emergencyMongooseEnabled = process.env.ENABLE_MONGOOSE_EMERGENCY_OS === 'true';
-    const emergencyMongoConfigured = Boolean(
-      process.env.MONGODB_URI || process.env.DATABASE_MONGO_URI,
-    );
+    const databaseConfig = this.configService.get<any>('database') || {};
+    const emergencyMongooseEnabled = databaseConfig.enableMongooseEmergencyOs === true;
+    const emergencyMongoConfigured = Boolean(databaseConfig.mongodbUri);
 
     return {
       environment: {
@@ -71,7 +60,10 @@ export class AppController {
             ? 'configured'
             : 'missing-mongo-uri'
           : 'disabled',
-        routeGroups: EMERGENCY_OS_MONGOOSE_ROUTE_GROUPS,
+        routeGroups: getRouteList().map((route) => route.fullPath),
+        legacyRouteGroups: getRouteList({ apiPrefix: '/api/emergency' }).map(
+          (route) => route.fullPath,
+        ),
       },
     };
   }

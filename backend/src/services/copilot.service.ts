@@ -1,4 +1,4 @@
-import { Patient, IPatient } from '../models/Patient';
+import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
 import { capacityService } from './capacity.service';
 import { reassessmentService } from './reassessment.service';
 import { emsService } from './ems.service';

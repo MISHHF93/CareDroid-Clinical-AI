@@ -30,6 +30,7 @@ describe('canonical route tree', () => {
       { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
       { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
+      { path: '/emergency/journey', type: 'page', componentKey: 'PatientJourneyRoute' },
       { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
       { path: '/emergency/intake', type: 'page', componentKey: 'SmartIntake' },
       { path: '/emergency/queues', type: 'page', componentKey: 'EmergencyQueueRoute' },
@@ -37,8 +38,15 @@ describe('canonical route tree', () => {
       { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
       { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
       { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
+      { path: '/emergency/provincial-health', type: 'page', componentKey: 'ProvincialHealthRoute' },
+      { path: '/emergency/integrations', type: 'page', componentKey: 'IntegrationHubRoute' },
       { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
+      { path: '/emergency/simulation', type: 'page', componentKey: 'RealTimeSimulationRoute' },
+      { path: '/emergency/federated-learning', type: 'page', componentKey: 'FederatedLearningRoute' },
+      { path: '/emergency/digital-twin', type: 'page', componentKey: 'HybridDigitalTwinRoute' },
+      { path: '/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
+      { path: '/emergency/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
       { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
       { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
     ]);
@@ -55,12 +63,17 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('<QueueRoute />');
     expect(appSource).toContain('<ReferralsRoute />');
     expect(appSource).toContain('<CapacityRoute />');
+    expect(appSource).toContain('<ProvincialHealthRoute />');
+    expect(appSource).toContain('<IntegrationsRoute />');
     expect(appSource).toContain('<CopilotRoute />');
     expect(appSource).toContain('<AnalyticsRoute />');
+    expect(appSource).toContain('<RealTimeSimulationRoute />');
+    expect(appSource).toContain('<FederatedLearningRoute />');
+    expect(appSource).toContain('<HybridDigitalTwinRoute />');
     expect(appSource).toContain('<EmergencySettingsRoute />');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyTools}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {

@@ -9,8 +9,13 @@ import {
   Room,
   Staff,
   Vitals,
+  WorkflowActionLog,
 } from '../types/emergency';
-import { useEmergencyStore } from '../store/emergencyStore';
+import { useEmergencyStore, workflowLogFromJourneyEvent } from '../store/emergencyStore';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
+import { buildPatientTimeline } from '../utils/patientTimeline';
 import HEARTScore from './calculators/HEARTScore';
 import QSOFA from './calculators/qSOFA';
 import PediatricDrugCalc from './calculators/PediatricDrugCalc';
@@ -64,6 +69,12 @@ function initials(nameOrId: string): string {
 
 function staffName(staff: Staff[], staffId: string): string {
   return staff.find((member) => member.id === staffId)?.name || staffId;
+}
+
+function workflowActor(log: WorkflowActionLog, staff: Staff[]): string {
+  if (log.actorName) return log.actorName;
+  if (log.actorStaffId) return staffName(staff, log.actorStaffId);
+  return log.source;
 }
 
 function journeyTimestamp(patient: Patient, state: PatientState): string | undefined {
@@ -126,18 +137,28 @@ function Badge({ children, color }: { children: string; color: string }) {
   );
 }
 
-function FieldButton({ children, onClick }: { children: string; onClick: () => void }) {
+function FieldButton({
+  children,
+  onClick,
+  disabled = false,
+}: {
+  children: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       style={{
         background: 'transparent',
         border: '1px solid #374151',
         color: '#F9FAFB',
         borderRadius: 10,
         padding: '8px 10px',
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.55 : 1,
       }}
     >
       {children}
@@ -146,9 +167,11 @@ function FieldButton({ children, onClick }: { children: string; onClick: () => v
 }
 
 export default function PatientDetailPanel() {
+  const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
+  const alerts = useEmergencyStore((state) => state.alerts);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
@@ -159,6 +182,7 @@ export default function PatientDetailPanel() {
   const removeFlag = useEmergencyStore((state) => state.removeFlag);
   const addVitals = useEmergencyStore((state) => state.addVitals);
   const addAlert = useEmergencyStore((state) => state.addAlert);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const [showVitalsForm, setShowVitalsForm] = useState(false);
   const [vitalsForm, setVitalsForm] = useState<VitalsForm>(emptyVitalsForm);
   const [flagToAdd, setFlagToAdd] = useState<PatientFlag>(PatientFlag.ReassessmentDue);
@@ -167,10 +191,44 @@ export default function PatientDetailPanel() {
   const [heartScoreOpen, setHeartScoreOpen] = useState(false);
   const [qsofaOpen, setQsofaOpen] = useState(false);
   const [pediatricDrugCalcOpen, setPediatricDrugCalcOpen] = useState(false);
+  const canTransition = emergencyRole.can(EMERGENCY_ACTIONS.transitionPatient);
+  const canWriteVitals = emergencyRole.can(EMERGENCY_ACTIONS.writeVitals);
+  const canWriteNote = emergencyRole.can(EMERGENCY_ACTIONS.writeNote);
+  const canManageFlags = emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
+  const canAssignStaff = emergencyRole.can(EMERGENCY_ACTIONS.assignStaff);
+  const canAssignRoom = emergencyRole.can(EMERGENCY_ACTIONS.assignRoom);
+  const canEscalate = emergencyRole.can(EMERGENCY_ACTIONS.escalatePatient);
+  const canDischarge = emergencyRole.can(EMERGENCY_ACTIONS.dischargePatient);
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
     [patients, selectedPatientId],
+  );
+  const timelineContextState = usePatientTimelineContext(selectedPatientId);
+  const patientWorkflowLogs = useMemo(() => {
+    if (!selectedPatient) return [];
+    const generatedLogs = selectedPatient.timeline.map((event) =>
+      workflowLogFromJourneyEvent(event, selectedPatient, staff),
+    );
+    const byId = new Map<string, WorkflowActionLog>();
+    [...workflowLogs.filter((log) => log.patientId === selectedPatient.id), ...generatedLogs].forEach((log) => {
+      byId.set(log.id, log);
+    });
+    return [...byId.values()].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
+  }, [selectedPatient, staff, workflowLogs]);
+  const patientTimeline = useMemo(
+    () =>
+      selectedPatient
+        ? buildPatientTimeline(selectedPatient, {
+            ...timelineContextState.context,
+            staff,
+            alerts,
+            workflowLogs: patientWorkflowLogs,
+          })
+        : [],
+    [alerts, patientWorkflowLogs, selectedPatient, staff, timelineContextState.context],
   );
 
   if (!selectedPatient) return null;
@@ -184,6 +242,7 @@ export default function PatientDetailPanel() {
 
   const submitVitals = (event: FormEvent) => {
     event.preventDefault();
+    if (!canWriteVitals) return;
     addVitals(selectedPatient.id, parseVitals(vitalsForm, actorStaffId));
     setVitalsForm(emptyVitalsForm);
     setShowVitalsForm(false);
@@ -191,6 +250,7 @@ export default function PatientDetailPanel() {
 
   const submitNote = (event: FormEvent) => {
     event.preventDefault();
+    if (!canWriteNote) return;
     const text = noteText.trim();
     if (!text) return;
 
@@ -206,6 +266,7 @@ export default function PatientDetailPanel() {
   };
 
   const escalate = () => {
+    if (!canEscalate) return;
     const alert: Alert = {
       id: createId('alert'),
       severity: 'Critical',
@@ -278,6 +339,8 @@ export default function PatientDetailPanel() {
           <button
             type="button"
             onClick={() => movePatientToState(selectedPatient.id, nextPatientState(selectedPatient.state), actorStaffId)}
+            disabled={!canTransition}
+            title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
             style={{
               marginLeft: 'auto',
               background: 'transparent',
@@ -285,7 +348,8 @@ export default function PatientDetailPanel() {
               color: '#F9FAFB',
               borderRadius: 10,
               padding: '8px 10px',
-              cursor: 'pointer',
+              cursor: canTransition ? 'pointer' : 'not-allowed',
+              opacity: canTransition ? 1 : 0.55,
             }}
           >
             Move to Next State
@@ -340,10 +404,84 @@ export default function PatientDetailPanel() {
         </div>
       </section>
 
+      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }} aria-labelledby="patient-timeline-heading">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <div>
+            <h3 id="patient-timeline-heading" style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>
+              Patient Timeline
+            </h3>
+            <p style={{ margin: '4px 0 0', color: '#6B7280', fontSize: 11 }}>
+              Intake, journey, triage, queue, reassessment, EMS, referral, boarding, discharge, AI, and provincial events.
+            </p>
+          </div>
+          <span style={{ color: '#9CA3AF', fontSize: 11, whiteSpace: 'nowrap' }}>{patientTimeline.length} events</span>
+        </div>
+
+        {timelineContextState.loading ? (
+          <div role="status" className="patient-timeline-status patient-timeline-status--loading">
+            Loading timeline enrichment from Emergency OS modules...
+          </div>
+        ) : null}
+
+        {timelineContextState.error ? (
+          <div role="alert" className="patient-timeline-status patient-timeline-status--error">
+            {timelineContextState.error}. Showing local patient timeline fallback.
+          </div>
+        ) : null}
+
+        {patientTimeline.length ? (
+          <ol className="patient-timeline-list" aria-label="Patient timeline events">
+            {patientTimeline.map((item) => (
+              <li key={`${item.id}-${item.category}`} className={`patient-timeline-item patient-timeline-item--${item.category}`}>
+                <div className="patient-timeline-item__marker" aria-hidden />
+                <div className="patient-timeline-item__body">
+                  <div className="patient-timeline-item__header">
+                    <span className="patient-timeline-item__category">{item.label}</span>
+                    <time dateTime={item.timestamp}>{formatTime(item.timestamp)}</time>
+                  </div>
+                  <div className="patient-timeline-item__summary">{item.summary}</div>
+                  <div className="patient-timeline-item__meta">
+                    <span>{item.source}</span>
+                    {item.actor ? <span>{item.actor}</span> : null}
+                    {item.severity ? <span>{item.severity}</span> : null}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div className="patient-timeline-empty">No patient timeline events are available yet.</div>
+        )}
+      </section>
+
+      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Workflow Actions</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {patientWorkflowLogs.length ? (
+            patientWorkflowLogs.slice(0, 8).map((log) => (
+              <article key={log.id} className="patient-detail-workflow-log">
+                <div>
+                  <strong>{log.title}</strong>
+                  <p>{log.summary}</p>
+                </div>
+                <div>
+                  <span>{workflowActor(log, staff)}</span>
+                  <time dateTime={log.timestamp}>{formatTime(log.timestamp)}</time>
+                </div>
+              </article>
+            ))
+          ) : (
+            <p style={{ margin: 0, color: '#9CA3AF', fontSize: 13 }}>
+              No workflow action logs for this patient yet.
+            </p>
+          )}
+        </div>
+      </section>
+
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <h3 style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>Latest Vitals</h3>
-          <FieldButton onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
+          <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
@@ -373,7 +511,7 @@ export default function PatientDetailPanel() {
           ))}
         </div>
 
-        {showVitalsForm ? (
+        {showVitalsForm && canWriteVitals ? (
           <form onSubmit={submitVitals} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
             {Object.keys(emptyVitalsForm).map((key) => (
               <input
@@ -430,9 +568,12 @@ export default function PatientDetailPanel() {
               {flag}
               <button
                 type="button"
-                onClick={() => removeFlag(selectedPatient.id, flag)}
+                onClick={() => {
+                  if (canManageFlags) removeFlag(selectedPatient.id, flag);
+                }}
+                disabled={!canManageFlags}
                 aria-label={`Remove ${flag}`}
-                style={{ border: 0, background: 'transparent', color: '#9CA3AF', cursor: 'pointer' }}
+                style={{ border: 0, background: 'transparent', color: '#9CA3AF', cursor: canManageFlags ? 'pointer' : 'not-allowed', opacity: canManageFlags ? 1 : 0.45 }}
               >
                 x
               </button>
@@ -443,13 +584,14 @@ export default function PatientDetailPanel() {
           <select
             value={flagToAdd}
             onChange={(event) => setFlagToAdd(event.target.value as PatientFlag)}
+            disabled={!canManageFlags}
             style={{ flex: 1, background: '#0B1120', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 9 }}
           >
             {Object.values(PatientFlag).map((flag) => (
               <option key={flag} value={flag}>{flag}</option>
             ))}
           </select>
-          <FieldButton onClick={() => addFlag(selectedPatient.id, flagToAdd)}>Add Flag</FieldButton>
+          <FieldButton disabled={!canManageFlags} onClick={() => addFlag(selectedPatient.id, flagToAdd)}>Add Flag</FieldButton>
         </div>
       </section>
 
@@ -470,6 +612,7 @@ export default function PatientDetailPanel() {
           <textarea
             value={noteText}
             onChange={(event) => setNoteText(event.target.value)}
+            disabled={!canWriteNote}
             placeholder="Add Note"
             style={{
               width: '100%',
@@ -483,7 +626,7 @@ export default function PatientDetailPanel() {
               padding: 10,
             }}
           />
-          <button type="submit" style={{ marginTop: 8, background: '#2563EB', border: 0, borderRadius: 10, color: '#F9FAFB', padding: '9px 12px', cursor: 'pointer' }}>
+          <button type="submit" disabled={!canWriteNote} style={{ marginTop: 8, background: '#2563EB', border: 0, borderRadius: 10, color: '#F9FAFB', padding: '9px 12px', cursor: canWriteNote ? 'pointer' : 'not-allowed', opacity: canWriteNote ? 1 : 0.55 }}>
             Submit Note
           </button>
         </form>
@@ -495,9 +638,11 @@ export default function PatientDetailPanel() {
             <select
               defaultValue={selectedPatient.assignedStaffId || ''}
               onChange={(event) => {
+                if (!canAssignStaff) return;
                 if (event.target.value) assignStaff(selectedPatient.id, event.target.value);
                 setActionMode(null);
               }}
+              disabled={!canAssignStaff}
               style={{ width: '100%', background: '#111827', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 10 }}
             >
               <option value="">Choose staff</option>
@@ -510,9 +655,11 @@ export default function PatientDetailPanel() {
             <select
               defaultValue={selectedPatient.roomId || ''}
               onChange={(event) => {
+                if (!canAssignRoom) return;
                 if (event.target.value) assignRoom(selectedPatient.id, event.target.value);
                 setActionMode(null);
               }}
+              disabled={!canAssignRoom}
               style={{ width: '100%', background: '#111827', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 10 }}
             >
               <option value="">Choose room</option>
@@ -524,7 +671,7 @@ export default function PatientDetailPanel() {
           {actionMode === 'escalate' ? (
             <div>
               <p style={{ margin: '0 0 10px', color: '#F9FAFB' }}>Escalate this patient and create a critical alert?</p>
-              <FieldButton onClick={escalate}>Confirm Escalation</FieldButton>
+              <FieldButton disabled={!canEscalate} onClick={escalate}>Confirm Escalation</FieldButton>
             </div>
           ) : null}
           {actionMode === 'discharge' ? (
@@ -532,9 +679,11 @@ export default function PatientDetailPanel() {
               <p style={{ margin: '0 0 10px', color: '#F9FAFB' }}>Discharge this patient?</p>
               <FieldButton
                 onClick={() => {
+                  if (!canDischarge) return;
                   movePatientToState(selectedPatient.id, PatientState.Discharge, actorStaffId, 'Discharged from detail panel');
                   setActionMode(null);
                 }}
+                disabled={!canDischarge}
               >
                 Confirm Discharge
               </FieldButton>
@@ -564,10 +713,10 @@ export default function PatientDetailPanel() {
           borderTop: '1px solid #1F2937',
         }}
       >
-        <FieldButton onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
-        <FieldButton onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
-        <FieldButton onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
-        <FieldButton onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
+        <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
+        <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
+        <FieldButton disabled={!canEscalate} onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
+        <FieldButton disabled={!canDischarge} onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
       </div>
       {heartScoreOpen ? (
         <HEARTScore patientId={selectedPatient.id} onClose={() => setHeartScoreOpen(false)} />

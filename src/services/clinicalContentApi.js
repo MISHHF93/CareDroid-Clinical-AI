@@ -66,6 +66,32 @@ export async function fetchProtocolCategories() {
 }
 
 /**
+ * @param {string} protocolId
+ */
+export async function fetchProtocolById(protocolId) {
+  if (!protocolId) {
+    return { ok: false, protocol: null, error: 'Protocol ID is required.' };
+  }
+
+  const endpoint = `/api/protocols/${encodeURIComponent(protocolId)}`;
+  try {
+    const { response, data } = await apiFetchJson(endpoint);
+    if (!response.ok) {
+      return { ok: false, protocol: null, error: getApiErrorMessage(null, response) };
+    }
+    return { ok: true, protocol: data || null, fromServer: true };
+  } catch (error) {
+    reportApiError({
+      title: 'Protocol detail load failed',
+      message: 'Unable to load protocol details.',
+      error,
+      endpoint,
+    });
+    return { ok: false, protocol: null, error: getApiErrorMessage(error), fromServer: false };
+  }
+}
+
+/**
  * @param {Record<string, string|number|undefined>} [query]
  */
 export async function fetchDrugs(query = {}) {

@@ -1,187 +1,30 @@
 /**
- * Canonical clinical operating system navigation.
+ * Compatibility projections for navigation consumers.
  *
- * Sidebar/drawer and quick command destinations consume this module directly.
- * `navigation/primaryNavigation.js` is now a compatibility re-export.
+ * The Emergency OS shell now derives from `unified-navigation.config.ts`.
+ * `navigation/primaryNavigation.js` is still a compatibility re-export.
  */
+import { NAVIGATION_ITEMS } from './unified-navigation.config';
 import { CANONICAL_ROUTES } from './routes.config';
 
-export const APP_SHELL_NAV_ITEMS = Object.freeze([
-  {
-    id: 'emergency_whiteboard',
-    label: 'Emergency Whiteboard',
-    mobileLabel: 'Board',
-    iconKey: 'emergency-whiteboard',
-    featureId: 'emergency_whiteboard',
-    path: CANONICAL_ROUTES.emergencyWorkspace,
-    activePaths: [CANONICAL_ROUTES.emergencyWorkspace],
-  },
-  {
-    id: 'emergency_patients',
-    label: 'Patients',
-    mobileLabel: 'Patients',
-    iconKey: 'emergency-patients',
-    featureId: 'emergency_patients',
-    path: CANONICAL_ROUTES.emergencyPatients,
-    activePaths: [CANONICAL_ROUTES.emergencyPatients],
-  },
-  {
-    id: 'patient_journey',
-    label: 'Journey',
-    mobileLabel: 'Journey',
-    iconKey: 'journey',
-    featureId: 'patient_journey',
-    path: CANONICAL_ROUTES.emergencyJourney,
-    activePaths: [CANONICAL_ROUTES.emergencyJourney],
-  },
-  {
-    id: 'ems_pipeline',
-    label: 'EMS',
-    mobileLabel: 'EMS',
-    iconKey: 'ems',
-    featureId: 'ems_pipeline',
-    path: CANONICAL_ROUTES.emergencyEms,
-    activePaths: [CANONICAL_ROUTES.emergencyEms],
-  },
-  {
-    id: 'smart_intake',
-    label: 'Smart Intake',
-    mobileLabel: 'Intake',
-    iconKey: 'intake',
-    featureId: 'smart_intake',
-    path: CANONICAL_ROUTES.emergencySmartIntake,
-    activePaths: [CANONICAL_ROUTES.emergencySmartIntake],
-  },
-  {
-    id: 'queue_intelligence',
-    label: 'Queue Intelligence',
-    mobileLabel: 'Queues',
-    iconKey: 'queues',
-    featureId: 'queue_intelligence',
-    path: CANONICAL_ROUTES.emergencyQueues,
-    activePaths: [CANONICAL_ROUTES.emergencyQueues],
-  },
-  {
-    id: 'reassessment_engine',
-    label: 'Reassessment',
-    mobileLabel: 'Review',
-    iconKey: 'reassessment',
-    featureId: 'reassessment_engine',
-    path: CANONICAL_ROUTES.emergencyReassessment,
-    activePaths: [CANONICAL_ROUTES.emergencyReassessment],
-  },
-  {
-    id: 'capacity_intelligence',
-    label: 'Capacity',
-    mobileLabel: 'Capacity',
-    iconKey: 'capacity',
-    featureId: 'capacity_intelligence',
-    path: CANONICAL_ROUTES.emergencyCapacity,
-    activePaths: [CANONICAL_ROUTES.emergencyCapacity],
-  },
-  {
-    id: 'boarding_intelligence',
-    label: 'Boarding',
-    mobileLabel: 'Boarding',
-    iconKey: 'boarding',
-    featureId: 'boarding_intelligence',
-    path: CANONICAL_ROUTES.emergencyBoarding,
-    activePaths: [CANONICAL_ROUTES.emergencyBoarding],
-  },
-  {
-    id: 'referral_intelligence',
-    label: 'Referrals',
-    mobileLabel: 'Referrals',
-    iconKey: 'referrals',
-    featureId: 'referral_intelligence',
-    path: CANONICAL_ROUTES.emergencyReferrals,
-    activePaths: [CANONICAL_ROUTES.emergencyReferrals],
-  },
-  {
-    id: 'provincial_health',
-    label: 'Provincial Health',
-    mobileLabel: 'Health',
-    iconKey: 'provincial-health',
-    featureId: 'provincial_health',
-    path: CANONICAL_ROUTES.emergencyProvincialHealth,
-    activePaths: [CANONICAL_ROUTES.emergencyProvincialHealth],
-  },
-  {
-    id: 'integration_hub',
-    label: 'Integrations',
-    mobileLabel: 'Hub',
-    iconKey: 'integrations',
-    featureId: 'integration_hub',
-    path: CANONICAL_ROUTES.emergencyIntegrations,
-    activePaths: [CANONICAL_ROUTES.emergencyIntegrations],
-  },
-  {
-    id: 'ed_copilot',
-    label: 'ED Copilot',
-    mobileLabel: 'Copilot',
-    iconKey: 'ed-copilot',
-    featureId: 'ed_copilot',
-    path: CANONICAL_ROUTES.emergencyCopilot,
-    activePaths: [CANONICAL_ROUTES.emergencyCopilot],
-  },
-  {
-    id: 'emergency_analytics',
-    label: 'Analytics',
-    mobileLabel: 'Analytics',
-    iconKey: 'emergency-analytics',
-    featureId: 'emergency_analytics',
-    path: CANONICAL_ROUTES.emergencyAnalytics,
-    activePaths: [CANONICAL_ROUTES.emergencyAnalytics],
-  },
-  {
-    id: 'real_time_simulation',
-    label: 'Simulation',
-    mobileLabel: 'Sim',
-    iconKey: 'simulation',
-    featureId: 'real_time_simulation',
-    path: CANONICAL_ROUTES.emergencySimulation,
-    activePaths: [CANONICAL_ROUTES.emergencySimulation],
-  },
-  {
-    id: 'federated_learning',
-    label: 'Federated',
-    mobileLabel: 'Fed',
-    iconKey: 'brain',
-    featureId: 'federated_learning',
-    path: CANONICAL_ROUTES.emergencyFederatedLearning,
-    activePaths: [CANONICAL_ROUTES.emergencyFederatedLearning],
-  },
-  {
-    id: 'hybrid_digital_twin',
-    label: 'Digital Twin',
-    mobileLabel: 'Twin',
-    iconKey: 'digital-twin',
-    featureId: 'hybrid_digital_twin',
-    path: CANONICAL_ROUTES.emergencyDigitalTwin,
-    activePaths: [CANONICAL_ROUTES.emergencyDigitalTwin],
-  },
-  {
-    id: 'ai_governance',
-    label: 'AI Governance',
-    mobileLabel: 'AI Gov',
-    iconKey: 'ai-governance',
-    featureId: 'ai_governance',
-    path: CANONICAL_ROUTES.aiGovernance,
-    activePaths: [CANONICAL_ROUTES.aiGovernance, CANONICAL_ROUTES.emergencyAiGovernance],
-    roles: ['charge_nurse', 'physician'],
-    isEmergencyCore: true,
-    order: 17,
-  },
-  {
-    id: 'emergency_settings',
-    label: 'Settings',
-    mobileLabel: 'Settings',
-    iconKey: 'emergency-settings',
-    featureId: 'emergency_settings',
-    path: CANONICAL_ROUTES.emergencySettings,
-    activePaths: [CANONICAL_ROUTES.emergencySettings],
-  },
-]);
+function appShellNavItemFromUnified(item) {
+  return Object.freeze({
+    id: item.id,
+    label: item.label,
+    mobileLabel: item.mobileLabel || item.label,
+    iconKey: item.icon,
+    featureId: item.featureId || item.id,
+    path: item.path,
+    activePaths: item.activePaths || [item.path],
+    roles: item.roles,
+    isEmergencyCore: item.isEmergencyCore,
+    order: item.order,
+  });
+}
+
+export const APP_SHELL_NAV_ITEMS = Object.freeze(
+  NAVIGATION_ITEMS.map(appShellNavItemFromUnified)
+);
 
 export const EMERGENCY_SIDEBAR_NAV_ITEMS = APP_SHELL_NAV_ITEMS;
 

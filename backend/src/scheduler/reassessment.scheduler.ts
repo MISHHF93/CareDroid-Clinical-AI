@@ -1,6 +1,6 @@
 import cron, { type ScheduledTask } from 'node-cron';
 import { reassessmentService } from '../services/reassessment.service';
-import { Patient } from '../models/Patient';
+import { UnifiedPatient as Patient } from '../models/unified-patient.model';
 
 export class ReassessmentScheduler {
   private job: ScheduledTask | null = null;

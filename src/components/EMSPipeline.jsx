@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
 import './EMSPipeline.css';
 
@@ -67,6 +69,9 @@ function EMSArrivalRow({
   onConvert,
   onCompleteHandoff,
   offloadTargetMinutes,
+  canPrepareBay,
+  canConvert,
+  canCompleteHandoff,
 }) {
   const remaining = minutesRemaining(arrival, now);
   const tone = etaTone(remaining, arrival.status);
@@ -121,7 +126,7 @@ function EMSArrivalRow({
             {roomName(rooms, arrival.preparedRoomId)}
           </span>
         ) : (
-          <button type="button" onClick={() => onPrepareBay(arrival.id)} disabled={!isIncoming}>
+          <button type="button" onClick={() => onPrepareBay(arrival.id)} disabled={!isIncoming || !canPrepareBay}>
             Prepare Bay
           </button>
         )}
@@ -130,6 +135,7 @@ function EMSArrivalRow({
             type="button"
             className="ems-pipeline__handoff"
             onClick={() => onConvert(arrival.id)}
+            disabled={!canConvert}
           >
             <CheckCircle2 size={14} aria-hidden />
             Add to Whiteboard
@@ -140,6 +146,7 @@ function EMSArrivalRow({
             type="button"
             className="ems-pipeline__handoff"
             onClick={() => onCompleteHandoff(arrival.id)}
+            disabled={!canCompleteHandoff}
           >
             Handoff complete
           </button>
@@ -153,15 +160,20 @@ function EMSArrivalRow({
 }
 
 export default function EMSPipeline() {
+  const emergencyRole = useEmergencyRolePermissions();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const rooms = useEmergencyStore((state) => state.rooms);
+  const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
   const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const [now, setNow] = useState(() => new Date());
   const [fleetSnapshot, setFleetSnapshot] = useState({ status: 'loading', units: [], message: '' });
   const [diversionStatus, setDiversionStatus] = useState({ status: 'idle', data: null, message: '' });
+  const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
+  const canConvert = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
+  const canCompleteHandoff = emergencyRole.can(EMERGENCY_ACTIONS.completeEmsHandoff);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -222,10 +234,11 @@ export default function EMSPipeline() {
     activeArrivals.forEach((arrival) => {
       if (arrival.status !== 'Inbound') return;
       if (minutesRemaining(arrival, now) <= 0) {
+        if (!canConvert) return;
         convertEMSArrivalToPatient(arrival.id);
       }
     });
-  }, [activeArrivals, convertEMSArrivalToPatient, now]);
+  }, [activeArrivals, canConvert, convertEMSArrivalToPatient, now]);
 
   const incoming = activeArrivals
     .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0)
@@ -257,6 +270,11 @@ export default function EMSPipeline() {
         <div>
           <span>Pre-arrival coordination</span>
           <h1 id="ems-pipeline-title">EMS Pipeline</h1>
+          {activeScenario ? (
+            <p className="ems-pipeline__source">
+              Scenario: {activeScenario.label}
+            </p>
+          ) : null}
         </div>
         <div className="ems-pipeline__header-actions">
           <span
@@ -289,13 +307,23 @@ export default function EMSPipeline() {
             </div>
           ) : null}
           <div className="ems-pipeline__unit-grid">
-            {fleetSnapshot.units.slice(0, 6).map((unit) => (
-              <article key={unit.id}>
-                <strong>{unit.callSign}</strong>
-                <span>{unit.status}</span>
-                <small>{unit.lastKnownLocation}</small>
-              </article>
-            ))}
+            {fleetSnapshot.status === 'loading' ? (
+              <p className="ems-pipeline__empty" role="status">Loading EMS unit visibility...</p>
+            ) : fleetSnapshot.status === 'error' ? (
+              <p className="ems-pipeline__empty" role="alert">
+                {fleetSnapshot.message || 'EMS unit backend unavailable.'}
+              </p>
+            ) : fleetSnapshot.units.length ? (
+              fleetSnapshot.units.slice(0, 6).map((unit) => (
+                <article key={unit.id}>
+                  <strong>{unit.callSign}</strong>
+                  <span>{unit.status}</span>
+                  <small>{unit.lastKnownLocation}</small>
+                </article>
+              ))
+            ) : (
+              <p className="ems-pipeline__empty">No EMS units returned by backend.</p>
+            )}
           </div>
         </section>
 
@@ -317,6 +345,9 @@ export default function EMSPipeline() {
                   onConvert={convertEMSArrivalToPatient}
                   onCompleteHandoff={completeHandoff}
                   offloadTargetMinutes={offloadTargetMinutes}
+                  canPrepareBay={canPrepareBay}
+                  canConvert={canConvert}
+                  canCompleteHandoff={canCompleteHandoff}
                 />
               ))
             ) : (
@@ -343,6 +374,9 @@ export default function EMSPipeline() {
                   onConvert={convertEMSArrivalToPatient}
                   onCompleteHandoff={completeHandoff}
                   offloadTargetMinutes={offloadTargetMinutes}
+                  canPrepareBay={canPrepareBay}
+                  canConvert={canConvert}
+                  canCompleteHandoff={canCompleteHandoff}
                 />
               ))
             ) : (

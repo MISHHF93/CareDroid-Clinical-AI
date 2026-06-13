@@ -12,3 +12,132 @@
 .patient-detail-timeline-dot--current {
   animation: patient-detail-current-pulse 1s infinite;
 }
+
+.patient-timeline-status {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.patient-timeline-status--loading {
+  border: 1px solid #1D4ED8;
+  background: #0B1F48;
+  color: #93C5FD;
+}
+
+.patient-timeline-status--error {
+  border: 1px solid #78350F;
+  background: #451A03;
+  color: #FCD34D;
+}
+
+.patient-timeline-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-timeline-item {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+}
+
+.patient-timeline-item__marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 9px;
+  background: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.patient-timeline-item--reassessment .patient-timeline-item__marker,
+.patient-timeline-item--boarding .patient-timeline-item__marker {
+  background: #F59E0B;
+}
+
+.patient-timeline-item--ems .patient-timeline-item__marker,
+.patient-timeline-item--discharge .patient-timeline-item__marker {
+  background: #EF4444;
+}
+
+.patient-timeline-item--ai-copilot .patient-timeline-item__marker,
+.patient-timeline-item--provincial-health .patient-timeline-item__marker {
+  background: #8B5CF6;
+}
+
+.patient-timeline-item__body,
+.patient-timeline-empty {
+  border: 1px solid #1F2937;
+  border-radius: 10px;
+  background: #0B1120;
+  padding: 10px;
+}
+
+.patient-timeline-item__header,
+.patient-timeline-item__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #9CA3AF;
+  font-size: 11px;
+}
+
+.patient-timeline-item__category {
+  color: #F9FAFB;
+  font-weight: 700;
+}
+
+.patient-timeline-item__summary {
+  margin-top: 6px;
+  color: #E5E7EB;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.patient-timeline-item__meta {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  color: #6B7280;
+}
+
+.patient-timeline-empty {
+  margin-top: 12px;
+  color: #9CA3AF;
+  font-size: 12px;
+}
+
+.patient-detail-workflow-log {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  background: #0b1120;
+}
+
+.patient-detail-workflow-log strong {
+  color: #f9fafb;
+  font-size: 13px;
+}
+
+.patient-detail-workflow-log p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.patient-detail-workflow-log div:last-child {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  color: #6b7280;
+  font-size: 11px;
+}

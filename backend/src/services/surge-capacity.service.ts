@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import mongoose from 'mongoose';
-import { Patient } from '../models/Patient';
+import { UnifiedPatient as Patient } from '../models/unified-patient.model';
 
 export interface SurgeResourceStatus {
   traumaBedsAvailable: number;

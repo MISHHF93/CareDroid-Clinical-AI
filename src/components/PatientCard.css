@@ -12,3 +12,21 @@
 .patient-card--reassessment-due {
   animation: patient-card-reassessment-pulse 1s infinite;
 }
+
+.patient-card__timeline-button {
+  border: 1px solid rgba(96, 165, 250, 0.42);
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.16);
+  color: #BFDBFE;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+}
+
+.patient-card__timeline-button:hover,
+.patient-card__timeline-button:focus-visible {
+  background: rgba(37, 99, 235, 0.28);
+  color: #F9FAFB;
+  outline: none;
+}

@@ -24,6 +24,25 @@ export const BACKEND_INTERNAL_SERVICES = Object.freeze([
   { symbol: 'EmergencyEscalationService', module: 'emergency-escalation', strategy: 'backend-only', reason: 'Chat pipeline' },
   { symbol: 'IntentClassifierService', module: 'intent-classifier', strategy: 'backend-only', reason: 'Via POST /api/chat/*' },
   { symbol: 'ToolOrchestratorService.executeInChat', module: 'tool-orchestrator', strategy: 'backend-only', reason: 'ChatService internal' },
+  {
+    symbol: 'FHIRService / MPIService / OCRService / TextMiningService',
+    module: 'services + api/smart-intake.routes',
+    strategy: 'optional-runtime',
+    reason: 'Mounted only by the optional Mongoose Emergency OS smart-intake workflow',
+  },
+  {
+    symbol: 'LiveTrackingService legacy adapters',
+    module: 'modules/live-tracking',
+    strategy: 'legacy',
+    reason:
+      'Legacy source-compatibility adapters; active routes live on FleetController, HospitalMapController, and TelemetryController',
+  },
+  {
+    symbol: 'EdgeAIAmbulanceService',
+    module: 'services + api/ems.socket',
+    strategy: 'backend-only',
+    reason: 'Emergency OS WebSocket support registered from backend startup',
+  },
 ]);
 
 export function assertNoOrphanedBackendFunctionality() {
@@ -138,9 +157,9 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| Tier | Action |',
     '|------|--------|',
     '| P0 | Keep capability gates on phantom frontend paths until Nest implements or UI removed |',
-    '| P1 | Wire `clinicalToolsApi` → validate, catalog/executors, statistics |',
-    '| P1 | Wire `complianceApi` → export + delete-account |',
-    '| P2 | Protocol/drug GET clients for reference pages |',
+    '| P1 | Keep `clinicalToolsApi` coverage for validate, catalog/executors, statistics |',
+    '| P1 | Keep `complianceApi` coverage for consent, export, and delete-account |',
+    '| P2 | Keep protocol/drug GET clients covered in the reference inventory |',
     '| P3 | Chat suggest-action / analyze-vitals on dashboard |',
     '',
     '## Quick counts',

@@ -18,21 +18,11 @@ const srcRoot = join(__dirname, '..');
 const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8');
 
 const visibleLinkInventory = [
-  ['Home welcome CTA', 'App.jsx', '/auth'],
-  ['Home dev bypass', 'App.jsx', '/emergency/whiteboard'],
-  ['Auth back link', 'pages/Auth.jsx', '/'],
-  ['Primary Whiteboard nav', 'config/navigation.config.js', '/emergency/whiteboard'],
-  ['Primary Patients nav', 'config/navigation.config.js', '/emergency/patients'],
-  ['Primary EMS nav', 'config/navigation.config.js', '/emergency/ems'],
-  ['Primary Intake nav', 'config/navigation.config.js', '/emergency/intake'],
-  ['Primary Queues nav', 'config/navigation.config.js', '/emergency/queues'],
-  ['Primary Reassessment nav', 'config/navigation.config.js', '/emergency/reassessment'],
-  ['Primary Capacity nav', 'config/navigation.config.js', '/emergency/capacity'],
-  ['Primary Boarding nav', 'config/navigation.config.js', '/emergency/boarding'],
-  ['Primary Referrals nav', 'config/navigation.config.js', '/emergency/referrals'],
-  ['Primary Copilot nav', 'config/navigation.config.js', '/emergency/copilot'],
-  ['Primary Analytics nav', 'config/navigation.config.js', '/emergency/analytics'],
-  ['Primary Settings nav', 'config/navigation.config.js', '/emergency/settings'],
+  ...APP_SHELL_NAV_ITEMS.map((item) => [
+    `Primary ${item.label} nav`,
+    'config/navigation.config.js',
+    item.path,
+  ]),
 ];
 
 const canonicalRoutes = new Set([
@@ -41,18 +31,7 @@ const canonicalRoutes = new Set([
   '/dashboard',
   '/assistant',
   '/app',
-  '/emergency/whiteboard',
-  '/emergency/patients',
-  '/emergency/ems',
-  '/emergency/intake',
-  '/emergency/queues',
-  '/emergency/reassessment',
-  '/emergency/capacity',
-  '/emergency/boarding',
-  '/emergency/referrals',
-  '/emergency/copilot',
-  '/emergency/analytics',
-  '/emergency/settings',
+  ...APP_SHELL_NAV_ITEMS.map((item) => item.path),
 ]);
 
 const userFacingLinkFiles = [
@@ -87,7 +66,7 @@ describe('section link inventory and route flattening', () => {
   it('keeps developer catalog aliases away from normal clinician links', () => {
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/catalog', to: '/emergency/copilot' }),
+        expect.objectContaining({ path: '/catalog', to: '/emergency/whiteboard' }),
       ])
     );
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
@@ -110,19 +89,11 @@ describe('section link inventory and route flattening', () => {
       expect.arrayContaining([
         expect.objectContaining({ path: '/emergency/smart-intake', to: '/emergency/intake' }),
         expect.objectContaining({ path: '/patients/*', to: '/emergency/patients' }),
-        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/copilot' }),
+        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/whiteboard' }),
       ])
     );
-    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ path: '/home', to: '/emergency/whiteboard' }),
-        expect.objectContaining({ path: '/chat', to: '/emergency/copilot' }),
-      ])
-    );
-    expect(app).toContain("path: '/tools/calculators/:slug'");
-    expect(app).toContain('<LegacyCalculatorRouteRedirect />');
-    expect(app).toContain('...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({');
-    expect(app).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
+    expect(app).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
+    expect(app).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");

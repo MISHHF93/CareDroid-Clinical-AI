@@ -14,6 +14,7 @@ import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { getCalculatorToolInventory, getUserFacingToolInventory } from './toolInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
+import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './emergencyPageRenderInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
@@ -37,20 +38,7 @@ const REQUIRED_LEGACY_REDIRECT_SNIPPETS = Object.freeze([
   'path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
 ]);
 
-const REQUIRED_ROUTES = Object.freeze([
-  '/emergency/whiteboard',
-  '/emergency/patients',
-  '/emergency/ems',
-  '/emergency/intake',
-  '/emergency/queues',
-  '/emergency/reassessment',
-  '/emergency/capacity',
-  '/emergency/boarding',
-  '/emergency/referrals',
-  '/emergency/copilot',
-  '/emergency/analytics',
-  '/emergency/settings',
-]);
+const REQUIRED_ROUTES = EMERGENCY_PAGE_ALL_RENDER_PATHS;
 
 const REQUIRED_CALCULATORS = Object.freeze([
   'qsofa',
@@ -140,7 +128,7 @@ describe('full platform consolidation contract', () => {
     expect(appSource).toContain('path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.fleetCommand}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.marketplace}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.aiGovernance}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.aiGovernance}');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 

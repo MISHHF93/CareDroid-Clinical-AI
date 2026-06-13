@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import {
   persistEmergencyReferral,
   updateEmergencyTransferWorkflow,
@@ -117,7 +119,7 @@ function acknowledgementMinutes(referral) {
   return Math.round((end - start) / 60000);
 }
 
-function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient }) {
+function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient, canUpdateWorkflow }) {
   const elapsed = formatElapsed(elapsedMinutes(referral.requestedAt, now));
   const needsResponseNote = referral.status === 'Sent';
 
@@ -160,7 +162,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
         </p>
       ) : null}
 
-      {referral.status !== 'Completed' && referral.status !== 'Declined' ? (
+      {canUpdateWorkflow && referral.status !== 'Completed' && referral.status !== 'Declined' ? (
         <div className="referral-row__actions">
           {needsResponseNote ? (
             <label className="referral-row__note">
@@ -248,6 +250,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
 }
 
 export default function ReferralPanel() {
+  const emergencyRole = useEmergencyRolePermissions();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const referrals = useEmergencyStore((state) => state.referrals);
@@ -265,6 +268,9 @@ export default function ReferralPanel() {
   const [formError, setFormError] = useState('');
   const [backendStatus, setBackendStatus] = useState('');
   const [backendPending, setBackendPending] = useState(false);
+  const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
+  const canManageTransfer = emergencyRole.can(EMERGENCY_ACTIONS.manageTransfer);
+  const canUpdateWorkflow = canManageReferral || canManageTransfer;
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30_000);
@@ -343,7 +349,7 @@ export default function ReferralPanel() {
 
     if (!patientId) {
       if (patientSearch) setPatientQuery(patientSearch);
-      if (shouldOpenForm) setFormOpen(true);
+      if (shouldOpenForm && canManageReferral) setFormOpen(true);
       return;
     }
 
@@ -351,8 +357,8 @@ export default function ReferralPanel() {
     if (!patient) return;
 
     selectFormPatient(patient);
-    setFormOpen(shouldOpenForm);
-  }, [patients, searchParams]);
+    setFormOpen(Boolean(shouldOpenForm && canManageReferral));
+  }, [canManageReferral, patients, searchParams]);
 
   const resetForm = () => {
     setForm(INITIAL_FORM);
@@ -361,6 +367,11 @@ export default function ReferralPanel() {
   };
 
   const submitReferral = (status) => {
+    const isTransfer = form.workflow === 'Transfer' || status === 'TransferRequested';
+    if ((isTransfer && !canManageTransfer) || (!isTransfer && !canManageReferral)) {
+      setFormError(`${emergencyRole.roleLabel} cannot create this workflow.`);
+      return;
+    }
     if (!selectedPatient) {
       setFormError('Select an active patient before creating a referral.');
       return;
@@ -401,6 +412,12 @@ export default function ReferralPanel() {
   };
 
   const handleStatusChange = (referralId, status, responseNote = '') => {
+    const referral = referrals.find((item) => item.id === referralId);
+    const isTransfer = referral?.workflow === 'Transfer' || ['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status);
+    if ((isTransfer && !canManageTransfer) || (!isTransfer && !canManageReferral)) {
+      setBackendStatus(`${emergencyRole.roleLabel} cannot update this workflow.`);
+      return;
+    }
     updateReferralStatus(referralId, status, responseNote);
     if (['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status)) {
       setBackendPending(true);
@@ -441,7 +458,9 @@ export default function ReferralPanel() {
           <strong aria-label={`${metrics.active} active referrals`}>{metrics.active}</strong>
           <button
             type="button"
+            disabled={!canManageReferral}
             onClick={() => {
+              if (!canManageReferral) return;
               setForm((current) => ({ ...current, workflow: 'Referral' }));
               setFormOpen((open) => !open);
             }}
@@ -451,7 +470,9 @@ export default function ReferralPanel() {
           </button>
           <button
             type="button"
+            disabled={!canManageTransfer}
             onClick={() => {
+              if (!canManageTransfer) return;
               setForm((current) => ({
                 ...current,
                 workflow: 'Transfer',
@@ -599,6 +620,10 @@ export default function ReferralPanel() {
             <button
               type="button"
               onClick={() => {
+                if (!canUpdateWorkflow) {
+                  setFormError(`${emergencyRole.roleLabel} cannot update referral forms.`);
+                  return;
+                }
                 if (!selectedPatient) {
                   setFormError('Select a patient to auto-fill a clinical summary.');
                   return;
@@ -610,16 +635,16 @@ export default function ReferralPanel() {
               Auto-fill summary
             </button>
             {form.workflow === 'Referral' ? (
-              <button type="button" onClick={() => submitReferral('Draft')} disabled={backendPending}>
+              <button type="button" onClick={() => submitReferral('Draft')} disabled={backendPending || !canManageReferral}>
                 Save Draft
               </button>
             ) : null}
             {form.workflow === 'Transfer' ? (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')} disabled={backendPending}>
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')} disabled={backendPending || !canManageTransfer}>
                 Request Transfer
               </button>
             ) : (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')} disabled={backendPending}>
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')} disabled={backendPending || !canManageReferral}>
                 <Send size={14} aria-hidden />
                 {backendPending ? 'Sending...' : 'Send Referral'}
               </button>
@@ -650,6 +675,7 @@ export default function ReferralPanel() {
                     }
                     onStatusChange={handleStatusChange}
                     onSelectPatient={handleSelectPatient}
+                    canUpdateWorkflow={canUpdateWorkflow}
                   />
                 ))
               ) : (

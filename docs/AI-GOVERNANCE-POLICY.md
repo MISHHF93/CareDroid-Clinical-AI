@@ -4,7 +4,7 @@
 
 This policy defines how CareDroid governs artificial intelligence across Emergency OS and related clinical platform services. It applies to generative AI, rules engines, predictive models, embeddings, identity matching, prompt templates, clinical documentation, triage support, operational copilots, and any workflow that can influence clinical operations.
 
-The implementation source of truth is `backend/src/config/ai-governance.registry.ts`, surfaced through `backend/src/config/ai.config.ts`, enforced by `backend/src/services/ai-governance.service.ts`, and exposed through `/api/v1/governance/*` plus `/api/emergency/governance/*` compatibility endpoints.
+The implementation source of truth is `backend/src/config/ai-governance.registry.ts`, surfaced through `backend/src/config/ai.config.ts`, enforced by `backend/src/services/ai-governance.service.ts`, and exposed to the frontend through `/api/emergency/governance/*`. The `/api/v1/governance/*` routes remain backend compatibility aliases.
 
 ## 2. Standards Alignment
 
@@ -23,7 +23,7 @@ No AI service may be launched, exposed in navigation, or integrated into workflo
 
 ## 4. Safety Rules Enforced In Code
 
-The runtime safety rules are not documentation-only. `AIGovernanceService.checkSafetyViolation()` blocks priority-lowering actions for DPS 1 or DPS 2 patients and enforces required disclaimers for clinical recommendations. Registered prompt templates are validated through `/api/v1/governance/validate-prompts`.
+The runtime safety rules are not documentation-only. `AIGovernanceService.checkSafetyViolation()` blocks priority-lowering actions for DPS 1 or DPS 2 patients and enforces required disclaimers for clinical recommendations. Registered prompt templates are validated through `/api/emergency/governance/validate-prompts`.
 
 Required disclaimers:
 

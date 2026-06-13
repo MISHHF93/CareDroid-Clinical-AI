@@ -10,8 +10,12 @@ router.post('/track-decision', async (req, res) => {
       return res.status(400).json({ error: 'patientId and clinicianId are required' });
     }
 
-    await boardingService.trackDecisionToAdmit(patientId, clinicianId);
-    return res.json({ success: true });
+    const decision = await boardingService.trackDecisionToAdmit(patientId, clinicianId);
+    return res.json({
+      success: true,
+      message: 'Decision to admit tracked',
+      ...decision,
+    });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

@@ -33,7 +33,11 @@ function ChartCard({ title, subtitle, children }) {
 export default function EmergencyAnalytics() {
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
+  const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const data = emergencyAnalytics.data?.operationalCommand || {};
+  const shift = emergencyAnalytics.data?.shift || {};
+  const totalDailyVolume = (data.dailyVolume || []).reduce((sum, point) => sum + Number(point.count || 0), 0);
+  const topComplaint = data.topComplaints?.[0];
 
   useEffect(() => {
     void loadEmergencyAnalytics({ force: true });
@@ -46,13 +50,30 @@ export default function EmergencyAnalytics() {
           <span>Operational Command</span>
           <h1>Emergency Analytics</h1>
           <p>
-            {emergencyAnalytics.source === 'backend'
+            {activeScenario
+              ? `Scenario fixture: ${activeScenario.label}`
+              : emergencyAnalytics.source === 'backend'
               ? 'Backend aggregate data'
               : 'Backend ED aggregate endpoints are not available yet; showing local operational fallback.'}
           </p>
         </div>
         <strong>{emergencyAnalytics.status === 'loading' ? 'Loading' : emergencyAnalytics.source}</strong>
       </header>
+
+      <div className="emergency-analytics__grid" aria-label="Emergency analytics KPIs">
+        <ChartCard title="Patients Seen" subtitle="Current shift">
+          <strong>{shift.patientsSeen ?? 0}</strong>
+        </ChartCard>
+        <ChartCard title="Discharges" subtitle="Current shift">
+          <strong>{shift.dischargeCount ?? 0}</strong>
+        </ChartCard>
+        <ChartCard title="Daily Volume Total" subtitle="Last 7 days">
+          <strong>{totalDailyVolume}</strong>
+        </ChartCard>
+        <ChartCard title="Top Complaint" subtitle="Current board">
+          <strong>{topComplaint ? `${topComplaint.name}: ${topComplaint.count}` : 'No volume'}</strong>
+        </ChartCard>
+      </div>
 
       <div className="emergency-analytics__grid">
         <ChartCard title="Daily Patient Volume" subtitle="Last 7 days">

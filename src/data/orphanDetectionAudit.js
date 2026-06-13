@@ -355,15 +355,6 @@ function detectDomainModuleOrphans(corpus, appImports) {
     }
   }
 
-  if (!existsSync(join(REPO_ROOT, 'src/pages/SimulationLaboratoryViewer.jsx'))) {
-    rows.push({
-      id: 'src/pages/SimulationLaboratoryViewer.jsx',
-      domain: 'simulation',
-      classification: ORPHAN_CLASSIFICATIONS.QUARANTINE,
-      evidence: 'Referenced in tests/docs but page module never existed; only .css remains',
-    });
-  }
-
   return rows;
 }
 
@@ -665,7 +656,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '## Critical findings',
     '',
-    '1. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.',
+    '1. **Simulation / lab / 3D workspace styles** — `SimulationLaboratoryViewer.css` is an intentional shared style module for active demo pages; no missing page component is required. Class: **legacy**.',
     '2. **AI agents / platform APIs** — platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.',
     '3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
     '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',

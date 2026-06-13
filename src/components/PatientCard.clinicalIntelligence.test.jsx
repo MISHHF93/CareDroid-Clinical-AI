@@ -3,9 +3,10 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import PatientCard from './PatientCard';
 import PatientDetailPanel from './PatientDetailPanel';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
 
@@ -81,6 +82,45 @@ function seedPatientDetail() {
   });
 }
 
+function timelinePatient() {
+  return {
+    ...selectedPatient(),
+    id: 'patient-timeline-test',
+    mrn: 'MRN-TL-1',
+    firstName: 'Taylor',
+    lastName: 'Timeline',
+    triageTime: '2026-06-12T08:45:00-04:00',
+    state: PatientState.Discharge,
+    roomId: 'r3',
+    flags: [
+      PatientFlag.EMSArrival,
+      PatientFlag.HighRisk,
+      PatientFlag.ReassessmentDue,
+      PatientFlag.PendingAdmission,
+    ],
+    timeline: [
+      {
+        id: 'timeline-state-assessment',
+        type: 'StateChange',
+        from: PatientState.Triage,
+        to: PatientState.Assessment,
+        timestamp: '2026-06-12T09:00:00-04:00',
+        staffId: 'staff-1',
+        note: 'Moved to assessment.',
+      },
+      {
+        id: 'timeline-discharge',
+        type: 'DispositionUpdated',
+        from: PatientState.Admission,
+        to: PatientState.Discharge,
+        timestamp: '2026-06-12T10:00:00-04:00',
+        staffId: 'staff-1',
+        note: 'Discharged home.',
+      },
+    ],
+  };
+}
+
 afterEach(() => {
   act(() => {
     useEmergencyStore.setState(originalState, true);
@@ -112,5 +152,60 @@ describe('PatientDetailPanel clinical intelligence', () => {
       .getState()
       .patients.find((patient) => patient.id === 'patient-ai-panel-test');
     expect(updated?.vitals.at(-1)?.hr).toBe(122);
+  });
+
+  it('opens a patient-scoped timeline from the card and renders core event categories', async () => {
+    const user = userEvent.setup();
+    const patient = timelinePatient();
+    act(() => {
+      useEmergencyStore.setState(
+        {
+          ...originalState,
+          patients: [patient],
+          selectedPatientId: null,
+          workflowLogs: [
+            {
+              id: 'workflow-copilot-test',
+              type: 'copilot_used',
+              title: 'Copilot used',
+              summary: 'Copilot summarized high-risk patient context for human review.',
+              timestamp: '2026-06-12T09:15:00-04:00',
+              patientId: patient.id,
+              source: 'ed-copilot',
+              severity: 'Warning',
+              status: 'recorded',
+              metadata: {},
+            },
+          ],
+        },
+        true
+      );
+    });
+
+    render(
+      <MemoryRouter>
+        <PatientCard patient={patient} />
+        <PatientDetailPanel />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole('button', { name: /open timeline for taylor timeline/i }));
+
+    expect(screen.getByRole('heading', { name: /Patient Timeline/i })).toBeInTheDocument();
+    [
+      'Intake',
+      'State transition',
+      'Triage',
+      'Queue movement',
+      'Reassessment',
+      'EMS',
+      'Referral',
+      'Boarding',
+      'Discharge',
+      'AI/Copilot',
+      'Provincial health data',
+    ].forEach((label) => {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    });
   });
 });

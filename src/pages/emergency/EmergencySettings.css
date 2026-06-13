@@ -74,6 +74,11 @@
   cursor: pointer;
 }
 
+.emergency-settings button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .emergency-settings input,
 .emergency-settings select {
   min-height: 36px;
@@ -94,8 +99,25 @@
   text-transform: uppercase;
 }
 
+.emergency-settings__banner,
+.emergency-settings__empty {
+  border: 1px solid color-mix(in srgb, var(--status-info) 30%, var(--color-border-subtle));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
+  color: var(--color-text-secondary);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.emergency-settings__banner--error {
+  border-color: color-mix(in srgb, var(--status-warning) 45%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--status-warning) 12%, var(--color-surface));
+}
+
 .emergency-settings__inline,
 .emergency-settings__grid,
+.emergency-settings__demo-card,
 .emergency-settings__rules,
 .emergency-settings__cards,
 .emergency-settings__table {
@@ -113,6 +135,48 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-3);
+}
+
+.emergency-settings__demo-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.emergency-settings__demo-card > div:first-child {
+  border: 1px solid color-mix(in srgb, var(--status-info) 28%, var(--color-border-subtle));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-info) 9%, var(--color-elevated));
+  padding: var(--space-3);
+}
+
+.emergency-settings__demo-card strong {
+  color: var(--color-text-primary);
+}
+
+.emergency-settings__demo-card p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.emergency-settings__demo-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.emergency-settings__demo-metrics span {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 999px;
+  background: var(--color-elevated);
+  color: var(--status-info);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .emergency-settings__table,
@@ -150,12 +214,81 @@
   text-transform: none;
 }
 
+.emergency-settings__check {
+  gap: var(--space-2);
+}
+
+.emergency-settings__check input {
+  min-height: auto;
+}
+
 .emergency-settings__cards {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .emergency-settings__cards article {
   align-items: flex-start;
+}
+
+.emergency-settings__audit-summary,
+.emergency-settings__audit-state,
+.emergency-settings__audit-list {
+  margin: 0 var(--space-4);
+}
+
+.emergency-settings__audit-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-elevated);
+}
+
+.emergency-settings__audit-summary strong {
+  color: var(--status-info);
+  font-size: var(--font-size-2xl);
+}
+
+.emergency-settings__audit-summary small,
+.emergency-settings__audit-state,
+.emergency-settings__audit-list small,
+.emergency-settings__audit-list time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.emergency-settings__audit-state--error {
+  color: var(--status-critical);
+}
+
+.emergency-settings__audit-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.emergency-settings__audit-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-elevated);
+}
+
+.emergency-settings__audit-list p {
+  margin: var(--space-1) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.emergency-settings__audit-list article > div:last-child {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
 }
 
 .emergency-settings__cards strong {
@@ -190,6 +323,10 @@
   .emergency-settings__grid,
   .emergency-settings__cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .emergency-settings__demo-card {
+    grid-template-columns: 1fr;
   }
 
   .emergency-settings__table article,

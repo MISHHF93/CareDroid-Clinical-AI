@@ -6,6 +6,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   journey: '/api/emergency/journey',
   ems: '/api/emergency/ems',
   intake: '/api/emergency/intake',
+  smartIntakeVerticalSlice: '/api/emergency/intake/vertical-slice',
   queues: '/api/emergency/queues',
   reassessment: '/api/emergency/reassessment',
   capacity: '/api/emergency/capacity',
@@ -14,6 +15,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   provincialHealth: '/api/emergency/provincial-health',
   integrations: '/api/emergency/integrations',
   copilot: '/api/emergency/copilot',
+  workflowLogs: '/api/emergency/workflow-logs',
   analytics: '/api/emergency/analytics',
   simulationUpdateLive: '/api/emergency/simulation/update-live',
   simulationEvaluate: '/api/emergency/simulation/evaluate',
@@ -64,6 +66,7 @@ export const fetchReferrals = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOI
 export const fetchProvincialHealth = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.provincialHealth);
 export const fetchIntegrationHub = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
+export const fetchEmergencyWorkflowLogs = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
 export const fetchEmergencyAnalytics = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
 export const fetchEmergencySettings = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
 export const updateRealTimeSimulationState = (state = {}) =>
@@ -134,6 +137,12 @@ export const createSmartIntakePatient = (patient) =>
     body: JSON.stringify(patient),
   });
 
+export const runSmartIntakeVerticalSlice = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.smartIntakeVerticalSlice, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
 export default Object.freeze({
   EMERGENCY_OS_API_ENDPOINTS,
   fetchEmergencyWhiteboard,
@@ -149,6 +158,7 @@ export default Object.freeze({
   fetchProvincialHealth,
   fetchIntegrationHub,
   fetchEDCopilot,
+  fetchEmergencyWorkflowLogs,
   fetchEmergencyAnalytics,
   fetchEmergencySettings,
   updateRealTimeSimulationState,
@@ -166,4 +176,5 @@ export default Object.freeze({
   evaluateHybridDigitalTwinScenario,
   createEmergencyPatient,
   createSmartIntakePatient,
+  runSmartIntakeVerticalSlice,
 });

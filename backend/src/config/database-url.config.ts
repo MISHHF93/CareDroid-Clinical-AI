@@ -1,4 +1,4 @@
-const parseBoolean = (value: string | undefined) => String(value || '').toLowerCase() === 'true';
+import { getEnvironmentConfig } from './environment.config';
 
 interface PostgresOptionsInput {
   entities: string[];
@@ -11,31 +11,33 @@ export function buildPostgresOptions({
   migrations,
   synchronize = false,
 }: PostgresOptionsInput): Record<string, unknown> {
+  const config = getEnvironmentConfig();
+  const database = config.database.sql;
   const base = {
     type: 'postgres',
     entities,
     synchronize,
-    logging: parseBoolean(process.env.DATABASE_LOGGING),
-    ssl: parseBoolean(process.env.DATABASE_SSL) ? { rejectUnauthorized: false } : false,
+    logging: database.logging,
+    ssl: database.ssl ? { rejectUnauthorized: false } : false,
     ...(migrations ? { migrations } : {}),
     extra: {
-      max: parseInt(process.env.DATABASE_POOL_SIZE || '10', 10),
+      max: database.poolSize,
     },
   };
 
-  if (process.env.DATABASE_URL) {
+  if (database.url) {
     return {
       ...base,
-      url: process.env.DATABASE_URL,
+      url: database.url,
     };
   }
 
   return {
     ...base,
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-    username: process.env.DATABASE_USER || 'postgres',
-    password: process.env.DATABASE_PASSWORD || 'postgres',
-    database: process.env.DATABASE_NAME || 'caredroid',
+    host: database.host,
+    port: database.port,
+    username: database.username,
+    password: database.password,
+    database: database.databaseName,
   };
 }

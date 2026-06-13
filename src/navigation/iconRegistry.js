@@ -159,6 +159,14 @@ const NAV_ICONS = {
   'provincial-health': Shield,
   integrations: Link2,
   'emergency-analytics': LineChart,
+  surge_management: LineChart,
+  'surge-management': LineChart,
+  safety_dashboard: Shield,
+  'safety-dashboard': Shield,
+  virtual_care: Stethoscope,
+  'virtual-care': Stethoscope,
+  wearable_monitor: Activity,
+  'wearable-monitor': Activity,
   'emergency-settings': Settings,
 };
 

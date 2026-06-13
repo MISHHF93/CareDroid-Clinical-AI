@@ -8,21 +8,16 @@ import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import mongoose from 'mongoose';
 import { AppModule } from './app.module';
-import capacityRoutes from './api/capacity.routes';
-import boardingRoutes from './api/boarding.routes';
-import copilotRoutes from './api/copilot.routes';
-import emsRoutes from './api/ems.routes';
-import governanceRoutes from './api/governance.routes';
 import {
   registerEdgeAIAmbulanceWebSocketSupport,
   registerEMSWebSocketSupport,
 } from './api/ems.socket';
-import reassessmentRoutes from './api/reassessment.routes';
-import smartIntakeRoutes from './api/smart-intake.routes';
-import surgeRoutes from './api/surge.routes';
+import healthRoutes from './api/health.routes';
+import { registerAllRoutes } from './api/routes-registry';
 import { reassessmentScheduler } from './scheduler/reassessment.scheduler';
-import { ocrService } from './services/ocr.service';
+import { initializeAllServices } from './services/service-registry';
 import { initSentry } from './config/sentry.config';
+import { type EnvironmentConfig, getEnvironmentConfig } from './config/environment.config';
 import { SWAGGER_DOCS_PATH } from './server-routes';
 import {
   resolveFrontendDistPath,
@@ -30,14 +25,18 @@ import {
   STATIC_ASSET_RENDER_PATH,
 } from './static-asset-excludes';
 
-function shouldServeFrontendAssets() {
-  return process.env.NODE_ENV === 'production' && !process.env.JEST_WORKER_ID;
+function shouldServeFrontendAssets(config: EnvironmentConfig) {
+  return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
 }
 
-async function registerEmergencyMongooseRuntime(app: INestApplication, logger: Logger) {
-  if (process.env.ENABLE_MONGOOSE_EMERGENCY_OS !== 'true') return;
+async function registerEmergencyMongooseRuntime(
+  app: INestApplication,
+  logger: Logger,
+  config: EnvironmentConfig,
+) {
+  if (!config.database.enableMongooseEmergencyOs) return;
 
-  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_MONGO_URI;
+  const mongoUri = config.database.mongodbUri;
   if (!mongoUri) {
     logger.warn(
       'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose Emergency OS routes.',
@@ -47,18 +46,23 @@ async function registerEmergencyMongooseRuntime(app: INestApplication, logger: L
 
   await mongoose.connect(mongoUri);
   const expressApp = app.getHttpAdapter().getInstance();
-  expressApp.use('/api/emergency/boarding', boardingRoutes);
-  expressApp.use('/api/emergency/capacity', capacityRoutes);
-  expressApp.use('/api/emergency/copilot', copilotRoutes);
-  expressApp.use('/api/emergency/ems', emsRoutes);
-  expressApp.use('/api/emergency/governance', governanceRoutes);
-  expressApp.use('/api/emergency/intake', smartIntakeRoutes);
-  expressApp.use('/api/emergency/reassessment', reassessmentRoutes);
-  expressApp.use('/api/emergency/surge', surgeRoutes);
+  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false });
+  registerAllRoutes(expressApp, { apiPrefix: '/api/emergency', mountDiscovery: false });
   registerEMSWebSocketSupport(expressApp, app.getHttpServer());
   reassessmentScheduler.start();
-  await ocrService.initialize();
-  logger.log('Mongoose Emergency OS routes mounted under /api/emergency/*');
+  const initialization = await initializeAllServices();
+  if (initialization.totals.failed > 0) {
+    logger.warn(
+      `Emergency OS service registry initialized with ${initialization.totals.failed} failed service(s).`,
+    );
+  } else {
+    logger.log(
+      `Emergency OS service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
+    );
+  }
+  logger.log(
+    `Mongoose Emergency OS routes mounted under /api/* (${mountedRoutes.length} route groups; legacy aliases under /api/emergency/*)`,
+  );
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
@@ -109,6 +113,7 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     rawBody: true,
   });
+  const environment = getEnvironmentConfig();
 
   // Enhanced Security headers with HSTS and strict CSP
   app.use(
@@ -154,16 +159,8 @@ async function bootstrap() {
   // HTTP request/response logging middleware (temporarily disabled for testing)
   // app.use(LoggingMiddleware);
 
-  // CORS configuration (allow same-origin since frontend is proxied)
-  const defaultOrigins = ['http://localhost:8000'];
-  const envOrigins = (process.env.FRONTEND_URL || '')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-  const allowedOrigins = envOrigins.length > 0 ? envOrigins : defaultOrigins;
-
   app.enableCors({
-    origin: allowedOrigins,
+    origin: environment.server.corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -190,15 +187,19 @@ async function bootstrap() {
     }),
   );
 
-  if (shouldServeFrontendAssets()) {
+  if (shouldServeFrontendAssets(environment)) {
     registerProductionFrontendAssets(app);
   }
 
   // API prefix (health and root endpoints will be at /)
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
+  const expressApp = app.getHttpAdapter().getInstance();
+  registerAllRoutes(expressApp, { mountRoutes: false });
+  expressApp.use('/api/health', healthRoutes);
+  expressApp.use('/health', healthRoutes);
 
-  await registerEmergencyMongooseRuntime(app, logger);
-  registerEdgeAIAmbulanceWebSocketSupport(app.getHttpAdapter().getInstance(), app.getHttpServer());
+  await registerEmergencyMongooseRuntime(app, logger, environment);
+  registerEdgeAIAmbulanceWebSocketSupport(expressApp, app.getHttpServer());
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -218,13 +219,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
 
-  const port = process.env.PORT || 3000;
+  const port = environment.server.port;
   await app.listen(port);
 
   logger.log(`CareDroid Backend running on: http://localhost:${port}`);
   logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
   logger.log(`Prometheus metrics at: http://localhost:${port}/api/metrics`);
-  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`Environment: ${environment.server.nodeEnv}`);
   logger.log('TLS 1.3: ENFORCED (only TLS 1.3+ allowed)');
   logger.log('Monitoring Stack when docker-compose is running:');
   logger.log('Grafana dashboards: http://localhost:3001');

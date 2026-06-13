@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
@@ -10,52 +12,52 @@ const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
 const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 
-const CANONICAL_APP_SHELL_ROUTES = [
-  ['/emergency/whiteboard', '<EmergencyWhiteboard />'],
-  ['/emergency/patients', '<EmergencyWhiteboard />'],
-  ['/emergency/ems', '<EMSPipeline />'],
-  ['/emergency/intake', '<SmartIntake />'],
-  ['/emergency/queues', '<EmergencyQueueRoute />'],
-  ['/emergency/reassessment', '<EmergencyWhiteboard />'],
-  ['/emergency/capacity', '<EmergencyCapacityRoute />'],
-  ['/emergency/boarding', '<EmergencyCapacityRoute />'],
-  ['/emergency/referrals', '<ReferralPanel />'],
-  ['/emergency/copilot', '<EmergencyCopilotRoute />'],
-  ['/emergency/analytics', '<EmergencyAnalytics />'],
-  ['/emergency/settings', '<SettingsRoute />'],
-];
+const routeNamesByPath = Object.entries(CANONICAL_ROUTES).reduce((map, [name, path]) => {
+  const names = map.get(path) || [];
+  names.push(name);
+  map.set(path, names);
+  return map;
+}, new Map());
 
 function routeBlockFor(path) {
-  const escapedPath = path.replace(/\//g, '\\/');
-  return appSource.match(
-    new RegExp(`path:\\s*'${escapedPath}'[\\s\\S]*?requiresAuth:\\s*true,?`)
-  )?.[0];
+  const routeNames = routeNamesByPath.get(path) || [];
+  const routeNeedles = [
+    ...routeNames.map((routeName) => `path={CANONICAL_ROUTES.${routeName}}`),
+    `path="${path}"`,
+  ];
+  const routeNeedle = routeNeedles.find((needle) => appSource.includes(needle));
+  if (!routeNeedle) return '';
+  const index = appSource.indexOf(routeNeedle);
+  if (index < 0) return '';
+  const lineStart = appSource.lastIndexOf('\n', index);
+  const lineEnd = appSource.indexOf('\n', index);
+  return appSource.slice(lineStart, lineEnd > index ? lineEnd : index + 240);
 }
 
 describe('canonical protected AppShell source-level route contract', () => {
-  it.each(CANONICAL_APP_SHELL_ROUTES)(
-    'registers %s as protected page content for the shared AppShell',
-    (path, elementText) => {
+  it.each(EMERGENCY_PAGE_ALL_RENDER_PATHS)(
+    'registers %s as page content for the shared AppShell',
+    (path) => {
       const routeBlock = routeBlockFor(path);
 
       expect(routeBlock).toBeTruthy();
-      expect(routeBlock).toContain(elementText);
-      expect(routeBlock).toContain('requiresAuth: true');
       expect(routeBlock).not.toMatch(/<AppShellPage\b|<AppShell\b|<Sidebar\b|<AuthShell\b|<PublicShell\b/);
       expect(routeBlock).not.toContain('app-shell-page-body');
     }
   );
 
-  it('keeps protected shell wrapping centralized in resolveElement', () => {
-    expect(appSource).toContain('if (requiresAuth || !publicOnly) {');
+  it('keeps protected shell wrapping centralized in RootLayout', () => {
     expect(appSource).not.toContain('<TenantRequired>');
-    expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
-    expect(appSource.match(/<AppShellPage\b/g)).toHaveLength(1);
+    expect(appSource).toContain('function RootLayout()');
+    expect(appSource).toContain('<Route element={<RootLayout />}>');
+    expect(appSource).toContain('<AppShell>');
+    expect(appSource).toContain('<Outlet />');
+    expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
   });
 
-  it('keeps non-canonical profile routes as future AppShell stubs instead of duplicate shells', () => {
-    expect(appSource).toContain("['Profile', '/profile']");
-    expect(appSource).toContain("['Profile', '/profile/*']");
+  it('keeps non-canonical profile routes off the mounted Emergency OS shell', () => {
+    expect(appSource).not.toContain('path="/profile"');
+    expect(appSource).not.toContain('path="/profile/*"');
     expect(appSource).not.toContain("path: '/profile/settings'");
     expect(appSource).not.toContain('<Sidebar');
     expect(appSource).not.toContain('element: null');

@@ -1,4 +1,4 @@
-import { Patient, IPatient } from '../models/Patient';
+import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
 
 export class ReassessmentService {
   getReassessmentDueMinutes(dpsScore: number): number {
@@ -83,7 +83,11 @@ export class ReassessmentService {
     return patient;
   }
 
-  async dismissReassessment(patientId: string, reason: string, clinician: string): Promise<void> {
+  async dismissReassessment(
+    patientId: string,
+    reason: string,
+    clinician: string,
+  ): Promise<IPatient> {
     const patient = await Patient.findById(patientId);
     if (!patient) throw new Error('Patient not found');
 
@@ -95,6 +99,7 @@ export class ReassessmentService {
     patient.next_reassessment_due = await this.calculateNextDueDate(patient);
     patient.alerts.push(`Reassessment dismissed by ${clinician}: ${reason}`);
     await patient.save();
+    return patient;
   }
 
   private isValidDpsScore(score: number): score is 1 | 2 | 3 | 4 | 5 {

@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { IconBell } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { CapacitySnapshot } from '../types/emergency';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import WorkloadBalancePanel from './WorkloadBalancePanel';
 
 const capacityColors: Record<CapacitySnapshot['band'], string> = {
   Green: '#10B981',
@@ -32,14 +36,17 @@ function Clock() {
   );
 }
 
-function CapacityBadge({ capacity }: { capacity: CapacitySnapshot }) {
+function CapacityBadge({ capacity, canOpen }: { capacity: CapacitySnapshot; canOpen: boolean }) {
   const navigate = useNavigate();
   const color = capacityColors[capacity.band];
 
   return (
     <button
       type="button"
-      onClick={() => navigate('/emergency/capacity')}
+      onClick={() => {
+        if (canOpen) navigate(CANONICAL_ROUTES.emergencyCapacity);
+      }}
+      disabled={!canOpen}
       style={{
         border: `1px solid ${color}`,
         background: `${color}1F`,
@@ -48,7 +55,8 @@ function CapacityBadge({ capacity }: { capacity: CapacitySnapshot }) {
         padding: '6px 12px',
         fontSize: 12,
         fontWeight: 700,
-        cursor: 'pointer',
+        cursor: canOpen ? 'pointer' : 'not-allowed',
+        opacity: canOpen ? 1 : 0.6,
         transition: 'background 180ms ease, border-color 180ms ease, color 180ms ease',
       }}
     >
@@ -58,17 +66,65 @@ function CapacityBadge({ capacity }: { capacity: CapacitySnapshot }) {
 }
 
 export function Header() {
-  const navigate = useNavigate();
+  const emergencyRole = useEmergencyRolePermissions();
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
+  const patients = useEmergencyStore((store) => store.patients);
+  const staff = useEmergencyStore((store) => store.staff);
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
+  const assignStaff = useEmergencyStore((store) => store.assignStaff);
+  const activeScenarioId = useEmergencyStore((store) => store.activeScenarioId);
+  const activeScenario = useEmergencyStore((store) => store.activeScenario);
+  const availableScenarios = useEmergencyStore((store) => store.availableScenarios);
+  const setActiveScenario = useEmergencyStore((store) => store.setActiveScenario);
   const [alertDrawerOpen, setAlertDrawerOpen] = useState(false);
   const [staffMenuOpen, setStaffMenuOpen] = useState(false);
+  const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
 
   const unreadAlertCount = useMemo(
     () => alerts.filter((alert) => !alert.dismissed).length,
     [alerts],
   );
+
+  const staffWorkloads = useMemo(
+    () =>
+      staff.map((member) => {
+        const assignedPatients = patients.filter((patient) => patient.assignedStaffId === member.id);
+        const assignedCount = assignedPatients.length;
+        return {
+          id: member.id,
+          displayName: member.name,
+          roleLabel: member.role,
+          initials: member.name
+            .split(/\s+/)
+            .map((part) => part[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase(),
+          assignedCount,
+          assignedPatients,
+          workloadTone: assignedCount >= 6 ? 'overloaded' : assignedCount >= 4 ? 'busy' : 'balanced',
+          workloadPercent: Math.min(100, Math.round((assignedCount / 6) * 100)),
+        };
+      }),
+    [patients, staff],
+  );
+
+  const rebalanceSuggestion = useMemo(() => {
+    if (!staffWorkloads.length) return null;
+    const teamAverage =
+      staffWorkloads.reduce((sum, member) => sum + member.assignedCount, 0) / staffWorkloads.length;
+    const highestLoad = [...staffWorkloads].sort((a, b) => b.assignedCount - a.assignedCount)[0];
+    if (!highestLoad || highestLoad.assignedCount < 4 || highestLoad.assignedCount - teamAverage < 2) return null;
+    return { ...highestLoad, name: highestLoad.displayName, teamAverage: Math.round(teamAverage * 10) / 10 };
+  }, [staffWorkloads]);
+
+  const currentStaffProfile = useMemo(() => {
+    const chargeStaff = staff.find((member) => member.role === 'Charge') || staff[0];
+    return chargeStaff
+      ? { id: chargeStaff.id, displayName: chargeStaff.name, roleLabel: chargeStaff.role }
+      : null;
+  }, [staff]);
 
   useEffect(() => {
     const closePanels = () => {
@@ -78,6 +134,10 @@ export function Header() {
     document.addEventListener('close-all-panels', closePanels);
     return () => document.removeEventListener('close-all-panels', closePanels);
   }, []);
+
+  const handleScenarioChange = (scenarioId: string) => {
+    setActiveScenario(scenarioId);
+  };
 
   return (
     <header
@@ -98,10 +158,57 @@ export function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <span style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}>Emergency OS</span>
         <Clock />
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9CA3AF', fontSize: 12 }}>
+          Role
+          <select
+            aria-label="Demo Emergency OS role"
+            value={emergencyRole.role}
+            onChange={(event) => emergencyRole.switchDemoRole(event.target.value)}
+            style={{
+              background: '#111827',
+              border: '1px solid #1F2937',
+              borderRadius: 8,
+              color: '#F9FAFB',
+              fontSize: 12,
+              padding: '5px 8px',
+            }}
+          >
+            {emergencyRole.demoRoles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-        <CapacityBadge capacity={capacity} />
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9CA3AF', fontSize: 12 }}>
+          Scenario
+          <select
+            aria-label="Emergency OS demo scenario"
+            value={activeScenarioId}
+            onChange={(event) => handleScenarioChange(event.target.value)}
+            title={activeScenario?.description || 'Emergency OS demo scenario'}
+            style={{
+              background: '#111827',
+              border: '1px solid #1F2937',
+              borderRadius: 999,
+              color: '#F9FAFB',
+              fontSize: 12,
+              fontWeight: 700,
+              minWidth: 190,
+              padding: '6px 10px',
+            }}
+          >
+            {availableScenarios.map((scenario) => (
+              <option key={scenario.id} value={scenario.id}>
+                {scenario.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <CapacityBadge capacity={capacity} canOpen={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)} />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
@@ -150,8 +257,12 @@ export function Header() {
 
         <button
           type="button"
-          onClick={() => setStaffMenuOpen((open) => !open)}
+          onClick={() => {
+            if (canManageWorkload) setStaffMenuOpen((open) => !open);
+          }}
           aria-label="Staff menu"
+          disabled={!canManageWorkload}
+          title={canManageWorkload ? 'Staff menu' : `${emergencyRole.roleLabel} cannot reassign workload`}
           style={{
             width: 24,
             height: 24,
@@ -164,7 +275,8 @@ export function Header() {
             justifyContent: 'center',
             fontSize: 10,
             fontWeight: 700,
-            cursor: 'pointer',
+            cursor: canManageWorkload ? 'pointer' : 'not-allowed',
+            opacity: canManageWorkload ? 1 : 0.6,
           }}
         >
           DA
@@ -226,43 +338,17 @@ export function Header() {
         </div>
       ) : null}
 
-      {staffMenuOpen ? (
-        <div
-          role="menu"
-          aria-label="Staff menu placeholder"
-          style={{
-            position: 'absolute',
-            top: 48,
-            right: 16,
-            background: '#111827',
-            border: '1px solid #1F2937',
-            borderRadius: 12,
-            color: '#F9FAFB',
-            padding: 12,
-            minWidth: 180,
-            zIndex: 120,
-            boxShadow: '0 18px 50px rgba(0,0,0,0.35)',
-          }}
-        >
-          <div style={{ fontSize: 13, fontWeight: 700 }}>Dr. A</div>
-          <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>Staff menu coming</div>
-          <button
-            type="button"
-            onClick={() => navigate('/emergency/settings')}
-            style={{
-              marginTop: 10,
-              background: '#1C2333',
-              border: '1px solid #374151',
-              borderRadius: 8,
-              color: '#F9FAFB',
-              padding: '7px 9px',
-              cursor: 'pointer',
-            }}
-          >
-            Open Settings
-          </button>
-        </div>
-      ) : null}
+      <WorkloadBalancePanel
+        open={staffMenuOpen}
+        activeShift={{ startTime: undefined, chargeStaffId: currentStaffProfile?.id }}
+        workloads={staffWorkloads}
+        rebalanceSuggestion={rebalanceSuggestion}
+        currentStaffProfile={currentStaffProfile}
+        onClose={() => setStaffMenuOpen(false)}
+        onAssignStaff={(patientId: string, staffId: string) => {
+          if (canManageWorkload) assignStaff(patientId, staffId);
+        }}
+      />
     </header>
   );
 }

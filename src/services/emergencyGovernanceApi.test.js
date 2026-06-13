@@ -24,28 +24,28 @@ describe('emergencyGovernanceApi', () => {
     });
   });
 
-  it('uses the formal enterprise AI governance API routes', async () => {
+  it('uses the canonical Emergency OS AI governance API routes', async () => {
     await fetchAIGovernanceRegistry();
     await fetchAIGovernanceSafetyRules();
     await fetchEmergencyGovernanceCompliance(14);
     await fetchEmergencyGovernanceViolations(5);
     await validateEmergencyGovernancePrompts();
 
-    expect(apiFetchJson).toHaveBeenNthCalledWith(1, '/api/v1/governance/registry', expect.any(Object));
-    expect(apiFetchJson).toHaveBeenNthCalledWith(2, '/api/v1/governance/safety-rules', expect.any(Object));
+    expect(apiFetchJson).toHaveBeenNthCalledWith(1, '/api/emergency/governance/registry', expect.any(Object));
+    expect(apiFetchJson).toHaveBeenNthCalledWith(2, '/api/emergency/governance/safety-rules', expect.any(Object));
     expect(apiFetchJson).toHaveBeenNthCalledWith(
       3,
-      '/api/v1/governance/compliance?days=14',
+      '/api/emergency/governance/compliance?days=14',
       expect.any(Object),
     );
     expect(apiFetchJson).toHaveBeenNthCalledWith(
       4,
-      '/api/v1/governance/violations?limit=5',
+      '/api/emergency/governance/violations?limit=5',
       expect.any(Object),
     );
     expect(apiFetchJson).toHaveBeenNthCalledWith(
       5,
-      '/api/v1/governance/validate-prompts',
+      '/api/emergency/governance/validate-prompts',
       expect.any(Object),
     );
   });

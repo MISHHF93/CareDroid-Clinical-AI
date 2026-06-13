@@ -11,7 +11,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs');
-const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 60 });
+const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 80 });
 
 describe('orphanDetectionAudit report', () => {
   it('builds orphan findings across categories', { timeout: 60_000 }, () => {

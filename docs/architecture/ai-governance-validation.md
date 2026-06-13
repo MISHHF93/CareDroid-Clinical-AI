@@ -9,8 +9,8 @@ This validation covers the enterprise AI governance implementation added to the 
 - Central backend registry: `backend/src/config/ai-governance.registry.ts`
 - Backend compatibility config: `backend/src/config/ai.config.ts`
 - Governance service: `backend/src/services/ai-governance.service.ts`
-- Nest routes: `/api/v1/governance/registry`, `/safety-rules`, `/compliance`, `/violations`, `/validate-prompts`
-- Compatibility routes: `/api/emergency/governance/*`
+- Frontend routes: `/api/emergency/governance/registry`, `/safety-rules`, `/compliance`, `/violations`, `/validate-prompts`
+- Compatibility aliases: `/api/v1/governance/*`
 - Frontend API client: `src/services/emergencyGovernanceApi.js`
 - Dashboard route: `/ai-governance` and `/emergency/ai-governance`
 - Navigation, command palette, search discovery, API inventories, and focused tests

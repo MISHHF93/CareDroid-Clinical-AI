@@ -14,30 +14,21 @@ import {
 } from '@tabler/icons-react';
 import { PatientFlag } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { EMERGENCY_SIDEBAR_NAV_ITEMS } from '../config/navigation.config';
+import { getVisibleNavigation, type NavigationItem } from '../config/unified-navigation.config';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import './Sidebar.css';
 
 type SidebarNavItem = {
   id: string;
   label: string;
-  iconKey: string;
+  icon: string;
   path: string;
-  activePaths?: string[];
+  activePaths?: readonly string[];
 };
 
-function isSidebarNavItem(item: SidebarNavItem | undefined): item is SidebarNavItem {
-  return Boolean(item?.id && item.label && item.iconKey && item.path);
-}
-
-const NAV: SidebarNavItem[] = (EMERGENCY_SIDEBAR_NAV_ITEMS as readonly (SidebarNavItem | undefined)[])
-  .filter(isSidebarNavItem)
-  .map((item) => ({
-    id: item.id,
-    label: item.label,
-    iconKey: item.iconKey,
-    path: item.path,
-    activePaths: item.activePaths,
-  }));
+type SidebarProps = {
+  navigationItems?: readonly NavigationItem[];
+};
 
 const ICONS: Record<string, Icon> = {
   'layout-dashboard': IconLayoutDashboard,
@@ -56,6 +47,7 @@ const ICONS: Record<string, Icon> = {
   capacity: IconChartBar,
   'emergency-analytics': IconChartBar,
   'department-pulse': IconChartBar,
+  'surge-management': IconChartBar,
   'list-check': IconListCheck,
   queues: IconListCheck,
   reassessment: IconListCheck,
@@ -63,10 +55,13 @@ const ICONS: Record<string, Icon> = {
   'ed-copilot': IconStethoscope,
   'shield-check': IconShieldCheck,
   shield: IconShieldCheck,
+  'safety-dashboard': IconShieldCheck,
   stethoscope: IconStethoscope,
+  'virtual-care': IconStethoscope,
   'clinical-tools': IconStethoscope,
   report: IconReport,
   'shift-summary': IconReport,
+  'wearable-monitor': IconReport,
   settings: IconSettings,
   'emergency-settings': IconSettings,
 };
@@ -77,11 +72,13 @@ function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
   return Boolean(item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)));
 }
 
-export function Sidebar() {
+export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
+  const emergencyRole = useEmergencyRolePermissions();
   const reassessmentDueCount = useEmergencyStore(
     (store) => store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
   );
+  const visibleNav: readonly SidebarNavItem[] = navigationItems || getVisibleNavigation(emergencyRole.role);
 
   return (
     <aside
@@ -99,8 +96,8 @@ export function Sidebar() {
       }}
       aria-label="Emergency navigation"
     >
-      {NAV.map((item) => {
-        const IconComponent = ICONS[item.iconKey] || IconLayoutDashboard;
+      {visibleNav.map((item) => {
+        const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
         const active = isActiveRoute(location.pathname, item);
         const isWhiteboard = item.id === 'emergency_whiteboard';
 
@@ -111,7 +108,7 @@ export function Sidebar() {
             className={[
               'sidebar-nav-item',
               active ? 'sidebar-nav-item--active' : '',
-              item.id === 'emergency_settings' ? 'sidebar-nav-item--settings' : '',
+              item.id === 'settings' ? 'sidebar-nav-item--settings' : '',
             ].filter(Boolean).join(' ')}
             aria-label={item.label}
             aria-current={active ? 'page' : undefined}

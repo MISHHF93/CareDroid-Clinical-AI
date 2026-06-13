@@ -3,6 +3,8 @@ import { AlertTriangle } from 'lucide-react';
 import { CRITICAL_CHECKLISTS } from '../../config/criticalChecklists';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { staffDisplayName } from '../utils/staffManagement';
 import './EMSCriticalBroadcast.css';
 
@@ -124,6 +126,7 @@ export function EMSCriticalCountdownBadge() {
 
 export default function EMSCriticalBroadcast() {
   const { user } = useUser();
+  const emergencyRole = useEmergencyRolePermissions();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const rooms = useEmergencyStore((state) => state.rooms);
   const staff = useEmergencyStore((state) => state.staff);
@@ -159,8 +162,11 @@ export default function EMSCriticalBroadcast() {
   const isCollapsed = Boolean(collapsedArrivalIds[arrival.id]);
   const isChecklistExpanded = !isPrepComplete && !isCollapsed;
   const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
+  const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
+  const canConvert = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
 
   const toggleItem = (item, checked) => {
+    if (!canPrepareBay) return;
     checkCriticalEMSChecklistItem(arrival.id, {
       itemId: item.id,
       label: item.label,
@@ -184,7 +190,7 @@ export default function EMSCriticalBroadcast() {
   };
 
   const markPrepComplete = () => {
-    if (!canMarkPrepComplete) return;
+    if (!canMarkPrepComplete || !canPrepareBay) return;
     completeCriticalEMSChecklist(arrival.id, {
       staffId: currentStaff.staffId,
       staffName: currentStaff.staffName,
@@ -194,6 +200,7 @@ export default function EMSCriticalBroadcast() {
   };
 
   const addToWhiteboard = () => {
+    if (!canConvert) return;
     convertEMSArrivalToPatient(arrival.id);
   };
 
@@ -235,7 +242,7 @@ export default function EMSCriticalBroadcast() {
               Reopen prep
             </button>
           ) : null}
-          <button type="button" onClick={addToWhiteboard}>
+          <button type="button" onClick={addToWhiteboard} disabled={!canConvert}>
             Add to whiteboard
           </button>
         </div>
@@ -261,10 +268,10 @@ export default function EMSCriticalBroadcast() {
             {completedCount}/{items.length} complete
           </strong>
           <div className="ems-critical-checklist__actions">
-            <button type="button" onClick={markPrepComplete} disabled={!canMarkPrepComplete}>
+            <button type="button" onClick={markPrepComplete} disabled={!canMarkPrepComplete || !canPrepareBay}>
               Mark prep complete
             </button>
-            <button type="button" onClick={addToWhiteboard}>
+            <button type="button" onClick={addToWhiteboard} disabled={!canConvert}>
               Add to whiteboard
             </button>
           </div>
@@ -281,6 +288,7 @@ export default function EMSCriticalBroadcast() {
                   type="checkbox"
                   checked={Boolean(completion)}
                   onChange={(event) => toggleItem(item, event.target.checked)}
+                  disabled={!canPrepareBay}
                 />
                 <span>{label}</span>
                 {completion ? (

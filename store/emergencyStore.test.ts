@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { hasPatientFlag, selectActiveAlerts, selectReassessmentQueue, useEmergencyStore } from './emergencyStore';
+import {
+  hasPatientFlag,
+  selectActiveAlerts,
+  selectPatientWorkflowTimeline,
+  selectReassessmentQueue,
+  selectWorkflowLogs,
+  useEmergencyStore,
+} from './emergencyStore';
 import { movePatientToState as movePatientWithJourneyRules } from '../engine/journeyEngine';
 import { PatientState, Priority } from '../types/emergency';
 
@@ -41,6 +48,19 @@ describe('emergencyStore EMS arrival conversion', () => {
       })
     );
     expect(patient && hasPatientFlag(patient, 'EMSArrival')).toBe(true);
+    expect(selectWorkflowLogs(nextState)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'ems_converted_to_patient',
+          patientId: patient?.id,
+        }),
+        expect.objectContaining({
+          type: 'patient_created',
+          patientId: patient?.id,
+          source: 'ems-pipeline',
+        }),
+      ])
+    );
   });
 
   it('auto-prepares critical EMS arrivals and saves checklist status to the patient record', () => {
@@ -387,6 +407,47 @@ describe('emergencyStore staff reassignment', () => {
         reason: 'Workload balance panel reassignment',
       }),
     });
+    expect(selectPatientWorkflowTimeline(state, patientId)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'clinician_assigned',
+          patientId,
+          actorStaffId: 'staff-priya-nair',
+        }),
+      ])
+    );
+  });
+});
+
+describe('emergencyStore workflow action logging', () => {
+  it('logs patient creation, journey movement, boarding start, and capacity changes', () => {
+    const base = useEmergencyStore.getState().patients[0];
+    const patient = {
+      ...base,
+      id: 'workflow-log-local-patient',
+      mrn: 'MRN-WORKFLOW-LOCAL',
+      firstName: 'Workflow',
+      lastName: 'Local',
+      state: PatientState.Triage,
+      timeline: [],
+      flags: [],
+      notes: [],
+    };
+
+    useEmergencyStore.getState().addPatient(patient);
+    useEmergencyStore.getState().movePatientToState(patient.id, PatientState.Admission);
+
+    const logs = selectPatientWorkflowTimeline(useEmergencyStore.getState(), patient.id);
+    expect(logs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'patient_created', patientId: patient.id }),
+        expect.objectContaining({ type: 'journey_state_changed', patientId: patient.id }),
+        expect.objectContaining({ type: 'boarding_started', patientId: patient.id }),
+      ])
+    );
+    expect(selectWorkflowLogs(useEmergencyStore.getState())).toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: 'capacity_score_changed' })])
+    );
   });
 });
 
@@ -429,6 +490,18 @@ describe('emergencyStore fast referrals', () => {
       title: 'Referral sent to Cardiology',
       patientId,
     });
+    expect(selectWorkflowLogs(state)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'referral_created',
+          patientId,
+          metadata: expect.objectContaining({
+            referralId: referral?.id,
+            targetDepartment: 'Cardiology',
+          }),
+        }),
+      ])
+    );
   });
 
   it('escalates urgent referrals when they remain unacknowledged', () => {
@@ -537,6 +610,15 @@ describe('emergencyStore reassessment reminders', () => {
       status: 'pending',
       note: 'Recheck BP after metoprolol',
     });
+    expect(selectPatientWorkflowTimeline(state, patientId)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'reassessment_created',
+          patientId,
+          status: 'pending',
+        }),
+      ])
+    );
     expect(patient && hasPatientFlag(patient, 'ReassessmentDue')).toBe(true);
     expect(selectReassessmentQueue(state).some((item) => item.patientId === patientId)).toBe(true);
     expect(activeAlerts.find((alert) => alert.reminderId === reminder!.id)).toMatchObject({
@@ -578,6 +660,15 @@ describe('emergencyStore reassessment reminders', () => {
     expect(patient?.timeline.at(-1)).toMatchObject({
       type: 'ReassessmentReminderCompleted',
     });
+    expect(selectPatientWorkflowTimeline(useEmergencyStore.getState(), patientId)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'reassessment_completed',
+          patientId,
+          status: 'completed',
+        }),
+      ])
+    );
   });
 });
 

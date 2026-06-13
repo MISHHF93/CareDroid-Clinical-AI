@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-06-13T00:33:02.592Z
+**Generated:** 2026-06-13T12:48:11.034Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -17,6 +17,11 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/linkedin/callback` | AuthController | OAuth callback |
 | `/api/two-factor/verify` | TwoFactorController | Used during login challenge |
 | `/api/subscriptions/webhook` | SubscriptionsController | Stripe webhook |
+| `/api/v1/governance/registry` | AIGovernanceV1Controller | Compatibility alias; SPA uses canonical Emergency OS governance route |
+| `/api/v1/governance/safety-rules` | AIGovernanceV1Controller | Compatibility alias; SPA uses canonical Emergency OS governance route |
+| `/api/v1/governance/compliance` | AIGovernanceV1Controller | Compatibility alias; SPA uses canonical Emergency OS governance route |
+| `/api/v1/governance/violations` | AIGovernanceV1Controller | Compatibility alias; SPA uses canonical Emergency OS governance route |
+| `/api/v1/governance/validate-prompts` | AIGovernanceV1Controller | Compatibility alias; SPA uses canonical Emergency OS governance route |
 | `/api/interoperability/events` | InteroperabilityController | Integration Hub ingestion endpoint for authenticated adapters and backend workflows |
 | `/api/cost-optimizer/route` | CostOptimizerController | Assistant lifecycle invokes route optimization server-side before model/tool execution |
 | `/api/health` | AnalyticsController | Client health ping (distinct from GET /health) |
@@ -35,18 +40,27 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `EmergencyEscalationService` | `emergency-escalation` | Chat pipeline |
 | `IntentClassifierService` | `intent-classifier` | Via POST /api/chat/* |
 | `ToolOrchestratorService.executeInChat` | `tool-orchestrator` | ChatService internal |
+| `FHIRService / MPIService / OCRService / TextMiningService` | `services + api/smart-intake.routes` | Mounted only by the optional Mongoose Emergency OS smart-intake workflow |
+| `LiveTrackingService legacy adapters` | `modules/live-tracking` | Legacy source-compatibility adapters; active routes live on FleetController, HospitalMapController, and TelemetryController |
+| `EdgeAIAmbulanceService` | `services + api/ems.socket` | Emergency OS WebSocket support registered from backend startup |
 
 ## B. Expose through SPA (recommended)
 
 | Route | Controller | Client hint |
 |-------|------------|-------------|
-| `/api/protocols/:id` | ProtocolController | Protocols.jsx |
-| `/api/compliance/export` | ComplianceController | complianceApi.js |
 
 ## C. Deferred / admin / SSO
 
 | Route | Controller | Reason |
 |-------|------------|--------|
+| `/api/emergency/digital-twin/organizational/simulate` | OrganizationalDigitalTwinController | Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints |
+| `/api/emergency/digital-twin/organizational/synchronize` | OrganizationalDigitalTwinController | Research controller; no dedicated SPA workflow yet |
+| `/api/ems/ai-call-interrogation` | AICallInterrogationController | Research EMS call interrogation endpoint; not exposed in active ED shell |
+| `/api/ems/ai-call-interrogation/ecg` | AICallInterrogationController | Research ECG interrogation endpoint; not exposed in active ED shell |
+| `/api/ems/federated/112-call` | FederatedEMSController | Research federated EMS endpoint; no frontend intake workflow is wired |
+| `/api/federated/lmecs/predict` | LMECSController | Research severity-prediction endpoint; no SPA client is wired |
+| `/api/federated/lmecs/select` | LMECSController | Research client-selection endpoint; no SPA client is wired |
+| `/api/handover/er-pulse` | ERPulseHandoverController | Research handover endpoint; active ED handoff UI is not mounted |
 | `/api/auth/oidc` | AuthController | SSO placeholder |
 | `/api/auth/saml` | AuthController | SSO placeholder |
 | `/api/auth/me` | AuthController | JWT introspection; SPA uses profile |
@@ -85,6 +99,10 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/memory/clinical` | MemoryController | Memory dashboard uses aggregate route |
 | `/api/subscriptions/config` | SubscriptionsController | Stripe config for checkout UI |
 | `/api/chat/message-3d` | ChatController | 3D avatar experiment |
+| `/api/emergency/copilot/message` | EmergencyAIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/intake/ai/message` | EmergencyAIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/referrals/ai/message` | EmergencyAIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/analytics/ai/message` | EmergencyAIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/patients` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/patients/:patientId` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/patients` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -232,22 +250,21 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | team-invite | POST | `/api/team/invite` | teamManagement | TeamManagement.jsx |
 | bulk-sync | POST | `/api/sync` | bulkSync | offline.js / OfflineSupport.jsx |
 | clinical-alerts-stream | GET | `/api/clinical/alerts/stream` | clinicalAlertsStream | clinicalAlertsApi.js / ClinicalAlertsPage.jsx |
-| emergency-analytics | GET | `/api/emergency/analytics` | emergencyOperationalAnalytics | emergencyAnalyticsApi.js |
 | emergency-capacity-history | GET | `/api/emergency/capacity/history` | emergencyCapacityHistory | emergencyAnalyticsApi.js |
 | emergency-queue-analytics | GET | `/api/emergency/queues/analytics` | emergencyQueueAnalytics | emergencyAnalyticsApi.js |
 | emergency-shift-report-export | GET | `/api/emergency/shift/report/export` | emergencyShiftReportExport | emergencyAnalyticsApi.js |
 | emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
 | emergency-transfer-status | PATCH | `/api/emergency/transfers/:referralId/status` | emergencyTransferWorkflow | emergencyTransportApi.js |
 | emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
-| emergency-smart-intake-session-create | POST | `/api/emergency/intake/sessions` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-manual-entry | POST | `/api/emergency/intake/:sessionId/manual-entry` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-document | POST | `/api/emergency/intake/:sessionId/documents` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-ocr | POST | `/api/emergency/intake/:sessionId/ocr-results` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-match | POST | `/api/emergency/intake/:sessionId/match` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-verify-field | POST | `/api/emergency/intake/:sessionId/verify-field` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-link-patient | POST | `/api/emergency/intake/:sessionId/link-patient` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-create-patient | POST | `/api/emergency/intake/:sessionId/create-patient` | emergencySmartIntake | smartIntakeApi.js |
-| emergency-smart-intake-continue-unknown | POST | `/api/emergency/intake/:sessionId/continue-unknown` | emergencySmartIntake | smartIntakeApi.js |
+| emergency-smart-intake-session-create | POST | `/api/emergency/intake/sessions` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-manual-entry | POST | `/api/emergency/intake/:sessionId/manual-entry` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-document | POST | `/api/emergency/intake/:sessionId/documents` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-ocr | POST | `/api/emergency/intake/:sessionId/ocr-results` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-match | POST | `/api/emergency/intake/:sessionId/match` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-verify-field | POST | `/api/emergency/intake/:sessionId/verify-field` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-link-patient | POST | `/api/emergency/intake/:sessionId/link-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-create-patient | POST | `/api/emergency/intake/:sessionId/create-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
+| emergency-smart-intake-continue-unknown | POST | `/api/emergency/intake/:sessionId/continue-unknown` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
@@ -265,18 +282,18 @@ NLU profiles without POST executor (216): client-side / chat only.
 | Tier | Action |
 |------|--------|
 | P0 | Keep capability gates on phantom frontend paths until Nest implements or UI removed |
-| P1 | Wire `clinicalToolsApi` → validate, catalog/executors, statistics |
-| P1 | Wire `complianceApi` → export + delete-account |
-| P2 | Protocol/drug GET clients for reference pages |
+| P1 | Keep `clinicalToolsApi` coverage for validate, catalog/executors, statistics |
+| P1 | Keep `complianceApi` coverage for consent, export, and delete-account |
+| P2 | Keep protocol/drug GET clients covered in the reference inventory |
 | P3 | Chat suggest-action / analyze-vitals on dashboard |
 
 ## Quick counts
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes | 216 |
+| Backend HTTP routes | 230 |
 | Wired frontend → backend | see exposure report |
-| Backend-only / deferred (policy) | 184 |
-| Gated frontend (no route) | 32 |
+| Backend-only / deferred (policy) | 199 |
+| Gated frontend (no route) | 31 |
 | POST executors | 3 |
 

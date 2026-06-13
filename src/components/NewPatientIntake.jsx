@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from 'lucide-react';
-import { PatientState, Priority } from '../../types/emergency';
+import { Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { TriageSuggestionEngine } from '../../engine/triageEngine';
+import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
+import { runSmartIntakeVerticalSlice } from '../services/emergencyOsApi';
 import './NewPatientIntake.css';
 
 const COMPLAINT_CATEGORIES = [
@@ -88,20 +90,6 @@ export function suggestPriority(complaintCategory = 'Other', vitals = {}, compla
   }).suggestedPriority;
 }
 
-function normalizeVitals(vitals, recordedAt) {
-  return {
-    hr: parseNumber(vitals.hr),
-    bpSystolic: parseNumber(vitals.bpSystolic),
-    bpDiastolic: null,
-    spo2: parseNumber(vitals.spo2),
-    temp: parseNumber(vitals.temp),
-    rr: null,
-    gcs: null,
-    pain: null,
-    recordedAt,
-  };
-}
-
 function hasEnteredVitals(vitals) {
   return Object.values(vitals).some((value) => String(value).trim());
 }
@@ -129,6 +117,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const [priorityOverride, setPriorityOverride] = useState('');
   const [priorityPickerOpen, setPriorityPickerOpen] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const age = useMemo(() => calculateAge(identity.dob), [identity.dob]);
   const autoSuggestion = useMemo(
@@ -208,7 +197,8 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
     setPriorityPickerOpen(false);
   };
 
-  const addToDepartment = () => {
+  const addToDepartment = async () => {
+    if (isSubmitting) return;
     setSubmitAttempted(true);
     if (!canSubmit) {
       complaintRef.current?.focus();
@@ -218,79 +208,50 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
     const now = new Date().toISOString();
     const patientId = `intake-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const vitalsEntered = hasEnteredVitals(vitals);
-    const normalizedVitals = normalizeVitals(vitalsEntered ? vitals : INITIAL_VITALS, now);
-    const patient = {
-      id: patientId,
+    const patient = buildSmartIntakeVerticalSlicePatient({
+      patientId,
       mrn,
-      firstName: identity.firstName.trim(),
-      lastName: identity.lastName.trim(),
-      dob: identity.dob,
+      identity,
       age: age ?? 0,
-      sex: identity.sex || 'Unspecified',
-      arrivalTime: now,
-      triageTime: now,
-      lastAssessedTime: vitalsEntered ? now : null,
-      chiefComplaint: complaintText.trim(),
-      complaint: complaintText.trim(),
       complaintCategory,
-      state: PatientState.Triage,
-      priority: selectedPriority,
-      vitals: normalizedVitals,
-      assignedStaffId: null,
-      roomId: null,
-      flags: [],
-      timeline: [
-        {
-          id: `evt-${patientId}-arrival`,
-          patientId,
-          type: 'Arrival',
-          timestamp: now,
-          summary: 'Quick intake created from Emergency Whiteboard.',
-        },
-        {
-          id: `evt-${patientId}-triage`,
-          patientId,
-          type: 'Triage',
-          timestamp: now,
-          summary: `Patient added to Triage with ${selectedPriority} priority.`,
-          metadata: {
-            suggestedPriority: autoSuggestion.suggestedPriority,
-            selectedPriority,
-            confidence: autoSuggestion.confidence,
-            ruleTriggered: autoSuggestion.ruleTriggered,
-            suggestionReason: autoSuggestion.reason,
-            override: triageSuggestion.override,
-            quickIntake: true,
-            vitalsEntered,
-          },
-        },
-        ...(triageSuggestion.override
-          ? [
-              {
-                id: `evt-${patientId}-triage-override`,
-                patientId,
-                type: 'Triage',
-                timestamp: now,
-                summary: `Priority override applied: ${selectedPriority} selected instead of ${autoSuggestion.suggestedPriority}.`,
-                metadata: {
-                  suggestedPriority: autoSuggestion.suggestedPriority,
-                  selectedPriority,
-                  ruleTriggered: autoSuggestion.ruleTriggered,
-                  override: true,
-                },
-              },
-            ]
-          : []),
-      ],
-      notes: [],
-    };
+      complaintText,
+      vitals: vitalsEntered ? vitals : INITIAL_VITALS,
+      selectedPriority,
+      autoSuggestion,
+      triageSuggestion,
+      timestamp: now,
+      source: 'Quick intake',
+    });
 
-    addPatient(patient);
+    setIsSubmitting(true);
+    let patientToAdd = patient;
+    let syncedThroughVerticalSlice = false;
+    try {
+      const response = await runSmartIntakeVerticalSlice({
+        patient,
+        staffId: 'staff-smart-intake-rn',
+      });
+      if (response?.data?.patient?.id) {
+        patientToAdd = {
+          ...patient,
+          ...response.data.patient,
+          vitals: patient.vitals,
+          flags: patient.flags,
+          timeline: patient.timeline,
+        };
+        syncedThroughVerticalSlice = true;
+      }
+    } catch {
+      syncedThroughVerticalSlice = false;
+    }
+
+    addPatient(patientToAdd, { syncToBackend: !syncedThroughVerticalSlice });
     setQueueFilter(null);
     setWhiteboardSearchQuery('');
-    onPatientAdded?.(patientId);
+    onPatientAdded?.(patientToAdd.id);
     resetDraft();
     onClose?.();
+    setIsSubmitting(false);
   };
 
   const intakeDialog = (
@@ -310,7 +271,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
         className="new-patient-intake__panel"
         onSubmit={(event) => {
           event.preventDefault();
-          addToDepartment();
+          void addToDepartment();
         }}
       >
         <header className="new-patient-intake__header">
@@ -488,9 +449,9 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
               </div>
             ) : null}
           </div>
-          <button type="submit" className="new-patient-intake__add" disabled={!canSubmit}>
+          <button type="submit" className="new-patient-intake__add" disabled={!canSubmit || isSubmitting}>
             <CheckCircle2 size={20} aria-hidden />
-            Add to Department
+            {isSubmitting ? 'Adding...' : 'Add to Department'}
           </button>
         </footer>
       </form>

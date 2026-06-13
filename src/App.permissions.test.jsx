@@ -7,6 +7,7 @@ import {
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
 } from './config/routes.config';
+import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './data/emergencyPageRenderInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, 'App.jsx'), 'utf8');
@@ -39,20 +40,7 @@ describe('App Emergency OS route contract', () => {
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
 
-    expect(ACTIVE_EMERGENCY_PAGE_PATHS).toEqual([
-      '/emergency/whiteboard',
-      '/emergency/patients',
-      '/emergency/ems',
-      '/emergency/intake',
-      '/emergency/queues',
-      '/emergency/reassessment',
-      '/emergency/capacity',
-      '/emergency/boarding',
-      '/emergency/referrals',
-      '/emergency/copilot',
-      '/emergency/analytics',
-      '/emergency/settings',
-    ]);
+    expect(ACTIVE_EMERGENCY_PAGE_PATHS).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
   });
 
   it.each(RETIRED_PLATFORM_PATHS)('%s is not mounted as an App page route', (path) => {

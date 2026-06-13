@@ -11,8 +11,8 @@ import {
   selectWhiteboardStats,
   useEmergencyStore,
 } from '../../store/emergencyStore';
-import PatientCard from './PatientCard';
-import PatientDetailPanel from './PatientDetailPanel';
+import PatientCard from './EmergencyPatientCard';
+import PatientDetailPanel from './EmergencyPatientDetailPanel';
 import NewPatientIntake from './NewPatientIntake';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
 import WhoNextPanel from './WhoNextPanel';

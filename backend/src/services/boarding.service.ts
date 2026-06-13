@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { IPatient, Patient } from '../models/Patient';
+import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
 
 export interface BoardingMetrics {
   medianBoardTime: number;
@@ -18,6 +18,12 @@ export interface BoardReport {
   colorCode: 'green' | 'yellow' | 'orange' | 'red';
 }
 
+export interface BoardingDecisionResult {
+  patient: IPatient;
+  boardingStartTime: Date;
+  clinicianId: string;
+}
+
 export class BoardingService extends EventEmitter {
   private readonly BENCHMARK_MINUTES = 158;
   private readonly WARNING_THRESHOLD = 240;
@@ -27,7 +33,10 @@ export class BoardingService extends EventEmitter {
   /**
    * Track decision-to-admit timestamp, the starting point for ED boarding.
    */
-  async trackDecisionToAdmit(patientId: string, clinicianId: string): Promise<void> {
+  async trackDecisionToAdmit(
+    patientId: string,
+    clinicianId: string,
+  ): Promise<BoardingDecisionResult> {
     const patient = await Patient.findById(patientId);
     if (!patient) throw new Error('Patient not found');
 
@@ -41,6 +50,12 @@ export class BoardingService extends EventEmitter {
     await patient.save();
     await this.notifyBedManagement(patientId);
     this.emit('decision_to_admit', { patientId, timestamp });
+
+    return {
+      patient,
+      boardingStartTime: timestamp,
+      clinicianId,
+    };
   }
 
   async calculateBoardMetrics(): Promise<BoardingMetrics> {

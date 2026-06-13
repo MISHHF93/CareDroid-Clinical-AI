@@ -14,11 +14,13 @@ const {
   compareRealTimeSimulationInterventions,
   evaluateHybridDigitalTwinScenario,
   evaluateRealTimeSimulationIntervention,
+  fetchEmergencyWorkflowLogs,
   fetchFederatedLearningDashboard,
   fetchFederatedLearningGlobalModel,
   fetchHybridDigitalTwinState,
   fetchRealTimeSimulationRecommendations,
   initializeHybridDigitalTwin,
+  runSmartIntakeVerticalSlice,
   registerFederatedHospital,
   simulateHybridDigitalTwin,
   submitFederatedModelUpdate,
@@ -119,6 +121,27 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
       4,
       '/api/emergency/digital-twin/scenario',
       expect.objectContaining({ method: 'POST' })
+    );
+  });
+
+  it('calls the Smart Intake vertical slice endpoint', async () => {
+    await runSmartIntakeVerticalSlice({ patient: { id: 'patient-1' }, staffId: 'rn-1' });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/emergency/intake/vertical-slice',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ patient: { id: 'patient-1' }, staffId: 'rn-1' }),
+      })
+    );
+  });
+
+  it('fetches Emergency OS workflow audit logs', async () => {
+    await fetchEmergencyWorkflowLogs();
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/emergency/workflow-logs',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
     );
   });
 });

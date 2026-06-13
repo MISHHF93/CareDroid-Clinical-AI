@@ -120,6 +120,60 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
     clientHint: 'clinicalChatService.js',
   },
 
+  'POST /api/emergency/digital-twin/organizational/simulate': {
+    strategy: 'deferred',
+    reason: 'Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints',
+  },
+  'POST /api/emergency/digital-twin/organizational/synchronize': {
+    strategy: 'deferred',
+    reason: 'Research controller; no dedicated SPA workflow yet',
+  },
+  'POST /api/ems/ai-call-interrogation': {
+    strategy: 'deferred',
+    reason: 'Research EMS call interrogation endpoint; not exposed in active ED shell',
+  },
+  'POST /api/ems/ai-call-interrogation/ecg': {
+    strategy: 'deferred',
+    reason: 'Research ECG interrogation endpoint; not exposed in active ED shell',
+  },
+  'POST /api/ems/federated/112-call': {
+    strategy: 'deferred',
+    reason: 'Research federated EMS endpoint; no frontend intake workflow is wired',
+  },
+  'POST /api/federated/lmecs/predict': {
+    strategy: 'deferred',
+    reason: 'Research severity-prediction endpoint; no SPA client is wired',
+  },
+  'POST /api/federated/lmecs/select': {
+    strategy: 'deferred',
+    reason: 'Research client-selection endpoint; no SPA client is wired',
+  },
+  'POST /api/handover/er-pulse': {
+    strategy: 'deferred',
+    reason: 'Research handover endpoint; active ED handoff UI is not mounted',
+  },
+
+  'GET /api/v1/governance/registry': {
+    strategy: 'backend-only',
+    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+  },
+  'GET /api/v1/governance/safety-rules': {
+    strategy: 'backend-only',
+    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+  },
+  'GET /api/v1/governance/compliance': {
+    strategy: 'backend-only',
+    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+  },
+  'GET /api/v1/governance/violations': {
+    strategy: 'backend-only',
+    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+  },
+  'GET /api/v1/governance/validate-prompts': {
+    strategy: 'backend-only',
+    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+  },
+
   'GET /api/tools/statistics': {
     strategy: 'expose-recommended',
     reason: 'Usage analytics',

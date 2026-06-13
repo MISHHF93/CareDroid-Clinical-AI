@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NewPatientIntake, { suggestPriority } from './NewPatientIntake';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { hasPatientFlag, selectQueueCounts, selectReassessmentQueue, useEmergencyStore } from '../../store/emergencyStore';
 import { PatientState, Priority } from '../../types/emergency';
 
 import './NewPatientIntake.css';
@@ -41,7 +41,7 @@ describe('NewPatientIntake quick flow', () => {
     expect(screen.getByText('P2 suggested - chest pain with HR 128')).toBeVisible();
   });
 
-  it('adds a name-and-complaint-only patient to the whiteboard in Triage state', async () => {
+  it('adds a Smart Intake vertical-slice patient to whiteboard, queues, reassessment, and capacity', async () => {
     const user = userEvent.setup();
     const beforeCount = useEmergencyStore.getState().patients.length;
     const onClose = vi.fn();
@@ -75,6 +75,23 @@ describe('NewPatientIntake quick flow', () => {
       })
     );
     expect(patient?.mrn).toMatch(/^ED-\d{6}$/);
+    expect(patient?.timeline).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'Arrival' }),
+        expect.objectContaining({ type: 'EncounterCreated' }),
+        expect.objectContaining({
+          type: 'StateChange',
+          from: PatientState.Arrival,
+          to: PatientState.Triage,
+        }),
+      ])
+    );
+    expect(patient && hasPatientFlag(patient, 'ReassessmentDue')).toBe(true);
+    expect(selectQueueCounts(useEmergencyStore.getState()).Triage).toBeGreaterThan(0);
+    expect(
+      selectReassessmentQueue(useEmergencyStore.getState()).some((item) => item.patientId === patient?.id)
+    ).toBe(true);
+    expect(useEmergencyStore.getState().capacity.reassessmentDueCount).toBeGreaterThan(0);
     expect(onPatientAdded).toHaveBeenCalledWith(patient?.id);
     expect(onClose).toHaveBeenCalled();
   });

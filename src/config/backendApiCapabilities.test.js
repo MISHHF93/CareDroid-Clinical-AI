@@ -27,6 +27,9 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('chatPersistence')).toBe(false);
     expect(isBackendCapabilityEnabled('reportsSchedule')).toBe(false);
     expect(isBackendCapabilityEnabled('clinicalAlertsStream')).toBe(false);
+    expect(isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')).toBe(false);
+    expect(isBackendCapabilityEnabled('emergencyCapacityHistory')).toBe(false);
+    expect(isBackendCapabilityEnabled('emergencyQueueAnalytics')).toBe(false);
   });
 
   it('enables wired clinical routes', () => {
@@ -43,6 +46,9 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('evaluationFramework')).toBe(true);
     expect(isBackendCapabilityEnabled('costOptimization')).toBe(true);
     expect(isBackendCapabilityEnabled('clinicalAlerts')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyGovernance')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencySmartIntake')).toBe(true);
+    expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
   });
 
   it('enables read-only live tracking contracts as demo-backed capabilities', () => {

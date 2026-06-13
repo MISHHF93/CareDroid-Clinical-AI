@@ -107,6 +107,20 @@ describe('backendFrontendExposure scan', () => {
     expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
   });
 
+  it('covers protocol detail and compliance data export bridges', () => {
+    const expectedCalls = [
+      ['GET', '/api/protocols/:id'],
+      ['POST', '/api/compliance/export'],
+    ];
+
+    for (const [method, path] of expectedCalls) {
+      expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
+        expect.arrayContaining([expect.objectContaining({ method, path })])
+      );
+      expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+    }
+  });
+
   it('covers profile, workspace, activity, and personalization client calls', () => {
     const expectedUserIdentityCalls = [
       ['GET', '/api/profile/me'],
@@ -160,7 +174,7 @@ describe('backendFrontendExposure scan', () => {
       expect.arrayContaining([
         expect.objectContaining({
           id: 'emergency-smart-intake-session-create',
-          capability: 'emergencySmartIntake',
+          capability: 'emergencySmartIntakeIdentitySession',
         }),
         expect.objectContaining({ id: 'emergency-referral-create', capability: 'emergencyReferralPersistence' }),
       ])
@@ -204,13 +218,19 @@ describe('backendFrontendExposure scan', () => {
     expect(stream?.exposure).toBe('gated-stub');
   }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
 
-  it('classifies frontend, backend-only, missing-route, and executor capabilities', () => {
+  it('classifies frontend, backend-only, planned, and executor capabilities', () => {
     const rows = buildBackendFrontendCapabilityRows();
     const classifications = new Set(rows.map((row) => row.classification));
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED);
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL);
-    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE);
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED);
+    expect(
+      rows.filter(
+        (row) =>
+          row.classification ===
+          BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE
+      )
+    ).toEqual([]);
     expect(
       rows.filter(
         (row) =>

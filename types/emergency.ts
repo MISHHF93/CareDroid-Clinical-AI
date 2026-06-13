@@ -80,6 +80,7 @@ export type PatientVitals = Vitals;
 
 export type JourneyEventType =
   | 'Arrival'
+  | 'EncounterCreated'
   | 'Registration'
   | 'Triage'
   | 'StateChange'
@@ -122,6 +123,39 @@ export interface JourneyEvent {
   note?: string;
   summary: string;
   metadata?: Record<string, string | number | boolean | null>;
+}
+
+export type WorkflowActionType =
+  | 'patient_created'
+  | 'journey_state_changed'
+  | 'clinician_assigned'
+  | 'reassessment_created'
+  | 'reassessment_completed'
+  | 'ems_arrival_created'
+  | 'ems_converted_to_patient'
+  | 'capacity_score_changed'
+  | 'boarding_started'
+  | 'referral_created'
+  | 'copilot_used'
+  | 'provincial_data_viewed'
+  | 'integration_event_received';
+
+export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
+export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';
+
+export interface WorkflowActionLog {
+  id: EntityId;
+  type: WorkflowActionType;
+  title: string;
+  summary: string;
+  timestamp: ISODateString;
+  actorStaffId?: EntityId;
+  actorName?: string;
+  patientId?: EntityId;
+  source: string;
+  severity: WorkflowActionSeverity;
+  status: WorkflowActionStatus;
+  metadata: Record<string, string | number | boolean | null>;
 }
 
 export type NoteType = 'Clinical' | 'Nursing' | 'Operational' | 'Handoff' | 'Referral' | 'System';

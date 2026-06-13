@@ -8,6 +8,8 @@ import {
   Vitals,
 } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 
 type QuickIntakeProps = {
@@ -119,6 +121,7 @@ function buildVitals(form: { hr: string; sbp: string; spo2: string; temp: string
 }
 
 export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
+  const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const complaintInputRef = useRef<HTMLTextAreaElement | null>(null);
   const [complaintCategory, setComplaintCategory] = useState<ComplaintCategory | null>(null);
@@ -133,6 +136,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
 
   const age = useMemo(() => calculateAge(dob), [dob]);
   const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);
@@ -166,6 +170,10 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
     if (submitting) return;
+    if (!canCreatePatient) {
+      setSubmitError(`${emergencyRole.roleLabel} cannot create patients.`);
+      return;
+    }
     const now = new Date().toISOString();
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
@@ -477,6 +485,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             <button
               type="button"
               onClick={() => setShowPriorityPicker((visible) => !visible)}
+              disabled={!canCreatePatient}
               aria-label={`CTAS ${priority} priority badge`}
               style={{
                 border: `1px solid ${PRIORITY_COLORS[priority]}`,
@@ -484,7 +493,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                 background: `${PRIORITY_COLORS[priority]}22`,
                 color: PRIORITY_COLORS[priority],
                 padding: '9px 13px',
-                cursor: 'pointer',
+                cursor: canCreatePatient ? 'pointer' : 'not-allowed',
+                opacity: canCreatePatient ? 1 : 0.55,
                 fontWeight: 800,
               }}
             >
@@ -538,14 +548,15 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !canCreatePatient}
             style={{
               height: 48,
               border: 0,
               borderRadius: 12,
-              background: submitting ? '#1E3A8A' : '#2563EB',
+              background: submitting || !canCreatePatient ? '#1E3A8A' : '#2563EB',
               color: '#F9FAFB',
-              cursor: submitting ? 'progress' : 'pointer',
+              cursor: submitting ? 'progress' : canCreatePatient ? 'pointer' : 'not-allowed',
+              opacity: canCreatePatient ? 1 : 0.65,
               fontWeight: 800,
               padding: '0 18px',
               minWidth: 170,

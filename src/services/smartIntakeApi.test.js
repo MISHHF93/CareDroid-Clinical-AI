@@ -28,7 +28,7 @@ describe('SmartIntakeApi', () => {
       'Backend Smart Intake endpoint is not available yet.'
     );
 
-    expect(isBackendCapabilityEnabled).toHaveBeenCalledWith('emergencySmartIntake');
+    expect(isBackendCapabilityEnabled).toHaveBeenCalledWith('emergencySmartIntakeIdentitySession');
     expect(apiFetch).not.toHaveBeenCalled();
   });
 

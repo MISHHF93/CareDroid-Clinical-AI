@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { PatientFlag, PatientState, Priority, type Patient } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
+import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
 
@@ -79,8 +81,10 @@ function StatCard({ value, label }: { value: string | number; label: string }) {
 }
 
 export default function EmergencyWhiteboard() {
+  const emergencyRole = useEmergencyRolePermissions();
   const storePatients = useEmergencyStore((state) => state.patients);
   const storeCapacity = useEmergencyStore((state) => state.capacity);
+  const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const whiteboard = useEmergencyWhiteboard();
   const whiteboardPayload = (whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null)?.data;
   const patients = whiteboardPayload?.patients || storePatients;
@@ -88,6 +92,7 @@ export default function EmergencyWhiteboard() {
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
   const [toast, setToast] = useState('');
+  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
 
   const stats = useMemo(() => {
     const waiting = patients.filter((patient) => patient.state === PatientState.Waiting).length;
@@ -109,7 +114,9 @@ export default function EmergencyWhiteboard() {
   );
 
   useEffect(() => {
-    const openIntake = () => setShowIntake(true);
+    const openIntake = () => {
+      if (canCreatePatient) setShowIntake(true);
+    };
     const closePanels = () => setShowIntake(false);
     document.addEventListener('open-intake', openIntake);
     document.addEventListener('close-all-panels', closePanels);
@@ -117,10 +124,18 @@ export default function EmergencyWhiteboard() {
       document.removeEventListener('open-intake', openIntake);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, []);
+  }, [canCreatePatient]);
 
   return (
     <section style={{ minHeight: '100%', background: '#0A0E1A' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid #1F2937', background: '#0F172A' }}>
+        <strong style={{ color: '#F9FAFB', fontSize: 13 }}>
+          Scenario loaded: {activeScenario?.label || 'Normal day'}
+        </strong>
+        <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 12 }}>
+          {activeScenario?.description || 'Emergency OS scenario fixture is active.'}
+        </p>
+      </div>
       <div
         style={{
           background: '#111827',
@@ -174,7 +189,11 @@ export default function EmergencyWhiteboard() {
 
         <button
           type="button"
-          onClick={() => setShowIntake(true)}
+          onClick={() => {
+            if (canCreatePatient) setShowIntake(true);
+          }}
+          disabled={!canCreatePatient}
+          title={canCreatePatient ? 'Create a new patient' : `${emergencyRole.roleLabel} cannot create patients`}
           style={{
             border: '1px solid rgba(255,255,255,0.16)',
             borderRadius: 12,
@@ -183,7 +202,8 @@ export default function EmergencyWhiteboard() {
             padding: '10px 14px',
             fontSize: 14,
             fontWeight: 700,
-            cursor: 'pointer',
+            cursor: canCreatePatient ? 'pointer' : 'not-allowed',
+            opacity: canCreatePatient ? 1 : 0.58,
             whiteSpace: 'nowrap',
           }}
         >
@@ -191,7 +211,7 @@ export default function EmergencyWhiteboard() {
         </button>
       </div>
 
-      {showIntake ? (
+      {showIntake && canCreatePatient ? (
         <QuickIntake
           onClose={() => setShowIntake(false)}
           onAdded={(patient) => {
