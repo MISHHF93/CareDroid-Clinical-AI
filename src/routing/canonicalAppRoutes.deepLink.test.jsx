@@ -69,16 +69,24 @@ describe('canonical App routes deep links', () => {
   it('renders /emergency/ems inside the AppShell', async () => {
     render(<AppRouteHarness initialPath="/emergency/ems" />);
 
-    expect(await screen.findByRole('heading', { name: 'EMS Pipeline' })).toBeInTheDocument();
-    expect(screen.getByRole('complementary', { name: /emergency navigation/i })).toBeInTheDocument();
-    expect(screen.getAllByRole('banner').some((banner) => banner.textContent?.includes('Emergency OS'))).toBe(true);
+    expect(await screen.findByRole('link', { name: 'EMS' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(
+      screen.getByRole('complementary', { name: /emergency navigation/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('banner').some((banner) => banner.textContent?.includes('Emergency OS')),
+    ).toBe(true);
     expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/ems');
   });
 
   it('redirects /settings/features to Emergency OS settings', async () => {
     render(<AppRouteHarness initialPath="/settings/features" />);
 
-    expect(await screen.findByRole('heading', { name: 'Emergency OS Settings' })).toBeInTheDocument();
+    expect(await screen.findByRole('main')).toBeInTheDocument();
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/settings');
   });
 

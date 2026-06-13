@@ -11,10 +11,41 @@ describe('build and service config consistency', () => {
 
     expect(compose).toContain('- "3000:3000"');
     expect(compose).toContain('- "8000:8000"');
-    expect(compose).toContain('VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}');
-    expect(compose).toContain('DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}');
+    expect(compose).toContain(
+      'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}',
+    );
+    expect(compose).toContain(
+      'DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}',
+    );
     expect(read('backend/src/config/database.config.ts')).toContain('buildPostgresOptions');
     expect(read('backend/src/data-source.ts')).toContain('buildPostgresOptions');
+  });
+
+  it('keeps app-only Docker Compose aligned with local full-stack defaults', () => {
+    const appCompose = read('docker-compose.app.yml');
+
+    expect(appCompose).toContain("- '3000:3000'");
+    expect(appCompose).toContain("- '8000:8000'");
+    expect(appCompose).toContain('DATABASE_CLIENT: sqlite');
+    expect(appCompose).toContain('SQLITE_PATH: /data/caredroid.dev.sqlite');
+    expect(appCompose).toContain('VITE_API_PROXY_TARGET: http://backend:3000');
+    expect(appCompose).toContain('NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-false}');
+    expect(appCompose).toContain("ANOMALY_DETECTION_ENABLED: 'false'");
+    expect(appCompose).toContain("RAG_ENABLED: 'false'");
+  });
+
+  it('keeps optional ML compose enabling tied to the NLU sidecar profile', () => {
+    const appCompose = read('docker-compose.app.yml');
+    const mlCompose = read('docker-compose.ml.yml');
+    const packageJson = read('package.json');
+
+    expect(appCompose).toContain('profiles:');
+    expect(appCompose).toContain('- ml');
+    expect(mlCompose).toContain("NLU_SERVICE_ENABLED: 'true'");
+    expect(mlCompose).toContain('- nlu');
+    expect(packageJson).toContain(
+      '-f docker-compose.app.yml -f docker-compose.ml.yml --profile ml',
+    );
   });
 
   it('does not allow Vercel same-origin /api unless a proxy is verified', () => {
@@ -31,6 +62,14 @@ describe('build and service config consistency', () => {
     expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/backend/src/main.js"]');
   });
 
+  it('keeps frontend and backend Node runtime baselines aligned', () => {
+    expect(read('.node-version').trim()).toBe('20');
+    expect(read('package.json')).toContain('"node": ">=20.19.0"');
+    expect(read('backend/package.json')).toContain('"node": ">=20.19.0"');
+    expect(read('Dockerfile')).toContain('FROM node:20-alpine');
+    expect(read('backend/Dockerfile')).toContain('FROM node:20-alpine');
+  });
+
   it('keeps backend dev scripts pointed at the widened build entrypoint', () => {
     const backendPackageJson = read('backend/package.json');
 
@@ -43,14 +82,20 @@ describe('build and service config consistency', () => {
   it('normalizes NLU defaults to port 8001', () => {
     expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://localhost:8001');
     expect(read('backend/src/config/nlu.config.ts')).toContain('http://localhost:8001');
-    expect(read('docker-compose.yml')).toContain('NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}');
+    expect(read('docker-compose.yml')).toContain(
+      'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}',
+    );
   });
 
   it('separates backend NLU client threshold from sidecar inference threshold', () => {
     expect(read('backend/.env.example')).toContain('NLU_CONFIDENCE_THRESHOLD=0.7');
     expect(read('backend/src/config/nlu.config.ts')).toContain('NLU_CONFIDENCE_THRESHOLD');
-    expect(read('backend/ml-services/nlu/.env.example')).toContain('NLU_INFERENCE_CONFIDENCE_THRESHOLD=0.5');
-    expect(read('backend/ml-services/nlu/config.py')).toContain('NLU_INFERENCE_CONFIDENCE_THRESHOLD');
+    expect(read('backend/ml-services/nlu/.env.example')).toContain(
+      'NLU_INFERENCE_CONFIDENCE_THRESHOLD=0.5',
+    );
+    expect(read('backend/ml-services/nlu/config.py')).toContain(
+      'NLU_INFERENCE_CONFIDENCE_THRESHOLD',
+    );
   });
 
   it('provides the root frontend Dockerfile used by docker-compose', () => {

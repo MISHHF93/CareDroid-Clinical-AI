@@ -6,7 +6,13 @@ import PatientDetailPanel from './PatientDetailPanel';
 import PatientCard from './PatientCard';
 import { Header } from './Header';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientFlag, PatientState, Priority, type CapacitySnapshot, type Patient } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type CapacitySnapshot,
+  type Patient,
+} from '../types/emergency';
 
 const mocks = vi.hoisted(() => ({
   toast: Object.assign(vi.fn(), {
@@ -110,6 +116,12 @@ describe('R12 complaint routing', () => {
 
     render(<QuickIntake onClose={() => {}} onAdded={() => {}} />);
 
+    expect(screen.getByRole('heading', { name: 'Central Node Intake' })).toBeTruthy();
+    expect(screen.getByLabelText('Central node input mode')).toHaveTextContent(
+      /Charge nurse input/i,
+    );
+    expect(screen.getByRole('button', { name: /Send to Central Node/i })).toBeTruthy();
+
     fireEvent.change(screen.getByPlaceholderText(/describe complaint/i), {
       target: { value: 'Crushing chest pain with diaphoresis' },
     });
@@ -167,7 +179,9 @@ describe('R12 critical vitals and flag reactivity', () => {
     fireEvent.click(screen.getByRole('button', { name: /save vitals/i }));
 
     await waitFor(() => {
-      const updatedPatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id);
+      const updatedPatient = useEmergencyStore
+        .getState()
+        .patients.find((candidate) => candidate.id === patient.id);
       expect(updatedPatient?.flags).toContain(PatientFlag.DeteriorationRisk);
     });
 
@@ -196,9 +210,11 @@ describe('R12 critical vitals and flag reactivity', () => {
     });
 
     expect(await screen.findByLabelText(PatientFlag.DeteriorationRisk)).toBeTruthy();
-    expect(document.querySelector('[data-patient-card-id="r12-patient-1"]')?.classList.contains(
-      'patient-card--deterioration-risk',
-    )).toBe(true);
+    expect(
+      document
+        .querySelector('[data-patient-card-id="r12-patient-1"]')
+        ?.classList.contains('patient-card--deterioration-risk'),
+    ).toBe(true);
   });
 });
 
@@ -209,7 +225,15 @@ describe('R12 capacity header flow', () => {
       {
         ...originalState,
         patients: [patient],
-        rooms: [{ id: 'r1', name: 'Room 1', type: 'Treatment', status: 'Occupied', patientId: patient.id }],
+        rooms: [
+          {
+            id: 'r1',
+            name: 'Room 1',
+            type: 'Treatment',
+            status: 'Occupied',
+            patientId: patient.id,
+          },
+        ],
         capacity: makeCapacity(),
       },
       true,

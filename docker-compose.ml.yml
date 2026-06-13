@@ -1,0 +1,6 @@
+services:
+  backend:
+    environment:
+      NLU_SERVICE_ENABLED: 'true'
+    depends_on:
+      - nlu

@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+android
+.git
+.cursor
+.venv
+backend
+mcp
+docs
+archive
+*.sqlite
+*.log
+npm-debug.log*

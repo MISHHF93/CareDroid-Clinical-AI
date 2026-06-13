@@ -3,6 +3,7 @@ import { PatientFlag, PatientState, Priority, type Patient } from '../../types/e
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
@@ -26,7 +27,9 @@ function isHighRisk(patient: Patient): boolean {
 }
 
 function isBoarding(patient: Patient): boolean {
-  return patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission);
+  return (
+    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
+  );
 }
 
 function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
@@ -74,9 +77,13 @@ export default function EmergencyWhiteboard() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
-  const activeScenario = useEmergencyStore((state) => state.activeScenario);
+  const centralControlSettings = useEmergencyStore(
+    (state) => state.emergencySettings.centralControl,
+  );
   const whiteboard = useEmergencyWhiteboard();
-  const whiteboardPayload = (whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null)?.data;
+  const whiteboardPayload = (
+    whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null
+  )?.data;
   const patients = useMemo(() => {
     const payloadPatients = whiteboardPayload?.patients;
     if (!payloadPatients?.length) return storePatients;
@@ -88,6 +95,15 @@ export default function EmergencyWhiteboard() {
   const [showIntake, setShowIntake] = useState(false);
   const [toast, setToast] = useState('');
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const centralControl = useMemo(
+    () =>
+      getCentralControlPolicy({
+        role: emergencyRole.role,
+        can: emergencyRole.can,
+        settings: centralControlSettings,
+      }),
+    [centralControlSettings, emergencyRole],
+  );
   const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
 
   const stats = useMemo(() => {
@@ -105,7 +121,10 @@ export default function EmergencyWhiteboard() {
   }, [capacity.score, patients]);
 
   const visiblePatients = useMemo(
-    () => patients.filter((patient) => filterPatient(patient, activeFilter)).sort(sortWhiteboardPatients),
+    () =>
+      patients
+        .filter((patient) => filterPatient(patient, activeFilter))
+        .sort(sortWhiteboardPatients),
     [activeFilter, patients],
   );
 
@@ -128,21 +147,28 @@ export default function EmergencyWhiteboard() {
 
   const closeIntake = useCallback(() => setShowIntake(false), []);
 
-  const handlePatientAdded = useCallback((patient: Patient) => {
-    setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
-    window.setTimeout(() => setToast(''), 2400);
-    setActiveFilter('All');
-    whiteboard.refresh();
-  }, [whiteboard.refresh]);
+  const handlePatientAdded = useCallback(
+    (patient: Patient) => {
+      setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
+      window.setTimeout(() => setToast(''), 2400);
+      setActiveFilter('All');
+      whiteboard.refresh();
+    },
+    [whiteboard.refresh],
+  );
 
   return (
     <section style={{ minHeight: '100%', background: '#0A0E1A' }}>
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid #1F2937', background: '#0F172A' }}>
+      <div
+        style={{ padding: '12px 16px', borderBottom: '1px solid #1F2937', background: '#0F172A' }}
+      >
         <strong style={{ color: '#F9FAFB', fontSize: 13 }}>
-          Scenario loaded: {activeScenario?.label || 'Normal day'}
+          {centralControl.label} managed dashboard
         </strong>
         <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 12 }}>
-          {activeScenario?.description || 'Emergency OS scenario fixture is active.'}
+          {centralControl.inputProfile.label} flows into{' '}
+          {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}. Rules, scenarios, and
+          dashboard state are subject to central policy.
         </p>
       </div>
       <CapacityCrisisMode
@@ -208,7 +234,11 @@ export default function EmergencyWhiteboard() {
           type="button"
           onClick={openIntake}
           disabled={!canCreatePatient}
-          title={canCreatePatient ? 'Create a new patient' : `${emergencyRole.roleLabel} cannot create patients`}
+          title={
+            canCreatePatient
+              ? 'Send a new patient input to the Central Node'
+              : `${emergencyRole.roleLabel} cannot create patients`
+          }
           style={{
             border: '1px solid rgba(255,255,255,0.16)',
             borderRadius: 12,
@@ -222,23 +252,28 @@ export default function EmergencyWhiteboard() {
             whiteSpace: 'nowrap',
           }}
         >
-          + New Patient
+          + Central Intake
         </button>
       </div>
 
       {showIntake && canCreatePatient ? (
-        <QuickIntake
-          onClose={closeIntake}
-          onAdded={handlePatientAdded}
-        />
+        <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
       ) : null}
 
-      {isInitialLoading ? (
-        <SkeletonLoader variant="whiteboard" />
-      ) : null}
+      {isInitialLoading ? <SkeletonLoader variant="whiteboard" /> : null}
 
       {whiteboard.error ? (
-        <div role="alert" style={{ margin: 16, padding: 12, border: '1px solid #7F1D1D', borderRadius: 12, background: '#450A0A', color: '#FCA5A5' }}>
+        <div
+          role="alert"
+          style={{
+            margin: 16,
+            padding: 12,
+            border: '1px solid #7F1D1D',
+            borderRadius: 12,
+            background: '#450A0A',
+            color: '#FCA5A5',
+          }}
+        >
           {whiteboard.error}. Showing the last local Emergency OS state.
         </div>
       ) : null}

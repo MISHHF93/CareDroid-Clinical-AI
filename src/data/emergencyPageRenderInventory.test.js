@@ -25,25 +25,37 @@ describe('emergencyPageRenderInventory', () => {
 
   it('keeps requested AppShell nav paths in the active page inventory', () => {
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.label)).toEqual([
-      'Emergency Whiteboard',
-      'Department Pulse',
-      'EMS Pipeline',
+      'Board',
+      'Pulse',
+      'Patients',
+      'Journey',
+      'Intake',
+      'Queues',
+      'Reassess',
+      'EMS',
       'Referrals',
+      'Provincial',
+      'Integrations',
       'Capacity',
-      'Clinical Tools',
-      'Shift Summary',
+      'Boarding',
+      'Copilot',
+      'Analytics',
+      'Sim',
+      'Tools',
+      'Shift',
       'Settings',
     ]);
 
-    for (const item of APP_SHELL_NAV_ITEMS.filter((navItem) => navItem.id !== 'settings')) {
+    for (const item of APP_SHELL_NAV_ITEMS) {
       expect(EMERGENCY_PAGE_PRIMARY_PATHS).toContain(item.path);
     }
-    expect(APP_SHELL_NAV_ITEMS.find((item) => item.id === 'settings')?.route).toBe('/settings');
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.id)).not.toContain('ai_governance');
   });
 
   it('maps page load and action endpoints to inventoried backend routes', () => {
-    const backendKeys = new Set(BACKEND_HTTP_ROUTES.map((route) => routeKey(route.method, route.path)));
+    const backendKeys = new Set(
+      BACKEND_HTTP_ROUTES.map((route) => routeKey(route.method, route.path)),
+    );
 
     for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY) {
       for (const endpoint of [...entry.loadEndpoints, ...entry.actionEndpoints]) {
@@ -54,11 +66,13 @@ describe('emergencyPageRenderInventory', () => {
 
   it('keeps screenshot targets unique and concrete', () => {
     expect(new Set(EMERGENCY_PAGE_SCREENSHOT_TARGETS.map((target) => target.path)).size).toBe(
-      EMERGENCY_PAGE_SCREENSHOT_TARGETS.length
+      EMERGENCY_PAGE_SCREENSHOT_TARGETS.length,
     );
-    expect(new Set(EMERGENCY_PAGE_SCREENSHOT_TARGETS.map((target) => target.screenshotSlug)).size).toBe(
-      EMERGENCY_PAGE_SCREENSHOT_TARGETS.length
+    expect(
+      new Set(EMERGENCY_PAGE_SCREENSHOT_TARGETS.map((target) => target.screenshotSlug)).size,
+    ).toBe(EMERGENCY_PAGE_SCREENSHOT_TARGETS.length);
+    expect(EMERGENCY_PAGE_SCREENSHOT_TARGETS.every((target) => target.path.startsWith('/'))).toBe(
+      true,
     );
-    expect(EMERGENCY_PAGE_SCREENSHOT_TARGETS.every((target) => target.path.startsWith('/'))).toBe(true);
   });
 });

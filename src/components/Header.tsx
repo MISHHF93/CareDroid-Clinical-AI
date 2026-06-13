@@ -5,6 +5,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, type CapacitySnapshot } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
@@ -89,13 +90,21 @@ export function Header() {
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
-  const activeScenarioId = useEmergencyStore((store) => store.activeScenarioId);
-  const activeScenario = useEmergencyStore((store) => store.activeScenario);
-  const availableScenarios = useEmergencyStore((store) => store.availableScenarios);
-  const setActiveScenario = useEmergencyStore((store) => store.setActiveScenario);
+  const centralControlSettings = useEmergencyStore(
+    (store) => store.emergencySettings.centralControl,
+  );
   const [alertDrawerOpen, setAlertDrawerOpen] = useState(false);
   const [staffWorkloadOpen, setStaffWorkloadOpen] = useState(false);
   const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
+  const centralControl = useMemo(
+    () =>
+      getCentralControlPolicy({
+        role: emergencyRole.role,
+        can: emergencyRole.can,
+        settings: centralControlSettings,
+      }),
+    [centralControlSettings, emergencyRole],
+  );
 
   const unreadAlertCount = useMemo(
     () => alerts.filter((alert) => !alert.dismissed).length,
@@ -105,7 +114,9 @@ export function Header() {
   const reassessmentAttentionCount = useMemo(
     () =>
       patients.filter((patient) =>
-        ((patient.flags ?? []) as unknown[]).some((flag) => reassessmentBadgeFlags.has(getHeaderFlagValue(flag))),
+        ((patient.flags ?? []) as unknown[]).some((flag) =>
+          reassessmentBadgeFlags.has(getHeaderFlagValue(flag)),
+        ),
       ).length,
     [patients],
   );
@@ -118,10 +129,6 @@ export function Header() {
     document.addEventListener('close-all-panels', closePanels);
     return () => document.removeEventListener('close-all-panels', closePanels);
   }, []);
-
-  const handleScenarioChange = (scenarioId: string) => {
-    setActiveScenario(scenarioId);
-  };
 
   return (
     <header
@@ -141,59 +148,35 @@ export function Header() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <span className="emergency-os-header__wordmark" style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}>Emergency OS</span>
+        <span
+          className="emergency-os-header__wordmark"
+          style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
+        >
+          Emergency OS
+        </span>
         <Clock />
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9CA3AF', fontSize: 12 }}>
-          Role
-          <select
-            aria-label="Demo Emergency OS role"
-            value={emergencyRole.role}
-            onChange={(event) => emergencyRole.switchDemoRole(event.target.value)}
-            style={{
-              background: '#111827',
-              border: '1px solid #1F2937',
-              borderRadius: 8,
-              color: '#F9FAFB',
-              fontSize: 12,
-              padding: '5px 8px',
-            }}
-          >
-            {emergencyRole.demoRoles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.label}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9CA3AF', fontSize: 12 }}>
-          Scenario
-          <select
-            aria-label="Emergency OS demo scenario"
-            value={activeScenarioId}
-            onChange={(event) => handleScenarioChange(event.target.value)}
-            title={activeScenario?.description || 'Emergency OS demo scenario'}
-            style={{
-              background: '#111827',
-              border: '1px solid #1F2937',
-              borderRadius: 999,
-              color: '#F9FAFB',
-              fontSize: 12,
-              fontWeight: 700,
-              minWidth: 190,
-              padding: '6px 10px',
-            }}
-          >
-            {availableScenarios.map((scenario) => (
-              <option key={scenario.id} value={scenario.id}>
-                {scenario.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <CapacityBadge capacity={capacity} canOpen={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)} />
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 10,
+        }}
+      >
+        <span
+          className="emergency-os-header__central-node"
+          title={`${centralControl.statusLabel}. ${centralControl.dashboardControlLabel}. ${centralControl.inputProfile.label}. ${centralControl.contributorMode ? 'Users submit inputs only.' : 'This role can operate central controls.'}`}
+        >
+          {centralControl.label}: {centralControl.contributorMode ? 'Input only' : 'Controller'} ·{' '}
+          {centralControl.inputProfile.label}
+        </span>
+        <CapacityBadge
+          capacity={capacity}
+          canOpen={emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)}
+        />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
@@ -286,7 +269,11 @@ export function Header() {
           aria-haspopup="dialog"
           aria-expanded={staffWorkloadOpen}
           disabled={!canManageWorkload}
-          title={canManageWorkload ? 'Staff workload' : `${emergencyRole.roleLabel} cannot reassign workload`}
+          title={
+            canManageWorkload
+              ? 'Staff workload'
+              : `${emergencyRole.roleLabel} cannot reassign workload`
+          }
           style={{
             width: 24,
             height: 24,
@@ -326,7 +313,9 @@ export function Header() {
             zIndex: 120,
           }}
         >
-          <div style={{ color: '#F9FAFB', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Alerts</div>
+          <div style={{ color: '#F9FAFB', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+            Alerts
+          </div>
           {alerts.length > 0 ? (
             alerts.map((alert) => (
               <button
@@ -349,7 +338,12 @@ export function Header() {
                   cursor: 'pointer',
                 }}
               >
-                <div style={{ color: alert.severity === 'Critical' ? '#EF4444' : '#F59E0B', fontSize: 11 }}>
+                <div
+                  style={{
+                    color: alert.severity === 'Critical' ? '#EF4444' : '#F59E0B',
+                    fontSize: 11,
+                  }}
+                >
                   {alert.severity}
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{alert.title}</div>

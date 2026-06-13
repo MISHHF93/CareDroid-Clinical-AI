@@ -2,7 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NewPatientIntake, { suggestPriority } from './NewPatientIntake';
-import { hasPatientFlag, selectQueueCounts, selectReassessmentQueue, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  hasPatientFlag,
+  selectQueueCounts,
+  selectReassessmentCount,
+  selectReassessmentQueue,
+  useEmergencyStore,
+} from '../../store/emergencyStore';
 import { PatientState, Priority } from '../types/emergency';
 
 import './NewPatientIntake.css';
@@ -22,7 +28,7 @@ describe('NewPatientIntake triage suggestions', () => {
 
   it('suggests P2 for chest pain with diaphoresis', () => {
     expect(suggestPriority('Chest Pain', { hr: '88', spo2: '98' }, 'diaphoretic and clammy')).toBe(
-      Priority.P2
+      Priority.P2,
     );
   });
 });
@@ -52,10 +58,13 @@ describe('NewPatientIntake quick flow', () => {
     await user.click(screen.getByRole('button', { name: /chest pain/i }));
     expect(screen.getByLabelText(/free-text complaint/i)).toHaveFocus();
 
-    await user.type(screen.getByLabelText(/free-text complaint/i), 'Chest pressure with diaphoresis');
+    await user.type(
+      screen.getByLabelText(/free-text complaint/i),
+      'Chest pressure with diaphoresis',
+    );
     await user.type(screen.getByLabelText(/first name/i), 'Avery');
     await user.type(screen.getByLabelText(/last name/i), 'Stone');
-    await user.click(screen.getByRole('button', { name: /add to department/i }));
+    await user.click(screen.getByRole('button', { name: /send to central node/i }));
 
     await waitFor(() => {
       expect(useEmergencyStore.getState().patients).toHaveLength(beforeCount + 1);
@@ -63,7 +72,9 @@ describe('NewPatientIntake quick flow', () => {
 
     const patient = useEmergencyStore
       .getState()
-      .patients.find((candidate) => candidate.firstName === 'Avery' && candidate.lastName === 'Stone');
+      .patients.find(
+        (candidate) => candidate.firstName === 'Avery' && candidate.lastName === 'Stone',
+      );
 
     expect(patient).toEqual(
       expect.objectContaining({
@@ -72,7 +83,7 @@ describe('NewPatientIntake quick flow', () => {
         chiefComplaint: 'Chest pressure with diaphoresis',
         complaintCategory: 'Chest Pain',
         lastAssessedTime: null,
-      })
+      }),
     );
     expect(patient?.mrn).toMatch(/^ED-\d{6}$/);
     expect(patient?.timeline).toEqual(
@@ -84,14 +95,18 @@ describe('NewPatientIntake quick flow', () => {
           from: PatientState.Arrival,
           to: PatientState.Triage,
         }),
-      ])
+      ]),
     );
     expect(patient && hasPatientFlag(patient, 'ReassessmentDue')).toBe(true);
     expect(selectQueueCounts(useEmergencyStore.getState()).Triage).toBeGreaterThan(0);
-    expect(
-      selectReassessmentQueue(useEmergencyStore.getState()).some((item) => item.patientId === patient?.id)
-    ).toBe(true);
-    expect(useEmergencyStore.getState().capacity.reassessmentDueCount).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(
+        selectReassessmentQueue(useEmergencyStore.getState()).some(
+          (item) => item.id === patient?.id,
+        ),
+      ).toBe(true);
+    });
+    expect(selectReassessmentCount(useEmergencyStore.getState())).toBeGreaterThan(0);
     expect(onPatientAdded).toHaveBeenCalledWith(patient?.id);
     expect(onClose).toHaveBeenCalled();
   });
@@ -105,10 +120,10 @@ describe('NewPatientIntake quick flow', () => {
     await user.click(screen.getByRole('button', { name: /chest pain/i }));
     await user.type(screen.getByLabelText(/free-text complaint/i), 'Chest pressure');
     await user.type(screen.getByLabelText(/^HR/i), '128');
-    await user.click(screen.getByRole('button', { name: /auto-suggested CTAS/i }));
+    await user.click(screen.getByRole('button', { name: /central CTAS suggestion/i }));
     await user.click(screen.getByRole('button', { name: /P4/i }));
     await user.type(screen.getByLabelText(/first name/i), 'Morgan');
-    await user.click(screen.getByRole('button', { name: /add to department/i }));
+    await user.click(screen.getByRole('button', { name: /send to central node/i }));
 
     await waitFor(() => {
       expect(useEmergencyStore.getState().patients).toHaveLength(beforeCount + 1);
@@ -129,7 +144,7 @@ describe('NewPatientIntake quick flow', () => {
             override: true,
           }),
         }),
-      ])
+      ]),
     );
   });
 

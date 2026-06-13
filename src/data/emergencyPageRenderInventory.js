@@ -31,7 +31,7 @@ function page({
 export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
   page({
     id: 'emergency-whiteboard',
-    label: 'Emergency Whiteboard',
+    label: 'Board',
     path: CANONICAL_ROUTES.emergencyWhiteboard,
     componentKey: 'EmergencyWhiteboard',
     navId: 'emergency_whiteboard',
@@ -40,7 +40,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
   }),
   page({
     id: 'department-pulse',
-    label: 'Department Pulse',
+    label: 'Pulse',
     path: CANONICAL_ROUTES.emergencyPulse,
     componentKey: 'DepartmentPulse',
     navId: 'department_pulse',
@@ -69,7 +69,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
   }),
   page({
     id: 'ems-pipeline',
-    label: 'EMS Pipeline',
+    label: 'EMS',
     path: CANONICAL_ROUTES.emergencyEms,
     componentKey: 'EMSPipeline',
     navId: 'ems_pipeline',
@@ -183,57 +183,9 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     ],
     backendContract: 'demo',
   }),
-  // Future module
-  // page({
-  //   id: 'federated-learning',
-  //   label: 'Federated Learning',
-  //   path: CANONICAL_ROUTES.emergencyFederatedLearning,
-  //   componentKey: 'FederatedLearningRoute',
-  //   navId: 'federated_learning',
-  //   screenshotSlug: '16-federated-learning',
-  //   loadEndpoints: ['/api/emergency/federated-learning/dashboard'],
-  //   actionEndpoints: [
-  //     'POST /api/emergency/federated-learning/register',
-  //     'POST /api/emergency/federated-learning/update',
-  //     'POST /api/emergency/federated-learning/aggregate',
-  //     'GET /api/emergency/federated-learning/global-model/:hospitalId',
-  //   ],
-  //   backendContract: 'demo',
-  // }),
-  // Future module
-  // page({
-  //   id: 'hybrid-digital-twin',
-  //   label: 'Hybrid Digital Twin',
-  //   path: CANONICAL_ROUTES.emergencyDigitalTwin,
-  //   componentKey: 'HybridDigitalTwinRoute',
-  //   navId: 'hybrid_digital_twin',
-  //   screenshotSlug: '17-hybrid-digital-twin',
-  //   loadEndpoints: ['/api/emergency/digital-twin/state'],
-  //   actionEndpoints: [
-  //     'POST /api/emergency/digital-twin/initialize',
-  //     'POST /api/emergency/digital-twin/simulate',
-  //     'POST /api/emergency/digital-twin/scenario',
-  //   ],
-  //   backendContract: 'demo',
-  // }),
-  // Future module
-  // page({
-  //   id: 'ai-governance',
-  //   label: 'AI Governance',
-  //   path: CANONICAL_ROUTES.aiGovernance,
-  //   componentKey: 'AIGovernanceDashboard',
-  //   navId: 'ai_governance',
-  //   screenshotSlug: '18-ai-governance',
-  //   loadEndpoints: [
-  //     '/api/emergency/governance/compliance',
-  //     '/api/emergency/governance/registry',
-  //     '/api/emergency/governance/validate-prompts',
-  //   ],
-  //   duplicateRenderPaths: [CANONICAL_ROUTES.emergencyAiGovernance],
-  // }),
   page({
     id: 'clinical-tools',
-    label: 'Clinical Tools',
+    label: 'Tools',
     path: CANONICAL_ROUTES.emergencyTools,
     componentKey: 'ClinicalCalculatorHub',
     navId: 'tools',
@@ -262,11 +214,11 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
 ]);
 
 export const EMERGENCY_PAGE_PRIMARY_PATHS = Object.freeze(
-  EMERGENCY_PAGE_RENDER_INVENTORY.map((entry) => entry.path)
+  EMERGENCY_PAGE_RENDER_INVENTORY.map((entry) => entry.path),
 );
 
 export const EMERGENCY_PAGE_ALL_RENDER_PATHS = Object.freeze(
-  EMERGENCY_PAGE_RENDER_INVENTORY.flatMap((entry) => [entry.path, ...entry.duplicateRenderPaths])
+  EMERGENCY_PAGE_RENDER_INVENTORY.flatMap((entry) => [entry.path, ...entry.duplicateRenderPaths]),
 );
 
 export const EMERGENCY_PAGE_SCREENSHOT_TARGETS = Object.freeze(
@@ -285,13 +237,13 @@ export const EMERGENCY_PAGE_SCREENSHOT_TARGETS = Object.freeze(
         path,
         screenshotSlug: `${entry.screenshotSlug}-alias-${index + 1}`,
         isDuplicateRenderPath: true,
-      })
+      }),
     ),
-  ])
+  ]),
 );
 
 export function getCanonicalAppPagePaths() {
-  return CANONICAL_APP_ROUTE_TREE
-    .filter((route) => route.type === 'page')
-    .map((route) => route.path);
+  return CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map(
+    (route) => route.path,
+  );
 }

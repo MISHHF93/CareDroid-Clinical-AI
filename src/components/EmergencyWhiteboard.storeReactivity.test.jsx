@@ -20,37 +20,49 @@ describe('EmergencyWhiteboard store reactivity', () => {
     const user = userEvent.setup();
     act(() => {
       useEmergencyStore.setState(
-        { ...originalState, selectedPatientId: null, activeQueueFilter: null, whiteboardSearchQuery: '' },
-        true
+        {
+          ...originalState,
+          selectedPatientId: null,
+          activeQueueFilter: null,
+          whiteboardSearchQuery: '',
+        },
+        true,
       );
     });
 
     render(
       <MemoryRouter>
         <EmergencyWhiteboard />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    await screen.findByText(/Scenario loaded/i);
+    await screen.findByText(/Central Node managed dashboard/i);
     const firstPatientCard = document.querySelector('[data-patient-card-id]');
     expect(firstPatientCard).toBeTruthy();
     await user.click(firstPatientCard);
 
-    expect(useEmergencyStore.getState().selectedPatientId).toBe(firstPatientCard.dataset.patientCardId);
+    expect(useEmergencyStore.getState().selectedPatientId).toBe(
+      firstPatientCard.dataset.patientCardId,
+    );
   });
 
   it('updates canonical store state when simulation-style actions discharge a patient', async () => {
     act(() => {
       useEmergencyStore.setState(
-        { ...originalState, selectedPatientId: null, activeQueueFilter: null, whiteboardSearchQuery: '' },
-        true
+        {
+          ...originalState,
+          selectedPatientId: null,
+          activeQueueFilter: null,
+          whiteboardSearchQuery: '',
+        },
+        true,
       );
     });
 
     render(
       <MemoryRouter>
         <EmergencyWhiteboard />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     let patientCard;
@@ -66,6 +78,8 @@ describe('EmergencyWhiteboard store reactivity', () => {
       useEmergencyStore.getState().updatePatient(patientId, { state: PatientState.Discharge });
     });
 
-    expect(useEmergencyStore.getState().patients.find((patient) => patient.id === patientId)?.state).toBe(PatientState.Discharge);
+    expect(
+      useEmergencyStore.getState().patients.find((patient) => patient.id === patientId)?.state,
+    ).toBe(PatientState.Discharge);
   });
 });

@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
-import {
-  Patient,
-  PatientFlag,
-  PatientState,
-  Priority,
-  Vitals,
-} from '../types/emergency';
+import { Patient, PatientFlag, PatientState, Priority, Vitals } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { routeComplaint } from '../engine/complaintRouter';
@@ -18,7 +13,15 @@ type QuickIntakeProps = {
   onAdded: (patient: Patient) => void;
 };
 
-type ComplaintCategory = 'Chest pain' | 'Breathing' | 'Neuro/Stroke' | 'Sepsis' | 'Trauma' | 'OB/Gyn' | 'Pediatric' | 'Other';
+type ComplaintCategory =
+  | 'Chest pain'
+  | 'Breathing'
+  | 'Neuro/Stroke'
+  | 'Sepsis'
+  | 'Trauma'
+  | 'OB/Gyn'
+  | 'Pediatric'
+  | 'Other';
 type Sex = Patient['sex'];
 
 const CATEGORY_BUTTONS: Array<{ label: ComplaintCategory; icon: string }> = [
@@ -87,7 +90,11 @@ function isMinorComplaint(category: ComplaintCategory, complaint: string): boole
   );
 }
 
-function computePriority(category: ComplaintCategory | null, complaint: string, vitals: Partial<Vitals>): Priority {
+function computePriority(
+  category: ComplaintCategory | null,
+  complaint: string,
+  vitals: Partial<Vitals>,
+): Priority {
   const hr = vitals.hr;
   const sbp = vitals.sbp;
   const spo2 = vitals.spo2;
@@ -112,7 +119,12 @@ function computePriority(category: ComplaintCategory | null, complaint: string, 
   return Priority.P3;
 }
 
-function buildVitals(form: { hr: string; sbp: string; spo2: string; temp: string }): Partial<Vitals> {
+function buildVitals(form: {
+  hr: string;
+  sbp: string;
+  spo2: string;
+  temp: string;
+}): Partial<Vitals> {
   return {
     hr: numeric(form.hr),
     sbp: numeric(form.sbp),
@@ -124,6 +136,9 @@ function buildVitals(form: { hr: string; sbp: string; spo2: string; temp: string
 export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
+  const centralControlSettings = useEmergencyStore(
+    (state) => state.emergencySettings.centralControl,
+  );
   const complaintInputRef = useRef<HTMLTextAreaElement | null>(null);
   const [complaintCategory, setComplaintCategory] = useState<ComplaintCategory | null>(null);
   const [complaint, setComplaint] = useState('');
@@ -139,6 +154,15 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const [submitError, setSubmitError] = useState('');
   const [protocolSuggestions, setProtocolSuggestions] = useState<string[]>([]);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const centralControl = useMemo(
+    () =>
+      getCentralControlPolicy({
+        role: emergencyRole.role,
+        can: emergencyRole.can,
+        settings: centralControlSettings,
+      }),
+    [centralControlSettings, emergencyRole],
+  );
 
   const age = useMemo(() => calculateAge(dob), [dob]);
   const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);
@@ -209,7 +233,21 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       priority,
       vitals: completeVitals,
       flags: priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [],
-      notes: [],
+      notes: [
+        {
+          id: createId('central-input-note'),
+          type: 'System',
+          body: `${centralControl.inputProfile.label} submitted unified intake input to ${centralControl.label}. Escalation path: ${centralControl.inputProfile.escalationPath}.`,
+          authorId: emergencyRole.role,
+          createdAt: now,
+          metadata: {
+            centralNodeId: centralControl.nodeId,
+            inputMode: centralControl.userInputMode,
+            inputRole: emergencyRole.role,
+            escalationPath: centralControl.inputProfile.escalationPath,
+          },
+        },
+      ],
       timeline: [],
     };
 
@@ -223,7 +261,9 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       onAdded(persistedPatient);
       onClose();
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Unable to save intake to the Emergency OS API.');
+      setSubmitError(
+        error instanceof Error ? error.message : 'Unable to save intake to the Emergency OS API.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -337,9 +377,11 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         >
           <div>
             <h2 id="quick-intake-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
-              Quick Intake
+              Central Node Intake
             </h2>
-            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>Single-screen ED registration</div>
+            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              Unified input and escalation for {centralControl.inputProfile.label}
+            </div>
           </div>
           <button
             type="button"
@@ -359,9 +401,30 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
           </button>
         </header>
 
-        <div className="quick-intake-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}>
+        <div
+          className="quick-intake-grid"
+          style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}
+        >
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div className="quick-intake-category-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div
+              aria-label="Central node input mode"
+              style={{
+                border: '1px solid rgba(96, 165, 250, 0.3)',
+                borderRadius: 12,
+                background: 'rgba(37, 99, 235, 0.12)',
+                color: '#BFDBFE',
+                padding: 10,
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              {centralControl.label} receives this as {centralControl.inputProfile.label}.
+              Escalation path: {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}.
+            </div>
+            <div
+              className="quick-intake-category-grid"
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}
+            >
               {CATEGORY_BUTTONS.map((category) => {
                 const active = complaintCategory === category.label;
                 return (
@@ -383,7 +446,9 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                       padding: '0 12px',
                     }}
                   >
-                    <span aria-hidden="true" style={{ marginRight: 6 }}>{category.icon}</span>
+                    <span aria-hidden="true" style={{ marginRight: 6 }}>
+                      {category.icon}
+                    </span>
                     {category.label}
                   </button>
                 );
@@ -421,7 +486,9 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                   padding: 10,
                 }}
               >
-                <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>Suggested protocols</div>
+                <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+                  Suggested protocols
+                </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {protocols.map((protocol) => (
                     <span
@@ -448,21 +515,41 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>First</span>
-              <input value={firstName} onChange={(event) => setFirstName(event.target.value)} disabled={submitting} style={inputStyle} />
+                <input
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  disabled={submitting}
+                  style={inputStyle}
+                />
               </label>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Last</span>
-              <input value={lastName} onChange={(event) => setLastName(event.target.value)} disabled={submitting} style={inputStyle} />
+                <input
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  disabled={submitting}
+                  style={inputStyle}
+                />
               </label>
             </div>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>DOB {dob ? `(Age ${age})` : ''}</span>
-              <input type="date" value={dob} onChange={(event) => setDob(event.target.value)} disabled={submitting} style={inputStyle} />
+              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>
+                DOB {dob ? `(Age ${age})` : ''}
+              </span>
+              <input
+                type="date"
+                value={dob}
+                onChange={(event) => setDob(event.target.value)}
+                disabled={submitting}
+                style={inputStyle}
+              />
             </label>
 
             <div>
-              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>Sex</div>
+              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+                Sex
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
                 {(['M', 'F', 'Other'] as Sex[]).map((candidate) => (
                   <button
@@ -487,23 +574,34 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>MRN</span>
-              <input value={mrn} readOnly aria-readonly="true" style={{ ...inputStyle, color: '#9CA3AF' }} />
+              <input
+                value={mrn}
+                readOnly
+                aria-readonly="true"
+                style={{ ...inputStyle, color: '#9CA3AF' }}
+              />
             </label>
 
             <div>
-              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>Vitals</div>
+              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+                Vitals
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-                {([
-                  ['hr', 'HR'],
-                  ['sbp', 'SBP'],
-                  ['spo2', 'SpO2'],
-                  ['temp', 'Temp'],
-                ] as const).map(([key, label]) => (
+                {(
+                  [
+                    ['hr', 'HR'],
+                    ['sbp', 'SBP'],
+                    ['spo2', 'SpO2'],
+                    ['temp', 'Temp'],
+                  ] as const
+                ).map(([key, label]) => (
                   <input
                     key={key}
                     aria-label={label}
                     value={vitalsForm[key]}
-                    onChange={(event) => setVitalsForm((previous) => ({ ...previous, [key]: event.target.value }))}
+                    onChange={(event) =>
+                      setVitalsForm((previous) => ({ ...previous, [key]: event.target.value }))
+                    }
                     inputMode="decimal"
                     placeholder={label}
                     style={{ ...inputStyle, padding: '8px 6px', textAlign: 'center' }}
@@ -545,7 +643,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                 fontWeight: 800,
               }}
             >
-              CTAS {priority}{priorityOverride ? ' override' : ''}
+              Central CTAS {priority}
+              {priorityOverride ? ' override' : ''}
             </button>
             {showPriorityPicker ? (
               <div
@@ -573,7 +672,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                     style={{
                       border: `1px solid ${PRIORITY_COLORS[candidate]}`,
                       borderRadius: 999,
-                      background: priority === candidate ? `${PRIORITY_COLORS[candidate]}33` : 'transparent',
+                      background:
+                        priority === candidate ? `${PRIORITY_COLORS[candidate]}33` : 'transparent',
                       color: PRIORITY_COLORS[candidate],
                       padding: '6px 8px',
                       cursor: 'pointer',
@@ -610,7 +710,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
               minWidth: 170,
             }}
           >
-            {submitting ? 'Saving...' : 'Add to Department'}
+            {submitting ? 'Sending...' : 'Send to Central Node'}
           </button>
         </footer>
       </form>

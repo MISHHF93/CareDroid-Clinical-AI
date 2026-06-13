@@ -32,8 +32,9 @@ No broad legacy folders were moved. The legacy surface is large and intertwined 
 
 - Generic root/dashboard/app/workspace/mobile routes redirect to `/emergency/whiteboard`.
 - Generic `/settings` redirects to `/emergency/settings`.
-- `/tools/*` and removed `/emergency/*` surfaces fall back to `/emergency/whiteboard`.
-- `/emergency/tools`, `/emergency/pulse`, `/emergency/shift`, and `/emergency/ai-governance` are no longer active mounts.
+- Legacy `/tools/*` aliases redirect into the active Emergency OS tools/whiteboard flow rather than mounting a duplicate legacy tools shell.
+- Future-only `/emergency/federated-learning`, `/emergency/digital-twin`, and `/emergency/ai-governance` are no longer active mounts.
+- `/emergency/pulse`, `/emergency/tools`, and `/emergency/shift` are active Emergency OS routes and first-class sidebar destinations.
 - Active route tree no longer mounts old general healthcare pages directly.
 - Conditional backend duplicate `/api/v1/governance` alias was removed.
 

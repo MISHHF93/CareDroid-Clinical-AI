@@ -15,6 +15,27 @@ import {
   normalizeEmergencyRole,
 } from './emergencyRolePermissions';
 
+const ALL_OPERATIONAL_SIDEBAR_IDS = [
+  'whiteboard',
+  'pulse',
+  'patients',
+  'journey',
+  'intake',
+  'queues',
+  'reassessment',
+  'ems',
+  'referrals',
+  'provincial_health',
+  'integrations',
+  'capacity',
+  'boarding',
+  'copilot',
+  'analytics',
+  'simulation',
+  'tools',
+  'shift',
+];
+
 describe('Emergency OS role-based views', () => {
   it('defines the requested demo roles with stable ids', () => {
     expect(getEmergencyDemoRoles().map((role) => role.label)).toEqual([
@@ -36,43 +57,83 @@ describe('Emergency OS role-based views', () => {
       EMERGENCY_ROLE_IDS.registrationClerk,
       APP_SHELL_NAV_ITEMS,
     ).map((item) => item.id);
-    expect(clerkNavIds).toEqual(['whiteboard', 'pulse']);
+    expect(clerkNavIds).toEqual(ALL_OPERATIONAL_SIDEBAR_IDS);
     expect(clerkNavIds).not.toContain('settings');
-    expect(clerkNavIds).not.toContain('referrals');
 
-    const emsNavIds = getVisibleEmergencyNavigationItems(EMERGENCY_ROLE_IDS.emsUser, APP_SHELL_NAV_ITEMS).map(
-      (item) => item.id,
-    );
-    expect(emsNavIds).toEqual(['whiteboard', 'pulse', 'ems', 'capacity']);
+    const emsNavIds = getVisibleEmergencyNavigationItems(
+      EMERGENCY_ROLE_IDS.emsUser,
+      APP_SHELL_NAV_ITEMS,
+    ).map((item) => item.id);
+    expect(emsNavIds).toEqual(ALL_OPERATIONAL_SIDEBAR_IDS);
     expect(emsNavIds).not.toContain('settings');
-    expect(emsNavIds).not.toContain('referrals');
   });
 
   it('guards page access and falls back to nearest permitted page', () => {
-    expect(canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.admin, CANONICAL_ROUTES.emergencySettings)).toBe(true);
-    expect(canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.readOnlyViewer, CANONICAL_ROUTES.emergencySettings)).toBe(false);
-    expect(getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencySettings)).toBe(
-      CANONICAL_ROUTES.emergencyIntake,
-    );
-    expect(getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencySettings)).toBe(
-      CANONICAL_ROUTES.emergencyEms,
-    );
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.admin, CANONICAL_ROUTES.emergencySettings),
+    ).toBe(true);
+    expect(
+      canAccessEmergencyRoute(
+        EMERGENCY_ROLE_IDS.readOnlyViewer,
+        CANONICAL_ROUTES.emergencySettings,
+      ),
+    ).toBe(false);
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyEms),
+    ).toBe(true);
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencyTools),
+    ).toBe(true);
+    expect(
+      getNearestEmergencyRoute(
+        EMERGENCY_ROLE_IDS.registrationClerk,
+        CANONICAL_ROUTES.emergencySettings,
+      ),
+    ).toBe(CANONICAL_ROUTES.emergencyIntake);
+    expect(
+      getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencySettings),
+    ).toBe(CANONICAL_ROUTES.emergencyEms);
   });
 
   it('keeps mutating action gates separate from read-only visibility', () => {
     expect(isEmergencyReadOnlyRole(EMERGENCY_ROLE_IDS.readOnlyViewer)).toBe(true);
-    expect(hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.readOnlyViewer, EMERGENCY_ACTIONS.createPatient)).toBe(false);
-    expect(hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.readOnlyViewer, EMERGENCY_ACTIONS.manageReferral)).toBe(false);
-    expect(hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.readOnlyViewer, EMERGENCY_ACTIONS.viewAnalytics)).toBe(true);
-    expect(hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.triageNurse, EMERGENCY_ACTIONS.verifyIntake)).toBe(true);
-    expect(hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage)).toBe(false);
+    expect(
+      hasEmergencyActionPermission(
+        EMERGENCY_ROLE_IDS.readOnlyViewer,
+        EMERGENCY_ACTIONS.createPatient,
+      ),
+    ).toBe(false);
+    expect(
+      hasEmergencyActionPermission(
+        EMERGENCY_ROLE_IDS.readOnlyViewer,
+        EMERGENCY_ACTIONS.manageReferral,
+      ),
+    ).toBe(false);
+    expect(
+      hasEmergencyActionPermission(
+        EMERGENCY_ROLE_IDS.readOnlyViewer,
+        EMERGENCY_ACTIONS.viewAnalytics,
+      ),
+    ).toBe(true);
+    expect(
+      hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.triageNurse, EMERGENCY_ACTIONS.verifyIntake),
+    ).toBe(true);
+    expect(
+      hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
+    ).toBe(false);
   });
 
   it('filters route commands to role-accessible destinations', () => {
-    const byId = Object.fromEntries(EMERGENCY_OS_ROUTE_COMMANDS.map((command) => [command.id, command]));
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics'])).toBe(true);
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings'])).toBe(false);
+    const byId = Object.fromEntries(
+      EMERGENCY_OS_ROUTE_COMMANDS.map((command) => [command.id, command]),
+    );
+    expect(
+      canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics']),
+    ).toBe(true);
+    expect(
+      canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings']),
+    ).toBe(false);
     expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-ems'])).toBe(true);
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-intake'])).toBe(false);
+    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-intake'])).toBe(true);
   });
 });

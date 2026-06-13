@@ -3,6 +3,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.emergency-os-header__central-node {
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.14);
+  color: #bfdbfe;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
 @media (max-width: 1024px) {
   .emergency-os-header {
     gap: 10px !important;
@@ -39,7 +51,7 @@
   }
 
   .emergency-os-header button:active {
-    border-color: #3B82F6 !important;
-    color: #F9FAFB !important;
+    border-color: #3b82f6 !important;
+    color: #f9fafb !important;
   }
 }

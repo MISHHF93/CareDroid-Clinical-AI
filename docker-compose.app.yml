@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: caredroid-backend-app
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      FRONTEND_URL: http://localhost:8000
+      CORS_ORIGIN: http://localhost:8000
+      DATABASE_CLIENT: sqlite
+      SQLITE_PATH: /data/caredroid.dev.sqlite
+      ENABLE_MONGOOSE_EMERGENCY_OS: 'false'
+      NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-false}
+      NLU_SERVICE_URL: http://nlu:8001
+      ANOMALY_DETECTION_ENABLED: 'false'
+      RAG_ENABLED: 'false'
+      AI_ENABLED: ${AI_ENABLED:-false}
+      JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_IN_PRODUCTION}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+    ports:
+      - '3000:3000'
+    volumes:
+      - backend_sqlite:/data
+    networks:
+      - caredroid-app
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: caredroid-frontend-app
+    environment:
+      VITE_API_URL: ''
+      VITE_API_PROXY_TARGET: http://backend:3000
+    ports:
+      - '8000:8000'
+    depends_on:
+      - backend
+    networks:
+      - caredroid-app
+
+  nlu:
+    profiles:
+      - ml
+    build:
+      context: ./backend/ml-services/nlu
+      dockerfile: Dockerfile
+    container_name: caredroid-nlu-app
+    environment:
+      NLU_HOST: 0.0.0.0
+      NLU_PORT: 8001
+      NLU_USE_GPU: 'false'
+      NLU_WORKERS: 2
+      NLU_LOG_LEVEL: info
+      PYTHONUNBUFFERED: 1
+    ports:
+      - '8001:8001'
+    volumes:
+      - nlu_models:/app/models
+      - nlu_cache:/root/.cache/huggingface
+    networks:
+      - caredroid-app
+
+volumes:
+  backend_sqlite:
+  nlu_models:
+  nlu_cache:
+
+networks:
+  caredroid-app:
+    driver: bridge

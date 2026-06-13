@@ -17,7 +17,11 @@ import {
 } from '@tabler/icons-react';
 import { PatientFlag } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { getVisibleNavigation, resolveFeatureGate, type NavigationItem } from '../config/unified-navigation.config';
+import {
+  getVisibleNavigation,
+  resolveFeatureGate,
+  type NavigationItem,
+} from '../config/unified-navigation.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import FeatureGate from './FeatureGate';
@@ -79,10 +83,13 @@ function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
   if (route === '/emergency' || item.path === '/emergency/whiteboard') {
     return pathname === route || pathname === item.path || pathname === '/emergency';
   }
-  if (item.path === '/emergency/whiteboard') return pathname === item.path || pathname === '/emergency';
+  if (item.path === '/emergency/whiteboard')
+    return pathname === item.path || pathname === '/emergency';
   if (pathname === item.path || pathname.startsWith(`${item.path}/`)) return true;
   if (pathname === route || pathname.startsWith(`${route}/`)) return true;
-  return Boolean(item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)));
+  return Boolean(
+    item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)),
+  );
 }
 
 export function Sidebar({ navigationItems }: SidebarProps) {
@@ -92,10 +99,13 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const reassessmentDueCount = useEmergencyStore(
-    (store) => store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
+    (store) =>
+      store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue))
+        .length,
   );
-  const visibleNav: readonly SidebarNavItem[] = navigationItems || getVisibleNavigation(emergencyRole.role);
-  const mobilePrimaryIds = ['whiteboard', 'ems', 'tools'];
+  const visibleNav: readonly SidebarNavItem[] =
+    navigationItems || getVisibleNavigation(emergencyRole.role);
+  const mobilePrimaryIds = ['whiteboard', 'pulse', 'intake'];
   const mobilePrimaryNav = mobilePrimaryIds
     .map((id) => visibleNav.find((item) => item.id === id))
     .filter((item): item is SidebarNavItem => Boolean(item));
@@ -115,13 +125,18 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           'sidebar-nav-item',
           active ? 'sidebar-nav-item--active' : '',
           item.id === 'settings' ? 'sidebar-nav-item--settings' : '',
-        ].filter(Boolean).join(' ')}
+        ]
+          .filter(Boolean)
+          .join(' ')}
         aria-label={item.label}
         aria-current={active ? 'page' : undefined}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
         {isWhiteboard && reassessmentDueCount > 0 ? (
-          <span className="sidebar-nav-item__badge" aria-label={`${reassessmentDueCount} reassessments due`}>
+          <span
+            className="sidebar-nav-item__badge"
+            aria-label={`${reassessmentDueCount} reassessments due`}
+          >
             {reassessmentDueCount}
           </span>
         ) : null}
@@ -134,7 +149,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       <FeatureGate key={item.id} feature={featureGate}>
         {navLink}
       </FeatureGate>
-    ) : navLink;
+    ) : (
+      navLink
+    );
   };
 
   const mobileNavLink = (item: SidebarNavItem) => {
@@ -145,10 +162,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       <Link
         key={item.id}
         to={item.route || item.path}
-        className={[
-          'sidebar-item',
-          active ? 'sidebar-item--active' : '',
-        ].filter(Boolean).join(' ')}
+        className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
         aria-label={label}
         aria-current={active ? 'page' : undefined}
         onClick={() => setMoreOpen(false)}
@@ -163,7 +177,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       <FeatureGate key={item.id} feature={featureGate}>
         {navLink}
       </FeatureGate>
-    ) : navLink;
+    ) : (
+      navLink
+    );
   };
 
   return (
@@ -190,7 +206,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         {mobilePrimaryNav.map(mobileNavLink)}
         <button
           type="button"
-          className={['sidebar-item', copilotOpen ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
+          className={['sidebar-item', copilotOpen ? 'sidebar-item--active' : '']
+            .filter(Boolean)
+            .join(' ')}
           onClick={toggleCopilot}
           disabled={!canUseCopilot}
           aria-pressed={copilotOpen}
@@ -201,7 +219,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         </button>
         <button
           type="button"
-          className={['sidebar-item', moreOpen || moreHasActiveItem ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
+          className={['sidebar-item', moreOpen || moreHasActiveItem ? 'sidebar-item--active' : '']
+            .filter(Boolean)
+            .join(' ')}
           onClick={() => setMoreOpen((open) => !open)}
           aria-expanded={moreOpen}
           aria-controls="sidebar-more-sheet"
@@ -212,7 +232,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         </button>
       </nav>
       {moreOpen ? (
-        <div className="sidebar-more-backdrop" role="presentation" onClick={() => setMoreOpen(false)}>
+        <div
+          className="sidebar-more-backdrop"
+          role="presentation"
+          onClick={() => setMoreOpen(false)}
+        >
           <section
             id="sidebar-more-sheet"
             className="sidebar-more-sheet"
@@ -221,7 +245,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           >
             <header>
               <strong>More</strong>
-              <button type="button" onClick={() => setMoreOpen(false)} aria-label="Close more navigation">
+              <button
+                type="button"
+                onClick={() => setMoreOpen(false)}
+                aria-label="Close more navigation"
+              >
                 Close
               </button>
             </header>
@@ -233,7 +261,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                   <Link
                     key={item.id}
                     to={item.route || item.path}
-                    className={['sidebar-more-item', active ? 'sidebar-more-item--active' : ''].filter(Boolean).join(' ')}
+                    className={['sidebar-more-item', active ? 'sidebar-more-item--active' : '']
+                      .filter(Boolean)
+                      .join(' ')}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => setMoreOpen(false)}
                   >
@@ -246,7 +276,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                   <FeatureGate key={item.id} feature={featureGate}>
                     {navLink}
                   </FeatureGate>
-                ) : navLink;
+                ) : (
+                  navLink
+                );
               })}
             </div>
           </section>

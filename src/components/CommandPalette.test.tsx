@@ -8,7 +8,9 @@ import {
 } from './CommandPalette';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
-function command(overrides: Partial<Command> & Pick<Command, 'id' | 'label' | 'keywords' | 'group'>): Command {
+function command(
+  overrides: Partial<Command> & Pick<Command, 'id' | 'label' | 'keywords' | 'group'>,
+): Command {
   return {
     description: '',
     action: vi.fn(),
@@ -48,9 +50,9 @@ describe('CommandPalette helpers', () => {
     const commands = [
       command({
         id: 'goto-tools',
-        label: 'Clinical Tools',
+        label: 'Tools',
         group: 'Navigation',
-        keywords: ['tools', 'calculators', 'scores'],
+        keywords: ['tools', 'clinical tools', 'calculators', 'scores'],
       }),
       command({
         id: 'heart',

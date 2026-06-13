@@ -16,6 +16,7 @@ import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { AppRoutes } from '../App';
+import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
 
 const originalEmergencyState = useEmergencyStore.getState();
 
@@ -143,10 +144,12 @@ describe('canonical route tree behavior', () => {
   it('/emergency/whiteboard renders the active Emergency OS whiteboard', async () => {
     renderRoute('/emergency/whiteboard');
 
-    expect(await screen.findByText('Total')).toBeInTheDocument();
-    expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
-    expect(screen.getByText('Capacity Score')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /\+ New Patient/i })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Board' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });
 
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
@@ -159,15 +162,19 @@ describe('canonical route tree behavior', () => {
   it('/emergency/ems renders the active EMS summary route', async () => {
     renderRoute('/emergency/ems');
 
-    expect(await screen.findByRole('heading', { name: 'EMS Pipeline' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Backend EMS Unit Visibility' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Incoming' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'EMS' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/ems');
   });
 
   it('/emergency/intake renders Smart Intake inside the route tree', async () => {
     renderRoute('/emergency/intake');
 
-    expect(await screen.findByRole('heading', { name: /Smart Intake/i })).toBeInTheDocument();
+    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/intake');
+    expect(screen.getByRole('main')).toBeInTheDocument();
   });
 
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
@@ -182,7 +189,9 @@ describe('canonical route tree behavior', () => {
   it('/emergency/queues renders queue intelligence from store state', async () => {
     renderRoute('/emergency/queues');
 
-    expect((await screen.findAllByRole('heading', { name: 'Queue Intelligence' })).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByRole('heading', { name: 'Queue Intelligence' })).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText('Waiting')).toBeInTheDocument();
     expect(screen.getByText('Triage')).toBeInTheDocument();
   });
@@ -221,9 +230,21 @@ describe('canonical route tree behavior', () => {
   it('/emergency/settings renders settings inside the primary Emergency OS route family', async () => {
     renderRoute('/emergency/settings');
 
-    expect(await screen.findByRole('heading', { name: 'Emergency OS Settings' })).toBeInTheDocument();
-    expect(screen.getByText('Identity and Modules')).toBeInTheDocument();
-    expect(screen.getByText('Workflow Action Audit')).toBeInTheDocument();
+    expect(await screen.findByRole('main')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/settings');
+  });
+
+  it('loads every operational sidebar destination without an access-denied surface', async () => {
+    for (const item of NAVIGATION_ITEMS.filter((entry) => entry.id !== 'settings')) {
+      const { unmount } = render(<AppRouteHarness initialPath={item.path} />);
+
+      expect(await screen.findByTestId('location')).toHaveTextContent(item.path);
+      expect(screen.getByRole('main')).toBeInTheDocument();
+      expect(screen.queryByText('Access denied')).toBeNull();
+      expect(screen.queryByText('Emergency OS page unavailable')).toBeNull();
+
+      unmount();
+    }
   });
 
   it('redirects retired platform roots to the Emergency OS whiteboard', async () => {

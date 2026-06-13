@@ -10,6 +10,7 @@ Generated: 2026-06-12
 - Additional backend API pattern: optional Express routers in `backend/src/api/*.routes.ts` are mounted from `backend/src/main.ts` only when `ENABLE_MONGOOSE_EMERGENCY_OS=true`.
 - Database/ORM: TypeORM with SQLite as the default development database and PostgreSQL when configured. Optional Emergency OS Mongoose models live in `backend/src/models`.
 - Package manager: npm, with `package-lock.json`, `backend/package-lock.json`, and `mcp/package-lock.json`.
+- Runtime baseline: Node 20+ for root and backend tooling, captured by `.node-version` and package `engines`.
 - Build tool: Vite for the frontend, Nest CLI/TypeScript for the backend.
 - Styling system: CSS files and CSS custom properties under `src/styles`, `src/index.css`, `src/globals.css`, `src/layout/AppShell.css`, and component CSS. `tailwind.config.ts` exists, but the active UI is primarily CSS/token based rather than Tailwind utility based.
 - Auth system: frontend `UserContext`, `AUTH_CONFIG`, dev auth bypass helpers, JWT bearer storage, tenant headers, and backend Nest `AuthModule` with Passport/JWT/OAuth strategies and authorization guards.
@@ -174,15 +175,18 @@ Broader platform modules remain imported by `backend/src/app.module.ts`, includi
 
 ## Current Build, Test, Lint, And Typecheck Commands
 
-- Frontend dev: `npm run dev`.
+- Local full-stack dev: `npm start` or `npm run dev:fullstack` starts the Vite frontend and Nest backend together with local SQLite defaults.
+- Frontend dev: `npm run dev:web` or `npm run dev`.
 - Frontend build: `npm run build`.
 - Frontend typecheck: `npm run typecheck:frontend`.
 - Frontend lint: `npm run lint`.
 - Frontend tests: `npm run test:run` or scoped Vitest commands.
-- Backend dev: `npm run backend:dev` or `cd backend && npm run start:dev`.
+- Backend dev: `npm run dev:api`, `npm run backend:dev`, or `cd backend && npm run start:dev`.
 - Backend build: `npm run backend:build` or `cd backend && npm run build`.
 - Backend lint: `cd backend && npm run lint`.
 - Backend tests: `cd backend && npm test`.
+- App-only Docker stack: `npm run compose:app:build`.
+- Optional ML Docker stack: `npm run compose:app:ml`.
 - Full available CI command: `npm run validate:ci`.
 
 ## Mismatches Between Intended Emergency OS Architecture And Actual Codebase

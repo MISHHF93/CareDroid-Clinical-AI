@@ -21,26 +21,41 @@ describe('Sidebar unified navigation rendering', () => {
     renderSidebar('admin');
 
     for (const label of [
-      'Emergency Whiteboard',
-      'EMS Pipeline',
+      'Board',
+      'Pulse',
+      'Patients',
+      'Journey',
+      'Intake',
+      'Queues',
+      'Reassess',
+      'EMS',
       'Referrals',
+      'Provincial',
+      'Integrations',
       'Capacity',
-      'Clinical Tools',
-      'Shift Summary',
+      'Boarding',
+      'Copilot',
+      'Analytics',
+      'Sim',
+      'Tools',
+      'Shift',
       'Settings',
     ]) {
       expect(screen.getByRole('link', { name: label })).toBeTruthy();
     }
 
     expect(screen.queryByRole('link', { name: 'AI Governance' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Patients' })).toBeNull();
   });
 
   it('renders only read-only visible pages and marks the active route', () => {
     renderSidebar('read_only_viewer', '/emergency/capacity');
 
-    expect(screen.getByRole('link', { name: 'Capacity' }).getAttribute('aria-current')).toBe('page');
-    expect(screen.getByRole('link', { name: 'Emergency Whiteboard' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Capacity' }).getAttribute('aria-current')).toBe(
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Board' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Patients' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Queues' })).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Settings' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'AI Governance' })).toBeNull();
   });
@@ -56,8 +71,8 @@ describe('Sidebar unified navigation rendering', () => {
     try {
       renderSidebar('admin');
 
-      expect(screen.queryByRole('link', { name: 'EMS Pipeline' })).toBeNull();
-      expect(screen.getByRole('link', { name: 'Emergency Whiteboard' })).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'EMS' })).toBeNull();
+      expect(screen.getByRole('link', { name: 'Board' })).toBeTruthy();
     } finally {
       useEmergencyStore.setState({
         flags: previousFlags,

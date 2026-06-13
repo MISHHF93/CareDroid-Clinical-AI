@@ -62,13 +62,20 @@ function normalizeSearch(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
-function searchableCommandText(command: Pick<Command, 'id' | 'label' | 'description' | 'keywords' | 'group'>): string {
+function searchableCommandText(
+  command: Pick<Command, 'id' | 'label' | 'description' | 'keywords' | 'group'>,
+): string {
   return normalizeSearch(
-    [command.id, command.label, command.description, command.group, ...command.keywords].filter(Boolean).join(' '),
+    [command.id, command.label, command.description, command.group, ...command.keywords]
+      .filter(Boolean)
+      .join(' '),
   );
 }
 
-export function commandMatchScore(command: Pick<Command, 'id' | 'label' | 'description' | 'keywords' | 'group'>, query: string): number {
+export function commandMatchScore(
+  command: Pick<Command, 'id' | 'label' | 'description' | 'keywords' | 'group'>,
+  query: string,
+): number {
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return 0;
 
@@ -115,11 +122,18 @@ export function matchAndRankCommands(commands: Command[], query: string): Comman
     .map((item) => item.command);
 }
 
-export function getPatientDisplayName(patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>): string {
-  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+export function getPatientDisplayName(
+  patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>,
+): string {
+  return (
+    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
+  );
 }
 
-export function patientNameMatchScore(patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>, query: string): number {
+export function patientNameMatchScore(
+  patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>,
+  query: string,
+): number {
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return -1;
 
@@ -136,7 +150,11 @@ export function patientNameMatchScore(patient: Pick<Patient, 'firstName' | 'last
   return initials.startsWith(normalizedQuery) ? 600 : -1;
 }
 
-export function searchPatientsByName(patients: Patient[], query: string, now = new Date()): PatientResult[] {
+export function searchPatientsByName(
+  patients: Patient[],
+  query: string,
+  now = new Date(),
+): PatientResult[] {
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return [];
 
@@ -165,20 +183,32 @@ export function readRecentCommandIds(storage: StorageLike | null = getBrowserSto
 
   try {
     const parsed = JSON.parse(storage.getItem(RECENT_COMMANDS_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string').slice(0, RECENT_COMMAND_LIMIT) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((id): id is string => typeof id === 'string').slice(0, RECENT_COMMAND_LIMIT)
+      : [];
   } catch {
     return [];
   }
 }
 
-export function writeRecentCommandIds(commandIds: string[], storage: StorageLike | null = getBrowserStorage()): string[] {
+export function writeRecentCommandIds(
+  commandIds: string[],
+  storage: StorageLike | null = getBrowserStorage(),
+): string[] {
   const nextIds = [...new Set(commandIds.filter(Boolean))].slice(0, RECENT_COMMAND_LIMIT);
   storage?.setItem(RECENT_COMMANDS_KEY, JSON.stringify(nextIds));
   return nextIds;
 }
 
-export function recordRecentCommand(commandId: string, currentIds: string[], storage: StorageLike | null = getBrowserStorage()): string[] {
-  return writeRecentCommandIds([commandId, ...currentIds.filter((id) => id !== commandId)], storage);
+export function recordRecentCommand(
+  commandId: string,
+  currentIds: string[],
+  storage: StorageLike | null = getBrowserStorage(),
+): string[] {
+  return writeRecentCommandIds(
+    [commandId, ...currentIds.filter((id) => id !== commandId)],
+    storage,
+  );
 }
 
 function getBrowserStorage(): StorageLike | null {
@@ -210,11 +240,14 @@ function dispatchDocumentEvent(name: string): void {
   document.dispatchEvent(new Event(name));
 }
 
-function createCommands(navigate: ReturnType<typeof useNavigate>, toggleCopilot: () => void): Command[] {
+function createCommands(
+  navigate: ReturnType<typeof useNavigate>,
+  toggleCopilot: () => void,
+): Command[] {
   return [
     {
       id: 'goto-whiteboard',
-      label: 'Go to Whiteboard',
+      label: 'Board',
       description: 'Open the main Emergency OS whiteboard.',
       shortcut: 'G W',
       group: 'Navigation',
@@ -223,44 +256,44 @@ function createCommands(navigate: ReturnType<typeof useNavigate>, toggleCopilot:
     },
     {
       id: 'goto-ems',
-      label: 'EMS Pipeline',
+      label: 'EMS',
       description: 'Review ambulance and inbound arrivals.',
       group: 'Navigation',
-      keywords: ['ems', 'ambulance', 'inbound'],
+      keywords: ['ems', 'ambulance', 'inbound', 'pipeline'],
       action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms),
     },
     {
       id: 'goto-tools',
-      label: 'Clinical Tools',
+      label: 'Tools',
       description: 'Open calculators and clinical score workflows.',
       group: 'Navigation',
-      keywords: ['tools', 'calculators', 'scores'],
+      keywords: ['tools', 'clinical tools', 'calculators', 'scores'],
       action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyTools),
     },
     {
       id: 'goto-shift',
-      label: 'Shift Summary',
+      label: 'Shift',
       description: 'Open throughput and shift handoff statistics.',
       group: 'Navigation',
-      keywords: ['shift', 'summary', 'stats'],
+      keywords: ['shift', 'shift summary', 'summary', 'stats'],
       action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyShift),
     },
     {
       id: 'new-patient',
-      label: 'New Patient',
-      description: 'Open the intake workflow.',
+      label: 'Central Intake',
+      description: 'Send a new patient input to the Central Node.',
       shortcut: 'N',
       group: 'Patient',
-      keywords: ['add', 'new', 'register', 'intake'],
+      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'escalation'],
       action: () => dispatchDocumentEvent('open-intake'),
     },
     {
       id: 'open-pulse',
-      label: 'Department Pulse',
+      label: 'Pulse',
       description: 'Open the department status overview.',
       shortcut: 'Shift+H',
       group: 'Department',
-      keywords: ['pulse', 'overview', 'status', 'charge'],
+      keywords: ['pulse', 'department pulse', 'overview', 'status', 'charge'],
       action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPulse),
     },
     {
@@ -335,7 +368,11 @@ function createCommands(navigate: ReturnType<typeof useNavigate>, toggleCopilot:
   ];
 }
 
-function buildCommandResults(commands: Command[], query: string, recentCommandIds: string[]): PaletteResult[] {
+function buildCommandResults(
+  commands: Command[],
+  query: string,
+  recentCommandIds: string[],
+): PaletteResult[] {
   if (!normalizeSearch(query)) {
     return recentCommandIds
       .map((id) => commands.find((command) => command.id === id))
@@ -386,7 +423,10 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const [recentCommandIds, setRecentCommandIds] = useState(() => readRecentCommandIds());
   const [results, setResults] = useState<PaletteResult[]>([]);
 
-  const commands = useMemo(() => createCommands(navigate, toggleCopilot), [navigate, toggleCopilot]);
+  const commands = useMemo(
+    () => createCommands(navigate, toggleCopilot),
+    [navigate, toggleCopilot],
+  );
 
   const computedResults = useMemo(() => {
     const patientResults = searchPatientsByName(patients, query);
@@ -431,7 +471,9 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
 
     if (event.key === 'ArrowUp') {
       event.preventDefault();
-      setSelectedIndex((index) => (results.length ? (index - 1 + results.length) % results.length : 0));
+      setSelectedIndex((index) =>
+        results.length ? (index - 1 + results.length) % results.length : 0,
+      );
       return;
     }
 
@@ -488,21 +530,34 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                       ...(active ? styles.resultItemActive : null),
                     }}
                   >
-                    <span style={result.type === 'patient' ? styles.patientIcon : styles.commandIcon} aria-hidden>
-                      {result.type === 'patient' ? patientInitials(result.label) : resultIcon(result)}
+                    <span
+                      style={result.type === 'patient' ? styles.patientIcon : styles.commandIcon}
+                      aria-hidden
+                    >
+                      {result.type === 'patient'
+                        ? patientInitials(result.label)
+                        : resultIcon(result)}
                     </span>
                     <span style={styles.resultText}>
                       <span style={styles.resultLabel}>{result.label}</span>
-                      {result.description ? <span style={styles.resultDescription}>{result.description}</span> : null}
+                      {result.description ? (
+                        <span style={styles.resultDescription}>{result.description}</span>
+                      ) : null}
                     </span>
-                    {result.type === 'command' && result.shortcut ? <kbd style={styles.shortcut}>{result.shortcut}</kbd> : null}
+                    {result.type === 'command' && result.shortcut ? (
+                      <kbd style={styles.shortcut}>{result.shortcut}</kbd>
+                    ) : null}
                   </button>
                 );
               })}
             </div>
           ))}
           {!results.length ? (
-            <div style={styles.empty}>{normalizeSearch(query) ? 'No matching patients or commands.' : 'No recent commands yet.'}</div>
+            <div style={styles.empty}>
+              {normalizeSearch(query)
+                ? 'No matching patients or commands.'
+                : 'No recent commands yet.'}
+            </div>
           ) : null}
         </div>
 

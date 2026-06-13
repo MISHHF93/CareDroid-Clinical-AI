@@ -67,7 +67,7 @@ describe('section link inventory and route flattening', () => {
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/catalog', to: '/emergency/whiteboard' }),
-      ])
+      ]),
     );
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
     expect(read('layout/AppShell.jsx')).not.toContain("navigate('/tools/catalog')");
@@ -89,11 +89,12 @@ describe('section link inventory and route flattening', () => {
       expect.arrayContaining([
         expect.objectContaining({ path: '/emergency/smart-intake', to: '/emergency/intake' }),
         expect.objectContaining({ path: '/patients/*', to: '/emergency/patients' }),
-        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/whiteboard' }),
-      ])
+        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/tools' }),
+      ]),
     );
     expect(app).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
-    expect(app).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(app).toContain('path="/tools/*"');
+    expect(app).toContain('<ToolsRedirect />');
     expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");

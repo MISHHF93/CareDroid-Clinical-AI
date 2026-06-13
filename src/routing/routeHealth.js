@@ -13,10 +13,10 @@ const repoRoot = join(srcRoot, '..');
 const appPath = join(srcRoot, 'App.jsx');
 const appSource = readFileSync(appPath, 'utf8');
 const canonicalRouteByExpression = new Map(
-  Object.entries(CANONICAL_ROUTES).map(([key, value]) => [`CANONICAL_ROUTES.${key}`, value])
+  Object.entries(CANONICAL_ROUTES).map(([key, value]) => [`CANONICAL_ROUTES.${key}`, value]),
 );
 const ACTIVE_EMERGENCY_ROUTE_PATHS = new Set(
-  CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)
+  CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
 );
 
 export const ROUTE_HEALTH_STATES = Object.freeze({
@@ -42,6 +42,7 @@ const ROUTE_OWNERSHIP_GROUPS = Object.freeze({
   PlatformSystemPage: 'platform-system-page',
   LegacyProtectedRouteRedirect: 'legacy-redirect',
   Navigate: 'router-redirect',
+  ToolsRedirect: 'tools-redirect',
   ToolNotFound: 'tools-fallback',
   ToolsAreaFallback: 'area-fallback',
 });
@@ -85,10 +86,7 @@ function extractOwner(block, fallback = 'GeneratedRoute') {
   if (navigate) return 'Navigate';
   const components = [...block.matchAll(/<([A-Z][A-Za-z0-9]+)\b/g)]
     .map((match) => match[1])
-    .filter(
-      (name) =>
-        !['AppShellPage', 'PermissionGate', 'Route'].includes(name)
-    );
+    .filter((name) => !['AppShellPage', 'PermissionGate', 'Route'].includes(name));
   return components.at(-1) || fallback;
 }
 
@@ -96,6 +94,7 @@ function inferStatus({ path, owner, block, generatedKind }) {
   const normalized = normalizePath(path);
   if (owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'LegacyProtectedRouteRedirect') return ROUTE_HEALTH_STATES.ALIAS;
+  if (owner === 'ToolsRedirect') return ROUTE_HEALTH_STATES.ALIAS;
   if (generatedKind?.endsWith('-alias')) return ROUTE_HEALTH_STATES.ALIAS;
   if (ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.ACTIVE;
   if (normalized.includes('*')) return ROUTE_HEALTH_STATES.HIDDEN;
@@ -140,7 +139,9 @@ function directAppRouteEntries() {
     });
   });
 
-  const jsxEntries = [...appSource.matchAll(/<Route\b[^>]*\bpath=(?:"([^"]+)"|'([^']+)'|\{([^}]+)\})[^>]*>/g)]
+  const jsxEntries = [
+    ...appSource.matchAll(/<Route\b[^>]*\bpath=(?:"([^"]+)"|'([^']+)'|\{([^}]+)\})[^>]*>/g),
+  ]
     .map((match) => {
       const path = resolveRoutePathValue(match[1] || match[2] || match[3] || '');
       if (!path) return null;
@@ -169,7 +170,7 @@ function generatedAliasEntries() {
       ...entry,
       owner: 'Navigate',
       source: entry.generatedKind,
-    })
+    }),
   );
 }
 
@@ -216,7 +217,7 @@ function referencedRoutePaths() {
       '/mobile',
       '/general-healthcare',
       '/tools/calculators/qsofa',
-    ]).map(normalizePath)
+    ]).map(normalizePath),
   );
 }
 
@@ -238,10 +239,7 @@ function orphanPageEntries() {
 }
 
 export function buildRouteHealthGraph() {
-  const rawRoutes = [
-    ...directAppRouteEntries(),
-    ...generatedAliasEntries(),
-  ];
+  const rawRoutes = [...directAppRouteEntries(), ...generatedAliasEntries()];
   const routes = mergeRouteEntries(rawRoutes);
   const referenced = referencedRoutePaths();
   const duplicateOwnership = Object.values(
@@ -257,7 +255,7 @@ export function buildRouteHealthGraph() {
       acc[route.path] = acc[route.path] || [];
       acc[route.path].push(route);
       return acc;
-    }, {})
+    }, {}),
   ).filter((owners) => new Set(owners.map((owner) => owner.owner)).size > 1);
   const routePaths = routes.map((route) => route.path);
   const unreachableRoutes = [...referenced]
@@ -318,7 +316,7 @@ export function formatRouteHealthReport(graph = buildRouteHealthGraph()) {
     '| --- | --- | --- | --- | --- | --- | --- |',
     ...graph.routes.map(
       (route) =>
-        `| \`${route.path}\` | ${route.component} | ${route.navigationEntry || 'none'} | ${route.inventoryEntry || 'none'} | ${route.backendContract || 'none'} | ${route.status} | ${route.sources?.join(', ') || route.source} |`
+        `| \`${route.path}\` | ${route.component} | ${route.navigationEntry || 'none'} | ${route.inventoryEntry || 'none'} | ${route.backendContract || 'none'} | ${route.status} | ${route.sources?.join(', ') || route.source} |`,
     ),
     '',
     '## Orphan Pages',

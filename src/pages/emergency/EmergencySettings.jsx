@@ -6,6 +6,13 @@ import {
 } from '../../store/emergencyStore';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
+  DEFAULT_CENTRAL_CONTROL_SETTINGS,
+  EMERGENCY_CTAS_PRIORITIES as CTAS_PRIORITIES,
+  EMERGENCY_SETTINGS_GROUP_LABELS as SETTING_GROUP_LABELS,
+  EMERGENCY_WORKSPACE_OPTIONS as WORKSPACE_OPTIONS,
+  buildEmergencySettingsPatchFromThresholds,
+} from '../../config/emergencySettings.config';
+import {
   fetchEmergencyOsSettings,
   saveEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
@@ -13,29 +20,6 @@ import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
-const CTAS_PRIORITIES = ['P1', 'P2', 'P3', 'P4', 'P5'];
-const WORKSPACE_OPTIONS = [
-  ['emergency-whiteboard', 'Emergency Whiteboard'],
-  ['smart-intake', 'Smart Intake'],
-  ['ems-pipeline', 'EMS Pipeline'],
-  ['capacity-command', 'Capacity Command'],
-  ['analytics', 'Emergency Analytics'],
-  ['settings', 'Settings'],
-];
-
-const SETTING_GROUP_LABELS = {
-  identity: 'Identity and Modules',
-  ai: 'AI Settings',
-  integrations: 'Integration Settings',
-  provincial: 'Provincial Health Settings',
-  notifications: 'Notification Settings',
-  reassessment: 'Reassessment Thresholds',
-  ctas: 'CTAS Wait Thresholds',
-  capacity: 'Capacity Thresholds',
-  ems: 'EMS Thresholds',
-  boarding: 'Boarding Thresholds',
-  alerts: 'Alert Rules',
-};
 
 function csvCell(value) {
   const text = typeof value === 'string' ? value : JSON.stringify(value ?? '');
@@ -54,40 +38,6 @@ export function auditLogToCsv(logs) {
     ]),
   ];
   return rows.map((row) => row.map(csvCell).join(',')).join('\n');
-}
-
-function thresholdSettingsPatch(thresholds) {
-  return {
-    reassessmentThresholds: {
-      P1: thresholds.reassessP1Min,
-      P2: thresholds.reassessP2Min,
-      P3: thresholds.reassessP3Min,
-      P4: thresholds.reassessP4Min,
-      P5: thresholds.reassessP5Min,
-    },
-    capacityThresholds: {
-      warningPercent: Math.round(thresholds.capacityOrangePct * 100),
-      criticalPercent: Math.round(thresholds.capacityRedPct * 100),
-    },
-    emsThresholds: {
-      offloadTargetMinutes: thresholds.emsOffloadTargetMin,
-    },
-    thresholds: {
-      waitWarningMinutes: thresholds.waitTimeWarningMin,
-      waitCriticalMinutes: thresholds.waitTimeCtiticalMin,
-      capacityWarningPercent: Math.round(thresholds.capacityWarningPct * 100),
-      capacityOrangePercent: Math.round(thresholds.capacityOrangePct * 100),
-      capacityRedPercent: Math.round(thresholds.capacityRedPct * 100),
-      emsOffloadTargetMinutes: thresholds.emsOffloadTargetMin,
-      reassessmentIntervals: {
-        P1: thresholds.reassessP1Min,
-        P2: thresholds.reassessP2Min,
-        P3: thresholds.reassessP3Min,
-        P4: thresholds.reassessP4Min,
-        P5: thresholds.reassessP5Min,
-      },
-    },
-  };
 }
 
 function Section({ id, title, subtitle, children, action }) {
@@ -115,12 +65,18 @@ function mergeSettings(base, patch = {}) {
     ...patch,
     enabledModules: patch.enabledModules || base.enabledModules || [],
     aiSettings: { ...(base.aiSettings || {}), ...(patch.aiSettings || {}) },
-    integrationSettings: { ...(base.integrationSettings || {}), ...(patch.integrationSettings || {}) },
+    integrationSettings: {
+      ...(base.integrationSettings || {}),
+      ...(patch.integrationSettings || {}),
+    },
     provincialHealthSettings: {
       ...(base.provincialHealthSettings || {}),
       ...(patch.provincialHealthSettings || {}),
     },
-    notificationSettings: { ...(base.notificationSettings || {}), ...(patch.notificationSettings || {}) },
+    notificationSettings: {
+      ...(base.notificationSettings || {}),
+      ...(patch.notificationSettings || {}),
+    },
     reassessmentThresholds: {
       ...(base.reassessmentThresholds || {}),
       ...(patch.reassessmentThresholds || {}),
@@ -145,6 +101,11 @@ function mergeSettings(base, patch = {}) {
       },
     },
     alertRules: { ...(base.alertRules || {}), ...(patch.alertRules || {}) },
+    centralControl: {
+      ...DEFAULT_CENTRAL_CONTROL_SETTINGS,
+      ...(base.centralControl || {}),
+      ...(patch.centralControl || {}),
+    },
   };
 }
 
@@ -172,18 +133,18 @@ function normalizePatchForStore(patch) {
       ...(Object.keys(ctasThresholds).length
         ? {
             ctasTargets: Object.fromEntries(
-              CTAS_PRIORITIES
-                .filter((priority) => ctasThresholds[priority] !== undefined)
-                .map((priority) => [priority, Number(ctasThresholds[priority])])
+              CTAS_PRIORITIES.filter((priority) => ctasThresholds[priority] !== undefined).map(
+                (priority) => [priority, Number(ctasThresholds[priority])],
+              ),
             ),
           }
         : {}),
       ...(Object.keys(reassessmentThresholds).length
         ? {
             reassessmentIntervals: Object.fromEntries(
-              CTAS_PRIORITIES
-                .filter((priority) => reassessmentThresholds[priority] !== undefined)
-                .map((priority) => [priority, Number(reassessmentThresholds[priority])])
+              CTAS_PRIORITIES.filter(
+                (priority) => reassessmentThresholds[priority] !== undefined,
+              ).map((priority) => [priority, Number(reassessmentThresholds[priority])]),
             ),
           }
         : {}),
@@ -195,7 +156,11 @@ function SettingsField({ label, value, type = 'text', onChange, options }) {
   if (type === 'checkbox') {
     return (
       <label className="emergency-settings__check">
-        <input type="checkbox" checked={Boolean(value)} onChange={(event) => onChange(event.target.checked)} />
+        <input
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(event) => onChange(event.target.checked)}
+        />
         {label}
       </label>
     );
@@ -222,7 +187,9 @@ function SettingsField({ label, value, type = 'text', onChange, options }) {
       <input
         type={type}
         value={value ?? ''}
-        onChange={(event) => onChange(type === 'number' ? Number(event.target.value) : event.target.value)}
+        onChange={(event) =>
+          onChange(type === 'number' ? Number(event.target.value) : event.target.value)
+        }
       />
     </label>
   );
@@ -238,7 +205,9 @@ export default function EmergencySettings() {
   const setShellActiveScenario = useShellEmergencyStore((state) => state.setActiveScenario);
   const shellWorkflowLogs = useShellEmergencyStore((state) => state.workflowLogs);
   const shellAuditLog = useShellEmergencyStore((state) => state.auditLog || []);
-  const thresholds = useShellEmergencyStore((state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS);
+  const thresholds = useShellEmergencyStore(
+    (state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS,
+  );
   const setThreshold = useShellEmergencyStore((state) => state.setThreshold);
   const resetThresholds = useShellEmergencyStore((state) => state.resetThresholds);
 
@@ -247,7 +216,12 @@ export default function EmergencySettings() {
   const [savingGroup, setSavingGroup] = useState('');
   const [auditStatus, setAuditStatus] = useState('loading');
   const [auditError, setAuditError] = useState('');
-  const [auditFilters, setAuditFilters] = useState({ action: 'all', staff: 'all', from: '', to: '' });
+  const [auditFilters, setAuditFilters] = useState({
+    action: 'all',
+    staff: 'all',
+    from: '',
+    to: '',
+  });
   const [backendWorkflowLogs, setBackendWorkflowLogs] = useState([]);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
@@ -263,7 +237,9 @@ export default function EmergencySettings() {
       .then((result) => {
         if (cancelled) return;
         if (!result.ok) {
-          setError(result.message || 'Backend settings unavailable. Local settings remain editable.');
+          setError(
+            result.message || 'Backend settings unavailable. Local settings remain editable.',
+          );
           setDraft(mergeSettings(storeSettings));
           return;
         }
@@ -273,7 +249,9 @@ export default function EmergencySettings() {
       })
       .catch((loadError) => {
         if (!cancelled) {
-          setError(loadError?.message || 'Backend settings unavailable. Local settings remain editable.');
+          setError(
+            loadError?.message || 'Backend settings unavailable. Local settings remain editable.',
+          );
           setDraft(mergeSettings(storeSettings));
         }
       })
@@ -286,10 +264,13 @@ export default function EmergencySettings() {
     };
   }, [saveEmergencySettings]);
 
-  useEffect(() => () => {
-    Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer));
-    if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer));
+      if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -316,7 +297,7 @@ export default function EmergencySettings() {
 
   const enabledCount = useMemo(
     () => draft.enabledModules.filter((module) => module.enabled).length,
-    [draft.enabledModules]
+    [draft.enabledModules],
   );
   const auditLogs = useMemo(() => {
     const byId = new Map();
@@ -328,7 +309,7 @@ export default function EmergencySettings() {
       if (log?.id) byId.set(log.id, log);
     });
     return [...byId.values()].sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
   }, [backendWorkflowLogs, rootWorkflowLogs, shellWorkflowLogs]);
   const storeAuditLogs = useMemo(() => {
@@ -340,23 +321,27 @@ export default function EmergencySettings() {
       if (log?.id) byId.set(log.id, log);
     });
     return [...byId.values()].sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
   }, [rootAuditLog, shellAuditLog]);
   const auditActionOptions = useMemo(
     () => [...new Set(storeAuditLogs.map((log) => log.action).filter(Boolean))].sort(),
-    [storeAuditLogs]
+    [storeAuditLogs],
   );
   const auditStaffOptions = useMemo(
     () => [...new Set(storeAuditLogs.map((log) => log.staffId || 'system').filter(Boolean))].sort(),
-    [storeAuditLogs]
+    [storeAuditLogs],
   );
   const filteredAuditLogs = useMemo(() => {
-    const from = auditFilters.from ? new Date(auditFilters.from).getTime() : Number.NEGATIVE_INFINITY;
+    const from = auditFilters.from
+      ? new Date(auditFilters.from).getTime()
+      : Number.NEGATIVE_INFINITY;
     const to = auditFilters.to ? new Date(auditFilters.to).getTime() : Number.POSITIVE_INFINITY;
     return storeAuditLogs
       .filter((log) => auditFilters.action === 'all' || log.action === auditFilters.action)
-      .filter((log) => auditFilters.staff === 'all' || (log.staffId || 'system') === auditFilters.staff)
+      .filter(
+        (log) => auditFilters.staff === 'all' || (log.staffId || 'system') === auditFilters.staff,
+      )
       .filter((log) => {
         const timestamp = new Date(log.timestamp).getTime();
         return timestamp >= from && timestamp <= to;
@@ -375,7 +360,7 @@ export default function EmergencySettings() {
           ...(current[section] || {}),
           [key]: value,
         },
-      })
+      }),
     );
   };
 
@@ -383,9 +368,9 @@ export default function EmergencySettings() {
     setDraft((current) =>
       mergeSettings(current, {
         enabledModules: current.enabledModules.map((module) =>
-          module.id === moduleId ? { ...module, enabled } : module
+          module.id === moduleId ? { ...module, enabled } : module,
         ),
-      })
+      }),
     );
   };
 
@@ -396,7 +381,7 @@ export default function EmergencySettings() {
           ...current.alertRules,
           [rule]: { ...current.alertRules[rule], ...patch },
         },
-      })
+      }),
     );
   };
 
@@ -423,7 +408,12 @@ export default function EmergencySettings() {
     Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer));
     thresholdTimersRef.current = {};
     resetThresholds();
-    setDraft((current) => mergeSettings(current, thresholdSettingsPatch(DEFAULT_EMERGENCY_THRESHOLDS)));
+    setDraft((current) =>
+      mergeSettings(
+        current,
+        buildEmergencySettingsPatchFromThresholds(DEFAULT_EMERGENCY_THRESHOLDS),
+      ),
+    );
     flashSaved();
   };
 
@@ -465,14 +455,14 @@ export default function EmergencySettings() {
   const loadFirstCustomerDemo = () => {
     setShellActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
     setRootActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
-    setStatus('First Customer Demo Mode loaded locally for the live walkthrough.');
+    setStatus('Central Node demo seed loaded locally for the live walkthrough.');
     setError('');
   };
 
   const resetDemoScenario = () => {
     setShellActiveScenario('normal-day');
     setRootActiveScenario('normal-day');
-    setStatus('Demo scenario reset to Normal day.');
+    setStatus('Central Node demo seed reset to Normal day.');
     setError('');
   };
 
@@ -483,44 +473,161 @@ export default function EmergencySettings() {
           <span>Emergency OS Admin</span>
           <h1>Emergency OS Settings</h1>
           <p>
-            Tenant identity, modules, AI, integrations, provincial health, notifications,
-            and operational thresholds.
+            Tenant identity, modules, AI, integrations, provincial health, notifications, and
+            operational thresholds.
           </p>
         </div>
-        <strong>{loading ? 'Loading department data...' : `${enabledCount} modules enabled`}</strong>
+        <strong>
+          {loading ? 'Loading department data...' : `${enabledCount} modules enabled`}
+        </strong>
       </header>
 
       {status ? <div className="emergency-settings__banner">{status}</div> : null}
-      {error ? <div className="emergency-settings__banner emergency-settings__banner--error">{error}</div> : null}
-      {isEmpty ? <div className="emergency-settings__empty">No settings were returned. Local defaults are ready to edit.</div> : null}
+      {error ? (
+        <div className="emergency-settings__banner emergency-settings__banner--error">{error}</div>
+      ) : null}
+      {isEmpty ? (
+        <div className="emergency-settings__empty">
+          No settings were returned. Local defaults are ready to edit.
+        </div>
+      ) : null}
 
       <Section
         id="first-customer-demo"
-        title="First Customer Demo Mode"
-        subtitle="Loads a deterministic 100-patient/day ED scenario for sales walkthroughs without backend dependencies."
+        title="Central Node Demo Seed"
+        subtitle="Loads deterministic department inputs into the central node for walkthroughs without exposing scenario control in the dashboard."
         action={
           <button type="button" onClick={loadFirstCustomerDemo}>
-            {isFirstCustomerDemoActive ? 'Reload Demo' : 'Load Demo'}
+            {isFirstCustomerDemoActive ? 'Reload Seed' : 'Load Seed'}
           </button>
         }
       >
         <div className="emergency-settings__demo-card">
           <div>
-            <strong>{isFirstCustomerDemoActive ? 'Demo mode active' : 'Demo mode inactive'}</strong>
+            <strong>
+              {isFirstCustomerDemoActive ? 'Central seed active' : 'Central seed inactive'}
+            </strong>
             <p>
-              {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound,
-              waiting and high-risk queues, reassessments, capacity pressure, boarders,
-              analytics KPIs, and ED Copilot context.
+              {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound, waiting
+              and high-risk queues, reassessments, capacity pressure, boarders, analytics KPIs, and
+              ED Copilot context.
             </p>
           </div>
-          <div className="emergency-settings__demo-metrics" aria-label="First Customer Demo Mode metrics">
+          <div
+            className="emergency-settings__demo-metrics"
+            aria-label="Central Node demo seed metrics"
+          >
             <span>100 patients/day</span>
             <span>42 active census</span>
             <span>Local fixture</span>
           </div>
           <button type="button" onClick={resetDemoScenario} disabled={!isFirstCustomerDemoActive}>
-            Reset to Normal Day
+            Reset Seed
           </button>
+        </div>
+      </Section>
+
+      <Section
+        id="central-control"
+        title="Central Control Node"
+        subtitle="Central policy owns dashboard decisions and scenario selection. Staff roles contribute unified inputs only unless they are central controllers."
+        action={
+          <button
+            type="button"
+            disabled={savingGroup === 'central'}
+            onClick={() => saveGroup('central', { centralControl: draft.centralControl })}
+          >
+            Save Central Node
+          </button>
+        }
+      >
+        <div className="emergency-settings__grid">
+          <SettingsField
+            type="checkbox"
+            label="Central control enabled"
+            value={draft.centralControl.enabled}
+            onChange={(value) =>
+              updateDraft({ centralControl: { ...draft.centralControl, enabled: value } })
+            }
+          />
+          <SettingsField
+            label="Dashboard authority"
+            value={draft.centralControl.dashboardAuthority}
+            options={[
+              ['central-node', 'Central Node'],
+              ['local-role', 'Local role override'],
+            ]}
+            onChange={(value) =>
+              updateDraft({
+                centralControl: { ...draft.centralControl, dashboardAuthority: value },
+              })
+            }
+          />
+          <SettingsField
+            label="Scenario authority"
+            value={draft.centralControl.scenarioAuthority}
+            options={[
+              ['central-node', 'Central Node'],
+              ['local-role', 'Local role override'],
+            ]}
+            onChange={(value) =>
+              updateDraft({ centralControl: { ...draft.centralControl, scenarioAuthority: value } })
+            }
+          />
+          <SettingsField
+            label="User input mode"
+            value={draft.centralControl.userInputMode}
+            options={[
+              ['central-escalation-input', 'Central escalation input'],
+              ['unified-input-only', 'Unified input only'],
+              ['controller-assisted', 'Controller assisted'],
+            ]}
+            onChange={(value) =>
+              updateDraft({ centralControl: { ...draft.centralControl, userInputMode: value } })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Dashboard decision interval (seconds)"
+            value={draft.centralControl.dashboardDecisionIntervalSeconds}
+            onChange={(value) =>
+              updateDraft({
+                centralControl: {
+                  ...draft.centralControl,
+                  dashboardDecisionIntervalSeconds: Number(value),
+                },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Rules review interval (minutes)"
+            value={draft.centralControl.rulesReviewIntervalMinutes}
+            onChange={(value) =>
+              updateDraft({
+                centralControl: {
+                  ...draft.centralControl,
+                  rulesReviewIntervalMinutes: Number(value),
+                },
+              })
+            }
+          />
+        </div>
+        <div className="emergency-settings__rules" aria-label="Central node governed rule groups">
+          {draft.centralControl.governedRuleGroups.map((ruleGroup) => (
+            <article key={ruleGroup}>
+              <strong>{ruleGroup.replace(/-/g, ' ')}</strong>
+              <small>central policy</small>
+            </article>
+          ))}
+        </div>
+        <div className="emergency-settings__rules" aria-label="Unified input channels">
+          {draft.centralControl.inputChannels.map((channel) => (
+            <article key={channel}>
+              <strong>{channel.replace(/-/g, ' ')}</strong>
+              <small>input only</small>
+            </article>
+          ))}
         </div>
       </Section>
 
@@ -541,10 +648,15 @@ export default function EmergencySettings() {
           </small>
         </div>
         {auditStatus === 'loading' ? (
-          <p className="emergency-settings__audit-state" role="status">Loading department data...</p>
+          <p className="emergency-settings__audit-state" role="status">
+            Loading department data...
+          </p>
         ) : null}
         {auditStatus === 'error' ? (
-          <p className="emergency-settings__audit-state emergency-settings__audit-state--error" role="alert">
+          <p
+            className="emergency-settings__audit-state emergency-settings__audit-state--error"
+            role="alert"
+          >
             {auditError}. Showing local workflow logs.
           </p>
         ) : null}
@@ -558,7 +670,9 @@ export default function EmergencySettings() {
                 <div>
                   <strong>{log.title || log.type}</strong>
                   <p>{log.summary}</p>
-                  <small>{log.source} · {log.patientId || 'department'}</small>
+                  <small>
+                    {log.source} · {log.patientId || 'department'}
+                  </small>
                 </div>
                 <div>
                   <span>{log.severity || 'Info'}</span>
@@ -612,7 +726,11 @@ export default function EmergencySettings() {
             onChange={(value) => updateAuditFilter('to', value)}
           />
         </div>
-        <div className="emergency-settings__audit-table" role="table" aria-label="Store action audit log">
+        <div
+          className="emergency-settings__audit-table"
+          role="table"
+          aria-label="Store action audit log"
+        >
           <div role="row" className="emergency-settings__audit-table-head">
             <span role="columnheader">Time</span>
             <span role="columnheader">Action</span>
@@ -620,16 +738,22 @@ export default function EmergencySettings() {
             <span role="columnheader">Staff</span>
             <span role="columnheader">Details</span>
           </div>
-          {filteredAuditLogs.length ? filteredAuditLogs.map((log) => (
-            <div role="row" key={log.id}>
-              <time role="cell" dateTime={log.timestamp}>{new Date(log.timestamp).toLocaleString()}</time>
-              <span role="cell">{log.action}</span>
-              <span role="cell">{log.patientId || 'department'}</span>
-              <span role="cell">{log.staffId || 'system'}</span>
-              <code role="cell">{JSON.stringify(log.details || {})}</code>
-            </div>
-          )) : (
-            <p className="emergency-settings__audit-state">No store actions match the current filters.</p>
+          {filteredAuditLogs.length ? (
+            filteredAuditLogs.map((log) => (
+              <div role="row" key={log.id}>
+                <time role="cell" dateTime={log.timestamp}>
+                  {new Date(log.timestamp).toLocaleString()}
+                </time>
+                <span role="cell">{log.action}</span>
+                <span role="cell">{log.patientId || 'department'}</span>
+                <span role="cell">{log.staffId || 'system'}</span>
+                <code role="cell">{JSON.stringify(log.details || {})}</code>
+              </div>
+            ))
+          ) : (
+            <p className="emergency-settings__audit-state">
+              No store actions match the current filters.
+            </p>
           )}
         </div>
       </Section>
@@ -655,7 +779,11 @@ export default function EmergencySettings() {
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField label="Tenant name" value={draft.tenantName} onChange={(value) => updateDraft({ tenantName: value })} />
+          <SettingsField
+            label="Tenant name"
+            value={draft.tenantName}
+            onChange={(value) => updateDraft({ tenantName: value })}
+          />
           <SettingsField
             label="Default workspace"
             value={draft.defaultWorkspace}
@@ -683,18 +811,50 @@ export default function EmergencySettings() {
         title="AI Settings"
         subtitle="Clinical AI availability, model routing, and human-review controls."
         action={
-          <button type="button" disabled={savingGroup === 'ai'} onClick={() => saveGroup('ai', { aiSettings: draft.aiSettings })}>
+          <button
+            type="button"
+            disabled={savingGroup === 'ai'}
+            onClick={() => saveGroup('ai', { aiSettings: draft.aiSettings })}
+          >
             Save AI
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="checkbox" label="AI enabled" value={draft.aiSettings.enabled} onChange={(value) => updateNested('aiSettings', 'enabled', value)} />
-          <SettingsField label="Provider" value={draft.aiSettings.provider} onChange={(value) => updateNested('aiSettings', 'provider', value)} />
-          <SettingsField label="Model" value={draft.aiSettings.model} onChange={(value) => updateNested('aiSettings', 'model', value)} />
-          <SettingsField type="checkbox" label="Triage assist" value={draft.aiSettings.triageAssistEnabled} onChange={(value) => updateNested('aiSettings', 'triageAssistEnabled', value)} />
-          <SettingsField type="checkbox" label="Summarization" value={draft.aiSettings.summarizationEnabled} onChange={(value) => updateNested('aiSettings', 'summarizationEnabled', value)} />
-          <SettingsField type="checkbox" label="Human review required" value={draft.aiSettings.humanReviewRequired} onChange={(value) => updateNested('aiSettings', 'humanReviewRequired', value)} />
+          <SettingsField
+            type="checkbox"
+            label="AI enabled"
+            value={draft.aiSettings.enabled}
+            onChange={(value) => updateNested('aiSettings', 'enabled', value)}
+          />
+          <SettingsField
+            label="Provider"
+            value={draft.aiSettings.provider}
+            onChange={(value) => updateNested('aiSettings', 'provider', value)}
+          />
+          <SettingsField
+            label="Model"
+            value={draft.aiSettings.model}
+            onChange={(value) => updateNested('aiSettings', 'model', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Triage assist"
+            value={draft.aiSettings.triageAssistEnabled}
+            onChange={(value) => updateNested('aiSettings', 'triageAssistEnabled', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Summarization"
+            value={draft.aiSettings.summarizationEnabled}
+            onChange={(value) => updateNested('aiSettings', 'summarizationEnabled', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Human review required"
+            value={draft.aiSettings.humanReviewRequired}
+            onChange={(value) => updateNested('aiSettings', 'humanReviewRequired', value)}
+          />
         </div>
       </Section>
 
@@ -706,17 +866,39 @@ export default function EmergencySettings() {
           <button
             type="button"
             disabled={savingGroup === 'integrations'}
-            onClick={() => saveGroup('integrations', { integrationSettings: draft.integrationSettings })}
+            onClick={() =>
+              saveGroup('integrations', { integrationSettings: draft.integrationSettings })
+            }
           >
             Save Integrations
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="checkbox" label="EHR enabled" value={draft.integrationSettings.ehrEnabled} onChange={(value) => updateNested('integrationSettings', 'ehrEnabled', value)} />
-          <SettingsField label="FHIR endpoint" value={draft.integrationSettings.fhirEndpoint} onChange={(value) => updateNested('integrationSettings', 'fhirEndpoint', value)} />
-          <SettingsField label="HL7 interface ID" value={draft.integrationSettings.hl7InterfaceId} onChange={(value) => updateNested('integrationSettings', 'hl7InterfaceId', value)} />
-          <SettingsField type="checkbox" label="Device telemetry" value={draft.integrationSettings.deviceTelemetryEnabled} onChange={(value) => updateNested('integrationSettings', 'deviceTelemetryEnabled', value)} />
+          <SettingsField
+            type="checkbox"
+            label="EHR enabled"
+            value={draft.integrationSettings.ehrEnabled}
+            onChange={(value) => updateNested('integrationSettings', 'ehrEnabled', value)}
+          />
+          <SettingsField
+            label="FHIR endpoint"
+            value={draft.integrationSettings.fhirEndpoint}
+            onChange={(value) => updateNested('integrationSettings', 'fhirEndpoint', value)}
+          />
+          <SettingsField
+            label="HL7 interface ID"
+            value={draft.integrationSettings.hl7InterfaceId}
+            onChange={(value) => updateNested('integrationSettings', 'hl7InterfaceId', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Device telemetry"
+            value={draft.integrationSettings.deviceTelemetryEnabled}
+            onChange={(value) =>
+              updateNested('integrationSettings', 'deviceTelemetryEnabled', value)
+            }
+          />
         </div>
       </Section>
 
@@ -728,15 +910,28 @@ export default function EmergencySettings() {
           <button
             type="button"
             disabled={savingGroup === 'provincial'}
-            onClick={() => saveGroup('provincial', { provincialHealthSettings: draft.provincialHealthSettings })}
+            onClick={() =>
+              saveGroup('provincial', { provincialHealthSettings: draft.provincialHealthSettings })
+            }
           >
             Save Provincial Health
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="checkbox" label="Connector enabled" value={draft.provincialHealthSettings.connectorEnabled} onChange={(value) => updateNested('provincialHealthSettings', 'connectorEnabled', value)} />
-          <SettingsField label="Jurisdiction" value={draft.provincialHealthSettings.jurisdiction} onChange={(value) => updateNested('provincialHealthSettings', 'jurisdiction', value)} />
+          <SettingsField
+            type="checkbox"
+            label="Connector enabled"
+            value={draft.provincialHealthSettings.connectorEnabled}
+            onChange={(value) =>
+              updateNested('provincialHealthSettings', 'connectorEnabled', value)
+            }
+          />
+          <SettingsField
+            label="Jurisdiction"
+            value={draft.provincialHealthSettings.jurisdiction}
+            onChange={(value) => updateNested('provincialHealthSettings', 'jurisdiction', value)}
+          />
           <SettingsField
             label="Lookup mode"
             value={draft.provincialHealthSettings.lookupMode}
@@ -747,7 +942,14 @@ export default function EmergencySettings() {
             ]}
             onChange={(value) => updateNested('provincialHealthSettings', 'lookupMode', value)}
           />
-          <SettingsField type="checkbox" label="Health-card validation" value={draft.provincialHealthSettings.healthCardValidation} onChange={(value) => updateNested('provincialHealthSettings', 'healthCardValidation', value)} />
+          <SettingsField
+            type="checkbox"
+            label="Health-card validation"
+            value={draft.provincialHealthSettings.healthCardValidation}
+            onChange={(value) =>
+              updateNested('provincialHealthSettings', 'healthCardValidation', value)
+            }
+          />
         </div>
       </Section>
 
@@ -759,19 +961,51 @@ export default function EmergencySettings() {
           <button
             type="button"
             disabled={savingGroup === 'notifications'}
-            onClick={() => saveGroup('notifications', { notificationSettings: draft.notificationSettings })}
+            onClick={() =>
+              saveGroup('notifications', { notificationSettings: draft.notificationSettings })
+            }
           >
             Save Notifications
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="checkbox" label="In-app notifications" value={draft.notificationSettings.inAppEnabled} onChange={(value) => updateNested('notificationSettings', 'inAppEnabled', value)} />
-          <SettingsField type="checkbox" label="Email notifications" value={draft.notificationSettings.emailEnabled} onChange={(value) => updateNested('notificationSettings', 'emailEnabled', value)} />
-          <SettingsField type="checkbox" label="SMS notifications" value={draft.notificationSettings.smsEnabled} onChange={(value) => updateNested('notificationSettings', 'smsEnabled', value)} />
-          <SettingsField type="number" label="Escalation minutes" value={draft.notificationSettings.escalationMinutes} onChange={(value) => updateNested('notificationSettings', 'escalationMinutes', value)} />
-          <SettingsField type="time" label="Quiet hours start" value={draft.notificationSettings.quietHoursStart} onChange={(value) => updateNested('notificationSettings', 'quietHoursStart', value)} />
-          <SettingsField type="time" label="Quiet hours end" value={draft.notificationSettings.quietHoursEnd} onChange={(value) => updateNested('notificationSettings', 'quietHoursEnd', value)} />
+          <SettingsField
+            type="checkbox"
+            label="In-app notifications"
+            value={draft.notificationSettings.inAppEnabled}
+            onChange={(value) => updateNested('notificationSettings', 'inAppEnabled', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Email notifications"
+            value={draft.notificationSettings.emailEnabled}
+            onChange={(value) => updateNested('notificationSettings', 'emailEnabled', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="SMS notifications"
+            value={draft.notificationSettings.smsEnabled}
+            onChange={(value) => updateNested('notificationSettings', 'smsEnabled', value)}
+          />
+          <SettingsField
+            type="number"
+            label="Escalation minutes"
+            value={draft.notificationSettings.escalationMinutes}
+            onChange={(value) => updateNested('notificationSettings', 'escalationMinutes', value)}
+          />
+          <SettingsField
+            type="time"
+            label="Quiet hours start"
+            value={draft.notificationSettings.quietHoursStart}
+            onChange={(value) => updateNested('notificationSettings', 'quietHoursStart', value)}
+          />
+          <SettingsField
+            type="time"
+            label="Quiet hours end"
+            value={draft.notificationSettings.quietHoursEnd}
+            onChange={(value) => updateNested('notificationSettings', 'quietHoursEnd', value)}
+          />
         </div>
       </Section>
 
@@ -783,7 +1017,9 @@ export default function EmergencySettings() {
           <button
             type="button"
             disabled={savingGroup === 'reassessment'}
-            onClick={() => saveGroup('reassessment', { reassessmentThresholds: draft.reassessmentThresholds })}
+            onClick={() =>
+              saveGroup('reassessment', { reassessmentThresholds: draft.reassessmentThresholds })
+            }
           >
             Save Reassessment
           </button>
@@ -802,19 +1038,28 @@ export default function EmergencySettings() {
               type="number"
               label={`${priority} interval minutes`}
               value={thresholds[key]}
-              onChange={(value) => updateThreshold(key, value, {
-                reassessmentThresholds: { ...draft.reassessmentThresholds, [priority]: value },
-                thresholds: {
-                  ...draft.thresholds,
-                  reassessmentIntervals: {
-                    ...(draft.thresholds?.reassessmentIntervals || {}),
-                    [priority]: value,
+              onChange={(value) =>
+                updateThreshold(key, value, {
+                  reassessmentThresholds: { ...draft.reassessmentThresholds, [priority]: value },
+                  thresholds: {
+                    ...draft.thresholds,
+                    reassessmentIntervals: {
+                      ...(draft.thresholds?.reassessmentIntervals || {}),
+                      [priority]: value,
+                    },
                   },
-                },
-              })}
+                })
+              }
             />
           ))}
-          <SettingsField type="number" label="Overdue grace minutes" value={draft.reassessmentThresholds.overdueGraceMinutes} onChange={(value) => updateNested('reassessmentThresholds', 'overdueGraceMinutes', value)} />
+          <SettingsField
+            type="number"
+            label="Overdue grace minutes"
+            value={draft.reassessmentThresholds.overdueGraceMinutes}
+            onChange={(value) =>
+              updateNested('reassessmentThresholds', 'overdueGraceMinutes', value)
+            }
+          />
         </div>
       </Section>
 
@@ -881,13 +1126,72 @@ export default function EmergencySettings() {
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="number" label="Department capacity target" value={draft.capacityThresholds.departmentCapacityTarget} onChange={(value) => updateNested('capacityThresholds', 'departmentCapacityTarget', value)} />
-          <SettingsField type="number" label="Capacity warning %" value={Math.round(thresholds.capacityWarningPct * 100)} onChange={(value) => updateThreshold('capacityWarningPct', value / 100, { thresholds: { ...draft.thresholds, capacityWarningPercent: value } })} />
-          <SettingsField type="number" label="Capacity orange %" value={Math.round(thresholds.capacityOrangePct * 100)} onChange={(value) => updateThreshold('capacityOrangePct', value / 100, { capacityThresholds: { ...draft.capacityThresholds, warningPercent: value }, thresholds: { ...draft.thresholds, capacityOrangePercent: value } })} />
-          <SettingsField type="number" label="Capacity critical %" value={Math.round(thresholds.capacityRedPct * 100)} onChange={(value) => updateThreshold('capacityRedPct', value / 100, { capacityThresholds: { ...draft.capacityThresholds, criticalPercent: value }, thresholds: { ...draft.thresholds, capacityRedPercent: value } })} />
-          <SettingsField type="number" label="Max waiting patients" value={draft.capacityThresholds.maxWaitingPatients} onChange={(value) => updateNested('capacityThresholds', 'maxWaitingPatients', value)} />
-          <SettingsField type="number" label="Wait warning minutes" value={thresholds.waitTimeWarningMin} onChange={(value) => updateThreshold('waitTimeWarningMin', value, { thresholds: { ...draft.thresholds, waitWarningMinutes: value } })} />
-          <SettingsField type="number" label="Wait critical minutes" value={thresholds.waitTimeCtiticalMin} onChange={(value) => updateThreshold('waitTimeCtiticalMin', value, { thresholds: { ...draft.thresholds, waitCriticalMinutes: value } })} />
+          <SettingsField
+            type="number"
+            label="Department capacity target"
+            value={draft.capacityThresholds.departmentCapacityTarget}
+            onChange={(value) =>
+              updateNested('capacityThresholds', 'departmentCapacityTarget', value)
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Capacity warning %"
+            value={Math.round(thresholds.capacityWarningPct * 100)}
+            onChange={(value) =>
+              updateThreshold('capacityWarningPct', value / 100, {
+                thresholds: { ...draft.thresholds, capacityWarningPercent: value },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Capacity orange %"
+            value={Math.round(thresholds.capacityOrangePct * 100)}
+            onChange={(value) =>
+              updateThreshold('capacityOrangePct', value / 100, {
+                capacityThresholds: { ...draft.capacityThresholds, warningPercent: value },
+                thresholds: { ...draft.thresholds, capacityOrangePercent: value },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Capacity critical %"
+            value={Math.round(thresholds.capacityRedPct * 100)}
+            onChange={(value) =>
+              updateThreshold('capacityRedPct', value / 100, {
+                capacityThresholds: { ...draft.capacityThresholds, criticalPercent: value },
+                thresholds: { ...draft.thresholds, capacityRedPercent: value },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Max waiting patients"
+            value={draft.capacityThresholds.maxWaitingPatients}
+            onChange={(value) => updateNested('capacityThresholds', 'maxWaitingPatients', value)}
+          />
+          <SettingsField
+            type="number"
+            label="Wait warning minutes"
+            value={thresholds.waitTimeWarningMin}
+            onChange={(value) =>
+              updateThreshold('waitTimeWarningMin', value, {
+                thresholds: { ...draft.thresholds, waitWarningMinutes: value },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Wait critical minutes"
+            value={thresholds.waitTimeCtiticalMin}
+            onChange={(value) =>
+              updateThreshold('waitTimeCtiticalMin', value, {
+                thresholds: { ...draft.thresholds, waitCriticalMinutes: value },
+              })
+            }
+          />
         </div>
       </Section>
 
@@ -896,15 +1200,39 @@ export default function EmergencySettings() {
         title="EMS Thresholds"
         subtitle="Offload targets and inbound critical ETA controls."
         action={
-          <button type="button" disabled={savingGroup === 'ems'} onClick={() => saveGroup('ems', { emsThresholds: draft.emsThresholds })}>
+          <button
+            type="button"
+            disabled={savingGroup === 'ems'}
+            onClick={() => saveGroup('ems', { emsThresholds: draft.emsThresholds })}
+          >
             Save EMS
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="number" label="Offload target minutes" value={thresholds.emsOffloadTargetMin} onChange={(value) => updateThreshold('emsOffloadTargetMin', value, { emsThresholds: { ...draft.emsThresholds, offloadTargetMinutes: value }, thresholds: { ...draft.thresholds, emsOffloadTargetMinutes: value } })} />
-          <SettingsField type="number" label="Critical ETA minutes" value={draft.emsThresholds.criticalEtaMinutes} onChange={(value) => updateNested('emsThresholds', 'criticalEtaMinutes', value)} />
-          <SettingsField type="checkbox" label="Auto-create arrival" value={draft.emsThresholds.autoCreateArrival} onChange={(value) => updateNested('emsThresholds', 'autoCreateArrival', value)} />
+          <SettingsField
+            type="number"
+            label="Offload target minutes"
+            value={thresholds.emsOffloadTargetMin}
+            onChange={(value) =>
+              updateThreshold('emsOffloadTargetMin', value, {
+                emsThresholds: { ...draft.emsThresholds, offloadTargetMinutes: value },
+                thresholds: { ...draft.thresholds, emsOffloadTargetMinutes: value },
+              })
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Critical ETA minutes"
+            value={draft.emsThresholds.criticalEtaMinutes}
+            onChange={(value) => updateNested('emsThresholds', 'criticalEtaMinutes', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Auto-create arrival"
+            value={draft.emsThresholds.autoCreateArrival}
+            onChange={(value) => updateNested('emsThresholds', 'autoCreateArrival', value)}
+          />
         </div>
       </Section>
 
@@ -913,16 +1241,42 @@ export default function EmergencySettings() {
         title="Boarding Thresholds"
         subtitle="Admission boarding escalation, critical boarding, and inpatient notification triggers."
         action={
-          <button type="button" disabled={savingGroup === 'boarding'} onClick={() => saveGroup('boarding', { boardingThresholds: draft.boardingThresholds })}>
+          <button
+            type="button"
+            disabled={savingGroup === 'boarding'}
+            onClick={() => saveGroup('boarding', { boardingThresholds: draft.boardingThresholds })}
+          >
             Save Boarding
           </button>
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="number" label="Escalation minutes" value={draft.boardingThresholds.escalationMinutes} onChange={(value) => updateNested('boardingThresholds', 'escalationMinutes', value)} />
-          <SettingsField type="number" label="Critical minutes" value={draft.boardingThresholds.criticalMinutes} onChange={(value) => updateNested('boardingThresholds', 'criticalMinutes', value)} />
-          <SettingsField type="number" label="Max boarders" value={draft.boardingThresholds.maxBoarders} onChange={(value) => updateNested('boardingThresholds', 'maxBoarders', value)} />
-          <SettingsField type="number" label="Inpatient notify minutes" value={draft.boardingThresholds.inpatientNotifyMinutes} onChange={(value) => updateNested('boardingThresholds', 'inpatientNotifyMinutes', value)} />
+          <SettingsField
+            type="number"
+            label="Escalation minutes"
+            value={draft.boardingThresholds.escalationMinutes}
+            onChange={(value) => updateNested('boardingThresholds', 'escalationMinutes', value)}
+          />
+          <SettingsField
+            type="number"
+            label="Critical minutes"
+            value={draft.boardingThresholds.criticalMinutes}
+            onChange={(value) => updateNested('boardingThresholds', 'criticalMinutes', value)}
+          />
+          <SettingsField
+            type="number"
+            label="Max boarders"
+            value={draft.boardingThresholds.maxBoarders}
+            onChange={(value) => updateNested('boardingThresholds', 'maxBoarders', value)}
+          />
+          <SettingsField
+            type="number"
+            label="Inpatient notify minutes"
+            value={draft.boardingThresholds.inpatientNotifyMinutes}
+            onChange={(value) =>
+              updateNested('boardingThresholds', 'inpatientNotifyMinutes', value)
+            }
+          />
         </div>
       </Section>
 
@@ -931,7 +1285,11 @@ export default function EmergencySettings() {
         title="Alert Rules"
         subtitle="Notification alert enablement and severity overrides."
         action={
-          <button type="button" disabled={savingGroup === 'alerts'} onClick={() => saveGroup('alerts', { alertRules: draft.alertRules })}>
+          <button
+            type="button"
+            disabled={savingGroup === 'alerts'}
+            onClick={() => saveGroup('alerts', { alertRules: draft.alertRules })}
+          >
             Save Alerts
           </button>
         }
@@ -939,8 +1297,16 @@ export default function EmergencySettings() {
         <div className="emergency-settings__rules">
           {Object.entries(draft.alertRules).map(([rule, config]) => (
             <article key={rule}>
-              <SettingsField type="checkbox" label={rule} value={config.enabled} onChange={(enabled) => updateAlertRule(rule, { enabled })} />
-              <select value={config.severity} onChange={(event) => updateAlertRule(rule, { severity: event.target.value })}>
+              <SettingsField
+                type="checkbox"
+                label={rule}
+                value={config.enabled}
+                onChange={(enabled) => updateAlertRule(rule, { enabled })}
+              />
+              <select
+                value={config.severity}
+                onChange={(event) => updateAlertRule(rule, { severity: event.target.value })}
+              >
                 {SEVERITIES.map((severity) => (
                   <option key={severity}>{severity}</option>
                 ))}

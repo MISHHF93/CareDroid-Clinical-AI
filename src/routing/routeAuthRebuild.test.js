@@ -4,12 +4,16 @@ import {
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from '../config/routes.config';
 import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
 
 const appSource = readFileSync(join(__dirname, '..', 'App.jsx'), 'utf8');
 const redirectsByPath = Object.fromEntries(
-  LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to])
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to]),
+);
+const nonEdRedirectPaths = new Set(
+  NON_ED_WORKSPACE_REDIRECT_ROUTES.map((redirect) => redirect.path),
 );
 
 describe('canonical route/auth architecture', () => {
@@ -24,9 +28,9 @@ describe('canonical route/auth architecture', () => {
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
     expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
-    expect(CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)).toEqual(
-      EMERGENCY_PAGE_ALL_RENDER_PATHS
-    );
+    expect(
+      CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
+    ).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
   });
 
   it('uses redirects for retired assistant and login aliases', () => {
@@ -49,7 +53,10 @@ describe('canonical route/auth architecture', () => {
       '/marketplace',
       '/platform-admin',
     ]) {
-      expect(redirectsByPath[path]).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
+      expect(
+        redirectsByPath[path] ||
+          (nonEdRedirectPaths.has(path) ? CANONICAL_ROUTES.emergencyWhiteboard : undefined),
+      ).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
     }
   });
 

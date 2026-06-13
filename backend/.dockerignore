@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.git
+.venv
+ml-services/nlu/models
+ml-services/nlu/.venv
+*.sqlite
+*.log
+npm-debug.log*

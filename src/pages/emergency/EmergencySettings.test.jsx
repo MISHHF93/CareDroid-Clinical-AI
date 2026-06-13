@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EmergencySettings, { auditLogToCsv } from './EmergencySettings';
-import { fetchEmergencyOsSettings, saveEmergencyOsSettings } from '../../services/emergencySettingsApi';
+import {
+  fetchEmergencyOsSettings,
+  saveEmergencyOsSettings,
+} from '../../services/emergencySettingsApi';
 import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
 
 const { saveEmergencySettings, setThreshold, resetThresholds, mockThresholds } = vi.hoisted(() => ({
@@ -11,9 +14,9 @@ const { saveEmergencySettings, setThreshold, resetThresholds, mockThresholds } =
   mockThresholds: {
     waitTimeWarningMin: 45,
     waitTimeCtiticalMin: 60,
-    capacityWarningPct: 0.70,
-    capacityOrangePct: 0.80,
-    capacityRedPct: 0.90,
+    capacityWarningPct: 0.7,
+    capacityOrangePct: 0.8,
+    capacityRedPct: 0.9,
     emsOffloadTargetMin: 15,
     reassessP1Min: 0,
     reassessP2Min: 15,
@@ -169,18 +172,21 @@ describe('EmergencySettings', () => {
               ...mockSettings.thresholds,
               ...(payload.thresholds || {}),
               capacityWarningPercent:
-                payload.capacityThresholds?.warningPercent ?? mockSettings.thresholds.capacityWarningPercent,
+                payload.capacityThresholds?.warningPercent ??
+                mockSettings.thresholds.capacityWarningPercent,
             },
           },
         },
-      })
+      }),
     );
   });
 
   it('renders the complete required settings surface', async () => {
     render(<EmergencySettings />);
 
-    expect(await screen.findByRole('heading', { name: 'Emergency OS Settings' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Emergency OS Settings' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Identity and Modules')).toBeInTheDocument();
     expect(screen.getByText('AI Settings')).toBeInTheDocument();
     expect(screen.getByText('Integration Settings')).toBeInTheDocument();
@@ -191,6 +197,12 @@ describe('EmergencySettings', () => {
     expect(screen.getByText('EMS Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Boarding Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Alert Rules')).toBeInTheDocument();
+    expect(screen.getByText('Central Control Node')).toBeInTheDocument();
+    expect(screen.getByLabelText('Central control enabled')).toBeChecked();
+    expect(screen.getByLabelText('Dashboard authority')).toHaveValue('central-node');
+    expect(screen.getByLabelText('User input mode')).toHaveValue('central-escalation-input');
+    expect(screen.getByText('scenario selection')).toBeInTheDocument();
+    expect(screen.getByText('patient intake')).toBeInTheDocument();
   });
 
   it('renders fetched workflow action audit logs', async () => {
@@ -213,13 +225,13 @@ describe('EmergencySettings', () => {
         expect.objectContaining({
           capacityThresholds: expect.objectContaining({ warningPercent: 76 }),
           thresholds: expect.objectContaining({ waitWarningMinutes: 45, waitCriticalMinutes: 60 }),
-        })
+        }),
       );
     });
     expect(saveEmergencySettings).toHaveBeenCalledWith(
       expect.objectContaining({
         thresholds: expect.objectContaining({ capacityWarningPercent: 76 }),
-      })
+      }),
     );
   });
 
@@ -233,7 +245,9 @@ describe('EmergencySettings', () => {
           staffId: 's1',
           details: { news2: 4 },
         },
-      ])
-    ).toContain('"Time","Action","Patient","Staff","Details"\n"2026-06-13T13:00:00.000Z","addVitals","p1","s1","{""news2"":4}"');
+      ]),
+    ).toContain(
+      '"Time","Action","Patient","Staff","Details"\n"2026-06-13T13:00:00.000Z","addVitals","p1","s1","{""news2"":4}"',
+    );
   });
 });

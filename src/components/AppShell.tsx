@@ -14,7 +14,9 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { PatientFlag, type Patient } from '../types/emergency';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
-const CopilotPanel = lazy(() => import('./CopilotPanel').then((module) => ({ default: module.CopilotPanel })));
+const CopilotPanel = lazy(() =>
+  import('./CopilotPanel').then((module) => ({ default: module.CopilotPanel })),
+);
 const CommandPalette = lazy(() => import('./CommandPalette'));
 const EMSCriticalBroadcast = lazy(() => import('./EMSCriticalBroadcast'));
 const ReassessmentDrawer = lazy(() => import('./ReassessmentDrawer'));
@@ -42,16 +44,16 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
-  '/emergency': 'Emergency OS — Whiteboard',
-  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Emergency OS — Whiteboard',
-  [CANONICAL_ROUTES.emergencyPulse]: 'Emergency OS — Department Pulse',
-  [CANONICAL_ROUTES.emergencyEms]: 'Emergency OS — EMS Pipeline',
-  [CANONICAL_ROUTES.emergencyReferrals]: 'Emergency OS — Referrals',
-  [CANONICAL_ROUTES.emergencyCapacity]: 'Emergency OS — Capacity',
-  [CANONICAL_ROUTES.emergencyTools]: 'Emergency OS — Clinical Tools',
-  [CANONICAL_ROUTES.emergencyShift]: 'Emergency OS — Shift Summary',
-  '/settings': 'Emergency OS — Settings',
-  [CANONICAL_ROUTES.emergencySettings]: 'Emergency OS — Settings',
+  '/emergency': 'Emergency OS - Board',
+  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Emergency OS - Board',
+  [CANONICAL_ROUTES.emergencyPulse]: 'Emergency OS - Pulse',
+  [CANONICAL_ROUTES.emergencyEms]: 'Emergency OS - EMS',
+  [CANONICAL_ROUTES.emergencyReferrals]: 'Emergency OS - Referrals',
+  [CANONICAL_ROUTES.emergencyCapacity]: 'Emergency OS - Capacity',
+  [CANONICAL_ROUTES.emergencyTools]: 'Emergency OS - Tools',
+  [CANONICAL_ROUTES.emergencyShift]: 'Emergency OS - Shift',
+  '/settings': 'Emergency OS - Settings',
+  [CANONICAL_ROUTES.emergencySettings]: 'Emergency OS - Settings',
 };
 
 type AppShellProps = {
@@ -117,7 +119,9 @@ export function AppShell({ children }: AppShellProps) {
     const reassessmentInterval = startReassessmentEngine();
     const capacityInterval = startCapacityEngine();
 
-    const isDevelopment = Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+    const isDevelopment = Boolean(
+      (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV,
+    );
     if (isDevelopment) {
       void import('../engine/simulation').then((simulation) => {
         if (cancelled) return;
@@ -161,8 +165,8 @@ export function AppShell({ children }: AppShellProps) {
       return;
     }
 
-    const activeItem = visibleNavigationItems.find((item) =>
-      location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
+    const activeItem = visibleNavigationItems.find(
+      (item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
     );
     document.title = activeItem ? `Emergency OS — ${activeItem.label}` : 'Emergency OS';
   }, [location.pathname, visibleNavigationItems]);
@@ -190,7 +194,14 @@ export function AppShell({ children }: AppShellProps) {
 
       if (inInput) return;
 
-      if (e.key.toLowerCase() === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat && canUseCopilot) {
+      if (
+        e.key.toLowerCase() === 'c' &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        !e.repeat &&
+        canUseCopilot
+      ) {
         e.preventDefault();
         store.toggleCopilot();
         return;
@@ -206,7 +217,12 @@ export function AppShell({ children }: AppShellProps) {
         e.preventDefault();
         document.dispatchEvent(new Event('open-command-palette'));
       }
-      if (e.key === 'n' && !e.metaKey && !e.ctrlKey && emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) {
+      if (
+        e.key === 'n' &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        emergencyRole.can(EMERGENCY_ACTIONS.createPatient)
+      ) {
         document.dispatchEvent(new Event('open-intake'));
       }
     };
@@ -242,12 +258,18 @@ export function AppShell({ children }: AppShellProps) {
         document.dispatchEvent(new Event('open-intake'));
         break;
       case 'OPEN_ROUTE':
-        if (action.path) navigate(emergencyRole.canAccessRoute(action.path) ? action.path : emergencyRole.nearestRoute(action.path));
+        if (action.path)
+          navigate(
+            emergencyRole.canAccessRoute(action.path)
+              ? action.path
+              : emergencyRole.nearestRoute(action.path),
+          );
         break;
       case 'VIEW_PATIENT':
       case 'FIND_PATIENT':
         if (action.patientId) selectPatient(action.patientId);
-        else if (action.value) navigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
+        else if (action.value)
+          navigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
         else navigate(CANONICAL_ROUTES.emergencyPatients);
         break;
       case 'OPEN_REFERRAL': {
@@ -265,7 +287,9 @@ export function AppShell({ children }: AppShellProps) {
         break;
       case 'OPEN_CALCULATOR':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) break;
-        navigate(`${CANONICAL_ROUTES.emergencyTools}${action.calculatorId ? `?tool=${action.calculatorId}` : ''}`);
+        navigate(
+          `${CANONICAL_ROUTES.emergencyTools}${action.calculatorId ? `?tool=${action.calculatorId}` : ''}`,
+        );
         break;
       case 'OPEN_CAPACITY':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) break;
@@ -300,7 +324,12 @@ export function AppShell({ children }: AppShellProps) {
       <Sidebar navigationItems={visibleNavigationItems} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header />
-        <main style={{ flex: 1, overflow: 'auto', paddingBottom: isMobileViewport ? 60 : 0 }}>{children}</main>
+        <main
+          role="main"
+          style={{ flex: 1, overflow: 'auto', paddingBottom: isMobileViewport ? 60 : 0 }}
+        >
+          {children}
+        </main>
       </div>
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>

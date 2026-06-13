@@ -47,6 +47,8 @@ const INITIAL_VITALS = {
   temp: '',
 };
 
+const noop = () => {};
+
 export function generateMrn() {
   return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
 }
@@ -106,8 +108,10 @@ function fieldLabel(field) {
 
 export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const addPatient = useEmergencyStore((state) => state.addPatient);
-  const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
-  const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter || noop);
+  const setWhiteboardSearchQuery = useEmergencyStore(
+    (state) => state.setWhiteboardSearchQuery || noop,
+  );
   const complaintRef = useRef(null);
   const [identity, setIdentity] = useState(INITIAL_IDENTITY);
   const [mrn, setMrn] = useState(() => generateMrn());
@@ -127,7 +131,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
         complaintText,
         vitals,
       }),
-    [complaintCategory, complaintText, vitals]
+    [complaintCategory, complaintText, vitals],
   );
   const triageSuggestion = useMemo(
     () =>
@@ -137,7 +141,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
         vitals,
         overridePriority: priorityOverride || null,
       }),
-    [complaintCategory, complaintText, priorityOverride, vitals]
+    [complaintCategory, complaintText, priorityOverride, vitals],
   );
   const selectedPriority = triageSuggestion.suggestedPriority;
   const nameEntered = Boolean(identity.firstName.trim() || identity.lastName.trim());
@@ -145,12 +149,12 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const canSubmit = nameEntered && complaintEntered;
   const dirty = Boolean(
     nameEntered ||
-      identity.dob ||
-      identity.sex ||
-      complaintText.trim() ||
-      complaintCategory !== 'Other' ||
-      priorityOverride ||
-      hasEnteredVitals(vitals)
+    identity.dob ||
+    identity.sex ||
+    complaintText.trim() ||
+    complaintCategory !== 'Other' ||
+    priorityOverride ||
+    hasEnteredVitals(vitals),
   );
 
   const resetDraft = () => {
@@ -276,8 +280,8 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
       >
         <header className="new-patient-intake__header">
           <div>
-            <span>Quick intake</span>
-            <h2 id="new-patient-title">Add walk-in to Triage</h2>
+            <span>Central intake</span>
+            <h2 id="new-patient-title">Send walk-in input to Central Node</h2>
           </div>
           <button type="button" onClick={requestClose} aria-label="Close quick intake">
             <X size={18} aria-hidden />
@@ -285,7 +289,10 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
         </header>
 
         <div className="new-patient-intake__content">
-          <section className="new-patient-intake__complaint-column" aria-labelledby="complaint-heading">
+          <section
+            className="new-patient-intake__complaint-column"
+            aria-labelledby="complaint-heading"
+          >
             <div className="new-patient-intake__section-heading">
               <h3 id="complaint-heading">Complaint</h3>
               <span>Touch category, then type</span>
@@ -297,7 +304,9 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
                   type="button"
                   tabIndex={-1}
                   className={
-                    complaintCategory === category.value ? 'new-patient-intake__complaint--active' : ''
+                    complaintCategory === category.value
+                      ? 'new-patient-intake__complaint--active'
+                      : ''
                   }
                   aria-pressed={complaintCategory === category.value}
                   onClick={() => handleCategoryClick(category.value)}
@@ -320,7 +329,10 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
             </label>
           </section>
 
-          <section className="new-patient-intake__identity-column" aria-labelledby="identity-heading">
+          <section
+            className="new-patient-intake__identity-column"
+            aria-labelledby="identity-heading"
+          >
             <div className="new-patient-intake__section-heading">
               <h3 id="identity-heading">Identity</h3>
               <span>MRN auto-generated</span>
@@ -398,7 +410,10 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
           {Object.entries(vitals).map(([field, value]) => {
             const tone = vitalTone(field, value);
             return (
-              <label key={field} className={`new-patient-intake__vital new-patient-intake__vital--${tone}`}>
+              <label
+                key={field}
+                className={`new-patient-intake__vital new-patient-intake__vital--${tone}`}
+              >
                 {fieldLabel(field)}
                 <input
                   value={value}
@@ -422,12 +437,17 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
               aria-expanded={priorityPickerOpen}
               onClick={() => setPriorityPickerOpen((current) => !current)}
             >
-              <span>{triageSuggestion.override ? 'Staff override CTAS' : 'Auto-suggested CTAS'}</span>
+              <span>
+                {triageSuggestion.override ? 'Staff CTAS context' : 'Central CTAS suggestion'}
+              </span>
               <strong>{CTAS_LABELS[selectedPriority]}</strong>
               <small>{triageSuggestion.reason}</small>
             </button>
             {priorityPickerOpen ? (
-              <div className="new-patient-intake__priority-options" aria-label="Override CTAS priority">
+              <div
+                className="new-patient-intake__priority-options"
+                aria-label="Override CTAS priority"
+              >
                 {Object.values(Priority).map((priority) => (
                   <button
                     key={priority}
@@ -449,9 +469,13 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
               </div>
             ) : null}
           </div>
-          <button type="submit" className="new-patient-intake__add" disabled={!canSubmit || isSubmitting}>
+          <button
+            type="submit"
+            className="new-patient-intake__add"
+            disabled={!canSubmit || isSubmitting}
+          >
             <CheckCircle2 size={20} aria-hidden />
-            {isSubmitting ? 'Adding...' : 'Add to Department'}
+            {isSubmitting ? 'Sending...' : 'Send to Central Node'}
           </button>
         </footer>
       </form>

@@ -1,5 +1,13 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
-import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Link,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useNavigate,
+} from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -27,7 +35,11 @@ import PatientCard from './components/PatientCard';
 const ReferralPanel = lazy(() => import('./components/ReferralPanel'));
 import { useEmergencyStore } from './store/emergencyStore';
 import { PatientFlag, PatientState } from './types/emergency';
-import { CANONICAL_ROUTES, LEGACY_EMERGENCY_ROUTE_REDIRECTS, NON_ED_WORKSPACE_STUB_ROUTES } from './config/routes.config';
+import {
+  CANONICAL_ROUTES,
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  NON_ED_WORKSPACE_REDIRECT_ROUTES,
+} from './config/routes.config';
 import { EMERGENCY_ACTIONS } from './config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import {
@@ -48,12 +60,31 @@ function EmergencyRoutePage({ eyebrow, title, description, children }) {
     <section style={{ padding: 24, display: 'grid', gap: 18 }}>
       <header>
         {eyebrow ? (
-          <span style={{ color: '#60A5FA', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <span
+            style={{
+              color: '#60A5FA',
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
             {eyebrow}
           </span>
         ) : null}
-        <h1 style={{ margin: eyebrow ? '4px 0 0' : 0, color: '#F9FAFB', fontSize: 22, fontWeight: 650 }}>{title}</h1>
-        {description ? <p style={{ color: '#9CA3AF', marginTop: 8, maxWidth: 760 }}>{description}</p> : null}
+        <h1
+          style={{
+            margin: eyebrow ? '4px 0 0' : 0,
+            color: '#F9FAFB',
+            fontSize: 22,
+            fontWeight: 650,
+          }}
+        >
+          {title}
+        </h1>
+        {description ? (
+          <p style={{ color: '#9CA3AF', marginTop: 8, maxWidth: 760 }}>{description}</p>
+        ) : null}
       </header>
       {children}
     </section>
@@ -72,39 +103,20 @@ function LazyRoute({ children, label }) {
   return <Suspense fallback={<RouteLoadingFallback label={label} />}>{children}</Suspense>;
 }
 
-function ComingSoonPage({ moduleName }) {
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      height: '60vh', gap: 16,
-      color: '#9CA3AF', textAlign: 'center'
-    }}>
-      <div style={{ fontSize: 32 }}>🏗️</div>
-      <h2 style={{
-        fontSize: 18, fontWeight: 500,
-        color: '#F9FAFB', margin: 0
-      }}>
-        {moduleName}
-      </h2>
-      <p style={{ fontSize: 14, margin: 0, maxWidth: 320 }}>
-        This module is part of a future release.
-        The Emergency OS is the current focus.
-      </p>
-      <a href="/emergency" style={{
-        color: '#3B82F6', fontSize: 13,
-        textDecoration: 'none', marginTop: 8
-      }}>← Back to Emergency Whiteboard</a>
-    </div>
-  );
-}
-
 function EmergencyAccessDenied({ requestedPath }) {
   const emergencyRole = useEmergencyRolePermissions();
   const fallbackPath = emergencyRole.nearestRoute(requestedPath);
 
   return (
-    <section style={{ minHeight: '100%', display: 'grid', placeItems: 'center', padding: 24, background: '#0A0E1A' }}>
+    <section
+      style={{
+        minHeight: '100%',
+        display: 'grid',
+        placeItems: 'center',
+        padding: 24,
+        background: '#0A0E1A',
+      }}
+    >
       <div
         role="alert"
         style={{
@@ -117,7 +129,15 @@ function EmergencyAccessDenied({ requestedPath }) {
           boxShadow: '0 24px 70px rgba(0,0,0,0.32)',
         }}
       >
-        <span style={{ color: '#FCA5A5', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <span
+          style={{
+            color: '#FCA5A5',
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}
+        >
           Access denied
         </span>
         <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>Emergency OS page unavailable</h1>
@@ -169,7 +189,12 @@ function EmergencyDefaultRedirect() {
       : null;
   return (
     <Navigate
-      to={chargeDefaultRoute || emergencyRole.defaultRoute || emergencyRole.allowedRoutes[0] || CANONICAL_ROUTES.emergencyWhiteboard}
+      to={
+        chargeDefaultRoute ||
+        emergencyRole.defaultRoute ||
+        emergencyRole.allowedRoutes[0] ||
+        CANONICAL_ROUTES.emergencyWhiteboard
+      }
       replace
     />
   );
@@ -177,11 +202,36 @@ function EmergencyDefaultRedirect() {
 
 function MetricGrid({ metrics }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+        gap: 12,
+      }}
+    >
       {metrics.map((metric) => (
-        <article key={metric.label} style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-          <strong style={{ display: 'block', color: metric.color || '#F9FAFB', fontSize: 28, lineHeight: 1 }}>{metric.value}</strong>
-          <span style={{ display: 'block', color: '#9CA3AF', fontSize: 12, marginTop: 6 }}>{metric.label}</span>
+        <article
+          key={metric.label}
+          style={{
+            padding: 16,
+            border: '1px solid #1F2937',
+            borderRadius: 12,
+            background: '#111827',
+          }}
+        >
+          <strong
+            style={{
+              display: 'block',
+              color: metric.color || '#F9FAFB',
+              fontSize: 28,
+              lineHeight: 1,
+            }}
+          >
+            {metric.value}
+          </strong>
+          <span style={{ display: 'block', color: '#9CA3AF', fontSize: 12, marginTop: 6 }}>
+            {metric.label}
+          </span>
         </article>
       ))}
     </div>
@@ -191,23 +241,50 @@ function MetricGrid({ metrics }) {
 function PatientGrid({ patients, emptyMessage }) {
   if (!patients.length) {
     return (
-      <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+      <div
+        style={{
+          padding: 18,
+          border: '1px solid #1F2937',
+          borderRadius: 12,
+          background: '#111827',
+          color: '#9CA3AF',
+        }}
+      >
         {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
-      {patients.map((patient) => <PatientCard key={patient.id} patient={patient} />)}
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 12,
+      }}
+    >
+      {patients.map((patient) => (
+        <PatientCard key={patient.id} patient={patient} />
+      ))}
     </div>
   );
 }
 
-function ApiStateBanner({ moduleState, fallbackText = 'Showing the last local Emergency OS state.' }) {
+function ApiStateBanner({
+  moduleState,
+  fallbackText = 'Showing the last local Emergency OS state.',
+}) {
   if (moduleState.loading && !moduleState.data) {
     return (
-      <div style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+      <div
+        style={{
+          padding: 14,
+          border: '1px solid #1F2937',
+          borderRadius: 12,
+          background: '#111827',
+          color: '#9CA3AF',
+        }}
+      >
         Loading department data...
       </div>
     );
@@ -215,7 +292,16 @@ function ApiStateBanner({ moduleState, fallbackText = 'Showing the last local Em
 
   if (moduleState.error) {
     return (
-      <div role="alert" style={{ padding: 14, border: '1px solid #7F1D1D', borderRadius: 12, background: '#450A0A', color: '#FCA5A5' }}>
+      <div
+        role="alert"
+        style={{
+          padding: 14,
+          border: '1px solid #7F1D1D',
+          borderRadius: 12,
+          background: '#450A0A',
+          color: '#FCA5A5',
+        }}
+      >
         {moduleState.error}. {fallbackText}
       </div>
     );
@@ -223,7 +309,15 @@ function ApiStateBanner({ moduleState, fallbackText = 'Showing the last local Em
 
   if (moduleState.isEmpty) {
     return (
-      <div style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+      <div
+        style={{
+          padding: 14,
+          border: '1px solid #1F2937',
+          borderRadius: 12,
+          background: '#111827',
+          color: '#9CA3AF',
+        }}
+      >
         No department data returned for this module.
       </div>
     );
@@ -267,14 +361,31 @@ function ActionButton({ children, onClick, disabled = false }) {
 function ActionStatus({ moduleState }) {
   if (moduleState.actionLoading) {
     return (
-      <div style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+      <div
+        style={{
+          padding: 12,
+          border: '1px solid #1F2937',
+          borderRadius: 12,
+          background: '#111827',
+          color: '#9CA3AF',
+        }}
+      >
         Running Emergency OS action...
       </div>
     );
   }
   if (moduleState.actionError) {
     return (
-      <div role="alert" style={{ padding: 12, border: '1px solid #7F1D1D', borderRadius: 12, background: '#450A0A', color: '#FCA5A5' }}>
+      <div
+        role="alert"
+        style={{
+          padding: 12,
+          border: '1px solid #7F1D1D',
+          borderRadius: 12,
+          background: '#450A0A',
+          color: '#FCA5A5',
+        }}
+      >
         {moduleState.actionError}
       </div>
     );
@@ -293,7 +404,9 @@ function isHighRisk(patient) {
 }
 
 function isBoarding(patient) {
-  return patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission);
+  return (
+    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
+  );
 }
 
 function PatientsRoute() {
@@ -312,7 +425,11 @@ function PatientsRoute() {
         metrics={[
           { label: 'Total patients', value: patients.length, color: '#60A5FA' },
           { label: 'High risk', value: patients.filter(isHighRisk).length, color: '#EF4444' },
-          { label: 'Waiting', value: patients.filter((patient) => patient.state === PatientState.Waiting).length, color: '#F59E0B' },
+          {
+            label: 'Waiting',
+            value: patients.filter((patient) => patient.state === PatientState.Waiting).length,
+            color: '#F59E0B',
+          },
         ]}
       />
       <PatientGrid patients={patients} emptyMessage="Department Clear" />
@@ -341,15 +458,35 @@ function JourneyRoute() {
         ]}
       />
       <div style={{ display: 'grid', gap: 10 }}>
-        {events.length ? events.map((event) => (
-          <article key={event.id} style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-            <strong style={{ color: '#F9FAFB' }}>{event.patientName}</strong>
-            <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-              {event.from ? `${event.from} -> ` : ''}{event.to} | {event.note || 'Journey event'} | {new Date(event.timestamp).toLocaleTimeString()}
-            </p>
-          </article>
-        )) : (
-          <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+        {events.length ? (
+          events.map((event) => (
+            <article
+              key={event.id}
+              style={{
+                padding: 14,
+                border: '1px solid #1F2937',
+                borderRadius: 12,
+                background: '#111827',
+              }}
+            >
+              <strong style={{ color: '#F9FAFB' }}>{event.patientName}</strong>
+              <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+                {event.from ? `${event.from} -> ` : ''}
+                {event.to} | {event.note || 'Journey event'} |{' '}
+                {new Date(event.timestamp).toLocaleTimeString()}
+              </p>
+            </article>
+          ))
+        ) : (
+          <div
+            style={{
+              padding: 18,
+              border: '1px solid #1F2937',
+              borderRadius: 12,
+              background: '#111827',
+              color: '#9CA3AF',
+            }}
+          >
             No journey events returned.
           </div>
         )}
@@ -415,19 +552,36 @@ function QueueRoute() {
       <div style={{ display: 'grid', gap: 10 }}>
         {visibleQueueRows.map((queue) => {
           const patientsInQueue = queue.patients || [];
-          const oldestWait = queue.oldestWaitMinutes ?? patientsInQueue.reduce((max, patient) => {
-            const arrivedAt = new Date(patient.arrivalTime).getTime();
-            if (!Number.isFinite(arrivedAt)) return max;
-            return Math.max(max, Math.round((Date.now() - arrivedAt) / 60000));
-          }, 0);
+          const oldestWait =
+            queue.oldestWaitMinutes ??
+            patientsInQueue.reduce((max, patient) => {
+              const arrivedAt = new Date(patient.arrivalTime).getTime();
+              if (!Number.isFinite(arrivedAt)) return max;
+              return Math.max(max, Math.round((Date.now() - arrivedAt) / 60000));
+            }, 0);
           const target = queue.targetMinutes ?? queue.target;
           const breached = queue.breached ?? oldestWait > target;
           return (
-            <article key={queue.label} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center', padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+            <article
+              key={queue.label}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto auto',
+                gap: 12,
+                alignItems: 'center',
+                padding: 14,
+                border: '1px solid #1F2937',
+                borderRadius: 12,
+                background: '#111827',
+              }}
+            >
               <div>
                 <strong style={{ color: '#F9FAFB' }}>{queue.label}</strong>
                 <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                  {patientsInQueue.slice(0, 3).map((patient) => `${patient.firstName} ${patient.lastName}`).join(', ') || 'Queue clear'}
+                  {patientsInQueue
+                    .slice(0, 3)
+                    .map((patient) => `${patient.firstName} ${patient.lastName}`)
+                    .join(', ') || 'Queue clear'}
                 </p>
               </div>
               <strong style={{ color: '#F9FAFB' }}>{queue.count ?? patientsInQueue.length}</strong>
@@ -446,7 +600,9 @@ function QueueRoute() {
 function ReassessmentRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const reassessment = useReassessmentQueue();
-  const duePatients = reassessment.data?.data?.patients || patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue));
+  const duePatients =
+    reassessment.data?.data?.patients ||
+    patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue));
 
   return (
     <EmergencyRoutePage
@@ -457,7 +613,11 @@ function ReassessmentRoute() {
       <ApiStateBanner moduleState={reassessment} />
       <MetricGrid
         metrics={[
-          { label: 'Due now', value: duePatients.length, color: duePatients.length ? '#F59E0B' : '#10B981' },
+          {
+            label: 'Due now',
+            value: duePatients.length,
+            color: duePatients.length ? '#F59E0B' : '#10B981',
+          },
           { label: 'Overdue', value: reassessment.data?.data?.overdueCount ?? 0, color: '#EF4444' },
           { label: 'Next action', value: reassessment.data?.data?.nextAction || 'Review queue' },
         ]}
@@ -483,7 +643,11 @@ function BoardingRoute() {
       <MetricGrid
         metrics={[
           { label: 'Boarding patients', value: boardingPatients.length, color: '#F59E0B' },
-          { label: 'Longest boarding', value: `${boarding.data?.data?.longestBoardingMinutes ?? 0}m`, color: '#F97316' },
+          {
+            label: 'Longest boarding',
+            value: `${boarding.data?.data?.longestBoardingMinutes ?? 0}m`,
+            color: '#F97316',
+          },
           { label: 'Escalation', value: boarding.data?.data?.escalation || 'No escalation' },
         ]}
       />
@@ -513,7 +677,11 @@ function CapacityRoute() {
       <ApiStateBanner moduleState={capacityStatus} />
       <MetricGrid
         metrics={[
-          { label: 'Capacity score', value: `${capacity.score} ${capacity.band}`, color: '#60A5FA' },
+          {
+            label: 'Capacity score',
+            value: `${capacity.score} ${capacity.band}`,
+            color: '#60A5FA',
+          },
           { label: 'Total patients', value: capacity.totalPatients },
           { label: 'Occupied rooms', value: capacity.occupiedRooms },
           { label: 'Available rooms', value: availableRooms, color: '#10B981' },
@@ -525,13 +693,25 @@ function CapacityRoute() {
       {capacityStatus.data?.data?.recommendations?.length ? (
         <div style={{ display: 'grid', gap: 8 }}>
           {capacityStatus.data.data.recommendations.map((recommendation) => (
-            <div key={recommendation} style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#BFDBFE' }}>
+            <div
+              key={recommendation}
+              style={{
+                padding: 12,
+                border: '1px solid #1F2937',
+                borderRadius: 12,
+                background: '#111827',
+                color: '#BFDBFE',
+              }}
+            >
               {recommendation}
             </div>
           ))}
         </div>
       ) : null}
-      <PatientGrid patients={boardingPatients} emptyMessage="No active boarders affecting capacity." />
+      <PatientGrid
+        patients={boardingPatients}
+        emptyMessage="No active boarders affecting capacity."
+      />
       <DataSourceNote moduleState={capacityStatus} />
     </EmergencyRoutePage>
   );
@@ -555,7 +735,13 @@ function ProvincialHealthRoute() {
         jurisdiction: provincialHealth.data?.data?.jurisdiction || null,
       },
     });
-  }, [provincialHealth.data, provincialHealth.error, provincialHealth.loading, recordWorkflowAction, records.length]);
+  }, [
+    provincialHealth.data,
+    provincialHealth.error,
+    provincialHealth.loading,
+    recordWorkflowAction,
+    records.length,
+  ]);
 
   return (
     <EmergencyRoutePage
@@ -563,17 +749,35 @@ function ProvincialHealthRoute() {
       title="Provincial Health Connector"
       description="Provincial/HIE placeholder records from `/api/emergency/provincial-health` with unavailable states made explicit."
     >
-      <ApiStateBanner moduleState={provincialHealth} fallbackText="Provincial health connector data is unavailable." />
+      <ApiStateBanner
+        moduleState={provincialHealth}
+        fallbackText="Provincial health connector data is unavailable."
+      />
       <MetricGrid
         metrics={[
-          { label: 'Connector status', value: provincialHealth.data?.data?.connectorStatus || 'unavailable', color: '#F59E0B' },
+          {
+            label: 'Connector status',
+            value: provincialHealth.data?.data?.connectorStatus || 'unavailable',
+            color: '#F59E0B',
+          },
           { label: 'Patient snapshots', value: records.length, color: '#60A5FA' },
-          { label: 'Jurisdiction', value: provincialHealth.data?.data?.jurisdiction || 'Not configured' },
+          {
+            label: 'Jurisdiction',
+            value: provincialHealth.data?.data?.jurisdiction || 'Not configured',
+          },
         ]}
       />
       <div style={{ display: 'grid', gap: 10 }}>
         {records.map((record) => (
-          <article key={record.patientId} style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+          <article
+            key={record.patientId}
+            style={{
+              padding: 14,
+              border: '1px solid #1F2937',
+              borderRadius: 12,
+              background: '#111827',
+            }}
+          >
             <strong style={{ color: '#F9FAFB' }}>{record.mrn}</strong>
             <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
               Medications: {record.medications.join('; ')}
@@ -631,24 +835,56 @@ function IntegrationsRoute() {
       title="IoT/Integration Hub"
       description="FHIR, HL7, and device integration placeholders from `/api/emergency/integrations`."
     >
-      <ApiStateBanner moduleState={integrations} fallbackText="Integration source data is unavailable." />
+      <ApiStateBanner
+        moduleState={integrations}
+        fallbackText="Integration source data is unavailable."
+      />
       <MetricGrid
         metrics={[
           { label: 'Sources', value: sources.length, color: '#60A5FA' },
-          { label: 'Review items', value: reviewQueue.length, color: reviewQueue.length ? '#F59E0B' : '#10B981' },
-          { label: 'Live feeds', value: sources.filter((source) => source.status === 'live').length, color: '#10B981' },
+          {
+            label: 'Review items',
+            value: reviewQueue.length,
+            color: reviewQueue.length ? '#F59E0B' : '#10B981',
+          },
+          {
+            label: 'Live feeds',
+            value: sources.filter((source) => source.status === 'live').length,
+            color: '#10B981',
+          },
         ]}
       />
       <div style={{ display: 'grid', gap: 10 }}>
         {sources.map((source) => (
-          <article key={source.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+          <article
+            key={source.id}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              gap: 12,
+              padding: 14,
+              border: '1px solid #1F2937',
+              borderRadius: 12,
+              background: '#111827',
+            }}
+          >
             <div>
               <strong style={{ color: '#F9FAFB' }}>{source.label}</strong>
               <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                Last event: {source.lastEventAt ? new Date(source.lastEventAt).toLocaleTimeString() : 'No live feed'}
+                Last event:{' '}
+                {source.lastEventAt
+                  ? new Date(source.lastEventAt).toLocaleTimeString()
+                  : 'No live feed'}
               </p>
             </div>
-            <span style={{ color: source.status === 'demo-ready' ? '#60A5FA' : '#F59E0B', fontSize: 12 }}>{source.status}</span>
+            <span
+              style={{
+                color: source.status === 'demo-ready' ? '#60A5FA' : '#F59E0B',
+                fontSize: 12,
+              }}
+            >
+              {source.status}
+            </span>
           </article>
         ))}
       </div>
@@ -674,7 +910,10 @@ function RealTimeSimulationRoute() {
       title="Real-Time Simulation"
       description="Fixture-backed RtS decision support for ED surge interventions, 4-hour recovery windows, census forecasts, and action recommendations."
     >
-      <ApiStateBanner moduleState={simulation} fallbackText="Real-time simulation recommendations are unavailable." />
+      <ApiStateBanner
+        moduleState={simulation}
+        fallbackText="Real-time simulation recommendations are unavailable."
+      />
       <ActionStatus moduleState={simulation} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         <ActionButton
@@ -700,7 +939,10 @@ function RealTimeSimulationRoute() {
         >
           Evaluate Fast Track
         </ActionButton>
-        <ActionButton disabled={simulation.actionLoading || !canRunSimulation} onClick={() => simulation.compareInterventions({})}>
+        <ActionButton
+          disabled={simulation.actionLoading || !canRunSimulation}
+          onClick={() => simulation.compareInterventions({})}
+        >
           Rank Interventions
         </ActionButton>
       </div>
@@ -709,47 +951,113 @@ function RealTimeSimulationRoute() {
           { label: 'Capacity band', value: status.capacityBand || 'Pending', color: '#60A5FA' },
           { label: 'Resource use', value: `${status.resourceUtilization ?? 0}%`, color: '#F59E0B' },
           { label: 'Avg wait', value: `${status.averageWaitMinutes ?? 0}m` },
-          { label: 'Deterioration', value: payload.projectedDeteriorationTimeMinutes == null ? 'None in 4h' : `${payload.projectedDeteriorationTimeMinutes}m`, color: '#EF4444' },
+          {
+            label: 'Deterioration',
+            value:
+              payload.projectedDeteriorationTimeMinutes == null
+                ? 'None in 4h'
+                : `${payload.projectedDeteriorationTimeMinutes}m`,
+            color: '#EF4444',
+          },
         ]}
       />
       {lastEvaluation ? (
-        <article style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-          <strong style={{ color: '#F9FAFB' }}>Last evaluation: {lastEvaluation.intervention.type}</strong>
+        <article
+          style={{
+            padding: 16,
+            border: '1px solid #1F2937',
+            borderRadius: 12,
+            background: '#111827',
+          }}
+        >
+          <strong style={{ color: '#F9FAFB' }}>
+            Last evaluation: {lastEvaluation.intervention.type}
+          </strong>
           <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
-            Recovery {lastEvaluation.recoveryTimeMinutes}m | Wait improvement {lastEvaluation.expectedImprovement.waitMinutes}m | Confidence {Math.round(lastEvaluation.confidence * 100)}%
+            Recovery {lastEvaluation.recoveryTimeMinutes}m | Wait improvement{' '}
+            {lastEvaluation.expectedImprovement.waitMinutes}m | Confidence{' '}
+            {Math.round(lastEvaluation.confidence * 100)}%
           </p>
         </article>
       ) : null}
       {lastComparison?.length ? (
         <div style={{ display: 'grid', gap: 8 }}>
           {lastComparison.map((item, index) => (
-            <article key={`${item.intervention.type}-${index}`} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-              <strong style={{ color: '#F9FAFB' }}>{index + 1}. {item.intervention.type.replace(/_/g, ' ')}</strong>
+            <article
+              key={`${item.intervention.type}-${index}`}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gap: 12,
+                padding: 14,
+                border: '1px solid #1F2937',
+                borderRadius: 12,
+                background: '#111827',
+              }}
+            >
+              <strong style={{ color: '#F9FAFB' }}>
+                {index + 1}. {item.intervention.type.replace(/_/g, ' ')}
+              </strong>
               <span style={{ color: '#60A5FA' }}>{item.recoveryTimeMinutes}m recovery</span>
             </article>
           ))}
         </div>
       ) : null}
       <div style={{ display: 'grid', gap: 10 }}>
-        {recommendations.length ? recommendations.map((recommendation) => (
-          <article key={recommendation.intervention} style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
-            <strong style={{ color: '#F9FAFB' }}>{recommendation.intervention.replace(/_/g, ' ')}</strong>
-            <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
-              Implement in {recommendation.timeToImplementMinutes}m, expected wait improvement {recommendation.expectedImprovement.waitMinutes}m.
-            </p>
-            <p style={{ color: '#BFDBFE', margin: '6px 0 0', fontSize: 13 }}>
-              {(recommendation.actionRecommendations || []).join(' | ')}
-            </p>
-          </article>
-        )) : (
-          <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+        {recommendations.length ? (
+          recommendations.map((recommendation) => (
+            <article
+              key={recommendation.intervention}
+              style={{
+                padding: 14,
+                border: '1px solid #1F2937',
+                borderRadius: 12,
+                background: '#111827',
+              }}
+            >
+              <strong style={{ color: '#F9FAFB' }}>
+                {recommendation.intervention.replace(/_/g, ' ')}
+              </strong>
+              <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
+                Implement in {recommendation.timeToImplementMinutes}m, expected wait improvement{' '}
+                {recommendation.expectedImprovement.waitMinutes}m.
+              </p>
+              <p style={{ color: '#BFDBFE', margin: '6px 0 0', fontSize: 13 }}>
+                {(recommendation.actionRecommendations || []).join(' | ')}
+              </p>
+            </article>
+          ))
+        ) : (
+          <div
+            style={{
+              padding: 18,
+              border: '1px solid #1F2937',
+              borderRadius: 12,
+              background: '#111827',
+              color: '#9CA3AF',
+            }}
+          >
             No simulation recommendations returned yet.
           </div>
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+          gap: 10,
+        }}
+      >
         {forecast.map((point) => (
-          <article key={point.minute} style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#0F172A' }}>
+          <article
+            key={point.minute}
+            style={{
+              padding: 12,
+              border: '1px solid #1F2937',
+              borderRadius: 12,
+              background: '#0F172A',
+            }}
+          >
             <strong style={{ color: '#F9FAFB' }}>{point.minute}m</strong>
             <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 13 }}>
               Census {point.census} | Wait {point.averageWaitMinutes}m | {point.capacityBand}
@@ -760,18 +1068,6 @@ function RealTimeSimulationRoute() {
       <DataSourceNote moduleState={simulation} />
     </EmergencyRoutePage>
   );
-}
-
-function FederatedLearningRoute() {
-  return <ComingSoonPage moduleName="Federated Learning" />;
-}
-
-function HybridDigitalTwinRoute() {
-  return <ComingSoonPage moduleName="Digital Twin" />;
-}
-
-function AIGovernanceRoute() {
-  return <ComingSoonPage moduleName="AI Governance" />;
 }
 
 function CopilotRoute() {
@@ -793,22 +1089,45 @@ function CopilotRoute() {
       <MetricGrid
         metrics={[
           { label: 'Active patients', value: promptContext.patientCount ?? activePatients.length },
-          { label: 'High risk', value: promptContext.highRiskCount ?? highRiskPatients.length, color: '#EF4444' },
-          { label: 'Capacity band', value: promptContext.capacity?.band ?? capacity.band, color: '#60A5FA' },
-          { label: 'Active alerts', value: alerts.filter((alert) => !alert.dismissed).length, color: '#F59E0B' },
+          {
+            label: 'High risk',
+            value: promptContext.highRiskCount ?? highRiskPatients.length,
+            color: '#EF4444',
+          },
+          {
+            label: 'Capacity band',
+            value: promptContext.capacity?.band ?? capacity.band,
+            color: '#60A5FA',
+          },
+          {
+            label: 'Active alerts',
+            value: alerts.filter((alert) => !alert.dismissed).length,
+            color: '#F59E0B',
+          },
         ]}
       />
       {copilot.data?.data?.quickActions?.length ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {copilot.data.data.quickActions.map((action) => (
-            <span key={action} style={{ border: '1px solid #1F2937', borderRadius: 999, background: '#111827', color: '#BFDBFE', padding: '6px 10px', fontSize: 12 }}>
+            <span
+              key={action}
+              style={{
+                border: '1px solid #1F2937',
+                borderRadius: 999,
+                background: '#111827',
+                color: '#BFDBFE',
+                padding: '6px 10px',
+                fontSize: 12,
+              }}
+            >
               {action}
             </span>
           ))}
         </div>
       ) : null}
       <p style={{ color: '#9CA3AF', margin: 0 }}>
-        Use the docked ED Copilot to ask about who needs attention, capacity pressure, EMS status, or reassessment priorities.
+        Use the docked ED Copilot to ask about who needs attention, capacity pressure, EMS status,
+        or reassessment priorities.
       </p>
       <DataSourceNote moduleState={copilot} />
     </EmergencyRoutePage>
@@ -826,7 +1145,9 @@ function ToolsRedirect() {
     params.delete('calc');
   }
   const suffix = params.toString();
-  return <Navigate to={`${CANONICAL_ROUTES.emergencyTools}${suffix ? `?${suffix}` : ''}`} replace />;
+  return (
+    <Navigate to={`${CANONICAL_ROUTES.emergencyTools}${suffix ? `?${suffix}` : ''}`} replace />
+  );
 }
 
 function RootLayout() {
@@ -843,50 +1164,232 @@ export function AppRoutes() {
       <Route path="/" element={<EmergencyDefaultRedirect />} />
       <Route element={<RootLayout />}>
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
-        <Route path={CANONICAL_ROUTES.emergencyWhiteboard} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}><ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload."><LazyRoute label="Loading whiteboard..."><EmergencyWhiteboard /></LazyRoute></ErrorBoundary></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyPulse} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPulse}><LazyRoute label="Loading department pulse..."><DepartmentPulse /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyPatients} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}><PatientsRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyJourney} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyJourney}><JourneyRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyEms} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}><LazyRoute label="Loading EMS pipeline..."><EMSPipeline /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyIntake} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}><LazyRoute label="Loading intake..."><SmartIntake /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyQueues} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}><QueueRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyReassessment} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}><ReassessmentRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyCapacity} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}><CapacityRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyBoarding} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}><BoardingRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyReferrals} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReferrals}><LazyRoute label="Loading referrals..."><ReferralPanel /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyProvincialHealth} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyProvincialHealth}><ProvincialHealthRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyIntegrations} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntegrations}><IntegrationsRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}><CopilotRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyAnalytics} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}><LazyRoute label="Loading analytics..."><EmergencyAnalytics /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencySimulation} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySimulation}><RealTimeSimulationRoute /></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyFederatedLearning} element={<FederatedLearningRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyDigitalTwin} element={<HybridDigitalTwinRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyTools} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><ErrorBoundary fallbackText="Calculator surface encountered an error. Refresh to reload."><LazyRoute label="Loading calculators..."><ClinicalCalculatorHub /></LazyRoute></ErrorBoundary></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyShift} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}><LazyRoute label="Loading shift summary..."><EmergencyShiftSummaryPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<AIGovernanceRoute />} />
-        <Route path={CANONICAL_ROUTES.aiGovernance} element={<AIGovernanceRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}><LazyRoute label="Loading settings..."><EmergencySettings /></LazyRoute></EmergencyRouteGuard>} />
-        {NON_ED_WORKSPACE_STUB_ROUTES.map(({ path, moduleName }) => (
-          <Route key={`${path}-${moduleName}`} path={path} element={<ComingSoonPage moduleName={moduleName} />} />
+        <Route
+          path={CANONICAL_ROUTES.emergencyWhiteboard}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
+              <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
+                <LazyRoute label="Loading whiteboard...">
+                  <EmergencyWhiteboard />
+                </LazyRoute>
+              </ErrorBoundary>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyPulse}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPulse}>
+              <LazyRoute label="Loading department pulse...">
+                <DepartmentPulse />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyPatients}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
+              <PatientsRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyJourney}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyJourney}>
+              <JourneyRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyEms}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
+              <LazyRoute label="Loading EMS pipeline...">
+                <EMSPipeline />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyIntake}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
+              <LazyRoute label="Loading intake...">
+                <SmartIntake />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyQueues}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
+              <QueueRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyReassessment}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}>
+              <ReassessmentRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyCapacity}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
+              <CapacityRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyBoarding}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}>
+              <BoardingRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyReferrals}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReferrals}>
+              <LazyRoute label="Loading referrals...">
+                <ReferralPanel />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyProvincialHealth}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyProvincialHealth}>
+              <ProvincialHealthRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyIntegrations}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntegrations}>
+              <IntegrationsRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyCopilot}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
+              <CopilotRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyAnalytics}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+              <LazyRoute label="Loading analytics...">
+                <EmergencyAnalytics />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencySimulation}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySimulation}>
+              <RealTimeSimulationRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyTools}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+              <ErrorBoundary fallbackText="Calculator surface encountered an error. Refresh to reload.">
+                <LazyRoute label="Loading calculators...">
+                  <ClinicalCalculatorHub />
+                </LazyRoute>
+              </ErrorBoundary>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyShift}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+              <LazyRoute label="Loading shift summary...">
+                <EmergencyShiftSummaryPage />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencySettings}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
+              <LazyRoute label="Loading settings...">
+                <EmergencySettings />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        {NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (
+          <Route
+            key={`${path}-${moduleName}`}
+            path={path}
+            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+          />
         ))}
       </Route>
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
         <Route key={`${path}-${to}`} path={path} element={<Navigate to={to} replace />} />
       ))}
-      <Route path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/home" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route
+        path="/dashboard"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/home"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
       <Route path="/app" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route
+        path="/workspace"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/mobile"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/general-healthcare"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
       <Route path="/tools/*" element={<ToolsRedirect />} />
       <Route path="/calculators/*" element={<ToolsRedirect />} />
       <Route path="/scores/*" element={<ToolsRedirect />} />
-      <Route path="/assistant" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/chat" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route
+        path="/assistant"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/chat"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
       <Route path="/ai" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/copilot" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route
+        path="/copilot"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/emergency/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
       <Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
     </Routes>
   );

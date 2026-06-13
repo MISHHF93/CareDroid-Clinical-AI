@@ -15,28 +15,35 @@ import {
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
+const SIDEBAR_MODEL = [
+  ['Board', '/emergency/whiteboard'],
+  ['Pulse', '/emergency/pulse'],
+  ['Patients', '/emergency/patients'],
+  ['Journey', '/emergency/journey'],
+  ['Intake', '/emergency/intake'],
+  ['Queues', '/emergency/queues'],
+  ['Reassess', '/emergency/reassessment'],
+  ['EMS', '/emergency/ems'],
+  ['Referrals', '/emergency/referrals'],
+  ['Provincial', '/emergency/provincial-health'],
+  ['Integrations', '/emergency/integrations'],
+  ['Capacity', '/emergency/capacity'],
+  ['Boarding', '/emergency/boarding'],
+  ['Copilot', '/emergency/copilot'],
+  ['Analytics', '/emergency/analytics'],
+  ['Sim', '/emergency/simulation'],
+  ['Tools', '/emergency/tools'],
+  ['Shift', '/emergency/shift'],
+  ['Settings', '/emergency/settings'],
+];
 
 describe('primaryNavigation', () => {
-  it('exposes the canonical R8 sidebar model in order', () => {
-    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Emergency Whiteboard', '/emergency/whiteboard'],
-      ['EMS Pipeline', '/emergency/ems'],
-      ['Referrals', '/emergency/referrals'],
-      ['Capacity', '/emergency/capacity'],
-      ['Clinical Tools', '/emergency/tools'],
-      ['Shift Summary', '/emergency/shift'],
-      ['Settings', '/settings'],
-    ]);
-    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.route)).toEqual([
-      '/emergency',
-      '/emergency/ems',
-      '/emergency/referrals',
-      '/emergency/capacity',
-      '/emergency/tools',
-      '/emergency/shift',
-      '/settings',
-    ]);
-    expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(7);
+  it('exposes the canonical sidebar-first Emergency OS model in order', () => {
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(SIDEBAR_MODEL);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.route)).toEqual(
+      SIDEBAR_MODEL.map(([, path]) => path),
+    );
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(SIDEBAR_MODEL.length);
   });
 
   it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
@@ -56,7 +63,9 @@ describe('primaryNavigation', () => {
       expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((nav) => nav.path)).not.toContain(item.path);
     }
     expect(getPrimaryNavItemForPath('/workflow-mining')?.id).toBe('workflow-mining');
-    expect(getPrimaryNavItemForPath('/workspace-dependency-graph')?.id).toBe('workspace-dependency-graph');
+    expect(getPrimaryNavItemForPath('/workspace-dependency-graph')?.id).toBe(
+      'workspace-dependency-graph',
+    );
   });
 
   it('keeps developer and governance routes in the searchable advanced catalog', () => {
@@ -96,12 +105,14 @@ describe('primaryNavigation', () => {
         ['Expansion Opportunities', '/expansion-opportunities'],
         ['Readiness Assessment', '/maturity-assessment'],
         ['Success Center', '/success-center'],
-      ])
+      ]),
     );
     expect(getPrimaryNavItemForPath('/solution-builder')?.id).toBe('solution-builder');
     expect(getPrimaryNavItemForPath('/value-tracking')?.id).toBe('value-tracking');
     expect(getPrimaryNavItemForPath('/product-intelligence')?.id).toBe('product-intelligence');
-    expect(getPrimaryNavItemForPath('/expansion-opportunities')?.id).toBe('expansion-opportunities');
+    expect(getPrimaryNavItemForPath('/expansion-opportunities')?.id).toBe(
+      'expansion-opportunities',
+    );
     expect(getPrimaryNavItemForPath('/maturity-assessment')?.id).toBe('maturity-assessment');
     expect(getPrimaryNavItemForPath('/customer-success')?.id).toBe('customer-success');
   });
@@ -129,7 +140,7 @@ describe('primaryNavigation', () => {
         item.path,
         ...(item.matchPaths || []),
         ...(item.legacyPaths || []),
-      ]).filter(Boolean)
+      ]).filter(Boolean),
     );
 
     for (const path of paths) {
@@ -137,27 +148,21 @@ describe('primaryNavigation', () => {
 
       expect(
         matches.map((item) => item.id),
-        path
+        path,
       ).toHaveLength(1);
     }
   });
 
   it('keeps the compact drawer navigation subset canonical', () => {
-    expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
-      '/emergency/whiteboard',
-      '/emergency/ems',
-      '/emergency/referrals',
-      '/emergency/capacity',
-      '/emergency/tools',
-      '/emergency/shift',
-      '/settings',
-    ]);
+    expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual(
+      SIDEBAR_MODEL.map(([, path]) => path),
+    );
   });
 
   it('assigns /tools/catalog to the permissioned Developer Audit entry only', () => {
     expect(getPrimaryNavItemForPath('/tools/catalog')?.id).toBe('developer-audit');
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
-      true
+      true,
     );
     expect(PRIMARY_NAV_BY_ID.tools?.path).toBe('/emergency/tools');
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.tools, '/tools/catalog')).toBe(false);
@@ -166,7 +171,7 @@ describe('primaryNavigation', () => {
 
   it('keeps calculator routes outside primary nav without a duplicate sidebar destination', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(
-      false
+      false,
     );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools')).toBe(false);
   });
@@ -183,11 +188,24 @@ describe('primaryNavigation', () => {
     const expected = [
       ['/emergency', 'whiteboard'],
       ['/emergency/whiteboard', 'whiteboard'],
+      ['/emergency/pulse', 'pulse'],
+      ['/emergency/patients', 'patients'],
+      ['/emergency/journey', 'journey'],
+      ['/emergency/intake', 'intake'],
+      ['/emergency/queues', 'queues'],
+      ['/emergency/reassessment', 'reassessment'],
       ['/emergency/ems', 'ems'],
       ['/emergency/referrals', 'referrals'],
+      ['/emergency/provincial-health', 'provincial_health'],
+      ['/emergency/integrations', 'integrations'],
       ['/emergency/capacity', 'capacity'],
+      ['/emergency/boarding', 'boarding'],
+      ['/emergency/copilot', 'copilot'],
+      ['/emergency/analytics', 'analytics'],
+      ['/emergency/simulation', 'simulation'],
       ['/emergency/tools', 'tools'],
       ['/emergency/shift', 'shift'],
+      ['/emergency/settings', 'settings'],
       ['/settings', 'settings'],
       ['/profile', undefined],
       ['/workspaces', undefined],
@@ -200,7 +218,7 @@ describe('primaryNavigation', () => {
 
       expect(
         matches.map((item) => item.id),
-        path
+        path,
       ).toEqual(persistentIds.has(itemId) ? [itemId] : []);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
@@ -229,7 +247,7 @@ describe('primaryNavigation', () => {
         ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
         ...OPERATIONS_SIDEBAR_NAV_ITEMS,
         ...ADVANCED_SIDEBAR_NAV_ITEMS,
-      ].map((item) => [item.id, item])
+      ].map((item) => [item.id, item]),
     );
 
     expect(byId.home).toBeUndefined();
@@ -238,9 +256,15 @@ describe('primaryNavigation', () => {
     expect(canExposeNavigationItem(byId.settings)).toBe(true);
     expect(canExposeNavigationItem(byId.search)).toBe(true);
     expect(canExposeNavigationItem(byId['workflow-mining'])).toBe(false);
-    expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(true);
-    expect(canExposeNavigationItem(byId['platform-admin'], { includeContextual: true })).toBe(false);
-    expect(canExposeNavigationItem(byId['platform-admin'], { permissions: ['CONFIGURE_SYSTEM'] })).toBe(true);
+    expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(
+      true,
+    );
+    expect(canExposeNavigationItem(byId['platform-admin'], { includeContextual: true })).toBe(
+      false,
+    );
+    expect(
+      canExposeNavigationItem(byId['platform-admin'], { permissions: ['CONFIGURE_SYSTEM'] }),
+    ).toBe(true);
   });
 
   it('keeps Discover and Workflows searchable without making them primary', () => {
@@ -250,10 +274,10 @@ describe('primaryNavigation', () => {
         ['Discover', '/discover'],
         ['Workflows', '/workflows'],
         ['Knowledge Hub', '/knowledge-hub'],
-      ])
+      ]),
     );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id)).not.toEqual(
-      expect.arrayContaining(['discover', 'workflows'])
+      expect.arrayContaining(['discover', 'workflows']),
     );
   });
 });
