@@ -25,6 +25,15 @@ dist-ssr
 
 .env
 
+# Local databases and Python cache artifacts
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+__pycache__/
+.pytest_cache/
+*.pyc
+
 # Playwright / responsive QA artifacts
 /test-results/
 /playwright-report/

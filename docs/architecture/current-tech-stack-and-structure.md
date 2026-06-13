@@ -1,6 +1,6 @@
 # Current Tech Stack And Structure
 
-Generated: 2026-06-12
+Generated: 2026-06-13
 
 ## Actual Tech Stack Found
 
@@ -12,23 +12,24 @@ Generated: 2026-06-12
 - Package manager: npm, with `package-lock.json`, `backend/package-lock.json`, and `mcp/package-lock.json`.
 - Runtime baseline: Node 20+ for root and backend tooling, captured by `.node-version` and package `engines`.
 - Build tool: Vite for the frontend, Nest CLI/TypeScript for the backend.
-- Styling system: CSS files and CSS custom properties under `src/styles`, `src/index.css`, `src/globals.css`, `src/layout/AppShell.css`, and component CSS. `tailwind.config.ts` exists, but the active UI is primarily CSS/token based rather than Tailwind utility based.
+- Styling system: CSS files and CSS custom properties under `src/styles`, `src/index.css`, `src/globals.css`, component CSS, and legacy `src/layout/AppShell.css`. `tailwind.config.ts` exists, but the active UI is primarily CSS/token based rather than Tailwind utility based.
 - Auth system: frontend `UserContext`, `AUTH_CONFIG`, dev auth bypass helpers, JWT bearer storage, tenant headers, and backend Nest `AuthModule` with Passport/JWT/OAuth strategies and authorization guards.
-- State management: Zustand stores in `store/`, especially `store/emergencyStore.ts` and `store/featureStore.ts`, plus React context providers in `src/contexts`.
+- State management: Zustand stores in `src/store/`, especially `src/store/emergencyStore.ts` and `src/store/featureStore.ts`, plus React context providers in `src/contexts`.
 - API client pattern: canonical frontend request helpers live in `src/services/apiClient.js`; URL normalization lives in `src/config/apiEnv.js` and `src/config/api.config.js`; root API environment values are parsed by `src/config/appConfig.js`.
 - Deployment config: `vercel.json` declares Vite, `npm ci`, `npm run validate:vercel-env`, and `npm run build`; root Vite output is `dist`.
 
 ## Folder Structure
 
 - `src/`: root React frontend, routes, contexts, components, pages, config, services, styles, tests, and data inventories.
-- `src/layout/`: active application shell. `src/layout/AppShell.jsx` is the active shell.
+- `src/components/AppShell.tsx`: active application shell for the Emergency OS route tree.
+- `src/layout/`: legacy application shell artifacts retained for review and compatibility documentation.
 - `src/config/`: frontend configuration for routes, navigation, API, environment projection, feature flags, layout, auth, entitlements, build info, and workspace projection.
 - `src/components/`: active Emergency OS components, command palette, chat, whiteboard, EMS, referral, queue, reassessment, and shared UI.
 - `src/pages/`: lazy-loaded pages, including active Emergency OS pages in `src/pages/emergency`.
 - `src/services/`: API clients and frontend service adapters. `src/services/apiClient.js` is the canonical low-level fetch/axios helper.
-- `store/`: Zustand state stores for Emergency OS and feature flags.
-- `engine/`: Emergency OS engines for patient journey, capacity, reassessment, and simulation.
-- `types/`: shared frontend TypeScript domain types, including `types/emergency.ts`.
+- `src/store/`: Zustand state stores for Emergency OS and feature flags.
+- `src/engine/`: Emergency OS engines for patient journey, capacity, reassessment, and simulation.
+- `src/types/`: shared frontend TypeScript domain types, including `src/types/emergency.ts`.
 - `backend/src/`: NestJS backend.
 - `backend/src/modules/`: Nest feature modules, controllers, services, DTOs, and TypeORM entities.
 - `backend/src/api/`: optional Express Emergency OS routers mounted behind `ENABLE_MONGOOSE_EMERGENCY_OS`.
@@ -44,19 +45,26 @@ Active normalized Emergency OS routes:
 
 - `/` redirects to `/emergency/whiteboard`.
 - `/emergency` redirects to `/emergency/whiteboard`.
-- `/emergency/whiteboard` renders `EmergencyWhiteboard`.
-- `/emergency/patients` renders `EmergencyWhiteboard`.
+- `/emergency/whiteboard` renders the active Emergency Whiteboard route in `src/pages/emergency/index.tsx`.
+- `/emergency/pulse` renders department pulse.
+- `/emergency/patients` renders the active patient whiteboard surface.
+- `/emergency/journey` renders patient journey.
 - `/emergency/ems` renders `EMSPipeline` behind `ems_pipeline`.
 - `/emergency/intake` renders `SmartIntake`.
 - `/emergency/queues` renders `EmergencyQueueRoute` behind `queue_intelligence`.
-- `/emergency/reassessment` renders `EmergencyWhiteboard`.
+- `/emergency/reassessment` renders the reassessment queue surface.
 - `/emergency/capacity` renders `EmergencyCapacityRoute` behind `capacity_intelligence`.
 - `/emergency/boarding` renders `EmergencyCapacityRoute` behind `capacity_intelligence`.
 - `/emergency/referrals` renders `ReferralPanel` behind `referral_intelligence`.
-- `/emergency/copilot` opens the persistent ED Copilot panel and redirects to `/emergency/whiteboard`.
+- `/emergency/provincial-health` renders provincial health context.
+- `/emergency/integrations` renders integration status.
+- `/emergency/copilot` opens the ED Copilot route context.
 - `/emergency/analytics` renders `EmergencyAnalytics`.
-- `/emergency/settings` renders `SettingsRoute`.
-- `/settings/features` renders `SettingsFeaturesRoute`.
+- `/emergency/simulation` renders simulation controls.
+- `/emergency/tools` renders the curated clinical tools hub.
+- `/emergency/shift` renders shift summary.
+- `/emergency/settings` renders `EmergencySettings`.
+- `/settings` and `/settings/*` redirect to `/emergency/settings`.
 - `*` redirects to `/emergency/whiteboard`.
 
 Legacy and future routes:
@@ -90,7 +98,7 @@ Legacy and future routes:
           - `Suspense`
             - `AppRoutes`
               - protected pages are wrapped once by `AppShellPage`
-                - `src/layout/AppShell.jsx`
+                - `src/components/AppShell.tsx`
                   - sidebar/navigation rail
                   - header
                   - command palette
@@ -102,11 +110,10 @@ No active page-level nested `AppShell`, duplicate `Sidebar`, or duplicate `Heade
 
 ## Current Navigation Structure
 
-- Active sidebar config: `APP_SHELL_NAV_ITEMS` in `src/config/navigation.config.js`.
-- The sidebar item labels/icons are resolved in `src/layout/AppShell.jsx` from `FEATURE_REGISTRY_BY_ID`.
-- Compatibility navigation exports remain in `src/navigation/primaryNavigation.js`; that file re-exports from `src/config/navigation.config.js`.
-- `PRIMARY_NAV_ITEMS`, `QUICK_COMMAND_NAV_ITEMS`, and related exported navigation groups still exist for compatibility and report/test consumers, but active AppShell sidebar items come from `APP_SHELL_NAV_ITEMS`.
-- Command palette route commands are currently defined inside `src/components/CommandPalette.jsx`.
+- Active sidebar source of truth: `NAVIGATION_ITEMS` in `src/config/unified-navigation.config.ts`.
+- Compatibility navigation projections remain in `src/config/navigation.config.js` and `src/navigation/primaryNavigation.js`.
+- `APP_SHELL_NAV_ITEMS`, `PRIMARY_NAV_ITEMS`, `QUICK_COMMAND_NAV_ITEMS`, and related exported navigation groups still exist for compatibility and report/test consumers, but they derive from the unified Emergency OS navigation config.
+- Command palette route commands are currently defined inside `src/components/CommandPalette.tsx`.
 - Search registry/discovery is currently in `src/data/searchFirstDiscovery.js`, which draws from navigation, workspace, asset, marketplace, simulation, protocol, automation, and platform data sources.
 
 ## Current API Structure
@@ -147,12 +154,12 @@ Backend:
 Active Emergency OS feature root is distributed across:
 
 - Routes: `src/App.jsx` and `src/config/routes.config.js`.
-- Navigation: `src/config/navigation.config.js`.
-- Shell: `src/layout/AppShell.jsx` and `src/layout/AppShell.css`.
-- State: `store/emergencyStore.ts`.
-- Types: `types/emergency.ts`.
-- Engines: `engine/journeyEngine.ts`, `engine/reassessmentEngine.ts`, `engine/capacityEngine.ts`, `engine/simulation.ts`.
-- Pages/components: `src/components/EmergencyWhiteboard.jsx`, `src/components/EMSPipeline.jsx`, `src/components/QueueIntelligencePanel.jsx`, `src/components/ReferralPanel.jsx`, `src/pages/emergency/SmartIntake.jsx`, `src/pages/emergency/EmergencyAnalytics.jsx`, `src/pages/emergency/EmergencySettings.jsx`.
+- Navigation: `src/config/unified-navigation.config.ts`, projected through `src/config/navigation.config.js`.
+- Shell: `src/components/AppShell.tsx`, `src/components/Sidebar.tsx`, and `src/components/Header.tsx`.
+- State: `src/store/emergencyStore.ts`.
+- Types: `src/types/emergency.ts`.
+- Engines: `src/engine/journeyEngine.ts`, `src/engine/reassessmentEngine.ts`, `src/engine/capacityEngine.ts`, `src/engine/simulation.ts`.
+- Pages/components: `src/pages/emergency/index.tsx`, `src/components/EmergencyWhiteboard.jsx` compatibility re-export, `src/components/EMSPipeline.jsx`, `src/components/ReferralPanel.jsx`, `src/pages/emergency/SmartIntake.jsx`, `src/pages/emergency/EmergencyAnalytics.jsx`, `src/pages/emergency/ClinicalCalculatorHub.jsx`, and `src/pages/emergency/EmergencySettings.jsx`.
 - Backend optional runtime: `backend/src/api`, `backend/src/services`, and `backend/src/models`.
 
 Broader platform modules remain imported by `backend/src/app.module.ts`, including platform assets, product catalog, fleet, simulation, governance, regulatory, telemetry, hospital map, memory, training, and evaluation.
@@ -191,9 +198,9 @@ Broader platform modules remain imported by `backend/src/app.module.ts`, includi
 
 ## Mismatches Between Intended Emergency OS Architecture And Actual Codebase
 
-- The intended active surface is the 12-route Emergency OS set, but `src/config/routes.config.js`, `src/App.jsx`, and `src/config/navigation.config.js` still retain many future/legacy platform paths for compatibility.
+- The intended active surface is the 19-route Emergency OS set, while `src/config/routes.config.js`, `src/App.jsx`, and compatibility config still retain future/legacy platform paths for deep-link redirects.
 - The active app uses one `AppShell`, one shell-owned sidebar, and one shell-owned header, but compatibility navigation groups remain exported from `src/config/navigation.config.js`.
-- Command palette route commands are defined directly inside `src/components/CommandPalette.jsx`, not in a separate registry file.
+- Command palette route commands are defined directly inside `src/components/CommandPalette.tsx`, not in a separate registry file.
 - Search discovery remains broad and imports platform/future module registries from `src/data/searchFirstDiscovery.js`; it filters some future routes but is not Emergency OS-only.
 - Workspace config is a projection over `src/data/workspaceArchitecture.js`; legacy `/workspace/emergency/*` redirects remain for deep links.
 - API base configuration is centralized through `appConfig`, `apiEnv`, `api.config`, and `apiClient`, but feature services still import these helpers in different ways.

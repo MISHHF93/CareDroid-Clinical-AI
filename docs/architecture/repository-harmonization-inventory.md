@@ -10,22 +10,22 @@ Generated from Git-visible tracked plus untracked, non-ignored files on 2026-06-
 
 | Metric                             | Count |
 | ---------------------------------- | ----: |
-| Total files                        | 2,802 |
-| Tracked files                      | 2,790 |
-| Untracked files                    |    12 |
+| Total files                        | 2,801 |
+| Tracked files                      | 2,800 |
+| Untracked files                    |     1 |
 | Directories containing files       |   288 |
 | Active Emergency OS page routes    |    19 |
-| `src/pages` source/test files      |   270 |
-| `src/pages` non-test files         |   155 |
-| `src/components` source/test files |   138 |
-| `src/components` non-test files    |    98 |
+| `src/pages` source/test files      |   359 |
+| `src/pages` non-test files         |   244 |
+| `src/components` source/test files |   207 |
+| `src/components` non-test files    |   167 |
 
 Top-level distribution:
 
 | Area      | Files | Status                                                        |
 | --------- | ----: | ------------------------------------------------------------- |
 | `src`     | 1,354 | Active web app plus legacy/future React surfaces              |
-| `backend` |   723 | Active NestJS API plus broad platform modules                 |
+| `backend` |   722 | Active NestJS API plus broad platform modules                 |
 | `docs`    |   309 | Architecture, audit, harmonization, and product documentation |
 | `android` |   127 | Kotlin/Java/Gradle mobile future module                       |
 | `qa`      |    93 | QA and audit artifacts                                        |
@@ -37,7 +37,7 @@ Largest file-format groups:
 | Extension        | Files | Primary Use                                     |
 | ---------------- | ----: | ----------------------------------------------- |
 | `.ts`            |   752 | Backend, frontend typed modules, engines, tests |
-| `.js`            |   716 | Frontend data/services/tests, scripts, config   |
+| `.js`            |   715 | Frontend data/services/tests, scripts, config   |
 | `.jsx`           |   384 | React pages/components/tests                    |
 | `.md`            |   334 | Documentation and audit reports                 |
 | `.css`           |   179 | Frontend styling                                |
@@ -120,7 +120,7 @@ Largest file-format groups:
 | Path                                                          | Classification                     | Notes                                                                                                              |
 | ------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `src/layout/AppShell.jsx`                                     | `LEGACY_PLATFORM_ARTIFACT`         | Large historical shell; not mounted by `src/App.jsx`                                                               |
-| `src/components/EmergencyWhiteboard.jsx`                      | `LEGACY_PLATFORM_ARTIFACT`         | Older whiteboard implementation; not active                                                                        |
+| `src/components/EmergencyWhiteboard.jsx`                      | `COMPATIBILITY_RE_EXPORT`          | Legacy import path that re-exports the active `src/pages/emergency` whiteboard route                               |
 | `src/components/PatientCard.jsx`                              | `LEGACY_PLATFORM_ARTIFACT`         | Deleted earlier in Emergency OS build; tests still reference old path                                              |
 | `src/components/NewPatientIntake.jsx`                         | `LEGACY_PLATFORM_ARTIFACT`         | Replaced by `QuickIntake.tsx` in active app                                                                        |
 | `src/components/PediatricDrugCalculator.jsx`                  | `LEGACY_PLATFORM_ARTIFACT`         | Replaced by `calculators/PediatricDrugCalc.tsx` in active app                                                      |
