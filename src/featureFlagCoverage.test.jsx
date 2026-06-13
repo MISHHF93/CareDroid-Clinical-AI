@@ -18,6 +18,7 @@ describe('feature flag UI coverage', () => {
     expect(sidebarItems.map((item) => item.featureId)).toEqual(
       expect.arrayContaining([
         'emergency_whiteboard',
+        'department_pulse',
         'referral_intelligence',
         'capacity_intelligence',
         'clinical_calculator_hub',
@@ -25,7 +26,7 @@ describe('feature flag UI coverage', () => {
         'emergency_settings',
       ])
     );
-    expect(sidebarItems).toHaveLength(6);
+    expect(sidebarItems).toHaveLength(7);
   });
 
   it('keeps first-load defaults on for core and professional features while environment-gating simulation', () => {
@@ -69,12 +70,14 @@ describe('feature flag UI coverage', () => {
 
   it('guards audit log, simulation autostart, and Copilot tool actions', () => {
     const settingsSource = readSource('pages/Settings.jsx');
-    const mainSource = readSource('main.jsx');
+    const appShellSource = readSource('components/AppShell.tsx');
     const chatSource = readSource('components/ChatInterface.jsx');
 
     expect(settingsSource).toContain('<FeatureGate feature="audit_log">');
-    expect(mainSource).toContain("isEnabled('simulation_engine')");
-    expect(mainSource).toContain('startEmergencySimulation();');
+    expect(appShellSource).toContain('startReassessmentEngine()');
+    expect(appShellSource).toContain('startCapacityEngine()');
+    expect(appShellSource).toContain('!isTabletViewport || copilotOpen');
+    expect(appShellSource).toContain('<CopilotPanel />');
     expect(chatSource).toContain('copilotToolActionsEnabled && actionSuggestion');
     expect(chatSource).toContain('enabledFeatures: enabledCopilotFeatures');
     expect(chatSource).toContain('emsPipelineEnabled ? buildEMSPressureCopilotContext(emsPressure) : null');

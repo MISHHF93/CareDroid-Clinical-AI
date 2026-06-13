@@ -11,13 +11,13 @@ import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import {
-  AIRequestType,
   AIError,
   Message,
   ToolDefinition,
   UNIFIED_AI_MODEL,
   unifiedAIClient,
 } from '../../../../src/lib/ai/client';
+import type { AIRequestType } from '../../../../lib/ai/types';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { promptForRequestType } from '../../../../lib/ai/promptRegistry';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';

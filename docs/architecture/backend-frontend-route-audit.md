@@ -27,7 +27,9 @@ The full route-level source of truth is `src/data/backendHttpRouteInventory.js`.
 
 ## Admin and Legacy Surface Decision
 
-No separate backend console UI was added in the final integration pass. The always-on legacy/platform surfaces are represented here and in `src/data/backendHttpRouteInventory.js`; exposing them as broad clinical navigation would mix platform administration with the Emergency OS workflow. Future UI exposure should be a controlled governance/admin surface with permissions, not additional left-sidebar clinical routes.
+A controlled backend surface console is exposed inside `src/pages/AIGovernanceDashboard.tsx`. It reads from `src/data/backendHttpRouteInventory.js` and groups mounted backend route families into Emergency OS, optional runtime, AI/clinical, governance/admin, platform/legacy, and operations/demo categories.
+
+Legacy/platform/admin APIs are intentionally not added to the Emergency OS clinical left sidebar. The console provides traceability and governance review while keeping bedside workflow navigation focused on Emergency OS pages.
 
 ## Known Non-Mounted Emergency Calls
 

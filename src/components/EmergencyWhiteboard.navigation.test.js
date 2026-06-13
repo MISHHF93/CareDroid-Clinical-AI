@@ -4,13 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const whiteboardSource = readFileSync(join(__dirname, 'EmergencyWhiteboard.jsx'), 'utf8');
+const whiteboardSource = readFileSync(join(__dirname, '../pages/emergency/index.tsx'), 'utf8');
 const patientCardSource = readFileSync(join(__dirname, 'PatientCard.tsx'), 'utf8');
 const patientDetailPanelSource = readFileSync(join(__dirname, 'PatientDetailPanel.tsx'), 'utf8');
 
 describe('Emergency Whiteboard navigation wiring', () => {
   it('opens and closes patient detail through the primary emergency store', () => {
-    expect(patientCardSource).toContain('onClick={() => selectPatient(patient.id)}');
+    expect(patientCardSource).toContain('const handleSelect = useCallback(');
+    expect(patientCardSource).toContain('selectPatient(patient.id);');
+    expect(patientCardSource).toContain('onClick={handleSelect}');
     expect(patientCardSource).toContain('role="button"');
     expect(patientCardSource).toContain("event.key === 'Enter' || event.key === ' '");
     expect(patientDetailPanelSource).toContain('onClick={() => selectPatient(null)}');
@@ -24,17 +26,14 @@ describe('Emergency Whiteboard navigation wiring', () => {
   });
 
   it('wires filter chips, queue shortcuts, and view toggles to live whiteboard state', () => {
-    expect(whiteboardSource).toContain('onClick={() => setQueueFilter(filter.type)}');
-    expect(whiteboardSource).toContain('setQueueFilter(filter?.type || null)');
-    expect(whiteboardSource).toContain("setViewMode('grid')");
-    expect(whiteboardSource).toContain("setViewMode('list')");
-    expect(whiteboardSource).toContain("aria-pressed={viewMode === 'grid'}");
-    expect(whiteboardSource).toContain("aria-pressed={viewMode === 'list'}");
+    expect(whiteboardSource).toContain('const [activeFilter, setActiveFilter]');
+    expect(whiteboardSource).toContain('onClick={() => setActiveFilter(filter)}');
+    expect(whiteboardSource).toContain('visiblePatients.map((patient)');
+    expect(whiteboardSource).toContain('<WhoNextPanel');
   });
 
   it('shows non-blank loading and empty states for filtered views', () => {
-    expect(whiteboardSource).toContain('aria-label="Loading patient whiteboard"');
-    expect(whiteboardSource).toContain('ed-whiteboard__empty');
+    expect(whiteboardSource).toContain('<SkeletonLoader');
     expect(whiteboardSource).toContain('Department Clear');
   });
 });

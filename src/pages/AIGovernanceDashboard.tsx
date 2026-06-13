@@ -5,6 +5,10 @@ import {
   fetchEmergencyGovernanceCompliance,
   validateEmergencyGovernancePrompts,
 } from '../services/emergencyGovernanceApi';
+import {
+  BACKEND_HTTP_ROUTES,
+  OPTIONAL_RUNTIME_BACKEND_ROUTES,
+} from '../data/backendHttpRouteInventory';
 
 interface ComplianceReport {
   period: { start: string; end: string };
@@ -47,6 +51,23 @@ interface GovernanceRegistry {
   governanceFrameworks?: string[];
 }
 
+interface BackendRoute {
+  method: string;
+  path: string;
+  controller: string;
+  notes?: string;
+  runtime?: string;
+  mountFlag?: string;
+}
+
+interface BackendSurfaceGroup {
+  id: string;
+  label: string;
+  status: string;
+  guidance: string;
+  routes: BackendRoute[];
+}
+
 const emptyReport: ComplianceReport = {
   period: { start: '', end: '' },
   totalInteractions: 0,
@@ -74,6 +95,74 @@ function SummaryCard({
       <div style={{ color, fontSize: 24, fontWeight: 700, marginTop: 6 }}>{value}</div>
     </article>
   );
+}
+
+function groupBackendSurfaces(): BackendSurfaceGroup[] {
+  const routes = BACKEND_HTTP_ROUTES as readonly BackendRoute[];
+  const optionalRoutes = OPTIONAL_RUNTIME_BACKEND_ROUTES as readonly BackendRoute[];
+  const routeMatches = (route: BackendRoute, fragments: string[]) =>
+    fragments.some((fragment) => route.path.includes(fragment) || route.controller.includes(fragment));
+
+  return [
+    {
+      id: 'emergency-core',
+      label: 'Emergency OS Core',
+      status: 'Mounted as Emergency OS workflow',
+      guidance: 'These surfaces are allowed to drive left-sidebar clinical workflows.',
+      routes: routes.filter((route) => route.path.startsWith('/api/emergency/')),
+    },
+    {
+      id: 'emergency-optional',
+      label: 'Emergency Optional Runtime',
+      status: 'Capability guarded',
+      guidance: 'These Mongoose-backed routes stay behind guarded service clients until runtime mount is confirmed.',
+      routes: [...optionalRoutes],
+    },
+    {
+      id: 'ai-clinical',
+      label: 'AI, Chat, Tools, Clinical Intelligence',
+      status: 'Governed service surface',
+      guidance: 'Expose through Copilot, tools, or governance pages with human-review controls.',
+      routes: routes.filter((route) =>
+        routeMatches(route, ['Chat', 'AI', 'Tool', 'ClinicalIntelligence', '/api/chat', '/api/ai', '/api/tools'])
+      ),
+    },
+    {
+      id: 'governance-admin',
+      label: 'Governance, Security, Audit',
+      status: 'Admin/governance only',
+      guidance: 'Do not add these to clinical workflow navigation; keep them in governance/admin views.',
+      routes: routes.filter((route) =>
+        routeMatches(route, ['Governance', 'Security', 'Audit', 'Compliance', 'Privacy', 'HumanReview'])
+      ),
+    },
+    {
+      id: 'platform-legacy',
+      label: 'Platform, Tenant, Product, Organization',
+      status: 'Legacy/platform administration',
+      guidance: 'Represented here for traceability; not promoted into Emergency OS bedside workflows.',
+      routes: routes.filter((route) =>
+        routeMatches(route, [
+          'Platform',
+          'Tenant',
+          'Organization',
+          'Product',
+          'Subscriptions',
+          'Workspaces',
+          'WhiteLabel',
+        ])
+      ),
+    },
+    {
+      id: 'operations-demo',
+      label: 'Operations, Fleet, IoT, Simulation',
+      status: 'Demo/future operational surface',
+      guidance: 'Keep clearly labeled until live integrations and ownership are confirmed.',
+      routes: routes.filter((route) =>
+        routeMatches(route, ['Fleet', 'HospitalMap', 'Telemetry', 'MedicalIot', 'Simulation', 'Device'])
+      ),
+    },
+  ];
 }
 
 export default function AIGovernanceDashboard() {
@@ -136,6 +225,8 @@ export default function AIGovernanceDashboard() {
   );
 
   const validationIssues = Object.values(promptValidation).flatMap((result) => result.issues || []);
+  const backendSurfaceGroups = useMemo(() => groupBackendSurfaces(), []);
+  const totalBackendRoutes = backendSurfaceGroups.reduce((sum, group) => sum + group.routes.length, 0);
 
   return (
     <main style={{ padding: 24, color: '#F9FAFB', minHeight: '100%' }}>
@@ -170,6 +261,7 @@ export default function AIGovernanceDashboard() {
         <SummaryCard label="Avg Latency" value={`${Math.round(report.averageLatencyMs)}ms`} />
         <SummaryCard label="Estimated Cost" value={`$${report.estimatedCost.toFixed(2)}`} />
         <SummaryCard label="Governed Services" value={serviceEntries.length} />
+        <SummaryCard label="Backend Routes Traced" value={totalBackendRoutes} />
       </section>
 
       {!loading && !serviceEntries.length ? (
@@ -206,7 +298,7 @@ export default function AIGovernanceDashboard() {
         </div>
       </section>
 
-      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14 }}>
+      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14, marginBottom: 24 }}>
         <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
           <h2 style={{ margin: 0, fontSize: 18 }}>Enforced Safety Rules</h2>
         </div>
@@ -257,6 +349,41 @@ export default function AIGovernanceDashboard() {
               <p style={{ color: '#34D399' }}>All registered prompt templates include required variables and human-review language.</p>
             )}
           </div>
+        </div>
+      </section>
+
+      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14 }}>
+        <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
+          <h2 style={{ margin: 0, fontSize: 18 }}>Backend Surface Console</h2>
+          <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+            Controlled route trace for mounted backend surfaces. Legacy, platform, and demo APIs are visible here for governance review instead of being added to clinical left-sidebar workflows.
+          </p>
+        </div>
+        <div style={{ padding: 18, display: 'grid', gap: 12 }}>
+          {backendSurfaceGroups.map((group) => (
+            <article key={group.id} style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <strong>{group.label}</strong>
+                <span style={{ color: group.id.includes('optional') ? '#FBBF24' : '#93C5FD' }}>
+                  {group.status} | {group.routes.length} routes
+                </span>
+              </div>
+              <p style={{ color: '#9CA3AF', margin: '8px 0' }}>{group.guidance}</p>
+              <div style={{ display: 'grid', gap: 6, color: '#CBD5E1', fontSize: 12 }}>
+                {group.routes.slice(0, 8).map((route) => (
+                  <div key={`${group.id}-${route.method}-${route.path}`} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ color: '#60A5FA', minWidth: 48 }}>{route.method}</span>
+                    <code>{route.path}</code>
+                    <span style={{ color: '#6B7280' }}>{route.controller}</span>
+                    {route.mountFlag ? <span style={{ color: '#FBBF24' }}>{route.mountFlag}</span> : null}
+                  </div>
+                ))}
+                {group.routes.length > 8 ? (
+                  <div style={{ color: '#6B7280' }}>+{group.routes.length - 8} more routes in the route inventory.</div>
+                ) : null}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </main>
