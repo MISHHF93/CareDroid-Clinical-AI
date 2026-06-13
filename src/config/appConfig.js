@@ -142,9 +142,6 @@ const appConfig = {
       baseUrl: 'https://pubmed.ncbi.nlm.nih.gov',
     },
   },
-  ai: {
-    model: getEnvValue('VITE_AI_MODEL', 'claude-sonnet-4-20250514'),
-  },
 };
 
 export default appConfig;

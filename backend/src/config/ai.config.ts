@@ -1,11 +1,27 @@
 import { registerAs } from '@nestjs/config';
-import { UNIFIED_AI_MODEL } from '../../../lib/ai/client';
+import { readAIProviderConfig, readTenantAISettings } from '../../../lib/ai/config';
+import { getAIPrompt } from '../../../lib/ai/promptRegistry';
+import { AIConfigRegistry, AISafetyRules, PromptTemplateRegistry } from './ai-governance.registry';
+
+export {
+  AIConfigRegistry,
+  AISafetyRules,
+  PromptTemplateRegistry,
+  type AIServiceConfig,
+  type AIPromptTemplate,
+} from './ai-governance.registry';
+
+const providerConfig = readAIProviderConfig();
+const tenantSettings = readTenantAISettings();
 
 export default registerAs('ai', () => ({
   apiKey: process.env.ANTHROPIC_API_KEY,
-  model: UNIFIED_AI_MODEL,
-  temperature: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
-  maxTokens: parseInt(process.env.AI_MAX_TOKENS || '2000', 10),
+  provider: providerConfig.provider,
+  model: providerConfig.model,
+  temperature: providerConfig.temperature,
+  maxTokens: providerConfig.maxTokens,
+  stream: providerConfig.stream,
+  tenantSettings,
 
   // Rate limits per subscription tier
   rateLimits: {
@@ -23,9 +39,8 @@ export default registerAs('ai', () => ({
     },
   },
 
-  systemPrompt: `You are a medical AI assistant integrated into CareDroid Clinical Companion.
-Your role is to provide evidence-based clinical information, structured outputs, and decision support.
-Always return responses in valid JSON format matching the requested schema.
-Never provide medical diagnoses or replace professional medical judgment.
-Include relevant citations and confidence levels when applicable.`,
+  systemPrompt: getAIPrompt('ed-copilot').prompt,
+  services: AIConfigRegistry,
+  promptTemplates: PromptTemplateRegistry,
+  safetyRules: AISafetyRules,
 }));

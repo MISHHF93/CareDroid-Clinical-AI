@@ -51,23 +51,22 @@ describe('feature flag UI coverage', () => {
     expect(defaults.simulation_engine).toBe(Boolean(import.meta.env.DEV));
   });
 
-  it('guards canonical route panels with their owning feature flags', () => {
+  it('mounts canonical route panels through the consolidated Emergency OS router', () => {
     const appSource = readSource('App.jsx');
 
-    expect(appSource).toContain('<FeatureRouteGuard feature="ems_pipeline">');
-    expect(appSource).toContain('<FeatureRouteGuard feature="queue_intelligence">');
-    expect(appSource).toContain('<FeatureRouteGuard feature="referral_intelligence">');
-    expect(appSource).toContain('<FeatureRouteGuard feature="capacity_intelligence">');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyEms}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyQueues}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyReferrals}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCapacity}');
   });
 
-  it('guards patient detail backend sections and calculator cards', () => {
-    const patientDetailSource = readSource('components/PatientCard.jsx');
+  it('keeps patient detail actions local and calculator cards gated', () => {
+    const patientDetailSource = readSource('components/PatientDetailPanel.tsx');
     const calculatorHubSource = readSource('pages/emergency/ClinicalCalculatorHub.jsx');
 
-    expect(patientDetailSource).toContain('<FeatureGate feature="vitals_history_chart"');
-    expect(patientDetailSource).toContain('feature={BACKEND_DATA_FEATURE_BY_TAB.medications}');
-    expect(patientDetailSource).toContain('feature={BACKEND_DATA_FEATURE_BY_TAB.orders}');
-    expect(patientDetailSource).toContain('feature={BACKEND_DATA_FEATURE_BY_TAB.labs}');
+    expect(patientDetailSource).toContain('<HEARTScore patientId={selectedPatient.id}');
+    expect(patientDetailSource).toContain('<QSOFA patientId={selectedPatient.id}');
+    expect(patientDetailSource).toContain('<PediatricDrugCalc patientId={selectedPatient.id}');
     expect(calculatorHubSource).toContain('feature={featureForTool(tool.id)}');
     expect(calculatorHubSource).toContain('<FeatureGate feature={activeToolFeature} showPlaceholder>');
   });

@@ -19,6 +19,7 @@ import {
   unifiedAIClient,
 } from '../../../../lib/ai/client';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
+import { promptForRequestType } from '../../../../lib/ai/promptRegistry';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
 
 interface RateLimitConfig {
@@ -229,8 +230,7 @@ export class AIService {
       const startTime = Date.now();
       const response = await unifiedAIClient.request({
         requestType,
-        systemPrompt:
-          'You are CareDroid, an AI clinical assistant. Provide evidence-based, structured medical information. Always include sources and note that this is not a substitute for professional medical advice.',
+        systemPrompt: promptForRequestType(requestType).prompt,
         messages: [{ role: 'user', content: prompt }],
         maxTokens: config.maxTokens,
         context,
@@ -342,8 +342,7 @@ export class AIService {
     try {
       const response = await unifiedAIClient.request({
         requestType,
-        systemPrompt:
-          'You are CareDroid, an AI clinical assistant. Generate only valid JSON matching the provided schema. Be accurate, evidence-based, and do not include prose outside the JSON object.',
+        systemPrompt: `${promptForRequestType(requestType).prompt} Return only valid JSON matching the requested schema.`,
         messages: [
           {
             role: 'user',

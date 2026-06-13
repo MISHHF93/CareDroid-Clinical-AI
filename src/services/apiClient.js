@@ -4,9 +4,18 @@ import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/api.config';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { getTenantHeaders } from './tenantContextStore';
 
-// In development, use empty string to let Vite proxy handle routing
-// In production, use full API URL (origin only; paths include /api)
-const getApiBaseUrl = () => appConfig.api.baseUrl || '';
+// In development, use empty string to let Vite proxy handle routing.
+// VITE_API_URL is treated as an origin only; request paths own the /api prefix.
+const getApiBaseUrl = () => {
+  const configured = appConfig.api.baseUrl || '';
+  if (!configured || configured.startsWith('/')) return '';
+
+  try {
+    return new URL(configured).origin;
+  } catch {
+    return configured.replace(/\/api\/?$/i, '').replace(/\/$/, '');
+  }
+};
 
 const normalizePath = (path) => {
   if (!path) return '';
@@ -57,6 +66,34 @@ const hasHeader = (headers, name) => {
   const lowerName = name.toLowerCase();
   return Object.keys(headers).some((key) => key.toLowerCase() === lowerName);
 };
+
+const getHeaderValue = (headers, name) => {
+  if (!headers) return '';
+  if (typeof headers.get === 'function') return headers.get(name) || '';
+  const lowerName = name.toLowerCase();
+  const key = Object.keys(headers).find((candidate) => candidate.toLowerCase() === lowerName);
+  return key ? String(headers[key] || '') : '';
+};
+
+const hasUsableAuthorization = (headers) => {
+  const value = getHeaderValue(headers, 'Authorization').trim();
+  if (!value) return false;
+  return !/^Bearer\s*(undefined|null)?$/i.test(value);
+};
+
+const shouldShortCircuitProtectedApi = (path, headers) => {
+  const apiPath = normalizeApiPath(path);
+  if (!apiPath.startsWith('/api/')) return false;
+  if (/^\/api\/auth(\/|$)/.test(apiPath)) return false;
+  return !hasUsableAuthorization(headers);
+};
+
+const unauthenticatedApiResponse = () =>
+  new Response(JSON.stringify({ message: 'Sign in required to load this data.' }), {
+    status: 401,
+    statusText: 'Unauthorized',
+    headers: { 'Content-Type': 'application/json' },
+  });
 
 const setHeaderIfMissing = (headers, name, value) => {
   if (!headers || hasHeader(headers, name)) return;
@@ -127,6 +164,10 @@ export const apiFetch = async (path, options = {}) => {
   } = options;
 
   const mergedHeaders = buildRequestHeaders(path, optionHeaders);
+
+  if (shouldShortCircuitProtectedApi(path, mergedHeaders)) {
+    return unauthenticatedApiResponse();
+  }
 
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);
 

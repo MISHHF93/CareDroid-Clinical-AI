@@ -117,6 +117,49 @@ export const APP_SHELL_NAV_ITEMS = Object.freeze([
   },
 ]);
 
+export const EMERGENCY_SIDEBAR_NAV_ITEMS = Object.freeze([
+  ...APP_SHELL_NAV_ITEMS.filter((item) => item.id !== 'ed_copilot' && item.id !== 'emergency_settings'),
+  {
+    id: 'clinical_tools',
+    label: 'Clinical Tools',
+    mobileLabel: 'Tools',
+    iconKey: 'clinical-tools',
+    featureId: 'clinical_tools',
+    path: CANONICAL_ROUTES.emergencyTools,
+    activePaths: [CANONICAL_ROUTES.emergencyTools, '/tools', '/tools/calculators'],
+  },
+  {
+    id: 'ai_governance',
+    label: 'AI Governance',
+    mobileLabel: 'AI Gov',
+    iconKey: 'shield',
+    featureId: 'ai_governance',
+    path: CANONICAL_ROUTES.emergencyAiGovernance,
+    activePaths: [CANONICAL_ROUTES.emergencyAiGovernance, CANONICAL_ROUTES.aiGovernance],
+    roles: ['charge_nurse', 'physician'],
+    isEmergencyCore: true,
+  },
+  {
+    id: 'department_pulse',
+    label: 'Department Pulse',
+    mobileLabel: 'Pulse',
+    iconKey: 'department-pulse',
+    featureId: 'department_pulse',
+    path: CANONICAL_ROUTES.emergencyPulse,
+    activePaths: [CANONICAL_ROUTES.emergencyPulse],
+  },
+  {
+    id: 'shift_summary',
+    label: 'Shift Summary',
+    mobileLabel: 'Shift',
+    iconKey: 'shift-summary',
+    featureId: 'shift_summary',
+    path: CANONICAL_ROUTES.emergencyShift,
+    activePaths: [CANONICAL_ROUTES.emergencyShift],
+  },
+  APP_SHELL_NAV_ITEMS.find((item) => item.id === 'emergency_settings'),
+].filter(Boolean));
+
 export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',
@@ -180,10 +223,10 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     id: 'clinical-tools',
     label: 'Clinical Tools',
     mobileLabel: 'Tools',
-    path: CANONICAL_ROUTES.emergencyCopilot,
+    path: CANONICAL_ROUTES.emergencyTools,
     showInSidebar: false,
     showInMobile: false,
-    matchPaths: [CANONICAL_ROUTES.emergencyCopilot, '/emergency/tools', '/tools/calculators'],
+    matchPaths: [CANONICAL_ROUTES.emergencyTools, '/tools', '/tools/calculators'],
     matchPrefixes: ['/tools/calculators/'],
   },
   {
@@ -741,7 +784,7 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     id: 'governance',
     label: 'Governance',
     mobileLabel: 'Gov',
-    path: CANONICAL_ROUTES.aiGovernance,
+    path: CANONICAL_ROUTES.emergencyAiGovernance,
     matchPaths: [
       '/governance',
       '/governance/ai',
@@ -750,6 +793,7 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
       '/governance/clinical-safety',
       '/governance/consent',
       '/governance/privacy',
+      CANONICAL_ROUTES.emergencyAiGovernance,
       CANONICAL_ROUTES.aiGovernance,
       '/privacy',
     ],

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
+import { EmergencyAIController } from './emergency-ai.controller';
 import { ChatService } from './chat.service';
 import { AiModule } from '../ai/ai.module';
 import { IntentClassifierModule } from '../medical-control-plane/intent-classifier/intent-classifier.module';
@@ -36,7 +37,7 @@ import { PlatformGovernanceModule } from '../platform-governance';
     EvaluationModule,
     PlatformGovernanceModule,
   ],
-  controllers: [ChatController],
+  controllers: [ChatController, EmergencyAIController],
   providers: [ChatService, CalculatorRecommenderService],
   exports: [ChatService],
 })

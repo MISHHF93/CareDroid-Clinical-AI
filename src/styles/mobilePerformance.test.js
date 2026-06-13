@@ -32,10 +32,13 @@ describe('mobile performance — startup deferral', () => {
 });
 
 describe('mobile performance — routing & bundles', () => {
-  it('keeps the removed assistant page out of the initial chunk', () => {
+  it('keeps Copilot persistent instead of mounting a duplicate assistant page', () => {
     const app = read('src/App.jsx');
+    const appShell = read('src/components/AppShell.tsx');
     expect(app).not.toMatch(/pages\/Dashboard/);
-    expect(app).toContain('EmergencyCopilotRoute');
+    expect(appShell).toContain('<CopilotPanel />');
+    expect(app).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
+    expect(app).toContain('element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
@@ -47,10 +50,10 @@ describe('mobile performance — routing & bundles', () => {
     expect(vite).toContain("'vendor-firebase'");
   });
 
-  it('does not use artificial 500ms auth gate', () => {
+  it('does not use artificial auth gates in the flattened app shell', () => {
     const app = read('src/App.jsx');
     expect(app).not.toContain('setIsChecking(false), 500');
-    expect(app).toContain('setIsChecking(false), 150');
+    expect(app).not.toContain('setIsChecking(false), 150');
   });
 });
 
@@ -63,8 +66,8 @@ describe('mobile performance — CLS & images', () => {
   });
 
   it('images use lazy decode and dimensions', () => {
-    const avatar = read('src/components/PatientCard.jsx');
-    expect(avatar).toContain('loading="lazy"');
+    const workloadPanel = read('src/components/WorkloadBalancePanel.jsx');
+    expect(workloadPanel).toContain('loading="lazy"');
     const tfa = read('src/pages/TwoFactorSetup.jsx');
     expect(tfa).toMatch(/width=\{280\}/);
     expect(tfa).toMatch(/height=\{280\}/);

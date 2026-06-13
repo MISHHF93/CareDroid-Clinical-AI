@@ -1,5 +1,7 @@
 import type { AIRequestType } from './types';
 import type { PatientState, Priority } from '../../types/emergency';
+import { promptForRequestType } from './promptRegistry';
+import { HUMAN_REVIEW_DISCLAIMER } from './safetyPolicy';
 
 export type CapacityBand = 'Green' | 'Yellow' | 'Orange' | 'Red';
 
@@ -100,12 +102,13 @@ export function buildDepartmentContext(): DepartmentContext {
 }
 
 export function buildSystemPrompt(context: DepartmentContext, requestType: AIRequestType): string {
-  const template = SYSTEM_PROMPTS[requestType] || SYSTEM_PROMPTS.COPILOT_CHAT;
+  const template = promptForRequestType(requestType).prompt;
 
   return [
     template,
     '',
     'Safety boundary: decision support only. Do not make autonomous diagnoses, orders, disposition decisions, staffing decisions, transfers, admissions, or discharges. Surface suggestions for qualified human review.',
+    HUMAN_REVIEW_DISCLAIMER,
     '',
     'Current department context:',
     JSON.stringify(context),
@@ -410,21 +413,3 @@ function recentScores(patient: any): string[] {
     });
 }
 
-const SYSTEM_PROMPTS: Record<AIRequestType, string> = {
-  COPILOT_CHAT:
-    'You are the ED Copilot for a busy emergency department. Be concise, operationally aware, and clinically cautious.',
-  CLINICAL_SUMMARY:
-    'Generate a concise clinical summary for human review. Highlight active problems, risk signals, pending work, and limitations.',
-  SCORE_ASSIST:
-    'Assist with clinical scoring workflows. Explain inputs, missing data, score context, and review requirements without inventing values.',
-  INTAKE_SUGGESTION:
-    'Suggest intake workflow support from the department context. Focus on triage readiness, missing information, queue pressure, and safety flags.',
-  HANDOFF_BRIEF:
-    'Generate a print-ready handoff brief for clinical staff. Surface queue pressure, patient risks, pending referrals, reassessments, and watch items.',
-  PROTOCOL_SUGGEST:
-    'Suggest relevant protocols or guidelines for human review. Cite uncertainty, required verification, and patient-safety boundaries.',
-  TRIAGE_ASSIST:
-    'Assist triage prioritization by surfacing risk indicators, queue pressure, EMS pressure, and reassessment needs for clinician review.',
-  SHIFT_SUMMARY:
-    'Summarize the shift operationally and clinically. Include capacity, EMS, queues, referrals, alerts, and patients needing follow-up.',
-};

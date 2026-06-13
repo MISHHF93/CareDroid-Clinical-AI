@@ -15,6 +15,32 @@ export interface IPatientIdentifier {
   addedAt: Date;
 }
 
+export interface ISafetyAlert {
+  incidentId: string;
+  type: string;
+  severity: number;
+  timestamp: Date;
+  resolved: boolean;
+}
+
+export interface IContinuousVitals {
+  timestamp: Date;
+  heartRate?: number;
+  oxygenSaturation?: number;
+  respiratoryRate?: number;
+  temperature?: number;
+  source: 'apple_watch' | 'samsung_watch' | 'fitbit' | 'other';
+}
+
+export interface ITriggeredProtocol {
+  protocolId: string;
+  protocolName: string;
+  triggeredAt: Date;
+  acknowledgedAt?: Date;
+  acknowledgedBy?: string;
+  status: 'pending' | 'acknowledged' | 'completed';
+}
+
 export interface IPatient extends Document {
   // Basic info
   name: string;
@@ -65,6 +91,41 @@ export interface IPatient extends Document {
   identifiers: IPatientIdentifier[];
   temporary_encounter_id: string | null;
   identity_reconciled: boolean;
+
+  // Boarding & Throughput
+  decisionToAdmitTime?: Date | null;
+  boardingStartTime?: Date | null;
+  boardingStatus?: 'not_boarded' | 'boarding' | 'transferred';
+  boardTimeMinutes?: number | null;
+
+  // Discharge & Follow-up
+  virtualRecheckScheduled: boolean;
+  virtualRecheckTime?: Date | null;
+  virtualRecheckCompleted: boolean;
+  dischargeReadinessScore?: number | null;
+  dischargeCriteriaMet: string[];
+
+  // MCI / Surge
+  mciBatchId?: string | null;
+  mciPatientNumber?: number | null;
+  triageColor?: 'RED' | 'YELLOW' | 'GREEN' | 'BLACK' | null;
+  surgeActivationId?: string | null;
+  fieldTriageTime?: Date | null;
+
+  // Safety
+  safetyAlerts: ISafetyAlert[];
+
+  // Wearable/IoT
+  wearableDeviceId?: string | null;
+  lastWearableSync?: Date | null;
+  continuousVitals: IContinuousVitals[];
+
+  // Clinical Protocols
+  triggeredProtocols: ITriggeredProtocol[];
+
+  // Audit
+  lastModifiedBy: string;
+  modifiedAt: Date;
 }
 
 const ReassessmentHistorySchema = new Schema<IReassessmentHistory>({
@@ -85,6 +146,49 @@ const PatientIdentifierSchema = new Schema<IPatientIdentifier>({
   verified: { type: Boolean, default: false },
   addedAt: { type: Date, default: Date.now },
 });
+
+const SafetyAlertSchema = new Schema<ISafetyAlert>(
+  {
+    incidentId: { type: String, required: true },
+    type: { type: String, required: true },
+    severity: { type: Number, required: true },
+    timestamp: { type: Date, default: Date.now },
+    resolved: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+const ContinuousVitalsSchema = new Schema<IContinuousVitals>(
+  {
+    timestamp: { type: Date, default: Date.now },
+    heartRate: Number,
+    oxygenSaturation: Number,
+    respiratoryRate: Number,
+    temperature: Number,
+    source: {
+      type: String,
+      enum: ['apple_watch', 'samsung_watch', 'fitbit', 'other'],
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
+const TriggeredProtocolSchema = new Schema<ITriggeredProtocol>(
+  {
+    protocolId: { type: String, required: true },
+    protocolName: { type: String, required: true },
+    triggeredAt: { type: Date, default: Date.now },
+    acknowledgedAt: { type: Date, default: null },
+    acknowledgedBy: { type: String, default: null },
+    status: {
+      type: String,
+      enum: ['pending', 'acknowledged', 'completed'],
+      default: 'pending',
+    },
+  },
+  { _id: false },
+);
 
 const PatientSchema = new Schema<IPatient>(
   {
@@ -138,6 +242,42 @@ const PatientSchema = new Schema<IPatient>(
     identifiers: { type: [PatientIdentifierSchema], default: [] },
     temporary_encounter_id: { type: String, default: null },
     identity_reconciled: { type: Boolean, default: true },
+
+    decisionToAdmitTime: { type: Date, default: null },
+    boardingStartTime: { type: Date, default: null },
+    boardingStatus: {
+      type: String,
+      enum: ['not_boarded', 'boarding', 'transferred'],
+      default: 'not_boarded',
+    },
+    boardTimeMinutes: { type: Number, default: null },
+
+    virtualRecheckScheduled: { type: Boolean, default: false },
+    virtualRecheckTime: { type: Date, default: null },
+    virtualRecheckCompleted: { type: Boolean, default: false },
+    dischargeReadinessScore: { type: Number, min: 0, max: 100, default: null },
+    dischargeCriteriaMet: { type: [String], default: [] },
+
+    mciBatchId: { type: String, default: null },
+    mciPatientNumber: { type: Number, default: null },
+    triageColor: {
+      type: String,
+      enum: ['RED', 'YELLOW', 'GREEN', 'BLACK', null],
+      default: null,
+    },
+    surgeActivationId: { type: String, default: null },
+    fieldTriageTime: { type: Date, default: null },
+
+    safetyAlerts: { type: [SafetyAlertSchema], default: [] },
+
+    wearableDeviceId: { type: String, default: null },
+    lastWearableSync: { type: Date, default: null },
+    continuousVitals: { type: [ContinuousVitalsSchema], default: [] },
+
+    triggeredProtocols: { type: [TriggeredProtocolSchema], default: [] },
+
+    lastModifiedBy: { type: String, default: 'system' },
+    modifiedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );
@@ -151,5 +291,11 @@ PatientSchema.index({ 'identifiers.type': 1, 'identifiers.value': 1 });
 PatientSchema.index({ name: 1, date_of_birth: 1 });
 PatientSchema.index({ phone: 1 });
 PatientSchema.index({ email: 1 });
+PatientSchema.index({ boardingStartTime: 1 });
+PatientSchema.index({ boardingStatus: 1, boardingStartTime: 1 });
+PatientSchema.index({ mciBatchId: 1 });
+PatientSchema.index({ triageColor: 1 });
+PatientSchema.index({ virtualRecheckTime: 1 });
+PatientSchema.index({ 'triggeredProtocols.protocolId': 1 });
 
 export const Patient = model<IPatient>('Patient', PatientSchema);

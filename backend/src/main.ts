@@ -9,11 +9,14 @@ import * as Sentry from '@sentry/node';
 import mongoose from 'mongoose';
 import { AppModule } from './app.module';
 import capacityRoutes from './api/capacity.routes';
+import boardingRoutes from './api/boarding.routes';
 import copilotRoutes from './api/copilot.routes';
 import emsRoutes from './api/ems.routes';
+import governanceRoutes from './api/governance.routes';
 import { registerEMSWebSocketSupport } from './api/ems.socket';
 import reassessmentRoutes from './api/reassessment.routes';
 import smartIntakeRoutes from './api/smart-intake.routes';
+import surgeRoutes from './api/surge.routes';
 import { reassessmentScheduler } from './scheduler/reassessment.scheduler';
 import { ocrService } from './services/ocr.service';
 import { initSentry } from './config/sentry.config';
@@ -41,17 +44,19 @@ async function registerEmergencyMongooseRuntime(app: INestApplication, logger: L
 
   await mongoose.connect(mongoUri);
   const expressApp = app.getHttpAdapter().getInstance();
-  expressApp.use('/api/capacity', capacityRoutes);
-  expressApp.use('/api/copilot', copilotRoutes);
-  expressApp.use('/api/ems', emsRoutes);
+  expressApp.use('/api/emergency/boarding', boardingRoutes);
+  expressApp.use('/api/emergency/capacity', capacityRoutes);
+  expressApp.use('/api/emergency/copilot', copilotRoutes);
+  expressApp.use('/api/emergency/ems', emsRoutes);
+  expressApp.use('/api/emergency/governance', governanceRoutes);
   expressApp.use('/api/emergency/intake', smartIntakeRoutes);
-  expressApp.use('/api/reassessment', reassessmentRoutes);
+  expressApp.use('/api/emergency/reassessment', reassessmentRoutes);
+  expressApp.use('/api/emergency/surge', surgeRoutes);
+  expressApp.use('/api/v1/governance', governanceRoutes);
   registerEMSWebSocketSupport(expressApp, app.getHttpServer());
   reassessmentScheduler.start();
   await ocrService.initialize();
-  logger.log(
-    'Mongoose Emergency OS routes mounted at /api/capacity, /api/copilot, /api/ems, /api/emergency/intake, /api/reassessment',
-  );
+  logger.log('Mongoose Emergency OS routes mounted under /api/emergency/*');
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {

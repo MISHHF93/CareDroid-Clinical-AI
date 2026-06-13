@@ -1415,7 +1415,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Orient the hospital to the ED command center, patient journey, human-review boundary, and workspace subpages.',
       outcome: 'The team understands that Emergency is an operating workspace, not a loose set of tools.',
-      targetRoute: '/workspace/emergency/dashboard',
+      targetRoute: '/emergency/whiteboard',
     }),
     Object.freeze({
       id: 'calculators',
@@ -1468,7 +1468,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       minute: '0-1',
       title: 'Open the Emergency Workspace',
       instruction: 'Start at the command center and explain the ED journey, operating queues, and human-review posture.',
-      targetRoute: '/workspace/emergency/dashboard',
+      targetRoute: '/emergency/whiteboard',
     }),
     Object.freeze({
       minute: '1-3',

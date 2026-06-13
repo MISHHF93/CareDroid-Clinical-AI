@@ -1,0 +1,547 @@
+import { useMemo, useRef, useState } from 'react';
+import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
+import {
+  Patient,
+  PatientFlag,
+  PatientState,
+  Priority,
+  Vitals,
+} from '../types/emergency';
+import { useEmergencyStore } from '../store/emergencyStore';
+
+type QuickIntakeProps = {
+  onClose: () => void;
+  onAdded: (patient: Patient) => void;
+};
+
+type ComplaintCategory = 'Chest pain' | 'Breathing' | 'Neuro/Stroke' | 'Sepsis' | 'Trauma' | 'OB/Gyn' | 'Pediatric' | 'Other';
+type Sex = Patient['sex'];
+
+const CATEGORY_BUTTONS: Array<{ label: ComplaintCategory; icon: string }> = [
+  { label: 'Chest pain', icon: '🫀' },
+  { label: 'Breathing', icon: '🫁' },
+  { label: 'Neuro/Stroke', icon: '🧠' },
+  { label: 'Sepsis', icon: '🩸' },
+  { label: 'Trauma', icon: '🤕' },
+  { label: 'OB/Gyn', icon: '🤰' },
+  { label: 'Pediatric', icon: '🧒' },
+  { label: 'Other', icon: '📋' },
+];
+
+const PRIORITY_COLORS: Record<Priority, string> = {
+  [Priority.P1]: '#EF4444',
+  [Priority.P2]: '#F97316',
+  [Priority.P3]: '#F59E0B',
+  [Priority.P4]: '#10B981',
+  [Priority.P5]: '#6B7280',
+};
+
+const SUGGESTED_PROTOCOLS: Partial<Record<ComplaintCategory, string[]>> = {
+  'Chest pain': ['HEART Score', 'ACS Protocol'],
+  Sepsis: ['qSOFA', 'Sepsis Bundle'],
+  'Neuro/Stroke': ['NIHSS', 'Stroke Protocol'],
+};
+
+const PRIORITIES = Object.values(Priority);
+
+function createId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createMrn(): string {
+  return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
+function numeric(value: string): number | undefined {
+  if (!value.trim()) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function calculateAge(dob: string): number {
+  const dobTime = new Date(dob).getTime();
+  if (!Number.isFinite(dobTime)) return 0;
+  const today = new Date();
+  const birthDate = new Date(dob);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDelta = today.getMonth() - birthDate.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) age -= 1;
+  return Math.max(0, age);
+}
+
+function isMinorComplaint(category: ComplaintCategory, complaint: string): boolean {
+  const text = complaint.toLowerCase();
+  return (
+    category === 'Other' ||
+    text.includes('rash') ||
+    text.includes('ankle') ||
+    text.includes('sprain') ||
+    text.includes('suture') ||
+    text.includes('refill') ||
+    text.includes('form') ||
+    text.includes('minor')
+  );
+}
+
+function computePriority(category: ComplaintCategory | null, complaint: string, vitals: Partial<Vitals>): Priority {
+  const hr = vitals.hr;
+  const sbp = vitals.sbp;
+  const spo2 = vitals.spo2;
+
+  if ((spo2 !== undefined && spo2 < 90) || (hr !== undefined && (hr < 40 || hr > 150))) {
+    return Priority.P1;
+  }
+
+  if (
+    (category === 'Chest pain' && hr !== undefined && hr > 100) ||
+    (sbp !== undefined && sbp < 90)
+  ) {
+    return Priority.P2;
+  }
+
+  if (category && isMinorComplaint(category, complaint)) {
+    return complaint.toLowerCase().includes('refill') || complaint.toLowerCase().includes('form')
+      ? Priority.P5
+      : Priority.P4;
+  }
+
+  return Priority.P3;
+}
+
+function buildVitals(form: { hr: string; sbp: string; spo2: string; temp: string }): Partial<Vitals> {
+  return {
+    hr: numeric(form.hr),
+    sbp: numeric(form.sbp),
+    spo2: numeric(form.spo2),
+    temp: numeric(form.temp),
+  };
+}
+
+export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
+  const addPatient = useEmergencyStore((state) => state.addPatient);
+  const complaintInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const [complaintCategory, setComplaintCategory] = useState<ComplaintCategory | null>(null);
+  const [complaint, setComplaint] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dob, setDob] = useState('');
+  const [sex, setSex] = useState<Sex>('Other');
+  const [mrn] = useState(createMrn);
+  const [vitalsForm, setVitalsForm] = useState({ hr: '', sbp: '', spo2: '', temp: '' });
+  const [priorityOverride, setPriorityOverride] = useState<Priority | null>(null);
+  const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+
+  const age = useMemo(() => calculateAge(dob), [dob]);
+  const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);
+  const computedPriority = useMemo(
+    () => computePriority(complaintCategory, complaint, vitals),
+    [complaint, complaintCategory, vitals],
+  );
+  const priority = priorityOverride || computedPriority;
+  const protocols = complaintCategory ? SUGGESTED_PROTOCOLS[complaintCategory] || [] : [];
+
+  const chooseCategory = (category: ComplaintCategory) => {
+    setComplaintCategory(category);
+    window.setTimeout(() => complaintInputRef.current?.focus(), 0);
+  };
+
+  const closeWithConfirm = () => {
+    const hasDraft = Boolean(
+      complaintCategory ||
+      complaint.trim() ||
+      firstName.trim() ||
+      lastName.trim() ||
+      dob ||
+      vitalsForm.hr ||
+      vitalsForm.sbp ||
+      vitalsForm.spo2 ||
+      vitalsForm.temp,
+    );
+    if (!hasDraft || window.confirm('Discard this intake?')) onClose();
+  };
+
+  const submit = (event?: FormEvent) => {
+    event?.preventDefault();
+    const now = new Date().toISOString();
+    const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
+      ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
+      : [];
+    const patient: Patient = {
+      id: createId('patient'),
+      mrn,
+      firstName: firstName.trim() || 'Unknown',
+      lastName: lastName.trim() || 'Patient',
+      dob: dob || new Date().toISOString().slice(0, 10),
+      age,
+      sex,
+      arrivalTime: now,
+      triageTime: now,
+      chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
+      complaintCategory: complaintCategory || 'Other',
+      state: PatientState.Triage,
+      priority,
+      vitals: completeVitals,
+      flags: priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [],
+      notes: [],
+      timeline: [],
+    };
+
+    addPatient(patient);
+    onAdded(patient);
+    onClose();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeWithConfirm();
+      return;
+    }
+
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submit();
+    }
+  };
+
+  return (
+    <div
+      className="quick-intake-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quick-intake-title"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 260,
+        background: 'rgba(0,0,0,0.66)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <style>
+        {`
+          @media (max-width: 720px) {
+            .quick-intake-overlay {
+              padding: 0 !important;
+            }
+
+            .quick-intake-modal {
+              width: 100% !important;
+              height: 100dvh !important;
+              max-height: none !important;
+              border-radius: 0 !important;
+            }
+
+            .quick-intake-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}
+      </style>
+      <form
+        className="quick-intake-modal"
+        onSubmit={submit}
+        onKeyDown={handleKeyDown}
+        style={{
+          width: 600,
+          maxWidth: '100%',
+          maxHeight: '92vh',
+          overflowY: 'auto',
+          background: '#111827',
+          border: '1px solid #1F2937',
+          borderRadius: 14,
+          color: '#F9FAFB',
+          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
+        }}
+      >
+        <header
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            padding: 16,
+            borderBottom: '1px solid #1F2937',
+          }}
+        >
+          <div>
+            <h2 id="quick-intake-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
+              Quick Intake
+            </h2>
+            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>Single-screen ED registration</div>
+          </div>
+          <button
+            type="button"
+            onClick={closeWithConfirm}
+            aria-label="Close quick intake"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              border: '1px solid #374151',
+              background: 'transparent',
+              color: '#F9FAFB',
+              cursor: 'pointer',
+            }}
+          >
+            X
+          </button>
+        </header>
+
+        <div className="quick-intake-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}>
+          <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {CATEGORY_BUTTONS.map((category) => {
+                const active = complaintCategory === category.label;
+                return (
+                  <button
+                    key={category.label}
+                    type="button"
+                    onClick={() => chooseCategory(category.label)}
+                    style={{
+                      height: 56,
+                      border: active ? '1px solid #60A5FA' : '1px solid #374151',
+                      borderRadius: 12,
+                      background: active ? '#1D4ED81F' : '#0B1120',
+                      color: '#F9FAFB',
+                      cursor: 'pointer',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      textAlign: 'left',
+                      padding: '0 12px',
+                    }}
+                  >
+                    <span aria-hidden="true" style={{ marginRight: 6 }}>{category.icon}</span>
+                    {category.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 700 }}>Complaint</span>
+              <textarea
+                ref={complaintInputRef}
+                value={complaint}
+                onChange={(event) => setComplaint(event.target.value)}
+                placeholder="Describe complaint..."
+                rows={2}
+                style={{
+                  resize: 'vertical',
+                  minHeight: 68,
+                  border: '1px solid #374151',
+                  borderRadius: 12,
+                  background: '#0B1120',
+                  color: '#F9FAFB',
+                  padding: 12,
+                  outline: 'none',
+                }}
+              />
+            </label>
+
+            {protocols.length ? (
+              <div
+                aria-label="Suggested protocols"
+                style={{
+                  border: '1px solid #1F2937',
+                  borderRadius: 12,
+                  background: '#0B1120',
+                  padding: 10,
+                }}
+              >
+                <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>Suggested protocols</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {protocols.map((protocol) => (
+                    <span
+                      key={protocol}
+                      style={{
+                        borderRadius: 999,
+                        background: '#1D4ED81F',
+                        border: '1px solid #2563EB',
+                        color: '#BFDBFE',
+                        padding: '5px 8px',
+                        fontSize: 12,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {protocol}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
+
+          <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>First</span>
+                <input value={firstName} onChange={(event) => setFirstName(event.target.value)} style={inputStyle} />
+              </label>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Last</span>
+                <input value={lastName} onChange={(event) => setLastName(event.target.value)} style={inputStyle} />
+              </label>
+            </div>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>DOB {dob ? `(Age ${age})` : ''}</span>
+              <input type="date" value={dob} onChange={(event) => setDob(event.target.value)} style={inputStyle} />
+            </label>
+
+            <div>
+              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>Sex</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                {(['M', 'F', 'Other'] as Sex[]).map((candidate) => (
+                  <button
+                    key={candidate}
+                    type="button"
+                    onClick={() => setSex(candidate)}
+                    style={{
+                      border: sex === candidate ? '1px solid #60A5FA' : '1px solid #374151',
+                      borderRadius: 10,
+                      background: sex === candidate ? '#1D4ED81F' : '#0B1120',
+                      color: '#F9FAFB',
+                      padding: '8px 6px',
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {candidate}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>MRN</span>
+              <input value={mrn} readOnly aria-readonly="true" style={{ ...inputStyle, color: '#9CA3AF' }} />
+            </label>
+
+            <div>
+              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>Vitals</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                {([
+                  ['hr', 'HR'],
+                  ['sbp', 'SBP'],
+                  ['spo2', 'SpO2'],
+                  ['temp', 'Temp'],
+                ] as const).map(([key, label]) => (
+                  <input
+                    key={key}
+                    aria-label={label}
+                    value={vitalsForm[key]}
+                    onChange={(event) => setVitalsForm((previous) => ({ ...previous, [key]: event.target.value }))}
+                    inputMode="decimal"
+                    placeholder={label}
+                    style={{ ...inputStyle, padding: '8px 6px', textAlign: 'center' }}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <footer
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            padding: 16,
+            borderTop: '1px solid #1F2937',
+            background: '#111827',
+          }}
+        >
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setShowPriorityPicker((visible) => !visible)}
+              aria-label={`CTAS ${priority} priority badge`}
+              style={{
+                border: `1px solid ${PRIORITY_COLORS[priority]}`,
+                borderRadius: 999,
+                background: `${PRIORITY_COLORS[priority]}22`,
+                color: PRIORITY_COLORS[priority],
+                padding: '9px 13px',
+                cursor: 'pointer',
+                fontWeight: 800,
+              }}
+            >
+              CTAS {priority}{priorityOverride ? ' override' : ''}
+            </button>
+            {showPriorityPicker ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  bottom: 44,
+                  display: 'flex',
+                  gap: 6,
+                  padding: 8,
+                  border: '1px solid #374151',
+                  borderRadius: 12,
+                  background: '#0B1120',
+                  boxShadow: '0 18px 40px rgba(0,0,0,0.35)',
+                }}
+              >
+                {PRIORITIES.map((candidate) => (
+                  <button
+                    key={candidate}
+                    type="button"
+                    onClick={() => {
+                      setPriorityOverride(candidate);
+                      setShowPriorityPicker(false);
+                    }}
+                    style={{
+                      border: `1px solid ${PRIORITY_COLORS[candidate]}`,
+                      borderRadius: 999,
+                      background: priority === candidate ? `${PRIORITY_COLORS[candidate]}33` : 'transparent',
+                      color: PRIORITY_COLORS[candidate],
+                      padding: '6px 8px',
+                      cursor: 'pointer',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {candidate}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              height: 48,
+              border: 0,
+              borderRadius: 12,
+              background: '#2563EB',
+              color: '#F9FAFB',
+              cursor: 'pointer',
+              fontWeight: 800,
+              padding: '0 18px',
+              minWidth: 170,
+            }}
+          >
+            Add to Department
+          </button>
+        </footer>
+      </form>
+    </div>
+  );
+}
+
+const inputStyle = {
+  border: '1px solid #374151',
+  borderRadius: 10,
+  background: '#0B1120',
+  color: '#F9FAFB',
+  padding: '9px 10px',
+  outline: 'none',
+} satisfies CSSProperties;

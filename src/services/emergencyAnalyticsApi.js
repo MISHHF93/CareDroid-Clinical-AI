@@ -180,6 +180,10 @@ export function fetchEmergencyCapacityHistory() {
   return guardedJson('emergencyCapacityHistory', '/api/emergency/capacity/history');
 }
 
+export function fetchEmergencyCapacityDashboard() {
+  return guardedJson('emergencyCapacityDashboard', '/api/emergency/capacity/dashboard');
+}
+
 export function fetchEmergencyQueueAnalytics() {
   return guardedJson('emergencyQueueAnalytics', '/api/emergency/queues/analytics');
 }

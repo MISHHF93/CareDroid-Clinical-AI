@@ -3,6 +3,7 @@ import {
   buildSystemPrompt,
   type DepartmentContext,
 } from './contextEngine';
+import { DEFAULT_AI_PROVIDER_CONFIG, readAIProviderConfig } from './config';
 import type { AIRequestType, ToolDefinition } from './types';
 import { getToolsForRequestType } from './toolRegistry';
 
@@ -87,10 +88,11 @@ type MetadataLogger = (metadata: {
   toolCallCount: number;
 }) => void;
 
-const MODEL = 'claude-sonnet-4-20250514';
+const PROVIDER_CONFIG = readAIProviderConfig();
+const MODEL = PROVIDER_CONFIG.model;
 const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
-const DEFAULT_MAX_TOKENS = 2000;
+const DEFAULT_MAX_TOKENS = DEFAULT_AI_PROVIDER_CONFIG.maxTokens;
 
 const REQUEST_TOKEN_BUDGETS: Record<AIRequestType, number> = {
   COPILOT_CHAT: 2000,
@@ -138,6 +140,7 @@ class UnifiedAIClient {
     const body = {
       model: MODEL,
       max_tokens: maxTokens,
+      temperature: PROVIDER_CONFIG.temperature,
       system: config.systemPrompt
         ? this.withDepartmentContext(config.systemPrompt, departmentContext)
         : buildSystemPrompt(departmentContext, config.requestType),

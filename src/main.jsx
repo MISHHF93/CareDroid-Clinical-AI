@@ -7,12 +7,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
+import { startSimulation, stopSimulation } from './engine/simulation';
 
-import {
-  startEmergencyReassessment,
-  stopEmergencyReassessment,
-} from '../engine/reassessmentEngine';
-import { startCapacityIntelligence, stopCapacityIntelligence } from '../engine/capacityEngine';
 import { startEmergencySimulation, stopEmergencySimulation } from '../engine/simulation';
 import { useFeatureStore } from '../store/featureStore';
 
@@ -64,14 +60,15 @@ void useFeatureStore
       startEmergencySimulation();
     }
   });
-startEmergencyReassessment();
-startCapacityIntelligence();
+
+if (import.meta.env.DEV) {
+  startSimulation();
+}
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
+    stopSimulation();
     stopEmergencySimulation();
-    stopEmergencyReassessment();
-    stopCapacityIntelligence();
   });
 }
 

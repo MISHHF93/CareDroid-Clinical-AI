@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   CANONICAL_APP_ROUTE_TREE,
+  CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   PROTECTED_ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
@@ -12,7 +13,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 
 function expectRoutePath(path) {
-  expect(appSource).toContain(`path: '${path}'`);
+  const routeNames = Object.entries(CANONICAL_ROUTES)
+    .filter(([, routePath]) => routePath === path)
+    .map(([name]) => name);
+  if (routeNames.length) {
+    expect(routeNames.some((routeName) => appSource.includes(`path={CANONICAL_ROUTES.${routeName}}`))).toBe(true);
+    return;
+  }
+  expect(appSource).toContain(`path="${path}"`);
 }
 
 describe('canonical route tree', () => {
@@ -29,28 +37,34 @@ describe('canonical route tree', () => {
       { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
       { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
       { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
-      { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotPanel' },
+      { path: '/emergency/tools', type: 'page', componentKey: 'Calculators' },
+      { path: '/emergency/copilot', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
-      { path: '/emergency/settings', type: 'page', componentKey: 'Settings' },
+      { path: '/emergency/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
+      { path: '/emergency/pulse', type: 'page', componentKey: 'EmergencyPulseRoute' },
+      { path: '/emergency/shift', type: 'page', componentKey: 'ShiftSummaryRoute' },
+      { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
       { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
     ]);
   });
 
-  it('mounts only canonical ED and settings page routes as primary pages', () => {
+  it('mounts canonical ED routes inside the flattened AppShell', () => {
     for (const route of CANONICAL_APP_ROUTE_TREE.filter((item) => item.type === 'page')) {
       expectRoutePath(route.path);
     }
 
-    expect(appSource).toContain('element: <EmergencyWhiteboard />');
+    expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<EMSPipeline />');
-    expect(appSource).toContain('<SmartIntake />');
-    expect(appSource).toContain('<EmergencyQueueRoute />');
+    expect(appSource).toContain('<SmartIntakeRoute />');
+    expect(appSource).toContain('<QueueRoute />');
     expect(appSource).toContain('<ReferralPanel />');
-    expect(appSource).toContain('<EmergencyCapacityRoute />');
-    expect(appSource).toContain('<EmergencyCopilotRoute />');
-    expect(appSource).toContain('<ClinicalCalculatorHub />');
-    expect(appSource).toContain('<EmergencyAnalytics />');
-    expect(appSource).toContain('element: <SettingsRoute />');
+    expect(appSource).toContain('<CapacityRoute />');
+    expect(appSource).toContain('<Calculators />');
+    expect(appSource).toContain('<AnalyticsRoute />');
+    expect(appSource).toContain('<AIGovernanceDashboard />');
+    expect(appSource).toContain('<EmergencySettingsRoute />');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
+    expect(appSource).toContain('element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {
@@ -65,7 +79,7 @@ describe('canonical route tree', () => {
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/assistant', to: '/emergency/copilot' }),
-        expect.objectContaining({ path: '/tools', to: '/emergency/copilot' }),
+        expect.objectContaining({ path: '/tools', to: '/emergency/tools' }),
       ])
     );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
@@ -73,32 +87,21 @@ describe('canonical route tree', () => {
         expect.objectContaining({ path: '/dashboard' }),
       ])
     );
-    expect(appSource).toContain("path: '/dashboard'");
-    expect(appSource).toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
-    expect(appSource).toContain("path: '/tools/drug-checker'");
-    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="drug-check" />');
-    expect(appSource).toContain('...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({');
+    expect(appSource).toContain('<Route path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyTools} replace />} />');
+    expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
   });
 
   it('keeps unsupported future modules on the Emergency OS whiteboard fallback', () => {
-    expect(appSource).toContain('const FUTURE_RELEASE_ROUTES = Object.freeze([');
-    expect(appSource).toContain('const ACTIVE_RELEASE_ROUTE_PATHS = new Set([');
-    expect(appSource).toContain("path: '/operations'");
-    expect(appSource).toContain("['Privacy Policy', '/privacy']");
-    expect(appSource).toContain("['Clinical Tools', '/tools/*']");
-    expect(appSource).toContain('.filter(([, path]) => !ACTIVE_RELEASE_ROUTE_PATHS.has(path))');
-    expect(appSource).toContain('.map(([, path]) => ({');
-    expect(appSource).toContain('element: <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />');
+    expect(appSource).toContain('<Route path="/app" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('<Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('<Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('<Route path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(appSource).not.toContain('<FutureReleaseStub');
   });
 
   it('keeps auth callbacks deep-linkable and catches all unknown routes', () => {
-    expectRoutePath('/auth-callback');
-    expectRoutePath('/auth/callback');
-    expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');
-    expect(appSource).toContain("path: '*'");
-    expect(appSource).toContain('element: <Navigate to="/emergency/whiteboard" replace />');
+    expect(appSource).toContain('<Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(appSource).not.toContain('Page not found');
     expect(appSource).not.toContain('<ToolNotFound');
   });

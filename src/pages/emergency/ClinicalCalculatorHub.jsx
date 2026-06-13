@@ -12,6 +12,9 @@ import { FEATURE_REGISTRY } from '../../../lib/features/featureRegistry';
 import FeatureGate from '../../components/FeatureGate';
 import { useFeature } from '../../hooks/useFeature';
 import { DRUG_REFERENCE_TOOLS } from '../../utils/drugReferenceTools';
+import HEARTScore from '../../components/calculators/HEARTScore';
+import QSOFA from '../../components/calculators/qSOFA';
+import PediatricDrugCalc from '../../components/calculators/PediatricDrugCalc';
 import './ClinicalCalculatorHub.css';
 
 const CATEGORY_TABS = Object.freeze([
@@ -385,6 +388,9 @@ export default function ClinicalCalculatorHub() {
   );
   const [result, setResult] = useState(null);
   const [savedMessage, setSavedMessage] = useState('');
+  const [heartScoreOpen, setHeartScoreOpen] = useState(false);
+  const [qsofaOpen, setQsofaOpen] = useState(false);
+  const [pediatricDrugCalcOpen, setPediatricDrugCalcOpen] = useState(false);
 
   const queryToolId = normalizeToolId(searchParams.get('tool') || searchParams.get('calc'));
   const queryPatientId = searchParams.get('patientId');
@@ -502,6 +508,17 @@ export default function ClinicalCalculatorHub() {
           <span className="clinical-calculator-hub__eyebrow">Emergency OS</span>
           <h1 id="clinical-tools-title">Clinical Tools</h1>
           <p>Search and launch calculators with optional patient-linked saving.</p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button type="button" onClick={() => setHeartScoreOpen(true)}>
+              HEART Score
+            </button>
+            <button type="button" onClick={() => setQsofaOpen(true)}>
+              qSOFA
+            </button>
+            <button type="button" onClick={() => setPediatricDrugCalcOpen(true)}>
+              Peds Drugs
+            </button>
+          </div>
         </div>
         <label className="clinical-calculator-hub__search">
           <span>Search tools</span>
@@ -668,6 +685,15 @@ export default function ClinicalCalculatorHub() {
           </div>
         )}
       </section>
+      {heartScoreOpen ? (
+        <HEARTScore onClose={() => setHeartScoreOpen(false)} />
+      ) : null}
+      {qsofaOpen ? (
+        <QSOFA onClose={() => setQsofaOpen(false)} />
+      ) : null}
+      {pediatricDrugCalcOpen ? (
+        <PediatricDrugCalc onClose={() => setPediatricDrugCalcOpen(false)} />
+      ) : null}
     </section>
   );
 }

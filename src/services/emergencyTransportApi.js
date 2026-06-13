@@ -92,3 +92,39 @@ export function updateEmergencyTransferWorkflow(referralId, status) {
 export function fetchEmergencyDiversionStatus() {
   return guardedJson('emergencyDiversionStatus', '/api/emergency/diversion/status');
 }
+
+export function createEmergencyEmsAlert(payload) {
+  return guardedJson('emergencyEmsRuntime', '/api/emergency/ems/alert', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateEmergencyEmsStatus(emsUnitId, status, etaMinutes) {
+  return guardedJson(
+    'emergencyEmsRuntime',
+    `/api/emergency/ems/status/${encodeURIComponent(emsUnitId)}`,
+    {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ status, eta_minutes: etaMinutes }),
+    }
+  );
+}
+
+export function confirmEmergencyEmsArrival(emsUnitId, arrivalDetails = {}) {
+  return guardedJson(
+    'emergencyEmsRuntime',
+    `/api/emergency/ems/arrive/${encodeURIComponent(emsUnitId)}`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(arrivalDetails),
+    }
+  );
+}
+
+export function fetchIncomingEmergencyEms() {
+  return guardedJson('emergencyEmsRuntime', '/api/emergency/ems/incoming');
+}

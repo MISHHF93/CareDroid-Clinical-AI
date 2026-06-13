@@ -2,11 +2,14 @@ import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 const EMERGENCY_OS_MONGOOSE_ROUTE_GROUPS = Object.freeze([
-  '/api/capacity',
-  '/api/copilot',
-  '/api/ems',
+  '/api/emergency/boarding',
+  '/api/emergency/capacity',
+  '/api/emergency/copilot',
+  '/api/emergency/ems',
+  '/api/emergency/governance',
   '/api/emergency/intake',
-  '/api/reassessment',
+  '/api/emergency/reassessment',
+  '/api/emergency/surge',
 ]);
 
 @Controller()

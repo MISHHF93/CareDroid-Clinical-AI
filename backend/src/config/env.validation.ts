@@ -45,6 +45,59 @@ export const envValidationSchema = Joi.object({
   JWT_SECRET: productionSecret('JWT_SECRET', 'CHANGE_ME_IN_PRODUCTION'),
   ENCRYPTION_MASTER_KEY: Joi.string().allow('').optional(),
   ANTHROPIC_API_KEY: Joi.string().allow('').optional(),
+  AI_PROVIDER: Joi.string().valid('anthropic', 'openai', 'gemini', 'local').default('anthropic'),
+  AI_MODEL: Joi.string().allow('').optional(),
+  AI_TEMPERATURE: Joi.number().min(0).max(2).default(0.2),
+  AI_MAX_TOKENS: Joi.number().integer().min(1).default(2000),
+  AI_STREAMING_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .optional(),
+  AI_ENABLED: Joi.boolean().truthy('true').truthy('1').falsy('false').falsy('0').default(false),
+  ED_COPILOT_AI_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(true),
+  SMART_INTAKE_AI_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(false),
+  REFERRAL_AI_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(false),
+  ANALYTICS_AI_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(false),
+  CLINICAL_WORKFLOW_AI_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(false),
+  AI_AUDIT_LOGGING_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(true),
+  AI_PATIENT_CONTEXT_ENABLED: Joi.boolean()
+    .truthy('true')
+    .truthy('1')
+    .falsy('false')
+    .falsy('0')
+    .default(false),
   ENABLE_DEV_AUTH_BYPASS: Joi.boolean()
     .truthy('true')
     .truthy('1')

@@ -1,4 +1,6 @@
 import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
+import { buildAIAuditEvent, logAIAuditEvent, previewAIText } from '../lib/ai/audit/logger';
+import { AI_ROUTES } from '../lib/ai/routes';
 
 import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
@@ -18,7 +20,7 @@ export function registryIdToChatToolParam(registryId) {
 
 /**
  * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
- * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, requestType?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
+ * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, requestType?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object, userId?: string, tenantId?: string, patientId?: string, encounterId?: string, purpose?: string, sourceModule?: string }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */
 export async function sendClinicalChatMessage({
@@ -31,14 +33,36 @@ export async function sendClinicalChatMessage({
   authToken,
   workspaceContext,
   memoryContext,
+  userId = 'current-user',
+  tenantId = 'default-tenant',
+  patientId,
+  encounterId,
+  purpose = 'Emergency OS operational support',
+  sourceModule = 'ed-copilot',
 }) {
   const headers = { 'Content-Type': 'application/json' };
   if (authToken) {
     headers.Authorization = `Bearer ${authToken}`;
   }
 
+  const aiRequest = {
+    userId,
+    tenantId,
+    ...(patientId ? { patientId } : {}),
+    ...(encounterId ? { encounterId } : {}),
+    purpose,
+    sourceModule,
+    requestType,
+  };
+
   const body = {
     message,
+    userId,
+    tenantId,
+    ...(patientId ? { patientId } : {}),
+    ...(encounterId ? { encounterId } : {}),
+    purpose,
+    sourceModule,
     ...(Array.isArray(messages) && messages.length ? { messages } : {}),
     ...(tool ? { tool } : {}),
     ...(feature ? { feature } : {}),
@@ -47,11 +71,12 @@ export async function sendClinicalChatMessage({
       ? {
           workspaceContext: {
             ...(workspaceContext || {}),
+            aiRequest,
             ...(requestType
               ? {
                   aiRequest: {
+                    ...aiRequest,
                     ...((workspaceContext && workspaceContext.aiRequest) || {}),
-                    requestType,
                   },
                 }
               : {}),
@@ -67,7 +92,22 @@ export async function sendClinicalChatMessage({
     }
   }
 
-  const response = await apiFetch('/api/chat/message', {
+  logAIAuditEvent(
+    buildAIAuditEvent({
+      userId,
+      tenantId,
+      ...(patientId ? { patientId } : {}),
+      ...(encounterId ? { encounterId } : {}),
+      purpose,
+      sourceModule,
+      requestType: requestType || 'UNKNOWN',
+      inputPreview: previewAIText(message),
+      safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+    }),
+  );
+
+  const route = requestType === 'COPILOT_CHAT' ? AI_ROUTES.edCopilot : '/api/chat/message';
+  const response = await apiFetch(route, {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
