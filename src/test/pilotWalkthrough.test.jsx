@@ -86,8 +86,11 @@ const originalEmergencyState = useEmergencyStore.getState();
 
 function DemoAccessRole() {
   const { setUser } = useUser();
+  const initialized = React.useRef(false);
 
   React.useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
     setUser({
       id: 'pilot-demo-admin',
       email: 'pilot-demo-admin@caredroid.local',

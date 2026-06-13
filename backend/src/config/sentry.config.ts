@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import { getEnvironmentConfig } from './environment.config';
 
 /**
  * Sentry Configuration for Error Tracking
@@ -6,9 +7,10 @@ import * as Sentry from '@sentry/node';
  */
 
 export const initSentry = (): void => {
+  const config = getEnvironmentConfig();
   const dsn = process.env.SENTRY_DSN;
-  const environment = process.env.NODE_ENV || 'development';
-  const release = process.env.APP_VERSION || 'unknown';
+  const environment = config.server.nodeEnv;
+  const release = config.deployment.version || 'unknown';
 
   if (!dsn) {
     console.warn(

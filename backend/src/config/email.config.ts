@@ -1,31 +1,36 @@
 import { registerAs } from '@nestjs/config';
+import { getEnvironmentConfig } from './environment.config';
 
-export default registerAs('email', () => ({
-  smtp: {
-    host: process.env.SMTP_HOST || 'smtp.sendgrid.net',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
+export default registerAs('email', () => {
+  const config = getEnvironmentConfig();
+
+  return {
+    smtp: {
+      host: process.env.SMTP_HOST || 'smtp.sendgrid.net',
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+      },
     },
-  },
-  from: {
-    name: 'CareDroid-Clinical-AI',
-    address: process.env.SMTP_FROM_EMAIL || 'noreply@caredroid.health',
-  },
-  templates: {
-    verification: {
-      subject: 'Verify your email - CareDroid-Clinical-AI',
-      expiryMinutes: parseInt(process.env.EMAIL_VERIFICATION_EXPIRY || '60', 10),
+    from: {
+      name: 'CareDroid-Clinical-AI',
+      address: process.env.SMTP_FROM_EMAIL || 'noreply@caredroid.health',
     },
-    passwordReset: {
-      subject: 'Reset your password - CareDroid-Clinical-AI',
-      expiryMinutes: parseInt(process.env.PASSWORD_RESET_EXPIRY || '30', 10),
+    templates: {
+      verification: {
+        subject: 'Verify your email - CareDroid-Clinical-AI',
+        expiryMinutes: parseInt(process.env.EMAIL_VERIFICATION_EXPIRY || '60', 10),
+      },
+      passwordReset: {
+        subject: 'Reset your password - CareDroid-Clinical-AI',
+        expiryMinutes: parseInt(process.env.PASSWORD_RESET_EXPIRY || '30', 10),
+      },
+      twoFactorCode: {
+        subject: 'Your two-factor authentication code',
+      },
     },
-    twoFactorCode: {
-      subject: 'Your two-factor authentication code',
-    },
-  },
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:8000',
-}));
+    frontendUrl: config.server.frontendUrl,
+  };
+});

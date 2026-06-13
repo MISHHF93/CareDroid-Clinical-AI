@@ -35,8 +35,9 @@ export class EncryptionService {
   constructor(private readonly configService: ConfigService) {
     // Get encryption key from environment
     const encryptionConfig = this.configService.get<any>('encryption');
-    const configuredKey = encryptionConfig?.masterKey || process.env.ENCRYPTION_MASTER_KEY;
-    const isDevelopment = (process.env.NODE_ENV || 'development') === 'development';
+    const serverConfig = this.configService.get<any>('server') || {};
+    const configuredKey = encryptionConfig?.masterKey;
+    const isDevelopment = (serverConfig.nodeEnv || 'development') === 'development';
     const keyString =
       configuredKey ||
       (isDevelopment ? '0000000000000000000000000000000000000000000000000000000000000000' : '');
@@ -60,8 +61,7 @@ export class EncryptionService {
 
     this.masterKey = Buffer.from(keyString, 'hex');
     this.algorithm = encryptionConfig?.algorithm || EncryptionAlgorithm.AES_256_GCM;
-    this.keyVersion =
-      encryptionConfig?.keyVersion || parseInt(process.env.ENCRYPTION_KEY_VERSION || '1', 10);
+    this.keyVersion = encryptionConfig?.keyVersion || 1;
 
     this.logger.log(`✅ Encryption service initialized with ${this.algorithm}`);
   }

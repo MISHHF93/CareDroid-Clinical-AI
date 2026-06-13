@@ -1,6 +1,7 @@
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 import { registerAs } from '@nestjs/config';
+import { getEnvironmentConfig } from './environment.config';
 
 /**
  * Winston Logger Configuration
@@ -27,7 +28,8 @@ const consoleFormatter = winston.format.combine(
 );
 
 export default registerAs('logger', () => {
-  const isProduction = (process.env.NODE_ENV || 'development') === 'production';
+  const config = getEnvironmentConfig();
+  const isProduction = config.server.nodeEnv === 'production';
   const logLevel = process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug');
   const logDir = process.env.LOG_DIR || 'logs';
   const maxSize = process.env.LOG_MAX_SIZE || '20m';
@@ -77,7 +79,7 @@ export default registerAs('logger', () => {
         format: jsonFormatter,
         defaultMeta: {
           service: 'caredroid-backend',
-          environment: process.env.NODE_ENV || 'development',
+          environment: config.server.nodeEnv,
         },
         transports,
       }),

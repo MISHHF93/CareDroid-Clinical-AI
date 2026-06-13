@@ -4,20 +4,22 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
+import { getEnvironmentConfig } from '../../config/environment.config';
 
 @Injectable()
 export class ObservabilityService {
   constructor(private readonly platformGovernance: PlatformGovernanceService) {}
 
   async getSystemHealth() {
+    const config = getEnvironmentConfig();
     const observability = await this.platformGovernance.recentObservability();
     return {
       frontendVersion: process.env.FRONTEND_VERSION || process.env.npm_package_version || 'local',
-      backendVersion: process.env.BACKEND_VERSION || process.env.npm_package_version || 'local',
-      gitCommit: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'unknown',
+      backendVersion: process.env.BACKEND_VERSION || config.deployment.version || 'local',
+      gitCommit: config.deployment.commit || 'unknown',
       buildTimestamp: process.env.BUILD_TIMESTAMP || new Date().toISOString(),
       apiHealth: 'ok',
-      vercelEnvironment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'local',
+      vercelEnvironment: process.env.VERCEL_ENV || config.server.nodeEnv,
       deploymentStatus: 'guarded',
       observability,
     };
@@ -29,6 +31,7 @@ export class ObservabilityService {
       status?: string;
       health?: Record<string, string>;
     };
+    const config = getEnvironmentConfig();
     const governanceHealth = observability.health || {};
 
     const checks = [
@@ -82,13 +85,13 @@ export class ObservabilityService {
       this.buildCheck({
         id: 'tenant',
         label: 'Tenant Health',
-        status: process.env.CAREDROID_TENANT_ISOLATION_DISABLED === 'true' ? 'critical' : 'healthy',
+        status: config.runtime.tenantIsolationDisabled ? 'critical' : 'healthy',
         summary:
-          process.env.CAREDROID_TENANT_ISOLATION_DISABLED === 'true'
+          config.runtime.tenantIsolationDisabled
             ? 'Tenant isolation has been explicitly disabled.'
             : 'Tenant context, organization scoping, and workspace scoping guards are active.',
         evidence: [
-          `strictEntitlements=${process.env.CAREDROID_STRICT_SAAS_ENTITLEMENTS === 'true'}`,
+          `strictEntitlements=${config.runtime.strictSaasEntitlements}`,
           'tenantGuards=active',
         ],
       }),
@@ -105,9 +108,9 @@ export class ObservabilityService {
       this.buildCheck({
         id: 'simulation',
         label: 'Simulation Health',
-        status: this.statusFromSignal(process.env.SIMULATION_HEALTH_STATUS || 'healthy'),
+        status: this.statusFromSignal(config.runtime.simulationHealthStatus),
         summary: 'Simulation assets and scenario routes are included in the SaaS health model.',
-        evidence: [`simulationStatus=${process.env.SIMULATION_HEALTH_STATUS || 'healthy'}`],
+        evidence: [`simulationStatus=${config.runtime.simulationHealthStatus}`],
       }),
     ];
 
