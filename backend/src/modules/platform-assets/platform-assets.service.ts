@@ -10,6 +10,7 @@ import { OrganizationEntitlement } from './entities/organization-entitlement.ent
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { RoleProfile } from './entities/role-profile.entity';
 import { EntitlementStatus, PlatformAssetLifecycle } from './enums/platform-asset.enums';
+import { getEnvironmentConfig } from '../../config/environment.config';
 
 const MARKETPLACE_PACK_IDS = [
   'emergency-department-pack',
@@ -116,7 +117,7 @@ export class PlatformAssetsService {
   }
 
   isStrictSaasEntitlementsEnabled() {
-    return process.env.CAREDROID_STRICT_SAAS_ENTITLEMENTS === 'true';
+    return getEnvironmentConfig().runtime.strictSaasEntitlements;
   }
 
   async resolveEntitledAssetIds(params: {

@@ -2,7 +2,23 @@ import { Router } from 'express';
 import { emsService } from '../services';
 
 const router = Router();
-const EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff', 'Complete', 'Cancelled']);
+type EMSLifecycleStatus = 'dispatched' | 'on_scene' | 'en_route' | 'arrived';
+
+const EMS_STATUS_ALIASES: Record<string, EMSLifecycleStatus> = {
+  dispatched: 'dispatched',
+  on_scene: 'on_scene',
+  en_route: 'en_route',
+  arrived: 'arrived',
+  Inbound: 'en_route',
+  Arrived: 'arrived',
+  Handoff: 'arrived',
+  Complete: 'arrived',
+};
+
+function normalizeEMSStatus(status: unknown): EMSLifecycleStatus | null {
+  if (typeof status !== 'string') return null;
+  return EMS_STATUS_ALIASES[status] || EMS_STATUS_ALIASES[status.toLowerCase()] || null;
+}
 
 router.post('/alert', async (req, res) => {
   try {
@@ -28,15 +44,16 @@ router.patch('/status/:emsUnitId', async (req, res) => {
   try {
     const { emsUnitId } = req.params;
     const { status, eta_minutes } = req.body;
+    const normalizedStatus = normalizeEMSStatus(status);
 
-    if (!EMS_STATUSES.has(status)) {
+    if (!normalizedStatus) {
       return res.status(400).json({ error: 'status is invalid' });
     }
     if (eta_minutes !== undefined && !Number.isFinite(Number(eta_minutes))) {
       return res.status(400).json({ error: 'eta_minutes must be numeric' });
     }
 
-    const patient = await emsService.updateEMSStatus(emsUnitId, status, eta_minutes);
+    const patient = await emsService.updateEMSStatus(emsUnitId, normalizedStatus, eta_minutes);
     if (!patient) {
       return res.status(404).json({ error: 'EMS unit not found' });
     }

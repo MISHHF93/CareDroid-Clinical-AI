@@ -3,6 +3,8 @@
  * Centralized enterprise inventory for all AI services in CareDroid Emergency OS.
  */
 
+import { getEnvironmentConfig } from './environment.config';
+
 export interface AIServiceConfig {
   name: string;
   provider: 'openai' | 'anthropic' | 'aws_bedrock' | 'azure_openai' | 'local';
@@ -33,19 +35,21 @@ export interface AIPromptTemplate {
   lastValidated: string;
 }
 
+const aiRuntimeConfig = getEnvironmentConfig().ai;
+
 export const AIConfigRegistry: Readonly<Record<string, AIServiceConfig>> = Object.freeze({
   copilot: {
     name: 'ED Copilot',
     provider: 'anthropic',
-    model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
+    model: aiRuntimeConfig.model,
     purpose:
       'Operational assistant for ED workflow - answers queries about wait times, reassessments, bottlenecks, capacity, EMS, boarding, and queues',
     owner: 'Clinical Informatics',
     riskLevel: 'medium',
     regulatoryCategory: 'informational',
     requiresHumanReview: true,
-    maxTokens: Number(process.env.AI_MAX_TOKENS || 2000),
-    temperature: Number(process.env.AI_TEMPERATURE || 0.3),
+    maxTokens: aiRuntimeConfig.maxTokens,
+    temperature: aiRuntimeConfig.temperature,
     rateLimit: { requestsPerMinute: 30, tokensPerMinute: 60000 },
     safetyConstraints: [
       'Cannot make autonomous clinical recommendations',
@@ -59,7 +63,7 @@ export const AIConfigRegistry: Readonly<Record<string, AIServiceConfig>> = Objec
   smartHandover: {
     name: 'Smart Handover',
     provider: 'anthropic',
-    model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
+    model: aiRuntimeConfig.model,
     purpose: 'Generate clinical handover summaries from patient data',
     owner: 'Clinical Operations',
     riskLevel: 'medium',
@@ -155,7 +159,7 @@ export const AIConfigRegistry: Readonly<Record<string, AIServiceConfig>> = Objec
   triageSupport: {
     name: 'AI Triage Assistant',
     provider: 'anthropic',
-    model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
+    model: aiRuntimeConfig.model,
     purpose: 'Assist nurse triage with acuity considerations for human review',
     owner: 'Emergency Nursing',
     riskLevel: 'high',
