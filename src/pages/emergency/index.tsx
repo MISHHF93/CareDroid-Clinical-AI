@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PatientFlag, PatientState, Priority, type Patient } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
@@ -6,24 +6,14 @@ import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
+import WhoNextPanel from '../../components/WhoNextPanel';
+import SkeletonLoader from '../../components/ui/SkeletonLoader';
+import CapacityCrisisMode from '../../components/CapacityCrisisMode';
+import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding';
 
 const FILTERS: FilterId[] = ['All', 'Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding'];
-
-const PRIORITY_RANK: Record<Priority, number> = {
-  [Priority.P1]: 1,
-  [Priority.P2]: 2,
-  [Priority.P3]: 3,
-  [Priority.P4]: 4,
-  [Priority.P5]: 5,
-};
-
-function waitMinutes(arrivalTime: string): number {
-  const arrivedAt = new Date(arrivalTime).getTime();
-  if (!Number.isFinite(arrivedAt)) return 0;
-  return Math.max(0, Math.round((Date.now() - arrivedAt) / 60000));
-}
 
 function isHighRisk(patient: Patient): boolean {
   return (
@@ -47,12 +37,6 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   if (activeFilter === 'EMS') return patient.flags.includes(PatientFlag.EMSArrival);
   if (activeFilter === 'Boarding') return isBoarding(patient);
   return true;
-}
-
-function sortPatients(a: Patient, b: Patient): number {
-  const priorityDelta = PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-  if (priorityDelta !== 0) return priorityDelta;
-  return waitMinutes(b.arrivalTime) - waitMinutes(a.arrivalTime);
 }
 
 function StatCard({ value, label }: { value: string | number; label: string }) {
@@ -85,6 +69,11 @@ export default function EmergencyWhiteboard() {
   const emergencyRole = useEmergencyRolePermissions();
   const storePatients = useEmergencyStore((state) => state.patients);
   const storeCapacity = useEmergencyStore((state) => state.capacity);
+  const storeLoading = useEmergencyStore((state) => state.loading);
+  const rooms = useEmergencyStore((state) => state.rooms);
+  const referrals = useEmergencyStore((state) => state.referrals);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const whiteboard = useEmergencyWhiteboard();
   const whiteboardPayload = (whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null)?.data;
@@ -99,6 +88,7 @@ export default function EmergencyWhiteboard() {
   const [showIntake, setShowIntake] = useState(false);
   const [toast, setToast] = useState('');
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
 
   const stats = useMemo(() => {
     const waiting = patients.filter((patient) => patient.state === PatientState.Waiting).length;
@@ -115,7 +105,7 @@ export default function EmergencyWhiteboard() {
   }, [capacity.score, patients]);
 
   const visiblePatients = useMemo(
-    () => patients.filter((patient) => filterPatient(patient, activeFilter)).sort(sortPatients),
+    () => patients.filter((patient) => filterPatient(patient, activeFilter)).sort(sortWhiteboardPatients),
     [activeFilter, patients],
   );
 
@@ -132,6 +122,19 @@ export default function EmergencyWhiteboard() {
     };
   }, [canCreatePatient]);
 
+  const openIntake = useCallback(() => {
+    if (canCreatePatient) setShowIntake(true);
+  }, [canCreatePatient]);
+
+  const closeIntake = useCallback(() => setShowIntake(false), []);
+
+  const handlePatientAdded = useCallback((patient: Patient) => {
+    setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
+    window.setTimeout(() => setToast(''), 2400);
+    setActiveFilter('All');
+    whiteboard.refresh();
+  }, [whiteboard.refresh]);
+
   return (
     <section style={{ minHeight: '100%', background: '#0A0E1A' }}>
       <div style={{ padding: '12px 16px', borderBottom: '1px solid #1F2937', background: '#0F172A' }}>
@@ -142,6 +145,14 @@ export default function EmergencyWhiteboard() {
           {activeScenario?.description || 'Emergency OS scenario fixture is active.'}
         </p>
       </div>
+      <CapacityCrisisMode
+        capacity={capacity}
+        patients={patients}
+        rooms={rooms}
+        referrals={referrals}
+        emsArrivals={emsArrivals}
+        emsIncomingPatients={emsIncomingPatients}
+      />
       <div
         style={{
           background: '#111827',
@@ -195,9 +206,7 @@ export default function EmergencyWhiteboard() {
 
         <button
           type="button"
-          onClick={() => {
-            if (canCreatePatient) setShowIntake(true);
-          }}
+          onClick={openIntake}
           disabled={!canCreatePatient}
           title={canCreatePatient ? 'Create a new patient' : `${emergencyRole.roleLabel} cannot create patients`}
           style={{
@@ -219,18 +228,13 @@ export default function EmergencyWhiteboard() {
 
       {showIntake && canCreatePatient ? (
         <QuickIntake
-          onClose={() => setShowIntake(false)}
-          onAdded={(patient) => {
-            setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
-            window.setTimeout(() => setToast(''), 2400);
-            setActiveFilter('All');
-            whiteboard.refresh();
-          }}
+          onClose={closeIntake}
+          onAdded={handlePatientAdded}
         />
       ) : null}
 
-      {whiteboard.loading && !patients.length ? (
-        <div style={{ padding: 16, color: '#9CA3AF' }}>Loading Emergency Whiteboard from `/api/emergency/whiteboard`...</div>
+      {isInitialLoading ? (
+        <SkeletonLoader variant="whiteboard" />
       ) : null}
 
       {whiteboard.error ? (
@@ -289,6 +293,7 @@ export default function EmergencyWhiteboard() {
           Department Clear
         </div>
       ) : null}
+      <WhoNextPanel mode="floating" />
     </section>
   );
 }

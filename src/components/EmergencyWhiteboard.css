@@ -757,7 +757,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .ed-whiteboard__body {
     padding: var(--space-2);
   }

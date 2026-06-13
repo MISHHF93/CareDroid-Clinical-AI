@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import CapacityIntelligence from './CapacityIntelligence';
-import { CapacityScore, PatientState } from '../../types/emergency';
+import { CapacityScore, PatientState } from '../types/emergency';
 
 function patients(count, state = PatientState.Assessment) {
   return Array.from({ length: count }, (_, index) => ({

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import PatientJourneyEngine from './PatientJourneyEngine';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 
 const basePatient = Object.freeze({
   id: 'patient-001',

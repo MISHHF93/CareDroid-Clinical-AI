@@ -23,11 +23,23 @@ describe('emergencyPageRenderInventory', () => {
     expect(getCanonicalAppPagePaths()).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
   });
 
-  it('keeps primary page paths reachable from the AppShell nav', () => {
-    expect(APP_SHELL_NAV_ITEMS.map((item) => item.path)).toEqual(EMERGENCY_PAGE_PRIMARY_PATHS);
-    expect(APP_SHELL_NAV_ITEMS.map((item) => item.id)).toEqual(
-      EMERGENCY_PAGE_RENDER_INVENTORY.map((entry) => entry.navId)
-    );
+  it('keeps requested AppShell nav paths in the active page inventory', () => {
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.label)).toEqual([
+      'Emergency Whiteboard',
+      'Department Pulse',
+      'EMS Pipeline',
+      'Referrals',
+      'Capacity',
+      'Clinical Tools',
+      'Shift Summary',
+      'Settings',
+    ]);
+
+    for (const item of APP_SHELL_NAV_ITEMS.filter((navItem) => navItem.id !== 'settings')) {
+      expect(EMERGENCY_PAGE_PRIMARY_PATHS).toContain(item.path);
+    }
+    expect(APP_SHELL_NAV_ITEMS.find((item) => item.id === 'settings')?.route).toBe('/settings');
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.id)).not.toContain('ai_governance');
   });
 
   it('maps page load and action endpoints to inventoried backend routes', () => {

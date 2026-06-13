@@ -8,11 +8,11 @@ import './OperatingWorkspace.css';
 
 const PATIENT_ACTIONS = Object.freeze([
   {
-    title: 'Open patient workspace',
-    body: 'Review imported context, timeline, risk score history, documentation, and care-plan status.',
+    title: 'Open patient context',
+    body: 'Review imported context, timeline, risk score history, documentation, and care-plan state.',
     path: '/patients/demo-patient/workspace',
     icon: CHROME_ICONS.users,
-    label: 'Open workspace',
+    label: 'Open patient',
   },
   {
     title: 'Import EHR patient context',
@@ -22,7 +22,7 @@ const PATIENT_ACTIONS = Object.freeze([
     label: 'Open import preview',
   },
   {
-    title: 'Summarize active case',
+    title: 'Summarize active patient',
     body: 'Build a clinician-reviewed problem, medication, lab, alert, and risk summary.',
     path: '/patients/demo-patient/summary',
     icon: CHROME_ICONS.clipboardList,
@@ -30,7 +30,7 @@ const PATIENT_ACTIONS = Object.freeze([
   },
   {
     title: 'Review clinical timeline',
-    body: 'Organize encounters, trends, and abnormal progression into a timeline workspace.',
+    body: 'Organize encounters, trends, and abnormal progression into a patient timeline.',
     path: '/patients/demo-patient/timeline',
     icon: CHROME_ICONS.clock,
     label: 'Open timeline AI',
@@ -81,7 +81,7 @@ export default function Patients() {
           <p className="operating-eyebrow">Patient context</p>
           <h1 id="patients-title">Patients</h1>
           <p>
-            Start from the active case, then bring summaries, timelines, notes, and order workflows into Assistant.
+            Start from the active patient, then bring summaries, timelines, notes, and order workflows into Assistant.
           </p>
         </div>
         <button type="button" className="operating-primary-action" onClick={() => navigate('/assistant')}>
@@ -91,7 +91,7 @@ export default function Patients() {
 
       <section className="operating-section" aria-labelledby="patient-actions-title">
         <div className="operating-section__header">
-          <h2 id="patient-actions-title">Case workflows</h2>
+          <h2 id="patient-actions-title">Patient workflows</h2>
           <p>Patient-facing AI stays reviewable and routes through existing protected tool surfaces.</p>
         </div>
         <div className="operating-card-grid">

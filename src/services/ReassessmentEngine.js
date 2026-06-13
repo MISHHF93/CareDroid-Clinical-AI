@@ -1,4 +1,4 @@
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { PATIENT_STATE_SEQUENCE } from './PatientJourneyEngine';
 
 export const REASSESSMENT_INTERVAL_MS = 60000;

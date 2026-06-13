@@ -106,27 +106,30 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
     keywords: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencySimulation }),
   },
-  {
-    id: 'open-federated-learning',
-    label: 'Open Federated Learning',
-    hint: 'FL',
-    keywords: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyFederatedLearning }),
-  },
-  {
-    id: 'open-digital-twin',
-    label: 'Open Digital Twin',
-    hint: 'Twin',
-    keywords: ['digital twin', 'des', 'abm', 'simulation twin', 'operations twin'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyDigitalTwin }),
-  },
-  {
-    id: 'open-ai-governance',
-    label: 'Open AI Governance',
-    hint: 'G',
-    keywords: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.aiGovernance }),
-  },
+  // Future module
+  // {
+  //   id: 'open-federated-learning',
+  //   label: 'Open Federated Learning',
+  //   hint: 'FL',
+  //   keywords: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation'],
+  //   build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyFederatedLearning }),
+  // },
+  // Future module
+  // {
+  //   id: 'open-digital-twin',
+  //   label: 'Open Digital Twin',
+  //   hint: 'Twin',
+  //   keywords: ['digital twin', 'des', 'abm', 'simulation twin', 'operations twin'],
+  //   build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyDigitalTwin }),
+  // },
+  // Future module
+  // {
+  //   id: 'open-ai-governance',
+  //   label: 'Open AI Governance',
+  //   hint: 'G',
+  //   keywords: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
+  //   build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.aiGovernance }),
+  // },
   {
     id: 'open-settings',
     label: 'Open Settings',

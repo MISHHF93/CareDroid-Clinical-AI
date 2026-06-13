@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Baby, Printer, Save, X } from 'lucide-react';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { saveCalculatorResult } from './calculators/calculatorSave';
 import './PediatricDrugCalculator.css';
 
 const CRITICAL_GROUPS = new Set(['resuscitation', 'rsi']);
@@ -341,7 +341,6 @@ export function calculatePediatricDrugRows(weightKg) {
 }
 
 export default function PediatricDrugCalculator({ open, patient = null, onClose }) {
-  const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const [weightInput, setWeightInput] = useState('');
   const [ageInput, setAgeInput] = useState('');
   const weightRef = useRef(null);
@@ -368,26 +367,27 @@ export default function PediatricDrugCalculator({ open, patient = null, onClose 
 
   const saveToPatient = () => {
     if (!canSave) return;
-    const timestamp = new Date().toISOString();
-    const currentPatient =
-      useEmergencyStore.getState().patients.find((candidate) => candidate.id === patient.id) || patient;
-    updatePatient(patient.id, {
-      timeline: [
-        ...currentPatient.timeline,
-        {
-          id: `evt-${patient.id}-peds-drugs-${Date.now()}`,
-          patientId: patient.id,
-          type: 'NoteAdded',
-          timestamp,
-          summary: `Pediatric drug reference generated at ${formatNumber(effectiveWeight)} kg.`,
-          metadata: {
-            weightKg: Number(formatNumber(effectiveWeight)),
-            drugCount: rows.length,
-            source: 'PediatricDrugCalculator',
-          },
-        },
-      ],
+    const saved = saveCalculatorResult({
+      patientId: patient.id,
+      scoreName: 'Pediatric Drug Calculator',
+      total: rows.length,
+      max: rows.length,
+      band: 'Dosing reference generated',
+      fields: {
+        weightKg: Number(formatNumber(effectiveWeight)),
+        rows: rows.map((row) => ({
+          id: row.id,
+          drug: row.drug,
+          calculatedDose: row.calculatedDose,
+          volumeToDraw: row.volumeToDraw,
+          route: row.route,
+          warning: Boolean(row.warning),
+        })),
+      },
+      staffId: patient.assignedStaffId || undefined,
+      critical: false,
     });
+    if (saved) onClose?.();
   };
 
   const modal = (

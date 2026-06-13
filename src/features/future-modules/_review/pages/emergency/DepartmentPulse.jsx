@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, Ambulance, Gauge, RotateCcw, Users } from 'lucide-react';
-import { Priority } from '../../../../../../types/emergency';
+import { Priority } from '../../../../../types/emergency';
 import {
   hasPatientFlag,
   selectActivePatients,

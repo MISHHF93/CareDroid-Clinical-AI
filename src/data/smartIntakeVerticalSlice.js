@@ -1,4 +1,4 @@
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 
 export const SMART_INTAKE_VERTICAL_SLICE_FIXTURE = Object.freeze({
   staffId: 'staff-smart-intake-rn',

@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useEmergencyStore } from '../../../store/emergencyStore';
-import { useEmergencyStore as useShellEmergencyStore } from '../../store/emergencyStore';
+import {
+  DEFAULT_EMERGENCY_THRESHOLDS,
+  useEmergencyStore as useShellEmergencyStore,
+} from '../../store/emergencyStore';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
   fetchEmergencyOsSettings,
@@ -10,6 +13,7 @@ import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
+const CTAS_PRIORITIES = ['P1', 'P2', 'P3', 'P4', 'P5'];
 const WORKSPACE_OPTIONS = [
   ['emergency-whiteboard', 'Emergency Whiteboard'],
   ['smart-intake', 'Smart Intake'],
@@ -26,11 +30,65 @@ const SETTING_GROUP_LABELS = {
   provincial: 'Provincial Health Settings',
   notifications: 'Notification Settings',
   reassessment: 'Reassessment Thresholds',
+  ctas: 'CTAS Wait Thresholds',
   capacity: 'Capacity Thresholds',
   ems: 'EMS Thresholds',
   boarding: 'Boarding Thresholds',
   alerts: 'Alert Rules',
 };
+
+function csvCell(value) {
+  const text = typeof value === 'string' ? value : JSON.stringify(value ?? '');
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+export function auditLogToCsv(logs) {
+  const rows = [
+    ['Time', 'Action', 'Patient', 'Staff', 'Details'],
+    ...logs.map((log) => [
+      log.timestamp,
+      log.action,
+      log.patientId || '',
+      log.staffId || 'system',
+      log.details || {},
+    ]),
+  ];
+  return rows.map((row) => row.map(csvCell).join(',')).join('\n');
+}
+
+function thresholdSettingsPatch(thresholds) {
+  return {
+    reassessmentThresholds: {
+      P1: thresholds.reassessP1Min,
+      P2: thresholds.reassessP2Min,
+      P3: thresholds.reassessP3Min,
+      P4: thresholds.reassessP4Min,
+      P5: thresholds.reassessP5Min,
+    },
+    capacityThresholds: {
+      warningPercent: Math.round(thresholds.capacityOrangePct * 100),
+      criticalPercent: Math.round(thresholds.capacityRedPct * 100),
+    },
+    emsThresholds: {
+      offloadTargetMinutes: thresholds.emsOffloadTargetMin,
+    },
+    thresholds: {
+      waitWarningMinutes: thresholds.waitTimeWarningMin,
+      waitCriticalMinutes: thresholds.waitTimeCtiticalMin,
+      capacityWarningPercent: Math.round(thresholds.capacityWarningPct * 100),
+      capacityOrangePercent: Math.round(thresholds.capacityOrangePct * 100),
+      capacityRedPercent: Math.round(thresholds.capacityRedPct * 100),
+      emsOffloadTargetMinutes: thresholds.emsOffloadTargetMin,
+      reassessmentIntervals: {
+        P1: thresholds.reassessP1Min,
+        P2: thresholds.reassessP2Min,
+        P3: thresholds.reassessP3Min,
+        P4: thresholds.reassessP4Min,
+        P5: thresholds.reassessP5Min,
+      },
+    },
+  };
+}
 
 function Section({ id, title, subtitle, children, action }) {
   return (
@@ -70,12 +128,20 @@ function mergeSettings(base, patch = {}) {
     capacityThresholds: { ...(base.capacityThresholds || {}), ...(patch.capacityThresholds || {}) },
     emsThresholds: { ...(base.emsThresholds || {}), ...(patch.emsThresholds || {}) },
     boardingThresholds: { ...(base.boardingThresholds || {}), ...(patch.boardingThresholds || {}) },
+    ctasThresholds: {
+      ...(base.ctasThresholds || base.thresholds?.ctasTargets || {}),
+      ...(patch.ctasThresholds || patch.thresholds?.ctasTargets || {}),
+    },
     thresholds: {
       ...(base.thresholds || {}),
       ...(patch.thresholds || {}),
       reassessmentIntervals: {
         ...(base.thresholds?.reassessmentIntervals || {}),
         ...(patch.thresholds?.reassessmentIntervals || {}),
+      },
+      ctasTargets: {
+        ...(base.thresholds?.ctasTargets || base.ctasThresholds || {}),
+        ...(patch.thresholds?.ctasTargets || patch.ctasThresholds || {}),
       },
     },
     alertRules: { ...(base.alertRules || {}), ...(patch.alertRules || {}) },
@@ -86,6 +152,7 @@ function normalizePatchForStore(patch) {
   const capacityThresholds = patch.capacityThresholds || {};
   const reassessmentThresholds = patch.reassessmentThresholds || {};
   const emsThresholds = patch.emsThresholds || {};
+  const ctasThresholds = patch.ctasThresholds || patch.thresholds?.ctasTargets || {};
 
   return {
     ...patch,
@@ -94,15 +161,27 @@ function normalizePatchForStore(patch) {
     thresholds: {
       ...(patch.thresholds || {}),
       ...(capacityThresholds.warningPercent !== undefined
-        ? { capacityWarningPercent: Number(capacityThresholds.warningPercent) }
+        ? { capacityOrangePercent: Number(capacityThresholds.warningPercent) }
+        : {}),
+      ...(capacityThresholds.criticalPercent !== undefined
+        ? { capacityRedPercent: Number(capacityThresholds.criticalPercent) }
         : {}),
       ...(emsThresholds.offloadTargetMinutes !== undefined
         ? { emsOffloadTargetMinutes: Number(emsThresholds.offloadTargetMinutes) }
         : {}),
+      ...(Object.keys(ctasThresholds).length
+        ? {
+            ctasTargets: Object.fromEntries(
+              CTAS_PRIORITIES
+                .filter((priority) => ctasThresholds[priority] !== undefined)
+                .map((priority) => [priority, Number(ctasThresholds[priority])])
+            ),
+          }
+        : {}),
       ...(Object.keys(reassessmentThresholds).length
         ? {
             reassessmentIntervals: Object.fromEntries(
-              ['P1', 'P2', 'P3', 'P4', 'P5']
+              CTAS_PRIORITIES
                 .filter((priority) => reassessmentThresholds[priority] !== undefined)
                 .map((priority) => [priority, Number(reassessmentThresholds[priority])])
             ),
@@ -155,17 +234,25 @@ export default function EmergencySettings() {
   const saveEmergencySettings = useEmergencyStore((state) => state.saveEmergencySettings);
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const setRootActiveScenario = useEmergencyStore((state) => state.setActiveScenario);
+  const rootAuditLog = useEmergencyStore((state) => state.auditLog || []);
   const setShellActiveScenario = useShellEmergencyStore((state) => state.setActiveScenario);
   const shellWorkflowLogs = useShellEmergencyStore((state) => state.workflowLogs);
+  const shellAuditLog = useShellEmergencyStore((state) => state.auditLog || []);
+  const thresholds = useShellEmergencyStore((state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS);
+  const setThreshold = useShellEmergencyStore((state) => state.setThreshold);
+  const resetThresholds = useShellEmergencyStore((state) => state.resetThresholds);
 
   const [draft, setDraft] = useState(() => mergeSettings(storeSettings));
   const [loading, setLoading] = useState(true);
   const [savingGroup, setSavingGroup] = useState('');
   const [auditStatus, setAuditStatus] = useState('loading');
   const [auditError, setAuditError] = useState('');
+  const [auditFilters, setAuditFilters] = useState({ action: 'all', staff: 'all', from: '', to: '' });
   const [backendWorkflowLogs, setBackendWorkflowLogs] = useState([]);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
+  const thresholdTimersRef = useRef({});
+  const savedFlashTimerRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -198,6 +285,11 @@ export default function EmergencySettings() {
       cancelled = true;
     };
   }, [saveEmergencySettings]);
+
+  useEffect(() => () => {
+    Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer));
+    if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -239,6 +331,38 @@ export default function EmergencySettings() {
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
   }, [backendWorkflowLogs, rootWorkflowLogs, shellWorkflowLogs]);
+  const storeAuditLogs = useMemo(() => {
+    const byId = new Map();
+    [
+      ...(Array.isArray(rootAuditLog) ? rootAuditLog : []),
+      ...(Array.isArray(shellAuditLog) ? shellAuditLog : []),
+    ].forEach((log) => {
+      if (log?.id) byId.set(log.id, log);
+    });
+    return [...byId.values()].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }, [rootAuditLog, shellAuditLog]);
+  const auditActionOptions = useMemo(
+    () => [...new Set(storeAuditLogs.map((log) => log.action).filter(Boolean))].sort(),
+    [storeAuditLogs]
+  );
+  const auditStaffOptions = useMemo(
+    () => [...new Set(storeAuditLogs.map((log) => log.staffId || 'system').filter(Boolean))].sort(),
+    [storeAuditLogs]
+  );
+  const filteredAuditLogs = useMemo(() => {
+    const from = auditFilters.from ? new Date(auditFilters.from).getTime() : Number.NEGATIVE_INFINITY;
+    const to = auditFilters.to ? new Date(auditFilters.to).getTime() : Number.POSITIVE_INFINITY;
+    return storeAuditLogs
+      .filter((log) => auditFilters.action === 'all' || log.action === auditFilters.action)
+      .filter((log) => auditFilters.staff === 'all' || (log.staffId || 'system') === auditFilters.staff)
+      .filter((log) => {
+        const timestamp = new Date(log.timestamp).getTime();
+        return timestamp >= from && timestamp <= to;
+      })
+      .slice(0, 50);
+  }, [auditFilters, storeAuditLogs]);
 
   const updateDraft = (patch) => {
     setDraft((current) => mergeSettings(current, patch));
@@ -274,6 +398,44 @@ export default function EmergencySettings() {
         },
       })
     );
+  };
+
+  const updateAuditFilter = (key, value) => {
+    setAuditFilters((current) => ({ ...current, [key]: value }));
+  };
+
+  const flashSaved = () => {
+    setStatus('Saved');
+    if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
+    savedFlashTimerRef.current = setTimeout(() => setStatus(''), 1200);
+  };
+
+  const updateThreshold = (key, value, patch = {}) => {
+    updateDraft(patch);
+    if (thresholdTimersRef.current[key]) clearTimeout(thresholdTimersRef.current[key]);
+    thresholdTimersRef.current[key] = setTimeout(() => {
+      setThreshold(key, Number(value));
+      flashSaved();
+    }, 500);
+  };
+
+  const resetAllThresholds = () => {
+    Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer));
+    thresholdTimersRef.current = {};
+    resetThresholds();
+    setDraft((current) => mergeSettings(current, thresholdSettingsPatch(DEFAULT_EMERGENCY_THRESHOLDS)));
+    flashSaved();
+  };
+
+  const exportAuditCsv = () => {
+    const csv = auditLogToCsv(filteredAuditLogs);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `emergency-audit-log-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const saveGroup = async (group, patch) => {
@@ -325,7 +487,7 @@ export default function EmergencySettings() {
             and operational thresholds.
           </p>
         </div>
-        <strong>{loading ? 'Loading settings...' : `${enabledCount} modules enabled`}</strong>
+        <strong>{loading ? 'Loading department data...' : `${enabledCount} modules enabled`}</strong>
       </header>
 
       {status ? <div className="emergency-settings__banner">{status}</div> : null}
@@ -374,12 +536,12 @@ export default function EmergencySettings() {
             {auditStatus === 'ready'
               ? 'Backend audit loaded'
               : auditStatus === 'loading'
-                ? 'Loading backend audit...'
+                ? 'Loading department data...'
                 : 'Local fallback active'}
           </small>
         </div>
         {auditStatus === 'loading' ? (
-          <p className="emergency-settings__audit-state" role="status">Loading workflow audit logs...</p>
+          <p className="emergency-settings__audit-state" role="status">Loading department data...</p>
         ) : null}
         {auditStatus === 'error' ? (
           <p className="emergency-settings__audit-state emergency-settings__audit-state--error" role="alert">
@@ -406,6 +568,70 @@ export default function EmergencySettings() {
             ))}
           </div>
         ) : null}
+      </Section>
+
+      <Section
+        id="audit-log"
+        title="Audit Log"
+        subtitle="Last 50 store actions with timestamps, patient context, staff attribution, and compact details."
+        action={
+          <button type="button" onClick={exportAuditCsv} disabled={!filteredAuditLogs.length}>
+            Export CSV
+          </button>
+        }
+      >
+        <div className="emergency-settings__inline">
+          <SettingsField
+            label="Action type"
+            value={auditFilters.action}
+            options={[
+              ['all', 'All actions'],
+              ...auditActionOptions.map((action) => [action, action]),
+            ]}
+            onChange={(value) => updateAuditFilter('action', value)}
+          />
+          <SettingsField
+            label="Staff"
+            value={auditFilters.staff}
+            options={[
+              ['all', 'All staff'],
+              ...auditStaffOptions.map((staffId) => [staffId, staffId]),
+            ]}
+            onChange={(value) => updateAuditFilter('staff', value)}
+          />
+          <SettingsField
+            type="datetime-local"
+            label="From"
+            value={auditFilters.from}
+            onChange={(value) => updateAuditFilter('from', value)}
+          />
+          <SettingsField
+            type="datetime-local"
+            label="To"
+            value={auditFilters.to}
+            onChange={(value) => updateAuditFilter('to', value)}
+          />
+        </div>
+        <div className="emergency-settings__audit-table" role="table" aria-label="Store action audit log">
+          <div role="row" className="emergency-settings__audit-table-head">
+            <span role="columnheader">Time</span>
+            <span role="columnheader">Action</span>
+            <span role="columnheader">Patient</span>
+            <span role="columnheader">Staff</span>
+            <span role="columnheader">Details</span>
+          </div>
+          {filteredAuditLogs.length ? filteredAuditLogs.map((log) => (
+            <div role="row" key={log.id}>
+              <time role="cell" dateTime={log.timestamp}>{new Date(log.timestamp).toLocaleString()}</time>
+              <span role="cell">{log.action}</span>
+              <span role="cell">{log.patientId || 'department'}</span>
+              <span role="cell">{log.staffId || 'system'}</span>
+              <code role="cell">{JSON.stringify(log.details || {})}</code>
+            </div>
+          )) : (
+            <p className="emergency-settings__audit-state">No store actions match the current filters.</p>
+          )}
+        </div>
       </Section>
 
       <Section
@@ -564,16 +790,63 @@ export default function EmergencySettings() {
         }
       >
         <div className="emergency-settings__grid">
-          {['P1', 'P2', 'P3', 'P4', 'P5'].map((priority) => (
+          {[
+            ['P1', 'reassessP1Min'],
+            ['P2', 'reassessP2Min'],
+            ['P3', 'reassessP3Min'],
+            ['P4', 'reassessP4Min'],
+            ['P5', 'reassessP5Min'],
+          ].map(([priority, key]) => (
             <SettingsField
               key={priority}
               type="number"
               label={`${priority} interval minutes`}
-              value={draft.reassessmentThresholds[priority]}
-              onChange={(value) => updateNested('reassessmentThresholds', priority, value)}
+              value={thresholds[key]}
+              onChange={(value) => updateThreshold(key, value, {
+                reassessmentThresholds: { ...draft.reassessmentThresholds, [priority]: value },
+                thresholds: {
+                  ...draft.thresholds,
+                  reassessmentIntervals: {
+                    ...(draft.thresholds?.reassessmentIntervals || {}),
+                    [priority]: value,
+                  },
+                },
+              })}
             />
           ))}
           <SettingsField type="number" label="Overdue grace minutes" value={draft.reassessmentThresholds.overdueGraceMinutes} onChange={(value) => updateNested('reassessmentThresholds', 'overdueGraceMinutes', value)} />
+        </div>
+      </Section>
+
+      <Section
+        id="ctas-thresholds"
+        title="CTAS Wait Thresholds"
+        subtitle="Priority-based wait targets used by long-wait rescue, LWBS risk alerts, Copilot, and shift metrics."
+        action={
+          <button
+            type="button"
+            disabled={savingGroup === 'ctas'}
+            onClick={() =>
+              saveGroup('ctas', {
+                ctasThresholds: draft.ctasThresholds,
+                thresholds: { ctasTargets: draft.ctasThresholds },
+              })
+            }
+          >
+            Save CTAS Thresholds
+          </button>
+        }
+      >
+        <div className="emergency-settings__grid">
+          {CTAS_PRIORITIES.map((priority) => (
+            <SettingsField
+              key={priority}
+              type="number"
+              label={`${priority} wait target minutes`}
+              value={draft.ctasThresholds?.[priority] ?? draft.thresholds?.ctasTargets?.[priority]}
+              onChange={(value) => updateNested('ctasThresholds', priority, value)}
+            />
+          ))}
         </div>
       </Section>
 
@@ -582,30 +855,39 @@ export default function EmergencySettings() {
         title="Capacity Thresholds"
         subtitle="Department target, occupancy bands, and queue wait limits used by local capacity calculations."
         action={
-          <button
-            type="button"
-            disabled={savingGroup === 'capacity'}
-            onClick={() =>
-              saveGroup('capacity', {
-                capacityThresholds: draft.capacityThresholds,
-                thresholds: {
-                  waitWarningMinutes: draft.thresholds.waitWarningMinutes,
-                  waitCriticalMinutes: draft.thresholds.waitCriticalMinutes,
-                },
-              })
-            }
-          >
-            Save Capacity
-          </button>
+          <div className="emergency-settings__actions">
+            <button type="button" onClick={resetAllThresholds}>
+              Reset Thresholds
+            </button>
+            <button
+              type="button"
+              disabled={savingGroup === 'capacity'}
+              onClick={() =>
+                saveGroup('capacity', {
+                  capacityThresholds: draft.capacityThresholds,
+                  thresholds: {
+                    waitWarningMinutes: draft.thresholds.waitWarningMinutes,
+                    waitCriticalMinutes: draft.thresholds.waitCriticalMinutes,
+                    capacityWarningPercent: draft.thresholds.capacityWarningPercent,
+                    capacityOrangePercent: draft.thresholds.capacityOrangePercent,
+                    capacityRedPercent: draft.thresholds.capacityRedPercent,
+                  },
+                })
+              }
+            >
+              Save Capacity
+            </button>
+          </div>
         }
       >
         <div className="emergency-settings__grid">
           <SettingsField type="number" label="Department capacity target" value={draft.capacityThresholds.departmentCapacityTarget} onChange={(value) => updateNested('capacityThresholds', 'departmentCapacityTarget', value)} />
-          <SettingsField type="number" label="Capacity warning %" value={draft.capacityThresholds.warningPercent} onChange={(value) => updateNested('capacityThresholds', 'warningPercent', value)} />
-          <SettingsField type="number" label="Capacity critical %" value={draft.capacityThresholds.criticalPercent} onChange={(value) => updateNested('capacityThresholds', 'criticalPercent', value)} />
+          <SettingsField type="number" label="Capacity warning %" value={Math.round(thresholds.capacityWarningPct * 100)} onChange={(value) => updateThreshold('capacityWarningPct', value / 100, { thresholds: { ...draft.thresholds, capacityWarningPercent: value } })} />
+          <SettingsField type="number" label="Capacity orange %" value={Math.round(thresholds.capacityOrangePct * 100)} onChange={(value) => updateThreshold('capacityOrangePct', value / 100, { capacityThresholds: { ...draft.capacityThresholds, warningPercent: value }, thresholds: { ...draft.thresholds, capacityOrangePercent: value } })} />
+          <SettingsField type="number" label="Capacity critical %" value={Math.round(thresholds.capacityRedPct * 100)} onChange={(value) => updateThreshold('capacityRedPct', value / 100, { capacityThresholds: { ...draft.capacityThresholds, criticalPercent: value }, thresholds: { ...draft.thresholds, capacityRedPercent: value } })} />
           <SettingsField type="number" label="Max waiting patients" value={draft.capacityThresholds.maxWaitingPatients} onChange={(value) => updateNested('capacityThresholds', 'maxWaitingPatients', value)} />
-          <SettingsField type="number" label="Wait warning minutes" value={draft.thresholds.waitWarningMinutes} onChange={(value) => updateDraft({ thresholds: { ...draft.thresholds, waitWarningMinutes: value } })} />
-          <SettingsField type="number" label="Wait critical minutes" value={draft.thresholds.waitCriticalMinutes} onChange={(value) => updateDraft({ thresholds: { ...draft.thresholds, waitCriticalMinutes: value } })} />
+          <SettingsField type="number" label="Wait warning minutes" value={thresholds.waitTimeWarningMin} onChange={(value) => updateThreshold('waitTimeWarningMin', value, { thresholds: { ...draft.thresholds, waitWarningMinutes: value } })} />
+          <SettingsField type="number" label="Wait critical minutes" value={thresholds.waitTimeCtiticalMin} onChange={(value) => updateThreshold('waitTimeCtiticalMin', value, { thresholds: { ...draft.thresholds, waitCriticalMinutes: value } })} />
         </div>
       </Section>
 
@@ -620,7 +902,7 @@ export default function EmergencySettings() {
         }
       >
         <div className="emergency-settings__grid">
-          <SettingsField type="number" label="Offload target minutes" value={draft.emsThresholds.offloadTargetMinutes} onChange={(value) => updateNested('emsThresholds', 'offloadTargetMinutes', value)} />
+          <SettingsField type="number" label="Offload target minutes" value={thresholds.emsOffloadTargetMin} onChange={(value) => updateThreshold('emsOffloadTargetMin', value, { emsThresholds: { ...draft.emsThresholds, offloadTargetMinutes: value }, thresholds: { ...draft.thresholds, emsOffloadTargetMinutes: value } })} />
           <SettingsField type="number" label="Critical ETA minutes" value={draft.emsThresholds.criticalEtaMinutes} onChange={(value) => updateNested('emsThresholds', 'criticalEtaMinutes', value)} />
           <SettingsField type="checkbox" label="Auto-create arrival" value={draft.emsThresholds.autoCreateArrival} onChange={(value) => updateNested('emsThresholds', 'autoCreateArrival', value)} />
         </div>

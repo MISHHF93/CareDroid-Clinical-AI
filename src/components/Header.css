@@ -1,0 +1,45 @@
+.emergency-os-header button,
+.emergency-os-header select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 1024px) {
+  .emergency-os-header {
+    gap: 10px !important;
+    padding-inline: 10px !important;
+  }
+
+  .emergency-os-header__wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .emergency-os-header {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .emergency-os-header::-webkit-scrollbar {
+    display: none;
+  }
+
+  .emergency-os-header button,
+  .emergency-os-header select {
+    min-height: 44px !important;
+  }
+
+  .emergency-os-header button {
+    min-width: 44px !important;
+  }
+
+  .emergency-os-header button:active {
+    border-color: #3B82F6 !important;
+    color: #F9FAFB !important;
+  }
+}

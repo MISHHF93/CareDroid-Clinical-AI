@@ -270,7 +270,7 @@ const ClinicalAlertsPage = () => {
         ) : (
           <div className="empty-state">
             <div className="empty-icon">✓</div>
-            <h3>No alerts found</h3>
+            <h3>All clear</h3>
             <p>Great! No clinical alerts match your current filters.</p>
           </div>
         )}

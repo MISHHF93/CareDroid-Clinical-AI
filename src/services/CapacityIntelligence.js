@@ -1,4 +1,4 @@
-import { CapacityScore, PatientState } from '../../types/emergency';
+import { CapacityScore, PatientState } from '../types/emergency';
 
 export const MAX_ED_PATIENT_CAPACITY = 30;
 

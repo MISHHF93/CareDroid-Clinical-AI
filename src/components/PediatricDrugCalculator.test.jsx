@@ -7,7 +7,7 @@ import PediatricDrugCalculator, {
   estimateWeightByLuscombe,
 } from './PediatricDrugCalculator';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 
 import './PediatricDrugCalculator.css';
 
@@ -98,7 +98,7 @@ describe('PediatricDrugCalculator dosing', () => {
     expect(screen.getByText('19 kg')).toBeInTheDocument();
   });
 
-  it('saves a pediatric drug reference event to the linked patient timeline', async () => {
+  it('saves pediatric drug reference notes to the linked patient', async () => {
     const user = userEvent.setup();
     useEmergencyStore.setState({ ...originalState, patients: [pediatricPatient] }, true);
 
@@ -108,15 +108,14 @@ describe('PediatricDrugCalculator dosing', () => {
     await user.click(screen.getByRole('button', { name: /save to patient/i }));
 
     const savedPatient = useEmergencyStore.getState().patients.find((patient) => patient.id === 'peds-001');
-    expect(savedPatient?.timeline).toEqual(
+    expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          summary: 'Pediatric drug reference generated at 14 kg.',
-          metadata: expect.objectContaining({
-            weightKg: 14,
-            drugCount: PEDIATRIC_DRUGS.length,
-            source: 'PediatricDrugCalculator',
-          }),
+          text: `Pediatric Drug Calculator: ${PEDIATRIC_DRUGS.length}/${PEDIATRIC_DRUGS.length} — Dosing reference generated`,
+          authorId: 's3',
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining('"weightKg":14'),
         }),
       ])
     );

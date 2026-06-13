@@ -265,14 +265,14 @@ function FutureWorkspacePanel({ workspace, onLaunchEmergency }) {
   return (
     <section className="workspace-panel" aria-labelledby="future-workspace-title">
       <div className="workspace-panel__header">
-        <p className="workspace-eyebrow">{workspace.roadmapLabel || 'Future Module'}</p>
+          <p className="workspace-eyebrow">{workspace.roadmapLabel || 'Future Feature'}</p>
         <h2 id="future-workspace-title">{workspace.label} is coming later</h2>
         <p>
           {workspace.productFocus ||
-            'This workspace is preserved in the codebase as a roadmap module.'}
+            'This workspace is preserved in the codebase as a roadmap feature.'}
         </p>
       </div>
-      <div className="emergency-journey-insights" aria-label="Future module status">
+      <div className="emergency-journey-insights" aria-label="Future feature status">
         <p>
           <strong>Status:</strong> {workspace.availabilityLabel || 'Coming Later'}.
         </p>
@@ -441,11 +441,11 @@ function EmergencyAutomationMarketplacePanel({ marketplace = {} }) {
         <h2 id="ed-automation-marketplace-title">ED Automation Marketplace</h2>
         <p>
           {marketplace.packagingStatement ||
-            'Emergency automations are packaged as sellable SaaS modules.'}
+            'Emergency automations are packaged as sellable SaaS features.'}
         </p>
       </div>
       <div className="emergency-journey-summary" aria-label="ED automation marketplace metrics">
-        <span>{metrics.totalModules || 0} modules</span>
+        <span>{metrics.totalModules || 0} features</span>
         <span>{metrics.enabledModules || 0} enabled</span>
         <span>{metrics.disabledModules || 0} disabled</span>
         <span>{metrics.categories || 0} categories</span>
@@ -586,7 +586,7 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">Smart Arrival</p>
           <h2>{smartArrival.title || 'Smart Arrival'}</h2>
-          <p>{smartArrival.operatingModel || 'Embedded in the Emergency Workspace.'}</p>
+          <p>{smartArrival.operatingModel || 'Embedded in Emergency OS.'}</p>
         </div>
         <div className="emergency-journey-summary" aria-label="Smart Arrival summary">
           <span>{(smartArrival.capturePipeline || []).length} capture steps</span>
@@ -613,7 +613,7 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
               'Patient confirmation or staff confirmation is required before finalizing.'}
           </p>
           <p>
-            <strong>Emergency Workspace feed:</strong>{' '}
+            <strong>Emergency Whiteboard:</strong>{' '}
             {(smartArrivalFeed.targetSurfaces || []).join(', ')}
           </p>
         </div>
@@ -665,11 +665,11 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
 
       <div className="workspace-panel">
         <div className="workspace-panel__header">
-          <p className="workspace-eyebrow">Verified intake record</p>
-          <h2>{intakeRecord.title || 'Create Intake Record'}</h2>
+          <p className="workspace-eyebrow">Verified intake patient</p>
+          <h2>{intakeRecord.title || 'Create Intake Patient'}</h2>
           <p>
             {intakeRecord.promotionRule ||
-              'Only confirmed values are promoted into the intake record.'}
+              'Only confirmed values are promoted into the intake patient context.'}
           </p>
         </div>
         <div className="emergency-journey-summary" aria-label="Intake governance summary">
@@ -843,7 +843,7 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
           className="emergency-journey-summary"
           aria-label="Emergency intake marketplace metrics"
         >
-          <span>{marketplace.metrics?.totalModules || 0} modules</span>
+          <span>{marketplace.metrics?.totalModules || 0} features</span>
           <span>{marketplace.metrics?.includedInCore || 0} core included</span>
           <span>{marketplace.metrics?.addOnModules || 0} add-ons</span>
           <span>{marketplace.metrics?.reviewControlledModules || 0} review controlled</span>
@@ -1176,10 +1176,10 @@ function EmergencyIntakeAnalyticsPanel({ intake = {} }) {
 
       <div className="workspace-panel">
         <div className="workspace-panel__header">
-          <p className="workspace-eyebrow">Patient Journey Engine feed</p>
-          <h2>All intake automations feed Emergency OS</h2>
+          <p className="workspace-eyebrow">Patient Journey Engine whiteboard updates</p>
+          <h2>All intake automations update Emergency OS</h2>
           <p>
-            Every intake module declares valid patient journey states and remains review-controlled.
+            Every intake feature declares valid patient journey states and remains review-controlled.
           </p>
         </div>
         <div className="emergency-journey-insights">
@@ -1307,7 +1307,7 @@ function EmergencyDigitalWhiteboardPanel({
         <p className="workspace-eyebrow">Primary workspace screen · No dashboard hopping</p>
         <h2 id="emergency-whiteboard-title">{whiteboard.title || 'Emergency Whiteboard'}</h2>
         <p>
-          CareDroid Emergency OS is organized around Patient Flow, Queue Flow, EMS Flow, Capacity
+          Emergency OS is organized around Patient Flow, Queue Flow, EMS Flow, Capacity
           Flow, and Decision Support for small teams handling 50-150 patients/day with fewer than 10
           staff.
         </p>
@@ -1930,7 +1930,7 @@ function EmergencyPreArrivalPanel({ preArrival = {}, onAskAssistant }) {
                 <dd>{patient.notificationStatus}</dd>
               </div>
               <div>
-                <dt>Whiteboard status</dt>
+                <dt>Whiteboard state</dt>
                 <dd>{patient.handoffStatus}</dd>
               </div>
             </dl>
@@ -2142,7 +2142,7 @@ function EmergencyWaitingRoomPanel({ waitingRoom = {}, onAskAssistant }) {
               <strong>{item.waitDuration}m</strong>
             </div>
             <p>{item.triggerReason}</p>
-            <p>Status: {item.status}</p>
+            <p>State: {item.status}</p>
             {completedReassessments[item.patientId] ? (
               <p>
                 Reassessment complete: {completedReassessments[item.patientId]?.timestamp} ·{' '}
@@ -2633,7 +2633,7 @@ function EmergencyReferralHubPanel({
         <div role="row" className="emergency-referral-table__header">
           <span role="columnheader">Referral</span>
           <span role="columnheader">Department</span>
-          <span role="columnheader">Stage</span>
+          <span role="columnheader">State</span>
           <span role="columnheader">Elapsed</span>
           <span role="columnheader">Priority</span>
         </div>
@@ -2824,7 +2824,7 @@ function emergencyActionGuidanceForCard({ id, label, detail }) {
     },
     'ems-arrivals': {
       verb: 'Complete',
-      suggestedAction: 'Complete handoff preparation for the next inbound EMS case.',
+      suggestedAction: 'Complete handoff preparation for the next inbound EMS patient.',
     },
     'referral-queue': {
       verb: 'Refer',
@@ -2852,7 +2852,7 @@ function emergencyActionGuidanceForCard({ id, label, detail }) {
     },
     'door-to-doctor': {
       verb: 'Review',
-      suggestedAction: 'Review throughput delays and assign the next operational owner.',
+      suggestedAction: 'Review throughput delays and assign the next operational staff member.',
     },
     'boarding-pressure': {
       verb: 'Escalate',
@@ -2865,7 +2865,7 @@ function emergencyActionGuidanceForCard({ id, label, detail }) {
     },
     'escalation-status': {
       verb: 'Escalate',
-      suggestedAction: 'Escalate active critical risks or confirm the current mitigation owner.',
+      suggestedAction: 'Escalate active critical risks or confirm the assigned clinician for mitigation.',
     },
     'automation-status': {
       verb: 'Complete',
@@ -3442,8 +3442,8 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
       >
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">Reduced Navigation</p>
-          <h2 id="emergency-command-flow-title">Dashboard-first workflow</h2>
-          <p>Deep routes remain available, but routine ED work starts from this Command Center.</p>
+          <h2 id="emergency-command-flow-title">Whiteboard-first workflow</h2>
+          <p>Deep routes remain available, but routine ED work starts from this Emergency Whiteboard.</p>
         </div>
         <ol className="emergency-journey-flow emergency-journey-flow--compact">
           {emergency.patientJourney.slice(0, 5).map((stage) => (
@@ -3532,7 +3532,7 @@ function EmergencyOneScreenWorkflow({
       target: '/workspace/emergency/ems',
       actionVerb: 'Complete',
       actionLabel: 'Complete EMS Handoff',
-      suggestedAction: 'Complete handoff prep for the next inbound or delayed EMS case.',
+      suggestedAction: 'Complete handoff prep for the next inbound or delayed EMS patient.',
       prompt:
         'Prepare EMS handoff priorities using inbound arrivals, ETA, offload delays, waiting handoffs, and high-risk context.',
       severity: emsOffload?.metrics?.pressureState === 'critical' ? 'critical' : 'medium',
@@ -3864,7 +3864,7 @@ function EmergencyDirectorCommandCenter({
       recommendations: [
         'Start from complaint before browsing tools or calculators.',
         'Review calculators and protocols before presenting the plan.',
-        'Keep attending review explicit for high-risk or protocol-driven cases.',
+        'Keep attending review explicit for high-risk or protocol-driven patients.',
       ],
     },
     {
@@ -4040,7 +4040,7 @@ function EmergencyDirectorCommandCenter({
         'Automation registry status across triage, referrals, documentation, IoT, simulations, and governance.',
       target: '/workspace/emergency/automations',
       assistantPrompt:
-        'Summarize Emergency automation status, active modules, review-required actions, and blocked automations.',
+        'Summarize Emergency automation status, active features, review-required actions, and blocked automations.',
       severity: automationState.blockedAutomations.length ? 'high' : 'medium',
     },
   ];
@@ -4135,7 +4135,7 @@ function EmergencyDirectorCommandCenter({
               'Manual route buttons live only in the tab bar',
             ],
             [
-              'Dashboard widgets reduced',
+              'Whiteboard widgets reduced',
               '36%',
               'Director widgets are drill-down, not default noise',
             ],
@@ -4278,7 +4278,7 @@ function EmergencyDirectorCommandCenter({
               <span>{operatingSystem.leadershipSummary.doorToDirection} min door-to-direction</span>
               <span>{operatingSystem.leadershipSummary.queueBottlenecks} queue bottlenecks</span>
               <span>{operatingSystem.leadershipSummary.capacityScore} capacity score</span>
-              <span>{operatingSystem.leadershipSummary.automationModules} SaaS modules</span>
+              <span>{operatingSystem.leadershipSummary.automationModules} SaaS features</span>
             </div>
           ) : null}
           <div className="emergency-command-grid">
@@ -4896,7 +4896,7 @@ function EmergencyDemoModePanel({ demoTenant, demoEnvironment, onLaunchRoute }) 
     [
       'Sample patients',
       demoTenant.samplePatients,
-      (patient) => `${patient.chiefComplaint} · ${patient.stage} · ${patient.summary}`,
+      (patient) => `${patient.chiefComplaint} · ${patient.state || patient.stage} · ${patient.summary}`,
     ],
     ['Sample alerts', demoTenant.sampleAlerts, (alert) => `${alert.severity} · ${alert.detail}`],
     ['Sample workflows', demoTenant.sampleWorkflows, (workflow) => workflow.detail],
@@ -4975,7 +4975,7 @@ function EmergencyDemoModePanel({ demoTenant, demoEnvironment, onLaunchRoute }) 
             <p className="workspace-eyebrow">Demo data</p>
             <h2>{title}</h2>
             <p>
-              Prospect-ready sample content for evaluating the Emergency Workspace without
+              Prospect-ready sample content for evaluating Emergency OS without
               integrations.
             </p>
           </div>
@@ -5013,7 +5013,7 @@ function EmergencySimulationScenariosPanel({ simulationScenarios = {} }) {
         <p className="workspace-eyebrow">Emergency Simulation Scenarios</p>
         <h2 id="emergency-simulation-scenarios-title">Operational Training</h2>
         <p>
-          Training mirrors real ED operational problems by reusing Emergency Workspace signals,
+          Training mirrors real ED operational problems by reusing Emergency OS signals,
           KPIs, queues, resources, and escalations.
         </p>
       </div>
@@ -5355,7 +5355,7 @@ function EmergencyFlowIntelligencePanel({ platform, flowEngine }) {
     ['Automation registry', platform.automationRegistry.length, 'Flow-aware automations'],
     ['Workflow registry', platform.workflowRegistry.length, 'Review-required workflows'],
     ['Analytics model', platform.analyticsModel.events.length, 'Bottleneck and adoption events'],
-    ['Dashboard model', platform.dashboardModel.widgets.length, 'Command-center widgets'],
+    ['Whiteboard model', platform.dashboardModel.widgets.length, 'Command-center widgets'],
     ['AI model', platform.aiModel.agents.length, 'Flow-aware AI agents'],
     ['SaaS packages', platform.saasPackagingModel.packages.length, 'Sellable tiers'],
   ];
@@ -6065,7 +6065,7 @@ function EmergencyAnalyticsPanel({ analytics, kpiLayer, demoEnvironment }) {
               item={{
                 id: 'demo-environment-coverage',
                 label: `${demoEnvironment.metrics.patientCount} clearly labeled demo patients`,
-                detail: `${demoEnvironment.metrics.reassessmentNeeded} reassessment needs, ${demoEnvironment.metrics.emsPatients} EMS cases, ${demoEnvironment.metrics.boardingPatients} boarders.`,
+                detail: `${demoEnvironment.metrics.reassessmentNeeded} reassessment needs, ${demoEnvironment.metrics.emsPatients} EMS patients, ${demoEnvironment.metrics.boardingPatients} boarders.`,
               }}
             />
           ) : null}
@@ -6391,7 +6391,7 @@ export default function WorkspaceHome() {
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
       eyebrow={workspaceExperience.operatingLabel}
-      title={isEmergencyWorkspace ? 'CareDroid Emergency OS' : `${model.workspace.label} Workspace`}
+      title={isEmergencyWorkspace ? 'Emergency OS' : `${model.workspace.label} Workspace`}
       description={workspaceExperience.dashboardSubtitle || model.workspace.description}
       actions={
         !isEmergencyWorkspace ? (

@@ -9,15 +9,15 @@ export const FRONTEND_OS_FLOW = Object.freeze([
   }),
   Object.freeze({
     id: 'workspace',
-    label: 'Workspace',
-    path: '/workspaces',
-    description: 'Workspace switches the operating mode, recommendations, assistant context, and asset graph.',
+    label: 'Emergency OS',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
+    description: 'Emergency OS sets the operating mode, recommendations, assistant context, and patient flow.',
   }),
   Object.freeze({
     id: 'dashboard',
-    label: 'Dashboard',
-    path: CANONICAL_ROUTES.dashboard,
-    description: 'Dashboard summarizes the active workspace and prioritizes the next action.',
+    label: 'Whiteboard',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
+    description: 'Whiteboard summarizes Emergency OS flow and prioritizes the next action.',
   }),
   Object.freeze({
     id: 'asset-launch',
@@ -92,7 +92,7 @@ function workspaceLabelFrom(workspaceLike) {
     workspaceLike?.name ||
     workspaceLike?.shortLabel ||
     workspaceLike?.workspaceProfile?.label ||
-    'Workspace'
+    'Emergency OS'
   );
 }
 
@@ -118,6 +118,6 @@ export function getFrontendOperatingSystemState({
       ...step,
       state: index < safeIndex ? 'complete' : index === safeIndex ? 'current' : 'next',
     })),
-    summary: `${workspaceLabel} workspace is in ${FRONTEND_OS_FLOW[safeIndex].label} mode.`,
+    summary: `${workspaceLabel} Emergency OS is in ${FRONTEND_OS_FLOW[safeIndex].label} mode.`,
   };
 }

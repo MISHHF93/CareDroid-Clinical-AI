@@ -9,8 +9,24 @@
   }
 }
 
+@keyframes patient-detail-slide-up {
+  from {
+    opacity: 0.92;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .patient-detail-timeline-dot--current {
   animation: patient-detail-current-pulse 1s infinite;
+}
+
+.patient-detail-panel__drag-handle {
+  display: none;
 }
 
 .patient-timeline-status {
@@ -140,4 +156,238 @@
   gap: 4px;
   color: #6b7280;
   font-size: 11px;
+}
+
+.sepsis-bundle-tracker {
+  padding: 16px;
+  border-bottom: 1px solid #1f2937;
+}
+
+.sepsis-bundle-tracker__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sepsis-bundle-tracker__header h3 {
+  margin: 0;
+  color: #f9fafb;
+  font-size: 14px;
+}
+
+.sepsis-bundle-tracker__header p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.sepsis-bundle-tracker__header strong {
+  color: #f9fafb;
+  font-size: 20px;
+}
+
+.sepsis-bundle-progress {
+  height: 8px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #1f2937;
+}
+
+.sepsis-bundle-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #10b981;
+}
+
+.sepsis-bundle-progress__label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 7px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.sepsis-bundle-progress__label strong {
+  color: #10b981;
+}
+
+.sepsis-bundle-antibiotics {
+  margin-top: 12px;
+  border: 1px solid;
+  border-radius: 10px;
+  background: #0b1120;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sepsis-bundle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sepsis-bundle-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  background: #0b1120;
+  padding: 10px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.sepsis-bundle-row--complete {
+  border-color: rgba(16, 185, 129, 0.42);
+  color: #d1fae5;
+}
+
+.sepsis-bundle-row__checkbox {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  background: #111827;
+  color: #10b981;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.sepsis-bundle-row__checkbox:disabled {
+  cursor: default;
+  border-color: rgba(16, 185, 129, 0.55);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.sepsis-bundle-row__label {
+  min-width: 0;
+}
+
+.sepsis-bundle-row__label strong {
+  display: block;
+  overflow: hidden;
+  color: #f9fafb;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sepsis-bundle-row__label span {
+  display: block;
+  margin-top: 3px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.sepsis-bundle-row__target,
+.sepsis-bundle-row__timestamp {
+  color: inherit;
+  font-size: 11px;
+}
+
+.sepsis-bundle-row__timestamp {
+  white-space: nowrap;
+}
+
+.sepsis-bundle-confirm {
+  margin-top: 12px;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  background: #111827;
+  padding: 12px;
+}
+
+.sepsis-bundle-confirm p {
+  margin: 0;
+  color: #f9fafb;
+  font-size: 13px;
+}
+
+.sepsis-bundle-confirm div {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.sepsis-bundle-confirm button {
+  border: 1px solid #374151;
+  border-radius: 10px;
+  background: transparent;
+  color: #f9fafb;
+  cursor: pointer;
+  padding: 8px 10px;
+}
+
+.sepsis-bundle-confirm button:first-child {
+  border-color: #047857;
+  background: #047857;
+}
+
+@media (max-width: 768px) {
+  .patient-detail-panel {
+    position: fixed !important;
+    inset: 0 0 60px 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    border-left: 0 !important;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.58) !important;
+    animation: patient-detail-slide-up 220ms ease-out;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .patient-detail-panel__drag-handle {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: block;
+    height: 20px;
+    background: #111827;
+  }
+
+  .patient-detail-panel__drag-handle::before {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 44px;
+    height: 5px;
+    border-radius: 999px;
+    background: #4B5563;
+    content: '';
+    transform: translateX(-50%);
+  }
+
+  .patient-detail-panel button,
+  .patient-detail-panel input,
+  .patient-detail-panel select {
+    min-height: 44px !important;
+  }
+
+  .patient-detail-panel button {
+    min-width: 44px !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .patient-detail-workflow-log {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sepsis-bundle-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .sepsis-bundle-row__target,
+  .sepsis-bundle-row__timestamp {
+    grid-column: 2;
+  }
 }

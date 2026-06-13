@@ -86,7 +86,7 @@ describe('EdAutomationMarketplace', () => {
           categories: ED_AUTOMATION_MARKETPLACE_CATEGORIES.length,
           reviewRequired: expect.any(Number),
         }),
-        packagingStatement: expect.stringMatching(/sellable SaaS modules/i),
+        packagingStatement: expect.stringMatching(/sellable SaaS features/i),
       })
     );
   });

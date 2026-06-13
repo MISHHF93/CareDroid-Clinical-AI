@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import {
   Patient,
@@ -11,6 +11,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
+import { routeComplaint } from '../engine/complaintRouter';
 
 type QuickIntakeProps = {
   onClose: () => void;
@@ -136,6 +137,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [protocolSuggestions, setProtocolSuggestions] = useState<string[]>([]);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
 
   const age = useMemo(() => calculateAge(dob), [dob]);
@@ -145,7 +147,20 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
     [complaint, complaintCategory, vitals],
   );
   const priority = priorityOverride || computedPriority;
-  const protocols = complaintCategory ? SUGGESTED_PROTOCOLS[complaintCategory] || [] : [];
+  const protocols = protocolSuggestions.length
+    ? protocolSuggestions
+    : complaintCategory
+      ? SUGGESTED_PROTOCOLS[complaintCategory] || []
+      : [];
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const route = routeComplaint(complaint);
+      setProtocolSuggestions(route ? route.scoreIds : []);
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
+  }, [complaint]);
 
   const chooseCategory = (category: ComplaintCategory) => {
     setComplaintCategory(category);
@@ -246,9 +261,11 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
     >
       <style>
         {`
-          @media (max-width: 720px) {
+          @media (max-width: 768px) {
             .quick-intake-overlay {
               padding: 0 !important;
+              align-items: stretch !important;
+              justify-content: stretch !important;
             }
 
             .quick-intake-modal {
@@ -260,6 +277,34 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
             .quick-intake-grid {
               grid-template-columns: 1fr !important;
+            }
+
+            .quick-intake-category-grid {
+              grid-template-columns: 1fr !important;
+            }
+
+            .quick-intake-category-button {
+              width: 100% !important;
+              min-height: 56px !important;
+              height: 56px !important;
+            }
+
+            .quick-intake-modal button,
+            .quick-intake-modal input,
+            .quick-intake-modal select,
+            .quick-intake-modal textarea {
+              min-height: 48px !important;
+              -webkit-tap-highlight-color: transparent;
+            }
+
+            .quick-intake-footer {
+              align-items: stretch !important;
+              flex-direction: column !important;
+            }
+
+            .quick-intake-submit {
+              width: 100% !important;
+              height: 56px !important;
             }
           }
         `}
@@ -316,11 +361,12 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
         <div className="quick-intake-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}>
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="quick-intake-category-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {CATEGORY_BUTTONS.map((category) => {
                 const active = complaintCategory === category.label;
                 return (
                   <button
+                    className="quick-intake-category-button"
                     key={category.label}
                     type="button"
                     onClick={() => chooseCategory(category.label)}
@@ -469,6 +515,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         </div>
 
         <footer
+          className="quick-intake-footer"
           style={{
             position: 'sticky',
             bottom: 0,
@@ -547,6 +594,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
           ) : null}
 
           <button
+            className="quick-intake-submit"
             type="submit"
             disabled={submitting || !canCreatePatient}
             style={{

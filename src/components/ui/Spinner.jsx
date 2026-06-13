@@ -21,7 +21,7 @@ export const Spinner = ({
       aria-label="Loading"
       {...props}
     >
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">Loading department data...</span>
     </div>
   );
 };
@@ -29,7 +29,7 @@ export const Spinner = ({
 /**
  * Full-screen loading overlay
  */
-export const LoadingScreen = ({ message = 'Loading...' }) => {
+export const LoadingScreen = ({ message = 'Loading department data...' }) => {
   return (
     <div className="loading-screen">
       <div className="loading-screen-content">

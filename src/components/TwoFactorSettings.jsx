@@ -86,7 +86,7 @@ const TwoFactorSettings = ({ authToken }) => {
     return (
       <Card style={{ padding: '24px' }}>
         <h3 style={{ marginTop: 0, marginBottom: '16px' }}>Two-Factor Authentication</h3>
-        <div style={{ color: 'var(--muted-text)' }}>Loading...</div>
+        <div style={{ color: 'var(--muted-text)' }}>Loading department data...</div>
       </Card>
     );
   }

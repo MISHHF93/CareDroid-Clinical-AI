@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from 'lucide-react';
-import { Priority } from '../../types/emergency';
+import { Priority } from '../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { TriageSuggestionEngine } from '../../engine/triageEngine';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';

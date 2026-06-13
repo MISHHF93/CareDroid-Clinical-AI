@@ -405,9 +405,6 @@ describe('resolveCatalogLaunch — NLU alias resolution', () => {
 describe('resolveCatalogLaunch — clinical safety compliance', () => {
   it('passes chat seed audit for all clinicalIntentTools with chatSeed', () => {
     const audit = runClinicalSafetyComplianceAudit(clinicalIntentTools);
-    if (audit.summary.failing > 0) {
-      console.log('chat seed audit failures:', audit.risks);
-    }
     expect(audit.summary.failing).toBe(0);
     expect(audit.summary.criticalIssues).toBe(0);
   });

@@ -9,7 +9,7 @@ import { PLATFORM_ANALYTICS_EVENT_TYPES } from './platformAnalytics';
 const inventory = [
   { id: 'qsofa', name: 'qSOFA', category: 'Calculator' },
   { id: 'news2', name: 'NEWS2', category: 'Calculator' },
-  { id: 'unused-dashboard', name: 'Unused Dashboard', category: 'Dashboard' },
+  { id: 'unused-dashboard', name: 'Unused Whiteboard', category: 'Whiteboard' },
   { id: 'workflow-helper', name: 'Workflow Helper', category: 'Workflow' },
 ];
 

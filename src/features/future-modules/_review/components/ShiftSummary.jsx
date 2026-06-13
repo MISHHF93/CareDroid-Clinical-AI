@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Copy, Download, Printer } from 'lucide-react';
-import { PatientState, Priority } from '../../../../../types/emergency';
+import { PatientState, Priority } from '../../../../types/emergency';
 import { useEmergencyStore } from '../../../../../store/emergencyStore';
 import { useUser } from '../../../../contexts/UserContext';
 import { sendClinicalChatMessage } from '../../../../services/clinicalChatService';

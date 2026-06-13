@@ -45,14 +45,18 @@ export const EMERGENCY_ACTIONS = Object.freeze({
   useCopilot: 'copilot.use',
   viewAnalytics: 'analytics.view',
   runSimulation: 'simulation.run',
+  // Future module
   manageFederatedLearning: 'federated.manage',
+  // Future module
   runDigitalTwin: 'digitalTwin.run',
   manageSettings: 'settings.manage',
+  // Future module
   viewAiGovernance: 'aiGovernance.view',
 });
 
 const ROUTES = Object.freeze({
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
+  pulse: CANONICAL_ROUTES.emergencyPulse,
   patients: CANONICAL_ROUTES.emergencyPatients,
   journey: CANONICAL_ROUTES.emergencyJourney,
   ems: CANONICAL_ROUTES.emergencyEms,
@@ -67,19 +71,35 @@ const ROUTES = Object.freeze({
   copilot: CANONICAL_ROUTES.emergencyCopilot,
   analytics: CANONICAL_ROUTES.emergencyAnalytics,
   simulation: CANONICAL_ROUTES.emergencySimulation,
+  // Future module
   federatedLearning: CANONICAL_ROUTES.emergencyFederatedLearning,
+  // Future module
   digitalTwin: CANONICAL_ROUTES.emergencyDigitalTwin,
   tools: CANONICAL_ROUTES.emergencyTools,
   shift: CANONICAL_ROUTES.emergencyShift,
+  // Future module
   aiGovernance: CANONICAL_ROUTES.emergencyAiGovernance,
+  // Future module
   aiGovernanceGlobal: CANONICAL_ROUTES.aiGovernance,
   settings: CANONICAL_ROUTES.emergencySettings,
 });
 
-const ALL_ROUTES = Object.freeze(Object.values(ROUTES));
-const ALL_ACTIONS = Object.freeze(Object.values(EMERGENCY_ACTIONS));
+const FUTURE_MODULE_ROUTES = Object.freeze([
+  ROUTES.federatedLearning,
+  ROUTES.digitalTwin,
+  ROUTES.aiGovernance,
+  ROUTES.aiGovernanceGlobal,
+]);
+const ALL_ROUTES = Object.freeze(Object.values(ROUTES).filter((route) => !FUTURE_MODULE_ROUTES.includes(route)));
+const FUTURE_MODULE_ACTIONS = Object.freeze([
+  EMERGENCY_ACTIONS.manageFederatedLearning,
+  EMERGENCY_ACTIONS.runDigitalTwin,
+  EMERGENCY_ACTIONS.viewAiGovernance,
+]);
+const ALL_ACTIONS = Object.freeze(Object.values(EMERGENCY_ACTIONS).filter((action) => !FUTURE_MODULE_ACTIONS.includes(action)));
 const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
+  ROUTES.pulse,
   ROUTES.patients,
   ROUTES.journey,
   ROUTES.queues,
@@ -93,6 +113,7 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
+  ROUTES.pulse,
   ROUTES.patients,
   ROUTES.journey,
   ROUTES.ems,
@@ -105,7 +126,6 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.copilot,
   ROUTES.analytics,
   ROUTES.simulation,
-  ROUTES.digitalTwin,
   ROUTES.tools,
   ROUTES.shift,
 ]);
@@ -136,7 +156,6 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
       EMERGENCY_ACTIONS.runSimulation,
-      EMERGENCY_ACTIONS.runDigitalTwin,
     ],
     defaultRoute: ROUTES.whiteboard,
   }),
@@ -144,7 +163,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.chargeNurse,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.chargeNurse],
     description: 'Shift command role for triage flow, reassessment, staff assignment, EMS readiness, and capacity pressure.',
-    routes: OPERATIONS_VIEW_ROUTES.filter((route) => route !== ROUTES.simulation && route !== ROUTES.digitalTwin),
+    routes: OPERATIONS_VIEW_ROUTES.filter((route) => route !== ROUTES.simulation),
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.triage,
@@ -174,6 +193,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description: 'Front-door clinical role for intake, triage, vitals, reassessment, and patient safety flags.',
     routes: [
       ROUTES.whiteboard,
+      ROUTES.pulse,
       ROUTES.patients,
       ROUTES.journey,
       ROUTES.ems,
@@ -208,8 +228,6 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ...CLINICAL_VIEW_ROUTES,
       ROUTES.copilot,
       ROUTES.analytics,
-      ROUTES.aiGovernance,
-      ROUTES.aiGovernanceGlobal,
     ],
     actions: [
       EMERGENCY_ACTIONS.transitionPatient,
@@ -222,7 +240,6 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.manageTransfer,
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
-      EMERGENCY_ACTIONS.viewAiGovernance,
     ],
     defaultRoute: ROUTES.whiteboard,
   }),
@@ -230,7 +247,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.registrationClerk,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description: 'Registration role for identity review and patient creation without clinical state management.',
-    routes: [ROUTES.whiteboard, ROUTES.patients, ROUTES.intake, ROUTES.queues, ROUTES.provincialHealth],
+    routes: [ROUTES.whiteboard, ROUTES.pulse, ROUTES.patients, ROUTES.intake, ROUTES.queues, ROUTES.provincialHealth],
     actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.verifyIntake],
     defaultRoute: ROUTES.intake,
   }),
@@ -238,7 +255,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.emsUser,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description: 'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.pulse, ROUTES.patients, ROUTES.capacity],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -253,6 +270,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description: 'Observer role with Emergency OS visibility and no mutating actions.',
     routes: [
       ROUTES.whiteboard,
+      ROUTES.pulse,
       ROUTES.patients,
       ROUTES.journey,
       ROUTES.ems,

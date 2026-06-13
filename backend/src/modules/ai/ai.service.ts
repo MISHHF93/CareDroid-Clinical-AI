@@ -17,7 +17,7 @@ import {
   ToolDefinition,
   UNIFIED_AI_MODEL,
   unifiedAIClient,
-} from '../../../../lib/ai/client';
+} from '../../../../src/lib/ai/client';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { promptForRequestType } from '../../../../lib/ai/promptRegistry';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';

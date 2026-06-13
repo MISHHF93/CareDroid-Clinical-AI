@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Save, X } from 'lucide-react';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import { useFeature } from '../hooks/useFeature';
+import { saveCalculatorResult } from './calculators/calculatorSave';
 import './ClinicalScoreCalculator.css';
 
 export const CALCULATOR_BY_SUGGESTION_ID = {
@@ -96,6 +97,12 @@ function maxForCalculator(calculatorId) {
   if (calculatorId === 'qsofa') return 1;
   if (calculatorId === 'nihss') return 4;
   return 2;
+}
+
+function maxTotalForCalculator(calculatorId) {
+  if (calculatorId === 'qsofa') return 3;
+  if (calculatorId === 'nihss') return 42;
+  return 10;
 }
 
 function totalScore(values) {
@@ -247,7 +254,7 @@ export default function ClinicalScoreCalculator({
   }, [onClose]);
 
   const saveScore = () => {
-    onSaveScore?.({
+    const score = {
       calculatorId,
       label,
       total,
@@ -255,6 +262,17 @@ export default function ClinicalScoreCalculator({
       recommendation: interpretation.recommendation,
       values,
       autoScorePrefill,
+    };
+    onSaveScore?.(score);
+    saveCalculatorResult({
+      patientId: patient?.id,
+      scoreName: label,
+      total,
+      max: maxTotalForCalculator(calculatorId),
+      band: interpretation.band,
+      fields: values,
+      staffId: patient?.assignedStaffId || undefined,
+      critical: /high|severe/i.test(interpretation.band),
     });
     onClose?.();
   };

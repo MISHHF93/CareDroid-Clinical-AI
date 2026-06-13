@@ -43,7 +43,7 @@ import { ArtifactsService } from '../artifacts/artifacts.service';
 import { ArtifactType } from '../artifacts/entities/artifact.entity';
 import { EvaluationService } from '../evaluation/evaluation.service';
 import { PlatformGovernanceService } from '../platform-governance';
-import { Message, unifiedAIClient } from '../../../../lib/ai/client';
+import { Message, unifiedAIClient } from '../../../../src/lib/ai/client';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
 

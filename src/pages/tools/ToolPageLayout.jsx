@@ -171,7 +171,7 @@ const ToolPageLayout = ({
           <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
-              <span>Dashboard</span>
+              <span>Whiteboard</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>

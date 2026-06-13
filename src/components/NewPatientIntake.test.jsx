@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NewPatientIntake, { suggestPriority } from './NewPatientIntake';
 import { hasPatientFlag, selectQueueCounts, selectReassessmentQueue, useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 
 import './NewPatientIntake.css';
 

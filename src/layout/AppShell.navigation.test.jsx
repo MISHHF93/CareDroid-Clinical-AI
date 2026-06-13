@@ -14,84 +14,57 @@ const commandPaletteSource = readFileSync(
   'utf8'
 );
 
-const PRIMARY_EMERGENCY_OS_PATHS = [
-  '/emergency/whiteboard',
-  '/emergency/patients',
-  '/emergency/journey',
+const CANONICAL_SIDEBAR_PATHS = [
+  '/emergency',
+  '/emergency/pulse',
   '/emergency/ems',
-  '/emergency/intake',
-  '/emergency/queues',
-  '/emergency/reassessment',
-  '/emergency/capacity',
-  '/emergency/boarding',
   '/emergency/referrals',
-  '/emergency/provincial-health',
-  '/emergency/integrations',
-  '/emergency/copilot',
-  '/emergency/analytics',
-  '/emergency/simulation',
-  '/emergency/federated-learning',
-  '/emergency/digital-twin',
-  '/ai-governance',
-  '/emergency/settings',
+  '/emergency/capacity',
+  '/emergency/tools',
+  '/emergency/shift',
+  '/settings',
 ];
 
 describe('AppShell navigation surfaces', () => {
-  it('renders one AppShell rail and no legacy sidebar or bottom navigation', () => {
-    expect(appShellJsx.match(/className="ed-nav-rail"/g)).toHaveLength(1);
-    expect(appShellJsx.match(/aria-label="Emergency OS navigation"/g)).toHaveLength(1);
-    expect(appShellJsx).not.toContain('<Sidebar');
+  it('renders the canonical Sidebar and no legacy rail or bottom navigation component', () => {
+    expect(appShellJsx).toContain('<Sidebar />');
+    expect(appShellJsx).not.toContain('className="ed-nav-rail"');
+    expect(appShellJsx).not.toContain('aria-label="Emergency OS navigation"');
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
     expect(appShellCss).not.toContain('app-shell-bottom-nav');
   });
 
-  it('keeps nav items in the canonical AppShell config array', () => {
+  it('keeps nav items projected from the canonical unified config', () => {
     expect(navigationConfig).toContain('export const APP_SHELL_NAV_ITEMS');
-    expect(appShellJsx).toContain('APP_SHELL_NAV_ITEMS.map');
-    expect(appShellJsx).toContain('label: item.label');
-    expect(appShellJsx).toContain('icon: getNavIcon(item.iconKey || item.id)');
+    expect(navigationConfig).toContain("import { NAVIGATION_ITEMS } from './unified-navigation.config'");
     expect(appShellJsx).not.toContain('SIDEBAR_ICON_COMPONENTS');
-    expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureId)).toEqual([
-      'emergency_whiteboard',
-      'emergency_patients',
-      'patient_journey',
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureGate)).toEqual([
+      null,
+      null,
       'ems_pipeline',
-      'smart_intake',
-      'queue_intelligence',
-      'reassessment_engine',
-      'capacity_intelligence',
-      'boarding_intelligence',
-      'referral_intelligence',
-      'provincial_health',
-      'integration_hub',
-      'ed_copilot',
-      'emergency_analytics',
-      'real_time_simulation',
-      'federated_learning',
-      'hybrid_digital_twin',
-      'ai_governance',
-      'emergency_settings',
+      'referral_intel',
+      'capacity_intel',
+      'clinical_tools',
+      null,
+      null,
     ]);
   });
 
   it('keeps each rail item wired to a route and active path list', () => {
     for (const item of APP_SHELL_NAV_ITEMS) {
       expect(item.path, item.id).toMatch(/^\//);
+      expect(item.route, item.id).toMatch(/^\//);
       expect(item.iconKey, item.id).toMatch(/^[a-z0-9-]+$/);
       expect(item.activePaths.length, item.id).toBeGreaterThan(0);
       expect(item.activePaths.every((path) => path.startsWith('/')), item.id).toBe(true);
     }
-    expect(appShellJsx).toContain('<Link');
-    expect(appShellJsx).toContain('to={item.path}');
-    expect(appShellJsx).toContain("isActive ? 'ed-nav-rail__item--active' : ''");
-    expect(appShellJsx).toContain("aria-current={isActive ? 'page' : undefined}");
-    expect(appShellJsx).toContain('title={isNew ? `${item.label} - New` : item.label}');
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.route)).toEqual(CANONICAL_SIDEBAR_PATHS);
   });
 
-  it('keeps every primary Emergency OS route reachable from the command palette', () => {
+  it('keeps canonical sidebar destinations reachable from the command palette where command-backed', () => {
     expect(commandPaletteSource).toContain('export const EMERGENCY_OS_ROUTE_COMMANDS');
     const commandPaths = EMERGENCY_OS_ROUTE_COMMANDS.map((command) => command.build().path);
-    for (const path of PRIMARY_EMERGENCY_OS_PATHS) {
+    for (const path of ['/emergency/ems', '/emergency/referrals', '/emergency/capacity']) {
       expect(commandPaths, path).toContain(path);
     }
   });
@@ -108,15 +81,11 @@ describe('AppShell navigation surfaces', () => {
     expect(appShellJsx).toContain('<StaffAvatar');
   });
 
-  it('keeps tablet bottom tabs complete and clickable at 1024px', () => {
-    expect(appShellCss).toMatch(
-      /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__items\s*\{[\s\S]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(44px,\s*1fr\)\)/
-    );
-    expect(appShellCss).toMatch(
-      /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__item\s*\{[\s\S]*display:\s*flex/
-    );
-    expect(appShellCss).not.toContain('.ed-nav-rail__item:nth-child(-n + 5)');
-    expect(APP_SHELL_NAV_ITEMS).toHaveLength(19);
+  it('delegates mobile bottom tabs to Sidebar.css', () => {
+    const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
+    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)/);
+    expect(sidebarCss).toContain('.sidebar-nav-item:nth-of-type(n + 6)');
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(8);
   });
 
   it('closes only the topmost AppShell panel on Escape', () => {

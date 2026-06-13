@@ -576,7 +576,7 @@ export default function Artifacts() {
         <section className="artifacts-list" aria-label="Artifact results">
           <div className="artifacts-section-heading">
             <h2>Artifacts</h2>
-            <span>{loading ? 'Loading...' : `${filteredArtifacts.length} results`}</span>
+            <span>{loading ? 'Loading department data...' : `${filteredArtifacts.length} results`}</span>
           </div>
           {filteredArtifacts.length === 0 ? (
             <div className="artifacts-empty" role="status">

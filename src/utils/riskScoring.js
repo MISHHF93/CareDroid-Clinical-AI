@@ -34,7 +34,7 @@ export const computeRiskScore = (tool, results) => {
     }
   }
 
-  // Lab Interpreter Risk Assessment
+  // Critical result risk assessment for ED decision support
   if ((tool === 'lab-interpreter' || tool === 'lab-interp') && results.criticalCount !== undefined) {
     const criticalCount = results.criticalCount || 0;
     const abnormalCount = results.abnormalCount || 0;

@@ -1,12 +1,14 @@
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
-export const LONG_WAIT_THRESHOLDS_BY_PRIORITY = {
+export const CTAS_TARGETS = {
   [Priority.P1]: 0,
   [Priority.P2]: 15,
   [Priority.P3]: 30,
   [Priority.P4]: 60,
   [Priority.P5]: 120,
 };
+
+export const LONG_WAIT_THRESHOLDS_BY_PRIORITY = CTAS_TARGETS;
 
 export const LONG_WAIT_PHASE_RANK = {
   none: 0,
@@ -23,36 +25,79 @@ function patientName(patient) {
   return patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Unknown patient';
 }
 
-export function waitMinutesForPatient(patient, now = new Date()) {
+function targetSource(settingsOrTargets = {}) {
+  return settingsOrTargets.ctasThresholds ||
+    settingsOrTargets.thresholds?.ctasTargets ||
+    settingsOrTargets.thresholds?.ctasThresholds ||
+    settingsOrTargets;
+}
+
+function patientFlags(patient) {
+  return Array.isArray(patient?.flags) ? patient.flags : [];
+}
+
+function hasFlag(patient, flag) {
+  return patientFlags(patient).includes(flag);
+}
+
+function roundedPercent(numerator, denominator) {
+  if (!denominator) return 0;
+  return Math.round((numerator / denominator) * 100);
+}
+
+export function resolveCtasTargets(settingsOrTargets = {}) {
+  const source = targetSource(settingsOrTargets);
+  return Object.fromEntries(
+    Object.values(Priority).map((priority) => {
+      const configured = Number(source?.[priority]);
+      const fallback = CTAS_TARGETS[priority];
+      return [priority, Number.isFinite(configured) && configured >= 0 ? configured : fallback];
+    })
+  );
+}
+
+export function waitMinutesExactForPatient(patient, now = new Date()) {
   const arrivedAt = new Date(patient?.arrivalTime).getTime();
   if (!Number.isFinite(arrivedAt)) return 0;
-  return Math.max(0, Math.round((now.getTime() - arrivedAt) / 60000));
+  return Math.max(0, (now.getTime() - arrivedAt) / 60000);
 }
 
-export function longWaitThresholdForPriority(priority) {
-  return LONG_WAIT_THRESHOLDS_BY_PRIORITY[priority] ?? LONG_WAIT_THRESHOLDS_BY_PRIORITY[Priority.P5];
+export function waitMinutesForPatient(patient, now = new Date()) {
+  return Math.round(waitMinutesExactForPatient(patient, now));
 }
 
-export function longWaitStatus(patient, now = new Date()) {
+export function longWaitThresholdForPriority(priority, settingsOrTargets = {}) {
+  const targets = resolveCtasTargets(settingsOrTargets);
+  return targets[priority] ?? targets[Priority.P5];
+}
+
+export function longWaitStatus(patient, now = new Date(), settingsOrTargets = {}) {
+  const thresholdMinutes = longWaitThresholdForPriority(patient?.priority, settingsOrTargets);
+  const waitMinutesExact = waitMinutesExactForPatient(patient, now);
+  const waitMinutes = Math.round(waitMinutesExact);
+  const warningAt = thresholdMinutes;
+  const criticalAt = thresholdMinutes * 1.5;
+  const lwbsAt = thresholdMinutes * 2;
+
   if (!patient || patient.state !== PatientState.Waiting) {
     return {
       phase: 'none',
-      waitMinutes: waitMinutesForPatient(patient, now),
-      thresholdMinutes: longWaitThresholdForPriority(patient?.priority),
+      waitMinutes,
+      waitMinutesExact,
+      thresholdMinutes,
+      warningAt,
       criticalMinutes: Infinity,
+      criticalAt: Infinity,
       lwbsMinutes: Infinity,
+      lwbsAt: Infinity,
       reason: '',
     };
   }
 
-  const thresholdMinutes = longWaitThresholdForPriority(patient.priority);
-  const waitMinutes = waitMinutesForPatient(patient, now);
-  const criticalMinutes = thresholdMinutes === 0 ? 0 : Math.ceil(thresholdMinutes * 1.5);
-  const lwbsMinutes = thresholdMinutes === 0 ? 1 : thresholdMinutes * 2;
   let phase = 'none';
-  if (waitMinutes >= thresholdMinutes) phase = 'warning';
-  if (waitMinutes >= criticalMinutes) phase = 'critical';
-  if (waitMinutes >= lwbsMinutes) phase = 'lwbs';
+  if (waitMinutesExact >= warningAt) phase = 'warning';
+  if (waitMinutesExact >= criticalAt) phase = 'critical';
+  if (waitMinutesExact >= lwbsAt) phase = 'lwbs';
 
   const reason =
     phase === 'lwbs'
@@ -66,9 +111,13 @@ export function longWaitStatus(patient, now = new Date()) {
   return {
     phase,
     waitMinutes,
+    waitMinutesExact,
     thresholdMinutes,
-    criticalMinutes,
-    lwbsMinutes,
+    warningAt,
+    criticalMinutes: criticalAt,
+    criticalAt,
+    lwbsMinutes: lwbsAt,
+    lwbsAt,
     reason,
   };
 }
@@ -83,14 +132,14 @@ export function longWaitSeverityForPhase(phase) {
   return 'Info';
 }
 
-export function longWaitSortWeight(patient, now = new Date()) {
-  const status = longWaitStatus(patient, now);
+export function longWaitSortWeight(patient, now = new Date(), settingsOrTargets = {}) {
+  const status = longWaitStatus(patient, now, settingsOrTargets);
   return LONG_WAIT_PHASE_RANK[status.phase] || 0;
 }
 
-export function getLongWaitPatients(patients = [], now = new Date()) {
+export function getLongWaitPatients(patients = [], now = new Date(), settingsOrTargets = {}) {
   return patients
-    .map((patient) => ({ patient, status: longWaitStatus(patient, now) }))
+    .map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }))
     .filter((entry) => entry.status.phase !== 'none')
     .sort(
       (a, b) =>
@@ -99,12 +148,12 @@ export function getLongWaitPatients(patients = [], now = new Date()) {
     );
 }
 
-export function getLongestWaitingPatient(patients = [], now = new Date()) {
-  return getLongWaitPatients(patients, now)[0] || null;
+export function getLongestWaitingPatient(patients = [], now = new Date(), settingsOrTargets = {}) {
+  return getLongWaitPatients(patients, now, settingsOrTargets)[0] || null;
 }
 
-export function formatLongWaitForCopilot(patients = [], now = new Date()) {
-  return getLongWaitPatients(patients, now)
+export function formatLongWaitForCopilot(patients = [], now = new Date(), settingsOrTargets = {}) {
+  return getLongWaitPatients(patients, now, settingsOrTargets)
     .filter((entry) => entry.status.phase === 'critical' || entry.status.phase === 'lwbs')
     .map(
       ({ patient, status }) =>
@@ -112,20 +161,47 @@ export function formatLongWaitForCopilot(patients = [], now = new Date()) {
     );
 }
 
-export function formatLongestWaitBroadcast(patients = [], now = new Date()) {
-  const longest = getLongestWaitingPatient(patients, now);
+export function formatLongWaitAttentionForCopilot(patients = [], now = new Date(), settingsOrTargets = {}) {
+  const longest = patients
+    .filter((patient) => patient?.state !== PatientState.Discharge && hasFlag(patient, PatientFlag.LongWait))
+    .map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }))
+    .sort((a, b) => b.status.waitMinutes - a.status.waitMinutes)[0];
+  if (!longest) return '';
+
+  const { patient, status } = longest;
+  return `ATTENTION: Longest waiting patient — ${patientName(patient)}, ${status.waitMinutes}min, ${patient.priority}, ${patient.chiefComplaint || patient.complaintCategory || 'Complaint pending'}`;
+}
+
+export function formatLongestWaitBroadcast(patients = [], now = new Date(), settingsOrTargets = {}) {
+  const longest = getLongestWaitingPatient(patients, now, settingsOrTargets);
   if (!longest) return '';
   const { patient, status } = longest;
   return `Longest waiting patient: ${patientName(patient)} ${status.waitMinutes} min · ${patient.priority} · ${patient.chiefComplaint || patient.complaintCategory}`;
 }
 
-export function longWaitShiftMetrics(patients = [], now = new Date()) {
-  const entries = patients.map((patient) => ({ patient, status: longWaitStatus(patient, now) }));
+export function longWaitShiftMetrics(patients = [], now = new Date(), settingsOrTargets = {}) {
+  const entries = patients.map((patient) => ({ patient, status: longWaitStatus(patient, now, settingsOrTargets) }));
+  const waitingEntries = entries.filter((entry) => entry.patient?.state === PatientState.Waiting);
+  const exceedingTargetCount = waitingEntries.filter((entry) => entry.status.waitMinutesExact >= entry.status.thresholdMinutes).length;
+  const longWaitEvents = entries.filter(
+    (entry) => hasFlag(entry.patient, PatientFlag.LongWait) || entry.status.phase !== 'none'
+  ).length;
+  const lwbsRiskEvents = entries.filter(
+    (entry) => hasFlag(entry.patient, PatientFlag.LWBSRisk) || entry.status.phase === 'lwbs'
+  ).length;
+
   return {
+    longWaitEvents,
+    lwbsRiskEvents,
+    maxWaitMinutes: entries.length
+      ? Math.max(...entries.map((entry) => entry.status.waitMinutes || 0))
+      : 0,
+    exceedingTargetCount,
+    exceedingTargetPercent: roundedPercent(exceedingTargetCount, waitingEntries.length),
     longestWaitMinutes: entries.length
       ? Math.max(...entries.map((entry) => entry.status.waitMinutes || 0))
       : 0,
-    exceededTargetCount: entries.filter((entry) => entry.status.phase !== 'none').length,
-    nearLwbsCount: entries.filter((entry) => entry.status.phase === 'lwbs').length,
+    exceededTargetCount: exceedingTargetCount,
+    nearLwbsCount: lwbsRiskEvents,
   };
 }

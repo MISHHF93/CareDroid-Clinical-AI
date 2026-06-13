@@ -2,7 +2,6 @@ import type { AIRequestType, ToolDefinition } from './types';
 import type {
   AlertSeverity,
   Patient,
-  PatientFlag,
   PatientState,
   Priority,
   QueueType,
@@ -202,6 +201,7 @@ const TOOL_BY_NAME: Record<EmergencyToolName, ToolDefinition> = {
 const TOOLS_BY_REQUEST_TYPE: Record<AIRequestType, EmergencyToolName[]> = {
   COPILOT_CHAT: Object.keys(TOOL_BY_NAME) as EmergencyToolName[],
   SCORE_ASSIST: ['launch_calculator'],
+  INTAKE_SUGGEST: ['get_patient_details', 'launch_calculator'],
   INTAKE_SUGGESTION: ['get_patient_details', 'launch_calculator'],
   CLINICAL_SUMMARY: ['get_patient_details', 'search_patients', 'get_capacity_status'],
   HANDOFF_BRIEF: [],
@@ -498,10 +498,17 @@ function getStoreState(): any | null {
   }
 }
 
-function normalizeFlag(flagInput: any, reason?: string): PatientFlag {
+type NormalizedFlag = {
+  type: string;
+  reason: string;
+  detectedAt: string;
+  severity: 'Info' | 'Warning' | 'Critical';
+};
+
+function normalizeFlag(flagInput: any, reason?: string): NormalizedFlag {
   const flag = typeof flagInput === 'string' ? { type: flagInput } : flagInput || {};
   return {
-    type: flag.type,
+    type: String(flag.type || 'HighRisk'),
     reason: reason || flag.reason || 'AI suggested flag for human review.',
     detectedAt: flag.detectedAt || new Date().toISOString(),
     severity: flag.severity || 'Warning',

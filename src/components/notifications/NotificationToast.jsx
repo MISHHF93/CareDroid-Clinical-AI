@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { dispatchAlert } from '../../engine/alertEngine';
 import './NotificationToast.css';
 
 /**
@@ -11,98 +12,42 @@ import './NotificationToast.css';
  * @param {Function} onDismiss - Callback when toast is dismissed
  */
 export const NotificationToastContainer = ({ toasts = [], onDismiss }) => {
-  return (
-    <div className="notification-toast-container" role="region" aria-label="Notifications" aria-live="polite">
-      {toasts.map(toast => (
-        <NotificationToast
-          key={toast.id}
-          toast={toast}
-          onDismiss={() => onDismiss(toast.id)}
-        />
-      ))}
-    </div>
-  );
-};
-
-/**
- * Individual Toast Component
- */
-const NotificationToast = ({ toast, onDismiss }) => {
   useEffect(() => {
-    const timer = setTimeout(onDismiss, 4000);
-    return () => clearTimeout(timer);
-  }, [onDismiss]);
+    toasts.forEach((notice) => {
+      dispatchNotice(notice);
+      onDismiss?.(notice.id);
+    });
+  }, [onDismiss, toasts]);
 
-  const getIcon = (type) => {
-    const icons = {
-      success: '✓',
-      error: '✕',
-      warning: '⚠',
-      info: 'ℹ',
-      critical: '🚨',
-    };
-    return icons[type] || 'ℹ';
-  };
-
-  const handleAction = () => {
-    if (toast.action?.onClick) {
-      toast.action.onClick();
-    }
-    onDismiss();
-  };
-
-  return (
-    <div className={`notification-toast notification-toast-${toast.type}`} role="status">
-      <div className="toast-icon">{getIcon(toast.type)}</div>
-      
-      <div className="toast-content">
-        {toast.title && <h4 className="toast-title">{toast.title}</h4>}
-        {toast.message && <p className="toast-message">{toast.message}</p>}
-      </div>
-
-      {toast.action && (
-        <button
-          className="toast-action"
-          onClick={handleAction}
-          aria-label={toast.action.label}
-        >
-          {toast.action.label}
-        </button>
-      )}
-
-      <button
-        className="toast-close"
-        onClick={onDismiss}
-        aria-label="Close notification"
-      >
-        ✕
-      </button>
-    </div>
-  );
+  return null;
 };
 
 /**
  * Custom Hook for Using Toasts
  * Usage:
- * const { toasts, addToast, removeToast } = useToasts();
+ * const { addToast } = useToasts();
  * addToast({ type: 'success', title: 'Success!', message: 'Operation completed.' });
  */
 export const useToasts = () => {
-  const [toasts, setToasts] = useState([]);
-
-  const addToast = (toast) => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, ...toast }]);
-    return id;
+  const addToast = (notice) => {
+    return dispatchNotice(notice);
   };
 
-  const removeToast = (id) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  const removeToast = () => {};
+  const clearToasts = () => {};
 
-  const clearToasts = () => {
-    setToasts([]);
-  };
-
+  const toasts = [];
   return { toasts, addToast, removeToast, clearToasts };
 };
+
+function dispatchNotice(notice) {
+  return dispatchAlert({
+    type: 'System',
+    severity: notice.type === 'critical' || notice.type === 'error' ? 'Critical' : notice.type === 'warning' ? 'Warning' : 'Info',
+    title: notice.title || notice.message || 'Notification',
+    message: notice.message || notice.title || 'Review notification details.',
+    actionLabel: notice.action?.label,
+    actionFn: notice.action?.onClick,
+    source: 'notification-toast-compat',
+  });
+}

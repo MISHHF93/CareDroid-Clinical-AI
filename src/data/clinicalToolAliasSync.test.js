@@ -16,7 +16,6 @@ import {
   buildMetadataParityReport,
   buildSynchronizedAliasMap,
   exportSynchronizedAliasMapJson,
-  formatAliasSyncReport,
 } from './clinicalToolAliasSync';
 import { aliasToSlug, extractToolPatternKeywords } from './parseToolPatterns';
 import { readToolPatternsSource } from './clinicalToolAliasSync';
@@ -46,9 +45,6 @@ describe('clinicalToolAliasSync — catalog aliases (PR1–PR7 + fleet)', () => 
   const report = buildClinicalToolAliasSyncReport({ patternsSource });
 
   it('has no missing or wrong required catalog alias targets', () => {
-    if (report.missingCatalogAliases.length || report.wrongCatalogTargets.length) {
-      console.log(formatAliasSyncReport(report));
-    }
     expect(report.wrongCatalogTargets).toEqual([]);
     expect(report.missingCatalogAliases).toEqual([]);
   });
@@ -79,9 +75,6 @@ describe('clinicalToolAliasSync — catalog aliases (PR1–PR7 + fleet)', () => 
 describe('clinicalToolAliasSync — metadata parity', () => {
   it('matches toolName and category for every NLU profile in frontend vs backend', () => {
     const mismatches = buildMetadataParityReport(patternsSource);
-    if (mismatches.length) {
-      console.log('metadata mismatches:', mismatches);
-    }
     expect(mismatches).toEqual([]);
   });
 });
@@ -106,9 +99,6 @@ describe('clinicalToolAliasSync — chat-assisted tools', () => {
 
   it('has backend keyword coverage for chat-assisted NLU tools and config aliases', () => {
     const gaps = buildChatAssistedBackendCoverageReport(patternsSource);
-    if (gaps.length) {
-      console.log('chat-assisted gaps:', gaps);
-    }
     expect(gaps).toEqual([]);
   });
 });
@@ -128,16 +118,10 @@ describe('clinicalToolAliasSync — safety and collisions', () => {
   });
 
   it('has no catalog alias slug collisions across different registry targets', () => {
-    if (report.catalogAliasCollisions.length) {
-      console.log(formatAliasSyncReport(report));
-    }
     expect(report.catalogAliasCollisions).toEqual([]);
   });
 
   it('documents expected backend keyword overlaps only via allowlist', () => {
-    if (report.backendKeywordCollisions.length) {
-      console.log(formatAliasSyncReport(report));
-    }
     expect(report.backendKeywordCollisions).toEqual([]);
   });
 });

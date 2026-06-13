@@ -13,9 +13,12 @@ function appShellNavItemFromUnified(item) {
     label: item.label,
     mobileLabel: item.mobileLabel || item.label,
     iconKey: item.icon,
-    featureId: item.featureId || item.id,
+    featureGate: item.featureGate,
+    featureId: item.featureId || item.featureGate || item.id,
     path: item.path,
+    route: item.route,
     activePaths: item.activePaths || [item.path],
+    matchPaths: item.activePaths || [item.path],
     roles: item.roles,
     isEmergencyCore: item.isEmergencyCore,
     order: item.order,
@@ -28,113 +31,7 @@ export const APP_SHELL_NAV_ITEMS = Object.freeze(
 
 export const EMERGENCY_SIDEBAR_NAV_ITEMS = APP_SHELL_NAV_ITEMS;
 
-export const PRIMARY_NAV_ITEMS = Object.freeze([
-  {
-    id: 'home',
-    label: 'Whiteboard',
-    mobileLabel: 'Board',
-    path: CANONICAL_ROUTES.emergencyWorkspace,
-    legacyPaths: ['/home', CANONICAL_ROUTES.dashboard],
-    matchPaths: ['/home', CANONICAL_ROUTES.dashboard, '/workspace/emergency', '/workspace/emergency/whiteboard'],
-  },
-  {
-    id: 'patients',
-    label: 'Patients',
-    mobileLabel: 'Patients',
-    path: CANONICAL_ROUTES.emergencyPatients,
-    matchPaths: ['/workspace/emergency/patients', '/workspace/emergency/patient-path', '/patients'],
-  },
-  {
-    id: 'ems',
-    label: 'EMS',
-    mobileLabel: 'EMS',
-    path: CANONICAL_ROUTES.emergencyEms,
-    matchPaths: ['/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
-  },
-  {
-    id: 'operations',
-    label: 'Operations',
-    mobileLabel: 'Ops',
-    path: CANONICAL_ROUTES.emergencyOperations,
-    matchPaths: [
-      '/workspace/emergency/flow',
-      '/workspace/emergency/referrals',
-      '/workspace/emergency/capacity',
-      '/workspace/emergency/analytics',
-      '/workspace/emergency/boarding',
-      '/workspace/emergency/queues',
-      '/workspace/emergency/waiting-room',
-      '/workspace/emergency/throughput',
-      '/workspace/emergency/director',
-      '/workspace/emergency/charge-nurse',
-    ],
-    matchPrefixes: ['/workspace/emergency/operations'],
-  },
-  {
-    id: 'assistant',
-    label: 'Copilot',
-    mobileLabel: 'AI',
-    path: CANONICAL_ROUTES.emergencyCopilot,
-    legacyPaths: [CANONICAL_ROUTES.assistant, '/chat', '/ai', '/copilot'],
-    matchPaths: [
-      CANONICAL_ROUTES.assistant,
-      '/chat',
-      '/ai',
-      '/copilot',
-      '/workspace/emergency/command-center',
-      '/workspace/emergency/triage',
-      '/workspace/emergency/evidence',
-      '/workspace/emergency/knowledge',
-    ],
-  },
-  {
-    id: 'clinical-tools',
-    label: 'Clinical Tools',
-    mobileLabel: 'Tools',
-    path: CANONICAL_ROUTES.emergencyTools,
-    showInSidebar: false,
-    showInMobile: false,
-    matchPaths: [CANONICAL_ROUTES.emergencyTools, '/tools', '/tools/calculators'],
-    matchPrefixes: ['/tools/calculators/'],
-  },
-  {
-    id: 'profile',
-    label: 'Profile',
-    mobileLabel: 'Profile',
-    path: CANONICAL_ROUTES.profile,
-    matchPaths: [
-      CANONICAL_ROUTES.profile,
-      '/profile/activity',
-      CANONICAL_ROUTES.profileToolPreferences,
-      '/profile/security',
-    ],
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    mobileLabel: 'Settings',
-    path: CANONICAL_ROUTES.settings,
-    showInSidebar: false,
-    showInMobile: false,
-    disclosure: 'account',
-    matchPaths: [
-      CANONICAL_ROUTES.settings,
-      CANONICAL_ROUTES.settingsFeatures,
-      CANONICAL_ROUTES.profileSettings,
-      '/profile/preferences',
-      '/profile-settings',
-      CANONICAL_ROUTES.notifications,
-      '/notification-preferences',
-      '/team',
-      '/consent',
-      '/consent-history',
-      '/two-factor-setup',
-      '/biometric-setup',
-      '/welcome',
-      '/onboarding',
-    ],
-  },
-]);
+export const PRIMARY_NAV_ITEMS = APP_SHELL_NAV_ITEMS;
 
 export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
   {
@@ -747,12 +644,6 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
 );
 
 const NORMAL_PRIMARY_NAV_IDS = new Set([
-  'home',
-  'patients',
-  'ems',
-  'operations',
-  'assistant',
-  'profile',
   ...APP_SHELL_NAV_ITEMS.map((item) => item.id),
 ]);
 const UTILITY_NAV_IDS = new Set(['search', 'notifications']);

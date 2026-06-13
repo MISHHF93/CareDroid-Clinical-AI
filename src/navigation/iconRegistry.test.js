@@ -45,8 +45,15 @@ describe('iconRegistry semantic icon map', () => {
 
   it('keeps Emergency OS rail icons semantically distinct', () => {
     expect(getNavIcon('emergency-whiteboard')).toBe(CHROME_ICONS.layoutDashboard);
+    expect(getNavIcon('layout-dashboard')).toBe(CHROME_ICONS.layoutDashboard);
     expect(getNavIcon('emergency-patients')).toBe(CHROME_ICONS.users);
     expect(getNavIcon('journey')).toBe(CHROME_ICONS.gitBranch);
+    expect(getNavIcon('ambulance')).toBe(CHROME_ICONS.truck);
+    expect(getNavIcon('send')).toBe(CHROME_ICONS.share);
+    expect(getNavIcon('chart-bar')).toBe(CHROME_ICONS.barChart);
+    expect(getNavIcon('department-pulse')).toBe(CHROME_ICONS.heartPulse);
+    expect(getNavIcon('stethoscope')).toBe(CHROME_ICONS.stethoscope);
+    expect(getNavIcon('report-analytics')).toBe(CHROME_ICONS.clipboardList);
     expect(getNavIcon('queues')).toBe(CHROME_ICONS.clock);
     expect(getNavIcon('reassessment')).toBe(CHROME_ICONS.calendarClock);
     expect(getNavIcon('capacity')).toBe(CHROME_ICONS.gauge);
@@ -56,7 +63,7 @@ describe('iconRegistry semantic icon map', () => {
     expect(getNavIcon('integrations')).toBe(CHROME_ICONS.shareLink);
 
     const railIcons = APP_SHELL_NAV_ITEMS.map((item) => getNavIcon(item.iconKey || item.id));
-    expect(new Set(railIcons).size).toBeGreaterThanOrEqual(10);
+    expect(new Set(railIcons).size).toBeGreaterThanOrEqual(6);
   });
 
   it('resolves an icon for every navigation destination', () => {

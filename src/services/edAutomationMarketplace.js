@@ -99,7 +99,7 @@ export const EdAutomationMarketplace = Object.freeze({
       modules: this.getMarketplaceModules(automations),
       metrics: this.getMarketplaceMetrics(automations),
       packagingStatement:
-        'Emergency automations are packaged as sellable SaaS modules with tiering, visibility, enablement state, and ROI estimates.',
+        'Emergency automations are packaged as sellable SaaS features with tiering, visibility, enablement state, and ROI estimates.',
     });
   },
 });

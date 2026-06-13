@@ -162,7 +162,7 @@ export default function SmartIntake() {
     <section className="smart-intake" aria-labelledby="smart-intake-title">
       <header className="smart-intake__hero">
         <div>
-          <span>CareDroid Emergency OS</span>
+          <span>Emergency OS</span>
           <h1 id="smart-intake-title">Smart Intake Identity Review</h1>
           <p>
             Verify extracted identity, medication, allergy, EMS, and referral evidence before creating,

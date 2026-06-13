@@ -229,7 +229,7 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded } =
                   ) : null}
                 </SummarySection>
 
-                <SummarySection title="Alerts" emptyText="No alerts extracted.">
+                <SummarySection title="Alerts" emptyText="All clear">
                   {result.alerts?.length ? (
                     <ul>
                       {result.alerts.map((alert) => (

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -654,7 +654,9 @@ export default function ReferralPanel() {
       ) : null}
 
       <div className="referral-panel__groups">
-        {groupedReferrals.map((group) => (
+        {!referrals.length ? (
+          <p className="referral-group__empty">No active referrals</p>
+        ) : groupedReferrals.map((group) => (
           <section key={group.status} className="referral-group" aria-labelledby={`referrals-${group.status}`}>
             <div className="referral-group__heading">
               <h2 id={`referrals-${group.status}`}>{statusLabel(group.status)}</h2>

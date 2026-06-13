@@ -36,7 +36,7 @@ export const INITIAL_AUTOMATION_AUDIT_ENTRIES = Object.freeze([
     actionSelected: 'Notify clinician escalation pool',
     user: { id: 'user-demo-clinician', name: 'Demo Clinician' },
     tenant: { id: 'tenant-demo-hospital', name: 'Demo Hospital' },
-    workspace: { id: 'emergency', name: 'Emergency Workspace' },
+    workspace: { id: 'emergency', name: 'Emergency OS' },
     aiInvolvement: { involved: true, summary: 'AI reviewed deterioration context and suggested NEWS2 escalation.' },
     toolCalled: 'news2',
     backendEndpoint: '/api/clinical/alerts',

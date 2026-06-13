@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 import {
   createSnooze,
   formatWhoNextForCopilot,

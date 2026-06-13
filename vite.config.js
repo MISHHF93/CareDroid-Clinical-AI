@@ -94,6 +94,15 @@ export default defineConfig(({ mode }) => {
             const normalizedId = id.replaceAll('\\', '/');
 
             if (normalizedId.includes('node_modules')) {
+              if (
+                normalizedId.includes('/react/') ||
+                normalizedId.includes('/react-dom/') ||
+                normalizedId.includes('/react-router-dom/') ||
+                normalizedId.includes('/@remix-run/router/') ||
+                normalizedId.includes('/scheduler/')
+              ) {
+                return 'vendor-react';
+              }
               if (normalizedId.includes('recharts')) {
                 return 'vendor-charts';
               }
@@ -103,10 +112,44 @@ export default defineConfig(({ mode }) => {
               if (normalizedId.includes('firebase')) {
                 return 'vendor-firebase';
               }
-              if (normalizedId.includes('lucide-react')) {
+              if (
+                normalizedId.includes('lucide-react') ||
+                normalizedId.includes('@tabler/icons-react')
+              ) {
                 return 'vendor-icons';
               }
+              if (
+                normalizedId.includes('axios') ||
+                normalizedId.includes('socket.io-client') ||
+                normalizedId.includes('engine.io-client')
+              ) {
+                return 'vendor-network';
+              }
               return 'vendor';
+            }
+
+            if (
+              normalizedId.includes('/src/data/clinicalIntentToolCatalog') ||
+              normalizedId.includes('/src/data/clinicalToolIdContract') ||
+              normalizedId.includes('/src/data/clinicalCatalogWiring') ||
+              normalizedId.includes('/src/data/chatAssistedHubGroups')
+            ) {
+              return 'data-clinical-tools';
+            }
+            if (
+              normalizedId.includes('/src/data/toolInventory') ||
+              normalizedId.includes('/src/data/toolRegistry') ||
+              normalizedId.includes('/src/data/sidebarToolPresentation')
+            ) {
+              return 'data-tool-registry';
+            }
+            if (
+              normalizedId.includes('/src/config/unified-navigation') ||
+              normalizedId.includes('/src/config/navigation') ||
+              normalizedId.includes('/src/data/workspaceExperience') ||
+              normalizedId.includes('/src/data/workspaceArchitecture')
+            ) {
+              return 'data-navigation';
             }
 
             if (normalizedId.includes('/src/pages/tools/mentalHealthCalculators')) {

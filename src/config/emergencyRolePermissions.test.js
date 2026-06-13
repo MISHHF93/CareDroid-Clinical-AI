@@ -36,17 +36,16 @@ describe('Emergency OS role-based views', () => {
       EMERGENCY_ROLE_IDS.registrationClerk,
       APP_SHELL_NAV_ITEMS,
     ).map((item) => item.id);
-    expect(clerkNavIds).toContain('smart_intake');
-    expect(clerkNavIds).toContain('emergency_patients');
-    expect(clerkNavIds).not.toContain('emergency_settings');
-    expect(clerkNavIds).not.toContain('referral_intelligence');
+    expect(clerkNavIds).toEqual(['whiteboard', 'pulse']);
+    expect(clerkNavIds).not.toContain('settings');
+    expect(clerkNavIds).not.toContain('referrals');
 
     const emsNavIds = getVisibleEmergencyNavigationItems(EMERGENCY_ROLE_IDS.emsUser, APP_SHELL_NAV_ITEMS).map(
       (item) => item.id,
     );
-    expect(emsNavIds).toContain('ems_pipeline');
-    expect(emsNavIds).not.toContain('smart_intake');
-    expect(emsNavIds).not.toContain('emergency_settings');
+    expect(emsNavIds).toEqual(['whiteboard', 'pulse', 'ems', 'capacity']);
+    expect(emsNavIds).not.toContain('settings');
+    expect(emsNavIds).not.toContain('referrals');
   });
 
   it('guards page access and falls back to nearest permitted page', () => {

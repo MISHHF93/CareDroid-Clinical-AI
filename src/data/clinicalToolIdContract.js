@@ -1908,7 +1908,7 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'practice stroke scenario': REGISTRY.simulationSuite,
   'launch medical simulation': REGISTRY.simulationSuite,
   'open simulation suite': REGISTRY.simulationSuite,
-  'practice sepsis case': REGISTRY.scenarioPlayer,
+  'practice sepsis scenario': REGISTRY.scenarioPlayer,
   'run stroke scenario': REGISTRY.scenarioPlayer,
   'show my simulation outcomes': REGISTRY.simulationOutcomes,
   'simulation outcomes': REGISTRY.simulationOutcomes,

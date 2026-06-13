@@ -170,7 +170,7 @@ function buildDefaultLinks() {
       source: 'simulation',
       target: 'laboratory',
       relationship: 'scenario-data',
-      rationale: 'Simulation cases include lab panels, abnormal values, and lab dashboard launch points.',
+      rationale: 'Simulation scenarios include lab panels, abnormal values, and lab dashboard launch points.',
       evidence: labEvidence,
       score: 82 + Math.min(labEvidence.length, 8),
     }),

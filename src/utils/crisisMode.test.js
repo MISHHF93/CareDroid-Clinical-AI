@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { deriveCrisisModeState } from './crisisMode';
 
 function patient(id, state, overrides = {}) {

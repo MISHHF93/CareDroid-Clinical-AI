@@ -2,13 +2,13 @@
  * CLI report runner (invoked via npm run safety-compliance:report).
  */
 
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { buildClinicalSafetyComplianceReport } from './clinicalSafetyComplianceReport';
 
 describe('clinicalSafetyCompliance report', () => {
-  it('prints compliance report to stdout', () => {
+  it('builds compliance report', () => {
     const report = buildClinicalSafetyComplianceReport();
-    console.log(report.markdown);
+    expect(report.markdown).toContain('#');
 
     if (report.riskLevel !== 'low' || report.summary.totalFailing > 0) {
       throw new Error(

@@ -7,14 +7,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
-import {
-  startSimulation,
-  startSimulation as startEmergencySimulation,
-  stopSimulation,
-  stopSimulation as stopEmergencySimulation,
-} from './engine/simulation';
-import { useFeatureStore } from '../store/featureStore';
-
 import './index.css';
 
 import './styles/design-tokens.css';
@@ -54,26 +46,6 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 scheduleDeferredStartupTasks();
-
-void useFeatureStore
-  .getState()
-  .initializeFlags()
-  .then(() => {
-    if (useFeatureStore.getState().isEnabled('simulation_engine')) {
-      startEmergencySimulation();
-    }
-  });
-
-if (import.meta.env.DEV) {
-  startSimulation();
-}
-
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    stopSimulation();
-    stopEmergencySimulation();
-  });
-}
 
 const clearDevelopmentServiceWorkers = () => {
   if (!('serviceWorker' in navigator)) return;

@@ -1,0 +1,367 @@
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEmergencyStore } from '../store/emergencyStore';
+import { Patient, PatientFlag, PatientState, Priority, Room } from '../types/emergency';
+
+export const CURRENT_STAFF_ID = 'current-staff';
+export const WHO_NEXT_REFRESH_MS = 30_000;
+export const WHO_NEXT_SNOOZE_TTL_MS = 15 * 60_000;
+export const WHO_NEXT_MATERIAL_SCORE_INCREASE = 25;
+
+const CRITICAL_SNOOZE_FLAGS = [
+  PatientFlag.DeteriorationRisk,
+  PatientFlag.HighRisk,
+  PatientFlag.SepsisAlert,
+  PatientFlag.ReassessmentDue,
+] as const;
+
+type WhoNextMode = 'detail' | 'floating';
+
+export type SnoozedPatient = {
+  patientId: string;
+  snoozedAt: number;
+  scoreAtSnooze: number;
+  flagsAtSnooze: PatientFlag[];
+};
+
+export type WhoNextRecommendation = {
+  patient: Patient;
+  score: number;
+  waitMins: number;
+  reasons: string[];
+  reason: string;
+  detailParts: string[];
+};
+
+type ReasonFactor = {
+  label: string;
+  weight: number;
+};
+
+type WhoNextPanelProps = {
+  mode?: WhoNextMode;
+};
+
+const priorityScore: Record<Priority, number> = {
+  [Priority.P1]: 50,
+  [Priority.P2]: 30,
+  [Priority.P3]: 15,
+  [Priority.P4]: 5,
+  [Priority.P5]: 0,
+};
+
+function waitMinutes(patient: Patient, now: number): number {
+  return (now - new Date(patient.arrivalTime).getTime()) / 60000;
+}
+
+function displayWaitMinutes(patient: Patient, now: number): number {
+  const waitMins = waitMinutes(patient, now);
+  return Number.isFinite(waitMins) ? Math.max(0, Math.round(waitMins)) : 0;
+}
+
+export function hasRunProtocolScores(patient: Patient, now = Date.now()): boolean {
+  const hour4 = now - 4 * 3600000;
+  return patient.notes.some((note) => {
+    const timestamp = note.timestamp || note.createdAt;
+    const text = note.text || note.body || '';
+    return (
+      timestamp !== undefined &&
+      timestamp > new Date(hour4).toISOString() &&
+      (text.includes('HEART') || text.includes('qSOFA') || text.includes('NIHSS'))
+    );
+  });
+}
+
+export function scorePatient(patient: Patient, now: number): number {
+  let score = 0;
+  const waitMins = waitMinutes(patient, now);
+  score += priorityScore[patient.priority] || 0;
+  if (waitMins > 45) score += 20 + (waitMins - 45) * 0.5;
+  if (patient.flags.includes(PatientFlag.ReassessmentDue)) score += 25;
+  if (patient.flags.includes(PatientFlag.DeteriorationRisk)) score += 35;
+  if (patient.flags.includes(PatientFlag.HighRisk)) score += 30;
+  if (patient.flags.includes(PatientFlag.SepsisAlert)) score += 40;
+  if (!hasRunProtocolScores(patient, now)) score += 15;
+  return score;
+}
+
+export function getReasonFactors(patient: Patient, now: number): ReasonFactor[] {
+  const factors: ReasonFactor[] = [];
+  const waitMins = waitMinutes(patient, now);
+  const priorityWeight = priorityScore[patient.priority] || 0;
+
+  if (priorityWeight > 0) factors.push({ label: `${patient.priority} priority`, weight: priorityWeight });
+  if (waitMins > 45) {
+    factors.push({
+      label: `Wait ${displayWaitMinutes(patient, now)}min`,
+      weight: 20 + (waitMins - 45) * 0.5,
+    });
+  }
+  if (patient.flags.includes(PatientFlag.ReassessmentDue)) {
+    factors.push({ label: 'Reassessment due', weight: 25 });
+  }
+  if (patient.flags.includes(PatientFlag.DeteriorationRisk)) {
+    factors.push({ label: 'Deterioration risk', weight: 35 });
+  }
+  if (patient.flags.includes(PatientFlag.HighRisk)) {
+    factors.push({ label: 'High risk', weight: 30 });
+  }
+  if (patient.flags.includes(PatientFlag.SepsisAlert)) {
+    factors.push({ label: 'Sepsis alert', weight: 40 });
+  }
+  if (!hasRunProtocolScores(patient, now)) {
+    factors.push({ label: 'Score overdue', weight: 15 });
+  }
+
+  return factors.sort((a, b) => b.weight - a.weight);
+}
+
+export function hasSnoozeBreakingDeterioration(patient: Patient, snooze: SnoozedPatient, now: number): boolean {
+  const flagsAtSnooze = new Set(snooze.flagsAtSnooze);
+  const hasNewCriticalFlag = CRITICAL_SNOOZE_FLAGS.some(
+    (flag) => patient.flags.includes(flag) && !flagsAtSnooze.has(flag),
+  );
+  const scoreIncrease = scorePatient(patient, now) - snooze.scoreAtSnooze;
+  const hasCriticalFlag = CRITICAL_SNOOZE_FLAGS.some((flag) => patient.flags.includes(flag));
+
+  return hasNewCriticalFlag || (hasCriticalFlag && scoreIncrease >= WHO_NEXT_MATERIAL_SCORE_INCREASE);
+}
+
+export function isSnoozeActive(patient: Patient, snooze: SnoozedPatient, now: number): boolean {
+  const withinTtl = now - snooze.snoozedAt < WHO_NEXT_SNOOZE_TTL_MS;
+  return withinTtl && !hasSnoozeBreakingDeterioration(patient, snooze, now);
+}
+
+export function getAssignedPatients(patients: Patient[]): Patient[] {
+  return patients.filter(
+    (patient) =>
+      patient.assignedStaffId === CURRENT_STAFF_ID &&
+      ![PatientState.Discharge, PatientState.Admission].includes(patient.state),
+  );
+}
+
+export function buildWhoNextRecommendation(
+  patients: Patient[],
+  snoozedPatients: SnoozedPatient[],
+  now: number,
+): WhoNextRecommendation | null {
+  const snoozesByPatientId = new Map(snoozedPatients.map((snooze) => [snooze.patientId, snooze]));
+  const candidates = getAssignedPatients(patients)
+    .filter((patient) => {
+      const snooze = snoozesByPatientId.get(patient.id);
+      return !snooze || !isSnoozeActive(patient, snooze, now);
+    })
+    .map((patient) => ({
+      patient,
+      score: scorePatient(patient, now),
+      waitMins: displayWaitMinutes(patient, now),
+      reasons: getReasonFactors(patient, now).slice(0, 2).map((factor) => factor.label),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  const recommendation = candidates[0];
+  if (!recommendation) return null;
+
+  const detailParts = [
+    recommendation.patient.priority,
+    `Wait ${recommendation.waitMins}min`,
+    !hasRunProtocolScores(recommendation.patient, now) ? 'Score overdue' : null,
+  ].filter((part): part is string => Boolean(part));
+
+  return {
+    ...recommendation,
+    reason: recommendation.reasons.join(' · '),
+    detailParts,
+  };
+}
+
+function patientName(patient: Patient): string {
+  return `${patient.firstName} ${patient.lastName}`.trim() || patient.name || patient.id;
+}
+
+function truncate(value: string, maxLength: number): string {
+  return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value;
+}
+
+function patientLocation(patient: Patient, rooms: Room[]): string {
+  if (patient.location) return patient.location;
+  const roomName = rooms.find((room) => room.id === patient.roomId)?.name;
+  if (roomName) return roomName;
+  if (patient.roomId) return patient.roomId.toUpperCase();
+  return 'Bed pending';
+}
+
+function isTextEntryTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable;
+}
+
+const buttonStyle: CSSProperties = {
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 9,
+  background: '#1C2333',
+  color: '#F9FAFB',
+  cursor: 'pointer',
+  fontSize: 12,
+  fontWeight: 700,
+  padding: '7px 9px',
+};
+
+export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
+  const patients = useEmergencyStore((store) => store.patients);
+  const rooms = useEmergencyStore((store) => store.rooms);
+  const selectPatient = useEmergencyStore((store) => store.selectPatient);
+  const [now, setNow] = useState(() => Date.now());
+  const [visible, setVisible] = useState(true);
+  const [pinned, setPinned] = useState(false);
+  const [snoozedPatients, setSnoozedPatients] = useState<SnoozedPatient[]>([]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(Date.now()), WHO_NEXT_REFRESH_MS);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    if (mode !== 'floating') return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 'w' || event.altKey || event.ctrlKey || event.metaKey || isTextEntryTarget(event.target)) {
+        return;
+      }
+      event.preventDefault();
+      setVisible((current) => (pinned ? true : !current));
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mode, pinned]);
+
+  useEffect(() => {
+    setSnoozedPatients((current) => {
+      const active = current.filter((snooze) => {
+        const patient = patients.find((candidate) => candidate.id === snooze.patientId);
+        return patient && isSnoozeActive(patient, snooze, now);
+      });
+      return active.length === current.length ? current : active;
+    });
+  }, [now, patients]);
+
+  const assignedPatients = useMemo(() => getAssignedPatients(patients), [patients]);
+  const recommendation = useMemo(
+    () => buildWhoNextRecommendation(patients, snoozedPatients, now),
+    [now, patients, snoozedPatients],
+  );
+
+  if (!visible) return null;
+
+  const containerStyle: CSSProperties =
+    mode === 'floating'
+      ? {
+          position: 'fixed',
+          right: 400,
+          bottom: 24,
+          width: 280,
+          zIndex: 330,
+        }
+      : {
+          width: '100%',
+        };
+
+  const closePanel = () => {
+    setPinned(false);
+    setVisible(false);
+  };
+
+  const skipPatient = () => {
+    if (!recommendation) return;
+    const { patient, score } = recommendation;
+    setSnoozedPatients((current) => [
+      ...current.filter((snooze) => snooze.patientId !== patient.id),
+      {
+        patientId: patient.id,
+        snoozedAt: now,
+        scoreAtSnooze: score,
+        flagsAtSnooze: [...patient.flags],
+      },
+    ]);
+  };
+
+  return (
+    <aside style={containerStyle} aria-label="See next patient recommendation">
+      <div
+        style={{
+          background: '#111827',
+          border: pinned ? '1px solid #3B82F6' : '1px solid #1F2937',
+          borderLeft: '4px solid #3B82F6',
+          borderRadius: 12,
+          boxShadow: mode === 'floating' ? '0 18px 48px rgba(0,0,0,0.38)' : 'none',
+          color: '#F9FAFB',
+          padding: 12,
+        }}
+      >
+        <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+          <strong style={{ color: '#93C5FD', fontSize: 11, letterSpacing: '0.12em' }}>SEE NEXT</strong>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              type="button"
+              aria-pressed={pinned}
+              onClick={() => setPinned((current) => !current)}
+              style={{
+                ...buttonStyle,
+                background: pinned ? '#1D4ED8' : '#1C2333',
+                color: pinned ? '#F9FAFB' : '#BFDBFE',
+                padding: '5px 8px',
+              }}
+            >
+              {pinned ? 'Pinned' : 'Pin'}
+            </button>
+            <button
+              type="button"
+              aria-label="Close see next panel"
+              onClick={closePanel}
+              style={{
+                ...buttonStyle,
+                color: '#9CA3AF',
+                padding: '5px 8px',
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        {recommendation ? (
+          <>
+            <div style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 700, marginTop: 10 }}>
+              {patientName(recommendation.patient)} · {patientLocation(recommendation.patient, rooms)} ·{' '}
+              {truncate(recommendation.patient.chiefComplaint, 36)}
+            </div>
+            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 5 }}>
+              {recommendation.detailParts.join(' · ')}
+            </div>
+            <div style={{ color: '#BFDBFE', fontSize: 12, fontWeight: 700, marginTop: 6 }}>
+              {recommendation.reason || 'Assigned patient needs review'}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
+              <button
+                type="button"
+                onClick={() => selectPatient(recommendation.patient.id)}
+                style={{ ...buttonStyle, background: '#2563EB', borderColor: '#2563EB' }}
+              >
+                Go to Patient
+              </button>
+              <button type="button" onClick={skipPatient} style={buttonStyle}>
+                Skip — next
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ color: '#D1D5DB', fontSize: 13, lineHeight: 1.4, marginTop: 10 }}>
+            {assignedPatients.length
+              ? 'All assigned patients snoozed. Recommendations refresh automatically.'
+              : 'No patients assigned. Check department list.'}
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}

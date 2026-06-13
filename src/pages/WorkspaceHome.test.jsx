@@ -77,7 +77,7 @@ describe('WorkspaceHome', () => {
   it('renders workspace context, routes, and recommended tools', () => {
     renderWorkspace();
 
-    expect(screen.getByRole('heading', { name: /^CareDroid Emergency OS$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^Emergency OS$/i })).toBeInTheDocument();
     expect(screen.getByText(/AI-assisted patient flow for small emergency departments/i)).toBeInTheDocument();
     expect(screen.queryByText(/emergency department operating environment/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/ED flow model/i)).not.toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('WorkspaceHome', () => {
 
     expect(screen.getByRole('heading', { name: /emergency intake command center/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Smart Arrival$/i })).toBeInTheDocument();
-    expect(screen.getByText(/embedded Emergency Workspace capability, not a separate intake app/i)).toBeInTheDocument();
+    expect(screen.getByText(/embedded Emergency OS capability, not a separate intake app/i)).toBeInTheDocument();
     expect(screen.getByText(/Capture ID document/i)).toBeInTheDocument();
     expect(screen.getByText(/Medication list ingestion/i)).toBeInTheDocument();
     expect(screen.getByText(/Allergy extraction/i)).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/patient confirmation or staff confirmation is required before finalizing/i)).toBeInTheDocument();
     expect(screen.getByText(/patient arrives inside Emergency OS already summarized/i)).toBeInTheDocument();
     expect(screen.getByText(/registration completion score/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /create intake record/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /create intake patient/i })).toBeInTheDocument();
     expect(screen.getByText(/Only confirmed values are promoted/i)).toBeInTheDocument();
     expect(screen.getByText(/conflict highlighted/i)).toBeInTheDocument();
     expect(screen.getAllByText(/missing required value/i).length).toBeGreaterThan(1);
@@ -203,7 +203,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/no autonomous triage decision/i)).toBeInTheDocument();
     expect(screen.getByText(/triage staff · measured/i)).toBeInTheDocument();
     expect(screen.getByText(/Unresolved: allergy confirmation incomplete/i)).toBeInTheDocument();
-    expect(screen.getByText(/all intake automations feed emergency os/i)).toBeInTheDocument();
+    expect(screen.getByText(/all intake automations update emergency os/i)).toBeInTheDocument();
     expect(screen.getByText(/Consent and Verification/i)).toBeInTheDocument();
     expect(screen.getByText(/Intake Analytics:/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /markdown plans linked to implementation/i })).toBeInTheDocument();
@@ -825,10 +825,10 @@ describe('WorkspaceHome', () => {
   it('renders the ED onboarding walkthrough and launches walkthrough targets', () => {
     renderWorkspace('/workspace/emergency/onboarding');
 
-    expect(screen.getByRole('heading', { name: /emergency workspace onboarding/i })).toBeInTheDocument();
-    expect(screen.getByText(/understand the Emergency Workspace in 10 minutes/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /emergency os onboarding/i })).toBeInTheDocument();
+    expect(screen.getByText(/understand Emergency OS in 10 minutes/i)).toBeInTheDocument();
     [
-      /Emergency Workspace overview/i,
+      /Emergency OS overview/i,
       /Calculators/i,
       /Protocols/i,
       /AI Copilot/i,
@@ -838,7 +838,7 @@ describe('WorkspaceHome', () => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
     expect(screen.getByRole('heading', { name: /run the first hospital demo/i })).toBeInTheDocument();
-    expect(screen.getByText(/Open the Emergency Workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/Open Emergency OS/i)).toBeInTheDocument();
     expect(screen.getByText(/Close with analytics/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /open analytics/i }));
@@ -903,7 +903,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByRole('heading', { name: /first customer deployment blueprint/i })).toBeInTheDocument();
     expect(screen.getAllByText(/minimal operational risk/i).length).toBeGreaterThan(0);
     [
-      /Standalone Emergency Workspace/i,
+      /Standalone Emergency OS/i,
       /Protocol Library/i,
       /AI Copilot/i,
       /Analytics/i,
@@ -934,7 +934,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/Patient Journey Engine, Queue Intelligence, ED Copilot, Referral Intelligence, EMS Intelligence, Analytics/i)).toBeInTheDocument();
     expect(screen.getByText(/9 files/i)).toBeInTheDocument();
     expect(screen.getByText(/69 focused tests passing/i)).toBeInTheDocument();
-    expect(screen.getByText(/Research Workspace, Education Workspace, Governance Workspace, Fleet Workspace, Medical IoT Workspace, Laboratory Workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/Research Feature, Education Feature, Governance Feature, Fleet Feature, Medical IoT Feature, Laboratory Feature/i)).toBeInTheDocument();
     expect(screen.getByText(/No live EHR or ADT ingestion in the MVP/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getAllByRole('button', { name: /open capability/i })[0]);
@@ -985,7 +985,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/Automation registry/i)).toBeInTheDocument();
     expect(screen.getByText(/Workflow registry/i)).toBeInTheDocument();
     expect(screen.getByText(/Analytics model/i)).toBeInTheDocument();
-    expect(screen.getByText(/Dashboard model/i)).toBeInTheDocument();
+    expect(screen.getByText(/Whiteboard model/i)).toBeInTheDocument();
     expect(screen.getByText(/AI model/i)).toBeInTheDocument();
     expect(screen.getByText(/SaaS packages/i)).toBeInTheDocument();
     expect(screen.getByText(/Emergency Flow Enterprise/i)).toBeInTheDocument();

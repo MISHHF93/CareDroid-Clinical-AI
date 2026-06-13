@@ -255,7 +255,12 @@ export default function EMSPipeline() {
   const avgOffload = offloadSamples.length
     ? Math.round(offloadSamples.reduce((sum, minutes) => sum + minutes, 0) / offloadSamples.length)
     : 0;
-  const offloadTargetMinutes = emergencySettings.thresholds.emsOffloadTargetMinutes || 15;
+  const offloadTargetMinutes =
+    Number(
+      emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
+        emergencySettings?.emsThresholds?.offloadTargetMinutes ??
+        15
+    ) || 15;
   const offloadBreachCount = offloadSamples.filter((minutes) => minutes > offloadTargetMinutes).length;
   const completeHandoff = (arrivalId) => {
     updateEMSArrival(arrivalId, {
@@ -308,7 +313,7 @@ export default function EMSPipeline() {
           ) : null}
           <div className="ems-pipeline__unit-grid">
             {fleetSnapshot.status === 'loading' ? (
-              <p className="ems-pipeline__empty" role="status">Loading EMS unit visibility...</p>
+              <p className="ems-pipeline__empty" role="status">Loading department data...</p>
             ) : fleetSnapshot.status === 'error' ? (
               <p className="ems-pipeline__empty" role="alert">
                 {fleetSnapshot.message || 'EMS unit backend unavailable.'}
@@ -322,7 +327,7 @@ export default function EMSPipeline() {
                 </article>
               ))
             ) : (
-              <p className="ems-pipeline__empty">No EMS units returned by backend.</p>
+              <p className="ems-pipeline__empty">No incoming units</p>
             )}
           </div>
         </section>
@@ -351,7 +356,7 @@ export default function EMSPipeline() {
                 />
               ))
             ) : (
-              <p className="ems-pipeline__empty">No inbound EMS units.</p>
+              <p className="ems-pipeline__empty">No incoming units</p>
             )}
           </div>
         </section>

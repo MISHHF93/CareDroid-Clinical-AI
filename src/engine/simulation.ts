@@ -54,8 +54,8 @@ function createSimulatedPatient(): Patient {
   };
 }
 
-export function startSimulation() {
-  if (intervals.length > 0) return;
+export function startSimulation(): number[] {
+  if (intervals.length > 0) return [...intervals];
 
   const store = useEmergencyStore.getState;
 
@@ -80,6 +80,8 @@ export function startSimulation() {
   intervals.push(window.setInterval(() => {
     store().addPatient(createSimulatedPatient());
   }, 60000));
+
+  return [...intervals];
 }
 
 export function stopSimulation() {

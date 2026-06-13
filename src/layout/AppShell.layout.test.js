@@ -6,6 +6,7 @@ import { COMPACT_MEDIA_QUERY } from './breakpoints';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
+const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
@@ -32,12 +33,12 @@ describe('single AppShell contract', () => {
     expect(appJsx).not.toContain("from './layout/PublicShell'");
   });
 
-  it('renders one sidebar rail, one header, one main region, and one Copilot panel', () => {
-    expect(appShellJsx.match(/className="ed-nav-rail"/g)).toHaveLength(1);
+  it('renders one canonical Sidebar, one header, one main region, and one Copilot panel', () => {
+    expect(appShellJsx.match(/<Sidebar \/>/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-os-header"/g)).toHaveLength(1);
     expect(appShellJsx.match(/data-layout-role={LAYOUT_SCROLL_CONTRACT.mainContentRole}/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
-    expect(appShellJsx).not.toContain('<Sidebar');
+    expect(sidebarCss).toContain("aside[aria-label='Emergency navigation']");
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
   });
 

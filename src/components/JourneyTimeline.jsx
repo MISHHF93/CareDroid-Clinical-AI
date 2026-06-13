@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 import { movePatientToState } from '../../engine/journeyEngine';
 import './JourneyTimeline.css';
 

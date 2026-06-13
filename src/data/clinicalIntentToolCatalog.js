@@ -2384,7 +2384,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Medical Simulation Suite',
     category: 'reference',
     description:
-      'Demo medical simulation suite for virtual patient cases, emergency scenarios, decision branching, scoring rubrics, and AI tutor debriefs.',
+      'Demo medical simulation suite for virtual patient scenarios, emergency scenarios, decision branching, scoring rubrics, and AI tutor debriefs.',
     path: TOOL_LAUNCH_PATHS.simulation,
     sidebarToolId: REGISTRY.simulationSuite,
     chatSeed:

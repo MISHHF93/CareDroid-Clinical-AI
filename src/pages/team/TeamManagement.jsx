@@ -423,7 +423,7 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
     'Admin': ['Read All', 'Write All', 'Delete All', 'Manage Users', 'View Audit Logs'],
     'Physician': ['Read PHI', 'Write Clinical Notes', 'Prescribe Medications', 'Order Tests'],
     'Nurse': ['Read PHI', 'Update Vitals', 'Document Care', 'Assist Physician'],
-    'Student': ['Read Clinical Cases', 'View Guidelines', 'Educational Resources'],
+    'Student': ['Read Clinical Scenarios', 'View Guidelines', 'Educational Resources'],
   };
 
   const handleSave = async () => {

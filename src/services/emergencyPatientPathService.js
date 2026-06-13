@@ -187,10 +187,10 @@ function getNextAction({ patient, riskLevel, queue, intentRoute, destination, ti
     return 'Review reassessment need and confirm the next clinician-owned action.';
   }
   if (queue?.bottleneck) {
-    return `Review ${queue.label.toLowerCase()} bottleneck and assign operational owner.`;
+    return `Review ${queue.label.toLowerCase()} bottleneck and assign operational staff.`;
   }
   if (destination.id === 'specialty-referral') {
-    return 'Confirm referral owner, missing data, and next review step.';
+    return 'Confirm referral assigned staff, missing data, and next review step.';
   }
   if (destination.id === 'inpatient-admission') {
     return 'Coordinate bed placement blockers and inpatient handoff readiness.';

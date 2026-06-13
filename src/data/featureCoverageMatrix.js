@@ -205,7 +205,7 @@ const SUPPLEMENTAL_FEATURES = [
     frontend: 'Routed',
     test: 'commandDashboardModel (partial)',
     doc: 'caredroid-command-dashboard-plan.md',
-    kind: 'Dashboard',
+    kind: 'Whiteboard',
   },
   {
     feature: 'Digital Twin',

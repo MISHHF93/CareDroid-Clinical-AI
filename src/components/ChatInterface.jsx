@@ -32,7 +32,11 @@ import { formatActiveVitalsForCopilot } from '../utils/vitalsAlertPipeline';
 import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
 import { drugReferenceToolListForCopilot } from '../utils/drugReferenceTools';
 import { formatWhoNextForCopilot, getWhoNextRecommendation } from '../utils/whoNext';
-import { formatLongestWaitBroadcast, formatLongWaitForCopilot } from '../utils/longWaitRescue';
+import {
+  formatLongestWaitBroadcast,
+  formatLongWaitAttentionForCopilot,
+  formatLongWaitForCopilot,
+} from '../utils/longWaitRescue';
 import './ChatInterface.css';
 
 function waitMinutes(arrivalTime) {
@@ -294,6 +298,7 @@ function buildRequestedEdCopilotSystemPrompt({
   const activeEscalations = formatActiveEscalationsForCopilot(activePatients, staff);
   const activeVitalsAlerts = formatActiveVitalsForCopilot(activePatients);
   const activeLongWaitAlerts = formatLongWaitForCopilot(activePatients);
+  const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients);
   const longestWaitBroadcast = formatLongestWaitBroadcast(activePatients);
   const enabledToolLines = [
     enabledFeatures.capacity_intelligence ? `Capacity: ${capacity.score} (${capacity.label})` : null,
@@ -315,6 +320,7 @@ function buildRequestedEdCopilotSystemPrompt({
     ...activeEscalations,
     ...activeVitalsAlerts,
     ...activeLongWaitAlerts,
+    longWaitAttention || null,
     longestWaitBroadcast ? `⏱ ${longestWaitBroadcast}` : null,
     ...enabledToolLines,
     '',

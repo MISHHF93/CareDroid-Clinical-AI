@@ -45,7 +45,7 @@ describe('operating workspace launch harness', () => {
   it('routes patient workflow cards to patient workspace platform routes', () => {
     renderInRouter(<Patients />);
 
-    fireEvent.click(screen.getByRole('button', { name: /summarize active case/i }));
+    fireEvent.click(screen.getByRole('button', { name: /summarize active patient/i }));
 
     expect(applyRegistryToolLaunch).not.toHaveBeenCalled();
     expect(navigateMock).toHaveBeenCalledWith('/patients/demo-patient/summary');

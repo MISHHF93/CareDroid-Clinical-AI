@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   AlertTriangle,
-  Baby,
   Bell,
   Bot,
   ChevronRight,
@@ -13,9 +12,9 @@ import {
 import ChatInterface from '../components/ChatInterface';
 import CommandPalette from '../components/CommandPalette';
 import EMSCriticalBroadcast, { EMSCriticalCountdownBadge } from '../components/EMSCriticalBroadcast';
-import { calculateEMSPressureScore, isEMSPressureElevated } from '../components/EMSPressureScore';
 import PediatricDrugCalculator from '../components/PediatricDrugCalculator';
 import ReassessmentDrawer from '../components/ReassessmentDrawer';
+import { Sidebar } from '../components/Sidebar';
 import WorkloadBalancePanel from '../components/WorkloadBalancePanel';
 import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
@@ -26,9 +25,8 @@ import {
   selectReassessmentCount,
   useEmergencyStore,
 } from '../../store/emergencyStore';
-import { useFeatureStore } from '../../store/featureStore';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { movePatientToState as movePatientWithJourneyRules } from '../../engine/journeyEngine';
 import {
   initializeEmergencySimulation,
@@ -47,7 +45,7 @@ import './AppShell.css';
 export function buildSidebarItems(isEnabled) {
   return APP_SHELL_NAV_ITEMS.map((item) => {
     const feature = FEATURE_REGISTRY_BY_ID[item.featureId];
-    if (!feature || !isEnabled(feature.id)) return null;
+    if (item.featureGate && (!feature || !isEnabled(feature.id))) return null;
     return {
       id: item.id,
       featureId: item.featureId,
@@ -55,7 +53,7 @@ export function buildSidebarItems(isEnabled) {
       path: item.path,
       icon: getNavIcon(item.iconKey || item.id),
       activePaths: item.activePaths,
-      tier: feature.tier,
+      tier: feature?.tier || 'core',
     };
   }).filter(Boolean);
 }
@@ -105,7 +103,6 @@ const SHORTCUT_GROUPS = [
   },
 ];
 
-const SIDEBAR_NEW_FEATURES_KEY = 'caredroid.emergency.sidebarNewFeatures.v1';
 const CHARGE_NURSE_PULSE_DEFAULT_KEY = 'caredroid.ed.departmentPulse.chargeDefaultSeen';
 const AI_AGENT_PREFILL_LABELS = Object.freeze({
   'agent-clinical': 'Clinical AI',
@@ -118,20 +115,6 @@ const AI_AGENT_PREFILL_LABELS = Object.freeze({
   'agent-governance': 'Governance AI',
 });
 
-function readSessionFeatureSet() {
-  if (typeof sessionStorage === 'undefined') return new Set();
-  try {
-    return new Set(JSON.parse(sessionStorage.getItem(SIDEBAR_NEW_FEATURES_KEY) || '[]'));
-  } catch (_error) {
-    return new Set();
-  }
-}
-
-function writeSessionFeatureSet(featureIds) {
-  if (typeof sessionStorage === 'undefined') return;
-  sessionStorage.setItem(SIDEBAR_NEW_FEATURES_KEY, JSON.stringify([...featureIds]));
-}
-
 function isEditableShortcutTarget(target) {
   return (
     target?.tagName === 'INPUT' ||
@@ -139,16 +122,6 @@ function isEditableShortcutTarget(target) {
     target?.tagName === 'SELECT' ||
     target?.isContentEditable
   );
-}
-
-function isNavItemActive(item, pathname) {
-  return item.activePaths.some((activePath) => {
-    if (activePath === '/emergency/whiteboard') {
-      return pathname === activePath;
-    }
-
-    return pathname === activePath || pathname.startsWith(`${activePath}/`);
-  });
 }
 
 function formatShiftClock(date) {
@@ -343,7 +316,7 @@ function buildCapacityRecommendations({
 
   if (incomingEMS.length) {
     recommendations.push(
-      `Pre-assign receiving bays for ${incomingEMS.length} inbound EMS case${incomingEMS.length === 1 ? '' : 's'} and protect one monitored space for critical arrivals.`
+      `Pre-assign receiving bays for ${incomingEMS.length} inbound EMS patient${incomingEMS.length === 1 ? '' : 's'} and protect one monitored space for critical arrivals.`
     );
   }
 
@@ -851,7 +824,7 @@ function AlertDrawer({ open, alerts, onClose, onDismiss, onAction }) {
             </article>
           ))
         ) : (
-          <p className="ed-alert-drawer__empty">No active alerts.</p>
+          <p className="ed-alert-drawer__empty">All clear</p>
         )}
       </div>
     </section>
@@ -1068,13 +1041,7 @@ const AppShell = ({
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
-  const featureFlags = useFeatureStore((state) => state.flags);
-  const featureOverrides = useFeatureStore((state) => state.overrides);
-  const featureTier = useFeatureStore((state) => state.tier);
-  const isFeatureEnabled = useFeatureStore((state) => state.isEnabled);
-  const toggleFeature = useFeatureStore((state) => state.toggleFeature);
   const reassessmentCount = useEmergencyStore(selectReassessmentCount);
-  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const activePatientCount = activePatients.length;
   const [clock, setClock] = useState(() => new Date());
   const isCopilotCollapsed = !copilotOpen;
@@ -1086,11 +1053,6 @@ const AppShell = ({
   const [isShortcutReferenceOpen, setIsShortcutReferenceOpen] = useState(false);
   const [pediatricDrugPatientId, setPediatricDrugPatientId] = useState(null);
   const [isPediatricDrugCalculatorOpen, setIsPediatricDrugCalculatorOpen] = useState(false);
-  const [sidebarMenu, setSidebarMenu] = useState(null);
-  const longPressTimerRef = useRef(null);
-  const suppressSidebarClickRef = useRef(false);
-  const previousSidebarFeatureIdsRef = useRef(null);
-  const [newSidebarFeatureIds, setNewSidebarFeatureIds] = useState(() => readSessionFeatureSet());
   const [isDemoSimulationActive, setIsDemoSimulationActive] = useState(
     () => isEmergencySimulationAvailable() && isEmergencySimulationRunning()
   );
@@ -1130,45 +1092,9 @@ const AppShell = ({
           : null,
     [patients, pediatricDrugPatientId, selectedPatientId]
   );
-  const sidebarItems = useMemo(
-    () => buildSidebarItems(isFeatureEnabled),
-    [featureFlags, featureOverrides, featureTier, isFeatureEnabled]
-  );
-
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const currentIds = new Set(sidebarItems.map((item) => item.featureId));
-    if (!previousSidebarFeatureIdsRef.current) {
-      previousSidebarFeatureIdsRef.current = currentIds;
-      return;
-    }
-
-    const sessionIds = readSessionFeatureSet();
-    currentIds.forEach((featureId) => {
-      if (!previousSidebarFeatureIdsRef.current.has(featureId) && !sessionIds.has(featureId)) {
-        sessionIds.add(featureId);
-      }
-    });
-    previousSidebarFeatureIdsRef.current = currentIds;
-    setNewSidebarFeatureIds(sessionIds);
-    writeSessionFeatureSet(sessionIds);
-  }, [sidebarItems]);
-
-  useEffect(() => {
-    const closeSidebarMenu = () => setSidebarMenu(null);
-    const closeSidebarMenuOnEscape = (event) => {
-      if (event.key === 'Escape') setSidebarMenu(null);
-    };
-    window.addEventListener('click', closeSidebarMenu);
-    window.addEventListener('keydown', closeSidebarMenuOnEscape);
-    return () => {
-      window.removeEventListener('click', closeSidebarMenu);
-      window.removeEventListener('keydown', closeSidebarMenuOnEscape);
-    };
   }, []);
 
   useEffect(() => {
@@ -1354,15 +1280,6 @@ const AppShell = ({
     setIsReassessmentDrawerOpen(false);
   }, []);
 
-  const activeNavId = useMemo(
-    () => sidebarItems.find((item) => isNavItemActive(item, location.pathname))?.id,
-    [location.pathname, sidebarItems]
-  );
-  const emsPressure = useMemo(
-    () => calculateEMSPressureScore(emsArrivals, clock),
-    [emsArrivals, clock]
-  );
-  const shouldFlashEMSNav = isEMSPressureElevated(emsPressure);
   const staffWorkloads = useMemo(
     () => buildStaffWorkloads(staff, patients, activeShift),
     [activeShift, patients, staff]
@@ -1651,73 +1568,6 @@ const AppShell = ({
     return () => window.removeEventListener('ed:open-clinical-tools', handleClinicalToolsLaunch);
   }, [navigate]);
 
-  const clearSidebarLongPress = useCallback(() => {
-    if (longPressTimerRef.current) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  }, []);
-
-  const openSidebarMenu = useCallback((event, item) => {
-    event.preventDefault();
-    event.stopPropagation();
-    clearSidebarLongPress();
-    setSidebarMenu({
-      item,
-      x: Math.min(event.clientX || 64, window.innerWidth - 220),
-      y: Math.min(event.clientY || 72, window.innerHeight - 132),
-    });
-  }, [clearSidebarLongPress]);
-
-  const handleSidebarPointerDown = useCallback(
-    (event, item) => {
-      if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
-      const clientX = event.clientX || 64;
-      const clientY = event.clientY || 72;
-      clearSidebarLongPress();
-      longPressTimerRef.current = window.setTimeout(() => {
-        suppressSidebarClickRef.current = true;
-        setSidebarMenu({
-          item,
-          x: Math.min(clientX, window.innerWidth - 220),
-          y: Math.min(clientY, window.innerHeight - 132),
-        });
-      }, 520);
-    },
-    [clearSidebarLongPress]
-  );
-
-  const handleSidebarPointerEnd = useCallback(() => {
-    clearSidebarLongPress();
-    window.setTimeout(() => {
-      suppressSidebarClickRef.current = false;
-    }, 0);
-  }, [clearSidebarLongPress]);
-
-  const handleSidebarClick = useCallback((event) => {
-    if (!suppressSidebarClickRef.current) return;
-    event.preventDefault();
-    event.stopPropagation();
-  }, []);
-
-  const handleDisableSidebarFeature = useCallback(async () => {
-    if (!sidebarMenu?.item || sidebarMenu.item.tier === 'core') return;
-    const item = sidebarMenu.item;
-    setSidebarMenu(null);
-    try {
-      await toggleFeature(item.featureId, false);
-    } catch (_error) {
-      // toggleFeature reverts failed optimistic updates; keep the rail stable.
-    }
-  }, [sidebarMenu, toggleFeature]);
-
-  const handleOpenFeatureSettings = useCallback(() => {
-    if (!sidebarMenu?.item) return;
-    const featureId = sidebarMenu.item.featureId;
-    setSidebarMenu(null);
-    navigate(`/settings/features#feature-${featureId}`);
-  }, [navigate, sidebarMenu]);
-
   return (
     <div
       className={[
@@ -1734,76 +1584,7 @@ const AppShell = ({
         </a>
       )}
 
-      <aside className="ed-nav-rail" aria-label="Emergency OS navigation">
-        <nav className="ed-nav-rail__items">
-          {sidebarItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.id === activeNavId;
-            const isNew = newSidebarFeatureIds.has(item.featureId);
-
-            return (
-              <Link
-                key={item.id}
-                to={item.path}
-                className={[
-                  'ed-nav-rail__item',
-                  'ed-nav-rail__item--appearing',
-                  isActive ? 'ed-nav-rail__item--active' : '',
-                  isNew ? 'ed-nav-rail__item--new' : '',
-                  item.featureId === 'ems_pipeline' && shouldFlashEMSNav ? 'ed-nav-rail__item--flash' : '',
-                  item.featureId === 'ems_pipeline' && shouldFlashEMSNav
-                    ? `ed-nav-rail__item--flash-${emsPressure.band.id}`
-                    : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                aria-label={isNew ? `${item.label}. New.` : item.label}
-                aria-current={isActive ? 'page' : undefined}
-                title={isNew ? `${item.label} - New` : item.label}
-                onClick={handleSidebarClick}
-                onContextMenu={(event) => openSidebarMenu(event, item)}
-                onPointerDown={(event) => handleSidebarPointerDown(event, item)}
-                onPointerUp={handleSidebarPointerEnd}
-                onPointerCancel={handleSidebarPointerEnd}
-                onPointerLeave={handleSidebarPointerEnd}
-              >
-                <Icon size={21} strokeWidth={2.1} aria-hidden />
-                {isNew ? <span className="ed-nav-rail__new-dot" aria-hidden /> : null}
-              </Link>
-            );
-          })}
-          <button
-            type="button"
-            className="ed-nav-rail__item ed-nav-rail__item--button"
-            aria-label="Pediatric drug calculator"
-            title="Pediatric drug calculator"
-            onClick={() => openPediatricDrugCalculator()}
-          >
-            <Baby size={21} strokeWidth={2.1} aria-hidden />
-          </button>
-        </nav>
-        {sidebarMenu ? (
-          <div
-            className="ed-nav-context-menu"
-            style={{ left: sidebarMenu.x, top: sidebarMenu.y }}
-            role="menu"
-            aria-label={`${sidebarMenu.item.label} feature shortcuts`}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              role="menuitem"
-              disabled={sidebarMenu.item.tier === 'core'}
-              onClick={handleDisableSidebarFeature}
-            >
-              Disable {sidebarMenu.item.label}
-            </button>
-            <button type="button" role="menuitem" onClick={handleOpenFeatureSettings}>
-              Feature Settings
-            </button>
-          </div>
-        ) : null}
-      </aside>
+      <Sidebar />
 
       <div className="ed-os-shell__workspace">
         <header className="ed-os-header" aria-label="Emergency OS header">
@@ -1814,7 +1595,7 @@ const AppShell = ({
               onClick={() => navigate('/emergency/whiteboard')}
               aria-label="Go to Emergency Whiteboard"
             >
-              CareDroid Emergency OS
+              Emergency OS
             </button>
             <button
               type="button"

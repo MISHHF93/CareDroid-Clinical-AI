@@ -1,4 +1,4 @@
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 
 const ACTIVE_EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff']);
 

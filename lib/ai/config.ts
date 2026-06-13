@@ -144,8 +144,8 @@ export const DEFAULT_TENANT_AI_SETTINGS: TenantAISettings = Object.freeze({
 
 export const DEFAULT_AI_PROVIDER_CONFIG: AIProviderConfig = Object.freeze({
   provider: 'anthropic',
-  model: 'claude-sonnet-4-20250514',
-  fallbackModel: 'claude-3-5-sonnet-20241022',
+  model: 'claude-sonnet-4-6',
+  fallbackModel: 'claude-sonnet-4-6',
   temperature: 0.2,
   maxTokens: 2000,
   stream: false,

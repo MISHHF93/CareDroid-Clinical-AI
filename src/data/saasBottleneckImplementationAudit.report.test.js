@@ -39,9 +39,6 @@ describe('saasBottleneckImplementationAudit report', () => {
     const markdown = formatSaasBottleneckImplementationAuditMarkdown(audit);
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'saas-bottleneck-implementation-audit.md'), `${markdown}\n`);
-    console.log(
-      `Wrote docs/saas-bottleneck-implementation-audit.md (${audit.summary.score}/100, ${audit.summary.pass}/${audit.summary.total} pass)`,
-    );
     expect(existsSync(join(docsDir, 'saas-bottleneck-implementation-audit.md'))).toBe(true);
   });
 });

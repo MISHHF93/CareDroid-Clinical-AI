@@ -229,7 +229,7 @@ export const ReferralHub = Object.freeze({
           title: `Review delayed ${delay.department} referral`,
           priority: delay.priority,
           rationale: delay.reason,
-          action: 'Confirm owner, missing data, department queue status, and next review step.',
+          action: 'Confirm assigned staff, missing data, department queue state, and next review step.',
         })
       )
     );

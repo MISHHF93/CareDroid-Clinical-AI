@@ -104,7 +104,7 @@ function buildPatientDetections(patients) {
         nextRecommendedAction:
           stage.id === 'waiting'
             ? 'Open the patient card, confirm reassessment status, and assign the next clinician-owned queue action.'
-            : `Review ${stage.label.toLowerCase()} owner, blockers, and next handoff step for this patient.`,
+            : `Review ${stage.label.toLowerCase()} assigned staff, blockers, and next handoff step for this patient.`,
       });
     })
     .filter(Boolean);
@@ -120,7 +120,7 @@ function buildReferralDetections(referralDashboard) {
       title: `${delay.department} referral delayed`,
       patientId: normalizePatientId(delay.patientLabel),
       reason: delay.reason,
-      nextRecommendedAction: 'Open ReferralHub, confirm specialty owner, and unblock the oldest delayed referral dependency.',
+      nextRecommendedAction: 'Open ReferralHub, confirm specialty assigned staff, and unblock the oldest delayed referral dependency.',
     })
   );
 }
@@ -169,7 +169,7 @@ function buildQueueDetections(queueDashboard) {
       severity: bottleneck.severity,
       title: `${bottleneck.label} bottleneck`,
       reason: bottleneck.reason,
-      nextRecommendedAction: `Open ${bottleneck.label} and assign an operational owner before downstream flow degrades.`,
+      nextRecommendedAction: `Open ${bottleneck.label} and assign operational staff before downstream flow degrades.`,
     })
   );
 }

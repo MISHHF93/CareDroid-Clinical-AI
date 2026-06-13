@@ -1,4 +1,4 @@
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 import { getSavedScores } from './clinicalScoreEvents';
 
 const ACTIVE_STATES = new Set(

@@ -1,10 +1,27 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import EmergencySettings from './EmergencySettings';
+import EmergencySettings, { auditLogToCsv } from './EmergencySettings';
 import { fetchEmergencyOsSettings, saveEmergencyOsSettings } from '../../services/emergencySettingsApi';
 import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
 
-const saveEmergencySettings = vi.fn();
+const { saveEmergencySettings, setThreshold, resetThresholds, mockThresholds } = vi.hoisted(() => ({
+  saveEmergencySettings: vi.fn(),
+  setThreshold: vi.fn(),
+  resetThresholds: vi.fn(),
+  mockThresholds: {
+    waitTimeWarningMin: 45,
+    waitTimeCtiticalMin: 60,
+    capacityWarningPct: 0.70,
+    capacityOrangePct: 0.80,
+    capacityRedPct: 0.90,
+    emsOffloadTargetMin: 15,
+    reassessP1Min: 0,
+    reassessP2Min: 15,
+    reassessP3Min: 30,
+    reassessP4Min: 60,
+    reassessP5Min: 120,
+  },
+}));
 
 const mockSettings = {
   tenantName: 'CareDroid ED',
@@ -86,6 +103,7 @@ vi.mock('../../../store/emergencyStore', () => ({
     selector({
       emergencySettings: mockSettings,
       workflowLogs: [],
+      auditLog: [],
       saveEmergencySettings,
       activeScenario: null,
       setActiveScenario: vi.fn(),
@@ -96,8 +114,13 @@ vi.mock('../../store/emergencyStore', () => ({
   useEmergencyStore: (selector) =>
     selector({
       workflowLogs: [],
+      auditLog: [],
+      thresholds: mockThresholds,
+      setThreshold,
+      resetThresholds,
       setActiveScenario: vi.fn(),
     }),
+  DEFAULT_EMERGENCY_THRESHOLDS: mockThresholds,
 }));
 
 vi.mock('../../services/emergencySettingsApi', () => ({
@@ -182,7 +205,7 @@ describe('EmergencySettings', () => {
     render(<EmergencySettings />);
 
     await screen.findByRole('heading', { name: 'Emergency OS Settings' });
-    fireEvent.change(screen.getByLabelText('Capacity warning %'), { target: { value: '76' } });
+    fireEvent.change(screen.getByLabelText('Capacity orange %'), { target: { value: '76' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save Capacity' }));
 
     await waitFor(() => {
@@ -198,5 +221,19 @@ describe('EmergencySettings', () => {
         thresholds: expect.objectContaining({ capacityWarningPercent: 76 }),
       })
     );
+  });
+
+  it('serializes store action audit logs to CSV', () => {
+    expect(
+      auditLogToCsv([
+        {
+          timestamp: '2026-06-13T13:00:00.000Z',
+          action: 'addVitals',
+          patientId: 'p1',
+          staffId: 's1',
+          details: { news2: 4 },
+        },
+      ])
+    ).toContain('"Time","Action","Patient","Staff","Details"\n"2026-06-13T13:00:00.000Z","addVitals","p1","s1","{""news2"":4}"');
   });
 });

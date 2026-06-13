@@ -141,7 +141,7 @@ describe('automationRegistry', () => {
         'AI Assistant',
         'Protocol Retrieval',
         'Workflow Guidance',
-        'Workspace Dashboard',
+        'Emergency Whiteboard',
       ])
     );
     expect(emergency.products.find((product) => product.title === 'Emergency Flow Starter')).toEqual(

@@ -2,7 +2,7 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import DepartmentPulse from './DepartmentPulse';
+import DepartmentPulse from './pulse';
 import { useEmergencyStore } from '../../../store/emergencyStore';
 
 const originalState = useEmergencyStore.getState();
@@ -19,7 +19,14 @@ describe('DepartmentPulse', () => {
       })
     );
     act(() => {
-      useEmergencyStore.setState({ ...originalState, selectedPatientId: null }, true);
+      useEmergencyStore.setState(
+        {
+          ...originalState,
+          selectedPatientId: null,
+          lastPulseView: Date.now() - 47 * 60_000,
+        },
+        true
+      );
     });
   });
 
@@ -37,12 +44,12 @@ describe('DepartmentPulse', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('heading', { name: /You were away/i, level: 1 })).toBeInTheDocument();
+    expect(screen.getByText(/You were away/i)).toBeInTheDocument();
     expect(screen.getByText('Active patients')).toBeInTheDocument();
     expect(screen.getByText('Capacity score')).toBeInTheDocument();
     expect(screen.getByText('High risk')).toBeInTheDocument();
     expect(screen.getAllByText('Reassessment due').length).toBeGreaterThan(0);
-    expect(screen.getByText('EMS inbound')).toBeInTheDocument();
+    expect(screen.getAllByText('EMS inbound').length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /Attention List/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Queue Snapshot/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Staff Snapshot/i })).toBeInTheDocument();

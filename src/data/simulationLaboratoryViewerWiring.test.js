@@ -7,7 +7,7 @@ import { buildCommandDashboardModel } from './commandDashboardModel';
 
 const EXPECTED_TOOLS = Object.freeze([
   { id: REGISTRY.simulationSuite, route: '/simulation', alias: 'start simulation' },
-  { id: REGISTRY.scenarioPlayer, route: '/simulation/sepsis-deterioration', alias: 'practice sepsis case' },
+  { id: REGISTRY.scenarioPlayer, route: '/simulation/sepsis-deterioration', alias: 'practice sepsis scenario' },
   { id: REGISTRY.simulationOutcomes, route: '/simulation/outcomes', alias: 'show my simulation outcomes' },
   { id: REGISTRY.debriefDashboard, route: '/simulation/sepsis-deterioration', alias: 'debrief my scenario' },
   { id: REGISTRY.competencyDashboard, route: '/simulation/outcomes', alias: 'competency dashboard' },

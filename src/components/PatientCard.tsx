@@ -1,3 +1,4 @@
+import { memo, useCallback, type KeyboardEvent, type MouseEvent } from 'react';
 import { Patient, PatientFlag, PatientState } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import './PatientCard.css';
@@ -35,6 +36,7 @@ const flagColors: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.ReassessmentDue]: '#F59E0B',
   [PatientFlag.ScoreReassessmentRecommended]: '#F59E0B',
   [PatientFlag.LongWait]: '#F97316',
+  [PatientFlag.LWBSRisk]: '#EF4444',
   [PatientFlag.HighRisk]: '#EF4444',
   [PatientFlag.EMSArrival]: '#38BDF8',
   [PatientFlag.PendingAdmission]: '#A78BFA',
@@ -46,6 +48,7 @@ const flagLabels: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.ReassessmentDue]: 'REA',
   [PatientFlag.ScoreReassessmentRecommended]: 'SCR',
   [PatientFlag.LongWait]: 'WAIT',
+  [PatientFlag.LWBSRisk]: 'LWBS',
   [PatientFlag.HighRisk]: 'RISK',
   [PatientFlag.EMSArrival]: 'EMS',
   [PatientFlag.PendingAdmission]: 'ADM',
@@ -101,12 +104,15 @@ function scoreBadges(patient: Patient): string[] {
   return [...scores].slice(0, 3);
 }
 
-export default function PatientCard({
-  patient,
+function PatientCard({
+  patient: patientProp,
   keyboardSelected = false,
   highlighted = false,
   onKeyboardFocus,
 }: PatientCardProps) {
+  const patient = useEmergencyStore((store) =>
+    store.patients.find((candidate) => candidate.id === patientProp.id)
+  ) || patientProp;
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
   const staff = useEmergencyStore((store) => store.staff);
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
@@ -117,7 +123,10 @@ export default function PatientCard({
   const hasReassessmentDue = patient.flags.includes(PatientFlag.ReassessmentDue);
   const hasDeteriorationRisk = patient.flags.includes(PatientFlag.DeteriorationRisk);
   const hasEmsArrival = patient.flags.includes(PatientFlag.EMSArrival) || patient.source === 'EMS';
+  const hasLongWait = patient.flags.includes(PatientFlag.LongWait);
+  const hasLwbsRisk = patient.flags.includes(PatientFlag.LWBSRisk);
   const scores = scoreBadges(patient);
+  const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
 
   const hr = vitals?.hr ?? vitals?.heartRate;
   const sbp = vitals?.sbp ?? vitals?.bpSystolic;
@@ -128,6 +137,17 @@ export default function PatientCard({
   const bpAbnormal = sbp !== undefined && (sbp < 90 || sbp > 180);
   const spo2Abnormal = spo2 !== undefined && spo2 < 94;
   const tempAbnormal = temp !== undefined && (temp >= 38 || temp < 36);
+  const handleSelect = useCallback(() => selectPatient(patient.id), [patient.id, selectPatient]);
+  const handleTimelineClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    selectPatient(patient.id);
+  }, [patient.id, selectPatient]);
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      selectPatient(patient.id);
+    }
+  }, [patient.id, selectPatient]);
 
   return (
     <div
@@ -136,35 +156,39 @@ export default function PatientCard({
         hasReassessmentDue ? 'patient-card--reassessment-due' : '',
         hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
         hasEmsArrival ? 'patient-card--ems-arrival' : '',
+        hasLongWait ? 'patient-card--long-wait' : '',
+        hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
         keyboardSelected ? 'patient-card--keyboard-selected' : '',
         highlighted ? 'patient-card--highlighted' : '',
       ].filter(Boolean).join(' ')}
       data-patient-card-id={patient.id}
-      onClick={() => selectPatient(patient.id)}
+      onClick={handleSelect}
       onFocus={onKeyboardFocus}
       role="button"
       tabIndex={0}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          selectPatient(patient.id);
-        }
-      }}
+      onKeyDown={handleKeyDown}
       style={{
         background: '#111827',
         border: '1px solid #1F2937',
+        borderTop: hasLongWait ? '1px solid #F59E0B' : '1px solid #1F2937',
         borderLeft: `4px solid ${priorityColors[patient.priority]}`,
         borderRadius: 8,
         height: 120,
         padding: 12,
         cursor: 'pointer',
         position: 'relative',
-        boxShadow: patient.priority === 'P1' ? '0 0 12px #EF444440' : undefined,
+        boxShadow: hasLwbsRisk
+          ? '0 0 22px rgba(239, 68, 68, 0.44)'
+          : patient.priority === 'P1'
+            ? '0 0 12px #EF444440'
+            : undefined,
         overflow: 'hidden',
       }}
       aria-label={`${patientName}, ${patient.state}, ${patient.priority}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+      {hasLwbsRisk ? <span className="patient-card__lwbs-badge">LWBS RISK</span> : null}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, paddingRight: hasLwbsRisk ? 76 : 0 }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {patientName}
@@ -194,11 +218,11 @@ export default function PatientCard({
         <span style={{ color: hrAbnormal ? '#EF4444' : '#9CA3AF' }}>HR {hr ?? '--'}</span>
         <span style={{ color: bpAbnormal ? '#F59E0B' : '#9CA3AF' }}>BP {sbp ?? '--'}/{dbp ?? '--'}</span>
         <span style={{ color: spo2Abnormal ? '#EF4444' : '#9CA3AF' }}>SpO2 {spo2 ?? '--'}%</span>
-        <span style={{ color: tempAbnormal ? '#F59E0B' : '#9CA3AF' }}>T {temp ?? '--'}°</span>
+        <span className="patient-card__vital-temp" style={{ color: tempAbnormal ? '#F59E0B' : '#9CA3AF' }}>T {temp ?? '--'}°</span>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 6 }}>
-        <div style={{ color: waitColor(minutesWaiting), fontSize: 11 }}>
+        <div style={{ color: waitStatusColor, fontSize: 11, fontWeight: hasLongWait || hasLwbsRisk ? 800 : 400 }}>
           Wait {minutesWaiting}m
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -214,10 +238,7 @@ export default function PatientCard({
             type="button"
             className="patient-card__timeline-button"
             aria-label={`Open timeline for ${patientName}`}
-            onClick={(event) => {
-              event.stopPropagation();
-              selectPatient(patient.id);
-            }}
+            onClick={handleTimelineClick}
           >
             Timeline
           </button>
@@ -263,3 +284,5 @@ export default function PatientCard({
     </div>
   );
 }
+
+export default memo(PatientCard);

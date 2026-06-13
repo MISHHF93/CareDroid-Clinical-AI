@@ -17,16 +17,26 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 
 describe('primaryNavigation', () => {
-  it('exposes the simplified primary sidebar model in canonical order', () => {
+  it('exposes the canonical R8 sidebar model in order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Whiteboard', '/emergency/whiteboard'],
-      ['Patients', '/emergency/patients'],
-      ['EMS', '/emergency/ems'],
-      ['Operations', '/emergency/queues'],
-      ['Copilot', '/emergency/copilot'],
-      ['Profile', '/profile'],
+      ['Emergency Whiteboard', '/emergency/whiteboard'],
+      ['EMS Pipeline', '/emergency/ems'],
+      ['Referrals', '/emergency/referrals'],
+      ['Capacity', '/emergency/capacity'],
+      ['Clinical Tools', '/emergency/tools'],
+      ['Shift Summary', '/emergency/shift'],
+      ['Settings', '/settings'],
     ]);
-    expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(6);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.route)).toEqual([
+      '/emergency',
+      '/emergency/ems',
+      '/emergency/referrals',
+      '/emergency/capacity',
+      '/emergency/tools',
+      '/emergency/shift',
+      '/settings',
+    ]);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(7);
   });
 
   it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
@@ -68,7 +78,7 @@ describe('primaryNavigation', () => {
       ['Brain', '/brain'],
       ['Business Brain', '/business-brain'],
       ['AI Evaluation', '/ai-evaluation'],
-      ['Governance', '/ai-governance'],
+      ['Governance', '/emergency/ai-governance'],
       ['Security', '/security'],
       ['Audit', '/audit'],
       ['Regulatory', '/regulatory'],
@@ -135,11 +145,12 @@ describe('primaryNavigation', () => {
   it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/emergency/whiteboard',
-      '/emergency/patients',
       '/emergency/ems',
-      '/emergency/queues',
-      '/emergency/copilot',
-      '/profile',
+      '/emergency/referrals',
+      '/emergency/capacity',
+      '/emergency/tools',
+      '/emergency/shift',
+      '/settings',
     ]);
   });
 
@@ -148,7 +159,8 @@ describe('primaryNavigation', () => {
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
       true
     );
-    expect(PRIMARY_NAV_BY_ID.tools).toBeUndefined();
+    expect(PRIMARY_NAV_BY_ID.tools?.path).toBe('/emergency/tools');
+    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.tools, '/tools/catalog')).toBe(false);
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.settings, '/tools/catalog')).toBe(false);
   });
 
@@ -160,30 +172,29 @@ describe('primaryNavigation', () => {
   });
 
   it('keeps Emergency operations routes under the primary Operations concept', () => {
-    expect(getPrimaryNavItemForPath('/workspace/emergency/flow')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/workspace/emergency/referrals')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/workspace/emergency/capacity')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/workspace/emergency/analytics')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/workspace/emergency/boarding')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/workspace/emergency/flow')?.id).toBeUndefined();
+    expect(getPrimaryNavItemForPath('/workspace/emergency/referrals')?.id).toBeUndefined();
+    expect(getPrimaryNavItemForPath('/workspace/emergency/capacity')?.id).toBeUndefined();
+    expect(getPrimaryNavItemForPath('/workspace/emergency/analytics')?.id).toBeUndefined();
+    expect(getPrimaryNavItemForPath('/workspace/emergency/boarding')?.id).toBeUndefined();
   });
 
-  it('keeps Emergency OS surfaces primary while settings and account utilities remain outside the persistent shell', () => {
+  it('keeps only canonical Emergency OS sidebar surfaces primary', () => {
     const expected = [
-      ['/profile', 'profile'],
-      ['/profile/activity', 'profile'],
-      ['/profile/tool-preferences', 'profile'],
-      ['/workspace/emergency/patients', 'patients'],
-      ['/workspace/emergency/ems', 'ems'],
-      ['/workspace/emergency/command-center', 'assistant'],
-      ['/workspaces', undefined],
-      ['/workspace/emergency', 'home'],
-      ['/profile/settings', 'settings'],
-      ['/profile/preferences', 'settings'],
+      ['/emergency', 'whiteboard'],
+      ['/emergency/whiteboard', 'whiteboard'],
+      ['/emergency/ems', 'ems'],
+      ['/emergency/referrals', 'referrals'],
+      ['/emergency/capacity', 'capacity'],
+      ['/emergency/tools', 'tools'],
+      ['/emergency/shift', 'shift'],
       ['/settings', 'settings'],
+      ['/profile', undefined],
+      ['/workspaces', undefined],
       ['/tenant-admin', 'tenant-admin'],
     ];
 
-    const persistentIds = new Set(['home', 'patients', 'ems', 'operations', 'assistant', 'profile']);
+    const persistentIds = new Set(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id));
     for (const [path, itemId] of expected) {
       const matches = PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => primaryNavPathMatches(item, path));
 
@@ -221,9 +232,10 @@ describe('primaryNavigation', () => {
       ].map((item) => [item.id, item])
     );
 
-    expect(canExposeNavigationItem(byId.home)).toBe(true);
-    expect(canExposeNavigationItem(byId.profile)).toBe(true);
-    expect(canExposeNavigationItem(byId.settings)).toBe(false);
+    expect(byId.home).toBeUndefined();
+    expect(byId.profile).toBeUndefined();
+    expect(canExposeNavigationItem(byId.whiteboard)).toBe(true);
+    expect(canExposeNavigationItem(byId.settings)).toBe(true);
     expect(canExposeNavigationItem(byId.search)).toBe(true);
     expect(canExposeNavigationItem(byId['workflow-mining'])).toBe(false);
     expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(true);

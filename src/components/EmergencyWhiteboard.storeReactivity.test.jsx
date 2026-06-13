@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
 import EmergencyWhiteboard from './EmergencyWhiteboard';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
 

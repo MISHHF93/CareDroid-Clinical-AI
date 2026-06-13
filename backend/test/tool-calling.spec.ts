@@ -30,7 +30,7 @@ import { LongMemoryService } from '../src/modules/memory/long-memory.service';
 import { ClinicalMemoryService } from '../src/modules/memory/clinical-memory.service';
 import { ArtifactsService } from '../src/modules/artifacts/artifacts.service';
 import { EvaluationService } from '../src/modules/evaluation/evaluation.service';
-import { unifiedAIClient } from '../../lib/ai/client';
+import { unifiedAIClient } from '../../src/lib/ai/client';
 
 describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   let aiService: AIService;

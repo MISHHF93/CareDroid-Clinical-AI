@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { buildStaffWorkloads, getStaffRebalanceSuggestion, workloadTone } from './staffManagement';
 
 const staff = [

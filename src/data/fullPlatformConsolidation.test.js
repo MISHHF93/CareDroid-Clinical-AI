@@ -119,7 +119,7 @@ describe('full platform consolidation contract', () => {
     expect(appConfigSource).toContain('VITE_SHOW_DEMO_AUTH');
   });
 
-  it('declares the CareDroid Emergency OS route surface once', () => {
+  it('declares the Emergency OS route surface once', () => {
     for (const route of REQUIRED_ROUTES) {
       expect(routeSurfaceDeclares(route), route).toBe(true);
     }

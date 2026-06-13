@@ -7,7 +7,7 @@ export const INTAKE_WORKFLOW_STAGES = Object.freeze([
   'Demographic Extraction',
   'Verification',
   'Patient Confirmation',
-  'Create Intake Record',
+  'Create Intake Patient',
 ]);
 
 export const DOCUMENT_INTELLIGENCE_INPUTS = Object.freeze([
@@ -25,7 +25,7 @@ export const DOCUMENT_INTELLIGENCE_PIPELINE = Object.freeze([
   'Field Extraction',
   'Validation',
   'Review',
-  'Structured Record',
+  'Structured Patient',
 ]);
 
 const SUPPORTED_EXTERNAL_DOCUMENTS = Object.freeze([
@@ -250,7 +250,7 @@ const DEMO_PATIENTS = Object.freeze([
     pendingIntakeReview: false,
     riskIndicators: ['Penicillin allergy', 'Warfarin reported'],
     missingFields: [],
-    sourceState: 'confirmed intake record + insurance card OCR',
+    sourceState: 'confirmed intake patient context + insurance card OCR',
   }),
   Object.freeze({
     patientId: 'INTAKE-002',
@@ -330,7 +330,7 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration', 'triage']),
     reviewControls: Object.freeze([...BASE_REVIEW_CONTROLS, 'patient or staff confirmation before finalizing']),
-    usageMetric: 'summarized arrivals in Emergency Workspace',
+    usageMetric: 'summarized arrivals in Emergency OS',
   }),
   Object.freeze({
     moduleId: 'smart-intake',
@@ -536,8 +536,8 @@ function buildRegistrationScore() {
 
 function buildIntakeRecord() {
   return Object.freeze({
-    title: 'Create Intake Record',
-    promotionRule: 'Only confirmed values are promoted into the intake record.',
+    title: 'Create Intake Patient',
+    promotionRule: 'Only confirmed values are promoted into the intake patient context.',
     confirmationStatus: 'patient or staff confirmed',
     fieldProposals: Object.freeze([
       { field: 'name', proposedValue: 'Jordan Lee', source: "driver's license OCR", editable: true, confirmationState: 'confirmed', conflict: false, missing: false },
@@ -549,7 +549,7 @@ function buildIntakeRecord() {
       { field: 'insurance metadata', proposedValue: 'payer and member ID accepted; group ID pending', source: 'insurance card OCR', editable: true, confirmationState: 'partial review', conflict: true, missing: false },
     ]),
     confirmedFields: Object.freeze([
-      { field: 'name', value: 'Jordan Lee', source: 'confirmed intake record', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
+      { field: 'name', value: 'Jordan Lee', source: 'confirmed intake patient context', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
       { field: 'DOB', value: '1971-04-12', source: "driver's license OCR", confirmedBy: 'registration staff', confirmedAt: 'frontend-runtime' },
       { field: 'address', value: 'confirmed address on file', source: 'QR code intake', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
       { field: 'phone', value: 'confirmed phone on file', source: 'patient-entered intake', confirmedBy: 'patient', confirmedAt: 'frontend-runtime' },
@@ -732,7 +732,7 @@ function buildPatientSnapshot() {
     generatedAt: 'frontend-runtime',
     generatedWithinSeconds: 8,
     clinicianReviewStatus: 'review required',
-    identityAnchor: 'confirmed intake record',
+    identityAnchor: 'confirmed intake patient context',
     sections: Object.freeze([
       {
         id: 'who',
@@ -795,14 +795,14 @@ function buildPatientSnapshot() {
       arrivalComplaint: 'Chest Pain',
     }),
     freshnessIndicators: Object.freeze([
-      { context: 'demographics', freshness: 'confirmed during current intake', source: 'confirmed intake record' },
-      { context: 'allergies', freshness: 'current record', source: 'confirmed-allergy-record' },
-      { context: 'medications', freshness: 'stale until pharmacy connection or bedside verification', source: 'patient report + prior medication record' },
+      { context: 'demographics', freshness: 'confirmed during current intake', source: 'confirmed intake patient context' },
+      { context: 'allergies', freshness: 'current patient context', source: 'confirmed allergy patient context' },
+      { context: 'medications', freshness: 'stale until pharmacy connection or bedside verification', source: 'patient report + prior medication patient context' },
       { context: 'recent encounters', freshness: '14 days old', source: 'discharge-summary-doc-142' },
     ]),
     missingContext: Object.freeze(['pharmacy integration not connected', 'emergency contact pending for one queued patient']),
     safetyStatement:
-      'Patient Snapshot summarizes source-cited context for clinician review and does not diagnose, triage, reconcile medications, or change records autonomously.',
+      'Patient Snapshot summarizes source-cited context for clinician review and does not diagnose, triage, reconcile medications, or change patient data autonomously.',
   });
 }
 
@@ -815,7 +815,7 @@ function buildSmartArrival({ documentRecords = [], patientSnapshot = buildPatien
     capabilityId: 'smart-arrival',
     title: 'Smart Arrival',
     route: '/workspace/emergency/intake',
-    operatingModel: 'embedded Emergency Workspace capability, not a separate intake app',
+    operatingModel: 'embedded Emergency OS capability, not a separate intake app',
     arrivalTrigger: 'Patient arrives inside Emergency OS and is summarized before handoff.',
     capturePipeline: SMART_ARRIVAL_CAPTURE_STEPS,
     documentInputs: Object.freeze([
@@ -874,7 +874,7 @@ function buildSmartArrival({ documentRecords = [], patientSnapshot = buildPatien
     }),
     emergencyWorkspaceFeed: Object.freeze({
       route: '/workspace/emergency',
-      feedMode: 'direct Emergency OS feed',
+      feedMode: 'direct Emergency Whiteboard update',
       targetSurfaces: Object.freeze([
         'command-center',
         'patient-context',
@@ -887,7 +887,7 @@ function buildSmartArrival({ documentRecords = [], patientSnapshot = buildPatien
       payloads: Object.freeze(['Patient Snapshot', 'Pre-Triage Queue entry', 'Patient Journey update']),
     }),
     safetyStatement:
-      'Smart Arrival summarizes and routes arrival context for human review; it does not create autonomous triage, diagnosis, medication reconciliation, or record writeback.',
+      'Smart Arrival summarizes and routes arrival context for human review; it does not create autonomous triage, diagnosis, medication reconciliation, or patient writeback.',
   });
 }
 
@@ -1178,7 +1178,7 @@ function buildMarketplace() {
       { from: 'Pro', to: 'Enterprise', unlocks: Object.freeze(['advanced Identity Resolution', 'Voice Intake', 'Multi-Language Intake']) },
     ]),
     configurationRules: Object.freeze(['role-based enablement', 'governance policy controls', 'review controls cannot be disabled for extracted clinical or identity data']),
-    packagingStatement: 'Intake is packaged as a sellable Emergency Workspace product category.',
+    packagingStatement: 'Intake is packaged as a sellable Emergency OS product category.',
   });
 }
 
@@ -1368,7 +1368,7 @@ export const EmergencyIntakeOperatingSystemService = Object.freeze({
         { surface: 'Document review workspace', route: '/workspace/emergency/intake', artifact: 'documentIntelligence' },
         { surface: 'Identity resolution review', route: '/workspace/emergency/patient-context', artifact: 'identityResolution' },
         { surface: 'Medication and allergy capture review', route: '/workspace/emergency/patient-context', artifact: 'medicationSummary + allergyRiskCapture' },
-        { surface: 'Smart Arrival summary in Emergency Workspace', route: '/workspace/emergency', artifact: 'smartArrival' },
+        { surface: 'Smart Arrival summary in Emergency OS', route: '/workspace/emergency', artifact: 'smartArrival' },
         { surface: 'Emergency command center and Patient Journey Engine views', route: '/workspace/emergency', artifact: 'emergencyOsIntegration' },
       ]),
       safetyStatement:

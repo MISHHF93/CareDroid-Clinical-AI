@@ -601,7 +601,7 @@ const Settings = () => {
                 <div className="settings-billing-summary">
                   <div>
                     <span className="settings-billing-label">Status</span>
-                    <strong>{tenantIsolationAudit?.status || 'Loading...'}</strong>
+                    <strong>{tenantIsolationAudit?.status || 'Loading department data...'}</strong>
                   </div>
                   <div>
                     <span className="settings-billing-label">Domains audited</span>
@@ -612,7 +612,7 @@ const Settings = () => {
                     <strong>
                       {tenantIsolationAudit?.summary?.crossTenantReadAllowed === false
                         ? 'Blocked'
-                        : 'Loading...'}
+                        : 'Loading department data...'}
                     </strong>
                   </div>
                 </div>
@@ -656,11 +656,11 @@ const Settings = () => {
                 <div className="settings-billing-summary" aria-busy={billingLoading}>
                   <div>
                     <span className="settings-billing-label">Current plan</span>
-                    <strong>{billingLoading ? 'Loading...' : subscription?.tier || 'Not returned'}</strong>
+                    <strong>{billingLoading ? 'Loading department data...' : subscription?.tier || 'Not returned'}</strong>
                   </div>
                   <div>
                     <span className="settings-billing-label">Payment status</span>
-                    <strong>{billingLoading ? 'Loading...' : subscription?.status || 'Not returned'}</strong>
+                    <strong>{billingLoading ? 'Loading department data...' : subscription?.status || 'Not returned'}</strong>
                   </div>
                   <div>
                     <span className="settings-billing-label">Current period ends</span>

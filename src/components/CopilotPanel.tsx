@@ -6,6 +6,8 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
+import './CopilotPanel.css';
+import { formatLongWaitAttentionForCopilot } from '../utils/longWaitRescue';
 
 type CopilotMessage = {
   id: string;
@@ -80,15 +82,18 @@ function buildDepartmentPrompt({
   patients,
   capacity,
   alerts,
+  emergencySettings,
 }: {
   patients: Patient[];
   capacity: ReturnType<typeof useEmergencyStore.getState>['capacity'];
   alerts: Alert[];
+  emergencySettings: ReturnType<typeof useEmergencyStore.getState>['emergencySettings'];
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
   const reassessmentQueue = activePatients.filter(isReassessmentDue);
   const activeAlerts = alerts.filter((alert) => !alert.dismissed);
+  const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
 
   return [
     getAIPrompt('ed-copilot').prompt,
@@ -99,6 +104,7 @@ function buildDepartmentPrompt({
     `High risk count: ${highRiskPatients.length}`,
     `Capacity band: ${capacity.band} (${capacity.score})`,
     `Reassessment queue count: ${reassessmentQueue.length}`,
+    longWaitAttention || null,
     '',
     'Active high risk patients:',
     highRiskPatients.length ? highRiskPatients.map((patient) => `- ${summarizePatient(patient)}`).join('\n') : '- None',
@@ -108,7 +114,7 @@ function buildDepartmentPrompt({
     '',
     'Active alerts:',
     activeAlerts.length ? activeAlerts.map((alert) => `- ${formatAlert(alert)}`).join('\n') : '- None',
-  ].join('\n');
+  ].filter((line): line is string => Boolean(line)).join('\n');
 }
 
 function extractResponseText(data: unknown): string {
@@ -167,6 +173,7 @@ export function CopilotPanel() {
   const patients = useEmergencyStore((store) => store.patients);
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
+  const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
   const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const [messages, setMessages] = useState<CopilotMessage[]>([
@@ -207,7 +214,7 @@ export function CopilotPanel() {
       timestamp: new Date(),
     };
     const history = messages;
-    const systemPrompt = buildDepartmentPrompt({ patients, capacity, alerts });
+    const systemPrompt = buildDepartmentPrompt({ patients, capacity, alerts, emergencySettings });
     recordWorkflowAction({
       type: 'copilot_used',
       title: 'Copilot used',
@@ -229,7 +236,6 @@ export function CopilotPanel() {
 
     try {
       const requestMessages = [
-        { role: 'system' as const, content: systemPrompt },
         ...history.map((message) => ({
           role: message.role === 'staff' ? 'user' as const : 'assistant' as const,
           content: message.content,
@@ -237,7 +243,8 @@ export function CopilotPanel() {
         { role: 'user' as const, content: text },
       ];
       const response = await callAI({
-        type: 'COPILOT_CHAT',
+        requestType: 'COPILOT_CHAT',
+        systemPrompt,
         message: text,
         messages: requestMessages,
         context: {
@@ -257,7 +264,9 @@ export function CopilotPanel() {
         throw new Error(`Chat request failed with status ${response.status}`);
       }
 
-      await streamIntoMessage(response.content || extractResponseText(response.data), assistantId, setMessages);
+      const responseText =
+        typeof response.content === 'string' ? response.content : extractResponseText(response.data);
+      await streamIntoMessage(responseText, assistantId, setMessages);
     } catch {
       await streamIntoMessage(
         'Copilot unavailable - check connection. Continue clinical review with human oversight.',
@@ -281,6 +290,7 @@ export function CopilotPanel() {
 
   return (
     <aside
+      className="ed-copilot-panel"
       style={{
         width: 380,
         height: '100vh',

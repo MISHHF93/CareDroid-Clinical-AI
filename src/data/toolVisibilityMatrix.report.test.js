@@ -9,7 +9,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   formatToolVisibilityMatrixMarkdown,
   getToolVisibilityMatrixDocument,
@@ -20,10 +20,11 @@ const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs');
 
 describe('toolVisibilityMatrix report', () => {
-  it('prints visibility matrix summary', () => {
+  it('builds visibility matrix summary', () => {
     const doc = getToolVisibilityMatrixDocument();
-    console.log(formatToolVisibilityMatrixMarkdown(doc));
-    console.log('\n--- Status counts ---\n', JSON.stringify(doc.summary.statusCounts, null, 2));
+
+    expect(formatToolVisibilityMatrixMarkdown(doc)).toContain('# Tool Visibility Matrix');
+    expect(doc.summary.statusCounts).toBeTruthy();
   });
 
   it('writes docs/tool-visibility-matrix.md when VISIBILITY_MATRIX_WRITE_DOCS is set', () => {
@@ -34,6 +35,5 @@ describe('toolVisibilityMatrix report', () => {
       join(docsDir, 'tool-visibility-matrix.md'),
       `${formatToolVisibilityMatrixMarkdown()}\n`
     );
-    console.log('Wrote docs/tool-visibility-matrix.md');
   });
 });

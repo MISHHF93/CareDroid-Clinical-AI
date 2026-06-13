@@ -28,7 +28,6 @@ describe('featureCoverageMatrix report', () => {
       join(docsDir, 'feature-coverage-matrix.md'),
       `${formatFeatureCoverageMatrixMarkdown(doc)}\n`
     );
-    console.log(`Wrote docs/feature-coverage-matrix.md (${doc.rows.length} rows)`);
     expect(existsSync(join(docsDir, 'feature-coverage-matrix.md'))).toBe(true);
   });
 });

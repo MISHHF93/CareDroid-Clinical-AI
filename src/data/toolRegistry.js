@@ -3958,12 +3958,12 @@ const toolRegistry = [
     path: '/simulation',
     color: '#7C3AED',
     description:
-      'Demo training simulation workspace for virtual patient cases, emergency scenarios, decision branching, scoring rubrics, and AI tutor debriefs',
+      'Demo training simulation feature for virtual patient scenarios, emergency scenarios, decision branching, scoring rubrics, and AI tutor debriefs',
     shortcut: 'Ctrl+Alt+M',
     category: 'Education & Simulation',
     features: [
       'Scenario library',
-      'Virtual patient cases',
+      'Virtual patient scenarios',
       'Emergency scenario branching',
       'Simulation progress',
       'Scoring rubric and debrief',

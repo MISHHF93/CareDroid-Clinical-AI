@@ -539,7 +539,7 @@ export default function CommandDashboard() {
         ) : null
       }
       actions={
-        <div className="command-hero__context" aria-label="Dashboard context">
+        <div className="command-hero__context" aria-label="Whiteboard context">
           <span>{workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'}</span>
           <span>{workspaceExperience.environment}</span>
           <Link to={CANONICAL_ROUTES.systemHealth}>
@@ -548,7 +548,7 @@ export default function CommandDashboard() {
         </div>
       }
     >
-      <DashboardGrid variant="dense" className="command-insight-strip" aria-label="Dashboard context summary">
+      <DashboardGrid variant="dense" className="command-insight-strip" aria-label="Whiteboard context summary">
           {(workspaceExperience.focusMetrics || []).slice(0, 1).map((metric) => (
             <InsightChip
               key={metric.label}
@@ -571,7 +571,7 @@ export default function CommandDashboard() {
             <CompactActionCard key={item.id} item={item} />
           ))}
         </DashboardGrid>
-        <div className="command-utility-links" aria-label="Secondary dashboard access">
+        <div className="command-utility-links" aria-label="Secondary Whiteboard access">
           <Link to={CANONICAL_ROUTES.search}>Search</Link>
           <Link to={CANONICAL_ROUTES.recommendations}>Recommendations</Link>
           <Link to="/profile/workspaces">Workspaces</Link>

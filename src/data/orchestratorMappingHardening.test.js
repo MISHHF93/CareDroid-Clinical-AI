@@ -38,9 +38,6 @@ describe('orchestratorMappingHardening — registry ↔ executor', () => {
 
   it('runOrchestratorMappingAudit passes with zero issues', () => {
     const report = runOrchestratorMappingAudit();
-    if (!report.ok) {
-      console.log('orchestrator audit issues:', report.issues);
-    }
     expect(report.ok).toBe(true);
     expect(report.issues).toEqual([]);
   });

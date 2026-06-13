@@ -12,6 +12,7 @@ import { getFirebaseMessagingToken } from './firebaseClient';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 import { makeNotificationStreamDisabledResponse } from './disabledBackendMocks';
 import { reportApiError } from './apiErrorHandling';
+import { dispatchAlert } from '../engine/alertEngine';
 import logger from '../utils/logger';
 
 const NOTIFICATION_ICON = '/logo.svg';
@@ -83,16 +84,20 @@ export const NotificationService = {
   },
 
   /**
-   * Send browser notification
+   * Send a user-facing notification through the canonical alert engine.
    */
   sendBrowserNotification(title, options = {}) {
-    if (Notification.permission === 'granted') {
-      return new Notification(title, {
-        icon: NOTIFICATION_ICON,
-        badge: NOTIFICATION_BADGE,
-        ...options,
-      });
-    }
+    return dispatchAlert({
+      type: options.type || 'System',
+      severity: options.severity || 'Info',
+      title,
+      message: options.body || options.message || title,
+      source: 'notification-service',
+      metadata: {
+        icon: options.icon || NOTIFICATION_ICON,
+        badge: options.badge || NOTIFICATION_BADGE,
+      },
+    });
   },
 
   /**

@@ -1,5 +1,4 @@
-import { useNotifications } from '../contexts/NotificationContext';
-import { dispatch as dispatchAlert } from '../../engine/alertEngine';
+import { dispatchAlert } from '../engine/alertEngine';
 
 const ALERT_SEVERITY_BY_NOTIFICATION_TYPE = {
   success: 'Info',
@@ -11,10 +10,6 @@ const ALERT_SEVERITY_BY_NOTIFICATION_TYPE = {
 
 function dispatchNotificationAlert(type, title, message, action = null) {
   return dispatchAlert({
-    id: `alert-notification-${type}-${String(title || 'notice')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')}`,
     type: 'System',
     severity: ALERT_SEVERITY_BY_NOTIFICATION_TYPE[type] || 'Info',
     title,
@@ -28,119 +23,57 @@ function dispatchNotificationAlert(type, title, message, action = null) {
  * Hook for easily adding notifications from any component
  *
  * Usage:
- * const { addNotification } = useNotificationActions();
+ * const { success } = useNotificationActions();
  *
- * addNotification({
- *   type: 'success',
- *   title: 'Success!',
- *   message: 'Your changes have been saved.',
- * });
+ * success('Success!', 'Your changes have been saved.');
  */
 export const useNotificationActions = () => {
-  const { addNotification, removeNotification, markAsRead } = useNotifications();
-
   return {
     /**
      * Add a success notification (green check)
      */
-    success: (title, message, action = null) => {
-      dispatchNotificationAlert('success', title, message, action);
-      return addNotification({
-        type: 'success',
-        title,
-        message,
-        action,
-      });
-    },
+    success: (title, message, action = null) => dispatchNotificationAlert('success', title, message, action),
 
     /**
      * Add an error notification (red X)
      */
-    error: (title, message, action = null) => {
-      dispatchNotificationAlert('error', title, message, action);
-      return addNotification({
-        type: 'error',
-        title,
-        message,
-        action,
-      });
-    },
+    error: (title, message, action = null) => dispatchNotificationAlert('error', title, message, action),
 
     /**
      * Add a warning notification (orange caution)
      */
-    warning: (title, message, action = null) => {
-      dispatchNotificationAlert('warning', title, message, action);
-      return addNotification({
-        type: 'warning',
-        title,
-        message,
-        action,
-      });
-    },
+    warning: (title, message, action = null) => dispatchNotificationAlert('warning', title, message, action),
 
     /**
      * Add an info notification (blue i)
      */
-    info: (title, message, action = null) => {
-      dispatchNotificationAlert('info', title, message, action);
-      return addNotification({
-        type: 'info',
-        title,
-        message,
-        action,
-      });
-    },
+    info: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Add a critical notification (red emergency banner)
      * These persist until manually removed and show with high prominence
      */
-    critical: (title, message, action = null) => {
-      dispatchNotificationAlert('critical', title, message, action);
-      return addNotification({
-        type: 'critical',
-        title,
-        message,
-        action,
-      });
-    },
+    critical: (title, message, action = null) => dispatchNotificationAlert('critical', title, message, action),
 
     /**
      * Add an update/product notification
      */
-    update: (title, message, action = null) => {
-      dispatchNotificationAlert('info', title, message, action);
-      return addNotification({
-        type: 'info',
-        title,
-        message,
-        action,
-      });
-    },
+    update: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Add an announcement notification
      */
-    announcement: (title, message, action = null) => {
-      dispatchNotificationAlert('info', title, message, action);
-      return addNotification({
-        type: 'info',
-        title,
-        message,
-        action,
-      });
-    },
+    announcement: (title, message, action = null) => dispatchNotificationAlert('info', title, message, action),
 
     /**
      * Remove a notification by ID
      */
-    remove: removeNotification,
+    remove: () => {},
 
     /**
      * Mark notification as read
      */
-    markRead: markAsRead,
+    markRead: () => {},
   };
 };
 

@@ -31,7 +31,6 @@ describe('tool audit report', () => {
         `${JSON.stringify(data, null, 2)}\n`
       );
       writeFileSync(join(repoRoot, 'TOOL_AUDIT_REPORT.md'), `${formatToolAuditMarkdown(data)}\n`);
-      console.log('Wrote TOOL_AUDIT_REPORT.md and TOOL_REGISTRY_STATUS.json');
     }
   });
 });

@@ -389,24 +389,27 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     path: CANONICAL_ROUTES.emergencySimulation,
     aliases: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast', 'surge decision support'],
   },
-  {
-    id: 'emergency-federated-learning',
-    title: 'Federated Learning',
-    path: CANONICAL_ROUTES.emergencyFederatedLearning,
-    aliases: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation', 'privacy preserving learning'],
-  },
-  {
-    id: 'emergency-digital-twin',
-    title: 'Digital Twin',
-    path: CANONICAL_ROUTES.emergencyDigitalTwin,
-    aliases: ['digital twin', 'des', 'abm', 'operations twin', 'hybrid simulation', 'calibration'],
-  },
-  {
-    id: 'ai-governance',
-    title: 'AI Governance',
-    path: CANONICAL_ROUTES.aiGovernance,
-    aliases: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
-  },
+  // Future module
+  // {
+  //   id: 'emergency-federated-learning',
+  //   title: 'Federated Learning',
+  //   path: CANONICAL_ROUTES.emergencyFederatedLearning,
+  //   aliases: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation', 'privacy preserving learning'],
+  // },
+  // Future module
+  // {
+  //   id: 'emergency-digital-twin',
+  //   title: 'Digital Twin',
+  //   path: CANONICAL_ROUTES.emergencyDigitalTwin,
+  //   aliases: ['digital twin', 'des', 'abm', 'operations twin', 'hybrid simulation', 'calibration'],
+  // },
+  // Future module
+  // {
+  //   id: 'ai-governance',
+  //   title: 'AI Governance',
+  //   path: CANONICAL_ROUTES.aiGovernance,
+  //   aliases: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
+  // },
   {
     id: 'emergency-settings',
     title: 'Settings',
@@ -424,7 +427,7 @@ function emergencyOsDestinationEntries() {
     type: 'navigation',
     title: destination.title,
     label: destination.title,
-    description: `Open ${destination.title} in CareDroid Emergency OS.`,
+    description: `Open ${destination.title} in Emergency OS.`,
     path: destination.path,
     workspaceIds: ['emergency'],
     aliases: unique([destination.id, ...(destination.aliases || [])]),

@@ -26,13 +26,6 @@ describe('productPackagingAudit report', () => {
     const markdown = formatProductPackagingAuditMarkdown();
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'product-packaging-audit.md'), `${markdown}\n`);
-    console.log(
-      `Wrote docs/product-packaging-audit.md (${auditSummary(buildProductPackagingAudit())})`
-    );
     expect(existsSync(join(docsDir, 'product-packaging-audit.md'))).toBe(true);
   });
 });
-
-function auditSummary(audit) {
-  return `${audit.summary.compliantAssets}/${audit.summary.seededAssetCount} compliant, ${audit.summary.inventoryOnlyCount} inventory-only`;
-}

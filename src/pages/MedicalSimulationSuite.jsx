@@ -66,7 +66,7 @@ export default function MedicalSimulationSuite() {
           <p className="ops-demo-eyebrow">Demo training simulation - Not live patient data</p>
           <h1 id="simulation-title">Medical Simulation Suite</h1>
           <p>
-            Structured simulation, competency, and debriefing workspace for virtual patient cases,
+            Structured simulation, competency, and debriefing workspace for virtual patient scenarios,
             timed drills, team scenarios, procedural checklists, and AI tutor-guided practice.
           </p>
         </div>
@@ -88,20 +88,20 @@ export default function MedicalSimulationSuite() {
           DEMO_LIVE_STATES.LOCAL_ONLY,
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
-        details="Scenario cases, AI tutor prompts, recommendations, and progress are demo/simulated training data. Launching or completing a scenario updates local browser state only; live learner records and external clinical actions are unsupported."
+        details="Patient scenarios, AI tutor prompts, recommendations, and progress are demo/simulated training data. Launching or completing a scenario updates local browser state only; live learner records and external clinical actions are unsupported."
       />
 
       <CrossModuleLinkPanel
         moduleId="simulation"
         title="Simulation connects to lab and anatomy review"
-        description="Training scenarios can jump into lab interpretation, anatomy review, telemetry, and operational modules when the case context calls for it."
+        description="Training scenarios can jump into lab interpretation, anatomy review, telemetry, and operational features when the patient context calls for it."
       />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Simulation status">
         <article className="ops-demo-metric">
           <span>Scenario library</span>
           <strong>{SIMULATION_SCENARIOS.length}</strong>
-          <small>Demo cases across roles</small>
+          <small>Demo patient scenarios across roles</small>
         </article>
         <article className="ops-demo-metric">
           <span>Categories</span>
@@ -125,9 +125,9 @@ export default function MedicalSimulationSuite() {
           <div className="ops-demo-panel__header">
             <div>
               <p className="ops-demo-eyebrow">Scenario library</p>
-              <h2>Launch structured simulation cases</h2>
+              <h2>Launch structured simulation scenarios</h2>
             </div>
-            <span className="ops-demo-badge">Demo cases</span>
+            <span className="ops-demo-badge">Demo scenarios</span>
           </div>
           <div className="ops-demo-chip-list" aria-label="Simulation categories">
             {['All', ...SIMULATION_CATEGORIES].map((category) => (

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import EMSCriticalBroadcast from './EMSCriticalBroadcast';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { Priority } from '../../types/emergency';
+import { Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
 

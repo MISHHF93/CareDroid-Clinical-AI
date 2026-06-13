@@ -13,10 +13,12 @@
 @keyframes patient-card-reassessment-pulse {
   0%,
   100% {
+    border-color: rgba(245, 158, 11, 0.58);
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.32);
   }
 
   50% {
+    border-color: rgba(245, 158, 11, 0.95);
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
   }
 }
@@ -30,6 +32,7 @@
 }
 
 .patient-card:hover,
+.patient-card:active,
 .patient-card:focus-visible,
 .patient-card--highlighted,
 .patient-card--keyboard-selected {
@@ -39,17 +42,45 @@
 }
 
 .patient-card--reassessment-due {
-  animation: patient-card-reassessment-pulse 1s infinite;
+  animation:
+    patient-card-enter 180ms ease-out,
+    patient-card-reassessment-pulse 1s infinite 180ms;
 }
 
 .patient-card--deterioration-risk {
   box-shadow: 0 0 18px rgba(239, 68, 68, 0.48) !important;
 }
 
+.patient-card--long-wait {
+  border-top-color: #F59E0B !important;
+}
+
+.patient-card--lwbs-risk {
+  box-shadow:
+    0 0 22px rgba(239, 68, 68, 0.44),
+    0 0 44px rgba(127, 29, 29, 0.22) !important;
+}
+
 .patient-card--ems-arrival {
   background:
     linear-gradient(90deg, rgba(14, 165, 233, 0.14), rgba(17, 24, 39, 0) 46%),
     #111827 !important;
+}
+
+.patient-card__lwbs-badge {
+  background: rgba(127, 29, 29, 0.96);
+  border: 1px solid rgba(248, 113, 113, 0.72);
+  border-radius: 999px;
+  color: #FEE2E2;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  position: absolute;
+  right: 8px;
+  text-transform: uppercase;
+  top: 8px;
+  z-index: 2;
 }
 
 .patient-card__vitals {
@@ -103,8 +134,31 @@
 }
 
 .patient-card__timeline-button:hover,
+.patient-card__timeline-button:active,
 .patient-card__timeline-button:focus-visible {
   background: rgba(37, 99, 235, 0.28);
   color: #F9FAFB;
   outline: none;
+}
+
+@media (max-width: 768px) {
+  .patient-card {
+    width: 100% !important;
+    height: 100px !important;
+    min-width: 0;
+    padding: 10px !important;
+  }
+
+  .patient-card__vitals {
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .patient-card__vital-temp {
+    display: none;
+  }
+
+  .patient-card__timeline-button {
+    min-height: 32px;
+  }
 }

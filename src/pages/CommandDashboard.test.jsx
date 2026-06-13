@@ -86,7 +86,7 @@ describe('CommandDashboard', () => {
     renderDashboard();
 
     expect(screen.getByRole('heading', { level: 1, name: /emergency whiteboard/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/caredroid emergency os/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/emergency os/i).length).toBeGreaterThan(0);
     for (const name of [
       /^actions$/i,
       /ai assistant/i,
@@ -101,8 +101,8 @@ describe('CommandDashboard', () => {
     expect(screen.queryByRole('heading', { name: /clinical tools detail/i })).not.toBeInTheDocument();
     expect(screen.getByText(/AI-assisted patient flow/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /systems ready/i })).toHaveAttribute('href', '/system-health');
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/volume/i)).toBeInTheDocument();
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/50-150/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/volume/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/50-150/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/emergency os operating brief/i)).not.toBeInTheDocument();
   });
@@ -201,7 +201,7 @@ describe('CommandDashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: /ask assistant/i }));
 
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('[CareDroid Emergency OS]'),
+      expect.stringContaining('[Emergency OS]'),
       'user'
     );
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
@@ -220,7 +220,7 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('heading', { level: 1, name: /medical iot command center/i })).toBeInTheDocument();
     expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
     expect(screen.getByText(/telemetry and device operations environment/i)).toBeInTheDocument();
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/telemetry/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/telemetry/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/offline devices/i)).toBeInTheDocument();
   });
 
@@ -233,7 +233,7 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('heading', { level: 1, name: /fleet command center/i })).toBeInTheDocument();
     expect(screen.getByText(/fleet os/i)).toBeInTheDocument();
     expect(screen.getByText(/transport logistics and dispatch environment/i)).toBeInTheDocument();
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/fleet map/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/fleet map/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/etas, route risk/i)).toBeInTheDocument();
   });
 

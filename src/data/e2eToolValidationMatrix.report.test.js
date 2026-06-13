@@ -9,7 +9,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   formatE2eMatrixMarkdown,
   getE2eValidationMatrixDocument,
@@ -26,9 +26,7 @@ describe('e2eToolValidationMatrix report', () => {
   it('prints matrix report and fails on validation issues', () => {
     const validation = runMatrixValidation();
     const doc = getE2eValidationMatrixDocument();
-    console.log(formatE2eMatrixMarkdown(doc));
-    console.log('\n--- Manual QA sections:', 'see docs/e2e-manual-qa-checklist.md ---');
-    console.log('--- Regression gates:', 'see docs/e2e-regression-checklist.md ---\n');
+    expect(formatE2eMatrixMarkdown(doc)).toContain('#');
 
     if (!validation.ok) {
       throw new Error(
@@ -48,6 +46,5 @@ describe('e2eToolValidationMatrix report', () => {
     writeFileSync(join(docsDir, 'e2e-tool-validation-matrix.md'), `${formatE2eMatrixMarkdown()}\n`);
     writeFileSync(join(docsDir, 'e2e-manual-qa-checklist.md'), `${formatManualQaMarkdown()}\n`);
     writeFileSync(join(docsDir, 'e2e-regression-checklist.md'), `${formatRegressionMarkdown()}\n`);
-    console.log('Wrote docs/e2e-*.md');
   });
 });

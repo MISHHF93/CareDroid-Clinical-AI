@@ -1,4 +1,16 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { FormEvent, TouchEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import {
   Note,
   Patient,
@@ -11,15 +23,24 @@ import {
   WorkflowActionLog,
 } from '../types/emergency';
 import { useEmergencyStore, workflowLogFromJourneyEvent } from '../store/emergencyStore';
-import { dispatchAlert, dispatchCriticalVitalsAlerts } from '../engine/alertEngine';
+import { dispatchAlert } from '../engine/alertEngine';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
 import { buildPatientTimeline } from '../utils/patientTimeline';
-import HEARTScore from './calculators/HEARTScore';
-import QSOFA from './calculators/qSOFA';
-import PediatricDrugCalc from './calculators/PediatricDrugCalc';
+import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
+import { findMatchingChecklists, type Checklist } from '../config/criticalChecklists';
+import CriticalChecklist from './CriticalChecklist';
+import SepsisBundleTracker from './SepsisBundleTracker';
+import StrokeCodeProtocol from './StrokeCodeProtocol';
+import WhoNextPanel from './WhoNextPanel';
+import ErrorBoundary from './ErrorBoundary';
 import './PatientDetailPanel.css';
+
+const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
+const QSOFA = lazy(() => import('./calculators/qSOFA'));
+const PediatricDrugCalc = lazy(() => import('./calculators/PediatricDrugCalc'));
 
 const priorityColors: Record<Priority, string> = {
   [Priority.P1]: '#EF4444',
@@ -44,6 +65,31 @@ const emptyVitalsForm = {
 
 type VitalsForm = typeof emptyVitalsForm;
 type ActionMode = null | 'staff' | 'room' | 'escalate' | 'discharge';
+type VitalsHistoryView = 'chart' | 'table';
+type VitalsLineKey = 'hr' | 'spo2' | 'sbp' | 'temp';
+type VitalTrend = {
+  symbol: '↑' | '↓' | '→';
+  color: string;
+  label: string;
+};
+type VitalsChartPoint = {
+  timestamp: string;
+  time: string;
+  hr?: number;
+  spo2?: number;
+  sbp?: number;
+  dbp?: number;
+  temp?: number;
+  rr?: number;
+  gcs?: number;
+};
+
+const vitalsLineConfig: Array<{ key: VitalsLineKey; label: string; color: string }> = [
+  { key: 'hr', label: 'HR', color: '#EF4444' },
+  { key: 'spo2', label: 'SpO2', color: '#3B82F6' },
+  { key: 'sbp', label: 'SBP', color: '#F59E0B' },
+  { key: 'temp', label: 'Temp', color: '#10B981' },
+];
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -57,6 +103,13 @@ function formatTime(value?: string): string {
   }).format(new Date(value));
 }
 
+function formatChartTime(value?: string): string {
+  if (!value) return '--';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--';
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 function initials(nameOrId: string): string {
   return nameOrId
     .split(/\s+/)
@@ -67,7 +120,8 @@ function initials(nameOrId: string): string {
     .toUpperCase();
 }
 
-function staffName(staff: Staff[], staffId: string): string {
+function staffName(staff: Staff[], staffId?: string | null): string {
+  if (!staffId) return '';
   return staff.find((member) => member.id === staffId)?.name || staffId;
 }
 
@@ -79,13 +133,21 @@ function workflowActor(log: WorkflowActionLog, staff: Staff[]): string {
 
 function journeyTimestamp(patient: Patient, state: PatientState): string | undefined {
   if (state === PatientState.Arrival) return patient.arrivalTime;
-  if (state === PatientState.Triage) return patient.triageTime;
+  if (state === PatientState.Triage) return patient.triageTime || undefined;
   return patient.timeline.find((event) => event.to === state)?.timestamp;
 }
 
 function nextPatientState(current: PatientState): PatientState {
   const index = patientStateOrder.indexOf(current);
   return patientStateOrder[Math.min(index + 1, patientStateOrder.length - 1)];
+}
+
+function hasPatientFlagValue(patient: Patient, flag: PatientFlag | string): boolean {
+  return patient.flags.some((patientFlag) => String(patientFlag) === String(flag));
+}
+
+function hasStrokeCodeFlag(patient: Patient): boolean {
+  return patient.flags.some((flag) => /stroke\s*code|strokecode|stroke_code/i.test(String(flag)));
 }
 
 function vitalTone(label: string, value?: number): string {
@@ -97,6 +159,258 @@ function vitalTone(label: string, value?: number): string {
   if (label === 'RR' && (value > 24 || value < 10)) return '#F59E0B';
   if (label === 'GCS' && value < 15) return '#F59E0B';
   return '#F9FAFB';
+}
+
+function trendArrow(label: string, current?: number, previous?: number): VitalTrend | null {
+  if (current === undefined || previous === undefined) return null;
+  const diff = current - previous;
+  const stable: VitalTrend = { symbol: '→', color: '#9CA3AF', label: `${label} stable` };
+
+  if (label === 'HR') {
+    if (diff > 10) return { symbol: '↑', color: '#EF4444', label: 'HR trending up' };
+    if (diff < -10) return { symbol: '↓', color: '#10B981', label: 'HR trending down' };
+    return stable;
+  }
+
+  if (label === 'SpO2') {
+    if (diff > 2) return { symbol: '↑', color: '#10B981', label: 'SpO2 trending up' };
+    if (diff < -2) return { symbol: '↓', color: '#EF4444', label: 'SpO2 trending down' };
+    return stable;
+  }
+
+  if (label === 'SBP') {
+    const contextualColor = current < 90 ? '#EF4444' : current > 180 ? '#F59E0B' : '#10B981';
+    if (diff > 15) return { symbol: '↑', color: contextualColor, label: 'SBP trending up' };
+    if (diff < -15) return { symbol: '↓', color: contextualColor, label: 'SBP trending down' };
+    return stable;
+  }
+
+  if (label === 'Temp') {
+    if (diff > 0.5) return { symbol: '↑', color: '#F59E0B', label: 'Temperature trending up' };
+    if (diff < -0.5) return { symbol: '↓', color: '#3B82F6', label: 'Temperature trending down' };
+    return stable;
+  }
+
+  return null;
+}
+
+function TooltipRow({ label, value, color }: { label: string; value: string | number; color: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, color }}>
+      <span>{label}</span>
+      <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>{value}</span>
+    </div>
+  );
+}
+
+function VitalsTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload?: VitalsChartPoint }>;
+}) {
+  const point = payload?.[0]?.payload;
+  if (!active || !point) return null;
+
+  return (
+    <div
+      style={{
+        background: '#1C2333',
+        border: '1px solid #374151',
+        borderRadius: 10,
+        color: '#F9FAFB',
+        fontSize: 12,
+        padding: 10,
+        minWidth: 132,
+        boxShadow: '0 12px 30px rgba(0,0,0,0.28)',
+      }}
+    >
+      <div style={{ color: '#9CA3AF', marginBottom: 6 }}>{point.time}</div>
+      <TooltipRow label="HR" value={point.hr ?? '--'} color={vitalTone('HR', point.hr)} />
+      <TooltipRow label="BP" value={`${point.sbp ?? '--'}/${point.dbp ?? '--'}`} color={vitalTone('SBP', point.sbp)} />
+      <TooltipRow label="SpO2" value={point.spo2 ?? '--'} color={vitalTone('SpO2', point.spo2)} />
+      <TooltipRow label="Temp" value={point.temp ?? '--'} color={vitalTone('Temp', point.temp)} />
+      <TooltipRow label="RR" value={point.rr ?? '--'} color={vitalTone('RR', point.rr)} />
+      <TooltipRow label="GCS" value={point.gcs ?? '--'} color={vitalTone('GCS', point.gcs)} />
+    </div>
+  );
+}
+
+function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
+  const [view, setView] = useState<VitalsHistoryView>('chart');
+  const [hiddenLines, setHiddenLines] = useState<Record<VitalsLineKey, boolean>>({
+    hr: false,
+    spo2: false,
+    sbp: false,
+    temp: true,
+  });
+
+  if (vitals.length === 0) {
+    return <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }}>No vitals recorded</p>;
+  }
+
+  if (vitals.length === 1) return null;
+
+  const chartData: VitalsChartPoint[] = [...vitals].reverse().map((vital) => ({
+    timestamp: vital.recordedAt,
+    time: formatChartTime(vital.recordedAt),
+    hr: vital.hr,
+    spo2: vital.spo2,
+    sbp: vital.sbp,
+    dbp: vital.dbp,
+    temp: vital.temp,
+    rr: vital.rr,
+    gcs: vital.gcs,
+  }));
+
+  const toggleLine = (key: VitalsLineKey) => {
+    setHiddenLines((current) => ({ ...current, [key]: !current[key] }));
+  };
+
+  return (
+    <section style={{ marginTop: 16 }} aria-labelledby="vitals-trend-heading">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <h4 id="vitals-trend-heading" style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>
+          Vitals Trend
+        </h4>
+        <div style={{ display: 'inline-flex', border: '1px solid #374151', borderRadius: 999, overflow: 'hidden' }}>
+          {(['chart', 'table'] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setView(mode)}
+              style={{
+                border: 0,
+                background: view === mode ? '#2563EB' : 'transparent',
+                color: '#F9FAFB',
+                cursor: 'pointer',
+                fontSize: 11,
+                padding: '5px 9px',
+              }}
+            >
+              {mode === 'chart' ? 'Chart' : 'Table'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {view === 'chart' ? (
+        <>
+          <div style={{ height: 160, marginTop: 10 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 2, left: -18 }}>
+                <CartesianGrid stroke="#1F2937" strokeOpacity={0.45} vertical={false} />
+                <XAxis
+                  dataKey="time"
+                  tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#1F2937' }}
+                />
+                <YAxis
+                  tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#1F2937' }}
+                  width={36}
+                />
+                <Tooltip content={<VitalsTooltip />} cursor={{ stroke: '#374151', strokeDasharray: '3 3' }} />
+                <ReferenceLine y={94} stroke="#3B82F6" strokeDasharray="4 4" strokeOpacity={0.45} />
+                <ReferenceLine y={100} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.4} />
+                <ReferenceLine y={90} stroke="#F59E0B" strokeDasharray="4 4" strokeOpacity={0.45} />
+                {vitalsLineConfig.map((line) => (
+                  <Line
+                    key={line.key}
+                    type="monotone"
+                    dataKey={line.key}
+                    name={line.label}
+                    stroke={line.color}
+                    strokeWidth={2}
+                    dot={false}
+                    hide={hiddenLines[line.key]}
+                    isAnimationActive={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div
+            aria-label="Toggle vitals trend lines"
+            style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap' }}
+          >
+            {vitalsLineConfig.map((line) => (
+              <button
+                key={line.key}
+                type="button"
+                onClick={() => toggleLine(line.key)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  border: 0,
+                  background: 'transparent',
+                  color: hiddenLines[line.key] ? '#6B7280' : '#D1D5DB',
+                  cursor: 'pointer',
+                  fontSize: 11,
+                  padding: 0,
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 999,
+                    background: line.color,
+                    opacity: hiddenLines[line.key] ? 0.35 : 1,
+                  }}
+                />
+                {line.label}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ overflowX: 'auto', marginTop: 10 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+            <thead>
+              <tr style={{ color: '#9CA3AF', textAlign: 'left' }}>
+                {['Time', 'HR', 'BP', 'SpO2', 'Temp', 'RR', 'GCS'].map((heading) => (
+                  <th key={heading} style={{ borderBottom: '1px solid #1F2937', fontWeight: 600, padding: '6px 5px' }}>
+                    {heading}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {chartData.map((point) => (
+                <tr key={point.timestamp} style={{ color: '#D1D5DB' }}>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px' }}>{point.time}</td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('HR', point.hr) }}>
+                    {point.hr ?? '--'}
+                  </td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('SBP', point.sbp) }}>
+                    {point.sbp ?? '--'}/{point.dbp ?? '--'}
+                  </td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('SpO2', point.spo2) }}>
+                    {point.spo2 ?? '--'}
+                  </td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('Temp', point.temp) }}>
+                    {point.temp ?? '--'}
+                  </td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('RR', point.rr) }}>
+                    {point.rr ?? '--'}
+                  </td>
+                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('GCS', point.gcs) }}>
+                    {point.gcs ?? '--'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
 }
 
 function parseVitals(form: VitalsForm, recordedBy: string): Vitals {
@@ -168,6 +482,7 @@ function FieldButton({
 
 export default function PatientDetailPanel() {
   const emergencyRole = useEmergencyRolePermissions();
+  const navigate = useNavigate();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
@@ -191,6 +506,13 @@ export default function PatientDetailPanel() {
   const [heartScoreOpen, setHeartScoreOpen] = useState(false);
   const [qsofaOpen, setQsofaOpen] = useState(false);
   const [pediatricDrugCalcOpen, setPediatricDrugCalcOpen] = useState(false);
+  const [criticalChecklistOpen, setCriticalChecklistOpen] = useState(false);
+  const [activeCriticalChecklist, setActiveCriticalChecklist] = useState<Checklist | null>(null);
+  const [criticalChecklistTitleHint, setCriticalChecklistTitleHint] = useState<string | undefined>();
+  const [autoOpenedChecklistKey, setAutoOpenedChecklistKey] = useState('');
+  const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
+  const swipeStartYRef = useRef<number | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
   const canTransition = emergencyRole.can(EMERGENCY_ACTIONS.transitionPatient);
   const canWriteVitals = emergencyRole.can(EMERGENCY_ACTIONS.writeVitals);
   const canWriteNote = emergencyRole.can(EMERGENCY_ACTIONS.writeNote);
@@ -204,6 +526,11 @@ export default function PatientDetailPanel() {
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
     [patients, selectedPatientId],
   );
+  const openCalculatorHub = useCallback((calculatorId: string) => {
+    if (!selectedPatientId) return;
+    const params = new URLSearchParams({ open: calculatorId, patientId: selectedPatientId });
+    navigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
+  }, [navigate, selectedPatientId]);
   const timelineContextState = usePatientTimelineContext(selectedPatientId);
   const patientWorkflowLogs = useMemo(() => {
     if (!selectedPatient) return [];
@@ -231,11 +558,75 @@ export default function PatientDetailPanel() {
     [alerts, patientWorkflowLogs, selectedPatient, staff, timelineContextState.context],
   );
 
+  useEffect(() => {
+    if (!selectedPatient) {
+      setSuggestedScores([]);
+      return;
+    }
+
+    const route = routeComplaint(selectedPatient.chiefComplaint);
+    setSuggestedScores(route && !hasRunScores(selectedPatient, route.scoreIds) ? route.scoreIds : []);
+  }, [selectedPatient]);
+
+  useEffect(() => {
+    if (!selectedPatient) {
+      setCriticalChecklistOpen(false);
+      setActiveCriticalChecklist(null);
+      setCriticalChecklistTitleHint(undefined);
+      return;
+    }
+
+    if (hasPatientFlagValue(selectedPatient, PatientFlag.SepsisAlert)) return;
+
+    if (hasStrokeCodeFlag(selectedPatient)) {
+      const autoKey = `${selectedPatient.id}:stroke-code`;
+      if (autoOpenedChecklistKey === autoKey) return;
+      setActiveCriticalChecklist(null);
+      setCriticalChecklistTitleHint('StrokeCode checklist pending configuration');
+      setCriticalChecklistOpen(true);
+      setAutoOpenedChecklistKey(autoKey);
+      return;
+    }
+
+    const isEmsPatient =
+      selectedPatient.source === 'EMS' ||
+      hasPatientFlagValue(selectedPatient, PatientFlag.EMSArrival) ||
+      Boolean(selectedPatient.emsArrival || selectedPatient.emsUnitId);
+    const isCriticalArrival = selectedPatient.emsArrival?.severity === 'Critical' || selectedPatient.priority === Priority.P1;
+    if (!isEmsPatient || !isCriticalArrival) return;
+
+    const matches = findMatchingChecklists(selectedPatient);
+    if (matches.length === 0) return;
+
+    const autoKey = `${selectedPatient.id}:${matches.map((match) => match.id).join(',')}`;
+    if (autoOpenedChecklistKey === autoKey) return;
+
+    setActiveCriticalChecklist(matches.length === 1 ? matches[0] : null);
+    setCriticalChecklistTitleHint(undefined);
+    setCriticalChecklistOpen(true);
+    setAutoOpenedChecklistKey(autoKey);
+  }, [autoOpenedChecklistKey, selectedPatient]);
+
   if (!selectedPatient) return null;
 
   const currentStateIndex = patientStateOrder.indexOf(selectedPatient.state);
-  const latestVitals = selectedPatient.vitals.at(-1);
+  const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals) ? selectedPatient.vitals : [];
+  const vitalsHistory = [...patientVitals].reverse();
+  const latestVitals = vitalsHistory[0];
+  const previousVitals = vitalsHistory[1];
+  const latestVitalEntries: Array<{ label: string; value?: number; trend?: VitalTrend | null }> = [
+    { label: 'HR', value: latestVitals?.hr, trend: trendArrow('HR', latestVitals?.hr, previousVitals?.hr) },
+    { label: 'SBP', value: latestVitals?.sbp, trend: trendArrow('SBP', latestVitals?.sbp, previousVitals?.sbp) },
+    { label: 'DBP', value: latestVitals?.dbp },
+    { label: 'SpO2', value: latestVitals?.spo2, trend: trendArrow('SpO2', latestVitals?.spo2, previousVitals?.spo2) },
+    { label: 'Temp', value: latestVitals?.temp, trend: trendArrow('Temp', latestVitals?.temp, previousVitals?.temp) },
+    { label: 'RR', value: latestVitals?.rr },
+    { label: 'GCS', value: latestVitals?.gcs },
+    { label: 'Pain', value: latestVitals?.pain },
+  ];
   const actorStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'system';
+  const checklistStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'current-staff';
+  const isSepsisChecklistBlocked = hasPatientFlagValue(selectedPatient, PatientFlag.SepsisAlert);
   const sortedNotes = [...selectedPatient.notes].sort(
     (a, b) =>
       new Date(b.timestamp || b.createdAt || 0).getTime() -
@@ -247,10 +638,23 @@ export default function PatientDetailPanel() {
     if (!canWriteVitals) return;
     const vitals = parseVitals(vitalsForm, actorStaffId);
     addVitals(selectedPatient.id, vitals);
-    dispatchCriticalVitalsAlerts({
-      ...selectedPatient,
-      vitals: [...selectedPatient.vitals, vitals],
-    });
+    const { spo2, hr, sbp } = vitals;
+    const hasCriticalVitals =
+      (spo2 !== undefined && spo2 < 88) ||
+      (hr !== undefined && (hr < 40 || hr > 150)) ||
+      (sbp !== undefined && sbp < 80);
+
+    if (hasCriticalVitals) {
+      dispatchAlert({
+        severity: 'Critical',
+        title: `Critical Vitals — ${selectedPatient.firstName}`,
+        message: `SpO2 ${spo2 ?? '--'}%, HR ${hr ?? '--'}, BP ${sbp ?? '--'}`,
+        patientId: selectedPatient.id,
+        source: 'patient-detail-panel',
+      });
+      addFlag(selectedPatient.id, PatientFlag.DeteriorationRisk);
+    }
+
     setVitalsForm(emptyVitalsForm);
     setShowVitalsForm(false);
   };
@@ -286,8 +690,40 @@ export default function PatientDetailPanel() {
     setActionMode(null);
   };
 
+  const openManualChecklist = () => {
+    const matches = findMatchingChecklists(selectedPatient);
+    setActiveCriticalChecklist(matches.length === 1 ? matches[0] : null);
+    setCriticalChecklistTitleHint(undefined);
+    setCriticalChecklistOpen(true);
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
+    if (event.touches.length !== 1) return;
+    swipeStartYRef.current = event.touches[0].clientY;
+    setSwipeOffset(0);
+  };
+
+  const handleTouchMove = (event: TouchEvent<HTMLElement>) => {
+    if (swipeStartYRef.current === null || event.touches.length !== 1) return;
+    const deltaY = event.touches[0].clientY - swipeStartYRef.current;
+    setSwipeOffset(Math.max(0, Math.min(deltaY, 180)));
+  };
+
+  const handleTouchEnd = () => {
+    if (swipeOffset > 90) {
+      selectPatient(null);
+    }
+    swipeStartYRef.current = null;
+    setSwipeOffset(0);
+  };
+
   return (
     <aside
+      className="patient-detail-panel"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       style={{
         position: 'fixed',
         right: 0,
@@ -300,8 +736,12 @@ export default function PatientDetailPanel() {
         overflowY: 'auto',
         color: '#F9FAFB',
         boxShadow: '-24px 0 60px rgba(0,0,0,0.36)',
+        transform: swipeOffset > 0 ? `translateY(${swipeOffset}px)` : undefined,
+        transition: swipeOffset > 0 ? 'none' : 'transform 180ms ease',
+        touchAction: 'pan-y',
       }}
     >
+      <div className="patient-detail-panel__drag-handle" aria-hidden="true" />
       <header
         style={{
           position: 'sticky',
@@ -341,6 +781,22 @@ export default function PatientDetailPanel() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
           <Badge color="#9CA3AF">{selectedPatient.state}</Badge>
+          {!isSepsisChecklistBlocked ? (
+            <button
+              type="button"
+              onClick={openManualChecklist}
+              style={{
+                background: 'transparent',
+                border: '1px solid #374151',
+                color: '#F9FAFB',
+                borderRadius: 10,
+                padding: '8px 10px',
+                cursor: 'pointer',
+              }}
+            >
+              Open Checklist
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => movePatientToState(selectedPatient.id, nextPatientState(selectedPatient.state), actorStaffId)}
@@ -490,16 +946,7 @@ export default function PatientDetailPanel() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
-          {[
-            ['HR', latestVitals?.hr],
-            ['SBP', latestVitals?.sbp],
-            ['DBP', latestVitals?.dbp],
-            ['SpO2', latestVitals?.spo2],
-            ['Temp', latestVitals?.temp],
-            ['RR', latestVitals?.rr],
-            ['GCS', latestVitals?.gcs],
-            ['Pain', latestVitals?.pain],
-          ].map(([label, value]) => (
+          {latestVitalEntries.map(({ label, value, trend }) => (
             <div key={label} style={{ background: '#0B1120', border: '1px solid #1F2937', borderRadius: 10, padding: 10 }}>
               <div style={{ color: '#9CA3AF', fontSize: 11 }}>{label}</div>
               <div
@@ -508,13 +955,27 @@ export default function PatientDetailPanel() {
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                   fontSize: 22,
                   marginTop: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
                 }}
               >
-                {value ?? '--'}
+                <span>{value ?? '--'}</span>
+                {trend ? (
+                  <span
+                    aria-label={trend.label}
+                    title={trend.label}
+                    style={{ color: trend.color, fontSize: 13, lineHeight: 1, marginTop: 2 }}
+                  >
+                    {trend.symbol}
+                  </span>
+                ) : null}
               </div>
             </div>
           ))}
         </div>
+
+        <VitalsHistoryChart vitals={vitalsHistory} />
 
         {showVitalsForm && canWriteVitals ? (
           <form onSubmit={submitVitals} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
@@ -599,6 +1060,15 @@ export default function PatientDetailPanel() {
           <FieldButton disabled={!canManageFlags} onClick={() => addFlag(selectedPatient.id, flagToAdd)}>Add Flag</FieldButton>
         </div>
       </section>
+
+      <SepsisBundleTracker patient={selectedPatient} />
+
+      <StrokeCodeProtocol
+        patient={selectedPatient}
+        canManageFlags={canManageFlags}
+        canWriteNote={canWriteNote}
+        onOpenCalculator={openCalculatorHub}
+      />
 
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Notes</h3>
@@ -699,6 +1169,34 @@ export default function PatientDetailPanel() {
 
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Clinical Calculators</h3>
+        {suggestedScores.length ? (
+          <div
+            aria-label="Suggested scores"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 8,
+              marginBottom: 12,
+            }}
+          >
+            {suggestedScores.map((scoreId) => (
+              <span
+                key={scoreId}
+                style={{
+                  border: '1px solid #2563EB',
+                  borderRadius: 999,
+                  background: '#1D4ED81F',
+                  color: '#BFDBFE',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  padding: '5px 8px',
+                }}
+              >
+                {scoreId}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <FieldButton onClick={() => setHeartScoreOpen(true)}>HEART Score</FieldButton>
           <FieldButton onClick={() => setQsofaOpen(true)}>qSOFA</FieldButton>
@@ -710,28 +1208,54 @@ export default function PatientDetailPanel() {
         style={{
           position: 'sticky',
           bottom: 0,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          display: 'flex',
+          flexDirection: 'column',
           gap: 8,
           padding: 16,
           background: '#111827',
           borderTop: '1px solid #1F2937',
         }}
       >
-        <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
-        <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
-        <FieldButton disabled={!canEscalate} onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
-        <FieldButton disabled={!canDischarge} onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
+        <WhoNextPanel />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
+          <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
+          <FieldButton disabled={!canEscalate} onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
+          <FieldButton disabled={!canDischarge} onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
+        </div>
       </div>
       {heartScoreOpen ? (
-        <HEARTScore patientId={selectedPatient.id} onClose={() => setHeartScoreOpen(false)} />
+        <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
+          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+            <HEARTScore patientId={selectedPatient.id} onClose={() => setHeartScoreOpen(false)} />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
       {qsofaOpen ? (
-        <QSOFA patientId={selectedPatient.id} onClose={() => setQsofaOpen(false)} />
+        <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
+          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+            <QSOFA patientId={selectedPatient.id} onClose={() => setQsofaOpen(false)} />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
       {pediatricDrugCalcOpen ? (
-        <PediatricDrugCalc patientId={selectedPatient.id} onClose={() => setPediatricDrugCalcOpen(false)} />
+        <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
+          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+            <PediatricDrugCalc patientId={selectedPatient.id} onClose={() => setPediatricDrugCalcOpen(false)} />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
+      <ErrorBoundary fallbackText="Calculator surface encountered an error. Refresh to reload.">
+        <CriticalChecklist
+          patient={selectedPatient}
+          checklist={activeCriticalChecklist}
+          open={criticalChecklistOpen}
+          onClose={() => setCriticalChecklistOpen(false)}
+          currentStaffId={checklistStaffId}
+          currentStaffName={staffName(staff, checklistStaffId)}
+          titleHint={criticalChecklistTitleHint}
+        />
+      </ErrorBoundary>
     </aside>
   );
 }

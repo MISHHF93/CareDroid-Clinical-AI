@@ -83,7 +83,7 @@ describe('ReferralHub', () => {
         }),
         recommendations: expect.arrayContaining([
           expect.objectContaining({
-            action: expect.stringMatching(/Confirm owner/i),
+            action: expect.stringMatching(/Confirm assigned staff/i),
           }),
         ]),
         safetyStatement: expect.stringMatching(/human-reviewed/i),

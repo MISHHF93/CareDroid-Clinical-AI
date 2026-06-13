@@ -92,10 +92,23 @@
 
 .command-palette__item--active,
 .command-palette__item:hover,
+.command-palette__item:active,
 .command-palette__item:focus-visible {
   border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-info) 12%, var(--color-surface));
   outline: none;
+}
+
+@keyframes command-palette-slide-up {
+  from {
+    opacity: 0.92;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .command-palette__item span {
@@ -188,5 +201,26 @@
   .command-palette__flag-dialog button,
   .command-palette__item {
     min-height: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .command-palette__overlay {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .command-palette {
+    height: 60vh;
+    max-height: 60vh;
+    border-radius: 20px 20px 0 0;
+    animation: command-palette-slide-up 180ms ease-out;
+  }
+
+  .command-palette__search {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-elevated);
   }
 }

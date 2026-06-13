@@ -4,6 +4,7 @@ import {
   selectReassessmentQueue,
   useEmergencyStore,
 } from '../../store/emergencyStore';
+import { dispatchAlert } from '../engine/alertEngine';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import { deriveCrisisModeState } from '../utils/crisisMode';
 import './CrisisMode.css';
@@ -37,7 +38,6 @@ export default function CrisisMode({ onVisibilityChange }) {
   const dischargePatient = useEmergencyStore((state) => state.dischargePatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
-  const dispatchAlert = useEmergencyStore((state) => state.dispatchAlert);
   const requestAdditionalStaff = useEmergencyStore((state) => state.requestAdditionalStaff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const [panelOpen, setPanelOpen] = useState(false);

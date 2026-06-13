@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../lib/features/featureRegistry';
-import { buildDefaultFlags } from '../store/featureStore';
+import { buildDefaultFlags } from './store/emergencyStore';
 import { buildSidebarItems } from './layout/AppShell';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,18 +18,14 @@ describe('feature flag UI coverage', () => {
     expect(sidebarItems.map((item) => item.featureId)).toEqual(
       expect.arrayContaining([
         'emergency_whiteboard',
-        'emergency_patients',
-        'smart_intake',
-        'queue_intelligence',
-        'reassessment_engine',
         'referral_intelligence',
         'capacity_intelligence',
-        'boarding_intelligence',
-        'ed_copilot',
-        'emergency_analytics',
+        'clinical_calculator_hub',
+        'shift_summary',
         'emergency_settings',
       ])
     );
+    expect(sidebarItems).toHaveLength(6);
   });
 
   it('keeps first-load defaults on for core and professional features while environment-gating simulation', () => {
@@ -62,13 +58,13 @@ describe('feature flag UI coverage', () => {
 
   it('keeps patient detail actions local and calculator cards gated', () => {
     const patientDetailSource = readSource('components/PatientDetailPanel.tsx');
-    const calculatorHubSource = readSource('pages/emergency/ClinicalCalculatorHub.jsx');
+    const calculatorHubSource = readSource('components/ClinicalCalculatorHub.tsx');
 
     expect(patientDetailSource).toContain('<HEARTScore patientId={selectedPatient.id}');
     expect(patientDetailSource).toContain('<QSOFA patientId={selectedPatient.id}');
     expect(patientDetailSource).toContain('<PediatricDrugCalc patientId={selectedPatient.id}');
-    expect(calculatorHubSource).toContain('feature={featureForTool(tool.id)}');
-    expect(calculatorHubSource).toContain('<FeatureGate feature={activeToolFeature} showPlaceholder>');
+    expect(calculatorHubSource).toContain('export const CALCULATORS');
+    expect(calculatorHubSource).toContain('component:');
   });
 
   it('guards audit log, simulation autostart, and Copilot tool actions', () => {
@@ -87,7 +83,7 @@ describe('feature flag UI coverage', () => {
   it('keeps requested feature ids registered for gated surfaces', () => {
     expect(FEATURE_REGISTRY_BY_ID.ems_pipeline.sidebarRoute).toBe('/emergency/ems');
     expect(FEATURE_REGISTRY_BY_ID.smart_intake.sidebarRoute).toBe('/emergency/intake');
-    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/copilot');
+    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/tools');
     expect(FEATURE_REGISTRY_BY_ID.queue_intelligence.sidebarRoute).toBe('/emergency/queues');
     expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');

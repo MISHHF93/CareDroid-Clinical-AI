@@ -65,6 +65,14 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallbackText || this.props.fallback) {
+        return this.props.fallback || (
+          <div role="alert" style={{ padding: 16, color: '#FCA5A5' }}>
+            {this.props.fallbackText}
+          </div>
+        );
+      }
+
       return (
         <div style={{
           display: 'flex',

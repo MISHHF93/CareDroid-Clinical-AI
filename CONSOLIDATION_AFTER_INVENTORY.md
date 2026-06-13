@@ -63,3 +63,195 @@ Generated after R2-R14 consolidation work.
 - Direct AI compatibility services still exist for broader modules; active ED Copilot is migrated to the unified browser-safe client.
 
 STATUS: EMERGENCY OS CORE CONSOLIDATED; LEGACY/FUTURE MODULE STUBS REMAIN
+
+## R15 - After Inventory Mirror
+
+Generated as the R15 mirror of R1. This section compares against `DUPLICATE_MAP.md` R1 counts and uses Windows-safe `rg`/glob equivalents instead of Unix `find | xargs | grep` pipelines.
+
+Important mapping notes:
+- R1 Search 1-8 comparable before total: 158 files/hits.
+- R1 full grand total: 208, but that includes Search 9 API clients and Search 10 layout/shell files, which R15 did not ask to rerun.
+- Several original grep patterns are broad and catch tests, CSS, support components, and data references. Counts below use the actual mirrored file hits, then classify canonical expected files separately.
+
+### Search 1 - Patient Display Components
+
+Equivalent used:
+- `rg -l "patient|Patient" src -g "*.tsx"`
+- Intersected with TSX files returning JSX. The literal line-oriented `return.*<div|return.*<tr|return.*<li` form returned 0 because these files use `return (` followed by JSX on the next line.
+
+Actual after count: 12 TSX file hits.
+
+Expected canonical files:
+- `src/components/PatientCard.tsx` - expected, canonical patient card.
+- `src/components/PatientDetailPanel.tsx` - expected, canonical patient detail surface.
+
+Residual broad-search hits:
+- `src/components/Header.tsx` - low risk; patient count/header context, not a patient display duplicate.
+- `src/pages/emergency/index.tsx` - medium risk; canonical Emergency OS page renders patient grid by composing `PatientCard`.
+- `src/components/AppShell.tsx` - low risk; shell mounts patient detail and store-driven UI.
+- `src/components/QuickIntake.tsx` - low risk; intake form creates patients, not duplicate display.
+- `src/components/ClinicalCalculatorHub.tsx` - low risk; calculator wrapper/context.
+- `src/components/calculators/PediatricDrugCalc.tsx` - low risk; patient-scoped calculator.
+- `src/components/calculators/qSOFA.tsx` - low risk; patient-scoped calculator.
+- `src/components/calculators/HEARTScore.tsx` - low risk; patient-scoped calculator.
+- `src/components/Sidebar.tsx` - low risk; reassessment badge references patients.
+- `src/components/CopilotPanel.tsx` - low risk; patient context for copilot.
+
+Status: Expected implementation count is supported at 2 canonical components, but the broad mirrored search returns 12 and therefore does not match the expected raw count.
+
+### Search 2 - State Stores
+
+Equivalent used:
+- Exact intent: `rg -l "create\(" src -g "*.ts"` filtered to store paths.
+- Zustand TypeScript-safe intent: `rg -l "create(?:<|\()" src -g "*.ts"` filtered to store paths.
+
+Actual after count: 1 creator file.
+
+Expected/canonical files:
+- `src/store/emergencyStore.ts` - expected, canonical Zustand creator.
+
+Residual/mapping note:
+- `store/featureStore.ts` exists and is expected by the R15 wording, but it is outside `src/` and is now a compatibility re-export from `src/store/emergencyStore.ts`, not a second `create(...)` store creator.
+- The exact `create\(` variant returns 0 because the Zustand creator is typed as `create<...>()(...)`.
+
+Status: Raw mirrored creator count is 1, not 2. Consolidation risk is low because the extra expected feature store is no longer an independent store.
+
+### Search 3 - AI Callers
+
+Equivalent used:
+- `rg -l "anthropic|openai" src -g "*.ts"`
+
+Actual after count: 1.
+
+Expected canonical files:
+- `src/lib/ai/client.ts` - expected; the only `anthropic`/`openai` hit under `src` TypeScript.
+
+Residual files: none.
+
+Status: Matches expected raw count.
+
+### Search 4 - Dashboard / Workspace Pages
+
+Equivalent used:
+- Globbed `src/pages/**/*.tsx`; `src/app` does not exist.
+
+Actual after count: 2 TSX page files.
+
+Expected/canonical files:
+- `src/pages/emergency/index.tsx` - expected Emergency OS route.
+
+Residual files:
+- `src/pages/AIGovernanceDashboard.tsx` - medium risk residual TSX page/alias outside the Emergency OS page directory.
+
+Status: Does not match the expected raw count of only Emergency OS TSX routes. Note that this search only measures TSX pages and does not include the many JSX page files still present in `src/pages`.
+
+### Search 5 - Type Definitions
+
+Equivalent used:
+- `rg -l "export interface Patient|export enum PatientState" src`
+
+Actual after count: 1.
+
+Expected canonical files:
+- `src/types/emergency.ts` - expected.
+
+Residual files: none under `src`.
+
+Mapping note:
+- A broader repo-wide search also finds backend DTO/model patient interfaces, but R15 asked for `src/`, and the expected frontend Emergency OS type source is singular.
+
+Status: Matches expected raw count.
+
+### Search 6 - Alert / Notification Systems
+
+Equivalent used:
+- `rg -l "toast\.|Toaster|ToastProvider" src`
+
+Actual after count: 5 raw files.
+
+Expected canonical files:
+- `src/engine/alertEngine.ts` - expected alert/toast dispatch engine.
+- `src/components/AppShell.tsx` - expected `Toaster` mount.
+
+Residual files:
+- `src/components/AppShell.r12.test.tsx` - low risk; test reference.
+- `src/engine/alertEngine.test.ts` - low risk; test reference.
+- `src/components/notifications/NotificationToast.css` - medium/low risk; legacy notification styling remains in source tree and is caught by the broad pattern.
+
+Status: Production implementation is effectively 2, but the raw mirrored search returns 5 because tests and legacy CSS remain.
+
+### Search 7 - Navigation Components
+
+Equivalent used:
+- `rg -l "NavLink|sidebar.*nav|nav.*item" src -g "*.tsx"`
+
+Actual after count: 2 raw TSX files.
+
+Expected canonical files:
+- `src/components/Sidebar.tsx` - expected.
+
+Residual files:
+- `src/components/Sidebar.test.tsx` - low risk; test reference.
+
+Status: Production implementation matches expected at 1, but the raw mirrored search returns 2 because it includes the test file.
+
+### Search 8 - Clinical Calculators
+
+Equivalent used:
+- `rg -l "score|Score|HEART|qSOFA|NIHSS" src -g "*.tsx"`
+
+Actual after count: 13 TSX file hits.
+
+Canonical calculator implementation location:
+- `src/components/calculators/` - expected location.
+- Files currently present there: `HEARTScore.tsx`, `qSOFA.tsx`, `PediatricDrugCalc.tsx`.
+
+Residual broad-search hits outside `src/components/calculators/`:
+- `src/components/Header.tsx` - low risk; capacity score label.
+- `src/pages/emergency/index.tsx` - low risk; capacity score stat.
+- `src/components/R12EndToEndWiring.test.tsx` - low risk; test reference.
+- `src/components/PatientCard.tsx` - low risk; displays score badges from patient notes.
+- `src/components/PatientDetailPanel.tsx` - medium/expected composition; launches canonical calculators.
+- `src/components/QuickIntake.tsx` - low risk; suggested score IDs.
+- `src/pages/AIGovernanceDashboard.tsx` - low risk; DPS score governance copy.
+- `src/components/ClinicalCalculatorHub.test.tsx` - low risk; test reference.
+- `src/components/ClinicalCalculatorHub.tsx` - medium/expected composition; canonical hub wrapper outside calculator implementation folder.
+- `src/components/CopilotPanel.tsx` - low risk; capacity score context.
+
+Status: Calculator implementation location is consolidated to 1 directory, but the raw mirrored file count is 13 because score terms appear in routing, context, tests, and displays.
+
+### BEFORE -> AFTER Comparison
+
+- Patient display: 8 -> 12 raw hits; 2 canonical implementation files.
+- State stores: 16 -> 1 raw creator file; `store/featureStore.ts` remains only as a re-export compatibility surface.
+- AI clients/callers: 6 -> 1.
+- Dashboard/workspace pages: 33 -> 2 TSX page files; 1 Emergency OS TSX route plus 1 AI Governance residual.
+- Type files: 9 -> 1 under `src`.
+- Alert systems: 14 -> 5 raw hits; 2 production alert/toast system files.
+- Nav components: 11 -> 2 raw TSX hits; 1 production component.
+- Calculator locations: 61 -> 13 raw TSX hits; 1 canonical calculator implementation directory.
+
+Comparable R1 Search 1-8 total: 158 -> 37 raw R15 hits.
+
+Estimated duplicate inventory reduction: 121 file hits.
+
+If using the R1 full grand total of 208 against the R15 eight-search raw total of 37, the arithmetic reduction is 171, but that comparison is not exact because R15 did not rerun R1 Search 9 API clients or Search 10 layout/shell files.
+
+### Files Removed / LOC Removed
+
+- Tracked physical deletions visible in `git status --short --untracked-files=no`: 3 files (`frontend/src/config/unified-navigation.config.ts`, `src/components/EmergencyPatientCard.jsx`, `src/components/EmergencyPatientDetailPanel.jsx`).
+- Estimated removed duplicate inventory from comparable R1/R15 searches: 121 file hits.
+- `git diff --stat` estimate for the full current working tree: 189 files changed, 4,931 insertions, 5,548 deletions, net -617 lines. This is a noisy working-tree estimate and includes other consolidation changes already present before R15.
+
+### Final Status
+
+R15 result: Emergency OS core consolidation is substantially supported, but the mirrored after inventory does not fully support the requested success statement as a raw search result.
+
+Target statement remains: One product. One language. One system. Emergency OS.
+
+Blockers/residuals:
+- Patient display search returns 12 raw TSX hits because support components, calculators, shell, and page composition still reference patients.
+- Dashboard/workspace TSX search still finds `src/pages/AIGovernanceDashboard.tsx`.
+- Alert/toast search still finds tests plus legacy `src/components/notifications/NotificationToast.css`.
+- Navigation search still finds `src/components/Sidebar.test.tsx`.
+- Calculator search still finds score references outside `src/components/calculators/`, though calculator implementations are consolidated to that directory.

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Note, Patient, Vitals } from '../../types/emergency';
+import type { Patient, Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { dispatchScoreAlert } from '../../engine/alertEngine';
+import { saveCalculatorResult } from './calculatorSave';
+import './mobileCalculator.css';
 
 type QSOFAProps = {
   patientId?: string;
@@ -54,15 +56,6 @@ function resultFor(total: number) {
   };
 }
 
-function createNote(patientId: string, text: string, authorId: string): Note {
-  return {
-    id: `note-qsofa-${patientId}-${Date.now()}`,
-    text,
-    authorId,
-    timestamp: new Date().toISOString(),
-  };
-}
-
 function criteriaLabels(criteria: CriteriaState): string[] {
   const labels: string[] = [];
   if (criteria.alteredMentation) labels.push('altered mentation / GCS < 15');
@@ -73,7 +66,6 @@ function criteriaLabels(criteria: CriteriaState): string[] {
 
 export default function QSOFA({ patientId, onClose }: QSOFAProps) {
   const patients = useEmergencyStore((state) => state.patients);
-  const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const patient = patientId ? patients.find((candidate) => candidate.id === patientId) : undefined;
   const firstVitals = patient?.vitals[0];
@@ -132,10 +124,22 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
 
   const saveToPatient = () => {
     if (!patient) return;
-    const noteText = `qSOFA: ${total}/3 (${result.band}). Criteria met: ${metLabels.length ? metLabels.join(', ') : 'none'}. ${result.recommendation}.`;
-    const note = createNote(patient.id, noteText, patient.assignedStaffId || 'system');
-    updatePatient(patient.id, { notes: [...patient.notes, note] });
+    const saved = saveCalculatorResult({
+      patientId: patient.id,
+      scoreName: 'qSOFA',
+      total,
+      max: 3,
+      band: result.band,
+      fields: {
+        ...criteria,
+        criteriaMet: metLabels,
+      },
+      staffId: patient.assignedStaffId || undefined,
+      critical: result.alert,
+    });
+    if (!saved) return;
     setSavedMessage('qSOFA score saved to patient.');
+    onClose();
   };
 
   const renderToggle = ({
@@ -150,6 +154,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
     autoFilledFromVitals: boolean;
   }) => (
     <label
+      className="clinical-calculator-modal__choice"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -180,6 +185,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
 
   return (
     <div
+      className="clinical-calculator-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="qsofa-title"
@@ -195,6 +201,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
       }}
     >
       <div
+        className="clinical-calculator-modal__panel"
         style={{
           width: '100%',
           maxWidth: 480,
@@ -291,6 +298,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
 
           {patient ? (
             <button
+              className="clinical-calculator-modal__submit"
               type="button"
               onClick={saveToPatient}
               style={{

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { saveCalculatorResult } from './calculatorSave';
+import './mobileCalculator.css';
 
 type PediatricDrugCalcProps = {
   patientId?: string;
@@ -65,8 +67,36 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
+  const saveToPatient = () => {
+    if (!patient || weight === null) return;
+    const rows = DRUGS.map((drug) => ({
+      drug: drug.name,
+      category: drug.category,
+      dosePerKg: dosePerKgLabel(drug),
+      calculatedDose: `${calculatedDose(weight, drug)} ${drug.unit}`,
+      max: drug.max,
+      unit: drug.unit,
+      critical: Boolean(drug.critical),
+    }));
+    const saved = saveCalculatorResult({
+      patientId: patient.id,
+      scoreName: 'Pediatric Drug Calculator',
+      total: rows.length,
+      max: rows.length,
+      band: 'Dosing reference generated',
+      fields: {
+        weightKg: weight,
+        rows,
+      },
+      staffId: patient.assignedStaffId || undefined,
+      critical: false,
+    });
+    if (saved) onClose();
+  };
+
   return (
     <div
+      className="clinical-calculator-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="pediatric-drug-title"
@@ -122,6 +152,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
         `}
       </style>
       <div
+        className="clinical-calculator-modal__panel"
         style={{
           width: '100%',
           maxWidth: 760,
@@ -175,6 +206,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
 
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <section
+            className="clinical-calculator-modal__mobile-stack"
             data-print-hide="true"
             style={{
               display: 'grid',
@@ -209,6 +241,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             </label>
             {canEstimateWeight && estimatedWeight !== null ? (
               <button
+                className="clinical-calculator-modal__submit"
                 type="button"
                 onClick={() => setWeightInput(String(estimatedWeight))}
                 style={{
@@ -240,6 +273,24 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             >
               Print
             </button>
+            {patient ? (
+              <button
+                type="button"
+                onClick={saveToPatient}
+                disabled={weight === null}
+                style={{
+                  border: '1px solid #2563EB',
+                  borderRadius: 10,
+                  background: weight === null ? '#1F2937' : '#2563EB',
+                  color: '#F9FAFB',
+                  cursor: weight === null ? 'not-allowed' : 'pointer',
+                  fontWeight: 700,
+                  padding: '12px 14px',
+                }}
+              >
+                Save to Patient
+              </button>
+            ) : null}
           </section>
 
           {canEstimateWeight && estimatedWeight !== null ? (

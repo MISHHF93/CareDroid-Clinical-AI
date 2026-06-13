@@ -141,7 +141,7 @@ export default function AIGovernanceDashboard() {
     <main style={{ padding: 24, color: '#F9FAFB', minHeight: '100%' }}>
       <header style={{ marginBottom: 24 }}>
         <p style={{ color: '#60A5FA', margin: 0, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}>
-          CareDroid Emergency OS
+          Emergency OS
         </p>
         <h1 style={{ margin: '6px 0 0', fontSize: 26 }}>AI Governance Dashboard</h1>
         <p style={{ color: '#9CA3AF', maxWidth: 760 }}>

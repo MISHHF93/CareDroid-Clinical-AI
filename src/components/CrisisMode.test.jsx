@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import CrisisMode from './CrisisMode';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState, Priority } from '../../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn(() =>

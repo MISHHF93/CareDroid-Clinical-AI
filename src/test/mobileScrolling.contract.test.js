@@ -13,6 +13,7 @@ const srcRoot = dirname(__dirname);
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeSurfacesCss = readFileSync(join(srcRoot, 'styles/theme-surfaces.css'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
+const sidebarCss = readFileSync(join(srcRoot, 'components/Sidebar.css'), 'utf8');
 const quickCommandCss = readFileSync(join(srcRoot, 'components/QuickCommandLauncher.css'), 'utf8');
 const drawerCss = readFileSync(join(srcRoot, 'components/ui/Drawer.css'), 'utf8');
 const chatInterfaceCss = readFileSync(join(srcRoot, 'components/ChatInterface.css'), 'utf8');
@@ -54,9 +55,9 @@ describe('mobile scrolling contracts', () => {
     expect(chatInterfaceCss).toMatch(/\.chat-interface__textarea\s*\{[\s\S]*overflow-y:\s*auto/);
   });
 
-  it('keeps the AppShell navigation rail and overlays from creating extra page scroll owners', () => {
-    expect(appShellCss).toMatch(/\.ed-nav-rail\s*\{[\s\S]*height:\s*100%/);
-    expect(appShellCss).toMatch(/\.ed-nav-rail__items\s*\{[\s\S]*flex-direction:\s*column/);
+  it('keeps the canonical Sidebar and overlays from creating extra page scroll owners', () => {
+    expect(sidebarCss).toMatch(/aside\[aria-label='Emergency navigation'\][\s\S]*position:\s*fixed/);
+    expect(sidebarCss).toMatch(/\.sidebar-nav-item:nth-of-type\(n \+ 6\)\s*\{[\s\S]*display:\s*none/);
     expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(quickCommandCss).toMatch(/\.quick-command\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay\s*\{[\s\S]*pointer-events:\s*none/);
@@ -88,6 +89,6 @@ describe('mobile scrolling contracts', () => {
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).not.toContain('app-shell-bottom-nav');
-    expect(appShellCss).toMatch(/@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail/);
+    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*aside\[aria-label='Emergency navigation'\]/);
   });
 });

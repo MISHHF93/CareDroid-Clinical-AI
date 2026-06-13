@@ -34,7 +34,6 @@ describe('duplicateSystemAudit report', () => {
     const markdown = formatDuplicateSystemAuditMarkdown();
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'duplicate-system-audit.md'), `${markdown}\n`);
-    console.log('Wrote docs/duplicate-system-audit.md');
     expect(existsSync(join(docsDir, 'duplicate-system-audit.md'))).toBe(true);
   });
 });

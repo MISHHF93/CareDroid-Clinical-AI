@@ -1,4 +1,4 @@
-import { PatientState } from '../../types/emergency';
+import { PatientState } from '../types/emergency';
 import { emergencyRoleForStaff } from './emergencyRolePermissions';
 
 const ACTIVE_PATIENT_STATES = new Set(

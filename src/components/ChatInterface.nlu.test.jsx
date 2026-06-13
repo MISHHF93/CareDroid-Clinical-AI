@@ -7,7 +7,6 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import ChatInterface from './ChatInterface';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { useFeatureStore } from '../../store/featureStore';
 
 vi.mock('./ChatInterface.css', () => ({}));
 vi.mock('./ToolPanel', () => ({ default: () => <div data-testid="tool-panel" /> }));
@@ -25,7 +24,7 @@ let activeWorkspaceId = 'medical-iot';
 let setQueueFilterSpy;
 let setWhiteboardSearchQuerySpy;
 let addFlagSpy;
-const originalFeatureState = useFeatureStore.getState();
+const originalFeatureState = useEmergencyStore.getState();
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: (...args) => sendClinicalChatMessage(...args),
@@ -54,7 +53,7 @@ describe('ChatInterface NLU integration', () => {
     HTMLElement.prototype.scrollTo = vi.fn();
     activeWorkspaceId = 'medical-iot';
     act(() => {
-      useFeatureStore.setState(originalFeatureState, true);
+      useEmergencyStore.setState(originalFeatureState, true);
     });
     vi.clearAllMocks();
     setQueueFilterSpy = vi.spyOn(useEmergencyStore.getState(), 'setQueueFilter');
@@ -78,7 +77,7 @@ describe('ChatInterface NLU integration', () => {
     setWhiteboardSearchQuerySpy?.mockRestore();
     addFlagSpy?.mockRestore();
     act(() => {
-      useFeatureStore.setState(originalFeatureState, true);
+      useEmergencyStore.setState(originalFeatureState, true);
     });
   });
 
@@ -203,7 +202,7 @@ describe('ChatInterface NLU integration', () => {
   it('hides Copilot action cards when copilot_tool_actions is disabled', () => {
     const patient = useEmergencyStore.getState().patients[0];
     act(() => {
-      useFeatureStore.setState((state) => ({
+      useEmergencyStore.setState((state) => ({
         flags: { ...state.flags, copilot_tool_actions: false },
         overrides: { ...state.overrides, copilot_tool_actions: false },
       }));
@@ -326,7 +325,7 @@ describe('ChatInterface NLU integration', () => {
   it('removes EMS Copilot commands and context when ems_pipeline is disabled', async () => {
     activeWorkspaceId = 'emergency';
     act(() => {
-      useFeatureStore.setState((state) => ({
+      useEmergencyStore.setState((state) => ({
         flags: { ...state.flags, ems_pipeline: false },
         overrides: { ...state.overrides, ems_pipeline: false },
       }));

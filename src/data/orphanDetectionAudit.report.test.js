@@ -30,7 +30,6 @@ describe('orphanDetectionAudit report', () => {
     const markdown = formatOrphanDetectionMarkdown();
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'orphan-detection-report.md'), `${markdown}\n`);
-    console.log(`Wrote docs/orphan-detection-report.md`);
     expect(existsSync(join(docsDir, 'orphan-detection-report.md'))).toBe(true);
   });
 });

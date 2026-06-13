@@ -14,7 +14,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../../../lib/features/featureRegistry';
-import { useFeatureStore } from '../../../store/featureStore';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import { FEATURE_TOGGLE_BACKEND_QUEUE } from '../../data/featureToggleBackendQueue';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
 import './FeatureManagement.css';
@@ -98,7 +98,7 @@ const BACKEND_SURFACING_QUEUE = [
     checklist: [
       ['Backend endpoint exists', true],
       ['Timeline source available', true],
-      ['Visit history layout mapped', false],
+      ['Encounter history layout mapped', false],
       ['Cross-encounter privacy copy reviewed', false],
     ],
   },
@@ -258,17 +258,17 @@ function FeatureToggle({ checked, disabled, pending, onClick, title }) {
 }
 
 export default function FeatureManagement() {
-  const flags = useFeatureStore((state) => state.flags);
-  const overrides = useFeatureStore((state) => state.overrides);
-  const tier = useFeatureStore((state) => state.tier);
-  const loading = useFeatureStore((state) => state.loading);
-  const backendAvailable = useFeatureStore((state) => state.backendAvailable);
-  const persistenceMode = useFeatureStore((state) => state.persistenceMode);
-  const initializeFlags = useFeatureStore((state) => state.initializeFlags);
-  const toggleFeature = useFeatureStore((state) => state.toggleFeature);
-  const setTier = useFeatureStore((state) => state.setTier);
-  const isEnabled = useFeatureStore((state) => state.isEnabled);
-  const getDependencyWarning = useFeatureStore((state) => state.getDependencyWarning);
+  const flags = useEmergencyStore((state) => state.flags);
+  const overrides = useEmergencyStore((state) => state.overrides);
+  const tier = useEmergencyStore((state) => state.tier);
+  const loading = useEmergencyStore((state) => state.loading);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const persistenceMode = useEmergencyStore((state) => state.persistenceMode);
+  const initializeFlags = useEmergencyStore((state) => state.initializeFlags);
+  const toggleFeature = useEmergencyStore((state) => state.toggleFeature);
+  const setTier = useEmergencyStore((state) => state.setTier);
+  const isEnabled = useEmergencyStore((state) => state.isEnabled);
+  const getDependencyWarning = useEmergencyStore((state) => state.getDependencyWarning);
   const { success, error: notifyError, warning: notifyWarning } = useNotificationActions();
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');

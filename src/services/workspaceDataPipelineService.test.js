@@ -325,7 +325,7 @@ describe('WorkspaceDataPipelineService', () => {
         ]),
         recommendations: expect.arrayContaining([
           expect.objectContaining({
-            action: expect.stringMatching(/Confirm owner/i),
+            action: expect.stringMatching(/Confirm assigned staff/i),
           }),
         ]),
       })
@@ -729,7 +729,7 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.demoTenant).toEqual(
       expect.objectContaining({
-        tenantName: 'CareDroid Emergency Demo Hospital',
+        tenantName: 'Emergency OS Demo Hospital',
         dataPosture: expect.stringMatching(/Demo\/local data only/i),
         samplePatients: expect.arrayContaining([
           expect.objectContaining({ dataLabel: 'Demo data', integrationLabel: 'No live integration' }),
@@ -752,7 +752,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         route: '/workspace/emergency/deployment',
         phases: expect.arrayContaining([
-          expect.objectContaining({ title: 'Standalone Emergency Workspace' }),
+          expect.objectContaining({ title: 'Standalone Emergency OS' }),
           expect.objectContaining({ title: 'Protocol Library' }),
           expect.objectContaining({ title: 'AI Copilot' }),
           expect.objectContaining({ title: 'Analytics' }),
@@ -832,7 +832,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         route: '/workspace/emergency/onboarding',
         sections: expect.arrayContaining([
-          expect.objectContaining({ label: 'Emergency Workspace overview' }),
+          expect.objectContaining({ label: 'Emergency OS overview' }),
           expect.objectContaining({ label: 'Calculators' }),
           expect.objectContaining({ label: 'Protocols' }),
           expect.objectContaining({ label: 'AI Copilot' }),
@@ -995,14 +995,14 @@ describe('WorkspaceDataPipelineService', () => {
         'HEART',
         'Protocol Retrieval',
         'Workflow Guidance',
-        'Workspace Dashboard',
+        'Emergency Whiteboard',
       ])
     );
     expect(data.emergency.optionalAddOns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           title: 'Documentation Integrity',
-          billingMetric: 'Module add-on per ED site per month',
+          billingMetric: 'Feature add-on per ED site per month',
           implementationDependency: 'Medium',
         }),
         expect.objectContaining({

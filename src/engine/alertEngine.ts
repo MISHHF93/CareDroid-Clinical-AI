@@ -1,28 +1,70 @@
+import { toast } from 'sonner';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert, Patient } from '../types/emergency';
 
 type AlertInput = Omit<Alert, 'id' | 'createdAt' | 'dismissed'> &
   Partial<Pick<Alert, 'id' | 'createdAt' | 'dismissed'>>;
 
-function createId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+function createId(): string {
+  return `alt${Date.now()}`;
 }
 
-export function dispatchAlert(input: AlertInput): Alert {
+function resolveAction(alert: Alert) {
+  if (alert.patientId) {
+    return {
+      label: 'View Patient',
+      onClick: () => useEmergencyStore.getState().selectPatient(alert.patientId || null),
+    };
+  }
+
+  if (alert.actionFn && alert.actionLabel) {
+    return {
+      label: alert.actionLabel,
+      onClick: alert.actionFn,
+    };
+  }
+
+  return undefined;
+}
+
+export function dispatchAlert(input: AlertInput): string {
   const alert: Alert = {
     ...input,
-    id: input.id || createId('alert'),
+    id: input.id || createId(),
     createdAt: input.createdAt || new Date().toISOString(),
     dismissed: input.dismissed ?? false,
     source: input.source || 'alert-engine',
   };
+
   useEmergencyStore.getState().addAlert(alert);
-  return alert;
+
+  switch (alert.severity) {
+    case 'Critical':
+      toast.error(alert.title, {
+        description: alert.message,
+        duration: Infinity,
+        action: resolveAction(alert),
+      });
+      break;
+    case 'Warning':
+      toast.warning(alert.title, {
+        description: alert.message,
+        duration: 10000,
+      });
+      break;
+    default:
+      toast(alert.title, {
+        description: alert.message,
+        duration: 5000,
+      });
+  }
+
+  return alert.id;
 }
 
 export const dispatch = dispatchAlert;
 
-export function dispatchCriticalVitalsAlerts(patient: Patient): Alert[] {
+export function dispatchCriticalVitalsAlerts(patient: Patient): string[] {
   const latestVitals = patient.vitals.at(-1);
   if (!latestVitals) return [];
 
@@ -51,7 +93,7 @@ export function dispatchScoreAlert(input: {
   scoreName: string;
   scoreValue: string | number;
   message: string;
-}): Alert {
+}): string {
   return dispatchAlert({
     severity: 'Critical',
     title: `${input.scoreName} warning`,

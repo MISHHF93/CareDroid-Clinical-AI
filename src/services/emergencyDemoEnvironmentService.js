@@ -52,7 +52,7 @@ export const EmergencyDemoEnvironmentService = Object.freeze({
     const patients = buildDemoPatients();
     return Object.freeze({
       id: 'emergency-demo-environment',
-      tenantName: 'CareDroid Emergency Demo Hospital',
+      tenantName: 'Emergency OS Demo Hospital',
       mode: 'demo',
       labels: Object.freeze(['Demo data', 'Demo tenant', 'No live integration', 'Sample patient', 'Simulated operational signal']),
       patients,

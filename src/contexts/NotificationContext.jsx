@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { dispatchAlert } from '../engine/alertEngine';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 /**
  * NotificationContext
@@ -7,6 +9,13 @@ import { createContext, useContext, useState, useCallback } from 'react';
  * Provides methods to add, remove, and update notifications
  */
 const NotificationContext = createContext();
+
+function toAlertSeverity(notification) {
+  const value = String(notification.severity || notification.type || '').toLowerCase();
+  if (value === 'critical' || value === 'error') return 'Critical';
+  if (value === 'warning' || value === 'warn') return 'Warning';
+  return 'Info';
+}
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
@@ -24,48 +33,57 @@ export const useNotifications = () => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([]);
+  const alerts = useEmergencyStore((state) => state.alerts);
+  const [readIds, setReadIds] = useState(() => new Set());
 
   const addNotification = useCallback((notification) => {
-    const id = Date.now().toString();
-    const newNotification = {
-      ...notification,
-      id,
-      read: false,
-      timestamp: new Date().toISOString(),
-    };
-    
-    setNotifications(prev => [newNotification, ...prev]);
-    
-    // Auto-remove non-critical notifications after 5 seconds (if no action)
-    if (notification.type !== 'critical' && notification.type !== 'alert') {
-      setTimeout(() => {
-        removeNotification(id);
-      }, 5000);
-    }
-    
-    return id;
+    return dispatchAlert({
+      id: notification.id,
+      type: notification.alertType || notification.type || 'System',
+      severity: toAlertSeverity(notification),
+      title: notification.title || notification.message || 'Notification',
+      message: notification.message || notification.body || notification.title || 'Review notification details.',
+      patientId: notification.patientId,
+      actionLabel: notification.action?.label,
+      actionFn: notification.action?.onClick,
+      source: notification.source || 'notification-context',
+      metadata: notification.metadata,
+    });
   }, []);
 
   const removeNotification = useCallback((id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setReadIds((current) => new Set(current).add(id));
   }, []);
 
   const markAsRead = useCallback((id) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === id ? { ...n, read: true } : n))
-    );
+    setReadIds((current) => new Set(current).add(id));
   }, []);
 
   const markAllAsRead = useCallback(() => {
-    setNotifications(prev =>
-      prev.map(n => ({ ...n, read: true }))
-    );
-  }, []);
+    setReadIds(new Set(alerts.map((alert) => alert.id)));
+  }, [alerts]);
 
   const clearAll = useCallback(() => {
-    setNotifications([]);
-  }, []);
+    setReadIds(new Set(alerts.map((alert) => alert.id)));
+  }, [alerts]);
+
+  const notifications = useMemo(
+    () =>
+      alerts.map((alert) => ({
+        ...alert,
+        read: readIds.has(alert.id) || alert.dismissed,
+        timestamp: alert.createdAt,
+        body: alert.message,
+        priority:
+          alert.severity === 'Critical'
+            ? 'critical'
+            : alert.severity === 'Warning'
+              ? 'high'
+              : 'medium',
+        workspaceIds: alert.metadata?.workspaceIds || ['emergency'],
+      })),
+    [alerts, readIds],
+  );
 
   const value = {
     notifications,

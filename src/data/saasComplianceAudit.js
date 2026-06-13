@@ -195,8 +195,8 @@ function workspaceAssignable(assetId, legacyTargets) {
 
 function supplementalSurfaces() {
   return [
-    { id: 'dashboard', route: '/dashboard', label: 'Command Dashboard', kind: 'Dashboard', inventoryId: 'dashboard' },
-    { id: 'digital-twin', route: '/digital-twin', label: 'Digital Twin', kind: 'Dashboard' },
+    { id: 'dashboard', route: '/dashboard', label: 'Command Whiteboard', kind: 'Whiteboard', inventoryId: 'dashboard' },
+    { id: 'digital-twin', route: '/digital-twin', label: 'Digital Twin', kind: 'Whiteboard' },
     { id: 'hospital-map', route: '/hospital-map', label: 'Hospital Map', kind: 'Map' },
     { id: 'medical-iot', route: '/medical-iot', label: 'Medical IoT Dashboard', kind: 'IoT' },
     { id: 'fleet-dashboard', route: '/fleet/command', label: 'Fleet Command', kind: 'Fleet' },

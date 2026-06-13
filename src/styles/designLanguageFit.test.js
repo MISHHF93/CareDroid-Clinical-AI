@@ -8,6 +8,7 @@ const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8
 const responsiveCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
+const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 const primitivesSource = readFileSync(
   join(__dirname, '../components/ui/CareDroidPrimitives.jsx'),
   'utf8'
@@ -47,20 +48,21 @@ describe('CareDroid design language fit contract', () => {
   });
 
   it('keeps the AppShell rail and header controls fitted in the viewport', () => {
-    expect(appShellCss).toMatch(/\.ed-nav-rail\s*\{[\s\S]*width:\s*var\(--ed-rail-width/);
-    expect(appShellCss).toMatch(/\.ed-nav-rail__item\s*\{[\s\S]*height:\s*44px/);
+    expect(sidebarCss).toMatch(/\.sidebar-nav-item\s*\{[\s\S]*width:\s*48px/);
+    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*height:\s*calc\(56px/);
     expect(appShellCss).toMatch(/\.ed-os-header\s*\{[\s\S]*min-width:\s*0/);
     expect(appShellCss).toMatch(/\.ed-os-header__left,[\s\S]*\.ed-os-header__right\s*\{[\s\S]*min-width:\s*0/);
   });
 
   it('fits workspace dropdown and compact shell controls inside mobile viewports', () => {
-    expect(appShellCss).toMatch(/\.ed-nav-rail__item\s*\{[\s\S]*min-width:\s*0/);
+    expect(sidebarCss).toContain('min-width: 44px');
     expect(appShellCss).toMatch(/\.ed-icon-button\s*\{[\s\S]*min-width:\s*32px/);
     expect(appShellCss).toMatch(/@media \(max-width: 1024px\)[\s\S]*\.ed-icon-button[\s\S]*min-width:\s*44px/);
   });
 
   it('uses one navigation system without a conflicting bottom nav', () => {
-    expect(appShellJsx).toContain('className="ed-nav-rail"');
+    expect(appShellJsx).toContain('<Sidebar />');
+    expect(appShellJsx).not.toContain('className="ed-nav-rail"');
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
     expect(appShellJsx).not.toContain('PRIMARY_MOBILE_NAV_ITEMS.map');
   });

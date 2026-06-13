@@ -8,7 +8,7 @@ import { AIQuery } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
-import { unifiedAIClient } from '../../../../lib/ai/client';
+import { unifiedAIClient } from '../../../../src/lib/ai/client';
 
 describe('AIService', () => {
   let service: AIService;
@@ -18,11 +18,11 @@ describe('AIService', () => {
     if (key === 'ANTHROPIC_API_KEY') return 'sk-test-key';
     if (key === 'ai') {
       return {
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         maxTokens: 1200,
         temperature: 0.2,
         rateLimits: {
-          free: { dailyLimit: 10, model: 'claude-sonnet-4-20250514', maxTokens: 1200 },
+          free: { dailyLimit: 10, model: 'claude-sonnet-4-6', maxTokens: 1200 },
         },
       };
     }
@@ -262,7 +262,10 @@ describe('AIService', () => {
       const userId = '1';
       const prompt = 'Summarize cardiology risk for this encounter';
       jest.mocked(unifiedAIClient.request).mockResolvedValue({
+        ok: true,
+        status: 200,
         content: 'Structured clinical summary',
+        data: {},
         toolCalls: [],
         usage: {
           inputTokens: 80,
@@ -316,7 +319,7 @@ describe('AIService', () => {
           assetId: 'differential-ai',
           agentId: 'cardiology-agent',
           modelClass: 'standard',
-          modelVersion: 'claude-sonnet-4-20250514',
+          modelVersion: 'claude-sonnet-4-6',
           routingExpert: 'cardiology',
           retrievalPolicy: 'guideline',
           requiresHumanReview: true,
@@ -346,7 +349,7 @@ describe('AIService', () => {
             workspaceId: '22222222-2222-2222-2222-222222222222',
             assetId: 'differential-ai',
             agentId: 'cardiology-agent',
-            modelVersion: 'claude-sonnet-4-20250514',
+            modelVersion: 'claude-sonnet-4-6',
           }),
         }),
       );

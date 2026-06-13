@@ -6,6 +6,7 @@ import {
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  NON_ED_WORKSPACE_STUB_ROUTES,
   PROTECTED_ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
 
@@ -43,37 +44,41 @@ describe('canonical route tree', () => {
       { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
       { path: '/emergency/simulation', type: 'page', componentKey: 'RealTimeSimulationRoute' },
-      { path: '/emergency/federated-learning', type: 'page', componentKey: 'FederatedLearningRoute' },
-      { path: '/emergency/digital-twin', type: 'page', componentKey: 'HybridDigitalTwinRoute' },
-      { path: '/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
-      { path: '/emergency/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
+      { path: '/emergency/federated-learning', type: 'stub', componentKey: 'ComingSoonPage' },
+      { path: '/emergency/digital-twin', type: 'stub', componentKey: 'ComingSoonPage' },
+      { path: '/emergency/tools', type: 'page', componentKey: 'ClinicalCalculatorHub' },
+      { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftRoute' },
+      { path: '/ai-governance', type: 'stub', componentKey: 'ComingSoonPage' },
+      { path: '/emergency/ai-governance', type: 'stub', componentKey: 'ComingSoonPage' },
       { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
       { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
     ]);
   });
 
   it('mounts canonical ED routes inside the flattened AppShell', () => {
-    for (const route of CANONICAL_APP_ROUTE_TREE.filter((item) => item.type === 'page')) {
+    for (const route of CANONICAL_APP_ROUTE_TREE.filter((item) => item.type !== 'redirect')) {
       expectRoutePath(route.path);
     }
 
     expect(appSource).toContain('<AppShell>');
-    expect(appSource).toContain('<EMSRoute />');
-    expect(appSource).toContain('<SmartIntakeRoute />');
+    expect(appSource).toContain('<EMSPipeline />');
+    expect(appSource).toContain('<SmartIntake />');
     expect(appSource).toContain('<QueueRoute />');
-    expect(appSource).toContain('<ReferralsRoute />');
+    expect(appSource).toContain('<ReferralPanel />');
     expect(appSource).toContain('<CapacityRoute />');
     expect(appSource).toContain('<ProvincialHealthRoute />');
     expect(appSource).toContain('<IntegrationsRoute />');
     expect(appSource).toContain('<CopilotRoute />');
-    expect(appSource).toContain('<AnalyticsRoute />');
+    expect(appSource).toContain('<EmergencyAnalytics />');
     expect(appSource).toContain('<RealTimeSimulationRoute />');
-    expect(appSource).toContain('<FederatedLearningRoute />');
-    expect(appSource).toContain('<HybridDigitalTwinRoute />');
-    expect(appSource).toContain('<EmergencySettingsRoute />');
+    expect(appSource).toContain('<ComingSoonPage moduleName="Federated Learning" />');
+    expect(appSource).toContain('<ComingSoonPage moduleName="Digital Twin" />');
+    expect(appSource).toContain('<AIGovernanceRoute />');
+    expect(appSource).toContain('<EmergencySettings />');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyTools}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyTools}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
+    expect(appSource).not.toContain('<AIGovernanceDashboard');
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {
@@ -96,16 +101,25 @@ describe('canonical route tree', () => {
       ])
     );
     expect(appSource).toContain('<Route path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
-    expect(appSource).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
+    expect(appSource).toContain('<Route path="/scores/*" element={<ToolsRedirect />} />');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
   });
 
-  it('keeps unsupported future modules on the Emergency OS whiteboard fallback', () => {
+  it('stubs non-ED workspace routes while preserving Emergency OS fallbacks', () => {
     expect(appSource).toContain('<Route path="/app" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(appSource).toContain('<Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(appSource).toContain('<Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(appSource).toContain('<Route path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
-    expect(appSource).not.toContain('<FutureReleaseStub');
+    expect(NON_ED_WORKSPACE_STUB_ROUTES).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/analytics', moduleName: 'Analytics' }),
+        expect.objectContaining({ path: '/fleet/*', moduleName: 'Fleet' }),
+        expect.objectContaining({ path: '/lab', moduleName: 'Laboratory' }),
+        expect.objectContaining({ path: '/governance/*', moduleName: 'Governance' }),
+        expect.objectContaining({ path: '/platform-admin', moduleName: 'Platform Admin' }),
+      ])
+    );
   });
 
   it('keeps auth callbacks deep-linkable and catches all unknown routes', () => {

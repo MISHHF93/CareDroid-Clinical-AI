@@ -24,9 +24,6 @@ describe('toolRenderExecuteMatrix', () => {
 
   it('passes render/execute validation', () => {
     const result = runRenderExecuteValidation();
-    if (!result.ok) {
-      console.log('render/execute issues:', result.findings.filter((f) => f.issues.length));
-    }
     expect(result.ok).toBe(true);
   });
 

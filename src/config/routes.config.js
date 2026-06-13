@@ -145,6 +145,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
+  { path: '/emergency/pulse', type: 'page', componentKey: 'DepartmentPulse' },
   { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
   { path: '/emergency/journey', type: 'page', componentKey: 'PatientJourneyRoute' },
   { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
@@ -159,11 +160,12 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
   { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
   { path: '/emergency/simulation', type: 'page', componentKey: 'RealTimeSimulationRoute' },
-  { path: '/emergency/federated-learning', type: 'page', componentKey: 'FederatedLearningRoute' },
-  { path: '/emergency/digital-twin', type: 'page', componentKey: 'HybridDigitalTwinRoute' },
+  { path: '/emergency/federated-learning', type: 'stub', componentKey: 'ComingSoonPage' },
+  { path: '/emergency/digital-twin', type: 'stub', componentKey: 'ComingSoonPage' },
   { path: '/emergency/tools', type: 'page', componentKey: 'ClinicalCalculatorHub' },
-  { path: '/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
-  { path: '/emergency/ai-governance', type: 'page', componentKey: 'AIGovernanceDashboard' },
+  { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftRoute' },
+  { path: '/ai-governance', type: 'stub', componentKey: 'ComingSoonPage' },
+  { path: '/emergency/ai-governance', type: 'stub', componentKey: 'ComingSoonPage' },
   { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
   { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
 ]);
@@ -231,22 +233,21 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([
   ['/referrals', CANONICAL_ROUTES.emergencyReferrals],
   ['/provincial-health', CANONICAL_ROUTES.emergencyProvincialHealth],
   ['/integrations', CANONICAL_ROUTES.emergencyIntegrations],
-  ['/analytics', CANONICAL_ROUTES.emergencyAnalytics],
   ['/simulation', CANONICAL_ROUTES.emergencySimulation],
-  ['/federated-learning', CANONICAL_ROUTES.emergencyFederatedLearning],
-  ['/digital-twin', CANONICAL_ROUTES.emergencyDigitalTwin],
   ['/shift', CANONICAL_ROUTES.emergencyShift],
   ['/shift-summary', CANONICAL_ROUTES.emergencyShift],
-  ['/pulse', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/pulse', CANONICAL_ROUTES.emergencyPulse],
   ['/tools', CANONICAL_ROUTES.emergencyTools],
   ['/calculators', CANONICAL_ROUTES.emergencyTools],
+  ['/scores', CANONICAL_ROUTES.emergencyTools],
+  ['/scores/*', CANONICAL_ROUTES.emergencyTools],
   ['/emergency/smart-intake', CANONICAL_ROUTES.emergencyIntake],
   ['/emergency/queue', CANONICAL_ROUTES.emergencyQueues],
   ['/emergency/calculators', CANONICAL_ROUTES.emergencyTools],
   ['/emergency/clinical-tools', CANONICAL_ROUTES.emergencyTools],
   ['/emergency/shift-summary', CANONICAL_ROUTES.emergencyShift],
   ['/emergency/command-center', CANONICAL_ROUTES.emergencyWhiteboard],
-  ['/workspace/emergency/pulse', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/workspace/emergency/pulse', CANONICAL_ROUTES.emergencyPulse],
   ['/workspace/emergency/charge-nurse', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/workspace/emergency', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/workspace/emergency/whiteboard', CANONICAL_ROUTES.emergencyWhiteboard],
@@ -280,8 +281,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([
   ['/settings/staff', CANONICAL_ROUTES.emergencySettings],
   ['/settings/integrations', CANONICAL_ROUTES.emergencySettings],
   ['/settings/features', CANONICAL_ROUTES.emergencySettings],
-  ['/fleet', CANONICAL_ROUTES.emergencyWhiteboard],
-  ['/fleet/*', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/hospital-map', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/medical-iot', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/devices', CANONICAL_ROUTES.emergencyWhiteboard],
@@ -291,7 +290,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([
   ['/workspaces', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/marketplace', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/integrations-marketplace', CANONICAL_ROUTES.emergencyWhiteboard],
-  ['/platform-admin', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/customer-portal', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/enterprise-readiness', CANONICAL_ROUTES.emergencyWhiteboard],
   ['/success-center', CANONICAL_ROUTES.emergencyWhiteboard],
@@ -303,6 +301,30 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([
     auth: 'required',
   })
 ));
+
+export const NON_ED_WORKSPACE_STUB_ROUTES = Object.freeze([
+  Object.freeze({ path: '/analytics', moduleName: 'Analytics' }),
+  Object.freeze({ path: '/federated-learning', moduleName: 'Federated Learning' }),
+  Object.freeze({ path: '/digital-twin', moduleName: 'Digital Twin' }),
+  Object.freeze({ path: '/governance', moduleName: 'Governance' }),
+  Object.freeze({ path: '/governance/*', moduleName: 'Governance' }),
+  Object.freeze({ path: CANONICAL_ROUTES.laboratory, moduleName: 'Laboratory' }),
+  Object.freeze({ path: '/lab', moduleName: 'Laboratory' }),
+  Object.freeze({ path: '/fleet', moduleName: 'Fleet' }),
+  Object.freeze({ path: '/fleet/*', moduleName: 'Fleet' }),
+  Object.freeze({ path: '/vehicle', moduleName: 'Vehicle Operations' }),
+  Object.freeze({ path: '/vehicle/*', moduleName: 'Vehicle Operations' }),
+  Object.freeze({ path: CANONICAL_ROUTES.research, moduleName: 'Research' }),
+  Object.freeze({ path: '/research/*', moduleName: 'Research' }),
+  Object.freeze({ path: '/education', moduleName: 'Education' }),
+  Object.freeze({ path: '/education/*', moduleName: 'Education' }),
+  Object.freeze({ path: CANONICAL_ROUTES.platformAdmin, moduleName: 'Platform Admin' }),
+  Object.freeze({ path: CANONICAL_ROUTES.tenantAdmin, moduleName: 'Tenant Admin' }),
+  Object.freeze({ path: '/pharmacy', moduleName: 'Pharmacy' }),
+  Object.freeze({ path: '/pharmacy/*', moduleName: 'Pharmacy' }),
+  Object.freeze({ path: '/radiology', moduleName: 'Radiology' }),
+  Object.freeze({ path: '/radiology/*', moduleName: 'Radiology' }),
+]);
 
 export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
@@ -437,13 +459,14 @@ export const ROUTE_RECORDS = Object.freeze([
     notes:
       'Enterprise readiness center with weighted SSO, RBAC, tenant isolation, audit, governance, integration, and security scoring.',
   }),
+  // Future module
   Object.freeze({
     id: 'platformAdmin',
     path: CANONICAL_ROUTES.platformAdmin,
     componentKey: 'PlatformAdminPage',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     navGroup: 'account',
     notes:
@@ -482,13 +505,14 @@ export const ROUTE_RECORDS = Object.freeze([
     matchPrefixes: ['/operations/'],
     navGroup: 'primary',
   }),
+  // Future module
   Object.freeze({
     id: 'digitalTwin',
     path: CANONICAL_ROUTES.digitalTwin,
     componentKey: 'DigitalTwinPage',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     matchPrefixes: ['/digital-twin/'],
     navGroup: 'operations',
@@ -548,13 +572,14 @@ export const ROUTE_RECORDS = Object.freeze([
     matchPrefixes: ['/simulation/'],
     navGroup: 'tools',
   }),
+  // Future module
   Object.freeze({
     id: 'laboratory',
     path: CANONICAL_ROUTES.laboratory,
     componentKey: 'LaboratoryDashboard',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: LABORATORY_ROUTE_ALIASES,
     navGroup: 'tools',
   }),
@@ -578,24 +603,26 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: LIVE_MAP_ROUTE_ALIASES,
     navGroup: 'operations',
   }),
+  // Future module
   Object.freeze({
     id: 'fleetMap',
     path: CANONICAL_ROUTES.fleetMap,
     componentKey: 'FleetLiveMap',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: FLEET_MAP_ROUTE_ALIASES,
     matchPrefixes: ['/fleet/'],
     navGroup: 'operations',
   }),
+  // Future module
   Object.freeze({
     id: 'fleetCommand',
     path: CANONICAL_ROUTES.fleetCommand,
     componentKey: 'FleetDashboard',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     navGroup: 'operations',
     notes:
@@ -977,25 +1004,27 @@ export const ROUTE_RECORDS = Object.freeze([
     notes:
       'SaaS health center for frontend, backend, API, integrations, tenant, AI, and simulation health.',
   }),
+  // Future module
   Object.freeze({
     id: 'governanceRegistry',
     path: CANONICAL_ROUTES.governanceRegistry,
     componentKey: 'GovernanceRegistry',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     navGroup: 'advanced',
     notes:
       'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules.',
   }),
+  // Future module
   Object.freeze({
     id: 'aiGovernance',
     path: CANONICAL_ROUTES.aiGovernance,
     componentKey: 'AIGovernanceDashboard',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     navGroup: 'advanced',
     notes:
@@ -1061,13 +1090,14 @@ export const ROUTE_RECORDS = Object.freeze([
     notes:
       'AI Evaluation Lab for model quality, hallucination, tool-call, workflow, latency, cost, and comparison benchmarks.',
   }),
+  // Future module
   Object.freeze({
     id: 'tenantAdmin',
     path: CANONICAL_ROUTES.tenantAdmin,
     componentKey: 'TenantAdministrationCenter',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'future',
     aliases: [],
     navGroup: 'account',
     notes: 'Tenant-scoped organization administration center for no-code customer configuration.',
@@ -1114,7 +1144,7 @@ export const ROUTE_RECORDS_BY_ID = Object.freeze(
 );
 
 export const ROUTE_ALIAS_REDIRECTS = Object.freeze(
-  ROUTE_RECORDS.flatMap((record) =>
+  ROUTE_RECORDS.filter((record) => record.status !== 'future').flatMap((record) =>
     (record.aliases || []).map((path) =>
       Object.freeze({
         path,
@@ -1131,7 +1161,9 @@ export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(
 );
 
 function aliasesForRoute(id) {
-  return ROUTE_RECORDS_BY_ID[id]?.aliases || Object.freeze([]);
+  const record = ROUTE_RECORDS_BY_ID[id];
+  if (!record || record.status === 'future') return Object.freeze([]);
+  return record.aliases || Object.freeze([]);
 }
 
 export const ROUTE_ALIAS_GROUPS = Object.freeze({

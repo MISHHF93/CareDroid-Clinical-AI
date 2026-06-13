@@ -76,7 +76,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           }),
         }),
         intakeRecord: expect.objectContaining({
-          promotionRule: 'Only confirmed values are promoted into the intake record.',
+          promotionRule: 'Only confirmed values are promoted into the intake patient context.',
           fieldProposals: expect.arrayContaining([
             expect.objectContaining({
               field: 'insurance metadata',
@@ -168,7 +168,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         'Document review workspace',
         'Identity resolution review',
         'Medication and allergy capture review',
-        'Smart Arrival summary in Emergency Workspace',
+        'Smart Arrival summary in Emergency OS',
         'Emergency command center and Patient Journey Engine views',
       ])
     );
@@ -228,7 +228,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           detectedDocumentType: 'insurance card',
           classified: true,
         }),
-        pipeline: ['Capture', 'OCR', 'Field Extraction', 'Validation', 'Review', 'Structured Record'],
+        pipeline: ['Capture', 'OCR', 'Field Extraction', 'Validation', 'Review', 'Structured Patient'],
         structuredRecord: expect.objectContaining({
           validationStatus: 'review required',
           reviewState: 'pending review',
@@ -357,7 +357,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
       'Recent encounters?',
     ]);
     expect(intake.patientSnapshot.sections.every((section) => section.sourceRecords.length > 0)).toBe(true);
-    expect(intake.patientSnapshot.identityAnchor).toBe('confirmed intake record');
+    expect(intake.patientSnapshot.identityAnchor).toBe('confirmed intake patient context');
     expect(intake.patientSnapshot.structuredSummary).toEqual(
       expect.objectContaining({
         demographics: expect.objectContaining({

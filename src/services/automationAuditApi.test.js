@@ -23,7 +23,7 @@ const backendEvent = {
   tenantId: 'tenant-demo-hospital',
   tenantName: 'Demo Hospital',
   workspaceId: 'emergency',
-  workspaceName: 'Emergency Workspace',
+  workspaceName: 'Emergency OS',
   aiInvolved: true,
   aiSummary: 'AI reviewed deterioration context.',
   toolCalled: 'news2',

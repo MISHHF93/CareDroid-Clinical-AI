@@ -1,7 +1,8 @@
-import { create } from 'zustand';
+import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import {
   Alert,
   ActiveShift,
+  CapacityHistoryEntry,
   CapacitySnapshot,
   EmsUnit,
   EmergencyFeatureFlags,
@@ -15,6 +16,7 @@ import {
   Referral,
   Room,
   Staff,
+  StaffingRequest,
   Vitals,
   WorkflowActionLog,
   WorkflowActionType,
@@ -25,6 +27,19 @@ import {
   getInitialEdScenarioId,
   persistEdScenarioId,
 } from '../data/edScenarioFixtures';
+import {
+  FEATURE_REGISTRY,
+  FEATURE_REGISTRY_BY_ID,
+  type Feature,
+  type FeatureTier,
+} from '../../lib/features/featureRegistry';
+import {
+  fetchSettingsFeatureFlags,
+  subscribeToSettingsFeatureChanges,
+  updateSettingsFeatureFlag,
+} from '../services/emergencySettingsApi';
+import { syncEmergencyAuditEvent } from '../services/emergencyStaffingApi';
+import { calculateNews2FromVitals } from '../utils/news2';
 
 export function tMinus(mins: number): string {
   return new Date(Date.now() - mins * 60000).toISOString();
@@ -207,8 +222,668 @@ const DEFAULT_FEATURES: EmergencyFeatureFlags = {
   copilot: true,
 };
 
+type FeatureFlags = Record<string, boolean>;
+type FeatureOverrides = Record<string, boolean>;
+type FeaturePersistenceMode = 'backend' | 'local';
+
+export type EmergencyThresholds = {
+  waitTimeWarningMin: number;
+  waitTimeCtiticalMin: number;
+  capacityWarningPct: number;
+  capacityOrangePct: number;
+  capacityRedPct: number;
+  emsOffloadTargetMin: number;
+  reassessP1Min: number;
+  reassessP2Min: number;
+  reassessP3Min: number;
+  reassessP4Min: number;
+  reassessP5Min: number;
+};
+
+export type EmergencyThresholdKey = keyof EmergencyThresholds;
+
+export type EmergencyAuditLogEntry = {
+  id: string;
+  action: string;
+  patientId?: string;
+  staffId: string;
+  timestamp: string;
+  details: Record<string, unknown>;
+};
+
+export const DEFAULT_EMERGENCY_THRESHOLDS: EmergencyThresholds = {
+  waitTimeWarningMin: 45,
+  waitTimeCtiticalMin: 60,
+  capacityWarningPct: 0.70,
+  capacityOrangePct: 0.80,
+  capacityRedPct: 0.90,
+  emsOffloadTargetMin: 15,
+  reassessP1Min: 0,
+  reassessP2Min: 15,
+  reassessP3Min: 30,
+  reassessP4Min: 60,
+  reassessP5Min: 120,
+};
+
+export type EmergencyCapacityColor = 'green' | 'yellow' | 'orange' | 'red' | 'unknown';
+export type EmergencyWebSocketConnectionState =
+  | 'idle'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'disconnected'
+  | 'error';
+export type CopilotSafetyStatus = 'safe' | 'caution' | 'unsafe' | 'blocked' | 'unknown';
+
+export type EmergencyRecord = Record<string, unknown> & { id: string };
+export type EmsIncomingPatient = EmergencyRecord;
+export type EmergencyBoardingPatient = EmergencyRecord & {
+  boardingMinutes?: number;
+  boardTimeMinutes?: number;
+};
+
+export type EmergencyRecommendation = {
+  id?: string;
+  title?: string;
+  message?: string;
+  action?: string;
+  priority?: string;
+} & Record<string, unknown>;
+
+export type EmergencyCapacityMetrics = {
+  score: number;
+  color: EmergencyCapacityColor;
+  triggers: string[];
+  recommendations: EmergencyRecommendation[];
+  updatedAt: string | null;
+  raw: unknown;
+};
+
+export type EmergencyBoardingMetrics = {
+  medianBoardTimeMinutes: number;
+  patientsBoarding: EmergencyBoardingPatient[];
+  exceedingThresholds: EmergencyBoardingPatient[];
+  updatedAt: string | null;
+  raw: unknown;
+};
+
+export type EmergencySurgeStatus = {
+  active: boolean;
+  event: EmergencyRecord | null;
+  activatedAt: string | null;
+  updatedAt: string | null;
+};
+
+export type EmergencyCopilotMessage = {
+  id: string;
+  query: string;
+  response: string;
+  safetyStatus: CopilotSafetyStatus;
+  createdAt: string;
+  raw?: unknown;
+};
+
+export type EmergencyUiState = {
+  loading: boolean;
+  error: string | null;
+  selectedPatientId: string | null;
+};
+
+export type EmergencyWebSocketStatus = {
+  connected: boolean;
+  status: EmergencyWebSocketConnectionState;
+  url: string | null;
+  lastConnectedAt: string | null;
+  lastDisconnectedAt: string | null;
+  lastEventAt: string | null;
+  error: string | null;
+};
+
+export type EmergencyIntegrationEvent = {
+  id: string;
+  type: string;
+  payload: unknown;
+  receivedAt: string;
+};
+
+export type EmergencyRealtimeEvent = {
+  type?: string;
+  event?: string;
+  name?: string;
+  topic?: string;
+  payload?: unknown;
+  data?: unknown;
+  record?: unknown;
+} & Record<string, unknown>;
+
+export type EmergencyDashboardRefreshResult = {
+  whiteboard?: unknown;
+  capacity?: unknown;
+  boarding?: unknown;
+  ems?: unknown;
+  errors: Record<string, string>;
+};
+
+export type ActivateSurgePayload = {
+  type?: string;
+  estimatedPatientCount?: number;
+  reason?: string;
+  activatedBy?: string;
+} & Record<string, unknown>;
+
+export type CopilotQueryOptions = {
+  userRole?: string;
+  context?: Record<string, unknown>;
+} & Record<string, unknown>;
+
+const FEATURE_STORE_STORAGE_KEY = 'caredroid.emergency.featureStore.v1';
+const PULSE_LAST_VIEW_STORAGE_KEY = 'caredroid.ed.departmentPulse.lastView.v1';
+const DEFAULT_TIER: FeatureTier = 'professional';
+const COPILOT_STORAGE_LIMIT = 50;
+const INTEGRATION_EVENT_LIMIT = 100;
+const DEFAULT_BOARDING_THRESHOLD_MINUTES = 240;
+const TIER_RANK: Record<FeatureTier, number> = {
+  core: 0,
+  professional: 1,
+  enterprise: 2,
+};
+
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const nowIso = () => new Date().toISOString();
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const AUDIT_LOG_LIMIT = 200;
+
+const asRecord = (value: unknown): Record<string, unknown> => (isObject(value) ? value : {});
+
+const asArray = <T = unknown>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+
+const stringFrom = (value: unknown): string | null => {
+  if (typeof value === 'string' && value.trim()) return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return null;
+};
+
+const numberFrom = (value: unknown, fallback = 0): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const pctFrom = (value: unknown, fallback: number): number => {
+  const parsed = numberFrom(value, Number.NaN);
+  if (!Number.isFinite(parsed)) return fallback;
+  return parsed > 1 ? parsed / 100 : parsed;
+};
+
+function thresholdsFromSettings(settings: unknown, base: EmergencyThresholds = DEFAULT_EMERGENCY_THRESHOLDS): EmergencyThresholds {
+  const record = asRecord(settings);
+  const thresholds = asRecord(record.thresholds);
+  const capacityThresholds = asRecord(record.capacityThresholds);
+  const reassessmentThresholds = asRecord(record.reassessmentThresholds);
+  const reassessmentIntervals = asRecord(thresholds.reassessmentIntervals);
+  const emsThresholds = asRecord(record.emsThresholds);
+
+  return {
+    waitTimeWarningMin: numberFrom(
+      thresholds.waitWarningMinutes ?? record.waitTimeWarningMin,
+      base.waitTimeWarningMin,
+    ),
+    waitTimeCtiticalMin: numberFrom(
+      thresholds.waitCriticalMinutes ?? record.waitTimeCtiticalMin,
+      base.waitTimeCtiticalMin,
+    ),
+    capacityWarningPct: pctFrom(
+      thresholds.capacityWarningPercent ?? record.capacityWarningPct,
+      base.capacityWarningPct,
+    ),
+    capacityOrangePct: pctFrom(
+      thresholds.capacityOrangePercent ?? capacityThresholds.warningPercent ?? record.capacityOrangePct,
+      base.capacityOrangePct,
+    ),
+    capacityRedPct: pctFrom(
+      thresholds.capacityRedPercent ?? capacityThresholds.criticalPercent ?? record.capacityRedPct,
+      base.capacityRedPct,
+    ),
+    emsOffloadTargetMin: numberFrom(
+      thresholds.emsOffloadTargetMinutes ?? emsThresholds.offloadTargetMinutes ?? record.emsOffloadTargetMin,
+      base.emsOffloadTargetMin,
+    ),
+    reassessP1Min: numberFrom(reassessmentIntervals.P1 ?? reassessmentThresholds.P1 ?? record.reassessP1Min, base.reassessP1Min),
+    reassessP2Min: numberFrom(reassessmentIntervals.P2 ?? reassessmentThresholds.P2 ?? record.reassessP2Min, base.reassessP2Min),
+    reassessP3Min: numberFrom(reassessmentIntervals.P3 ?? reassessmentThresholds.P3 ?? record.reassessP3Min, base.reassessP3Min),
+    reassessP4Min: numberFrom(reassessmentIntervals.P4 ?? reassessmentThresholds.P4 ?? record.reassessP4Min, base.reassessP4Min),
+    reassessP5Min: numberFrom(reassessmentIntervals.P5 ?? reassessmentThresholds.P5 ?? record.reassessP5Min, base.reassessP5Min),
+  };
+}
+
+function settingsPatchFromThresholds(thresholds: EmergencyThresholds): Partial<EmergencyOsSettings> {
+  return {
+    reassessmentThresholds: {
+      P1: thresholds.reassessP1Min,
+      P2: thresholds.reassessP2Min,
+      P3: thresholds.reassessP3Min,
+      P4: thresholds.reassessP4Min,
+      P5: thresholds.reassessP5Min,
+    },
+    capacityThresholds: {
+      warningPercent: Math.round(thresholds.capacityOrangePct * 100),
+      criticalPercent: Math.round(thresholds.capacityRedPct * 100),
+    },
+    emsThresholds: {
+      offloadTargetMinutes: thresholds.emsOffloadTargetMin,
+    },
+    thresholds: {
+      waitWarningMinutes: thresholds.waitTimeWarningMin,
+      waitCriticalMinutes: thresholds.waitTimeCtiticalMin,
+      capacityWarningPercent: Math.round(thresholds.capacityWarningPct * 100),
+      capacityOrangePercent: Math.round(thresholds.capacityOrangePct * 100),
+      capacityRedPercent: Math.round(thresholds.capacityRedPct * 100),
+      emsOffloadTargetMinutes: thresholds.emsOffloadTargetMin,
+      reassessmentIntervals: {
+        P1: thresholds.reassessP1Min,
+        P2: thresholds.reassessP2Min,
+        P3: thresholds.reassessP3Min,
+        P4: thresholds.reassessP4Min,
+        P5: thresholds.reassessP5Min,
+      },
+      ctasTargets: DEFAULT_CTAS_TARGETS,
+    },
+  } as Partial<EmergencyOsSettings>;
+}
+
+function createAuditLogEntry(input: {
+  action: string;
+  patientId?: string;
+  staffId?: string | null;
+  details?: Record<string, unknown>;
+}): EmergencyAuditLogEntry {
+  return {
+    id: createId(`audit-${input.action}`),
+    action: input.action,
+    patientId: input.patientId,
+    staffId: input.staffId || 'system',
+    timestamp: nowIso(),
+    details: input.details || {},
+  };
+}
+
+function appendAuditLog(
+  existing: EmergencyAuditLogEntry[],
+  input: Parameters<typeof createAuditLogEntry>[0] | null | undefined,
+): EmergencyAuditLogEntry[] {
+  if (!input) return existing;
+  return [createAuditLogEntry(input), ...existing].slice(0, AUDIT_LOG_LIMIT);
+}
+
+const getNested = (source: unknown, path: string): unknown =>
+  path.split('.').reduce<unknown>((current, key) => asRecord(current)[key], source);
+
+const firstValue = (source: unknown, paths: string[]): unknown => {
+  for (const path of paths) {
+    const value = getNested(source, path);
+    if (value !== undefined && value !== null) return value;
+  }
+  return undefined;
+};
+
+const unwrapData = (value: unknown): unknown => {
+  const record = asRecord(value);
+  return record.data ?? record.result ?? record.payload ?? value;
+};
+
+const stableId = (prefix: string, source: unknown, index = 0): string => {
+  const record = asRecord(source);
+  const candidate =
+    record.id ??
+    record.patientId ??
+    record.patient_id ??
+    record.mrn ??
+    record.unitId ??
+    record.unit_id ??
+    record.eventId;
+  return stringFrom(candidate) || `${prefix}-${Date.now()}-${index}`;
+};
+
+const normalizeStringList = (value: unknown): string[] =>
+  asArray(value)
+    .map((item) => stringFrom(item) || stringFrom(asRecord(item).label) || stringFrom(asRecord(item).title))
+    .filter((item): item is string => Boolean(item));
+
+const normalizeRecommendation = (value: unknown, index: number): EmergencyRecommendation => {
+  if (isObject(value)) return { id: stringFrom(value.id) || `recommendation-${index}`, ...value };
+  return { id: `recommendation-${index}`, message: stringFrom(value) || 'Review Emergency OS recommendation.' };
+};
+
+const normalizeCapacityColor = (value: unknown, score = 0): EmergencyCapacityColor => {
+  const normalized = String(value || '').toLowerCase();
+  if (normalized.includes('red') || normalized.includes('critical')) return 'red';
+  if (normalized.includes('orange') || normalized.includes('high')) return 'orange';
+  if (normalized.includes('yellow') || normalized.includes('moderate')) return 'yellow';
+  if (normalized.includes('green') || normalized.includes('normal') || normalized.includes('low')) return 'green';
+  if (score >= 85) return 'red';
+  if (score >= 70) return 'orange';
+  if (score >= 45) return 'yellow';
+  if (score > 0) return 'green';
+  return 'unknown';
+};
+
+const normalizeCapacityMetrics = (raw: unknown): EmergencyCapacityMetrics => {
+  const data = unwrapData(raw);
+  const source = firstValue(data, ['capacity', 'capacityMetrics', 'capacityEngine']) ?? data;
+  const score = numberFrom(firstValue(source, ['score', 'capacityScore', 'capacityPressure']), 0);
+  return {
+    score,
+    color: normalizeCapacityColor(firstValue(source, ['color', 'riskLevel', 'band', 'label']), score),
+    triggers: normalizeStringList(
+      firstValue(source, ['triggers', 'thresholdSignals', 'signals', 'deductions']) ??
+        firstValue(data, ['triggers', 'signals'])
+    ),
+    recommendations: asArray(firstValue(source, ['recommendations', 'nextRecommendedActions'])).map(
+      normalizeRecommendation
+    ),
+    updatedAt: stringFrom(firstValue(source, ['updatedAt', 'generatedAt'])) || nowIso(),
+    raw,
+  };
+};
+
+const normalizeBoardingPatient = (value: unknown, index = 0): EmergencyBoardingPatient => ({
+  ...asRecord(value),
+  id: stableId('boarding-patient', value, index),
+  boardingMinutes: numberFrom(
+    firstValue(value, ['boardingMinutes', 'boardTimeMinutes', 'boardingTime', 'waitMinutes']),
+    0
+  ),
+});
+
+const normalizeBoardingMetrics = (raw: unknown): EmergencyBoardingMetrics => {
+  const data = unwrapData(raw);
+  const source = firstValue(data, ['boarding', 'boardingMetrics', 'metrics']) ?? data;
+  const patients = asArray(
+    firstValue(data, ['patientsBoarding', 'boardingPatients', 'boardedPatients', 'boarders']) ??
+      firstValue(source, ['patientsBoarding', 'boardingPatients', 'boardedPatients', 'boarders'])
+  ).map(normalizeBoardingPatient);
+  const explicitExceeding = asArray(
+    firstValue(data, ['exceedingThresholds', 'thresholdBreaches']) ??
+      firstValue(source, ['exceedingThresholds', 'thresholdBreaches'])
+  ).map(normalizeBoardingPatient);
+  return {
+    medianBoardTimeMinutes: numberFrom(
+      firstValue(source, [
+        'medianBoardTimeMinutes',
+        'medianBoardTime',
+        'medianBoardingMinutes',
+        'boardingTime',
+        'averageBoardTime',
+      ]),
+      0
+    ),
+    patientsBoarding: patients,
+    exceedingThresholds: explicitExceeding.length
+      ? explicitExceeding
+      : patients.filter(
+          (patient) =>
+            numberFrom(patient.boardingMinutes ?? patient.boardTimeMinutes, 0) >=
+            DEFAULT_BOARDING_THRESHOLD_MINUTES
+        ),
+    updatedAt: stringFrom(firstValue(source, ['updatedAt', 'generatedAt'])) || nowIso(),
+    raw,
+  };
+};
+
+const normalizeEmsIncomingPatient = (value: unknown, index = 0): EmsIncomingPatient => ({
+  ...asRecord(value),
+  id: stableId('ems', value, index),
+});
+
+const extractEmsIncomingPatients = (raw: unknown): EmsIncomingPatient[] => {
+  const data = unwrapData(raw);
+  const candidate =
+    (Array.isArray(data) && data) ||
+    firstValue(data, ['incomingPatients', 'emsIncomingPatients', 'emsArrivals', 'arrivals', 'patients', 'queue.incomingPatients']);
+  return asArray(candidate).map(normalizeEmsIncomingPatient);
+};
+
+const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
+  score: 0,
+  color: 'unknown',
+  triggers: [],
+  recommendations: [],
+  updatedAt: null,
+  raw: null,
+});
+
+const emptyBoardingMetrics = (): EmergencyBoardingMetrics => ({
+  medianBoardTimeMinutes: 0,
+  patientsBoarding: [],
+  exceedingThresholds: [],
+  updatedAt: null,
+  raw: null,
+});
+
+const emptySurgeStatus = (): EmergencySurgeStatus => ({
+  active: false,
+  event: null,
+  activatedAt: null,
+  updatedAt: null,
+});
+
+const emptyUiState = (): EmergencyUiState => ({
+  loading: false,
+  error: null,
+  selectedPatientId: null,
+});
+
+const emptyWebSocketStatus = (): EmergencyWebSocketStatus => ({
+  connected: false,
+  status: 'idle',
+  url: null,
+  lastConnectedAt: null,
+  lastDisconnectedAt: null,
+  lastEventAt: null,
+  error: null,
+});
+
+const capCopilotMessages = (messages: EmergencyCopilotMessage[]): EmergencyCopilotMessage[] =>
+  messages.slice(-COPILOT_STORAGE_LIMIT);
+
+function isFeatureAvailableForTier(feature: Feature, tier: FeatureTier): boolean {
+  return TIER_RANK[feature.tier] <= TIER_RANK[tier];
+}
+
+const isDevelopmentMode = () => Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+
+function defaultEnabledForFeature(feature: Feature, tier: FeatureTier): boolean {
+  if (feature.tier === 'core') return true;
+  if (!isFeatureAvailableForTier(feature, tier)) return false;
+  if (feature.id === 'simulation_engine') return isDevelopmentMode();
+  if (feature.tier === 'professional' && isDevelopmentMode()) return true;
+  return feature.defaultEnabled;
+}
+
+export function buildDefaultFlags(tier: FeatureTier = DEFAULT_TIER): FeatureFlags {
+  return Object.fromEntries(
+    FEATURE_REGISTRY.map((feature) => [feature.id, defaultEnabledForFeature(feature, tier)])
+  );
+}
+
+function resolveEffectiveFlag(
+  featureId: string,
+  flags: FeatureFlags,
+  overrides: FeatureOverrides,
+  tier: FeatureTier,
+  visited = new Set<string>(),
+): boolean {
+  const feature = FEATURE_REGISTRY_BY_ID[featureId];
+  if (!feature || visited.has(featureId)) return false;
+  if (!isFeatureAvailableForTier(feature, tier)) return false;
+  visited.add(featureId);
+  const dependenciesEnabled = feature.dependencies.every((dependencyId) =>
+    resolveEffectiveFlag(dependencyId, flags, overrides, tier, new Set(visited)),
+  );
+  if (!dependenciesEnabled) return false;
+  if (feature.tier === 'core') return true;
+  return Object.prototype.hasOwnProperty.call(overrides, featureId)
+    ? Boolean(overrides[featureId])
+    : Boolean(flags[featureId]);
+}
+
+function dependentEnabledFeatures(
+  featureId: string,
+  flags: FeatureFlags,
+  overrides: FeatureOverrides,
+  tier: FeatureTier,
+): Feature[] {
+  return FEATURE_REGISTRY.filter((feature) =>
+    feature.dependencies.includes(featureId) && resolveEffectiveFlag(feature.id, flags, overrides, tier),
+  );
+}
+
+function normalizeTier(value: unknown, fallback: FeatureTier = DEFAULT_TIER): FeatureTier {
+  return value === 'core' || value === 'professional' || value === 'enterprise'
+    ? value
+    : fallback;
+}
+
+function normalizeBackendFlags(payload: unknown): FeatureOverrides {
+  const record = asRecord(payload);
+  const flagsRecord = asRecord(record.flags);
+  if (record.flags && isObject(record.flags)) {
+    return Object.fromEntries(
+      Object.entries(flagsRecord)
+        .filter(([featureId]) => FEATURE_REGISTRY_BY_ID[String(featureId)])
+        .map(([featureId, enabled]) => [String(featureId), Boolean(enabled)]),
+    );
+  }
+
+  return asArray(record.flags)
+    .filter((flag) => FEATURE_REGISTRY_BY_ID[String(asRecord(flag).id || asRecord(flag).featureId || '')])
+    .reduce<FeatureOverrides>((acc, flag) => {
+      const row = asRecord(flag);
+      const featureId = String(row.id || row.featureId);
+      const state = String(row.state || '').toLowerCase();
+      acc[featureId] =
+        typeof row.enabled === 'boolean' ? row.enabled : state !== 'disabled' && state !== 'false';
+      return acc;
+    }, {});
+}
+
+function normalizeSyncPayload(payload: unknown) {
+  const wrapper = asRecord(payload);
+  const row = asRecord(wrapper.new ?? wrapper.record ?? wrapper.data ?? payload);
+  const featureId = String(row.featureId || row.feature_id || row.flagId || row.flag_id || '').trim();
+  if (!FEATURE_REGISTRY_BY_ID[featureId]) return null;
+  return {
+    featureId,
+    enabled:
+      typeof row.enabled === 'boolean'
+        ? row.enabled
+        : String(row.state || row.enabled || '').toLowerCase() === 'enabled',
+    changedBy:
+      stringFrom(row.changedByName) ||
+      stringFrom(row.changed_by_name) ||
+      stringFrom(row.staffName) ||
+      stringFrom(row.staff_name) ||
+      stringFrom(row.changedBy) ||
+      stringFrom(row.changed_by) ||
+      undefined,
+    tier: normalizeTier(row.tier, DEFAULT_TIER),
+  };
+}
+
+type FeatureSnapshot = {
+  flags: FeatureFlags;
+  overrides: FeatureOverrides;
+  tier: FeatureTier;
+  lastSynced: Date | null;
+};
+
+function readLocalFeatureSnapshot(): Partial<FeatureSnapshot> {
+  if (typeof localStorage === 'undefined') return {};
+  try {
+    const parsed = JSON.parse(localStorage.getItem(FEATURE_STORE_STORAGE_KEY) || '{}');
+    return {
+      flags: isObject(parsed.flags) ? parsed.flags as FeatureFlags : undefined,
+      overrides: isObject(parsed.overrides) ? parsed.overrides as FeatureOverrides : undefined,
+      tier: parsed.tier && parsed.tier in TIER_RANK ? parsed.tier : undefined,
+      lastSynced: parsed.lastSynced ? new Date(parsed.lastSynced) : null,
+    };
+  } catch (_error) {
+    return {};
+  }
+}
+
+function writeLocalFeatureSnapshot(state: FeatureSnapshot) {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.setItem(
+    FEATURE_STORE_STORAGE_KEY,
+    JSON.stringify({
+      flags: state.flags,
+      overrides: state.overrides,
+      tier: state.tier,
+      lastSynced: state.lastSynced?.toISOString() || null,
+    }),
+  );
+}
+
+function readLastPulseViewTimestamp(): number | null {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(PULSE_LAST_VIEW_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const candidate =
+      typeof parsed === 'number'
+        ? parsed
+        : numberFrom(parsed?.timestamp ?? parsed?.lastVisitedAt, Number.NaN);
+    if (Number.isFinite(candidate)) return candidate;
+    const viewedAt = stringFrom(parsed?.viewedAt);
+    const parsedDate = viewedAt ? Date.parse(viewedAt) : Number.NaN;
+    return Number.isFinite(parsedDate) ? parsedDate : null;
+  } catch (_error) {
+    const raw = localStorage.getItem(PULSE_LAST_VIEW_STORAGE_KEY);
+    const numeric = Number(raw);
+    if (Number.isFinite(numeric)) return numeric;
+    const parsedDate = raw ? Date.parse(raw) : Number.NaN;
+    return Number.isFinite(parsedDate) ? parsedDate : null;
+  }
+}
+
+function writeLastPulseViewTimestamp(timestamp: number) {
+  if (typeof localStorage === 'undefined' || !Number.isFinite(timestamp)) return;
+  localStorage.setItem(
+    PULSE_LAST_VIEW_STORAGE_KEY,
+    JSON.stringify({
+      timestamp,
+      viewedAt: new Date(timestamp).toISOString(),
+    }),
+  );
+}
+
+function persistFeatureOverride(featureId: string, enabled: boolean, changedBy?: string) {
+  return updateSettingsFeatureFlag({
+    featureId,
+    enabled,
+    changedBy: changedBy || 'current-user',
+    timestamp: nowIso(),
+  });
+}
+
+function auditFeatureToggle(featureId: string, enabled: boolean, metadata: Record<string, unknown> = {}) {
+  void syncEmergencyAuditEvent({
+    action: 'feature_toggle',
+    resourceType: 'feature',
+    resourceId: featureId,
+    timestamp: nowIso(),
+    metadata: {
+      enabled,
+      ...metadata,
+    },
+  });
 }
 
 function createPatientTimelineEvent(
@@ -242,6 +917,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   ems_converted_to_patient: 'EMS converted to patient',
   capacity_score_changed: 'Capacity score changed',
   boarding_started: 'Boarding started',
+  staffing_request_created: 'Staffing request created',
   referral_created: 'Referral created',
   copilot_used: 'Copilot used',
   provincial_data_viewed: 'Provincial data viewed',
@@ -370,30 +1046,100 @@ type EmergencyAnalyticsState = {
   data?: ReturnType<typeof buildLocalEmergencyAnalytics>;
 };
 
+type EmergencyScenarioSummary = {
+  id: string;
+  label: string;
+  description?: string;
+};
+
+type EmergencyQueueSummary = {
+  id?: string;
+  label: string;
+  count: number;
+};
+
+type EmergencyScenarioData = Record<string, unknown> & {
+  copilotContext: Record<string, number>;
+  boarding: Record<string, unknown> & { patients: unknown[] };
+};
+
+type EmergencyCtasThresholds = Record<Priority, number>;
+
+type EmergencyOsSettings = {
+  tenantName: string;
+  defaultWorkspace: string;
+  enabledModules: Array<{ id: string; label: string; enabled: boolean }>;
+  aiSettings: Record<string, string | boolean>;
+  integrationSettings: Record<string, string | boolean>;
+  provincialHealthSettings: Record<string, string | boolean>;
+  notificationSettings: Record<string, string | number | boolean>;
+  reassessmentThresholds: Record<string, number>;
+  capacityThresholds: Record<string, number>;
+  emsThresholds: Record<string, number | boolean>;
+  boardingThresholds: Record<string, number>;
+  ctasThresholds: EmergencyCtasThresholds;
+  thresholds: Record<string, unknown> & {
+    waitWarningMinutes: number;
+    waitCriticalMinutes: number;
+    capacityWarningPercent: number;
+    emsOffloadTargetMinutes: number;
+    reassessmentIntervals: Record<string, number>;
+    ctasTargets: EmergencyCtasThresholds;
+  };
+  departmentCapacityTarget: number;
+  alertRules: Record<string, { enabled: boolean; severity: Alert['severity'] }>;
+  demoMode?: unknown;
+};
+
 interface EmergencyStoreState {
   patients: Patient[];
   staff: Staff[];
   rooms: Room[];
   capacity: CapacitySnapshot;
+  capacityHistory: CapacityHistoryEntry[];
   activeShift: ActiveShift;
   emsUnits: EmsUnit[];
   emsArrivals: EmsUnit[];
   referrals: Referral[];
+  capacityMetrics: EmergencyCapacityMetrics;
+  boardingMetrics: EmergencyBoardingMetrics;
+  surgeStatus: EmergencySurgeStatus;
+  copilotMessages: EmergencyCopilotMessage[];
+  emsIncomingPatients: EmsIncomingPatient[];
+  ui: EmergencyUiState;
+  websocket: EmergencyWebSocketStatus;
+  integrationEvents: EmergencyIntegrationEvent[];
   emergencyAnalytics: EmergencyAnalyticsState;
   activeScenarioId: string;
-  activeScenario: any;
-  availableScenarios: any[];
-  scenarioData: any;
-  queues: any[];
+  activeScenario: EmergencyScenarioSummary;
+  availableScenarios: EmergencyScenarioSummary[];
+  scenarioData: EmergencyScenarioData;
+  queues: EmergencyQueueSummary[];
   selectedPatientId: string | null;
   copilotOpen: boolean;
-  activeQueueFilter: string;
+  activeQueueFilter: string | null;
   loading: boolean;
   features: EmergencyFeatureFlags;
+  flags: FeatureFlags;
+  overrides: FeatureOverrides;
+  tier: FeatureTier;
+  lastSynced: Date | null;
+  backendAvailable: boolean;
+  persistenceMode: FeaturePersistenceMode;
   alerts: Alert[];
   workflowLogs: WorkflowActionLog[];
+  staffingRequests: StaffingRequest[];
+  auditLog: EmergencyAuditLogEntry[];
+  thresholds: EmergencyThresholds;
+  emergencySettings: EmergencyOsSettings;
+  lastPulseView: number | null;
 
   addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
+  setThreshold: (key: EmergencyThresholdKey, value: number) => void;
+  resetThresholds: () => void;
+  saveEmergencySettings: (patch: Partial<EmergencyOsSettings>) => void;
+  setPatients: (patients: Patient[]) => void;
+  removePatient: (patientId: string) => void;
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
   movePatientToState: (
     patientId: string,
@@ -407,7 +1153,7 @@ interface EmergencyStoreState {
   addFlag: (patientId: string, flag: PatientFlag | string, options?: Partial<Alert>) => void;
   removeFlag: (patientId: string, flag: PatientFlag) => void;
   addVitals: (patientId: string, vitals: Vitals) => void;
-  addNote: (patientId: string, note: Note) => void;
+  addNote: (patientId: string, note: Note | string, staffId?: string) => void;
   scheduleReassessmentReminder: (
     patientId: string,
     reminder: Omit<ReassessmentReminder, 'id' | 'patientId' | 'status'>
@@ -418,45 +1164,281 @@ interface EmergencyStoreState {
     options?: { completedBy?: string; completedAt?: string }
   ) => void;
   selectPatient: (patientId: string | null) => void;
-  setActiveQueueFilter: (filter: string) => void;
+  clearPatientSelection: () => void;
+  setActiveQueueFilter: (filter: string | null) => void;
+  setLastPulseView: (timestamp: number) => void;
   setLoading: (loading: boolean) => void;
   toggleCopilot: () => void;
+  clearError: () => void;
+  initializeFromBackend: () => Promise<EmergencyDashboardRefreshResult>;
+  refreshAllData: () => Promise<EmergencyDashboardRefreshResult>;
+  activateSurge: (payload?: ActivateSurgePayload) => Promise<EmergencySurgeStatus>;
+  sendCopilotQuery: (query: string, options?: CopilotQueryOptions) => Promise<EmergencyCopilotMessage>;
+  setWebSocketStatus: (status: Partial<EmergencyWebSocketStatus>) => void;
+  dispatchWebSocketEvent: (event: EmergencyRealtimeEvent | unknown) => void;
+  appendCopilotMessage: (message: EmergencyCopilotMessage) => void;
+  upsertEmsIncomingPatient: (patient: EmsIncomingPatient) => void;
   addAlert: (alert: Alert) => void;
   setCapacity: (capacity: CapacitySnapshot) => void;
+  initializeFlags: () => Promise<void>;
+  toggleFeature: (featureId: string, enabled: boolean, metadata?: { changedBy?: string }) => Promise<boolean>;
+  setTier: (tier: FeatureTier) => void;
+  isEnabled: (featureId: string) => boolean;
+  getEnabledFeatures: () => Feature[];
+  getDependencyWarning: (featureId: string) => string | null;
+  syncFeatureFlag: (payload: unknown) => { featureId: string; enabled: boolean; changedBy?: string } | null;
   setActiveScenario: (scenarioId: string) => void;
   createReferral: (input: Partial<Referral> & { patientId: string }) => Referral;
   updateReferralStatus: (referralId: string, status: Referral['status'], responseNote?: string) => void;
   loadEmergencyAnalytics: (options?: { force?: boolean }) => Promise<EmergencyAnalyticsState>;
   recordWorkflowAction: (input: WorkflowActionInput) => WorkflowActionLog;
+  requestAdditionalStaff: (
+    input?: Partial<Omit<StaffingRequest, 'id' | 'requestedAt' | 'status'>>
+  ) => StaffingRequest;
   hydrateFromApi: (payload: Partial<{
     patients: Patient[];
     staff: Staff[];
     rooms: Room[];
     alerts: Alert[];
     capacity: CapacitySnapshot;
+    capacityHistory: CapacityHistoryEntry[];
     workflowLogs: WorkflowActionLog[];
     activeShift: ActiveShift;
     emsUnits: EmsUnit[];
     emsArrivals: EmsUnit[];
     referrals: Referral[];
-    activeQueueFilter: string;
+    activeQueueFilter: string | null;
     loading: boolean;
     features: EmergencyFeatureFlags;
+    flags: FeatureFlags;
+    overrides: FeatureOverrides;
+    tier: FeatureTier;
   }>) => void;
 }
 
 const initialScenarioState = buildSrcEmergencyScenarioState(getInitialEdScenarioId());
 const initialCapacity = initialScenarioState.capacity || buildCapacitySnapshot(SEED_PATIENTS, SEED_ROOMS);
+const initialFeatureState = readLocalFeatureSnapshot();
+const initialTier = initialFeatureState.tier || DEFAULT_TIER;
+const initialFlags = {
+  ...buildDefaultFlags(initialTier),
+  ...(initialFeatureState.flags || {}),
+};
 
-export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
+const DEFAULT_CTAS_TARGETS: EmergencyCtasThresholds = {
+  [Priority.P1]: 0,
+  [Priority.P2]: 15,
+  [Priority.P3]: 30,
+  [Priority.P4]: 60,
+  [Priority.P5]: 120,
+};
+
+const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
+  tenantName: 'CareDroid Emergency Department',
+  defaultWorkspace: 'emergency-whiteboard',
+  enabledModules: [
+    { id: 'emergency-whiteboard', label: 'Emergency Whiteboard', enabled: true },
+    { id: 'smart-intake', label: 'Smart Intake', enabled: true },
+    { id: 'ems-pipeline', label: 'EMS Pipeline', enabled: true },
+    { id: 'capacity-command', label: 'Capacity Command', enabled: true },
+    { id: 'analytics', label: 'Emergency Analytics', enabled: true },
+    { id: 'settings', label: 'Settings', enabled: true },
+  ],
+  aiSettings: {
+    enabled: true,
+    provider: 'configured',
+    model: 'default',
+    triageAssistEnabled: true,
+    summarizationEnabled: true,
+    humanReviewRequired: true,
+  },
+  integrationSettings: {
+    ehrEnabled: false,
+    fhirEndpoint: '',
+    hl7InterfaceId: '',
+    deviceTelemetryEnabled: false,
+  },
+  provincialHealthSettings: {
+    connectorEnabled: false,
+    jurisdiction: '',
+    lookupMode: 'manual-review',
+    healthCardValidation: false,
+  },
+  notificationSettings: {
+    inAppEnabled: true,
+    emailEnabled: false,
+    smsEnabled: false,
+    escalationMinutes: 10,
+    quietHoursStart: '00:00',
+    quietHoursEnd: '00:00',
+  },
+  reassessmentThresholds: {
+    P1: 5,
+    P2: 15,
+    P3: 30,
+    P4: 60,
+    P5: 120,
+    overdueGraceMinutes: 10,
+  },
+  capacityThresholds: {
+    departmentCapacityTarget: 85,
+    warningPercent: 75,
+    criticalPercent: 90,
+    maxWaitingPatients: 12,
+  },
+  emsThresholds: {
+    offloadTargetMinutes: 15,
+    criticalEtaMinutes: 10,
+    autoCreateArrival: true,
+  },
+  boardingThresholds: {
+    escalationMinutes: 120,
+    criticalMinutes: 240,
+    maxBoarders: 8,
+    inpatientNotifyMinutes: 60,
+  },
+  ctasThresholds: DEFAULT_CTAS_TARGETS,
+  thresholds: {
+    waitWarningMinutes: 45,
+    waitCriticalMinutes: 60,
+    capacityWarningPercent: 75,
+    emsOffloadTargetMinutes: 15,
+    reassessmentIntervals: {
+      P1: 5,
+      P2: 15,
+      P3: 30,
+      P4: 60,
+      P5: 120,
+    },
+    ctasTargets: DEFAULT_CTAS_TARGETS,
+  },
+  departmentCapacityTarget: 85,
+  alertRules: {
+    longWait: { enabled: true, severity: 'Warning' },
+    lwbsRisk: { enabled: true, severity: 'Critical' },
+    reassessmentDue: { enabled: true, severity: 'Warning' },
+    capacity: { enabled: true, severity: 'Warning' },
+    emsCritical: { enabled: true, severity: 'Critical' },
+  },
+};
+
+function mergeCtasThresholds(
+  base: EmergencyCtasThresholds,
+  patch?: Partial<Record<Priority | string, unknown>>
+): EmergencyCtasThresholds {
+  return Object.fromEntries(
+    Object.values(Priority).map((priority) => {
+      const configured = Number(patch?.[priority]);
+      return [priority, Number.isFinite(configured) && configured >= 0 ? configured : base[priority]];
+    })
+  ) as EmergencyCtasThresholds;
+}
+
+function mergeEmergencyOsSettings(
+  base: EmergencyOsSettings,
+  patch: Partial<EmergencyOsSettings> = {}
+): EmergencyOsSettings {
+  const baseThresholds = {
+    ...DEFAULT_EMERGENCY_SETTINGS.thresholds,
+    ...(base.thresholds || {}),
+    reassessmentIntervals: {
+      ...DEFAULT_EMERGENCY_SETTINGS.thresholds.reassessmentIntervals,
+      ...(base.thresholds?.reassessmentIntervals || {}),
+    },
+  };
+  const baseCtas = base.ctasThresholds || baseThresholds.ctasTargets || DEFAULT_CTAS_TARGETS;
+  const patchCtas = patch.ctasThresholds || (patch.thresholds?.ctasTargets as Partial<Record<Priority, number>> | undefined);
+  const ctasThresholds = mergeCtasThresholds(baseCtas, patchCtas);
+
+  return {
+    ...base,
+    ...patch,
+    enabledModules: patch.enabledModules || base.enabledModules,
+    aiSettings: { ...base.aiSettings, ...(patch.aiSettings || {}) },
+    integrationSettings: { ...base.integrationSettings, ...(patch.integrationSettings || {}) },
+    provincialHealthSettings: { ...base.provincialHealthSettings, ...(patch.provincialHealthSettings || {}) },
+    notificationSettings: { ...base.notificationSettings, ...(patch.notificationSettings || {}) },
+    reassessmentThresholds: { ...base.reassessmentThresholds, ...(patch.reassessmentThresholds || {}) },
+    capacityThresholds: { ...base.capacityThresholds, ...(patch.capacityThresholds || {}) },
+    emsThresholds: { ...base.emsThresholds, ...(patch.emsThresholds || {}) },
+    boardingThresholds: { ...base.boardingThresholds, ...(patch.boardingThresholds || {}) },
+    ctasThresholds,
+    thresholds: {
+      ...baseThresholds,
+      ...(patch.thresholds || {}),
+      reassessmentIntervals: {
+        ...baseThresholds.reassessmentIntervals,
+        ...(patch.thresholds?.reassessmentIntervals || {}),
+      },
+      ctasTargets: ctasThresholds,
+    },
+    alertRules: { ...base.alertRules, ...(patch.alertRules || {}) },
+  };
+}
+
+function seedCapacityHistory(capacity: CapacitySnapshot): CapacityHistoryEntry[] {
+  return [
+    {
+      id: 'capacity-history-initial',
+      timestamp: capacity.updatedAt || new Date().toISOString(),
+      band: capacity.band,
+      score: capacity.score,
+      source: 'current-capacity-seed',
+      reason: 'Initial capacity history is seeded from the current snapshot when no prior history is available.',
+    },
+  ];
+}
+
+function appendCapacityBandChange(
+  history: CapacityHistoryEntry[],
+  previousCapacity: CapacitySnapshot,
+  nextCapacity: CapacitySnapshot,
+  reason: string,
+): CapacityHistoryEntry[] {
+  if (previousCapacity.band === nextCapacity.band) return history;
+  const timestamp = nextCapacity.updatedAt || new Date().toISOString();
+  const lastEntry = history[history.length - 1];
+  if (lastEntry?.timestamp === timestamp && lastEntry.band === nextCapacity.band) return history;
+  return [
+    ...history,
+    {
+      id: createId('capacity-history'),
+      timestamp,
+      band: nextCapacity.band,
+      score: nextCapacity.score,
+      fromBand: previousCapacity.band,
+      toBand: nextCapacity.band,
+      source: 'capacity-engine',
+      reason,
+    },
+  ].slice(-200);
+}
+
+const initialEmergencySettingsPatch = (initialScenarioState.emergencySettings || {}) as Partial<EmergencyOsSettings>;
+const initialThresholds = thresholdsFromSettings(initialEmergencySettingsPatch, DEFAULT_EMERGENCY_THRESHOLDS);
+const initialEmergencySettings = mergeEmergencyOsSettings(
+  mergeEmergencyOsSettings(DEFAULT_EMERGENCY_SETTINGS, initialEmergencySettingsPatch),
+  settingsPatchFromThresholds(initialThresholds),
+);
+
+export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> = create<EmergencyStoreState>((set, get) => ({
   patients: initialScenarioState.patients || SEED_PATIENTS,
   staff: initialScenarioState.staff || SEED_STAFF,
   rooms: initialScenarioState.rooms || SEED_ROOMS,
   capacity: initialCapacity,
+  capacityHistory: seedCapacityHistory(initialCapacity),
   activeShift: initialScenarioState.activeShift || SEED_SHIFT,
   emsUnits: initialScenarioState.emsUnits || initialScenarioState.emsArrivals || SEED_EMS_UNITS,
   emsArrivals: initialScenarioState.emsArrivals || SEED_EMS_UNITS,
   referrals: initialScenarioState.referrals || SEED_REFERRALS,
+  capacityMetrics: emptyCapacityMetrics(),
+  boardingMetrics: emptyBoardingMetrics(),
+  surgeStatus: emptySurgeStatus(),
+  copilotMessages: [],
+  emsIncomingPatients: [],
+  ui: emptyUiState(),
+  websocket: emptyWebSocketStatus(),
+  integrationEvents: [],
   emergencyAnalytics: {
     status: 'idle',
     source: 'local',
@@ -470,10 +1452,21 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   queues: initialScenarioState.queues || [],
   selectedPatientId: null,
   copilotOpen: false,
-  activeQueueFilter: 'All',
+  activeQueueFilter: null,
   loading: false,
   features: DEFAULT_FEATURES,
+  flags: initialFlags,
+  overrides: initialFeatureState.overrides || {},
+  tier: initialTier,
+  lastSynced: initialFeatureState.lastSynced || null,
+  backendAvailable: false,
+  persistenceMode: 'local',
   workflowLogs: [],
+  staffingRequests: [],
+  auditLog: [],
+  thresholds: initialThresholds,
+  emergencySettings: initialEmergencySettings,
+  lastPulseView: readLastPulseViewTimestamp(),
   alerts: initialScenarioState.alerts || [
     {
       id: 'a1',
@@ -518,13 +1511,23 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     return {
       patients,
       capacity,
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'addPatient',
+        patientId: patientWithTimeline.id,
+        staffId: patientWithTimeline.assignedStaffId || 'intake',
+        details: {
+          mrn: patientWithTimeline.mrn,
+          state: patientWithTimeline.state,
+          priority: patientWithTimeline.priority,
+        },
+      }),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         {
           type: 'patient_created',
           title: 'Patient created',
           summary: `Created patient ${patientWithTimeline.firstName} ${patientWithTimeline.lastName}.`,
           patientId: patientWithTimeline.id,
-          actorStaffId: patientWithTimeline.assignedStaffId,
+          actorStaffId: patientWithTimeline.assignedStaffId || undefined,
           source: 'local-emergency-store',
           metadata: {
             mrn: patientWithTimeline.mrn,
@@ -551,12 +1554,81 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     };
   }),
 
+  setThreshold: (key, value) => set((state) => {
+    const thresholds = { ...state.thresholds, [key]: value };
+    return {
+      thresholds,
+      emergencySettings: mergeEmergencyOsSettings(
+        state.emergencySettings,
+        settingsPatchFromThresholds(thresholds),
+      ),
+    };
+  }),
+
+  resetThresholds: () => set((state) => ({
+    thresholds: DEFAULT_EMERGENCY_THRESHOLDS,
+    emergencySettings: mergeEmergencyOsSettings(
+      state.emergencySettings,
+      settingsPatchFromThresholds(DEFAULT_EMERGENCY_THRESHOLDS),
+    ),
+  })),
+
+  saveEmergencySettings: (patch) => set((state) => {
+    const emergencySettings = mergeEmergencyOsSettings(state.emergencySettings, patch);
+    return {
+      emergencySettings,
+      thresholds: thresholdsFromSettings(emergencySettings, state.thresholds),
+    };
+  }),
+
+  setPatients: (patients) => set((state) => ({
+    patients,
+    capacity: buildCapacitySnapshot(patients, state.rooms),
+    auditLog: appendAuditLog(state.auditLog, {
+      action: 'setPatients',
+      staffId: 'system',
+      details: { count: patients.length },
+    }),
+  })),
+
+  removePatient: (patientId) => set((state) => {
+    const patients = state.patients.filter((patient) => patient.id !== patientId);
+    const rooms = state.rooms.map((room) =>
+      room.patientId === patientId ? { ...room, patientId: undefined, status: 'Available' as const } : room
+    );
+    return {
+      patients,
+      rooms,
+      capacity: buildCapacitySnapshot(patients, rooms),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'removePatient',
+        patientId,
+        staffId: 'system',
+        details: { clearedRoom: state.rooms.some((room) => room.patientId === patientId) },
+      }),
+      selectedPatientId: state.selectedPatientId === patientId ? null : state.selectedPatientId,
+      ui: {
+        ...state.ui,
+        selectedPatientId: state.ui.selectedPatientId === patientId ? null : state.ui.selectedPatientId,
+      },
+    };
+  }),
+
   updatePatient: (patientId, patch) => set((state) => {
     const patients = state.patients.map((patient) =>
       patient.id === patientId ? { ...patient, ...patch } : patient
     );
     const capacity = buildCapacitySnapshot(patients, state.rooms);
-    return { patients, capacity };
+    return {
+      patients,
+      capacity,
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'updatePatient',
+        patientId,
+        staffId: state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+        details: { fields: Object.keys(patch) },
+      }),
+    };
   }),
 
   movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) => set((state) => {
@@ -590,6 +1662,17 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     return {
       patients,
       capacity,
+      auditLog: appendAuditLog(
+        state.auditLog,
+        beforePatient
+          ? {
+              action: 'movePatientToState',
+              patientId,
+              staffId,
+              details: { fromState: beforePatient.state, toState: to },
+            }
+          : null,
+      ),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         beforePatient
           ? {
@@ -658,7 +1741,16 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }
         : patient
     );
-    return { patients, capacity: buildCapacitySnapshot(patients, state.rooms) };
+    return {
+      patients,
+      capacity: buildCapacitySnapshot(patients, state.rooms),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'dischargePatient',
+        patientId,
+        staffId,
+        details: { toState: PatientState.Discharge, note: options.note || null },
+      }),
+    };
   }),
 
   assignStaff: (patientId, staffId) => set((state) => {
@@ -682,6 +1774,12 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
             }
           : patient
       ),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'assignStaff',
+        patientId,
+        staffId,
+        details: { toStaffId: staffId, staffName },
+      }),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         {
           type: 'clinician_assigned',
@@ -728,7 +1826,17 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         : patient
     );
 
-    return { rooms, patients, capacity: buildCapacitySnapshot(patients, rooms) };
+    return {
+      rooms,
+      patients,
+      capacity: buildCapacitySnapshot(patients, rooms),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'assignRoom',
+        patientId,
+        staffId: state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+        details: { roomId },
+      }),
+    };
   }),
 
   addFlag: (patientId, flag) => set((state) => {
@@ -754,6 +1862,12 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     return {
       patients,
       capacity: buildCapacitySnapshot(patients, state.rooms),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'addFlag',
+        patientId,
+        staffId: state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+        details: { flag: normalizedFlag },
+      }),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         normalizedFlag === PatientFlag.ReassessmentDue
           ? {
@@ -812,69 +1926,137 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         : patient
     );
 
-    return { patients, capacity: buildCapacitySnapshot(patients, state.rooms) };
+    return {
+      patients,
+      capacity: buildCapacitySnapshot(patients, state.rooms),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'removeFlag',
+        patientId,
+        staffId: state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+        details: { flag },
+      }),
+    };
   }),
 
-  addVitals: (patientId, vitals) => set((state) => ({
-    patients: state.patients.map((patient) =>
-      patient.id === patientId
-        ? {
-            ...patient,
-            vitals: [...patient.vitals, vitals],
-            timeline: [
-              ...patient.timeline,
-              createPatientTimelineEvent(patient, 'VitalsUpdated', 'Vitals reassessment recorded.', {
-                timestamp: vitals.recordedAt,
-                staffId: vitals.recordedBy,
-                metadata: {
-                  hr: vitals.hr,
-                  sbp: vitals.sbp,
-                  dbp: vitals.dbp,
-                  spo2: vitals.spo2,
-                  temp: vitals.temp,
-                  rr: vitals.rr,
-                  gcs: vitals.gcs,
-                  pain: vitals.pain,
-                },
-              }),
-            ],
-          }
-        : patient
-    ),
-    workflowLogs: appendWorkflowLogs(state.workflowLogs, [
-      {
-        type: 'reassessment_completed',
-        title: 'Reassessment completed',
-        summary: 'Vitals reassessment recorded.',
+  addVitals: (patientId, vitals) => set((state) => {
+    const news2 = calculateNews2FromVitals(vitals);
+    const shouldFlagForReassessment = news2.total >= 5;
+    const news2Alert: Alert | null = news2.response.alertSeverity
+      ? {
+          id: createId('alert'),
+          type: 'Reassessment',
+          severity: news2.response.alertSeverity,
+          title: `NEWS2 ${news2.response.band} deterioration risk`,
+          message: `NEWS2 ${news2.total}: ${news2.response.recommendation}`,
+          patientId,
+          createdAt: vitals.recordedAt || new Date().toISOString(),
+          dismissed: false,
+          source: 'news2-auto-score',
+          metadata: {
+            score: news2.total,
+            band: news2.response.band,
+            hasSingleRed: news2.hasSingleRed,
+          },
+        }
+      : null;
+    const patients = state.patients.map((patient) => {
+      if (patient.id !== patientId) return patient;
+      const flags =
+        shouldFlagForReassessment && !patient.flags.includes(PatientFlag.ReassessmentDue)
+          ? [...patient.flags, PatientFlag.ReassessmentDue]
+          : patient.flags;
+      return {
+        ...patient,
+        flags,
+        vitals: [...patient.vitals, vitals],
+        timeline: [
+          ...patient.timeline,
+          createPatientTimelineEvent(patient, 'VitalsUpdated', 'Vitals reassessment recorded.', {
+            timestamp: vitals.recordedAt,
+            staffId: vitals.recordedBy,
+            metadata: {
+              hr: vitals.hr,
+              sbp: vitals.sbp,
+              dbp: vitals.dbp,
+              spo2: vitals.spo2,
+              temp: vitals.temp,
+              rr: vitals.rr,
+              gcs: vitals.gcs,
+              pain: vitals.pain,
+              news2: news2.total,
+            },
+          }),
+        ],
+      };
+    });
+    return {
+      patients,
+      capacity: buildCapacitySnapshot(patients, state.rooms),
+      alerts: news2Alert ? [news2Alert, ...state.alerts] : state.alerts,
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'addVitals',
         patientId,
-        actorStaffId: vitals.recordedBy,
-        timestamp: vitals.recordedAt,
-        source: 'reassessment-engine',
-        metadata: {
-          hr: vitals.hr ?? null,
-          spo2: vitals.spo2 ?? null,
+        staffId: vitals.recordedBy || state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+        details: {
+          recordedAt: vitals.recordedAt || null,
+          news2: news2.total,
+          reassessmentFlagAdded: shouldFlagForReassessment,
         },
-      },
-    ]),
-  })),
+      }),
+      workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+        {
+          type: 'reassessment_completed',
+          title: 'Reassessment completed',
+          summary: 'Vitals reassessment recorded.',
+          patientId,
+          actorStaffId: vitals.recordedBy,
+          timestamp: vitals.recordedAt,
+          source: 'reassessment-engine',
+          metadata: {
+            hr: vitals.hr ?? null,
+            spo2: vitals.spo2 ?? null,
+            news2: news2.total,
+          },
+        },
+      ]),
+    };
+  }),
 
-  addNote: (patientId, note) => set((state) => ({
+  addNote: (patientId, note, staffId) => set((state) => ({
     patients: state.patients.map((patient) =>
       patient.id === patientId
         ? {
             ...patient,
             notes: [
               ...patient.notes,
-              {
-                ...note,
-                id: note.id || createId('note'),
-                patientId,
-                timestamp: note.timestamp || note.createdAt || new Date().toISOString(),
-              },
+              typeof note === 'string'
+                ? {
+                    id: createId('note'),
+                    patientId,
+                    text: note,
+                    body: note,
+                    authorId: staffId || patient.assignedStaffId || 'system',
+                    authorStaffId: staffId || patient.assignedStaffId || 'system',
+                    type: 'Score',
+                    timestamp: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                  }
+                : {
+                    ...note,
+                    id: note.id || createId('note'),
+                    patientId,
+                    timestamp: note.timestamp || note.createdAt || new Date().toISOString(),
+                  },
             ],
           }
         : patient
     ),
+    auditLog: appendAuditLog(state.auditLog, {
+      action: 'addNote',
+      patientId,
+      staffId: staffId || state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+      details: { noteType: typeof note === 'string' ? 'text' : note.type || 'note' },
+    }),
   })),
 
   scheduleReassessmentReminder: (patientId, reminder) => {
@@ -894,6 +2076,12 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
             }
           : patient
       ),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'scheduleReassessmentReminder',
+        patientId,
+        staffId: reminder.scheduledBy,
+        details: { reminderId: nextReminder.id, dueAt: reminder.dueAt },
+      }),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         {
           type: 'reassessment_created',
@@ -929,15 +2117,286 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }
         : patient
     ),
+    auditLog: appendAuditLog(state.auditLog, {
+      action: 'completeReassessmentReminder',
+      patientId,
+      staffId: options.completedBy || state.patients.find((patient) => patient.id === patientId)?.assignedStaffId || 'system',
+      details: { reminderId, completedAt: options.completedAt || null },
+    }),
   })),
 
-  selectPatient: (patientId) => set({ selectedPatientId: patientId }),
+  selectPatient: (patientId) => set((state) => ({
+    selectedPatientId: patientId,
+    ui: { ...state.ui, selectedPatientId: patientId },
+  })),
+
+  clearPatientSelection: () => set((state) => ({
+    selectedPatientId: null,
+    ui: { ...state.ui, selectedPatientId: null },
+  })),
 
   setActiveQueueFilter: (filter) => set({ activeQueueFilter: filter }),
 
-  setLoading: (loading) => set({ loading }),
+  setLastPulseView: (timestamp) => {
+    writeLastPulseViewTimestamp(timestamp);
+    set({ lastPulseView: timestamp });
+  },
+
+  setLoading: (loading) => set((state) => ({ loading, ui: { ...state.ui, loading } })),
 
   toggleCopilot: () => set((state) => ({ copilotOpen: !state.copilotOpen })),
+
+  clearError: () => set((state) => ({ ui: { ...state.ui, error: null } })),
+
+  initializeFromBackend: async () => {
+    set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
+
+    await get().initializeFlags();
+
+    try {
+      const result = await get().refreshAllData();
+      const whiteboardData = asRecord(unwrapData(result.whiteboard));
+      const whiteboardPayload = asRecord(firstValue(whiteboardData, ['whiteboard', 'emergencyWhiteboard']) ?? whiteboardData);
+      const patients = asArray<Patient>(firstValue(whiteboardPayload, ['patients']));
+      const staff = asArray<Staff>(firstValue(whiteboardPayload, ['staff']));
+      const rooms = asArray<Room>(firstValue(whiteboardPayload, ['rooms']));
+      const alerts = asArray<Alert>(firstValue(whiteboardPayload, ['alerts']));
+      const workflowLogs = asArray<WorkflowActionLog>(firstValue(whiteboardPayload, ['workflowLogs', 'workflow_logs']));
+      const activeShift = firstValue(whiteboardPayload, ['activeShift', 'shift']) as ActiveShift | undefined;
+      const capacity = firstValue(whiteboardPayload, ['capacity']) as CapacitySnapshot | undefined;
+      const hasBackendErrors = Object.keys(result.errors).length > 0;
+
+      if (patients.length || staff.length || rooms.length || alerts.length || workflowLogs.length || activeShift || capacity) {
+        get().hydrateFromApi({
+          patients: patients.length ? patients : undefined,
+          staff: staff.length ? staff : undefined,
+          rooms: rooms.length ? rooms : undefined,
+          alerts: alerts.length ? alerts : undefined,
+          workflowLogs: workflowLogs.length ? workflowLogs : undefined,
+          activeShift,
+          capacity,
+        });
+      }
+
+      set((state) => ({
+        backendAvailable: !hasBackendErrors,
+        loading: false,
+        ui: {
+          ...state.ui,
+          loading: false,
+          error: null,
+        },
+      }));
+
+      return result;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Emergency OS backend unavailable.';
+      set((state) => ({
+        backendAvailable: false,
+        persistenceMode: 'local',
+        loading: false,
+        ui: {
+          ...state.ui,
+          loading: false,
+          error: null,
+        },
+      }));
+
+      return {
+        errors: { backend: message },
+      };
+    }
+  },
+
+  refreshAllData: async () => {
+    set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
+    const loadDataset = async (path: string): Promise<{ data?: unknown; error?: string }> => {
+      try {
+        const response = await fetch(path, { headers: { Accept: 'application/json' } });
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
+        if (!response.ok) {
+          return {
+            error:
+              stringFrom(firstValue(data, ['message', 'error', 'detail'])) ||
+              `Emergency OS request failed with status ${response.status}.`,
+          };
+        }
+        return { data };
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : 'Unable to load Emergency OS data.' };
+      }
+    };
+
+    const [whiteboard, capacity, boarding, ems] = await Promise.all([
+      loadDataset('/api/emergency/whiteboard'),
+      loadDataset('/api/emergency/capacity'),
+      loadDataset('/api/emergency/boarding'),
+      loadDataset('/api/emergency/ems'),
+    ]);
+    const errors = Object.fromEntries(
+      Object.entries({ whiteboard, capacity, boarding, ems })
+        .filter(([, result]) => result.error)
+        .map(([key, result]) => [key, result.error as string])
+    );
+
+    set((state) => ({
+      capacityMetrics: capacity.data ? normalizeCapacityMetrics(capacity.data) : state.capacityMetrics,
+      boardingMetrics: boarding.data ? normalizeBoardingMetrics(boarding.data) : state.boardingMetrics,
+      emsIncomingPatients: ems.data ? extractEmsIncomingPatients(ems.data) : state.emsIncomingPatients,
+      loading: false,
+      ui: {
+        ...state.ui,
+        loading: false,
+        error: Object.values(errors)[0] ?? null,
+      },
+    }));
+
+    return {
+      whiteboard: whiteboard.data,
+      capacity: capacity.data,
+      boarding: boarding.data,
+      ems: ems.data,
+      errors,
+    };
+  },
+
+  activateSurge: async (payload = {}) => {
+    set((state) => ({ ui: { ...state.ui, error: null } }));
+    try {
+      const response = await fetch('/api/emergency/surge/activate', {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+      if (!response.ok) {
+        throw new Error(
+          stringFrom(firstValue(data, ['message', 'error', 'detail'])) ||
+            `Emergency OS request failed with status ${response.status}.`
+        );
+      }
+      const event = { ...payload, ...asRecord(firstValue(data, ['event', 'surgeEvent']) ?? data) };
+      const surgeStatus: EmergencySurgeStatus = {
+        active: Boolean(firstValue(data, ['active']) ?? true),
+        event: { ...event, id: stableId('surge', event) },
+        activatedAt: stringFrom(firstValue(event, ['activatedAt', 'activationTime', 'timestamp'])) || nowIso(),
+        updatedAt: nowIso(),
+      };
+      set({ surgeStatus });
+      return surgeStatus;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to activate surge mode.';
+      set((state) => ({ ui: { ...state.ui, error: message } }));
+      throw error;
+    }
+  },
+
+  sendCopilotQuery: async (query, options = {}) => {
+    const cleanQuery = query.trim();
+    if (!cleanQuery) throw new Error('Copilot query is required.');
+    set((state) => ({ ui: { ...state.ui, error: null } }));
+    try {
+      const response = await fetch('/api/emergency/copilot/query', {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: cleanQuery,
+          user_role: options.userRole,
+          context: options.context,
+          ...options,
+        }),
+      });
+      const text = await response.text();
+      const raw = text ? JSON.parse(text) : {};
+      if (!response.ok) {
+        throw new Error(
+          stringFrom(firstValue(raw, ['message', 'error', 'detail'])) ||
+            `Emergency OS request failed with status ${response.status}.`
+        );
+      }
+      const data = unwrapData(raw);
+      const message: EmergencyCopilotMessage = {
+        id: stringFrom(firstValue(data, ['id', 'messageId'])) || createId('copilot'),
+        query: cleanQuery,
+        response:
+          stringFrom(firstValue(data, ['response', 'answer', 'message', 'content', 'text'])) ||
+          'Emergency Copilot returned no response text.',
+        safetyStatus: String(firstValue(data, ['safetyStatus', 'safety_status', 'safety.status']) || 'unknown')
+          .toLowerCase()
+          .includes('unsafe')
+          ? 'unsafe'
+          : 'unknown',
+        createdAt: stringFrom(firstValue(data, ['createdAt', 'timestamp'])) || nowIso(),
+        raw,
+      };
+      get().appendCopilotMessage(message);
+      return message;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to send Copilot query.';
+      set((state) => ({ ui: { ...state.ui, error: message } }));
+      throw error;
+    }
+  },
+
+  setWebSocketStatus: (status) => set((state) => ({
+    websocket: { ...state.websocket, ...status },
+  })),
+
+  dispatchWebSocketEvent: (event) => {
+    const record = asRecord(event);
+    const type = String(record.type ?? record.event ?? record.name ?? record.topic ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s.:/-]+/g, '_');
+    const payload = record.payload ?? record.data ?? record.record ?? event;
+    get().setWebSocketStatus({ lastEventAt: nowIso() });
+
+    if (['capacity_updated', 'capacity_changed', 'capacity_score_changed'].includes(type)) {
+      set({ capacityMetrics: normalizeCapacityMetrics(payload) });
+      return;
+    }
+    if (['boarding_updated', 'boarding_changed', 'boarding_started'].includes(type)) {
+      set({ boardingMetrics: normalizeBoardingMetrics(payload) });
+      return;
+    }
+    if (['ems_arrival', 'ems_arrival_created', 'ems_incoming', 'ems_updated'].includes(type)) {
+      get().upsertEmsIncomingPatient(normalizeEmsIncomingPatient(firstValue(payload, ['patient', 'arrival']) ?? payload));
+      return;
+    }
+    if (['copilot_message', 'copilot_response', 'copilot_query_completed'].includes(type)) {
+      const data = asRecord(payload);
+      get().appendCopilotMessage({
+        id: stringFrom(firstValue(data, ['id', 'messageId'])) || createId('copilot'),
+        query: stringFrom(firstValue(data, ['query', 'prompt'])) || '',
+        response: stringFrom(firstValue(data, ['response', 'answer', 'message', 'content'])) || '',
+        safetyStatus: 'unknown',
+        createdAt: stringFrom(firstValue(data, ['createdAt', 'timestamp'])) || nowIso(),
+        raw: payload,
+      });
+      return;
+    }
+    if (['integration_event', 'integration_event_received', 'integration_updated'].includes(type)) {
+      set((state) => ({
+        integrationEvents: [
+          { id: stableId('integration-event', payload), type, payload, receivedAt: nowIso() },
+          ...state.integrationEvents,
+        ].slice(0, INTEGRATION_EVENT_LIMIT),
+      }));
+    }
+  },
+
+  appendCopilotMessage: (message) => set((state) => ({
+    copilotMessages: capCopilotMessages([...state.copilotMessages, message]),
+  })),
+
+  upsertEmsIncomingPatient: (patient) => set((state) => ({
+    emsIncomingPatients: [
+      normalizeEmsIncomingPatient(patient),
+      ...state.emsIncomingPatients.filter((candidate) => candidate.id !== patient.id),
+    ],
+  })),
 
   addAlert: (alert) => set((state) => ({
     alerts: [alert, ...state.alerts],
@@ -961,6 +2420,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 
   setCapacity: (capacity) => set((state) => ({
     capacity,
+    capacityHistory: appendCapacityBandChange(state.capacityHistory, state.capacity, capacity, 'set_capacity'),
     workflowLogs:
       capacity.score !== state.capacity.score
         ? appendWorkflowLogs(state.workflowLogs, [
@@ -973,6 +2433,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
               metadata: {
                 fromScore: state.capacity.score,
                 toScore: capacity.score,
+                fromBand: state.capacity.band,
                 band: capacity.band,
                 reason: 'set_capacity',
               },
@@ -980,6 +2441,171 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ])
         : state.workflowLogs,
   })),
+
+  initializeFlags: async () => {
+    const tier = get().tier || DEFAULT_TIER;
+    const defaults = buildDefaultFlags(tier);
+    set((state) => ({ loading: true, flags: { ...defaults, ...state.flags } }));
+
+    try {
+      const result = await fetchSettingsFeatureFlags();
+      if (!result?.ok) {
+        throw new Error(result?.message || 'Feature settings endpoint unavailable.');
+      }
+
+      const backendTier = normalizeTier(result.data?.tier, tier);
+      const backendDefaults = buildDefaultFlags(backendTier);
+      const backendOverrides = normalizeBackendFlags(result.data);
+      const nextState = {
+        flags: { ...backendDefaults, ...backendOverrides },
+        features: { ...DEFAULT_FEATURES, ...backendDefaults, ...backendOverrides },
+        overrides: backendOverrides,
+        tier: backendTier,
+        loading: false,
+        lastSynced: new Date(),
+        backendAvailable: true,
+        persistenceMode: 'backend' as FeaturePersistenceMode,
+      };
+      set(nextState);
+      writeLocalFeatureSnapshot(nextState);
+    } catch (_error) {
+      const state = get();
+      const localTier = state.tier || DEFAULT_TIER;
+      const localDefaults = buildDefaultFlags(localTier);
+      const nextState = {
+        flags: { ...localDefaults, ...state.flags },
+        features: { ...DEFAULT_FEATURES, ...localDefaults, ...state.flags },
+        overrides: state.overrides,
+        tier: localTier,
+        loading: false,
+        lastSynced: state.lastSynced,
+        backendAvailable: false,
+        persistenceMode: 'local' as FeaturePersistenceMode,
+      };
+      set(nextState);
+      writeLocalFeatureSnapshot(nextState);
+    }
+  },
+
+  toggleFeature: async (featureId, enabled, metadata = {}) => {
+    const feature = FEATURE_REGISTRY_BY_ID[featureId];
+    if (!feature) return false;
+    const state = get();
+    if (feature.tier === 'core' && !enabled) return false;
+    if (enabled && !isFeatureAvailableForTier(feature, state.tier)) return false;
+    if (enabled) {
+      const unmetDependency = feature.dependencies.find((dependencyId) => !state.isEnabled(dependencyId));
+      if (unmetDependency) return false;
+    }
+
+    const nextFlags = { ...state.flags, [featureId]: enabled };
+    const nextOverrides = { ...state.overrides, [featureId]: enabled };
+    const nextState = {
+      flags: nextFlags,
+      features: { ...state.features, ...nextFlags },
+      overrides: nextOverrides,
+      tier: state.tier,
+      loading: false,
+      lastSynced: state.lastSynced,
+      backendAvailable: state.backendAvailable,
+      persistenceMode: state.persistenceMode,
+    };
+    set(nextState);
+    writeLocalFeatureSnapshot(nextState);
+
+    const result =
+      state.persistenceMode === 'local'
+        ? { ok: true, localFallback: true, message: '' }
+        : await persistFeatureOverride(featureId, enabled, metadata.changedBy).catch((error: unknown) => ({
+            ok: false,
+            message: error instanceof Error ? error.message : String(error),
+          }));
+
+    if (!result?.ok) {
+      const rollbackState = {
+        flags: state.flags,
+        features: state.features,
+        overrides: state.overrides,
+        tier: state.tier,
+        loading: false,
+        lastSynced: state.lastSynced,
+        backendAvailable: state.backendAvailable,
+        persistenceMode: state.persistenceMode,
+      };
+      set(rollbackState);
+      writeLocalFeatureSnapshot(rollbackState);
+      throw new Error(result?.message || 'Unable to persist feature toggle.');
+    }
+
+    const lastSynced = new Date();
+    set({ lastSynced });
+    writeLocalFeatureSnapshot({ ...nextState, lastSynced });
+
+    if (state.persistenceMode === 'local') {
+      auditFeatureToggle(featureId, enabled, {
+        tier: state.tier,
+        backendPersisted: false,
+        warning: !enabled ? get().getDependencyWarning(featureId) : null,
+      });
+    }
+    return true;
+  },
+
+  setTier: (tier) => {
+    const state = get();
+    const flags = buildDefaultFlags(tier);
+    const nextState = {
+      flags,
+      features: { ...DEFAULT_FEATURES, ...flags },
+      overrides: {},
+      tier,
+      loading: false,
+      lastSynced: state.lastSynced,
+      backendAvailable: state.backendAvailable,
+      persistenceMode: state.persistenceMode,
+    };
+    set(nextState);
+    writeLocalFeatureSnapshot(nextState);
+  },
+
+  isEnabled: (featureId) => {
+    const state = get();
+    return resolveEffectiveFlag(featureId, state.flags, state.overrides, state.tier);
+  },
+
+  getEnabledFeatures: () => FEATURE_REGISTRY.filter((feature) => get().isEnabled(feature.id)),
+
+  getDependencyWarning: (featureId) => {
+    const state = get();
+    const dependents = dependentEnabledFeatures(featureId, state.flags, state.overrides, state.tier);
+    if (!dependents.length) return null;
+    const labels = dependents.map((feature) => feature.label).slice(0, 4).join(', ');
+    const suffix = dependents.length > 4 ? ` and ${dependents.length - 4} more` : '';
+    return `Disabling this feature will also disable dependent features: ${labels}${suffix}.`;
+  },
+
+  syncFeatureFlag: (payload) => {
+    const change = normalizeSyncPayload(payload);
+    if (!change) return null;
+    const state = get();
+    const nextState = {
+      flags: { ...state.flags, [change.featureId]: change.enabled },
+      features: { ...state.features, [change.featureId]: change.enabled },
+      overrides: { ...state.overrides, [change.featureId]: change.enabled },
+      tier: state.tier,
+      loading: false,
+      lastSynced: new Date(),
+      backendAvailable: true,
+      persistenceMode: 'backend' as FeaturePersistenceMode,
+    };
+    set(nextState);
+    writeLocalFeatureSnapshot(nextState);
+    return {
+      featureId: change.featureId,
+      enabled: change.enabled,
+      changedBy: change.changedBy,
+    };
+  },
 
   recordWorkflowAction: (input) => {
     const log = createWorkflowLog(input);
@@ -989,6 +2615,45 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       ),
     }));
     return log;
+  },
+
+  requestAdditionalStaff: (input = {}) => {
+    const state = get();
+    const requestedAt = new Date().toISOString();
+    const request: StaffingRequest = {
+      id: createId('staffing-request'),
+      requestedAt,
+      requestedByStaffId: input.requestedByStaffId || state.activeShift.chargeStaffId || 'charge-nurse',
+      requestedByName: input.requestedByName,
+      reason: input.reason || `Capacity crisis ${state.capacity.band} at ${state.capacity.score}/100`,
+      capacityScore: input.capacityScore ?? state.capacity.score,
+      capacityBand: input.capacityBand || state.capacity.band,
+      status: 'Requested',
+      source: input.source || 'capacity-crisis-mode',
+      metadata: input.metadata || {},
+    };
+    const log = createWorkflowLog({
+      type: 'staffing_request_created',
+      title: 'Staffing request created',
+      summary: request.reason,
+      actorStaffId: request.requestedByStaffId,
+      timestamp: requestedAt,
+      source: request.source,
+      severity: 'Critical',
+      metadata: {
+        requestId: request.id,
+        capacityScore: request.capacityScore,
+        capacityBand: request.capacityBand,
+        ...request.metadata,
+      },
+    });
+
+    set((current) => ({
+      staffingRequests: [request, ...current.staffingRequests],
+      workflowLogs: [log, ...current.workflowLogs],
+    }));
+
+    return request;
   },
 
   setActiveScenario: (scenarioId) => set(() => {
@@ -1006,6 +2671,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       staff: scenarioState.staff,
       rooms: scenarioState.rooms,
       capacity: scenarioState.capacity,
+      capacityHistory: seedCapacityHistory(scenarioState.capacity),
       alerts: scenarioState.alerts,
       activeShift: scenarioState.activeShift || SEED_SHIFT,
       emsUnits: scenarioState.emsUnits || scenarioState.emsArrivals || SEED_EMS_UNITS,
@@ -1059,6 +2725,16 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
             }
           : patient
       ),
+      auditLog: appendAuditLog(state.auditLog, {
+        action: 'createReferral',
+        patientId: referral.patientId,
+        staffId: referral.requestingStaffId,
+        details: {
+          referralId: referral.id,
+          targetDepartment: referral.targetDepartment,
+          urgency: referral.urgency,
+        },
+      }),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
         {
           type: 'referral_created',
@@ -1081,6 +2757,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 
   updateReferralStatus: (referralId, status, responseNote) => set((state) => {
     const now = new Date().toISOString();
+    const referral = state.referrals.find((candidate) => candidate.id === referralId);
     return {
       referrals: state.referrals.map((referral) =>
         referral.id === referralId
@@ -1092,11 +2769,22 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
             }
           : referral
       ),
+      auditLog: appendAuditLog(
+        state.auditLog,
+        referral
+          ? {
+              action: 'updateReferralStatus',
+              patientId: referral.patientId,
+              staffId: referral.requestingStaffId || 'system',
+              details: { referralId, status, hasResponseNote: Boolean(responseNote) },
+            }
+          : null,
+      ),
     };
   }),
 
   loadEmergencyAnalytics: async () => {
-    const state = useEmergencyStore.getState();
+    const state = get();
     const nextState: EmergencyAnalyticsState = {
       status: 'ready',
       source: 'client-fallback',
@@ -1126,25 +2814,43 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ),
         ]
       : state.referrals;
+    const capacity = payload.capacity || buildCapacitySnapshot(patients, rooms);
     return {
       patients,
       rooms,
       staff: payload.staff || state.staff,
       alerts: payload.alerts || state.alerts,
-      capacity: payload.capacity || buildCapacitySnapshot(patients, rooms),
+      capacity,
+      capacityHistory: payload.capacityHistory || appendCapacityBandChange(state.capacityHistory, state.capacity, capacity, 'hydrate_from_api'),
       workflowLogs: payload.workflowLogs || state.workflowLogs,
       activeShift: payload.activeShift || state.activeShift,
       emsUnits: payload.emsUnits || payload.emsArrivals || state.emsUnits,
       emsArrivals: payload.emsArrivals || payload.emsUnits || state.emsArrivals,
       referrals,
-      activeQueueFilter: payload.activeQueueFilter || state.activeQueueFilter,
+      activeQueueFilter: payload.activeQueueFilter ?? state.activeQueueFilter,
       loading: payload.loading ?? state.loading,
-      features: payload.features || state.features,
+      features: payload.features || payload.flags || state.features,
+      flags: payload.flags || payload.features || state.flags,
+      overrides: payload.overrides || state.overrides,
+      tier: payload.tier || state.tier,
     };
   }),
 }));
 
-export type { EmergencyStoreState };
+export type { EmergencyStoreState, FeatureFlags, FeatureOverrides, FeaturePersistenceMode };
+
+export const useFeatureStore = useEmergencyStore;
+
+export function subscribeToFeatureFlagSync(
+  onExternalToggle?: (change: { featureId: string; enabled: boolean; changedBy?: string }) => void,
+) {
+  return subscribeToSettingsFeatureChanges((payload: unknown) => {
+    const change = useEmergencyStore.getState().syncFeatureFlag(payload);
+    if (change && typeof onExternalToggle === 'function') {
+      onExternalToggle(change);
+    }
+  });
+}
 
 export function getPatientFlagType(flag: PatientFlag | string | { type?: PatientFlag | string }): PatientFlag {
   const candidate = typeof flag === 'object' ? flag.type : flag;

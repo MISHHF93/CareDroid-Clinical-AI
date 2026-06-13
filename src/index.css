@@ -658,6 +658,21 @@ textarea {
   touch-action: manipulation;
 }
 
+.emergency-app-shell,
+.emergency-app-shell * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .emergency-app-shell button,
+  .emergency-app-shell [role='button'],
+  .emergency-app-shell input,
+  .emergency-app-shell select,
+  .emergency-app-shell textarea {
+    min-height: 44px;
+  }
+}
+
 .app-scroll-container {
   min-height: 0;
   min-width: 0;

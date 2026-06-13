@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconBell } from '@tabler/icons-react';
+import { IconBell, IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
-import type { CapacitySnapshot } from '../types/emergency';
+import { PatientFlag, type CapacitySnapshot } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import WorkloadBalancePanel from './WorkloadBalancePanel';
+import StaffWorkloadPanel from './StaffWorkloadPanel';
+import './ReassessmentDrawer.css';
+import './Header.css';
 
 const capacityColors: Record<CapacitySnapshot['band'], string> = {
   Green: '#10B981',
@@ -14,6 +16,22 @@ const capacityColors: Record<CapacitySnapshot['band'], string> = {
   Orange: '#F97316',
   Red: '#EF4444',
 };
+
+const reassessmentBadgeFlags = new Set<string>([
+  PatientFlag.ReassessmentDue,
+  PatientFlag.DeteriorationRisk,
+  PatientFlag.HighRisk,
+  PatientFlag.SepsisAlert,
+]);
+
+function getHeaderFlagValue(flag: unknown): string {
+  if (typeof flag === 'object' && flag !== null && 'type' in flag) {
+    const typedFlag = flag as { type?: unknown };
+    return typeof typedFlag.type === 'string' ? typedFlag.type : '';
+  }
+
+  return typeof flag === 'string' ? flag : '';
+}
 
 function Clock() {
   const [now, setNow] = useState(() => new Date());
@@ -70,15 +88,13 @@ export function Header() {
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
-  const staff = useEmergencyStore((store) => store.staff);
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
-  const assignStaff = useEmergencyStore((store) => store.assignStaff);
   const activeScenarioId = useEmergencyStore((store) => store.activeScenarioId);
   const activeScenario = useEmergencyStore((store) => store.activeScenario);
   const availableScenarios = useEmergencyStore((store) => store.availableScenarios);
   const setActiveScenario = useEmergencyStore((store) => store.setActiveScenario);
   const [alertDrawerOpen, setAlertDrawerOpen] = useState(false);
-  const [staffMenuOpen, setStaffMenuOpen] = useState(false);
+  const [staffWorkloadOpen, setStaffWorkloadOpen] = useState(false);
   const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
 
   const unreadAlertCount = useMemo(
@@ -86,50 +102,18 @@ export function Header() {
     [alerts],
   );
 
-  const staffWorkloads = useMemo(
+  const reassessmentAttentionCount = useMemo(
     () =>
-      staff.map((member) => {
-        const assignedPatients = patients.filter((patient) => patient.assignedStaffId === member.id);
-        const assignedCount = assignedPatients.length;
-        return {
-          id: member.id,
-          displayName: member.name,
-          roleLabel: member.role,
-          initials: member.name
-            .split(/\s+/)
-            .map((part) => part[0])
-            .join('')
-            .slice(0, 2)
-            .toUpperCase(),
-          assignedCount,
-          assignedPatients,
-          workloadTone: assignedCount >= 6 ? 'overloaded' : assignedCount >= 4 ? 'busy' : 'balanced',
-          workloadPercent: Math.min(100, Math.round((assignedCount / 6) * 100)),
-        };
-      }),
-    [patients, staff],
+      patients.filter((patient) =>
+        ((patient.flags ?? []) as unknown[]).some((flag) => reassessmentBadgeFlags.has(getHeaderFlagValue(flag))),
+      ).length,
+    [patients],
   );
-
-  const rebalanceSuggestion = useMemo(() => {
-    if (!staffWorkloads.length) return null;
-    const teamAverage =
-      staffWorkloads.reduce((sum, member) => sum + member.assignedCount, 0) / staffWorkloads.length;
-    const highestLoad = [...staffWorkloads].sort((a, b) => b.assignedCount - a.assignedCount)[0];
-    if (!highestLoad || highestLoad.assignedCount < 4 || highestLoad.assignedCount - teamAverage < 2) return null;
-    return { ...highestLoad, name: highestLoad.displayName, teamAverage: Math.round(teamAverage * 10) / 10 };
-  }, [staffWorkloads]);
-
-  const currentStaffProfile = useMemo(() => {
-    const chargeStaff = staff.find((member) => member.role === 'Charge') || staff[0];
-    return chargeStaff
-      ? { id: chargeStaff.id, displayName: chargeStaff.name, roleLabel: chargeStaff.role }
-      : null;
-  }, [staff]);
 
   useEffect(() => {
     const closePanels = () => {
       setAlertDrawerOpen(false);
-      setStaffMenuOpen(false);
+      setStaffWorkloadOpen(false);
     };
     document.addEventListener('close-all-panels', closePanels);
     return () => document.removeEventListener('close-all-panels', closePanels);
@@ -141,6 +125,7 @@ export function Header() {
 
   return (
     <header
+      className="emergency-os-header"
       style={{
         height: 48,
         width: '100%',
@@ -156,7 +141,7 @@ export function Header() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <span style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}>Emergency OS</span>
+        <span className="emergency-os-header__wordmark" style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}>Emergency OS</span>
         <Clock />
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#9CA3AF', fontSize: 12 }}>
           Role
@@ -214,6 +199,39 @@ export function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <button
           type="button"
+          onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
+          aria-label="Open command palette"
+          title="Search patients, commands, tools..."
+          style={{
+            width: 32,
+            height: 32,
+            border: '1px solid #1F2937',
+            borderRadius: 8,
+            background: '#111827',
+            color: '#9CA3AF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <IconSearch size={18} stroke={2} />
+        </button>
+
+        {reassessmentAttentionCount > 0 ? (
+          <button
+            type="button"
+            className="reassessment-header-badge"
+            onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
+            aria-label={`Open reassessment drawer: ${reassessmentAttentionCount} patients need attention`}
+            title={`${reassessmentAttentionCount} patients need attention`}
+          >
+            {reassessmentAttentionCount}
+          </button>
+        ) : null}
+
+        <button
+          type="button"
           onClick={() => setAlertDrawerOpen((open) => !open)}
           aria-label="Alerts"
           style={{
@@ -258,11 +276,17 @@ export function Header() {
         <button
           type="button"
           onClick={() => {
-            if (canManageWorkload) setStaffMenuOpen((open) => !open);
+            if (canManageWorkload) setStaffWorkloadOpen((open) => !open);
           }}
-          aria-label="Staff menu"
+          onContextMenu={(event) => {
+            event.preventDefault();
+            if (canManageWorkload) setStaffWorkloadOpen(true);
+          }}
+          aria-label="Staff workload"
+          aria-haspopup="dialog"
+          aria-expanded={staffWorkloadOpen}
           disabled={!canManageWorkload}
-          title={canManageWorkload ? 'Staff menu' : `${emergencyRole.roleLabel} cannot reassign workload`}
+          title={canManageWorkload ? 'Staff workload' : `${emergencyRole.roleLabel} cannot reassign workload`}
           style={{
             width: 24,
             height: 24,
@@ -333,22 +357,12 @@ export function Header() {
               </button>
             ))
           ) : (
-            <div style={{ color: '#9CA3AF', fontSize: 12 }}>No active alerts.</div>
+            <div style={{ color: '#9CA3AF', fontSize: 12 }}>All clear</div>
           )}
         </div>
       ) : null}
 
-      <WorkloadBalancePanel
-        open={staffMenuOpen}
-        activeShift={{ startTime: undefined, chargeStaffId: currentStaffProfile?.id }}
-        workloads={staffWorkloads}
-        rebalanceSuggestion={rebalanceSuggestion}
-        currentStaffProfile={currentStaffProfile}
-        onClose={() => setStaffMenuOpen(false)}
-        onAssignStaff={(patientId: string, staffId: string) => {
-          if (canManageWorkload) assignStaff(patientId, staffId);
-        }}
-      />
+      <StaffWorkloadPanel open={staffWorkloadOpen} onClose={() => setStaffWorkloadOpen(false)} />
     </header>
   );
 }

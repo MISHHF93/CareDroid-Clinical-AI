@@ -64,7 +64,7 @@ describe('canonical protected AppShell source-level route contract', () => {
   });
 
   it('keeps AppShell as the only shell owner for main content and sidebar', () => {
-    expect(appShellSource.match(/className="ed-nav-rail"/g)).toHaveLength(1);
+    expect(appShellSource.match(/<Sidebar \/>/g)).toHaveLength(1);
     expect(appShellSource.match(/<header className="ed-os-header"/g)).toHaveLength(1);
     expect(appShellSource.match(/data-layout-role=\{LAYOUT_SCROLL_CONTRACT\.mainContentRole\}/g)).toHaveLength(1);
     expect(appShellSource.match(/<main\b/g)).toHaveLength(1);

@@ -33,9 +33,6 @@ describe('saasComplianceAudit report', () => {
       join(docsDir, 'saas-compliance-audit.md'),
       `${formatSaasComplianceMarkdown(doc)}\n`
     );
-    console.log(
-      `Wrote docs/saas-compliance-audit.md (${doc.rows.length} rows, ${doc.summary.nonCompliant} with violations)`
-    );
     expect(existsSync(join(docsDir, 'saas-compliance-audit.md'))).toBe(true);
   });
 });

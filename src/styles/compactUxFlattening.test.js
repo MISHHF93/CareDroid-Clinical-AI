@@ -24,25 +24,19 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('normalizes primary navigation around canonical command app entries', () => {
-    const nav = read('config/navigation.config.js');
-    const shellNav = nav.match(/export const APP_SHELL_NAV_ITEMS = Object\.freeze\(\[[\s\S]*?\]\);/)?.[0] || '';
+    const shellNav = read('config/unified-navigation.config.ts');
     for (const id of [
-      "id: 'emergency_whiteboard'",
-      "id: 'emergency_patients'",
-      "id: 'ems_pipeline'",
-      "id: 'smart_intake'",
-      "id: 'queue_intelligence'",
-      "id: 'reassessment_engine'",
-      "id: 'capacity_intelligence'",
-      "id: 'boarding_intelligence'",
-      "id: 'referral_intelligence'",
-      "id: 'ed_copilot'",
-      "id: 'emergency_analytics'",
-      "id: 'emergency_settings'",
+      "id: 'whiteboard'",
+      "id: 'ems'",
+      "id: 'referrals'",
+      "id: 'capacity'",
+      "id: 'tools'",
+      "id: 'shift'",
+      "id: 'settings'",
     ]) {
       expect(shellNav).toContain(id);
     }
-    expect(shellNav).not.toContain("id: 'tools'");
+    expect(shellNav).toContain("featureGate: 'clinical_tools'");
     expect(shellNav).not.toContain("id: 'fleet'");
     expect(shellNav).not.toContain("id: 'security'");
     expect(shellNav).not.toContain("id: 'maps'");

@@ -19,7 +19,7 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
     id: 'assistant',
     label: 'AI Assistant',
     path: CANONICAL_ROUTES.emergencyCopilot,
-    description: 'Ask questions, reason through cases, and launch context-aware tools.',
+    description: 'Ask questions, reason through patients, and launch context-aware tools.',
   },
   commandCenter: {
     id: 'command-center',
@@ -360,7 +360,7 @@ const CARE_WORKSPACE_BASE = [
     icon: 'Siren',
     path: CANONICAL_ROUTES.emergencyWhiteboard,
     description:
-      'CareDroid Emergency OS is an AI-assisted patient flow platform for small emergency departments, urgent care clinics, and clinics handling 50-150 patients/day with fewer than 10 staff.',
+      'Emergency OS is an AI-assisted patient flow platform for small emergency departments, urgent care clinics, and clinics handling 50-150 patients/day with fewer than 10 staff.',
     aiContext:
       'Prioritize ED flow bottlenecks from arrival through admission/discharge. Reduce waiting, handoff delays, bed pressure, referral friction, equipment gaps, and cognitive load while preserving human review and avoiding autonomous clinical decisions.',
     routeIds: ['assistant', 'commandCenter', 'hospitalMap', 'medicalIot', 'liveMap', 'simulation', 'calculators'],
@@ -702,7 +702,7 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
     workspaceId: 'emergency',
     modeName: 'Emergency OS',
     purpose:
-      'CareDroid Emergency OS for patient flow, queue flow, EMS flow, capacity flow, and decision support in small ED, urgent care, and clinic operations.',
+      'Emergency OS for patient flow, queue flow, EMS flow, capacity flow, and decision support in small ED, urgent care, and clinic operations.',
     primaryUsers: ['Emergency physicians', 'Triage nurses', 'Charge nurses', 'EMS coordinators', 'Hospital operations'],
     primaryDataSources: [
       'frontend local/demo data',
@@ -837,7 +837,7 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
       { id: 'intake-analytics', label: 'Intake Analytics', group: 'proof', priority: 4 },
       { id: 'demo', label: EMERGENCY_DEMO_TENANT.mode === 'demo' ? 'Demo Mode' : 'Demo', group: 'proof', priority: 5 },
       { id: 'flow', label: EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.title.replace('Emergency ', ''), group: 'proof', priority: 6 },
-      { id: 'onboarding', label: EMERGENCY_ONBOARDING_EXPERIENCE.title.replace('Emergency Workspace ', ''), group: 'proof', priority: 7 },
+      { id: 'onboarding', label: EMERGENCY_ONBOARDING_EXPERIENCE.title.replace('Emergency OS ', ''), group: 'proof', priority: 7 },
       { id: 'roi', label: EMERGENCY_ROI_ESTIMATOR.title.replace('ED ', ''), group: 'proof', priority: 8 },
       { id: 'deployment', label: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.title.replace('First Customer ', ''), group: 'proof', priority: 9 },
       { id: 'implementation', label: 'Implementation', group: 'proof', priority: 10 },

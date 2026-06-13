@@ -285,7 +285,7 @@ export function getJourneyRecommendations(options = {}) {
         stateId: state.id,
         title: `Add automation coverage for ${state.label}`,
         priority: 'medium',
-        rationale: `${state.label} has no attached Emergency Workspace automation.`,
+        rationale: `${state.label} has no attached Emergency OS automation.`,
         action: 'Attach at least one review-bound automation to this journey state.',
       })
     );

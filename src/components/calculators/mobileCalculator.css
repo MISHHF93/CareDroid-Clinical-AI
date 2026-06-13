@@ -1,0 +1,44 @@
+.clinical-calculator-modal button,
+.clinical-calculator-modal input,
+.clinical-calculator-modal label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.clinical-calculator-modal__choice {
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .clinical-calculator-modal {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+  }
+
+  .clinical-calculator-modal__panel {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+
+  .clinical-calculator-modal__choice {
+    min-height: 44px !important;
+  }
+
+  .clinical-calculator-modal button,
+  .clinical-calculator-modal input,
+  .clinical-calculator-modal select {
+    min-height: 44px !important;
+  }
+
+  .clinical-calculator-modal__submit {
+    width: 100% !important;
+    min-height: 56px !important;
+  }
+
+  .clinical-calculator-modal__mobile-stack {
+    grid-template-columns: 1fr !important;
+  }
+}

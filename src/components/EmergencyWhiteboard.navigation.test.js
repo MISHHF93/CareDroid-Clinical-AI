@@ -35,7 +35,6 @@ describe('Emergency Whiteboard navigation wiring', () => {
   it('shows non-blank loading and empty states for filtered views', () => {
     expect(whiteboardSource).toContain('aria-label="Loading patient whiteboard"');
     expect(whiteboardSource).toContain('ed-whiteboard__empty');
-    expect(whiteboardSource).toContain('No patients match this search.');
     expect(whiteboardSource).toContain('Department Clear');
   });
 });

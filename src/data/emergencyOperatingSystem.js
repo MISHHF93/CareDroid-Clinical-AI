@@ -633,7 +633,7 @@ export const EMERGENCY_DEMO_DATA_LABELS = Object.freeze({
 
 export const EMERGENCY_DEMO_TENANT = Object.freeze({
   tenantId: 'emergency-demo-tenant',
-  tenantName: 'CareDroid Emergency Demo Hospital',
+  tenantName: 'Emergency OS Demo Hospital',
   workspaceId: EMERGENCY_WORKSPACE_ID,
   workspaceRoute: '/workspace/emergency/demo',
   mode: 'demo',
@@ -646,7 +646,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       id: 'ED-DEMO-001',
       displayName: 'Demo Patient A',
       chiefComplaint: 'Chest pain',
-      stage: 'triage',
+      state: 'triage',
       acuity: 'High-risk review',
       location: 'Waiting room',
       summary: 'Chest pressure with HEART review ready for clinician confirmation.',
@@ -656,30 +656,30 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       id: 'ED-DEMO-002',
       displayName: 'Demo Patient B',
       chiefComplaint: 'Stroke symptoms',
-      stage: 'assessment',
+      state: 'assessment',
       acuity: 'Time-sensitive protocol',
       location: 'Assessment bay',
-      summary: 'Facial droop sample case with NIHSS and stroke protocol retrieval attached.',
+      summary: 'Facial droop sample patient with NIHSS and stroke protocol retrieval attached.',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
       id: 'ED-DEMO-003',
       displayName: 'Demo Patient C',
       chiefComplaint: 'Sepsis concern',
-      stage: 'results',
+      state: 'results',
       acuity: 'Critical alert',
       location: 'Results pending',
-      summary: 'Fever and hypotension sample case with qSOFA, NEWS2, and sepsis pathway prompts.',
+      summary: 'Fever and hypotension sample patient with qSOFA, NEWS2, and sepsis pathway prompts.',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
       id: 'ED-DEMO-004',
       displayName: 'Demo Patient D',
       chiefComplaint: 'Shortness of breath',
-      stage: 'disposition',
+      state: 'disposition',
       acuity: 'Protocol review',
       location: 'Disposition queue',
-      summary: 'Dyspnea sample case with Wells PE and respiratory protocol context.',
+      summary: 'Dyspnea sample patient with Wells PE and respiratory protocol context.',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
   ]),
@@ -794,7 +794,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
 export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
   route: '/workspace/emergency/roi',
   title: 'ED ROI Estimator',
-  goal: 'Estimate Emergency Workspace value for sales discovery, onboarding, and pilot planning.',
+  goal: 'Estimate Emergency OS value for sales discovery, onboarding, and pilot planning.',
   inputFields: Object.freeze([
     Object.freeze({
       id: 'annualEdVolume',
@@ -837,7 +837,7 @@ export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
     Object.freeze({
       id: 'workflowEfficiency',
       label: 'Workflow efficiency',
-      helper: 'Estimated efficiency lift from moving repeated ED work into one workspace.',
+      helper: 'Estimated efficiency lift from moving repeated ED work into Emergency OS.',
     }),
     Object.freeze({
       id: 'adoptionPotential',
@@ -852,9 +852,9 @@ export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
 export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
   route: '/workspace/emergency/deployment',
   title: 'First Customer Deployment Blueprint',
-  goal: 'Deploy CareDroid for the first ED customer with minimal operational risk.',
+  goal: 'Deploy Emergency OS for the first ED customer with minimal operational risk.',
   principle:
-    'Start with a standalone Emergency Workspace, keep every clinical output human-reviewed, and add integrations only after the buyer sees value.',
+    'Start with standalone Emergency OS, keep every clinical output human-reviewed, and add integrations only after the buyer sees value.',
   minimumSellableCapabilities: Object.freeze([
     'Patient Journey Engine',
     'Queue Intelligence',
@@ -890,13 +890,13 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
     Object.freeze({
       id: 'phase-1-standalone-emergency-workspace',
       phase: 'Phase 1',
-      title: 'Standalone Emergency Workspace',
+      title: 'Standalone Emergency OS',
       description:
-        'Demonstrate the ED command center, triage workspace, calculators, sample patients, sample alerts, onboarding, ROI estimator, and safety messaging with demo/local data.',
+        'Demonstrate the Emergency Whiteboard, triage flow, calculators, sample patients, sample alerts, onboarding, ROI estimator, and safety messaging with demo/local data.',
       operationalRisk: 'Minimal',
       integrationRequirement: 'No integrations required',
       acceptance:
-        'Prospect can experience Emergency Workspace without EHR writeback, order placement, disposition automation, or live patient identity dependency.',
+        'Prospect can experience Emergency OS without EHR writeback, order placement, disposition automation, or live patient identity dependency.',
     }),
     Object.freeze({
       id: 'phase-2-protocol-library',
@@ -927,7 +927,7 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
       description:
         'Track assessments completed, calculators used, protocol retrievals, workflow launches, AI requests, and simulation completion.',
       operationalRisk: 'Minimal',
-      integrationRequirement: 'Demo/local or workspace event data',
+      integrationRequirement: 'Demo/local or Emergency OS event data',
       acceptance:
         'Analytics demonstrate adoption, workflow efficiency, and ROI potential without claiming autonomous clinical quality outcomes.',
     }),
@@ -944,7 +944,7 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
     }),
   ]),
   acceptance:
-    'Emergency Workspace can be demonstrated, piloted, and sold without requiring a full hospital-wide deployment.',
+    'Emergency OS can be demonstrated, piloted, and sold without requiring a full hospital-wide deployment.',
 });
 
 export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
@@ -1033,7 +1033,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
       capability: 'First Customer Path',
       route: '/workspace/emergency/deployment',
       service: 'EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT',
-      acceptance: 'CareDroid can be piloted by an Emergency Department without requiring hospital-wide deployment.',
+      acceptance: 'Emergency OS can be piloted by an Emergency Department without requiring hospital-wide deployment.',
       status: 'implemented',
     }),
   ]),
@@ -1047,12 +1047,12 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     lintStatus: 'No linter errors on edited files',
   }),
   frozenModules: Object.freeze([
-    'Research Workspace',
-    'Education Workspace',
-    'Governance Workspace',
-    'Fleet Workspace',
-    'Medical IoT Workspace',
-    'Laboratory Workspace',
+    'Research Feature',
+    'Education Feature',
+    'Governance Feature',
+    'Fleet Feature',
+    'Medical IoT Feature',
+    'Laboratory Feature',
   ]),
   intentionalBoundaries: Object.freeze([
     'No live EHR or ADT ingestion in the MVP.',
@@ -1111,7 +1111,7 @@ export const EMERGENCY_FLOW_VALUE_DRIVERS = Object.freeze([
 
 export const EMERGENCY_FLOW_OPERATING_PRINCIPLES = Object.freeze([
   'Do not build isolated calculators or tools.',
-  'Map every automation, workflow, analytics event, dashboard widget, AI capability, and package into the ED patient flow.',
+  'Map every automation, workflow, analytics event, whiteboard widget, AI capability, and package into the ED patient flow.',
   'Keep every clinical, operational, handoff, referral, discharge, and escalation action under human review.',
   'Demonstrate value without requiring a full hospital-wide deployment or live writeback.',
 ]);
@@ -1399,22 +1399,22 @@ export const EMERGENCY_FLOW_INTELLIGENCE_PLATFORM = Object.freeze({
   aiModel: EMERGENCY_FLOW_AI_MODEL,
   saasPackagingModel: EMERGENCY_FLOW_SAAS_PACKAGING_MODEL,
   acceptance:
-    'Emergency Workspace becomes a sellable Emergency Flow Intelligence solution rather than a collection of calculators.',
+    'Emergency OS becomes a sellable Emergency Flow Intelligence solution rather than a collection of calculators.',
 });
 
 export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
   route: '/workspace/emergency/onboarding',
-  title: 'Emergency Workspace Onboarding',
-  goal: 'Help a new hospital understand the Emergency Workspace in 10 minutes.',
+  title: 'Emergency OS Onboarding',
+  goal: 'Help a new hospital understand Emergency OS in 10 minutes.',
   audience: 'ED directors, triage nurses, clinical informatics leads, operations leaders, and implementation teams.',
   sections: Object.freeze([
     Object.freeze({
       id: 'overview',
-      label: 'Emergency Workspace overview',
+      label: 'Emergency OS overview',
       duration: '1 minute',
       summary:
-        'Orient the hospital to the ED command center, patient journey, human-review boundary, and workspace subpages.',
-      outcome: 'The team understands that Emergency is an operating workspace, not a loose set of tools.',
+        'Orient the hospital to the Emergency Whiteboard, patient journey, human-review boundary, and Emergency OS subpages.',
+      outcome: 'The team understands that Emergency OS is an operating environment, not a loose set of tools.',
       targetRoute: '/emergency/whiteboard',
     }),
     Object.freeze({
@@ -1449,8 +1449,8 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       label: 'Workflows',
       duration: '2 minutes',
       summary:
-        'Launch triage review, protocol guidance, automation queues, patient follow-up, and simulation practice from the command center.',
-      outcome: 'The team sees how Emergency Workspace turns guidance into coordinated next steps.',
+        'Launch triage review, protocol guidance, automation queues, patient follow-up, and simulation practice from the Emergency Whiteboard.',
+      outcome: 'The team sees how Emergency OS turns guidance into coordinated next steps.',
       targetRoute: '/workspace/emergency/automations',
     }),
     Object.freeze({
@@ -1466,8 +1466,8 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
   walkthrough: Object.freeze([
     Object.freeze({
       minute: '0-1',
-      title: 'Open the Emergency Workspace',
-      instruction: 'Start at the command center and explain the ED journey, operating queues, and human-review posture.',
+      title: 'Open Emergency OS',
+      instruction: 'Start at the Emergency Whiteboard and explain the ED journey, operating queues, and human-review posture.',
       targetRoute: '/emergency/whiteboard',
     }),
     Object.freeze({
@@ -1502,7 +1502,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
     }),
   ]),
   takeaway:
-    'A hospital should leave onboarding knowing what Emergency Workspace does first, how clinicians stay in control, and how adoption is measured.',
+    'A hospital should leave onboarding knowing what Emergency OS does first, how clinicians stay in control, and how adoption is measured.',
 });
 
 export const ED_READINESS_CLASSIFICATIONS = Object.freeze({
@@ -1625,7 +1625,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
       'Maps live ED patterns and gaps into emergency simulations for sepsis, stroke, trauma, chest pain, and respiratory distress.',
     type: 'Simulation',
     trigger: 'Simulation gap, protocol drift, missed calculator, or high-risk presentation pattern detected.',
-    inputs: ['case pattern', 'protocol gap', 'calculator utilization', 'role', 'competency objective'],
+    inputs: ['patient pattern', 'protocol gap', 'calculator utilization', 'role', 'competency objective'],
     outputs: ['recommended simulation', 'practice assignment', 'debrief prompt', 'completion metric'],
     requiredAssets: [REGISTRY.simulationSuite, REGISTRY.scenarioPlayer, REGISTRY.simulationOutcomes],
     requiredAI: ['simulation-coach', 'debrief-summarizer'],
@@ -1974,9 +1974,9 @@ export const EMERGENCY_CORE_MVP_PACKAGE = Object.freeze({
     }),
     Object.freeze({
       id: 'workspace-dashboard',
-      label: 'Workspace Dashboard',
-      type: 'dashboard',
-      reason: 'ED-specific command surface for the MVP story.',
+      label: 'Emergency Whiteboard',
+      type: 'whiteboard',
+      reason: 'ED-specific whiteboard surface for the MVP story.',
       dependencyPosture: 'Can run with local/demo or manually loaded data',
     }),
   ]),
@@ -2000,7 +2000,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-documentation-integrity'],
     dependencyLevel: 'EHR notes, orders/results, and audit feeds',
     implementationDependency: 'Medium',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Expansion pilot after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2010,7 +2010,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-discharge-summary-drafting'],
     dependencyLevel: 'EHR documentation and medication reconciliation',
     implementationDependency: 'Medium',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Expansion pilot after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2020,7 +2020,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-referral-routing'],
     dependencyLevel: 'Provider directory, transfer center, referral workflow, secure messaging',
     implementationDependency: 'Medium',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Workflow expansion after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2030,7 +2030,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-surge-staffing'],
     dependencyLevel: 'Staff scheduling, bed board, ADT/census',
     implementationDependency: 'Medium',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Operational expansion after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2040,7 +2040,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-simulation-academy'],
     dependencyLevel: 'Standalone first, optional LMS integration',
     implementationDependency: 'Low',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Standalone training pilot after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2050,7 +2050,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-medical-iot-monitoring'],
     dependencyLevel: 'Device telemetry, monitor assignment, biomedical ticketing',
     implementationDependency: 'High',
-    billingMetric: 'Module add-on per ED site per month',
+    billingMetric: 'Feature add-on per ED site per month',
     trialPosture: 'Device integration pilot after Emergency Flow Starter acceptance',
     upgradeTier: 'professional',
   }),
@@ -2060,7 +2060,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-virtual-ed'],
     dependencyLevel: 'Telehealth, patient portal, EMS handoff, identity, EHR encounter feed',
     implementationDependency: 'High',
-    billingMetric: 'Enterprise module add-on per ED site per month',
+    billingMetric: 'Enterprise feature add-on per ED site per month',
     trialPosture: 'Enterprise expansion after telehealth and identity scope are approved',
     upgradeTier: 'enterprise',
   }),
@@ -2070,7 +2070,7 @@ export const EMERGENCY_OPTIONAL_ADD_ONS = Object.freeze([
     automationIds: ['emergency-prior-authorization'],
     dependencyLevel: 'Payer policy API, EHR orders, documentation export',
     implementationDependency: 'High',
-    billingMetric: 'Enterprise module add-on per ED site per month',
+    billingMetric: 'Enterprise feature add-on per ED site per month',
     trialPosture: 'Enterprise roadmap expansion after payer and documentation integrations',
     upgradeTier: 'enterprise',
   }),
@@ -2137,8 +2137,8 @@ export const EMERGENCY_FASTEST_TO_MARKET_OFFERINGS = Object.freeze([
     sellableNow: 'Standalone emergency scenarios, practice assignments, and debrief prompts.',
   }),
   Object.freeze({
-    id: 'ed-command-dashboard-pilot',
-    title: 'ED Command Dashboard Pilot',
+    id: 'ed-command-whiteboard-pilot',
+    title: 'ED Command Whiteboard Pilot',
     classification: ED_READINESS_CLASSIFICATIONS.READY_TO_SELL,
     capabilityIds: ['waiting-room', 'active-patients', 'high-risk-patients', 'critical-alerts'],
     sellableNow: 'ED operating queues using demo/local or manually loaded data before live ADT/EHR feeds.',
@@ -2154,8 +2154,8 @@ export const EMERGENCY_FASTEST_TO_MARKET_OFFERINGS = Object.freeze([
 
 export const EMERGENCY_CUSTOMER_READINESS_CAPABILITIES = Object.freeze([
   Object.freeze({
-    capabilityId: 'emergency-command-dashboard',
-    title: 'ED Command Dashboard',
+    capabilityId: 'emergency-command-whiteboard',
+    title: 'ED Command Whiteboard',
     classification: ED_READINESS_CLASSIFICATIONS.READY_TO_SELL,
     standaloneViability: 'yes',
     requiresEhrAccess: false,
@@ -2275,7 +2275,7 @@ function uniqueCalculators(calculators = []) {
 export function buildEmergencyCopilotGuidance(input = {}) {
   const complaint = String(input.complaint || '').trim();
   const vitals = String(input.vitals || input.vitalsSummary || '').trim();
-  const workspaceContext = String(input.workspaceContext || 'Emergency Workspace').trim();
+  const workspaceContext = String(input.workspaceContext || 'Emergency OS').trim();
   const surfacedCalculators = uniqueCalculators(input.surfacedCalculators || input.selectedCalculators || []);
   const routedComplaint = routeEmergencyChiefComplaint(complaint);
   const recommendedTools = uniqueCalculators([

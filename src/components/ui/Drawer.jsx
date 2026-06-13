@@ -125,9 +125,9 @@ export const Drawer = ({
 };
 
 /**
- * Mobile Navigation Drawer (left). Distinct name from route-level mobile nav components.
+ * Drawer menu shell (left).
  */
-export const DrawerMobileNav = ({ isOpen, onClose, children }) => {
+export const DrawerMenuPanel = ({ isOpen, onClose, children }) => {
   return (
     <Drawer
       isOpen={isOpen}

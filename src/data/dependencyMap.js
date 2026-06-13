@@ -11,7 +11,7 @@ export const DEPENDENCY_ISSUE_TYPES = Object.freeze({
 });
 
 const ROUTE_LABELS = Object.freeze({
-  dashboard: 'Dashboard',
+  dashboard: 'Whiteboard',
   discover: 'Capability Discovery',
   automation: 'Workflow Automation',
   dependencyMap: 'Dependency Map',

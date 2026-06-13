@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Note } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { saveCalculatorResult } from './calculatorSave';
+import './mobileCalculator.css';
 
 type ScoreValue = 0 | 1 | 2;
 
@@ -97,18 +98,8 @@ function resultFor(total: number) {
   };
 }
 
-function createNote(patientId: string, text: string, authorId: string): Note {
-  return {
-    id: `note-heart-${patientId}-${Date.now()}`,
-    text,
-    authorId,
-    timestamp: new Date().toISOString(),
-  };
-}
-
 export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
   const patients = useEmergencyStore((state) => state.patients);
-  const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const patient = patientId ? patients.find((candidate) => candidate.id === patientId) : undefined;
   const [scores, setScores] = useState<Record<ScoreKey, ScoreValue>>({
     history: 0,
@@ -141,14 +132,24 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
 
   const saveToPatient = () => {
     if (!patient) return;
-    const noteText = `HEART Score: ${total}/10 (${result.band})`;
-    const note = createNote(patient.id, noteText, patient.assignedStaffId || 'system');
-    updatePatient(patient.id, { notes: [...patient.notes, note] });
+    const saved = saveCalculatorResult({
+      patientId: patient.id,
+      scoreName: 'HEART Score',
+      total,
+      max: 10,
+      band: result.band,
+      fields: scores,
+      staffId: patient.assignedStaffId || undefined,
+      critical: total >= 7,
+    });
+    if (!saved) return;
     setSavedMessage('HEART score saved to patient.');
+    onClose();
   };
 
   return (
     <div
+      className="clinical-calculator-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="heart-score-title"
@@ -164,6 +165,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
       }}
     >
       <div
+        className="clinical-calculator-modal__panel"
         style={{
           width: '100%',
           maxWidth: 480,
@@ -221,6 +223,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {field.options.map((option) => (
                   <label
+                    className="clinical-calculator-modal__choice"
                     key={option.value}
                     style={{
                       display: 'flex',
@@ -266,6 +269,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
 
           {patient ? (
             <button
+              className="clinical-calculator-modal__submit"
               type="button"
               onClick={saveToPatient}
               style={{

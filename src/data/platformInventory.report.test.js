@@ -1,13 +1,11 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { formatPlatformInventoryMarkdown, getPlatformInventory } from './platformInventory';
 
 describe('platformInventory report', () => {
-  it('prints platform inventory summary', () => {
+  it('builds platform inventory summary', () => {
     const inv = getPlatformInventory();
-     
-    console.log('\n--- Platform inventory (source-derived) ---\n');
-    console.log(formatPlatformInventoryMarkdown(inv));
-    console.log('\n--- Counts JSON ---\n');
-    console.log(JSON.stringify(inv.counts, null, 2));
+
+    expect(formatPlatformInventoryMarkdown(inv)).toContain('#');
+    expect(inv.counts).toBeTruthy();
   });
 });

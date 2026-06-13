@@ -406,7 +406,7 @@ export function getEnvironmentConfig(env: EnvSource = process.env): EnvironmentC
       anthropicApiKey: readOptional(env, 'ANTHROPIC_API_KEY'),
       azureOpenAIEndpoint: readOptional(env, 'AZURE_OPENAI_ENDPOINT'),
       provider: readOptional(env, 'AI_PROVIDER') || 'anthropic',
-      model: readOptional(env, 'AI_MODEL') || 'claude-3-5-sonnet-20241022',
+      model: readOptional(env, 'AI_MODEL') || 'claude-sonnet-4-6',
       temperature: readNumber(env, 'AI_TEMPERATURE', 0.2),
       maxTokens: readNumber(env, 'AI_MAX_TOKENS', 2000),
       streamingEnabled: readBoolean(env, 'AI_STREAMING_ENABLED'),

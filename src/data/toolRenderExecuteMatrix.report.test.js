@@ -29,6 +29,5 @@ describe('toolRenderExecuteMatrix report', () => {
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'tool-render-execute-matrix.md'), `${formatRenderExecuteMarkdown()}\n`);
     writeFileSync(join(docsDir, 'tool-render-execute-manual-qa.md'), `${formatManualQaMarkdown()}\n`);
-    console.log('Wrote docs/tool-render-execute-matrix.md and docs/tool-render-execute-manual-qa.md');
   });
 });
