@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-06-12T21:17:44.471Z
+**Generated:** 2026-06-13T00:33:02.592Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -17,6 +17,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/linkedin/callback` | AuthController | OAuth callback |
 | `/api/two-factor/verify` | TwoFactorController | Used during login challenge |
 | `/api/subscriptions/webhook` | SubscriptionsController | Stripe webhook |
+| `/api/interoperability/events` | InteroperabilityController | Integration Hub ingestion endpoint for authenticated adapters and backend workflows |
 | `/api/cost-optimizer/route` | CostOptimizerController | Assistant lifecycle invokes route optimization server-side before model/tool execution |
 | `/api/health` | AnalyticsController | Client health ping (distinct from GET /health) |
 | `/api/ai/query` | AiController | Invoked via chat pipeline |
@@ -93,6 +94,8 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/shift` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ems` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/referrals` | PlatformSystemsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/interoperability/events` | InteroperabilityController | Integration Hub traceability list for a future admin/review surface |
+| `/api/interoperability/events/:id` | InteroperabilityController | Integration Hub event trace detail for a future admin/review surface |
 | `/api/tools/execute` | ToolOrchestratorController | Batch execute; UI uses per-id execute |
 | `/api/tool-calling/execute` | ToolCallingController | Chat delegates server-side; direct UI not exposed yet |
 | `/api/tool-calling/catalog` | ToolCallingController | Internal tool-calling contract catalog |
@@ -271,9 +274,9 @@ NLU profiles without POST executor (216): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes | 213 |
+| Backend HTTP routes | 216 |
 | Wired frontend → backend | see exposure report |
-| Backend-only / deferred (policy) | 181 |
+| Backend-only / deferred (policy) | 184 |
 | Gated frontend (no route) | 32 |
 | POST executors | 3 |
 

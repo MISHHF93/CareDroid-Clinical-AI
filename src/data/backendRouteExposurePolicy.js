@@ -262,6 +262,19 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
     reason: 'Client health ping (distinct from GET /health)',
   },
 
+  'POST /api/interoperability/events': {
+    strategy: 'backend-only',
+    reason: 'Integration Hub ingestion endpoint for authenticated adapters and backend workflows',
+  },
+  'GET /api/interoperability/events': {
+    strategy: 'deferred',
+    reason: 'Integration Hub traceability list for a future admin/review surface',
+  },
+  'GET /api/interoperability/events/:id': {
+    strategy: 'deferred',
+    reason: 'Integration Hub event trace detail for a future admin/review surface',
+  },
+
   'POST /api/ai/query': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },
   'POST /api/ai/structured': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },
   'GET /api/ai/usage': { strategy: 'deferred', reason: 'Usage meter UI' },

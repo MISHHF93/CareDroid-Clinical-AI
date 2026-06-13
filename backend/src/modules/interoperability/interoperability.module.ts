@@ -1,13 +1,34 @@
-import { Controller, Get, Injectable, Module, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Injectable,
+  Module,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { AuditModule } from '../audit/audit.module';
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
 import { PlatformSystemsModule } from '../platform-systems/platform-systems.module';
 import { PlatformSystemsService } from '../platform-systems/platform-systems.service';
+import {
+  IntegrationEventRecordEntity,
+  IntegrationSourceEntity,
+  NormalizedIntegrationEventEntity,
+} from './entities/integration-hub.entity';
 import { IntegrationAutomationRouter } from './integration-automation-router.service';
 import { IntegrationEventRegistry } from './integration-event-registry.service';
+import { IntegrationHubIngestRequest, IntegrationHubService } from './integration-hub.service';
 
 @Injectable()
 export class FHIRService {
@@ -57,6 +78,7 @@ export class InteroperabilityController {
     private readonly medicationImport: MedicationImportService,
     private readonly platformGovernance: PlatformGovernanceService,
     private readonly integrationEventRegistry: IntegrationEventRegistry,
+    private readonly integrationHub: IntegrationHubService,
   ) {}
 
   @Get('summary')
@@ -84,10 +106,42 @@ export class InteroperabilityController {
       uiStates: { loading: false, error: null, connectionState: 'demo_unconfigured' },
     };
   }
+
+  @Post('events')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
+  ingestEvent(@Body() body: IntegrationHubIngestRequest, @Req() req: any) {
+    return this.integrationHub.ingest(body, {
+      userId: req.user?.id || req.user?.userId,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+      userAgent: String(req.headers?.['user-agent'] || 'unknown'),
+    });
+  }
+
+  @Get('events')
+  @Permissions(Permission.VIEW_INTEGRATIONS)
+  listEvents(@Query('limit') limit?: string) {
+    return this.integrationHub.listRecent(limit ? Number(limit) : undefined);
+  }
+
+  @Get('events/:id')
+  @Permissions(Permission.VIEW_INTEGRATIONS)
+  getEventTrace(@Param('id') id: string) {
+    return this.integrationHub.getTrace(id);
+  }
 }
 
 @Module({
-  imports: [PlatformSystemsModule, PlatformGovernanceModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      IntegrationSourceEntity,
+      IntegrationEventRecordEntity,
+      NormalizedIntegrationEventEntity,
+    ]),
+    PlatformSystemsModule,
+    PlatformGovernanceModule,
+    AuditModule,
+  ],
   controllers: [InteroperabilityController],
   providers: [
     FHIRService,
@@ -97,6 +151,7 @@ export class InteroperabilityController {
     MedicationImportService,
     IntegrationEventRegistry,
     IntegrationAutomationRouter,
+    IntegrationHubService,
   ],
   exports: [
     FHIRService,
@@ -106,6 +161,7 @@ export class InteroperabilityController {
     MedicationImportService,
     IntegrationEventRegistry,
     IntegrationAutomationRouter,
+    IntegrationHubService,
   ],
 })
 export class InteroperabilityModule {}

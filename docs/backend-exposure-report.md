@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-06-12T21:17:42.289Z
+**Generated:** 2026-06-13T00:33:00.248Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -8,7 +8,7 @@
 
 | Metric | Count |
 |--------|------:|
-| Backend HTTP routes (inventory) | 416 |
+| Backend HTTP routes (inventory) | 419 |
 | Frontend API calls (inventory) | 268 |
 | Wired (route exists) | 236 |
 | Gated stubs (no route, capability off) | 32 |

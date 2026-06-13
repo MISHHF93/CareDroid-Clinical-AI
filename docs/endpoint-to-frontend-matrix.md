@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-06-12T21:17:42.291Z
+**Generated:** 2026-06-13T00:33:00.250Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -296,5 +296,5 @@
 - `GET /api/auth/saml`
 - `GET /api/auth/me`
 
-_…and 396 more in src/data/backendHttpRouteInventory.js_
+_…and 399 more in src/data/backendHttpRouteInventory.js_
 
