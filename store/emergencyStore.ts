@@ -350,8 +350,8 @@ type ReferralCreateInput = Pick<
   status?: Extract<ReferralStatus, 'Draft' | 'Sent' | 'TransferRequested'>;
   workflow?: Referral['workflow'];
 };
-type WorkflowActionInput = Omit<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'> &
-  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'>>;
+type WorkflowActionInput = Omit<WorkflowActionLog, 'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'> &
+  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'>>;
 
 const syncPatientCreateToBackend = (patient: Patient) => {
   void createEmergencyPatientRecord(patient).then((result) => {

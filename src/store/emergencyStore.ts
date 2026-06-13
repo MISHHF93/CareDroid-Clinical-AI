@@ -208,8 +208,8 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   integration_event_received: 'Integration event received',
 };
 
-type WorkflowActionInput = Omit<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'> &
-  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'severity' | 'status' | 'source' | 'metadata'>>;
+type WorkflowActionInput = Omit<WorkflowActionLog, 'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'> &
+  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'>>;
 
 function createWorkflowLog(input: WorkflowActionInput): WorkflowActionLog {
   const timestamp = input.timestamp || new Date().toISOString();

@@ -1,3 +1,5 @@
+import { getEnvironmentConfig } from '../config/environment.config';
+
 export interface IoTTelemetryEvent {
   sourceId: string;
   patientId?: string;
@@ -9,6 +11,7 @@ export interface IoTTelemetryEvent {
 
 export class IoTDigitalTwinService {
   private readonly telemetry = new Map<string, IoTTelemetryEvent[]>();
+  private readonly mqttConfig = getEnvironmentConfig().mqtt;
 
   ingestTelemetry(event: IoTTelemetryEvent): IoTTelemetryEvent {
     const normalized = {
@@ -36,6 +39,8 @@ export class IoTDigitalTwinService {
     return {
       status: 'ready',
       trackedEntities: this.telemetry.size,
+      mqttConfigured: this.mqttConfig.enabled,
+      mqttBrokerUrl: this.mqttConfig.brokerUrl || null,
     };
   }
 }

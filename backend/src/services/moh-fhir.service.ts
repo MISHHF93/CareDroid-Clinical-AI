@@ -1,3 +1,5 @@
+import { getEnvironmentConfig } from '../config/environment.config';
+
 export interface MohFhirPatientSnapshot {
   healthCardNumber?: string;
   fhirPatientId?: string;
@@ -12,9 +14,10 @@ export interface MohFhirPatientSnapshot {
 
 export class MOHFHIRService {
   private connected = false;
+  private readonly config = getEnvironmentConfig().externalApis.mohFhir;
 
   async connect(): Promise<void> {
-    this.connected = true;
+    this.connected = this.config.enabled;
   }
 
   normalizePatientSnapshot(snapshot: MohFhirPatientSnapshot): MohFhirPatientSnapshot {
@@ -31,6 +34,8 @@ export class MOHFHIRService {
     return {
       status: this.connected ? 'ready' : 'not_connected',
       connector: 'MOH FHIR',
+      configured: this.config.enabled,
+      baseUrl: this.config.baseUrl || null,
     };
   }
 }

@@ -1,3 +1,5 @@
+import { getEnvironmentConfig } from '../config/environment.config';
+
 export interface IncidentReportInput {
   serviceName: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -15,6 +17,7 @@ export interface IncidentReport extends IncidentReportInput {
 
 export class IncidentReportingService {
   private readonly incidents: IncidentReport[] = [];
+  private readonly notificationConfig = getEnvironmentConfig().notifications;
 
   reportIncident(input: IncidentReportInput): IncidentReport {
     const incident: IncidentReport = {
@@ -42,6 +45,8 @@ export class IncidentReportingService {
     return {
       status: 'ready',
       openIncidents: this.incidents.filter((incident) => incident.status !== 'closed').length,
+      escalationRecipients: this.notificationConfig.incidentEscalationEmails.length,
+      smsGatewayConfigured: Boolean(this.notificationConfig.surgeSmsGatewayUrl),
     };
   }
 }

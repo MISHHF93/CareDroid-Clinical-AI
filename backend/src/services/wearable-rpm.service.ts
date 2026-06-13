@@ -1,3 +1,5 @@
+import { getEnvironmentConfig } from '../config/environment.config';
+
 export interface WearableReading {
   patientId: string;
   deviceId: string;
@@ -12,9 +14,10 @@ export interface WearableReading {
 export class WearableRPMService {
   private connected = false;
   private readonly latestReadings = new Map<string, WearableReading>();
+  private readonly config = getEnvironmentConfig().wearables;
 
   async connect(): Promise<void> {
-    this.connected = true;
+    this.connected = this.config.enabled;
   }
 
   ingestReading(reading: WearableReading): WearableReading {
@@ -35,6 +38,8 @@ export class WearableRPMService {
     return {
       status: this.connected ? 'ready' : 'not_connected',
       trackedPatients: this.latestReadings.size,
+      configured: this.config.enabled,
+      healthkitConfigured: Boolean(this.config.healthkitTeamId),
     };
   }
 }

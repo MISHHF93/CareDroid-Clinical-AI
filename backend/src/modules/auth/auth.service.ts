@@ -238,16 +238,18 @@ export class AuthService {
    * Development-only: issue a real JWT for explicit local/demo UI access.
    */
   async createDevSession(ipAddress: string, userAgent: string) {
+    const authConfig = this.configService.get<any>('auth') || {};
+    const serverConfig = this.configService.get<any>('server') || {};
     const explicitDevBypassEnabled = [
       this.configService.get<string | boolean>('ENABLE_DEV_AUTH_BYPASS'),
-      process.env.ENABLE_DEV_AUTH_BYPASS,
-      process.env.VITE_ENABLE_DEV_AUTH_BYPASS,
+      authConfig.enableDevAuthBypass,
+      authConfig.enableViteDevAuthBypass,
     ].some((value) => String(value).toLowerCase() === 'true');
     const productionDemoAuthEnabled = [
       this.configService.get<string | boolean>('ALLOW_DEMO_AUTH_IN_PRODUCTION'),
-      process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION,
+      authConfig.allowDemoAuthInProduction,
     ].some((value) => String(value).toLowerCase() === 'true');
-    const nodeEnv = process.env.NODE_ENV || 'development';
+    const nodeEnv = serverConfig.nodeEnv || 'development';
     const isLocalDevelopment =
       nodeEnv === 'development' && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(ipAddress);
 
@@ -261,7 +263,7 @@ export class AuthService {
       );
     }
 
-    const email = process.env.DEV_LOGIN_EMAIL || 'dev@caredroid.local';
+    const email = authConfig.devLoginEmail || 'dev@caredroid.local';
     let user = await this.userRepository.findOne({
       where: { email },
       relations: ['profile', 'subscription', 'twoFactor'],

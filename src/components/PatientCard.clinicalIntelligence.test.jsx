@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -144,8 +144,7 @@ describe('PatientDetailPanel clinical intelligence', () => {
     expect(screen.getByRole('button', { name: /move to next state/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /add vitals/i }));
-    await user.clear(screen.getByLabelText(/^HR$/i));
-    await user.type(screen.getByLabelText(/^HR$/i), '122');
+    fireEvent.change(screen.getByLabelText(/^HR$/i), { target: { value: '122' } });
     await user.click(screen.getByRole('button', { name: /save vitals/i }));
 
     const updated = useEmergencyStore
