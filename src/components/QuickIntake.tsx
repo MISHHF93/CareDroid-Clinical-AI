@@ -163,6 +163,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
       }),
     [centralControlSettings, emergencyRole],
   );
+  const canSubmitCentralInput =
+    canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
 
   const age = useMemo(() => calculateAge(dob), [dob]);
   const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);
@@ -209,8 +211,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
     if (submitting) return;
-    if (!canCreatePatient) {
-      setSubmitError(`${emergencyRole.roleLabel} cannot create patients.`);
+    if (!canSubmitCentralInput) {
+      setSubmitError(`${emergencyRole.roleLabel} cannot submit central intake inputs.`);
       return;
     }
     const now = new Date().toISOString();
@@ -630,7 +632,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             <button
               type="button"
               onClick={() => setShowPriorityPicker((visible) => !visible)}
-              disabled={!canCreatePatient}
+              disabled={!canSubmitCentralInput}
               aria-label={`CTAS ${priority} priority badge`}
               style={{
                 border: `1px solid ${PRIORITY_COLORS[priority]}`,
@@ -638,8 +640,8 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                 background: `${PRIORITY_COLORS[priority]}22`,
                 color: PRIORITY_COLORS[priority],
                 padding: '9px 13px',
-                cursor: canCreatePatient ? 'pointer' : 'not-allowed',
-                opacity: canCreatePatient ? 1 : 0.55,
+                cursor: canSubmitCentralInput ? 'pointer' : 'not-allowed',
+                opacity: canSubmitCentralInput ? 1 : 0.55,
                 fontWeight: 800,
               }}
             >
@@ -696,15 +698,15 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
           <button
             className="quick-intake-submit"
             type="submit"
-            disabled={submitting || !canCreatePatient}
+            disabled={submitting || !canSubmitCentralInput}
             style={{
               height: 48,
               border: 0,
               borderRadius: 12,
-              background: submitting || !canCreatePatient ? '#1E3A8A' : '#2563EB',
+              background: submitting || !canSubmitCentralInput ? '#1E3A8A' : '#2563EB',
               color: '#F9FAFB',
-              cursor: submitting ? 'progress' : canCreatePatient ? 'pointer' : 'not-allowed',
-              opacity: canCreatePatient ? 1 : 0.65,
+              cursor: submitting ? 'progress' : canSubmitCentralInput ? 'pointer' : 'not-allowed',
+              opacity: canSubmitCentralInput ? 1 : 0.65,
               fontWeight: 800,
               padding: '0 18px',
               minWidth: 170,

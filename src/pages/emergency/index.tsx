@@ -104,6 +104,8 @@ export default function EmergencyWhiteboard() {
       }),
     [centralControlSettings, emergencyRole],
   );
+  const canUseCentralIntake =
+    canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
 
   const stats = useMemo(() => {
@@ -130,7 +132,7 @@ export default function EmergencyWhiteboard() {
 
   useEffect(() => {
     const openIntake = () => {
-      if (canCreatePatient) setShowIntake(true);
+      if (canUseCentralIntake) setShowIntake(true);
     };
     const closePanels = () => setShowIntake(false);
     document.addEventListener('open-intake', openIntake);
@@ -139,11 +141,11 @@ export default function EmergencyWhiteboard() {
       document.removeEventListener('open-intake', openIntake);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, [canCreatePatient]);
+  }, [canUseCentralIntake]);
 
   const openIntake = useCallback(() => {
-    if (canCreatePatient) setShowIntake(true);
-  }, [canCreatePatient]);
+    if (canUseCentralIntake) setShowIntake(true);
+  }, [canUseCentralIntake]);
 
   const closeIntake = useCallback(() => setShowIntake(false), []);
 
@@ -233,11 +235,11 @@ export default function EmergencyWhiteboard() {
         <button
           type="button"
           onClick={openIntake}
-          disabled={!canCreatePatient}
+          disabled={!canUseCentralIntake}
           title={
-            canCreatePatient
+            canUseCentralIntake
               ? 'Send a new patient input to the Central Node'
-              : `${emergencyRole.roleLabel} cannot create patients`
+              : `${emergencyRole.roleLabel} cannot submit central intake inputs`
           }
           style={{
             border: '1px solid rgba(255,255,255,0.16)',
@@ -247,8 +249,8 @@ export default function EmergencyWhiteboard() {
             padding: '10px 14px',
             fontSize: 14,
             fontWeight: 700,
-            cursor: canCreatePatient ? 'pointer' : 'not-allowed',
-            opacity: canCreatePatient ? 1 : 0.58,
+            cursor: canUseCentralIntake ? 'pointer' : 'not-allowed',
+            opacity: canUseCentralIntake ? 1 : 0.58,
             whiteSpace: 'nowrap',
           }}
         >
@@ -256,7 +258,7 @@ export default function EmergencyWhiteboard() {
         </button>
       </div>
 
-      {showIntake && canCreatePatient ? (
+      {showIntake && canUseCentralIntake ? (
         <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
       ) : null}
 

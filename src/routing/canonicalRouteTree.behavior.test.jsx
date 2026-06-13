@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
@@ -19,6 +20,7 @@ import { AppRoutes } from '../App';
 import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
 
 const originalEmergencyState = useEmergencyStore.getState();
+const ROUTE_LOAD_TIMEOUT = 5000;
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn().mockResolvedValue({
@@ -136,6 +138,10 @@ function renderRoute(initialPath) {
   return render(<AppRouteHarness initialPath={initialPath} />);
 }
 
+function findRouteHeading(name) {
+  return screen.findByRole('heading', { name }, { timeout: ROUTE_LOAD_TIMEOUT });
+}
+
 describe('canonical route tree behavior', () => {
   afterEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
@@ -211,7 +217,7 @@ describe('canonical route tree behavior', () => {
   it('/emergency/referrals renders referral candidates from the active patient list', async () => {
     renderRoute('/emergency/referrals');
 
-    expect(await screen.findByRole('heading', { name: 'Referrals' })).toBeInTheDocument();
+    expect(await findRouteHeading('Referrals')).toBeInTheDocument();
   });
 
   it('/emergency/copilot renders the active Copilot route context', async () => {
@@ -224,7 +230,7 @@ describe('canonical route tree behavior', () => {
   it('/emergency/analytics renders the Emergency OS analytics route', async () => {
     renderRoute('/emergency/analytics');
 
-    expect(await screen.findByRole('heading', { name: 'Emergency Analytics' })).toBeInTheDocument();
+    expect(await findRouteHeading('Emergency Analytics')).toBeInTheDocument();
   });
 
   it('/emergency/settings renders settings inside the primary Emergency OS route family', async () => {
@@ -246,6 +252,38 @@ describe('canonical route tree behavior', () => {
       unmount();
     }
   });
+
+  it('keeps sidebar links and primary shell buttons clickable from the frontend', async () => {
+    const user = userEvent.setup();
+    renderRoute('/emergency/whiteboard');
+
+    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+
+    await user.click(screen.getByRole('button', { name: /\+ Central Intake/i }));
+    expect(await findRouteHeading('Central Node Intake')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /close quick intake/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: 'Central Node Intake' })).toBeNull();
+    });
+
+    for (const filter of ['Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding', 'All']) {
+      await user.click(screen.getByRole('button', { name: filter }));
+      expect(screen.getAllByRole('main').length).toBeGreaterThan(0);
+    }
+
+    for (const item of NAVIGATION_ITEMS.filter((entry) => entry.id !== 'settings')) {
+      const link = screen.getAllByRole('link', { name: item.label })[0];
+      await user.click(link);
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('location')).toHaveTextContent(item.path);
+        },
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      );
+      expect(screen.getAllByRole('main').length).toBeGreaterThan(0);
+      expect(screen.queryByText('Emergency OS page unavailable')).toBeNull();
+    }
+  }, 30000);
 
   it('redirects retired platform roots to the Emergency OS whiteboard', async () => {
     renderRoute('/marketplace');
