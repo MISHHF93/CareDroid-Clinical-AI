@@ -1,9 +1,16 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { buildBuiltinHubCalculatorCards, getHubChatAssistedTools } from '../data/calculatorHubManifest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Patient, Vitals } from '../types/emergency';
 import ErrorBoundary from './ErrorBoundary';
+import CIWAAr from './calculators/CIWAAr';
+import ColumbiaSSRS from './calculators/ColumbiaSSRS';
+import HEARTScore from './calculators/HEARTScore';
+import NIHSS from './calculators/NIHSS';
+import NEWS2 from './calculators/NEWS2';
+import PediatricDrugCalc from './calculators/PediatricDrugCalc';
+import QSOFA from './calculators/qSOFA';
 import { createLegacyCalculatorComponent } from './calculators/LegacyCalculatorWrapper.jsx';
 import '../pages/emergency/ClinicalCalculatorHub.css';
 
@@ -39,18 +46,6 @@ type ChatAssistedTool = {
   description?: string;
   path?: string;
 };
-
-const lazyCalculator = (
-  loader: () => Promise<{ default: ComponentType<CalculatorComponentProps> }>,
-) => lazy(loader) as unknown as ComponentType<CalculatorComponentProps>;
-
-const CIWAAr = lazyCalculator(() => import('./calculators/CIWAAr'));
-const ColumbiaSSRS = lazyCalculator(() => import('./calculators/ColumbiaSSRS'));
-const HEARTScore = lazyCalculator(() => import('./calculators/HEARTScore'));
-const NIHSS = lazyCalculator(() => import('./calculators/NIHSS'));
-const NEWS2 = lazyCalculator(() => import('./calculators/NEWS2'));
-const PediatricDrugCalc = lazyCalculator(() => import('./calculators/PediatricDrugCalc'));
-const QSOFA = lazyCalculator(() => import('./calculators/qSOFA'));
 
 const CATEGORY_BY_CALCULATOR_ID: Record<string, string> = {
   sofa: 'Sepsis',

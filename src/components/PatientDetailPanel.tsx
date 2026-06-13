@@ -1,6 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, TouchEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   CartesianGrid,
   Line,
@@ -482,7 +481,6 @@ function FieldButton({
 
 export default function PatientDetailPanel() {
   const emergencyRole = useEmergencyRolePermissions();
-  const navigate = useNavigate();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
@@ -529,8 +527,10 @@ export default function PatientDetailPanel() {
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
     const params = new URLSearchParams({ open: calculatorId, patientId: selectedPatientId });
-    navigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
-  }, [navigate, selectedPatientId]);
+    const nextUrl = `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
+    window.history.pushState(null, '', nextUrl);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, [selectedPatientId]);
   const timelineContextState = usePatientTimelineContext(selectedPatientId);
   const patientWorkflowLogs = useMemo(() => {
     if (!selectedPatient) return [];
