@@ -1,6 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { EmergencyOsController } from './emergency-os.controller';
 import {
+  FederatedLearningService,
+  HybridDigitalTwinService,
+  RealTimeSimulationService,
+} from './emergency-os.advanced-services';
+import {
   BoardingService,
   CapacityService,
   EDCopilotService,
@@ -40,6 +45,9 @@ describe('EmergencyOsController', () => {
         EDCopilotService,
         EmergencyAnalyticsService,
         EmergencySettingsService,
+        RealTimeSimulationService,
+        FederatedLearningService,
+        HybridDigitalTwinService,
       ],
     }).compile();
 
@@ -63,6 +71,9 @@ describe('EmergencyOsController', () => {
       controller.getCopilot(),
       controller.getAnalytics(),
       controller.getSettings(),
+      controller.getSimulationRecommendations(),
+      controller.getFederatedDashboard(),
+      controller.getDigitalTwinState(),
     ];
 
     for (const envelope of modules) {
@@ -88,5 +99,68 @@ describe('EmergencyOsController', () => {
       controller.getPatients().data.patients.some((patient) => patient.mrn === 'ED-TEST-1'),
     ).toBe(true);
     expect(controller.getAnalytics().data.activeCensus).toBeGreaterThan(0);
+  });
+
+  it('evaluates deterministic real-time simulation interventions', () => {
+    const live = controller.updateLiveSimulation({
+      census: 54,
+      waitingPatients: 18,
+      boardingCount: 8,
+      staffedBeds: 36,
+      physicians: 4,
+      nurses: 12,
+    });
+    const evaluation = controller.evaluateSimulation({ type: 'open_fast_track', intensity: 1 });
+    const comparison = controller.compareSimulation({});
+
+    expect(live.data.currentStatus.resourceUtilization).toBeGreaterThan(0);
+    expect(evaluation.data.evaluation.fourHourForecast).toHaveLength(5);
+    expect(evaluation.data.evaluation.expectedImprovement.waitMinutes).toBeGreaterThanOrEqual(0);
+    expect(comparison.data.rankedInterventions[0].recoveryTimeMinutes).toBeLessThanOrEqual(
+      comparison.data.rankedInterventions[comparison.data.rankedInterventions.length - 1]
+        .recoveryTimeMinutes,
+    );
+  });
+
+  it('registers hospitals and performs weighted FedAvg aggregation', () => {
+    controller.registerFederatedHospital({
+      hospitalId: 'ed-a',
+      name: 'ED A',
+      sampleCapacity: 1000,
+    });
+    controller.updateFederatedModel({
+      hospitalId: 'ed-a',
+      sampleCount: 100,
+      weights: { intercept: 0.1, waitingPatients: 0.2 },
+      metrics: { auc: 0.8, calibration: 0.9, sensitivity: 0.7, specificity: 0.75 },
+    });
+    controller.updateFederatedModel({
+      hospitalId: 'ed-b',
+      sampleCount: 300,
+      weights: { intercept: 0.3, waitingPatients: 0.4 },
+      metrics: { auc: 0.84, calibration: 0.92, sensitivity: 0.74, specificity: 0.79 },
+    });
+
+    const aggregate = controller.aggregateFederatedRound();
+    const model = controller.getFederatedGlobalModel('ed-a');
+
+    expect(aggregate.data.aggregated).toBe(true);
+    expect(aggregate.data.globalModel.weights.intercept).toBe(0.25);
+    expect(model.data.authorized).toBe(true);
+    expect(controller.getFederatedDashboard().data.currentRound).toBe(1);
+  });
+
+  it('initializes and simulates a hybrid DES-ABM digital twin', () => {
+    const initialized = controller.initializeDigitalTwin({ twinId: 'test-twin', census: 50 });
+    const simulated = controller.simulateDigitalTwin({ horizonMinutes: 120, includeTrace: true });
+    const scenario = controller.evaluateDigitalTwinScenario({
+      interventions: [{ type: 'increase_staff', intensity: 1 }],
+      includeTrace: true,
+    });
+
+    expect(initialized.data.twin.twinId).toBe('test-twin');
+    expect(simulated.data.metrics.throughput).toBeGreaterThan(0);
+    expect(simulated.data.eventTrace.length).toBeGreaterThan(0);
+    expect(scenario.data.scenario.metrics.confidenceIntervals.averageWaitMinutes).toHaveLength(2);
   });
 });

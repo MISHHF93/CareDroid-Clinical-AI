@@ -29,6 +29,9 @@ const PRIMARY_EMERGENCY_OS_PATHS = [
   '/emergency/integrations',
   '/emergency/copilot',
   '/emergency/analytics',
+  '/emergency/simulation',
+  '/emergency/federated-learning',
+  '/emergency/digital-twin',
   '/ai-governance',
   '/emergency/settings',
 ];
@@ -63,6 +66,9 @@ describe('AppShell navigation surfaces', () => {
       'integration_hub',
       'ed_copilot',
       'emergency_analytics',
+      'real_time_simulation',
+      'federated_learning',
+      'hybrid_digital_twin',
       'ai_governance',
       'emergency_settings',
     ]);
@@ -110,7 +116,7 @@ describe('AppShell navigation surfaces', () => {
       /@media \(max-width: 1024px\)[\s\S]*\.ed-nav-rail__item\s*\{[\s\S]*display:\s*flex/
     );
     expect(appShellCss).not.toContain('.ed-nav-rail__item:nth-child(-n + 5)');
-    expect(APP_SHELL_NAV_ITEMS).toHaveLength(16);
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(19);
   });
 
   it('closes only the topmost AppShell panel on Escape', () => {

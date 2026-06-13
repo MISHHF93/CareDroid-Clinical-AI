@@ -76,6 +76,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyCapacityHistory: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyQueueAnalytics: BACKEND_CAPABILITY_STATUS.DEMO,
+  emergencyAdvancedDecisionSupport: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyReferralPersistence: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReferralHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyTransferWorkflow: BACKEND_CAPABILITY_STATUS.DISABLED,

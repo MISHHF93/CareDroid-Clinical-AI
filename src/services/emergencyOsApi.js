@@ -15,6 +15,19 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   integrations: '/api/emergency/integrations',
   copilot: '/api/emergency/copilot',
   analytics: '/api/emergency/analytics',
+  simulationUpdateLive: '/api/emergency/simulation/update-live',
+  simulationEvaluate: '/api/emergency/simulation/evaluate',
+  simulationCompare: '/api/emergency/simulation/compare',
+  simulationRecommendations: '/api/emergency/simulation/recommendations',
+  federatedLearningRegister: '/api/emergency/federated-learning/register',
+  federatedLearningUpdate: '/api/emergency/federated-learning/update',
+  federatedLearningAggregate: '/api/emergency/federated-learning/aggregate',
+  federatedLearningGlobalModel: '/api/emergency/federated-learning/global-model',
+  federatedLearningDashboard: '/api/emergency/federated-learning/dashboard',
+  digitalTwinInitialize: '/api/emergency/digital-twin/initialize',
+  digitalTwinSimulate: '/api/emergency/digital-twin/simulate',
+  digitalTwinState: '/api/emergency/digital-twin/state',
+  digitalTwinScenario: '/api/emergency/digital-twin/scenario',
   settings: '/api/emergency/settings',
 });
 
@@ -53,6 +66,61 @@ export const fetchIntegrationHub = () => requestEmergencyJson(EMERGENCY_OS_API_E
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
 export const fetchEmergencyAnalytics = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
 export const fetchEmergencySettings = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
+export const updateRealTimeSimulationState = (state = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.simulationUpdateLive, {
+    method: 'POST',
+    body: JSON.stringify(state),
+  });
+export const evaluateRealTimeSimulationIntervention = (intervention = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.simulationEvaluate, {
+    method: 'POST',
+    body: JSON.stringify(intervention),
+  });
+export const compareRealTimeSimulationInterventions = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.simulationCompare, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const fetchRealTimeSimulationRecommendations = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.simulationRecommendations);
+export const registerFederatedHospital = (hospital = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.federatedLearningRegister, {
+    method: 'POST',
+    body: JSON.stringify(hospital),
+  });
+export const submitFederatedModelUpdate = (update = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.federatedLearningUpdate, {
+    method: 'POST',
+    body: JSON.stringify(update),
+  });
+export const aggregateFederatedLearningRound = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.federatedLearningAggregate, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+export const fetchFederatedLearningGlobalModel = (hospitalId) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.federatedLearningGlobalModel}/${encodeURIComponent(hospitalId)}`
+  );
+export const fetchFederatedLearningDashboard = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.federatedLearningDashboard);
+export const initializeHybridDigitalTwin = (state = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.digitalTwinInitialize, {
+    method: 'POST',
+    body: JSON.stringify(state),
+  });
+export const simulateHybridDigitalTwin = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.digitalTwinSimulate, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const fetchHybridDigitalTwinState = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.digitalTwinState);
+export const evaluateHybridDigitalTwinScenario = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.digitalTwinScenario, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 
 export const createEmergencyPatient = (patient) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients, {
@@ -83,6 +151,19 @@ export default Object.freeze({
   fetchEDCopilot,
   fetchEmergencyAnalytics,
   fetchEmergencySettings,
+  updateRealTimeSimulationState,
+  evaluateRealTimeSimulationIntervention,
+  compareRealTimeSimulationInterventions,
+  fetchRealTimeSimulationRecommendations,
+  registerFederatedHospital,
+  submitFederatedModelUpdate,
+  aggregateFederatedLearningRound,
+  fetchFederatedLearningGlobalModel,
+  fetchFederatedLearningDashboard,
+  initializeHybridDigitalTwin,
+  simulateHybridDigitalTwin,
+  fetchHybridDigitalTwinState,
+  evaluateHybridDigitalTwinScenario,
   createEmergencyPatient,
   createSmartIntakePatient,
 });

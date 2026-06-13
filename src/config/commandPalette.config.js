@@ -100,6 +100,27 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyAnalytics }),
   },
   {
+    id: 'open-simulation',
+    label: 'Open Real-Time Simulation',
+    hint: 'Sim',
+    keywords: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencySimulation }),
+  },
+  {
+    id: 'open-federated-learning',
+    label: 'Open Federated Learning',
+    hint: 'FL',
+    keywords: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyFederatedLearning }),
+  },
+  {
+    id: 'open-digital-twin',
+    label: 'Open Digital Twin',
+    hint: 'Twin',
+    keywords: ['digital twin', 'des', 'abm', 'simulation twin', 'operations twin'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyDigitalTwin }),
+  },
+  {
     id: 'open-ai-governance',
     label: 'Open AI Governance',
     hint: 'G',

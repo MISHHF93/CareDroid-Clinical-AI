@@ -384,6 +384,24 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['analytics', 'metrics', 'throughput', 'trends'],
   },
   {
+    id: 'emergency-simulation',
+    title: 'Real-Time Simulation',
+    path: CANONICAL_ROUTES.emergencySimulation,
+    aliases: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast', 'surge decision support'],
+  },
+  {
+    id: 'emergency-federated-learning',
+    title: 'Federated Learning',
+    path: CANONICAL_ROUTES.emergencyFederatedLearning,
+    aliases: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation', 'privacy preserving learning'],
+  },
+  {
+    id: 'emergency-digital-twin',
+    title: 'Digital Twin',
+    path: CANONICAL_ROUTES.emergencyDigitalTwin,
+    aliases: ['digital twin', 'des', 'abm', 'operations twin', 'hybrid simulation', 'calibration'],
+  },
+  {
     id: 'ai-governance',
     title: 'AI Governance',
     path: CANONICAL_ROUTES.aiGovernance,

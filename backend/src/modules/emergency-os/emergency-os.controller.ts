@@ -1,4 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  FederatedLearningService,
+  HybridDigitalTwinService,
+  RealTimeSimulationService,
+} from './emergency-os.advanced-services';
 import {
   BoardingService,
   CapacityService,
@@ -36,6 +41,9 @@ export class EmergencyOsController {
     private readonly copilotService: EDCopilotService,
     private readonly analyticsService: EmergencyAnalyticsService,
     private readonly settingsService: EmergencySettingsService,
+    private readonly realTimeSimulationService: RealTimeSimulationService,
+    private readonly federatedLearningService: FederatedLearningService,
+    private readonly hybridDigitalTwinService: HybridDigitalTwinService,
   ) {}
 
   @Get('whiteboard')
@@ -121,5 +129,70 @@ export class EmergencyOsController {
   @Get('settings')
   getSettings() {
     return this.settingsService.getSettings();
+  }
+
+  @Post('simulation/update-live')
+  updateLiveSimulation(@Body() dto: any): any {
+    return this.realTimeSimulationService.updateLiveState(dto);
+  }
+
+  @Post('simulation/evaluate')
+  evaluateSimulation(@Body() dto: any): any {
+    return this.realTimeSimulationService.evaluateIntervention(dto);
+  }
+
+  @Post('simulation/compare')
+  compareSimulation(@Body() dto: any): any {
+    return this.realTimeSimulationService.compareInterventions(dto);
+  }
+
+  @Get('simulation/recommendations')
+  getSimulationRecommendations(): any {
+    return this.realTimeSimulationService.getRecommendations();
+  }
+
+  @Post('federated-learning/register')
+  registerFederatedHospital(@Body() dto: any): any {
+    return this.federatedLearningService.registerHospital(dto);
+  }
+
+  @Post('federated-learning/update')
+  updateFederatedModel(@Body() dto: any): any {
+    return this.federatedLearningService.receiveLocalUpdate(dto);
+  }
+
+  @Post('federated-learning/aggregate')
+  aggregateFederatedRound(): any {
+    return this.federatedLearningService.aggregateRound();
+  }
+
+  @Get('federated-learning/global-model/:hospitalId')
+  getFederatedGlobalModel(@Param('hospitalId') hospitalId: string): any {
+    return this.federatedLearningService.getGlobalModel(hospitalId);
+  }
+
+  @Get('federated-learning/dashboard')
+  getFederatedDashboard(): any {
+    return this.federatedLearningService.getDashboard();
+  }
+
+  @Post('digital-twin/initialize')
+  initializeDigitalTwin(@Body() dto: any): any {
+    return this.hybridDigitalTwinService.initialize(dto);
+  }
+
+  @Post('digital-twin/simulate')
+  simulateDigitalTwin(@Body() dto: any): any {
+    return this.hybridDigitalTwinService.simulate(dto);
+  }
+
+  @Get('digital-twin/state')
+  getDigitalTwinState(): any {
+    return this.hybridDigitalTwinService.getState();
+  }
+
+  @Post('digital-twin/scenario')
+  evaluateDigitalTwinScenario(@Body() dto: any): any {
+    return this.hybridDigitalTwinService.evaluateScenario(dto);
   }
 }

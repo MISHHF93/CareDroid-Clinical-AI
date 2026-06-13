@@ -32,9 +32,12 @@ import {
   useEmergencyPatients,
   useEmergencyQueues,
   useEmergencySettings,
+  useFederatedLearning,
+  useHybridDigitalTwin,
   useIntegrationHub,
   usePatientJourney,
   useProvincialHealth,
+  useRealTimeSimulation,
   useReassessmentQueue,
   useReferrals,
   useSmartIntake,
@@ -122,6 +125,46 @@ function DataSourceNote({ moduleState }) {
       {generatedAt ? ` | Updated ${new Date(generatedAt).toLocaleTimeString()}` : ''}
     </div>
   );
+}
+
+function ActionButton({ children, onClick, disabled = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        border: '1px solid rgba(96,165,250,0.45)',
+        borderRadius: 10,
+        background: disabled ? '#1F2937' : '#1D4ED8',
+        color: '#F9FAFB',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontSize: 13,
+        fontWeight: 700,
+        padding: '9px 12px',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function ActionStatus({ moduleState }) {
+  if (moduleState.actionLoading) {
+    return (
+      <div style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+        Running Emergency OS action...
+      </div>
+    );
+  }
+  if (moduleState.actionError) {
+    return (
+      <div role="alert" style={{ padding: 12, border: '1px solid #7F1D1D', borderRadius: 12, background: '#450A0A', color: '#FCA5A5' }}>
+        {moduleState.actionError}
+      </div>
+    );
+  }
+  return null;
 }
 
 function isHighRisk(patient) {
@@ -584,6 +627,268 @@ function AnalyticsRoute() {
   );
 }
 
+function RealTimeSimulationRoute() {
+  const simulation = useRealTimeSimulation();
+  const payload = simulation.data?.data || {};
+  const status = payload.currentStatus || {};
+  const recommendations = payload.recommendations || [];
+  const forecast = payload.fourHourForecast || [];
+  const lastEvaluation = simulation.lastActionResult?.data?.evaluation;
+  const lastComparison = simulation.lastActionResult?.data?.rankedInterventions;
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="Decision Support"
+      title="Real-Time Simulation"
+      description="Fixture-backed RtS decision support for ED surge interventions, 4-hour recovery windows, census forecasts, and action recommendations."
+    >
+      <ApiStateBanner moduleState={simulation} fallbackText="Real-time simulation recommendations are unavailable." />
+      <ActionStatus moduleState={simulation} />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <ActionButton
+          disabled={simulation.actionLoading}
+          onClick={() =>
+            simulation.updateLiveState({
+              census: 58,
+              waitingPatients: 21,
+              boardingCount: 9,
+              staffedBeds: 36,
+              physicians: 4,
+              nurses: 12,
+              arrivalsPerHour: 9,
+              source: 'ui-fixture-surge',
+            })
+          }
+        >
+          Fuse Surge State
+        </ActionButton>
+        <ActionButton
+          disabled={simulation.actionLoading}
+          onClick={() => simulation.evaluateIntervention({ type: 'open_fast_track', intensity: 1 })}
+        >
+          Evaluate Fast Track
+        </ActionButton>
+        <ActionButton disabled={simulation.actionLoading} onClick={() => simulation.compareInterventions({})}>
+          Rank Interventions
+        </ActionButton>
+      </div>
+      <MetricGrid
+        metrics={[
+          { label: 'Capacity band', value: status.capacityBand || 'Pending', color: '#60A5FA' },
+          { label: 'Resource use', value: `${status.resourceUtilization ?? 0}%`, color: '#F59E0B' },
+          { label: 'Avg wait', value: `${status.averageWaitMinutes ?? 0}m` },
+          { label: 'Deterioration', value: payload.projectedDeteriorationTimeMinutes == null ? 'None in 4h' : `${payload.projectedDeteriorationTimeMinutes}m`, color: '#EF4444' },
+        ]}
+      />
+      {lastEvaluation ? (
+        <article style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+          <strong style={{ color: '#F9FAFB' }}>Last evaluation: {lastEvaluation.intervention.type}</strong>
+          <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
+            Recovery {lastEvaluation.recoveryTimeMinutes}m | Wait improvement {lastEvaluation.expectedImprovement.waitMinutes}m | Confidence {Math.round(lastEvaluation.confidence * 100)}%
+          </p>
+        </article>
+      ) : null}
+      {lastComparison?.length ? (
+        <div style={{ display: 'grid', gap: 8 }}>
+          {lastComparison.map((item, index) => (
+            <article key={`${item.intervention.type}-${index}`} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+              <strong style={{ color: '#F9FAFB' }}>{index + 1}. {item.intervention.type.replace(/_/g, ' ')}</strong>
+              <span style={{ color: '#60A5FA' }}>{item.recoveryTimeMinutes}m recovery</span>
+            </article>
+          ))}
+        </div>
+      ) : null}
+      <div style={{ display: 'grid', gap: 10 }}>
+        {recommendations.length ? recommendations.map((recommendation) => (
+          <article key={recommendation.intervention} style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+            <strong style={{ color: '#F9FAFB' }}>{recommendation.intervention.replace(/_/g, ' ')}</strong>
+            <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
+              Implement in {recommendation.timeToImplementMinutes}m, expected wait improvement {recommendation.expectedImprovement.waitMinutes}m.
+            </p>
+            <p style={{ color: '#BFDBFE', margin: '6px 0 0', fontSize: 13 }}>
+              {(recommendation.actionRecommendations || []).join(' | ')}
+            </p>
+          </article>
+        )) : (
+          <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+            No simulation recommendations returned yet.
+          </div>
+        )}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
+        {forecast.map((point) => (
+          <article key={point.minute} style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#0F172A' }}>
+            <strong style={{ color: '#F9FAFB' }}>{point.minute}m</strong>
+            <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 13 }}>
+              Census {point.census} | Wait {point.averageWaitMinutes}m | {point.capacityBand}
+            </p>
+          </article>
+        ))}
+      </div>
+      <DataSourceNote moduleState={simulation} />
+    </EmergencyRoutePage>
+  );
+}
+
+function FederatedLearningRoute() {
+  const federated = useFederatedLearning();
+  const payload = federated.data?.data || {};
+  const performance = payload.modelPerformance || {};
+  const hospitals = payload.hospitals || [];
+  const contributions = payload.hospitalContributions || [];
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="Multi-Hospital Learning"
+      title="Federated Learning"
+      description="Endpoint-driven FedAvg for ED prediction models with deterministic privacy noise, contribution tracking, and explicit secure aggregation placeholders."
+    >
+      <ApiStateBanner moduleState={federated} fallbackText="Federated dashboard is unavailable." />
+      <ActionStatus moduleState={federated} />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <ActionButton
+          disabled={federated.actionLoading}
+          onClick={() => federated.registerHospital({ hospitalId: 'demo-ed-north', name: 'Demo ED North', region: 'Ontario', sampleCapacity: 1200 })}
+        >
+          Register Hospital
+        </ActionButton>
+        <ActionButton
+          disabled={federated.actionLoading}
+          onClick={() =>
+            federated.submitModelUpdate({
+              hospitalId: 'demo-ed-north',
+              sampleCount: 240,
+              weights: { intercept: 0.12, waitingPatients: 0.32, boardingCount: 0.41, acuityP1P2: 0.29, nurseCoverage: -0.18 },
+              metrics: { auc: 0.82, calibration: 0.93, sensitivity: 0.76, specificity: 0.74 },
+              differentialPrivacy: true,
+            })
+          }
+        >
+          Submit Local Update
+        </ActionButton>
+        <ActionButton disabled={federated.actionLoading} onClick={() => federated.aggregateRound()}>
+          Aggregate FedAvg
+        </ActionButton>
+      </div>
+      <MetricGrid
+        metrics={[
+          { label: 'Active hospitals', value: payload.activeHospitals ?? 0, color: '#60A5FA' },
+          { label: 'Registered', value: payload.registeredHospitals ?? hospitals.length },
+          { label: 'Current round', value: payload.currentRound ?? 0, color: '#10B981' },
+          { label: 'Pending updates', value: payload.pendingUpdates ?? 0, color: '#F59E0B' },
+        ]}
+      />
+      <MetricGrid
+        metrics={[
+          { label: 'AUC', value: performance.auc ?? 'n/a', color: '#60A5FA' },
+          { label: 'Calibration', value: performance.calibration ?? 'n/a' },
+          { label: 'Sensitivity', value: performance.sensitivity ?? 'n/a' },
+          { label: 'Specificity', value: performance.specificity ?? 'n/a' },
+        ]}
+      />
+      <div style={{ display: 'grid', gap: 10 }}>
+        {hospitals.length ? hospitals.map((hospital) => (
+          <article key={hospital.hospitalId} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+            <div>
+              <strong style={{ color: '#F9FAFB' }}>{hospital.name}</strong>
+              <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 13 }}>{hospital.hospitalId} | {hospital.region}</p>
+            </div>
+            <span style={{ color: hospital.status === 'active' ? '#10B981' : '#60A5FA' }}>{hospital.status}</span>
+          </article>
+        )) : (
+          <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+            No hospitals registered in this in-memory federated round.
+          </div>
+        )}
+      </div>
+      {contributions.length ? (
+        <div style={{ display: 'grid', gap: 8 }}>
+          {contributions.map((contribution) => (
+            <div key={contribution.hospitalId} style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#0F172A', color: '#BFDBFE' }}>
+              {contribution.hospitalId}: {Math.round(contribution.contributionWeight * 100)}% of last aggregation ({contribution.sampleCount} samples)
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <DataSourceNote moduleState={federated} />
+    </EmergencyRoutePage>
+  );
+}
+
+function HybridDigitalTwinRoute() {
+  const twin = useHybridDigitalTwin();
+  const payload = twin.data?.data || {};
+  const twinState = payload.twin || {};
+  const metrics = twin.lastActionResult?.data?.metrics || twin.lastActionResult?.data?.scenario?.metrics || payload.currentMetrics || {};
+  const eventTrace = twin.lastActionResult?.data?.eventTrace || twin.lastActionResult?.data?.scenario?.eventTrace || twinState.lastEventTrace || [];
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="Operations Twin"
+      title="Hybrid DES-ABM Digital Twin"
+      description="Deterministic ED operations twin combining discrete process events with patient/staff behavior metrics, scenario evaluation, and event traces."
+    >
+      <ApiStateBanner moduleState={twin} fallbackText="Digital twin state is unavailable." />
+      <ActionStatus moduleState={twin} />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <ActionButton
+          disabled={twin.actionLoading}
+          onClick={() => twin.initializeTwin({ twinId: 'ed-hybrid-des-abm-ui', census: 52, waitingPatients: 16, boardingCount: 7 })}
+        >
+          Initialize Twin
+        </ActionButton>
+        <ActionButton disabled={twin.actionLoading} onClick={() => twin.simulateTwin({ horizonMinutes: 240, includeTrace: true })}>
+          Run DES-ABM
+        </ActionButton>
+        <ActionButton
+          disabled={twin.actionLoading}
+          onClick={() =>
+            twin.evaluateScenario({
+              interventions: [{ type: 'increase_staff', intensity: 1 }, { type: 'split_flow_triage', intensity: 1 }],
+              includeTrace: true,
+            })
+          }
+        >
+          Evaluate Scenario
+        </ActionButton>
+      </div>
+      <MetricGrid
+        metrics={[
+          { label: 'Twin status', value: twinState.status || 'Pending', color: '#60A5FA' },
+          { label: 'Throughput', value: metrics.throughput ?? 0, color: '#10B981' },
+          { label: 'Avg wait', value: `${metrics.averageWaitMinutes ?? 0}m`, color: '#F59E0B' },
+          { label: 'LOS', value: `${metrics.lengthOfStayMinutes ?? 0}m` },
+          { label: 'LWBS', value: metrics.lwbsRate == null ? 'n/a' : `${Math.round(metrics.lwbsRate * 100)}%`, color: '#EF4444' },
+          { label: 'Burnout', value: metrics.burnoutIndex ?? 0, color: '#F97316' },
+          { label: 'Bed use', value: `${metrics.bedUtilization ?? 0}%` },
+          { label: 'Calibration error', value: metrics.calibrationError ?? 0 },
+        ]}
+      />
+      {metrics.confidenceIntervals ? (
+        <article style={{ padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+          <strong style={{ color: '#F9FAFB' }}>Confidence intervals</strong>
+          <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
+            Wait {metrics.confidenceIntervals.averageWaitMinutes.join(' - ')}m | Throughput {metrics.confidenceIntervals.throughput.join(' - ')}
+          </p>
+        </article>
+      ) : null}
+      <div style={{ display: 'grid', gap: 8 }}>
+        {eventTrace.length ? eventTrace.slice(0, 8).map((event) => (
+          <article key={`${event.minute}-${event.type}-${event.census}`} style={{ padding: 12, border: '1px solid #1F2937', borderRadius: 12, background: '#0F172A' }}>
+            <strong style={{ color: '#F9FAFB' }}>{event.minute}m {event.type}</strong>
+            <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 13 }}>{event.description}</p>
+          </article>
+        )) : (
+          <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+            Run a simulation with event trace enabled to inspect DES-ABM events.
+          </div>
+        )}
+      </div>
+      <DataSourceNote moduleState={twin} />
+    </EmergencyRoutePage>
+  );
+}
+
 function CopilotRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
@@ -686,6 +991,9 @@ export function AppRoutes() {
         <Route path={CANONICAL_ROUTES.emergencyIntegrations} element={<IntegrationsRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<CopilotRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyAnalytics} element={<AnalyticsRoute />} />
+        <Route path={CANONICAL_ROUTES.emergencySimulation} element={<RealTimeSimulationRoute />} />
+        <Route path={CANONICAL_ROUTES.emergencyFederatedLearning} element={<FederatedLearningRoute />} />
+        <Route path={CANONICAL_ROUTES.emergencyDigitalTwin} element={<HybridDigitalTwinRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<AIGovernanceDashboard />} />
         <Route path={CANONICAL_ROUTES.aiGovernance} element={<AIGovernanceDashboard />} />
         <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencySettingsRoute />} />

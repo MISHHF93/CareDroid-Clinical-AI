@@ -13,7 +13,10 @@ import boardingRoutes from './api/boarding.routes';
 import copilotRoutes from './api/copilot.routes';
 import emsRoutes from './api/ems.routes';
 import governanceRoutes from './api/governance.routes';
-import { registerEMSWebSocketSupport } from './api/ems.socket';
+import {
+  registerEdgeAIAmbulanceWebSocketSupport,
+  registerEMSWebSocketSupport,
+} from './api/ems.socket';
 import reassessmentRoutes from './api/reassessment.routes';
 import smartIntakeRoutes from './api/smart-intake.routes';
 import surgeRoutes from './api/surge.routes';
@@ -195,6 +198,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
 
   await registerEmergencyMongooseRuntime(app, logger);
+  registerEdgeAIAmbulanceWebSocketSupport(app.getHttpAdapter().getInstance(), app.getHttpServer());
 
   // Swagger documentation
   const config = new DocumentBuilder()
