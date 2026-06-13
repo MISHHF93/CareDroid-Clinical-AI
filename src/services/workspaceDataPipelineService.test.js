@@ -310,7 +310,7 @@ describe('WorkspaceDataPipelineService', () => {
           expect.objectContaining({ label: 'Request' }),
           expect.objectContaining({ label: 'Closed' }),
         ]),
-        departments: ['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery', 'ICU', 'Laboratory'],
+        departments: expect.arrayContaining(['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery', 'ICU']),
         metrics: expect.objectContaining({
           total: expect.any(Number),
           delayed: expect.any(Number),

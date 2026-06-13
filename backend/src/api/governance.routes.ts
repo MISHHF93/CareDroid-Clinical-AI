@@ -20,7 +20,9 @@ router.get('/compliance', async (req, res) => {
 router.get('/violations', async (req, res) => {
   try {
     const limit = Number(req.query.limit || 50);
-    const violations = await aiGovernanceService.getSafetyViolations(Number.isFinite(limit) ? limit : 50);
+    const violations = await aiGovernanceService.getSafetyViolations(
+      Number.isFinite(limit) ? limit : 50,
+    );
     res.json({ violations });
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Failed to load AI safety violations' });

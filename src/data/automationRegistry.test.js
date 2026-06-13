@@ -122,18 +122,28 @@ describe('automationRegistry', () => {
       'Emergency Flow Professional',
       'Emergency Flow Enterprise',
     ]);
-    expect(emergency.coreMvpPackage.includedCapabilities.map((capability) => capability.label)).toEqual([
-      'qSOFA',
-      'NEWS2',
-      'HEART',
-      'Wells PE',
-      'Wells DVT',
-      'Shock Index',
-      'AI Assistant',
-      'Protocol Retrieval',
-      'Workflow Guidance',
-      'Workspace Dashboard',
-    ]);
+    const starterCapabilityLabels = emergency.coreMvpPackage.includedCapabilities.map((capability) => capability.label);
+    expect(starterCapabilityLabels).toHaveLength(16);
+    expect(starterCapabilityLabels).toEqual(
+      expect.arrayContaining([
+        'Patient Journey Engine',
+        'Queue Intelligence',
+        'ED Copilot',
+        'Referral Intelligence',
+        'EMS Intelligence',
+        'Analytics',
+        'qSOFA',
+        'NEWS2',
+        'HEART',
+        'Wells PE',
+        'Wells DVT',
+        'Shock Index',
+        'AI Assistant',
+        'Protocol Retrieval',
+        'Workflow Guidance',
+        'Workspace Dashboard',
+      ])
+    );
     expect(emergency.products.find((product) => product.title === 'Emergency Flow Starter')).toEqual(
       expect.objectContaining({
         mvpPackageId: 'emergency-core-mvp',

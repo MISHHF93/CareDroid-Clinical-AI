@@ -7,9 +7,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
-import { startSimulation, stopSimulation } from './engine/simulation';
-
-import { startEmergencySimulation, stopEmergencySimulation } from '../engine/simulation';
+import {
+  startSimulation,
+  startSimulation as startEmergencySimulation,
+  stopSimulation,
+  stopSimulation as stopEmergencySimulation,
+} from './engine/simulation';
 import { useFeatureStore } from '../store/featureStore';
 
 import './index.css';

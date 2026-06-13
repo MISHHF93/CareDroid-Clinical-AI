@@ -220,7 +220,10 @@ describe('PR4A coverage — NLU aliases & resolveCatalogLaunch', () => {
 describe('PR4A coverage — route resolution', () => {
   it('registers dedicated calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
     for (const id of PR4A_TOOL_IDS) {
       expect(matchCalculatorRoute(`${PR4A_HUB_PATH}/${id}`)?.calculatorSlug).toBe(id);
     }

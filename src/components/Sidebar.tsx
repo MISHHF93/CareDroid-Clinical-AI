@@ -29,7 +29,7 @@ function isSidebarNavItem(item: SidebarNavItem | undefined): item is SidebarNavI
   return Boolean(item?.id && item.label && item.iconKey && item.path);
 }
 
-const NAV: SidebarNavItem[] = (EMERGENCY_SIDEBAR_NAV_ITEMS as Array<SidebarNavItem | undefined>)
+const NAV: SidebarNavItem[] = (EMERGENCY_SIDEBAR_NAV_ITEMS as readonly (SidebarNavItem | undefined)[])
   .filter(isSidebarNavItem)
   .map((item) => ({
     id: item.id,
@@ -57,6 +57,7 @@ const ICONS: Record<string, Icon> = {
   queues: IconListCheck,
   reassessment: IconListCheck,
   boarding: IconListCheck,
+  'ed-copilot': IconStethoscope,
   'shield-check': IconShieldCheck,
   shield: IconShieldCheck,
   stethoscope: IconStethoscope,

@@ -251,6 +251,10 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/chat/message-3d', controller: 'ChatController' },
   { method: 'POST', path: '/api/chat/suggest-action', controller: 'ChatController' },
   { method: 'POST', path: '/api/chat/analyze-vitals', controller: 'ChatController' },
+  { method: 'POST', path: '/api/emergency/copilot/message', controller: 'EmergencyAIController' },
+  { method: 'POST', path: '/api/emergency/intake/ai/message', controller: 'EmergencyAIController' },
+  { method: 'POST', path: '/api/emergency/referrals/ai/message', controller: 'EmergencyAIController' },
+  { method: 'POST', path: '/api/emergency/analytics/ai/message', controller: 'EmergencyAIController' },
 
   {
     method: 'POST',

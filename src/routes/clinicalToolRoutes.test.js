@@ -46,7 +46,7 @@ const REQUIRED_OVERVIEW_PATHS = ['/tools', '/tools/catalog'];
 
 const FLEET_PATHS = ['/fleet/command', '/fleet/predictive-maintenance', '/fleet/route-optimizer'];
 
-describe('clinicalToolRoutes — registry ↔ routes', () => {
+describe('clinicalToolRoutes — archived registry inventory', () => {
   it('includes tools overview paths', () => {
     for (const path of REQUIRED_OVERVIEW_PATHS) {
       expect(TOOLS_OVERVIEW_PATHS).toContain(path);
@@ -79,13 +79,15 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     expect(defPaths.sort()).toEqual([...new Set(builtinPaths)].sort());
   });
 
-  it.each(REQUIRED_CALCULATOR_PATHS)('App.jsx route contract includes calculator %s', (path) => {
+  it.each(REQUIRED_CALCULATOR_PATHS)('calculator %s remains in archived inventory, not App routes', (path) => {
     const slug = path.split('/').pop();
     const def = CALCULATOR_ROUTE_DEFS.find((d) => d.path === path);
     expect(def?.calculatorSlug).toBe(slug);
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).not.toContain('path="/tools/calculators/:slug"');
+    expect(appSource).toContain('path="/tools/*"');
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
   });
 
   it('matches calculator slugs for deep links', () => {

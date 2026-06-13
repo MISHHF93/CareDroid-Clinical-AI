@@ -9,7 +9,7 @@ const toolsOverviewJsx = readFileSync(join(__dirname, 'ToolsOverview.jsx'), 'utf
 
 describe('ToolsOverview responsive layout', () => {
   it('wraps cards and prevents tool metadata overflow', () => {
-    expect(toolsOverviewCss).toMatch(/\.tools-grid[\s\S]*minmax\(min\(100%,\s*240px\)/);
+    expect(toolsOverviewCss).toMatch(/\.tools-grid[\s\S]*minmax\(min\(100%,\s*var\(--app-grid-card-min-density,\s*240px\)/);
     expect(toolsOverviewCss).toMatch(/\.tool-card-large[\s\S]*min-width:\s*0/);
     expect(toolsOverviewCss).toMatch(/\.tool-meta[\s\S]*min-width:\s*min\(100%,\s*12rem\)/);
   });

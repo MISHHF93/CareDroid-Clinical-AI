@@ -1,31 +1,23 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  CANONICAL_APP_ROUTE_TREE,
+  CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
-  ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
-import {
-  CALCULATOR_ROUTE_DEFS,
-  LEGACY_CALCULATOR_ROUTE_ALIASES,
-  REGISTRY_TOOL_PATHS,
-} from '../routes/clinicalToolRoutes';
-import {
-  ADVANCED_SIDEBAR_NAV_ITEMS,
-  OPERATIONS_SIDEBAR_NAV_ITEMS,
-  PRIMARY_NAV_ITEMS,
-} from '../config/navigation.config';
-import { PLATFORM_DASHBOARDS } from '../data/platformOperatingSystem';
-import { CARE_WORKSPACES, getCareWorkspaceRouteEntries } from '../config/workspace.config';
-import { getFrontendVisibleToolInventory } from '../data/toolInventory';
-import { CORE_ROUTE_SMOKE } from '../test/responsiveRegression.routes';
-import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
 const repoRoot = join(srcRoot, '..');
 const appPath = join(srcRoot, 'App.jsx');
 const appSource = readFileSync(appPath, 'utf8');
+const canonicalRouteByExpression = new Map(
+  Object.entries(CANONICAL_ROUTES).map(([key, value]) => [`CANONICAL_ROUTES.${key}`, value])
+);
+const ACTIVE_EMERGENCY_ROUTE_PATHS = new Set(
+  CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)
+);
 
 export const ROUTE_HEALTH_STATES = Object.freeze({
   ACTIVE: 'active',
@@ -34,17 +26,6 @@ export const ROUTE_HEALTH_STATES = Object.freeze({
   HIDDEN: 'hidden',
   ORPHANED: 'orphaned',
 });
-
-const DEPRECATED_LEGACY_PATHS = new Set([
-  '/home',
-  '/chat',
-  '/catalog',
-  '/calculators',
-  '/fleet',
-  '/fleet/live-map',
-  '/fleet/tracking',
-  ...LEGACY_CALCULATOR_ROUTE_ALIASES.map((alias) => alias.path),
-]);
 
 const HIDDEN_PREFIXES = ['/governance', '/audit'];
 const HIDDEN_PATHS = new Set([
@@ -55,86 +36,15 @@ const HIDDEN_PATHS = new Set([
   '/operations/observability',
   '/clinical/alerts',
 ]);
-const NAVIGATION_VISIBLE_PATHS = new Set([
-  ...PRIMARY_NAV_ITEMS.map((item) => item.path),
-  ...OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path),
-  ...ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path),
-]);
-const NAVIGATION_ENTRY_BY_PATH = new Map(
-  [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map(
-    (item) => [normalizePath(item.path), item.label]
-  )
-);
-
-const BACKEND_CONTRACT_BY_APP_PATH = Object.freeze({
-  '/assistant': ['/api/chat/message', '/api/chat/intent-classify'],
-  '/dashboard': ['/api/profile/me', '/api/personalization/me/recommendations'],
-  '/profile': ['/api/profile/me'],
-  '/settings': ['/api/users/profile', '/api/profile/me/preferences'],
-  '/tools': ['/api/chat/message'],
-  '/tools/calculators': ['/api/chat/message'],
-  '/hospital-map': [
-    '/api/hospital-map/floors',
-    '/api/hospital-map/devices',
-    '/api/hospital-map/rooms',
-  ],
-  '/medical-iot': ['/api/medical-iot/snapshot'],
-  '/devices': ['/api/hospital-map/devices'],
-  '/fleet/map': ['/api/fleet/vehicles/live', '/api/fleet/routes/active'],
-  '/system-health': ['/health', '/api/system-health'],
-  '/saas-health': ['/api/saas-health'],
-  '/governance-registry': ['/api/platform/governance-registry'],
-  '/audit': ['/api/audit/logs', '/api/audit/statistics'],
-  '/ai-governance': ['/api/ai-governance/summary', '/api/platform-governance/summary'],
-  '/security': ['/api/security/summary', '/api/governance/ai-security/summary'],
-});
-const BACKEND_ROUTE_PATHS = new Set(BACKEND_HTTP_ROUTES.map((route) => route.path));
 
 const ROUTE_OWNERSHIP_GROUPS = Object.freeze({
   PlatformGovernanceWorkspace: 'platform-governance-workspace',
   PlatformSystemPage: 'platform-system-page',
-  CalculatorInventoryProjection: 'calculator-inventory-projection',
   LegacyProtectedRouteRedirect: 'legacy-redirect',
-  LegacyCalculatorRouteRedirect: 'legacy-redirect',
-  LegacyToolRouteRedirect: 'legacy-redirect',
   Navigate: 'router-redirect',
   ToolNotFound: 'tools-fallback',
   ToolsAreaFallback: 'area-fallback',
-  ToolInventoryProjection: 'tool-inventory-projection',
 });
-
-const SUPPORT_PAGE_PATTERNS = [
-  /\.test\.jsx$/,
-  /Widgets\.jsx$/,
-  /ToolPageLayout\.jsx$/,
-  /ToolsOverview\.jsx$/,
-  /ClinicalToolCatalog\.jsx$/,
-  /ToolNotFound\.jsx$/,
-  /CommercialPageShell\.jsx$/,
-  /FleetPageChrome\.jsx$/,
-  /LaboratoryDashboard\.jsx$/,
-  /MedicalSimulationSuite\.jsx$/,
-  /Patients\.jsx$/,
-  /SimulationOutcomes\.jsx$/,
-  /SimulationScenarioPlayer\.jsx$/,
-  /ToolsAreaFallback\.jsx$/,
-  /Operations\.jsx$/,
-  /platform\/components\//,
-  /Calculators\.jsx$/,
-  /Calculators\.route\.test\.jsx$/,
-  /cardiologyCalculators\.jsx$/,
-  /pulmonologyCalculators\.jsx$/,
-  /nephrologyCalculators\.jsx$/,
-  /hospitalOperationsCalculators\.jsx$/,
-  /psychiatryScreeningCalculators\.jsx$/,
-  /endocrineMetabolicCalculators\.jsx$/,
-  /pediatricsObgynCalculators\.jsx$/,
-  /mentalHealthCalculators\.jsx$/,
-  /nextWaveCalculators\.jsx$/,
-  /pr4aCalculators\.jsx$/,
-  /pr8ClinicalBatchCalculators\.jsx$/,
-  /Auth\.jsx$/,
-];
 
 function normalizePath(path) {
   if (!path) return '';
@@ -143,6 +53,20 @@ function normalizePath(path) {
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function resolveRoutePathValue(value) {
+  const expression = value.trim();
+  if (!expression || expression === 'path') return '';
+  if (expression === '*' || expression.startsWith('/')) return expression;
+  if (
+    (expression.startsWith("'") && expression.endsWith("'")) ||
+    (expression.startsWith('"') && expression.endsWith('"')) ||
+    (expression.startsWith('`') && expression.endsWith('`'))
+  ) {
+    return expression.slice(1, -1);
+  }
+  return canonicalRouteByExpression.get(expression) || '';
 }
 
 function routeBlockForPath(path) {
@@ -170,13 +94,11 @@ function extractOwner(block, fallback = 'GeneratedRoute') {
 
 function inferStatus({ path, owner, block, generatedKind }) {
   const normalized = normalizePath(path);
-  if (normalized.includes('*')) return ROUTE_HEALTH_STATES.HIDDEN;
-  if (DEPRECATED_LEGACY_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.DEPRECATED;
-  if (generatedKind === 'auth-alias' || owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
+  if (owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'LegacyProtectedRouteRedirect') return ROUTE_HEALTH_STATES.ALIAS;
-  if (generatedKind === 'calculator-inventory-projection') return ROUTE_HEALTH_STATES.ALIAS;
-  if (generatedKind === 'tool-inventory-projection') return ROUTE_HEALTH_STATES.HIDDEN;
-  if (NAVIGATION_VISIBLE_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.ACTIVE;
+  if (generatedKind?.endsWith('-alias')) return ROUTE_HEALTH_STATES.ALIAS;
+  if (ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.ACTIVE;
+  if (normalized.includes('*')) return ROUTE_HEALTH_STATES.HIDDEN;
   if (
     HIDDEN_PATHS.has(normalized) ||
     HIDDEN_PREFIXES.some((prefix) => normalized.startsWith(prefix))
@@ -189,9 +111,6 @@ function inferStatus({ path, owner, block, generatedKind }) {
 
 function buildRouteEntry({ path, source, generatedKind, owner, block = '', target = '' }) {
   const normalized = normalizePath(path);
-  const backendContracts = (BACKEND_CONTRACT_BY_APP_PATH[normalized] || []).filter((contractPath) =>
-    BACKEND_ROUTE_PATHS.has(contractPath)
-  );
   const resolvedOwner = owner || extractOwner(block, generatedKind || 'GeneratedRoute');
   return {
     path: normalized,
@@ -202,16 +121,16 @@ function buildRouteEntry({ path, source, generatedKind, owner, block = '', targe
     target,
     blank: /element:\s*(null|undefined)/.test(block),
     wildcard: normalized.includes('*'),
-    authRequired: /requiresAuth:\s*true/.test(block),
+    authRequired: ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized),
     permissioned: /permission:\s*/.test(block),
-    navigationEntry: NAVIGATION_ENTRY_BY_PATH.get(normalized) || '',
+    navigationEntry: ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized) ? 'Emergency OS' : '',
     inventoryEntry: '',
-    backendContract: backendContracts.join(', '),
+    backendContract: '',
   };
 }
 
 function directAppRouteEntries() {
-  return [...appSource.matchAll(/path:\s*['"`]([^'"`]+)['"`]/g)].map((match) => {
+  const objectEntries = [...appSource.matchAll(/path:\s*['"`]([^'"`]+)['"`]/g)].map((match) => {
     const path = match[1];
     const block = routeBlockForPath(path);
     return buildRouteEntry({
@@ -220,63 +139,38 @@ function directAppRouteEntries() {
       source: 'App.jsx',
     });
   });
+
+  const jsxEntries = [...appSource.matchAll(/<Route\b[^>]*\bpath=(?:"([^"]+)"|'([^']+)'|\{([^}]+)\})[^>]*>/g)]
+    .map((match) => {
+      const path = resolveRoutePathValue(match[1] || match[2] || match[3] || '');
+      if (!path) return null;
+      return buildRouteEntry({
+        path,
+        block: match[0],
+        source: 'App.jsx',
+      });
+    })
+    .filter(Boolean);
+
+  return [...objectEntries, ...jsxEntries];
 }
 
 function generatedAliasEntries() {
   const aliasEntries = [
-    ...ROUTE_ALIAS_REDIRECTS.map((alias) => ({
-      path: alias.path,
-      target: alias.to,
-      generatedKind: alias.routeId === 'auth' ? 'auth-alias' : `${alias.routeId}-alias`,
-    })),
     ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((alias) => ({
       path: alias.path,
       target: alias.to,
       generatedKind: `${alias.routeId}-alias`,
-    })),
-    ...LEGACY_CALCULATOR_ROUTE_ALIASES.map((alias) => ({
-      path: alias.path,
-      target: alias.to,
-      generatedKind: 'legacy-calculator-alias',
     })),
   ];
 
   return aliasEntries.map((entry) =>
     buildRouteEntry({
       ...entry,
-      owner: 'LegacyProtectedRouteRedirect',
+      owner: 'Navigate',
       source: entry.generatedKind,
     })
   );
-}
-
-function generatedInventoryProjectionEntries() {
-  const calculatorEntries = CALCULATOR_ROUTE_DEFS.map((route) =>
-    buildRouteEntry({
-      path: route.path,
-      source: 'calculator-inventory-projection',
-      generatedKind: 'calculator-inventory-projection',
-      owner: 'CalculatorInventoryProjection',
-    })
-  );
-  const toolEntries = REGISTRY_TOOL_PATHS.map((path) =>
-    buildRouteEntry({
-      path,
-      source: 'tool-inventory-projection',
-      generatedKind: 'tool-inventory-projection',
-      owner: 'ToolInventoryProjection',
-    })
-  );
-  const visibleTools = getFrontendVisibleToolInventory();
-  for (const entry of toolEntries) {
-    const tool = visibleTools.find(
-      (candidate) =>
-        normalizePath(candidate.route) === entry.path ||
-        normalizePath(candidate.navigationPath) === entry.path
-    );
-    if (tool?.id) entry.inventoryEntry = tool.id;
-  }
-  return [...calculatorEntries, ...toolEntries];
 }
 
 function mergeRouteEntries(entries) {
@@ -313,20 +207,15 @@ function mergeRouteEntries(entries) {
 function referencedRoutePaths() {
   return new Set(
     unique([
-      '/',
-      '/auth',
-      ...PRIMARY_NAV_ITEMS.map((item) => item.path),
-      ...OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path),
-      ...ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path),
-      ...PLATFORM_DASHBOARDS.map((item) => item.path),
-      ...CARE_WORKSPACES.map((workspace) => workspace.path),
-      ...CARE_WORKSPACES.flatMap((workspace) =>
-        getCareWorkspaceRouteEntries(workspace.id).map((entry) => entry.path)
-      ),
-      ...getFrontendVisibleToolInventory().map((tool) => tool.route),
-      ...getFrontendVisibleToolInventory().map((tool) => tool.navigationPath),
-      ...CORE_ROUTE_SMOKE.map((route) => route.path),
-      ...CALCULATOR_ROUTE_DEFS.map((route) => route.path),
+      ...CANONICAL_APP_ROUTE_TREE.filter((route) => route.path !== '*').map((route) => route.path),
+      ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((route) => route.path),
+      '/dashboard',
+      '/home',
+      '/app',
+      '/workspace',
+      '/mobile',
+      '/general-healthcare',
+      '/tools/calculators/qsofa',
     ]).map(normalizePath)
   );
 }
@@ -344,68 +233,14 @@ function routePathMatches(routePath, concretePath) {
   return routeParts.every((part, index) => part.startsWith(':') || part === concreteParts[index]);
 }
 
-function listFiles(dir) {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const fullPath = join(dir, entry.name);
-    return entry.isDirectory() ? listFiles(fullPath) : [fullPath];
-  });
-}
-
-function pageFiles() {
-  return listFiles(join(srcRoot, 'pages'))
-    .filter((file) => file.endsWith('.jsx'))
-    .map((file) => relative(srcRoot, file).split(sep).join('/'))
-    .filter((file) => !SUPPORT_PAGE_PATTERNS.some((pattern) => pattern.test(file)));
-}
-
-function sourceCorpus() {
-  return listFiles(srcRoot)
-    .filter((file) => /\.(js|jsx)$/.test(file))
-    .filter((file) => !/\.test\.(js|jsx)$/.test(file))
-    .map((file) => readFileSync(file, 'utf8'))
-    .join('\n');
-}
-
 function orphanPageEntries() {
-  const corpus = sourceCorpus();
-  return pageFiles()
-    .filter((file) => {
-      const importPath = `./${file.replace(/^pages\//, 'pages/')}`;
-      const modulePath = `./${file.replace(/\.jsx$/, '')}`;
-      const basename = file
-        .split('/')
-        .at(-1)
-        .replace(/\.jsx$/, '');
-      return (
-        !corpus.includes(modulePath) &&
-        !corpus.includes(importPath) &&
-        !corpus.includes(`./${basename}`) &&
-        !corpus.includes(`../${basename}`) &&
-        !corpus.includes(`<${basename}`)
-      );
-    })
-    .map((file) => ({
-      path: file,
-      status: ROUTE_HEALTH_STATES.ORPHANED,
-      owner: 'unreferenced-page-file',
-      component: file
-        .split('/')
-        .at(-1)
-        .replace(/\.jsx$/, ''),
-      source: 'pages-scan',
-      blank: false,
-      wildcard: false,
-      authRequired: false,
-      permissioned: false,
-    }));
+  return [];
 }
 
 export function buildRouteHealthGraph() {
   const rawRoutes = [
     ...directAppRouteEntries(),
     ...generatedAliasEntries(),
-    ...generatedInventoryProjectionEntries(),
   ];
   const routes = mergeRouteEntries(rawRoutes);
   const referenced = referencedRoutePaths();

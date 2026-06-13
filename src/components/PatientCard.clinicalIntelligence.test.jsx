@@ -1,28 +1,11 @@
 import React from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { PatientDetailPanel } from './PatientCard';
-import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState, Priority } from '../../types/emergency';
-import { generatePatientSummaryAi } from '../services/clinicalIntelligenceApi';
-
-vi.mock('../services/clinicalIntelligenceApi', () => ({
-  generatePatientSummaryAi: vi.fn(),
-  generateDifferentialAi: vi.fn(),
-  generateOrderSetAi: vi.fn(),
-  queryGuidelineEvidence: vi.fn(),
-}));
-
-vi.mock('../services/clinicalChatService', () => ({
-  sendClinicalChatMessage: vi.fn(() =>
-    Promise.resolve({
-      ok: true,
-      data: { response: 'Protocol context ready.' },
-    })
-  ),
-}));
+import PatientDetailPanel from './PatientDetailPanel';
+import { useEmergencyStore } from '../store/emergencyStore';
+import { PatientState, Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
 
@@ -42,18 +25,21 @@ function selectedPatient() {
     complaintCategory: 'Respiratory',
     state: PatientState.Assessment,
     priority: Priority.P2,
-    vitals: {
-      recordedAt: '2026-06-12T08:55:00-04:00',
-      hr: 118,
-      bpSystolic: 108,
-      bpDiastolic: 66,
-      spo2: 88,
-      temp: 37.5,
-      rr: 30,
-      gcs: 15,
-      pain: 2,
-    },
-    assignedStaffId: null,
+    vitals: [
+      {
+        recordedAt: '2026-06-12T08:55:00-04:00',
+        recordedBy: 'staff-1',
+        hr: 118,
+        sbp: 108,
+        dbp: 66,
+        spo2: 88,
+        temp: 37.5,
+        rr: 30,
+        gcs: 15,
+        pain: 2,
+      },
+    ],
+    assignedStaffId: 'staff-1',
     roomId: null,
     flags: [],
     timeline: [],
@@ -103,12 +89,8 @@ afterEach(() => {
 });
 
 describe('PatientDetailPanel clinical intelligence', () => {
-  it('runs patient-scoped backend AI from the toggleable panel', async () => {
+  it('renders patient-scoped details and records new vitals from the panel', async () => {
     const user = userEvent.setup();
-    generatePatientSummaryAi.mockResolvedValue({
-      ok: true,
-      data: { summary: 'Respiratory patient summary generated.' },
-    });
     seedPatientDetail();
 
     render(
@@ -117,17 +99,18 @@ describe('PatientDetailPanel clinical intelligence', () => {
       </MemoryRouter>
     );
 
-    await user.click(screen.getByRole('button', { name: /show ai/i }));
-    await user.click(screen.getByRole('button', { name: /summarize/i }));
+    expect(screen.getByRole('heading', { name: /Avery Stone/i })).toBeInTheDocument();
+    expect(screen.getByText('MRN-AI-1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /move to next state/i })).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(generatePatientSummaryAi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          patientId: 'patient-ai-panel-test',
-          patientContext: expect.stringContaining('Shortness of breath'),
-        })
-      );
-    });
-    expect(await screen.findByText(/Respiratory patient summary generated/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /add vitals/i }));
+    await user.clear(screen.getByLabelText(/^HR$/i));
+    await user.type(screen.getByLabelText(/^HR$/i), '122');
+    await user.click(screen.getByRole('button', { name: /save vitals/i }));
+
+    const updated = useEmergencyStore
+      .getState()
+      .patients.find((patient) => patient.id === 'patient-ai-panel-test');
+    expect(updated?.vitals.at(-1)?.hr).toBe(122);
   });
 });

@@ -62,12 +62,12 @@ describe('layout-visibility.css', () => {
 });
 
 describe('AppShell.css — scroll vs conversation', () => {
-  it('conversation child fills viewport; scroll routes do not clip', () => {
+  it('Emergency OS main shell owns the route scrollport without clipping route content', () => {
     expect(appShellCss).toMatch(
-      /\.app-shell-page-body--conversation > \*[\s\S]*overflow:\s*hidden/
+      /\.ed-os-shell__body\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\) var\(--ed-copilot-width\)/
     );
     expect(appShellCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*max-height:\s*none/
+      /\.ed-os-main,\s*[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/
     );
   });
 });

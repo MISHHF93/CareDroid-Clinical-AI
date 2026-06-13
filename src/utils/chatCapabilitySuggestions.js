@@ -271,17 +271,23 @@ function normalizeSearchFirstQuery(input) {
   return tokens.join(' ').trim();
 }
 
-function getSearchFirstCapabilitySuggestions({ input, workspaceContext, navigationPermissions = [] }) {
+function getSearchFirstCapabilitySuggestions({
+  input,
+  workspaceContext,
+  navigationPermissions = [],
+  includePlatformCatalog = false,
+}) {
   const query = normalizeSearchFirstQuery(input);
   if (!query) return [];
   const scopedResults = buildSearchFirstResults({
     query,
     workspaceId: workspaceContext?.activeWorkspaceId || 'all',
     navigationPermissions,
+    includePlatformCatalog,
   });
   const results = scopedResults.length
     ? scopedResults
-    : buildSearchFirstResults({ query, navigationPermissions });
+    : buildSearchFirstResults({ query, navigationPermissions, includePlatformCatalog });
 
   return results
     .filter((entry) => entry.path || entry.tool?.id)
@@ -375,6 +381,7 @@ export function getChatCapabilitySuggestions({
   workspaceContext = null,
   recentToolIds = [],
   navigationPermissions = [],
+  includePlatformCatalog = false,
 } = {}) {
   const suggestions = [];
 
@@ -392,7 +399,12 @@ export function getChatCapabilitySuggestions({
     suggestions.push(suggestion);
   });
 
-  getSearchFirstCapabilitySuggestions({ input, workspaceContext, navigationPermissions }).forEach((suggestion) => {
+  getSearchFirstCapabilitySuggestions({
+    input,
+    workspaceContext,
+    navigationPermissions,
+    includePlatformCatalog,
+  }).forEach((suggestion) => {
     suggestions.push(suggestion);
   });
 

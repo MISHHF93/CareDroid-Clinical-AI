@@ -3,9 +3,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const backlog = readFileSync('docs/plan-implementation-backlog.md', 'utf8');
 const battery = readFileSync('docs/plan-scan-battery-report.md', 'utf8');
 
-const totalTasks = (backlog.match(/^- \[ \]/gm) || []).length;
+const uncheckedTasks = (backlog.match(/^- \[ \]/gm) || []).length;
 const completedTasks = (backlog.match(/^- \[x\]/gim) || []).length;
-const pendingTasks = totalTasks - completedTasks;
+const totalTasks = uncheckedTasks + completedTasks;
+const pendingTasks = uncheckedTasks;
 
 const summaryMatch = battery.match(/- Suites run: (\d+)\n- Passed: (\d+)\n- Failed: (\d+)/m);
 const suitesRun = summaryMatch ? Number(summaryMatch[1]) : 0;
@@ -18,6 +19,12 @@ const lines = [
   '# Plan Progress Dashboard',
   '',
   `Generated: ${generatedAt}`,
+  '',
+  '## Backlog Progress',
+  '',
+  `- Total plan checklist items: ${totalTasks}`,
+  `- Completed checklist items: ${completedTasks}`,
+  `- Pending checklist items: ${pendingTasks}`,
   '',
   '## Extracted Plan Phase Inventory',
   '',

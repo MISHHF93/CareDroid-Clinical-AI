@@ -12,7 +12,7 @@ Mobile artifacts include:
 - `Dockerfile.android`.
 - Android QA matrix/test artifacts under `src/data` and E2E scripts.
 
-No active web/SaaS source import of Android, Kotlin, Java, or Capacitor runtime code was found in `src/` outside test/data references.
+No active Emergency OS web route, shell, sidebar, header, or service import of Android, Kotlin, Java, React Native, Expo, or Capacitor runtime code was found. Vite explicitly excludes Capacitor packages from dependency optimization, and Android code remains outside the active React route tree.
 
 ## Classification
 
@@ -22,7 +22,7 @@ No active web/SaaS source import of Android, Kotlin, Java, or Capacitor runtime 
 | `capacitor.config.json` | `MOBILE_FUTURE_MODULE` | Keep only if mobile packaging remains a supported future module |
 | `Dockerfile.android` | `MOBILE_FUTURE_MODULE` | Keep with Android future module or archive with Android tree |
 | `src/data/androidDeviceQaMatrix.js` and tests | `MOBILE_FUTURE_MODULE` / `NEEDS_MANUAL_REVIEW` | Disconnect from active web validation if mobile is archived |
-| `@capacitor/*` dependencies and scripts | `MOBILE_FUTURE_MODULE` | Remove from primary package only after mobile archive decision |
+| `@capacitor/*` dependencies and scripts | `MOBILE_FUTURE_MODULE` | Keep out of active web imports; remove from primary package only after mobile archive decision |
 
 ## What Was Moved
 
@@ -55,8 +55,9 @@ No mobile files were removed.
 ## Commands Run
 
 - Kotlin, Java, Swift, Gradle, Capacitor config, and Android script inventory.
-- Active web import search for `android`, `capacitor`, and `@capacitor`.
+- Active web import search for Android/Kotlin/Java/Capacitor/Expo/React Native terms.
+- Frontend typecheck, lint, build, and focused route/navigation tests.
 
 ## Validation Result
 
-No Android/mobile code is imported into the active Emergency OS web app.
+No Android/mobile code is imported into the active Emergency OS web app. Mobile remains `MOBILE_FUTURE_MODULE`; archiving the physical Android tree still needs a package-script and CI decision.

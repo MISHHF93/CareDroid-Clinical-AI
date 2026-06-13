@@ -18,8 +18,8 @@ describe('plan implementation backlog document', () => {
   });
 
   it('tracks core roadmap sources', () => {
-    expect(content).toContain('`platform-systems-expansion-plan.md`');
-    expect(content).toContain('`platform-blind-spots-upgrade-plan.md`');
-    expect(content).toContain('`caredroid-next-generation-roadmap.md`');
+    expect(content).toContain('`first-customer-deployment-blueprint.md`');
+    expect(content).toContain('`navigation-reduction-plan.md`');
+    expect(content).toContain('`one-product-redesign-plan.md`');
   });
 });

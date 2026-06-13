@@ -25,23 +25,27 @@ describe('compact UX/UI flattening contracts', () => {
 
   it('normalizes primary navigation around canonical command app entries', () => {
     const nav = read('config/navigation.config.js');
+    const shellNav = nav.match(/export const APP_SHELL_NAV_ITEMS = Object\.freeze\(\[[\s\S]*?\]\);/)?.[0] || '';
     for (const id of [
-      "id: 'home'",
-      "id: 'assistant'",
-      "id: 'tools'",
-      "id: 'operations'",
-      "id: 'digital-twin'",
-      "id: 'hospital-map'",
-      "id: 'medical-iot'",
-      "id: 'fleet'",
-      "id: 'developer-audit'",
-      "id: 'security'",
-      "id: 'settings'",
+      "id: 'emergency_whiteboard'",
+      "id: 'emergency_patients'",
+      "id: 'ems_pipeline'",
+      "id: 'smart_intake'",
+      "id: 'queue_intelligence'",
+      "id: 'reassessment_engine'",
+      "id: 'capacity_intelligence'",
+      "id: 'boarding_intelligence'",
+      "id: 'referral_intelligence'",
+      "id: 'ed_copilot'",
+      "id: 'emergency_analytics'",
+      "id: 'emergency_settings'",
     ]) {
-      expect(nav).toContain(id);
+      expect(shellNav).toContain(id);
     }
-    expect(nav).not.toContain("id: 'patients'");
-    expect(nav).not.toContain("id: 'maps'");
+    expect(shellNav).not.toContain("id: 'tools'");
+    expect(shellNav).not.toContain("id: 'fleet'");
+    expect(shellNav).not.toContain("id: 'security'");
+    expect(shellNav).not.toContain("id: 'maps'");
   });
 
   it('keeps /tools canonical and removes duplicate developer catalog shortcuts', () => {

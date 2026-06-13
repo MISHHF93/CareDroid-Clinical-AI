@@ -1,8 +1,8 @@
 /**
  * Shared assertions for calculator deep links.
  *
- * `CALCULATOR_ROUTE_DEFS` remains the inventory/index for calculator slugs. App.jsx now keeps
- * one mounted calculator redirect surface that opens the active ED Copilot workflow.
+ * `CALCULATOR_ROUTE_DEFS` remains the historical inventory/index for calculator slugs. App.jsx no
+ * longer mounts calculator routes in the active Emergency OS-only product surface.
  */
 
 import { expect } from 'vitest';
@@ -13,13 +13,12 @@ import { CALCULATOR_ROUTE_DEFS } from '../../routes/clinicalToolRoutes';
  * @param {string[]} registryIds - calculatorSlug values
  */
 export function assertAppCalculatorRouteWiring(appSource, registryIds) {
-  const hubIdx = appSource.indexOf("path: '/tools/calculators'");
-  const slugRedirectIdx = appSource.indexOf("path: '/tools/calculators/:slug'");
   expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
   expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
-  expect(hubIdx).toBeGreaterThan(-1);
-  expect(slugRedirectIdx).toBeGreaterThan(hubIdx);
-  expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+  expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+  expect(appSource).toContain(
+    '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+  );
 
   for (const id of registryIds) {
     const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id);

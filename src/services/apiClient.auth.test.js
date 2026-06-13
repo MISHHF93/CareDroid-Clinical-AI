@@ -146,6 +146,7 @@ describe('buildStreamUrl', () => {
 
 describe('apiFetchJson', () => {
   beforeEach(() => {
+    localStorage.setItem('caredroid_access_token', 'test-jwt');
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -159,6 +160,7 @@ describe('apiFetchJson', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    localStorage.clear();
   });
 
   it('returns parsed data', async () => {

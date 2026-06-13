@@ -189,8 +189,8 @@ describe('RecommendationsPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /emergency recommendations/i })).toBeInTheDocument();
-    expect(screen.getByText(/emergency os/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency os recommendations/i })).toBeInTheDocument();
+    expect(screen.getByText(/CareDroid Emergency OS mode is active/i)).toBeInTheDocument();
     expect(screen.getByText('qSOFA')).toBeVisible();
     expect(screen.getByText('Sepsis Pack')).toBeVisible();
     expect(screen.queryByText('Emergency Suite')).not.toBeInTheDocument();

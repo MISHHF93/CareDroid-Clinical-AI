@@ -95,10 +95,13 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
 });
 
 describe('PR1 coverage — registry & routes', () => {
-  it('keeps hub route and PR1 calculator routes via CALCULATOR_ROUTE_DEFS in App.jsx', () => {
-    expect(appSource).toContain("path: '/tools/calculators'");
+  it('keeps PR1 calculator inventory while retiring active App.jsx calculator mounts', () => {
+    expect(appSource).not.toContain("path: '/tools/calculators'");
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
   });
 
   it('exposes each PR1 registry id exactly once in toolRegistry export', () => {

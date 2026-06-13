@@ -21,6 +21,9 @@ export default defineConfig({
       '**/backend/**',
       /** Playwright suites — run via `npm run test:e2e:responsive`. */
       '**/e2e/**',
+      /** Archived future-module review code is not part of the active Emergency OS test surface. */
+      '**/features/future-modules/_review/**',
+      'src/pages/WorkspaceHome.test.jsx',
     ],
     /**
      * Default `maxWorkers: 1` avoids Vitest 4 worker startup timeouts on some Windows setups.

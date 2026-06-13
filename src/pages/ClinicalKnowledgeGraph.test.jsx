@@ -264,7 +264,7 @@ describe('ClinicalKnowledgeGraph', () => {
   it('renders graph explorer, node categories, and relationship visualization', () => {
     renderKnowledgeGraph();
 
-    expect(screen.getByRole('heading', { name: /artifact knowledge graph/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /clinical knowledge graph/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /graph explorer/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /normalized relationships/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /orphans and duplicates/i })).toBeInTheDocument();

@@ -9,7 +9,11 @@
  */
 
 import mongoose from 'mongoose';
-import { AIConfigRegistry, AISafetyRules, PromptTemplateRegistry } from '../config/ai-governance.registry';
+import {
+  AIConfigRegistry,
+  AISafetyRules,
+  PromptTemplateRegistry,
+} from '../config/ai-governance.registry';
 
 export interface AIInteractionAudit {
   id: string;
@@ -104,14 +108,17 @@ export class AIGovernanceService {
     const interactionsByService: Record<string, number> = {};
 
     for (const audit of relevantAudits) {
-      interactionsByService[audit.serviceName] = (interactionsByService[audit.serviceName] || 0) + 1;
+      interactionsByService[audit.serviceName] =
+        (interactionsByService[audit.serviceName] || 0) + 1;
     }
 
     const safetyViolations = relevantAudits.filter((audit) => !audit.safetyCheckPassed).length;
     const totalLatency = relevantAudits.reduce((sum, audit) => sum + audit.latencyMs, 0);
     const averageLatencyMs = relevantAudits.length ? totalLatency / relevantAudits.length : 0;
     const reviewedInteractions = relevantAudits.filter((audit) => audit.humanReviewed).length;
-    const humanReviewRate = relevantAudits.length ? reviewedInteractions / relevantAudits.length : 0;
+    const humanReviewRate = relevantAudits.length
+      ? reviewedInteractions / relevantAudits.length
+      : 0;
     const totalCost = relevantAudits.reduce((sum, audit) => sum + (audit.costCents || 0), 0);
 
     const userCounts: Record<string, number> = {};
@@ -139,7 +146,10 @@ export class AIGovernanceService {
   async getSafetyViolations(limit = 50): Promise<AIInteractionAudit[]> {
     const db = getMongoDb();
     if (!db) {
-      return this.auditTrail.filter((audit) => !audit.safetyCheckPassed).slice(-limit).reverse();
+      return this.auditTrail
+        .filter((audit) => !audit.safetyCheckPassed)
+        .slice(-limit)
+        .reverse();
     }
 
     return (await db

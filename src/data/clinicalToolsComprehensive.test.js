@@ -419,7 +419,10 @@ describe('9. Route resolution', () => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
     expect(calculatorsSource).toContain(`case '${id}':`);
   });
 

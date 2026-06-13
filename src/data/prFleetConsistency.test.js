@@ -89,7 +89,7 @@ describe('PR-FLEET consistency — centralized audit lists', () => {
   });
 });
 
-describe('PR-FLEET consistency — registry IDs and routes', () => {
+describe('PR-FLEET consistency — registry IDs and archived routes', () => {
   it.each(PR_FLEET_TOOL_IDS)('%s aligns toolRegistry, NLU, and backend pattern', (id) => {
     const spec = PR_FLEET_TOOL_SPECS[id];
     const reg = toolRegistryById[id];
@@ -115,10 +115,12 @@ describe('PR-FLEET consistency — registry IDs and routes', () => {
     }
   });
 
-  it.each(PR_FLEET_TIER_A_IDS)('%s registers dedicated App route and page component', (id) => {
+  it.each(PR_FLEET_TIER_A_IDS)('%s stays in registry but is not an active App route', (id) => {
     const spec = PR_FLEET_TOOL_SPECS[id];
-    expect(appSource).toContain(`path: '${spec.routePath}'`);
-    expect(appSource).toContain(spec.appComponent);
+    expect(appSource).not.toContain(`path: '${spec.routePath}'`);
+    expect(appSource).not.toContain(`path="${spec.routePath}"`);
+    expect(appSource).not.toContain(spec.appComponent);
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
     expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
   });
 

@@ -66,6 +66,7 @@ export default function PatientCard({ patient }: PatientCardProps) {
   return (
     <div
       className={hasReassessmentDue ? 'patient-card patient-card--reassessment-due' : 'patient-card'}
+      data-patient-card-id={patient.id}
       onClick={() => selectPatient(patient.id)}
       role="button"
       tabIndex={0}

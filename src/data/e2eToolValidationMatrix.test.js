@@ -117,7 +117,10 @@ describe('e2e matrix — route validity', () => {
 
   it('calculator routes are indexed by CALCULATOR_ROUTE_DEFS and redirected by App.jsx', () => {
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
     expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
     for (const def of CALCULATOR_ROUTE_DEFS) {
       expect(matchCalculatorRoute(def.path)?.calculatorSlug).toBe(def.calculatorSlug);

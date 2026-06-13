@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
@@ -17,13 +17,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { NotificationToastContainer } from './components/notifications/NotificationToast';
 import { AppShell } from './components/AppShell';
 import EmergencyWhiteboard from './pages/emergency';
-import EMSPipeline from './components/EMSPipeline';
-import ReferralPanel from './components/ReferralPanel';
-import QueueIntelligencePanel from './components/QueueIntelligencePanel';
 import QuickIntake from './components/QuickIntake';
 import PatientCard from './components/PatientCard';
-import Calculators from './pages/tools/Calculators';
-import AIGovernanceDashboard from './pages/AIGovernanceDashboard';
 import { useEmergencyStore } from './store/emergencyStore';
 import { PatientFlag, PatientState } from './types/emergency';
 import { CANONICAL_ROUTES, LEGACY_EMERGENCY_ROUTE_REDIRECTS } from './config/routes.config';
@@ -108,7 +103,47 @@ function SmartIntakeRoute() {
 }
 
 function QueueRoute() {
-  const [collapsed, setCollapsed] = useState(false);
+  const patients = useEmergencyStore((state) => state.patients);
+  const queueRows = useMemo(
+    () => [
+      {
+        label: 'Waiting',
+        patients: patients.filter((patient) => patient.state === PatientState.Waiting),
+        target: 30,
+      },
+      {
+        label: 'Triage',
+        patients: patients.filter((patient) => patient.state === PatientState.Triage),
+        target: 10,
+      },
+      {
+        label: 'Assessment',
+        patients: patients.filter((patient) => patient.state === PatientState.Assessment),
+        target: 45,
+      },
+      {
+        label: 'Orders',
+        patients: patients.filter((patient) => patient.state === PatientState.Orders),
+        target: 60,
+      },
+      {
+        label: 'Results',
+        patients: patients.filter((patient) => patient.state === PatientState.Results),
+        target: 90,
+      },
+      {
+        label: 'Admission',
+        patients: patients.filter((patient) => patient.state === PatientState.Admission),
+        target: 120,
+      },
+      {
+        label: 'Reassessment',
+        patients: patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)),
+        target: 30,
+      },
+    ],
+    [patients],
+  );
 
   return (
     <EmergencyRoutePage
@@ -116,9 +151,57 @@ function QueueRoute() {
       title="Queue Intelligence"
       description="Live bottleneck and handoff pressure across waiting, triage, provider, results, referrals, admission, discharge, and reassessment queues."
     >
-      <div style={{ height: 'min(720px, calc(100vh - 160px))' }}>
-        <QueueIntelligencePanel collapsed={collapsed} onCollapsedChange={setCollapsed} />
+      <div style={{ display: 'grid', gap: 10 }}>
+        {queueRows.map((queue) => {
+          const oldestWait = queue.patients.reduce((max, patient) => {
+            const arrivedAt = new Date(patient.arrivalTime).getTime();
+            if (!Number.isFinite(arrivedAt)) return max;
+            return Math.max(max, Math.round((Date.now() - arrivedAt) / 60000));
+          }, 0);
+          const breached = oldestWait > queue.target;
+          return (
+            <article key={queue.label} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center', padding: 14, border: '1px solid #1F2937', borderRadius: 12, background: '#111827' }}>
+              <div>
+                <strong style={{ color: '#F9FAFB' }}>{queue.label}</strong>
+                <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+                  {queue.patients.slice(0, 3).map((patient) => `${patient.firstName} ${patient.lastName}`).join(', ') || 'No patients queued'}
+                </p>
+              </div>
+              <strong style={{ color: '#F9FAFB' }}>{queue.patients.length}</strong>
+              <span style={{ color: breached ? '#EF4444' : '#10B981', fontSize: 12 }}>
+                Oldest {oldestWait}m
+              </span>
+            </article>
+          );
+        })}
       </div>
+    </EmergencyRoutePage>
+  );
+}
+
+function EMSRoute() {
+  const patients = useEmergencyStore((state) => state.patients);
+  const rooms = useEmergencyStore((state) => state.rooms);
+  const emsPatients = useMemo(
+    () => patients.filter((patient) => patient.flags.includes(PatientFlag.EMSArrival) || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint)),
+    [patients],
+  );
+  const availableResusRooms = rooms.filter((room) => room.type === 'Resus' && room.status === 'Available').length;
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="EMS"
+      title="EMS Pipeline"
+      description="Inbound and recently converted EMS arrivals using the active Emergency OS patient model."
+    >
+      <MetricGrid
+        metrics={[
+          { label: 'EMS-linked patients', value: emsPatients.length, color: '#60A5FA' },
+          { label: 'Available resus rooms', value: availableResusRooms, color: availableResusRooms ? '#10B981' : '#EF4444' },
+          { label: 'High-risk inbound', value: emsPatients.filter(isHighRisk).length, color: '#EF4444' },
+        ]}
+      />
+      <PatientGrid patients={emsPatients} emptyMessage="No EMS arrivals are active in the current Emergency OS store." />
     </EmergencyRoutePage>
   );
 }
@@ -152,6 +235,24 @@ function BoardingRoute() {
       description="Pending admissions and boarders that are contributing to capacity pressure."
     >
       <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
+    </EmergencyRoutePage>
+  );
+}
+
+function ReferralsRoute() {
+  const patients = useEmergencyStore((state) => state.patients);
+  const referralCandidates = useMemo(
+    () => patients.filter((patient) => patient.state === PatientState.Disposition || isBoarding(patient) || isHighRisk(patient)),
+    [patients],
+  );
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="Transfers"
+      title="Referrals"
+      description="Referral and transfer candidates from the active Emergency OS patient list."
+    >
+      <PatientGrid patients={referralCandidates} emptyMessage="No referral or transfer candidates are currently flagged." />
     </EmergencyRoutePage>
   );
 }
@@ -212,58 +313,30 @@ function AnalyticsRoute() {
   );
 }
 
-function PulseRoute() {
+function CopilotRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
   const alerts = useEmergencyStore((state) => state.alerts);
-  const activeAlerts = alerts.filter((alert) => !alert.dismissed);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Charge Nurse"
-      title="Department Pulse"
-      description="At-a-glance operational pulse for charge nurse handoff and department status checks."
-    >
-      <MetricGrid
-        metrics={[
-          { label: 'Census', value: patients.length },
-          { label: 'Capacity', value: `${capacity.score} ${capacity.band}`, color: '#60A5FA' },
-          { label: 'Active alerts', value: activeAlerts.length, color: activeAlerts.length ? '#EF4444' : '#10B981' },
-          { label: 'High-risk patients', value: patients.filter(isHighRisk).length, color: '#EF4444' },
-        ]}
-      />
-      <div style={{ display: 'grid', gap: 10 }}>
-        {activeAlerts.map((alert) => (
-          <article key={alert.id} style={{ padding: 14, border: '1px solid #374151', borderRadius: 12, background: '#111827' }}>
-            <strong style={{ color: alert.severity === 'Critical' ? '#EF4444' : '#F59E0B' }}>{alert.title}</strong>
-            <p style={{ color: '#D1D5DB', margin: '6px 0 0' }}>{alert.message}</p>
-          </article>
-        ))}
-      </div>
-    </EmergencyRoutePage>
-  );
-}
-
-function ShiftSummaryRoute() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const capacity = useEmergencyStore((state) => state.capacity);
   const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
+  const highRiskPatients = activePatients.filter(isHighRisk);
 
   return (
     <EmergencyRoutePage
-      eyebrow="Handoff"
-      title="Shift Summary"
-      description="Operational handoff summary generated from the current Emergency OS store."
+      eyebrow="AI Assist"
+      title="ED Copilot"
+      description="The copilot panel is mounted in the Emergency OS shell and uses this route context for department-level questions."
     >
       <MetricGrid
         metrics={[
           { label: 'Active patients', value: activePatients.length },
-          { label: 'High risk', value: activePatients.filter(isHighRisk).length, color: '#EF4444' },
-          { label: 'Boarding', value: activePatients.filter(isBoarding).length, color: '#F97316' },
-          { label: 'Reassessment due', value: capacity.reassessmentDue, color: '#EF4444' },
+          { label: 'High risk', value: highRiskPatients.length, color: '#EF4444' },
+          { label: 'Capacity band', value: capacity.band, color: '#60A5FA' },
+          { label: 'Active alerts', value: alerts.filter((alert) => !alert.dismissed).length, color: '#F59E0B' },
         ]}
       />
-      <PatientGrid patients={activePatients.filter((patient) => isHighRisk(patient) || isBoarding(patient))} emptyMessage="No high-risk or boarding patients to highlight." />
+      <p style={{ color: '#9CA3AF', margin: 0 }}>
+        Use the docked ED Copilot to ask about who needs attention, capacity pressure, EMS status, or reassessment priorities.
+      </p>
     </EmergencyRoutePage>
   );
 }
@@ -303,34 +376,32 @@ export function AppRoutes() {
         <Route path="/emergency" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path={CANONICAL_ROUTES.emergencyWhiteboard} element={<EmergencyWhiteboard />} />
         <Route path={CANONICAL_ROUTES.emergencyPatients} element={<EmergencyWhiteboard />} />
-        <Route path={CANONICAL_ROUTES.emergencyEms} element={<EMSPipeline />} />
+        <Route path={CANONICAL_ROUTES.emergencyEms} element={<EMSRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyIntake} element={<SmartIntakeRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyQueues} element={<QueueRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyReassessment} element={<ReassessmentRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyCapacity} element={<CapacityRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyBoarding} element={<BoardingRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyReferrals} element={<ReferralPanel />} />
-        <Route path={CANONICAL_ROUTES.emergencyTools} element={<Calculators />} />
-        <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        <Route path={CANONICAL_ROUTES.emergencyReferrals} element={<ReferralsRoute />} />
+        <Route path={CANONICAL_ROUTES.emergencyCopilot} element={<CopilotRoute />} />
         <Route path={CANONICAL_ROUTES.emergencyAnalytics} element={<AnalyticsRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<AIGovernanceDashboard />} />
-        <Route path={CANONICAL_ROUTES.emergencyPulse} element={<PulseRoute />} />
-        <Route path={CANONICAL_ROUTES.emergencyShift} element={<ShiftSummaryRoute />} />
         <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencySettingsRoute />} />
       </Route>
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
         <Route key={`${path}-${to}`} path={path} element={<Navigate to={to} replace />} />
       ))}
       <Route path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route path="/home" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/app" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyTools} replace />} />
+      <Route path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/assistant" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/chat" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/ai" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/copilot" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/ai-governance" element={<Navigate to={CANONICAL_ROUTES.emergencyAiGovernance} replace />} />
+      <Route path="/ai-governance" element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
       <Route path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
     </Routes>

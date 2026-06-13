@@ -51,7 +51,7 @@ describe('simulation, laboratory, and 3D viewer pages', () => {
 
   it('renders simulation outcomes metrics and recommended practice', () => {
     renderPage(SimulationOutcomes);
-    expect(screen.getByRole('heading', { name: /simulation outcomes/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /simulation outcomes/i })).toBeInTheDocument();
     expect(screen.getByText(/demo outcomes dashboard/i)).toBeInTheDocument();
     expect(screen.getAllByText(/completion rate/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/competency coverage/i).length).toBeGreaterThan(0);

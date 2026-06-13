@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { render, screen, waitFor } from '@testing-library/react';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { WelcomePage } from './App';
 
 const mocks = vi.hoisted(() => ({
   appConfig: {
@@ -50,11 +48,6 @@ vi.mock('./hooks/useNotificationActions', () => ({
   useNotificationActions: () => mocks.notifications,
 }));
 
-function LocationProbe() {
-  const location = useLocation();
-  return <div data-testid="location">{location.pathname}</div>;
-}
-
 function AuthStateProbe() {
   const { isAuthenticated, isDevAuthBypass, user } = useUser();
   return (
@@ -65,18 +58,7 @@ function AuthStateProbe() {
   );
 }
 
-function renderWelcome() {
-  render(
-    <MemoryRouter initialEntries={['/']}>
-      <UserProvider>
-        <WelcomePage />
-        <LocationProbe />
-      </UserProvider>
-    </MemoryRouter>
-  );
-}
-
-describe('Welcome page platform access', () => {
+describe('Emergency OS open access state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -85,91 +67,43 @@ describe('Welcome page platform access', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('shows one platform access action in development even with flags disabled', () => {
-    renderWelcome();
-
-    expect(
-      screen.queryByRole('button', { name: /enter platform/i })
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('button', { name: /direct sign in/i })
-    ).not.toBeInTheDocument();
-  });
-
-  it('allows platform access when flags are disabled in local dev and routes to dashboard', async () => {
-    renderWelcome();
-
-    fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
+  it('starts open access automatically when no stored auth exists', async () => {
+    render(
+      <UserProvider>
+        <AuthStateProbe />
+      </UserProvider>
+    );
 
     await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
+      expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
     });
+    expect(localStorage.getItem('caredroid_access_token')).toBeNull();
+    expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
   });
 
-  it('uses the platform access action when explicitly enabled and routes to dashboard', async () => {
-    mocks.appConfig.features.enableDevAuthBypass = true;
-    renderWelcome();
+  it('clears persisted auth and keeps open access after refresh-compatible remounts', async () => {
+    localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
+    localStorage.setItem(
+      'caredroid_user_profile',
+      JSON.stringify({
+        id: 'platform-access-user',
+        role: 'physician',
+        authMode: 'platform-access',
+        isDevAuthBypass: true,
+        devAuthLabel: 'Platform Access',
+      })
+    );
 
-    fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
+    render(
+      <UserProvider>
+        <AuthStateProbe />
+      </UserProvider>
+    );
 
     await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
+      expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
     });
+    expect(localStorage.getItem('caredroid_access_token')).toBeNull();
+    expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
   });
-});
-
-
-it('shows platform access when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
-  mocks.appConfig.features.enableDevAuthBypass = false;
-  mocks.appConfig.features.enableDemoMode = true;
-  renderWelcome();
-
-  fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
-
-  await waitFor(() => {
-    expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
-  });
-});
-
-it('starts open access automatically when no stored auth exists', async () => {
-  localStorage.clear();
-
-  render(
-    <UserProvider>
-      <AuthStateProbe />
-    </UserProvider>
-  );
-
-  await waitFor(() => {
-    expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
-  });
-  expect(localStorage.getItem('caredroid_access_token')).toBeNull();
-  expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
-});
-
-it('clears persisted auth and keeps open access after refresh-compatible remounts', async () => {
-  localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
-  localStorage.setItem(
-    'caredroid_user_profile',
-    JSON.stringify({
-      id: 'platform-access-user',
-      role: 'physician',
-      authMode: 'platform-access',
-      isDevAuthBypass: true,
-      devAuthLabel: 'Platform Access',
-    })
-  );
-
-  render(
-    <UserProvider>
-      <AuthStateProbe />
-    </UserProvider>
-  );
-
-  await waitFor(() => {
-    expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
-  });
-  expect(localStorage.getItem('caredroid_access_token')).toBeNull();
-  expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
 });

@@ -99,7 +99,10 @@ describe('Wiring audit — registry IDs and route slugs', () => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s has no dedicated /tools/calculators/<id> App route', (id) => {

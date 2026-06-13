@@ -168,6 +168,7 @@ function launchPathWorks(row) {
   if (!navPath && !launch.path) return false;
   const effective = navPath || launch.path;
   if (effective === '/assistant') return Boolean(launch.chatSeed?.length > 20);
+  if (effective.startsWith('/tools') || effective.startsWith('/fleet')) return false;
   return isKnownToolAreaPath(effective);
 }
 
@@ -311,6 +312,7 @@ function formatTierLabel(tier) {
  * @param {ReturnType<typeof buildVisibilityRow>} row
  */
 function deriveStatus(row, { tier, routeExists, catalogLaunchDiffers }) {
+  if (!routeExists && row.route !== '—' && isKnownToolAreaPath(row.route)) return 'archived route';
   if (!routeExists && row.route !== '—') return 'route missing';
   if (!row.catalogEntryExists) return 'catalog missing';
   if (!row.frontendComponentExists) return 'component missing';

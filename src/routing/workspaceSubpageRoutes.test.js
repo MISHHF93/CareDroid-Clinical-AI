@@ -2,24 +2,16 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS } from '../config/routes.config';
+import {
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS,
+} from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 
-function routeBlockFor(path) {
-  const escapedPath = path.replace(/\//g, '\\/');
-  return appSource.match(new RegExp(`path:\\s*'${escapedPath}'[\\s\\S]*?requiresAuth:\\s*true,?`))?.[0];
-}
-
 describe('workspace subpage routes', () => {
-  it('keeps workspace subpages on the protected Emergency OS redirect owner', () => {
-    const routeBlock = routeBlockFor('/workspace/:workspaceId/:subpage');
-
-    expect(routeBlock).toBeTruthy();
-    expect(routeBlock).toContain('<WorkspaceRouteRedirect />');
-    expect(routeBlock).toContain('requiresAuth: true');
-    expect(routeBlock).not.toMatch(/<AppShell\b|<Sidebar\b|app-shell-page-body/);
+  it('keeps workspace aliases on the Emergency OS redirect contract', () => {
     expect(WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS).toMatchObject({
       whiteboard: '/emergency/whiteboard',
       patients: '/emergency/patients',
@@ -27,14 +19,21 @@ describe('workspace subpage routes', () => {
       'command-center': '/emergency/whiteboard',
       copilot: '/emergency/copilot',
     });
-    expect(appSource).toContain('WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS[subpage]');
-    expect(appSource).not.toContain('const routeMap = {');
+    expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/workspace/emergency', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/workspace/emergency/patients', to: '/emergency/patients' }),
+        expect.objectContaining({ path: '/workspace/emergency/queues', to: '/emergency/queues' }),
+      ])
+    );
+    expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
+    expect(appSource).toContain('<Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).not.toContain('function WorkspaceRouteRedirect');
   });
 
-  it('keeps automation analytics as a future-release redirect into Emergency OS', () => {
-    expect(appSource).toContain("['Automation Analytics', '/automation-analytics']");
-    expect(appSource).toContain('.filter(([, path]) => !ACTIVE_RELEASE_ROUTE_PATHS.has(path))');
-    expect(appSource).toContain('.map(([, path]) => ({');
-    expect(appSource).toContain('<LegacyProtectedRouteRedirect to="/emergency/whiteboard" />');
+  it('keeps automation analytics unmounted from the active Emergency OS app', () => {
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.automationAnalytics}');
+    expect(appSource).not.toContain("path=\"/automation-analytics\"");
+    expect(appSource).toContain('<Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
   });
 });

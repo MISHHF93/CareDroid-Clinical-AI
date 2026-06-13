@@ -212,7 +212,10 @@ describe('PR4A ten-area — 8. route resolution', () => {
     const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
     expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
   });
 });
 

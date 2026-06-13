@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
@@ -16,17 +16,19 @@ import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import { AppRoutes } from '../App';
 
-vi.mock('../components/ChatInterface', () => ({
-  default: ({ prefillText = '' }) => <div data-testid="copilot-chat">{prefillText || 'Copilot chat'}</div>,
+vi.mock('../services/clinicalChatService', () => ({
+  sendClinicalChatMessage: vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    data: { response: 'AI generated handoff brief.' },
+  }),
+  mapChatResponseToAssistantMessage: vi.fn(),
 }));
 
-vi.mock('../components/EMSPipeline', () => ({
-  default: () => <h1>EMS Pipeline</h1>,
-}));
-
-vi.mock('../pages/settings/FeatureManagement', () => ({
-  default: () => <h1>FeatureTogglePanel</h1>,
-}));
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="location">{location.pathname}</output>;
+}
 
 function AppRouteHarness({ initialPath }) {
   return (
@@ -45,6 +47,7 @@ function AppRouteHarness({ initialPath }) {
                             <SystemConfigProvider>
                               <Suspense fallback={<div>Loading route</div>}>
                                 <AppRoutes />
+                                <LocationProbe />
                               </Suspense>
                             </SystemConfigProvider>
                           </ConversationProvider>
@@ -67,25 +70,22 @@ describe('canonical App routes deep links', () => {
     render(<AppRouteHarness initialPath="/emergency/ems" />);
 
     expect(await screen.findByRole('heading', { name: 'EMS Pipeline' })).toBeInTheDocument();
-    expect(screen.getByRole('complementary', { name: /emergency os navigation/i })).toBeInTheDocument();
-    expect(screen.getByRole('banner', { name: /emergency os header/i })).toBeInTheDocument();
-    expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
+    expect(screen.getByRole('complementary', { name: /emergency navigation/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('banner').some((banner) => banner.textContent?.includes('Emergency OS'))).toBe(true);
+    expect(screen.getByRole('main')).toBeInTheDocument();
   });
 
-  it('renders /settings/features inside the AppShell', async () => {
+  it('redirects /settings/features to Emergency OS settings', async () => {
     render(<AppRouteHarness initialPath="/settings/features" />);
 
-    expect(await screen.findByRole('heading', { name: 'FeatureTogglePanel' })).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: /settings tabs/i })).toBeInTheDocument();
-    expect(screen.getByRole('complementary', { name: /emergency os navigation/i })).toBeInTheDocument();
-    expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
+    expect(await screen.findByRole('heading', { name: 'Emergency OS Settings' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/settings');
   });
 
-  it('preserves assistant agent launch context through the ED Copilot alias', async () => {
+  it('redirects the retired assistant alias to the Emergency OS whiteboard', async () => {
     render(<AppRouteHarness initialPath="/assistant?agent=agent-emergency" />);
 
-    expect(await screen.findByTestId('copilot-chat')).toHaveTextContent(
-      /Use Emergency AI \(agent-emergency\)/
-    );
+    expect(await screen.findByText('Total')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });
 });

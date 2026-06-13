@@ -1,53 +1,70 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import {
+  CANONICAL_APP_ROUTE_TREE,
+  CANONICAL_ROUTES,
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+} from '../config/routes.config';
 
 const appSource = readFileSync(join(__dirname, '..', 'App.jsx'), 'utf8');
-const routeConfigSource = readFileSync(join(__dirname, '..', 'config/routes.config.js'), 'utf8');
+const redirectsByPath = Object.fromEntries(
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to])
+);
 
 describe('canonical route/auth architecture', () => {
-  it('bypasses canonical auth and routes aliases to the Emergency Whiteboard', () => {
-    expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/emergency/whiteboard" replace />');
-    expect(appSource).toContain('...AUTH_PATH_ALIASES.map((path) => ({');
-    expect(appSource).toContain('element: <AuthPathRedirect />');
-  });
-
-  it('keeps one protected AppShell owner for canonical Emergency OS routes', () => {
+  it('bypasses retired auth routes into the Emergency Whiteboard', () => {
+    expect(appSource).not.toContain('function AuthPathRedirect()');
     expect(appSource).not.toContain('<TenantRequired>');
-    expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
-    expect(appSource.match(/<AppShellPage\b/g)).toHaveLength(1);
-    expect(appSource).toContain("path: '/emergency/whiteboard'");
-    expect(appSource).toContain("path: '/emergency/patients'");
-    expect(appSource).toContain("path: '/emergency/settings'");
+    expect(redirectsByPath['/auth']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
   });
 
-  it('uses redirects for auth aliases and login aliases', () => {
-    expect(routeConfigSource).toContain(
-      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/assistant', '/chat', '/ai', '/copilot'])"
-    );
-    expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
+  it('keeps one AppShell owner for canonical Emergency OS routes', () => {
+    expect(appSource).not.toContain('<TenantRequired>');
+    expect(appSource).toContain('<AppShell>');
+    expect(appSource).toContain('<Outlet />');
+    expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
+    expect(CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path)).toEqual([
+      '/emergency/whiteboard',
+      '/emergency/patients',
+      '/emergency/ems',
+      '/emergency/intake',
+      '/emergency/queues',
+      '/emergency/reassessment',
+      '/emergency/capacity',
+      '/emergency/boarding',
+      '/emergency/referrals',
+      '/emergency/copilot',
+      '/emergency/analytics',
+      '/emergency/settings',
+    ]);
+  });
+
+  it('uses redirects for retired assistant and login aliases', () => {
+    for (const path of ['/assistant', '/chat', '/ai', '/copilot']) {
+      expect(appSource).toContain(`path="${path}"`);
+      expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
+    }
   });
 
   it('normalizes legacy tools and product aliases into Emergency OS redirects', () => {
-    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze([");
-    expect(routeConfigSource).toContain("'/tools',");
-    expect(routeConfigSource).toContain("'/all-tools',");
-    expect(routeConfigSource).toContain("'/clinical-tools',");
-    expect(routeConfigSource).toContain("'/catalog',");
-    expect(routeConfigSource).toContain(
-      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
-    );
-    expect(routeConfigSource).toMatch(
-      /id:\s*'tools'[\s\S]*path:\s*CANONICAL_ROUTES\.emergencyCopilot[\s\S]*aliases:\s*TOOLS_ROUTE_ALIASES/
-    );
-    expect(appSource).toContain("path: '/emergency/tools'");
-    expect(appSource).toContain('<LegacyProtectedRouteRedirect to="/emergency/copilot" />');
-    expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
+    expect(appSource).toContain('path="/tools/*"');
+    for (const path of [
+      '/fleet',
+      '/fleet/*',
+      '/hospital-map',
+      '/medical-iot',
+      '/devices',
+      '/operations',
+      '/operations/*',
+      '/marketplace',
+      '/platform-admin',
+    ]) {
+      expect(redirectsByPath[path]).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
+    }
   });
 
   it('ensures unknown protected routes redirect to the Emergency Whiteboard', () => {
-    expect(appSource).toMatch(
-      /path:\s*'\*'[\s\S]*<Navigate to="\/emergency\/whiteboard" replace \/>[\s\S]*requiresAuth:\s*true/
-    );
+    expect(appSource).toContain('path="*"');
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
   });
 });

@@ -97,9 +97,11 @@ describe('getApiErrorMessage', () => {
 describe('apiFetch timeout', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    localStorage.clear();
   });
 
   it('aborts when the request exceeds timeoutMs', async () => {
+    localStorage.setItem('caredroid_access_token', 'test-jwt');
     vi.stubGlobal(
       'fetch',
       vi.fn(

@@ -528,11 +528,13 @@ describe('7. Discovery inclusion', () => {
   );
 });
 
-describe('8. Route validation', () => {
-  it.each(PR_FLEET_TIER_A_IDS)('%s registers dedicated /fleet App route (not calculators slug)', (id) => {
+describe('8. Archived route validation', () => {
+  it.each(PR_FLEET_TIER_A_IDS)('%s remains archived outside active App routes', (id) => {
     const spec = PR_FLEET_TOOL_SPECS[id];
-    expect(appSource.indexOf(`path: '${spec.routePath}'`)).toBeGreaterThan(-1);
-    expect(appSource).toContain(spec.appComponent);
+    expect(appSource).not.toContain(`path: '${spec.routePath}'`);
+    expect(appSource).not.toContain(`path="${spec.routePath}"`);
+    expect(appSource).not.toContain(spec.appComponent);
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
     expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
     expect(calculatorsSource).not.toContain(`case '${id}':`);
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);

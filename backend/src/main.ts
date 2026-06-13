@@ -52,7 +52,6 @@ async function registerEmergencyMongooseRuntime(app: INestApplication, logger: L
   expressApp.use('/api/emergency/intake', smartIntakeRoutes);
   expressApp.use('/api/emergency/reassessment', reassessmentRoutes);
   expressApp.use('/api/emergency/surge', surgeRoutes);
-  expressApp.use('/api/v1/governance', governanceRoutes);
   registerEMSWebSocketSupport(expressApp, app.getHttpServer());
   reassessmentScheduler.start();
   await ocrService.initialize();

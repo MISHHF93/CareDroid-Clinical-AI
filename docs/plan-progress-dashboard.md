@@ -2,6 +2,12 @@
 
 Generated: 2026-06-12T21:33:32.362Z
 
+## Backlog Progress
+
+- Total plan checklist items: 183
+- Completed checklist items: 0
+- Pending checklist items: 183
+
 ## Extracted Plan Phase Inventory
 
 - Extracted plan phase entries: 183

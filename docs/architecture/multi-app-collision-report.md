@@ -20,9 +20,12 @@ The repository contains collided systems:
 | Patient cards | `src/components/PatientCard.tsx` | `src/components/PatientCard.jsx` | Active TSX card consolidated; legacy JSX card already deleted/unmounted |
 | Detail panel | `src/components/PatientDetailPanel.tsx` | legacy nested card/detail implementations | Active detail panel consolidated |
 | Intake | `src/components/QuickIntake.tsx` | `src/components/NewPatientIntake.jsx` | Active quick intake consolidated |
-| Pediatric drugs | `src/components/calculators/PediatricDrugCalc.tsx` | `src/components/PediatricDrugCalculator.jsx` | Active calculator consolidated |
+| EMS | route-local `EMSRoute` in `src/App.jsx` | `src/components/EMSPipeline.jsx` using root store | Active route no longer mounts root-store panel |
+| Queues | route-local `QueueRoute` in `src/App.jsx` | `src/components/QueueIntelligencePanel.jsx` using root store | Active route no longer mounts root-store panel |
+| Referrals | route-local `ReferralsRoute` in `src/App.jsx` | `src/components/ReferralPanel.jsx` using root store | Active route no longer mounts root-store panel |
+| Pediatric drugs | future calculator modules | `src/components/PediatricDrugCalculator.jsx`, broad `src/pages/tools/*` library | Removed from standalone active route; curate later |
 | Navigation | `src/components/Sidebar.tsx` | `src/config/navigation.config.js`, old shell nav | Active sidebar route targets normalized; config remains review/shared |
-| Command palette | `src/components/AppShell.tsx` inline palette | `src/config/commandPalette.config.js`, old `CommandPalette` | Active keyboard palette consolidated; registry needs later merge |
+| Command palette | `src/components/AppShell.tsx` + `src/config/commandPalette.config.js` | old `CommandPalette` | Active keyboard palette now consumes one Emergency OS command registry |
 | API client | `src/services/apiClient.js` | multiple service-specific API wrappers | Central client remains; service wrappers need curation |
 | Routes | `src/App.jsx` | `src/config/routes.config.js`, route health/test inventories | Active route tree normalized; legacy config remains audit/reference |
 
@@ -33,8 +36,9 @@ No directories were moved. High-risk areas are documented in `archive/_review/RE
 ## What Was Merged
 
 - Emergency OS active routes now mount from one router in `src/App.jsx`.
-- Sidebar targets now match the normalized `/emergency/*` route family.
-- Command palette destinations now match the normalized route family.
+- Sidebar targets now match the requested normalized `/emergency/*` route family.
+- Command palette destinations now match the normalized route family and no longer launch inactive tools/pulse/shift/governance routes.
+- Conditional backend Express routers now mount under `/api/emergency/*` only.
 
 ## What Was Archived
 
@@ -44,7 +48,8 @@ No directories were moved. High-risk areas are documented in `archive/_review/RE
 ## What Was Removed
 
 - Active `/settings` mounting of the generic platform settings page was removed by redirecting `/settings` to `/emergency/settings`.
-- Active `/emergency/tools` is no longer a primary route; it redirects to `/emergency/copilot`.
+- Active `/emergency/tools`, `/emergency/pulse`, `/emergency/shift`, and `/emergency/ai-governance` mounts were removed; unknown `/emergency/*` routes fall back to `/emergency/whiteboard`.
+- Duplicate backend `/api/v1/governance` alias was removed.
 
 ## Manual Review
 
@@ -61,8 +66,9 @@ No directories were moved. High-risk areas are documented in `archive/_review/RE
 
 - Config/package glob inventory
 - Route/layout/navigation source reads
-- Active import searches for legacy shell and mobile code
+- Active import searches for legacy shell, root store panels, and mobile code
+- Frontend/backend validation commands listed in `repository-harmonization-report.md`
 
 ## Validation Result
 
-Active route tree consolidated. Full validation to be rerun after report generation.
+Active route tree consolidated. Typecheck, lint, production build, focused frontend route/navigation tests, backend build/lint/tests, and dependency checks pass. Full frontend suite still fails legacy/audit assumptions and hung after failure output.

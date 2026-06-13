@@ -23,7 +23,9 @@ const emsCriticalBroadcastCss = readFileSync(
 describe('single AppShell contract', () => {
   it('keeps AppShell as the only route shell wrapper', () => {
     expect(appJsx.match(/<AppShell\b/g)).toHaveLength(1);
-    expect(appJsx).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
+    expect(appJsx).toContain('function RootLayout()');
+    expect(appJsx).toContain('<AppShell>');
+    expect(appJsx).toContain('<Outlet />');
     expect(appJsx).not.toContain('<AuthShell');
     expect(appJsx).not.toContain('<PublicShell');
     expect(appJsx).not.toContain("from './layout/AuthShell'");

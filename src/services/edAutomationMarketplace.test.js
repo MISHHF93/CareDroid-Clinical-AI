@@ -15,6 +15,8 @@ describe('EdAutomationMarketplace', () => {
       'Boarding',
       'Equipment',
       'Discharge',
+      'Simulation',
+      'Analytics',
     ]);
   });
 
@@ -42,7 +44,7 @@ describe('EdAutomationMarketplace', () => {
   it('groups modules by marketplace category', () => {
     const categories = EdAutomationMarketplace.getMarketplaceCategories();
 
-    expect(categories).toHaveLength(8);
+    expect(categories).toHaveLength(ED_AUTOMATION_MARKETPLACE_CATEGORIES.length);
     expect(categories.find((category) => category.category === 'Boarding')).toEqual(
       expect.objectContaining({
         moduleCount: expect.any(Number),
@@ -60,6 +62,14 @@ describe('EdAutomationMarketplace', () => {
         }),
       ])
     );
+    expect(categories.find((category) => category.category === 'Simulation').modules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: 'Simulation Academy',
+        }),
+      ])
+    );
+    expect(categories.find((category) => category.category === 'Analytics').moduleCount).toBeGreaterThan(0);
   });
 
   it('returns a marketplace dashboard summary', () => {
@@ -73,7 +83,7 @@ describe('EdAutomationMarketplace', () => {
           totalModules: 10,
           enabledModules: expect.any(Number),
           disabledModules: expect.any(Number),
-          categories: 8,
+          categories: ED_AUTOMATION_MARKETPLACE_CATEGORIES.length,
           reviewRequired: expect.any(Number),
         }),
         packagingStatement: expect.stringMatching(/sellable SaaS modules/i),

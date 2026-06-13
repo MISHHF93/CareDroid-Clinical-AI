@@ -42,13 +42,15 @@ const FLEET_PRODUCTION_PATHS = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
   p.startsWith('/fleet/')
 );
 
-describe('Production routes — App.jsx redirects calculator routes through Copilot', () => {
-  it('uses one calculator redirect surface while CALCULATOR_ROUTE_DEFS owns slug inventory', () => {
+describe('Production routes — archived calculator route inventory', () => {
+  it('keeps calculator slug inventory while App.jsx retires standalone calculator pages', () => {
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
     expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
-    expect(appSource).toContain("path: '/tools/calculators'");
-    expect(appSource).toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain("path: '/tools/calculators'");
+    expect(appSource).not.toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).not.toContain('path="/tools/calculators/:slug"');
+    expect(appSource).toContain('path="/tools/*"');
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
     const requiredCalculatorPaths = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
       p.startsWith('/tools/calculators/') && p !== TOOL_LAUNCH_PATHS.calculatorsHub
     );
@@ -58,11 +60,11 @@ describe('Production routes — App.jsx redirects calculator routes through Copi
     }
   });
 
-  it('declares calculators hub before the slug redirect fallback', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators'");
-    expect(hubIdx).toBeGreaterThan(-1);
-    const slugRedirectIdx = appSource.indexOf("path: '/tools/calculators/:slug'");
-    expect(slugRedirectIdx).toBeGreaterThan(hubIdx);
+  it('declares retired tools wildcard before the global fallback', () => {
+    const toolsWildcardIdx = appSource.indexOf('path="/tools/*"');
+    expect(toolsWildcardIdx).toBeGreaterThan(-1);
+    const globalFallbackIdx = appSource.indexOf('path="*"');
+    expect(globalFallbackIdx).toBeGreaterThan(toolsWildcardIdx);
   });
 
   it.each(REQUIRED_PRODUCTION_TOOL_PATHS)('registers required production path %s', (path) => {

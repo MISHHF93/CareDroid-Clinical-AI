@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import Patients from './Patients';
 import Operations from './Operations';
 import {
@@ -32,13 +33,17 @@ vi.mock('../navigation/registryToolLaunch', () => ({
 
 vi.mock('./OperatingWorkspace.css', () => ({}));
 
+function renderInRouter(element) {
+  return render(<MemoryRouter>{element}</MemoryRouter>);
+}
+
 describe('operating workspace launch harness', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('routes patient workflow cards to patient workspace platform routes', () => {
-    render(<Patients />);
+    renderInRouter(<Patients />);
 
     fireEvent.click(screen.getByRole('button', { name: /summarize active case/i }));
 
@@ -47,7 +52,7 @@ describe('operating workspace launch harness', () => {
   });
 
   it('routes fleet operation cards through the registry launch resolver', () => {
-    render(<Operations />);
+    renderInRouter(<Operations />);
 
     fireEvent.click(screen.getByRole('button', { name: /fleet command/i }));
 
@@ -64,7 +69,7 @@ describe('operating workspace launch harness', () => {
   });
 
   it('keeps non-tool operational cards on explicit workspace routes', () => {
-    render(<Operations />);
+    renderInRouter(<Operations />);
 
     fireEvent.click(screen.getByRole('button', { name: /clinical alerts/i }));
 

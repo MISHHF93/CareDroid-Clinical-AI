@@ -102,10 +102,10 @@ describe('frontend rendering — per-tool layers', () => {
     expect(validateFrontendRenderingRow(row), registryId).toEqual([]);
   });
 
-  it.each(ROADMAP_TIER_A_IDS)('Tier A %s has App route and Calculators switch', (registryId) => {
+  it.each(ROADMAP_TIER_A_IDS)('Tier A %s keeps calculator switch but no active App route', (registryId) => {
     const row = buildFrontendRenderingRow(registryId);
     expect(row.tier).toBe('A');
-    expect(row.layers.appRoute).toBe(true);
+    expect(row.layers.appRoute).toBe(false);
     expect(row.layers.tierAFormSwitch).toBe(true);
     expect(row.builtinSlug).toBeTruthy();
     expect(calculatorsSource).toContain(`case '${row.builtinSlug}':`);
@@ -120,23 +120,26 @@ describe('frontend rendering — per-tool layers', () => {
     expect(launch.path).toBe('/tools/calculators');
   });
 
-  it.each(FLEET_TIER_A_REGISTRY_IDS)('fleet Tier A %s registers dedicated /fleet route', (registryId) => {
+  it.each(FLEET_TIER_A_REGISTRY_IDS)('fleet Tier A %s remains archived outside active App routes', (registryId) => {
     const row = buildFrontendRenderingRow(registryId);
     expect(row.tier).toBe('fleet-A');
-    expect(row.layers.fleetPage).toBe(true);
+    expect(row.layers.fleetPage).toBe(false);
     expect(row.route.startsWith('/fleet/')).toBe(true);
   });
 });
 
 describe('frontend rendering — App.jsx routes', () => {
-  it('registers catalog and calculators hub', () => {
-    expect(appSource).toContain("path: '/tools/calculators'");
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+  it('redirects retired tools routes into the Emergency OS whiteboard', () => {
+    expect(appSource).not.toContain("path: '/tools/calculators'");
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
   });
 
   it('derives Tier A calculator routes from CALCULATOR_ROUTE_DEFS in App.jsx', () => {
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
     expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
     const roadmapSlugs = buildFrontendRenderingInventory()
       .filter((r) => r.tier === 'A')
@@ -149,11 +152,11 @@ describe('frontend rendering — App.jsx routes', () => {
     }
   });
 
-  it('registers fleet catch-all fallback', () => {
+  it('keeps fleet routes out of the active Emergency OS app', () => {
     for (const id of FLEET_TIER_A_REGISTRY_IDS) {
       const row = buildFrontendRenderingRow(id);
       expect(row.route.startsWith('/fleet/')).toBe(true);
-      expect(row.layers.appRoute).toBe(true);
+      expect(row.layers.appRoute).toBe(false);
     }
   });
 });

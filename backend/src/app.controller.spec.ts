@@ -50,11 +50,14 @@ describe('AppController environment config', () => {
           configuredForMount: true,
           status: 'configured',
           routeGroups: [
-            '/api/capacity',
-            '/api/copilot',
-            '/api/ems',
+            '/api/emergency/boarding',
+            '/api/emergency/capacity',
+            '/api/emergency/copilot',
+            '/api/emergency/ems',
+            '/api/emergency/governance',
             '/api/emergency/intake',
-            '/api/reassessment',
+            '/api/emergency/reassessment',
+            '/api/emergency/surge',
           ],
         },
       });

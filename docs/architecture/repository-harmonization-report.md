@@ -4,7 +4,7 @@
 
 CareDroid contains one active Vite React web app, one NestJS backend, one MCP bridge package, one Android/Capacitor mobile tree, and a large set of historical web platform pages/components/tests from a broader healthcare AI platform.
 
-The active product should be CareDroid Emergency OS. Prior to this pass, the active app had already been rebuilt around `src/components/AppShell.tsx`, but routes still used `/emergency`, `/settings`, and `/emergency/tools` as active product paths.
+The active product is CareDroid Emergency OS. Prior to this pass, the active app had been rebuilt around `src/components/AppShell.tsx`, but active navigation still exposed extra tools/governance/pulse/shift surfaces and several active routes still mounted older root-store panels.
 
 ## What Was Moved
 
@@ -13,9 +13,12 @@ No high-risk code directories were physically moved in this pass. The separate a
 ## What Was Merged
 
 - Active route ownership was consolidated in `src/App.jsx`.
-- Active navigation route targets were consolidated in `src/components/Sidebar.tsx`.
-- Active keyboard command destinations were consolidated in `src/components/AppShell.tsx`.
+- Active navigation route targets were consolidated through `src/config/navigation.config.js` and `src/components/Sidebar.tsx`.
+- Active keyboard command destinations now consume `src/config/commandPalette.config.js`.
 - Legacy generic settings route was unmounted from the active product and replaced with an Emergency OS settings placeholder at `/emergency/settings`.
+- Older root-store EMS, queue, referral, calculator, pulse, shift, and AI governance route mounts were removed from the active app surface.
+- Active startup simulation now uses `src/engine/simulation.ts` instead of the older root-level simulation engine.
+- The conditional backend Emergency OS runtime now mounts only `/api/emergency/*` route groups.
 
 ## What Was Archived
 
@@ -28,15 +31,16 @@ No high-risk code directories were physically moved in this pass. The separate a
 - No files were deleted in this pass.
 - Active references to old root/general product paths were removed from the primary route tree through redirects to `/emergency/whiteboard`.
 - Active mounting of the generic `/settings` page was removed; `/settings` now redirects to `/emergency/settings`.
+- The duplicate `/api/v1/governance` backend mount was removed.
 
 ## What Still Needs Manual Review
 
 - Whether `android/` should remain in-repo as `MOBILE_FUTURE_MODULE` or move under `archive/_review/android`.
 - Whether `mcp/` should stay as first-class tooling or move under `archive/_review/mcp`.
-- Which `src/pages/tools/*` calculators should be curated into the Emergency OS tools experience.
+- Which `src/pages/tools/*` and `src/components/calculators/*` calculators should be curated back into Emergency OS as embedded workflow tools.
 - Whether app-wide providers from legacy platform contexts can be safely removed from `src/App.jsx`.
-- Backend endpoint migration from broad `/api/*` to `/api/emergency/*` where appropriate.
-- Legacy tests that assert old component paths, such as `src/components/PatientCard.jsx`.
+- Backend endpoint migration from broad Nest `/api/*` modules to `/api/emergency/*` where appropriate.
+- Legacy tests and audits that still assert old component paths, old platform docs, retired fleet/tools UX, or broad backend inventories.
 
 ## Risks
 
@@ -46,25 +50,30 @@ No high-risk code directories were physically moved in this pass. The separate a
 
 ## Commands Run
 
+- `npm ls --depth=0`
 - `npm run typecheck:frontend`
 - `npm run lint`
 - `npm run build`
-- `npm run test:run -- src/test/routePagesSmoke.test.jsx`
-- `npm run backend:build`
-- `npm ls --depth=0`
+- `npm run test:run -- src/routing/canonicalRouteRedirects.test.js src/featureFlagCoverage.test.jsx src/components/EmergencyWhiteboard.navigation.test.js`
+- `npm run test:run`
+- `cd backend && npm run build`
+- `cd backend && npm run lint`
+- `cd backend && npm test`
 - `cd backend && npm ls --depth=0`
-- Browser route validation with Playwright against Vite dev server on `/`, `/dashboard`, `/settings`, `/emergency`, and all normalized `/emergency/*` routes
 - Repository searches for package roots, configs, Android/Kotlin, React components, backend controllers/modules, and deployment files
 
 ## Validation Result
 
-Pass.
+Pass for build/type/lint/backend/focused active-route tests. A follow-up frontend cleanup also passes the affected route, calculator, frontend rendering, and tool visibility audits. Full root frontend test suite still fails and then hangs after reporting unrelated legacy/audit failures.
 
 - Frontend typecheck: pass
 - Frontend lint: pass
 - Production build: pass, with existing large chunk warning for calculator bundle
-- Focused route smoke test: pass
+- Focused route/navigation tests: pass, 15 tests
 - Backend build: pass
-- Root dependency install check: pass
+- Backend lint: pass
+- Backend tests: pass, 963 tests
+- Root dependency install check: pass (`npm ls --depth=0`)
 - Backend dependency install check: pass
-- Browser route/console smoke: pass, zero console errors
+- Follow-up affected frontend tests: pass (`391` route/rendering tests, `1837` calculator/audit tests, `9` tool visibility tests, and `40` route-config tests).
+- Full frontend tests: fail/hung. Safe stale failures for removed calculator mounts, old shell route wrappers, broad route aliases, active `_review` execution, and tool visibility route status were fixed. Remaining failures are concentrated in backend orphan inventory for Emergency AI endpoints, orphan-detection thresholds, legacy platform page/content assertions, API client timeout/auth behavior, plan-doc freshness, retired fleet/tools CSS/accessibility checks, automation registry product-tier expectations, and bundle budget checks expecting removed calculator chunks. The process was stopped after the bounded wait while already showing failures.

@@ -120,6 +120,7 @@ describe('chat capability suggestions', () => {
     const suggestions = getChatCapabilitySuggestions({
       input: 'where is sepsis management lactate pathway',
       hasPermission: allowAll,
+      includePlatformCatalog: true,
     });
 
     expect(suggestions).toEqual(
@@ -138,7 +139,7 @@ describe('chat capability suggestions', () => {
       hasPermission: allowAll,
     });
 
-    expect(operationsSuggestions).toEqual(
+    expect(operationsSuggestions).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: 'search-first-nav-destination:workflow-mining',

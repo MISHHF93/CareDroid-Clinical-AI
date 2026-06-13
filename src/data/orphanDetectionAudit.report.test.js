@@ -11,12 +11,16 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs');
+const EMERGENCY_OS_APP_ROUTE_RANGE = Object.freeze({ min: 30, max: 60 });
 
 describe('orphanDetectionAudit report', () => {
   it('builds orphan findings across categories', { timeout: 60_000 }, () => {
     const report = buildOrphanDetectionReport();
     expect(report.summary.total).toBeGreaterThan(0);
-    expect(report.summary.appRouteCount).toBeGreaterThan(50);
+    // Emergency OS intentionally retired the broad platform route surface; this
+    // count now covers active ED routes plus legacy redirects into the ED shell.
+    expect(report.summary.appRouteCount).toBeGreaterThanOrEqual(EMERGENCY_OS_APP_ROUTE_RANGE.min);
+    expect(report.summary.appRouteCount).toBeLessThanOrEqual(EMERGENCY_OS_APP_ROUTE_RANGE.max);
     expect(report.all.some((r) => r.classification === ORPHAN_CLASSIFICATIONS.QUARANTINE)).toBe(true);
   });
 

@@ -55,20 +55,23 @@ describe('Calculators.jsx route wiring', () => {
     expect(ROADMAP_FRONTEND_REGISTRY_IDS.length).toBe(25);
   });
 
-  it('registers calculator hub redirects in App.jsx', () => {
-    expect(appSource).toContain("path: '/tools/calculators'");
-    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+  it('keeps calculator hub routes retired from App.jsx', () => {
+    expect(appSource).not.toContain("path: '/tools/calculators'");
+    expect(appSource).not.toContain("path: '/tools/calculators/:slug'");
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
     expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
   });
 
-  it('keeps backend-backed lab tools in the ED Copilot hub and mounts protocols directly', () => {
-    expect(appSource).toContain("path: '/tools/lab-interpreter'");
-    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="lab-interp" />');
-    expect(appSource).toContain("path: '/tools/calculator-recommender'");
-    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="calculator-recommender-ai" />');
-    expect(appSource).toContain("path: '/protocols'");
-    expect(appSource).toContain('element: <Protocols />');
+  it('keeps backend-backed lab tools and protocols out of active App.jsx mounts', () => {
+    expect(appSource).not.toContain("path: '/tools/lab-interpreter'");
+    expect(appSource).not.toContain('<LegacyToolRouteRedirect toolId="lab-interp" />');
+    expect(appSource).not.toContain("path: '/tools/calculator-recommender'");
+    expect(appSource).not.toContain('<LegacyToolRouteRedirect toolId="calculator-recommender-ai" />');
+    expect(appSource).not.toContain("path: '/protocols'");
+    expect(appSource).not.toContain('element: <Protocols />');
   });
 });

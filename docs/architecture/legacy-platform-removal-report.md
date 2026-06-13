@@ -10,6 +10,7 @@ The repo contains historical general healthcare AI platform surfaces:
 - Legacy `src/layout/AppShell.jsx`.
 - Legacy route/navigation/command registries.
 - Legacy calculators and clinical tools library.
+- Older root-store EMS, queue, referral, and whiteboard panels.
 - Tests and inventory scripts that still document those systems.
 
 ## What Was Moved
@@ -19,7 +20,8 @@ No broad legacy folders were moved. The legacy surface is large and intertwined 
 ## What Was Merged
 
 - Active Emergency OS runtime uses `src/components/AppShell.tsx`, not the legacy shell.
-- Active whiteboard/detail/intake/calculator implementations use new Emergency OS TSX modules.
+- Active whiteboard/detail/intake implementations use new Emergency OS TSX modules.
+- Active EMS, queue, referral, copilot, analytics, boarding, and capacity routes now render from the active `src/store/emergencyStore.ts` path instead of root-store legacy panels.
 
 ## What Was Archived
 
@@ -30,8 +32,10 @@ No broad legacy folders were moved. The legacy surface is large and intertwined 
 
 - Generic root/dashboard/app/workspace/mobile routes redirect to `/emergency/whiteboard`.
 - Generic `/settings` redirects to `/emergency/settings`.
-- `/emergency/tools` redirects to `/emergency/copilot`.
+- `/tools/*` and removed `/emergency/*` surfaces fall back to `/emergency/whiteboard`.
+- `/emergency/tools`, `/emergency/pulse`, `/emergency/shift`, and `/emergency/ai-governance` are no longer active mounts.
 - Active route tree no longer mounts old general healthcare pages directly.
+- Conditional backend duplicate `/api/v1/governance` alias was removed.
 
 ## Still Needs Manual Review
 
@@ -39,6 +43,7 @@ No broad legacy folders were moved. The legacy surface is large and intertwined 
 - `src/layout/AppShell.jsx` and its CSS can be archived once no tests or reports require it.
 - `src/config/routes.config.js`, `src/config/navigation.config.js`, and `src/config/commandPalette.config.js` should be reduced or archived after active registry replacements are finalized.
 - Legacy service wrappers should be grouped under an Emergency OS API layer or moved to future modules.
+- Full frontend test failures should be triaged by retiring or rewriting tests that assert removed standalone calculator/platform routes.
 
 ## Risks
 
@@ -48,9 +53,10 @@ No broad legacy folders were moved. The legacy surface is large and intertwined 
 ## Commands Run
 
 - Active route source review.
-- Duplicate shell/whiteboard/patient/intake/calculator import searches.
+- Duplicate shell/whiteboard/patient/intake/calculator/import searches.
 - Navigation and command registry reads.
+- Typecheck, lint, build, focused frontend tests, full frontend test attempt, backend build/lint/tests.
 
 ## Validation Result
 
-Legacy product pages are no longer mounted by the active `src/App.jsx` route tree. Legacy code remains in repository for manual review and test-aware archiving.
+Legacy product pages are no longer mounted by the active `src/App.jsx` route tree. Typecheck, lint, build, focused active-route tests, backend build, backend lint, and backend tests pass. Full frontend tests still fail many legacy/audit expectations and hung after failure output, so legacy test cleanup remains manual review.

@@ -38,7 +38,7 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/signin')).toBe('/auth');
     expect(getRouteAliasTarget('/chat')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
-    expect(getRouteAliasTarget('/catalog')).toBe('/emergency/copilot');
+    expect(getRouteAliasTarget('/catalog')).toBe('/emergency/whiteboard');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
     expect(getRouteAliasTarget('/home')).toBe('/emergency/whiteboard');
     expect(getRouteAliasTarget('/automation')).toBe('/workflows');
@@ -53,7 +53,7 @@ describe('canonical configuration contract', () => {
     );
 
     expect(appSource).toContain("from './config/routes.config'");
-    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
+    expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(appSource).not.toMatch(/const\s+ASSISTANT_ROUTE_ALIASES\s*=\s*\[/);
     expect(appSource).not.toMatch(/const\s+TOOLS_ROUTE_ALIASES\s*=\s*\[/);
     expect(appSource).not.toContain('ASSISTANT_ROUTE_ALIASES.map');
@@ -69,8 +69,8 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/emergency/whiteboard');
     expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
     expect(ROUTE_RECORDS_BY_ID.assistant.path).toBe('/emergency/copilot');
-    expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/copilot');
-    expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/copilot');
+    expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/whiteboard');
+    expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/whiteboard');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.componentKey).toBe('PackMarketplace');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');

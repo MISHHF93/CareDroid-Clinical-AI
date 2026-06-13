@@ -41,15 +41,15 @@ describe('toolVisibilityMatrix', () => {
     );
   });
 
-  it('marks Tier B registry tools as fully visible after centralized launch', () => {
+  it('marks Tier B registry tools as archived after active tools routes were retired', () => {
     const rows = buildToolVisibilityMatrix();
     const wells = rows.find((r) => r.canonicalId === 'wells-pe');
     expect(wells?.tier).toBe('B');
-    expect(wells?.currentStatus).toBe('fully visible');
+    expect(wells?.currentStatus).toBe('archived route');
     expect(wells?.launchPathWorks).toBe(true);
   });
 
-  it('marks NLU hub-only profiles with sidebar registry rows as fully visible', () => {
+  it('marks NLU hub-only profiles with sidebar registry rows as archived routes', () => {
     const rows = buildToolVisibilityMatrix();
     for (const nluId of NLU_HUB_ONLY_PROFILE_TOOL_IDS) {
       const row = rows.find((r) => r.canonicalId === nluId);
@@ -57,7 +57,7 @@ describe('toolVisibilityMatrix', () => {
       expect(row.registryEntryExists).toBe(true);
       expect(row.sidebarVisible).toBe(true);
       expect(row.launchPathWorks).toBe(true);
-      expect(row.currentStatus).toBe('fully visible');
+      expect(row.currentStatus).toBe('archived route');
     }
   });
 
@@ -65,7 +65,7 @@ describe('toolVisibilityMatrix', () => {
     const row = buildToolVisibilityMatrix().find((r) => r.canonicalId === 'calc-gfr');
     expect(row?.calculatorSlug).toBe('gfr');
     expect(row?.rendersInUi).toBe(true);
-    expect(row?.currentStatus).toBe('frontend-only');
+    expect(row?.currentStatus).toBe('archived route');
   });
 
   it('generates markdown with matrix table header', () => {

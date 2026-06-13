@@ -9,28 +9,25 @@ const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.
 
 describe('auth canonical flow wiring', () => {
   it('bypasses the auth page and redirects auth aliases into the Emergency Whiteboard', () => {
-    expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/emergency/whiteboard" replace />');
-    expect(appSource).toContain('...AUTH_PATH_ALIASES.map');
-    expect(appSource).toContain('element: <AuthPathRedirect />');
+    expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
+    expect(routeConfigSource).toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
+    expect(appSource).not.toContain('function AuthPathRedirect()');
   });
 
-  it('keeps protected-route shell wiring while UserProvider supplies platform access', () => {
+  it('keeps Emergency OS routes inside the AppShell while UserProvider supplies platform access', () => {
     expect(appSource).not.toContain('buildAuthRedirectSearch(location)');
     expect(appSource).not.toContain("pathname: '/auth'");
-    expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
-    expect(appSource).toMatch(
-      /path:\s*'\/auth-callback'[\s\S]*element:\s*<AuthCallback \/>[\s\S]*shell:\s*false/
-    );
-    expect(appSource).toMatch(
-      /path:\s*'\/auth\/callback'[\s\S]*element:\s*<LegacyOAuthCallbackRedirect \/>[\s\S]*shell:\s*false/
-    );
+    expect(appSource).toContain('function RootLayout()');
+    expect(appSource).toContain('<AppShell>');
+    expect(appSource).toContain('<Outlet />');
+    expect(appSource).not.toContain('<AuthCallback');
+    expect(appSource).not.toContain('LegacyOAuthCallbackRedirect');
   });
 
-  it('redirects duplicate calculators route aliases to canonical /tools/calculators', () => {
-    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
+  it('redirects duplicate calculators route aliases into the Emergency OS whiteboard', () => {
+    expect(appSource).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
     expect(routeConfigSource).toContain("export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])");
     expect(routeConfigSource).toContain('aliases: CALCULATORS_ROUTE_ALIASES');
-    expect(routeConfigSource).toContain("to: record.path");
+    expect(routeConfigSource).toContain("['/calculators', CANONICAL_ROUTES.emergencyWhiteboard]");
   });
 });

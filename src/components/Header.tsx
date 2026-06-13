@@ -248,7 +248,7 @@ export function Header() {
           <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>Staff menu coming</div>
           <button
             type="button"
-            onClick={() => navigate('/settings')}
+            onClick={() => navigate('/emergency/settings')}
             style={{
               marginTop: 10,
               background: '#1C2333',

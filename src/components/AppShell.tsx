@@ -7,6 +7,7 @@ import PatientDetailPanel from './PatientDetailPanel';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
+import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 
 type AppShellProps = {
   children: ReactNode;
@@ -129,15 +130,13 @@ export function AppShell({ children }: AppShellProps) {
           document.dispatchEvent(new Event('open-intake'));
         },
       },
-      { label: 'find patient', action: () => navigate('/emergency/patients') },
-      { label: 'ems pipeline', action: () => navigate('/emergency/ems') },
-      { label: 'capacity', action: () => navigate('/emergency/capacity') },
-      { label: 'clinical tools', action: () => navigate('/emergency/tools') },
-      { label: 'heart score', action: () => navigate('/emergency/tools?calc=heart-score') },
-      { label: 'qsofa', action: () => navigate('/emergency/tools?calc=qsofa') },
-      { label: 'nihss', action: () => navigate('/emergency/tools?calc=nihss') },
-      { label: 'peds doses', action: () => navigate('/emergency/tools?calc=pediatric-dose-safety-checker') },
-      { label: 'shift summary', action: () => navigate('/emergency/shift') },
+      ...EMERGENCY_OS_ROUTE_COMMANDS.map((command) => ({
+        label: command.label.toLowerCase(),
+        action: () => {
+          const action = command.build();
+          if (action.type === 'OPEN_ROUTE') navigate(action.path);
+        },
+      })),
     ],
     [navigate],
   );

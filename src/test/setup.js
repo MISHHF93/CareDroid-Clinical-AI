@@ -103,3 +103,7 @@ class ResizeObserverMock {
 
 global.ResizeObserver = global.ResizeObserver || ResizeObserverMock;
 window.ResizeObserver = window.ResizeObserver || ResizeObserverMock;
+
+if (!window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = vi.fn();
+}

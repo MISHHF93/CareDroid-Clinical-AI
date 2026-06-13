@@ -33,6 +33,7 @@ CareDroid Emergency OS is the active primary product. The repository also contai
 | Path | Classification | Notes |
 |---|---|---|
 | `src/App.jsx` | `ACTIVE_EMERGENCY_OS` | Active BrowserRouter route root now redirects to `/emergency/whiteboard` |
+| `src/main.jsx` | `ACTIVE_EMERGENCY_OS` | Active React mount and startup simulation now use `src/engine/simulation.ts` |
 | `src/components/AppShell.tsx` | `ACTIVE_EMERGENCY_OS` | Active layout shell, shortcut handler, command palette, engines lifecycle |
 | `src/components/Sidebar.tsx` | `ACTIVE_EMERGENCY_OS` | Active Emergency OS navigation rail |
 | `src/components/Header.tsx` | `ACTIVE_EMERGENCY_OS` | Active header; duplicate shortcut handling removed |
@@ -41,7 +42,7 @@ CareDroid Emergency OS is the active primary product. The repository also contai
 | `src/components/PatientDetailPanel.tsx` | `ACTIVE_EMERGENCY_OS` | Active detail panel |
 | `src/components/QuickIntake.tsx` | `ACTIVE_EMERGENCY_OS` | Active intake modal |
 | `src/components/CopilotPanel.tsx` | `ACTIVE_EMERGENCY_OS` | Active ED Copilot side panel |
-| `src/components/calculators/*.tsx` | `ACTIVE_EMERGENCY_OS` | HEART, qSOFA, pediatric drug calculator |
+| `src/components/calculators/*.tsx` | `FUTURE_MODULE` / `SHARED_LIBRARY` | Valuable Emergency OS clinical tools, but no longer mounted as a standalone active route |
 | `src/store/emergencyStore.ts` | `ACTIVE_EMERGENCY_OS` | Active Emergency OS store and seed data |
 | `src/types/emergency.ts` | `ACTIVE_EMERGENCY_OS` | Active Emergency OS domain model |
 | `src/engine/*.ts` | `ACTIVE_EMERGENCY_OS` | Simulation, reassessment, capacity engines |
@@ -60,7 +61,7 @@ CareDroid Emergency OS is the active primary product. The repository also contai
 
 | Path | Classification | Notes |
 |---|---|---|
-| `backend/src/modules/chat` | `BACKEND_REQUIRED` | `/api/chat/message` powers ED Copilot |
+| `backend/src/modules/chat` | `BACKEND_REQUIRED` | Chat service powers ED Copilot; `/api/chat/*` remains a documented backend exception while `/api/emergency/copilot/*` is normalized |
 | `backend/src/modules/auth` | `BACKEND_REQUIRED` | Auth endpoints are documented exception to `/api/emergency/*` |
 | `backend/src/modules/clinical`, `clinical-intelligence`, `medical-control-plane` | `BACKEND_REQUIRED` | Clinical tools and AI orchestration candidates |
 | `backend/src/modules/fleet`, `live-tracking` | `BACKEND_REQUIRED` / `FUTURE_MODULE` | EMS/fleet operations, not yet fully `/api/emergency/*` |
@@ -77,7 +78,8 @@ CareDroid Emergency OS is the active primary product. The repository also contai
 | `src/components/PediatricDrugCalculator.jsx` | `LEGACY_PLATFORM_ARTIFACT` | Replaced by `calculators/PediatricDrugCalc.tsx` in active app |
 | `src/pages/fleet/*` | `FUTURE_MODULE` | Fleet product artifacts; not active Emergency OS routes |
 | `src/pages/commercial/*`, organization/product/customer pages | `LEGACY_PLATFORM_ARTIFACT` | General SaaS/platform artifacts; unmounted from active route tree |
-| `src/pages/tools/*` calculator library | `SHARED_LIBRARY` / `FUTURE_MODULE` | Still used by `ClinicalCalculatorHub`; should be curated into Emergency OS clinical tools |
+| `src/components/EMSPipeline.jsx`, `src/components/ReferralPanel.jsx`, `src/components/QueueIntelligencePanel.jsx` | `FUTURE_MODULE` / `LEGACY_PLATFORM_ARTIFACT` | Older root-store panels; no longer mounted by active `src/App.jsx` |
+| `src/pages/tools/*` calculator library | `SHARED_LIBRARY` / `FUTURE_MODULE` | Valuable clinical calculator inventory, but removed from active standalone routing until curated into Emergency OS |
 | `android/` | `MOBILE_FUTURE_MODULE` | Native/mobile code preserved but disconnected from active web imports |
 | `backend/ml-services/nlu/` | `NEEDS_MANUAL_REVIEW` | Separate service artifact |
 | `caredroid.sqlite` | `NEEDS_MANUAL_REVIEW` | Untracked local database artifact; do not commit without decision |
@@ -99,4 +101,21 @@ Mounted active routes now normalize to:
 - `/emergency/analytics`
 - `/emergency/settings`
 
-Legacy roots `/`, `/emergency`, `/settings`, `/dashboard`, `/app`, `/workspace`, `/mobile`, and `/tools/*` redirect into the Emergency OS route tree.
+Legacy roots `/`, `/emergency`, `/settings`, `/dashboard`, `/home`, `/app`, `/workspace`, `/mobile`, `/general-healthcare`, and `/tools/*` redirect into the Emergency OS route tree, with generic/platform roots landing on `/emergency/whiteboard`.
+
+## Detailed Collision Inventory
+
+| Collision | Files / Roots | Classification | Resolution |
+|---|---|---|---|
+| Multiple `package.json` files | `package.json`, `backend/package.json`, `mcp/package.json` | `ACTIVE_EMERGENCY_OS`, `BACKEND_REQUIRED`, `FUTURE_MODULE` | Keep root web app and backend active; keep MCP isolated from deployed app |
+| Multiple lockfiles | `package-lock.json`, `backend/package-lock.json`, `mcp/package-lock.json` | `NEEDS_MANUAL_REVIEW` | npm-only, but package roots remain separate |
+| Multiple TypeScript configs | `tsconfig.json`, `tsconfig.frontend.json`, `backend/tsconfig*.json` | `SHARED_LIBRARY` / `BACKEND_REQUIRED` | Frontend/backend separation retained |
+| Multiple app shells | `src/components/AppShell.tsx`, `src/layout/AppShell.jsx` | `ACTIVE_EMERGENCY_OS`, `LEGACY_PLATFORM_ARTIFACT` | Active app mounts only `src/components/AppShell.tsx` |
+| Multiple route systems | `src/App.jsx`, `src/config/routes.config.js`, route-health inventories | `ACTIVE_EMERGENCY_OS` / `NEEDS_MANUAL_REVIEW` | Active router is `src/App.jsx`; config remains audit/compatibility metadata |
+| Multiple sidebars / headers | `src/components/Sidebar.tsx`, `src/components/Header.tsx`, legacy shell internals, Android `Sidebar.kt` | `ACTIVE_EMERGENCY_OS`, `LEGACY_PLATFORM_ARTIFACT`, `MOBILE_FUTURE_MODULE` | Active web app mounts one sidebar/header pair |
+| Duplicated Emergency domain models | `src/types/emergency.ts`, `types/emergency.ts`, `src/store/emergencyStore.ts`, `store/emergencyStore.ts` | `ACTIVE_EMERGENCY_OS`, `FUTURE_MODULE` | Active routes now use `src/types`/`src/store`; root store/type pair is isolated from active route imports |
+| Android/Kotlin/Gradle code | `android/`, `Dockerfile.android`, `capacitor.config.json` | `MOBILE_FUTURE_MODULE` | Preserved but disconnected from active web routing/build imports |
+| React Native / Expo | none found | n/a | No Expo or React Native app root discovered |
+| Serverless functions | none found | n/a | No dedicated `functions/`, Netlify, or Vercel serverless function root discovered |
+| API clients | `src/services/apiClient.js`, many service wrappers | `SHARED_LIBRARY` / `NEEDS_MANUAL_REVIEW` | Central `apiClient` remains convention; Emergency OS wrappers use `/api/emergency/*` where available |
+| Backend services/controllers | `backend/src/modules/*`, `backend/src/api/*.routes.ts` | `BACKEND_REQUIRED` / `LEGACY_PLATFORM_ARTIFACT` | Conditional Emergency OS routers mount only under `/api/emergency/*`; broad Nest modules remain documented exceptions |

@@ -266,7 +266,10 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
 
   it('registers calculator routes via CALCULATOR_ROUTE_DEFS before calculators hub', () => {
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain(
+      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
+    );
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
       expect(matchCalculatorRoute(`${PR4A_HUB_PATH}/${id}`)?.calculatorSlug).toBe(id);
     }

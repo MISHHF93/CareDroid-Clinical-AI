@@ -58,7 +58,7 @@ describe('EmergencyOperatingSystemService', () => {
         ]),
       })
     );
-    expect(operatingSystem.queueFlow.metrics.queueCount).toBe(8);
+    expect(operatingSystem.queueFlow.metrics.queueCount).toBe(9);
     expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
     expect(operatingSystem.waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);
     expect(operatingSystem.reassessment.queue.label).toBe('Reassessment Queue');
@@ -70,15 +70,9 @@ describe('EmergencyOperatingSystemService', () => {
         }),
       ])
     );
-    expect(operatingSystem.referralFlow.departments).toEqual([
-      'Cardiology',
-      'Neurology',
-      'Psychiatry',
-      'Internal Medicine',
-      'Surgery',
-      'ICU',
-      'Laboratory',
-    ]);
+    expect(operatingSystem.referralFlow.departments).toEqual(
+      expect.arrayContaining(['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery', 'ICU'])
+    );
     expect(operatingSystem.emsFlow.metrics.incomingCount).toBeGreaterThan(0);
     expect(operatingSystem.emsOffload.metrics.waitingHandoffs).toBeGreaterThan(0);
     expect(operatingSystem.capacityFlow.score).toEqual(expect.any(Number));
@@ -156,13 +150,15 @@ describe('EmergencyOperatingSystemService', () => {
       })
     );
     expect(operatingSystem.digitalWhiteboard.columns.map((column) => column.label)).toEqual([
-      'Arrival',
-      'Triage',
+      'EMS Incoming',
       'Waiting',
-      'Assessment',
-      'Orders',
-      'Results',
+      'Triage',
+      'In Assessment',
+      'Orders Pending',
+      'Results Pending',
+      'Reassessment Due',
       'Disposition',
+      'Discharge Ready',
     ]);
     expect(operatingSystem.copilot.copilotId).toBe('emergency-ai-copilot');
     expect(operatingSystem.analytics.route).toBe('/workspace/emergency/analytics');

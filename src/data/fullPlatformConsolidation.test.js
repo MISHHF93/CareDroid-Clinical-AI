@@ -30,43 +30,26 @@ const themeTokensCss = readFileSync(join(srcRoot, 'styles/theme-tokens.css'), 'u
 const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.js'), 'utf8');
 const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 'utf8');
 
-const REQUIRED_AUTH_SNIPPETS = Object.freeze([
-  'AUTH_PATH_ALIASES.map',
+const REQUIRED_LEGACY_REDIRECT_SNIPPETS = Object.freeze([
   'LEGACY_EMERGENCY_ROUTE_REDIRECTS.map',
-  'element: <Navigate to="/emergency/whiteboard" replace />',
+  'path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
+  'path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
+  'path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
 ]);
 
 const REQUIRED_ROUTES = Object.freeze([
-  '/dashboard',
-  '/workspaces',
-  '/search',
-  '/timeline',
-  '/notifications',
-  '/digital-twin',
-  '/workflows',
-  '/assets',
-  '/assistant',
-  '/tools',
-  '/tools/calculators',
-  '/tools/catalog',
-  '/ai-command-center',
-  '/fleet/command',
-  '/fleet/map',
-  '/medical-iot',
-  '/hospital-map',
-  '/devices',
-  '/live-map',
-  '/profile',
-  '/profile/settings',
-  '/profile/activity',
-  '/profile/workspaces',
-  '/ai-governance',
-  '/security',
-  '/privacy',
-  '/audit',
-  '/regulatory',
-  '/human-review',
-  '/system-health',
+  '/emergency/whiteboard',
+  '/emergency/patients',
+  '/emergency/ems',
+  '/emergency/intake',
+  '/emergency/queues',
+  '/emergency/reassessment',
+  '/emergency/capacity',
+  '/emergency/boarding',
+  '/emergency/referrals',
+  '/emergency/copilot',
+  '/emergency/analytics',
+  '/emergency/settings',
 ]);
 
 const REQUIRED_CALCULATORS = Object.freeze([
@@ -128,8 +111,8 @@ function routeSurfaceDeclares(route) {
 }
 
 describe('full platform consolidation contract', () => {
-  it('bypasses /auth with direct open access and no team verification wrapper', () => {
-    for (const snippet of REQUIRED_AUTH_SNIPPETS) {
+  it('redirects retired roots to Emergency OS and keeps auth open-access configuration intact', () => {
+    for (const snippet of REQUIRED_LEGACY_REDIRECT_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
     expect(routeConfigSource).toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
@@ -148,23 +131,16 @@ describe('full platform consolidation contract', () => {
     expect(appConfigSource).toContain('VITE_SHOW_DEMO_AUTH');
   });
 
-  it('declares the unified clinical operating-system route surface once', () => {
+  it('declares the CareDroid Emergency OS route surface once', () => {
     for (const route of REQUIRED_ROUTES) {
       expect(routeSurfaceDeclares(route), route).toBe(true);
     }
 
-    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
-    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/assistant', '/chat', '/ai', '/copilot'])");
-    expect(routeConfigSource).toContain("'/tools'");
-    expect(routeConfigSource).toContain("'/all-tools'");
-    expect(routeConfigSource).toContain("'/clinical-tools'");
-    expect(routeConfigSource).toContain("'/catalog'");
-    expect(routeConfigSource).toContain(
-      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
-    );
-    expect(routeConfigSource).toContain("'/dashboard'");
-    expect(routeConfigSource).toContain("'/home'");
-    expect(routeConfigSource).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');
+    expect(appSource).toContain('path="/emergency" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
+    expect(appSource).toContain('path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.fleetCommand}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.marketplace}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.aiGovernance}');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 

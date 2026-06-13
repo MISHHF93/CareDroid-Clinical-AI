@@ -111,23 +111,19 @@ function nluApplies(registryId) {
   );
 }
 
-function appUsesCalculatorRedirectRoutes() {
-  return (
-    appSource.includes("path: '/tools/calculators'") &&
-    appSource.includes("path: '/tools/calculators/:slug'") &&
-    appSource.includes('<LegacyCalculatorRouteRedirect />')
+function appUsesRetiredToolsRedirect() {
+  return appSource.includes(
+    '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
   );
 }
 
 function appRouteRegistered(registryId, builtinSlug, regPath) {
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) {
-    const spec = PR_FLEET_TOOL_SPECS[registryId];
-    if (!spec?.routePath) return false;
-    return isKnownToolAreaPath(spec.routePath) && Boolean(spec.appComponent);
+    return false;
   }
   if (builtinSlug) {
     const def = getCalculatorRouteBySlug(builtinSlug);
-    if (def && appUsesCalculatorRedirectRoutes()) return true;
+    if (def && appUsesRetiredToolsRedirect()) return false;
     if (appSource.includes(`initialCalculatorId="${builtinSlug}"`)) return true;
     if (def && appSource.includes(`path: '${def.path}'`)) return true;
   }
@@ -263,13 +259,13 @@ export function validateFrontendRenderingRow(row) {
   if (!L.discovery) issues.push('missing-discovery');
   if (!L.catalogLaunchHandler) issues.push('missing-catalog-launch');
   if (!L.sidebarPath) issues.push('sidebar-dead-link');
-  if (!L.appRoute) issues.push('missing-app-route');
+  if (tier === 'active-emergency' && !L.appRoute) issues.push('missing-app-route');
   if (tier === 'A' && !L.tierAFormSwitch) issues.push('tier-a-no-form-switch');
   if (tier === 'A' && !L.clinicalDisclaimer) issues.push('missing-clinical-disclaimer');
   if ((tier === 'B' || tier === 'fleet-B') && !L.tierBHubCard) issues.push('tier-b-no-hub-card');
   if ((tier === 'B' || tier === 'fleet-B') && !L.tierBChatSeed) issues.push('tier-b-no-chat-seed');
   if (tier === 'B' && !L.clinicalDisclaimer) issues.push('missing-clinical-disclaimer');
-  if (tier === 'fleet-A' && !L.fleetPage) issues.push('fleet-page-not-wired');
+  if (tier === 'active-emergency-fleet' && !L.fleetPage) issues.push('fleet-page-not-wired');
   if (tier === 'fleet-A' && !L.operationalDisclaimer) issues.push('missing-operational-disclaimer');
   if (tier === 'fleet-B' && !L.operationalDisclaimer) issues.push('missing-operational-disclaimer');
   if (!L.toolNotFoundFallback) issues.push('missing-not-found-fallback');
