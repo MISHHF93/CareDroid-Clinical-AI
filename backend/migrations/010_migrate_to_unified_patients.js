@@ -594,7 +594,7 @@ function transformGroup(group, backupId) {
 
   const sourceVitals = [
     ...allPatients.flatMap((patient) => asArray(patient.vitalHistory || patient.vital_history)),
-    ...allPatients.flatMap((patient) => (Array.isArray(patient.vitals) ? patient.vitals : [])),
+    ...allPatients.flatMap((patient) => (Array.isArray(patient.vitals) ? patient.vitals : patient.vitals ? [patient.vitals] : [])),
     ...relatedPayload(group, 'vitals'),
   ];
   const currentVitals =

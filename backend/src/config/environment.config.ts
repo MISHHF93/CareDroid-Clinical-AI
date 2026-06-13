@@ -156,8 +156,14 @@ export const envValidationSchema = Joi.object({
   CORS_ORIGIN: Joi.string().allow('').optional(),
   FRONTEND_URL: Joi.string().allow('').optional(),
 
-  MONGODB_URI: Joi.string().uri({ scheme: [/mongodb/] }).allow('').optional(),
-  DATABASE_MONGO_URI: Joi.string().uri({ scheme: [/mongodb/] }).allow('').optional(),
+  MONGODB_URI: Joi.string()
+    .uri({ scheme: [/mongodb/] })
+    .allow('')
+    .optional(),
+  DATABASE_MONGO_URI: Joi.string()
+    .uri({ scheme: [/mongodb/] })
+    .allow('')
+    .optional(),
   DB_NAME: Joi.string().allow('').optional(),
   DATABASE_CLIENT: Joi.string().valid('sqlite', 'postgres').optional(),
   DATABASE_URL: Joi.string()
@@ -190,14 +196,19 @@ export const envValidationSchema = Joi.object({
   WEARABLE_API_KEY: Joi.string().allow('').optional(),
   HEALTHKIT_TEAM_ID: Joi.string().allow('').optional(),
 
-  MQTT_BROKER_URL: Joi.string().uri({ scheme: [/mqtt/, /mqtts/, /tcp/, /ssl/, /ws/, /wss/] }).allow('').optional(),
+  MQTT_BROKER_URL: Joi.string()
+    .uri({ scheme: [/mqtt/, /mqtts/, /tcp/, /ssl/, /ws/, /wss/] })
+    .allow('')
+    .optional(),
   MQTT_USERNAME: Joi.string().allow('').optional(),
   MQTT_PASSWORD: Joi.string().allow('').optional(),
 
   OPENAI_API_KEY: Joi.string().allow('').optional(),
   ANTHROPIC_API_KEY: Joi.string().allow('').optional(),
   AZURE_OPENAI_ENDPOINT: Joi.string().uri().allow('').optional(),
-  AI_PROVIDER: Joi.string().valid('anthropic', 'openai', 'azure-openai', 'gemini', 'local').default('anthropic'),
+  AI_PROVIDER: Joi.string()
+    .valid('anthropic', 'openai', 'azure-openai', 'gemini', 'local')
+    .default('anthropic'),
   AI_MODEL: Joi.string().allow('').optional(),
   AI_TEMPERATURE: Joi.number().min(0).max(2).default(0.2),
   AI_MAX_TOKENS: Joi.number().integer().min(1).default(2000),
@@ -313,7 +324,11 @@ export function getEnvironmentConfig(env: EnvSource = process.env): EnvironmentC
       bannerEnabled: readOptional(env, 'ENVIRONMENT_BANNER_ENABLED') !== 'false',
       allowed: CARE_ENVIRONMENTS,
       validation: {
-        source: readOptional(env, 'CARE_ENV') ? 'CARE_ENV' : readOptional(env, 'APP_ENV') ? 'APP_ENV' : 'NODE_ENV',
+        source: readOptional(env, 'CARE_ENV')
+          ? 'CARE_ENV'
+          : readOptional(env, 'APP_ENV')
+            ? 'APP_ENV'
+            : 'NODE_ENV',
         valid: true,
       },
     },
@@ -330,7 +345,10 @@ export function getEnvironmentConfig(env: EnvSource = process.env): EnvironmentC
       nodeEnv,
       corsOrigin: corsOrigins.join(','),
       corsOrigins,
-      frontendUrl: readFirst(env, ['FRONTEND_URL', 'CORS_ORIGIN'], DEFAULT_FRONTEND_URL).replace(/\/$/, ''),
+      frontendUrl: readFirst(env, ['FRONTEND_URL', 'CORS_ORIGIN'], DEFAULT_FRONTEND_URL).replace(
+        /\/$/,
+        '',
+      ),
     },
     database: {
       mongodbUri,
@@ -371,7 +389,9 @@ export function getEnvironmentConfig(env: EnvSource = process.env): EnvironmentC
     wearables: {
       apiKey: readOptional(env, 'WEARABLE_API_KEY'),
       healthkitTeamId: readOptional(env, 'HEALTHKIT_TEAM_ID'),
-      enabled: Boolean(readOptional(env, 'WEARABLE_API_KEY') || readOptional(env, 'HEALTHKIT_TEAM_ID')),
+      enabled: Boolean(
+        readOptional(env, 'WEARABLE_API_KEY') || readOptional(env, 'HEALTHKIT_TEAM_ID'),
+      ),
     },
     mqtt: {
       brokerUrl: mqttBrokerUrl,
@@ -467,8 +487,14 @@ export function validateEnvironmentConfig(
     errors.push('ANTHROPIC_API_KEY is required when AI_PROVIDER=anthropic and AI_ENABLED=true');
   }
 
-  if (config.ai.provider === 'azure-openai' && config.ai.enabled && !config.ai.azureOpenAIEndpoint) {
-    errors.push('AZURE_OPENAI_ENDPOINT is required when AI_PROVIDER=azure-openai and AI_ENABLED=true');
+  if (
+    config.ai.provider === 'azure-openai' &&
+    config.ai.enabled &&
+    !config.ai.azureOpenAIEndpoint
+  ) {
+    errors.push(
+      'AZURE_OPENAI_ENDPOINT is required when AI_PROVIDER=azure-openai and AI_ENABLED=true',
+    );
   }
 
   if (config.telehealth.videoProvider === 'zoom' && !config.telehealth.zoomApiKey) {

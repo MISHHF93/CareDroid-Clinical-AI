@@ -86,10 +86,9 @@ export class ObservabilityService {
         id: 'tenant',
         label: 'Tenant Health',
         status: config.runtime.tenantIsolationDisabled ? 'critical' : 'healthy',
-        summary:
-          config.runtime.tenantIsolationDisabled
-            ? 'Tenant isolation has been explicitly disabled.'
-            : 'Tenant context, organization scoping, and workspace scoping guards are active.',
+        summary: config.runtime.tenantIsolationDisabled
+          ? 'Tenant isolation has been explicitly disabled.'
+          : 'Tenant context, organization scoping, and workspace scoping guards are active.',
         evidence: [
           `strictEntitlements=${config.runtime.strictSaasEntitlements}`,
           'tenantGuards=active',

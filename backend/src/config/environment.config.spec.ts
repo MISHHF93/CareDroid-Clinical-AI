@@ -68,9 +68,7 @@ describe('environment config', () => {
   it('throws a clear error for missing production JWT_SECRET', () => {
     const config = getEnvironmentConfig({ NODE_ENV: 'production' });
 
-    expect(() => validateEnvironmentConfig(config)).toThrow(
-      'JWT_SECRET is required in production',
-    );
+    expect(() => validateEnvironmentConfig(config)).toThrow('JWT_SECRET is required in production');
   });
 
   it('requires feature credentials only when dependent integrations are configured', () => {
