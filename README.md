@@ -1,6 +1,8 @@
-# CareDroid Clinical AI
+# CareDroid Emergency OS
 
-CareDroid Clinical AI keeps one documentation source of truth:
+CareDroid Emergency OS is a React/Vite Emergency Department operating surface with a NestJS backend, focused on whiteboard flow, EMS intake, referrals, capacity pressure, clinical tools, shift context, and human-reviewed AI support.
+
+The repository keeps one documentation source of truth:
 
 - [`docs/CARE_DROID_MASTER_PLATFORM_INVENTORY.md`](docs/CARE_DROID_MASTER_PLATFORM_INVENTORY.md)
 

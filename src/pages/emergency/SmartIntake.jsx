@@ -118,7 +118,14 @@ export default function SmartIntake() {
     if (!canCreatePatient) return null;
     const patient = buildSmartIntakePatient(sessionId, label);
     const timeline = patient.timeline.map((event) => ({ ...event, patientId: patient.id }));
-    addPatient({ ...patient, timeline });
+    addPatient(
+      {
+        ...patient,
+        vitals: Array.isArray(patient.vitals) ? patient.vitals : [patient.vitals],
+        timeline,
+      },
+      { syncToBackend: false }
+    );
     selectPatient(patient.id);
     navigate('/emergency/patients');
     return patient;

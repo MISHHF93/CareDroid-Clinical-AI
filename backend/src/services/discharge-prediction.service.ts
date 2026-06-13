@@ -1,4 +1,12 @@
-import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
+import {
+  UnifiedPatient as Patient,
+  type IUnifiedPatient as IPatient,
+} from '../models/unified-patient.model';
+
+type PatientVirtualFollowup = IPatient & {
+  virtualRecheckScheduled?: boolean;
+  virtualRecheckTime?: Date | string | null;
+};
 
 export interface DischargeReadiness {
   patientId: string;
@@ -147,7 +155,8 @@ export class DischargePredictionService {
   }
 
   private async checkFollowup(patient: IPatient): Promise<boolean> {
-    return patient.virtualRecheckScheduled || Boolean(patient.virtualRecheckTime);
+    const followup = patient as PatientVirtualFollowup;
+    return Boolean(followup.virtualRecheckScheduled || followup.virtualRecheckTime);
   }
 
   private async checkMedicationReconciliation(_patient: IPatient): Promise<boolean> {

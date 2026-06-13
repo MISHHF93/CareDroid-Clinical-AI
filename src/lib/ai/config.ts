@@ -1,39 +1,23 @@
-export type AIProvider = 'anthropic' | 'openai' | 'gemini' | 'local';
+// Browser-safe compatibility surface for frontend imports. Runtime provider
+// credentials and model selection remain backend-owned.
+export type {
+  AIPlatformConfig,
+  AIPlatformServiceConfig,
+  AIProviderConfig,
+  AIProvider,
+  AIRagConfig,
+  AIRiskModelThresholds,
+  GovernanceAIProvider,
+  TenantAISettings,
+} from '../../../lib/ai/config';
 
-export interface TenantAISettings {
-  aiEnabled: boolean;
-  edCopilotEnabled: boolean;
-  smartIntakeAiEnabled: boolean;
-  referralAiEnabled: boolean;
-  analyticsAiEnabled: boolean;
-  clinicalWorkflowAiEnabled: boolean;
-  aiAuditLoggingEnabled: boolean;
-  aiPatientContextEnabled: boolean;
-}
-
-export interface AIProviderConfig {
-  provider: AIProvider;
-  model: string;
-  temperature: number;
-  maxTokens: number;
-  stream: boolean;
-}
-
-export const DEFAULT_TENANT_AI_SETTINGS: TenantAISettings = Object.freeze({
-  aiEnabled: false,
-  edCopilotEnabled: true,
-  smartIntakeAiEnabled: false,
-  referralAiEnabled: false,
-  analyticsAiEnabled: false,
-  clinicalWorkflowAiEnabled: false,
-  aiAuditLoggingEnabled: true,
-  aiPatientContextEnabled: false,
-});
-
-export const DEFAULT_AI_PROVIDER_CONFIG: AIProviderConfig = Object.freeze({
-  provider: 'anthropic',
-  model: 'backend-configured',
-  temperature: 0.2,
-  maxTokens: 2000,
-  stream: false,
-});
+export {
+  CARE_AI_PLATFORM_BUILD,
+  DEFAULT_AI_ANOMALY_DETECTION_CONFIG,
+  DEFAULT_AI_NLU_CONFIG,
+  DEFAULT_AI_PROVIDER_CONFIG,
+  DEFAULT_AI_RAG_CONFIG,
+  DEFAULT_AI_RISK_THRESHOLDS,
+  DEFAULT_TENANT_AI_SETTINGS,
+  readAIPlatformConfig,
+} from '../../../lib/ai/config';

@@ -54,4 +54,3 @@ describe('UnifiedPatient model', () => {
     expect(patient.currentVitals?.spO2).toBe(91);
   });
 });
-

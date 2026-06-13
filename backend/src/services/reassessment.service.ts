@@ -1,4 +1,7 @@
-import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
+import {
+  UnifiedPatient as Patient,
+  type IUnifiedPatient as IPatient,
+} from '../models/unified-patient.model';
 
 export class ReassessmentService {
   getReassessmentDueMinutes(dpsScore: number): number {

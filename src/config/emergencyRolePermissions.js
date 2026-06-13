@@ -70,6 +70,7 @@ const ROUTES = Object.freeze({
   federatedLearning: CANONICAL_ROUTES.emergencyFederatedLearning,
   digitalTwin: CANONICAL_ROUTES.emergencyDigitalTwin,
   tools: CANONICAL_ROUTES.emergencyTools,
+  shift: CANONICAL_ROUTES.emergencyShift,
   aiGovernance: CANONICAL_ROUTES.emergencyAiGovernance,
   aiGovernanceGlobal: CANONICAL_ROUTES.aiGovernance,
   settings: CANONICAL_ROUTES.emergencySettings,
@@ -88,6 +89,7 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.referrals,
   ROUTES.provincialHealth,
   ROUTES.tools,
+  ROUTES.shift,
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
@@ -105,6 +107,7 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.simulation,
   ROUTES.digitalTwin,
   ROUTES.tools,
+  ROUTES.shift,
 ]);
 
 export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
@@ -179,6 +182,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.reassessment,
       ROUTES.copilot,
       ROUTES.tools,
+      ROUTES.shift,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
@@ -258,6 +262,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.boarding,
       ROUTES.referrals,
       ROUTES.analytics,
+      ROUTES.shift,
     ],
     actions: [EMERGENCY_ACTIONS.viewAnalytics],
     defaultRoute: ROUTES.whiteboard,

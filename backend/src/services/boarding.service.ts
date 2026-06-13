@@ -1,5 +1,8 @@
 import { EventEmitter } from 'events';
-import { UnifiedPatient as Patient, type IUnifiedPatient as IPatient } from '../models/unified-patient.model';
+import {
+  UnifiedPatient as Patient,
+  type IUnifiedPatient as IPatient,
+} from '../models/unified-patient.model';
 
 export interface BoardingMetrics {
   medianBoardTime: number;

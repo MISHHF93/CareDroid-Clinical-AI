@@ -40,6 +40,7 @@ function isBoarding(patient: Patient): boolean {
 }
 
 function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
+  if (patient.state === PatientState.Discharge) return false;
   if (activeFilter === 'Waiting') return patient.state === PatientState.Waiting;
   if (activeFilter === 'Assessment') return patient.state === PatientState.Assessment;
   if (activeFilter === 'High Risk') return isHighRisk(patient);
@@ -87,7 +88,12 @@ export default function EmergencyWhiteboard() {
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const whiteboard = useEmergencyWhiteboard();
   const whiteboardPayload = (whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null)?.data;
-  const patients = whiteboardPayload?.patients || storePatients;
+  const patients = useMemo(() => {
+    const payloadPatients = whiteboardPayload?.patients;
+    if (!payloadPatients?.length) return storePatients;
+    const payloadIds = new Set(payloadPatients.map((patient) => patient.id));
+    return [...payloadPatients, ...storePatients.filter((patient) => !payloadIds.has(patient.id))];
+  }, [storePatients, whiteboardPayload?.patients]);
   const capacity = whiteboardPayload?.capacity || storeCapacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);

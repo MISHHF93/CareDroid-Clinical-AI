@@ -1,6 +1,5 @@
 import { FormEvent, useMemo, useState } from 'react';
 import {
-  Alert,
   Note,
   Patient,
   PatientFlag,
@@ -12,6 +11,7 @@ import {
   WorkflowActionLog,
 } from '../types/emergency';
 import { useEmergencyStore, workflowLogFromJourneyEvent } from '../store/emergencyStore';
+import { dispatchAlert, dispatchCriticalVitalsAlerts } from '../engine/alertEngine';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
@@ -181,7 +181,7 @@ export default function PatientDetailPanel() {
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const removeFlag = useEmergencyStore((state) => state.removeFlag);
   const addVitals = useEmergencyStore((state) => state.addVitals);
-  const addAlert = useEmergencyStore((state) => state.addAlert);
+  const addNote = useEmergencyStore((state) => state.addNote);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const [showVitalsForm, setShowVitalsForm] = useState(false);
   const [vitalsForm, setVitalsForm] = useState<VitalsForm>(emptyVitalsForm);
@@ -237,13 +237,20 @@ export default function PatientDetailPanel() {
   const latestVitals = selectedPatient.vitals.at(-1);
   const actorStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'system';
   const sortedNotes = [...selectedPatient.notes].sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    (a, b) =>
+      new Date(b.timestamp || b.createdAt || 0).getTime() -
+      new Date(a.timestamp || a.createdAt || 0).getTime(),
   );
 
   const submitVitals = (event: FormEvent) => {
     event.preventDefault();
     if (!canWriteVitals) return;
-    addVitals(selectedPatient.id, parseVitals(vitalsForm, actorStaffId));
+    const vitals = parseVitals(vitalsForm, actorStaffId);
+    addVitals(selectedPatient.id, vitals);
+    dispatchCriticalVitalsAlerts({
+      ...selectedPatient,
+      vitals: [...selectedPatient.vitals, vitals],
+    });
     setVitalsForm(emptyVitalsForm);
     setShowVitalsForm(false);
   };
@@ -261,22 +268,20 @@ export default function PatientDetailPanel() {
       timestamp: new Date().toISOString(),
     };
 
-    updatePatient(selectedPatient.id, { notes: [...selectedPatient.notes, note] });
+    addNote(selectedPatient.id, note);
     setNoteText('');
   };
 
   const escalate = () => {
     if (!canEscalate) return;
-    const alert: Alert = {
+    dispatchAlert({
       id: createId('alert'),
       severity: 'Critical',
       title: 'Patient escalated',
       message: `${selectedPatient.firstName} ${selectedPatient.lastName} was escalated for urgent review.`,
       patientId: selectedPatient.id,
-      createdAt: new Date().toISOString(),
-      dismissed: false,
-    };
-    addAlert(alert);
+      source: 'patient-detail-panel',
+    });
     addFlag(selectedPatient.id, PatientFlag.HighRisk);
     setActionMode(null);
   };
@@ -601,10 +606,10 @@ export default function PatientDetailPanel() {
           {sortedNotes.map((note) => (
             <div key={note.id} style={{ background: '#0B1120', borderRadius: 10, padding: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#9CA3AF', fontSize: 11 }}>
-                <span>{initials(staffName(staff, note.authorId))}</span>
+                <span>{initials(staffName(staff, note.authorId || note.authorStaffId || 'system'))}</span>
                 <span>{formatTime(note.timestamp)}</span>
               </div>
-              <div style={{ color: '#F9FAFB', fontSize: 13, marginTop: 6 }}>{note.text}</div>
+              <div style={{ color: '#F9FAFB', fontSize: 13, marginTop: 6 }}>{note.text || note.body}</div>
             </div>
           ))}
         </div>

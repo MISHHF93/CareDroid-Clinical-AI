@@ -147,7 +147,9 @@ function summarizeServiceStatuses(services: Record<string, { status?: unknown }>
     ['failed', 'unhealthy', 'error'].includes(service.status.toLowerCase()),
   );
   const degraded = statuses.filter((service) =>
-    ['degraded', 'not_connected', 'not-configured', 'unknown'].includes(service.status.toLowerCase()),
+    ['degraded', 'not_connected', 'not-configured', 'unknown'].includes(
+      service.status.toLowerCase(),
+    ),
   );
 
   return { statuses, unhealthy, degraded };
@@ -205,7 +207,10 @@ async function checkWebSocketStatus(req: Request): Promise<ComponentHealth> {
   return timedComponent(false, async () => {
     const servers = [
       socketServerDetails('ems', req.app.get('io') as SocketIOServer | undefined),
-      socketServerDetails('edge-ai-ambulance', req.app.get('edgeAIAmbulanceIo') as SocketIOServer | undefined),
+      socketServerDetails(
+        'edge-ai-ambulance',
+        req.app.get('edgeAIAmbulanceIo') as SocketIOServer | undefined,
+      ),
     ].filter(Boolean);
 
     if (servers.length === 0) {
@@ -347,25 +352,11 @@ async function probeHttpEndpoint(endpoint: string) {
   }
 }
 
-function resolveExternalEndpoint(...keys: string[]): string | null {
-  const endpoint = configuredValue(...keys);
-  if (!endpoint) return null;
-
-  try {
-    return new URL(endpoint).toString();
-  } catch {
-    return null;
-  }
-}
-
-async function checkExternalApi(
-  label: string,
-  envKeys: string[],
-): Promise<ComponentHealth> {
+async function checkExternalApi(label: string, envKeys: string[]): Promise<ComponentHealth> {
   return timedComponent(false, async () => {
-    const endpoint = resolveExternalEndpoint(...envKeys);
+    const configuredEndpoint = configuredValue(...envKeys);
 
-    if (!endpoint) {
+    if (!configuredEndpoint) {
       return {
         status: 'not-configured',
         configured: false,
@@ -373,6 +364,22 @@ async function checkExternalApi(
           label,
           supportedEnv: envKeys,
         },
+      };
+    }
+
+    let endpoint: string;
+    try {
+      endpoint = new URL(configuredEndpoint).toString();
+    } catch {
+      return {
+        status: 'degraded',
+        configured: true,
+        details: {
+          label,
+          endpoint: configuredEndpoint,
+          supportedEnv: envKeys,
+        },
+        error: `${label} endpoint is not a valid URL.`,
       };
     }
 
@@ -415,7 +422,12 @@ router.get('/', async (req, res) => {
     checkRegisteredServices(),
     checkWebSocketStatus(req),
     checkMqttBroker(),
-    checkExternalApi('MoH FHIR', ['MOH_FHIR_BASE_URL', 'MOH_FHIR_URL', 'FHIR_BASE_URL', 'FHIR_API_URL']),
+    checkExternalApi('MoH FHIR', [
+      'MOH_FHIR_BASE_URL',
+      'MOH_FHIR_URL',
+      'FHIR_BASE_URL',
+      'FHIR_API_URL',
+    ]),
     checkExternalApi('Wearable API', [
       'WEARABLE_API_URL',
       'WEARABLES_API_URL',

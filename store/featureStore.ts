@@ -290,7 +290,7 @@ export const useFeatureStore = create<FeatureStoreState>((set, get) => ({
 
     const result =
       state.persistenceMode === 'local'
-        ? { ok: true, localFallback: true }
+        ? { ok: true, localFallback: true, message: '' }
         : await persistFeatureOverride(featureId, enabled, metadata.changedBy).catch((error: unknown) => ({
             ok: false,
             message: error instanceof Error ? error.message : String(error),

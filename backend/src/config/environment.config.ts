@@ -277,7 +277,9 @@ function readBoolean(env: EnvSource, key: string, defaultValue = false): boolean
 }
 
 function readNumber(env: EnvSource, key: string, defaultValue: number): number {
-  const value = Number(readOptional(env, key));
+  const rawValue = readOptional(env, key);
+  if (!rawValue) return defaultValue;
+  const value = Number(rawValue);
   return Number.isFinite(value) ? value : defaultValue;
 }
 

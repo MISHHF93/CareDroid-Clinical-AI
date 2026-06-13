@@ -32,19 +32,22 @@ describe('API routes registry', () => {
 
   it('does not expose router internals in discovery metadata', () => {
     const routeList = getRouteList();
+    const capacityRoute = routeList.find((route) => route.path === '/capacity');
 
-    expect(routeList[0]).toMatchObject({
+    expect(capacityRoute).toMatchObject({
       path: '/capacity',
       fullPath: '/api/capacity',
       version: 'v1',
       enabled: true,
     });
-    expect(routeList[0]).not.toHaveProperty('router');
+    expect(capacityRoute).not.toHaveProperty('router');
   });
 
   it('builds full paths from a custom API prefix', () => {
-    expect(getRouteList({ apiPrefix: '/api/emergency/' })[0].fullPath).toBe(
-      '/api/emergency/capacity',
+    const capacityRoute = getRouteList({ apiPrefix: '/api/emergency/' }).find(
+      (route) => route.path === '/capacity',
     );
+
+    expect(capacityRoute?.fullPath).toBe('/api/emergency/capacity');
   });
 });

@@ -11,6 +11,8 @@ import './CommandPalette.css';
 
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
 const HUB_CALCULATORS = buildBuiltinHubCalculatorCards();
+const EMPTY_PATIENT_BACKEND_SEARCH = { query: '', results: [] };
+const noopSearchBackendPatients = () => Promise.resolve();
 
 const BASE_COMMANDS = [
   ...EMERGENCY_OS_ROUTE_COMMANDS,
@@ -249,8 +251,8 @@ export default function CommandPalette({ open, onClose, onExecute }) {
   const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const addFlag = useEmergencyStore((state) => state.addFlag);
-  const patientBackendSearch = useEmergencyStore((state) => state.patientBackendSearch);
-  const searchBackendPatients = useEmergencyStore((state) => state.searchBackendPatients);
+  const patientBackendSearch = useEmergencyStore((state) => state.patientBackendSearch || EMPTY_PATIENT_BACKEND_SEARCH);
+  const searchBackendPatients = useEmergencyStore((state) => state.searchBackendPatients || noopSearchBackendPatients);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [recentCommandIds, setRecentCommandIds] = useState(() => readRecentCommands());

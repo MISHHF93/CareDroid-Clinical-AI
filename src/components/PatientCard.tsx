@@ -4,6 +4,17 @@ import './PatientCard.css';
 
 type PatientCardProps = {
   patient: Patient;
+  keyboardSelected?: boolean;
+  highlighted?: boolean;
+  onKeyboardFocus?: () => void;
+};
+
+type LegacyVitals = NonNullable<Patient['vitals'][number]> & {
+  heartRate?: number;
+  bpSystolic?: number;
+  bpDiastolic?: number;
+  oxygenSaturation?: number;
+  temperature?: number;
 };
 
 const priorityColors = {
@@ -22,8 +33,27 @@ const flagColors: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.SepsisAlert]: '#EF4444',
   [PatientFlag.DeteriorationRisk]: '#EF4444',
   [PatientFlag.ReassessmentDue]: '#F59E0B',
+  [PatientFlag.ScoreReassessmentRecommended]: '#F59E0B',
   [PatientFlag.LongWait]: '#F97316',
+  [PatientFlag.HighRisk]: '#EF4444',
+  [PatientFlag.EMSArrival]: '#38BDF8',
+  [PatientFlag.PendingAdmission]: '#A78BFA',
 };
+
+const flagLabels: Partial<Record<PatientFlag, string>> = {
+  [PatientFlag.SepsisAlert]: 'SEP',
+  [PatientFlag.DeteriorationRisk]: 'DET',
+  [PatientFlag.ReassessmentDue]: 'REA',
+  [PatientFlag.ScoreReassessmentRecommended]: 'SCR',
+  [PatientFlag.LongWait]: 'WAIT',
+  [PatientFlag.HighRisk]: 'RISK',
+  [PatientFlag.EMSArrival]: 'EMS',
+  [PatientFlag.PendingAdmission]: 'ADM',
+};
+
+function latestVitals(patient: Patient): LegacyVitals | undefined {
+  return patient.vitals.at(-1) as LegacyVitals | undefined;
+}
 
 function truncateComplaint(complaint: string): string {
   return complaint.length > 30 ? `${complaint.slice(0, 30)}...` : complaint;
@@ -52,23 +82,66 @@ function staffInitials(name?: string): string {
     .toUpperCase();
 }
 
-export default function PatientCard({ patient }: PatientCardProps) {
+function noteContent(note: Patient['notes'][number]): string {
+  return `${note.text || ''} ${note.body || ''} ${JSON.stringify(note.metadata || {})}`;
+}
+
+function scoreBadges(patient: Patient): string[] {
+  const scores = new Set<string>();
+  patient.notes.forEach((note) => {
+    const content = noteContent(note);
+    ['HEART', 'qSOFA', 'NEWS2', 'NIHSS', 'GCS', 'Wells', 'PERC'].forEach((scoreName) => {
+      if (new RegExp(`\\b${scoreName}\\b`, 'i').test(content)) {
+        scores.add(scoreName);
+      }
+    });
+    const scoreLabel = note.metadata?.scoreLabel || note.metadata?.scoreId;
+    if (scoreLabel) scores.add(String(scoreLabel).slice(0, 14));
+  });
+  return [...scores].slice(0, 3);
+}
+
+export default function PatientCard({
+  patient,
+  keyboardSelected = false,
+  highlighted = false,
+  onKeyboardFocus,
+}: PatientCardProps) {
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
   const staff = useEmergencyStore((store) => store.staff);
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
   const patientName = `${patient.firstName} ${patient.lastName}`.trim();
-  const vitals = patient.vitals[0];
+  // Merged from src/components/EmergencyPatientCard.jsx: tolerate legacy vital field names.
+  const vitals = latestVitals(patient);
   const minutesWaiting = waitMinutes(patient.arrivalTime);
   const hasReassessmentDue = patient.flags.includes(PatientFlag.ReassessmentDue);
+  const hasDeteriorationRisk = patient.flags.includes(PatientFlag.DeteriorationRisk);
+  const hasEmsArrival = patient.flags.includes(PatientFlag.EMSArrival) || patient.source === 'EMS';
+  const scores = scoreBadges(patient);
 
-  const hrAbnormal = vitals?.hr !== undefined && (vitals.hr > 120 || vitals.hr < 50);
-  const spo2Abnormal = vitals?.spo2 !== undefined && vitals.spo2 < 94;
+  const hr = vitals?.hr ?? vitals?.heartRate;
+  const sbp = vitals?.sbp ?? vitals?.bpSystolic;
+  const dbp = vitals?.dbp ?? vitals?.bpDiastolic;
+  const spo2 = vitals?.spo2 ?? vitals?.oxygenSaturation;
+  const temp = vitals?.temp ?? vitals?.temperature;
+  const hrAbnormal = hr !== undefined && (hr > 120 || hr < 50);
+  const bpAbnormal = sbp !== undefined && (sbp < 90 || sbp > 180);
+  const spo2Abnormal = spo2 !== undefined && spo2 < 94;
+  const tempAbnormal = temp !== undefined && (temp >= 38 || temp < 36);
 
   return (
     <div
-      className={hasReassessmentDue ? 'patient-card patient-card--reassessment-due' : 'patient-card'}
+      className={[
+        'patient-card',
+        hasReassessmentDue ? 'patient-card--reassessment-due' : '',
+        hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
+        hasEmsArrival ? 'patient-card--ems-arrival' : '',
+        keyboardSelected ? 'patient-card--keyboard-selected' : '',
+        highlighted ? 'patient-card--highlighted' : '',
+      ].filter(Boolean).join(' ')}
       data-patient-card-id={patient.id}
       onClick={() => selectPatient(patient.id)}
+      onFocus={onKeyboardFocus}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => {
@@ -89,10 +162,14 @@ export default function PatientCard({ patient }: PatientCardProps) {
         boxShadow: patient.priority === 'P1' ? '0 0 12px #EF444440' : undefined,
         overflow: 'hidden',
       }}
+      aria-label={`${patientName}, ${patient.state}, ${patient.priority}`}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {patientName}
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {patientName}
+          </div>
+          <div style={{ color: '#6B7280', fontSize: 10, marginTop: 1 }}>{patient.mrn}</div>
         </div>
         <div style={{ background: '#1C2333', color: '#9CA3AF', borderRadius: 999, padding: '2px 8px', fontSize: 11, flex: '0 0 auto' }}>
           {patient.age}/{patient.sex}
@@ -106,13 +183,18 @@ export default function PatientCard({ patient }: PatientCardProps) {
         <div style={{ background: '#1C2333', borderRadius: 12, padding: '2px 8px', fontSize: 11, color: stateColors[patient.state] ?? '#6B7280', flex: '0 0 auto' }}>
           {patient.state}
         </div>
+        {hasEmsArrival ? (
+          <div style={{ background: '#082F49', borderRadius: 12, padding: '2px 8px', fontSize: 11, color: '#7DD3FC', flex: '0 0 auto' }}>
+            EMS
+          </div>
+        ) : null}
       </div>
 
-      <div style={{ fontSize: 11, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: '#6B7280', marginTop: 6 }}>
-        <span style={{ color: hrAbnormal ? '#EF4444' : '#6B7280' }}>HR: {vitals?.hr ?? '--'}</span>{' '}
-        BP: {vitals?.sbp ?? '--'}/{vitals?.dbp ?? '--'}{' '}
-        <span style={{ color: spo2Abnormal ? '#EF4444' : '#6B7280' }}>SpO2: {vitals?.spo2 ?? '--'}%</span>{' '}
-        T:{vitals?.temp ?? '--'}°
+      <div className="patient-card__vitals">
+        <span style={{ color: hrAbnormal ? '#EF4444' : '#9CA3AF' }}>HR {hr ?? '--'}</span>
+        <span style={{ color: bpAbnormal ? '#F59E0B' : '#9CA3AF' }}>BP {sbp ?? '--'}/{dbp ?? '--'}</span>
+        <span style={{ color: spo2Abnormal ? '#EF4444' : '#9CA3AF' }}>SpO2 {spo2 ?? '--'}%</span>
+        <span style={{ color: tempAbnormal ? '#F59E0B' : '#9CA3AF' }}>T {temp ?? '--'}°</span>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 6 }}>
@@ -142,7 +224,15 @@ export default function PatientCard({ patient }: PatientCardProps) {
         </div>
       </div>
 
-      <div style={{ position: 'absolute', bottom: 8, left: 12, display: 'flex', gap: 5 }}>
+      {scores.length ? (
+        <div className="patient-card__scores" aria-label="Saved score badges">
+          {scores.map((score) => (
+            <span key={score}>{score}</span>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="patient-card__flags" aria-label="Patient flags">
         {patient.flags.map((flag) => {
           const color = flagColors[flag];
           if (!color) return null;
@@ -152,13 +242,21 @@ export default function PatientCard({ patient }: PatientCardProps) {
               title={flag}
               aria-label={flag}
               style={{
-                width: 7,
-                height: 7,
+                minWidth: 7,
+                height: 14,
                 borderRadius: 999,
                 background: color,
-                display: 'inline-block',
+                color: '#F9FAFB',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 8,
+                fontWeight: 800,
+                padding: '0 4px',
               }}
-            />
+            >
+              {flagLabels[flag] || flag.slice(0, 3).toUpperCase()}
+            </span>
           );
         })}
       </div>

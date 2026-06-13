@@ -1,13 +1,19 @@
-import express from 'express';
-import request from 'supertest';
-import healthRoutes from './health.routes';
-import { checkServiceHealth } from '../services/service-registry';
+import * as express from 'express';
+import * as request from 'supertest';
+import type healthRoutesType from './health.routes';
+import type { checkServiceHealth as checkServiceHealthType } from '../services/service-registry';
 
 jest.mock('../services/service-registry', () => ({
   checkServiceHealth: jest.fn(),
 }));
 
-const mockedCheckServiceHealth = checkServiceHealth as jest.MockedFunction<typeof checkServiceHealth>;
+const { default: healthRoutes } = jest.requireActual<{ default: typeof healthRoutesType }>(
+  './health.routes',
+);
+const { checkServiceHealth } = jest.requireMock<{
+  checkServiceHealth: jest.MockedFunction<typeof checkServiceHealthType>;
+}>('../services/service-registry');
+const mockedCheckServiceHealth = checkServiceHealth;
 
 function buildApp() {
   const app = express();

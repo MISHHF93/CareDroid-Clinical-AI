@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EmergencySettings from './EmergencySettings';
 import { fetchEmergencyOsSettings, saveEmergencyOsSettings } from '../../services/emergencySettingsApi';
+import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
 
 const saveEmergencySettings = vi.fn();
 
@@ -84,7 +85,18 @@ vi.mock('../../../store/emergencyStore', () => ({
   useEmergencyStore: (selector) =>
     selector({
       emergencySettings: mockSettings,
+      workflowLogs: [],
       saveEmergencySettings,
+      activeScenario: null,
+      setActiveScenario: vi.fn(),
+    }),
+}));
+
+vi.mock('../../store/emergencyStore', () => ({
+  useEmergencyStore: (selector) =>
+    selector({
+      workflowLogs: [],
+      setActiveScenario: vi.fn(),
     }),
 }));
 
@@ -93,10 +105,32 @@ vi.mock('../../services/emergencySettingsApi', () => ({
   saveEmergencyOsSettings: vi.fn(),
 }));
 
+vi.mock('../../services/emergencyOsApi', () => ({
+  fetchEmergencyWorkflowLogs: vi.fn(),
+}));
+
 describe('EmergencySettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fetchEmergencyOsSettings.mockResolvedValue({ ok: true, data: { data: mockSettings } });
+    fetchEmergencyWorkflowLogs.mockResolvedValue({
+      data: {
+        logs: [
+          {
+            id: 'workflow-audit-test',
+            type: 'patient_created',
+            title: 'Patient created',
+            summary: 'Created patient Audit Render.',
+            timestamp: '2026-06-13T13:00:00.000Z',
+            patientId: 'patient-audit-render',
+            source: 'test-backend',
+            severity: 'Info',
+            status: 'recorded',
+            metadata: {},
+          },
+        ],
+      },
+    });
     saveEmergencyOsSettings.mockImplementation((payload) =>
       Promise.resolve({
         ok: true,
@@ -134,6 +168,14 @@ describe('EmergencySettings', () => {
     expect(screen.getByText('EMS Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Boarding Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Alert Rules')).toBeInTheDocument();
+  });
+
+  it('renders fetched workflow action audit logs', async () => {
+    render(<EmergencySettings />);
+
+    expect(await screen.findByText('Workflow Action Audit')).toBeInTheDocument();
+    expect(await screen.findByText('Created patient Audit Render.')).toBeInTheDocument();
+    expect(screen.getByText(/Backend audit loaded/i)).toBeInTheDocument();
   });
 
   it('saves capacity thresholds through the settings API and local store', async () => {

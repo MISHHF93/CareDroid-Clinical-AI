@@ -19,7 +19,9 @@ router.get('/health', (_req, res) => {
 
 router.post('/predict', (req, res) => {
   const input = req.body || {};
-  const hasContext = Boolean(input.triageCode || input.triage_code || input.vitals || input.riskFlags);
+  const hasContext = Boolean(
+    input.triageCode || input.triage_code || input.vitals || input.riskFlags,
+  );
   if (!hasContext) {
     return res.status(400).json({
       error: 'triageCode, vitals, or riskFlags are required',

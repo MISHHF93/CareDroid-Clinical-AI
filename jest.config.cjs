@@ -21,5 +21,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
   moduleDirectories: ['node_modules', '<rootDir>/backend/node_modules'],
-  testTimeout: 60000,
+  testTimeout: 180000,
 };

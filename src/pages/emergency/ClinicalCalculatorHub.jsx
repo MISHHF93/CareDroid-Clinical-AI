@@ -15,6 +15,7 @@ import { DRUG_REFERENCE_TOOLS } from '../../utils/drugReferenceTools';
 import HEARTScore from '../../components/calculators/HEARTScore';
 import QSOFA from '../../components/calculators/qSOFA';
 import PediatricDrugCalc from '../../components/calculators/PediatricDrugCalc';
+import { dispatchAlert } from '../../engine/alertEngine';
 import './ClinicalCalculatorHub.css';
 
 const CATEGORY_TABS = Object.freeze([
@@ -392,7 +393,7 @@ export default function ClinicalCalculatorHub() {
   const [qsofaOpen, setQsofaOpen] = useState(false);
   const [pediatricDrugCalcOpen, setPediatricDrugCalcOpen] = useState(false);
 
-  const queryToolId = normalizeToolId(searchParams.get('tool') || searchParams.get('calc'));
+  const queryToolId = normalizeToolId(searchParams.get('tool') || searchParams.get('open') || searchParams.get('calc'));
   const queryPatientId = searchParams.get('patientId');
   const pendingPatient = location.state?.pendingPatient || null;
   const patient =
@@ -498,6 +499,20 @@ export default function ClinicalCalculatorHub() {
       body: `${score.label}: ${score.total} (${score.interpretation}). ${score.recommendation}`,
       createdAt: now,
     });
+    if (/high|critical|severe|red/i.test(`${score.interpretation} ${score.recommendation}`)) {
+      dispatchAlert({
+        severity: /critical|severe|red/i.test(`${score.interpretation} ${score.recommendation}`) ? 'Critical' : 'Warning',
+        title: `${score.label} review`,
+        message: `${patientName(currentPatient)} has ${score.label}: ${score.total} (${score.interpretation}).`,
+        patientId: currentPatient.id,
+        source: 'clinical-calculator-hub',
+        metadata: {
+          calculatorId: score.calculatorId,
+          scoreTotal: String(score.total),
+          interpretation: score.interpretation,
+        },
+      });
+    }
     setSavedMessage(`Saved ${activeTool.name} to ${patientName(currentPatient)}.`);
   };
 

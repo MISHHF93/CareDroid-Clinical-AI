@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 import {
   Alert,
+  ActiveShift,
   CapacitySnapshot,
+  EmsUnit,
+  EmergencyFeatureFlags,
   JourneyEvent,
   Note,
   Patient,
   PatientFlag,
   PatientState,
   Priority,
+  ReassessmentReminder,
+  Referral,
   Room,
   Staff,
   Vitals,
@@ -167,6 +172,41 @@ const SEED_ROOMS: Room[] = [
   { id: 'r15', name: 'Waiting Area B', type: 'Waiting', status: 'Available' },
 ];
 
+const SEED_SHIFT: ActiveShift = {
+  id: 'shift-day-ed',
+  label: 'ED Day Shift',
+  startTime: tMinus(180),
+  status: 'Open',
+  chargeStaffId: 's3',
+};
+
+const SEED_EMS_UNITS: EmsUnit[] = [
+  { id: 'ems-12', unitNumber: 'EMS 12', etaMinutes: 7, status: 'Inbound', acuity: Priority.P2 },
+  { id: 'ems-18', unitNumber: 'EMS 18', etaMinutes: 14, status: 'Inbound', acuity: Priority.P3 },
+];
+
+const SEED_REFERRALS: Referral[] = [
+  {
+    id: 'ref-p12-psych',
+    patientId: 'p12',
+    service: 'Mental Health',
+    status: 'Delayed',
+    createdAt: tMinus(110),
+    summary: 'Awaiting inpatient psychiatric disposition review.',
+  },
+];
+
+const DEFAULT_FEATURES: EmergencyFeatureFlags = {
+  whiteboard: true,
+  ems: true,
+  referrals: true,
+  capacity: true,
+  tools: true,
+  shift: true,
+  settings: true,
+  copilot: true,
+};
+
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -284,6 +324,8 @@ function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnap
   return {
     score,
     band,
+    label: `${band} capacity`,
+    riskLevel: band,
     totalPatients: patients.length,
     occupiedRooms,
     boardingCount,
@@ -292,35 +334,99 @@ function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnap
   };
 }
 
+function buildLocalEmergencyAnalytics(state: Pick<EmergencyStoreState, 'patients' | 'capacity' | 'activeShift'>) {
+  const today = new Date().toISOString().slice(0, 10);
+  const complaintCounts = new Map<string, number>();
+
+  state.patients.forEach((patient) => {
+    const complaint = patient.complaintCategory || patient.chiefComplaint || 'Other';
+    complaintCounts.set(complaint, (complaintCounts.get(complaint) || 0) + 1);
+  });
+
+  return {
+    shift: {
+      id: state.activeShift.id,
+      label: state.activeShift.label,
+      patientsSeen: state.patients.filter((patient) => patient.state !== PatientState.Registration).length,
+      dischargeCount: state.patients.filter((patient) => patient.state === PatientState.Discharge).length,
+      reassessmentDueCount: state.patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue)).length,
+      capacityScore: state.capacity.score,
+    },
+    operationalCommand: {
+      dailyVolume: [{ date: today, count: state.patients.length }],
+      topComplaints: [...complaintCounts.entries()]
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count),
+      capacity: state.capacity,
+    },
+  };
+}
+
+type EmergencyAnalyticsState = {
+  status: 'idle' | 'loading' | 'ready' | 'error';
+  source: string;
+  loadedAt: string | null;
+  message: string;
+  data?: ReturnType<typeof buildLocalEmergencyAnalytics>;
+};
+
 interface EmergencyStoreState {
   patients: Patient[];
   staff: Staff[];
   rooms: Room[];
   capacity: CapacitySnapshot;
+  activeShift: ActiveShift;
+  emsUnits: EmsUnit[];
+  emsArrivals: EmsUnit[];
+  referrals: Referral[];
+  emergencyAnalytics: EmergencyAnalyticsState;
   activeScenarioId: string;
   activeScenario: any;
   availableScenarios: any[];
   scenarioData: any;
-  emsArrivals: any[];
   queues: any[];
   selectedPatientId: string | null;
   copilotOpen: boolean;
+  activeQueueFilter: string;
+  loading: boolean;
+  features: EmergencyFeatureFlags;
   alerts: Alert[];
   workflowLogs: WorkflowActionLog[];
 
-  addPatient: (patient: Patient) => void;
+  addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
-  movePatientToState: (patientId: string, to: PatientState, staffId?: string, note?: string) => void;
+  movePatientToState: (
+    patientId: string,
+    to: PatientState,
+    staffIdOrOptions?: string | { staffId?: string; note?: string; timelineEvent?: JourneyEvent },
+    note?: string
+  ) => void;
+  dischargePatient: (patientId: string, options?: { staffId?: string; note?: string }) => void;
   assignStaff: (patientId: string, staffId: string) => void;
   assignRoom: (patientId: string, roomId: string) => void;
-  addFlag: (patientId: string, flag: PatientFlag) => void;
+  addFlag: (patientId: string, flag: PatientFlag | string, options?: Partial<Alert>) => void;
   removeFlag: (patientId: string, flag: PatientFlag) => void;
   addVitals: (patientId: string, vitals: Vitals) => void;
+  addNote: (patientId: string, note: Note) => void;
+  scheduleReassessmentReminder: (
+    patientId: string,
+    reminder: Omit<ReassessmentReminder, 'id' | 'patientId' | 'status'>
+  ) => ReassessmentReminder;
+  completeReassessmentReminder: (
+    patientId: string,
+    reminderId: string,
+    options?: { completedBy?: string; completedAt?: string }
+  ) => void;
   selectPatient: (patientId: string | null) => void;
+  setActiveQueueFilter: (filter: string) => void;
+  setLoading: (loading: boolean) => void;
   toggleCopilot: () => void;
   addAlert: (alert: Alert) => void;
   setCapacity: (capacity: CapacitySnapshot) => void;
   setActiveScenario: (scenarioId: string) => void;
+  createReferral: (input: Partial<Referral> & { patientId: string }) => Referral;
+  updateReferralStatus: (referralId: string, status: Referral['status'], responseNote?: string) => void;
+  loadEmergencyAnalytics: (options?: { force?: boolean }) => Promise<EmergencyAnalyticsState>;
   recordWorkflowAction: (input: WorkflowActionInput) => WorkflowActionLog;
   hydrateFromApi: (payload: Partial<{
     patients: Patient[];
@@ -329,6 +435,13 @@ interface EmergencyStoreState {
     alerts: Alert[];
     capacity: CapacitySnapshot;
     workflowLogs: WorkflowActionLog[];
+    activeShift: ActiveShift;
+    emsUnits: EmsUnit[];
+    emsArrivals: EmsUnit[];
+    referrals: Referral[];
+    activeQueueFilter: string;
+    loading: boolean;
+    features: EmergencyFeatureFlags;
   }>) => void;
 }
 
@@ -340,14 +453,26 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   staff: initialScenarioState.staff || SEED_STAFF,
   rooms: initialScenarioState.rooms || SEED_ROOMS,
   capacity: initialCapacity,
+  activeShift: initialScenarioState.activeShift || SEED_SHIFT,
+  emsUnits: initialScenarioState.emsUnits || initialScenarioState.emsArrivals || SEED_EMS_UNITS,
+  emsArrivals: initialScenarioState.emsArrivals || SEED_EMS_UNITS,
+  referrals: initialScenarioState.referrals || SEED_REFERRALS,
+  emergencyAnalytics: {
+    status: 'idle',
+    source: 'local',
+    loadedAt: null,
+    message: '',
+  },
   activeScenarioId: initialScenarioState.activeScenarioId,
   activeScenario: initialScenarioState.activeScenario,
   availableScenarios: ED_SCENARIO_DEMO_MODES,
   scenarioData: initialScenarioState.scenarioData,
-  emsArrivals: initialScenarioState.emsArrivals || [],
   queues: initialScenarioState.queues || [],
   selectedPatientId: null,
   copilotOpen: false,
+  activeQueueFilter: 'All',
+  loading: false,
+  features: DEFAULT_FEATURES,
   workflowLogs: [],
   alerts: initialScenarioState.alerts || [
     {
@@ -434,25 +559,29 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     return { patients, capacity };
   }),
 
-  movePatientToState: (patientId, to, staffId = 's3', note) => set((state) => {
+  movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) => set((state) => {
+    const options = typeof staffIdOrOptions === 'string' ? { staffId: staffIdOrOptions, note } : staffIdOrOptions;
+    const staffId = options.staffId || 's3';
     const beforePatient = state.patients.find((patient) => patient.id === patientId);
     const patients = state.patients.map((patient) => {
       if (patient.id !== patientId) return patient;
 
-      const event: JourneyEvent = createPatientTimelineEvent(
-        patient,
-        to === PatientState.Discharge ? 'DispositionUpdated' : to === PatientState.Triage ? 'Triage' : 'StateChange',
-        note || `Moved patient from ${patient.state} to ${to}.`,
-        {
-          from: patient.state,
-          to,
-          staffId,
-          metadata: {
-            fromState: patient.state,
-            toState: to,
-          },
-        }
-      );
+      const event: JourneyEvent =
+        options.timelineEvent ||
+        createPatientTimelineEvent(
+          patient,
+          to === PatientState.Discharge ? 'DispositionUpdated' : to === PatientState.Triage ? 'Triage' : 'StateChange',
+          options.note || `Moved patient from ${patient.state} to ${to}.`,
+          {
+            from: patient.state,
+            to,
+            staffId,
+            metadata: {
+              fromState: patient.state,
+              toState: to,
+            },
+          }
+        );
 
       return { ...patient, state: to, timeline: [...patient.timeline, event] };
     });
@@ -508,6 +637,28 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           : null,
       ]),
     };
+  }),
+
+  dischargePatient: (patientId, options = {}) => set((state) => {
+    const staffId = options.staffId || 's3';
+    const patients = state.patients.map((patient) =>
+      patient.id === patientId
+        ? {
+            ...patient,
+            state: PatientState.Discharge,
+            timeline: [
+              ...patient.timeline,
+              createPatientTimelineEvent(
+                patient,
+                'DispositionUpdated',
+                options.note || 'Patient discharged from Emergency OS.',
+                { from: patient.state, to: PatientState.Discharge, staffId },
+              ),
+            ],
+          }
+        : patient
+    );
+    return { patients, capacity: buildCapacitySnapshot(patients, state.rooms) };
   }),
 
   assignStaff: (patientId, staffId) => set((state) => {
@@ -581,16 +732,19 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   }),
 
   addFlag: (patientId, flag) => set((state) => {
+    const normalizedFlag = Object.values(PatientFlag).includes(flag as PatientFlag)
+      ? flag as PatientFlag
+      : PatientFlag.HighRisk;
     const patients = state.patients.map((patient) => {
-      if (patient.id !== patientId || patient.flags.includes(flag)) return patient;
+      if (patient.id !== patientId || patient.flags.includes(normalizedFlag)) return patient;
       return {
         ...patient,
-        flags: [...patient.flags, flag],
+        flags: [...patient.flags, normalizedFlag],
         timeline: [
           ...patient.timeline,
-          createPatientTimelineEvent(patient, 'FlagAdded', `Added ${flag} flag.`, {
+          createPatientTimelineEvent(patient, 'FlagAdded', `Added ${normalizedFlag} flag.`, {
             metadata: {
-              flag,
+              flag: normalizedFlag,
             },
           }),
         ],
@@ -601,7 +755,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       patients,
       capacity: buildCapacitySnapshot(patients, state.rooms),
       workflowLogs: appendWorkflowLogs(state.workflowLogs, [
-        flag === PatientFlag.ReassessmentDue
+        normalizedFlag === PatientFlag.ReassessmentDue
           ? {
               type: 'reassessment_created',
               title: 'Reassessment created',
@@ -609,10 +763,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
               patientId,
               source: 'reassessment-engine',
               severity: 'Warning',
-              metadata: { flag },
+              metadata: { flag: normalizedFlag },
             }
           : null,
-        flag === PatientFlag.PendingAdmission
+        normalizedFlag === PatientFlag.PendingAdmission
           ? {
               type: 'boarding_started',
               title: 'Boarding started',
@@ -620,18 +774,18 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
               patientId,
               source: 'boarding-intelligence',
               severity: 'Warning',
-              metadata: { flag },
+              metadata: { flag: normalizedFlag },
             }
           : null,
-        flag === PatientFlag.HighRisk || flag === PatientFlag.DeteriorationRisk || flag === PatientFlag.SepsisAlert
+        normalizedFlag === PatientFlag.HighRisk || normalizedFlag === PatientFlag.DeteriorationRisk || normalizedFlag === PatientFlag.SepsisAlert
           ? {
               type: 'copilot_used',
               title: 'Copilot used',
-              summary: `Patient risk signal ${flag} added for human review.`,
+              summary: `Patient risk signal ${normalizedFlag} added for human review.`,
               patientId,
               source: 'ed-copilot',
-              severity: flag === PatientFlag.HighRisk ? 'Warning' : 'Critical',
-              metadata: { flag },
+              severity: normalizedFlag === PatientFlag.HighRisk ? 'Warning' : 'Critical',
+              metadata: { flag: normalizedFlag },
             }
           : null,
       ]),
@@ -704,7 +858,84 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
     ]),
   })),
 
+  addNote: (patientId, note) => set((state) => ({
+    patients: state.patients.map((patient) =>
+      patient.id === patientId
+        ? {
+            ...patient,
+            notes: [
+              ...patient.notes,
+              {
+                ...note,
+                id: note.id || createId('note'),
+                patientId,
+                timestamp: note.timestamp || note.createdAt || new Date().toISOString(),
+              },
+            ],
+          }
+        : patient
+    ),
+  })),
+
+  scheduleReassessmentReminder: (patientId, reminder) => {
+    const nextReminder: ReassessmentReminder = {
+      ...reminder,
+      id: createId('reassessment'),
+      patientId,
+      status: 'pending',
+    };
+
+    set((state) => ({
+      patients: state.patients.map((patient) =>
+        patient.id === patientId
+          ? {
+              ...patient,
+              reassessmentReminders: [...(patient.reassessmentReminders || []), nextReminder],
+            }
+          : patient
+      ),
+      workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+        {
+          type: 'reassessment_created',
+          title: 'Reassessment created',
+          summary: reminder.note || 'Reassessment reminder scheduled.',
+          patientId,
+          actorStaffId: reminder.scheduledBy,
+          source: 'reassessment-engine',
+          severity: 'Warning',
+          metadata: { dueAt: reminder.dueAt },
+        },
+      ]),
+    }));
+
+    return nextReminder;
+  },
+
+  completeReassessmentReminder: (patientId, reminderId, options = {}) => set((state) => ({
+    patients: state.patients.map((patient) =>
+      patient.id === patientId
+        ? {
+            ...patient,
+            reassessmentReminders: (patient.reassessmentReminders || []).map((reminder) =>
+              reminder.id === reminderId
+                ? {
+                    ...reminder,
+                    status: 'completed',
+                    completedBy: options.completedBy,
+                    completedAt: options.completedAt || new Date().toISOString(),
+                  }
+                : reminder
+            ),
+          }
+        : patient
+    ),
+  })),
+
   selectPatient: (patientId) => set({ selectedPatientId: patientId }),
+
+  setActiveQueueFilter: (filter) => set({ activeQueueFilter: filter }),
+
+  setLoading: (loading) => set({ loading }),
 
   toggleCopilot: () => set((state) => ({ copilotOpen: !state.copilotOpen })),
 
@@ -776,18 +1007,125 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       rooms: scenarioState.rooms,
       capacity: scenarioState.capacity,
       alerts: scenarioState.alerts,
+      activeShift: scenarioState.activeShift || SEED_SHIFT,
+      emsUnits: scenarioState.emsUnits || scenarioState.emsArrivals || SEED_EMS_UNITS,
+      emsArrivals: scenarioState.emsArrivals || scenarioState.emsUnits || SEED_EMS_UNITS,
+      referrals: scenarioState.referrals || SEED_REFERRALS,
       activeScenarioId: scenarioState.activeScenarioId,
       activeScenario: scenarioState.activeScenario,
       scenarioData: scenarioState.scenarioData,
-      emsArrivals: scenarioState.emsArrivals || [],
       queues: scenarioState.queues || [],
       selectedPatientId: null,
     };
   }),
 
+  createReferral: (input) => {
+    const now = new Date().toISOString();
+    const referral: Referral = {
+      id: input.id || createId('referral'),
+      patientId: input.patientId,
+      requestingStaffId: input.requestingStaffId || 's3',
+      targetDepartment: input.targetDepartment || input.service || 'Other',
+      urgency: input.urgency || 'Routine',
+      reason: input.reason || input.summary || 'Referral requested.',
+      clinicalSummary: input.clinicalSummary || input.summary || '',
+      status: input.status || 'Draft',
+      workflow: input.workflow || 'Referral',
+      requestedAt: input.requestedAt || input.createdAt || now,
+      createdAt: input.createdAt || now,
+      respondedAt: input.respondedAt,
+      responseNote: input.responseNote,
+      summary: input.summary || input.reason || 'Referral requested.',
+      service: input.service || input.targetDepartment || 'Other',
+    } as Referral;
+
+    set((state) => ({
+      referrals: [referral, ...state.referrals],
+      patients: state.patients.map((patient) =>
+        patient.id === referral.patientId
+          ? {
+              ...patient,
+              referral,
+              timeline: [
+                ...patient.timeline,
+                createPatientTimelineEvent(patient, 'ReferralCreated', `Referral created for ${referral.targetDepartment}.`, {
+                  metadata: {
+                    referralId: referral.id,
+                    targetDepartment: referral.targetDepartment,
+                    urgency: referral.urgency,
+                  },
+                }),
+              ],
+            }
+          : patient
+      ),
+      workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+        {
+          type: 'referral_created',
+          title: 'Referral created',
+          summary: `${referral.targetDepartment} referral created.`,
+          patientId: referral.patientId,
+          actorStaffId: referral.requestingStaffId,
+          source: 'referral-workflow',
+          metadata: {
+            referralId: referral.id,
+            status: referral.status,
+            urgency: referral.urgency,
+          },
+        },
+      ]),
+    }));
+
+    return referral;
+  },
+
+  updateReferralStatus: (referralId, status, responseNote) => set((state) => {
+    const now = new Date().toISOString();
+    return {
+      referrals: state.referrals.map((referral) =>
+        referral.id === referralId
+          ? {
+              ...referral,
+              status,
+              responseNote: responseNote || referral.responseNote,
+              respondedAt: status === 'Sent' || status === 'Draft' ? referral.respondedAt : now,
+            }
+          : referral
+      ),
+    };
+  }),
+
+  loadEmergencyAnalytics: async () => {
+    const state = useEmergencyStore.getState();
+    const nextState: EmergencyAnalyticsState = {
+      status: 'ready',
+      source: 'client-fallback',
+      loadedAt: new Date().toISOString(),
+      message: 'Using local Emergency OS operational state.',
+      data: buildLocalEmergencyAnalytics(state),
+    };
+    set({ emergencyAnalytics: nextState });
+    return nextState;
+  },
+
   hydrateFromApi: (payload) => set((state) => {
-    const patients = payload.patients || state.patients;
+    const patients = payload.patients
+      ? [
+          ...payload.patients,
+          ...state.patients.filter(
+            (patient) => !payload.patients!.some((payloadPatient) => payloadPatient.id === patient.id)
+          ),
+        ]
+      : state.patients;
     const rooms = payload.rooms || state.rooms;
+    const referrals = payload.referrals
+      ? [
+          ...payload.referrals,
+          ...state.referrals.filter(
+            (referral) => !payload.referrals!.some((payloadReferral) => payloadReferral.id === referral.id)
+          ),
+        ]
+      : state.referrals;
     return {
       patients,
       rooms,
@@ -795,8 +1133,50 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       alerts: payload.alerts || state.alerts,
       capacity: payload.capacity || buildCapacitySnapshot(patients, rooms),
       workflowLogs: payload.workflowLogs || state.workflowLogs,
+      activeShift: payload.activeShift || state.activeShift,
+      emsUnits: payload.emsUnits || payload.emsArrivals || state.emsUnits,
+      emsArrivals: payload.emsArrivals || payload.emsUnits || state.emsArrivals,
+      referrals,
+      activeQueueFilter: payload.activeQueueFilter || state.activeQueueFilter,
+      loading: payload.loading ?? state.loading,
+      features: payload.features || state.features,
     };
   }),
 }));
 
 export type { EmergencyStoreState };
+
+export function getPatientFlagType(flag: PatientFlag | string | { type?: PatientFlag | string }): PatientFlag {
+  const candidate = typeof flag === 'object' ? flag.type : flag;
+  return Object.values(PatientFlag).includes(candidate as PatientFlag)
+    ? candidate as PatientFlag
+    : PatientFlag.HighRisk;
+}
+
+export function hasPatientFlag(patient: Patient, flag: PatientFlag | string): boolean {
+  return patient.flags.map(getPatientFlagType).includes(getPatientFlagType(flag));
+}
+
+export const selectActivePatients = (state: EmergencyStoreState): Patient[] =>
+  state.patients.filter((patient) => patient.state !== PatientState.Discharge);
+
+export const selectSelectedPatient = (state: EmergencyStoreState): Patient | null =>
+  state.patients.find((patient) => patient.id === state.selectedPatientId) || null;
+
+export const selectActiveAlerts = (state: EmergencyStoreState): Alert[] =>
+  state.alerts.filter((alert) => !alert.dismissed);
+
+export const selectReassessmentCount = (state: EmergencyStoreState): number =>
+  state.patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue)).length;
+
+export const selectReassessmentQueue = (state: EmergencyStoreState): Patient[] =>
+  state.patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue));
+
+export const selectQueueCounts = (state: EmergencyStoreState): Record<string, number> =>
+  state.patients.reduce<Record<string, number>>((counts, patient) => {
+    counts[patient.state] = (counts[patient.state] || 0) + 1;
+    return counts;
+  }, {});
+
+export const selectQueueBottleneckAlert = (state: EmergencyStoreState): Alert | null =>
+  selectActiveAlerts(state).find((alert) => /capacity|queue|wait|boarding/i.test(`${alert.title} ${alert.message}`)) || null;

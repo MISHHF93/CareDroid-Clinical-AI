@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 
@@ -229,22 +229,18 @@ export function CopilotPanel() {
 
     try {
       const requestMessages = [
-        { role: 'system', content: systemPrompt },
+        { role: 'system' as const, content: systemPrompt },
         ...history.map((message) => ({
-          role: message.role === 'staff' ? 'user' : 'assistant',
+          role: message.role === 'staff' ? 'user' as const : 'assistant' as const,
           content: message.content,
         })),
-        { role: 'user', content: text },
+        { role: 'user' as const, content: text },
       ];
-      const response = await sendClinicalChatMessage({
+      const response = await callAI({
+        type: 'COPILOT_CHAT',
         message: text,
         messages: requestMessages,
-        requestType: 'COPILOT_CHAT',
-        userId: 'current-user',
-        tenantId: 'default-tenant',
-        purpose: 'Summarize Emergency OS operational status and launch safe workflows',
-        sourceModule: 'ed-copilot-panel',
-        workspaceContext: {
+        context: {
           edCopilot: {
             patientCount: activePatients.length,
             highRiskCount,
@@ -261,7 +257,7 @@ export function CopilotPanel() {
         throw new Error(`Chat request failed with status ${response.status}`);
       }
 
-      await streamIntoMessage(extractResponseText(response.data), assistantId, setMessages);
+      await streamIntoMessage(response.content || extractResponseText(response.data), assistantId, setMessages);
     } catch {
       await streamIntoMessage(
         'Copilot unavailable - check connection. Continue clinical review with human oversight.',

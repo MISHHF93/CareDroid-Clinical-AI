@@ -45,7 +45,14 @@ export interface IEmergencyContact {
 }
 
 export interface IPatientIdentifier {
-  type: 'internal' | 'mrn' | 'phn' | 'health_card' | 'ems_temporary' | 'external_ehr' | 'referral_source';
+  type:
+    | 'internal'
+    | 'mrn'
+    | 'phn'
+    | 'health_card'
+    | 'ems_temporary'
+    | 'external_ehr'
+    | 'referral_source';
   value: string;
   issuer?: string | null;
   verified: boolean;
@@ -328,7 +335,15 @@ const PatientIdentifierSchema = new Schema<IPatientIdentifier>(
   {
     type: {
       type: String,
-      enum: ['internal', 'mrn', 'phn', 'health_card', 'ems_temporary', 'external_ehr', 'referral_source'],
+      enum: [
+        'internal',
+        'mrn',
+        'phn',
+        'health_card',
+        'ems_temporary',
+        'external_ehr',
+        'referral_source',
+      ],
       required: true,
     },
     value: { type: String, required: true },
@@ -354,7 +369,11 @@ const AllergySchema = new Schema<IClinicalAllergy>(
   {
     substance: { type: String, required: true },
     reaction: nullableString,
-    severity: { type: String, enum: ['mild', 'moderate', 'severe', 'unknown', null], default: null },
+    severity: {
+      type: String,
+      enum: ['mild', 'moderate', 'severe', 'unknown', null],
+      default: null,
+    },
   },
   { _id: false },
 );
@@ -378,7 +397,19 @@ const TriageSchema = new Schema<ITriageData>(
   {
     code: {
       type: String,
-      enum: ['CTAS1', 'CTAS2', 'CTAS3', 'CTAS4', 'CTAS5', 'ESI1', 'ESI2', 'ESI3', 'ESI4', 'ESI5', null],
+      enum: [
+        'CTAS1',
+        'CTAS2',
+        'CTAS3',
+        'CTAS4',
+        'CTAS5',
+        'ESI1',
+        'ESI2',
+        'ESI3',
+        'ESI4',
+        'ESI5',
+        null,
+      ],
       default: null,
     },
     system: { type: String, enum: ['CTAS', 'ESI', null], default: null },
@@ -735,7 +766,19 @@ export const UnifiedPatientSchema = new Schema<IUnifiedPatient>(
     reassessment_history: { type: [DPSHistorySchema], default: [] },
     triage_code: {
       type: String,
-      enum: ['CTAS1', 'CTAS2', 'CTAS3', 'CTAS4', 'CTAS5', 'ESI1', 'ESI2', 'ESI3', 'ESI4', 'ESI5', null],
+      enum: [
+        'CTAS1',
+        'CTAS2',
+        'CTAS3',
+        'CTAS4',
+        'CTAS5',
+        'ESI1',
+        'ESI2',
+        'ESI3',
+        'ESI4',
+        'ESI5',
+        null,
+      ],
       default: null,
     },
     safety_override: { type: Boolean, default: false },
@@ -792,7 +835,8 @@ UnifiedPatientSchema.pre('validate', function syncLegacyPatientFields() {
     patient.dob = patient.date_of_birth;
   }
   patient.dob = patient.dob || patient.date_of_birth || null;
-  patient.date_of_birth = patient.date_of_birth || (typeof patient.dob === 'string' ? patient.dob : null);
+  patient.date_of_birth =
+    patient.date_of_birth || (typeof patient.dob === 'string' ? patient.dob : null);
 
   if (legacyChanged('current_state') && patient.current_state) {
     patient.currentState = patient.current_state;
@@ -802,8 +846,12 @@ UnifiedPatientSchema.pre('validate', function syncLegacyPatientFields() {
   if (legacyChanged('state_history') && patient.state_history?.length) {
     patient.stateHistory = patient.state_history;
   }
-  patient.stateHistory = patient.stateHistory?.length ? patient.stateHistory : patient.state_history || [];
-  patient.state_history = patient.state_history?.length ? patient.state_history : patient.stateHistory || [];
+  patient.stateHistory = patient.stateHistory?.length
+    ? patient.stateHistory
+    : patient.state_history || [];
+  patient.state_history = patient.state_history?.length
+    ? patient.state_history
+    : patient.stateHistory || [];
   if (legacyChanged('wait_time_minutes')) {
     patient.waitTimeMinutes = patient.wait_time_minutes;
   }
@@ -823,12 +871,16 @@ UnifiedPatientSchema.pre('validate', function syncLegacyPatientFields() {
   if (legacyChanged('next_reassessment_due')) {
     patient.nextReassessmentDue = patient.next_reassessment_due || null;
   }
-  patient.nextReassessmentDue = patient.nextReassessmentDue || patient.next_reassessment_due || null;
-  patient.next_reassessment_due = patient.next_reassessment_due || patient.nextReassessmentDue || null;
+  patient.nextReassessmentDue =
+    patient.nextReassessmentDue || patient.next_reassessment_due || null;
+  patient.next_reassessment_due =
+    patient.next_reassessment_due || patient.nextReassessmentDue || null;
   if (legacyChanged('reassessment_history') && patient.reassessment_history?.length) {
     patient.dpsHistory = patient.reassessment_history;
   }
-  patient.dpsHistory = patient.dpsHistory?.length ? patient.dpsHistory : patient.reassessment_history || [];
+  patient.dpsHistory = patient.dpsHistory?.length
+    ? patient.dpsHistory
+    : patient.reassessment_history || [];
   patient.reassessment_history = patient.reassessment_history?.length
     ? patient.reassessment_history
     : patient.dpsHistory || [];
@@ -886,25 +938,44 @@ UnifiedPatientSchema.pre('validate', function syncLegacyPatientFields() {
     recheckCompleted: false,
   };
   patient.modifiedAt = new Date();
-
 });
 
-UnifiedPatientSchema.index({ mrn: 1 }, { name: 'idx_unified_patients_mrn', unique: true, sparse: true });
-UnifiedPatientSchema.index({ phn: 1 }, { name: 'idx_unified_patients_phn', unique: true, sparse: true });
+UnifiedPatientSchema.index(
+  { mrn: 1 },
+  { name: 'idx_unified_patients_mrn', unique: true, sparse: true },
+);
+UnifiedPatientSchema.index(
+  { phn: 1 },
+  { name: 'idx_unified_patients_phn', unique: true, sparse: true },
+);
 UnifiedPatientSchema.index({ currentState: 1 }, { name: 'idx_unified_patients_current_state' });
 UnifiedPatientSchema.index({ dpsScore: 1 }, { name: 'idx_unified_patients_dps_score' });
-UnifiedPatientSchema.index({ boardingStartTime: 1 }, { name: 'idx_unified_patients_boarding_start_time' });
+UnifiedPatientSchema.index(
+  { boardingStartTime: 1 },
+  { name: 'idx_unified_patients_boarding_start_time' },
+);
 UnifiedPatientSchema.index({ mciBatchId: 1 }, { name: 'idx_unified_patients_mci_batch_id' });
-UnifiedPatientSchema.index({ wearableDeviceId: 1 }, { name: 'idx_unified_patients_wearable_device_id' });
+UnifiedPatientSchema.index(
+  { wearableDeviceId: 1 },
+  { name: 'idx_unified_patients_wearable_device_id' },
+);
 UnifiedPatientSchema.index(
   { 'triggeredProtocols.status': 1 },
   { name: 'idx_unified_patients_triggered_protocol_status' },
 );
-UnifiedPatientSchema.index({ nextReassessmentDue: 1 }, { name: 'idx_unified_patients_next_reassessment_due' });
-UnifiedPatientSchema.index({ emsStatus: 1, etaMinutes: 1 }, { name: 'idx_unified_patients_ems_eta' });
-UnifiedPatientSchema.index({ 'identifiers.type': 1, 'identifiers.value': 1 }, { name: 'idx_unified_patients_identifier' });
+UnifiedPatientSchema.index(
+  { nextReassessmentDue: 1 },
+  { name: 'idx_unified_patients_next_reassessment_due' },
+);
+UnifiedPatientSchema.index(
+  { emsStatus: 1, etaMinutes: 1 },
+  { name: 'idx_unified_patients_ems_eta' },
+);
+UnifiedPatientSchema.index(
+  { 'identifiers.type': 1, 'identifiers.value': 1 },
+  { name: 'idx_unified_patients_identifier' },
+);
 
 export const UnifiedPatient =
   (models.UnifiedPatient as Model<IUnifiedPatient> | undefined) ||
   model<IUnifiedPatient>('UnifiedPatient', UnifiedPatientSchema);
-

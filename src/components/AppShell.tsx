@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { CopilotPanel } from './CopilotPanel';
@@ -30,6 +30,7 @@ type CommandAction = {
 
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
@@ -49,6 +50,13 @@ export function AppShell({ children }: AppShellProps) {
       window.clearInterval(capacityInterval);
     };
   }, []);
+
+  useEffect(() => {
+    const activeItem = visibleNavigationItems.find((item) =>
+      location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
+    );
+    document.title = activeItem ? `${activeItem.label} | Emergency OS` : 'Emergency OS';
+  }, [location.pathname, visibleNavigationItems]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

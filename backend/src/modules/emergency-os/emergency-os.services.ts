@@ -247,7 +247,12 @@ type WorkflowActionInput = Omit<
   WorkflowActionLog,
   'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'
 > &
-  Partial<Pick<WorkflowActionLog, 'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'>>;
+  Partial<
+    Pick<
+      WorkflowActionLog,
+      'id' | 'timestamp' | 'title' | 'severity' | 'status' | 'source' | 'metadata'
+    >
+  >;
 
 @Injectable()
 export class WorkflowActionLogService {
@@ -790,12 +795,12 @@ export class ProvincialHealthService {
         connectorStatus: 'placeholder-unavailable',
         jurisdiction: 'Ontario/OHIP demo placeholder',
         records: patients.map((patient) => ({
-            patientId: patient.id,
-            mrn: patient.mrn,
-            medications: ['Medication history requires provincial/EHR connector review'],
-            allergies: ['Allergy history requires provincial/EHR connector review'],
-            recentEncounters: ['External encounter feed not connected'],
-          })),
+          patientId: patient.id,
+          mrn: patient.mrn,
+          medications: ['Medication history requires provincial/EHR connector review'],
+          allergies: ['Allergy history requires provincial/EHR connector review'],
+          recentEncounters: ['External encounter feed not connected'],
+        })),
       },
       ['No production provincial credential, adapter, or HIE/OHIP feed is connected.'],
     );
@@ -918,7 +923,10 @@ export class EmergencySettingsService {
   }
 
   updateSettings(patch: EmergencyOsSettingsPatch) {
-    const next = mergeSettings(this.settings, patch || {});
+    const next = mergeSettings(
+      this.settings,
+      (patch || {}) as Partial<EmergencyOsSettingsContract>,
+    );
     const reassessmentIntervals =
       next.thresholds?.reassessmentIntervals || this.settings.thresholds.reassessmentIntervals;
     const reassessmentThresholds =

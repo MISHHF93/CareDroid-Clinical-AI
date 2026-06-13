@@ -20,7 +20,7 @@ import EmergencyWhiteboard from './components/EmergencyWhiteboard';
 import SmartIntake from './pages/emergency/SmartIntake';
 import EmergencyAnalytics from './pages/emergency/EmergencyAnalytics';
 import EmergencySettings from './pages/emergency/EmergencySettings';
-import ClinicalCalculatorHub from './pages/emergency/ClinicalCalculatorHub';
+import ClinicalCalculatorHub from './components/ClinicalCalculatorHub';
 import AIGovernanceDashboard from './pages/AIGovernanceDashboard';
 import EMSPipeline from './components/EMSPipeline';
 import PatientCard from './components/PatientCard';
@@ -911,6 +911,46 @@ function CopilotRoute() {
   );
 }
 
+function ShiftRoute() {
+  const activeShift = useEmergencyStore((state) => state.activeShift);
+  const staff = useEmergencyStore((state) => state.staff);
+  const patients = useEmergencyStore((state) => state.patients);
+  const alerts = useEmergencyStore((state) => state.alerts);
+  const charge = staff.find((member) => member.id === activeShift.chargeStaffId);
+
+  return (
+    <EmergencyRoutePage
+      eyebrow="Shift"
+      title="Emergency OS Shift"
+      description="Current ED shift context, handoff pressure, and open operational signals."
+    >
+      <MetricGrid
+        metrics={[
+          { label: 'Active patients', value: patients.filter((patient) => patient.state !== PatientState.Discharge).length, color: '#60A5FA' },
+          { label: 'Open alerts', value: alerts.filter((alert) => !alert.dismissed).length, color: '#F59E0B' },
+          { label: 'Charge', value: charge?.name || activeShift.chargeStaffId, color: '#10B981' },
+        ]}
+      />
+      <div style={{ padding: 18, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF' }}>
+        {activeShift.label} started {new Date(activeShift.startTime).toLocaleString()}. Use ED Copilot for a human-reviewed handoff brief.
+      </div>
+    </EmergencyRoutePage>
+  );
+}
+
+function ToolsRedirect() {
+  const location = window.location;
+  const parts = location.pathname.split('/').filter(Boolean);
+  const candidate = parts.at(-1);
+  const params = new URLSearchParams(location.search);
+  if (candidate && !['tools', 'calculators'].includes(candidate)) {
+    params.set('open', candidate);
+    params.set('tool', candidate);
+  }
+  const suffix = params.toString();
+  return <Navigate to={`${CANONICAL_ROUTES.emergencyTools}${suffix ? `?${suffix}` : ''}`} replace />;
+}
+
 function RootLayout() {
   return (
     <AppShell>
@@ -943,6 +983,7 @@ export function AppRoutes() {
         <Route path={CANONICAL_ROUTES.emergencyFederatedLearning} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyFederatedLearning}><FederatedLearningRoute /></EmergencyRouteGuard>} />
         <Route path={CANONICAL_ROUTES.emergencyDigitalTwin} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDigitalTwin}><HybridDigitalTwinRoute /></EmergencyRouteGuard>} />
         <Route path={CANONICAL_ROUTES.emergencyTools} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><ClinicalCalculatorHub /></EmergencyRouteGuard>} />
+        <Route path={CANONICAL_ROUTES.emergencyShift} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}><ShiftRoute /></EmergencyRouteGuard>} />
         <Route path={CANONICAL_ROUTES.emergencyAiGovernance} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAiGovernance}><AIGovernanceDashboard /></EmergencyRouteGuard>} />
         <Route path={CANONICAL_ROUTES.aiGovernance} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.aiGovernance}><AIGovernanceDashboard /></EmergencyRouteGuard>} />
         <Route path={CANONICAL_ROUTES.emergencySettings} element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}><EmergencySettings /></EmergencyRouteGuard>} />
@@ -956,7 +997,8 @@ export function AppRoutes() {
       <Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/mobile" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyTools} replace />} />
+      <Route path="/tools/*" element={<ToolsRedirect />} />
+      <Route path="/calculators/*" element={<ToolsRedirect />} />
       <Route path="/assistant" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/chat" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
       <Route path="/ai" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />

@@ -37,9 +37,8 @@ export class DeteriorationPredictionV3Service {
 
     let score = 0.18;
     const triageSignal =
-      { CTAS1: 0.42, CTAS2: 0.28, CTAS3: 0.14, CTAS4: 0.05, CTAS5: 0.02 }[
-        input.triageCode || ''
-      ] || 0.08;
+      { CTAS1: 0.42, CTAS2: 0.28, CTAS3: 0.14, CTAS4: 0.05, CTAS5: 0.02 }[input.triageCode || ''] ||
+      0.08;
     score += triageSignal;
     if (input.triageCode) contributingSignals.push(`triage:${input.triageCode}`);
 

@@ -1,5 +1,6 @@
 import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientFlag, PatientState, type Alert, type CapacitySnapshot } from '../types/emergency';
+import { dispatchAlert } from './alertEngine';
+import { PatientFlag, PatientState, type CapacitySnapshot } from '../types/emergency';
 
 export function calculateCapacity(): CapacitySnapshot {
   const { patients, rooms } = useEmergencyStore.getState();
@@ -36,15 +37,13 @@ export function startCapacityEngine() {
     const snapshot = calculateCapacity();
     useEmergencyStore.getState().setCapacity(snapshot);
     if (snapshot.band === 'Orange' || snapshot.band === 'Red') {
-      const alert: Alert = {
+      dispatchAlert({
         id: 'cap-' + Date.now(),
         severity: snapshot.band === 'Red' ? 'Critical':'Warning',
         title: 'Capacity ' + snapshot.band,
         message: `Score ${snapshot.score} — ${snapshot.band} zone`,
-        createdAt: new Date().toISOString(),
-        dismissed: false,
-      };
-      useEmergencyStore.getState().addAlert(alert);
+        source: 'capacity-engine',
+      });
     }
   };
   update();

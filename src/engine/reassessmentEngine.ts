@@ -1,6 +1,13 @@
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
+export const REASSESSMENT_FLAG_TYPES = [
+  PatientFlag.DeteriorationRisk,
+  PatientFlag.HighRisk,
+  PatientFlag.ScoreReassessmentRecommended,
+  PatientFlag.ReassessmentDue,
+];
+
 const laterStates = [
   PatientState.Assessment,
   PatientState.Orders,

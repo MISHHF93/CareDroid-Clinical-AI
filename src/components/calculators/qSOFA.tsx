@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Alert, Note, Patient, Vitals } from '../../types/emergency';
+import type { Note, Patient, Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { dispatchScoreAlert } from '../../engine/alertEngine';
 
 type QSOFAProps = {
   patientId?: string;
@@ -62,18 +63,6 @@ function createNote(patientId: string, text: string, authorId: string): Note {
   };
 }
 
-function createAlert(patient: Patient, total: number, criteriaMet: string[]): Alert {
-  return {
-    id: `alert-qsofa-${patient.id}-${Date.now()}`,
-    severity: 'Critical',
-    title: 'qSOFA sepsis alert',
-    message: `${patient.firstName} ${patient.lastName} has qSOFA ${total}/3: ${criteriaMet.join(', ')}.`,
-    patientId: patient.id,
-    createdAt: new Date().toISOString(),
-    dismissed: false,
-  };
-}
-
 function criteriaLabels(criteria: CriteriaState): string[] {
   const labels: string[] = [];
   if (criteria.alteredMentation) labels.push('altered mentation / GCS < 15');
@@ -86,7 +75,6 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
   const patients = useEmergencyStore((state) => state.patients);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const addFlag = useEmergencyStore((state) => state.addFlag);
-  const addAlert = useEmergencyStore((state) => state.addAlert);
   const patient = patientId ? patients.find((candidate) => candidate.id === patientId) : undefined;
   const firstVitals = patient?.vitals[0];
   const autoFilled = useMemo(() => criteriaFromVitals(firstVitals), [firstVitals]);
@@ -127,10 +115,15 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
     }
 
     if (!alertCreatedRef.current) {
-      addAlert(createAlert(patient, total, metLabels));
+      dispatchScoreAlert({
+        patient,
+        scoreName: 'qSOFA',
+        scoreValue: `${total}/3`,
+        message: `qSOFA ${total}/3: ${metLabels.join(', ')}.`,
+      });
       alertCreatedRef.current = true;
     }
-  }, [addAlert, addFlag, metLabels, patient, total]);
+  }, [addFlag, metLabels, patient, total]);
 
   const toggleCriteria = (key: CriteriaKey) => {
     setCriteria((previous) => ({ ...previous, [key]: !previous[key] }));
