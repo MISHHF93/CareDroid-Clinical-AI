@@ -29,6 +29,12 @@ describe('AppController environment config', () => {
               deployedAt: '2026-06-06T12:00:00.000Z',
             };
           }
+          if (key === 'database') {
+            return {
+              enableMongooseEmergencyOs: true,
+              mongodbUri: 'mongodb://localhost:27017/caredroid-test',
+            };
+          }
           return {};
         }),
       } as any);

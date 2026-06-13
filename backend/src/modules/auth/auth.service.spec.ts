@@ -133,6 +133,17 @@ describe('AuthService', () => {
           return '15m';
         case 'JWT_REFRESH_EXPIRES_IN':
           return '7d';
+        case 'auth':
+          return {
+            enableDevAuthBypass: process.env.ENABLE_DEV_AUTH_BYPASS === 'true',
+            enableViteDevAuthBypass: process.env.VITE_ENABLE_DEV_AUTH_BYPASS === 'true',
+            allowDemoAuthInProduction: process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION === 'true',
+            devLoginEmail: 'dev@caredroid.local',
+          };
+        case 'server':
+          return {
+            nodeEnv: process.env.NODE_ENV || 'development',
+          };
         default:
           return undefined;
       }

@@ -199,7 +199,7 @@ describe('pilot walkthrough', () => {
     expect(await screen.findByText('Emergency OS')).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: 'Emergency Whiteboard' })).toBeInTheDocument();
 
-    await user.click(screen.getByLabelText('Smart Intake'));
+    await user.click(screen.getByLabelText('EMS Intake'));
     expect(await screen.findByRole('heading', { name: 'Smart Intake Identity Review' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /Start Intake/i }));
