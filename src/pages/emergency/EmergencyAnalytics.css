@@ -1,19 +1,25 @@
 .emergency-analytics {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--component-card-gap);
   min-height: 100%;
-  padding: var(--space-4);
+  padding: clamp(var(--space-3), 2vw, var(--space-5));
   overflow-y: auto;
+  overflow-x: clip;
   background: var(--color-background);
   color: var(--color-text-primary);
+  animation: emergency-page-enter var(--motion-transition-slow) both;
 }
 
 .emergency-analytics__header,
 .emergency-analytics__card {
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  background: var(--color-card);
+  box-shadow: none;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .emergency-analytics__header {
@@ -21,14 +27,15 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-4);
+  padding: var(--component-card-padding);
+  box-shadow: none;
 }
 
 .emergency-analytics__header span,
 .emergency-analytics__card header span {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -36,6 +43,7 @@
 .emergency-analytics__header h1 {
   margin: var(--space-1) 0;
   font-size: var(--font-size-2xl);
+  font-weight: 650;
 }
 
 .emergency-analytics__header p,
@@ -54,17 +62,52 @@
   text-transform: uppercase;
 }
 
+.emergency-analytics__state,
+.emergency-analytics__empty {
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--status-info) 8%, transparent);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 650;
+}
+
+.emergency-analytics__state {
+  padding: var(--space-3);
+}
+
+.emergency-analytics__state--empty,
+.emergency-analytics__empty {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.emergency-analytics__empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  padding: var(--space-4);
+  text-align: center;
+}
+
 .emergency-analytics__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: var(--component-card-gap);
 }
 
 .emergency-analytics__card {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
-  padding: var(--space-4);
+  padding: var(--component-card-padding);
+  animation: emergency-card-enter var(--motion-transition-normal) both;
+}
+
+.emergency-analytics__card:hover {
+  background: color-mix(in srgb, var(--status-info) 5%, var(--color-card));
+  transform: translateY(-1px);
 }
 
 .emergency-analytics__card header {
@@ -94,7 +137,39 @@
   color: var(--color-text-primary);
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 700;
+  transition:
+    background-color var(--motion-transition-normal),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.emergency-analytics__heatmap span:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes emergency-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emergency-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .emergency-analytics__legend {
@@ -119,7 +194,47 @@
 }
 
 @media (max-width: 980px) {
+  .emergency-analytics__header,
+  .emergency-analytics__card header {
+    flex-direction: column;
+  }
+
   .emergency-analytics__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .emergency-analytics__card,
+  .emergency-analytics__header {
+    padding: var(--space-3);
+  }
+
+  .emergency-analytics__heatmap {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .emergency-analytics__heatmap {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1920px) {
+  .emergency-analytics__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergency-analytics,
+  .emergency-analytics__card {
+    animation: none !important;
+  }
+
+  .emergency-analytics__card:hover,
+  .emergency-analytics__heatmap span:hover {
+    transform: none;
   }
 }

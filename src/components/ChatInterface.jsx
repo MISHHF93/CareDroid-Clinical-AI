@@ -22,7 +22,7 @@ import {
   selectReassessmentCount,
   selectReassessmentQueue,
   useEmergencyStore,
-} from '../../store/emergencyStore';
+} from '../store/emergencyStore';
 import { buildEMSPressureCopilotContext, calculateEMSPressureScore } from './EMSPressureScore';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import {

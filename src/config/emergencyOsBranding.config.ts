@@ -4,7 +4,7 @@ export const EMERGENCY_OS_BRANDING = Object.freeze({
   aiiosName: 'AIIOS',
   copilotName: 'AIIOS ED Copilot',
   commandCenterName: 'Command Center',
-  commandCenterRoute: '/emergency/command-center',
+  commandCenterRoute: '/emergency/whiteboard',
   safetyLine: 'Decision support only. Human review is required for clinical actions.',
   safetyShort: 'Human-reviewed decision support',
   commandCenterSummary:

@@ -2,6 +2,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentType
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { buildBuiltinHubCalculatorCards, getHubChatAssistedTools } from '../data/calculatorHubManifest';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import type { Patient, Vitals } from '../types/emergency';
 import ErrorBoundary from './ErrorBoundary';
 import CIWAAr from './calculators/CIWAAr';
@@ -346,7 +347,7 @@ export default function ClinicalCalculatorHub() {
         <div>
           <span className="clinical-calculator-hub__eyebrow">Emergency OS</span>
           <h1 id="clinical-tools-title">Clinical Calculator Hub</h1>
-          <p>One searchable hub for clinical calculators and score workflows.</p>
+          <p>One searchable hub for clinical calculators and score workflows. {HUMAN_REVIEW_DISCLAIMER}</p>
         </div>
         <label className="clinical-calculator-hub__search">
           <span>Search calculators</span>

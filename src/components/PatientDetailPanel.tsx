@@ -527,7 +527,7 @@ export default function PatientDetailPanel() {
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
     const params = new URLSearchParams({ open: calculatorId, patientId: selectedPatientId });
-    const nextUrl = `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
+    const nextUrl = `${CANONICAL_ROUTES.emergencyWhiteboard}?${params.toString()}`;
     window.history.pushState(null, '', nextUrl);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, [selectedPatientId]);
@@ -567,6 +567,15 @@ export default function PatientDetailPanel() {
     const route = routeComplaint(selectedPatient.chiefComplaint);
     setSuggestedScores(route && !hasRunScores(selectedPatient, route.scoreIds) ? route.scoreIds : []);
   }, [selectedPatient]);
+
+  useEffect(() => {
+    const openDischargeConfirmation = () => {
+      if (selectedPatientId && canDischarge) setActionMode('discharge');
+    };
+
+    document.addEventListener('open-patient-discharge', openDischargeConfirmation);
+    return () => document.removeEventListener('open-patient-discharge', openDischargeConfirmation);
+  }, [canDischarge, selectedPatientId]);
 
   useEffect(() => {
     if (!selectedPatient) {
@@ -731,7 +740,7 @@ export default function PatientDetailPanel() {
         width: 480,
         height: '100vh',
         background: '#111827',
-        borderLeft: '1px solid #1F2937',
+        borderLeft: 0,
         zIndex: 100,
         overflowY: 'auto',
         color: '#F9FAFB',
@@ -947,7 +956,11 @@ export default function PatientDetailPanel() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
           {latestVitalEntries.map(({ label, value, trend }) => (
-            <div key={label} style={{ background: '#0B1120', border: '1px solid #1F2937', borderRadius: 10, padding: 10 }}>
+            <div
+              key={label}
+              className="patient-detail-vital-tile"
+              style={{ background: '#0B1120', border: '1px solid #1F2937', borderRadius: 10, padding: 10 }}
+            >
               <div style={{ color: '#9CA3AF', fontSize: 11 }}>{label}</div>
               <div
                 style={{
@@ -1074,7 +1087,11 @@ export default function PatientDetailPanel() {
         <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Notes</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {sortedNotes.map((note) => (
-            <div key={note.id} style={{ background: '#0B1120', borderRadius: 10, padding: 10 }}>
+            <div
+              key={note.id}
+              className="patient-detail-note-row"
+              style={{ background: '#0B1120', borderRadius: 10, padding: 10 }}
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#9CA3AF', fontSize: 11 }}>
                 <span>{initials(staffName(staff, note.authorId || note.authorStaffId || 'system'))}</span>
                 <span>{formatTime(note.timestamp)}</span>
@@ -1108,7 +1125,7 @@ export default function PatientDetailPanel() {
       </section>
 
       {actionMode ? (
-        <section style={{ padding: 16, borderBottom: '1px solid #1F2937', background: '#0B1120' }}>
+        <section className="patient-detail-action-panel" style={{ padding: 16, borderBottom: '1px solid #1F2937', background: '#0B1120' }}>
           {actionMode === 'staff' ? (
             <select
               defaultValue={selectedPatient.assignedStaffId || ''}

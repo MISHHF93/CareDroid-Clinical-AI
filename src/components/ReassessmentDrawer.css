@@ -14,7 +14,12 @@
   line-height: 1;
   box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65);
   cursor: pointer;
-  animation: reassessment-badge-pulse 1.6s ease-out infinite;
+  animation: reassessment-badge-pulse 1.6s var(--motion-ease-standard, ease-out) infinite;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .reassessment-header-badge:hover,
@@ -22,6 +27,7 @@
   background: #ef4444;
   outline: 2px solid rgba(248, 113, 113, 0.45);
   outline-offset: 2px;
+  transform: translateY(-1px);
 }
 
 .reassessment-drawer-layer {
@@ -38,6 +44,7 @@
   background: rgba(3, 7, 18, 0.58);
   cursor: pointer;
   pointer-events: auto;
+  animation: reassessment-backdrop-fade var(--motion-transition-normal) both;
 }
 
 .reassessment-drawer {
@@ -46,14 +53,14 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
-  max-height: 50vh;
+  max-height: min(50vh, calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px)));
   overflow-y: auto;
   border-bottom: 1px solid rgba(248, 113, 113, 0.35);
   background: #0f172a;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
   color: #f9fafb;
   pointer-events: auto;
-  animation: reassessment-drawer-slide 180ms ease-out;
+  animation: reassessment-drawer-slide var(--motion-transition-normal) both;
 }
 
 .reassessment-drawer__header {
@@ -113,6 +120,11 @@
   background: rgba(15, 23, 42, 0.9);
   color: #cbd5e1;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .reassessment-drawer__sort button {
@@ -145,6 +157,7 @@
   border-color: rgba(248, 113, 113, 0.72);
   color: #fff;
   outline: none;
+  transform: translateY(-1px);
 }
 
 .reassessment-drawer__list {
@@ -162,26 +175,38 @@
   gap: 12px;
   height: 56px;
   padding: 0 14px 0 0;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.82);
+  border: 0;
+  border-radius: var(--component-inner-radius);
+  background: var(--component-inner-row-bg);
+  box-shadow: var(--component-inner-shadow);
   overflow: hidden;
+  animation: reassessment-row-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.reassessment-drawer__row:hover {
+  transform: translateY(-1px);
 }
 
 .reassessment-drawer__row--red {
-  background: linear-gradient(90deg, rgba(127, 29, 29, 0.34), rgba(15, 23, 42, 0.9) 42%);
+  background: linear-gradient(90deg, rgba(127, 29, 29, 0.24), transparent 42%);
 }
 
 .reassessment-drawer__row--orange {
-  background: linear-gradient(90deg, rgba(154, 52, 18, 0.3), rgba(15, 23, 42, 0.9) 42%);
+  background: linear-gradient(90deg, rgba(154, 52, 18, 0.22), transparent 42%);
 }
 
 .reassessment-drawer__row--yellow {
-  background: linear-gradient(90deg, rgba(133, 77, 14, 0.28), rgba(15, 23, 42, 0.9) 42%);
+  background: linear-gradient(90deg, rgba(133, 77, 14, 0.2), transparent 42%);
 }
 
 .reassessment-drawer__row--reassessment-due {
-  animation: reassessment-row-pulse 1.8s ease-in-out infinite;
+  animation:
+    reassessment-row-enter var(--motion-transition-normal) both,
+    reassessment-row-pulse 1.8s var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .reassessment-drawer__priority-bar {
@@ -195,7 +220,7 @@
 }
 
 .reassessment-drawer__row--orange .reassessment-drawer__priority-bar {
-  background: #f97316;
+  background: var(--status-orange, #f97316);
 }
 
 .reassessment-drawer__row--yellow .reassessment-drawer__priority-bar {
@@ -215,9 +240,9 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 0;
   border-radius: 999px;
-  background: rgba(30, 41, 59, 0.88);
+  background: var(--component-inner-surface-bg);
   color: #e2e8f0;
   font-size: 12px;
   font-weight: 900;
@@ -297,9 +322,9 @@
   height: 20px;
   padding: 0 8px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 0;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.72);
+  background: transparent;
   color: #cbd5e1;
   font-size: 11px;
   text-overflow: ellipsis;
@@ -365,12 +390,17 @@
   font-weight: 900;
   white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .reassessment-drawer__assess:hover,
 .reassessment-drawer__assess:focus-visible {
   background: #3b82f6;
   outline: none;
+  transform: translateY(-1px);
 }
 
 .reassessment-drawer__flag-time {
@@ -385,6 +415,7 @@
   min-height: 180px;
   padding: 32px 18px 40px;
   color: #94a3b8;
+  animation: reassessment-row-enter var(--motion-transition-slow) both;
 }
 
 .reassessment-drawer__empty-icon {
@@ -407,10 +438,34 @@
 
 @keyframes reassessment-drawer-slide {
   from {
+    opacity: 0;
     transform: translateY(-100%);
   }
 
   to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reassessment-backdrop-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reassessment-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -432,11 +487,15 @@
 @keyframes reassessment-row-pulse {
   0%,
   100% {
-    border-color: rgba(234, 179, 8, 0.28);
+    box-shadow:
+      0 0 0 0 rgba(234, 179, 8, 0.18),
+      var(--component-inner-shadow);
   }
 
   50% {
-    border-color: rgba(234, 179, 8, 0.72);
+    box-shadow:
+      0 0 0 3px rgba(234, 179, 8, 0.16),
+      var(--component-inner-shadow);
   }
 }
 
@@ -456,8 +515,14 @@
 }
 
 @media (max-width: 760px) {
+  .reassessment-drawer {
+    max-height: min(72dvh, calc(var(--app-viewport-height, 100dvh) - 60px));
+  }
+
   .reassessment-drawer__header {
     grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px;
   }
 
   .reassessment-drawer__sort {
@@ -466,10 +531,54 @@
   }
 
   .reassessment-drawer__row {
-    grid-template-columns: 4px minmax(0, 1fr) auto;
+    grid-template-columns: 4px minmax(0, 1fr);
+    align-items: start;
+    height: auto;
+    min-height: 64px;
+    padding: 10px 10px 10px 0;
   }
 
   .reassessment-drawer__avatar {
     display: none;
+  }
+
+  .reassessment-drawer__actions {
+    grid-column: 2;
+    grid-template-columns: minmax(0, 1fr);
+    justify-content: stretch;
+  }
+
+  .reassessment-drawer__wait,
+  .reassessment-drawer__flag-time {
+    text-align: left;
+  }
+
+  .reassessment-drawer__assess,
+  .reassessment-drawer__sort button,
+  .reassessment-drawer__close {
+    min-height: var(--app-min-touch-target, 44px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reassessment-header-badge,
+  .reassessment-drawer__backdrop,
+  .reassessment-drawer,
+  .reassessment-drawer__row,
+  .reassessment-drawer__row--reassessment-due,
+  .reassessment-drawer__empty {
+    animation: none !important;
+  }
+
+  .reassessment-header-badge:hover,
+  .reassessment-header-badge:focus-visible,
+  .reassessment-drawer__sort button:hover,
+  .reassessment-drawer__sort button:focus-visible,
+  .reassessment-drawer__close:hover,
+  .reassessment-drawer__close:focus-visible,
+  .reassessment-drawer__row:hover,
+  .reassessment-drawer__assess:hover,
+  .reassessment-drawer__assess:focus-visible {
+    transform: none;
   }
 }

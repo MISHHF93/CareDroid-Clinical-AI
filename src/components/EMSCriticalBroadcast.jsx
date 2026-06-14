@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { CRITICAL_CHECKLISTS } from '../../config/criticalChecklists';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { CRITICAL_CHECKLISTS } from '../config/criticalChecklists';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';

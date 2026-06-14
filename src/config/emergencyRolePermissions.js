@@ -84,15 +84,20 @@ const ROUTES = Object.freeze({
   settings: CANONICAL_ROUTES.emergencySettings,
 });
 
-const FUTURE_MODULE_ROUTES = Object.freeze([
-  ROUTES.federatedLearning,
-  ROUTES.digitalTwin,
-  ROUTES.aiGovernance,
-  ROUTES.aiGovernanceGlobal,
+const ALL_ROUTES = Object.freeze([
+  ROUTES.whiteboard,
+  ROUTES.patients,
+  ROUTES.ems,
+  ROUTES.intake,
+  ROUTES.queues,
+  ROUTES.reassessment,
+  ROUTES.capacity,
+  ROUTES.boarding,
+  ROUTES.referrals,
+  ROUTES.copilot,
+  ROUTES.analytics,
+  ROUTES.settings,
 ]);
-const ALL_ROUTES = Object.freeze(
-  Object.values(ROUTES).filter((route) => !FUTURE_MODULE_ROUTES.includes(route)),
-);
 const CENTRAL_READABLE_ROUTES = Object.freeze(
   ALL_ROUTES.filter((route) => route !== ROUTES.settings),
 );
@@ -106,35 +111,27 @@ const ALL_ACTIONS = Object.freeze(
 );
 const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
-  ROUTES.pulse,
   ROUTES.patients,
-  ROUTES.journey,
   ROUTES.queues,
   ROUTES.reassessment,
   ROUTES.capacity,
   ROUTES.boarding,
   ROUTES.referrals,
-  ROUTES.provincialHealth,
-  ROUTES.tools,
-  ROUTES.shift,
+  ROUTES.copilot,
+  ROUTES.analytics,
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
-  ROUTES.pulse,
   ROUTES.patients,
-  ROUTES.journey,
   ROUTES.ems,
+  ROUTES.intake,
   ROUTES.queues,
   ROUTES.reassessment,
   ROUTES.capacity,
   ROUTES.boarding,
   ROUTES.referrals,
-  ROUTES.integrations,
   ROUTES.copilot,
   ROUTES.analytics,
-  ROUTES.simulation,
-  ROUTES.tools,
-  ROUTES.shift,
 ]);
 
 export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
@@ -173,7 +170,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.chargeNurse],
     description:
       'Shift command role for triage flow, reassessment, staff assignment, EMS readiness, and capacity pressure.',
-    routes: OPERATIONS_VIEW_ROUTES.filter((route) => route !== ROUTES.simulation),
+    routes: OPERATIONS_VIEW_ROUTES,
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.triage,
@@ -204,16 +201,12 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       'Front-door clinical role for intake, triage, vitals, reassessment, and patient safety flags.',
     routes: [
       ROUTES.whiteboard,
-      ROUTES.pulse,
       ROUTES.patients,
-      ROUTES.journey,
       ROUTES.ems,
       ROUTES.intake,
       ROUTES.queues,
       ROUTES.reassessment,
       ROUTES.copilot,
-      ROUTES.tools,
-      ROUTES.shift,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
@@ -258,11 +251,9 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       'Registration role for identity review and patient creation without clinical state management.',
     routes: [
       ROUTES.whiteboard,
-      ROUTES.pulse,
       ROUTES.patients,
       ROUTES.intake,
       ROUTES.queues,
-      ROUTES.provincialHealth,
     ],
     actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.verifyIntake],
     defaultRoute: ROUTES.intake,
@@ -272,7 +263,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.pulse, ROUTES.patients, ROUTES.capacity],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -287,9 +278,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description: 'Observer role with Emergency OS visibility and no mutating actions.',
     routes: [
       ROUTES.whiteboard,
-      ROUTES.pulse,
       ROUTES.patients,
-      ROUTES.journey,
       ROUTES.ems,
       ROUTES.queues,
       ROUTES.reassessment,
@@ -297,7 +286,6 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.boarding,
       ROUTES.referrals,
       ROUTES.analytics,
-      ROUTES.shift,
     ],
     actions: [EMERGENCY_ACTIONS.viewAnalytics],
     defaultRoute: ROUTES.whiteboard,

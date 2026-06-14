@@ -21,16 +21,16 @@ const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
 const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 
 describe('theme color system revamp', () => {
-  it('defines clean neutral light and OLED-conscious dark root palettes', () => {
-    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-bg:\s*#fbfbfc/);
+  it('defines Emergency OS light and dark root palettes', () => {
+    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-bg:\s*#f6f8fb/);
     expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-surface-1:\s*#ffffff/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-bg:\s*#050505/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-surface-1:\s*#101114/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-bg:\s*#0b1220/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-surface-1:\s*#111827/);
   });
 
   it('uses blue as the product accent in both light and dark themes', () => {
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent:\s*#38bdf8/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent-interactive:\s*#38bdf8/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent:\s*#3b82f6/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent-interactive:\s*#3b82f6/);
     expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent:\s*#2563eb/);
     expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*#2563eb/);
   });

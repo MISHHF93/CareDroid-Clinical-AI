@@ -10,15 +10,19 @@ vi.mock('./apiClient', () => ({
 }));
 
 const {
+  ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS,
+  REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS,
   aggregateFederatedLearningRound,
   compareRealTimeSimulationInterventions,
   evaluateHybridDigitalTwinScenario,
   evaluateRealTimeSimulationIntervention,
   fetchEmergencyWorkflowLogs,
+  fetchCompleteImplementationReadiness,
   fetchFederatedLearningDashboard,
   fetchFederatedLearningGlobalModel,
   fetchHybridDigitalTwinState,
   fetchRealTimeSimulationRecommendations,
+  updateEmergencySettings,
   initializeHybridDigitalTwin,
   runSmartIntakeVerticalSlice,
   registerFederatedHospital,
@@ -32,6 +36,36 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     vi.clearAllMocks();
     parseApiResponse.mockResolvedValue({ status: 'ok' });
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: true });
+  });
+
+  it('marks active Emergency OS page endpoints separately from review-only capabilities', () => {
+    expect(ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual([
+      'whiteboard',
+      'patients',
+      'ems',
+      'intake',
+      'smartIntakeVerticalSlice',
+      'queues',
+      'reassessment',
+      'capacity',
+      'boarding',
+      'referrals',
+      'copilot',
+      'workflowLogs',
+      'analytics',
+      'settings',
+    ]);
+    expect(REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual(
+      expect.arrayContaining([
+        'journey',
+        'provincialHealth',
+        'integrations',
+        'simulationUpdateLive',
+        'federatedLearningDashboard',
+        'digitalTwinState',
+        'implementationReadiness',
+      ]),
+    );
   });
 
   it('calls the real-time simulation endpoints', async () => {
@@ -142,6 +176,27 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     expect(globalThis.fetch).toHaveBeenCalledWith(
       '/api/emergency/workflow-logs',
       expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+  });
+
+  it('fetches the review-only complete implementation readiness contract', async () => {
+    await fetchCompleteImplementationReadiness();
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/emergency/implementation-readiness',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+  });
+
+  it('updates Emergency OS settings through the canonical facade', async () => {
+    await updateEmergencySettings({ tenantName: 'North Command ED' });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/emergency/settings',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ tenantName: 'North Command ED' }),
+      })
     );
   });
 });

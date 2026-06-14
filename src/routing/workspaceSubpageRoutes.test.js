@@ -16,7 +16,7 @@ describe('workspace subpage routes', () => {
       whiteboard: '/emergency/whiteboard',
       patients: '/emergency/patients',
       queues: '/emergency/queues',
-      'command-center': '/emergency/command-center',
+      'command-center': '/emergency/whiteboard',
       copilot: '/emergency/copilot',
     });
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(

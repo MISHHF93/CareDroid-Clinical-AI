@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
-import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
+import {
+  NAVIGATION_ITEMS,
+  getPilotCustomerNavigationItems,
+} from '../config/unified-navigation.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellSource = readFileSync(join(__dirname, '../components/AppShell.tsx'), 'utf8');
@@ -14,7 +17,8 @@ const commandPaletteSource = readFileSync(
   'utf8',
 );
 
-const CANONICAL_SIDEBAR_PATHS = NAVIGATION_ITEMS.map((item) => item.path);
+const PILOT_SIDEBAR_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);
+const CANONICAL_SIDEBAR_PATHS = PILOT_SIDEBAR_ITEMS.map((item) => item.path);
 
 describe('AppShell navigation surfaces', () => {
   it('renders the canonical Sidebar and no legacy rail or bottom navigation component', () => {
@@ -26,11 +30,11 @@ describe('AppShell navigation surfaces', () => {
   it('keeps nav items projected from the canonical unified config', () => {
     expect(navigationConfig).toContain('export const APP_SHELL_NAV_ITEMS');
     expect(navigationConfig).toContain(
-      "import { NAVIGATION_ITEMS } from './unified-navigation.config'",
+      "from './unified-navigation.config'",
     );
     expect(appShellSource).not.toContain('SIDEBAR_ICON_COMPONENTS');
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureGate)).toEqual(
-      NAVIGATION_ITEMS.map((item) => item.featureGate),
+      PILOT_SIDEBAR_ITEMS.map((item) => item.featureGate),
     );
   });
 
@@ -51,13 +55,13 @@ describe('AppShell navigation surfaces', () => {
   it('keeps canonical sidebar destinations reachable from the command palette where command-backed', () => {
     expect(commandPaletteSource).toContain('export const EMERGENCY_OS_ROUTE_COMMANDS');
     const commandPaths = EMERGENCY_OS_ROUTE_COMMANDS.map((command) => command.build().path);
-    for (const path of ['/emergency/ems', '/emergency/referrals', '/emergency/capacity']) {
-      expect(commandPaths, path).toContain(path);
-    }
+    expect(commandPaths).toEqual(CANONICAL_SIDEBAR_PATHS);
+    expect(commandPaths).not.toContain('/emergency/analytics');
+    expect(commandPaths).not.toContain('/emergency/settings');
   });
 
   it('renders required header and content regions once', () => {
-    expect(appShellSource).toContain('<Header />');
+    expect(appShellSource).toContain('<Header pageTitle={currentPage.label}');
     expect(appShellSource.match(/role="main"/g)).toHaveLength(1);
     expect(appShellSource).toContain('<CopilotPanel />');
     expect(appShellSource).toContain('<PatientDetailPanel />');
@@ -69,7 +73,7 @@ describe('AppShell navigation surfaces', () => {
     expect(sidebarCss).toMatch(/@media \(max-width: 768px\)/);
     expect(sidebarCss).toContain('.sidebar-nav-item:nth-of-type(n + 6)');
     expect(sidebarCss).toContain('.sidebar-more-sheet');
-    expect(APP_SHELL_NAV_ITEMS).toHaveLength(NAVIGATION_ITEMS.length);
+    expect(APP_SHELL_NAV_ITEMS).toHaveLength(PILOT_SIDEBAR_ITEMS.length);
   });
 
   it('closes active AppShell overlays on Escape', () => {

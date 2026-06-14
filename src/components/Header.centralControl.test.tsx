@@ -15,12 +15,30 @@ function renderHeader() {
 }
 
 describe('Header central control', () => {
-  it('keeps scenario and role switching out of the top bar for input-only users', () => {
+  it('hides advanced central controls from the pilot top bar', () => {
     renderHeader();
 
-    expect(screen.getByText(/Central Node: Input only/i)).toBeInTheDocument();
-    expect(screen.getByText(/Physician input/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Central Node: Input only/i)).toBeNull();
+    expect(screen.queryByText(/Physician input/i)).toBeNull();
     expect(screen.queryByLabelText('Emergency OS demo scenario')).toBeNull();
     expect(screen.queryByLabelText('Demo Emergency OS role')).toBeNull();
+  });
+
+  it('renders the global operational command metrics', () => {
+    renderHeader();
+
+    const commandContext = screen.getByLabelText('Operational command context');
+    for (const label of [
+      'Patients Today',
+      'Waiting',
+      'Longest Wait',
+      'EMS Inbound',
+      'Reassessments Due',
+      'Capacity Score',
+      'Boarders',
+      'Referrals Pending',
+    ]) {
+      expect(commandContext).toHaveTextContent(label);
+    }
   });
 });

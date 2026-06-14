@@ -10,7 +10,7 @@
   background: radial-gradient(circle at center, #ef4444 0%, #991b1b 54%, #450a0a 100%);
   color: white;
   text-align: center;
-  animation: ems-critical-overlay-pulse 800ms ease-in-out infinite;
+  animation: ems-critical-overlay-pulse 900ms var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .ems-critical-overlay h2 {
@@ -49,7 +49,7 @@
   background: #b91c1c;
   color: white;
   box-shadow: 0 12px 30px rgba(127, 29, 29, 0.42);
-  animation: ems-critical-banner-pulse 1.2s ease-in-out infinite;
+  animation: ems-critical-banner-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .ems-critical-banner--collapsed,
@@ -89,6 +89,10 @@
   font-size: var(--font-size-xs);
   font-weight: 950;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .ems-critical-banner__actions button:hover,
@@ -100,6 +104,7 @@
   background: rgba(255, 255, 255, 0.22);
   outline: 2px solid rgba(254, 242, 242, 0.72);
   outline-offset: 2px;
+  transform: translateY(-1px);
 }
 
 .ems-critical-checklist__actions button:disabled {
@@ -120,7 +125,7 @@
   font-size: var(--font-size-xs);
   font-weight: 950;
   white-space: nowrap;
-  animation: ems-critical-chip-pulse 1s ease-in-out infinite;
+  animation: ems-critical-chip-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .ems-critical-checklist {
@@ -135,7 +140,7 @@
   background: color-mix(in srgb, #1f0a0a 92%, var(--color-elevated));
   color: white;
   box-shadow: -20px 0 60px rgba(0, 0, 0, 0.42);
-  animation: ems-critical-checklist-slide 220ms var(--ease-smooth, ease) both;
+  animation: ems-critical-checklist-slide var(--motion-transition-slow, 240ms ease) both;
 }
 
 .ems-critical-checklist header {
@@ -197,7 +202,7 @@
   height: 100%;
   border-radius: inherit;
   background: #fef2f2;
-  transition: width 160ms var(--ease-smooth, ease);
+  transition: width var(--motion-transition-fast, 120ms ease);
 }
 
 .ems-critical-checklist__items {
@@ -286,5 +291,23 @@
   .ems-critical-banner__actions {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ems-critical-overlay,
+  .ems-critical-banner,
+  .ems-critical-countdown,
+  .ems-critical-checklist {
+    animation: none !important;
+  }
+
+  .ems-critical-banner__actions button:hover,
+  .ems-critical-banner__actions button:focus-visible,
+  .ems-critical-checklist__header-row button:hover,
+  .ems-critical-checklist__header-row button:focus-visible,
+  .ems-critical-checklist__actions button:hover,
+  .ems-critical-checklist__actions button:focus-visible {
+    transform: none;
   }
 }

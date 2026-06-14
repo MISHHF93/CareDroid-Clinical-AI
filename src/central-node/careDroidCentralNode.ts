@@ -1,0 +1,648 @@
+import { PatientFlag, PatientState, Priority, type Alert, type Patient, type Referral } from '../types/emergency';
+import type { EmergencyStoreState } from '../store/emergencyStore';
+
+export const CARE_DROID_CENTRAL_NODE_ID = 'CareDroidCentralNode';
+
+export const CARE_DROID_SCREEN_MODES = Object.freeze({
+  triage: 'TRIAGE_SCREEN',
+  registration: 'REGISTRATION_SCREEN',
+  chargeNurse: 'CHARGE_NURSE_SCREEN',
+  physician: 'PHYSICIAN_SCREEN',
+  ems: 'EMS_SCREEN',
+  waitingRoom: 'WAITING_ROOM_DISPLAY',
+  commandCenter: 'COMMAND_CENTER_DISPLAY',
+  admin: 'ADMIN_SCREEN',
+  readOnly: 'READ_ONLY_DISPLAY',
+} as const);
+
+export type CareDroidScreenMode =
+  (typeof CARE_DROID_SCREEN_MODES)[keyof typeof CARE_DROID_SCREEN_MODES];
+
+export type CareDroidPressure = 'normal' | 'watch' | 'strained' | 'critical';
+
+export const CARE_DROID_SCREEN_MODE_OPTIONS: CareDroidScreenMode[] = Object.values(
+  CARE_DROID_SCREEN_MODES,
+);
+
+export const CARE_DROID_SCREEN_MODE_CONFIG: Record<
+  CareDroidScreenMode,
+  {
+    label: string;
+    visibleWidgets: string[];
+    availableActions: string[];
+    density: 'comfortable' | 'compact' | 'wall';
+    readOnly: boolean;
+    publicDisplay: boolean;
+    defaultFocus: string;
+    alertVisibility: 'all' | 'critical' | 'operational' | 'redacted';
+  }
+> = {
+  TRIAGE_SCREEN: {
+    label: 'Triage screen',
+    visibleWidgets: ['whiteboard', 'smart-intake', 'queues', 'reassessment', 'alerts'],
+    availableActions: ['create-patient', 'triage', 'record-vitals', 'flag-reassessment'],
+    density: 'compact',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'smart-intake',
+    alertVisibility: 'all',
+  },
+  REGISTRATION_SCREEN: {
+    label: 'Registration screen',
+    visibleWidgets: ['smart-intake', 'patient-lookup', 'queues'],
+    availableActions: ['create-patient', 'verify-identity'],
+    density: 'comfortable',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'patient-lookup',
+    alertVisibility: 'operational',
+  },
+  CHARGE_NURSE_SCREEN: {
+    label: 'Charge nurse screen',
+    visibleWidgets: ['whiteboard', 'capacity', 'ems', 'reassessment', 'boarding', 'alerts'],
+    availableActions: ['create-patient', 'prepare-ems-bay', 'move-patient', 'staffing-request'],
+    density: 'compact',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'critical-patients',
+    alertVisibility: 'all',
+  },
+  PHYSICIAN_SCREEN: {
+    label: 'Physician screen',
+    visibleWidgets: ['whiteboard', 'patient-detail', 'referrals', 'reassessment', 'copilot'],
+    availableActions: ['review-patient', 'write-note', 'refer', 'discharge-with-review'],
+    density: 'comfortable',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'patient-detail',
+    alertVisibility: 'all',
+  },
+  EMS_SCREEN: {
+    label: 'EMS screen',
+    visibleWidgets: ['ems', 'capacity', 'whiteboard', 'alerts'],
+    availableActions: ['prepare-ems-bay', 'convert-arrival', 'complete-handoff'],
+    density: 'compact',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'ems-inbound',
+    alertVisibility: 'critical',
+  },
+  WAITING_ROOM_DISPLAY: {
+    label: 'Waiting room display',
+    visibleWidgets: ['queue-health', 'capacity-status'],
+    availableActions: [],
+    density: 'wall',
+    readOnly: true,
+    publicDisplay: true,
+    defaultFocus: 'queue-health',
+    alertVisibility: 'redacted',
+  },
+  COMMAND_CENTER_DISPLAY: {
+    label: 'Command center display',
+    visibleWidgets: ['whiteboard', 'queues', 'ems', 'capacity', 'boarding', 'analytics', 'alerts'],
+    availableActions: ['central-review', 'open-command-palette'],
+    density: 'wall',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'department-status',
+    alertVisibility: 'all',
+  },
+  ADMIN_SCREEN: {
+    label: 'Admin screen',
+    visibleWidgets: ['settings', 'analytics', 'audit', 'integrations'],
+    availableActions: ['manage-settings', 'review-audit', 'configure-modules'],
+    density: 'comfortable',
+    readOnly: false,
+    publicDisplay: false,
+    defaultFocus: 'settings',
+    alertVisibility: 'operational',
+  },
+  READ_ONLY_DISPLAY: {
+    label: 'Read-only display',
+    visibleWidgets: ['whiteboard', 'queues', 'capacity', 'alerts'],
+    availableActions: [],
+    density: 'wall',
+    readOnly: true,
+    publicDisplay: true,
+    defaultFocus: 'department-status',
+    alertVisibility: 'redacted',
+  },
+};
+
+export type CareDroidCentralNodeSource = Pick<
+  EmergencyStoreState,
+  | 'patients'
+  | 'capacity'
+  | 'alerts'
+  | 'emsArrivals'
+  | 'emsIncomingPatients'
+  | 'emsUnits'
+  | 'referrals'
+  | 'workflowLogs'
+  | 'emergencySettings'
+  | 'websocket'
+  | 'copilotMessages'
+  | 'integrationEvents'
+  | 'selectedPatientId'
+  | 'activeQueueFilter'
+  | 'whiteboardSearchQuery'
+  | 'loading'
+  | 'backendAvailable'
+>;
+
+export type CareDroidCentralNodeRoleContext = {
+  role: string;
+  roleLabel: string;
+  readOnly: boolean;
+  allowedRoutes: string[];
+  can?: (action: string) => boolean;
+};
+
+export type CareDroidPatientReference = {
+  id: string;
+  displayName: string;
+  mrn?: string;
+  state: string;
+  priority: string | number;
+  chiefComplaint?: string;
+  waitMinutes: number;
+  flags: string[];
+  assignedStaffId?: string;
+  roomId?: string;
+};
+
+export type CareDroidCentralNodeSnapshot = {
+  node: typeof CARE_DROID_CENTRAL_NODE_ID;
+  generatedAt: string;
+  sync: {
+    source: 'store' | 'backend-snapshot';
+    status: string;
+    mode: string;
+    lastSyncedAt: string | null;
+    stale: boolean;
+    message: string;
+  };
+  currentDepartmentStatus: {
+    patientsToday: number;
+    activePatients: number;
+    waitingPatients: number;
+    longestWait: number;
+    averageWait: number;
+    capacityBand: string;
+    activeAlerts: number;
+  };
+  activePatientFlow: {
+    patients: CareDroidPatientReference[];
+    criticalPatients: CareDroidPatientReference[];
+  };
+  queueHealth: Array<{
+    id: string;
+    label: string;
+    count: number;
+    oldestWaitMinutes: number;
+    targetMinutes: number;
+    breached: boolean;
+  }>;
+  emsPressure: {
+    inbound: number;
+    criticalInbound: number;
+    status: CareDroidPressure;
+  };
+  capacityStatus: EmergencyStoreState['capacity'];
+  boardingStatus: {
+    boarders: number;
+    risk: CareDroidPressure;
+  };
+  reassessmentStatus: {
+    due: number;
+    overdue: number;
+  };
+  referralStatus: {
+    pending: number;
+  };
+  operationalAlerts: Alert[];
+  screenContext: {
+    mode: CareDroidScreenMode;
+    config: (typeof CARE_DROID_SCREEN_MODE_CONFIG)[CareDroidScreenMode];
+    sensitiveDataRedacted: boolean;
+  };
+  roleContext: Omit<CareDroidCentralNodeRoleContext, 'can'>;
+  tenantSettings: {
+    tenantName: string;
+    defaultScreenMode: CareDroidScreenMode;
+    enabledScreenModes: CareDroidScreenMode[];
+    readOnlyDisplayMode: boolean;
+    commandCenterMode: boolean;
+    wallDisplayRefreshInterval: number;
+  };
+  aiCopilotContext: {
+    enabled: boolean;
+    humanReviewRequired: boolean;
+    recentMessages: number;
+    safetyRule: string;
+  };
+  moduleStatuses: Array<{ id: string; label: string; enabled: boolean }>;
+  recentEvents: EmergencyStoreState['workflowLogs'];
+  operationalSummary: {
+    generatedAt: string;
+    metrics: Array<{
+      key:
+        | 'patientsToday'
+        | 'waiting'
+        | 'longestWait'
+        | 'emsInbound'
+        | 'reassessmentsDue'
+        | 'capacityScore'
+        | 'boarders'
+        | 'referralsPending';
+      label: string;
+      value: string | number;
+      source: string;
+      tone?: 'neutral' | 'info' | 'success' | 'warning' | 'critical';
+    }>;
+  };
+};
+
+function localDateKey(value: string | Date = new Date()): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
+
+function minutesSince(value?: string | null): number {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return 0;
+  return Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+}
+
+function formatWaitMinutes(minutes: number): string {
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+}
+
+function patientDisplayName(patient: Patient): string {
+  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+}
+
+function patientFlags(patient: Patient): string[] {
+  return (patient.flags || []).map((flag) => String(flag));
+}
+
+function isHighRisk(patient: Patient): boolean {
+  const flags = patientFlags(patient);
+  return (
+    patient.priority === Priority.P1 ||
+    patient.priority === Priority.P2 ||
+    flags.includes(PatientFlag.HighRisk) ||
+    flags.includes(PatientFlag.DeteriorationRisk) ||
+    flags.includes(PatientFlag.SepsisAlert)
+  );
+}
+
+function isBoarding(patient: Patient): boolean {
+  const flags = patientFlags(patient);
+  return (
+    patient.state === PatientState.Admission ||
+    patient.state === PatientState.Disposition ||
+    flags.includes(PatientFlag.PendingAdmission)
+  );
+}
+
+function isReferralPending(referral: Referral): boolean {
+  return !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status);
+}
+
+function activePatients(source: CareDroidCentralNodeSource): Patient[] {
+  return source.patients.filter((patient) => patient.state !== PatientState.Discharge);
+}
+
+function toPatientReference(patient: Patient): CareDroidPatientReference {
+  return {
+    id: patient.id,
+    displayName: patientDisplayName(patient),
+    mrn: patient.mrn,
+    state: String(patient.state),
+    priority: patient.priority,
+    chiefComplaint: patient.chiefComplaint || patient.complaint,
+    waitMinutes: minutesSince(patient.arrivalTime),
+    flags: patientFlags(patient),
+    assignedStaffId: patient.assignedStaffId || undefined,
+    roomId: patient.roomId || undefined,
+  };
+}
+
+function pressureFromCount(count: number, critical = false): CareDroidPressure {
+  if (critical || count >= 4) return 'critical';
+  if (count >= 2) return 'strained';
+  if (count === 1) return 'watch';
+  return 'normal';
+}
+
+function resolveScreenMode(
+  source: CareDroidCentralNodeSource,
+  roleContext: CareDroidCentralNodeRoleContext,
+  override?: CareDroidScreenMode,
+): CareDroidScreenMode {
+  const configured = override || source.emergencySettings.defaultScreenMode;
+  if (configured && CARE_DROID_SCREEN_MODE_CONFIG[configured as CareDroidScreenMode]) {
+    return configured as CareDroidScreenMode;
+  }
+  if (source.emergencySettings.readOnlyDisplayMode || roleContext.readOnly) return CARE_DROID_SCREEN_MODES.readOnly;
+  return CARE_DROID_SCREEN_MODES.chargeNurse;
+}
+
+function buildQueueHealth(source: CareDroidCentralNodeSource) {
+  const patients = activePatients(source);
+  const states = [
+    PatientState.Arrival,
+    PatientState.Registration,
+    PatientState.Triage,
+    PatientState.Waiting,
+    PatientState.Assessment,
+    PatientState.Orders,
+    PatientState.Results,
+    PatientState.Disposition,
+    PatientState.Admission,
+  ];
+  const targetByState: Record<string, number> = {
+    Arrival: 5,
+    Registration: 10,
+    Triage: 10,
+    Waiting: Number(source.emergencySettings.thresholds?.waitWarningMinutes || 45),
+    Assessment: 45,
+    Orders: 60,
+    Results: 90,
+    Disposition: 60,
+    Admission: Number(source.emergencySettings.boardingThresholds?.escalationMinutes || 120),
+  };
+
+  return states.map((state) => {
+    const rows = patients.filter((patient) => patient.state === state);
+    const oldestWaitMinutes = rows.reduce(
+      (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
+      0,
+    );
+    const targetMinutes = targetByState[state] || 45;
+    return {
+      id: String(state).toLowerCase(),
+      label: String(state),
+      count: rows.length,
+      oldestWaitMinutes,
+      targetMinutes,
+      breached: rows.length > 0 && oldestWaitMinutes > targetMinutes,
+    };
+  });
+}
+
+function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'>) {
+  return {
+    generatedAt: snapshot.generatedAt,
+    metrics: [
+      {
+        key: 'patientsToday' as const,
+        label: 'Patients Today',
+        value: snapshot.currentDepartmentStatus.patientsToday,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.currentDepartmentStatus`,
+        tone: 'info' as const,
+      },
+      {
+        key: 'waiting' as const,
+        label: 'Waiting',
+        value: snapshot.currentDepartmentStatus.waitingPatients,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.queueHealth`,
+        tone: snapshot.currentDepartmentStatus.waitingPatients ? ('warning' as const) : ('success' as const),
+      },
+      {
+        key: 'longestWait' as const,
+        label: 'Longest Wait',
+        value: formatWaitMinutes(snapshot.currentDepartmentStatus.longestWait),
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.currentDepartmentStatus`,
+        tone:
+          snapshot.currentDepartmentStatus.longestWait >= 60
+            ? ('critical' as const)
+            : snapshot.currentDepartmentStatus.longestWait >= 30
+              ? ('warning' as const)
+              : ('neutral' as const),
+      },
+      {
+        key: 'emsInbound' as const,
+        label: 'EMS Inbound',
+        value: snapshot.emsPressure.inbound,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.emsPressure`,
+        tone: snapshot.emsPressure.inbound ? ('warning' as const) : ('success' as const),
+      },
+      {
+        key: 'reassessmentsDue' as const,
+        label: 'Reassessments Due',
+        value: snapshot.reassessmentStatus.due,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.reassessmentStatus`,
+        tone: snapshot.reassessmentStatus.due ? ('critical' as const) : ('success' as const),
+      },
+      {
+        key: 'capacityScore' as const,
+        label: 'Capacity Score',
+        value: `${snapshot.capacityStatus.score} ${snapshot.capacityStatus.band}`,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.capacityStatus`,
+        tone:
+          snapshot.capacityStatus.band === 'Red'
+            ? ('critical' as const)
+            : snapshot.capacityStatus.band === 'Orange' || snapshot.capacityStatus.band === 'Yellow'
+              ? ('warning' as const)
+              : ('success' as const),
+      },
+      {
+        key: 'boarders' as const,
+        label: 'Boarders',
+        value: snapshot.boardingStatus.boarders,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.boardingStatus`,
+        tone: snapshot.boardingStatus.boarders ? ('warning' as const) : ('success' as const),
+      },
+      {
+        key: 'referralsPending' as const,
+        label: 'Referrals Pending',
+        value: snapshot.referralStatus.pending,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.referralStatus`,
+        tone: snapshot.referralStatus.pending ? ('warning' as const) : ('success' as const),
+      },
+    ],
+  };
+}
+
+export function buildCareDroidCentralNodeSnapshot(
+  source: CareDroidCentralNodeSource,
+  roleContext: CareDroidCentralNodeRoleContext,
+  options: { screenMode?: CareDroidScreenMode; source?: 'store' | 'backend-snapshot' } = {},
+): CareDroidCentralNodeSnapshot {
+  const generatedAt = new Date().toISOString();
+  const active = activePatients(source);
+  const waiting = active.filter((patient) => patient.state === PatientState.Waiting);
+  const waits = active.map((patient) => minutesSince(patient.arrivalTime));
+  const activeAlerts = source.alerts.filter((alert) => !alert.dismissed);
+  const emsInbound =
+    source.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length +
+    source.emsIncomingPatients.length +
+    source.emsUnits.filter((unit) => unit.status === 'Inbound').length +
+    active.filter((patient) => patientFlags(patient).includes(PatientFlag.EMSArrival)).length;
+  const criticalEms = active.filter(
+    (patient) => patientFlags(patient).includes(PatientFlag.EMSArrival) && isHighRisk(patient),
+  ).length;
+  const boarders = active.filter(isBoarding).length;
+  const reassessmentDue = active.filter((patient) =>
+    patientFlags(patient).includes(PatientFlag.ReassessmentDue),
+  ).length;
+  const screenMode = resolveScreenMode(source, roleContext, options.screenMode);
+  const screenConfig = CARE_DROID_SCREEN_MODE_CONFIG[screenMode];
+  const enabledModes = source.emergencySettings.enabledScreenModes?.filter(
+    (mode): mode is CareDroidScreenMode =>
+      Boolean(CARE_DROID_SCREEN_MODE_CONFIG[mode as CareDroidScreenMode]),
+  ) || CARE_DROID_SCREEN_MODE_OPTIONS;
+  const lastSyncedAt = source.websocket.lastEventAt || source.websocket.updatedAt || null;
+  const baseSnapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'> = {
+    node: CARE_DROID_CENTRAL_NODE_ID,
+    generatedAt,
+    sync: {
+      source: options.source || 'store',
+      status: source.websocket.status || (source.backendAvailable ? 'connected' : 'local'),
+      mode: source.websocket.mode || 'polling',
+      lastSyncedAt,
+      stale: !lastSyncedAt || minutesSince(lastSyncedAt) > 2,
+      message:
+        source.websocket.message ||
+        (source.backendAvailable ? 'Central node synced.' : 'Local snapshot active.'),
+    },
+    currentDepartmentStatus: {
+      patientsToday: source.patients.filter((patient) => localDateKey(patient.arrivalTime) === localDateKey())
+        .length,
+      activePatients: active.length,
+      waitingPatients: waiting.length,
+      longestWait: waits.reduce((max, wait) => Math.max(max, wait), 0),
+      averageWait: waits.length ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length) : 0,
+      capacityBand: source.capacity.band,
+      activeAlerts: activeAlerts.length,
+    },
+    activePatientFlow: {
+      patients: active.map(toPatientReference),
+      criticalPatients: active.filter(isHighRisk).map(toPatientReference),
+    },
+    queueHealth: buildQueueHealth(source),
+    emsPressure: {
+      inbound: emsInbound,
+      criticalInbound: criticalEms,
+      status: pressureFromCount(emsInbound, criticalEms > 0),
+    },
+    capacityStatus: source.capacity,
+    boardingStatus: {
+      boarders,
+      risk: pressureFromCount(
+        boarders,
+        boarders >= Number(source.emergencySettings.boardingThresholds?.maxBoarders || 8),
+      ),
+    },
+    reassessmentStatus: {
+      due: reassessmentDue,
+      overdue: active.filter(
+        (patient) =>
+          patientFlags(patient).includes(PatientFlag.ReassessmentDue) &&
+          minutesSince(patient.arrivalTime) >
+            Number(source.emergencySettings.thresholds?.reassessmentIntervals?.P3 || 60),
+      ).length,
+    },
+    referralStatus: {
+      pending: source.referrals.filter(isReferralPending).length,
+    },
+    operationalAlerts: activeAlerts,
+    screenContext: {
+      mode: screenMode,
+      config: screenConfig,
+      sensitiveDataRedacted: screenConfig.publicDisplay,
+    },
+    roleContext: {
+      role: roleContext.role,
+      roleLabel: roleContext.roleLabel,
+      readOnly: roleContext.readOnly || screenConfig.readOnly,
+      allowedRoutes: roleContext.allowedRoutes,
+    },
+    tenantSettings: {
+      tenantName: source.emergencySettings.tenantName,
+      defaultScreenMode:
+        (CARE_DROID_SCREEN_MODE_CONFIG[
+          source.emergencySettings.defaultScreenMode as CareDroidScreenMode
+        ]
+          ? (source.emergencySettings.defaultScreenMode as CareDroidScreenMode)
+          : CARE_DROID_SCREEN_MODES.chargeNurse),
+      enabledScreenModes: enabledModes,
+      readOnlyDisplayMode: Boolean(source.emergencySettings.readOnlyDisplayMode),
+      commandCenterMode: Boolean(source.emergencySettings.commandCenterMode),
+      wallDisplayRefreshInterval: Number(source.emergencySettings.wallDisplayRefreshInterval || 30000),
+    },
+    aiCopilotContext: {
+      enabled: Boolean(source.emergencySettings.aiSettings?.enabled),
+      humanReviewRequired: source.emergencySettings.aiSettings?.humanReviewRequired !== false,
+      recentMessages: source.copilotMessages.length,
+      safetyRule: 'Human review is required for clinical decisions and actions.',
+    },
+    moduleStatuses: source.emergencySettings.enabledModules || [],
+    recentEvents: source.workflowLogs.slice(0, 12),
+  };
+
+  const snapshot = {
+    ...baseSnapshot,
+    operationalSummary: buildOperationalSummary(baseSnapshot),
+  };
+
+  return snapshot.screenContext.sensitiveDataRedacted
+    ? redactCentralNodeSnapshotForScreenMode(snapshot, screenMode)
+    : snapshot;
+}
+
+export function redactCentralNodeSnapshotForScreenMode(
+  snapshot: CareDroidCentralNodeSnapshot,
+  screenMode: CareDroidScreenMode = snapshot.screenContext.mode,
+): CareDroidCentralNodeSnapshot {
+  const config = CARE_DROID_SCREEN_MODE_CONFIG[screenMode];
+  if (!config.publicDisplay) return snapshot;
+
+  const redactPatient = (patient: CareDroidPatientReference): CareDroidPatientReference => ({
+    id: patient.id,
+    displayName: `Patient ${patient.id.slice(-4).toUpperCase()}`,
+    state: patient.state,
+    priority: patient.priority,
+    waitMinutes: patient.waitMinutes,
+    flags: [],
+  });
+
+  return {
+    ...snapshot,
+    activePatientFlow: {
+      patients: snapshot.activePatientFlow.patients.map(redactPatient),
+      criticalPatients: snapshot.activePatientFlow.criticalPatients.map(redactPatient),
+    },
+    operationalAlerts: snapshot.operationalAlerts.map((alert) => ({
+      id: alert.id,
+      type: 'System',
+      severity: alert.severity,
+      title: 'Operational alert',
+      message: 'Sensitive clinical details hidden for public display.',
+      createdAt: alert.createdAt,
+      dismissed: alert.dismissed,
+      source: alert.source || 'central-node-redaction',
+    })),
+    recentEvents: [],
+    screenContext: {
+      mode: screenMode,
+      config,
+      sensitiveDataRedacted: true,
+    },
+    roleContext: {
+      ...snapshot.roleContext,
+      readOnly: true,
+    },
+  };
+}

@@ -1,8 +1,8 @@
 export const FIRST_CUSTOMER_DEMO_MODE = Object.freeze({
   id: 'first-customer-demo-mode',
-  label: 'First Customer Demo Mode',
-  tenantName: 'CareDroid First Customer Demo ED',
-  sourceLabel: 'First customer demo data - local deterministic fixture',
+  label: 'Live Customer Walkthrough',
+  tenantName: 'Metro General Emergency Department',
+  sourceLabel: 'Metro General ED walkthrough dataset',
   patientVolumePerDay: 100,
 });
 
@@ -167,7 +167,7 @@ function buildActivePatientModels(now) {
     const assignedStaffId = ['demo-attending-1', 'demo-charge-rn', 'demo-triage-rn', 'demo-fasttrack-rn'][index % 4];
     const patient = {
       id: `demo-pt-${String(index + 1).padStart(3, '0')}`,
-      mrn: `DEMO-${String(42000 + index).padStart(6, '0')}`,
+      mrn: `ED-${String(42000 + index).padStart(6, '0')}`,
       firstName,
       lastName,
       age,
@@ -200,7 +200,7 @@ function buildDischargedPatientModels(now) {
     const arrivalMinutes = 60 + index * 13;
     return {
       id: `demo-discharged-${String(index + 1).padStart(3, '0')}`,
-      mrn: `DEMO-${String(43000 + index).padStart(6, '0')}`,
+      mrn: `ED-${String(43000 + index).padStart(6, '0')}`,
       firstName: name[0],
       lastName: `${name[1]}${index + 1}`,
       age: name[2],
@@ -257,7 +257,7 @@ function buildSimplePatient(patient) {
     notes: [
       {
         id: `note-${patient.id}-demo`,
-        text: 'First customer demo fixture patient. Simulated data only.',
+        text: 'Customer walkthrough patient record. No live clinical data.',
         authorId: patient.assignedStaffId || 'demo-charge-rn',
         timestamp: patient.lastAssessedTime || patient.arrivalTime,
       },
@@ -268,7 +268,7 @@ function buildSimplePatient(patient) {
         to: patient.state,
         timestamp: patient.arrivalTime,
         staffId: patient.assignedStaffId || 'demo-charge-rn',
-        note: `${patient.state} state loaded for first customer demo.`,
+        note: `${patient.state} state loaded for customer walkthrough.`,
       },
     ],
   };
@@ -283,8 +283,8 @@ function buildRootFlag(flag, patient) {
         : flag === 'EMSArrival'
           ? 'Converted or active EMS handoff'
           : flag === 'LongWait'
-            ? 'Waiting queue exceeds demo target'
-            : `${flag} in first customer demo`,
+            ? 'Waiting queue exceeds operational target'
+            : `${flag} triggered in customer walkthrough`,
     detectedAt: patient.lastAssessedTime || patient.arrivalTime,
     severity: SIMPLE_FLAG_SEVERITY[flag] || 'Info',
   };
@@ -311,7 +311,7 @@ function buildRootPatient(patient) {
       to: patient.state,
       toState: patient.state,
       staffId: patient.assignedStaffId || 'demo-charge-rn',
-      summary: `${patient.firstName} ${patient.lastName} loaded into ${patient.state} for first customer demo.`,
+      summary: `${patient.firstName} ${patient.lastName} loaded into ${patient.state} for customer walkthrough.`,
       metadata: { demoMode: true },
     },
   ];
@@ -326,7 +326,7 @@ function buildRootPatient(patient) {
       fromState: 'Disposition',
       toState: 'Discharge',
       staffId: 'demo-fasttrack-rn',
-      summary: 'Discharged during the 100-patient demo day.',
+      summary: 'Discharged during the 100-patient walkthrough day.',
       metadata: { demoMode: true },
     });
   }
@@ -362,7 +362,7 @@ function buildRootPatient(patient) {
             scheduledBy: 'demo-charge-rn',
             scheduledAt: patient.triageTime || patient.arrivalTime,
             dueAt: isoMinutesAgo(new Date(patient.lastAssessedTime || patient.arrivalTime), -5),
-            note: 'Demo reassessment due for sales walkthrough.',
+            note: 'Reassessment due for customer walkthrough.',
             status: 'pending',
             lastAlertStage: 'due',
           },
@@ -376,7 +376,7 @@ function buildRootPatient(patient) {
         patientId: patient.id,
         authorStaffId: patient.assignedStaffId || 'demo-charge-rn',
         type: 'Operational',
-        body: 'Simulated first customer demo patient. No live clinical data.',
+        body: 'Customer walkthrough patient record. No live clinical data.',
         createdAt: patient.lastAssessedTime || patient.arrivalTime,
       },
     ],
@@ -501,7 +501,7 @@ function buildAlerts(now, simplePatients) {
     {
       id: 'demo-alert-capacity',
       severity: 'Critical',
-      title: 'First customer demo capacity pressure',
+      title: 'High-volume ED capacity pressure',
       message: 'ED is running a 100-patient day with boarders, EMS arrivals, and reassessments due.',
       createdAt: isoMinutesAgo(now, 8),
       dismissed: false,
@@ -519,7 +519,7 @@ function buildAlerts(now, simplePatients) {
       id: 'demo-alert-sepsis',
       severity: 'Critical',
       title: 'Sepsis risk in waiting queue',
-      message: 'Demo scenario includes a deteriorating infection patient for ED Copilot review.',
+      message: 'Walkthrough dataset includes a deteriorating infection patient for ED Copilot review.',
       patientId: sepsisPatient?.id,
       createdAt: isoMinutesAgo(now, 4),
       dismissed: false,
@@ -654,7 +654,7 @@ function buildAnalytics(now, activeModels) {
     status: 'ready',
     source: 'client-fallback',
     loadedAt: now.toISOString(),
-    message: 'First Customer Demo Mode analytics fixture. No backend dependency.',
+    message: 'Metro General ED operational walkthrough dataset loaded.',
     data: {
       source: 'first-customer-demo',
       generatedAt: now.toISOString(),
@@ -769,7 +769,7 @@ function buildCopilotContext(simplePatients, capacity, alerts, emsArrivals) {
       reason: `${patient.priority} ${patient.complaintCategory}`,
     })),
     activeAlerts: alerts.filter((alert) => !alert.dismissed).length,
-    safetyBoundary: 'Demo data only. ED Copilot provides workflow guidance for human review.',
+    safetyBoundary: 'Walkthrough data only. ED Copilot provides workflow guidance for human review.',
   };
 }
 
@@ -828,7 +828,7 @@ export function buildFirstCustomerDemoMode(nowInput = new Date()) {
       alerts: alerts.map(rootAlert),
       activeShift: {
         id: 'demo-shift-first-customer',
-        name: 'First customer demo shift',
+        name: 'Live customer walkthrough shift',
         startTime: isoMinutesAgo(now, 360),
         endTime: isoMinutesFrom(now, 120),
         status: 'Active',
@@ -857,7 +857,7 @@ export function buildFirstCustomerDemoApiEnvelope(moduleId, state, nowInput = ne
     ok: true,
     source: 'first-customer-demo',
     generatedAt: now.toISOString(),
-    message: 'First Customer Demo Mode local fixture.',
+    message: 'Metro General ED walkthrough dataset.',
   };
 
   switch (moduleId) {

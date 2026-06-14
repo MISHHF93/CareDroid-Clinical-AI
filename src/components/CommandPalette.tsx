@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
+import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import type { Patient } from '../types/emergency';
 
 export type CommandGroup = 'Navigation' | 'Patient' | 'Clinical' | 'Department' | 'Settings';
@@ -40,6 +42,9 @@ type GroupedResult = {
   entries: Array<{ result: PaletteResult; index: number }>;
 };
 
+type PatientLookupFields = Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'> &
+  Partial<Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory' | 'state' | 'priority'>>;
+
 type CommandPaletteProps = {
   open: boolean;
   onClose: () => void;
@@ -49,14 +54,6 @@ type CommandPaletteProps = {
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
 const RECENT_COMMAND_LIMIT = 5;
 const MAX_PATIENT_RESULTS = 5;
-
-const CALCULATOR_IDS = {
-  heart: 'heart-score',
-  qsofa: 'qsofa',
-  nihss: 'nihss',
-  peds: 'pediatric-dose-safety-checker',
-  news2: 'news2',
-} as const;
 
 function normalizeSearch(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -131,23 +128,43 @@ export function getPatientDisplayName(
 }
 
 export function patientNameMatchScore(
-  patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>,
+  patient: PatientLookupFields,
   query: string,
 ): number {
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return -1;
 
   const name = normalizeSearch(getPatientDisplayName(patient));
+  const mrn = normalizeSearch(patient.mrn);
+  const clinicalContext = normalizeSearch(
+    [
+      patient.chiefComplaint,
+      patient.complaint,
+      patient.complaintCategory,
+      patient.state,
+      patient.priority,
+    ]
+      .filter(Boolean)
+      .join(' '),
+  );
+  const lookupText = normalizeSearch([name, mrn, clinicalContext].filter(Boolean).join(' '));
   if (name === normalizedQuery) return 1000;
   if (name.startsWith(normalizedQuery)) return 900 - name.indexOf(normalizedQuery);
+  if (mrn === normalizedQuery) return 880;
+  if (mrn.startsWith(normalizedQuery)) return 820 - mrn.indexOf(normalizedQuery);
   const nameIndex = name.indexOf(normalizedQuery);
   if (nameIndex >= 0) return 800 - nameIndex;
+  const clinicalIndex = clinicalContext.indexOf(normalizedQuery);
+  if (clinicalIndex >= 0) return 620 - clinicalIndex;
 
   const initials = name
     .split(' ')
     .map((part) => part[0])
     .join('');
-  return initials.startsWith(normalizedQuery) ? 600 : -1;
+  if (initials.startsWith(normalizedQuery)) return 600;
+
+  const queryTokens = normalizedQuery.split(' ').filter(Boolean);
+  return queryTokens.every((token) => lookupText.includes(token)) ? 480 - queryTokens.length : -1;
 }
 
 export function searchPatientsByName(
@@ -232,114 +249,57 @@ function navigateWithRoleGuard(navigate: ReturnType<typeof useNavigate>, path: s
   navigate(path);
 }
 
-function openCalculator(navigate: ReturnType<typeof useNavigate>, calculatorId: string): void {
-  navigate(`${CANONICAL_ROUTES.emergencyTools}?open=${encodeURIComponent(calculatorId)}`);
-}
-
 function dispatchDocumentEvent(name: string): void {
   document.dispatchEvent(new Event(name));
+}
+
+function createEmergencyRouteCommands(navigate: ReturnType<typeof useNavigate>): Command[] {
+  return EMERGENCY_OS_ROUTE_COMMANDS.map((command) => ({
+    id: command.id,
+    label: command.label.replace(/^Open /, ''),
+    description: `${command.label} in the active Emergency OS shell.`,
+    shortcut: command.hint ? `G ${command.hint}` : undefined,
+    group: 'Navigation',
+    keywords: command.keywords,
+    action: () => {
+      const action = command.build();
+      if (action.type === 'OPEN_ROUTE' && action.path) {
+        navigateWithRoleGuard(navigate, action.path);
+      }
+    },
+  }));
 }
 
 function createCommands(
   navigate: ReturnType<typeof useNavigate>,
   toggleCopilot: () => void,
 ): Command[] {
-  return [
-    {
-      id: 'goto-whiteboard',
-      label: 'Board',
-      description: 'Open the main Emergency OS whiteboard.',
-      shortcut: 'G W',
-      group: 'Navigation',
-      keywords: ['home', 'main', 'whiteboard', 'board'],
-      action: () => navigateWithRoleGuard(navigate, '/emergency'),
-    },
-    {
-      id: 'goto-ems',
-      label: 'EMS',
-      description: 'Review ambulance and inbound arrivals.',
-      group: 'Navigation',
-      keywords: ['ems', 'ambulance', 'inbound', 'pipeline'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms),
-    },
-    {
-      id: 'goto-tools',
-      label: 'Tools',
-      description: 'Open calculators and clinical score workflows.',
-      group: 'Navigation',
-      keywords: ['tools', 'clinical tools', 'calculators', 'scores'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyTools),
-    },
-    {
-      id: 'goto-shift',
-      label: 'Shift',
-      description: 'Open throughput and shift handoff statistics.',
-      group: 'Navigation',
-      keywords: ['shift', 'shift summary', 'summary', 'stats'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyShift),
-    },
+  const commands: Command[] = [
+    ...createEmergencyRouteCommands(navigate),
     {
       id: 'new-patient',
-      label: 'Central Intake',
-      description: 'Send a new patient input to the Central Node.',
+      label: 'Create Patient',
+      description: 'Start central intake on the Whiteboard; human review remains required.',
       shortcut: 'N',
       group: 'Patient',
-      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'escalation'],
-      action: () => dispatchDocumentEvent('open-intake'),
+      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'patient create'],
+      action: () => {
+        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard);
+        window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
+      },
     },
     {
-      id: 'open-pulse',
-      label: 'Pulse',
-      description: 'Open the department status overview.',
-      shortcut: 'Shift+H',
-      group: 'Department',
-      keywords: ['pulse', 'department pulse', 'overview', 'status', 'charge'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPulse),
-    },
-    {
-      id: 'heart',
-      label: 'HEART Score',
-      description: 'Chest pain and ACS risk stratification.',
-      group: 'Clinical',
-      keywords: ['heart', 'chest', 'acs', 'cardiac'],
-      action: () => openCalculator(navigate, CALCULATOR_IDS.heart),
-    },
-    {
-      id: 'qsofa',
-      label: 'qSOFA — Sepsis Screen',
-      description: 'Screen suspected infection for sepsis risk.',
-      group: 'Clinical',
-      keywords: ['qsofa', 'sepsis', 'infection'],
-      action: () => openCalculator(navigate, CALCULATOR_IDS.qsofa),
-    },
-    {
-      id: 'nihss',
-      label: 'NIHSS — Stroke',
-      description: 'Open the stroke severity calculator.',
-      group: 'Clinical',
-      keywords: ['nihss', 'stroke', 'neuro'],
-      action: () => openCalculator(navigate, CALCULATOR_IDS.nihss),
-    },
-    {
-      id: 'peds',
-      label: 'Pediatric Drug Calculator',
-      description: 'Weight-based pediatric emergency dosing.',
-      group: 'Clinical',
-      keywords: ['peds', 'pediatric', 'child', 'dose', 'weight'],
-      action: () => openCalculator(navigate, CALCULATOR_IDS.peds),
-    },
-    {
-      id: 'news2',
-      label: 'NEWS2 Score',
-      description: 'National Early Warning Score 2 workflow.',
-      group: 'Clinical',
-      keywords: ['news', 'news2', 'early', 'warning'],
-      action: () => openCalculator(navigate, CALCULATOR_IDS.news2),
+      id: 'patient-lookup',
+      label: 'Patient Lookup',
+      description: 'Open patient search and census lookup.',
+      group: 'Patient',
+      keywords: ['find patient', 'lookup', 'mrn', 'search patient', 'census'],
+      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPatients),
     },
     {
       id: 'toggle-copilot',
-      label: 'Toggle ED Copilot',
-      description: 'Show or hide the ED Copilot panel.',
+      label: 'Toggle Copilot',
+      description: 'Show or hide human-reviewed Emergency OS Copilot context.',
       shortcut: 'C',
       group: 'Department',
       keywords: ['copilot', 'ai', 'chat', 'assistant'],
@@ -348,7 +308,7 @@ function createCommands(
     {
       id: 'reassessment',
       label: 'Reassessment Queue',
-      description: 'Open the patient reassessment queue.',
+      description: 'Open due reassessments for clinician review.',
       shortcut: 'R',
       group: 'Department',
       keywords: ['reassess', 'flag', 'attention'],
@@ -358,14 +318,26 @@ function createCommands(
       },
     },
     {
-      id: 'capacity',
-      label: 'Capacity Status',
-      description: 'Open rooms, beds, and surge capacity status.',
-      group: 'Department',
-      keywords: ['capacity', 'full', 'beds', 'rooms'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyCapacity),
+      id: 'new-referral',
+      label: 'New Referral',
+      description: 'Create a referral or consult request for human review.',
+      group: 'Clinical',
+      keywords: ['referral', 'consult', 'transfer', 'specialty', 'send referral'],
+      action: () => navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`),
+    },
+    {
+      id: 'discharge-selected-patient',
+      label: 'Discharge Selected Patient',
+      description: 'Open discharge confirmation for the selected patient; no autonomous discharge.',
+      group: 'Clinical',
+      keywords: ['discharge', 'disposition', 'send home', 'close encounter'],
+      action: () => dispatchDocumentEvent('open-patient-discharge'),
     },
   ];
+
+  return PILOT_CUSTOMER_MODE.enabled
+    ? commands.filter((command) => command.id !== 'discharge-selected-patient')
+    : commands;
 }
 
 function buildCommandResults(
@@ -505,8 +477,8 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search patients, commands, tools..."
-            aria-label="Search patients, commands, tools"
+            placeholder="Search patients and actions..."
+            aria-label="Search patients and actions"
             style={styles.input}
           />
         </div>

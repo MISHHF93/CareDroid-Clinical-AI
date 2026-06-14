@@ -93,7 +93,7 @@ describe('ED scenario fixtures', () => {
       expect.objectContaining({
         patientCount: 42,
         emsInboundCount: expect.any(Number),
-        safetyBoundary: expect.stringMatching(/Demo data only/i),
+        safetyBoundary: expect.stringMatching(/Walkthrough data only/i),
       })
     );
     expect(analytics.data.operationalCommand.dailyVolume.at(-1).count).toBe(100);

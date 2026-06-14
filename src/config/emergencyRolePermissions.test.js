@@ -17,23 +17,15 @@ import {
 
 const ALL_OPERATIONAL_SIDEBAR_IDS = [
   'whiteboard',
-  'pulse',
   'patients',
-  'journey',
+  'ems',
   'intake',
   'queues',
   'reassessment',
-  'ems',
-  'referrals',
-  'provincial_health',
-  'integrations',
   'capacity',
   'boarding',
+  'referrals',
   'copilot',
-  'analytics',
-  'simulation',
-  'tools',
-  'shift',
 ];
 
 describe('Emergency OS role-based views', () => {
@@ -83,7 +75,7 @@ describe('Emergency OS role-based views', () => {
     ).toBe(true);
     expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencyTools),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       getNearestEmergencyRoute(
         EMERGENCY_ROLE_IDS.registrationClerk,
@@ -127,9 +119,9 @@ describe('Emergency OS role-based views', () => {
     const byId = Object.fromEntries(
       EMERGENCY_OS_ROUTE_COMMANDS.map((command) => [command.id, command]),
     );
-    expect(
-      canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics']),
-    ).toBe(true);
+    expect(byId['open-analytics']).toBeUndefined();
+    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics'])).toBe(false);
+    expect(byId['open-settings']).toBeUndefined();
     expect(
       canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings']),
     ).toBe(false);

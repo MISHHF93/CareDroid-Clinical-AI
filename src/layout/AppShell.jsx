@@ -24,7 +24,7 @@ import {
   selectActivePatients,
   selectReassessmentCount,
   useEmergencyStore,
-} from '../../store/emergencyStore';
+} from '../store/emergencyStore';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 import { PatientState } from '../types/emergency';
 import { movePatientToState as movePatientWithJourneyRules } from '../../engine/journeyEngine';

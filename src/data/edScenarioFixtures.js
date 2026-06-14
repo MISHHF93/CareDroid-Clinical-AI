@@ -132,7 +132,7 @@ function patient(input, now) {
   const patientId = input.id;
   return {
     id: patientId,
-    mrn: input.mrn || `ED-DEMO-${patientId.slice(-3).toUpperCase()}`,
+    mrn: input.mrn || `ED-${patientId.slice(-3).toUpperCase()}`,
     firstName: input.firstName,
     lastName: input.lastName,
     dob: input.dob || '1975-01-01',
@@ -879,7 +879,7 @@ function buildFirstCustomerEdScenarioFixture(now) {
     unknownIntake: {
       active: false,
       temporaryMrn: null,
-      requiredAction: 'Use First Customer Demo Mode for local deterministic walkthroughs.',
+      requiredAction: 'Load the department walkthrough dataset for deterministic customer walkthroughs.',
     },
   };
 }
@@ -1135,7 +1135,7 @@ export function buildRootEmergencyScenarioState(scenarioId = getInitialEdScenari
       status: 'ready',
       source: 'client-fallback',
       loadedAt: scenario.loadedAt,
-      message: `Scenario fixture: ${scenario.label}`,
+      message: `Operational walkthrough dataset: ${scenario.label}`,
       data: scenario.analytics,
     },
     scenarioData: scenario,

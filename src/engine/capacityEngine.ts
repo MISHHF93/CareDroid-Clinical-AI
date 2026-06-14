@@ -10,17 +10,12 @@ import {
   type Referral,
   type Room,
 } from '../types/emergency';
+import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
 
 type CrisisBand = 'Orange' | 'Red';
 type TimestampSource = 'timeline' | 'lastAssessedTime' | 'arrivalTime' | 'unknown';
 
 const ACTIVE_CRITICAL_EMS_STATUSES = new Set(['Inbound', 'Dispatched', 'EnRoute', 'En route']);
-const SCORE_BAND_ORDER: Record<CapacitySnapshot['band'], number> = {
-  Green: 0,
-  Yellow: 1,
-  Orange: 2,
-  Red: 3,
-};
 
 export type CapacityCrisisFactor = {
   id: 'boarding' | 'occupancy' | 'reassessment' | 'discharge' | 'ems';
@@ -89,26 +84,48 @@ export function calculateCapacity(): CapacitySnapshot {
   const occupied = rooms.filter(r =>
     r.status === 'Occupied').length;
   const maxRooms = rooms.length || 15;
+  const result = calculateEmergencyOsCapacity({
+    totalPatients: total,
+    occupiedRooms: occupied,
+    totalRooms: maxRooms,
+    boardingCount: boarding,
+    reassessmentDue,
+    waitingCount: patients.filter((patient) => patient.state === PatientState.Waiting).length,
+    dischargeReadyCount: patients.filter((patient) => patient.state === PatientState.Disposition).length,
+    criticalEmsInboundCount: patients.filter(
+      (patient) =>
+        hasPatientFlag(patient, PatientFlag.EMSArrival) &&
+        (patient.priority === Priority.P1 || patient.priority === Priority.P2),
+    ).length,
+    thresholds: {
+      warningPercent: thresholds.capacityWarningPct * 100,
+      orangePercent: thresholds.capacityOrangePct * 100,
+      criticalPercent: thresholds.capacityRedPct * 100,
+    },
+  });
 
-  let score = 100;
-  const occupancyPct = occupied / maxRooms;
-  if (occupancyPct > thresholds.capacityOrangePct) {
-    score -= (occupancyPct - thresholds.capacityOrangePct) * 100;
-  }
-  score -= boarding * 8;
-  if (reassessmentDue > 3) score -= 10;
-  score = Math.max(0, Math.min(100, score));
-
-  const scoreBand: CapacitySnapshot['band'] = score >= 80 ? 'Green'
-    : score >= 60 ? 'Yellow'
-    : score >= 40 ? 'Orange' : 'Red';
-  const occupancyBand = capacityBandFromOccupancy(occupancyPct, thresholds);
-  const band = SCORE_BAND_ORDER[occupancyBand] > SCORE_BAND_ORDER[scoreBand] ? occupancyBand : scoreBand;
-
-  return { score: Math.round(score), band,
-    totalPatients: total, occupiedRooms: occupied,
-    boardingCount: boarding, reassessmentDue,
-    updatedAt: new Date().toISOString() };
+  return {
+    score: result.score,
+    band: result.band,
+    label: `${result.band} capacity`,
+    riskLevel: result.band,
+    totalPatients: total,
+    occupiedRooms: occupied,
+    boardingCount: boarding,
+    reassessmentDue,
+    currentOccupancy: occupied,
+    maxCapacity: maxRooms,
+    occupancyPercent: result.occupancyPercent,
+    waitingCount: result.waitingCount,
+    dischargeReadyCount: result.dischargeReadyCount,
+    incomingEMSCriticalCount: result.criticalEmsInboundCount,
+    deductions: result.factors.map((factor) => ({
+      id: factor.id,
+      label: factor.label,
+      value: factor.points,
+    })),
+    updatedAt: result.updatedAt,
+  };
 }
 
 export function isCapacityCrisis(capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null): boolean {
@@ -237,16 +254,6 @@ export function startCapacityEngine() {
 function crisisBand(capacity?: Pick<CapacitySnapshot, 'band' | 'riskLevel'> | null): CrisisBand | null {
   const band = capacity?.band || capacity?.riskLevel;
   return band === 'Orange' || band === 'Red' ? band : null;
-}
-
-function capacityBandFromOccupancy(
-  occupancyPct: number,
-  thresholds: ReturnType<typeof useEmergencyStore.getState>['thresholds'],
-): CapacitySnapshot['band'] {
-  if (occupancyPct >= thresholds.capacityRedPct) return 'Red';
-  if (occupancyPct >= thresholds.capacityOrangePct) return 'Orange';
-  if (occupancyPct >= thresholds.capacityWarningPct) return 'Yellow';
-  return 'Green';
 }
 
 function deriveBoardingPatients(patients: Patient[], referrals: Referral[], now: Date): CapacityCrisisBoardingPatient[] {

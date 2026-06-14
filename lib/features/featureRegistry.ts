@@ -88,7 +88,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'pulse',
-    sidebarRoute: '/emergency/pulse',
+    sidebarRoute: '/emergency/whiteboard',
   }),
   feature({
     id: 'smart_intake',
@@ -111,7 +111,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'calculators',
-    sidebarRoute: '/emergency/tools',
+    sidebarRoute: '/emergency/whiteboard',
     relatedTools: ['calculators'],
   }),
 
@@ -510,7 +510,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'shift',
-    sidebarRoute: '/emergency/shift',
+    sidebarRoute: '/emergency/whiteboard',
   }),
   feature({
     id: 'audit_log',

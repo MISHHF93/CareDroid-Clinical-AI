@@ -1,5 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {
+  calculateEmergencyOsCapacity,
+  type EmergencyOsCapacityThresholds,
+} from '../../../../lib/emergency-os/logic';
+import { readAIProviderConfig } from '../../../../lib/ai/config';
+import {
+  EXTERNAL_DATA_REVIEW_DISCLAIMER,
+  HUMAN_REVIEW_DISCLAIMER,
+} from '../../../../lib/ai/safetyPolicy';
+import {
   emergencyAlertsFixture,
   emergencyPatientsFixture,
   emergencyRoomsFixture,
@@ -7,6 +16,11 @@ import {
 } from './emergency-os.fixtures';
 import type {
   CapacitySnapshot,
+  CareDroidCentralNodeSnapshot,
+  CareDroidScreenMode,
+  CompleteImplementationReadinessContract,
+  CompleteImplementationRequirement,
+  CompleteImplementationRequirementClassification,
   EmergencyAlert,
   EmergencyEncounter,
   EmergencyModuleEnvelope,
@@ -35,6 +49,16 @@ function minutesSince(timestamp: string): number {
   return Math.max(0, Math.round((Date.now() - ms) / 60000));
 }
 
+function localDateKey(value: string | Date = new Date()): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
+
 function isHighRisk(patient: EmergencyPatient): boolean {
   return (
     patient.priority === 'P1' ||
@@ -49,6 +73,10 @@ function isBoarding(patient: EmergencyPatient): boolean {
     patient.state === 'Disposition' ||
     patient.flags.includes('PendingAdmission')
   );
+}
+
+function isDischargeReady(patient: EmergencyPatient): boolean {
+  return patient.state === 'Disposition';
 }
 
 function latestVitals(patient: EmergencyPatient): Partial<EmergencyVitals> {
@@ -87,6 +115,19 @@ function requiresReassessment(patient: EmergencyPatient): boolean {
 function withUniqueFlags(flags: string[]): string[] {
   return Array.from(new Set(flags.filter(Boolean)));
 }
+
+const aiProviderConfig = readAIProviderConfig();
+const CARE_DROID_SCREEN_MODES: CareDroidScreenMode[] = [
+  'TRIAGE_SCREEN',
+  'REGISTRATION_SCREEN',
+  'CHARGE_NURSE_SCREEN',
+  'PHYSICIAN_SCREEN',
+  'EMS_SCREEN',
+  'WAITING_ROOM_DISPLAY',
+  'COMMAND_CENTER_DISPLAY',
+  'ADMIN_SCREEN',
+  'READ_ONLY_DISPLAY',
+];
 
 function envelope<T>(
   module: string,
@@ -131,6 +172,11 @@ function mergeSettings<T>(current: T, patch: unknown): T {
 const DEFAULT_EMERGENCY_OS_SETTINGS: EmergencyOsSettingsContract = {
   tenantName: 'CareDroid Emergency Department',
   defaultWorkspace: 'emergency-whiteboard',
+  defaultScreenMode: 'CHARGE_NURSE_SCREEN',
+  enabledScreenModes: CARE_DROID_SCREEN_MODES,
+  readOnlyDisplayMode: false,
+  commandCenterMode: true,
+  wallDisplayRefreshInterval: 30000,
   enabledModules: [
     { id: 'whiteboard', label: 'Emergency Whiteboard', enabled: true },
     { id: 'patients', label: 'Patients', enabled: true },
@@ -150,9 +196,9 @@ const DEFAULT_EMERGENCY_OS_SETTINGS: EmergencyOsSettingsContract = {
   ],
   aiSettings: {
     enabled: true,
-    provider: 'CareDroid demo router',
-    model: 'clinical-command-preview',
-    triageAssistEnabled: true,
+    provider: aiProviderConfig.provider,
+    model: aiProviderConfig.model,
+    triageAssistEnabled: false,
     summarizationEnabled: true,
     humanReviewRequired: true,
   },
@@ -227,6 +273,209 @@ const DEFAULT_EMERGENCY_OS_SETTINGS: EmergencyOsSettingsContract = {
   updatedAt: new Date(0).toISOString(),
 };
 
+const IMPLEMENTATION_CLASSIFICATIONS: CompleteImplementationRequirementClassification[] = [
+  'ALREADY_IMPLEMENTED_COMPATIBLE',
+  'SAFE_TO_IMPLEMENT_NOW',
+  'PARTIALLY_IMPLEMENTED_NEEDS_EXTENSION',
+  'CONFLICTS_WITH_ACTIVE_SPINE',
+  'REQUIRES_MANUAL_APPROVAL',
+  'DEMO_FACADE_ONLY',
+];
+
+const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] = [
+  {
+    id: 'active-vite-spa',
+    requirement: 'Build the Emergency OS frontend application shell and route surface.',
+    classification: 'ALREADY_IMPLEMENTED_COMPATIBLE',
+    activeSpineDecision:
+      'Keep the active Vite React SPA under src/ with the existing AppShell and pilot route family.',
+    implementationState:
+      'src/App.jsx, src/components/AppShell.tsx, and the active Emergency OS pages already define the mounted app spine.',
+    evidence: ['src/App.jsx', 'src/components/AppShell.tsx', 'src/config/routes.config.js'],
+    safeNextStep: 'Extend existing pages or service hooks only when a mounted route needs data.',
+  },
+  {
+    id: 'new-frontend-src-shell',
+    requirement: 'Create a new /frontend/src app shell, router, layout, and store.',
+    classification: 'CONFLICTS_WITH_ACTIVE_SPINE',
+    activeSpineDecision:
+      'Do not create a duplicate frontend architecture while src/ is the active application.',
+    implementationState:
+      'frontend/src contains retained artifacts, but active runtime wiring uses src/ and should remain there.',
+    evidence: [
+      'src/App.jsx',
+      'src/components/AppShell.tsx',
+      'frontend/src/store/emergency-store.ts',
+    ],
+    safeNextStep:
+      'Document any useful retained code before moving it to review with explicit approval.',
+    approvalsRequired: ['Architecture owner approval before replacing the active SPA root.'],
+  },
+  {
+    id: 'api-v1-surface',
+    requirement: 'Switch or add the Emergency OS API under /api/v1.',
+    classification: 'CONFLICTS_WITH_ACTIVE_SPINE',
+    activeSpineDecision: 'Keep canonical active calls on the Nest /api/emergency/* surface.',
+    implementationState:
+      'The Nest global prefix plus EmergencyOsController maps active endpoints to /api/emergency/*.',
+    evidence: [
+      'backend/src/main.ts',
+      'backend/src/modules/emergency-os/emergency-os.controller.ts',
+      'src/services/emergencyOsApi.js',
+    ],
+    safeNextStep: 'Add adapters under /api/emergency/* when current flows need them.',
+    approvalsRequired: ['API versioning plan and frontend migration approval.'],
+  },
+  {
+    id: 'backend-domain-models',
+    requirement: 'Add backend models, interfaces, and services for Emergency OS capabilities.',
+    classification: 'PARTIALLY_IMPLEMENTED_NEEDS_EXTENSION',
+    activeSpineDecision:
+      'Use the existing Nest EmergencyOsModule and typed contracts instead of a parallel backend surface.',
+    implementationState:
+      'Core patient, queue, capacity, boarding, referral, settings, workflow-log, simulation, federated-learning, and digital-twin contracts exist as in-memory/demo services.',
+    evidence: [
+      'backend/src/modules/emergency-os/emergency-os.types.ts',
+      'backend/src/modules/emergency-os/emergency-os.services.ts',
+      'backend/src/modules/emergency-os/emergency-os.advanced-services.ts',
+    ],
+    safeNextStep:
+      'Harden typed contracts and DTO adapters inside EmergencyOsModule before introducing persistence.',
+  },
+  {
+    id: 'implementation-readiness-contract',
+    requirement: 'Reconcile the complete implementation prompt against current repo state.',
+    classification: 'SAFE_TO_IMPLEMENT_NOW',
+    activeSpineDecision:
+      'Expose a fixture-backed readiness registry from the existing Emergency OS module for audits and docs.',
+    implementationState:
+      'Implemented as a typed /api/emergency/implementation-readiness contract in this safe slice.',
+    evidence: [
+      'backend/src/modules/emergency-os/emergency-os.types.ts',
+      'backend/src/modules/emergency-os/emergency-os.services.ts',
+      'backend/src/modules/emergency-os/emergency-os.controller.ts',
+    ],
+    safeNextStep: 'Keep the registry aligned whenever deferred items are promoted to real modules.',
+  },
+  {
+    id: 'database-migrations',
+    requirement: 'Run or add migrations for new Emergency OS persistence.',
+    classification: 'REQUIRES_MANUAL_APPROVAL',
+    activeSpineDecision:
+      'Do not run database migrations during reconciliation without explicit database target approval.',
+    implementationState:
+      'TypeORM migration commands exist, while active Emergency OS services are fixture/in-memory backed.',
+    evidence: ['backend/package.json', 'backend/src/app.module.ts'],
+    safeNextStep:
+      'Design persistence entities and dry-run migrations against a named local database first.',
+    approvalsRequired: [
+      'Database owner approval',
+      'Target environment confirmation',
+      'Rollback plan',
+    ],
+  },
+  {
+    id: 'legacy-cleanup',
+    requirement: 'Delete legacy modules or run cleanup scripts to remove old surfaces.',
+    classification: 'REQUIRES_MANUAL_APPROVAL',
+    activeSpineDecision:
+      'Do not delete broad modules in a dirty tree or while concurrent workers may be editing adjacent files.',
+    implementationState:
+      'Legacy and review-only surfaces remain in the repo; active navigation is already narrowed to Emergency OS.',
+    evidence: [
+      'docs/architecture/legacy-platform-removal-report.md',
+      'src/config/routes.config.js',
+    ],
+    safeNextStep:
+      'Use non-destructive inventory reports or move explicitly approved files to _review.',
+    approvalsRequired: ['File ownership approval', 'Current branch cleanup plan'],
+  },
+  {
+    id: 'health-and-env',
+    requirement: 'Add health checks and environment configuration for Emergency OS dependencies.',
+    classification: 'ALREADY_IMPLEMENTED_COMPATIBLE',
+    activeSpineDecision:
+      'Retain current health/config checks and keep optional integrations marked not-configured until wired.',
+    implementationState:
+      'Health checks cover database, service registry, websocket, MQTT, MoH FHIR, and wearable endpoints without requiring live credentials.',
+    evidence: ['backend/src/api/health.routes.ts', 'backend/src/config/environment.config.ts'],
+    safeNextStep: 'Add component checks only when a connector has real configuration and tests.',
+  },
+  {
+    id: 'external-integrations',
+    requirement: 'Wire MQTT, wearable RPM, MoH/FHIR, EMS, and other external integrations.',
+    classification: 'DEMO_FACADE_ONLY',
+    activeSpineDecision:
+      'Keep integration contracts explicit placeholders until credentials, environments, and validation plans exist.',
+    implementationState:
+      'Integration and health surfaces report demo/placeholder/not-configured states rather than claiming live connectivity.',
+    evidence: [
+      'backend/src/modules/emergency-os/emergency-os.services.ts',
+      'backend/src/api/health.routes.ts',
+      'src/services/emergencyOsApi.js',
+    ],
+    safeNextStep:
+      'Promote one connector at a time behind env configuration, contract tests, and operational runbooks.',
+    approvalsRequired: [
+      'Credential approval',
+      'Security/privacy review',
+      'Vendor/API environment confirmation',
+    ],
+  },
+  {
+    id: 'ai-governance-ml',
+    requirement:
+      'Implement deterioration ML, federated learning, AI governance, real-time simulation, and digital twin capabilities.',
+    classification: 'DEMO_FACADE_ONLY',
+    activeSpineDecision:
+      'Keep advanced AI/ML as clearly labeled deterministic/demo facades until validated.',
+    implementationState:
+      'Simulation, federated learning, and digital twin endpoints return backend-fixture envelopes with remainingGaps.',
+    evidence: [
+      'backend/src/modules/emergency-os/emergency-os.advanced-services.ts',
+      'backend/src/modules/emergency-os/emergency-os.controller.spec.ts',
+    ],
+    safeNextStep:
+      'Require data provenance, validation metrics, clinical safety review, and governance signoff before production claims.',
+    approvalsRequired: [
+      'Clinical safety approval',
+      'Model governance approval',
+      'Data-use approval',
+    ],
+  },
+  {
+    id: 'install-migrate-devserver',
+    requirement: 'Run npm install, migrations, cleanup commands, and long-running dev servers.',
+    classification: 'REQUIRES_MANUAL_APPROVAL',
+    activeSpineDecision:
+      'Run only focused tests/build checks needed for the safe slice; avoid long-running or destructive commands.',
+    implementationState:
+      'Package scripts exist, but this reconciliation does not need dependency installation, real migrations, or dev server startup.',
+    evidence: ['package.json', 'backend/package.json'],
+    safeNextStep:
+      'Request explicit approval with target command, expected side effects, and stop condition.',
+    approvalsRequired: [
+      'Dependency install approval',
+      'Migration approval',
+      'Dev server startup request',
+    ],
+  },
+];
+
+function buildImplementationSummary(
+  requirements: CompleteImplementationRequirement[],
+): Record<CompleteImplementationRequirementClassification, number> {
+  return requirements.reduce(
+    (summary, requirement) => {
+      summary[requirement.classification] += 1;
+      return summary;
+    },
+    Object.fromEntries(
+      IMPLEMENTATION_CLASSIFICATIONS.map((classification) => [classification, 0]),
+    ) as Record<CompleteImplementationRequirementClassification, number>,
+  );
+}
+
 const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   patient_created: 'Patient created',
   journey_state_changed: 'Journey state changed',
@@ -263,12 +512,22 @@ export class WorkflowActionLogService {
     const log: WorkflowActionLog = {
       id: input.id || createId(`workflow-${input.type}`),
       type: input.type,
+      action: input.type,
       title: input.title || WORKFLOW_LOG_TITLES[input.type],
       summary: input.summary,
       timestamp,
+      userId: input.metadata?.userId ? String(input.metadata.userId) : input.actorStaffId,
+      tenantId: input.metadata?.tenantId ? String(input.metadata.tenantId) : 'default-tenant',
       actorStaffId: input.actorStaffId,
       actorName: input.actorName,
       patientId: input.patientId,
+      encounterId: input.metadata?.encounterId ? String(input.metadata.encounterId) : undefined,
+      module: input.source || 'emergency-os-backend',
+      purpose: input.metadata?.purpose
+        ? String(input.metadata.purpose)
+        : 'Emergency OS operational workflow audit',
+      result: input.status || 'recorded',
+      error: input.metadata?.error ? String(input.metadata.error) : undefined,
       source: input.source || 'emergency-os-backend',
       severity: input.severity || 'Info',
       status: input.status || 'recorded',
@@ -444,16 +703,28 @@ export class EmergencyPatientService {
     const reassessmentDue = this.patients.filter((patient) =>
       patient.flags.includes('ReassessmentDue'),
     ).length;
-    const score = Math.min(
-      100,
-      Math.round(
-        (occupiedRooms / Math.max(this.rooms.length, 1)) * 65 +
-          boardingCount * 6 +
-          reassessmentDue * 4,
-      ),
-    );
-    const band: CapacitySnapshot['band'] =
-      score >= 85 ? 'Red' : score >= 70 ? 'Orange' : score >= 50 ? 'Yellow' : 'Green';
+    const waitingCount = this.patients.filter((patient) => patient.state === 'Waiting').length;
+    const dischargeReadyCount = this.patients.filter(isDischargeReady).length;
+    const result = calculateEmergencyOsCapacity({
+      totalPatients: this.patients.length,
+      occupiedRooms,
+      totalRooms: this.rooms.length,
+      boardingCount,
+      reassessmentDue,
+      waitingCount,
+      dischargeReadyCount,
+      criticalEmsInboundCount: this.patients.filter(
+        (patient) => patient.flags.includes('EMSArrival') && isHighRisk(patient),
+      ).length,
+      thresholds: {
+        warningPercent: DEFAULT_EMERGENCY_OS_SETTINGS.capacityThresholds.warningPercent,
+        orangePercent: DEFAULT_EMERGENCY_OS_SETTINGS.capacityThresholds.warningPercent,
+        criticalPercent: DEFAULT_EMERGENCY_OS_SETTINGS.capacityThresholds.criticalPercent,
+        boardingCriticalCount: DEFAULT_EMERGENCY_OS_SETTINGS.boardingThresholds.maxBoarders,
+      } satisfies Partial<EmergencyOsCapacityThresholds>,
+    });
+    const score = result.score;
+    const band: CapacitySnapshot['band'] = result.band;
     const snapshot = {
       score,
       band,
@@ -461,7 +732,19 @@ export class EmergencyPatientService {
       occupiedRooms,
       boardingCount,
       reassessmentDue,
-      updatedAt: new Date().toISOString(),
+      totalRooms: this.rooms.length,
+      occupancyPercent: result.occupancyPercent,
+      waitingCount,
+      dischargeReadyCount,
+      criticalEmsInboundCount: result.criticalEmsInboundCount,
+      deductions: result.factors.map((factor) => ({
+        id: factor.id,
+        label: factor.label,
+        value: factor.points,
+      })),
+      units: result.units,
+      errors: result.errors,
+      updatedAt: result.updatedAt,
     };
     if (this.lastCapacityScore !== undefined && this.lastCapacityScore !== score) {
       this.workflowLogService.record({
@@ -794,6 +1077,7 @@ export class ProvincialHealthService {
       {
         connectorStatus: 'placeholder-unavailable',
         jurisdiction: 'Ontario/OHIP demo placeholder',
+        disclaimer: EXTERNAL_DATA_REVIEW_DISCLAIMER,
         records: patients.map((patient) => ({
           patientId: patient.id,
           mrn: patient.mrn,
@@ -883,7 +1167,7 @@ export class EDCopilotService {
         reassessmentCount: patients.filter((patient) => patient.flags.includes('ReassessmentDue'))
           .length,
         capacity: this.patientService.computeCapacity(),
-        safetyRule: 'Human review required. Do not make autonomous clinical decisions.',
+        safetyRule: HUMAN_REVIEW_DISCLAIMER,
       },
       quickActions: ['Who needs attention?', 'Capacity status', 'EMS update', 'Reassessment queue'],
     });
@@ -911,6 +1195,33 @@ export class EmergencyAnalyticsService {
       averageWaitMinutes,
       capacity: this.patientService.computeCapacity(),
     });
+  }
+}
+
+@Injectable()
+export class CompleteImplementationReadinessService {
+  getReadiness(): EmergencyModuleEnvelope<CompleteImplementationReadinessContract> {
+    return envelope(
+      'Complete Implementation Prompt Reconciliation',
+      {
+        activeSpine: {
+          frontendRoot: 'src/',
+          appEntry: 'src/App.jsx',
+          appShell: 'src/components/AppShell.tsx',
+          backendModule: 'backend/src/modules/emergency-os',
+          apiBase: '/api/emergency',
+          pilotRouteCount: 12,
+        },
+        generatedBy: 'EmergencyOsModule safe-slice reconciliation registry',
+        clinicalSafetyNotice:
+          'Demo, fixture, and facade outputs are not clinical validation, production readiness, live integration status, or measured model performance.',
+        summary: buildImplementationSummary(COMPLETE_IMPLEMENTATION_REQUIREMENTS),
+        requirements: clone(COMPLETE_IMPLEMENTATION_REQUIREMENTS),
+      },
+      [
+        'Persistence migrations, destructive cleanup, /api/v1 migration, and duplicate frontend architecture are intentionally deferred.',
+      ],
+    );
   }
 }
 
@@ -955,5 +1266,146 @@ export class EmergencySettingsService {
     };
 
     return this.getSettings();
+  }
+}
+
+@Injectable()
+export class CareDroidCentralNodeService {
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    private readonly settingsService: EmergencySettingsService,
+    private readonly workflowLogService: WorkflowActionLogService,
+  ) {}
+
+  getSnapshot(): EmergencyModuleEnvelope<CareDroidCentralNodeSnapshot> {
+    const generatedAt = new Date().toISOString();
+    const patients = this.patientService.listPatients();
+    const activePatients = patients.filter((patient) => patient.state !== 'Discharge');
+    const waitingPatients = activePatients.filter((patient) => patient.state === 'Waiting');
+    const waits = activePatients.map((patient) => minutesSince(patient.arrivalTime));
+    const capacity = this.patientService.computeCapacity();
+    const settings = this.settingsService.getSettings().data;
+    const operationalAlerts = this.patientService
+      .listAlerts()
+      .filter((alert) => !alert.dismissed)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const emsInbound = activePatients.filter(
+      (patient) =>
+        patient.flags.includes('EMSArrival') ||
+        /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
+    ).length;
+    const boarders = activePatients.filter(isBoarding).length;
+    const referralsPending = activePatients.filter(
+      (patient) => patient.state === 'Disposition' || isBoarding(patient) || isHighRisk(patient),
+    ).length;
+    const reassessmentsDue = activePatients.filter((patient) =>
+      patient.flags.includes('ReassessmentDue'),
+    ).length;
+    const states: Array<EmergencyPatientState | 'Reassessment' | 'EMS'> = [
+      'Arrival',
+      'Registration',
+      'Triage',
+      'Waiting',
+      'Assessment',
+      'Orders',
+      'Results',
+      'Disposition',
+      'Admission',
+      'Reassessment',
+      'EMS',
+    ];
+    const targetByQueue: Record<string, number> = {
+      Arrival: 5,
+      Registration: 10,
+      Triage: 10,
+      Waiting: settings.thresholds.waitWarningMinutes,
+      Assessment: 45,
+      Orders: 60,
+      Results: 90,
+      Disposition: 60,
+      Admission: settings.boardingThresholds.escalationMinutes,
+      Reassessment: 30,
+      EMS: settings.emsThresholds.offloadTargetMinutes,
+    };
+    const patientsForQueue = (queue: EmergencyPatientState | 'Reassessment' | 'EMS') =>
+      activePatients.filter((patient) => {
+        if (queue === 'Reassessment') return patient.flags.includes('ReassessmentDue');
+        if (queue === 'EMS') {
+          return (
+            patient.flags.includes('EMSArrival') ||
+            /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint)
+          );
+        }
+        return patient.state === queue;
+      });
+
+    return envelope('CareDroid Central Node', {
+      node: 'CareDroidCentralNode',
+      generatedAt,
+      patientsToday: patients.filter(
+        (patient) => localDateKey(patient.arrivalTime) === localDateKey(),
+      ).length,
+      activePatients: activePatients.length,
+      waitingPatients: waitingPatients.length,
+      longestWait: waits.reduce((max, wait) => Math.max(max, wait), 0),
+      averageWait: waits.length
+        ? Math.round(waits.reduce((sum, wait) => sum + wait, 0) / waits.length)
+        : 0,
+      emsInbound,
+      emsPressure:
+        emsInbound >= 4 ||
+        activePatients.some(
+          (patient) => patient.flags.includes('EMSArrival') && isHighRisk(patient),
+        )
+          ? 'critical'
+          : emsInbound >= 2
+            ? 'strained'
+            : emsInbound === 1
+              ? 'watch'
+              : 'normal',
+      reassessmentsDue,
+      capacityStatus: capacity,
+      boarders,
+      boardingRisk:
+        boarders >= settings.boardingThresholds.maxBoarders
+          ? 'critical'
+          : boarders >= Math.ceil(settings.boardingThresholds.maxBoarders * 0.7)
+            ? 'strained'
+            : boarders > 0
+              ? 'watch'
+              : 'normal',
+      referralsPending,
+      operationalAlerts,
+      whiteboardColumns: states.map((state) => {
+        const rows = patientsForQueue(state);
+        return {
+          id: state,
+          label: state,
+          patientIds: rows.map((patient) => patient.id),
+          count: rows.length,
+        };
+      }),
+      queueMetrics: states.map((state) => {
+        const rows = patientsForQueue(state);
+        const oldestWaitMinutes = rows.reduce(
+          (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
+          0,
+        );
+        const targetMinutes = targetByQueue[state] || settings.thresholds.waitWarningMinutes;
+        return {
+          id: String(state).toLowerCase(),
+          label: state,
+          count: rows.length,
+          oldestWaitMinutes,
+          targetMinutes,
+          breached: rows.length > 0 && oldestWaitMinutes > targetMinutes,
+        };
+      }),
+      recentEvents: this.workflowLogService.listLogs().slice(0, 12),
+      tenantSettings: settings,
+      enabledModules: settings.enabledModules
+        .filter((module) => module.enabled)
+        .map((module) => module.id),
+    });
   }
 }

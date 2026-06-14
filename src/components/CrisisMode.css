@@ -176,7 +176,7 @@
   display: grid;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-left: 4px solid var(--status-warning);
   border-radius: var(--radius-lg);
   background: var(--color-elevated);

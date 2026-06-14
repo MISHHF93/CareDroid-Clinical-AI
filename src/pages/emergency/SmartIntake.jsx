@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, FileScan, Link2, UserPlus, UserRoundX } from 'lucide-react';
-import { useEmergencyStore } from '../../../store/emergencyStore';
+import { AlertTriangle, FileScan, Link2, UserPlus, UserRoundX } from 'lucide-react';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { SMART_INTAKE_DEMO } from '../../data/smartIntakeFixtures';
 import { buildSmartIntakeVerticalSlicePatient } from '../../data/smartIntakeVerticalSlice';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
-import SmartIntakeApi from '../../services/smartIntakeApi';
+import { fetchSmartIntake, runSmartIntakeVerticalSlice } from '../../services/emergencyOsApi';
 import './SmartIntake.css';
 
 const STATUS_LABEL = {
@@ -71,6 +71,8 @@ export default function SmartIntake() {
   const emergencyRole = useEmergencyRolePermissions();
   const navigate = useNavigate();
   const addPatient = useEmergencyStore((state) => state.addPatient);
+  const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
+  const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedCandidateId, setSelectedCandidateId] = useState(
@@ -78,7 +80,7 @@ export default function SmartIntake() {
   );
   const [sessionId, setSessionId] = useState(SMART_INTAKE_DEMO.sessionId);
   const [statusMessage, setStatusMessage] = useState(
-    'Demo review loaded. Backend API is used when Mongoose Emergency OS runtime is enabled.',
+    'Identity evidence is ready for staff verification.',
   );
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
@@ -105,13 +107,15 @@ export default function SmartIntake() {
     setIsStarting(true);
     setErrorMessage('');
     try {
-      const result = await SmartIntakeApi.createSession('Smart Intake RN');
-      setSessionId(result.sessionId || result.session?._id || SMART_INTAKE_DEMO.sessionId);
-      setStatusMessage('Backend Smart Intake session created.');
+      const result = await fetchSmartIntake();
+      setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);
+      setStatusMessage('Backend Smart Intake contract loaded for staff review.');
       setActiveStep(1);
     } catch (error) {
-      setErrorMessage(`Backend Smart Intake unavailable: ${error.message}`);
-      setStatusMessage(`Using local demo workflow: ${error.message}`);
+      setErrorMessage(
+        `${error?.message || 'Backend Smart Intake contract is not reachable.'} Continue verification in safeguarded review mode.`,
+      );
+      setStatusMessage('Safeguarded identity review is active for this session.');
       setActiveStep(1);
     } finally {
       setIsStarting(false);
@@ -144,6 +148,23 @@ export default function SmartIntake() {
     return patient;
   };
 
+  const hydrateSmartIntakeResult = (result, fallbackPatient) => {
+    const data = result?.data || {};
+    const whiteboard = data.whiteboard || {};
+    const capacity = data.capacity?.capacity || data.capacity;
+    const patient = data.patient || fallbackPatient;
+    hydrateFromApi({
+      patients: whiteboard.patients || (patient ? [patient] : undefined),
+      rooms: whiteboard.rooms,
+      staff: whiteboard.staff,
+      alerts: whiteboard.alerts,
+      capacity: whiteboard.capacity || capacity,
+    });
+    if (patient?.id) selectPatient(patient.id);
+    navigate('/emergency/patients');
+    return patient;
+  };
+
   const completeFinalAction = async (actionLabel, backendAction, localCompletion) => {
     if (!canCreatePatient) {
       setErrorMessage(
@@ -159,11 +180,11 @@ export default function SmartIntake() {
       setStatusMessage(
         `${actionLabel} confirmed for session ${result.sessionId || sessionId}. Identity audit trail updated for human review.`,
       );
-    } catch (error) {
+    } catch {
       localCompletion?.(null);
-      setErrorMessage(`Backend confirmation failed: ${error.message}`);
+      setErrorMessage('Live confirmation is pending. Staff review remains required before downstream record changes.');
       setStatusMessage(
-        `${actionLabel} recorded locally for session ${sessionId}. Backend confirmation is pending human review.`,
+        `${actionLabel} recorded for session ${sessionId}. Confirmation is pending human review.`,
       );
     } finally {
       setActiveStep(SMART_INTAKE_DEMO.steps.length - 1);
@@ -173,6 +194,9 @@ export default function SmartIntake() {
 
   const selectedCandidate = SMART_INTAKE_DEMO.candidates.find(
     (candidate) => candidate.patientId === selectedCandidateId,
+  );
+  const selectedCandidateOnBoard = Boolean(
+    selectedCandidate && patients.some((patient) => patient.id === selectedCandidate.patientId),
   );
 
   return (
@@ -262,7 +286,7 @@ export default function SmartIntake() {
                       onClick={() => updateDecision(field.field, 'edited')}
                       disabled={!canVerifyIntake}
                     >
-                      Edit
+                      Mark Edited
                     </button>
                     <button
                       type="button"
@@ -328,18 +352,24 @@ export default function SmartIntake() {
           disabled={
             !verificationComplete ||
             !selectedCandidate ||
+            !selectedCandidateOnBoard ||
             Boolean(pendingAction) ||
             !canCreatePatient
+          }
+          title={
+            selectedCandidateOnBoard
+              ? 'Link this intake review to the selected active patient'
+              : 'Selected match is not on the active board. Create a new intake record or continue as unknown.'
           }
           onClick={() =>
             completeFinalAction(
               `Linked ${selectedCandidate?.displayName || 'selected patient'}`,
               () =>
-                SmartIntakeApi.linkPatient(
+                Promise.resolve({
                   sessionId,
-                  selectedCandidate.patientId,
-                  'Smart Intake RN',
-                ),
+                  status: 'manual-link-review',
+                  patientId: selectedCandidate.patientId,
+                }),
               () => {
                 selectPatient(selectedCandidate.patientId);
                 navigate('/emergency/patients');
@@ -353,46 +383,42 @@ export default function SmartIntake() {
         <button
           type="button"
           disabled={!verificationComplete || Boolean(pendingAction) || !canCreatePatient}
-          onClick={() =>
+          onClick={() => {
+            const patient = buildSmartIntakePatient(sessionId, 'Smart Intake patient');
             completeFinalAction(
-              'Create-new-patient intake',
-              () => SmartIntakeApi.createPatient(sessionId, 'Smart Intake RN'),
-              () => addSmartIntakePatientToWhiteboard('Smart Intake patient'),
-            )
-          }
+              'Create-and-triage intake',
+              () => runSmartIntakeVerticalSlice({ patient, staffId: 'smart-intake-rn' }),
+              (result) =>
+                result
+                  ? hydrateSmartIntakeResult(result, patient)
+                  : addSmartIntakePatientToWhiteboard('Smart Intake patient'),
+            );
+          }}
         >
           <UserPlus size={17} aria-hidden />
-          {pendingAction === 'Create-new-patient intake' ? 'Sending...' : 'Send New Patient Input'}
+          {pendingAction === 'Create-and-triage intake'
+            ? 'Sending...'
+            : 'Create and Send to Triage'}
         </button>
         <button
           type="button"
           disabled={Boolean(pendingAction) || !canCreatePatient}
-          onClick={() =>
+          onClick={() => {
+            const patient = buildSmartIntakePatient(sessionId, 'Unknown Patient');
             completeFinalAction(
               'Unknown-patient intake',
-              () => SmartIntakeApi.continueUnknown(sessionId, 'Unknown Patient', 'Smart Intake RN'),
-              () => addSmartIntakePatientToWhiteboard('Unknown Patient'),
-            )
-          }
+              () => runSmartIntakeVerticalSlice({ patient, staffId: 'smart-intake-rn' }),
+              (result) =>
+                result
+                  ? hydrateSmartIntakeResult(result, patient)
+                  : addSmartIntakePatientToWhiteboard('Unknown Patient'),
+            );
+          }}
         >
           <UserRoundX size={17} aria-hidden />
           {pendingAction === 'Unknown-patient intake'
             ? 'Recording...'
             : 'Continue as Unknown Patient'}
-        </button>
-        <button
-          type="button"
-          disabled={!verificationComplete || Boolean(pendingAction)}
-          onClick={() =>
-            completeFinalAction(
-              'Sent-to-triage intake',
-              () => SmartIntakeApi.createPatient(sessionId, 'Smart Intake RN'),
-              () => addSmartIntakePatientToWhiteboard('Smart Intake triage patient'),
-            )
-          }
-        >
-          <CheckCircle2 size={17} aria-hidden />
-          {pendingAction === 'Sent-to-triage intake' ? 'Sending...' : 'Send to Triage'}
         </button>
       </section>
 

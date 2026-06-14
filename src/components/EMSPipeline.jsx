@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
 import './EMSPipeline.css';
 
@@ -126,7 +127,18 @@ function EMSArrivalRow({
             {roomName(rooms, arrival.preparedRoomId)}
           </span>
         ) : (
-          <button type="button" onClick={() => onPrepareBay(arrival.id)} disabled={!isIncoming || !canPrepareBay}>
+          <button
+            type="button"
+            onClick={() => onPrepareBay(arrival.id)}
+            disabled={!isIncoming || !canPrepareBay}
+            title={
+              !canPrepareBay
+                ? 'Prepare Bay unavailable for this role'
+                : !isIncoming
+                  ? 'Bay preparation is only available for inbound units'
+                  : 'Prepare a bay for this EMS unit'
+            }
+          >
             Prepare Bay
           </button>
         )}
@@ -136,6 +148,11 @@ function EMSArrivalRow({
             className="ems-pipeline__handoff"
             onClick={() => onConvert(arrival.id)}
             disabled={!canConvert}
+            title={
+              canConvert
+                ? 'Convert this arrived EMS unit to a whiteboard patient'
+                : 'Add to Whiteboard unavailable for this role'
+            }
           >
             <CheckCircle2 size={14} aria-hidden />
             Add to Whiteboard
@@ -147,6 +164,11 @@ function EMSArrivalRow({
             className="ems-pipeline__handoff"
             onClick={() => onCompleteHandoff(arrival.id)}
             disabled={!canCompleteHandoff}
+            title={
+              canCompleteHandoff
+                ? 'Mark this EMS handoff complete'
+                : 'Handoff completion unavailable for this role'
+            }
           >
             Handoff complete
           </button>
@@ -161,10 +183,10 @@ function EMSArrivalRow({
 
 export default function EMSPipeline() {
   const emergencyRole = useEmergencyRolePermissions();
+  const emsModule = useEMSIntake();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const rooms = useEmergencyStore((state) => state.rooms);
-  const activeScenario = useEmergencyStore((state) => state.activeScenario);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
   const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
@@ -189,18 +211,18 @@ export default function EMSPipeline() {
           setFleetSnapshot({
             status: 'ready',
             units: result.data?.units || [],
-            message: result.data?.sourceLabel || result.message || '',
+            message: result.data?.sourceLabel || 'Live EMS feed connected.',
           });
         } else {
-          setFleetSnapshot({ status: 'error', units: [], message: result.message || 'EMS unit backend unavailable.' });
+          setFleetSnapshot({ status: 'error', units: [], message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.' });
         }
       })
-      .catch((error) => {
+      .catch(() => {
         if (cancelled) return;
         setFleetSnapshot({
           status: 'error',
           units: [],
-          message: error.message || 'EMS unit backend unavailable.',
+          message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.',
         });
       });
     fetchEmergencyDiversionStatus()
@@ -212,12 +234,12 @@ export default function EMSPipeline() {
           message: result.message || '',
         });
       })
-      .catch((error) => {
+      .catch(() => {
         if (cancelled) return;
         setDiversionStatus({
           status: 'unavailable',
           data: null,
-          message: error.message || 'Diversion status backend unavailable.',
+          message: 'Diversion status feed is unavailable. Confirm diversion status with charge leadership.',
         });
       });
     return () => {
@@ -275,11 +297,10 @@ export default function EMSPipeline() {
         <div>
           <span>Pre-arrival coordination</span>
           <h1 id="ems-pipeline-title">EMS Pipeline</h1>
-          {activeScenario ? (
-            <p className="ems-pipeline__source">
-              Scenario: {activeScenario.label}
-            </p>
-          ) : null}
+          <p className="ems-pipeline__source">
+            Track inbound units, bay preparation, handoff timing, and diversion awareness.
+            {emsModule.data?.source ? ` Source: ${emsModule.data.source}.` : ''}
+          </p>
         </div>
         <div className="ems-pipeline__header-actions">
           <span
@@ -289,19 +310,27 @@ export default function EMSPipeline() {
             Avg offload {avgOffload}m
           </span>
           <EMSPressureScore />
-          <strong aria-label={`${incoming.length} incoming EMS units`}>{incoming.length}</strong>
         </div>
       </header>
+
+      {emsModule.loading && !emsArrivals.length ? (
+        <p className="ems-pipeline__empty" role="status">Loading Emergency OS EMS intake...</p>
+      ) : null}
+      {emsModule.error ? (
+        <p className="ems-pipeline__empty" role="alert">
+          {emsModule.error}. Showing the last local EMS state.
+        </p>
+      ) : null}
 
       <div className="ems-pipeline__sections">
         <section className="ems-pipeline__section">
           <div className="ems-pipeline__section-heading">
             <Ambulance size={17} aria-hidden />
-            <h2>Backend EMS Unit Visibility</h2>
+            <h2>EMS Unit Visibility</h2>
             <span>{fleetSnapshot.units.length}</span>
           </div>
           <p className="ems-pipeline__source">
-            {fleetSnapshot.message || 'Fleet backend status unavailable.'}
+            {fleetSnapshot.message || 'Live EMS feed status is pending.'}
           </p>
           {diversionStatus.status === 'ready' && diversionStatus.data ? (
             <div className="ems-pipeline__diversion">
@@ -316,7 +345,7 @@ export default function EMSPipeline() {
               <p className="ems-pipeline__empty" role="status">Loading department data...</p>
             ) : fleetSnapshot.status === 'error' ? (
               <p className="ems-pipeline__empty" role="alert">
-                {fleetSnapshot.message || 'EMS unit backend unavailable.'}
+                {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
               </p>
             ) : fleetSnapshot.units.length ? (
               fleetSnapshot.units.slice(0, 6).map((unit) => (

@@ -32,8 +32,21 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('<WhoNextPanel');
   });
 
+  it('promotes Whiteboard-first workflow launch points without duplicating workflow logic', () => {
+    expect(whiteboardSource).toContain('Critical actions from the board');
+    expect(whiteboardSource).toContain('openReassessmentTasks');
+    expect(whiteboardSource).toContain('convertEMSArrivalToPatient(arrival.id)');
+    expect(whiteboardSource).toContain('openReferralWorkflow');
+    expect(whiteboardSource).toContain('openQueueReview');
+    expect(whiteboardSource).toContain('missionControlActions');
+    expect(patientCardSource).toContain('missionControlActions?: boolean');
+    expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-reassessment-drawer'))");
+    expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-patient-discharge'))");
+    expect(patientCardSource).toContain('movePatientToState(patient.id, PatientState.Admission');
+  });
+
   it('shows non-blank loading and empty states for filtered views', () => {
     expect(whiteboardSource).toContain('<SkeletonLoader');
-    expect(whiteboardSource).toContain('Department Clear');
+    expect(whiteboardSource).toContain('No active patients are currently on the board.');
   });
 });

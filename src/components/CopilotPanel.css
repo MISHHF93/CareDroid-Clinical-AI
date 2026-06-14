@@ -5,13 +5,13 @@
     inset-block-end: 0 !important;
     z-index: 48;
     width: 100% !important;
-    height: min(58vh, 560px) !important;
+    height: min(58dvh, 560px) !important;
+    max-height: calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px));
     min-height: 320px;
-    border: 1px solid #1F2937 !important;
-    border-bottom: 0 !important;
+    border: 0 !important;
     border-radius: 18px 18px 0 0;
     box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.5);
-    animation: ed-copilot-panel-slide-up 180ms ease-out;
+    animation: ed-copilot-panel-slide-up var(--motion-transition-normal, 180ms ease-out);
   }
 
   .ed-copilot-panel::before {
@@ -32,7 +32,8 @@
   .ed-copilot-panel {
     inset-block-end: 60px !important;
     z-index: 48;
-    height: 56vh !important;
+    height: min(56dvh, calc(var(--app-viewport-height, 100dvh) - 60px)) !important;
+    min-height: min(320px, calc(var(--app-viewport-height, 100dvh) - 60px));
   }
 
   .ed-copilot-panel button,
@@ -50,5 +51,11 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-copilot-panel {
+    animation: none !important;
   }
 }

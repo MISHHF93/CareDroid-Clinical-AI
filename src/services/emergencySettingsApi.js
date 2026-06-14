@@ -1,6 +1,7 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { getTenantContext } from './tenantContextStore';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { fetchEmergencySettings, updateEmergencySettings } from './emergencyOsApi';
 
 export const EMERGENCY_SETTINGS_ENDPOINT = '/api/emergency/settings';
 
@@ -82,17 +83,24 @@ function organizationId() {
  */
 
 export function fetchEmergencyOsSettings() {
-  return guardedJson('emergencyDepartmentSettings', EMERGENCY_SETTINGS_ENDPOINT);
+  if (!isBackendCapabilityEnabled('emergencyDepartmentSettings')) {
+    return Promise.resolve({ ok: false, data: null, message: 'Backend endpoint not available yet.' });
+  }
+  return fetchEmergencySettings()
+    .then((data) => ({ ok: true, data, message: data?.message || '' }))
+    .catch((error) => ({ ok: false, data: null, message: getApiErrorMessage(error) }));
 }
 
 /**
  * @param {Partial<EmergencyOsSettings>} payload
  */
 export function saveEmergencyOsSettings(payload) {
-  return guardedJson('emergencyDepartmentSettings', EMERGENCY_SETTINGS_ENDPOINT, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  if (!isBackendCapabilityEnabled('emergencyDepartmentSettings')) {
+    return Promise.resolve({ ok: false, data: null, message: 'Backend endpoint not available yet.' });
+  }
+  return updateEmergencySettings(payload)
+    .then((data) => ({ ok: true, data, message: data?.message || '' }))
+    .catch((error) => ({ ok: false, data: null, message: getApiErrorMessage(error) }));
 }
 
 function saveTenantEmergencySettings(section, payload) {

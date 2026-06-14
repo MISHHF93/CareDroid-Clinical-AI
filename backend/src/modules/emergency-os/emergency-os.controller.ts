@@ -6,7 +6,9 @@ import {
 } from './emergency-os.advanced-services';
 import {
   BoardingService,
+  CareDroidCentralNodeService,
   CapacityService,
+  CompleteImplementationReadinessService,
   EDCopilotService,
   EMSIntakeService,
   EmergencyAnalyticsService,
@@ -43,14 +45,21 @@ export class EmergencyOsController {
     private readonly analyticsService: EmergencyAnalyticsService,
     private readonly settingsService: EmergencySettingsService,
     private readonly workflowActionLogService: WorkflowActionLogService,
+    private readonly implementationReadinessService: CompleteImplementationReadinessService,
     private readonly realTimeSimulationService: RealTimeSimulationService,
     private readonly federatedLearningService: FederatedLearningService,
     private readonly hybridDigitalTwinService: HybridDigitalTwinService,
+    private readonly centralNodeService: CareDroidCentralNodeService,
   ) {}
 
   @Get('whiteboard')
   getWhiteboard() {
     return this.whiteboardService.getWhiteboard();
+  }
+
+  @Get('central-node/snapshot')
+  getCentralNodeSnapshot() {
+    return this.centralNodeService.getSnapshot();
   }
 
   @Get('patients')
@@ -71,6 +80,11 @@ export class EmergencyOsController {
   @Get('workflow-logs')
   getWorkflowLogs() {
     return this.workflowActionLogService.getEnvelope();
+  }
+
+  @Get('implementation-readiness')
+  getImplementationReadiness() {
+    return this.implementationReadinessService.getReadiness();
   }
 
   @Get('patients/:patientId/workflow-logs')

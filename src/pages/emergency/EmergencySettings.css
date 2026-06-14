@@ -1,19 +1,29 @@
 .emergency-settings {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--component-card-gap);
   min-height: 100%;
-  padding: var(--space-4);
+  padding: clamp(var(--space-3), 2vw, var(--space-5));
   overflow-y: auto;
+  overflow-x: clip;
   background: var(--color-background);
   color: var(--color-text-primary);
+  animation: emergency-settings-page-enter var(--motion-transition-slow) both;
 }
 
 .emergency-settings__hero,
 .emergency-settings__section {
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  background: var(--color-card);
+  box-shadow: none;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.emergency-settings__section:hover {
+  background: color-mix(in srgb, var(--status-info) 4%, var(--color-card));
 }
 
 .emergency-settings__hero,
@@ -22,7 +32,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-4);
+  padding: var(--component-card-padding);
 }
 
 .emergency-settings__section {
@@ -35,7 +45,7 @@
 .emergency-settings__section header span {
   color: var(--status-info);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -43,6 +53,7 @@
 .emergency-settings__hero h1 {
   margin: var(--space-1) 0;
   font-size: var(--font-size-2xl);
+  font-weight: 650;
 }
 
 .emergency-settings__hero p,
@@ -63,25 +74,43 @@
 }
 
 .emergency-settings button {
-  min-height: 34px;
+  min-height: var(--component-button-height);
   border: 1px solid color-mix(in srgb, var(--status-info) 36%, var(--color-border-default));
-  border-radius: var(--radius-md);
+  border-radius: var(--component-button-radius);
   background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
   color: var(--status-info);
   font: inherit;
   font-size: var(--font-size-sm);
-  font-weight: 900;
+  font-weight: 650;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    opacity var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.emergency-settings button:hover:not(:disabled),
+.emergency-settings button:focus-visible:not(:disabled) {
+  border-color: color-mix(in srgb, var(--status-info) 48%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 16%, var(--color-elevated));
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.emergency-settings button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
 }
 
 .emergency-settings button:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.62;
 }
 
 .emergency-settings input,
 .emergency-settings select {
-  min-height: 36px;
+  min-height: var(--component-button-height);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   background: var(--color-elevated);
@@ -95,7 +124,7 @@
   gap: var(--space-1);
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -107,7 +136,8 @@
   color: var(--color-text-secondary);
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-sm);
-  font-weight: 800;
+  font-weight: 650;
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
 }
 
 .emergency-settings__banner--error {
@@ -140,7 +170,7 @@
 
 .emergency-settings__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: var(--space-3);
 }
 
@@ -152,10 +182,12 @@
 }
 
 .emergency-settings__demo-card > div:first-child {
-  border: 1px solid color-mix(in srgb, var(--status-info) 28%, var(--color-border-subtle));
+  border: 0;
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--status-info) 9%, var(--color-elevated));
   padding: var(--space-3);
+  box-shadow: inset 3px 0 0 var(--status-info);
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
 }
 
 .emergency-settings__demo-card strong {
@@ -210,9 +242,19 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-lg);
   background: var(--color-elevated);
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.emergency-settings__rules article:hover,
+.emergency-settings__cards article:hover {
+  background: color-mix(in srgb, var(--status-info) 6%, var(--color-elevated));
+  transform: translateY(-1px);
 }
 
 .emergency-settings__rules label {
@@ -249,9 +291,10 @@
   align-items: baseline;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-lg);
   background: var(--color-elevated);
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
 }
 
 .emergency-settings__audit-summary strong {
@@ -281,9 +324,10 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-3);
   padding: var(--space-3);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-lg);
   background: var(--color-elevated);
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
 }
 
 .emergency-settings__audit-list p {
@@ -312,11 +356,12 @@
   align-items: start;
   min-width: 900px;
   padding: var(--space-2);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-md);
   background: var(--color-elevated);
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
+  animation: emergency-settings-card-enter var(--motion-transition-normal) both;
 }
 
 .emergency-settings__audit-table-head {
@@ -344,6 +389,9 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
 }
 
 .emergency-settings__status--green {
@@ -356,6 +404,42 @@
 
 .emergency-settings__status--red {
   background: var(--status-critical);
+  animation: emergency-settings-status-red 1.6s var(--motion-ease-standard, ease-in-out) infinite;
+}
+
+@keyframes emergency-settings-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emergency-settings-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emergency-settings-status-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-critical) 26%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--status-critical) 8%, transparent);
+  }
 }
 
 @media (max-width: 1100px) {
@@ -380,10 +464,75 @@
     flex-direction: column;
   }
 
+  .emergency-settings__section > header,
+  .emergency-settings__inline,
+  .emergency-settings__grid,
+  .emergency-settings__demo-card,
+  .emergency-settings__rules,
+  .emergency-settings__cards,
+  .emergency-settings__table,
+  .emergency-settings__audit-table {
+    padding-inline: var(--space-3);
+  }
+
   .emergency-settings__grid,
   .emergency-settings__cards,
   .emergency-settings__table article,
   .emergency-settings__table--staff article {
     grid-template-columns: 1fr;
+  }
+
+  .emergency-settings__rules article,
+  .emergency-settings__cards article,
+  .emergency-settings__audit-list article {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .emergency-settings__actions,
+  .emergency-settings__audit-list article > div:last-child {
+    justify-content: stretch;
+    justify-items: stretch;
+  }
+
+  .emergency-settings button {
+    width: 100%;
+  }
+
+  .emergency-settings__audit-table {
+    overflow-x: visible;
+  }
+
+  .emergency-settings__audit-table > div {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .emergency-settings__audit-table-head {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergency-settings,
+  .emergency-settings__banner,
+  .emergency-settings__empty,
+  .emergency-settings__demo-card > div:first-child,
+  .emergency-settings__rules article,
+  .emergency-settings__cards article,
+  .emergency-settings__audit-summary,
+  .emergency-settings__audit-list article,
+  .emergency-settings__audit-table > div,
+  .emergency-settings__status--red {
+    animation: none !important;
+  }
+
+  .emergency-settings button:hover:not(:disabled),
+  .emergency-settings button:focus-visible:not(:disabled),
+  .emergency-settings button:active:not(:disabled),
+  .emergency-settings__rules article:hover,
+  .emergency-settings__cards article:hover {
+    transform: none;
   }
 }

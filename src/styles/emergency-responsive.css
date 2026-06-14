@@ -1,0 +1,283 @@
+/**
+ * Emergency OS responsive utilities.
+ *
+ * This layer adapts the active src/ Emergency OS surfaces to the current
+ * design-token stack. It intentionally does not replace AppShell, routing, or
+ * page architecture.
+ */
+
+:root {
+  --ed-page-pad: clamp(10px, 1.8vw, 20px);
+  --ed-section-gap: clamp(10px, 1.5vw, 16px);
+  --ed-card-pad: clamp(10px, 1.4vw, 16px);
+  --ed-touch-target: var(--app-min-touch-target, 44px);
+  --ed-whiteboard-card-min: min(100%, 240px);
+  --ed-whiteboard-card-min-wide: min(100%, 260px);
+  --ed-whiteboard-card-min-command: min(100%, 300px);
+  --ed-viewport-height: var(--app-viewport-height, 100dvh);
+}
+
+.emergency-app-shell,
+.emergency-app-shell *,
+.emergency-app-shell *::before,
+.emergency-app-shell *::after {
+  box-sizing: border-box;
+}
+
+.emergency-app-shell {
+  min-width: 0;
+  height: var(--ed-viewport-height) !important;
+  min-height: 0;
+}
+
+.emergency-app-shell :is(main, section, article, aside, header, footer, form, nav, div) {
+  min-width: 0;
+}
+
+.emergency-app-shell :is(button, [role='button'], input, select, textarea) {
+  max-width: 100%;
+  touch-action: manipulation;
+}
+
+.emergency-app-shell :is(p, span, strong, h1, h2, h3, h4, small, label, td, th) {
+  overflow-wrap: break-word;
+}
+
+.emergency-os-page,
+.emergency-whiteboard-page,
+.emergency-analytics,
+.smart-intake,
+.emergency-settings,
+.ems-pipeline,
+.referral-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.emergency-whiteboard-page {
+  background: #0a0e1a;
+}
+
+.emergency-whiteboard-page__hero,
+.emergency-whiteboard-page__mission,
+.emergency-whiteboard-page__controls,
+.emergency-whiteboard-page__grid {
+  min-width: 0;
+}
+
+.emergency-whiteboard-page__hero {
+  padding: var(--ed-page-pad) !important;
+}
+
+.emergency-whiteboard-page__hero h1 {
+  font-size: clamp(1.35rem, 2.2vw, 1.95rem) !important;
+}
+
+.emergency-whiteboard-page__hero p {
+  max-width: min(100%, 920px) !important;
+}
+
+.emergency-whiteboard-page__status {
+  min-width: 0;
+}
+
+.emergency-whiteboard-page__status span {
+  max-width: 100%;
+}
+
+.emergency-whiteboard-page__stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)) !important;
+  overflow: visible !important;
+}
+
+.emergency-whiteboard-page__stat {
+  min-width: 0 !important;
+  border-right: 0 !important;
+}
+
+.emergency-whiteboard-page__mission {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+  gap: var(--ed-section-gap) !important;
+  padding: var(--ed-page-pad) !important;
+}
+
+.emergency-whiteboard-page__mission-card {
+  min-width: 0;
+}
+
+.emergency-whiteboard-page__mission-card button {
+  min-width: 0;
+}
+
+.emergency-whiteboard-page__arrival-card {
+  min-width: 0;
+}
+
+.emergency-whiteboard-page__controls {
+  flex-wrap: wrap;
+  padding: var(--ed-page-pad) !important;
+}
+
+.emergency-whiteboard-page__filters {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.emergency-whiteboard-page__filters button,
+.emergency-whiteboard-page__intake-button {
+  min-height: var(--ed-touch-target);
+}
+
+.emergency-whiteboard-page__grid {
+  grid-template-columns: repeat(auto-fill, minmax(var(--ed-whiteboard-card-min), 1fr)) !important;
+  gap: clamp(8px, 1.1vw, 12px) !important;
+  padding: var(--ed-page-pad) !important;
+}
+
+.ed-responsive-table {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .emergency-app-shell :is(button, [role='button']) {
+    min-height: var(--ed-touch-target);
+  }
+
+  .emergency-app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    min-height: var(--ed-touch-target);
+    font-size: max(var(--text-input-min, 16px), 1rem);
+  }
+
+  .emergency-whiteboard-page__status {
+    align-items: stretch !important;
+  }
+
+  .emergency-whiteboard-page__status span {
+    flex: 1 1 100%;
+  }
+
+  .emergency-whiteboard-page__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .emergency-whiteboard-page__mission {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .emergency-whiteboard-page__mission-card [style*='grid-template-columns'] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .emergency-whiteboard-page__arrival-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .emergency-whiteboard-page__controls {
+    align-items: stretch !important;
+  }
+
+  .emergency-whiteboard-page__filters {
+    flex-wrap: nowrap !important;
+    width: 100%;
+    padding-bottom: 2px;
+  }
+
+  .emergency-whiteboard-page__filters button,
+  .emergency-whiteboard-page__intake-button {
+    flex: 0 0 auto;
+  }
+
+  .emergency-whiteboard-page__intake-button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .emergency-whiteboard-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--ed-whiteboard-card-min-wide), 1fr)) !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  .emergency-whiteboard-page__mission {
+    grid-template-columns: minmax(300px, 1.05fr) minmax(320px, 1fr) minmax(300px, 0.95fr) !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --ed-whiteboard-card-min: var(--ed-whiteboard-card-min-wide);
+  }
+
+  .emergency-whiteboard-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--ed-whiteboard-card-min-wide), 1fr)) !important;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --ed-whiteboard-card-min: var(--ed-whiteboard-card-min-command);
+  }
+
+  .emergency-whiteboard-page__grid,
+  .emergency-whiteboard-page__hero,
+  .emergency-whiteboard-page__mission,
+  .emergency-whiteboard-page__controls {
+    padding-inline: clamp(20px, 2vw, 56px) !important;
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --font-size-base: clamp(14px, 0.42vw, 18px);
+    --font-size-md: clamp(14px, 0.42vw, 18px);
+    --font-size-lg: clamp(18px, 0.58vw, 24px);
+    --font-size-xl: clamp(24px, 0.72vw, 32px);
+    --font-size-2xl: clamp(32px, 0.95vw, 42px);
+  }
+}
+
+@media print {
+  .sidebar,
+  .emergency-os-header,
+  .ed-copilot-panel,
+  .patient-detail-panel,
+  .command-palette__overlay,
+  .sidebar-more-backdrop {
+    display: none !important;
+  }
+
+  .emergency-app-shell {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .emergency-app-shell main {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .emergency-whiteboard-page,
+  .emergency-analytics,
+  .smart-intake,
+  .emergency-settings,
+  .ems-pipeline,
+  .referral-panel {
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

@@ -2,7 +2,7 @@
 
 .skeleton {
   display: block;
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--app-surface-raised, #1f2937) 62%, transparent);
   border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden;
@@ -19,10 +19,10 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
+    color-mix(in srgb, var(--app-accent-action, #3b82f6) 12%, transparent) 50%,
     transparent 100%
   );
-  animation: shimmer 1.5s infinite;
+  animation: shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 @keyframes shimmer {
@@ -89,7 +89,7 @@
 /* Skeleton Conversation */
 .skeleton-conversation {
   padding: var(--space-4);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--app-surface-raised, #1f2937) 24%, transparent);
   border-radius: var(--radius-md);
   border: 1px solid var(--panel-border);
   margin-bottom: var(--space-3);
@@ -130,7 +130,7 @@
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: var(--space-4);
   padding: var(--space-3);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--app-surface-raised, #1f2937) 24%, transparent);
   border-radius: var(--radius-sm);
 }
 

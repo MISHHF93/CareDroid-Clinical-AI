@@ -13,22 +13,39 @@
 @keyframes patient-card-reassessment-pulse {
   0%,
   100% {
-    border-color: rgba(245, 158, 11, 0.58);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.32);
+    box-shadow:
+      inset 0 3px 0 var(--status-warning),
+      0 0 0 0 color-mix(in srgb, var(--status-warning) 24%, transparent),
+      var(--app-elevation-card);
   }
 
   50% {
-    border-color: rgba(245, 158, 11, 0.95);
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+    box-shadow:
+      inset 0 3px 0 var(--status-warning),
+      0 0 0 3px color-mix(in srgb, var(--status-warning) 14%, transparent),
+      var(--app-elevation-card);
   }
 }
 
 .patient-card {
-  animation: patient-card-enter 180ms ease-out;
+  animation: patient-card-enter var(--motion-duration-normal, 180ms) var(--motion-ease-standard, ease-out);
+  background: var(--color-card);
+  color: var(--color-text-primary);
+  inline-size: 100%;
+  min-inline-size: 0;
+  isolation: isolate;
   transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    transform 140ms ease;
+    background-color var(--motion-transition-fast, 120ms ease),
+    border-color var(--motion-transition-fast, 120ms ease),
+    box-shadow var(--motion-transition-fast, 120ms ease),
+    transform var(--motion-transition-fast, 120ms ease);
+  will-change: transform;
+}
+
+.patient-card [style*='var(--color-floating-surface)'] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: var(--component-inner-shadow) !important;
 }
 
 .patient-card:hover,
@@ -36,44 +53,60 @@
 .patient-card:focus-visible,
 .patient-card--highlighted,
 .patient-card--keyboard-selected {
-  border-color: #60A5FA !important;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent),
+    var(--app-elevation-card) !important;
   outline: none;
   transform: translateY(-1px);
 }
 
+.patient-card:active {
+  transform: translateY(0) scale(0.996);
+}
+
 .patient-card--reassessment-due {
   animation:
-    patient-card-enter 180ms ease-out,
-    patient-card-reassessment-pulse 1s infinite 180ms;
+    patient-card-enter var(--motion-duration-normal, 180ms) var(--motion-ease-standard, ease-out),
+    patient-card-reassessment-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite
+      var(--motion-duration-normal, 180ms);
 }
 
 .patient-card--deterioration-risk {
-  box-shadow: 0 0 18px rgba(239, 68, 68, 0.48) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--status-danger) 36%, transparent),
+    var(--app-elevation-card) !important;
 }
 
 .patient-card--long-wait {
-  border-top-color: #F59E0B !important;
+  box-shadow:
+    inset 0 3px 0 var(--status-warning),
+    var(--app-elevation-card) !important;
 }
 
 .patient-card--lwbs-risk {
   box-shadow:
-    0 0 22px rgba(239, 68, 68, 0.44),
-    0 0 44px rgba(127, 29, 29, 0.22) !important;
+    0 0 0 1px color-mix(in srgb, var(--status-danger) 40%, transparent),
+    var(--app-elevation-floating, var(--app-elevation-card)) !important;
 }
 
 .patient-card--ems-arrival {
   background:
-    linear-gradient(90deg, rgba(14, 165, 233, 0.14), rgba(17, 24, 39, 0) 46%),
-    #111827 !important;
+    linear-gradient(90deg, color-mix(in srgb, var(--color-secondary) 12%, transparent), transparent 46%),
+    var(--color-card) !important;
+}
+
+.patient-card--mission-control .patient-card__scores,
+.patient-card--mission-control .patient-card__flags {
+  bottom: 42px;
 }
 
 .patient-card__lwbs-badge {
-  background: rgba(127, 29, 29, 0.96);
-  border: 1px solid rgba(248, 113, 113, 0.72);
+  background: color-mix(in srgb, var(--status-danger) 88%, var(--color-background));
+  border: 1px solid color-mix(in srgb, var(--status-danger) 54%, var(--color-border-default));
   border-radius: 999px;
-  color: #FEE2E2;
+  color: var(--app-on-solid);
   font-size: 9px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.04em;
   padding: 2px 6px;
   position: absolute;
@@ -84,13 +117,15 @@
 }
 
 .patient-card__vitals {
-  color: #6B7280;
+  color: var(--color-text-secondary);
   display: flex;
   flex-wrap: wrap;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--component-inner-surface-border);
 }
 
 .patient-card__scores {
@@ -102,13 +137,17 @@
 }
 
 .patient-card__scores span {
-  background: rgba(96, 165, 250, 0.16);
-  border: 1px solid rgba(96, 165, 250, 0.28);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border: 0;
   border-radius: 999px;
-  color: #BFDBFE;
+  color: var(--color-primary);
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 1px 5px;
+  transition:
+    background-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    opacity var(--motion-transition-fast);
 }
 
 .patient-card__flags {
@@ -123,30 +162,98 @@
 }
 
 .patient-card__timeline-button {
-  border: 1px solid rgba(96, 165, 250, 0.42);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.16);
-  color: #BFDBFE;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  color: var(--color-primary);
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
   padding: 3px 7px;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .patient-card__timeline-button:hover,
 .patient-card__timeline-button:active,
 .patient-card__timeline-button:focus-visible {
-  background: rgba(37, 99, 235, 0.28);
-  color: #F9FAFB;
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-border-default));
+  color: var(--color-text-primary);
   outline: none;
+}
+
+.patient-card__timeline-button:active {
+  transform: scale(0.985);
+}
+
+.patient-card__mission-actions {
+  bottom: 8px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  left: 10px;
+  position: absolute;
+  right: 10px;
+}
+
+.patient-card__mission-actions button {
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  min-height: 24px;
+  overflow: hidden;
+  padding: 3px 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    opacity var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.patient-card__mission-actions button:hover,
+.patient-card__mission-actions button:active,
+.patient-card__mission-actions button:focus-visible {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-border-default));
+  color: var(--color-text-primary);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.patient-card__mission-actions button:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.patient-card__mission-actions button:disabled {
+  border-color: var(--color-border-subtle);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.62;
 }
 
 @media (max-width: 768px) {
   .patient-card {
     width: 100% !important;
-    height: 100px !important;
+    min-height: 112px !important;
+    height: auto !important;
     min-width: 0;
     padding: 10px !important;
+  }
+
+  .patient-card--mission-control {
+    min-height: 172px !important;
+    height: auto !important;
   }
 
   .patient-card__vitals {
@@ -160,5 +267,54 @@
 
   .patient-card__timeline-button {
     min-height: 32px;
+  }
+
+  .patient-card__mission-actions button {
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 390px) {
+  .patient-card__scores,
+  .patient-card__flags {
+    position: static;
+    margin-top: var(--space-2);
+    max-width: 100%;
+  }
+
+  .patient-card--mission-control .patient-card__scores,
+  .patient-card--mission-control .patient-card__flags {
+    bottom: auto;
+  }
+
+  .patient-card__mission-actions {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: var(--space-2);
+  }
+
+  .patient-card__mission-actions button {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-card,
+  .patient-card--reassessment-due {
+    animation: none !important;
+    transition: none;
+    will-change: auto;
+  }
+
+  .patient-card:hover,
+  .patient-card:active,
+  .patient-card:focus-visible,
+  .patient-card--highlighted,
+  .patient-card--keyboard-selected,
+  .patient-card__timeline-button:active,
+  .patient-card__mission-actions button:hover,
+  .patient-card__mission-actions button:active,
+  .patient-card__mission-actions button:focus-visible {
+    transform: none;
   }
 }

@@ -3,16 +3,23 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   IconActivity,
   IconAmbulance,
+  IconArrowsExchange,
+  IconBed,
   IconChartBar,
+  IconClipboardPlus,
   IconDots,
+  IconGauge,
   IconLayoutDashboard,
-  IconListCheck,
+  IconListDetails,
   IconNotes,
+  IconRefresh,
   IconReport,
+  IconRobot,
   IconSend,
   IconSettings,
   IconShieldCheck,
   IconStethoscope,
+  IconUsers,
   type Icon,
 } from '@tabler/icons-react';
 import { PatientFlag } from '../types/emergency';
@@ -45,26 +52,26 @@ type SidebarProps = {
 const ICONS: Record<string, Icon> = {
   'layout-dashboard': IconLayoutDashboard,
   'emergency-whiteboard': IconLayoutDashboard,
-  'emergency-patients': IconNotes,
-  journey: IconListCheck,
+  'emergency-patients': IconUsers,
+  journey: IconListDetails,
   notes: IconNotes,
   ambulance: IconAmbulance,
   ems: IconAmbulance,
   send: IconSend,
-  intake: IconSend,
-  referrals: IconSend,
+  intake: IconClipboardPlus,
+  referrals: IconArrowsExchange,
   'provincial-health': IconShieldCheck,
   integrations: IconSettings,
   'chart-bar': IconChartBar,
-  capacity: IconChartBar,
+  capacity: IconGauge,
   'emergency-analytics': IconChartBar,
   'department-pulse': IconActivity,
-  'surge-management': IconChartBar,
-  'list-check': IconListCheck,
-  queues: IconListCheck,
-  reassessment: IconListCheck,
-  boarding: IconListCheck,
-  'ed-copilot': IconStethoscope,
+  'surge-management': IconGauge,
+  'list-check': IconListDetails,
+  queues: IconListDetails,
+  reassessment: IconRefresh,
+  boarding: IconBed,
+  'ed-copilot': IconRobot,
   'shield-check': IconShieldCheck,
   shield: IconShieldCheck,
   'safety-dashboard': IconShieldCheck,
@@ -110,7 +117,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   );
   const visibleNav: readonly SidebarNavItem[] =
     navigationItems || getVisibleNavigation(emergencyRole.role);
-  const mobilePrimaryIds = ['whiteboard', 'pulse', 'intake'];
+  const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
   const mobilePrimaryNav = mobilePrimaryIds
     .map((id) => visibleNav.find((item) => item.id === id))
     .filter((item): item is SidebarNavItem => Boolean(item));
@@ -135,6 +142,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           .join(' ')}
         aria-label={item.label}
         aria-current={active ? 'page' : undefined}
+        title={item.label}
+        data-nav-id={item.id}
+        data-icon-key={item.icon}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
         {isWhiteboard && reassessmentDueCount > 0 ? (
@@ -170,6 +180,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
         aria-label={label}
         aria-current={active ? 'page' : undefined}
+        title={label}
+        data-nav-id={item.id}
+        data-icon-key={item.icon}
         onClick={() => setMoreOpen(false)}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
@@ -192,7 +205,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       className="sidebar"
       style={{
         width: 56,
-        height: '100vh',
+        height: 'var(--app-viewport-height, 100dvh)',
         flexShrink: 0,
         background: '#0D1117',
         borderRight: '1px solid #1F2937',
@@ -200,6 +213,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         flexDirection: 'column',
         alignItems: 'center',
         padding: '8px 0',
+        overflowX: 'hidden',
         overflowY: 'auto',
       }}
       aria-label="Emergency navigation"
@@ -218,8 +232,9 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           disabled={!canUseCopilot}
           aria-pressed={copilotOpen}
           aria-label={canUseCopilot ? 'Copilot' : 'Copilot unavailable'}
+          title={canUseCopilot ? 'Copilot' : 'Copilot unavailable'}
         >
-          <IconStethoscope size={20} stroke={2} className="sidebar-nav-item__icon" />
+          <IconRobot size={20} stroke={2} className="sidebar-nav-item__icon" />
           <label>Copilot</label>
         </button>
         <button
@@ -270,6 +285,10 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                       .filter(Boolean)
                       .join(' ')}
                     aria-current={active ? 'page' : undefined}
+                    aria-label={item.label}
+                    title={item.label}
+                    data-nav-id={item.id}
+                    data-icon-key={item.icon}
                     onClick={() => setMoreOpen(false)}
                   >
                     <IconComponent size={18} stroke={2} />

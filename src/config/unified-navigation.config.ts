@@ -7,6 +7,36 @@ import {
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyWhiteboard;
 
+export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'whiteboard',
+  'patients',
+  'ems',
+  'intake',
+  'queues',
+  'reassessment',
+  'capacity',
+  'boarding',
+  'referrals',
+  'copilot',
+]);
+
+export const PILOT_CUSTOMER_MODE = Object.freeze({
+  enabled: true,
+  label: 'Pilot Customer Mode',
+  assumptions: Object.freeze({
+    patientsPerDay: 100,
+    staffRange: '5-10',
+    pressureLevel: 'high',
+    trainingLevel: 'limited',
+  }),
+  visibleNavItemIds: PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS,
+  hiddenNavItemIds: Object.freeze(['analytics', 'settings']),
+  retainedDirectRoutes: Object.freeze([
+    CANONICAL_ROUTES.emergencyAnalytics,
+    CANONICAL_ROUTES.emergencySettings,
+  ]),
+});
+
 export type NavItem = Readonly<{
   id: string;
   label: string;
@@ -33,16 +63,9 @@ export type NavigationItem = Readonly<{
 export const NAV_ITEMS = Object.freeze([
   {
     id: 'whiteboard',
-    label: 'Board',
+    label: 'Whiteboard',
     icon: 'layout-dashboard',
     route: CANONICAL_ROUTES.emergencyWhiteboard,
-    featureGate: null,
-  },
-  {
-    id: 'pulse',
-    label: 'Pulse',
-    icon: 'department-pulse',
-    route: '/emergency/pulse',
     featureGate: null,
   },
   {
@@ -53,11 +76,11 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
-    id: 'journey',
-    label: 'Journey',
-    icon: 'journey',
-    route: CANONICAL_ROUTES.emergencyJourney,
-    featureGate: null,
+    id: 'ems',
+    label: 'EMS',
+    icon: 'ambulance',
+    route: CANONICAL_ROUTES.emergencyEms,
+    featureGate: 'ems_pipeline',
   },
   {
     id: 'intake',
@@ -81,38 +104,10 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
-    id: 'ems',
-    label: 'EMS',
-    icon: 'ambulance',
-    route: '/emergency/ems',
-    featureGate: 'ems_pipeline',
-  },
-  {
-    id: 'referrals',
-    label: 'Referrals',
-    icon: 'send',
-    route: '/emergency/referrals',
-    featureGate: 'referral_intel',
-  },
-  {
-    id: 'provincial_health',
-    label: 'Provincial',
-    icon: 'provincial-health',
-    route: CANONICAL_ROUTES.emergencyProvincialHealth,
-    featureGate: null,
-  },
-  {
-    id: 'integrations',
-    label: 'Integrations',
-    icon: 'integrations',
-    route: CANONICAL_ROUTES.emergencyIntegrations,
-    featureGate: null,
-  },
-  {
     id: 'capacity',
     label: 'Capacity',
-    icon: 'chart-bar',
-    route: '/emergency/capacity',
+    icon: 'capacity',
+    route: CANONICAL_ROUTES.emergencyCapacity,
     featureGate: 'capacity_intel',
   },
   {
@@ -121,6 +116,13 @@ export const NAV_ITEMS = Object.freeze([
     icon: 'boarding',
     route: CANONICAL_ROUTES.emergencyBoarding,
     featureGate: null,
+  },
+  {
+    id: 'referrals',
+    label: 'Referrals',
+    icon: 'referrals',
+    route: CANONICAL_ROUTES.emergencyReferrals,
+    featureGate: 'referral_intel',
   },
   {
     id: 'copilot',
@@ -137,27 +139,6 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
-    id: 'simulation',
-    label: 'Sim',
-    icon: 'list-check',
-    route: CANONICAL_ROUTES.emergencySimulation,
-    featureGate: null,
-  },
-  {
-    id: 'tools',
-    label: 'Tools',
-    icon: 'stethoscope',
-    route: '/emergency/tools',
-    featureGate: 'clinical_tools',
-  },
-  {
-    id: 'shift',
-    label: 'Shift',
-    icon: 'report-analytics',
-    route: '/emergency/shift',
-    featureGate: null,
-  },
-  {
     id: 'settings',
     label: 'Settings',
     icon: 'settings',
@@ -170,23 +151,16 @@ const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
 const ALL_ROLES = Object.freeze(Object.values(ROLES));
 const NAV_FEATURE_IDS = Object.freeze({
   whiteboard: 'emergency_whiteboard',
-  pulse: 'department_pulse',
   patients: 'emergency_patients',
-  journey: 'patient_journey',
+  ems: 'ems_pipeline',
   intake: 'smart_intake',
   queues: 'queue_intelligence',
   reassessment: 'reassessment_engine',
-  ems: 'ems_pipeline',
-  referrals: 'referral_intelligence',
-  provincial_health: 'provincial_health',
-  integrations: 'integration_hub',
   capacity: 'capacity_intelligence',
   boarding: 'boarding_intelligence',
+  referrals: 'referral_intelligence',
   copilot: 'ed_copilot',
   analytics: 'emergency_analytics',
-  simulation: 'real_time_simulation',
-  tools: 'clinical_calculator_hub',
-  shift: 'shift_summary',
   settings: 'emergency_settings',
 } as const);
 
@@ -224,17 +198,11 @@ export const NAVIGATION_ITEMS = Object.freeze(
       order: index + 1,
       roles: item.id === 'settings' ? rolesForRoute(item.route) : ALL_ROLES,
       isEmergencyCore: true,
-      mobileLabel:
-        item.id === 'provincial_health'
-          ? 'Prov'
-          : item.id === 'reassessment'
-            ? 'Recheck'
-            : item.label,
+      mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
         item.id === 'whiteboard'
           ? [
               CANONICAL_ROUTES.emergencyWhiteboard,
-              CANONICAL_ROUTES.emergencyCommandCenter,
               '/emergency',
             ]
           : item.id === 'settings'
@@ -244,11 +212,23 @@ export const NAVIGATION_ITEMS = Object.freeze(
   ),
 ) satisfies readonly NavigationItem[];
 
+export function isPilotCustomerVisibleNavItemId(id: string): boolean {
+  return !PILOT_CUSTOMER_MODE.enabled || PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS.includes(id);
+}
+
+export function getPilotCustomerNavigationItems(
+  items: readonly NavigationItem[] = NAVIGATION_ITEMS,
+): readonly NavigationItem[] {
+  return items.filter((item) => isPilotCustomerVisibleNavItemId(item.id));
+}
+
 export function getVisibleNavigation(
   userRole: string | null | undefined,
 ): readonly NavigationItem[] {
   const normalizedRole = normalizeEmergencyRole(userRole);
-  return NAVIGATION_ITEMS.filter((item) => item.roles.includes(normalizedRole)).sort(
-    (first, second) => first.order - second.order,
-  );
+  return [
+    ...getPilotCustomerNavigationItems(
+      NAVIGATION_ITEMS.filter((item) => item.roles.includes(normalizedRole)),
+    ),
+  ].sort((first, second) => first.order - second.order);
 }

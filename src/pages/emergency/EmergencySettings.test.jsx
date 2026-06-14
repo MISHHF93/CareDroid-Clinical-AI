@@ -116,8 +116,11 @@ vi.mock('../../../store/emergencyStore', () => ({
 vi.mock('../../store/emergencyStore', () => ({
   useEmergencyStore: (selector) =>
     selector({
+      emergencySettings: mockSettings,
       workflowLogs: [],
       auditLog: [],
+      saveEmergencySettings,
+      activeScenario: null,
       thresholds: mockThresholds,
       setThreshold,
       resetThresholds,
@@ -201,7 +204,7 @@ describe('EmergencySettings', () => {
     expect(screen.getByLabelText('Central control enabled')).toBeChecked();
     expect(screen.getByLabelText('Dashboard authority')).toHaveValue('central-node');
     expect(screen.getByLabelText('User input mode')).toHaveValue('central-escalation-input');
-    expect(screen.getByText('scenario selection')).toBeInTheDocument();
+    expect(screen.getByText('department operating mode')).toBeInTheDocument();
     expect(screen.getByText('patient intake')).toBeInTheDocument();
   });
 
@@ -210,7 +213,7 @@ describe('EmergencySettings', () => {
 
     expect(await screen.findByText('Workflow Action Audit')).toBeInTheDocument();
     expect(await screen.findByText('Created patient Audit Render.')).toBeInTheDocument();
-    expect(screen.getByText(/Backend audit loaded/i)).toBeInTheDocument();
+    expect(screen.getByText(/Workflow audit loaded/i)).toBeInTheDocument();
   });
 
   it('saves capacity thresholds through the settings API and local store', async () => {

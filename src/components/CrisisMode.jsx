@@ -3,7 +3,7 @@ import { AlertTriangle, Siren, X } from 'lucide-react';
 import {
   selectReassessmentQueue,
   useEmergencyStore,
-} from '../../store/emergencyStore';
+} from '../store/emergencyStore';
 import { dispatchAlert } from '../engine/alertEngine';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import { deriveCrisisModeState } from '../utils/crisisMode';

@@ -49,9 +49,22 @@
   --text-md: 16px;
   --text-lg: 18px;
   --text-xl: 22px;
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 240ms;
+  --animation-fast: var(--motion-fast);
+  --animation-base: var(--motion-normal);
+  --animation-slow: var(--motion-slow);
+  --motion-duration-fast: var(--motion-fast);
+  --motion-duration-normal: var(--motion-normal);
+  --motion-duration-slow: var(--motion-slow);
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: var(--motion-ease-standard);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
+  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 /* Smooth scrolling */
@@ -365,7 +378,13 @@ button,
 input,
 select,
 textarea {
-  transition: all 0.2s var(--ease-smooth);
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    opacity var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 /* Backdrop Blur Utility */
@@ -401,7 +420,7 @@ textarea {
     rgba(255, 255, 255, 0.05) 75%
   );
   background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
+  animation: skeleton-loading var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard) infinite;
   border-radius: var(--radius-sm);
 }
 

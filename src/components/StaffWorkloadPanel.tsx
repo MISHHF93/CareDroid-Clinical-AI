@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { unifiedAIClient } from '../lib/ai/client';
-import { useEmergencyStore } from '../store/emergency-store';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState, type Patient, type Staff } from '../types/emergency';
 import './StaffWorkloadPanel.css';
 

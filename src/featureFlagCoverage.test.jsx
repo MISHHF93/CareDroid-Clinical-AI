@@ -19,12 +19,8 @@ describe('feature flag UI coverage', () => {
     expect(sidebarItems.map((item) => item.featureId)).toEqual(
       expect.arrayContaining([
         'emergency_whiteboard',
-        'department_pulse',
         'referral_intelligence',
         'capacity_intelligence',
-        'clinical_calculator_hub',
-        'shift_summary',
-        'emergency_settings',
       ])
     );
     expect(sidebarItems).toHaveLength(
@@ -89,7 +85,7 @@ describe('feature flag UI coverage', () => {
   it('keeps requested feature ids registered for gated surfaces', () => {
     expect(FEATURE_REGISTRY_BY_ID.ems_pipeline.sidebarRoute).toBe('/emergency/ems');
     expect(FEATURE_REGISTRY_BY_ID.smart_intake.sidebarRoute).toBe('/emergency/intake');
-    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/tools');
+    expect(FEATURE_REGISTRY_BY_ID.clinical_calculator_hub.sidebarRoute).toBe('/emergency/whiteboard');
     expect(FEATURE_REGISTRY_BY_ID.queue_intelligence.sidebarRoute).toBe('/emergency/queues');
     expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');

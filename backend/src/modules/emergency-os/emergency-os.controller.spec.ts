@@ -7,7 +7,9 @@ import {
 } from './emergency-os.advanced-services';
 import {
   BoardingService,
+  CareDroidCentralNodeService,
   CapacityService,
+  CompleteImplementationReadinessService,
   EDCopilotService,
   EMSIntakeService,
   EmergencyAnalyticsService,
@@ -41,12 +43,14 @@ describe('EmergencyOsController', () => {
         ReassessmentService,
         CapacityService,
         BoardingService,
+        CareDroidCentralNodeService,
         ReferralService,
         ProvincialHealthService,
         IntegrationHubService,
         EDCopilotService,
         EmergencyAnalyticsService,
         EmergencySettingsService,
+        CompleteImplementationReadinessService,
         RealTimeSimulationService,
         FederatedLearningService,
         HybridDigitalTwinService,
@@ -59,6 +63,7 @@ describe('EmergencyOsController', () => {
   it('returns backend envelopes for all normalized Emergency OS modules', () => {
     const modules = [
       controller.getWhiteboard(),
+      controller.getCentralNodeSnapshot(),
       controller.getPatients(),
       controller.getJourney(),
       controller.getEMS(),
@@ -73,6 +78,7 @@ describe('EmergencyOsController', () => {
       controller.getCopilot(),
       controller.getAnalytics(),
       controller.getSettings(),
+      controller.getImplementationReadiness(),
       controller.getSimulationRecommendations(),
       controller.getFederatedDashboard(),
       controller.getDigitalTwinState(),
@@ -150,6 +156,14 @@ describe('EmergencyOsController', () => {
     expect(settings.data).toMatchObject({
       tenantName: expect.any(String),
       defaultWorkspace: expect.any(String),
+      defaultScreenMode: 'CHARGE_NURSE_SCREEN',
+      enabledScreenModes: expect.arrayContaining([
+        'WAITING_ROOM_DISPLAY',
+        'COMMAND_CENTER_DISPLAY',
+      ]),
+      readOnlyDisplayMode: expect.any(Boolean),
+      commandCenterMode: expect.any(Boolean),
+      wallDisplayRefreshInterval: expect.any(Number),
       enabledModules: expect.arrayContaining([
         expect.objectContaining({ id: 'reassessment', enabled: true }),
       ]),
@@ -184,6 +198,80 @@ describe('EmergencyOsController', () => {
       }),
     });
     expect(controller.getSettings().data.tenantName).toBe('North Command ED');
+  });
+
+  it('exposes a central node operational snapshot across Emergency OS modules', () => {
+    const snapshot = controller.getCentralNodeSnapshot();
+
+    expect(snapshot).toMatchObject({
+      module: 'CareDroid Central Node',
+      status: 'active',
+      data: {
+        node: 'CareDroidCentralNode',
+        patientsToday: expect.any(Number),
+        activePatients: expect.any(Number),
+        waitingPatients: expect.any(Number),
+        longestWait: expect.any(Number),
+        averageWait: expect.any(Number),
+        emsInbound: expect.any(Number),
+        emsPressure: expect.stringMatching(/normal|watch|strained|critical/),
+        reassessmentsDue: expect.any(Number),
+        capacityStatus: expect.any(Object),
+        boarders: expect.any(Number),
+        boardingRisk: expect.stringMatching(/normal|watch|strained|critical/),
+        referralsPending: expect.any(Number),
+        operationalAlerts: expect.any(Array),
+        whiteboardColumns: expect.any(Array),
+        queueMetrics: expect.any(Array),
+        recentEvents: expect.any(Array),
+        tenantSettings: expect.any(Object),
+        enabledModules: expect.any(Array),
+      },
+    });
+    expect(snapshot.data.whiteboardColumns.map((column) => column.id)).toEqual(
+      expect.arrayContaining(['Waiting', 'Reassessment', 'EMS']),
+    );
+  });
+
+  it('classifies the complete implementation prompt against the active Emergency OS spine', () => {
+    const readiness = controller.getImplementationReadiness();
+
+    expect(readiness).toMatchObject({
+      module: 'Complete Implementation Prompt Reconciliation',
+      status: 'placeholder',
+      data: {
+        activeSpine: {
+          frontendRoot: 'src/',
+          appShell: 'src/components/AppShell.tsx',
+          apiBase: '/api/emergency',
+          pilotRouteCount: 12,
+        },
+        clinicalSafetyNotice: expect.stringContaining('not clinical validation'),
+      },
+    });
+    expect(readiness.data.summary.SAFE_TO_IMPLEMENT_NOW).toBeGreaterThan(0);
+    expect(readiness.data.summary.CONFLICTS_WITH_ACTIVE_SPINE).toBeGreaterThan(0);
+    expect(readiness.data.summary.REQUIRES_MANUAL_APPROVAL).toBeGreaterThan(0);
+    expect(readiness.data.summary.DEMO_FACADE_ONLY).toBeGreaterThan(0);
+    expect(readiness.data.requirements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'new-frontend-src-shell',
+          classification: 'CONFLICTS_WITH_ACTIVE_SPINE',
+          approvalsRequired: expect.arrayContaining([
+            expect.stringContaining('Architecture owner approval'),
+          ]),
+        }),
+        expect.objectContaining({
+          id: 'api-v1-surface',
+          classification: 'CONFLICTS_WITH_ACTIVE_SPINE',
+        }),
+        expect.objectContaining({
+          id: 'ai-governance-ml',
+          classification: 'DEMO_FACADE_ONLY',
+        }),
+      ]),
+    );
   });
 
   it('runs the Smart Intake vertical slice through whiteboard, queues, reassessment, and capacity', () => {

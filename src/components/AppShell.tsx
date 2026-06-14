@@ -47,15 +47,35 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
-  [CANONICAL_ROUTES.emergencyCommandCenter]: `${EMERGENCY_OS_BRANDING.productName} - ${EMERGENCY_OS_BRANDING.commandCenterName}`,
-  [CANONICAL_ROUTES.emergencyPulse]: `${EMERGENCY_OS_BRANDING.productName} - Pulse`,
+  [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
   [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS`,
+  [CANONICAL_ROUTES.emergencyIntake]: `${EMERGENCY_OS_BRANDING.productName} - Intake`,
+  [CANONICAL_ROUTES.emergencyQueues]: `${EMERGENCY_OS_BRANDING.productName} - Queues`,
+  [CANONICAL_ROUTES.emergencyReassessment]: `${EMERGENCY_OS_BRANDING.productName} - Reassessment`,
   [CANONICAL_ROUTES.emergencyReferrals]: `${EMERGENCY_OS_BRANDING.productName} - Referrals`,
   [CANONICAL_ROUTES.emergencyCapacity]: `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
-  [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Tools`,
-  [CANONICAL_ROUTES.emergencyShift]: `${EMERGENCY_OS_BRANDING.productName} - Shift`,
+  [CANONICAL_ROUTES.emergencyBoarding]: `${EMERGENCY_OS_BRANDING.productName} - Boarding`,
+  [CANONICAL_ROUTES.emergencyCopilot]: `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
+  [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
   '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
+};
+
+const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
+  '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
+  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Patient flow, capacity, EMS, and reassessment status.',
+  [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
+  [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS, offload pressure, and handoff actions.',
+  [CANONICAL_ROUTES.emergencyIntake]: 'Identity verification and patient creation workflow.',
+  [CANONICAL_ROUTES.emergencyQueues]: 'Queue bottlenecks and queue-level operating metrics.',
+  [CANONICAL_ROUTES.emergencyReassessment]: 'Due and overdue reassessment tasks.',
+  [CANONICAL_ROUTES.emergencyCapacity]: 'Capacity score, rooms, boarders, and pressure inputs.',
+  [CANONICAL_ROUTES.emergencyBoarding]: 'Admission boarders and boarding escalation status.',
+  [CANONICAL_ROUTES.emergencyReferrals]: 'Referral and transfer queue status.',
+  [CANONICAL_ROUTES.emergencyCopilot]: 'Safe Emergency OS Copilot context and actions.',
+  [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
+  '/settings': 'Tenant, module, AI, integration, and threshold controls.',
+  [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
 };
 
 type AppShellProps = {
@@ -108,6 +128,22 @@ export function AppShell({ children }: AppShellProps) {
     () => getVisibleNavigation(emergencyRole.role),
     [emergencyRole.role],
   );
+  const currentPage = useMemo(() => {
+    const activeItem = visibleNavigationItems.find((item) =>
+      item.activePaths?.some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`)) ||
+      location.pathname === item.path ||
+      location.pathname.startsWith(`${item.path}/`),
+    );
+    const title = EMERGENCY_OS_PAGE_TITLES[location.pathname];
+    const labelFromTitle = title?.replace(`${EMERGENCY_OS_BRANDING.productName} - `, '');
+
+    return {
+      label: labelFromTitle || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
+      subtitle:
+        EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
+        (activeItem ? `Open ${activeItem.label} in Emergency OS.` : EMERGENCY_OS_BRANDING.safetyLine),
+    };
+  }, [location.pathname, visibleNavigationItems]);
 
   useEffect(() => {
     if (startupStartedRef.current) return undefined;
@@ -189,14 +225,20 @@ export function AppShell({ children }: AppShellProps) {
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
         e.preventDefault();
         navigate(
-          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse)
-            ? CANONICAL_ROUTES.emergencyPulse
-            : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyPulse),
+          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyWhiteboard)
+            ? CANONICAL_ROUTES.emergencyWhiteboard
+            : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyWhiteboard),
         );
         return;
       }
 
       if (inInput) return;
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.dispatchEvent(new Event('open-command-palette'));
+        return;
+      }
 
       if (
         e.key.toLowerCase() === 'c' &&
@@ -286,14 +328,10 @@ export function AppShell({ children }: AppShellProps) {
         break;
       }
       case 'OPEN_PEDIATRIC_DRUGS':
-        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) break;
-        navigate(`${CANONICAL_ROUTES.emergencyTools}?tool=pediatric-dose-safety-checker`);
+        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
         break;
       case 'OPEN_CALCULATOR':
-        if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)) break;
-        navigate(
-          `${CANONICAL_ROUTES.emergencyTools}${action.calculatorId ? `?tool=${action.calculatorId}` : ''}`,
-        );
+        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
         break;
       case 'OPEN_CAPACITY':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) break;
@@ -318,7 +356,7 @@ export function AppShell({ children }: AppShellProps) {
       className="emergency-app-shell"
       style={{
         display: 'flex',
-        height: '100vh',
+        height: 'var(--app-viewport-height, 100dvh)',
         background: '#0A0E1A',
         color: '#F9FAFB',
         fontFamily: 'Inter, system-ui, sans-serif',
@@ -327,12 +365,20 @@ export function AppShell({ children }: AppShellProps) {
     >
       <Sidebar navigationItems={visibleNavigationItems} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Header />
+        <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         <main
           role="main"
-          style={{ flex: 1, overflow: 'auto', paddingBottom: isMobileViewport ? 60 : 0 }}
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            paddingBottom: isMobileViewport ? 'calc(60px + env(safe-area-inset-bottom, 0px))' : 0,
+          }}
         >
-          {children}
+          <ErrorBoundary fallbackText="Emergency OS page encountered an error. Refresh to reload.">
+            <Suspense fallback={<div role="status" style={{ padding: 24, color: '#9CA3AF' }}>Loading Emergency OS page...</div>}>
+              {children}
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">

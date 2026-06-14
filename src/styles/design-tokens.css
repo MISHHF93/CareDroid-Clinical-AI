@@ -70,7 +70,7 @@
   --app-type-label: var(--text-small);
   --app-type-helper: var(--text-caption);
 
-  --app-font-family-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --app-font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --app-font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
   --type-heading-line-height: 1.3;
@@ -91,7 +91,7 @@
   --app-min-touch-target: var(--touch-target-min);
   --app-min-touch-target-comfortable: var(--touch-target-comfortable);
   --app-control-height-sm: 34px;
-  --app-control-height-md: 38px;
+  --app-control-height-md: 40px;
   --app-control-height-lg: 44px;
   --app-control-padding-x-sm: 10px;
   --app-control-padding-x-md: 12px;
@@ -101,7 +101,7 @@
   --app-icon-size-lg: 24px;
   --app-icon-button-size: var(--app-control-height-lg);
   --app-input-height: var(--app-control-height-md);
-  --app-button-height: var(--app-control-height-md);
+  --app-button-height: 40px;
 
   /* —— Radius scale —— */
   --app-radius-sm: var(--radius-sm);
@@ -129,23 +129,31 @@
   --app-grid-card-min: 14rem;
   --app-grid-card-min-compact: 11.5rem;
   --app-grid-card-min-wide: 16rem;
-  --app-card-padding-compact: clamp(10px, 1.8vw, 14px);
-  --app-card-padding-standard: clamp(14px, 2vw, 18px);
-  --app-card-padding-dashboard: clamp(14px, 2.2vw, 20px);
-  --app-card-padding-tool: clamp(12px, 2vw, 16px);
-  --app-card-padding-calculator: clamp(12px, 2vw, 18px);
+  --app-card-padding-compact: 16px;
+  --app-card-padding-standard: 20px;
+  --app-card-padding-dashboard: 20px;
+  --app-card-padding-tool: 20px;
+  --app-card-padding-calculator: 20px;
   --app-card-padding-alert: clamp(10px, 1.8vw, 14px);
   --app-callout-padding-compact: clamp(8px, 1.6vw, var(--space-3));
+  --app-card-gap: 16px;
+  --app-modal-padding: 24px;
+  --app-modal-radius: 20px;
+  --app-page-title-size: 32px;
+  --app-section-title-size: 24px;
+  --app-card-title-size: 18px;
+  --app-body-size: 14px;
+  --app-caption-size: 12px;
 
   /* Compact clinical command layout primitives */
   --compact-page-gap: clamp(10px, 1.8vw, 16px);
   --compact-panel-gap: clamp(8px, 1.4vw, 12px);
-  --compact-card-padding: clamp(10px, 1.6vw, 14px);
-  --compact-panel-padding: clamp(12px, 2vw, 16px);
+  --compact-card-padding: 16px;
+  --compact-panel-padding: 20px;
   --compact-control-height: var(--app-control-height-md);
   --compact-card-radius: 12px;
-  --compact-panel-radius: 14px;
-  --compact-shadow: none;
+  --compact-panel-radius: 16px;
+  --compact-shadow: var(--app-elevation-card);
 
   /* App shell / sidebar layout */
   --app-sidebar-width-expanded: 15.5rem;
@@ -178,10 +186,52 @@
   --app-focus-ring-width: 2px;
   --app-focus-ring-offset: 2px;
   --app-focus-ring: 0 0 0 3px var(--app-focus);
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 240ms;
+  --animation-fast: var(--motion-fast);
+  --animation-base: var(--motion-normal);
+  --animation-slow: var(--motion-slow);
+  --motion-duration-fast: var(--motion-fast);
+  --motion-duration-normal: var(--motion-normal);
+  --motion-duration-slow: var(--motion-slow);
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
+  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
+  --motion-hover-lift-y: -1px;
+  --motion-press-y: 0;
+  --motion-enter-distance: 6px;
+  --motion-skeleton-duration: 1.15s;
   --app-elevation-none: none;
   --app-elevation-card: var(--app-shadow-1);
   --app-elevation-overlay: var(--app-shadow-2);
   --app-elevation-subtle: var(--app-shadow-1);
+  --app-elevation-floating: var(--app-shadow-2);
+
+  /* Emergency OS component variants */
+  --component-card-bg: var(--app-surface-2, var(--app-surface));
+  --component-card-border: var(--app-border-subtle, var(--app-border));
+  --component-card-radius: var(--app-radius-lg);
+  --component-card-padding: var(--app-card-padding-standard);
+  --component-card-gap: var(--app-card-gap);
+  --component-card-shadow: var(--app-elevation-none);
+  --component-inner-surface-bg: color-mix(in srgb, var(--app-surface-raised) 36%, transparent);
+  --component-inner-surface-border: color-mix(in srgb, var(--app-border) 44%, transparent);
+  --component-inner-row-bg: color-mix(in srgb, var(--app-surface-raised) 22%, transparent);
+  --component-inner-row-hover-bg: color-mix(in srgb, var(--app-accent-action) 10%, transparent);
+  --component-inner-radius: var(--app-radius-md);
+  --component-inner-shadow: var(--app-elevation-none);
+  --component-button-radius: var(--app-radius-md);
+  --component-button-height: var(--app-button-height);
+  --component-button-primary-bg: var(--app-accent-action, var(--app-accent-interactive));
+  --component-button-primary-fg: var(--app-on-solid);
+  --component-button-secondary-bg: var(--app-surface-raised);
+  --component-button-secondary-fg: var(--app-text-primary);
+  --component-button-danger-bg: var(--app-danger);
+  --component-button-danger-fg: var(--app-on-solid);
+  --component-button-ghost-bg: transparent;
+  --component-button-ghost-fg: var(--app-text-primary);
 
   --app-content-max-width: 1760px;
   --app-keyboard-inset-bottom: 0px;
@@ -230,6 +280,79 @@
   font-family: var(--app-font-family-mono);
   font-size: var(--text-mono);
   line-height: var(--type-caption-line-height);
+}
+
+.motion-enter-soft {
+  animation: cd-motion-enter-soft var(--motion-transition-normal) both;
+}
+
+.motion-hover-lift {
+  transition:
+    transform var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
+}
+
+.motion-hover-lift:hover,
+.motion-hover-lift:focus-visible {
+  transform: translateY(var(--motion-hover-lift-y));
+}
+
+.motion-pressable {
+  transition:
+    transform var(--motion-transition-fast),
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
+}
+
+.motion-pressable:active {
+  transform: translateY(var(--motion-press-y)) scale(0.985);
+}
+
+.motion-chip {
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    opacity var(--motion-transition-fast);
+}
+
+.cd-skeleton-shimmer {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 0%,
+      color-mix(in srgb, var(--app-accent-action) 12%, var(--app-surface-raised)) 42%,
+      color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 84%
+    );
+  background-size: 220% 100%;
+  animation: cd-skeleton-shimmer var(--motion-skeleton-duration) var(--motion-ease-standard) infinite;
+}
+
+@keyframes cd-motion-enter-soft {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-enter-distance));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cd-skeleton-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+
+  100% {
+    background-position: -120% 0;
+  }
 }
 
 /* CareDroid design language primitives for app-wide page authorship. */
@@ -320,5 +443,33 @@
 @media (min-width: 1920px) {
   :root {
     --app-fluid-container-max-wide: min(100%, 96rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-normal: 1ms;
+    --motion-slow: 1ms;
+    --animation-fast: 1ms;
+    --animation-base: 1ms;
+    --animation-slow: 1ms;
+    --motion-duration-fast: 1ms;
+    --motion-duration-normal: 1ms;
+    --motion-duration-slow: 1ms;
+    --motion-hover-lift-y: 0;
+    --motion-press-y: 0;
+    --motion-enter-distance: 0;
+  }
+
+  .motion-enter-soft,
+  .cd-skeleton-shimmer {
+    animation: none !important;
+  }
+
+  .motion-hover-lift:hover,
+  .motion-hover-lift:focus-visible,
+  .motion-pressable:active {
+    transform: none;
   }
 }

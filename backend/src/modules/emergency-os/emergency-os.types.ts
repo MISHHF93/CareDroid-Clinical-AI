@@ -12,6 +12,16 @@ export type EmergencyPatientState =
 
 export type EmergencyPriority = 'P1' | 'P2' | 'P3' | 'P4' | 'P5';
 export type CapacityBand = 'Green' | 'Yellow' | 'Orange' | 'Red';
+export type CareDroidScreenMode =
+  | 'TRIAGE_SCREEN'
+  | 'REGISTRATION_SCREEN'
+  | 'CHARGE_NURSE_SCREEN'
+  | 'PHYSICIAN_SCREEN'
+  | 'EMS_SCREEN'
+  | 'WAITING_ROOM_DISPLAY'
+  | 'COMMAND_CENTER_DISPLAY'
+  | 'ADMIN_SCREEN'
+  | 'READ_ONLY_DISPLAY';
 
 export interface EmergencyVitals {
   hr?: number;
@@ -56,12 +66,20 @@ export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'faile
 export interface WorkflowActionLog {
   id: string;
   type: WorkflowActionType;
+  action?: WorkflowActionType;
   title: string;
   summary: string;
   timestamp: string;
+  userId?: string;
+  tenantId?: string;
   actorStaffId?: string;
   actorName?: string;
   patientId?: string;
+  encounterId?: string;
+  module?: string;
+  purpose?: string;
+  result?: WorkflowActionStatus;
+  error?: string;
   source: string;
   severity: WorkflowActionSeverity;
   status: WorkflowActionStatus;
@@ -133,6 +151,14 @@ export interface CapacitySnapshot {
   boardingCount: number;
   reassessmentDue: number;
   updatedAt: string;
+  totalRooms?: number;
+  occupancyPercent?: number;
+  waitingCount?: number;
+  dischargeReadyCount?: number;
+  criticalEmsInboundCount?: number;
+  deductions?: Array<{ id: string; label: string; value: number }>;
+  units?: Record<string, string>;
+  errors?: string[];
 }
 
 export interface EmergencyModuleEnvelope<T> {
@@ -145,6 +171,40 @@ export interface EmergencyModuleEnvelope<T> {
   remainingGaps?: string[];
 }
 
+export type CompleteImplementationRequirementClassification =
+  | 'ALREADY_IMPLEMENTED_COMPATIBLE'
+  | 'SAFE_TO_IMPLEMENT_NOW'
+  | 'PARTIALLY_IMPLEMENTED_NEEDS_EXTENSION'
+  | 'CONFLICTS_WITH_ACTIVE_SPINE'
+  | 'REQUIRES_MANUAL_APPROVAL'
+  | 'DEMO_FACADE_ONLY';
+
+export interface CompleteImplementationRequirement {
+  id: string;
+  requirement: string;
+  classification: CompleteImplementationRequirementClassification;
+  activeSpineDecision: string;
+  implementationState: string;
+  evidence: string[];
+  safeNextStep: string;
+  approvalsRequired?: string[];
+}
+
+export interface CompleteImplementationReadinessContract {
+  activeSpine: {
+    frontendRoot: string;
+    appEntry: string;
+    appShell: string;
+    backendModule: string;
+    apiBase: string;
+    pilotRouteCount: number;
+  };
+  generatedBy: string;
+  clinicalSafetyNotice: string;
+  summary: Record<CompleteImplementationRequirementClassification, number>;
+  requirements: CompleteImplementationRequirement[];
+}
+
 export interface EmergencyOsModuleSetting {
   id: string;
   label: string;
@@ -154,6 +214,11 @@ export interface EmergencyOsModuleSetting {
 export interface EmergencyOsSettingsContract {
   tenantName: string;
   defaultWorkspace: string;
+  defaultScreenMode: CareDroidScreenMode;
+  enabledScreenModes: CareDroidScreenMode[];
+  readOnlyDisplayMode: boolean;
+  commandCenterMode: boolean;
+  wallDisplayRefreshInterval: number;
   enabledModules: EmergencyOsModuleSetting[];
   aiSettings: {
     enabled: boolean;
@@ -218,6 +283,41 @@ export interface EmergencyOsSettingsContract {
   departmentCapacityTarget: number;
   alertRules: Record<string, { enabled: boolean; severity: string }>;
   updatedAt: string;
+}
+
+export interface CareDroidCentralNodeSnapshot {
+  node: 'CareDroidCentralNode';
+  generatedAt: string;
+  patientsToday: number;
+  activePatients: number;
+  waitingPatients: number;
+  longestWait: number;
+  averageWait: number;
+  emsInbound: number;
+  emsPressure: 'normal' | 'watch' | 'strained' | 'critical';
+  reassessmentsDue: number;
+  capacityStatus: CapacitySnapshot;
+  boarders: number;
+  boardingRisk: 'normal' | 'watch' | 'strained' | 'critical';
+  referralsPending: number;
+  operationalAlerts: EmergencyAlert[];
+  whiteboardColumns: Array<{
+    id: EmergencyPatientState | 'Reassessment' | 'EMS';
+    label: string;
+    patientIds: string[];
+    count: number;
+  }>;
+  queueMetrics: Array<{
+    id: string;
+    label: string;
+    count: number;
+    oldestWaitMinutes: number;
+    targetMinutes: number;
+    breached: boolean;
+  }>;
+  recentEvents: WorkflowActionLog[];
+  tenantSettings: EmergencyOsSettingsContract;
+  enabledModules: string[];
 }
 
 export type EmergencyOsSettingsPatch = {

@@ -1,54 +1,61 @@
 :root,
-html,
-html[data-theme='dark'],
-html[data-theme='light'] {
-  color-scheme: dark;
+html {
+  /* Emergency Operations Mission Control primitives */
+  --color-primary: #3b82f6;
+  --color-secondary: #38bdf8;
+  --color-accent: #22d3ee;
+  --color-background: #0b1220;
+  --color-surface: #111827;
+  --color-card: #172033;
+  --color-floating-surface: #1e293b;
+  --color-border-default: #2d3748;
+  --color-border-subtle: color-mix(in srgb, var(--color-border-default) 72%, transparent);
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: color-mix(in srgb, var(--color-text-secondary) 74%, transparent);
 
-  /* Emergency OS dark clinical primitives */
-  --bg-base: #0a0e1a;
-  --bg-surface: #111827;
-  --bg-elevated: #1c2333;
-  --border-subtle: #1f2937;
-  --border-default: #374151;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --bg-base: var(--color-background);
+  --bg-surface: var(--color-surface);
+  --bg-elevated: var(--color-floating-surface);
+  --border-subtle: var(--color-border-subtle);
+  --border-default: var(--color-border-default);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
 
-  --color-background: var(--bg-base);
-  --color-surface: var(--bg-surface);
-  --color-elevated: var(--bg-elevated);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-default: var(--border-default);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-
-  /* Semantic clinical status colors */
-  --status-critical: #ef4444;
+  --status-success: #22c55e;
   --status-warning: #f59e0b;
-  --status-stable: #10b981;
-  --status-inactive: #6b7280;
-  --status-info: #3b82f6;
+  --status-danger: #ef4444;
+  --status-critical: #ef4444;
+  --status-info: #06b6d4;
+  --status-emergency: #dc2626;
+  --status-stable: var(--status-success);
+  --status-inactive: var(--color-text-secondary);
 
-  /* Emergency severity ladder */
-  --priority-p1: #ef4444;
-  --priority-p2: #f97316;
-  --priority-p3: #f59e0b;
-  --priority-p4: #10b981;
-  --priority-p5: #6b7280;
+  --capacity-green: #22c55e;
+  --capacity-yellow: #eab308;
+  --capacity-orange: #f97316;
+  --capacity-red: #dc2626;
+  --status-orange: var(--capacity-orange);
 
-  /* Typography */
+  --priority-p1: var(--status-emergency);
+  --priority-p2: var(--capacity-orange);
+  --priority-p3: var(--status-warning);
+  --priority-p4: var(--status-success);
+  --priority-p5: var(--color-text-secondary);
+
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  --font-size-xs: 11px;
+  --font-size-xs: 12px;
   --font-size-sm: 12px;
   --font-size-base: 14px;
-  --font-size-md: 15px;
-  --font-size-lg: 17px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
+  --font-size-md: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-size-section: 24px;
+  --font-size-card-title: 18px;
 
-  /* 4px base spacing system */
   --space-0-5: 2px;
   --space-1: 4px;
   --space-1-5: 6px;
@@ -60,16 +67,23 @@ html[data-theme='light'] {
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --component-card-padding: 20px;
+  --component-card-gap: 16px;
 
-  /* Component radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-xl: var(--radius-lg);
-  --radius-2xl: var(--radius-lg);
+  --radius-sm: 12px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 20px;
   --radius-pill: 999px;
 
-  /* Existing app token bridge */
+  --elevation-none: none;
+  --elevation-card: 0 10px 24px rgba(2, 6, 23, 0.22);
+  --elevation-floating: 0 18px 40px rgba(2, 6, 23, 0.3);
+  --elevation-modal: 0 24px 60px rgba(2, 6, 23, 0.38);
+  --component-button-height: 40px;
+  --component-button-radius: 12px;
+
   --app-bg: var(--color-background);
   --app-background: var(--color-background);
   --app-navy-ink: var(--color-background);
@@ -78,61 +92,62 @@ html[data-theme='light'] {
   --app-text-primary: var(--color-text-primary);
   --app-text-secondary: var(--color-text-secondary);
   --app-text-muted: var(--color-text-muted);
-  --app-panel-bg: var(--color-surface);
+  --app-panel-bg: var(--color-card);
   --app-panel-border: var(--color-border-default);
   --app-border: var(--color-border-default);
   --app-border-subtle: var(--color-border-subtle);
-  --app-border-strong: color-mix(
-    in srgb,
-    var(--color-border-default) 72%,
-    var(--color-text-primary)
-  );
+  --app-border-strong: color-mix(in srgb, var(--color-border-default) 78%, var(--color-text-primary));
   --app-surface: var(--color-surface);
   --app-surface-0: var(--color-background);
   --app-surface-1: var(--color-surface);
-  --app-surface-2: var(--color-elevated);
-  --app-surface-elevated: var(--color-elevated);
-  --app-surface-raised: var(--color-elevated);
-  --app-surface-muted: color-mix(in srgb, var(--color-elevated) 74%, var(--color-background));
-  --app-surface-subtle: color-mix(in srgb, var(--color-surface) 80%, var(--color-background));
+  --app-surface-2: var(--color-card);
+  --app-surface-elevated: var(--color-floating-surface);
+  --app-surface-raised: var(--color-floating-surface);
+  --app-surface-muted: color-mix(in srgb, var(--color-card) 78%, var(--color-background));
+  --app-surface-subtle: color-mix(in srgb, var(--color-surface) 82%, var(--color-background));
   --app-surface-glass: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  --app-divider-on-surface: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
-  --app-overlay-on-surface: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
-  --app-overlay-on-surface-strong: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
-  --app-shadow-1: 0 10px 24px rgba(0, 0, 0, 0.22);
-  --app-shadow-2: 0 18px 44px rgba(0, 0, 0, 0.32);
-  --app-accent: var(--status-info);
-  --app-accent-2: var(--status-stable);
-  --app-accent-interactive: var(--status-info);
-  --app-accent-hover: color-mix(in srgb, var(--status-info) 86%, white);
-  --app-danger: var(--status-critical);
+  --app-divider-on-surface: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  --app-shadow-1: var(--elevation-card);
+  --app-shadow-2: var(--elevation-floating);
+  --app-accent: var(--color-primary);
+  --app-accent-2: var(--color-secondary);
+  --app-accent-interactive: var(--color-primary);
+  --app-accent-action: var(--color-primary);
+  --app-accent-hover: color-mix(in srgb, var(--color-primary) 82%, white);
+  --app-danger: var(--status-danger);
   --app-warning: var(--status-warning);
-  --app-success: var(--status-stable);
+  --app-success: var(--status-success);
   --app-info: var(--status-info);
   --app-disabled: var(--status-inactive);
-  --app-focus: color-mix(in srgb, var(--status-info) 24%, transparent);
-  --app-focus-ring-aa: var(--status-info);
-  --app-hover: color-mix(in srgb, var(--status-info) 12%, transparent);
-  --app-input-bg: color-mix(in srgb, var(--color-elevated) 70%, var(--color-background));
-  --app-input-bg-hover: var(--color-elevated);
+  --app-focus: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  --app-focus-ring-aa: var(--color-primary);
+  --app-hover: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --app-input-bg: color-mix(in srgb, var(--color-floating-surface) 76%, var(--color-background));
+  --app-input-bg-hover: var(--color-floating-surface);
   --app-input-border: var(--color-border-default);
-  --app-table-header-bg: color-mix(in srgb, var(--color-elevated) 72%, var(--color-background));
-  --app-table-row-hover: color-mix(in srgb, var(--status-info) 8%, transparent);
+  --app-table-header-bg: color-mix(in srgb, var(--color-floating-surface) 70%, var(--color-background));
+  --app-table-row-hover: color-mix(in srgb, var(--color-primary) 8%, transparent);
   --app-on-solid: #ffffff;
-  --app-mesh-cyan: color-mix(in srgb, var(--status-info) 8%, transparent);
-  --app-mesh-green: color-mix(in srgb, var(--status-stable) 5%, transparent);
+  --app-accent-contrast: #ffffff;
+  --app-danger-contrast: #fff7f7;
+  --app-warning-contrast: #1f1600;
+  --app-success-contrast: #04111f;
+  --app-mesh-cyan: color-mix(in srgb, var(--color-accent) 5%, transparent);
+  --app-mesh-green: color-mix(in srgb, var(--status-success) 3%, transparent);
   --app-scrollbar-track: color-mix(in srgb, var(--color-surface) 82%, var(--color-background));
   --app-scrollbar-thumb: var(--color-border-default);
-  --app-scrollbar-thumb-hover: var(--color-text-muted);
+  --app-scrollbar-thumb-hover: var(--color-text-secondary);
   --app-code-bg: var(--color-background);
   --app-tool-card-body-bg: var(--color-surface);
   --app-tool-card-body-fg: var(--color-text-primary);
-  --app-chart-1: var(--status-info);
-  --app-chart-2: var(--status-stable);
+  --app-chart-1: var(--color-primary);
+  --app-chart-2: var(--status-success);
   --app-chart-3: var(--status-warning);
-  --app-chart-4: var(--status-critical);
-  --app-chart-5: var(--color-text-muted);
-  --app-chart-6: var(--color-border-default);
+  --app-chart-4: var(--status-danger);
+  --app-chart-5: var(--color-accent);
+  --app-chart-6: var(--color-text-secondary);
 
   --app-font-family-body: var(--font-ui);
   --app-font-family-mono: var(--font-mono);
@@ -142,69 +157,108 @@ html[data-theme='light'] {
   --font-13: var(--font-size-base);
   --font-14: var(--font-size-base);
   --font-15: var(--font-size-md);
-  --font-16: var(--font-size-lg);
-  --font-18: var(--font-size-lg);
-  --font-20: var(--font-size-xl);
-  --font-22: var(--font-size-xl);
-  --font-24: var(--font-size-2xl);
-  --font-28: var(--font-size-2xl);
+  --font-16: var(--font-size-base);
+  --font-18: var(--font-size-card-title);
+  --font-20: var(--font-size-card-title);
+  --font-22: var(--font-size-section);
+  --font-24: var(--font-size-section);
+  --font-28: var(--font-size-section);
   --font-36: var(--font-size-2xl);
   --text-xs: var(--font-size-xs);
-  --text-sm: var(--font-size-sm);
+  --text-sm: var(--font-size-base);
   --text-base: var(--font-size-base);
   --text-md: var(--font-size-md);
-  --text-lg: var(--font-size-lg);
-  --text-xl: var(--font-size-xl);
+  --text-lg: var(--font-size-card-title);
+  --text-xl: var(--font-size-section);
   --text-2xl: var(--font-size-2xl);
   --text-body: var(--font-size-base);
   --text-small: var(--font-size-sm);
   --text-caption: var(--font-size-xs);
   --text-mono: var(--font-size-sm);
+  --app-type-title: var(--font-size-2xl);
+  --app-type-heading: var(--font-size-section);
+  --app-type-subheading: var(--font-size-card-title);
   --app-type-body: var(--font-size-base);
-  --app-type-small: var(--font-size-sm);
+  --app-type-small: var(--font-size-base);
   --app-type-caption: var(--font-size-xs);
-  --app-type-label: var(--font-size-sm);
+  --app-type-label: var(--font-size-xs);
   --app-type-helper: var(--font-size-xs);
   --app-type-mono: var(--font-size-sm);
 
   --app-radius-sm: var(--radius-sm);
   --app-radius-md: var(--radius-md);
   --app-radius-lg: var(--radius-lg);
-  --app-radius-xl: var(--radius-lg);
-  --app-radius-2xl: var(--radius-lg);
+  --app-radius-xl: var(--radius-xl);
+  --app-radius-2xl: var(--radius-2xl);
   --app-radius-pill: var(--radius-pill);
+  --app-elevation-none: var(--elevation-none);
+  --app-elevation-subtle: var(--elevation-card);
+  --app-elevation-card: var(--elevation-card);
+  --app-elevation-overlay: var(--elevation-modal);
 
-  --app-status-critical: var(--status-critical);
+  --app-status-critical: var(--status-danger);
   --app-status-degraded: var(--status-warning);
-  --app-status-online: var(--status-stable);
+  --app-status-online: var(--status-success);
   --app-status-offline: var(--status-inactive);
   --app-status-demo: var(--status-info);
   --app-status-unsupported: var(--status-inactive);
+  --app-status-orange: var(--capacity-orange);
 
   --navy-bg: var(--color-background);
   --navy-ink: var(--color-background);
-  --navy-lighter: var(--color-elevated);
+  --navy-lighter: var(--color-floating-surface);
   --text-color: var(--color-text-primary);
   --text-primary: var(--color-text-primary);
   --text-secondary: var(--color-text-secondary);
   --text-muted: var(--color-text-muted);
   --muted-text: var(--color-text-secondary);
-  --panel-bg: var(--color-surface);
+  --panel-bg: var(--color-card);
   --panel-background: var(--color-surface);
   --panel-border: var(--color-border-default);
   --border-color: var(--color-border-default);
   --surface-0: var(--color-background);
   --surface-1: var(--color-surface);
-  --surface-2: var(--color-elevated);
+  --surface-2: var(--color-card);
   --surface-muted: var(--app-surface-muted);
   --surface-glass: var(--app-surface-glass);
-  --border-subtle: var(--color-border-subtle);
-  --danger: var(--status-critical);
-  --error-color: var(--status-critical);
+  --danger: var(--status-danger);
+  --error-color: var(--status-danger);
   --warning: var(--status-warning);
-  --success: var(--status-stable);
-  --success-color: var(--status-stable);
+  --success: var(--status-success);
+  --success-color: var(--status-success);
   --info: var(--status-info);
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+  --color-primary: #2563eb;
+  --color-secondary: #0ea5e9;
+  --color-accent: #06b6d4;
+  --color-background: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-floating-surface: #ffffff;
+  --color-border-default: #e5e7eb;
+  --color-border-subtle: #e5e7eb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
+  --elevation-card: 0 8px 20px rgba(17, 24, 39, 0.07);
+  --elevation-floating: 0 16px 36px rgba(17, 24, 39, 0.1);
+  --elevation-modal: 0 24px 60px rgba(17, 24, 39, 0.16);
+  --app-accent-contrast: #ffffff;
+  --app-input-bg: #ffffff;
+  --app-input-bg-hover: #ffffff;
+  --app-table-header-bg: color-mix(in srgb, var(--color-background) 78%, var(--color-surface));
+  --app-scrollbar-track: color-mix(in srgb, var(--color-background) 72%, var(--color-surface));
+  --app-scrollbar-thumb: color-mix(in srgb, var(--color-primary) 24%, var(--color-border-default));
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--color-primary) 40%, var(--color-border-default));
+  --app-mesh-cyan: color-mix(in srgb, var(--color-accent) 3%, transparent);
+  --app-mesh-green: transparent;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {

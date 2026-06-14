@@ -31,7 +31,7 @@ vi.mock('../lib/ai/client', () => ({
   },
 }));
 
-vi.mock('../store/emergency-store', () => ({
+vi.mock('../store/emergencyStore', () => ({
   useEmergencyStore: (selector: (state: typeof mocks.storeState) => unknown) => selector(mocks.storeState),
 }));
 

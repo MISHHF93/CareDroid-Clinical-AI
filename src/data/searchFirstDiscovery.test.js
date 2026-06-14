@@ -3,7 +3,9 @@ import {
   buildSearchFirstDiscoveryEntries,
   buildSearchFirstResults,
 } from './searchFirstDiscovery';
-import { EMERGENCY_PAGE_PRIMARY_PATHS } from './emergencyPageRenderInventory';
+import { getPilotCustomerNavigationItems } from '../config/unified-navigation.config';
+
+const PILOT_VISIBLE_PATHS = getPilotCustomerNavigationItems().map((item) => item.path);
 
 describe('search-first discovery index', () => {
   it('indexes every primary Emergency OS route as a searchable destination', () => {
@@ -14,7 +16,7 @@ describe('search-first discovery index', () => {
         .map((entry) => entry.path)
     );
 
-    expect([...emergencyOsPaths].sort()).toEqual([...EMERGENCY_PAGE_PRIMARY_PATHS].sort());
+    expect([...emergencyOsPaths].sort()).toEqual([...PILOT_VISIBLE_PATHS].sort());
     expect(buildSearchFirstResults({ query: 'boarding boarders' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'emergency-boarding', path: '/emergency/boarding' }),
@@ -27,8 +29,19 @@ describe('search-first discovery index', () => {
     const paths = new Set(entries.map((entry) => entry.path));
     const kinds = new Set(entries.map((entry) => entry.kind));
 
-    expect([...paths].sort()).toEqual([...EMERGENCY_PAGE_PRIMARY_PATHS].sort());
+    expect([...paths].sort()).toEqual([...PILOT_VISIBLE_PATHS].sort());
+    expect(entries.map((entry) => entry.path)).toHaveLength(paths.size);
     expect([...kinds]).toEqual(['destination']);
+    expect(buildSearchFirstResults({ query: 'analytics throughput' })).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ sourceId: 'emergency-analytics', path: '/emergency/analytics' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'settings thresholds' })).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ sourceId: 'emergency-settings', path: '/emergency/settings' }),
+      ])
+    );
   });
 
   it('indexes assets, workflows, simulations, protocols, AI, operations, commercial capabilities, and workspaces in platform catalog mode', () => {

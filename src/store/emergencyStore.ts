@@ -24,7 +24,7 @@ import {
   WorkflowActionLog,
   WorkflowActionType,
 } from '../types/emergency';
-import { resolveCriticalChecklistConfig } from '../../config/criticalChecklists';
+import { resolveCriticalChecklistConfig } from '../config/criticalChecklists';
 import {
   ED_SCENARIO_DEMO_MODES,
   buildSrcEmergencyScenarioState,
@@ -42,6 +42,7 @@ import {
   subscribeToSettingsFeatureChanges,
   updateSettingsFeatureFlag,
 } from '../services/emergencySettingsApi';
+import { fetchEmergencyAnalytics } from '../services/emergencyOsApi';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
   DEFAULT_EMERGENCY_ALERT_RULES,
@@ -51,6 +52,7 @@ import {
 } from '../config/emergencySettings.config';
 import { syncEmergencyAuditEvent } from '../services/emergencyStaffingApi';
 import { calculateNews2FromVitals } from '../utils/news2';
+import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
 
 export function tMinus(mins: number): string {
   return new Date(Date.now() - mins * 60000).toISOString();
@@ -635,10 +637,13 @@ export type EmergencyUiState = {
 export type EmergencyWebSocketStatus = {
   connected: boolean;
   status: EmergencyWebSocketConnectionState;
+  mode?: 'websocket' | 'sse' | 'polling' | string;
   url: string | null;
   lastConnectedAt: string | null;
   lastDisconnectedAt: string | null;
   lastEventAt: string | null;
+  updatedAt?: string | null;
+  message?: string;
   error: string | null;
 };
 
@@ -998,6 +1003,8 @@ const emptyWebSocketStatus = (): EmergencyWebSocketStatus => ({
   lastConnectedAt: null,
   lastDisconnectedAt: null,
   lastEventAt: null,
+  updatedAt: null,
+  message: '',
   error: null,
 });
 
@@ -1319,11 +1326,24 @@ function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnap
   const reassessmentDue = patients.filter((patient) =>
     patient.flags.includes(PatientFlag.ReassessmentDue),
   ).length;
-  const score = Math.min(
-    100,
-    Math.round((occupiedRooms / rooms.length) * 65 + boardingCount * 6 + reassessmentDue * 4),
-  );
-  const band = score >= 85 ? 'Red' : score >= 70 ? 'Orange' : score >= 50 ? 'Yellow' : 'Green';
+  const waitingCount = patients.filter((patient) => patient.state === PatientState.Waiting).length;
+  const dischargeReadyCount = patients.filter((patient) => patient.state === PatientState.Disposition).length;
+  const criticalEmsInboundCount = patients.filter(
+    (patient) =>
+      patient.flags.includes(PatientFlag.EMSArrival) &&
+      (patient.priority === Priority.P1 || patient.priority === Priority.P2),
+  ).length;
+  const result = calculateEmergencyOsCapacity({
+    totalPatients: patients.length,
+    occupiedRooms,
+    totalRooms: rooms.length,
+    boardingCount,
+    reassessmentDue,
+    waitingCount,
+    dischargeReadyCount,
+    criticalEmsInboundCount,
+  });
+  const { score, band } = result;
 
   return {
     score,
@@ -1334,7 +1354,18 @@ function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnap
     occupiedRooms,
     boardingCount,
     reassessmentDue,
-    updatedAt: new Date().toISOString(),
+    currentOccupancy: occupiedRooms,
+    maxCapacity: rooms.length,
+    occupancyPercent: result.occupancyPercent,
+    waitingCount,
+    dischargeReadyCount,
+    incomingEMSCriticalCount: criticalEmsInboundCount,
+    deductions: result.factors.map((factor) => ({
+      id: factor.id,
+      label: factor.label,
+      value: factor.points,
+    })),
+    updatedAt: result.updatedAt,
   };
 }
 
@@ -1504,6 +1535,39 @@ function buildLocalEmergencyAnalytics(
   };
 }
 
+function buildBackendEmergencyAnalytics(
+  state: Pick<EmergencyStoreState, 'patients' | 'capacity' | 'activeShift'>,
+  backendData: Record<string, unknown>,
+) {
+  const local = buildLocalEmergencyAnalytics(state);
+  const capacity = (backendData.capacity as CapacitySnapshot | undefined) || state.capacity;
+  return {
+    ...local,
+    shift: {
+      ...local.shift,
+      patientsSeen: Number(backendData.activeCensus ?? local.shift.patientsSeen),
+      waitingCount: Number(backendData.waiting ?? 0),
+      highRiskCount: Number(backendData.highRisk ?? 0),
+      boardingCount: Number(backendData.boarding ?? capacity.boardingCount ?? 0),
+      reassessmentDueCount: Number(backendData.reassessmentDue ?? local.shift.reassessmentDueCount),
+      averageWaitMinutes: Number(backendData.averageWaitMinutes ?? 0),
+      capacityScore: capacity.score ?? local.shift.capacityScore,
+    },
+    operationalCommand: {
+      ...local.operationalCommand,
+      capacity,
+      backendSummary: {
+        activeCensus: Number(backendData.activeCensus ?? local.shift.patientsSeen),
+        waiting: Number(backendData.waiting ?? 0),
+        highRisk: Number(backendData.highRisk ?? 0),
+        boarding: Number(backendData.boarding ?? capacity.boardingCount ?? 0),
+        reassessmentDue: Number(backendData.reassessmentDue ?? local.shift.reassessmentDueCount),
+        averageWaitMinutes: Number(backendData.averageWaitMinutes ?? 0),
+      },
+    },
+  };
+}
+
 type EmergencyAnalyticsState = {
   status: 'idle' | 'loading' | 'ready' | 'error';
   source: string;
@@ -1534,6 +1598,11 @@ type EmergencyCtasThresholds = Record<Priority, number>;
 type EmergencyOsSettings = {
   tenantName: string;
   defaultWorkspace: string;
+  defaultScreenMode: string;
+  enabledScreenModes: string[];
+  readOnlyDisplayMode: boolean;
+  commandCenterMode: boolean;
+  wallDisplayRefreshInterval: number;
   enabledModules: Array<{ id: string; label: string; enabled: boolean }>;
   aiSettings: Record<string, string | boolean>;
   integrationSettings: Record<string, string | boolean>;
@@ -1738,6 +1807,21 @@ const DEFAULT_CTAS_TARGETS: EmergencyCtasThresholds = {
 const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
   tenantName: 'CareDroid Emergency Department',
   defaultWorkspace: 'emergency-whiteboard',
+  defaultScreenMode: 'CHARGE_NURSE_SCREEN',
+  enabledScreenModes: [
+    'TRIAGE_SCREEN',
+    'REGISTRATION_SCREEN',
+    'CHARGE_NURSE_SCREEN',
+    'PHYSICIAN_SCREEN',
+    'EMS_SCREEN',
+    'WAITING_ROOM_DISPLAY',
+    'COMMAND_CENTER_DISPLAY',
+    'ADMIN_SCREEN',
+    'READ_ONLY_DISPLAY',
+  ],
+  readOnlyDisplayMode: false,
+  commandCenterMode: true,
+  wallDisplayRefreshInterval: 30000,
   enabledModules: DEFAULT_EMERGENCY_MODULES.map((module) => ({ ...module })),
   aiSettings: {
     enabled: true,
@@ -3613,16 +3697,42 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }),
 
     loadEmergencyAnalytics: async () => {
+      set((state) => ({
+        emergencyAnalytics: {
+          ...state.emergencyAnalytics,
+          status: 'loading',
+          message: '',
+        },
+      }));
       const state = get();
-      const nextState: EmergencyAnalyticsState = {
-        status: 'ready',
-        source: 'client-fallback',
-        loadedAt: new Date().toISOString(),
-        message: 'Using local Emergency OS operational state.',
-        data: buildLocalEmergencyAnalytics(state),
-      };
-      set({ emergencyAnalytics: nextState });
-      return nextState;
+      try {
+        const envelope = await fetchEmergencyAnalytics();
+        const backendData = (envelope?.data || envelope || {}) as Record<string, unknown>;
+        const nextState: EmergencyAnalyticsState = {
+          status: 'ready',
+          source: 'backend',
+          loadedAt: new Date().toISOString(),
+          message: envelope?.remainingGaps?.length
+            ? envelope.remainingGaps.join(' ')
+            : 'Using Emergency OS backend analytics.',
+          data: buildBackendEmergencyAnalytics(state, backendData),
+        };
+        set({ emergencyAnalytics: nextState });
+        return nextState;
+      } catch (error) {
+        const nextState: EmergencyAnalyticsState = {
+          status: 'ready',
+          source: 'client-fallback',
+          loadedAt: new Date().toISOString(),
+          message:
+            error instanceof Error
+              ? `Backend analytics unavailable: ${error.message}`
+              : 'Using local Emergency OS operational state.',
+          data: buildLocalEmergencyAnalytics(state),
+        };
+        set({ emergencyAnalytics: nextState });
+        return nextState;
+      }
     },
 
     hydrateFromApi: (payload) =>
@@ -3826,4 +3936,156 @@ export const selectQueueBottleneckAlert = (state: EmergencyStoreState): Alert | 
     createdAt: nowIso(),
     dismissed: false,
   } as Alert & { queue: string; reason: string };
+};
+
+export type EmergencyOperationalMetricKey =
+  | 'patientsToday'
+  | 'waiting'
+  | 'longestWait'
+  | 'emsInbound'
+  | 'reassessmentsDue'
+  | 'capacityScore'
+  | 'boarders'
+  | 'referralsPending';
+
+export type EmergencyOperationalMetric = {
+  key: EmergencyOperationalMetricKey;
+  label: string;
+  value: string | number;
+  source: string;
+  tone?: 'neutral' | 'info' | 'success' | 'warning' | 'critical';
+};
+
+export type EmergencyOperationalSummary = {
+  generatedAt: string;
+  metrics: EmergencyOperationalMetric[];
+};
+
+function localDateKey(value: string | Date = new Date()): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
+
+function minutesSince(value?: string | null): number {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return 0;
+  return Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+}
+
+function formatWaitMinutes(minutes: number): string {
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+}
+
+function isBoardingPatient(patient: Patient): boolean {
+  return (
+    patient.state === PatientState.Admission ||
+    patient.state === PatientState.Disposition ||
+    hasPatientFlag(patient, PatientFlag.PendingAdmission)
+  );
+}
+
+function isPendingReferral(referral: Referral): boolean {
+  return !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status);
+}
+
+export const selectEmergencyOperationalSummary = (
+  state: EmergencyStoreState,
+): EmergencyOperationalSummary => {
+  const today = localDateKey();
+  const patientsToday = state.patients.filter(
+    (patient) => localDateKey(patient.arrivalTime) === today,
+  ).length;
+  const waitingPatients = state.patients.filter((patient) => patient.state === PatientState.Waiting);
+  const longestWaitMinutes =
+    state.capacity.longestWaitMinutes ??
+    waitingPatients.reduce(
+      (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
+      0,
+    );
+  const emsInbound =
+    state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length +
+    state.emsIncomingPatients.length +
+    state.emsUnits.filter((unit) => unit.status === 'Inbound').length;
+  const reassessmentDue =
+    state.capacity.reassessmentDueCount ??
+    state.capacity.reassessmentDue ??
+    selectReassessmentCount(state);
+  const boarders = state.capacity.boardingCount ?? state.patients.filter(isBoardingPatient).length;
+  const referralsPending = state.referrals.filter(isPendingReferral).length;
+
+  return {
+    generatedAt: new Date().toISOString(),
+    metrics: [
+      {
+        key: 'patientsToday',
+        label: 'Patients Today',
+        value: patientsToday,
+        source: 'store.patients arrivalTime',
+        tone: 'info',
+      },
+      {
+        key: 'waiting',
+        label: 'Waiting',
+        value: waitingPatients.length,
+        source: 'store.patients state',
+        tone: waitingPatients.length ? 'warning' : 'success',
+      },
+      {
+        key: 'longestWait',
+        label: 'Longest Wait',
+        value: formatWaitMinutes(longestWaitMinutes),
+        source: 'capacity.longestWaitMinutes or waiting patient arrivalTime',
+        tone: longestWaitMinutes >= 60 ? 'critical' : longestWaitMinutes >= 30 ? 'warning' : 'neutral',
+      },
+      {
+        key: 'emsInbound',
+        label: 'EMS Inbound',
+        value: emsInbound,
+        source: 'store.emsArrivals, emsIncomingPatients, emsUnits',
+        tone: emsInbound ? 'warning' : 'success',
+      },
+      {
+        key: 'reassessmentsDue',
+        label: 'Reassessments Due',
+        value: reassessmentDue,
+        source: 'capacity reassessment count or ReassessmentDue flags',
+        tone: reassessmentDue ? 'critical' : 'success',
+      },
+      {
+        key: 'capacityScore',
+        label: 'Capacity Score',
+        value: `${state.capacity.score} ${state.capacity.band}`,
+        source: 'store.capacity',
+        tone:
+          state.capacity.band === 'Red'
+            ? 'critical'
+            : state.capacity.band === 'Orange' || state.capacity.band === 'Yellow'
+              ? 'warning'
+              : 'success',
+      },
+      {
+        key: 'boarders',
+        label: 'Boarders',
+        value: boarders,
+        source: 'capacity.boardingCount or patient boarding state',
+        tone: boarders ? 'warning' : 'success',
+      },
+      {
+        key: 'referralsPending',
+        label: 'Referrals Pending',
+        value: referralsPending,
+        source: 'store.referrals active statuses',
+        tone: referralsPending ? 'warning' : 'success',
+      },
+    ],
+  };
 };

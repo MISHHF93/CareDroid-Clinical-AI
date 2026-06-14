@@ -4,7 +4,10 @@
  * The Emergency OS shell now derives from `unified-navigation.config.ts`.
  * `navigation/primaryNavigation.js` is still a compatibility re-export.
  */
-import { NAVIGATION_ITEMS } from './unified-navigation.config';
+import {
+  NAVIGATION_ITEMS,
+  getPilotCustomerNavigationItems,
+} from './unified-navigation.config';
 import { CANONICAL_ROUTES } from './routes.config';
 
 function appShellNavItemFromUnified(item) {
@@ -26,7 +29,7 @@ function appShellNavItemFromUnified(item) {
 }
 
 export const APP_SHELL_NAV_ITEMS = Object.freeze(
-  NAVIGATION_ITEMS.map(appShellNavItemFromUnified)
+  getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(appShellNavItemFromUnified)
 );
 
 export const EMERGENCY_SIDEBAR_NAV_ITEMS = APP_SHELL_NAV_ITEMS;

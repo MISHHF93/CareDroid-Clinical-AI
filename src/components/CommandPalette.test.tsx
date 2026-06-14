@@ -72,7 +72,7 @@ describe('CommandPalette helpers', () => {
     expect(matchAndRankCommands(commands, 'beds')[0].id).toBe('capacity');
   });
 
-  it('returns patient results only for patient name matches', () => {
+  it('returns patient lookup results for name, MRN, and clinical context matches', () => {
     const now = new Date('2026-06-13T12:42:00.000Z');
 
     expect(searchPatientsByName([patient], 'avery', now)[0]).toEqual(
@@ -83,7 +83,8 @@ describe('CommandPalette helpers', () => {
         icon: 'person',
       }),
     );
-    expect(searchPatientsByName([patient], 'chest', now)).toEqual([]);
+    expect(searchPatientsByName([patient], 'MRN-1', now)[0]?.id).toBe('patient-patient-1');
+    expect(searchPatientsByName([patient], 'chest', now)[0]?.id).toBe('patient-patient-1');
   });
 
   it('records recent commands with de-dupe and five item limit', () => {

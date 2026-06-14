@@ -29,6 +29,8 @@ import './styles/visual-consistency.css';
 
 import './styles/mobile-first-recovery.css';
 
+import './styles/emergency-responsive.css';
+
 import './globals.css';
 
 import logger from './utils/logger';

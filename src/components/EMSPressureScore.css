@@ -13,7 +13,7 @@
 }
 
 .ems-pressure--elevated {
-  --ems-pressure-color: #f97316;
+  --ems-pressure-color: var(--status-orange, #f97316);
 }
 
 .ems-pressure--critical {
@@ -32,6 +32,10 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   white-space: nowrap;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast);
 }
 
 .ems-pressure--badge strong {
@@ -46,6 +50,13 @@
   border-radius: var(--radius-pill);
   background: var(--ems-pressure-color);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ems-pressure-color) 18%, transparent);
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
+}
+
+.ems-pressure--critical .ems-pressure__dot {
+  animation: ems-pressure-red-breathe 1.6s var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .ems-pressure--gauge {
@@ -54,9 +65,19 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid var(--ems-pressure-border);
+  border: 0;
   border-radius: var(--radius-lg);
   background: var(--ems-pressure-bg);
+  box-shadow: inset 3px 0 0 var(--ems-pressure-color);
+  animation: ems-pressure-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ems-pressure--gauge:hover {
+  transform: translateY(-1px);
 }
 
 .ems-pressure__gauge {
@@ -69,6 +90,7 @@
   background:
     radial-gradient(circle at center, var(--color-surface) 58%, transparent 60%),
     conic-gradient(var(--ems-pressure-color) var(--ems-pressure-deg), var(--color-border-subtle) 0);
+  transition: background var(--motion-transition-normal);
 }
 
 .ems-pressure__gauge strong {
@@ -113,4 +135,38 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+@keyframes ems-pressure-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ems-pressure-red-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ems-pressure-color) 18%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--ems-pressure-color) 8%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ems-pressure--gauge,
+  .ems-pressure--critical .ems-pressure__dot {
+    animation: none !important;
+  }
+
+  .ems-pressure--gauge:hover {
+    transform: none;
+  }
 }

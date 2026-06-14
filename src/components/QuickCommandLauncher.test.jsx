@@ -244,23 +244,16 @@ describe('QuickCommandLauncher', () => {
     );
     expect(navIds).toEqual([
       'whiteboard',
-      'pulse',
       'patients',
-      'journey',
+      'ems',
       'intake',
       'queues',
       'reassessment',
-      'ems',
-      'referrals',
-      'provincial_health',
-      'integrations',
       'capacity',
       'boarding',
+      'referrals',
       'copilot',
       'analytics',
-      'simulation',
-      'tools',
-      'shift',
       'settings',
     ]);
     expect(toolIds).toEqual(expect.arrayContaining(['qsofa', 'news2']));

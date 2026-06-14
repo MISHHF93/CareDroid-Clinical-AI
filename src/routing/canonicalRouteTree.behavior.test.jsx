@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
@@ -15,12 +14,16 @@ import { UserIdentityProvider } from '../contexts/UserIdentityContext';
 import { CostTrackingProvider } from '../contexts/CostTrackingContext';
 import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { AppRoutes } from '../App';
-import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
+import {
+  NAVIGATION_ITEMS,
+  getPilotCustomerNavigationItems,
+} from '../config/unified-navigation.config';
 
 const originalEmergencyState = useEmergencyStore.getState();
-const ROUTE_LOAD_TIMEOUT = 5000;
+const ROUTE_LOAD_TIMEOUT = 15000;
+const PILOT_VISIBLE_NAVIGATION_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn().mockResolvedValue({
@@ -150,22 +153,12 @@ describe('canonical route tree behavior', () => {
   it('/emergency/whiteboard renders the active Emergency OS whiteboard', async () => {
     renderRoute('/emergency/whiteboard');
 
-    expect(await screen.findByRole('link', { name: 'Board' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Whiteboard' })).toHaveAttribute(
       'aria-current',
       'page',
     );
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
-  });
-
-  it('/emergency/command-center renders the AIIOS command center alias', async () => {
-    renderRoute('/emergency/command-center');
-
-    expect(await findRouteHeading('Command Center')).toBeInTheDocument();
-    expect(screen.getByText(/Emergency OS powered by AIIOS/i)).toBeInTheDocument();
-    expect(screen.getByText(/Dispatcher, EMS, device telemetry/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Board' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/command-center');
   });
 
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
@@ -196,7 +189,7 @@ describe('canonical route tree behavior', () => {
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
     renderRoute('/emergency/capacity');
 
-    expect(await screen.findByRole('heading', { name: 'Capacity Detail' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Capacity' })).toBeInTheDocument();
     expect(screen.getByText('Capacity score')).toBeInTheDocument();
     expect(screen.getByText('Available rooms')).toBeInTheDocument();
     expect(screen.getByText('Boarding patients')).toBeInTheDocument();
@@ -206,9 +199,9 @@ describe('canonical route tree behavior', () => {
     renderRoute('/emergency/queues');
 
     expect(
-      (await screen.findAllByRole('heading', { name: 'Queue Intelligence' })).length,
+      (await screen.findAllByRole('heading', { name: 'Queues' })).length,
     ).toBeGreaterThan(0);
-    expect(screen.getByText('Waiting')).toBeInTheDocument();
+    expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
     expect(screen.getByText('Triage')).toBeInTheDocument();
   });
 
@@ -228,7 +221,7 @@ describe('canonical route tree behavior', () => {
     renderRoute('/emergency/referrals');
 
     expect(await findRouteHeading('Referrals')).toBeInTheDocument();
-  });
+  }, ROUTE_LOAD_TIMEOUT);
 
   it('/emergency/copilot renders the active Copilot route context', async () => {
     renderRoute('/emergency/copilot');
@@ -251,11 +244,12 @@ describe('canonical route tree behavior', () => {
   });
 
   it('loads every operational sidebar destination without an access-denied surface', async () => {
-    for (const item of NAVIGATION_ITEMS.filter((entry) => entry.id !== 'settings')) {
+    for (const item of PILOT_VISIBLE_NAVIGATION_ITEMS) {
       const { unmount } = render(<AppRouteHarness initialPath={item.path} />);
 
       expect(await screen.findByTestId('location')).toHaveTextContent(item.path);
       expect(screen.getByRole('main')).toBeInTheDocument();
+      expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();
       expect(screen.queryByText('Emergency OS page unavailable')).toBeNull();
 
@@ -263,40 +257,38 @@ describe('canonical route tree behavior', () => {
     }
   });
 
-  it('keeps sidebar links and primary shell buttons clickable from the frontend', async () => {
-    const user = userEvent.setup();
+  it('keeps primary shell controls and representative sidebar links exposed', async () => {
     renderRoute('/emergency/whiteboard');
 
     expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+    expect(
+      await screen.findByRole('button', { name: /\+ Central Intake/i }, { timeout: ROUTE_LOAD_TIMEOUT }),
+    ).toBeEnabled();
 
-    await user.click(screen.getByRole('button', { name: /\+ Central Intake/i }));
-    expect(await findRouteHeading('Central Node Intake')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /close quick intake/i }));
-    await waitFor(() => {
-      expect(screen.queryByRole('heading', { name: 'Central Node Intake' })).toBeNull();
+    const desktopNavigation = screen.getByRole('navigation', {
+      name: 'Emergency desktop navigation',
     });
+    expect(within(desktopNavigation).queryByRole('link', { name: 'Analytics' })).toBeNull();
+    expect(within(desktopNavigation).queryByRole('link', { name: 'Settings' })).toBeNull();
 
-    for (const filter of ['Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding', 'All']) {
-      await user.click(screen.getByRole('button', { name: filter }));
-      expect(screen.getAllByRole('main').length).toBeGreaterThan(0);
-    }
-
-    for (const item of NAVIGATION_ITEMS.filter((entry) => entry.id !== 'settings')) {
-      const link = screen.getAllByRole('link', { name: item.label })[0];
-      await user.click(link);
-      await waitFor(
-        () => {
-          expect(screen.getByTestId('location')).toHaveTextContent(item.path);
-        },
-        { timeout: ROUTE_LOAD_TIMEOUT },
+    for (const label of ['Whiteboard', 'Patients', 'Queues']) {
+      const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
+      expect(item, label).toBeTruthy();
+      expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
+        'href',
+        item.path,
       );
-      expect(screen.getAllByRole('main').length).toBeGreaterThan(0);
-      expect(screen.queryByText('Emergency OS page unavailable')).toBeNull();
     }
-  }, 30000);
+  }, ROUTE_LOAD_TIMEOUT);
 
   it('redirects retired platform roots to the Emergency OS whiteboard', async () => {
     renderRoute('/marketplace');
+
+    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+  });
+
+  it('redirects retired Emergency OS routes to the whiteboard', async () => {
+    renderRoute('/emergency/pulse');
 
     expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });

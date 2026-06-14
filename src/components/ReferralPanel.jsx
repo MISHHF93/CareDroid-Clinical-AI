@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../types/emergency';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { useReferrals } from '../hooks/useEmergencyOs';
 import {
   persistEmergencyReferral,
   updateEmergencyTransferWorkflow,
@@ -149,7 +150,12 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
       </span>
 
       <div className="referral-row__view">
-        <button type="button" onClick={() => onSelectPatient(patient?.id)}>
+        <button
+          type="button"
+          onClick={() => onSelectPatient(patient?.id)}
+          disabled={!patient?.id}
+          title={patient?.id ? 'Open patient detail' : 'Patient record unavailable'}
+        >
           View
         </button>
       </div>
@@ -253,6 +259,7 @@ export default function ReferralPanel() {
   const emergencyRole = useEmergencyRolePermissions();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const referralsModule = useReferrals();
   const referrals = useEmergencyStore((state) => state.referrals);
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
@@ -399,12 +406,12 @@ export default function ReferralPanel() {
       .then((result) => {
         setBackendStatus(
           result.ok
-            ? 'Referral persisted to backend.'
-            : result.message || 'Referral saved locally; backend persistence endpoint is not available yet.'
+            ? 'Referral saved to Emergency OS.'
+            : 'Referral saved for this shift. Live sync is pending.'
         );
       })
-      .catch((error) => {
-        setBackendStatus(`Referral saved locally; backend sync failed: ${error.message}`);
+      .catch(() => {
+        setBackendStatus('Referral saved for this shift. Live sync is pending.');
       })
       .finally(() => setBackendPending(false));
     resetForm();
@@ -425,12 +432,12 @@ export default function ReferralPanel() {
         .then((result) => {
           setBackendStatus(
             result.ok
-              ? 'Transfer workflow synced to backend.'
-              : result.message || 'Transfer updated locally; backend endpoint is not available yet.'
+              ? 'Transfer workflow synced to Emergency OS.'
+              : 'Transfer updated for this shift. Live sync is pending.'
           );
         })
-        .catch((error) => {
-          setBackendStatus(`Transfer updated locally; backend sync failed: ${error.message}`);
+        .catch(() => {
+          setBackendStatus('Transfer updated for this shift. Live sync is pending.');
         })
         .finally(() => setBackendPending(false));
     }
@@ -453,12 +460,21 @@ export default function ReferralPanel() {
         <div>
           <span>Referral Intelligence</span>
           <h1 id="referral-panel-title">Referrals</h1>
+          <p>
+            {referralsModule.data?.source
+              ? `Source: ${referralsModule.data.source}`
+              : 'Specialty requests, transfer workflows, and delay signals.'}
+          </p>
         </div>
         <div className="referral-panel__header-actions">
-          <strong aria-label={`${metrics.active} active referrals`}>{metrics.active}</strong>
           <button
             type="button"
             disabled={!canManageReferral}
+            title={
+              canManageReferral
+                ? 'Create a new referral'
+                : `${emergencyRole.roleLabel} cannot create referrals`
+            }
             onClick={() => {
               if (!canManageReferral) return;
               setForm((current) => ({ ...current, workflow: 'Referral' }));
@@ -471,6 +487,11 @@ export default function ReferralPanel() {
           <button
             type="button"
             disabled={!canManageTransfer}
+            title={
+              canManageTransfer
+                ? 'Create a new transfer request'
+                : `${emergencyRole.roleLabel} cannot create transfers`
+            }
             onClick={() => {
               if (!canManageTransfer) return;
               setForm((current) => ({
@@ -486,6 +507,17 @@ export default function ReferralPanel() {
           </button>
         </div>
       </header>
+
+      {referralsModule.loading && !referrals.length ? (
+        <p className="referral-panel__backend-status" role="status">
+          Loading Emergency OS referrals...
+        </p>
+      ) : null}
+      {referralsModule.error ? (
+        <p className="referral-panel__backend-status" role="alert">
+          {referralsModule.error}. Showing the last local referral queue.
+        </p>
+      ) : null}
 
       <div className="referral-panel__metrics" aria-label="Referral metrics">
         <div>
@@ -547,19 +579,23 @@ export default function ReferralPanel() {
           </label>
 
           <div className="referral-form__patient-results" aria-label="Active patient search results">
-            {filteredPatients.map((patient) => (
-              <button
-                key={patient.id}
-                type="button"
-                className={patient.id === form.patientId ? 'referral-form__patient--selected' : ''}
-                onClick={() => selectFormPatient(patient)}
-              >
-                <strong>{patientName(patient)}</strong>
-                <span>
-                  {patient.mrn} · {patient.chiefComplaint}
-                </span>
-              </button>
-            ))}
+            {filteredPatients.length ? (
+              filteredPatients.map((patient) => (
+                <button
+                  key={patient.id}
+                  type="button"
+                  className={patient.id === form.patientId ? 'referral-form__patient--selected' : ''}
+                  onClick={() => selectFormPatient(patient)}
+                >
+                  <strong>{patientName(patient)}</strong>
+                  <span>
+                    {patient.mrn} · {patient.chiefComplaint}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="referral-form__empty">No active patients match this search.</p>
+            )}
           </div>
 
           <div className="referral-form__grid">

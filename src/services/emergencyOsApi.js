@@ -1,6 +1,15 @@
 import { buildApiUrl, getApiErrorMessage, parseApiResponse } from './apiClient';
 
+/**
+ * Canonical Emergency OS frontend facade.
+ *
+ * Active pages should prefer the Nest `/api/emergency/*` endpoints listed in
+ * ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS. The review-only groups remain exported
+ * for retained demos, placeholder connectors, and legacy audit coverage, but
+ * they are not active navigation contracts.
+ */
 export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
+  centralNodeSnapshot: '/api/emergency/central-node/snapshot',
   whiteboard: '/api/emergency/whiteboard',
   patients: '/api/emergency/patients',
   journey: '/api/emergency/journey',
@@ -16,6 +25,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   integrations: '/api/emergency/integrations',
   copilot: '/api/emergency/copilot',
   workflowLogs: '/api/emergency/workflow-logs',
+  implementationReadiness: '/api/emergency/implementation-readiness',
   analytics: '/api/emergency/analytics',
   simulationUpdateLive: '/api/emergency/simulation/update-live',
   simulationEvaluate: '/api/emergency/simulation/evaluate',
@@ -32,6 +42,44 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   digitalTwinScenario: '/api/emergency/digital-twin/scenario',
   settings: '/api/emergency/settings',
 });
+
+export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
+  'centralNodeSnapshot',
+  'whiteboard',
+  'patients',
+  'ems',
+  'intake',
+  'smartIntakeVerticalSlice',
+  'queues',
+  'reassessment',
+  'capacity',
+  'boarding',
+  'referrals',
+  'copilot',
+  'workflowLogs',
+  'analytics',
+  'settings',
+]);
+
+export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
+  'journey',
+  'provincialHealth',
+  'integrations',
+  'simulationUpdateLive',
+  'simulationEvaluate',
+  'simulationCompare',
+  'simulationRecommendations',
+  'federatedLearningRegister',
+  'federatedLearningUpdate',
+  'federatedLearningAggregate',
+  'federatedLearningGlobalModel',
+  'federatedLearningDashboard',
+  'digitalTwinInitialize',
+  'digitalTwinSimulate',
+  'digitalTwinState',
+  'digitalTwinScenario',
+  'implementationReadiness',
+]);
 
 async function requestEmergencyJson(path, options = {}) {
   try {
@@ -54,6 +102,8 @@ async function requestEmergencyJson(path, options = {}) {
 }
 
 export const fetchEmergencyWhiteboard = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
+export const fetchCareDroidCentralNodeSnapshot = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot);
 export const fetchEmergencyPatients = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
@@ -67,8 +117,15 @@ export const fetchProvincialHealth = () => requestEmergencyJson(EMERGENCY_OS_API
 export const fetchIntegrationHub = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
 export const fetchEmergencyWorkflowLogs = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
+export const fetchCompleteImplementationReadiness = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.implementationReadiness);
 export const fetchEmergencyAnalytics = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
 export const fetchEmergencySettings = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
+export const updateEmergencySettings = (settings = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings, {
+    method: 'PATCH',
+    body: JSON.stringify(settings),
+  });
 export const updateRealTimeSimulationState = (state = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.simulationUpdateLive, {
     method: 'POST',
@@ -145,6 +202,9 @@ export const runSmartIntakeVerticalSlice = (payload = {}) =>
 
 export default Object.freeze({
   EMERGENCY_OS_API_ENDPOINTS,
+  ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS,
+  REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS,
+  fetchCareDroidCentralNodeSnapshot,
   fetchEmergencyWhiteboard,
   fetchEmergencyPatients,
   fetchPatientJourney,
@@ -159,8 +219,10 @@ export default Object.freeze({
   fetchIntegrationHub,
   fetchEDCopilot,
   fetchEmergencyWorkflowLogs,
+  fetchCompleteImplementationReadiness,
   fetchEmergencyAnalytics,
   fetchEmergencySettings,
+  updateEmergencySettings,
   updateRealTimeSimulationState,
   evaluateRealTimeSimulationIntervention,
   compareRealTimeSimulationInterventions,

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useEmergencyStore } from '../../../store/emergencyStore';
 import {
   DEFAULT_EMERGENCY_THRESHOLDS,
+  useEmergencyStore,
   useEmergencyStore as useShellEmergencyStore,
 } from '../../store/emergencyStore';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
@@ -60,7 +60,7 @@ function payloadFromEnvelope(result) {
   return result?.data?.data || result?.data || result;
 }
 
-function mergeSettings(base, patch = {}) {
+function mergeSettings(base = {}, patch = {}) {
   return {
     ...base,
     ...patch,
@@ -196,8 +196,39 @@ function SettingsField({ label, value, type = 'text', onChange, options }) {
   );
 }
 
+function governedRuleLabel(ruleGroup) {
+  return {
+    'scenario-selection': 'department operating mode',
+    'patient-intake': 'patient intake',
+    'capacity-thresholds': 'capacity thresholds',
+    'reassessment-rules': 'reassessment rules',
+    'ems-routing': 'EMS routing',
+    'referral-routing': 'referral routing',
+  }[ruleGroup] || ruleGroup.replace(/-/g, ' ');
+}
+
+function patientAuditLabel(patientId, patients) {
+  if (!patientId) return 'Department';
+  const patientList = Array.isArray(patients) ? patients : [];
+  const patient = patientList.find((candidate) => candidate.id === patientId);
+  if (!patient) return 'Patient record';
+  return `${patient.firstName} ${patient.lastName} (${patient.mrn})`;
+}
+
+function auditDetailSummary(details = {}) {
+  const entries = Object.entries(details).filter(
+    ([key]) => !/patientId|staffId|id/i.test(key),
+  );
+  if (!entries.length) return 'Action metadata recorded';
+  return entries
+    .slice(0, 3)
+    .map(([key, value]) => `${key.replace(/([A-Z])/g, ' $1')}: ${String(value)}`)
+    .join(' | ');
+}
+
 export default function EmergencySettings() {
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
+  const patients = useEmergencyStore((state) => state.patients);
   const rootWorkflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const saveEmergencySettings = useEmergencyStore((state) => state.saveEmergencySettings);
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
@@ -239,19 +270,19 @@ export default function EmergencySettings() {
         if (cancelled) return;
         if (!result.ok) {
           setError(
-            result.message || 'Backend settings unavailable. Local settings remain editable.',
+            'Live settings service unavailable. Local settings remain editable.',
           );
           setDraft(mergeSettings(storeSettings));
           return;
         }
         const nextSettings = mergeSettings(storeSettings, payloadFromEnvelope(result));
         setDraft(nextSettings);
-        saveEmergencySettings(normalizePatchForStore(nextSettings));
+        saveEmergencySettings?.(normalizePatchForStore(nextSettings));
       })
-      .catch((loadError) => {
+      .catch(() => {
         if (!cancelled) {
           setError(
-            loadError?.message || 'Backend settings unavailable. Local settings remain editable.',
+            'Live settings service unavailable. Local settings remain editable.',
           );
           setDraft(mergeSettings(storeSettings));
         }
@@ -285,9 +316,9 @@ export default function EmergencySettings() {
         setBackendWorkflowLogs(Array.isArray(logs) ? logs : []);
         setAuditStatus('ready');
       })
-      .catch((loadError) => {
+      .catch(() => {
         if (cancelled) return;
-        setAuditError(loadError?.message || 'Workflow audit logs unavailable.');
+        setAuditError('Workflow audit logs are temporarily unavailable.');
         setAuditStatus('error');
       });
 
@@ -439,10 +470,10 @@ export default function EmergencySettings() {
     if (result.ok) {
       const nextSettings = mergeSettings(draft, payloadFromEnvelope(result));
       setDraft(nextSettings);
-      saveEmergencySettings(normalizePatchForStore(nextSettings));
+      saveEmergencySettings?.(normalizePatchForStore(nextSettings));
       setStatus(`${SETTING_GROUP_LABELS[group]} saved.`);
     } else {
-      saveEmergencySettings(storePatch);
+      saveEmergencySettings?.(storePatch);
       setDraft((current) => mergeSettings(current, patch));
       setError(`${SETTING_GROUP_LABELS[group]} saved locally only: ${result.message}`);
     }
@@ -456,14 +487,14 @@ export default function EmergencySettings() {
   const loadFirstCustomerDemo = () => {
     setShellActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
     setRootActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
-    setStatus('Central Node demo seed loaded locally for the live walkthrough.');
+    setStatus('Department walkthrough dataset loaded for the live customer walkthrough.');
     setError('');
   };
 
   const resetDemoScenario = () => {
     setShellActiveScenario('normal-day');
     setRootActiveScenario('normal-day');
-    setStatus('Central Node demo seed reset to Normal day.');
+    setStatus('Department walkthrough dataset reset to normal operations.');
     setError('');
   };
 
@@ -496,18 +527,18 @@ export default function EmergencySettings() {
 
       <Section
         id="first-customer-demo"
-        title="Central Node Demo Seed"
-        subtitle="Loads deterministic department inputs into the central node for walkthroughs without exposing scenario control in the dashboard."
+        title="Department Walkthrough Dataset"
+        subtitle="Loads a stable high-volume department picture for customer walkthroughs without changing the pilot dashboard surface."
         action={
           <button type="button" onClick={loadFirstCustomerDemo}>
-            {isFirstCustomerDemoActive ? 'Reload Seed' : 'Load Seed'}
+            {isFirstCustomerDemoActive ? 'Reload Dataset' : 'Load Dataset'}
           </button>
         }
       >
         <div className="emergency-settings__demo-card">
           <div>
             <strong>
-              {isFirstCustomerDemoActive ? 'Central seed active' : 'Central seed inactive'}
+              {isFirstCustomerDemoActive ? 'Walkthrough data active' : 'Walkthrough data inactive'}
             </strong>
             <p>
               {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound, waiting
@@ -517,14 +548,14 @@ export default function EmergencySettings() {
           </div>
           <div
             className="emergency-settings__demo-metrics"
-            aria-label="Central Node demo seed metrics"
+            aria-label="Department walkthrough dataset metrics"
           >
             <span>100 patients/day</span>
             <span>42 active census</span>
-            <span>Local fixture</span>
+            <span>Walkthrough dataset</span>
           </div>
           <button type="button" onClick={resetDemoScenario} disabled={!isFirstCustomerDemoActive}>
-            Reset Seed
+            Reset Dataset
           </button>
         </div>
       </Section>
@@ -537,7 +568,16 @@ export default function EmergencySettings() {
           <button
             type="button"
             disabled={savingGroup === 'central'}
-            onClick={() => saveGroup('central', { centralControl: draft.centralControl })}
+            onClick={() =>
+              saveGroup('central', {
+                centralControl: draft.centralControl,
+                defaultScreenMode: draft.defaultScreenMode,
+                enabledScreenModes: draft.enabledScreenModes,
+                readOnlyDisplayMode: draft.readOnlyDisplayMode,
+                commandCenterMode: draft.commandCenterMode,
+                wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
+              })
+            }
           >
             Save Central Node
           </button>
@@ -614,11 +654,45 @@ export default function EmergencySettings() {
               })
             }
           />
+          <SettingsField
+            label="Default screen mode"
+            value={draft.defaultScreenMode}
+            options={[
+              ['TRIAGE_SCREEN', 'Triage screen'],
+              ['REGISTRATION_SCREEN', 'Registration screen'],
+              ['CHARGE_NURSE_SCREEN', 'Charge nurse screen'],
+              ['PHYSICIAN_SCREEN', 'Physician screen'],
+              ['EMS_SCREEN', 'EMS screen'],
+              ['WAITING_ROOM_DISPLAY', 'Waiting room display'],
+              ['COMMAND_CENTER_DISPLAY', 'Command center display'],
+              ['ADMIN_SCREEN', 'Admin screen'],
+              ['READ_ONLY_DISPLAY', 'Read-only display'],
+            ]}
+            onChange={(value) => updateDraft({ defaultScreenMode: value })}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Command center mode"
+            value={draft.commandCenterMode}
+            onChange={(value) => updateDraft({ commandCenterMode: value })}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Read-only display mode"
+            value={draft.readOnlyDisplayMode}
+            onChange={(value) => updateDraft({ readOnlyDisplayMode: value })}
+          />
+          <SettingsField
+            type="number"
+            label="Wall display refresh interval (ms)"
+            value={draft.wallDisplayRefreshInterval}
+            onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
+          />
         </div>
         <div className="emergency-settings__rules" aria-label="Central node governed rule groups">
           {draft.centralControl.governedRuleGroups.map((ruleGroup) => (
             <article key={ruleGroup}>
-              <strong>{ruleGroup.replace(/-/g, ' ')}</strong>
+              <strong>{governedRuleLabel(ruleGroup)}</strong>
               <small>central policy</small>
             </article>
           ))}
@@ -643,10 +717,10 @@ export default function EmergencySettings() {
           <span>workflow action logs</span>
           <small>
             {auditStatus === 'ready'
-              ? 'Backend audit loaded'
+              ? 'Workflow audit loaded'
               : auditStatus === 'loading'
                 ? 'Loading department data...'
-                : 'Local fallback active'}
+                : 'Local audit log active'}
           </small>
         </div>
         {auditStatus === 'loading' ? (
@@ -673,7 +747,7 @@ export default function EmergencySettings() {
                   <strong>{log.title || log.type}</strong>
                   <p>{log.summary}</p>
                   <small>
-                    {log.source} · {log.patientId || 'department'}
+                    {log.source} · {patientAuditLabel(log.patientId, patients)}
                   </small>
                 </div>
                 <div>
@@ -689,7 +763,7 @@ export default function EmergencySettings() {
       <Section
         id="audit-log"
         title="Audit Log"
-        subtitle="Last 50 store actions with timestamps, patient context, staff attribution, and compact details."
+        subtitle="Last 50 local actions with timestamps, patient context, staff attribution, and compact details."
         action={
           <button type="button" onClick={exportAuditCsv} disabled={!filteredAuditLogs.length}>
             Export CSV
@@ -731,7 +805,7 @@ export default function EmergencySettings() {
         <div
           className="emergency-settings__audit-table"
           role="table"
-          aria-label="Store action audit log"
+          aria-label="Local action audit log"
         >
           <div role="row" className="emergency-settings__audit-table-head">
             <span role="columnheader">Time</span>
@@ -747,14 +821,14 @@ export default function EmergencySettings() {
                   {new Date(log.timestamp).toLocaleString()}
                 </time>
                 <span role="cell">{log.action}</span>
-                <span role="cell">{log.patientId || 'department'}</span>
+                <span role="cell">{patientAuditLabel(log.patientId, patients)}</span>
                 <span role="cell">{log.staffId || 'system'}</span>
-                <code role="cell">{JSON.stringify(log.details || {})}</code>
+                <span role="cell">{auditDetailSummary(log.details)}</span>
               </div>
             ))
           ) : (
             <p className="emergency-settings__audit-state">
-              No store actions match the current filters.
+              No local actions match the current filters.
             </p>
           )}
         </div>
@@ -802,7 +876,7 @@ export default function EmergencySettings() {
                 value={module.enabled}
                 onChange={(enabled) => updateModule(module.id, enabled)}
               />
-              <small>{module.id}</small>
+              <small>Configured module</small>
             </article>
           ))}
         </div>
@@ -810,7 +884,7 @@ export default function EmergencySettings() {
 
       <Section
         id="ai"
-        title={`${EMERGENCY_OS_BRANDING.aiiosName} Settings`}
+        title="AI Settings"
         subtitle="AIIOS routing, context, evidence, workflow support, and human-review controls."
         action={
           <button

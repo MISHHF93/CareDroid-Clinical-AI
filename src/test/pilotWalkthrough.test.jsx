@@ -228,7 +228,7 @@ describe('pilot walkthrough', () => {
     for (const approveButton of screen.getAllByRole('button', { name: 'Approve' })) {
       await user.click(approveButton);
     }
-    await user.click(screen.getAllByRole('button', { name: /Send to Triage/i }).at(-1));
+    await user.click(screen.getAllByRole('button', { name: /Create and Send to Triage/i }).at(-1));
 
     const createdPatient = await waitForNewPatient(beforePatientIds);
     expect(createdPatient.state).toBe(PatientState.Triage);

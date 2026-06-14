@@ -36,7 +36,9 @@ describe('EmergencyWhiteboard store reactivity', () => {
       </MemoryRouter>,
     );
 
-    await screen.findByText(/Central Node managed dashboard/i);
+    const commandStatus = await screen.findByLabelText('AIIOS command center status');
+    expect(commandStatus).toHaveTextContent(/Central Node managed/i);
+    expect(commandStatus).toHaveTextContent(/active ED records/i);
     const firstPatientCard = document.querySelector('[data-patient-card-id]');
     expect(firstPatientCard).toBeTruthy();
     await user.click(firstPatientCard);

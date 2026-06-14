@@ -7,6 +7,7 @@
   padding-top: min(14vh, 120px);
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(6px);
+  animation: command-palette-backdrop var(--motion-transition-normal) both;
 }
 
 .command-palette {
@@ -20,6 +21,7 @@
   background: var(--color-elevated);
   color: var(--color-text-primary);
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+  animation: command-palette-scale-fade var(--motion-transition-normal) both;
 }
 
 .command-palette__search {
@@ -56,6 +58,11 @@
   font-size: var(--font-size-sm);
   font-weight: 800;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .command-palette__body {
@@ -88,6 +95,11 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .command-palette__item--active,
@@ -97,6 +109,39 @@
   border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-info) 12%, var(--color-surface));
   outline: none;
+  transform: translateY(-1px);
+}
+
+.command-palette__search button:hover,
+.command-palette__search button:focus-visible,
+.command-palette__flag-dialog button:hover,
+.command-palette__flag-dialog button:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  color: var(--color-text-primary);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+@keyframes command-palette-backdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes command-palette-scale-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes command-palette-slide-up {
@@ -214,7 +259,7 @@
     height: 60vh;
     max-height: 60vh;
     border-radius: 20px 20px 0 0;
-    animation: command-palette-slide-up 180ms ease-out;
+    animation: command-palette-slide-up var(--motion-transition-normal) both;
   }
 
   .command-palette__search {
@@ -222,5 +267,27 @@
     top: 0;
     z-index: 1;
     background: var(--color-elevated);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command-palette__overlay,
+  .command-palette,
+  .command-palette__item,
+  .command-palette__search button,
+  .command-palette__flag-dialog button {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+
+  .command-palette__item--active,
+  .command-palette__item:hover,
+  .command-palette__item:active,
+  .command-palette__item:focus-visible,
+  .command-palette__search button:hover,
+  .command-palette__search button:focus-visible,
+  .command-palette__flag-dialog button:hover,
+  .command-palette__flag-dialog button:focus-visible {
+    transform: none;
   }
 }

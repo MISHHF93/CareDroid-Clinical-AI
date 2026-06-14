@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
 import { staffDisplayName } from '../utils/staffManagement';
 import './EscalateButton.css';

@@ -1,6 +1,10 @@
 import { getActiveWorkspaceRegistry, isFutureWorkspace } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS, canExposeNavigationItem } from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import {
+  PILOT_CUSTOMER_MODE,
+  getPilotCustomerNavigationItems,
+} from '../config/unified-navigation.config';
 import { buildAssetInventoryProjection } from './assetInventory';
 import { PLATFORM_DASHBOARDS, PLATFORM_NOTIFICATIONS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
 import { SIMULATION_SCENARIOS } from './medicalSimulationCatalog';
@@ -12,6 +16,15 @@ import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
 
 function unique(values) {
   return [...new Set((values || []).flat().filter(Boolean).map(String))];
+}
+
+function uniqueEntriesByPath(entries) {
+  const seen = new Set();
+  return entries.filter((entry) => {
+    if (!entry.path || seen.has(entry.path)) return false;
+    seen.add(entry.path);
+    return true;
+  });
 }
 
 const ACTIVE_WORKSPACE_ID_SET = new Set(getActiveWorkspaceRegistry().map((workspace) => workspace.id));
@@ -306,22 +319,10 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['whiteboard', 'board', 'patient flow', 'operational screen'],
   },
   {
-    id: 'department-pulse',
-    title: 'Department Pulse',
-    path: CANONICAL_ROUTES.emergencyPulse,
-    aliases: ['pulse', 'department pulse', 'charge nurse', 'return brief'],
-  },
-  {
     id: 'emergency-patients',
     title: 'Patients',
     path: CANONICAL_ROUTES.emergencyPatients,
     aliases: ['patients', 'patient list', 'patient snapshots'],
-  },
-  {
-    id: 'emergency-journey',
-    title: 'Patient Journey',
-    path: CANONICAL_ROUTES.emergencyJourney,
-    aliases: ['journey', 'patient journey', 'flow events', 'state transitions'],
   },
   {
     id: 'emergency-ems',
@@ -366,18 +367,6 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['referrals', 'consults', 'transfer', 'specialty'],
   },
   {
-    id: 'emergency-provincial-health',
-    title: 'Provincial Health',
-    path: CANONICAL_ROUTES.emergencyProvincialHealth,
-    aliases: ['provincial health', 'ohip', 'hie', 'external records', 'medications', 'allergies'],
-  },
-  {
-    id: 'emergency-integrations',
-    title: 'Integration Hub',
-    path: CANONICAL_ROUTES.emergencyIntegrations,
-    aliases: ['integrations', 'integration hub', 'fhir', 'hl7', 'iot', 'devices'],
-  },
-  {
     id: 'emergency-copilot',
     title: 'ED Copilot',
     path: CANONICAL_ROUTES.emergencyCopilot,
@@ -390,45 +379,6 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['analytics', 'metrics', 'throughput', 'trends'],
   },
   {
-    id: 'emergency-simulation',
-    title: 'Real-Time Simulation',
-    path: CANONICAL_ROUTES.emergencySimulation,
-    aliases: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast', 'surge decision support'],
-  },
-  {
-    id: 'emergency-tools',
-    title: 'Emergency Tools',
-    path: CANONICAL_ROUTES.emergencyTools,
-    aliases: ['tools', 'calculators', 'clinical tools', 'scores'],
-  },
-  {
-    id: 'emergency-shift',
-    title: 'Shift Summary',
-    path: CANONICAL_ROUTES.emergencyShift,
-    aliases: ['shift', 'shift summary', 'handoff', 'end of shift'],
-  },
-  // Future module
-  // {
-  //   id: 'emergency-federated-learning',
-  //   title: 'Federated Learning',
-  //   path: CANONICAL_ROUTES.emergencyFederatedLearning,
-  //   aliases: ['federated learning', 'fedavg', 'multi hospital', 'model aggregation', 'privacy preserving learning'],
-  // },
-  // Future module
-  // {
-  //   id: 'emergency-digital-twin',
-  //   title: 'Digital Twin',
-  //   path: CANONICAL_ROUTES.emergencyDigitalTwin,
-  //   aliases: ['digital twin', 'des', 'abm', 'operations twin', 'hybrid simulation', 'calibration'],
-  // },
-  // Future module
-  // {
-  //   id: 'ai-governance',
-  //   title: 'AI Governance',
-  //   path: CANONICAL_ROUTES.aiGovernance,
-  //   aliases: ['ai governance', 'governance', 'safety', 'compliance', 'model inventory'],
-  // },
-  {
     id: 'emergency-settings',
     title: 'Settings',
     path: CANONICAL_ROUTES.emergencySettings,
@@ -436,20 +386,27 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
   },
 ]);
 
+const PILOT_EMERGENCY_OS_DESTINATION_PATHS = new Set(
+  getPilotCustomerNavigationItems().map((item) => item.path),
+);
+
 function emergencyOsDestinationEntries() {
-  return EMERGENCY_OS_DESTINATIONS.map((destination) => ({
-    id: `emergency-os:${destination.id}`,
-    sourceId: destination.id,
-    kind: 'destination',
-    category: 'emergency-os',
-    type: 'navigation',
-    title: destination.title,
-    label: destination.title,
-    description: `Open ${destination.title} in Emergency OS.`,
-    path: destination.path,
-    workspaceIds: ['emergency'],
-    aliases: unique([destination.id, ...(destination.aliases || [])]),
-    assistantPrompt: `Open or explain the ${destination.title} Emergency OS workflow.`,
+  return EMERGENCY_OS_DESTINATIONS.filter(
+    (destination) =>
+      !PILOT_CUSTOMER_MODE.enabled || PILOT_EMERGENCY_OS_DESTINATION_PATHS.has(destination.path),
+  ).map((destination) => ({
+      id: `emergency-os:${destination.id}`,
+      sourceId: destination.id,
+      kind: 'destination',
+      category: 'emergency-os',
+      type: 'navigation',
+      title: destination.title,
+      label: destination.title,
+      description: `Open ${destination.title} in Emergency OS.`,
+      path: destination.path,
+      workspaceIds: ['emergency'],
+      aliases: unique([destination.id, ...(destination.aliases || [])]),
+      assistantPrompt: `Open or explain the ${destination.title} Emergency OS workflow.`,
   }));
 }
 
@@ -778,10 +735,10 @@ export function buildSearchFirstDiscoveryEntries({
   includeContextualDestinations = false,
   includePlatformCatalog = false,
 } = {}) {
-  const activeEmergencyEntries = [
+  const activeEmergencyEntries = uniqueEntriesByPath([
     ...emergencyOsDestinationEntries(),
     ...navigationDestinationEntries({ navigationPermissions, includeContextualDestinations }),
-  ];
+  ]);
   const platformCatalogEntries = includePlatformCatalog
     ? [
         ...workspaceEntries(),

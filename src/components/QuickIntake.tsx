@@ -312,7 +312,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
 
             .quick-intake-modal {
               width: 100% !important;
-              height: 100dvh !important;
+              height: var(--app-viewport-height, 100dvh) !important;
               max-height: none !important;
               border-radius: 0 !important;
             }
@@ -349,6 +349,14 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
               height: 56px !important;
             }
           }
+
+          @media (max-width: 390px) {
+            .quick-intake-modal [style*='grid-template-columns: repeat(3, 1fr)'],
+            .quick-intake-modal [style*='grid-template-columns: repeat(4, 1fr)'],
+            .quick-intake-modal [style*='grid-template-columns: 1fr 1fr'] {
+              grid-template-columns: 1fr !important;
+            }
+          }
         `}
       </style>
       <form
@@ -356,12 +364,12 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         onSubmit={submit}
         onKeyDown={handleKeyDown}
         style={{
-          width: 600,
+          width: 'min(600px, calc(100vw - 24px))',
           maxWidth: '100%',
-          maxHeight: '92vh',
+          maxHeight: 'min(92vh, calc(var(--app-viewport-height, 100dvh) - 24px))',
           overflowY: 'auto',
           background: '#111827',
-          border: '1px solid #1F2937',
+          border: 0,
           borderRadius: 14,
           color: '#F9FAFB',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
@@ -411,9 +419,10 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
             <div
               aria-label="Central node input mode"
               style={{
-                border: '1px solid rgba(96, 165, 250, 0.3)',
+                border: 0,
                 borderRadius: 12,
                 background: 'rgba(37, 99, 235, 0.12)',
+                boxShadow: 'inset 3px 0 0 rgba(96,165,250,0.72)',
                 color: '#BFDBFE',
                 padding: 10,
                 fontSize: 12,
@@ -482,7 +491,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
               <div
                 aria-label="Suggested protocols"
                 style={{
-                  border: '1px solid #1F2937',
+                  border: 0,
                   borderRadius: 12,
                   background: '#0B1120',
                   padding: 10,

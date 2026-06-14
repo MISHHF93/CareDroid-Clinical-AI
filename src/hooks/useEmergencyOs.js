@@ -33,19 +33,110 @@ import {
   updateRealTimeSimulationState,
 } from '../services/emergencyOsApi';
 
+function latestVitals(patient = {}) {
+  if (Array.isArray(patient.vitals)) return patient.vitals.at(-1) || {};
+  return patient.vitals || {};
+}
+
+function normalizeEmsSeverity(patient = {}, offloadRisk = '') {
+  if (patient.priority === 'P1' || offloadRisk === 'high') return 'Critical';
+  if (patient.priority === 'P2') return 'High';
+  if (patient.priority === 'P4' || patient.priority === 'P5') return 'Low';
+  return 'Moderate';
+}
+
+function normalizeEmsArrival(row = {}, index = 0) {
+  const patient = row.patient || row;
+  const eta = Number(row.etaMinutes ?? row.eta ?? 0) || 0;
+  const isPreArrival = row.handoffStatus === 'pre-arrival' || patient.state === 'Arrival';
+  const estimatedArrivalTime = new Date(Date.now() + Math.max(0, eta) * 60000).toISOString();
+
+  return {
+    id: row.id || `ems-arrival-${patient.id || index}`,
+    patientId: isPreArrival ? undefined : patient.id,
+    unitId: patient.mrn || row.unitId || `EMS-${index + 1}`,
+    unitName: row.unitName || patient.mrn || `EMS ${index + 1}`,
+    crewNames: row.crewNames || ['EMS crew pending'],
+    patientAge: Number(patient.age || 0),
+    patientSex: patient.sex || 'Unknown',
+    chiefComplaint: patient.chiefComplaint || row.chiefComplaint || 'EMS pre-arrival',
+    vitals: latestVitals(patient),
+    eta,
+    severity: normalizeEmsSeverity(patient, row.offloadRisk),
+    dispatchTime: patient.arrivalTime || estimatedArrivalTime,
+    estimatedArrivalTime,
+    notes: row.handoffStatus || patient.chiefComplaint || 'EMS intake fixture',
+    arrivedAt: isPreArrival ? undefined : patient.arrivalTime,
+    status: isPreArrival ? 'Inbound' : 'Handoff',
+    prearrivalComplaint: patient.chiefComplaint || row.chiefComplaint || 'EMS pre-arrival',
+    priority: patient.priority || 'P3',
+  };
+}
+
+function normalizeReferralStatus(status = '') {
+  const normalized = String(status).toLowerCase();
+  if (normalized.includes('accepted')) return 'Accepted';
+  if (normalized.includes('closed') || normalized.includes('complete')) return 'Completed';
+  if (normalized.includes('declined')) return 'Declined';
+  if (normalized.includes('delay')) return 'InfoRequested';
+  if (normalized.includes('draft')) return 'Draft';
+  return 'Sent';
+}
+
+function normalizeReferral(row = {}, index = 0) {
+  const patient = row.patient || {};
+  const elapsedMinutes = Number(row.elapsedMinutes || 0);
+  return {
+    id: row.id || `referral-${patient.id || index}`,
+    patientId: row.patientId || patient.id,
+    targetDepartment: row.targetDepartment || row.specialty || row.department || 'Other',
+    service: row.service || row.specialty || row.department || 'Other',
+    urgency: row.urgency || (patient.priority === 'P1' || patient.priority === 'P2' ? 'Emergent' : 'Urgent'),
+    reason: row.reason || patient.chiefComplaint || 'Specialty review requested.',
+    clinicalSummary:
+      row.clinicalSummary ||
+      row.summary ||
+      `${patient.firstName || 'Unknown'} ${patient.lastName || 'patient'}: ${patient.chiefComplaint || 'review requested'}`,
+    status: normalizeReferralStatus(row.status),
+    workflow: row.workflow || 'Referral',
+    requestedAt:
+      row.requestedAt ||
+      row.createdAt ||
+      new Date(Date.now() - Math.max(0, elapsedMinutes) * 60000).toISOString(),
+    respondedAt: row.respondedAt,
+    responseNote: row.responseNote,
+    summary: row.summary || row.reason || patient.chiefComplaint || 'Referral requested.',
+  };
+}
+
 function pickHydrationPayload(envelope) {
   const data = envelope?.data || {};
+  const emsArrivals = data.emsArrivals || data.arrivals?.map(normalizeEmsArrival);
+  const referrals = data.referrals?.map(normalizeReferral);
+  const workflowLogs = data.workflowLogs || data.logs;
   return {
     patients: data.patients || data.patient ? data.patients || [data.patient] : undefined,
     rooms: data.rooms,
     staff: data.staff,
     alerts: data.alerts,
     capacity: data.capacity,
+    emsArrivals,
+    referrals,
+    workflowLogs,
   };
 }
 
 function hasHydrationPayload(payload) {
-  return Boolean(payload.patients || payload.rooms || payload.staff || payload.alerts || payload.capacity);
+  return Boolean(
+    payload.patients ||
+      payload.rooms ||
+      payload.staff ||
+      payload.alerts ||
+      payload.capacity ||
+      payload.emsArrivals ||
+      payload.referrals ||
+      payload.workflowLogs
+  );
 }
 
 function useEmergencyModule(fetcher, scenarioModule) {

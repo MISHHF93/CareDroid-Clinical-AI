@@ -13,12 +13,16 @@ import {
 describe('Emergency OS settings config', () => {
   it('unifies settings form options with default module config', () => {
     expect(DEFAULT_EMERGENCY_MODULES.map((module) => module.label)).toEqual([
-      'Board',
-      'Smart Intake',
+      'Whiteboard',
+      'Patients',
       'EMS',
+      'Intake',
+      'Queues',
+      'Reassessment',
       'Capacity',
-      'Analytics',
-      'Settings',
+      'Boarding',
+      'Referrals',
+      'Copilot',
     ]);
     expect(EMERGENCY_WORKSPACE_OPTIONS).toEqual(
       DEFAULT_EMERGENCY_MODULES.map((module) => [module.id, module.label]),

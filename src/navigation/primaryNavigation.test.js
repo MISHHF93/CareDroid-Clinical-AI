@@ -16,25 +16,16 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 const SIDEBAR_MODEL = [
-  ['Board', '/emergency/whiteboard'],
-  ['Pulse', '/emergency/pulse'],
+  ['Whiteboard', '/emergency/whiteboard'],
   ['Patients', '/emergency/patients'],
-  ['Journey', '/emergency/journey'],
+  ['EMS', '/emergency/ems'],
   ['Intake', '/emergency/intake'],
   ['Queues', '/emergency/queues'],
   ['Reassess', '/emergency/reassessment'],
-  ['EMS', '/emergency/ems'],
-  ['Referrals', '/emergency/referrals'],
-  ['Provincial', '/emergency/provincial-health'],
-  ['Integrations', '/emergency/integrations'],
   ['Capacity', '/emergency/capacity'],
   ['Boarding', '/emergency/boarding'],
+  ['Referrals', '/emergency/referrals'],
   ['Copilot', '/emergency/copilot'],
-  ['Analytics', '/emergency/analytics'],
-  ['Sim', '/emergency/simulation'],
-  ['Tools', '/emergency/tools'],
-  ['Shift', '/emergency/shift'],
-  ['Settings', '/emergency/settings'],
 ];
 
 describe('primaryNavigation', () => {
@@ -164,9 +155,8 @@ describe('primaryNavigation', () => {
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
       true,
     );
-    expect(PRIMARY_NAV_BY_ID.tools?.path).toBe('/emergency/tools');
-    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.tools, '/tools/catalog')).toBe(false);
-    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.settings, '/tools/catalog')).toBe(false);
+    expect(PRIMARY_NAV_BY_ID.tools).toBeUndefined();
+    expect(PRIMARY_NAV_BY_ID.settings).toBeUndefined();
   });
 
   it('keeps calculator routes outside primary nav without a duplicate sidebar destination', () => {
@@ -188,25 +178,25 @@ describe('primaryNavigation', () => {
     const expected = [
       ['/emergency', 'whiteboard'],
       ['/emergency/whiteboard', 'whiteboard'],
-      ['/emergency/pulse', 'pulse'],
       ['/emergency/patients', 'patients'],
-      ['/emergency/journey', 'journey'],
+      ['/emergency/ems', 'ems'],
       ['/emergency/intake', 'intake'],
       ['/emergency/queues', 'queues'],
       ['/emergency/reassessment', 'reassessment'],
-      ['/emergency/ems', 'ems'],
-      ['/emergency/referrals', 'referrals'],
-      ['/emergency/provincial-health', 'provincial_health'],
-      ['/emergency/integrations', 'integrations'],
       ['/emergency/capacity', 'capacity'],
       ['/emergency/boarding', 'boarding'],
+      ['/emergency/referrals', 'referrals'],
       ['/emergency/copilot', 'copilot'],
-      ['/emergency/analytics', 'analytics'],
-      ['/emergency/simulation', 'simulation'],
-      ['/emergency/tools', 'tools'],
-      ['/emergency/shift', 'shift'],
-      ['/emergency/settings', 'settings'],
-      ['/settings', 'settings'],
+      ['/emergency/analytics', undefined],
+      ['/emergency/settings', undefined],
+      ['/settings', undefined],
+      ['/emergency/pulse', undefined],
+      ['/emergency/journey', undefined],
+      ['/emergency/provincial-health', undefined],
+      ['/emergency/integrations', undefined],
+      ['/emergency/simulation', undefined],
+      ['/emergency/tools', undefined],
+      ['/emergency/shift', undefined],
       ['/profile', undefined],
       ['/workspaces', undefined],
       ['/tenant-admin', 'tenant-admin'],
@@ -253,7 +243,8 @@ describe('primaryNavigation', () => {
     expect(byId.home).toBeUndefined();
     expect(byId.profile).toBeUndefined();
     expect(canExposeNavigationItem(byId.whiteboard)).toBe(true);
-    expect(canExposeNavigationItem(byId.settings)).toBe(true);
+    expect(byId.analytics).toBeUndefined();
+    expect(byId.settings).toBeUndefined();
     expect(canExposeNavigationItem(byId.search)).toBe(true);
     expect(canExposeNavigationItem(byId['workflow-mining'])).toBe(false);
     expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(

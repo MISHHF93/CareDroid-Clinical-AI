@@ -6,15 +6,14 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-  border: 1px solid color-mix(in srgb, var(--color-border-subtle) 86%, transparent);
-  border-radius: var(--radius-lg);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 90%, var(--status-info) 4%) 0%, var(--color-surface) 100%);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white 5%, transparent),
-    0 16px 34px rgba(0, 0, 0, 0.16);
+  border: 0;
+  border-radius: var(--component-card-radius);
+  background: var(--color-card);
+  box-shadow: var(--component-inner-shadow, var(--component-card-shadow));
   overflow: hidden;
-  transition: width 180ms var(--ease-smooth, ease);
+  transition:
+    width var(--motion-transition-normal, 180ms ease),
+    background-color var(--motion-transition-normal, 180ms ease);
 }
 
 .queue-intel--collapsed {
@@ -29,7 +28,7 @@
   min-height: 48px;
   padding: var(--space-2) var(--space-5) var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--color-border-subtle);
-  background: color-mix(in srgb, var(--bg-surface) 78%, transparent);
+  background: color-mix(in srgb, var(--color-card) 90%, transparent);
 }
 
 .queue-intel__collapse {
@@ -44,10 +43,15 @@
   height: 30px;
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  background: var(--color-elevated);
+  background: var(--component-inner-row-bg);
   color: var(--color-text-secondary);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+  box-shadow: var(--component-inner-shadow);
   cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .queue-intel--collapsed .queue-intel__collapse {
@@ -83,12 +87,16 @@
   padding: var(--space-2);
   border: 1px solid var(--status-warning);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--status-warning) 14%, var(--color-surface));
+  background: color-mix(in srgb, var(--status-warning) 10%, transparent);
+  animation: queue-panel-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast);
 }
 
 .queue-intel__bottleneck--red {
   border-color: var(--status-critical);
-  background: color-mix(in srgb, var(--status-critical) 14%, var(--color-surface));
+  background: color-mix(in srgb, var(--status-critical) 10%, transparent);
 }
 
 .queue-intel__bottleneck strong {
@@ -122,13 +130,19 @@
   gap: 2px var(--space-2);
   min-width: 0;
   padding: var(--space-2);
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-elevated) 42%, transparent);
+  background: transparent;
   color: var(--color-text-secondary);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  box-shadow: var(--component-inner-shadow);
+  animation: queue-panel-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .queue-intel__warning {
@@ -143,9 +157,12 @@
 .queue-intel__row:hover,
 .queue-intel__row:focus-visible,
 .queue-intel__row--active {
-  border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
-  background: color-mix(in srgb, var(--status-info) 10%, var(--color-elevated));
+  background: var(--component-inner-row-hover-bg);
+  box-shadow:
+    inset 3px 0 0 var(--status-info),
+    var(--component-inner-shadow);
   outline: none;
+  transform: translateY(-1px);
 }
 
 .queue-intel__icon {
@@ -156,7 +173,7 @@
   width: 22px;
   height: 22px;
   border-radius: var(--radius-md);
-  background: var(--color-elevated);
+  background: var(--component-inner-surface-bg);
   color: var(--color-text-muted);
 }
 
@@ -166,7 +183,7 @@
   overflow: hidden;
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
-  font-weight: 800;
+  font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -175,7 +192,7 @@
   grid-area: count;
   color: var(--color-text-primary);
   font-family: var(--font-mono);
-  font-size: 24px;
+  font-size: var(--font-size-section);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -186,6 +203,10 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-pill);
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    opacity var(--motion-transition-fast);
 }
 
 .queue-intel__health--green {
@@ -198,7 +219,7 @@
 
 .queue-intel__health--red {
   background: var(--status-critical);
-  animation: queue-health-red-pulse 1.2s ease-in-out infinite;
+  animation: queue-health-red-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-critical) 42%, transparent);
 }
 
@@ -217,7 +238,7 @@
   grid-area: avg;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
-  font-weight: 800;
+  font-weight: 650;
 }
 
 .queue-intel__row em {
@@ -232,7 +253,7 @@
   gap: var(--space-2);
   padding: var(--space-2);
   border-top: 1px solid var(--color-border-subtle);
-  background: color-mix(in srgb, var(--bg-surface) 64%, transparent);
+  background: color-mix(in srgb, var(--color-card) 88%, transparent);
 }
 
 .queue-intel__performance {
@@ -240,15 +261,17 @@
   gap: var(--space-2);
   margin: var(--space-2);
   padding: var(--space-2);
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: var(--radius-md);
-  background: var(--color-elevated);
+  background: var(--component-inner-row-bg);
+  box-shadow: var(--component-inner-shadow);
+  animation: queue-panel-enter var(--motion-transition-normal) both;
 }
 
 .queue-intel__performance strong {
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -261,7 +284,7 @@
 .queue-intel__performance span {
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .queue-intel__performance small {
@@ -285,7 +308,7 @@
   color: var(--status-info);
   font: inherit;
   font-size: var(--font-size-sm);
-  font-weight: 800;
+  font-weight: 650;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -297,6 +320,19 @@
   border-color: var(--status-info);
   color: var(--color-text-primary);
   outline: none;
+  transform: translateY(-1px);
+}
+
+@keyframes queue-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .queue-intel--collapsed .queue-intel__header {
@@ -360,5 +396,26 @@
 @media (max-width: 720px) {
   .queue-intel__rows {
     grid-template-columns: repeat(2, minmax(132px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .queue-intel,
+  .queue-intel__bottleneck,
+  .queue-intel__row,
+  .queue-intel__performance,
+  .queue-intel__health--red {
+    animation: none !important;
+    transition: none;
+  }
+
+  .queue-intel__row:hover,
+  .queue-intel__row:focus-visible,
+  .queue-intel__row--active,
+  .queue-intel__footer button:hover,
+  .queue-intel__footer button:focus-visible,
+  .queue-intel__collapse:hover,
+  .queue-intel__collapse:focus-visible {
+    transform: none;
   }
 }

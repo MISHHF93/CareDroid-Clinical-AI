@@ -1,8 +1,10 @@
 import { CANONICAL_ROUTES } from './routes.config';
+import { isPilotCustomerVisibleNavItemId } from './unified-navigation.config';
 
-export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
+const EMERGENCY_OS_ROUTE_COMMAND_DEFINITIONS = Object.freeze([
   {
     id: 'open-whiteboard',
+    navItemId: 'whiteboard',
     label: 'Open Whiteboard',
     hint: 'W',
     keywords: ['whiteboard', 'board', 'patient flow', 'operational screen'],
@@ -10,20 +12,15 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-patients',
+    navItemId: 'patients',
     label: 'Open Patients',
     hint: 'P',
     keywords: ['patients', 'patient list', 'snapshots'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyPatients }),
   },
   {
-    id: 'open-journey',
-    label: 'Open Patient Journey',
-    hint: 'J',
-    keywords: ['journey', 'patient journey', 'flow events', 'state transitions'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyJourney }),
-  },
-  {
     id: 'open-ems',
+    navItemId: 'ems',
     label: 'Open EMS',
     hint: 'E',
     keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline'],
@@ -31,13 +28,15 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-intake',
-    label: 'Open Smart Intake',
+    navItemId: 'intake',
+    label: 'Open Intake',
     hint: 'I',
     keywords: ['intake', 'arrival', 'identity', 'registration', 'ocr'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyIntake }),
   },
   {
     id: 'open-queues',
+    navItemId: 'queues',
     label: 'Open Queues',
     hint: 'Q',
     keywords: ['queues', 'queue intelligence', 'waiting', 'who next'],
@@ -45,6 +44,7 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-reassessment',
+    navItemId: 'reassessment',
     label: 'Open Reassessment',
     hint: 'R',
     keywords: ['reassessment', 'due', 'safety', 'review'],
@@ -52,6 +52,7 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-capacity',
+    navItemId: 'capacity',
     label: 'Open Capacity',
     hint: 'C',
     keywords: ['capacity', 'rooms', 'pressure', 'occupancy'],
@@ -59,6 +60,7 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-boarding',
+    navItemId: 'boarding',
     label: 'Open Boarding',
     hint: 'B',
     keywords: ['boarding', 'admission pending', 'boarders'],
@@ -66,51 +68,40 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze([
   },
   {
     id: 'open-referrals',
+    navItemId: 'referrals',
     label: 'Open Referrals',
     hint: 'Ref',
     keywords: ['referrals', 'consults', 'transfer', 'specialty'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyReferrals }),
   },
   {
-    id: 'open-provincial-health',
-    label: 'Open Provincial Health',
-    hint: 'PH',
-    keywords: ['provincial health', 'ohip', 'hie', 'external records', 'medications', 'allergies'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyProvincialHealth }),
-  },
-  {
-    id: 'open-integrations',
-    label: 'Open Integration Hub',
-    hint: 'Hub',
-    keywords: ['integrations', 'integration hub', 'fhir', 'hl7', 'iot', 'devices'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyIntegrations }),
-  },
-  {
     id: 'open-copilot',
-    label: 'Open ED Copilot',
+    navItemId: 'copilot',
+    label: 'Open Copilot',
     hint: 'AI',
     keywords: ['copilot', 'assistant', 'ai', 'chat'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyCopilot }),
   },
   {
     id: 'open-analytics',
+    navItemId: 'analytics',
     label: 'Open Analytics',
     hint: 'A',
     keywords: ['analytics', 'throughput', 'metrics', 'trends'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyAnalytics }),
   },
   {
-    id: 'open-simulation',
-    label: 'Open Real-Time Simulation',
-    hint: 'Sim',
-    keywords: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencySimulation }),
-  },
-  {
     id: 'open-settings',
+    navItemId: 'settings',
     label: 'Open Settings',
     hint: 'S',
     keywords: ['settings', 'thresholds', 'staff', 'configuration'],
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencySettings }),
   },
 ]);
+
+export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
+  EMERGENCY_OS_ROUTE_COMMAND_DEFINITIONS.filter((command) =>
+    isPilotCustomerVisibleNavItemId(command.navItemId),
+  ),
+);

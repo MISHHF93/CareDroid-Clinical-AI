@@ -3,6 +3,8 @@ import {
   DEFAULT_ROUTE,
   NAVIGATION_ITEMS,
   NAV_ITEMS,
+  PILOT_CUSTOMER_MODE,
+  getPilotCustomerNavigationItems,
   getVisibleNavigation,
   resolveFeatureGate,
 } from './unified-navigation.config';
@@ -10,16 +12,9 @@ import {
 const REQUESTED_ITEMS = [
   {
     id: 'whiteboard',
-    label: 'Board',
+    label: 'Whiteboard',
     icon: 'layout-dashboard',
     route: '/emergency/whiteboard',
-    featureGate: null,
-  },
-  {
-    id: 'pulse',
-    label: 'Pulse',
-    icon: 'department-pulse',
-    route: '/emergency/pulse',
     featureGate: null,
   },
   {
@@ -30,11 +25,11 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
-    id: 'journey',
-    label: 'Journey',
-    icon: 'journey',
-    route: '/emergency/journey',
-    featureGate: null,
+    id: 'ems',
+    label: 'EMS',
+    icon: 'ambulance',
+    route: '/emergency/ems',
+    featureGate: 'ems_pipeline',
   },
   {
     id: 'intake',
@@ -58,37 +53,9 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
-    id: 'ems',
-    label: 'EMS',
-    icon: 'ambulance',
-    route: '/emergency/ems',
-    featureGate: 'ems_pipeline',
-  },
-  {
-    id: 'referrals',
-    label: 'Referrals',
-    icon: 'send',
-    route: '/emergency/referrals',
-    featureGate: 'referral_intel',
-  },
-  {
-    id: 'provincial_health',
-    label: 'Provincial',
-    icon: 'provincial-health',
-    route: '/emergency/provincial-health',
-    featureGate: null,
-  },
-  {
-    id: 'integrations',
-    label: 'Integrations',
-    icon: 'integrations',
-    route: '/emergency/integrations',
-    featureGate: null,
-  },
-  {
     id: 'capacity',
     label: 'Capacity',
-    icon: 'chart-bar',
+    icon: 'capacity',
     route: '/emergency/capacity',
     featureGate: 'capacity_intel',
   },
@@ -98,6 +65,13 @@ const REQUESTED_ITEMS = [
     icon: 'boarding',
     route: '/emergency/boarding',
     featureGate: null,
+  },
+  {
+    id: 'referrals',
+    label: 'Referrals',
+    icon: 'referrals',
+    route: '/emergency/referrals',
+    featureGate: 'referral_intel',
   },
   {
     id: 'copilot',
@@ -114,27 +88,6 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
-    id: 'simulation',
-    label: 'Sim',
-    icon: 'list-check',
-    route: '/emergency/simulation',
-    featureGate: null,
-  },
-  {
-    id: 'tools',
-    label: 'Tools',
-    icon: 'stethoscope',
-    route: '/emergency/tools',
-    featureGate: 'clinical_tools',
-  },
-  {
-    id: 'shift',
-    label: 'Shift',
-    icon: 'report-analytics',
-    route: '/emergency/shift',
-    featureGate: null,
-  },
-  {
     id: 'settings',
     label: 'Settings',
     icon: 'settings',
@@ -142,6 +95,10 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
 ];
+
+const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS.filter(
+  (item) => !['analytics', 'settings'].includes(item.id),
+);
 
 describe('unified navigation config', () => {
   it('exports the exact requested Emergency OS nav items in order', () => {
@@ -172,32 +129,44 @@ describe('unified navigation config', () => {
     }
   });
 
-  it('shows every page to admin and filters sensitive pages for read-only users', () => {
+  it('preserves 12 canonical items while exposing 10 pilot items', () => {
+    expect(PILOT_CUSTOMER_MODE.enabled).toBe(true);
+    expect(getPilotCustomerNavigationItems().map((item) => item.id)).toEqual(
+      PILOT_VISIBLE_ITEMS.map((item) => item.id),
+    );
+    expect(PILOT_CUSTOMER_MODE.hiddenNavItemIds).toEqual(['analytics', 'settings']);
+    expect(PILOT_CUSTOMER_MODE.retainedDirectRoutes).toEqual([
+      '/emergency/analytics',
+      '/emergency/settings',
+    ]);
+  });
+
+  it('uses distinct pilot sidebar icon keys for visual scanning', () => {
+    const pilotIcons = getPilotCustomerNavigationItems().map((item) => item.icon);
+
+    expect(pilotIcons).toEqual(PILOT_VISIBLE_ITEMS.map((item) => item.icon));
+    expect(new Set(pilotIcons).size).toBe(pilotIcons.length);
+  });
+
+  it('shows the pilot surface to admin and read-only users', () => {
     expect(getVisibleNavigation('admin').map((item) => item.label)).toEqual(
-      REQUESTED_ITEMS.map((item) => item.label),
+      PILOT_VISIBLE_ITEMS.map((item) => item.label),
     );
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
     expect(readOnlyLabels).toEqual([
-      'Board',
-      'Pulse',
+      'Whiteboard',
       'Patients',
-      'Journey',
+      'EMS',
       'Intake',
       'Queues',
       'Reassess',
-      'EMS',
-      'Referrals',
-      'Provincial',
-      'Integrations',
       'Capacity',
       'Boarding',
+      'Referrals',
       'Copilot',
-      'Analytics',
-      'Sim',
-      'Tools',
-      'Shift',
     ]);
+    expect(readOnlyLabels).not.toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
   });
 
@@ -205,7 +174,6 @@ describe('unified navigation config', () => {
     expect(resolveFeatureGate('ems_pipeline')).toBe('ems_pipeline');
     expect(resolveFeatureGate('referral_intel')).toBe('referral_intelligence');
     expect(resolveFeatureGate('capacity_intel')).toBe('capacity_intelligence');
-    expect(resolveFeatureGate('clinical_tools')).toBe('clinical_calculator_hub');
     expect(resolveFeatureGate(null)).toBeNull();
   });
 

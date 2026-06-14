@@ -13,12 +13,16 @@ export const DEFAULT_EMERGENCY_CTAS_TARGETS = Object.freeze({
 });
 
 export const DEFAULT_EMERGENCY_MODULES = Object.freeze([
-  Object.freeze({ id: 'emergency-whiteboard', label: 'Board', enabled: true }),
-  Object.freeze({ id: 'smart-intake', label: 'Smart Intake', enabled: true }),
+  Object.freeze({ id: 'emergency-whiteboard', label: 'Whiteboard', enabled: true }),
+  Object.freeze({ id: 'emergency-patients', label: 'Patients', enabled: true }),
   Object.freeze({ id: 'ems-pipeline', label: 'EMS', enabled: true }),
-  Object.freeze({ id: 'capacity-command', label: 'Capacity', enabled: true }),
-  Object.freeze({ id: 'analytics', label: 'Analytics', enabled: true }),
-  Object.freeze({ id: 'settings', label: 'Settings', enabled: true }),
+  Object.freeze({ id: 'smart-intake', label: 'Intake', enabled: true }),
+  Object.freeze({ id: 'queue-intelligence', label: 'Queues', enabled: true }),
+  Object.freeze({ id: 'reassessment-engine', label: 'Reassessment', enabled: true }),
+  Object.freeze({ id: 'capacity-intelligence', label: 'Capacity', enabled: true }),
+  Object.freeze({ id: 'boarding-intelligence', label: 'Boarding', enabled: true }),
+  Object.freeze({ id: 'referral-intelligence', label: 'Referrals', enabled: true }),
+  Object.freeze({ id: 'ed-copilot', label: 'Copilot', enabled: true }),
 ]);
 
 export const EMERGENCY_WORKSPACE_OPTIONS = Object.freeze(

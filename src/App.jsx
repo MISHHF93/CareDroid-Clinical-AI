@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import {
   BrowserRouter,
   Link,
@@ -6,7 +6,7 @@ import {
   Outlet,
   Route,
   Routes,
-  useNavigate,
+  useSearchParams,
 } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
@@ -27,9 +27,6 @@ const EmergencyWhiteboard = lazy(() => import('./components/EmergencyWhiteboard'
 const SmartIntake = lazy(() => import('./pages/emergency/SmartIntake'));
 const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalytics'));
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
-const DepartmentPulse = lazy(() => import('./pages/emergency/pulse'));
-const EmergencyShiftSummaryPage = lazy(() => import('./pages/emergency/shift'));
-const ClinicalCalculatorHub = lazy(() => import('./components/ClinicalCalculatorHub'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 import PatientCard from './components/PatientCard';
 const ReferralPanel = lazy(() => import('./components/ReferralPanel'));
@@ -41,7 +38,6 @@ import {
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from './config/routes.config';
 import { EMERGENCY_OS_BRANDING } from './config/emergencyOsBranding.config';
-import { EMERGENCY_ACTIONS } from './config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import {
   useBoardingStatus,
@@ -49,43 +45,69 @@ import {
   useEDCopilot,
   useEmergencyPatients,
   useEmergencyQueues,
-  useIntegrationHub,
-  usePatientJourney,
-  useProvincialHealth,
-  useRealTimeSimulation,
   useReassessmentQueue,
 } from './hooks/useEmergencyOs';
 
-function EmergencyRoutePage({ eyebrow, title, description, children }) {
+const emergencyRouteStyles = {
+  page: {
+    minHeight: '100%',
+    display: 'grid',
+    alignContent: 'start',
+    gap: 'var(--space-4, 16px)',
+    padding: 'var(--space-4, 16px)',
+    background: 'var(--color-background, #0A0E1A)',
+    color: 'var(--color-text-primary, #F9FAFB)',
+  },
+  hero: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 'var(--space-4, 16px)',
+    border: '1px solid var(--color-border-subtle, #1F2937)',
+    borderRadius: 'var(--radius-xl, 16px)',
+    background: 'var(--color-card, #172033)',
+    padding: 'var(--space-4, 16px)',
+    boxShadow: 'none',
+  },
+  eyebrow: {
+    color: 'var(--status-info, #60A5FA)',
+    fontSize: 'var(--font-size-xs, 12px)',
+    fontWeight: 900,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+  },
+  title: {
+    margin: 'var(--space-1, 4px) 0 0',
+    color: 'var(--color-text-primary, #F9FAFB)',
+    fontSize: 'var(--font-size-2xl, 24px)',
+    lineHeight: 1.05,
+  },
+  description: {
+    color: 'var(--color-text-secondary, #9CA3AF)',
+    fontSize: 'var(--font-size-sm, 14px)',
+    margin: 'var(--space-1, 4px) 0 0',
+    maxWidth: 860,
+  },
+  card: {
+    border: '1px solid var(--color-border-subtle, #1F2937)',
+    borderRadius: 'var(--radius-lg, 12px)',
+    background: 'var(--color-surface, #111827)',
+  },
+  muted: {
+    color: 'var(--color-text-muted, #6B7280)',
+  },
+};
+
+function EmergencyRoutePage({ eyebrow, title, description, children, actions }) {
   return (
-    <section style={{ padding: 24, display: 'grid', gap: 18 }}>
-      <header>
-        {eyebrow ? (
-          <span
-            style={{
-              color: '#60A5FA',
-              fontSize: 12,
-              fontWeight: 800,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {eyebrow}
-          </span>
-        ) : null}
-        <h1
-          style={{
-            margin: eyebrow ? '4px 0 0' : 0,
-            color: '#F9FAFB',
-            fontSize: 22,
-            fontWeight: 650,
-          }}
-        >
-          {title}
-        </h1>
-        {description ? (
-          <p style={{ color: '#9CA3AF', marginTop: 8, maxWidth: 760 }}>{description}</p>
-        ) : null}
+    <section style={emergencyRouteStyles.page}>
+      <header style={emergencyRouteStyles.hero}>
+        <div>
+          {eyebrow ? <span style={emergencyRouteStyles.eyebrow}>{eyebrow}</span> : null}
+          <h1 style={emergencyRouteStyles.title}>{title}</h1>
+          {description ? <p style={emergencyRouteStyles.description}>{description}</p> : null}
+        </div>
+        {actions ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{actions}</div> : null}
       </header>
       {children}
     </section>
@@ -127,7 +149,7 @@ function EmergencyAccessDenied({ requestedPath }) {
           background: '#111827',
           color: '#F9FAFB',
           padding: 24,
-          boxShadow: '0 24px 70px rgba(0,0,0,0.32)',
+          boxShadow: 'none',
         }}
       >
         <span
@@ -175,26 +197,14 @@ function EmergencyRouteGuard({ path, children }) {
 
 function EmergencyDefaultRedirect() {
   const emergencyRole = useEmergencyRolePermissions();
-  const staff = useEmergencyStore((state) => state.staff);
-  const activeShift = useEmergencyStore((state) => state.activeShift);
-  const currentStaff = useMemo(
-    () =>
-      staff.find((member) => member.id === activeShift.chargeStaffId) ||
-      staff.find((member) => member.role === 'Charge') ||
-      null,
-    [activeShift.chargeStaffId, staff],
-  );
-  const chargeDefaultRoute =
-    currentStaff?.role === 'Charge' && emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse)
-      ? CANONICAL_ROUTES.emergencyPulse
-      : null;
   return (
     <Navigate
       to={
-        chargeDefaultRoute ||
-        emergencyRole.defaultRoute ||
-        emergencyRole.allowedRoutes[0] ||
-        CANONICAL_ROUTES.emergencyWhiteboard
+        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyWhiteboard)
+          ? CANONICAL_ROUTES.emergencyWhiteboard
+          : emergencyRole.defaultRoute ||
+            emergencyRole.allowedRoutes[0] ||
+            CANONICAL_ROUTES.emergencyWhiteboard
       }
       replace
     />
@@ -214,23 +224,34 @@ function MetricGrid({ metrics }) {
         <article
           key={metric.label}
           style={{
-            padding: 16,
-            border: '1px solid #1F2937',
-            borderRadius: 12,
-            background: '#111827',
+            ...emergencyRouteStyles.card,
+            display: 'grid',
+            gap: 6,
+            minWidth: 0,
+            padding: 'var(--space-3, 12px)',
           }}
         >
           <strong
             style={{
               display: 'block',
-              color: metric.color || '#F9FAFB',
+              color: metric.color || 'var(--color-text-primary, #F9FAFB)',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
               fontSize: 28,
               lineHeight: 1,
             }}
           >
             {metric.value}
           </strong>
-          <span style={{ display: 'block', color: '#9CA3AF', fontSize: 12, marginTop: 6 }}>
+          <span
+            style={{
+              display: 'block',
+              color: 'var(--color-text-secondary, #9CA3AF)',
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+            }}
+          >
             {metric.label}
           </span>
         </article>
@@ -244,11 +265,11 @@ function PatientGrid({ patients, emptyMessage }) {
     return (
       <div
         style={{
-          padding: 18,
-          border: '1px solid #1F2937',
-          borderRadius: 12,
-          background: '#111827',
-          color: '#9CA3AF',
+          ...emergencyRouteStyles.card,
+          borderStyle: 'dashed',
+          color: 'var(--color-text-muted, #9CA3AF)',
+          padding: 'var(--space-6, 24px)',
+          textAlign: 'center',
         }}
       >
         {emptyMessage}
@@ -260,8 +281,8 @@ function PatientGrid({ patients, emptyMessage }) {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        gap: 12,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+        gap: 10,
       }}
     >
       {patients.map((patient) => (
@@ -279,11 +300,9 @@ function ApiStateBanner({
     return (
       <div
         style={{
-          padding: 14,
-          border: '1px solid #1F2937',
-          borderRadius: 12,
-          background: '#111827',
-          color: '#9CA3AF',
+          ...emergencyRouteStyles.card,
+          color: 'var(--color-text-secondary, #9CA3AF)',
+          padding: 'var(--space-3, 12px)',
         }}
       >
         Loading department data...
@@ -296,11 +315,11 @@ function ApiStateBanner({
       <div
         role="alert"
         style={{
-          padding: 14,
-          border: '1px solid #7F1D1D',
-          borderRadius: 12,
-          background: '#450A0A',
-          color: '#FCA5A5',
+          border: '1px solid color-mix(in srgb, var(--status-critical, #EF4444) 54%, var(--color-border-default, #7F1D1D))',
+          borderRadius: 'var(--radius-lg, 12px)',
+          background: 'color-mix(in srgb, var(--status-critical, #EF4444) 12%, var(--color-surface, #111827))',
+          color: 'var(--status-critical, #FCA5A5)',
+          padding: 'var(--space-3, 12px)',
         }}
       >
         {moduleState.error}. {fallbackText}
@@ -312,14 +331,13 @@ function ApiStateBanner({
     return (
       <div
         style={{
-          padding: 14,
-          border: '1px solid #1F2937',
-          borderRadius: 12,
-          background: '#111827',
-          color: '#9CA3AF',
+          ...emergencyRouteStyles.card,
+          borderStyle: 'dashed',
+          color: 'var(--color-text-muted, #9CA3AF)',
+          padding: 'var(--space-3, 12px)',
         }}
       >
-        No department data returned for this module.
+        No active records are available for this module yet.
       </div>
     );
   }
@@ -329,69 +347,19 @@ function ApiStateBanner({
 
 function DataSourceNote({ moduleState }) {
   const generatedAt = moduleState.data?.generatedAt;
+  const source = moduleState.data?.source;
+  const sourceLabel =
+    !source || /fallback|demo|fixture|first-customer/i.test(source)
+      ? 'walkthrough dataset'
+      : source === 'backend'
+        ? 'live Emergency OS feed'
+        : source;
   return (
-    <div style={{ color: '#6B7280', fontSize: 12 }}>
-      Source: {moduleState.data?.source || 'local-fallback'}
+    <div style={{ color: 'var(--color-text-muted, #6B7280)', fontSize: 12 }}>
+      Source: {sourceLabel}
       {generatedAt ? ` | Updated ${new Date(generatedAt).toLocaleTimeString()}` : ''}
     </div>
   );
-}
-
-function ActionButton({ children, onClick, disabled = false }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        border: '1px solid rgba(96,165,250,0.45)',
-        borderRadius: 10,
-        background: disabled ? '#1F2937' : '#1D4ED8',
-        color: '#F9FAFB',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        fontSize: 13,
-        fontWeight: 700,
-        padding: '9px 12px',
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function ActionStatus({ moduleState }) {
-  if (moduleState.actionLoading) {
-    return (
-      <div
-        style={{
-          padding: 12,
-          border: '1px solid #1F2937',
-          borderRadius: 12,
-          background: '#111827',
-          color: '#9CA3AF',
-        }}
-      >
-        Running Emergency OS action...
-      </div>
-    );
-  }
-  if (moduleState.actionError) {
-    return (
-      <div
-        role="alert"
-        style={{
-          padding: 12,
-          border: '1px solid #7F1D1D',
-          borderRadius: 12,
-          background: '#450A0A',
-          color: '#FCA5A5',
-        }}
-      >
-        {moduleState.actionError}
-      </div>
-    );
-  }
-  return null;
 }
 
 function isHighRisk(patient) {
@@ -411,15 +379,77 @@ function isBoarding(patient) {
 }
 
 function PatientsRoute() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const storePatients = useEmergencyStore((state) => state.patients);
   const patientsModule = useEmergencyPatients();
   const patients = patientsModule.data?.data?.patients || storePatients;
+  const query = searchParams.get('q') || '';
+  const visiblePatients = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return patients;
+    return patients.filter((patient) =>
+      [
+        patient.firstName,
+        patient.lastName,
+        patient.name,
+        patient.mrn,
+        patient.chiefComplaint,
+        patient.complaint,
+        patient.state,
+        patient.priority,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedQuery),
+    );
+  }, [patients, query]);
+
+  const updateQuery = (value) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (value.trim()) nextParams.set('q', value);
+    else nextParams.delete('q');
+    setSearchParams(nextParams, { replace: true });
+  };
 
   return (
     <EmergencyRoutePage
       eyebrow="Patients"
       title="Emergency Patients"
-      description="Backend-backed active patient census from `/api/emergency/patients`."
+      description="Find active patients, search by name or MRN, and open a patient card for next steps."
+      actions={
+        <label
+          style={{
+            display: 'grid',
+            gap: 4,
+            minWidth: 260,
+            color: 'var(--color-text-secondary, #9CA3AF)',
+            fontSize: 11,
+            fontWeight: 900,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Search patients
+          <input
+            type="search"
+            value={query}
+            placeholder="Name, MRN, complaint..."
+            onChange={(event) => updateQuery(event.target.value)}
+            style={{
+              minHeight: 38,
+              border: '1px solid var(--color-border-subtle, #1F2937)',
+              borderRadius: 'var(--radius-md, 10px)',
+              background: 'var(--color-elevated, #0B1120)',
+              color: 'var(--color-text-primary, #F9FAFB)',
+              font: 'inherit',
+              fontSize: 13,
+              padding: '0 12px',
+              textTransform: 'none',
+            }}
+          />
+        </label>
+      }
     >
       <ApiStateBanner moduleState={patientsModule} />
       <MetricGrid
@@ -433,66 +463,15 @@ function PatientsRoute() {
           },
         ]}
       />
-      <PatientGrid patients={patients} emptyMessage="Department Clear" />
-      <DataSourceNote moduleState={patientsModule} />
-    </EmergencyRoutePage>
-  );
-}
-
-function JourneyRoute() {
-  const journey = usePatientJourney();
-  const events = journey.data?.data?.events || [];
-  const stateCounts = journey.data?.data?.stateCounts || {};
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Flow"
-      title="Patient Journey Engine"
-      description="State transitions and timeline events from `/api/emergency/journey`."
-    >
-      <ApiStateBanner moduleState={journey} />
-      <MetricGrid
-        metrics={[
-          { label: 'Journey events', value: events.length, color: '#60A5FA' },
-          { label: 'States represented', value: Object.keys(stateCounts).length },
-          { label: 'Waiting', value: stateCounts.Waiting || 0, color: '#F59E0B' },
-        ]}
+      <PatientGrid
+        patients={visiblePatients}
+        emptyMessage={
+          query
+            ? 'No patients match the current search. Clear the search to return to the active board.'
+            : 'No active patients are currently on the board.'
+        }
       />
-      <div style={{ display: 'grid', gap: 10 }}>
-        {events.length ? (
-          events.map((event) => (
-            <article
-              key={event.id}
-              style={{
-                padding: 14,
-                border: '1px solid #1F2937',
-                borderRadius: 12,
-                background: '#111827',
-              }}
-            >
-              <strong style={{ color: '#F9FAFB' }}>{event.patientName}</strong>
-              <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                {event.from ? `${event.from} -> ` : ''}
-                {event.to} | {event.note || 'Journey event'} |{' '}
-                {new Date(event.timestamp).toLocaleTimeString()}
-              </p>
-            </article>
-          ))
-        ) : (
-          <div
-            style={{
-              padding: 18,
-              border: '1px solid #1F2937',
-              borderRadius: 12,
-              background: '#111827',
-              color: '#9CA3AF',
-            }}
-          >
-            No journey events returned.
-          </div>
-        )}
-      </div>
-      <DataSourceNote moduleState={journey} />
+      <DataSourceNote moduleState={patientsModule} />
     </EmergencyRoutePage>
   );
 }
@@ -542,15 +521,45 @@ function QueueRoute() {
   );
   const apiQueueRows = queues.data?.data?.queues;
   const visibleQueueRows = apiQueueRows?.length ? apiQueueRows : queueRows;
+  const queueMetrics = useMemo(() => {
+    const totalQueued = visibleQueueRows.reduce(
+      (total, queue) => total + (queue.count ?? queue.patients?.length ?? 0),
+      0,
+    );
+    const breachedQueues = visibleQueueRows.filter((queue) => {
+      const patientsInQueue = queue.patients || [];
+      const oldestWait =
+        queue.oldestWaitMinutes ??
+        patientsInQueue.reduce((max, patient) => {
+          const arrivedAt = new Date(patient.arrivalTime).getTime();
+          if (!Number.isFinite(arrivedAt)) return max;
+          return Math.max(max, Math.round((Date.now() - arrivedAt) / 60000));
+        }, 0);
+      const target = queue.targetMinutes ?? queue.target ?? 0;
+      return queue.breached ?? oldestWait > target;
+    }).length;
+    return { totalQueued, breachedQueues };
+  }, [visibleQueueRows]);
 
   return (
     <EmergencyRoutePage
       eyebrow="Operations"
-      title="Queue Intelligence"
-      description="Live bottleneck and handoff pressure across waiting, triage, provider, results, referrals, admission, discharge, and reassessment queues."
+      title="Queues"
+      description="See who is waiting, which queues need attention, and where the next handoff is blocked."
     >
       <ApiStateBanner moduleState={queues} />
-      <div style={{ display: 'grid', gap: 10 }}>
+      <MetricGrid
+        metrics={[
+          { label: 'Total queued', value: queueMetrics.totalQueued, color: '#60A5FA' },
+          {
+            label: 'Breached queues',
+            value: queueMetrics.breachedQueues,
+            color: queueMetrics.breachedQueues ? '#EF4444' : '#10B981',
+          },
+          { label: 'Tracked queues', value: visibleQueueRows.length },
+        ]}
+      />
+      <div style={{ display: 'grid', gap: 'var(--space-3, 12px)' }}>
         {visibleQueueRows.map((queue) => {
           const patientsInQueue = queue.patients || [];
           const oldestWait =
@@ -566,27 +575,42 @@ function QueueRoute() {
             <article
               key={queue.label}
               style={{
+                ...emergencyRouteStyles.card,
                 display: 'grid',
                 gridTemplateColumns: '1fr auto auto',
                 gap: 12,
                 alignItems: 'center',
-                padding: 14,
-                border: '1px solid #1F2937',
-                borderRadius: 12,
-                background: '#111827',
+                borderLeft: `4px solid ${breached ? '#EF4444' : '#60A5FA'}`,
+                padding: 'var(--space-3, 12px)',
               }}
             >
               <div>
-                <strong style={{ color: '#F9FAFB' }}>{queue.label}</strong>
-                <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+                <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>{queue.label}</strong>
+                <p
+                  style={{
+                    margin: '4px 0 0',
+                    color: 'var(--color-text-secondary, #9CA3AF)',
+                    fontSize: 13,
+                  }}
+                >
                   {patientsInQueue
                     .slice(0, 3)
                     .map((patient) => `${patient.firstName} ${patient.lastName}`)
                     .join(', ') || 'Queue clear'}
                 </p>
               </div>
-              <strong style={{ color: '#F9FAFB' }}>{queue.count ?? patientsInQueue.length}</strong>
-              <span style={{ color: breached ? '#EF4444' : '#10B981', fontSize: 12 }}>
+              <strong
+                style={{
+                  borderRadius: 999,
+                  background: 'var(--color-elevated, #0B1120)',
+                  color: 'var(--color-text-primary, #F9FAFB)',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                  padding: '5px 10px',
+                }}
+              >
+                {queue.count ?? patientsInQueue.length}
+              </strong>
+              <span style={{ color: breached ? '#EF4444' : '#10B981', fontSize: 12, fontWeight: 900 }}>
                 Oldest {oldestWait}m
               </span>
             </article>
@@ -609,7 +633,7 @@ function ReassessmentRoute() {
     <EmergencyRoutePage
       eyebrow="Safety"
       title="Reassessment"
-      description="Patients with active reassessment flags. Select a card to open the patient detail panel."
+      description="Patients due for another look. Open a patient card to review details and update the plan."
     >
       <ApiStateBanner moduleState={reassessment} />
       <MetricGrid
@@ -638,7 +662,7 @@ function BoardingRoute() {
     <EmergencyRoutePage
       eyebrow="Flow"
       title="Boarding"
-      description="Pending admissions and boarders that are contributing to capacity pressure."
+      description="Patients waiting for an inpatient bed and the boarding pressure affecting department flow."
     >
       <ApiStateBanner moduleState={boarding} />
       <MetricGrid
@@ -672,8 +696,8 @@ function CapacityRoute() {
   return (
     <EmergencyRoutePage
       eyebrow="Capacity"
-      title="Capacity Detail"
-      description="Current ED occupancy, room availability, boarding load, and reassessment pressure."
+      title="Capacity"
+      description="Current room availability, boarding load, and department pressure in one view."
     >
       <ApiStateBanner moduleState={capacityStatus} />
       <MetricGrid
@@ -683,7 +707,6 @@ function CapacityRoute() {
             value: `${capacity.score} ${capacity.band}`,
             color: '#60A5FA',
           },
-          { label: 'Total patients', value: capacity.totalPatients },
           { label: 'Occupied rooms', value: capacity.occupiedRooms },
           { label: 'Available rooms', value: availableRooms, color: '#10B981' },
           { label: 'Blocked rooms', value: blockedRooms, color: '#F97316' },
@@ -697,11 +720,12 @@ function CapacityRoute() {
             <div
               key={recommendation}
               style={{
-                padding: 12,
-                border: '1px solid #1F2937',
-                borderRadius: 12,
-                background: '#111827',
+                ...emergencyRouteStyles.card,
+                borderColor: 'color-mix(in srgb, var(--status-info, #60A5FA) 36%, var(--color-border-default, #1F2937))',
+                background:
+                  'color-mix(in srgb, var(--status-info, #60A5FA) 8%, var(--color-surface, #111827))',
                 color: '#BFDBFE',
+                padding: 'var(--space-3, 12px)',
               }}
             >
               {recommendation}
@@ -714,359 +738,6 @@ function CapacityRoute() {
         emptyMessage="No active boarders affecting capacity."
       />
       <DataSourceNote moduleState={capacityStatus} />
-    </EmergencyRoutePage>
-  );
-}
-
-function ProvincialHealthRoute() {
-  const provincialHealth = useProvincialHealth();
-  const records = provincialHealth.data?.data?.records || [];
-  const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
-
-  useEffect(() => {
-    if (!provincialHealth.data || provincialHealth.loading || provincialHealth.error) return;
-    recordWorkflowAction({
-      type: 'provincial_data_viewed',
-      title: 'Provincial data viewed',
-      summary: `Viewed ${records.length} provincial health placeholder record${records.length === 1 ? '' : 's'}.`,
-      source: 'provincial-health-route',
-      metadata: {
-        recordCount: records.length,
-        connectorStatus: provincialHealth.data?.data?.connectorStatus || 'unavailable',
-        jurisdiction: provincialHealth.data?.data?.jurisdiction || null,
-      },
-    });
-  }, [
-    provincialHealth.data,
-    provincialHealth.error,
-    provincialHealth.loading,
-    recordWorkflowAction,
-    records.length,
-  ]);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="External Data"
-      title="Provincial Health Connector"
-      description="Provincial/HIE placeholder records from `/api/emergency/provincial-health` with unavailable states made explicit."
-    >
-      <ApiStateBanner
-        moduleState={provincialHealth}
-        fallbackText="Provincial health connector data is unavailable."
-      />
-      <MetricGrid
-        metrics={[
-          {
-            label: 'Connector status',
-            value: provincialHealth.data?.data?.connectorStatus || 'unavailable',
-            color: '#F59E0B',
-          },
-          { label: 'Patient snapshots', value: records.length, color: '#60A5FA' },
-          {
-            label: 'Jurisdiction',
-            value: provincialHealth.data?.data?.jurisdiction || 'Not configured',
-          },
-        ]}
-      />
-      <div style={{ display: 'grid', gap: 10 }}>
-        {records.map((record) => (
-          <article
-            key={record.patientId}
-            style={{
-              padding: 14,
-              border: '1px solid #1F2937',
-              borderRadius: 12,
-              background: '#111827',
-            }}
-          >
-            <strong style={{ color: '#F9FAFB' }}>{record.mrn}</strong>
-            <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-              Medications: {record.medications.join('; ')}
-            </p>
-            <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-              Allergies: {record.allergies.join('; ')}
-            </p>
-          </article>
-        ))}
-      </div>
-      <DataSourceNote moduleState={provincialHealth} />
-    </EmergencyRoutePage>
-  );
-}
-
-function IntegrationsRoute() {
-  const integrations = useIntegrationHub();
-  const sources = integrations.data?.data?.sources || [];
-  const reviewQueue = integrations.data?.data?.reviewQueue || [];
-  const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
-  const latestSource = sources.find((source) => source.lastEventAt) || sources[0];
-  const sourceCount = sources.length;
-  const latestSourceId = latestSource?.id || null;
-  const latestEventAt = latestSource?.lastEventAt || null;
-
-  useEffect(() => {
-    if (!integrations.data || integrations.loading || integrations.error) return;
-    recordWorkflowAction({
-      type: 'integration_event_received',
-      title: 'Integration event received',
-      summary: `Integration Hub received ${sourceCount} source status record${sourceCount === 1 ? '' : 's'}.`,
-      source: 'integration-hub-route',
-      severity: reviewQueue.length ? 'Warning' : 'Info',
-      metadata: {
-        sourceCount,
-        reviewQueueCount: reviewQueue.length,
-        latestSourceId,
-        latestEventAt,
-      },
-    });
-  }, [
-    integrations.data,
-    integrations.error,
-    integrations.loading,
-    latestEventAt,
-    latestSourceId,
-    recordWorkflowAction,
-    reviewQueue.length,
-    sourceCount,
-  ]);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Integrations"
-      title="IoT/Integration Hub"
-      description="FHIR, HL7, and device integration placeholders from `/api/emergency/integrations`."
-    >
-      <ApiStateBanner
-        moduleState={integrations}
-        fallbackText="Integration source data is unavailable."
-      />
-      <MetricGrid
-        metrics={[
-          { label: 'Sources', value: sources.length, color: '#60A5FA' },
-          {
-            label: 'Review items',
-            value: reviewQueue.length,
-            color: reviewQueue.length ? '#F59E0B' : '#10B981',
-          },
-          {
-            label: 'Live feeds',
-            value: sources.filter((source) => source.status === 'live').length,
-            color: '#10B981',
-          },
-        ]}
-      />
-      <div style={{ display: 'grid', gap: 10 }}>
-        {sources.map((source) => (
-          <article
-            key={source.id}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr auto',
-              gap: 12,
-              padding: 14,
-              border: '1px solid #1F2937',
-              borderRadius: 12,
-              background: '#111827',
-            }}
-          >
-            <div>
-              <strong style={{ color: '#F9FAFB' }}>{source.label}</strong>
-              <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                Last event:{' '}
-                {source.lastEventAt
-                  ? new Date(source.lastEventAt).toLocaleTimeString()
-                  : 'No live feed'}
-              </p>
-            </div>
-            <span
-              style={{
-                color: source.status === 'demo-ready' ? '#60A5FA' : '#F59E0B',
-                fontSize: 12,
-              }}
-            >
-              {source.status}
-            </span>
-          </article>
-        ))}
-      </div>
-      <DataSourceNote moduleState={integrations} />
-    </EmergencyRoutePage>
-  );
-}
-
-function RealTimeSimulationRoute() {
-  const emergencyRole = useEmergencyRolePermissions();
-  const simulation = useRealTimeSimulation();
-  const payload = simulation.data?.data || {};
-  const status = payload.currentStatus || {};
-  const recommendations = payload.recommendations || [];
-  const forecast = payload.fourHourForecast || [];
-  const lastEvaluation = simulation.lastActionResult?.data?.evaluation;
-  const lastComparison = simulation.lastActionResult?.data?.rankedInterventions;
-  const canRunSimulation = emergencyRole.can(EMERGENCY_ACTIONS.runSimulation);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Decision Support"
-      title="Real-Time Simulation"
-      description="Fixture-backed RtS decision support for ED surge interventions, 4-hour recovery windows, census forecasts, and action recommendations."
-    >
-      <ApiStateBanner
-        moduleState={simulation}
-        fallbackText="Real-time simulation recommendations are unavailable."
-      />
-      <ActionStatus moduleState={simulation} />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        <ActionButton
-          disabled={simulation.actionLoading || !canRunSimulation}
-          onClick={() =>
-            simulation.updateLiveState({
-              census: 58,
-              waitingPatients: 21,
-              boardingCount: 9,
-              staffedBeds: 36,
-              physicians: 4,
-              nurses: 12,
-              arrivalsPerHour: 9,
-              source: 'ui-fixture-surge',
-            })
-          }
-        >
-          Fuse Surge State
-        </ActionButton>
-        <ActionButton
-          disabled={simulation.actionLoading || !canRunSimulation}
-          onClick={() => simulation.evaluateIntervention({ type: 'open_fast_track', intensity: 1 })}
-        >
-          Evaluate Fast Track
-        </ActionButton>
-        <ActionButton
-          disabled={simulation.actionLoading || !canRunSimulation}
-          onClick={() => simulation.compareInterventions({})}
-        >
-          Rank Interventions
-        </ActionButton>
-      </div>
-      <MetricGrid
-        metrics={[
-          { label: 'Capacity band', value: status.capacityBand || 'Pending', color: '#60A5FA' },
-          { label: 'Resource use', value: `${status.resourceUtilization ?? 0}%`, color: '#F59E0B' },
-          { label: 'Avg wait', value: `${status.averageWaitMinutes ?? 0}m` },
-          {
-            label: 'Deterioration',
-            value:
-              payload.projectedDeteriorationTimeMinutes == null
-                ? 'None in 4h'
-                : `${payload.projectedDeteriorationTimeMinutes}m`,
-            color: '#EF4444',
-          },
-        ]}
-      />
-      {lastEvaluation ? (
-        <article
-          style={{
-            padding: 16,
-            border: '1px solid #1F2937',
-            borderRadius: 12,
-            background: '#111827',
-          }}
-        >
-          <strong style={{ color: '#F9FAFB' }}>
-            Last evaluation: {lastEvaluation.intervention.type}
-          </strong>
-          <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
-            Recovery {lastEvaluation.recoveryTimeMinutes}m | Wait improvement{' '}
-            {lastEvaluation.expectedImprovement.waitMinutes}m | Confidence{' '}
-            {Math.round(lastEvaluation.confidence * 100)}%
-          </p>
-        </article>
-      ) : null}
-      {lastComparison?.length ? (
-        <div style={{ display: 'grid', gap: 8 }}>
-          {lastComparison.map((item, index) => (
-            <article
-              key={`${item.intervention.type}-${index}`}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                gap: 12,
-                padding: 14,
-                border: '1px solid #1F2937',
-                borderRadius: 12,
-                background: '#111827',
-              }}
-            >
-              <strong style={{ color: '#F9FAFB' }}>
-                {index + 1}. {item.intervention.type.replace(/_/g, ' ')}
-              </strong>
-              <span style={{ color: '#60A5FA' }}>{item.recoveryTimeMinutes}m recovery</span>
-            </article>
-          ))}
-        </div>
-      ) : null}
-      <div style={{ display: 'grid', gap: 10 }}>
-        {recommendations.length ? (
-          recommendations.map((recommendation) => (
-            <article
-              key={recommendation.intervention}
-              style={{
-                padding: 14,
-                border: '1px solid #1F2937',
-                borderRadius: 12,
-                background: '#111827',
-              }}
-            >
-              <strong style={{ color: '#F9FAFB' }}>
-                {recommendation.intervention.replace(/_/g, ' ')}
-              </strong>
-              <p style={{ color: '#9CA3AF', margin: '6px 0 0' }}>
-                Implement in {recommendation.timeToImplementMinutes}m, expected wait improvement{' '}
-                {recommendation.expectedImprovement.waitMinutes}m.
-              </p>
-              <p style={{ color: '#BFDBFE', margin: '6px 0 0', fontSize: 13 }}>
-                {(recommendation.actionRecommendations || []).join(' | ')}
-              </p>
-            </article>
-          ))
-        ) : (
-          <div
-            style={{
-              padding: 18,
-              border: '1px solid #1F2937',
-              borderRadius: 12,
-              background: '#111827',
-              color: '#9CA3AF',
-            }}
-          >
-            No simulation recommendations returned yet.
-          </div>
-        )}
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
-          gap: 10,
-        }}
-      >
-        {forecast.map((point) => (
-          <article
-            key={point.minute}
-            style={{
-              padding: 12,
-              border: '1px solid #1F2937',
-              borderRadius: 12,
-              background: '#0F172A',
-            }}
-          >
-            <strong style={{ color: '#F9FAFB' }}>{point.minute}m</strong>
-            <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 13 }}>
-              Census {point.census} | Wait {point.averageWaitMinutes}m | {point.capacityBand}
-            </p>
-          </article>
-        ))}
-      </div>
-      <DataSourceNote moduleState={simulation} />
     </EmergencyRoutePage>
   );
 }
@@ -1113,12 +784,14 @@ function CopilotRoute() {
             <span
               key={action}
               style={{
-                border: '1px solid #1F2937',
+                border: '1px solid color-mix(in srgb, var(--status-info, #60A5FA) 34%, var(--color-border-default, #1F2937))',
                 borderRadius: 999,
-                background: '#111827',
+                background:
+                  'color-mix(in srgb, var(--status-info, #60A5FA) 10%, var(--color-surface, #111827))',
                 color: '#BFDBFE',
                 padding: '6px 10px',
                 fontSize: 12,
+                fontWeight: 800,
               }}
             >
               {action}
@@ -1126,29 +799,24 @@ function CopilotRoute() {
           ))}
         </div>
       ) : null}
-      <p style={{ color: '#9CA3AF', margin: 0 }}>
+      <p
+        style={{
+          ...emergencyRouteStyles.card,
+          borderColor:
+            'color-mix(in srgb, var(--status-warning, #F59E0B) 40%, var(--color-border-default, #1F2937))',
+          background:
+            'color-mix(in srgb, var(--status-warning, #F59E0B) 8%, var(--color-surface, #111827))',
+          color: 'var(--color-text-secondary, #9CA3AF)',
+          margin: 0,
+          padding: 'var(--space-3, 12px)',
+        }}
+      >
         Use the docked {EMERGENCY_OS_BRANDING.copilotName} to ask about who needs attention,
         capacity pressure, EMS status, or reassessment priorities.{' '}
         {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
       <DataSourceNote moduleState={copilot} />
     </EmergencyRoutePage>
-  );
-}
-
-function ToolsRedirect() {
-  const location = window.location;
-  const parts = location.pathname.split('/').filter(Boolean);
-  const candidate = parts.at(-1);
-  const params = new URLSearchParams(location.search);
-  if (candidate && !['tools', 'calculators'].includes(candidate)) {
-    params.set('open', candidate);
-    params.delete('tool');
-    params.delete('calc');
-  }
-  const suffix = params.toString();
-  return (
-    <Navigate to={`${CANONICAL_ROUTES.emergencyTools}${suffix ? `?${suffix}` : ''}`} replace />
   );
 }
 
@@ -1179,40 +847,10 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={CANONICAL_ROUTES.emergencyCommandCenter}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
-              <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
-                <LazyRoute label="Loading command center...">
-                  <EmergencyWhiteboard />
-                </LazyRoute>
-              </ErrorBoundary>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencyPulse}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPulse}>
-              <LazyRoute label="Loading department pulse...">
-                <DepartmentPulse />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
           path={CANONICAL_ROUTES.emergencyPatients}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
               <PatientsRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencyJourney}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyJourney}>
-              <JourneyRoute />
             </EmergencyRouteGuard>
           }
         />
@@ -1279,22 +917,6 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={CANONICAL_ROUTES.emergencyProvincialHealth}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyProvincialHealth}>
-              <ProvincialHealthRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencyIntegrations}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntegrations}>
-              <IntegrationsRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
           path={CANONICAL_ROUTES.emergencyCopilot}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
@@ -1308,36 +930,6 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading analytics...">
                 <EmergencyAnalytics />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencySimulation}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySimulation}>
-              <RealTimeSimulationRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencyTools}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
-              <ErrorBoundary fallbackText="Calculator surface encountered an error. Refresh to reload.">
-                <LazyRoute label="Loading calculators...">
-                  <ClinicalCalculatorHub />
-                </LazyRoute>
-              </ErrorBoundary>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.emergencyShift}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
-              <LazyRoute label="Loading shift summary...">
-                <EmergencyShiftSummaryPage />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
@@ -1381,12 +973,37 @@ export function AppRoutes() {
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
       />
       <Route
+        path="/mobile/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/android"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/android/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
         path="/general-healthcare"
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
       />
-      <Route path="/tools/*" element={<ToolsRedirect />} />
-      <Route path="/calculators/*" element={<ToolsRedirect />} />
-      <Route path="/scores/*" element={<ToolsRedirect />} />
+      <Route
+        path="/general-healthcare/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/tools/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/calculators/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
+      <Route
+        path="/scores/*"
+        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+      />
       <Route
         path="/assistant"
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}

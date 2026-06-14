@@ -16,7 +16,7 @@ import {
   selectQueueOverallHealthScore,
   selectQueuePanelRows,
   useEmergencyStore,
-} from '../../store/emergencyStore';
+} from '../store/emergencyStore';
 import './QueueIntelligencePanel.css';
 
 const QUEUE_CONFIG = [

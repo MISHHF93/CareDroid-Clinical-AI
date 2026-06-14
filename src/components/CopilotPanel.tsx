@@ -181,7 +181,7 @@ export function CopilotPanel() {
     {
       id: 'copilot-welcome',
       role: 'copilot',
-      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Ask about attention needs, capacity, EMS, or reassessment queue. ${EMERGENCY_OS_BRANDING.safetyShort}.`,
+      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Ask about attention needs, capacity, EMS, or reassessment queue. ${HUMAN_REVIEW_DISCLAIMER}`,
       timestamp: new Date(),
     },
   ]);

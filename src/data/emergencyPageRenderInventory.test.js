@@ -25,25 +25,16 @@ describe('emergencyPageRenderInventory', () => {
 
   it('keeps requested AppShell nav paths in the active page inventory', () => {
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.label)).toEqual([
-      'Board',
-      'Pulse',
+      'Whiteboard',
       'Patients',
-      'Journey',
+      'EMS',
       'Intake',
       'Queues',
       'Reassess',
-      'EMS',
-      'Referrals',
-      'Provincial',
-      'Integrations',
       'Capacity',
       'Boarding',
+      'Referrals',
       'Copilot',
-      'Analytics',
-      'Sim',
-      'Tools',
-      'Shift',
-      'Settings',
     ]);
 
     for (const item of APP_SHELL_NAV_ITEMS) {
