@@ -1115,9 +1115,19 @@ const normalizeOperationalAlert = (
     patientId: stringFrom(record.patientId) || undefined,
     reminderId: stringFrom(record.reminderId) || undefined,
     actionLabel: stringFrom(record.actionLabel) || undefined,
+    actionFn: typeof (value as { actionFn?: unknown }).actionFn === 'function'
+      ? (value as { actionFn: () => void }).actionFn
+      : undefined,
     actionType: stringFrom(record.actionType) || undefined,
     createdAt: stringFrom(firstValue(record, ['createdAt', 'detectedAt', 'timestamp'])) || generatedAt,
+    read: Boolean(record.read),
+    acknowledged: Boolean(record.acknowledged),
+    acknowledgedAt: stringFrom(record.acknowledgedAt) || undefined,
     dismissed: Boolean(record.dismissed),
+    dismissedAt: stringFrom(record.dismissedAt) || undefined,
+    autoDismissAfter: Number.isFinite(Number(record.autoDismissAfter))
+      ? Number(record.autoDismissAfter)
+      : undefined,
     source: stringFrom(record.source) || source,
     metadata: isObject(record.metadata) ? (record.metadata as Alert['metadata']) : undefined,
   };
@@ -2248,6 +2258,9 @@ interface EmergencyStoreState {
   appendCopilotMessage: (message: EmergencyCopilotMessage) => void;
   upsertEmsIncomingPatient: (patient: EmsIncomingPatient) => void;
   addAlert: (alert: Alert) => void;
+  markAlertRead: (alertId: string) => void;
+  acknowledgeAlert: (alertId: string) => void;
+  dismissAlert: (alertId: string) => void;
   setCapacity: (capacity: CapacitySnapshot) => void;
   addEMSArrival: (arrival: EMSArrival) => void;
   prepareEMSBay: (arrivalId: string) => void;
@@ -3864,6 +3877,37 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             : null,
         ]),
       })),
+
+    markAlertRead: (alertId) =>
+      set((state) => ({
+        alerts: state.alerts.map((alert) =>
+          alert.id === alertId ? { ...alert, read: true } : alert,
+        ),
+      })),
+
+    acknowledgeAlert: (alertId) =>
+      set((state) => {
+        const acknowledgedAt = nowIso();
+        return {
+          alerts: state.alerts.map((alert) =>
+            alert.id === alertId
+              ? { ...alert, read: true, acknowledged: true, acknowledgedAt }
+              : alert,
+          ),
+        };
+      }),
+
+    dismissAlert: (alertId) =>
+      set((state) => {
+        const dismissedAt = nowIso();
+        return {
+          alerts: state.alerts.map((alert) =>
+            alert.id === alertId
+              ? { ...alert, read: true, dismissed: true, dismissedAt }
+              : alert,
+          ),
+        };
+      }),
 
     setCapacity: (capacity) =>
       set((state) => ({

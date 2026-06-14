@@ -523,6 +523,9 @@ export interface Alert {
   actionFn?: () => void;
   actionType?: string;
   createdAt: ISODateString;
+  read?: boolean;
+  acknowledged?: boolean;
+  acknowledgedAt?: ISODateString;
   dismissed: boolean;
   dismissedAt?: ISODateString;
   autoDismissAfter?: number;

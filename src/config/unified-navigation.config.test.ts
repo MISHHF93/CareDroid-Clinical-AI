@@ -144,7 +144,9 @@ describe('unified navigation config', () => {
     expect(PILOT_CUSTOMER_MODE.hiddenNavItemIds).toEqual(['analytics', 'settings']);
     expect(PILOT_CUSTOMER_MODE.retainedDirectRoutes).toEqual([
       '/emergency/analytics',
+      '/emergency/pulse',
       '/emergency/settings',
+      '/emergency/shift',
     ]);
   });
 

@@ -110,4 +110,70 @@ describe('Emergency OS store shim', () => {
     );
     expect(next.websocket.lastEventAt).toEqual(expect.any(String));
   });
+
+  it('hydrates single-record realtime patient, referral, and settings events', () => {
+    const store = useEmergencyStore.getState();
+    const patient = {
+      ...store.patients[0],
+      id: 'realtime-patient-created-test',
+      mrn: 'RT-STATE-1',
+      firstName: 'Realtime',
+      lastName: 'Patient',
+      timeline: [],
+    };
+
+    store.dispatchWebSocketEvent({
+      type: 'patient_created',
+      payload: {
+        patient,
+        summary: 'Realtime patient created.',
+      },
+    });
+
+    useEmergencyStore.getState().dispatchWebSocketEvent({
+      type: 'referral_created',
+      payload: {
+        referral: {
+          id: 'realtime-referral-created-test',
+          patientId: patient.id,
+          targetDepartment: 'Cardiology',
+          urgency: 'Emergent',
+          reason: 'Realtime consult requested.',
+          clinicalSummary: 'Realtime patient requires cardiology review.',
+          status: 'Sent',
+          workflow: 'Referral',
+          requestedAt: '2026-06-14T06:31:00.000Z',
+        },
+      },
+    });
+
+    useEmergencyStore.getState().dispatchWebSocketEvent({
+      type: 'settings_updated',
+      payload: {
+        settings: {
+          thresholds: {
+            waitWarningMinutes: 37,
+          },
+        },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.patients.find((candidate) => candidate.id === patient.id)).toEqual(
+      expect.objectContaining({ mrn: 'RT-STATE-1' }),
+    );
+    expect(next.referrals.find((referral) => referral.id === 'realtime-referral-created-test')).toEqual(
+      expect.objectContaining({
+        patientId: patient.id,
+        status: 'Sent',
+      }),
+    );
+    expect(next.thresholds.waitTimeWarningMin).toBe(37);
+    expect(next.workflowLogs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'patient_created', patientId: patient.id }),
+        expect.objectContaining({ type: 'referral_created', patientId: patient.id }),
+      ]),
+    );
+  });
 });

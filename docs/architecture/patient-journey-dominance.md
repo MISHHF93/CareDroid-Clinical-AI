@@ -125,9 +125,16 @@ The refactor stayed within existing architecture and did not add a new AppShell,
 
 ## Validation Commands / Results
 
-Pending in this run at report creation. Expected focused validation:
+Ran in this pass:
 
-- `npm run lint -- src/App.jsx src/data/emergencyPageRenderInventory.js src/data/emergencyPageRenderInventory.test.js src/routing/canonicalRouteTree.behavior.test.jsx`
-- `npm run typecheck:frontend`
-- `npx vitest run src/data/emergencyPageRenderInventory.test.js src/routing/canonicalRouteTree.behavior.test.jsx`
+- `ReadLints` on touched files: passed, no linter errors reported.
+- `npx eslint "src/App.jsx" "src/data/emergencyPageRenderInventory.js" "src/data/emergencyPageRenderInventory.test.js" "src/routing/canonicalRouteTree.behavior.test.jsx"`: passed.
+- `npm run typecheck:frontend`: passed.
+- `npx vitest run "src/data/emergencyPageRenderInventory.test.js"`: passed, 5 tests.
+- `npx vitest run "src/data/emergencyPageRenderInventory.test.js" "src/routing/canonicalRouteTree.behavior.test.jsx"`: inventory tests passed; route suite failed before route assertions with an existing `Sidebar` `Maximum update depth exceeded` / `getSnapshot should be cached` loop.
+- `npx vitest run "src/routing/canonicalRouteTree.behavior.test.jsx" -t "/emergency/queues renders queue intelligence from store state"`: failed for the same `Sidebar` update-depth loop before reaching the queue movement-stage assertion.
+
+Validation remaining:
+
+- Re-run the route behavior suite after the existing `Sidebar` store subscription/update loop is fixed. That issue is outside this movement-stage refactor and was not changed in this pass.
 

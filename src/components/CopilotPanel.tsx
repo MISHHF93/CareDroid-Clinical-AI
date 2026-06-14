@@ -20,6 +20,8 @@ type CopilotMessage = {
   timestamp: Date;
 };
 
+type StoreCopilotMessage = ReturnType<typeof useEmergencyStore.getState>['copilotMessages'][number];
+
 const QUICK_ACTIONS = [
   'Who needs attention?',
   'Capacity status',
@@ -187,6 +189,31 @@ async function streamIntoMessage(
   }
 }
 
+function timestampFromStoreMessage(message: StoreCopilotMessage): Date {
+  const parsed = new Date(message.createdAt);
+  return Number.isFinite(parsed.getTime()) ? parsed : new Date();
+}
+
+function panelMessagesFromStoreMessage(message: StoreCopilotMessage): CopilotMessage[] {
+  const timestamp = timestampFromStoreMessage(message);
+  return [
+    message.query
+      ? {
+          id: `${message.id}-staff`,
+          role: 'staff' as const,
+          content: message.query,
+          timestamp,
+        }
+      : null,
+    {
+      id: message.id,
+      role: 'copilot' as const,
+      content: message.response,
+      timestamp,
+    },
+  ].filter((item): item is CopilotMessage => Boolean(item));
+}
+
 function TypingIndicator() {
   return (
     <div style={{ display: 'flex', gap: 4, padding: '4px 0' }} aria-label="Copilot typing">
@@ -214,6 +241,8 @@ export function CopilotPanel() {
   const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
   const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
+  const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
+  const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
   const centralNode = useCareDroidCentralNode({ screenMode: 'PHYSICIAN_SCREEN' });
   const centralSnapshot = centralNode.snapshot;
   const [messages, setMessages] = useState<CopilotMessage[]>([
@@ -290,6 +319,24 @@ export function CopilotPanel() {
       detail: activeOperationalAlerts[0]?.title || 'All clear',
     },
   ];
+
+  useEffect(() => {
+    if (!storeCopilotMessages.length) return;
+    setMessages((currentMessages) => {
+      const nextMessages = [...currentMessages];
+      for (const storeMessage of storeCopilotMessages) {
+        if (!storeMessage.response) continue;
+        const alreadyRendered = nextMessages.some(
+          (message) =>
+            message.id === storeMessage.id ||
+            (message.role === 'copilot' && message.content === storeMessage.response),
+        );
+        if (alreadyRendered) continue;
+        nextMessages.push(...panelMessagesFromStoreMessage(storeMessage));
+      }
+      return nextMessages.length === currentMessages.length ? currentMessages : nextMessages;
+    });
+  }, [storeCopilotMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
@@ -383,12 +430,28 @@ export function CopilotPanel() {
       const responseText =
         typeof response.content === 'string' ? response.content : extractResponseText(response.data);
       await streamIntoMessage(responseText, assistantId, setMessages);
+      appendCopilotMessage({
+        id: assistantId,
+        query: text,
+        response: responseText,
+        safetyStatus: 'unknown',
+        createdAt: assistantMessage.timestamp.toISOString(),
+        raw: response.data,
+      });
     } catch {
+      const fallbackResponse = `${EMERGENCY_OS_BRANDING.copilotName} unavailable - check connection. Continue clinical review with human oversight.`;
       await streamIntoMessage(
-        `${EMERGENCY_OS_BRANDING.copilotName} unavailable - check connection. Continue clinical review with human oversight.`,
+        fallbackResponse,
         assistantId,
         setMessages,
       );
+      appendCopilotMessage({
+        id: assistantId,
+        query: text,
+        response: fallbackResponse,
+        safetyStatus: 'unknown',
+        createdAt: assistantMessage.timestamp.toISOString(),
+      });
     } finally {
       setLoading(false);
     }

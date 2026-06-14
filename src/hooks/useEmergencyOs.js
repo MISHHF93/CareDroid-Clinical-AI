@@ -122,6 +122,11 @@ function pickHydrationPayload(envelope) {
   const emsArrivals = data.emsArrivals || data.arrivals?.map(normalizeEmsArrival);
   const referrals = data.referrals?.map(normalizeReferral);
   const workflowLogs = data.workflowLogs || data.logs;
+  const emergencySettings =
+    data.emergencySettings ||
+    data.settings ||
+    data.tenantSettings ||
+    (data.tenantName && data.thresholds ? data : undefined);
   return {
     patients: data.patients || data.patient ? data.patients || [data.patient] : undefined,
     rooms: data.rooms,
@@ -131,6 +136,7 @@ function pickHydrationPayload(envelope) {
     emsArrivals,
     referrals,
     workflowLogs,
+    emergencySettings,
   };
 }
 
@@ -143,7 +149,8 @@ function hasHydrationPayload(payload) {
       payload.capacity ||
       payload.emsArrivals ||
       payload.referrals ||
-      payload.workflowLogs
+      payload.workflowLogs ||
+      payload.emergencySettings
   );
 }
 

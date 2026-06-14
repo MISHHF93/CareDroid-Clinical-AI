@@ -306,6 +306,7 @@ export default function ReferralPanel() {
   const createReferral = useEmergencyStore((state) => state.createReferral);
   const updateReferralStatus = useEmergencyStore((state) => state.updateReferralStatus);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const dispatchWebSocketEvent = useEmergencyStore((state) => state.dispatchWebSocketEvent);
   const [now, setNow] = useState(() => new Date());
   const [formOpen, setFormOpen] = useState(false);
   const [patientQuery, setPatientQuery] = useState('');
@@ -441,10 +442,19 @@ export default function ReferralPanel() {
       workflow: form.workflow,
     };
 
-    createReferral(payload);
+    const localReferral = createReferral(payload);
+    const persistedPayload = {
+      ...payload,
+      id: localReferral.id,
+      requestedAt: localReferral.requestedAt,
+      createdAt: localReferral.createdAt,
+    };
     setBackendPending(true);
-    persistEmergencyReferral(payload)
+    persistEmergencyReferral(persistedPayload)
       .then((result) => {
+        if (result.ok) {
+          dispatchWebSocketEvent({ type: 'referrals_updated', payload: result.data });
+        }
         setBackendStatus(
           result.ok
             ? 'Referral saved to Emergency OS.'
