@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   IconActivity,
@@ -23,7 +23,7 @@ import {
   type Icon,
 } from '@tabler/icons-react';
 import { PatientFlag, type Alert } from '../types/emergency';
-import { selectActiveAlerts, useEmergencyStore } from '../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import {
   getVisibleNavigation,
   resolveFeatureGate,
@@ -128,7 +128,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const emergencyRole = useEmergencyRolePermissions();
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
-  const activeAlerts = useEmergencyStore(selectActiveAlerts);
+  const alerts = useEmergencyStore((state) => state.alerts);
+  const activeAlerts = useMemo(() => alerts.filter((alert) => !alert.dismissed), [alerts]);
   const reassessmentDueCount = useEmergencyStore(
     (store) =>
       store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue))

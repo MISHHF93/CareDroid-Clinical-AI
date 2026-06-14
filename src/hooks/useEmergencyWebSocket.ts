@@ -22,7 +22,7 @@ export function useEmergencyWebSocket(options: UseEmergencyWebSocketOptions = {}
       socket.addEventListener('message', (event) => {
         try {
           const payload = JSON.parse(event.data);
-          useEmergencyStore.getState().hydrateFromApi(payload);
+          useEmergencyStore.getState().dispatchWebSocketEvent(payload);
         } catch {
           // Ignore malformed realtime events; polling/store state remains authoritative.
         }

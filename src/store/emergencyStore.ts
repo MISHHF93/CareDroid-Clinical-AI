@@ -1385,7 +1385,9 @@ const normalizeWorkflowLog = (value: unknown, index = 0): WorkflowActionLog => {
       stringFrom(firstValue(record, ['timestamp', 'createdAt', 'receivedAt'])) || nowIso(),
     actorStaffId: stringFrom(record.actorStaffId) || undefined,
     actorName: stringFrom(record.actorName) || undefined,
-    patientId: stringFrom(firstValue(record, ['patientId', 'patient.id'])) || undefined,
+    patientId:
+      stringFrom(firstValue(record, ['patientId', 'patient.id', 'referral.patientId'])) ||
+      undefined,
     source: stringFrom(record.source) || 'emergency-realtime',
     severity: normalizeAlertSeverity(record.severity),
     status: (stringFrom(record.status) as WorkflowActionLog['status']) || 'recorded',

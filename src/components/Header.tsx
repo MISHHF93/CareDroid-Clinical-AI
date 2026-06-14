@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconBell, IconSearch } from '@tabler/icons-react';
 import {
@@ -41,12 +41,64 @@ const OPERATIONAL_METRIC_ROUTES: Record<EmergencyOperationalMetricKey, string> =
 const ALERT_TYPE_ROUTES: Record<string, string> = {
   capacity: CANONICAL_ROUTES.emergencyCapacity,
   capacity_crisis: CANONICAL_ROUTES.emergencyCapacity,
+  capacity_crunch: CANONICAL_ROUTES.emergencyCapacity,
   ems: CANONICAL_ROUTES.emergencyEms,
+  eta: CANONICAL_ROUTES.emergencyEms,
   boarding: CANONICAL_ROUTES.emergencyBoarding,
   reassessment: CANONICAL_ROUTES.emergencyReassessment,
+  reassessment_overdue: CANONICAL_ROUTES.emergencyReassessment,
   referral: CANONICAL_ROUTES.emergencyReferrals,
+  referral_delay: CANONICAL_ROUTES.emergencyReferrals,
   queue: CANONICAL_ROUTES.emergencyQueues,
+  sync: CANONICAL_ROUTES.emergencySettings,
+  system: CANONICAL_ROUTES.emergencySettings,
+  integration: CANONICAL_ROUTES.emergencyIntegrations,
+  provincial: CANONICAL_ROUTES.emergencyProvincialHealth,
+  ai: CANONICAL_ROUTES.emergencyCopilot,
+  copilot: CANONICAL_ROUTES.emergencyCopilot,
 };
+
+type NotificationCenterAction = {
+  key: string;
+  label: string;
+  disabled?: boolean;
+  disabledLabel?: string;
+  onSelect?: () => void;
+};
+
+function normalizeAlertKey(value: unknown): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
+}
+
+function alertSeverityTone(alert: Alert): 'info' | 'warning' | 'critical' {
+  if (alert.severity === 'Critical') return 'critical';
+  if (alert.severity === 'Warning') return 'warning';
+  return 'info';
+}
+
+function formatAlertTime(timestamp?: string): string {
+  if (!timestamp) return 'Time pending';
+  const date = new Date(timestamp);
+  if (!Number.isFinite(date.getTime())) return 'Time pending';
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function describeAlertSource(alert: Alert): string {
+  const source = alert.source || alert.type || 'Emergency OS';
+  return String(source)
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function alertPatientLabel(alert: Alert, patientById: Map<string, Patient>): string | null {
+  if (!alert.patientId) return null;
+  const patient = patientById.get(alert.patientId);
+  if (!patient) return `Patient target unavailable (${alert.patientId})`;
+  return `${getPatientDisplayName(patient)} · ${patient.mrn}`;
+}
 
 function getHeaderFlagValue(flag: unknown): string {
   if (typeof flag === 'object' && flag !== null && 'type' in flag) {
@@ -77,7 +129,7 @@ function patientLookupText(patient: Patient): string {
 }
 
 function alertRoute(alert: Alert): string | null {
-  const key = String(alert.type || '').toLowerCase();
+  const key = normalizeAlertKey(alert.actionType || alert.type);
   if (ALERT_TYPE_ROUTES[key]) return ALERT_TYPE_ROUTES[key];
   const text = `${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
   if (text.includes('ems')) return CANONICAL_ROUTES.emergencyEms;
@@ -86,6 +138,9 @@ function alertRoute(alert: Alert): string | null {
   if (text.includes('referral') || text.includes('transfer')) return CANONICAL_ROUTES.emergencyReferrals;
   if (text.includes('queue') || text.includes('wait')) return CANONICAL_ROUTES.emergencyQueues;
   if (text.includes('capacity')) return CANONICAL_ROUTES.emergencyCapacity;
+  if (text.includes('provincial')) return CANONICAL_ROUTES.emergencyProvincialHealth;
+  if (text.includes('integration') || text.includes('sync')) return CANONICAL_ROUTES.emergencyIntegrations;
+  if (text.includes('ai') || text.includes('copilot')) return CANONICAL_ROUTES.emergencyCopilot;
   return null;
 }
 
@@ -137,11 +192,23 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
   const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
+  const loading = useEmergencyStore((store) => store.loading);
+  const integrationEvents = useEmergencyStore((store) => store.integrationEvents);
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
+  const markAlertRead = useEmergencyStore((store) => store.markAlertRead);
+  const acknowledgeAlert = useEmergencyStore((store) => store.acknowledgeAlert);
+  const dismissAlert = useEmergencyStore((store) => store.dismissAlert);
   const centralControlSettings = useEmergencyStore(
     (store) => store.emergencySettings.centralControl,
   );
   const [alertDrawerOpen, setAlertDrawerOpen] = useState(false);
+  const [localReadAlertIds, setLocalReadAlertIds] = useState<Set<string>>(() => new Set());
+  const [localAcknowledgedAlertIds, setLocalAcknowledgedAlertIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [localDismissedAlertIds, setLocalDismissedAlertIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [staffWorkloadOpen, setStaffWorkloadOpen] = useState(false);
   const [patientLookupQuery, setPatientLookupQuery] = useState('');
   const [patientLookupOpen, setPatientLookupOpen] = useState(false);
@@ -176,19 +243,94 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   ]
     .filter(Boolean)
     .join('. ');
-  const visibleAlerts = useMemo(() => {
-    const byId = new Map<string, Alert>();
-    for (const alert of [...centralSnapshot.operationalAlerts, ...alerts]) {
-      byId.set(alert.id, alert);
+  const patientById = useMemo(
+    () => new Map(patients.map((patient) => [patient.id, patient])),
+    [patients],
+  );
+  const storeAlertIds = useMemo(() => new Set(alerts.map((alert) => alert.id)), [alerts]);
+  const supplementalAlerts = useMemo<Alert[]>(() => {
+    const generatedAt = centralSnapshot.generatedAt || new Date().toISOString();
+    const notices: Alert[] = [];
+    if (centralSnapshot.sync.stale || centralSnapshot.sync.status !== 'connected') {
+      notices.push({
+        id: 'system-sync-status',
+        type: 'System',
+        severity: centralSnapshot.sync.stale ? 'Warning' : 'Info',
+        title: centralSnapshot.sync.stale ? 'System sync delayed' : 'System sync status',
+        message: centralSnapshot.sync.message || `Central node sync is ${centralSnapshot.sync.status}.`,
+        createdAt: centralSnapshot.sync.lastSyncedAt || generatedAt,
+        dismissed: false,
+        source: 'central-node-sync',
+        actionType: 'sync',
+      });
     }
-    return Array.from(byId.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-  }, [alerts, centralSnapshot.operationalAlerts]);
+    if (
+      centralSnapshot.aiCopilotContext.enabled &&
+      centralSnapshot.aiCopilotContext.humanReviewRequired
+    ) {
+      notices.push({
+        id: 'ai-copilot-safety-notice',
+        type: 'AI',
+        severity: 'Info',
+        title: 'AI/Copilot safety notice',
+        message: centralSnapshot.aiCopilotContext.safetyRule,
+        createdAt: generatedAt,
+        dismissed: false,
+        source: 'ai-governance',
+        actionType: 'copilot',
+        metadata: {
+          recentMessages: centralSnapshot.aiCopilotContext.recentMessages,
+        },
+      });
+    }
+    const latestIntegrationEvent = integrationEvents[0];
+    if (latestIntegrationEvent) {
+      const payloadText = JSON.stringify(latestIntegrationEvent.payload ?? {});
+      const isProvincial = /provincial|health-card|eligibility|ehealth/i.test(
+        `${latestIntegrationEvent.type} ${payloadText}`,
+      );
+      const isWarning = /error|fail|stale|reject|timeout/i.test(
+        `${latestIntegrationEvent.type} ${payloadText}`,
+      );
+      notices.push({
+        id: `integration-${latestIntegrationEvent.id}`,
+        type: isProvincial ? 'Provincial' : 'Integration',
+        severity: isWarning ? 'Warning' : 'Info',
+        title: isProvincial ? 'Provincial data event' : 'Integration event received',
+        message: isWarning
+          ? 'Integration signal needs review before relying on downstream data.'
+          : 'Integration signal captured in the Emergency OS event stream.',
+        createdAt: latestIntegrationEvent.receivedAt,
+        dismissed: false,
+        source: isProvincial ? 'provincial-data' : 'integration-events',
+        actionType: isProvincial ? 'provincial' : 'integration',
+      });
+    }
+    return notices;
+  }, [centralSnapshot, integrationEvents]);
+  const notificationAlerts = useMemo(() => {
+    const byId = new Map<string, Alert>();
+    for (const alert of [...supplementalAlerts, ...centralSnapshot.operationalAlerts, ...alerts]) {
+      const read = Boolean(alert.read || alert.dismissed || localReadAlertIds.has(alert.id));
+      const acknowledged = Boolean(alert.acknowledged || localAcknowledgedAlertIds.has(alert.id));
+      const dismissed = Boolean(alert.dismissed || localDismissedAlertIds.has(alert.id));
+      byId.set(alert.id, { ...alert, read, acknowledged, dismissed });
+    }
+    return Array.from(byId.values())
+      .filter((alert) => !alert.dismissed)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [
+    alerts,
+    centralSnapshot.operationalAlerts,
+    localAcknowledgedAlertIds,
+    localDismissedAlertIds,
+    localReadAlertIds,
+    supplementalAlerts,
+  ]);
 
   const unreadAlertCount = useMemo(
-    () => visibleAlerts.filter((alert) => !alert.dismissed).length,
-    [visibleAlerts],
+    () => notificationAlerts.filter((alert) => !alert.read && !alert.dismissed).length,
+    [notificationAlerts],
   );
 
   const reassessmentAttentionCount = useMemo(
@@ -250,6 +392,97 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     navigateEmergencyRoute(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
     setPatientLookupQuery('');
     setPatientLookupOpen(false);
+  };
+
+  const recordAlertRead = useCallback(
+    (alertId: string) => {
+      setLocalReadAlertIds((current) => new Set(current).add(alertId));
+      if (storeAlertIds.has(alertId)) markAlertRead(alertId);
+    },
+    [markAlertRead, storeAlertIds],
+  );
+
+  const recordAlertAcknowledged = useCallback(
+    (alertId: string) => {
+      setLocalReadAlertIds((current) => new Set(current).add(alertId));
+      setLocalAcknowledgedAlertIds((current) => new Set(current).add(alertId));
+      if (storeAlertIds.has(alertId)) acknowledgeAlert(alertId);
+    },
+    [acknowledgeAlert, storeAlertIds],
+  );
+
+  const recordAlertDismissed = useCallback(
+    (alertId: string) => {
+      setLocalReadAlertIds((current) => new Set(current).add(alertId));
+      setLocalDismissedAlertIds((current) => new Set(current).add(alertId));
+      if (storeAlertIds.has(alertId)) dismissAlert(alertId);
+    },
+    [dismissAlert, storeAlertIds],
+  );
+
+  const openAlertRoute = useCallback(
+    (alert: Alert): NotificationCenterAction => {
+      if (alert.patientId) {
+        const patientExists = patientById.has(alert.patientId);
+        return {
+          key: 'open-patient',
+          label: 'Open patient',
+          disabled: !patientExists,
+          disabledLabel: 'Patient unavailable',
+          onSelect: patientExists
+            ? () => {
+                selectPatient(alert.patientId || null);
+                navigateEmergencyRoute(
+                  `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(alert.patientId || '')}`,
+                );
+                setAlertDrawerOpen(false);
+              }
+            : undefined,
+        };
+      }
+
+      if (alert.actionFn) {
+        return {
+          key: 'custom-action',
+          label: alert.actionLabel || 'Open action',
+          onSelect: () => {
+            alert.actionFn?.();
+            setAlertDrawerOpen(false);
+          },
+        };
+      }
+
+      const route = alertRoute(alert);
+      if (!route) {
+        return {
+          key: 'missing-target',
+          label: 'Open target',
+          disabled: true,
+          disabledLabel: 'No target available',
+        };
+      }
+
+      const canOpenRoute = emergencyRole.canAccessRoute(routePermissionPath(route));
+      return {
+        key: `open-${normalizeAlertKey(alert.type || alert.source || 'module')}`,
+        label: alert.actionLabel || 'Open module',
+        disabled: !canOpenRoute,
+        disabledLabel: 'Route unavailable',
+        onSelect: canOpenRoute
+          ? () => {
+              navigateEmergencyRoute(route);
+              setAlertDrawerOpen(false);
+            }
+          : undefined,
+      };
+    },
+    [emergencyRole, navigateEmergencyRoute, patientById, selectPatient],
+  );
+
+  const markAllNotificationsRead = () => {
+    for (const alert of notificationAlerts) {
+      recordAlertRead(alert.id);
+    }
   };
 
   useEffect(() => {
@@ -492,43 +725,17 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
         <button
           type="button"
+          className="emergency-os-header__icon-button emergency-os-header__notification-trigger"
           onClick={() => setAlertDrawerOpen((open) => !open)}
-          aria-label="Alerts"
-          style={{
-            width: 32,
-            height: 32,
-            border: '1px solid #1F2937',
-            borderRadius: 8,
-            background: '#111827',
-            color: '#9CA3AF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            position: 'relative',
-          }}
+          aria-label={`Notification Center${unreadAlertCount ? `: ${unreadAlertCount} unread` : ''}`}
+          aria-haspopup="dialog"
+          aria-expanded={alertDrawerOpen}
+          title="Open Notification Center"
         >
-          <IconBell size={18} stroke={2} />
+          <IconBell size={18} stroke={2} aria-hidden />
           {unreadAlertCount > 0 ? (
-            <span
-              style={{
-                position: 'absolute',
-                top: -5,
-                right: -5,
-                minWidth: 16,
-                height: 16,
-                borderRadius: 999,
-                background: '#EF4444',
-                color: '#F9FAFB',
-                fontSize: 10,
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 0 2px #0D1117',
-              }}
-            >
-              {unreadAlertCount}
+            <span className="emergency-os-header__notification-badge">
+              {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
             </span>
           ) : null}
         </button>

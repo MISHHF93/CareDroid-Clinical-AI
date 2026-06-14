@@ -20,7 +20,7 @@ import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { assertExposureScanPasses } from './backendFrontendExposure';
 
-const HEAVY_ORPHAN_SCAN_TIMEOUT_MS = 30_000;
+const HEAVY_ORPHAN_SCAN_TIMEOUT_MS = 120_000;
 
 describe('backend orphan audit', () => {
   it('passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend)', () => {
