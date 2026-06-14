@@ -14,7 +14,12 @@
 
 ## Validation Commands
 
-Validation run details are recorded in the final response for this worker. Broad validation may surface unrelated dirty-tree issues because the repository contains many uncommitted generated and documentation changes.
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npm run typecheck:frontend` | Passed | Frontend TypeScript completed with exit code 0. |
+| `npm run lint` | Passed | Frontend ESLint completed with exit code 0. |
+| `npx vitest run src/components/Header.centralControl.test.tsx src/store/emergency-store.test.ts src/central-node/careDroidCentralNode.test.ts` | Passed | 3 test files, 11 tests passed. |
+| `npm run build` | Passed | Asset validation and Vite production build completed. Existing build warnings reported circular/manual chunk and mixed static/dynamic import notices, but the build succeeded. |
 
 ## Manual Review Risks
 
