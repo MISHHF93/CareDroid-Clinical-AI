@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EMERGENCY_OS_ROUTE_COMMANDS } from './commandPalette.config';
+import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from './commandPalette.config';
 import { APP_SHELL_NAV_ITEMS } from './navigation.config';
 import { CANONICAL_ROUTES } from './routes.config';
 import {
@@ -8,26 +8,13 @@ import {
   canAccessEmergencyRoute,
   canExecuteEmergencyCommand,
   getEmergencyDemoRoles,
+  getEmergencyRoleDefinition,
   getNearestEmergencyRoute,
   getVisibleEmergencyNavigationItems,
   hasEmergencyActionPermission,
   isEmergencyReadOnlyRole,
   normalizeEmergencyRole,
 } from './emergencyRolePermissions';
-
-const ALL_OPERATIONAL_SIDEBAR_IDS = [
-  'whiteboard',
-  'patients',
-  'ems',
-  'intake',
-  'queues',
-  'reassessment',
-  'capacity',
-  'boarding',
-  'referrals',
-  'copilot',
-  'tools',
-];
 
 describe('Emergency OS role-based views', () => {
   it('defines the requested demo roles with stable ids', () => {
@@ -50,14 +37,14 @@ describe('Emergency OS role-based views', () => {
       EMERGENCY_ROLE_IDS.registrationClerk,
       APP_SHELL_NAV_ITEMS,
     ).map((item) => item.id);
-    expect(clerkNavIds).toEqual(ALL_OPERATIONAL_SIDEBAR_IDS);
+    expect(clerkNavIds).toEqual(['whiteboard', 'patients', 'intake', 'queues', 'tools']);
     expect(clerkNavIds).not.toContain('settings');
 
     const emsNavIds = getVisibleEmergencyNavigationItems(
       EMERGENCY_ROLE_IDS.emsUser,
       APP_SHELL_NAV_ITEMS,
     ).map((item) => item.id);
-    expect(emsNavIds).toEqual(ALL_OPERATIONAL_SIDEBAR_IDS);
+    expect(emsNavIds).toEqual(['whiteboard', 'patients', 'ems', 'capacity', 'tools']);
     expect(emsNavIds).not.toContain('settings');
   });
 
@@ -73,7 +60,7 @@ describe('Emergency OS role-based views', () => {
     ).toBe(false);
     expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyEms),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencyTools),
     ).toBe(true);
@@ -127,7 +114,32 @@ describe('Emergency OS role-based views', () => {
       canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings']),
     ).toBe(false);
     expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-ems'])).toBe(true);
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-intake'])).toBe(true);
+    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-intake'])).toBe(false);
     expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-tools'])).toBe(true);
+  });
+
+  it('keeps role route fixtures aligned across sidebar, direct access, and commands', () => {
+    for (const { id: role } of getEmergencyDemoRoles()) {
+      const definition = getEmergencyRoleDefinition(role);
+      const visibleNav = getVisibleEmergencyNavigationItems(role, APP_SHELL_NAV_ITEMS);
+
+      for (const item of visibleNav) {
+        expect(canAccessEmergencyRoute(role, item.path), `${role}:${item.id}`).toBe(true);
+      }
+
+      for (const command of EMERGENCY_OS_ROUTE_COMMANDS) {
+        const target = command.build?.()?.path;
+        if (!target) continue;
+        expect(canExecuteEmergencyCommand(role, command), `${role}:${command.id}`).toBe(
+          canAccessEmergencyRoute(role, target),
+        );
+      }
+
+      for (const command of EMERGENCY_OS_TOOL_COMMANDS) {
+        expect(canExecuteEmergencyCommand(role, command), `${role}:${command.id}`).toBe(
+          definition.routes.includes(CANONICAL_ROUTES.emergencyTools),
+        );
+      }
+    }
   });
 });

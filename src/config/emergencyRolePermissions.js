@@ -101,9 +101,6 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.analytics,
   ROUTES.settings,
 ]);
-const CENTRAL_READABLE_ROUTES = Object.freeze(
-  ALL_ROUTES.filter((route) => route !== ROUTES.settings),
-);
 const FUTURE_MODULE_ACTIONS = Object.freeze([
   EMERGENCY_ACTIONS.manageFederatedLearning,
   EMERGENCY_ACTIONS.runDigitalTwin,
@@ -214,6 +211,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.queues,
       ROUTES.reassessment,
       ROUTES.copilot,
+      ROUTES.tools,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
@@ -236,7 +234,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.physician],
     description:
       'Clinical decision role for patient review, state movement, referrals, reassessment, tools, and AI support.',
-    routes: [...CLINICAL_VIEW_ROUTES, ROUTES.copilot, ROUTES.analytics],
+    routes: [...CLINICAL_VIEW_ROUTES, ROUTES.ems, ROUTES.intake, ROUTES.copilot, ROUTES.analytics],
     actions: [
       EMERGENCY_ACTIONS.transitionPatient,
       EMERGENCY_ACTIONS.writeVitals,
@@ -261,6 +259,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.patients,
       ROUTES.intake,
       ROUTES.queues,
+      ROUTES.tools,
     ],
     actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.verifyIntake],
     defaultRoute: ROUTES.intake,
@@ -270,7 +269,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -287,11 +286,14 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.whiteboard,
       ROUTES.patients,
       ROUTES.ems,
+      ROUTES.intake,
       ROUTES.queues,
       ROUTES.reassessment,
       ROUTES.capacity,
       ROUTES.boarding,
       ROUTES.referrals,
+      ROUTES.copilot,
+      ROUTES.tools,
       ROUTES.analytics,
     ],
     actions: [EMERGENCY_ACTIONS.viewAnalytics],
@@ -371,13 +373,6 @@ export function canAccessEmergencyRoute(role, path) {
   const definition = getEmergencyRoleDefinition(role);
   if (!definition || !path) return false;
   const normalizedPath = String(path).split('?')[0];
-  if (
-    CENTRAL_READABLE_ROUTES.some(
-      (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
-    )
-  ) {
-    return true;
-  }
   return definition.routes.some(
     (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
   );
@@ -391,7 +386,10 @@ export function getNearestEmergencyRoute(role, preferredPath) {
 }
 
 export function getVisibleEmergencyNavigationItems(role, items) {
-  return (items || []).filter((item) => canAccessEmergencyRoute(role, item.path));
+  const normalizedRole = normalizeEmergencyRole(role);
+  return (items || []).filter((item) =>
+    item.roles?.length ? item.roles.includes(normalizedRole) : canAccessEmergencyRoute(role, item.path),
+  );
 }
 
 export function canExecuteEmergencyCommand(role, command) {

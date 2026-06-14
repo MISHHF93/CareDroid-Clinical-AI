@@ -41,6 +41,7 @@ import {
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from './config/routes.config';
+import { resolveRegistryId } from './data/clinicalCatalogWiring';
 import { EMERGENCY_OS_BRANDING } from './config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import {
@@ -228,18 +229,72 @@ function pathSegmentAfter(pathname, prefix) {
   return pathname.slice(prefix.length).split('/').filter(Boolean)[0] || '';
 }
 
-function buildEmergencyToolsRedirect(location) {
+function safeDecodeURIComponent(value) {
+  try {
+    return decodeURIComponent(String(value || '').trim());
+  } catch {
+    return String(value || '').trim();
+  }
+}
+
+function canonicalToolQuery(slug) {
+  const decoded = safeDecodeURIComponent(slug);
+  if (!decoded) return '';
+  return resolveRegistryId(decoded) || decoded;
+}
+
+function operationToolQuery(pathname) {
+  if (pathname === CANONICAL_ROUTES.hospitalMap) return 'hospital-map';
+  if (pathname === CANONICAL_ROUTES.medicalIot) return 'medical-iot-dashboard';
+  if (pathname === CANONICAL_ROUTES.devices) return 'device-fleet-management';
+  if (
+    pathname === CANONICAL_ROUTES.liveMap ||
+    pathname === '/maps' ||
+    pathname === '/tracking' ||
+    pathname === '/live-tracking'
+  ) {
+    return 'live-tracking-map';
+  }
+  if (pathname === CANONICAL_ROUTES.digitalTwin) return 'digital-twin';
+  if (pathname === CANONICAL_ROUTES.fleetMap || pathname === '/fleet/live-map' || pathname === '/fleet/tracking') {
+    return 'fleet-live-map';
+  }
+  if (pathname === CANONICAL_ROUTES.fleetCommand || pathname === '/fleet' || pathname === '/vehicle') {
+    return 'fleet-command';
+  }
+  if (pathname.startsWith('/fleet/')) {
+    const slug = pathSegmentAfter(pathname, '/fleet/');
+    if (slug === 'map' || slug === 'live-map' || slug === 'tracking') return 'fleet-live-map';
+    if (slug === 'command') return 'fleet-command';
+    return canonicalToolQuery(slug) || 'fleet-command';
+  }
+  if (pathname.startsWith('/vehicle/')) return 'fleet-command';
+  if (pathname.startsWith('/operations/')) return canonicalToolQuery(pathSegmentAfter(pathname, '/operations/')) || 'fleet-command';
+  return 'fleet-command';
+}
+
+export function buildEmergencyToolsRedirect(location) {
   const pathname = normalizeRedirectPath(location.pathname);
   const params = new URLSearchParams(location.search);
   const setDefault = (key, value) => {
     if (!params.has(key)) params.set(key, value);
   };
   const setQueryFromSlug = (slug) => {
-    if (slug && !params.has('q') && !params.has('search')) {
-      params.set('q', decodeURIComponent(slug));
+    const query = canonicalToolQuery(slug);
+    if (query && !params.has('q') && !params.has('search')) {
+      params.set('q', query);
     }
-    if (slug && !params.has('open') && !params.has('tool') && !params.has('calc')) {
-      params.set('open', decodeURIComponent(slug));
+    if (query && !params.has('open') && !params.has('tool') && !params.has('calc')) {
+      params.set('open', query);
+    }
+  };
+  const setCalculatorQueryFromSlug = (slug) => {
+    const query = safeDecodeURIComponent(slug);
+    if (query && !params.has('q') && !params.has('search')) {
+      params.set('q', query);
+    }
+    if (query && !params.has('open') && !params.has('tool') && !params.has('calc')) {
+      params.set('open', query);
     }
   };
 
@@ -252,9 +307,52 @@ function buildEmergencyToolsRedirect(location) {
   } else if (pathname === CANONICAL_ROUTES.workflows || pathname === CANONICAL_ROUTES.automation) {
     setDefault('source', 'workflows');
     setDefault('filter', 'ai-workflows');
+  } else if (pathname === CANONICAL_ROUTES.protocols || pathname.startsWith('/protocols/')) {
+    setDefault('source', 'clinical-tools');
+    setDefault('filter', 'clinical-tools');
+    setDefault('q', 'protocols');
+    setDefault('open', 'protocols');
+  } else if (pathname === CANONICAL_ROUTES.laboratory || pathname === '/lab') {
+    setDefault('source', 'laboratory');
+    setDefault('filter', 'laboratory');
+    setDefault('q', 'lab-interp');
+    setDefault('open', 'lab-interp');
+  } else if (pathname === '/pharmacy' || pathname.startsWith('/pharmacy/')) {
+    setDefault('source', 'clinical-tools');
+    setDefault('filter', 'clinical-tools');
+    setDefault('q', 'drug-check');
+    setDefault('open', 'drug-check');
+  } else if (pathname === '/radiology' || pathname.startsWith('/radiology/')) {
+    setDefault('source', 'workflows');
+    setDefault('filter', 'ai-workflows');
+    setDefault('q', 'guideline-rag');
+    setDefault('open', 'guideline-rag');
+  } else if (
+    pathname === CANONICAL_ROUTES.hospitalMap ||
+    pathname === CANONICAL_ROUTES.medicalIot ||
+    pathname === CANONICAL_ROUTES.devices ||
+    pathname === CANONICAL_ROUTES.liveMap ||
+    pathname === '/maps' ||
+    pathname === '/tracking' ||
+    pathname === '/live-tracking' ||
+    pathname === CANONICAL_ROUTES.operations ||
+    pathname === CANONICAL_ROUTES.operationsCenter ||
+    pathname.startsWith('/operations/') ||
+    pathname === '/fleet' ||
+    pathname.startsWith('/fleet/') ||
+    pathname === '/vehicle' ||
+    pathname.startsWith('/vehicle/') ||
+    pathname === CANONICAL_ROUTES.digitalTwin
+  ) {
+    const operationQuery = operationToolQuery(pathname);
+    setDefault('source', 'operations');
+    setDefault('filter', 'operations');
+    setDefault('q', operationQuery);
+    if (operationQuery) setDefault('open', operationQuery);
   } else if (
     pathname === CANONICAL_ROUTES.calculators ||
     pathname.startsWith(`${CANONICAL_ROUTES.calculators}/`) ||
+    pathname.startsWith('/tools/calculator/') ||
     pathname === '/calculators' ||
     pathname.startsWith('/calculators/') ||
     pathname === '/scores' ||
@@ -263,17 +361,23 @@ function buildEmergencyToolsRedirect(location) {
   ) {
     const slug =
       pathSegmentAfter(pathname, `${CANONICAL_ROUTES.calculators}/`) ||
+      pathSegmentAfter(pathname, '/tools/calculator/') ||
       pathSegmentAfter(pathname, '/calculators/') ||
       pathSegmentAfter(pathname, '/scores/');
     setDefault('source', 'calculators');
     setDefault('filter', 'calculator');
-    setQueryFromSlug(slug);
+    setCalculatorQueryFromSlug(slug);
   } else if (pathname === '/clinical-tools') {
     setDefault('source', 'clinical-tools');
     setDefault('filter', 'clinical-tools');
   } else if (pathname === '/all-tools') {
     setDefault('source', 'all-tools');
     setDefault('filter', 'all');
+  } else if (pathname.startsWith('/tools/')) {
+    const slug = pathSegmentAfter(pathname, '/tools/');
+    setDefault('source', 'tools');
+    setDefault('filter', 'clinical-tools');
+    setQueryFromSlug(slug);
   } else {
     setDefault('source', 'tools');
   }
@@ -287,6 +391,32 @@ function buildEmergencyToolsRedirect(location) {
 
 function ToolsRedirect() {
   const location = useLocation();
+  return (
+    <Navigate
+      to={buildEmergencyToolsRedirect(location)}
+      replace
+      state={{ from: location.pathname }}
+    />
+  );
+}
+
+function NonEmergencyWorkspaceRedirect() {
+  const location = useLocation();
+  const pathname = normalizeRedirectPath(location.pathname);
+  if (pathname === '/analytics') {
+    return <Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />;
+  }
+  if (pathname === '/governance' || pathname.startsWith('/governance/')) {
+    return (
+      <Navigate
+        to={{
+          pathname: CANONICAL_ROUTES.emergencyTools,
+          search: '?source=governance&filter=governance',
+        }}
+        replace
+      />
+    );
+  }
   return (
     <Navigate
       to={buildEmergencyToolsRedirect(location)}
@@ -1476,7 +1606,7 @@ export function AppRoutes() {
           <Route
             key={`${path}-${moduleName}`}
             path={path}
-            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+            element={<NonEmergencyWorkspaceRedirect />}
           />
         ))}
       </Route>
@@ -1489,6 +1619,28 @@ export function AppRoutes() {
       <Route path="/catalog" element={<ToolsRedirect />} />
       <Route path="/all-tools" element={<ToolsRedirect />} />
       <Route path="/clinical-tools" element={<ToolsRedirect />} />
+      <Route path="/protocols" element={<ToolsRedirect />} />
+      <Route path="/protocols/*" element={<ToolsRedirect />} />
+      <Route path="/laboratory" element={<ToolsRedirect />} />
+      <Route path="/lab" element={<ToolsRedirect />} />
+      <Route path="/hospital-map" element={<ToolsRedirect />} />
+      <Route path="/medical-iot" element={<ToolsRedirect />} />
+      <Route path="/devices" element={<ToolsRedirect />} />
+      <Route path="/live-map" element={<ToolsRedirect />} />
+      <Route path="/maps" element={<ToolsRedirect />} />
+      <Route path="/tracking" element={<ToolsRedirect />} />
+      <Route path="/live-tracking" element={<ToolsRedirect />} />
+      <Route path="/operations" element={<ToolsRedirect />} />
+      <Route path="/operations/*" element={<ToolsRedirect />} />
+      <Route path="/operations-center" element={<ToolsRedirect />} />
+      <Route path="/fleet" element={<ToolsRedirect />} />
+      <Route path="/fleet/*" element={<ToolsRedirect />} />
+      <Route path="/vehicle" element={<ToolsRedirect />} />
+      <Route path="/vehicle/*" element={<ToolsRedirect />} />
+      <Route path="/pharmacy" element={<ToolsRedirect />} />
+      <Route path="/pharmacy/*" element={<ToolsRedirect />} />
+      <Route path="/radiology" element={<ToolsRedirect />} />
+      <Route path="/radiology/*" element={<ToolsRedirect />} />
       <Route path="/workflows" element={<ToolsRedirect />} />
       <Route path="/automation" element={<ToolsRedirect />} />
       <Route path="/recommendations" element={<ToolsRedirect />} />

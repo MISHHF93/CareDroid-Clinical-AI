@@ -38,7 +38,8 @@ describe('workspace experience profiles', () => {
       expect.objectContaining({
         id: 'medical-iot',
         label: 'Medical IoT',
-        path: '/medical-iot',
+        path:
+          '/emergency/tools?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard',
       })
     );
   });

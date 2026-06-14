@@ -9,7 +9,7 @@ import {
 } from './CommandPalette';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import { EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
+import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
 function command(
@@ -103,14 +103,26 @@ describe('CommandPalette helpers', () => {
     expect(readRecentCommandIds(storage)).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
   });
 
-  it('registers calculator commands against the canonical Medical Tools route', () => {
-    const commandPaths = EMERGENCY_OS_TOOL_COMMANDS.map((entry) => entry.build().path);
-
-    expect(commandPaths).toContain(
-      `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator`
+  it('registers route and calculator commands against canonical Emergency OS paths', () => {
+    const routePathsById = Object.fromEntries(
+      EMERGENCY_OS_ROUTE_COMMANDS.map((entry) => [entry.id, entry.build().path]),
     );
-    expect(commandPaths).toContain(
-      `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=qsofa&open=qsofa`
+    const toolPathsById = Object.fromEntries(
+      EMERGENCY_OS_TOOL_COMMANDS.map((entry) => [entry.id, entry.build().path]),
+    );
+
+    expect(routePathsById['open-pulse']).toBe(CANONICAL_ROUTES.emergencyPulse);
+    expect(routePathsById['open-shift']).toBe(CANONICAL_ROUTES.emergencyShift);
+    expect(routePathsById['open-analytics']).toBeUndefined();
+    expect(routePathsById['open-settings']).toBeUndefined();
+
+    expect(toolPathsById).toEqual(
+      expect.objectContaining({
+        'open-calculators': `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator`,
+        'open-qsofa': `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=qsofa&open=qsofa`,
+        'open-heart-score': `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=heart-score&open=heart-score`,
+        'open-nihss': `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=nihss&open=nihss`,
+      }),
     );
   });
 

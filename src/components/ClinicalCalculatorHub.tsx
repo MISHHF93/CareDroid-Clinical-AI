@@ -1,5 +1,8 @@
 import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+import { useConversation } from '../contexts/ConversationContext';
+import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
 import { buildBuiltinHubCalculatorCards, getHubChatAssistedTools } from '../data/calculatorHubManifest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
@@ -12,8 +15,14 @@ import NIHSS from './calculators/NIHSS';
 import NEWS2 from './calculators/NEWS2';
 import PediatricDrugCalc from './calculators/PediatricDrugCalc';
 import QSOFA from './calculators/qSOFA';
-import { createLegacyCalculatorComponent } from './calculators/LegacyCalculatorWrapper.jsx';
+import Calculators from '../pages/tools/Calculators.jsx';
 import '../pages/emergency/ClinicalCalculatorHub.css';
+
+const EmbeddedCalculators = Calculators as ComponentType<{
+  embedded?: boolean;
+  initialCalculatorId?: string | null;
+  onCloseEmbedded?: () => void;
+}>;
 
 export type CalculatorComponentProps = {
   patientId?: string;
@@ -28,6 +37,7 @@ export type ClinicalCalculatorRegistryEntry = {
   component: ComponentType<CalculatorComponentProps>;
   keywords: string[];
   timeCritical?: boolean;
+  launchMode?: 'calculator' | 'chat';
 };
 
 type BuiltinCalculatorCard = {
@@ -162,21 +172,65 @@ function keywordList(...values: Array<string | undefined>): string[] {
   return [...new Set(values.flatMap((value) => String(value || '').toLowerCase().split(/[^a-z0-9]+/)).filter(Boolean))];
 }
 
-function createComingSoonComponent(name: string, description: string): ComponentType<CalculatorComponentProps> {
-  function ComingSoonCalculator({ onClose }: CalculatorComponentProps) {
+function createEmbeddedCalculatorComponent(card: BuiltinCalculatorCard): ComponentType<CalculatorComponentProps> {
+  function EmbeddedCalculator({ onClose }: CalculatorComponentProps) {
+    return (
+      <EmbeddedCalculators
+        embedded
+        initialCalculatorId={card.id}
+        onCloseEmbedded={onClose}
+      />
+    );
+  }
+
+  EmbeddedCalculator.displayName = `EmbeddedCalculator_${card.id.replace(/[^a-z0-9]/gi, '_')}`;
+  return EmbeddedCalculator;
+}
+
+function createChatAssistedComponent(
+  toolId: string,
+  name: string,
+  description: string,
+): ComponentType<CalculatorComponentProps> {
+  function ChatAssistedCalculator({ onClose }: CalculatorComponentProps) {
+    const navigate = useNavigate();
+    const { addMessage, selectTool, setActiveTool } = useConversation();
+    const seedMessage = addMessage as unknown as (content: string, role: string) => void;
+    const chooseTool = selectTool as unknown as (id: string) => void;
+    const activateTool = setActiveTool as unknown as (id: string | null) => void;
+
+    const startGuidedWorkflow = () => {
+      const launch = resolveCatalogLaunch(toolId);
+      const registryId = launch.registryId || toolId;
+      chooseTool?.(registryId);
+      activateTool?.(registryId);
+      seedMessage?.(
+        launch.chatSeed ||
+          `Help me use ${name} as clinical decision support only. Ask for any missing context before suggesting next steps.`,
+        'user',
+      );
+      navigate(CANONICAL_ROUTES.emergencyCopilot);
+    };
+
     return (
       <div className="clinical-calculator-hub__select">
         <h2>{name}</h2>
-        <p>Coming soon. {description}</p>
-        <button type="button" onClick={onClose}>
-          All calculators
-        </button>
+        <p>{description}</p>
+        <p>{HUMAN_REVIEW_DISCLAIMER}</p>
+        <div className="clinical-calculator-hub__actions">
+          <button type="button" onClick={startGuidedWorkflow}>
+            Start guided chat
+          </button>
+          <button type="button" onClick={onClose}>
+            All calculators
+          </button>
+        </div>
       </div>
     );
   }
 
-  ComingSoonCalculator.displayName = `ComingSoon_${name.replace(/[^a-z0-9]/gi, '_')}`;
-  return ComingSoonCalculator;
+  ChatAssistedCalculator.displayName = `ChatAssisted_${toolId.replace(/[^a-z0-9]/gi, '_')}`;
+  return ChatAssistedCalculator;
 }
 
 function normalizeToolId(value: string | null): string {
@@ -226,7 +280,7 @@ export const CALCULATORS: ClinicalCalculatorRegistryEntry[] = [
   ...builtinCards.filter((card) => !NON_CLINICAL_CALCULATOR_IDS.has(card.id)).map((card) => {
     const component =
       COMPONENT_OVERRIDES[card.id] ||
-      (createLegacyCalculatorComponent(card) as ComponentType<CalculatorComponentProps>);
+      createEmbeddedCalculatorComponent(card);
     return {
       id: card.id,
       name: card.name,
@@ -240,6 +294,7 @@ export const CALCULATORS: ClinicalCalculatorRegistryEntry[] = [
         ]),
       ],
       timeCritical: TIME_CRITICAL_IDS.has(card.id),
+      launchMode: 'calculator' as const,
     };
   }),
   ...chatAssistedTools
@@ -252,7 +307,7 @@ export const CALCULATORS: ClinicalCalculatorRegistryEntry[] = [
         name: tool.name,
         description,
         category: categoryFor(id),
-        component: COMPONENT_OVERRIDES[id] || createComingSoonComponent(tool.name, description),
+        component: COMPONENT_OVERRIDES[id] || createChatAssistedComponent(id, tool.name, description),
         keywords: [
           ...new Set([
             ...keywordList(id, tool.toolId, tool.name, description),
@@ -260,6 +315,7 @@ export const CALCULATORS: ClinicalCalculatorRegistryEntry[] = [
           ]),
         ],
         timeCritical: TIME_CRITICAL_IDS.has(id),
+        launchMode: 'chat' as const,
       };
     }),
 ].sort((a, b) => a.name.localeCompare(b.name));
@@ -300,7 +356,12 @@ function formatVitals(patient?: Patient): Array<[string, string | number | undef
 
 export default function ClinicalCalculatorHub() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
+  const seedMessage = addMessage as unknown as (content: string, role: string) => void;
+  const chooseTool = selectTool as unknown as (id: string) => void;
+  const activateTool = setActiveTool as unknown as (id: string | null) => void;
   const patients = useEmergencyStore((state) => state.patients);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const [search, setSearch] = useState('');
@@ -316,6 +377,7 @@ export default function ClinicalCalculatorHub() {
 
   useEffect(() => {
     if (queryCalculatorId) setActiveCalculatorId(queryCalculatorId);
+    else setActiveCalculatorId('');
   }, [queryCalculatorId]);
 
   const activeCalculator = CALCULATORS.find((calculator) => calculator.id === activeCalculatorId);
@@ -339,14 +401,30 @@ export default function ClinicalCalculatorHub() {
     setActiveCalculatorId(calculatorId);
   }, [location.state, patient?.id, searchParams, setSearchParams]);
 
+  const launchChatAssisted = useCallback((calculator: ClinicalCalculatorRegistryEntry) => {
+    const launch = resolveCatalogLaunch(calculator.id);
+    const registryId = launch.registryId || calculator.id;
+    chooseTool?.(registryId);
+    activateTool?.(registryId);
+    seedMessage?.(
+      launch.chatSeed ||
+        `Help me use ${calculator.name} as clinical decision support only. Ask for any missing context before suggesting next steps.`,
+      'user',
+    );
+    navigate(CANONICAL_ROUTES.emergencyCopilot);
+  }, [activateTool, chooseTool, navigate, seedMessage]);
+
   const closeCalculator = useCallback(() => {
     const params = new URLSearchParams(searchParams);
+    const activeId = activeCalculatorId;
+    if (resolveKnownCalculatorId(params.get('q'))) params.delete('q');
+    if (resolveKnownCalculatorId(params.get('search'))) params.delete('search');
     params.delete('open');
     params.delete('tool');
     params.delete('calc');
     setSearchParams(params, { state: location.state });
     setActiveCalculatorId('');
-  }, [location.state, searchParams, setSearchParams]);
+  }, [activeCalculatorId, location.state, searchParams, setSearchParams]);
 
   const ActiveComponent = activeCalculator?.component;
 
@@ -368,13 +446,12 @@ export default function ClinicalCalculatorHub() {
         </label>
       </section>
 
-      <div className="clinical-calculator-hub__tabs" role="tablist" aria-label="Clinical calculator categories">
+      <div className="clinical-calculator-hub__tabs" role="group" aria-label="Clinical calculator categories">
         {CATEGORY_TABS.map((category) => (
           <button
             key={category}
             type="button"
-            role="tab"
-            aria-selected={activeCategory === category}
+            aria-pressed={activeCategory === category}
             className={activeCategory === category ? 'is-active' : ''}
             onClick={() => setActiveCategory(category)}
           >
@@ -426,8 +503,16 @@ export default function ClinicalCalculatorHub() {
               <span>{calculator.category}</span>
               {calculator.timeCritical ? <span>Time critical</span> : null}
             </div>
-            <button type="button" onClick={() => launchCalculator(calculator.id)}>
-              {calculator.component.name.startsWith('ComingSoon') ? 'Preview' : 'Launch'}
+            <button
+              type="button"
+              aria-label={`${calculator.launchMode === 'chat' ? 'Ask Assistant about' : 'Launch'} ${calculator.name}`}
+              onClick={() =>
+                calculator.launchMode === 'chat'
+                  ? launchChatAssisted(calculator)
+                  : launchCalculator(calculator.id)
+              }
+            >
+              {calculator.launchMode === 'chat' ? 'Ask Assistant' : 'Launch'}
             </button>
           </article>
         ))}

@@ -9,6 +9,7 @@ import {
   getActiveWorkspaceRegistry,
   getCareWorkspaceById,
   getWorkspacePresetForOrganizationType,
+  WORKSPACE_ROUTE_SHORTCUTS,
   getWorkspaceSubpageById,
   getWorkspaceSubpageEntries,
   isFutureWorkspace,
@@ -192,7 +193,42 @@ describe('workspaceArchitecture', () => {
         'simulation-suite',
       ])
     );
-    expect(routePaths).toEqual(expect.arrayContaining(['/emergency/copilot', '/emergency/whiteboard', '/live-map']));
+    expect(routePaths).toEqual(
+      expect.arrayContaining([
+        '/emergency/copilot',
+        '/emergency/whiteboard',
+        '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map',
+      ])
+    );
+  });
+
+  it('routes workspace tool shortcuts through Medical Tools with preserved intent', () => {
+    expect(
+      Object.fromEntries(
+        [
+          'tools',
+          'calculators',
+          'hospitalMap',
+          'medicalIot',
+          'devices',
+          'fleetMap',
+          'liveMap',
+          'laboratory',
+        ].map((id) => [id, WORKSPACE_ROUTE_SHORTCUTS[id].path])
+      )
+    ).toEqual({
+      tools: '/emergency/tools?source=catalog&filter=all',
+      calculators: '/emergency/tools?source=calculators&filter=calculator',
+      hospitalMap: '/emergency/tools?source=operations&filter=operations&q=hospital-map&open=hospital-map',
+      medicalIot:
+        '/emergency/tools?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard',
+      devices:
+        '/emergency/tools?source=operations&filter=operations&q=device-fleet-management&open=device-fleet-management',
+      fleetMap: '/emergency/tools?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map',
+      liveMap:
+        '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map',
+      laboratory: '/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+    });
   });
 
   it('defines functionality modes and subpages for requested workspaces', () => {

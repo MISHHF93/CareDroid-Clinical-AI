@@ -209,7 +209,7 @@ export const NAVIGATION_ITEMS = Object.freeze(
       path: item.route,
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
       order: index + 1,
-      roles: item.id === 'settings' ? rolesForRoute(item.route) : ALL_ROLES,
+      roles: rolesForRoute(item.route),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:

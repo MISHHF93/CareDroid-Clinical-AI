@@ -1,13 +1,91 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { act, render } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AppShell } from '../components/AppShell';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 import {
   NAVIGATION_ITEMS,
   getPilotCustomerNavigationItems,
 } from '../config/unified-navigation.config';
+
+const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
+  navigateMock: vi.fn(),
+  shellLocation: { pathname: '/emergency/whiteboard' },
+  emergencyStoreState: {
+    patients: [],
+    copilotOpen: false,
+    selectPatient: vi.fn(),
+    initializeFromBackend: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+    useLocation: () => shellLocation,
+  };
+});
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({
+    role: 'physician',
+    can: () => true,
+    canAccessRoute: () => true,
+    nearestRoute: () => '/emergency/whiteboard',
+  }),
+}));
+
+vi.mock('../store/emergencyStore', () => {
+  const useEmergencyStore = (selector) =>
+    typeof selector === 'function' ? selector(emergencyStoreState) : emergencyStoreState;
+  useEmergencyStore.getState = () => emergencyStoreState;
+  return { useEmergencyStore };
+});
+
+vi.mock('../engine/reassessmentEngine', () => ({
+  startReassessmentEngine: () => 0,
+}));
+
+vi.mock('../engine/capacityEngine', () => ({
+  startCapacityEngine: () => 0,
+}));
+
+vi.mock('../components/Sidebar', () => ({
+  Sidebar: () => <nav aria-label="Mock sidebar" />,
+}));
+
+vi.mock('../components/Header', () => ({
+  Header: ({ pageTitle }) => <header>{pageTitle}</header>,
+}));
+
+vi.mock('../components/ErrorBoundary', () => ({
+  default: ({ children }) => <>{children}</>,
+}));
+
+vi.mock('../components/PatientDetailPanel', () => ({
+  default: () => null,
+}));
+
+vi.mock('../components/CopilotPanel', () => ({
+  CopilotPanel: () => null,
+}));
+
+vi.mock('../components/CommandPalette', () => ({
+  default: () => null,
+}));
+
+vi.mock('../components/EMSCriticalBroadcast', () => ({
+  default: () => null,
+}));
+
+vi.mock('../components/ReassessmentDrawer', () => ({
+  default: () => null,
+}));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellSource = readFileSync(join(__dirname, '../components/AppShell.tsx'), 'utf8');
@@ -21,6 +99,12 @@ const PILOT_SIDEBAR_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);
 const CANONICAL_SIDEBAR_PATHS = PILOT_SIDEBAR_ITEMS.map((item) => item.path);
 
 describe('AppShell navigation surfaces', () => {
+  beforeEach(() => {
+    navigateMock.mockClear();
+    emergencyStoreState.selectPatient.mockClear();
+    emergencyStoreState.initializeFromBackend.mockClear();
+  });
+
   it('renders the canonical Sidebar and no legacy rail or bottom navigation component', () => {
     expect(appShellSource).toContain('<Sidebar navigationItems={visibleNavigationItems} />');
     expect(appShellSource).not.toContain('className="ed-nav-rail"');
@@ -87,5 +171,35 @@ describe('AppShell navigation surfaces', () => {
     expect(appShellSource).toContain('store.selectPatient(null);');
     expect(appShellSource).toContain('setShowReassessmentDrawer(false);');
     expect(appShellSource).toContain("document.dispatchEvent(new Event('close-all-panels'));");
+  });
+
+  it('navigates Medical Tools browser events with query intent preserved', async () => {
+    render(
+      <AppShell>
+        <div>Route content</div>
+      </AppShell>,
+    );
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent('ed:open-tools', {
+          detail: { source: 'chat', filter: 'clinical-tools', query: 'drug-check' },
+        }),
+      );
+    });
+    expect(navigateMock).toHaveBeenLastCalledWith(
+      '/emergency/tools?source=chat&filter=clinical-tools&q=drug-check',
+    );
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent('ed:open-calculator', {
+          detail: { calculatorId: 'heart-score', patientId: 'patient-123' },
+        }),
+      );
+    });
+    expect(navigateMock).toHaveBeenLastCalledWith(
+      '/emergency/tools?source=calculators&filter=calculator&q=heart-score&open=heart-score&patientId=patient-123',
+    );
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
 import {
@@ -14,6 +14,7 @@ import {
 } from '../../test/testRenderUtils';
 
 const navigateMock = vi.fn();
+const fetchToolExecutorCatalogMock = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -24,6 +25,26 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('./ToolsOverview.css', () => ({}));
+
+vi.mock('../../services/clinicalToolsApi', () => ({
+  fetchToolExecutorCatalog: (...args) => fetchToolExecutorCatalogMock(...args),
+}));
+
+vi.mock('./Calculators', () => ({
+  default: ({ initialCalculatorId, embedded }) => (
+    <div data-testid="embedded-calculators">
+      {initialCalculatorId}:{embedded ? 'embedded' : 'standalone'}
+    </div>
+  ),
+}));
+
+vi.mock('./LabInterpreter', () => ({
+  default: ({ embedded }) => (
+    <div data-testid="embedded-lab-interpreter">
+      lab-interp:{embedded ? 'embedded' : 'standalone'}
+    </div>
+  ),
+}));
 
 vi.mock('../../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
@@ -37,9 +58,9 @@ vi.mock('../../contexts/WorkspaceContext', () => ({
   useWorkspace: () => mockWorkspaceValue,
 }));
 
-function renderOverview() {
+function renderOverview(route = '/tools') {
   return render(
-    <MemoryRouter initialEntries={['/tools']}>
+    <MemoryRouter initialEntries={[route]}>
       <ToolsOverview />
     </MemoryRouter>
   );
@@ -103,6 +124,26 @@ function expectedFilterIds(filter) {
 describe('ToolsOverview complete visibility, search, filters, and launch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    fetchToolExecutorCatalogMock.mockResolvedValue({
+      ok: true,
+      data: {
+        registeredExecutorToolIds: ['sofa-calculator', 'drug-interactions', 'lab-interpreter'],
+        registryIdToExecutor: {
+          'drug-check': 'drug-interactions',
+          'lab-interp': 'lab-interpreter',
+          'sofa-score': 'sofa-calculator',
+        },
+        unsupportedTools: [
+          {
+            nluToolId: 'qsofa',
+            registryId: 'qsofa',
+            surface: 'calculator-form',
+            reason: 'Deterministic client-side calculator; no server executor.',
+          },
+        ],
+      },
+      error: null,
+    });
     mockWorkspaceValue.workspaces = [{ id: 'all', name: 'All Tools', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'all';
     mockWorkspaceValue.activeWorkspace = { id: 'all', name: 'All Tools', toolIds: [] };
@@ -211,6 +252,25 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(renderedIds.sort()).toEqual(expectedIds.sort());
   });
 
+  it('labels execution modes from the executor catalog without promoting unsupported local tools', async () => {
+    const { container } = renderOverview();
+    showAllTools();
+
+    await waitFor(() => {
+      expect(toolCard(container, 'drug-check')).toHaveTextContent(/server-backed/i);
+    });
+
+    expect(toolCard(container, 'lab-interp')).toHaveTextContent(/server-backed/i);
+    expect(toolCard(container, 'qsofa')).toHaveTextContent(/local calculator/i);
+    expect(toolCard(container, 'wells-dvt-calculator')).toHaveTextContent(/chat-assisted/i);
+    const platformTool = getUserFacingToolRegistryProjection().find(
+      (tool) => tool.executorStatus === 'platform' && toolCard(container, tool.id)
+    );
+    if (platformTool) {
+      expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform api/i);
+    }
+  }, 10000);
+
   it('shows a resettable empty state for unmatched search', () => {
     renderOverview();
     const input = screen.getByRole('searchbox', { name: /search all tools/i });
@@ -223,13 +283,57 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(screen.getAllByText(/^(open|start with chat)/i).length).toBeGreaterThan(0);
   }, 10000);
 
+  it('renders the active calculator surface from a Medical Tools URL entry', async () => {
+    renderOverview('/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=patient-123');
+
+    const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
+    expect(activeSurface).toBeInTheDocument();
+    expect(within(activeSurface).getByRole('heading', { name: /heart score/i })).toBeInTheDocument();
+    expect(await screen.findByTestId('embedded-calculators')).toHaveTextContent('heart-score:embedded');
+    expect(navigateMock).not.toHaveBeenCalled();
+  }, 10000);
+
+  it('renders a non-calculator active tool surface from a Medical Tools URL entry', async () => {
+    renderOverview('/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp');
+
+    const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
+    expect(within(activeSurface).getByRole('heading', { name: /lab interpreter/i })).toBeInTheDocument();
+    expect(within(activeSurface).queryByText(/local calculator/i)).toBeNull();
+    expect(await screen.findByTestId('embedded-lab-interpreter')).toHaveTextContent('lab-interp:embedded');
+    expect(screen.getByText(/continue into workflow/i)).toBeInTheDocument();
+  }, 10000);
+
+  it('launches a chat-assisted active surface from a Medical Tools URL entry', () => {
+    renderOverview('/emergency/tools?source=tools&filter=ai-workflows&open=wells-dvt-calculator');
+
+    const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
+    expect(within(activeSurface).getByRole('heading', { name: /wells dvt/i })).toBeInTheDocument();
+    expect(within(activeSurface).getByText(/^chat-assisted$/i)).toBeInTheDocument();
+
+    fireEvent.click(within(activeSurface).getByRole('button', { name: /ask assistant/i }));
+
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot');
+  }, 10000);
+
+  it('shows a clear not-found surface for unknown active tool links', () => {
+    renderOverview('/emergency/tools?source=tools&filter=clinical-tools&q=missing-tool&open=missing-tool');
+
+    const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
+    expect(within(activeSurface).getByRole('heading', { name: /tool not found/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('embedded-calculators')).toBeNull();
+  });
+
   it('launches representative calculator, clinical-page, fleet, hub, and chat-assisted tools', () => {
     const { container } = renderOverview();
     showAllTools();
 
     openTool(container, 'qsofa');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa' },
+      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa&open=qsofa' },
       expect.objectContaining({ replace: true })
     );
 

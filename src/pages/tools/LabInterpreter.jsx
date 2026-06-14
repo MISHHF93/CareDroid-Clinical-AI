@@ -154,11 +154,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
           className="lab-source-notice"
           title="Lab interpreter source states"
           states={[
+            DEMO_LIVE_STATES.LIVE,
             DEMO_LIVE_STATES.LOCAL_ONLY,
-            DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
             DEMO_LIVE_STATES.UNSUPPORTED,
           ]}
-          details="Entered lab values and examples are local-only until submitted. Interpretation depends on the clinical tool backend; when that route is backend unavailable or unsupported, the page shows the returned unsupported/error state instead of fake live AI output."
+          details="Entered lab values and examples stay local until submitted. Interpretation uses the existing clinical tool backend when available; if the backend returns unsupported or an error, the page shows that state instead of fake live AI output."
         />
 
         {/* Input Panel */}

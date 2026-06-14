@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import ClinicalCalculatorHub from '../../components/ClinicalCalculatorHub';
@@ -15,7 +15,9 @@ import {
 } from '../../data/profileToolSegmentation';
 import {
   getUserFacingToolRegistryProjection,
+  TOOL_LAUNCH_TYPES,
   TOOL_LIFECYCLE_LABELS,
+  TOOL_SURFACES,
 } from '../../data/toolInventory';
 import {
   ASSET_ACCESS_STATES,
@@ -36,7 +38,41 @@ import {
   trackRoleAssetUsage,
   trackRoleSearchBehavior,
 } from '../../services/roleIntelligenceTelemetry';
+import { fetchToolExecutorCatalog } from '../../services/clinicalToolsApi';
 import './ToolsOverview.css';
+
+const EmbeddedCalculators = lazy(() => import('./Calculators'));
+const DrugChecker = lazy(() => import('./DrugChecker'));
+const LabInterpreter = lazy(() => import('./LabInterpreter'));
+const Protocols = lazy(() => import('./Protocols'));
+const DiagnosisAssistant = lazy(() => import('./DiagnosisAssistant'));
+const ProcedureGuide = lazy(() => import('./ProcedureGuide'));
+const CalculatorRecommender = lazy(() => import('./CalculatorRecommender'));
+const AmbientScribe = lazy(() => import('./AmbientScribe'));
+const GuidelineRag = lazy(() => import('./GuidelineRag'));
+const DifferentialAi = lazy(() => import('./DifferentialAi'));
+const TimelineAi = lazy(() => import('./TimelineAi'));
+const PatientSummaryAi = lazy(() => import('./PatientSummaryAi'));
+const OrderSetAi = lazy(() => import('./OrderSetAi'));
+const AiExplainability = lazy(() => import('./AiExplainability'));
+const ClinicalAudit = lazy(() => import('./ClinicalAudit'));
+
+const EMBEDDED_TOOL_COMPONENTS = Object.freeze({
+  'drug-check': DrugChecker,
+  'lab-interp': LabInterpreter,
+  protocols: Protocols,
+  diagnosis: DiagnosisAssistant,
+  procedures: ProcedureGuide,
+  'calculator-recommender-ai': CalculatorRecommender,
+  'ambient-scribe': AmbientScribe,
+  'guideline-rag': GuidelineRag,
+  'differential-ai': DifferentialAi,
+  'timeline-ai': TimelineAi,
+  'patient-summary-ai': PatientSummaryAi,
+  'order-set-ai': OrderSetAi,
+  'ai-explainability': AiExplainability,
+  'clinical-audit': ClinicalAudit,
+});
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'recommended', label: 'Recommended' },
@@ -248,18 +284,242 @@ function accessRestrictionCopy(tool) {
   return tool.accessLabel || '';
 }
 
+function toolIdentityValues(tool) {
+  const mountedCapability = tool?.mountedCapability || {};
+  return [
+    tool?.id,
+    tool?.canonicalInventoryId,
+    tool?.nluToolId,
+    tool?.orchestratorToolId,
+    tool?.calculatorSlug,
+    tool?.label,
+    tool?.name,
+    tool?.route,
+    tool?.navigationPath,
+    mountedCapability.capabilityId,
+    ...(tool?.aliases || []),
+    ...(tool?.nluProfileIds || []),
+    ...(tool?.aiAliases || []),
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).trim().toLowerCase());
+}
+
+function resolveActiveTool(tools, queryValue, filteredTools = []) {
+  const normalized = normalizeSearch(queryValue);
+  if (!normalized) return null;
+  const exactTool = tools.find((tool) => toolIdentityValues(tool).includes(normalized));
+  if (exactTool) return exactTool;
+  const slug = normalized.replace(/^\/+|\/+$/g, '').split('/').pop();
+  if (slug && slug !== normalized) {
+    const slugTool = tools.find((tool) => toolIdentityValues(tool).includes(slug));
+    if (slugTool) return slugTool;
+  }
+  return null;
+}
+
+function isCalculatorTool(tool) {
+  return (
+    tool?.id === 'calculators' ||
+    tool?.category === 'Calculator' ||
+    tool?.surface === TOOL_SURFACES.CALCULATOR_FORM ||
+    Boolean(tool?.calculatorSlug)
+  );
+}
+
+function isToolAccessible(tool) {
+  if (!tool || tool.isLaunchable === false || tool.restrictionReason) return false;
+  return [
+    ASSET_ACCESS_STATES.ALLOWED,
+    ASSET_ACCESS_STATES.BETA,
+    ASSET_ACCESS_STATES.EXPERIMENTAL,
+    ASSET_ACCESS_STATES.DEMO_ONLY,
+  ].includes(tool.accessState || ASSET_ACCESS_STATES.ALLOWED);
+}
+
+function executionModeForTool(tool, executorCatalog) {
+  if (!tool) {
+    return {
+      label: 'Catalog',
+      detail: 'Select a tool to view launch and execution details.',
+      tone: 'catalog',
+    };
+  }
+
+  const registryExecutor = executorCatalog?.registryIdToExecutor?.[tool.id];
+  const executorId = registryExecutor || tool.orchestratorToolId;
+  const registeredExecutorIds = new Set(executorCatalog?.registeredExecutorToolIds || []);
+  const unsupportedExecutorIds = new Set(
+    (executorCatalog?.unsupportedTools || []).flatMap((entry) =>
+      [entry?.registryId, entry?.nluToolId, entry?.toolId].filter(Boolean)
+    )
+  );
+  const markedUnsupported = unsupportedExecutorIds.has(tool.id) || unsupportedExecutorIds.has(tool.nluToolId);
+
+  if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted') {
+    return {
+      label: 'Chat-assisted',
+      detail: 'Launches Copilot with a guarded clinical decision-support prompt.',
+      tone: 'chat',
+    };
+  }
+  if (!markedUnsupported && (tool.executorStatus === 'registered' || (executorId && registeredExecutorIds.has(executorId)))) {
+    return {
+      label: isCalculatorTool(tool) ? 'Backend validated form' : 'Server-backed',
+      detail: executorId
+        ? `Uses the local Medical Tools surface and can execute through /api/tools/${executorId}/execute.`
+        : 'Uses the local Medical Tools surface with registered backend validation.',
+      tone: 'server',
+    };
+  }
+  if (tool.executorStatus === 'platform' || (tool.endpoint && tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)) {
+    return {
+      label: 'Platform API',
+      detail: tool.endpoint ? `Uses ${tool.endpoint}.` : 'Uses a platform API client when launched.',
+      tone: 'platform',
+    };
+  }
+  if (isCalculatorTool(tool)) {
+    return {
+      label: 'Local calculator',
+      detail: 'Runs in the browser with the built-in calculator form; no fake backend executor is called.',
+      tone: 'local',
+    };
+  }
+  return {
+    label: 'Catalog launch',
+    detail: tool.endpoint ? `Connected endpoint: ${tool.endpoint}.` : 'Launches through the Medical Tools catalog.',
+    tone: 'catalog',
+  };
+}
+
+function ActiveToolSurface({
+  tool,
+  executorCatalog,
+  onClose,
+  onAssistantLaunch,
+  onToolLaunch,
+}) {
+  if (!tool) return null;
+
+  const executionMode = executionModeForTool(tool, executorCatalog);
+  const embeddedComponent = EMBEDDED_TOOL_COMPONENTS[tool.id];
+  const calculatorId = tool.calculatorSlug || (tool.id !== 'calculators' ? tool.id : '');
+  const accessible = isToolAccessible(tool);
+  const chatAssisted = tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted';
+
+  let body = null;
+  if (!accessible) {
+    body = (
+      <div className="tools-active-surface__fallback" role="status">
+        <strong className="tools-active-surface__fallback-title">{tool.label || tool.name}</strong>
+        <p>Unavailable: {tool.restrictionReason || accessRestrictionCopy(tool)}</p>
+      </div>
+    );
+  } else if (tool.id === 'calculators') {
+    body = <ClinicalCalculatorHub />;
+  } else if (chatAssisted) {
+    body = (
+      <div className="tools-active-surface__fallback">
+        <strong className="tools-active-surface__fallback-title">{tool.label || tool.name}</strong>
+        <p>{tool.description}</p>
+        <button
+          type="button"
+          className="btn-open-tool"
+          onClick={() => onAssistantLaunch(tool)}
+        >
+          Ask Assistant
+        </button>
+      </div>
+    );
+  } else if (isCalculatorTool(tool)) {
+    body = (
+      <EmbeddedCalculators
+        embedded
+        initialCalculatorId={calculatorId}
+        onCloseEmbedded={onClose}
+      />
+    );
+  } else if (embeddedComponent) {
+    const Component = embeddedComponent;
+    body = <Component embedded onCloseEmbedded={onClose} />;
+  } else {
+    body = (
+      <div className="tools-active-surface__fallback">
+        <strong className="tools-active-surface__fallback-title">{tool.label || tool.name}</strong>
+        <p>{tool.description}</p>
+        <button
+          type="button"
+          className="btn-open-tool"
+          onClick={() => onToolLaunch(tool)}
+        >
+          Open from catalog
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <section className="tools-active-surface" aria-label="Active Medical Tools surface">
+      <header className="tools-active-surface__header">
+        <div>
+          <span className={`tools-execution-badge tools-execution-badge--${executionMode.tone}`}>
+            {executionMode.label}
+          </span>
+          <h2>{tool.label || tool.name}</h2>
+          <p>{executionMode.detail}</p>
+        </div>
+        <button type="button" className="tools-active-surface__close" onClick={onClose}>
+          Back to catalog
+        </button>
+      </header>
+      <Suspense fallback={<div className="tools-active-surface__loading">Loading tool surface...</div>}>
+        {body}
+      </Suspense>
+    </section>
+  );
+}
+
+function UnknownActiveToolSurface({ requestedTool, onClose }) {
+  return (
+    <section className="tools-active-surface" aria-label="Active Medical Tools surface">
+      <header className="tools-active-surface__header">
+        <div>
+          <span className="tools-execution-badge tools-execution-badge--catalog">Not found</span>
+          <h2>Tool not found</h2>
+          <p>No Medical Tools entry matches “{requestedTool}”. Check the spelling or search the catalog below.</p>
+        </div>
+        <button type="button" className="tools-active-surface__close" onClick={onClose}>
+          Back to catalog
+        </button>
+      </header>
+    </section>
+  );
+}
+
 const ToolsOverview = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
   const requestedSource = searchParams.get('source');
+  const requestedOpenTool =
+    searchParams.get('open') ||
+    searchParams.get('tool') ||
+    searchParams.get('calc') ||
+    '';
   const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'recommended';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
     TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
   );
+  const [executorCatalog, setExecutorCatalog] = useState({
+    registeredExecutorToolIds: [],
+    registryIdToExecutor: {},
+    unsupportedTools: [],
+    error: null,
+  });
 
   useEffect(() => {
     setToolFilter(
@@ -270,6 +530,27 @@ const ToolsOverview = () => {
   useEffect(() => {
     setSearch(requestedSearch);
   }, [requestedSearch]);
+
+  useEffect(() => {
+    let alive = true;
+    fetchToolExecutorCatalog().then((result) => {
+      if (!alive) return;
+      if (result.ok) {
+        setExecutorCatalog({
+          registeredExecutorToolIds: result.data?.registeredExecutorToolIds || [],
+          registryIdToExecutor: result.data?.registryIdToExecutor || {},
+          unsupportedTools: result.data?.unsupportedTools || [],
+          error: null,
+        });
+        return;
+      }
+      setExecutorCatalog((previous) => ({ ...previous, error: result.error || 'Tool catalog unavailable' }));
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const { selectTool, setActiveTool, addMessage } = useConversation();
   const toolPreferences = useToolPreferences();
   const {
@@ -545,6 +826,40 @@ const ToolsOverview = () => {
     recentToolItems,
     workspaceRecommendedTools,
   ]);
+  const activeToolRequest = requestedOpenTool || requestedSearch;
+  const activeTool = useMemo(
+    () => resolveActiveTool(allToolsWithAccess, activeToolRequest, filteredTools),
+    [activeToolRequest, allToolsWithAccess, filteredTools]
+  );
+  const requestedActiveToolMissing = Boolean(requestedOpenTool && !activeTool);
+
+  const closeActiveTool = () => {
+    const params = new URLSearchParams(searchParams);
+    const activeIdentities = new Set(toolIdentityValues(activeTool));
+    const q = normalizeSearch(params.get('q'));
+    const searchValue = normalizeSearch(params.get('search'));
+    const qTool = resolveActiveTool(allToolsWithAccess, q);
+    const searchTool = resolveActiveTool(allToolsWithAccess, searchValue);
+    params.delete('open');
+    params.delete('tool');
+    params.delete('calc');
+    if (activeIdentities.has(q) || qTool) params.delete('q');
+    if (activeIdentities.has(searchValue) || searchTool) params.delete('search');
+    setSearch(params.get('q') || params.get('search') || '');
+    setSearchParams(params, { state: location.state });
+  };
+
+  const clearSearchAndFilters = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('open');
+    params.delete('tool');
+    params.delete('calc');
+    params.delete('q');
+    params.delete('search');
+    setSearch('');
+    setToolFilter(routeDefaultFilter);
+    setSearchParams(params, { state: location.state });
+  };
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -609,11 +924,13 @@ const ToolsOverview = () => {
       ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
       : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
   const showCalculatorHub =
-    toolFilter === 'calculator' ||
-    requestedSource === 'calculators' ||
-    searchParams.has('open') ||
-    searchParams.has('tool') ||
-    searchParams.has('calc');
+    !activeTool &&
+    !requestedActiveToolMissing &&
+    (toolFilter === 'calculator' ||
+      requestedSource === 'calculators' ||
+      searchParams.has('open') ||
+      searchParams.has('tool') ||
+      searchParams.has('calc'));
 
   return (
     <div className="tools-overview">
@@ -685,13 +1002,12 @@ const ToolsOverview = () => {
               </select>
             </label>
           </div>
-          <div className="tools-filter-tabs" role="tablist" aria-label="Tool category filters">
+          <div className="tools-filter-tabs" role="group" aria-label="Tool category filters">
             {filterTabs.map((option) => (
               <button
                 key={option.value}
                 type="button"
-                role="tab"
-                aria-selected={toolFilter === option.value}
+                aria-pressed={toolFilter === option.value}
                 aria-label={option.value === 'all' ? 'All' : option.label}
                 className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
                 onClick={() => setToolFilter(option.value)}
@@ -722,6 +1038,20 @@ const ToolsOverview = () => {
           </div>
         </div>
       </div>
+
+      {activeTool ? (
+        <ActiveToolSurface
+          tool={activeTool}
+          executorCatalog={executorCatalog}
+          onClose={closeActiveTool}
+          onAssistantLaunch={handleAssistantLaunch}
+          onToolLaunch={handleToolClick}
+        />
+      ) : null}
+
+      {requestedActiveToolMissing ? (
+        <UnknownActiveToolSurface requestedTool={requestedOpenTool} onClose={closeActiveTool} />
+      ) : null}
 
       {showCalculatorHub ? (
         <section
@@ -830,23 +1160,22 @@ const ToolsOverview = () => {
           <button
             type="button"
             className="btn-open-tool"
-            onClick={() => {
-              setSearch('');
-              setToolFilter(routeDefaultFilter);
-            }}
+            onClick={clearSearchAndFilters}
           >
             Clear search and filters →
           </button>
         </div>
       ) : (
         <div className="tools-grid">
-          {orderedTools.map((tool) => (
-            <div
-              key={tool.id}
-              data-tool-id={tool.id}
-              className="tool-card-large"
-              aria-disabled={tool.isLaunchable === false}
-            >
+          {orderedTools.map((tool) => {
+            const executionMode = executionModeForTool(tool, executorCatalog);
+            return (
+              <div
+                key={tool.id}
+                data-tool-id={tool.id}
+                className="tool-card-large"
+                aria-disabled={tool.isLaunchable === false}
+              >
               <div className="tool-card-header">
                 <div className="tool-icon">
                   <span aria-hidden>
@@ -868,6 +1197,9 @@ const ToolsOverview = () => {
                       {tool.accessLabel}
                     </span>
                   ) : null}
+                  <span className={`tools-execution-badge tools-execution-badge--${executionMode.tone}`}>
+                    {executionMode.label}
+                  </span>
                   {tool.surface === 'chat-assisted' ? (
                     <span className="tool-category tool-category--guided">Guided</span>
                   ) : null}
@@ -888,6 +1220,7 @@ const ToolsOverview = () => {
                     title={
                       favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'
                     }
+                    aria-label={`${favoriteToolIdSet.has(tool.id) ? 'Remove' : 'Add'} ${tool.name} ${favoriteToolIdSet.has(tool.id) ? 'from' : 'to'} favorites`}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFavorite(tool.id);
@@ -904,6 +1237,7 @@ const ToolsOverview = () => {
                   <button
                     className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
                     title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
+                    aria-label={`${pinnedToolIdSet.has(tool.id) ? 'Unpin' : 'Pin'} ${tool.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       togglePinned(tool.id);
@@ -919,6 +1253,7 @@ const ToolsOverview = () => {
                         ? 'Show tool by default'
                         : 'Hide from default views'
                     }
+                    aria-label={`${hiddenToolIdSet.has(tool.id) ? 'Show' : 'Hide'} ${tool.name} by default`}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleHidden(tool.id);
@@ -969,6 +1304,7 @@ const ToolsOverview = () => {
                 <button
                   className="btn-open-tool"
                   disabled={Boolean(tool.restrictionReason) || tool.isLaunchable === false}
+                  aria-label={`${primaryActionLabel(tool)} ${tool.name}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleToolClick(tool);
@@ -981,6 +1317,7 @@ const ToolsOverview = () => {
                 tool.isLaunchable !== false ? (
                   <button
                     className="btn-chat-tool"
+                    aria-label={`Ask Assistant about ${tool.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleAssistantLaunch(tool);
@@ -990,8 +1327,9 @@ const ToolsOverview = () => {
                   </button>
                 ) : null}
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
 

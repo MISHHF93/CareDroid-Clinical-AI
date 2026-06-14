@@ -25,6 +25,108 @@
   padding: 0;
 }
 
+.tools-active-surface {
+  display: grid;
+  gap: 12px;
+  margin-bottom: var(--compact-page-gap, 14px);
+  padding: 12px;
+  border: 1px solid var(--app-panel-border, var(--panel-border));
+  border-radius: var(--compact-panel-radius, 16px);
+  background: var(--app-surface-1, var(--panel-background));
+  min-width: 0;
+}
+
+.tools-active-surface__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tools-active-surface__header h2 {
+  margin: 6px 0 4px;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.tools-active-surface__header p,
+.tools-active-surface__fallback p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.tools-active-surface__close {
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-background);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tools-active-surface__loading,
+.tools-active-surface__fallback {
+  padding: 12px;
+  border: 1px dashed var(--panel-border);
+  border-radius: var(--compact-card-radius, 12px);
+  color: var(--text-secondary);
+}
+
+.tools-active-surface__fallback {
+  display: grid;
+  gap: 10px;
+}
+
+.tools-active-surface__fallback-title {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.tools-execution-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-2, var(--panel-background));
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.tools-execution-badge--server {
+  border-color: color-mix(in srgb, var(--status-success, #22C55E) 44%, var(--panel-border));
+  color: var(--status-success, #22C55E);
+}
+
+.tools-execution-badge--local {
+  border-color: color-mix(in srgb, var(--status-info, #60A5FA) 44%, var(--panel-border));
+  color: var(--status-info, #60A5FA);
+}
+
+.tools-execution-badge--platform {
+  border-color: color-mix(in srgb, var(--primary-color) 44%, var(--panel-border));
+  color: var(--primary-color);
+}
+
+.tools-execution-badge--chat {
+  border-color: color-mix(in srgb, var(--status-warning, #F59E0B) 44%, var(--panel-border));
+  color: var(--status-warning, #F59E0B);
+}
+
+.tools-execution-badge--catalog {
+  border-color: color-mix(in srgb, var(--text-secondary) 34%, var(--panel-border));
+  color: var(--text-secondary);
+}
+
 .header-content h1 {
   font-size: var(--text-title-fluid);
   margin-bottom: 6px;

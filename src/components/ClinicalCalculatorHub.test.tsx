@@ -1,12 +1,35 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import ClinicalCalculatorHub, { CALCULATORS } from './ClinicalCalculatorHub';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
+const navigateMock = vi.fn();
+const conversationMock = {
+  addMessage: vi.fn(),
+  selectTool: vi.fn(),
+  setActiveTool: vi.fn(),
+};
 const originalState = useEmergencyStore.getState();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
+
+vi.mock('../contexts/ConversationContext', () => ({
+  useConversation: () => conversationMock,
+}));
+
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="location-search">{location.search}</output>;
+}
 
 const patient: Patient = {
   id: 'hub-patient-1',
@@ -40,6 +63,7 @@ const patient: Patient = {
 };
 
 afterEach(() => {
+  vi.clearAllMocks();
   useEmergencyStore.setState(originalState, true);
 });
 
@@ -47,6 +71,7 @@ function renderHub(route: string) {
   return render(
     <MemoryRouter initialEntries={[route]}>
       <ClinicalCalculatorHub />
+      <LocationProbe />
     </MemoryRouter>,
   );
 }
@@ -97,6 +122,14 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
         keywords: expect.arrayContaining(['news', 'early warning', 'deterioration', 'obs']),
       }),
     );
+    expect(CALCULATORS.map((calculator) => calculator.id)).not.toEqual(
+      expect.arrayContaining([
+        'bed-occupancy-calculator',
+        'staffing-ratio-calculator',
+        'turnaround-time-calculator',
+        'resource-utilization-index',
+      ]),
+    );
   });
 
   it('auto-opens a calculator from the open query parameter', () => {
@@ -109,6 +142,60 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
     renderHub('/emergency/tools?source=calculators&filter=calculator&q=heart');
 
     expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
+  });
+
+  it.each([
+    ['/emergency/tools?source=calculators&filter=calculator&q=stroke', /nihss/i],
+    ['/emergency/tools?source=calculators&filter=calculator&q=stroke%20scale', /nihss/i],
+    ['/emergency/tools?source=calculators&filter=calculator&calc=ciwa', /ciwa-ar alcohol withdrawal/i],
+    ['/emergency/tools?source=calculators&filter=calculator&tool=cssrs', /columbia suicide severity/i],
+    ['/emergency/tools?source=calculators&filter=calculator&open=c-ssrs', /columbia suicide severity/i],
+  ])('resolves calculator URL aliases for %s', (route, expectedDialogName) => {
+    renderHub(route);
+
+    expect(screen.getByRole('dialog', { name: expectedDialogName })).toBeTruthy();
+  });
+
+  it('removes alias search params when closing a URL-opened calculator', async () => {
+    const user = userEvent.setup();
+    renderHub('/emergency/tools?source=calculators&filter=calculator&q=heart&open=heart-score&patientId=hub-patient-1');
+
+    expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: /close heart score/i }));
+
+    expect(screen.queryByRole('dialog', { name: /heart score/i })).toBeNull();
+    expect(screen.getByTestId('location-search')).toHaveTextContent('source=calculators');
+    expect(screen.getByTestId('location-search')).toHaveTextContent('filter=calculator');
+    expect(screen.getByTestId('location-search')).toHaveTextContent('patientId=hub-patient-1');
+    expect(screen.getByTestId('location-search')).not.toHaveTextContent('q=');
+    expect(screen.getByTestId('location-search')).not.toHaveTextContent('open=');
+  });
+
+  it('does not promote a conflicting known q calculator after closing an explicit open calculator', async () => {
+    const user = userEvent.setup();
+    renderHub('/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=heart-score&patientId=hub-patient-1');
+
+    expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: /close heart score/i }));
+
+    expect(screen.queryByRole('dialog', { name: /heart score/i })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: /qsofa/i })).toBeNull();
+    expect(screen.getByTestId('location-search')).toHaveTextContent('source=calculators');
+    expect(screen.getByTestId('location-search')).toHaveTextContent('filter=calculator');
+    expect(screen.getByTestId('location-search')).not.toHaveTextContent('q=');
+    expect(screen.getByTestId('location-search')).not.toHaveTextContent('open=');
+  });
+
+  it('launches chat-assisted calculator rows directly into Copilot', async () => {
+    const user = userEvent.setup();
+    renderHub('/emergency/tools?source=calculators&filter=calculator');
+
+    await user.click(screen.getByRole('button', { name: /ask assistant about wells dvt/i }));
+
+    expect(conversationMock.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(conversationMock.setActiveTool).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(conversationMock.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
+    expect(navigateMock).toHaveBeenCalledWith('/emergency/copilot');
   });
 
   it('saves score and detail notes, then closes the opened calculator', async () => {
