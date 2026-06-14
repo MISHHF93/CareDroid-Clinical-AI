@@ -48,11 +48,21 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('costOptimization')).toBe(true);
     expect(isBackendCapabilityEnabled('clinicalAlerts')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyGovernance')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyCentralNode')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyWhiteboard')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyPatients')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyPatientJourney')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyQueues')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyCapacity')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyWorkflowAudit')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyIntegrationHub')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyProvincialHealth')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencySmartIntake')).toBe(true);
+    expect(getBackendCapabilityStatus('emergencyCentralNode')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('emergencyIntegrationHub')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
   });
 

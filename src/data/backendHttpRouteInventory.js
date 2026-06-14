@@ -14,6 +14,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
   { method: 'PATCH', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
   { method: 'GET', path: '/api/emergency/whiteboard', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/central-node/snapshot', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/patients', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/patients', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/journey', controller: 'EmergencyOsController' },

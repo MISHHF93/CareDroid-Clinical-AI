@@ -42,7 +42,17 @@ import {
   subscribeToSettingsFeatureChanges,
   updateSettingsFeatureFlag,
 } from '../services/emergencySettingsApi';
-import { fetchEmergencyAnalytics } from '../services/emergencyOsApi';
+import {
+  fetchBoardingStatus,
+  fetchCapacityStatus,
+  fetchEMSIntake,
+  fetchEmergencyAnalytics,
+  fetchEmergencyQueues,
+  fetchEmergencyWhiteboard,
+  fetchEmergencyWorkflowLogs,
+  fetchReassessmentQueue,
+  fetchReferrals,
+} from '../services/emergencyOsApi';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
   DEFAULT_EMERGENCY_ALERT_RULES,
@@ -669,6 +679,10 @@ export type EmergencyDashboardRefreshResult = {
   capacity?: unknown;
   boarding?: unknown;
   ems?: unknown;
+  queues?: unknown;
+  reassessment?: unknown;
+  referrals?: unknown;
+  workflowLogs?: unknown;
   errors: Record<string, string>;
 };
 
@@ -964,6 +978,85 @@ const extractEmsIncomingPatients = (raw: unknown): EmsIncomingPatient[] => {
       'queue.incomingPatients',
     ]);
   return asArray(candidate).map(normalizeEmsIncomingPatient);
+};
+
+const extractQueueSummaries = (raw: unknown): EmergencyQueueSummary[] => {
+  const data = unwrapData(raw);
+  const queues = asArray(firstValue(data, ['queues', 'queueRows', 'queueMetrics']));
+  return queues
+    .map((queue, index) => {
+      const record = asRecord(queue);
+      const label = stringFrom(firstValue(record, ['label', 'name', 'type'])) || `Queue ${index + 1}`;
+      return {
+        ...record,
+        id: stringFrom(record.id) || `queue-${label.toLowerCase().replace(/\s+/g, '-')}`,
+        label,
+        count: numberFrom(
+          firstValue(record, ['count', 'patientCount']) ?? asArray(record.patients).length,
+          0,
+        ),
+      } as EmergencyQueueSummary;
+    })
+    .filter((queue) => Boolean(queue.label));
+};
+
+const normalizeReferralStatus = (status: unknown): Referral['status'] => {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized.includes('accepted')) return 'Accepted';
+  if (normalized.includes('complete') || normalized.includes('closed')) return 'Completed';
+  if (normalized.includes('declined')) return 'Declined';
+  if (normalized.includes('delay')) return 'Delayed';
+  if (normalized.includes('info')) return 'InfoRequested';
+  if (normalized.includes('draft')) return 'Draft';
+  return 'Sent';
+};
+
+const extractReferrals = (raw: unknown): Referral[] => {
+  const data = unwrapData(raw);
+  return asArray(firstValue(data, ['referrals'])).map((referral, index) => {
+    const record = asRecord(referral);
+    const patient = asRecord(record.patient);
+    const patientId =
+      stringFrom(record.patientId) || stringFrom(patient.id) || `backend-referral-patient-${index + 1}`;
+    const elapsedMinutes = numberFrom(record.elapsedMinutes, 0);
+    const priority = stringFrom(patient.priority);
+    const requestedAt =
+      stringFrom(firstValue(record, ['requestedAt', 'createdAt'])) ||
+      new Date(Date.now() - Math.max(0, elapsedMinutes) * 60000).toISOString();
+    const targetDepartment =
+      stringFrom(firstValue(record, ['targetDepartment', 'specialty', 'department', 'service'])) ||
+      'Other';
+
+    return {
+      id: stringFrom(record.id) || `backend-referral-${patientId}`,
+      patientId,
+      targetDepartment,
+      service: stringFrom(record.service) || targetDepartment,
+      urgency:
+        stringFrom(record.urgency) ||
+        (priority === Priority.P1 || priority === Priority.P2 ? 'Emergent' : 'Urgent'),
+      reason:
+        stringFrom(record.reason) ||
+        stringFrom(patient.chiefComplaint) ||
+        'Specialty review requested.',
+      clinicalSummary:
+        stringFrom(record.clinicalSummary) ||
+        stringFrom(record.summary) ||
+        `${stringFrom(patient.firstName) || 'Unknown'} ${stringFrom(patient.lastName) || 'patient'}: ${
+          stringFrom(patient.chiefComplaint) || 'review requested'
+        }`,
+      workflow: stringFrom(record.workflow) || 'Referral',
+      status: normalizeReferralStatus(record.status),
+      requestedAt,
+      respondedAt: stringFrom(record.respondedAt) || undefined,
+      responseNote: stringFrom(record.responseNote) || undefined,
+      summary:
+        stringFrom(record.summary) ||
+        stringFrom(record.reason) ||
+        stringFrom(patient.chiefComplaint) ||
+        'Referral requested.',
+    };
+  });
 };
 
 const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
@@ -1832,6 +1925,7 @@ interface EmergencyStoreState {
       emsUnits: EmsUnit[];
       emsArrivals: EMSArrival[];
       referrals: Referral[];
+      queues: EmergencyQueueSummary[];
       activeQueueFilter: string | null;
       whiteboardSearchQuery: string;
       loading: boolean;
@@ -2888,9 +2982,20 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         const activeShift = firstValue(whiteboardPayload, ['activeShift', 'shift']) as
           | ActiveShift
           | undefined;
-        const capacity = firstValue(whiteboardPayload, ['capacity']) as
+        const capacityData = asRecord(unwrapData(result.capacity));
+        const capacity = (firstValue(whiteboardPayload, ['capacity']) ||
+          firstValue(capacityData, ['capacity'])) as
           | CapacitySnapshot
           | undefined;
+        const emsArrivals = extractEmsIncomingPatients(result.ems) as unknown as EMSArrival[];
+        const referrals = extractReferrals(result.referrals);
+        const queues = extractQueueSummaries(result.queues);
+        const reassessmentPatients = asArray<Patient>(
+          firstValue(unwrapData(result.reassessment), ['patients']),
+        );
+        const backendWorkflowLogs = asArray<WorkflowActionLog>(
+          firstValue(unwrapData(result.workflowLogs), ['logs', 'workflowLogs']),
+        );
         const hasBackendErrors = Object.keys(result.errors).length > 0;
 
         if (
@@ -2899,17 +3004,25 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           rooms.length ||
           alerts.length ||
           workflowLogs.length ||
+          backendWorkflowLogs.length ||
           activeShift ||
-          capacity
+          capacity ||
+          emsArrivals.length ||
+          referrals.length ||
+          queues.length ||
+          reassessmentPatients.length
         ) {
           get().hydrateFromApi({
             patients: patients.length ? patients : undefined,
             staff: staff.length ? staff : undefined,
             rooms: rooms.length ? rooms : undefined,
             alerts: alerts.length ? alerts : undefined,
-            workflowLogs: workflowLogs.length ? workflowLogs : undefined,
+            workflowLogs: backendWorkflowLogs.length ? backendWorkflowLogs : workflowLogs.length ? workflowLogs : undefined,
             activeShift,
             capacity,
+            emsArrivals: emsArrivals.length ? emsArrivals : undefined,
+            referrals: referrals.length ? referrals : undefined,
+            queues: queues.length ? queues : undefined,
           });
         }
 
@@ -2946,34 +3059,34 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     refreshAllData: async () => {
       set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
-      const loadDataset = async (path: string): Promise<{ data?: unknown; error?: string }> => {
+      const loadDataset = async (
+        label: string,
+        fetcher: () => Promise<unknown>,
+      ): Promise<{ data?: unknown; error?: string }> => {
         try {
-          const response = await fetch(path, { headers: { Accept: 'application/json' } });
-          const text = await response.text();
-          const data = text ? JSON.parse(text) : {};
-          if (!response.ok) {
-            return {
-              error:
-                stringFrom(firstValue(data, ['message', 'error', 'detail'])) ||
-                `Emergency OS request failed with status ${response.status}.`,
-            };
-          }
-          return { data };
+          return { data: await fetcher() };
         } catch (error) {
           return {
-            error: error instanceof Error ? error.message : 'Unable to load Emergency OS data.',
+            error:
+              error instanceof Error
+                ? error.message
+                : `Unable to load Emergency OS ${label} data.`,
           };
         }
       };
 
-      const [whiteboard, capacity, boarding, ems] = await Promise.all([
-        loadDataset('/api/emergency/whiteboard'),
-        loadDataset('/api/emergency/capacity'),
-        loadDataset('/api/emergency/boarding'),
-        loadDataset('/api/emergency/ems'),
+      const [whiteboard, capacity, boarding, ems, queues, reassessment, referrals, workflowLogs] = await Promise.all([
+        loadDataset('whiteboard', fetchEmergencyWhiteboard),
+        loadDataset('capacity', fetchCapacityStatus),
+        loadDataset('boarding', fetchBoardingStatus),
+        loadDataset('EMS', fetchEMSIntake),
+        loadDataset('queues', fetchEmergencyQueues),
+        loadDataset('reassessment', fetchReassessmentQueue),
+        loadDataset('referrals', fetchReferrals),
+        loadDataset('workflow logs', fetchEmergencyWorkflowLogs),
       ]);
       const errors = Object.fromEntries(
-        Object.entries({ whiteboard, capacity, boarding, ems })
+        Object.entries({ whiteboard, capacity, boarding, ems, queues, reassessment, referrals, workflowLogs })
           .filter(([, result]) => result.error)
           .map(([key, result]) => [key, result.error as string]),
       );
@@ -2988,6 +3101,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         emsIncomingPatients: ems.data
           ? extractEmsIncomingPatients(ems.data)
           : state.emsIncomingPatients,
+        queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
         loading: false,
         ui: {
           ...state.ui,
@@ -3001,6 +3115,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         capacity: capacity.data,
         boarding: boarding.data,
         ems: ems.data,
+        queues: queues.data,
+        reassessment: reassessment.data,
+        referrals: referrals.data,
+        workflowLogs: workflowLogs.data,
         errors,
       };
     },
@@ -3829,6 +3947,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           emsUnits: payload.emsUnits || state.emsUnits,
           emsArrivals: payload.emsArrivals || state.emsArrivals,
           referrals,
+          queues: payload.queues || state.queues,
           activeQueueFilter: payload.activeQueueFilter ?? state.activeQueueFilter,
           whiteboardSearchQuery: payload.whiteboardSearchQuery ?? state.whiteboardSearchQuery,
           loading: payload.loading ?? state.loading,

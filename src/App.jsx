@@ -50,6 +50,7 @@ import {
   useUpgradeHarnessAuditSummary,
   useUpgradeHarnessCapacity,
   useUpgradeHarnessClinicalIntelligence,
+  usePatientJourney,
   useReassessmentQueue,
 } from './hooks/useEmergencyOs';
 
@@ -518,8 +519,20 @@ function PatientsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const storePatients = useEmergencyStore((state) => state.patients);
   const patientsModule = useEmergencyPatients();
+  const journeyModule = usePatientJourney();
   const patients = patientsModule.data?.data?.patients || storePatients;
   const query = searchParams.get('q') || '';
+  const journeyData = journeyModule.data?.data || {};
+  const journeyStateCounts = journeyData.stateCounts || patients.reduce((counts, patient) => {
+    counts[patient.state] = (counts[patient.state] || 0) + 1;
+    return counts;
+  }, {});
+  const journeyEvents = Array.isArray(journeyData.events)
+    ? journeyData.events
+    : patients.flatMap((patient) => patient.timeline || []);
+  const visibleJourneyStates = Object.entries(journeyStateCounts)
+    .filter(([, count]) => Number(count) > 0)
+    .slice(0, 6);
   const visiblePatients = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) return patients;
@@ -599,6 +612,67 @@ function PatientsRoute() {
           },
         ]}
       />
+      <ApiStateBanner
+        moduleState={journeyModule}
+        fallbackText="Patient Journey endpoint is unavailable; patient cards remain available."
+      />
+      <article
+        aria-label="Patient Journey backend status"
+        style={{
+          ...emergencyRouteStyles.card,
+          display: 'grid',
+          gap: 10,
+          padding: 'var(--space-3, 12px)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div>
+            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>
+              Patient Journey Engine
+            </strong>
+            <p style={{ margin: '4px 0 0', color: 'var(--color-text-secondary, #9CA3AF)', fontSize: 13 }}>
+              Backend state-count and timeline-event envelope rendered through the active Patients route.
+            </p>
+          </div>
+          <span
+            style={{
+              borderRadius: 999,
+              background: 'var(--color-elevated, #0B1120)',
+              color: '#BFDBFE',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontSize: 12,
+              fontWeight: 900,
+              padding: '6px 10px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {journeyEvents.length} events
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {visibleJourneyStates.length ? (
+            visibleJourneyStates.map(([state, count]) => (
+              <span
+                key={state}
+                style={{
+                  border: '1px solid var(--color-border-subtle, #1F2937)',
+                  borderRadius: 999,
+                  color: 'var(--color-text-secondary, #9CA3AF)',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  padding: '5px 9px',
+                }}
+              >
+                {state}: {count}
+              </span>
+            ))
+          ) : (
+            <span style={{ color: 'var(--color-text-muted, #6B7280)', fontSize: 13 }}>
+              No active journey state counts yet.
+            </span>
+          )}
+        </div>
+      </article>
       <PatientGrid
         patients={visiblePatients}
         emptyMessage={

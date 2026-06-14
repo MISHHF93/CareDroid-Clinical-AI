@@ -141,6 +141,112 @@ describe('CareDroidCentralNode contract', () => {
     );
   });
 
+  it('harmonizes the backend central-node envelope into the visible operational snapshot', () => {
+    const snapshot = buildCareDroidCentralNodeSnapshot(
+      source(),
+      {
+        role: 'charge_nurse',
+        roleLabel: 'Charge Nurse',
+        readOnly: false,
+        allowedRoutes: ['/emergency/whiteboard'],
+      },
+      {
+        backendSnapshot: {
+          module: 'CareDroid Central Node',
+          generatedAt: '2026-06-13T12:05:00.000Z',
+          source: 'backend-fixture',
+          status: 'active',
+          data: {
+            node: 'CareDroidCentralNode',
+            generatedAt: '2026-06-13T12:05:00.000Z',
+            patientsToday: 18,
+            activePatients: 14,
+            waitingPatients: 6,
+            longestWait: 88,
+            averageWait: 42,
+            emsInbound: 3,
+            emsPressure: 'strained',
+            reassessmentsDue: 5,
+            capacityStatus: {
+              score: 91,
+              band: 'Red',
+              totalPatients: 14,
+              occupiedRooms: 10,
+              boardingCount: 4,
+              reassessmentDue: 5,
+              criticalEmsInboundCount: 1,
+              updatedAt: '2026-06-13T12:05:00.000Z',
+            },
+            boarders: 4,
+            boardingRisk: 'strained',
+            referralsPending: 2,
+            operationalAlerts: [
+              {
+                id: 'backend-alert-1',
+                severity: 'Critical',
+                title: 'Capacity critical',
+                message: 'Backend central node alert.',
+                createdAt: '2026-06-13T12:04:00.000Z',
+                dismissed: false,
+              },
+            ],
+            queueMetrics: [
+              {
+                id: 'waiting',
+                label: 'Waiting',
+                count: 6,
+                oldestWaitMinutes: 88,
+                targetMinutes: 45,
+                breached: true,
+              },
+            ],
+          },
+        },
+      },
+    );
+
+    expect(snapshot.sync).toMatchObject({
+      source: 'backend-snapshot',
+      status: 'connected',
+      stale: false,
+      lastSyncedAt: '2026-06-13T12:05:00.000Z',
+    });
+    expect(snapshot.currentDepartmentStatus).toMatchObject({
+      patientsToday: 18,
+      activePatients: 14,
+      waitingPatients: 6,
+      longestWait: 88,
+      capacityBand: 'Red',
+      activeAlerts: 1,
+    });
+    expect(snapshot.capacityStatus).toMatchObject({
+      score: 91,
+      band: 'Red',
+      totalPatients: 14,
+      boardingCount: 4,
+      reassessmentDue: 5,
+    });
+    expect(snapshot.emsPressure).toMatchObject({
+      inbound: 3,
+      criticalInbound: 1,
+      status: 'strained',
+    });
+    expect(snapshot.boardingStatus).toEqual({ boarders: 4, risk: 'strained' });
+    expect(snapshot.referralStatus.pending).toBe(2);
+    expect(snapshot.queueHealth[0]).toMatchObject({
+      id: 'waiting',
+      count: 6,
+      breached: true,
+    });
+    expect(snapshot.operationalSummary.metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ key: 'capacityScore', value: '91 Red' }),
+        expect.objectContaining({ key: 'emsInbound', value: 3 }),
+        expect.objectContaining({ key: 'reassessmentsDue', value: 5 }),
+      ]),
+    );
+  });
+
   it('redacts patient-sensitive fields for public display modes', () => {
     const snapshot = buildCareDroidCentralNodeSnapshot(
       source(),

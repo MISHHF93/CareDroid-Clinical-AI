@@ -263,6 +263,33 @@ export type CareDroidCentralNodeSnapshot = {
   };
 };
 
+type BackendCentralNodePayload = {
+  node?: unknown;
+  generatedAt?: unknown;
+  patientsToday?: unknown;
+  activePatients?: unknown;
+  waitingPatients?: unknown;
+  longestWait?: unknown;
+  averageWait?: unknown;
+  emsInbound?: unknown;
+  emsPressure?: unknown;
+  reassessmentsDue?: unknown;
+  capacityStatus?: unknown;
+  boarders?: unknown;
+  boardingRisk?: unknown;
+  referralsPending?: unknown;
+  operationalAlerts?: unknown;
+  queueMetrics?: unknown;
+  recentEvents?: unknown;
+  tenantSettings?: unknown;
+  enabledModules?: unknown;
+};
+
+type BackendCentralNodeEnvelope = {
+  generatedAt?: unknown;
+  data?: BackendCentralNodePayload;
+};
+
 function localDateKey(value: string | Date = new Date()): string {
   const date = value instanceof Date ? value : new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
@@ -475,10 +502,242 @@ function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'o
   };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function finiteNumber(value: unknown, fallback: number): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function stringOr(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.trim() ? value : fallback;
+}
+
+function pressureOr(value: unknown, fallback: CareDroidPressure): CareDroidPressure {
+  const normalized = String(value || '').toLowerCase();
+  if (normalized === 'critical') return 'critical';
+  if (normalized === 'strained') return 'strained';
+  if (normalized === 'watch') return 'watch';
+  if (normalized === 'normal') return 'normal';
+  return fallback;
+}
+
+function extractBackendCentralNodePayload(
+  backendSnapshot: unknown,
+): { payload: BackendCentralNodePayload; generatedAt: string } | null {
+  if (!isRecord(backendSnapshot)) return null;
+  const envelope = backendSnapshot as BackendCentralNodeEnvelope;
+  const rawPayload = isRecord(envelope.data) ? envelope.data : backendSnapshot;
+  if (!isRecord(rawPayload) || rawPayload.node !== CARE_DROID_CENTRAL_NODE_ID) return null;
+
+  return {
+    payload: rawPayload as BackendCentralNodePayload,
+    generatedAt: stringOr(rawPayload.generatedAt ?? envelope.generatedAt, new Date().toISOString()),
+  };
+}
+
+function normalizeBackendCapacity(
+  value: unknown,
+  fallback: EmergencyStoreState['capacity'],
+  generatedAt: string,
+): EmergencyStoreState['capacity'] {
+  if (!isRecord(value)) return fallback;
+  const band = ['Green', 'Yellow', 'Orange', 'Red'].includes(String(value.band))
+    ? (String(value.band) as EmergencyStoreState['capacity']['band'])
+    : fallback.band;
+
+  return {
+    ...fallback,
+    ...(value as Partial<EmergencyStoreState['capacity']>),
+    score: finiteNumber(value.score, fallback.score),
+    band,
+    totalPatients: finiteNumber(value.totalPatients, fallback.totalPatients),
+    occupiedRooms: finiteNumber(value.occupiedRooms, fallback.occupiedRooms),
+    boardingCount: finiteNumber(value.boardingCount, fallback.boardingCount),
+    reassessmentDue: finiteNumber(value.reassessmentDue, fallback.reassessmentDue),
+    updatedAt: stringOr(value.updatedAt, generatedAt),
+  };
+}
+
+function normalizeBackendQueueMetrics(
+  value: unknown,
+  fallback: CareDroidCentralNodeSnapshot['queueHealth'],
+): CareDroidCentralNodeSnapshot['queueHealth'] {
+  if (!Array.isArray(value)) return fallback;
+  const rows = value.filter(isRecord).map((metric, index) => {
+    const label = stringOr(metric.label, `Queue ${index + 1}`);
+    return {
+      id: stringOr(metric.id, label.toLowerCase().replace(/\s+/g, '-')),
+      label,
+      count: finiteNumber(metric.count, 0),
+      oldestWaitMinutes: finiteNumber(metric.oldestWaitMinutes, 0),
+      targetMinutes: finiteNumber(metric.targetMinutes, 0),
+      breached: Boolean(metric.breached),
+    };
+  });
+  return rows.length ? rows : fallback;
+}
+
+function normalizeBackendAlerts(value: unknown, fallback: Alert[], generatedAt: string): Alert[] {
+  if (!Array.isArray(value)) return fallback;
+  const alerts = value.filter(isRecord).map((alert, index) => {
+    const severity = ['Info', 'Warning', 'Critical'].includes(String(alert.severity))
+      ? (String(alert.severity) as Alert['severity'])
+      : 'Info';
+    return {
+      id: stringOr(alert.id, `backend-alert-${index + 1}`),
+      type: stringOr(alert.type, 'System'),
+      severity,
+      title: stringOr(alert.title, 'Operational alert'),
+      message: stringOr(alert.message, 'Backend central node alert.'),
+      patientId: typeof alert.patientId === 'string' ? alert.patientId : undefined,
+      createdAt: stringOr(alert.createdAt, generatedAt),
+      dismissed: Boolean(alert.dismissed),
+      source: stringOr(alert.source, 'emergency-os-backend'),
+      metadata: isRecord(alert.metadata)
+        ? (alert.metadata as Alert['metadata'])
+        : undefined,
+    };
+  });
+  return alerts.length ? alerts : fallback;
+}
+
+function normalizeBackendTenantSettings(
+  value: unknown,
+  fallback: CareDroidCentralNodeSnapshot['tenantSettings'],
+): CareDroidCentralNodeSnapshot['tenantSettings'] {
+  if (!isRecord(value)) return fallback;
+  const defaultScreenMode = CARE_DROID_SCREEN_MODE_CONFIG[value.defaultScreenMode as CareDroidScreenMode]
+    ? (value.defaultScreenMode as CareDroidScreenMode)
+    : fallback.defaultScreenMode;
+  const enabledScreenModes = Array.isArray(value.enabledScreenModes)
+    ? value.enabledScreenModes.filter(
+        (mode): mode is CareDroidScreenMode =>
+          typeof mode === 'string' && Boolean(CARE_DROID_SCREEN_MODE_CONFIG[mode as CareDroidScreenMode]),
+      )
+    : fallback.enabledScreenModes;
+
+  return {
+    tenantName: stringOr(value.tenantName, fallback.tenantName),
+    defaultScreenMode,
+    enabledScreenModes: enabledScreenModes.length ? enabledScreenModes : fallback.enabledScreenModes,
+    readOnlyDisplayMode:
+      typeof value.readOnlyDisplayMode === 'boolean'
+        ? value.readOnlyDisplayMode
+        : fallback.readOnlyDisplayMode,
+    commandCenterMode:
+      typeof value.commandCenterMode === 'boolean'
+        ? value.commandCenterMode
+        : fallback.commandCenterMode,
+    wallDisplayRefreshInterval: finiteNumber(
+      value.wallDisplayRefreshInterval,
+      fallback.wallDisplayRefreshInterval,
+    ),
+  };
+}
+
+function normalizeBackendModuleStatuses(
+  payload: BackendCentralNodePayload,
+  fallback: CareDroidCentralNodeSnapshot['moduleStatuses'],
+): CareDroidCentralNodeSnapshot['moduleStatuses'] {
+  const tenantSettings = isRecord(payload.tenantSettings) ? payload.tenantSettings : {};
+  const backendModules = Array.isArray(tenantSettings.enabledModules)
+    ? tenantSettings.enabledModules
+    : [];
+  const normalizedModules = backendModules.filter(isRecord).map((module, index) => {
+    const id = stringOr(module.id, `backend-module-${index + 1}`);
+    const fallbackModule = fallback.find((candidate) => candidate.id === id);
+    return {
+      id,
+      label: stringOr(module.label, fallbackModule?.label || id),
+      enabled: typeof module.enabled === 'boolean' ? module.enabled : Boolean(fallbackModule?.enabled),
+    };
+  });
+  if (normalizedModules.length) return normalizedModules;
+
+  const enabledIds = Array.isArray(payload.enabledModules)
+    ? new Set(payload.enabledModules.map((id) => String(id)))
+    : null;
+  if (!enabledIds?.size) return fallback;
+  return fallback.map((module) => ({ ...module, enabled: enabledIds.has(module.id) }));
+}
+
+function applyBackendCentralNodePayload(
+  snapshot: Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'>,
+  backendSnapshot: unknown,
+): Omit<CareDroidCentralNodeSnapshot, 'operationalSummary'> {
+  const backend = extractBackendCentralNodePayload(backendSnapshot);
+  if (!backend) return snapshot;
+
+  const { payload, generatedAt } = backend;
+  const capacityStatus = normalizeBackendCapacity(payload.capacityStatus, snapshot.capacityStatus, generatedAt);
+  const operationalAlerts = normalizeBackendAlerts(payload.operationalAlerts, snapshot.operationalAlerts, generatedAt);
+  const emsInbound = finiteNumber(payload.emsInbound, snapshot.emsPressure.inbound);
+  const criticalInbound = finiteNumber(
+    isRecord(payload.capacityStatus) ? payload.capacityStatus.criticalEmsInboundCount : undefined,
+    snapshot.emsPressure.criticalInbound,
+  );
+  const boarders = finiteNumber(payload.boarders, snapshot.boardingStatus.boarders);
+
+  return {
+    ...snapshot,
+    generatedAt,
+    sync: {
+      ...snapshot.sync,
+      source: 'backend-snapshot',
+      status: 'connected',
+      mode: snapshot.sync.mode || 'polling',
+      lastSyncedAt: generatedAt,
+      stale: false,
+      message: 'Central node backend snapshot active.',
+    },
+    currentDepartmentStatus: {
+      ...snapshot.currentDepartmentStatus,
+      patientsToday: finiteNumber(payload.patientsToday, snapshot.currentDepartmentStatus.patientsToday),
+      activePatients: finiteNumber(payload.activePatients, snapshot.currentDepartmentStatus.activePatients),
+      waitingPatients: finiteNumber(payload.waitingPatients, snapshot.currentDepartmentStatus.waitingPatients),
+      longestWait: finiteNumber(payload.longestWait, snapshot.currentDepartmentStatus.longestWait),
+      averageWait: finiteNumber(payload.averageWait, snapshot.currentDepartmentStatus.averageWait),
+      capacityBand: String(capacityStatus.band),
+      activeAlerts: operationalAlerts.filter((alert) => !alert.dismissed).length,
+    },
+    queueHealth: normalizeBackendQueueMetrics(payload.queueMetrics, snapshot.queueHealth),
+    emsPressure: {
+      inbound: emsInbound,
+      criticalInbound,
+      status: pressureOr(payload.emsPressure, pressureFromCount(emsInbound, criticalInbound > 0)),
+    },
+    capacityStatus,
+    boardingStatus: {
+      boarders,
+      risk: pressureOr(payload.boardingRisk, pressureFromCount(boarders)),
+    },
+    reassessmentStatus: {
+      ...snapshot.reassessmentStatus,
+      due: finiteNumber(payload.reassessmentsDue, snapshot.reassessmentStatus.due),
+    },
+    referralStatus: {
+      pending: finiteNumber(payload.referralsPending, snapshot.referralStatus.pending),
+    },
+    operationalAlerts,
+    tenantSettings: normalizeBackendTenantSettings(payload.tenantSettings, snapshot.tenantSettings),
+    moduleStatuses: normalizeBackendModuleStatuses(payload, snapshot.moduleStatuses),
+    recentEvents: Array.isArray(payload.recentEvents)
+      ? (payload.recentEvents.filter(isRecord) as unknown as EmergencyStoreState['workflowLogs'])
+      : snapshot.recentEvents,
+  };
+}
+
 export function buildCareDroidCentralNodeSnapshot(
   source: CareDroidCentralNodeSource,
   roleContext: CareDroidCentralNodeRoleContext,
-  options: { screenMode?: CareDroidScreenMode; source?: 'store' | 'backend-snapshot' } = {},
+  options: {
+    screenMode?: CareDroidScreenMode;
+    source?: 'store' | 'backend-snapshot';
+    backendSnapshot?: unknown;
+  } = {},
 ): CareDroidCentralNodeSnapshot {
   const generatedAt = new Date().toISOString();
   const active = activePatients(source);
@@ -592,9 +851,10 @@ export function buildCareDroidCentralNodeSnapshot(
     recentEvents: source.workflowLogs.slice(0, 12),
   };
 
+  const wiredSnapshot = applyBackendCentralNodePayload(baseSnapshot, options.backendSnapshot);
   const snapshot = {
-    ...baseSnapshot,
-    operationalSummary: buildOperationalSummary(baseSnapshot),
+    ...wiredSnapshot,
+    operationalSummary: buildOperationalSummary(wiredSnapshot),
   };
 
   return snapshot.screenContext.sensitiveDataRedacted

@@ -54,6 +54,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
       'centralNodeSnapshot',
       'whiteboard',
       'patients',
+      'journey',
       'ems',
       'intake',
       'smartIntakeVerticalSlice',
@@ -62,6 +63,8 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
       'capacity',
       'boarding',
       'referrals',
+      'provincialHealth',
+      'integrations',
       'copilot',
       'workflowLogs',
       'patientWorkflowLogs',
@@ -73,9 +76,6 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     ]);
     expect(REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual(
       expect.arrayContaining([
-        'journey',
-        'provincialHealth',
-        'integrations',
         'simulationUpdateLive',
         'federatedLearningDashboard',
         'digitalTwinState',

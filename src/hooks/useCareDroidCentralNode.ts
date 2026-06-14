@@ -91,6 +91,7 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
         {
           screenMode: options.screenMode,
           source: backendSnapshot ? 'backend-snapshot' : 'store',
+          backendSnapshot,
         },
       ),
     [backendSnapshot, emergencyRole, options.screenMode, source],

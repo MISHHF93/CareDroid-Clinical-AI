@@ -58,6 +58,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'centralNodeSnapshot',
   'whiteboard',
   'patients',
+  'journey',
   'ems',
   'intake',
   'smartIntakeVerticalSlice',
@@ -66,6 +67,8 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'capacity',
   'boarding',
   'referrals',
+  'provincialHealth',
+  'integrations',
   'copilot',
   'workflowLogs',
   'patientWorkflowLogs',
@@ -77,9 +80,6 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
 ]);
 
 export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
-  'journey',
-  'provincialHealth',
-  'integrations',
   'simulationUpdateLive',
   'simulationEvaluate',
   'simulationCompare',
