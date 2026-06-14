@@ -14,20 +14,36 @@ const {
   REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS,
   aggregateFederatedLearningRound,
   compareRealTimeSimulationInterventions,
+  fetchBoardingStatus,
+  fetchCapacityStatus,
+  fetchCareDroidCentralNodeSnapshot,
+  fetchEDCopilot,
+  fetchEMSIntake,
   evaluateHybridDigitalTwinScenario,
   evaluateRealTimeSimulationIntervention,
   fetchAdvancedEmergencyOsUpgradeHarness,
+  fetchEmergencyAnalytics,
   fetchEmergencyAiGovernanceCompliance,
   fetchEmergencyAiGovernanceRegistry,
   fetchEmergencyAiGovernanceSafetyRules,
+  fetchEmergencyPatients,
+  fetchEmergencyQueues,
+  fetchEmergencySettings,
+  fetchEmergencyWhiteboard,
   fetchEmergencyWorkflowLogs,
+  fetchIntegrationHub,
+  fetchPatientJourney,
   fetchPatientWorkflowLogs,
   fetchCompleteImplementationReadiness,
   fetchEmergencyAiGovernanceViolations,
   fetchFederatedLearningDashboard,
   fetchFederatedLearningGlobalModel,
   fetchHybridDigitalTwinState,
+  fetchProvincialHealth,
   fetchRealTimeSimulationRecommendations,
+  fetchReassessmentQueue,
+  fetchReferrals,
+  fetchSmartIntake,
   fetchUpgradeHarnessAuditSummary,
   fetchUpgradeHarnessCapacity,
   fetchUpgradeHarnessClinicalIntelligence,
@@ -89,6 +105,39 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
         'upgradeHarnessAuditSummary',
       ]),
     );
+  });
+
+  it('calls the active Emergency OS module endpoints through the canonical facade', async () => {
+    const activeFetchers = [
+      [fetchCareDroidCentralNodeSnapshot, '/api/emergency/central-node/snapshot'],
+      [fetchEmergencyWhiteboard, '/api/emergency/whiteboard'],
+      [fetchEmergencyPatients, '/api/emergency/patients'],
+      [fetchPatientJourney, '/api/emergency/journey'],
+      [fetchEMSIntake, '/api/emergency/ems'],
+      [fetchSmartIntake, '/api/emergency/intake'],
+      [fetchEmergencyQueues, '/api/emergency/queues'],
+      [fetchReassessmentQueue, '/api/emergency/reassessment'],
+      [fetchCapacityStatus, '/api/emergency/capacity'],
+      [fetchBoardingStatus, '/api/emergency/boarding'],
+      [fetchReferrals, '/api/emergency/referrals'],
+      [fetchProvincialHealth, '/api/emergency/provincial-health'],
+      [fetchIntegrationHub, '/api/emergency/integrations'],
+      [fetchEDCopilot, '/api/emergency/copilot'],
+      [fetchEmergencyAnalytics, '/api/emergency/analytics'],
+      [fetchEmergencySettings, '/api/emergency/settings'],
+    ];
+
+    for (const [fetcher] of activeFetchers) {
+      await fetcher();
+    }
+
+    activeFetchers.forEach(([, path], index) => {
+      expect(globalThis.fetch).toHaveBeenNthCalledWith(
+        index + 1,
+        path,
+        expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+      );
+    });
   });
 
   it('calls the real-time simulation endpoints', async () => {

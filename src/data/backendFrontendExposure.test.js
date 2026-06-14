@@ -168,18 +168,37 @@ describe('backendFrontendExposure scan', () => {
 
   it('gates optional Emergency OS frontend calls when the optional runtime is disabled', () => {
     const scan = runBackendFrontendExposureScan();
-    const smartIntake = scan.analyzed.find((row) => row.id === 'emergency-smart-intake-session-create');
+    const optionalSmartIntakeIds = [
+      'emergency-smart-intake-session-create',
+      'emergency-smart-intake-manual-entry',
+      'emergency-smart-intake-document',
+      'emergency-smart-intake-ocr',
+      'emergency-smart-intake-match',
+      'emergency-smart-intake-verify-field',
+      'emergency-smart-intake-link-patient',
+      'emergency-smart-intake-create-patient',
+      'emergency-smart-intake-continue-unknown',
+      'emergency-smart-intake-ems-evidence',
+      'emergency-smart-intake-reconcile-unknown',
+      'emergency-smart-intake-biometric-consent',
+      'emergency-smart-intake-biometric-consent-withdraw',
+      'emergency-smart-intake-audit-log',
+    ];
 
     expect(FRONTEND_API_CALLS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({
-          id: 'emergency-smart-intake-session-create',
-          capability: 'emergencySmartIntakeIdentitySession',
-        }),
+        ...optionalSmartIntakeIds.map((id) =>
+          expect.objectContaining({
+            id,
+            capability: 'emergencySmartIntakeIdentitySession',
+          })
+        ),
         expect.objectContaining({ id: 'emergency-referral-create', capability: 'emergencyReferralPersistence' }),
       ])
     );
-    expect(smartIntake?.exposure).toBe('gated-stub');
+    for (const id of optionalSmartIntakeIds) {
+      expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('gated-stub');
+    }
   }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
 
   it('covers memory dashboard and memory fabric client calls', () => {

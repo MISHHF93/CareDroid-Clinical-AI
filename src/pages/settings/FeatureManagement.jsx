@@ -122,7 +122,7 @@ const BACKEND_SURFACING_QUEUE = [
     surfacesIn: 'EMS Pipeline',
     effort: 'Medium',
     checklist: [
-      ['Backend endpoint exists', true],
+      ['Backend endpoint exists', false],
       ['EMS Pipeline dependency declared', true],
       ['Diversion status control designed', false],
       ['Escalation and audit copy reviewed', false],
@@ -135,7 +135,7 @@ const BACKEND_SURFACING_QUEUE = [
     surfacesIn: 'Referral panel',
     effort: 'Medium',
     checklist: [
-      ['Backend endpoint exists', true],
+      ['Backend endpoint exists', false],
       ['Referral dependency declared', true],
       ['Transfer status UI added', false],
       ['Receiving facility workflow reviewed', false],
@@ -148,7 +148,7 @@ const BACKEND_SURFACING_QUEUE = [
     surfacesIn: 'Clinical tools or documentation workflow',
     effort: 'High',
     checklist: [
-      ['Backend endpoint exists', true],
+      ['Backend endpoint exists', false],
       ['Feature flag registered', true],
       ['Lookup search UI built', false],
       ['Coding guidance and disclaimers reviewed', false],
@@ -161,7 +161,7 @@ const BACKEND_SURFACING_QUEUE = [
     surfacesIn: 'Shift Summary',
     effort: 'Medium',
     checklist: [
-      ['Backend endpoint exists', true],
+      ['Backend endpoint exists', false],
       ['Shift summary source data available', true],
       ['Export button added', false],
       ['Download format and audit event verified', false],
