@@ -99,3 +99,46 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
     ...RETAINED_DIRECT_ROUTE_COMMANDS,
   ],
 );
+
+export const EMERGENCY_OS_TOOL_COMMANDS = Object.freeze([
+  {
+    id: 'open-calculators',
+    label: 'Open Calculators',
+    hint: 'Calc',
+    keywords: ['calculator', 'calculators', 'scores', 'clinical scores', 'medical calculators'],
+    build: () => ({
+      type: 'OPEN_ROUTE',
+      path: `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator`,
+    }),
+  },
+  {
+    id: 'open-qsofa',
+    label: 'Open qSOFA Calculator',
+    hint: 'qSOFA',
+    keywords: ['qsofa', 'quick sofa', 'sepsis score', 'sepsis calculator'],
+    build: () => ({
+      type: 'OPEN_ROUTE',
+      path: `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=qsofa&open=qsofa`,
+    }),
+  },
+  {
+    id: 'open-heart-score',
+    label: 'Open HEART Score',
+    hint: 'HEART',
+    keywords: ['heart', 'heart score', 'chest pain', 'acs', 'cardiac score'],
+    build: () => ({
+      type: 'OPEN_ROUTE',
+      path: `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=heart-score&open=heart-score`,
+    }),
+  },
+  {
+    id: 'open-nihss',
+    label: 'Open NIHSS',
+    hint: 'NIHSS',
+    keywords: ['nihss', 'stroke', 'stroke scale', 'neuro score'],
+    build: () => ({
+      type: 'OPEN_ROUTE',
+      path: `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=nihss&open=nihss`,
+    }),
+  },
+]);

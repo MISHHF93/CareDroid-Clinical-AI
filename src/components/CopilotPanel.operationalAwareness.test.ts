@@ -22,4 +22,11 @@ describe('Copilot operational awareness wiring', () => {
     expect(source).toContain('visionModelConnected: false');
     expect(source).toContain('Do not infer clinical findings from image attachments');
   });
+
+  it('keeps targetable route-backed tool actions in the docked Copilot panel', () => {
+    expect(source).toContain('ed-copilot-panel__tool-actions');
+    expect(source).toContain('data-copilot-tool-action');
+    expect(source).toContain("eventName: 'ed:open-tools'");
+    expect(source).toContain("eventName: 'ed:open-calculator'");
+  });
 });

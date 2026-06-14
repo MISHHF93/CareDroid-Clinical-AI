@@ -500,6 +500,27 @@ const COMMAND_PALETTE_OPTIONS = [
   { label: 'Reassessment queue' },
 ];
 
+const TOOL_LAUNCH_ACTIONS = [
+  {
+    id: 'medical-tools',
+    label: 'Medical Tools',
+    eventName: 'ed:open-tools',
+    detail: { source: 'chat', filter: 'all' },
+  },
+  {
+    id: 'calculator-hub',
+    label: 'Calculators',
+    eventName: 'ed:open-tools',
+    detail: { source: 'calculators', filter: 'calculator' },
+  },
+  {
+    id: 'qsofa-calculator',
+    label: 'qSOFA',
+    eventName: 'ed:open-calculator',
+    detail: { calculatorId: 'qsofa' },
+  },
+];
+
 const isFeatureActionVisible = (action, enabledFeatures) =>
   !action.featureId || Boolean(enabledFeatures[action.featureId]);
 
@@ -635,6 +656,10 @@ const ChatInterface = ({
   const visibleCommandPaletteOptions = useMemo(
     () => COMMAND_PALETTE_OPTIONS.filter((action) => isFeatureActionVisible(action, enabledCopilotFeatures)),
     [enabledCopilotFeatures]
+  );
+  const visibleToolLaunchActions = useMemo(
+    () => (isEmergencyCopilot && clinicalCalculatorHubEnabled ? TOOL_LAUNCH_ACTIONS : []),
+    [clinicalCalculatorHubEnabled, isEmergencyCopilot]
   );
   const patients = useMemo(
     () =>
@@ -1089,6 +1114,10 @@ const ChatInterface = ({
     handleSend(message);
   };
 
+  const handleToolLaunch = (action) => {
+    window.dispatchEvent(new CustomEvent(action.eventName, { detail: action.detail }));
+  };
+
   return (
     <div className="chat-interface">
       <div
@@ -1249,6 +1278,22 @@ const ChatInterface = ({
       {(currentTool || currentFeature) && <ToolPanel tool={currentTool} feature={currentFeature} />}
 
       <div className="chat-interface__input-area">
+        {visibleToolLaunchActions.length ? (
+          <div className="chat-interface__tool-actions" role="toolbar" aria-label="Open Copilot tools">
+            {visibleToolLaunchActions.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                onClick={() => handleToolLaunch(action)}
+                disabled={isLoading}
+                data-copilot-tool-action={action.id}
+                aria-label={`Open ${action.label}`}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <div className="chat-interface__quick-actions" aria-label="Copilot quick actions">
           {visibleQuickActions.map((action) => (
             <button

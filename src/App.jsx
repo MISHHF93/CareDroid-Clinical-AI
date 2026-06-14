@@ -238,6 +238,9 @@ function buildEmergencyToolsRedirect(location) {
     if (slug && !params.has('q') && !params.has('search')) {
       params.set('q', decodeURIComponent(slug));
     }
+    if (slug && !params.has('open') && !params.has('tool') && !params.has('calc')) {
+      params.set('open', decodeURIComponent(slug));
+    }
   };
 
   if (pathname === CANONICAL_ROUTES.developerCatalog || pathname === '/catalog') {

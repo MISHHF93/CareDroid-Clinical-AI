@@ -79,7 +79,7 @@ function resolveEmergencyToolTarget(pathname, registryId, inventoryRecord) {
     const slug = slugFromPath(pathname, `${TOOL_LAUNCH_PATHS.calculatorsHub}/`);
     return {
       pathname: CANONICAL_ROUTES.emergencyTools,
-      search: buildSearch({ source: 'calculators', filter: 'calculator', q: slug }),
+      search: buildSearch({ source: 'calculators', filter: 'calculator', q: slug, open: slug }),
     };
   }
 
@@ -183,7 +183,12 @@ export function getRegistryToolNavigation(toolId) {
     return {
       mode: 'calculator-hub',
       pathname: CANONICAL_ROUTES.emergencyTools,
-      search: buildSearch({ source: 'calculators', filter: 'calculator', q: calculatorSlug }),
+      search: buildSearch({
+        source: 'calculators',
+        filter: 'calculator',
+        q: calculatorSlug,
+        open: calculatorSlug,
+      }),
       registryId,
       launch,
       shouldSeedChat: false,

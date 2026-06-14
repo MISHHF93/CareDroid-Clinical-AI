@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import ClinicalCalculatorHub from '../../components/ClinicalCalculatorHub';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
@@ -253,6 +254,7 @@ const ToolsOverview = () => {
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
+  const requestedSource = searchParams.get('source');
   const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'recommended';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
@@ -606,6 +608,12 @@ const ToolsOverview = () => {
     hiddenTools.length > 0
       ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
       : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
+  const showCalculatorHub =
+    toolFilter === 'calculator' ||
+    requestedSource === 'calculators' ||
+    searchParams.has('open') ||
+    searchParams.has('tool') ||
+    searchParams.has('calc');
 
   return (
     <div className="tools-overview">
@@ -714,6 +722,15 @@ const ToolsOverview = () => {
           </div>
         </div>
       </div>
+
+      {showCalculatorHub ? (
+        <section
+          className="tools-calculator-surface"
+          aria-label="Clinical calculator launch surface"
+        >
+          <ClinicalCalculatorHub />
+        </section>
+      ) : null}
 
       <section className="tools-recent" aria-labelledby="tools-workflow-stitch-title">
         <div className="tools-recent-header">

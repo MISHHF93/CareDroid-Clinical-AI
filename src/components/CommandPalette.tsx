@@ -4,7 +4,10 @@ import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
+import {
+  EMERGENCY_OS_ROUTE_COMMANDS,
+  EMERGENCY_OS_TOOL_COMMANDS,
+} from '../config/commandPalette.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import type { Patient } from '../types/emergency';
@@ -31,6 +34,14 @@ type CommandWithVisibility = Command & {
   requiredAction?: string;
   requiredRoute?: string;
   hiddenInPilotMode?: boolean;
+};
+
+type RouteCommandConfig = {
+  id: string;
+  label: string;
+  hint?: string;
+  keywords: readonly string[];
+  build: () => { type: string; path?: string };
 };
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
@@ -283,8 +294,9 @@ function dispatchDocumentEvent(name: string): void {
 function createEmergencyRouteCommands(
   navigate: ReturnType<typeof useNavigate>,
   emergencyRole: EmergencyCommandPermissions,
+  commands: readonly RouteCommandConfig[] = EMERGENCY_OS_ROUTE_COMMANDS,
 ): CommandWithVisibility[] {
-  return EMERGENCY_OS_ROUTE_COMMANDS.map((command) => {
+  return commands.map((command) => {
     const action = command.build();
     return {
       id: command.id,
@@ -292,7 +304,7 @@ function createEmergencyRouteCommands(
       description: `${command.label} in the active Emergency OS shell.`,
       shortcut: command.hint ? `G ${command.hint}` : undefined,
       group: 'Navigation',
-      keywords: command.keywords,
+      keywords: [...command.keywords],
       requiredRoute: action.path,
       action: () => {
         if (action.type === 'OPEN_ROUTE' && action.path) {
@@ -320,6 +332,11 @@ function createCommands(
 ): Command[] {
   const commands: CommandWithVisibility[] = [
     ...createEmergencyRouteCommands(navigate, emergencyRole),
+    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_TOOL_COMMANDS).map((command) => ({
+      ...command,
+      group: 'Clinical' as const,
+      description: command.description?.replace(' in the active Emergency OS shell.', ' in Medical Tools.'),
+    })),
     {
       id: 'new-patient',
       label: 'Create Patient',

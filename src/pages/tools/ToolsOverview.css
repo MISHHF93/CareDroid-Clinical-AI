@@ -15,6 +15,16 @@
   min-width: 0;
 }
 
+.tools-calculator-surface {
+  margin-bottom: var(--compact-page-gap, 14px);
+  min-width: 0;
+}
+
+.tools-calculator-surface .clinical-calculator-hub {
+  max-width: 100%;
+  padding: 0;
+}
+
 .header-content h1 {
   font-size: var(--text-title-fluid);
   margin-bottom: 6px;

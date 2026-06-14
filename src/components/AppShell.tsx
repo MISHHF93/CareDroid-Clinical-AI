@@ -109,6 +109,15 @@ function routePermissionPath(path: string): string {
   return path.split(/[?#]/)[0] || path;
 }
 
+function buildEmergencyToolsPath(params: Record<string, string | null | undefined>): string {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value) searchParams.set(key, value);
+  }
+  const search = searchParams.toString();
+  return `${CANONICAL_ROUTES.emergencyTools}${search ? `?${search}` : ''}`;
+}
+
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -305,6 +314,46 @@ export function AppShell({ children }: AppShellProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const openTools = (event: Event) => {
+      const detail = (event as CustomEvent<{ filter?: string; query?: string; source?: string }>).detail || {};
+      const targetPath = buildEmergencyToolsPath({
+        source: detail.source || 'chat',
+        filter: detail.filter || 'all',
+        q: detail.query,
+      });
+      navigate(
+        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
+          ? targetPath
+          : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
+      );
+    };
+
+    const openCalculator = (event: Event) => {
+      const detail =
+        (event as CustomEvent<{ calculatorId?: string; patientId?: string | null }>).detail || {};
+      const targetPath = buildEmergencyToolsPath({
+        source: 'calculators',
+        filter: 'calculator',
+        q: detail.calculatorId,
+        open: detail.calculatorId,
+        patientId: detail.patientId || undefined,
+      });
+      navigate(
+        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
+          ? targetPath
+          : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
+      );
+    };
+
+    window.addEventListener('ed:open-tools', openTools);
+    window.addEventListener('ed:open-calculator', openCalculator);
+    return () => {
+      window.removeEventListener('ed:open-tools', openTools);
+      window.removeEventListener('ed:open-calculator', openCalculator);
+    };
+  }, [emergencyRole, navigate]);
+
   const handleCommandExecute = (action: CommandAction) => {
     switch (action.type) {
       case 'OPEN_INTAKE':
@@ -339,14 +388,22 @@ export function AppShell({ children }: AppShellProps) {
         break;
       }
       case 'OPEN_PEDIATRIC_DRUGS':
-        navigate(`${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=pediatric-dose-safety-checker`);
+        navigate(buildEmergencyToolsPath({
+          source: 'calculators',
+          filter: 'calculator',
+          q: 'pediatric-dose-safety-checker',
+          open: 'pediatric-dose-safety-checker',
+        }));
         break;
       case 'OPEN_CALCULATOR': {
         const params = new URLSearchParams({
           source: 'calculators',
           filter: 'calculator',
         });
-        if (action.calculatorId) params.set('q', action.calculatorId);
+        if (action.calculatorId) {
+          params.set('q', action.calculatorId);
+          params.set('open', action.calculatorId);
+        }
         if (action.patientId) params.set('patientId', action.patientId);
         navigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
         break;

@@ -278,7 +278,11 @@ describe('canonical route tree behavior', () => {
     renderRoute('/emergency/tools');
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: /^emergency os console$/i }),
+      await screen.findByRole(
+        'heading',
+        { level: 1, name: /^emergency os console$/i },
+        { timeout: ROUTE_LOAD_TIMEOUT },
+      ),
     ).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
       'aria-current',
@@ -303,7 +307,7 @@ describe('canonical route tree behavior', () => {
 
   it.each([
     ['/tools/catalog', '/emergency/tools?source=catalog&filter=all'],
-    ['/tools/calculators/qsofa', '/emergency/tools?source=calculators&filter=calculator&q=qsofa'],
+    ['/tools/calculators/qsofa', '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa'],
     ['/calculators', '/emergency/tools?source=calculators&filter=calculator'],
     ['/workflows', '/emergency/tools?source=workflows&filter=ai-workflows'],
     ['/recommendations', '/emergency/tools?source=recommendations&filter=recommended'],

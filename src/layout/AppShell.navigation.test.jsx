@@ -70,6 +70,8 @@ describe('AppShell navigation surfaces', () => {
     expect(appShellSource).toContain('<CopilotPanel />');
     expect(appShellSource).toContain('<PatientDetailPanel />');
     expect(appShellSource).toContain('<CommandPalette');
+    expect(appShellSource).toContain("window.addEventListener('ed:open-tools'");
+    expect(appShellSource).toContain("window.addEventListener('ed:open-calculator'");
   });
 
   it('delegates mobile navigation and overflow to Sidebar.css', () => {

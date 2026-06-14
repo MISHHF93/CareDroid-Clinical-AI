@@ -263,10 +263,18 @@
 
 .chat-interface__composer,
 .chat-interface__disclaimer,
+.chat-interface__tool-actions,
 .chat-interface__quick-actions,
 .chat-interface__command-palette {
   width: min(900px, 100%);
   margin-inline: auto;
+}
+
+.chat-interface__tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .chat-interface__quick-actions {
@@ -276,6 +284,7 @@
   margin-bottom: 10px;
 }
 
+.chat-interface__tool-actions button,
 .chat-interface__quick-actions button,
 .chat-interface__command-palette button,
 .chat-interface__voice {
@@ -298,6 +307,15 @@
     transform var(--motion-transition-fast);
 }
 
+.chat-interface__tool-actions button {
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: color-mix(in srgb, var(--status-info) 10%, var(--surface-1));
+}
+
+.chat-interface__tool-actions button:hover,
+.chat-interface__tool-actions button:focus-visible,
 .chat-interface__quick-actions button:hover,
 .chat-interface__quick-actions button:focus-visible,
 .chat-interface__command-palette button:hover,
@@ -460,6 +478,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .chat-interface__tool-actions button {
+    flex: 1 1 min(100%, 120px);
+  }
+
   .chat-interface__action-card {
     align-items: stretch;
     flex-direction: column;
@@ -577,6 +599,8 @@
   }
 
   .chat-interface__bubble:hover,
+  .chat-interface__tool-actions button:hover,
+  .chat-interface__tool-actions button:focus-visible,
   .chat-interface__quick-actions button:hover,
   .chat-interface__quick-actions button:focus-visible,
   .chat-interface__command-palette button:hover,

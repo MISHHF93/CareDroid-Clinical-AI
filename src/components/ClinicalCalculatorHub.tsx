@@ -266,6 +266,12 @@ export const CALCULATORS: ClinicalCalculatorRegistryEntry[] = [
 
 const CATEGORY_TABS = ['All', 'Cardiac', 'Neuro', 'Sepsis', 'Respiratory', 'Trauma', 'Pediatric', 'Psych', 'General'];
 
+function resolveKnownCalculatorId(value: string | null): string {
+  const normalized = normalizeToolId(value);
+  if (!normalized) return '';
+  return CALCULATORS.some((calculator) => calculator.id === normalized) ? normalized : '';
+}
+
 function patientName(patient: Patient): string {
   return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn;
 }
@@ -299,7 +305,9 @@ export default function ClinicalCalculatorHub() {
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState(() => searchParams.get('category') || 'All');
-  const queryCalculatorId = normalizeToolId(searchParams.get('open') || searchParams.get('tool') || searchParams.get('calc'));
+  const queryCalculatorId =
+    resolveKnownCalculatorId(searchParams.get('open') || searchParams.get('tool') || searchParams.get('calc')) ||
+    resolveKnownCalculatorId(searchParams.get('q') || searchParams.get('search'));
   const [activeCalculatorId, setActiveCalculatorId] = useState(queryCalculatorId);
   const queryPatientId = searchParams.get('patientId');
   const patient =
@@ -323,6 +331,7 @@ export default function ClinicalCalculatorHub() {
   const launchCalculator = useCallback((calculatorId: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('open', calculatorId);
+    params.set('q', calculatorId);
     params.delete('tool');
     params.delete('calc');
     if (patient?.id) params.set('patientId', patient.id);

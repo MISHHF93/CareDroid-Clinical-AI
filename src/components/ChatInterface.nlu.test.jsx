@@ -150,8 +150,8 @@ describe('ChatInterface NLU integration', () => {
       patientCount: emergencyState.patients.length,
       capacitySnapshot: expect.objectContaining({ score: emergencyState.capacity.score }),
     });
-    expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never recommend autonomous actions/i);
-    expect(payload.messages[0].content).toMatch(/You are the ED Copilot for a busy Emergency Department/i);
+    expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Human review is required/i);
+    expect(payload.messages[0].content).toMatch(/You are AIIOS ED Copilot for a busy Emergency Department/i);
     expect(payload.messages[0].content).toMatch(/Current department snapshot:/);
     expect(payload.messages[0].content).toMatch(/Priorities: P1 first\. Flag deteriorating patients\./);
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
@@ -320,6 +320,36 @@ describe('ChatInterface NLU integration', () => {
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
       intent: 'QUERY_EMS',
     });
+  });
+
+  it('exposes route-backed medical tool chips in ED Copilot', async () => {
+    activeWorkspaceId = 'emergency';
+    const user = userEvent.setup();
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    expect(screen.getByRole('toolbar', { name: /open copilot tools/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /open calculators/i }));
+
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ed:open-tools',
+        detail: expect.objectContaining({
+          source: 'calculators',
+          filter: 'calculator',
+        }),
+      })
+    );
+    dispatchSpy.mockRestore();
   });
 
   it('removes EMS Copilot commands and context when ems_pipeline is disabled', async () => {

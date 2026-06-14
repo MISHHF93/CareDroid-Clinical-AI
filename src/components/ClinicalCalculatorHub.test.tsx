@@ -105,6 +105,12 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
     expect(screen.getByRole('dialog', { name: /qsofa/i })).toBeTruthy();
   });
 
+  it('auto-opens a calculator from calculator-filtered search params', () => {
+    renderHub('/emergency/tools?source=calculators&filter=calculator&q=heart');
+
+    expect(screen.getByRole('dialog', { name: /heart score/i })).toBeTruthy();
+  });
+
   it('saves score and detail notes, then closes the opened calculator', async () => {
     const user = userEvent.setup();
     useEmergencyStore.setState({ ...originalState, patients: [patient] }, true);

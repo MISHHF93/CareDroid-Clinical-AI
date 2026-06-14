@@ -33,8 +33,8 @@ describe('registryToolLaunch', () => {
   });
 
   it.each([
-    ['qsofa', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=qsofa'],
-    ['sofa-score', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=sofa'],
+    ['qsofa', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=qsofa&open=qsofa'],
+    ['sofa-score', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=sofa&open=sofa'],
     ['drug-check', 'tool-page', '/emergency/tools', '?source=tools&filter=clinical-tools&q=drug-check'],
     ['fleet-command', 'tool-page', '/emergency/tools', '?source=operations&filter=operations&q=fleet-command'],
   ])('getRegistryToolNavigation(%s) → %s %s', (id, mode, pathname, search) => {

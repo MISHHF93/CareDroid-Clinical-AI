@@ -9,6 +9,7 @@ import {
 } from './CommandPalette';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
 function command(
@@ -100,6 +101,17 @@ describe('CommandPalette helpers', () => {
 
     expect(nextIds).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
     expect(readRecentCommandIds(storage)).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
+  });
+
+  it('registers calculator commands against the canonical Medical Tools route', () => {
+    const commandPaths = EMERGENCY_OS_TOOL_COMMANDS.map((entry) => entry.build().path);
+
+    expect(commandPaths).toContain(
+      `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator`
+    );
+    expect(commandPaths).toContain(
+      `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=qsofa&open=qsofa`
+    );
   });
 
   it('hides command actions that the active Emergency OS role cannot perform', () => {

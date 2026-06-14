@@ -51,6 +51,26 @@ const QUICK_ACTIONS = [
   'EMS update',
   'Reassessment queue',
 ];
+const TOOL_ACTIONS = Object.freeze([
+  {
+    id: 'medical-tools',
+    label: 'Medical tools',
+    eventName: 'ed:open-tools',
+    detail: { source: 'copilot', filter: 'all' },
+  },
+  {
+    id: 'calculator-hub',
+    label: 'Calculators',
+    eventName: 'ed:open-tools',
+    detail: { source: 'calculators', filter: 'calculator' },
+  },
+  {
+    id: 'qsofa-calculator',
+    label: 'qSOFA',
+    eventName: 'ed:open-calculator',
+    detail: { calculatorId: 'qsofa' },
+  },
+]);
 const MAX_COPILOT_ATTACHMENTS = 3;
 const MAX_COPILOT_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 
@@ -657,6 +677,10 @@ export function CopilotPanel() {
     void sendMessage(action);
   };
 
+  const openToolAction = (action: (typeof TOOL_ACTIONS)[number]) => {
+    window.dispatchEvent(new CustomEvent(action.eventName, { detail: action.detail }));
+  };
+
   return (
     <aside
       className="ed-copilot-panel"
@@ -887,6 +911,21 @@ export function CopilotPanel() {
             }}
           >
             {action}
+          </button>
+        ))}
+      </div>
+
+      <div className="ed-copilot-panel__tool-actions" role="toolbar" aria-label="Open Copilot tools">
+        {TOOL_ACTIONS.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            onClick={() => openToolAction(action)}
+            disabled={loading}
+            data-copilot-tool-action={action.id}
+            aria-label={`Open ${action.label}`}
+          >
+            {action.label}
           </button>
         ))}
       </div>
