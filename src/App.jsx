@@ -40,6 +40,7 @@ import {
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from './config/routes.config';
+import { EMERGENCY_OS_BRANDING } from './config/emergencyOsBranding.config';
 import { EMERGENCY_ACTIONS } from './config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import {
@@ -1081,9 +1082,9 @@ function CopilotRoute() {
 
   return (
     <EmergencyRoutePage
-      eyebrow="AI Assist"
-      title="ED Copilot"
-      description="The copilot panel is mounted in the Emergency OS shell and uses this route context for department-level questions."
+      eyebrow={EMERGENCY_OS_BRANDING.aiiosName}
+      title={EMERGENCY_OS_BRANDING.copilotName}
+      description={EMERGENCY_OS_BRANDING.copilotIntro}
     >
       <ApiStateBanner moduleState={copilot} />
       <MetricGrid
@@ -1126,8 +1127,9 @@ function CopilotRoute() {
         </div>
       ) : null}
       <p style={{ color: '#9CA3AF', margin: 0 }}>
-        Use the docked ED Copilot to ask about who needs attention, capacity pressure, EMS status,
-        or reassessment priorities.
+        Use the docked {EMERGENCY_OS_BRANDING.copilotName} to ask about who needs attention,
+        capacity pressure, EMS status, or reassessment priorities.{' '}
+        {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
       <DataSourceNote moduleState={copilot} />
     </EmergencyRoutePage>
@@ -1170,6 +1172,18 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
                 <LazyRoute label="Loading whiteboard...">
+                  <EmergencyWhiteboard />
+                </LazyRoute>
+              </ErrorBoundary>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyCommandCenter}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
+              <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
+                <LazyRoute label="Loading command center...">
                   <EmergencyWhiteboard />
                 </LazyRoute>
               </ErrorBoundary>

@@ -81,7 +81,12 @@ const ICONS: Record<string, Icon> = {
 function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
   const route = item.route || item.path;
   if (route === '/emergency' || item.path === '/emergency/whiteboard') {
-    return pathname === route || pathname === item.path || pathname === '/emergency';
+    return (
+      pathname === route ||
+      pathname === item.path ||
+      pathname === '/emergency' ||
+      Boolean(item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)))
+    );
   }
   if (item.path === '/emergency/whiteboard')
     return pathname === item.path || pathname === '/emergency';

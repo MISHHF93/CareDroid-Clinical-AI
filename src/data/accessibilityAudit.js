@@ -29,6 +29,7 @@ function check(id, category, title, passed, evidence, fix) {
 
 export function buildAccessibilityAudit(sourceSnapshot = {}) {
   const appShellJsx = sourceSnapshot.appShellJsx || '';
+  const sidebarTsx = sourceSnapshot.sidebarTsx || '';
   const appShellCss = sourceSnapshot.appShellCss || '';
   const themeSurfacesCss = sourceSnapshot.themeSurfacesCss || '';
   const themeTokensCss = sourceSnapshot.themeTokensCss || '';
@@ -57,7 +58,8 @@ export function buildAccessibilityAudit(sourceSnapshot = {}) {
       'screen-reader-icon-buttons',
       ACCESSIBILITY_AUDIT_CATEGORIES.SCREEN_READERS,
       'Icon-only shell controls expose accessible names',
-      has(appShellJsx, 'aria-label={isNew ? `${item.label}. New.` : item.label}') &&
+      (has(appShellJsx, 'aria-label={isNew ? `${item.label}. New.` : item.label}') ||
+        has(sidebarTsx, 'aria-label={item.label}')) &&
         has(appShellJsx, 'aria-label={`${activeAlerts.length} unread alerts`}') &&
         has(appShellJsx, "aria-label={isCopilotCollapsed ? 'Expand ED Copilot' : 'Collapse ED Copilot'}"),
       'Collapsed rail, alert bell, and Copilot toggle have explicit labels.',

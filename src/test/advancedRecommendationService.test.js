@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import advancedRecommendationService from '../services/advancedRecommendationService';
+import { AUTH_CONFIG } from '../config/auth.config';
 
 describe('AdvancedRecommendationService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     advancedRecommendationService.clearCache();
+    localStorage.setItem(AUTH_CONFIG.tokenStorageKey, 'test-token');
     global.fetch = vi.fn();
   });
 

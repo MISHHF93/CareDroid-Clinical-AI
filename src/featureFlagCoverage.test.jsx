@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../lib/features/featureRegistry';
 import { buildDefaultFlags } from './store/emergencyStore';
+import { APP_SHELL_NAV_ITEMS } from './config/navigation.config';
 import { buildSidebarItems } from './layout/AppShell';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -26,7 +27,9 @@ describe('feature flag UI coverage', () => {
         'emergency_settings',
       ])
     );
-    expect(sidebarItems).toHaveLength(7);
+    expect(sidebarItems).toHaveLength(
+      APP_SHELL_NAV_ITEMS.filter((item) => !(item.featureGate && item.featureId === 'ems_pipeline')).length
+    );
   });
 
   it('keeps first-load defaults on for core and professional features while environment-gating simulation', () => {

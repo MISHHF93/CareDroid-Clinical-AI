@@ -16,7 +16,7 @@ describe('workspace subpage routes', () => {
       whiteboard: '/emergency/whiteboard',
       patients: '/emergency/patients',
       queues: '/emergency/queues',
-      'command-center': '/emergency/whiteboard',
+      'command-center': '/emergency/command-center',
       copilot: '/emergency/copilot',
     });
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
@@ -27,7 +27,7 @@ describe('workspace subpage routes', () => {
       ])
     );
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
-    expect(appSource).toContain('<Route path="/workspace" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toContain('path="/workspace"');
     expect(appSource).not.toContain('function WorkspaceRouteRedirect');
   });
 

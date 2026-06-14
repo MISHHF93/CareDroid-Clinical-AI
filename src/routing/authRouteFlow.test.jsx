@@ -24,10 +24,10 @@ describe('auth canonical flow wiring', () => {
     expect(appSource).not.toContain('LegacyOAuthCallbackRedirect');
   });
 
-  it('redirects duplicate calculators route aliases into the Emergency OS whiteboard', () => {
-    expect(appSource).toContain('<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+  it('redirects duplicate calculators route aliases into Emergency Tools', () => {
+    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
     expect(routeConfigSource).toContain("export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])");
     expect(routeConfigSource).toContain('aliases: CALCULATORS_ROUTE_ALIASES');
-    expect(routeConfigSource).toContain("['/calculators', CANONICAL_ROUTES.emergencyWhiteboard]");
+    expect(routeConfigSource).toContain("['/calculators', CANONICAL_ROUTES.emergencyTools]");
   });
 });

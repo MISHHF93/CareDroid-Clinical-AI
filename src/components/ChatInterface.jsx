@@ -9,6 +9,7 @@ import {
   sendClinicalChatMessage,
   mapChatResponseToAssistantMessage,
 } from '../services/clinicalChatService';
+import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useFeature } from '../hooks/useFeature';
 import { useUser } from '../contexts/UserContext';
@@ -311,8 +312,9 @@ function buildRequestedEdCopilotSystemPrompt({
   ].filter(Boolean);
 
   return [
-    'You are the ED Copilot for a busy Emergency Department.',
-    'You assist clinical staff — never make autonomous clinical decisions. Always surface for human review.',
+    `You are ${EMERGENCY_OS_BRANDING.copilotName} for a busy Emergency Department.`,
+    EMERGENCY_OS_BRANDING.copilotIntro,
+    EMERGENCY_OS_BRANDING.safetyLine,
     'Be concise. Staff are under pressure.',
     '',
     'Current department snapshot:',
@@ -328,7 +330,7 @@ function buildRequestedEdCopilotSystemPrompt({
     formatBriefPatientList(activePatients),
     '',
     'Priorities: P1 first. Flag deteriorating patients.',
-    'Never recommend autonomous actions.',
+    EMERGENCY_OS_BRANDING.safetyLine,
     ...(detectedIntent ? ['', formatStructuredIntentBlock(detectedIntent)] : []),
   ].join('\n');
 }
@@ -573,18 +575,37 @@ const ChatInterface = ({
   const emergencyPatients = useEmergencyStore((state) => state.patients);
   const emergencyStaff = useEmergencyStore((state) => state.staff);
   const emergencyRooms = useEmergencyStore((state) => state.rooms);
+  const emergencyQueues = useEmergencyStore((state) => state.queues);
+  const emergencyAlerts = useEmergencyStore((state) => state.alerts);
   const patientBackendDetails = useEmergencyStore((state) => state.patientBackendDetails);
-  const edQueueHealth = useEmergencyStore(selectEdQueueHealth);
-  const reassessmentQueue = useEmergencyStore(selectReassessmentQueue);
-  const reassessmentCount = useEmergencyStore(selectReassessmentCount);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const emergencyCapacity = useEmergencyStore((state) => state.capacity);
   const emergencyReferrals = useEmergencyStore((state) => state.referrals);
-  const bottleneckAlert = useEmergencyStore(selectQueueBottleneckAlert);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
   const addFlag = useEmergencyStore((state) => state.addFlag);
+  const edQueueHealth = useMemo(
+    () => selectEdQueueHealth({ patients: emergencyPatients, queues: emergencyQueues, alerts: emergencyAlerts }),
+    [emergencyAlerts, emergencyPatients, emergencyQueues]
+  );
+  const reassessmentQueue = useMemo(
+    () => selectReassessmentQueue({ patients: emergencyPatients }),
+    [emergencyPatients]
+  );
+  const reassessmentCount = useMemo(
+    () => selectReassessmentCount({ patients: emergencyPatients }),
+    [emergencyPatients]
+  );
+  const bottleneckAlert = useMemo(
+    () =>
+      selectQueueBottleneckAlert({
+        patients: emergencyPatients,
+        queues: emergencyQueues,
+        alerts: emergencyAlerts,
+      }),
+    [emergencyAlerts, emergencyPatients, emergencyQueues]
+  );
   const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
   const isEmergencyCopilot = activeWorkspaceId === 'emergency';
   const enabledCopilotFeatures = useMemo(
@@ -727,8 +748,7 @@ const ChatInterface = ({
           waitMinutes: waitMinutes(patient.arrivalTime),
           assignedTo: patient.assignedTo,
         })),
-        safetyBoundary:
-          'Decision support only. Never make autonomous clinical decisions; all actions require human review.',
+        safetyBoundary: EMERGENCY_OS_BRANDING.safetyLine,
         whoNext: getWhoNextRecommendation({
           patients: emergencyPatients,
           rooms: emergencyRooms,
@@ -1102,7 +1122,9 @@ const ChatInterface = ({
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className="chat-interface__speaker-label">ED Copilot</div>
+                  <div className="chat-interface__speaker-label">
+                    {EMERGENCY_OS_BRANDING.copilotName}
+                  </div>
                 )}
                 {renderMessageContent(message.content)}
                 {message.confidence !== undefined && message.role === 'assistant' && (
@@ -1137,7 +1159,7 @@ const ChatInterface = ({
                 )}
                 {message.metadata?.isCopilotError && (
                   <div className="chat-interface__retry-card">
-                    <span>Copilot unavailable — check connection</span>
+                    <span>{EMERGENCY_OS_BRANDING.copilotName} unavailable - check connection</span>
                     <button
                       type="button"
                       className="btn-secondary"
@@ -1202,13 +1224,18 @@ const ChatInterface = ({
               🤖
             </div>
             <div className="chat-interface__loading-bubble">
-              <div className="chat-interface__speaker-label">ED Copilot</div>
+              <div className="chat-interface__speaker-label">
+                {EMERGENCY_OS_BRANDING.copilotName}
+              </div>
               <div className="chat-interface__skeleton" aria-hidden>
                 <span />
                 <span />
                 <span />
               </div>
-              <div className="chat-interface__typing" aria-label="ED Copilot is typing">
+              <div
+                className="chat-interface__typing"
+                aria-label={`${EMERGENCY_OS_BRANDING.copilotName} is typing`}
+              >
                 <span />
                 <span />
                 <span />
@@ -1256,8 +1283,8 @@ const ChatInterface = ({
             onFocus={keepComposerVisible}
             onChange={handleComposerChange}
             onKeyDown={handleKeyPress}
-            aria-label="Ask ED Copilot"
-            placeholder='Ask ED Copilot, or type "/" for commands'
+            aria-label={`Ask ${EMERGENCY_OS_BRANDING.copilotName}`}
+            placeholder={`Ask ${EMERGENCY_OS_BRANDING.copilotName}, or type "/" for commands`}
             disabled={isLoading}
             className="chat-interface__textarea"
             rows={1}
@@ -1285,7 +1312,7 @@ const ChatInterface = ({
           </button>
         </div>
         <div className="chat-interface__disclaimer">
-          CareDroid can make mistakes. Verify medical information.
+          {EMERGENCY_OS_BRANDING.safetyLine}
         </div>
       </div>
 

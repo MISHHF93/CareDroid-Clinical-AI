@@ -306,6 +306,12 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['whiteboard', 'board', 'patient flow', 'operational screen'],
   },
   {
+    id: 'department-pulse',
+    title: 'Department Pulse',
+    path: CANONICAL_ROUTES.emergencyPulse,
+    aliases: ['pulse', 'department pulse', 'charge nurse', 'return brief'],
+  },
+  {
     id: 'emergency-patients',
     title: 'Patients',
     path: CANONICAL_ROUTES.emergencyPatients,
@@ -388,6 +394,18 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     title: 'Real-Time Simulation',
     path: CANONICAL_ROUTES.emergencySimulation,
     aliases: ['simulation', 'real-time simulation', 'rts', 'interventions', 'forecast', 'surge decision support'],
+  },
+  {
+    id: 'emergency-tools',
+    title: 'Emergency Tools',
+    path: CANONICAL_ROUTES.emergencyTools,
+    aliases: ['tools', 'calculators', 'clinical tools', 'scores'],
+  },
+  {
+    id: 'emergency-shift',
+    title: 'Shift Summary',
+    path: CANONICAL_ROUTES.emergencyShift,
+    aliases: ['shift', 'shift summary', 'handoff', 'end of shift'],
   },
   // Future module
   // {

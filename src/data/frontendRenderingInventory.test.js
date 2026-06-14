@@ -132,9 +132,7 @@ describe('frontend rendering — App.jsx routes', () => {
   it('redirects retired tools routes into the Emergency OS whiteboard', () => {
     expect(appSource).not.toContain("path: '/tools/calculators'");
     expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
-    expect(appSource).toContain(
-      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
-    );
+    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
   });
 
   it('derives Tier A calculator routes from CALCULATOR_ROUTE_DEFS in App.jsx', () => {

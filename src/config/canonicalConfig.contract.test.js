@@ -39,7 +39,7 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/chat')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/catalog')).toBe('/emergency/whiteboard');
-    expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
+    expect(getRouteAliasTarget('/fleet')).toBeNull();
     expect(getRouteAliasTarget('/home')).toBe('/emergency/whiteboard');
     expect(getRouteAliasTarget('/automation')).toBe('/workflows');
     expect(getRouteAliasTarget('/asset-packs')).toBeNull();

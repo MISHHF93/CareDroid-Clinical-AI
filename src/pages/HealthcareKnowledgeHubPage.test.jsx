@@ -15,7 +15,7 @@ describe('HealthcareKnowledgeHubPage', () => {
     expect(screen.getAllByText('documentation').length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Specialty')).toBeInTheDocument();
     expect(screen.getByLabelText('Role')).toBeInTheDocument();
-    expect(screen.getByLabelText('Workspace')).toBeInTheDocument();
+    expect(screen.getByLabelText('Emergency OS')).toBeInTheDocument();
     expect(screen.getByLabelText('Department')).toBeInTheDocument();
     expect(screen.getByText('Sepsis escalation protocol')).toBeInTheDocument();
     expect(screen.getByText('Code Blue simulation readiness')).toBeInTheDocument();
@@ -30,7 +30,7 @@ describe('HealthcareKnowledgeHubPage', () => {
     fireEvent.change(screen.getByLabelText('Role'), {
       target: { value: 'compliance-leader' },
     });
-    fireEvent.change(screen.getByLabelText('Workspace'), {
+    fireEvent.change(screen.getByLabelText('Emergency OS'), {
       target: { value: 'governance' },
     });
 

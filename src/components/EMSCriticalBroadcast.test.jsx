@@ -1,10 +1,16 @@
 import React from 'react';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import EMSCriticalBroadcast from './EMSCriticalBroadcast';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { Priority } from '../types/emergency';
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({
+    can: () => true,
+  }),
+}));
 
 const originalState = useEmergencyStore.getState();
 

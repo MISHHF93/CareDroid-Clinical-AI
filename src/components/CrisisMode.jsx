@@ -34,7 +34,6 @@ export default function CrisisMode({ onVisibilityChange }) {
   const rooms = useEmergencyStore((state) => state.rooms);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
-  const reassessmentQueue = useEmergencyStore(selectReassessmentQueue);
   const dischargePatient = useEmergencyStore((state) => state.dischargePatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
@@ -46,6 +45,7 @@ export default function CrisisMode({ onVisibilityChange }) {
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const reassessmentQueue = useMemo(() => selectReassessmentQueue({ patients }), [patients]);
   const crisisState = useMemo(
     () =>
       deriveCrisisModeState({
@@ -144,7 +144,7 @@ export default function CrisisMode({ onVisibilityChange }) {
   return (
     <>
       <section
-        className={`crisis-mode-banner crisis-mode-banner--${capacity.riskLevel.toLowerCase()}`}
+        className={`crisis-mode-banner crisis-mode-banner--${crisisState.severity.toLowerCase()}`}
         role="alert"
         aria-label="Capacity crisis mode"
       >
@@ -206,7 +206,7 @@ export default function CrisisMode({ onVisibilityChange }) {
             <div>
               <span>Capacity Crisis Actions</span>
               <h2>Score {capacity.score}/100 - {capacity.riskLevel}</h2>
-              <p>{capacity.deductions.map((deduction) => deduction.label).join(' - ') || 'No score deductions recorded.'}</p>
+              <p>{(capacity.deductions || []).map((deduction) => deduction.label).join(' - ') || 'No score deductions recorded.'}</p>
             </div>
             <button type="button" onClick={() => setPanelOpen(false)} aria-label="Close crisis action panel">
               <X size={18} aria-hidden />

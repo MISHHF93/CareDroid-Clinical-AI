@@ -441,7 +441,7 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     .join('\n');
 
   const lines = [
-    '# Tool visibility matrix',
+    '# Tool Visibility Matrix',
     '',
     `*Generated from shipped source on **${doc.generatedAt.slice(0, 10)}**. Regenerate:* \`npm run visibility-matrix:write-docs\``,
     '',

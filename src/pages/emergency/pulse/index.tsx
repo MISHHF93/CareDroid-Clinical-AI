@@ -374,9 +374,21 @@ export default function DepartmentPulse() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals as EmsRecord[]);
   const alerts = useEmergencyStore((state) => state.alerts);
+  const queues = useEmergencyStore((state) => state.queues);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
-  const reassessmentCount = useEmergencyStore(selectReassessmentCount);
-  const bottleneckAlert = useEmergencyStore(selectQueueBottleneckAlert);
+  const reassessmentCount = useMemo(
+    () => selectReassessmentCount({ patients } as Parameters<typeof selectReassessmentCount>[0]),
+    [patients],
+  );
+  const bottleneckAlert = useMemo(
+    () =>
+      selectQueueBottleneckAlert({
+        patients,
+        queues,
+        alerts,
+      } as Parameters<typeof selectQueueBottleneckAlert>[0]),
+    [alerts, patients, queues],
+  );
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const setLastPulseView = useEmergencyStore((state) => state.setLastPulseView);
   const [previousSnapshot] = useState(() => readPulseSnapshot());

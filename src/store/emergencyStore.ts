@@ -4,12 +4,15 @@ import {
   ActiveShift,
   CapacityHistoryEntry,
   CapacitySnapshot,
+  CriticalChecklistRecord,
   EmsUnit,
+  EMSArrival,
   EmergencyFeatureFlags,
   JourneyEvent,
   Note,
   Patient,
   PatientFlag,
+  PatientFlagRecord,
   PatientState,
   Priority,
   ReassessmentReminder,
@@ -21,6 +24,7 @@ import {
   WorkflowActionLog,
   WorkflowActionType,
 } from '../types/emergency';
+import { resolveCriticalChecklistConfig } from '../../config/criticalChecklists';
 import {
   ED_SCENARIO_DEMO_MODES,
   buildSrcEmergencyScenarioState,
@@ -1334,6 +1338,138 @@ function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnap
   };
 }
 
+function selectEMSPreparationRoom(rooms: Room[]): Room | undefined {
+  return (
+    rooms.find((room) => room.status === 'Available' && ['Resus', 'Resuscitation'].includes(room.type)) ||
+    rooms.find((room) => room.status === 'Available' && room.type === 'Treatment') ||
+    rooms.find((room) => room.status === 'Available')
+  );
+}
+
+function roomLabel(rooms: Room[], roomId?: string): string | undefined {
+  if (!roomId) return undefined;
+  return rooms.find((room) => room.id === roomId)?.name;
+}
+
+function prepareCriticalChecklist(
+  arrival: EMSArrival,
+  rooms: Room[],
+  timestamp = nowIso(),
+): { arrival: EMSArrival; rooms: Room[]; reservedRoom?: Room } {
+  const checklistConfig = resolveCriticalChecklistConfig(arrival);
+  if (!checklistConfig || arrival.criticalChecklist) {
+    return { arrival, rooms };
+  }
+
+  const reservedRoom = selectEMSPreparationRoom(rooms);
+  const assignedRoomId = reservedRoom?.id || arrival.preparedRoomId;
+  const criticalChecklist: CriticalChecklistRecord = {
+    type: checklistConfig.type,
+    title: checklistConfig.title,
+    triggeredAt: timestamp,
+    assignedRoomId,
+    assignedRoomName: roomLabel(rooms, assignedRoomId),
+    completions: [],
+  };
+
+  return {
+    arrival: {
+      ...arrival,
+      preparedRoomId: assignedRoomId || arrival.preparedRoomId,
+      criticalChecklist,
+    },
+    rooms: reservedRoom
+      ? rooms.map((room) =>
+          room.id === reservedRoom.id
+            ? { ...room, status: 'Reserved' as const, currentPatientId: null }
+            : room,
+        )
+      : rooms,
+    reservedRoom,
+  };
+}
+
+function emsArrivalToPatient(arrival: EMSArrival, timestamp = nowIso()): Patient {
+  const patientId = arrival.patientId || createId('patient-ems');
+  const savedChecklist = arrival.criticalChecklist?.completedAt
+    ? { ...arrival.criticalChecklist, savedToPatientAt: timestamp }
+    : arrival.criticalChecklist;
+  const vitals = arrival.vitals
+    ? [
+        {
+          ...arrival.vitals,
+          recordedAt: arrival.vitals.recordedAt || timestamp,
+          recordedBy: arrival.unitName,
+        },
+      ]
+    : [];
+
+  const patient: Patient = {
+    id: patientId,
+    mrn: `EMS-${arrival.id.toUpperCase()}`,
+    firstName: 'EMS',
+    lastName: `Patient ${arrival.patientAge}`,
+    dob: new Date(timestamp).toISOString().slice(0, 10),
+    age: arrival.patientAge,
+    sex: arrival.patientSex,
+    arrivalTime: timestamp,
+    triageTime: null,
+    lastAssessedTime: null,
+    chiefComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint,
+    complaint: arrival.prearrivalComplaint,
+    complaintCategory: 'EMS',
+    state: PatientState.Arrival,
+    priority: arrival.priority,
+    vitals,
+    flags: [
+      PatientFlag.EMSArrival,
+      ...(arrival.priority === Priority.P1 || arrival.priority === Priority.P2
+        ? [PatientFlag.HighRisk]
+        : []),
+    ],
+    assignedStaffId: null,
+    roomId: arrival.preparedRoomId,
+    notes: [
+      {
+        id: createId('ems-note'),
+        type: 'System',
+        body: `${arrival.unitName} handoff created from EMS pipeline. ${arrival.notes || ''}`.trim(),
+        authorId: 'ems',
+        createdAt: timestamp,
+      },
+    ],
+    timeline: [],
+    source: 'EMS',
+    emsUnitId: arrival.unitId,
+    emsArrival: arrival,
+    criticalChecklist: savedChecklist,
+  };
+
+  patient.timeline = [
+    createPatientTimelineEvent(patient, 'Arrival', `EMS arrival from ${arrival.unitName}.`, {
+      timestamp,
+      metadata: { emsArrivalId: arrival.id, unitId: arrival.unitId },
+    }),
+    savedChecklist?.completedAt
+      ? createPatientTimelineEvent(
+          patient,
+          'EMSCriticalChecklistSaved',
+          `${savedChecklist.title} saved to patient record.`,
+          {
+            timestamp,
+            metadata: {
+              emsArrivalId: arrival.id,
+              checklistType: savedChecklist.type,
+              completedAt: savedChecklist.completedAt,
+            },
+          },
+        )
+      : null,
+  ].filter(Boolean) as JourneyEvent[];
+
+  return patient;
+}
+
 function buildLocalEmergencyAnalytics(
   state: Pick<EmergencyStoreState, 'patients' | 'capacity' | 'activeShift'>,
 ) {
@@ -1430,7 +1566,7 @@ interface EmergencyStoreState {
   capacityHistory: CapacityHistoryEntry[];
   activeShift: ActiveShift;
   emsUnits: EmsUnit[];
-  emsArrivals: EmsUnit[];
+  emsArrivals: EMSArrival[];
   referrals: Referral[];
   capacityMetrics: EmergencyCapacityMetrics;
   boardingMetrics: EmergencyBoardingMetrics;
@@ -1449,6 +1585,7 @@ interface EmergencyStoreState {
   selectedPatientId: string | null;
   copilotOpen: boolean;
   activeQueueFilter: string | null;
+  whiteboardSearchQuery: string;
   loading: boolean;
   features: EmergencyFeatureFlags;
   flags: FeatureFlags;
@@ -1481,7 +1618,7 @@ interface EmergencyStoreState {
   dischargePatient: (patientId: string, options?: { staffId?: string; note?: string }) => void;
   assignStaff: (patientId: string, staffId: string) => void;
   assignRoom: (patientId: string, roomId: string) => void;
-  addFlag: (patientId: string, flag: PatientFlag | string, options?: Partial<Alert>) => void;
+  addFlag: (patientId: string, flag: PatientFlag | string | PatientFlagRecord, options?: Partial<Alert>) => void;
   removeFlag: (patientId: string, flag: PatientFlag) => void;
   addVitals: (patientId: string, vitals: Vitals) => void;
   addNote: (patientId: string, note: Note | string, staffId?: string) => void;
@@ -1497,6 +1634,8 @@ interface EmergencyStoreState {
   selectPatient: (patientId: string | null) => void;
   clearPatientSelection: () => void;
   setActiveQueueFilter: (filter: string | null) => void;
+  setQueueFilter: (filter: string | null) => void;
+  setWhiteboardSearchQuery: (query: string) => void;
   setLastPulseView: (timestamp: number) => void;
   setLoading: (loading: boolean) => void;
   toggleCopilot: () => void;
@@ -1514,6 +1653,25 @@ interface EmergencyStoreState {
   upsertEmsIncomingPatient: (patient: EmsIncomingPatient) => void;
   addAlert: (alert: Alert) => void;
   setCapacity: (capacity: CapacitySnapshot) => void;
+  addEMSArrival: (arrival: EMSArrival) => void;
+  prepareEMSBay: (arrivalId: string) => void;
+  updateEMSArrival: (arrivalId: string, patch: Partial<EMSArrival>) => void;
+  checkCriticalEMSChecklistItem: (
+    arrivalId: string,
+    input: {
+      itemId: string;
+      label: string;
+      checked: boolean;
+      staffId: string;
+      staffName: string;
+      timestamp?: string;
+    },
+  ) => void;
+  completeCriticalEMSChecklist: (
+    arrivalId: string,
+    input: { staffId: string; staffName: string; timestamp?: string },
+  ) => void;
+  convertEMSArrivalToPatient: (arrivalId: string) => void;
   initializeFlags: () => Promise<void>;
   toggleFeature: (
     featureId: string,
@@ -1550,9 +1708,10 @@ interface EmergencyStoreState {
       workflowLogs: WorkflowActionLog[];
       activeShift: ActiveShift;
       emsUnits: EmsUnit[];
-      emsArrivals: EmsUnit[];
+      emsArrivals: EMSArrival[];
       referrals: Referral[];
       activeQueueFilter: string | null;
+      whiteboardSearchQuery: string;
       loading: boolean;
       features: EmergencyFeatureFlags;
       flags: FeatureFlags;
@@ -1779,8 +1938,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     capacity: initialCapacity,
     capacityHistory: seedCapacityHistory(initialCapacity),
     activeShift: initialScenarioState.activeShift || SEED_SHIFT,
-    emsUnits: initialScenarioState.emsUnits || initialScenarioState.emsArrivals || SEED_EMS_UNITS,
-    emsArrivals: initialScenarioState.emsArrivals || SEED_EMS_UNITS,
+    emsUnits: initialScenarioState.emsUnits || SEED_EMS_UNITS,
+    emsArrivals: initialScenarioState.emsArrivals || [],
     referrals: initialScenarioState.referrals || SEED_REFERRALS,
     capacityMetrics: emptyCapacityMetrics(),
     boardingMetrics: emptyBoardingMetrics(),
@@ -1804,6 +1963,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     selectedPatientId: null,
     copilotOpen: false,
     activeQueueFilter: null,
+    whiteboardSearchQuery: '',
     loading: false,
     features: DEFAULT_FEATURES,
     flags: initialFlags,
@@ -2234,9 +2394,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     addFlag: (patientId, flag) =>
       set((state) => {
-        const normalizedFlag = Object.values(PatientFlag).includes(flag as PatientFlag)
-          ? (flag as PatientFlag)
-          : PatientFlag.HighRisk;
+        const normalizedFlag = getPatientFlagType(flag);
         const patients = state.patients.map((patient) => {
           if (patient.id !== patientId || patient.flags.includes(normalizedFlag)) return patient;
           return {
@@ -2556,6 +2714,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       })),
 
     setActiveQueueFilter: (filter) => set({ activeQueueFilter: filter }),
+
+    setQueueFilter: (filter) => set({ activeQueueFilter: filter }),
+
+    setWhiteboardSearchQuery: (query) => set({ whiteboardSearchQuery: query }),
 
     setLastPulseView: (timestamp) => {
       writeLastPulseViewTimestamp(timestamp);
@@ -2913,6 +3075,180 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             : state.workflowLogs,
       })),
 
+    addEMSArrival: (arrival) =>
+      set((state) => {
+        const timestamp = nowIso();
+        const prepared = prepareCriticalChecklist(arrival, state.rooms, timestamp);
+        const nextArrivals = [
+          prepared.arrival,
+          ...state.emsArrivals.filter((candidate) => candidate.id !== arrival.id),
+        ];
+
+        return {
+          rooms: prepared.rooms,
+          emsArrivals: nextArrivals,
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'ems_arrival_created',
+              title: 'EMS arrival created',
+              summary: `${arrival.unitName} inbound: ${arrival.chiefComplaint}.`,
+              timestamp,
+              source: 'ems-pipeline',
+              severity: arrival.severity === 'Critical' ? 'Critical' : 'Info',
+              metadata: {
+                arrivalId: arrival.id,
+                unitId: arrival.unitId,
+                criticalChecklistType: prepared.arrival.criticalChecklist?.type || null,
+                preparedRoomId: prepared.arrival.preparedRoomId || null,
+              },
+            },
+          ]),
+        };
+      }),
+
+    prepareEMSBay: (arrivalId) =>
+      set((state) => {
+        const arrival = state.emsArrivals.find((candidate) => candidate.id === arrivalId);
+        if (!arrival?.id || arrival.preparedRoomId) return {};
+
+        const room = selectEMSPreparationRoom(state.rooms);
+        if (!room) return {};
+
+        return {
+          rooms: state.rooms.map((candidate) =>
+            candidate.id === room.id
+              ? { ...candidate, status: 'Reserved' as const, currentPatientId: null }
+              : candidate,
+          ),
+          emsArrivals: state.emsArrivals.map((candidate) =>
+            candidate.id === arrivalId
+              ? {
+                  ...candidate,
+                  preparedRoomId: room.id,
+                  criticalChecklist: candidate.criticalChecklist
+                    ? {
+                        ...candidate.criticalChecklist,
+                        assignedRoomId: room.id,
+                        assignedRoomName: room.name,
+                      }
+                    : candidate.criticalChecklist,
+                }
+              : candidate,
+          ),
+        };
+      }),
+
+    updateEMSArrival: (arrivalId, patch) =>
+      set((state) => ({
+        emsArrivals: state.emsArrivals.map((arrival) =>
+          arrival.id === arrivalId ? { ...arrival, ...patch } : arrival,
+        ),
+      })),
+
+    checkCriticalEMSChecklistItem: (arrivalId, input) =>
+      set((state) => ({
+        emsArrivals: state.emsArrivals.map((arrival) => {
+          if (arrival.id !== arrivalId || !arrival.criticalChecklist) return arrival;
+          const completions = arrival.criticalChecklist.completions.filter(
+            (completion) => completion.itemId !== input.itemId,
+          );
+
+          return {
+            ...arrival,
+            criticalChecklist: {
+              ...arrival.criticalChecklist,
+              completions: input.checked
+                ? [
+                    ...completions,
+                    {
+                      itemId: input.itemId,
+                      label: input.label,
+                      checkedByStaffId: input.staffId,
+                      checkedByStaffName: input.staffName,
+                      checkedAt: input.timestamp || nowIso(),
+                    },
+                  ]
+                : completions,
+            },
+          };
+        }),
+      })),
+
+    completeCriticalEMSChecklist: (arrivalId, input) =>
+      set((state) => ({
+        emsArrivals: state.emsArrivals.map((arrival) =>
+          arrival.id === arrivalId && arrival.criticalChecklist
+            ? {
+                ...arrival,
+                criticalChecklist: {
+                  ...arrival.criticalChecklist,
+                  completedAt: input.timestamp || nowIso(),
+                  completedByStaffId: input.staffId,
+                  completedByStaffName: input.staffName,
+                },
+              }
+            : arrival,
+        ),
+      })),
+
+    convertEMSArrivalToPatient: (arrivalId) =>
+      set((state) => {
+        const arrival = state.emsArrivals.find((candidate) => candidate.id === arrivalId);
+        if (!arrival || arrival.patientId) return {};
+
+        const timestamp = nowIso();
+        const patient = emsArrivalToPatient(
+          {
+            ...arrival,
+            status: 'Handoff',
+            arrivedAt: arrival.arrivedAt || timestamp,
+          },
+          timestamp,
+        );
+        const convertedArrival = {
+          ...arrival,
+          status: 'Handoff' as const,
+          patientId: patient.id,
+          arrivedAt: arrival.arrivedAt || timestamp,
+        };
+        const patients = [patient, ...state.patients.filter((candidate) => candidate.id !== patient.id)];
+        const rooms = state.rooms.map((room) =>
+          room.id === patient.roomId
+            ? {
+                ...room,
+                status: 'Occupied' as const,
+                patientId: patient.id,
+                currentPatientId: patient.id,
+              }
+            : room,
+        );
+
+        return {
+          patients,
+          rooms,
+          capacity: buildCapacitySnapshot(patients, rooms),
+          emsArrivals: state.emsArrivals.map((candidate) =>
+            candidate.id === arrivalId ? convertedArrival : candidate,
+          ),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'ems_converted_to_patient',
+              title: 'EMS converted to patient',
+              summary: `${arrival.unitName} converted to whiteboard patient.`,
+              patientId: patient.id,
+              timestamp,
+              source: 'ems-pipeline',
+              severity: arrival.severity === 'Critical' ? 'Critical' : 'Info',
+              metadata: {
+                arrivalId: arrival.id,
+                unitId: arrival.unitId,
+                roomId: patient.roomId || null,
+              },
+            },
+          ]),
+        };
+      }),
+
     initializeFlags: async () => {
       const tier = get().tier || DEFAULT_TIER;
       const defaults = buildDefaultFlags(tier);
@@ -3161,7 +3497,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           capacityHistory: seedCapacityHistory(scenarioState.capacity),
           alerts: scenarioState.alerts,
           activeShift: scenarioState.activeShift || SEED_SHIFT,
-          emsUnits: scenarioState.emsUnits || scenarioState.emsArrivals || SEED_EMS_UNITS,
+          emsUnits: scenarioState.emsUnits || SEED_EMS_UNITS,
           emsArrivals: scenarioState.emsArrivals || scenarioState.emsUnits || SEED_EMS_UNITS,
           referrals: scenarioState.referrals || SEED_REFERRALS,
           activeScenarioId: scenarioState.activeScenarioId,
@@ -3327,10 +3663,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             ),
           workflowLogs: payload.workflowLogs || state.workflowLogs,
           activeShift: payload.activeShift || state.activeShift,
-          emsUnits: payload.emsUnits || payload.emsArrivals || state.emsUnits,
-          emsArrivals: payload.emsArrivals || payload.emsUnits || state.emsArrivals,
+          emsUnits: payload.emsUnits || state.emsUnits,
+          emsArrivals: payload.emsArrivals || state.emsArrivals,
           referrals,
           activeQueueFilter: payload.activeQueueFilter ?? state.activeQueueFilter,
+          whiteboardSearchQuery: payload.whiteboardSearchQuery ?? state.whiteboardSearchQuery,
           loading: payload.loading ?? state.loading,
           features: payload.features || payload.flags || state.features,
           flags: payload.flags || payload.features || state.flags,
@@ -3364,6 +3701,27 @@ export function getPatientFlagType(
     : PatientFlag.HighRisk;
 }
 
+export function createPatientFlag(
+  flag: PatientFlag | string | { type?: PatientFlag | string },
+  options: Partial<PatientFlagRecord> = {},
+): PatientFlagRecord {
+  const type = getPatientFlagType(flag);
+  const severity =
+    options.severity ||
+    (type === PatientFlag.HighRisk ||
+    type === PatientFlag.DeteriorationRisk ||
+    type === PatientFlag.SepsisAlert
+      ? 'Critical'
+      : 'Warning');
+
+  return {
+    type,
+    reason: options.reason || 'Flagged for human review.',
+    detectedAt: options.detectedAt || nowIso(),
+    severity,
+  };
+}
+
 export function hasPatientFlag(patient: Patient, flag: PatientFlag | string): boolean {
   return patient.flags.map(getPatientFlagType).includes(getPatientFlagType(flag));
 }
@@ -3389,7 +3747,83 @@ export const selectQueueCounts = (state: EmergencyStoreState): Record<string, nu
     return counts;
   }, {});
 
-export const selectQueueBottleneckAlert = (state: EmergencyStoreState): Alert | null =>
-  selectActiveAlerts(state).find((alert) =>
-    /capacity|queue|wait|boarding/i.test(`${alert.title} ${alert.message}`),
-  ) || null;
+export const selectQueuePanelRows = (state: EmergencyStoreState): Array<Record<string, any>> => {
+  if (Array.isArray(state.queues) && state.queues.length) {
+    return state.queues.map((queue) => {
+      const queueRecord = queue as Record<string, any>;
+      const averageWaitMinutes = Number(queueRecord.averageWaitMinutes || 0);
+      const oldestWaitMinutes = Number(queueRecord.oldestWaitMinutes || queueRecord.longestWaitMinutes || 0);
+      const targetWaitMinutes = Number(queueRecord.targetWaitMinutes || 30);
+      return {
+        ...queueRecord,
+        type: queueRecord.type || queueRecord.label,
+        name: queueRecord.name || queueRecord.label || queueRecord.type,
+        count: Number(queueRecord.count ?? queueRecord.patientIds?.length ?? 0),
+        averageWaitMinutes,
+        oldestWaitMinutes,
+        health:
+          averageWaitMinutes > targetWaitMinutes || oldestWaitMinutes > targetWaitMinutes * 1.5
+            ? 'red'
+            : averageWaitMinutes > targetWaitMinutes * 0.8
+              ? 'yellow'
+              : 'green',
+      };
+    });
+  }
+
+  const counts = selectQueueCounts(state);
+  return Object.entries(counts).map(([type, count]) => ({
+    id: `queue-${type.toLowerCase()}`,
+    type,
+    name: type,
+    count,
+    averageWaitMinutes: 0,
+    oldestWaitMinutes: 0,
+    health: 'green',
+    updatedAt: nowIso(),
+  }));
+};
+
+export const selectEdQueueHealth = (state: EmergencyStoreState): Array<Record<string, any>> =>
+  selectQueuePanelRows(state);
+
+export const selectQueueOverallHealthScore = (state: EmergencyStoreState): number => {
+  const rows = selectQueuePanelRows(state);
+  if (!rows.length) return 100;
+  const penalty = rows.reduce((sum, row) => {
+    if (row.health === 'red') return sum + 18;
+    if (row.health === 'yellow') return sum + 8;
+    return sum;
+  }, 0);
+  return Math.max(0, 100 - penalty);
+};
+
+export const selectQueueBottleneckAlert = (state: EmergencyStoreState): Alert | null => {
+  const explicitAlert =
+    selectActiveAlerts(state).find((alert) =>
+      /capacity|queue|wait|boarding/i.test(`${alert.title} ${alert.message}`),
+    ) || null;
+  if (explicitAlert) return explicitAlert;
+
+  const bottleneck = selectQueuePanelRows(state)
+    .filter((queue) => queue.count > 0)
+    .sort(
+      (a, b) =>
+        Number(b.averageWaitMinutes || 0) - Number(a.averageWaitMinutes || 0) ||
+        Number(b.oldestWaitMinutes || 0) - Number(a.oldestWaitMinutes || 0),
+    )[0];
+
+  if (!bottleneck || Number(bottleneck.averageWaitMinutes || 0) <= 0) return null;
+
+  return {
+    id: `queue-bottleneck-${bottleneck.type}`,
+    type: 'Capacity',
+    severity: bottleneck.health === 'red' ? 'Red' : 'Warning',
+    title: `Bottleneck: ${bottleneck.type}`,
+    message: `${bottleneck.count} patients, avg ${bottleneck.averageWaitMinutes}min`,
+    queue: bottleneck.type,
+    reason: `${bottleneck.count} patients, avg ${bottleneck.averageWaitMinutes}min`,
+    createdAt: nowIso(),
+    dismissed: false,
+  } as Alert & { queue: string; reason: string };
+};

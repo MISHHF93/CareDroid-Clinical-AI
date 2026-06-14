@@ -49,7 +49,7 @@ describe('CareDroid design language fit contract', () => {
 
   it('keeps the AppShell rail and header controls fitted in the viewport', () => {
     expect(sidebarCss).toMatch(/\.sidebar-nav-item\s*\{[\s\S]*width:\s*48px/);
-    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*height:\s*calc\(56px/);
+    expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*height:\s*60px/);
     expect(appShellCss).toMatch(/\.ed-os-header\s*\{[\s\S]*min-width:\s*0/);
     expect(appShellCss).toMatch(/\.ed-os-header__left,[\s\S]*\.ed-os-header__right\s*\{[\s\S]*min-width:\s*0/);
   });

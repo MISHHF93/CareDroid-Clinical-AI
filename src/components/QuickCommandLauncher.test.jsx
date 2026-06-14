@@ -243,18 +243,25 @@ describe('QuickCommandLauncher', () => {
       expect.arrayContaining(['laboratory', 'fleet', 'medical-iot', 'education', 'research', 'governance'])
     );
     expect(navIds).toEqual([
-      'emergency_whiteboard',
-      'emergency_patients',
-      'ems_pipeline',
-      'smart_intake',
-      'queue_intelligence',
-      'reassessment_engine',
-      'capacity_intelligence',
-      'boarding_intelligence',
-      'referral_intelligence',
-      'ed_copilot',
-      'emergency_analytics',
-      'emergency_settings',
+      'whiteboard',
+      'pulse',
+      'patients',
+      'journey',
+      'intake',
+      'queues',
+      'reassessment',
+      'ems',
+      'referrals',
+      'provincial_health',
+      'integrations',
+      'capacity',
+      'boarding',
+      'copilot',
+      'analytics',
+      'simulation',
+      'tools',
+      'shift',
+      'settings',
     ]);
     expect(toolIds).toEqual(expect.arrayContaining(['qsofa', 'news2']));
   });

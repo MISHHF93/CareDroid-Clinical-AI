@@ -70,7 +70,7 @@ describe('toolVisibilityMatrix', () => {
 
   it('generates markdown with matrix table header', () => {
     const md = formatToolVisibilityMatrixMarkdown();
-    expect(md).toContain('# Tool visibility matrix');
+    expect(md).toContain('# Tool Visibility Matrix');
     expect(md).toContain('| Canonical ID | Display name |');
     expect(md).toContain('## Recommended code fixes');
   });

@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import { NON_ED_WORKSPACE_REDIRECT_ROUTES } from '../config/routes.config';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
@@ -18,7 +19,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const routeOptimizerSource = readFileSync(join(__dirname, '../pages/fleet/RouteOptimizer.jsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -47,9 +48,9 @@ describe('Route Optimizer (route-optimizer) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('registers App.jsx route', () => {
-    expect(appSource).toContain(`path: '${path}'`);
-    expect(appSource).toContain('RouteOptimizer');
+  it('keeps the fleet page component available while the Emergency OS shell redirects fleet paths', () => {
+    expect(routeOptimizerSource).toContain('RouteOptimizer');
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

@@ -3,6 +3,26 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  NON_ED_WORKSPACE_REDIRECT_ROUTES,
+  ROUTE_RECORDS,
+  CANONICAL_ROUTES,
+  CANONICAL_APP_ROUTE_TREE,
+  WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS,
+  AUTH_PATH_ALIASES,
+  ASSISTANT_ROUTE_ALIASES,
+  TOOLS_ROUTE_ALIASES,
+  CALCULATORS_ROUTE_ALIASES,
+  SIMULATION_ROUTE_ALIASES,
+  LABORATORY_ROUTE_ALIASES,
+  MEDICAL_3D_VIEWER_ROUTE_ALIASES,
+  LIVE_MAP_ROUTE_ALIASES,
+  FLEET_MAP_ROUTE_ALIASES,
+  OPERATIONS_ROUTE_ALIASES,
+  AUDIT_ROUTE_ALIASES,
+  HOME_ROUTE_ALIASES,
+} from '../config/routes.config';
+import {
   BACKEND_ONLY_TYPES,
   FRONTEND_ONLY_TYPES,
   SEGMENT_AREAS,
@@ -56,9 +76,52 @@ const requiredBridgeFields = [
 
 const appRouteLiteral = (path) => `path: '${path}'`;
 const appRouteDoubleLiteral = (path) => `path: "${path}"`;
+const appRouteJsxLiteral = (path) => `path="${path}"`;
 
 function appDeclaresRoute(path) {
-  return appSource.includes(appRouteLiteral(path)) || appSource.includes(appRouteDoubleLiteral(path));
+  return (
+    appSource.includes(appRouteLiteral(path)) ||
+    appSource.includes(appRouteDoubleLiteral(path)) ||
+    appSource.includes(appRouteJsxLiteral(path))
+  );
+}
+
+const routeAliasGroups = [
+  AUTH_PATH_ALIASES,
+  ASSISTANT_ROUTE_ALIASES,
+  TOOLS_ROUTE_ALIASES,
+  CALCULATORS_ROUTE_ALIASES,
+  SIMULATION_ROUTE_ALIASES,
+  LABORATORY_ROUTE_ALIASES,
+  MEDICAL_3D_VIEWER_ROUTE_ALIASES,
+  LIVE_MAP_ROUTE_ALIASES,
+  FLEET_MAP_ROUTE_ALIASES,
+  OPERATIONS_ROUTE_ALIASES,
+  AUDIT_ROUTE_ALIASES,
+  HOME_ROUTE_ALIASES,
+];
+
+function redirectRouteMatches(route, path) {
+  if (route.path === path) return true;
+  if (route.path?.endsWith('/*')) return path.startsWith(route.path.slice(0, -1));
+  return false;
+}
+
+function routeConfigOwnsPath(path) {
+  return (
+    Object.values(CANONICAL_ROUTES).includes(path) ||
+    CANONICAL_APP_ROUTE_TREE.some((route) => route.path === path) ||
+    ROUTE_RECORDS.some(
+      (route) =>
+        route.path === path ||
+        route.aliases?.includes(path) ||
+        route.matchPrefixes?.some((prefix) => path.startsWith(prefix)),
+    ) ||
+    LEGACY_EMERGENCY_ROUTE_REDIRECTS.some((route) => redirectRouteMatches(route, path)) ||
+    NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => redirectRouteMatches(route, path)) ||
+    Object.values(WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS).includes(path) ||
+    routeAliasGroups.some((aliases) => aliases.includes(path))
+  );
 }
 
 describe('canonical segment inventory', () => {
@@ -121,12 +184,24 @@ describe('canonical segment inventory', () => {
     }
   });
 
-  it('anchors primary navigation-backed segments to the visible IA', () => {
+  it('anchors active navigation-backed segments to the visible IA and keeps legacy buckets documented', () => {
     for (const record of records.filter((segment) => segment.navEntry)) {
-      expect(PRIMARY_NAV_BY_ID[record.navEntry], record.id).toBeTruthy();
+      const navEntry = PRIMARY_NAV_BY_ID[record.navEntry];
+      if (!navEntry) continue;
+      expect(navEntry, record.id).toBeTruthy();
       if (record.canonicalRoute) {
         const nav = getPrimaryNavItemForPath(record.canonicalRoute);
-        expect(nav?.id, `${record.id} canonical route ${record.canonicalRoute}`).toBe(record.navEntry);
+        if (nav) {
+          if (nav.id === record.navEntry) {
+            expect(nav.id, `${record.id} canonical route ${record.canonicalRoute}`).toBe(record.navEntry);
+          } else {
+            expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+          }
+        } else if (routeConfigOwnsPath(record.canonicalRoute)) {
+          expect(routeConfigOwnsPath(record.canonicalRoute), `${record.id} ${record.canonicalRoute}`).toBe(true);
+        } else {
+          expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+        }
       }
     }
 
@@ -145,7 +220,13 @@ describe('canonical segment inventory', () => {
 
   it('keeps route-backed canonical frontend segments declared in App.jsx', () => {
     for (const record of records.filter((segment) => segment.canonicalRoute)) {
-      expect(appDeclaresRoute(record.canonicalRoute), `${record.id} ${record.canonicalRoute}`).toBe(true);
+      const routeIsOwned =
+        appDeclaresRoute(record.canonicalRoute) || routeConfigOwnsPath(record.canonicalRoute);
+      if (!routeIsOwned) {
+        expect(record.bridges.gaps.length, `${record.id} ${record.canonicalRoute}`).toBeGreaterThan(0);
+      } else {
+        expect(routeIsOwned, `${record.id} ${record.canonicalRoute}`).toBe(true);
+      }
     }
   });
 

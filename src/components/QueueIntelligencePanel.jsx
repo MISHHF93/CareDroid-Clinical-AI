@@ -72,9 +72,20 @@ function suggestedAction(queueType) {
 
 export default function QueueIntelligencePanel({ collapsed, onCollapsedChange }) {
   const queues = useEmergencyStore((state) => state.queues);
-  const storeQueueRows = useEmergencyStore(selectQueuePanelRows);
-  const overallHealthScore = useEmergencyStore(selectQueueOverallHealthScore);
-  const nextBottleneckAlert = useEmergencyStore(selectQueueBottleneckAlert);
+  const alerts = useEmergencyStore((state) => state.alerts);
+  const patients = useEmergencyStore((state) => state.patients);
+  const storeQueueRows = useMemo(
+    () => selectQueuePanelRows({ queues, alerts, patients }),
+    [alerts, patients, queues]
+  );
+  const overallHealthScore = useMemo(
+    () => selectQueueOverallHealthScore({ queues, alerts, patients }),
+    [alerts, patients, queues]
+  );
+  const nextBottleneckAlert = useMemo(
+    () => selectQueueBottleneckAlert({ queues, alerts, patients }),
+    [alerts, patients, queues]
+  );
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);

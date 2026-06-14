@@ -15,7 +15,7 @@ describe('CustomerExpansionOpportunitiesPage', () => {
     expect(screen.getByText('Education Pack')).toBeInTheDocument();
     expect(screen.getByText('Research Pack')).toBeInTheDocument();
     expect(screen.getByText('AI Evaluation Pack')).toBeInTheDocument();
-    expect(screen.getAllByText(/opportunity score/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/motion:/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^Score$/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^Motion$/i).length).toBeGreaterThan(0);
   });
 });

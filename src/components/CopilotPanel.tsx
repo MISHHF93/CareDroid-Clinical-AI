@@ -6,6 +6,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
+import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import './CopilotPanel.css';
 import { formatLongWaitAttentionForCopilot } from '../utils/longWaitRescue';
 
@@ -180,7 +181,7 @@ export function CopilotPanel() {
     {
       id: 'copilot-welcome',
       role: 'copilot',
-      content: 'ED Copilot online. Ask about attention needs, capacity, EMS, or reassessment queue.',
+      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Ask about attention needs, capacity, EMS, or reassessment queue. ${EMERGENCY_OS_BRANDING.safetyShort}.`,
       timestamp: new Date(),
     },
   ]);
@@ -255,7 +256,7 @@ export function CopilotPanel() {
             capacityScore: capacity.score,
             reassessmentQueueCount: reassessmentCount,
             activeAlerts: alerts.filter((alert) => !alert.dismissed).length,
-            safetyRule: 'Never make autonomous clinical decisions. Always flag for human review.',
+            safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
           },
         },
       });
@@ -269,7 +270,7 @@ export function CopilotPanel() {
       await streamIntoMessage(responseText, assistantId, setMessages);
     } catch {
       await streamIntoMessage(
-        'Copilot unavailable - check connection. Continue clinical review with human oversight.',
+        `${EMERGENCY_OS_BRANDING.copilotName} unavailable - check connection. Continue clinical review with human oversight.`,
         assistantId,
         setMessages,
       );
@@ -341,7 +342,9 @@ export function CopilotPanel() {
             flexShrink: 0,
           }}
         />
-        <span style={{ fontSize: 14, fontWeight: 500, marginRight: 2 }}>ED Copilot</span>
+        <span style={{ fontSize: 14, fontWeight: 500, marginRight: 2 }}>
+          {EMERGENCY_OS_BRANDING.copilotName}
+        </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, flex: 1, minWidth: 0 }}>
           {[activePatients.length, capacity.band, reassessmentCount].map((value, index) => (
             <span
@@ -364,7 +367,7 @@ export function CopilotPanel() {
         <button
           type="button"
           onClick={toggleCopilot}
-          aria-label="Close ED Copilot"
+          aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
           style={{
             width: 28,
             height: 28,
@@ -381,7 +384,7 @@ export function CopilotPanel() {
       </header>
 
       <div
-        aria-label="ED Copilot messages"
+        aria-label={`${EMERGENCY_OS_BRANDING.copilotName} messages`}
         style={{
           flex: 1,
           overflowY: 'auto',
@@ -471,8 +474,8 @@ export function CopilotPanel() {
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Ask ED Copilot..."
-          aria-label="Message ED Copilot"
+          placeholder={`Ask ${EMERGENCY_OS_BRANDING.copilotName}...`}
+          aria-label={`Message ${EMERGENCY_OS_BRANDING.copilotName}`}
           style={{
             flex: 1,
             minWidth: 0,
@@ -486,7 +489,7 @@ export function CopilotPanel() {
         />
         <button
           type="submit"
-          aria-label="Send ED Copilot message"
+          aria-label={`Send ${EMERGENCY_OS_BRANDING.copilotName} message`}
           disabled={loading || !input.trim()}
           style={{
             width: 36,

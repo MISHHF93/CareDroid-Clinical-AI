@@ -16,9 +16,7 @@ export function assertAppCalculatorRouteWiring(appSource, registryIds) {
   expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
   expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
   expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
-  expect(appSource).toContain(
-    '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
-  );
+  expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
 
   for (const id of registryIds) {
     const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id);

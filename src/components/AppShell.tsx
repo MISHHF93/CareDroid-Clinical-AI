@@ -8,6 +8,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -44,16 +45,17 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
-  '/emergency': 'Emergency OS - Board',
-  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Emergency OS - Board',
-  [CANONICAL_ROUTES.emergencyPulse]: 'Emergency OS - Pulse',
-  [CANONICAL_ROUTES.emergencyEms]: 'Emergency OS - EMS',
-  [CANONICAL_ROUTES.emergencyReferrals]: 'Emergency OS - Referrals',
-  [CANONICAL_ROUTES.emergencyCapacity]: 'Emergency OS - Capacity',
-  [CANONICAL_ROUTES.emergencyTools]: 'Emergency OS - Tools',
-  [CANONICAL_ROUTES.emergencyShift]: 'Emergency OS - Shift',
-  '/settings': 'Emergency OS - Settings',
-  [CANONICAL_ROUTES.emergencySettings]: 'Emergency OS - Settings',
+  '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
+  [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
+  [CANONICAL_ROUTES.emergencyCommandCenter]: `${EMERGENCY_OS_BRANDING.productName} - ${EMERGENCY_OS_BRANDING.commandCenterName}`,
+  [CANONICAL_ROUTES.emergencyPulse]: `${EMERGENCY_OS_BRANDING.productName} - Pulse`,
+  [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS`,
+  [CANONICAL_ROUTES.emergencyReferrals]: `${EMERGENCY_OS_BRANDING.productName} - Referrals`,
+  [CANONICAL_ROUTES.emergencyCapacity]: `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
+  [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Tools`,
+  [CANONICAL_ROUTES.emergencyShift]: `${EMERGENCY_OS_BRANDING.productName} - Shift`,
+  '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
+  [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
 };
 
 type AppShellProps = {
@@ -168,7 +170,9 @@ export function AppShell({ children }: AppShellProps) {
     const activeItem = visibleNavigationItems.find(
       (item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
     );
-    document.title = activeItem ? `Emergency OS — ${activeItem.label}` : 'Emergency OS';
+    document.title = activeItem
+      ? `${EMERGENCY_OS_BRANDING.productName} - ${activeItem.label}`
+      : EMERGENCY_OS_BRANDING.productName;
   }, [location.pathname, visibleNavigationItems]);
 
   useEffect(() => {

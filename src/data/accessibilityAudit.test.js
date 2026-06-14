@@ -13,6 +13,7 @@ function readSource(relativePath) {
 function buildCurrentSourceSnapshot() {
   return {
     appShellJsx: readSource('../layout/AppShell.jsx'),
+    sidebarTsx: readSource('../components/Sidebar.tsx'),
     appShellCss: readSource('../layout/AppShell.css'),
     themeSurfacesCss: readSource('../styles/theme-surfaces.css'),
     themeTokensCss: readSource('../styles/theme-tokens.css'),

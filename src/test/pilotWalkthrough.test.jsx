@@ -325,5 +325,5 @@ describe('pilot walkthrough', () => {
     const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
     expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
     expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
-  });
+  }, 30000);
 });

@@ -67,7 +67,7 @@ describe('ToolsOverview unified inventory', () => {
       card.getAttribute('data-tool-id')
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /^workspace tool console$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /^emergency os tool console$/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute('aria-selected', 'true');
     expect(
       [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)

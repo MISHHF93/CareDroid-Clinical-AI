@@ -232,7 +232,11 @@ export const NAVIGATION_ITEMS = Object.freeze(
             : item.label,
       activePaths:
         item.id === 'whiteboard'
-          ? [CANONICAL_ROUTES.emergencyWhiteboard, '/emergency']
+          ? [
+              CANONICAL_ROUTES.emergencyWhiteboard,
+              CANONICAL_ROUTES.emergencyCommandCenter,
+              '/emergency',
+            ]
           : item.id === 'settings'
             ? [CANONICAL_ROUTES.emergencySettings, '/settings']
             : undefined,

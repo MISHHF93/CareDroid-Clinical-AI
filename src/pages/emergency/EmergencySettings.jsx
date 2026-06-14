@@ -17,6 +17,7 @@ import {
   saveEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
 import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
+import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
@@ -470,11 +471,12 @@ export default function EmergencySettings() {
     <section className="emergency-settings" aria-label="Emergency OS settings">
       <header className="emergency-settings__hero">
         <div>
-          <span>Emergency OS Admin</span>
+          <span>{EMERGENCY_OS_BRANDING.platformLine} Admin</span>
           <h1>Emergency OS Settings</h1>
           <p>
-            Tenant identity, modules, AI, integrations, provincial health, notifications, and
-            operational thresholds.
+            Tenant identity, modules, {EMERGENCY_OS_BRANDING.aiiosName} controls, integrations,
+            provincial health, notifications, and operational thresholds.{' '}
+            {EMERGENCY_OS_BRANDING.safetyLine}
           </p>
         </div>
         <strong>
@@ -808,8 +810,8 @@ export default function EmergencySettings() {
 
       <Section
         id="ai"
-        title="AI Settings"
-        subtitle="Clinical AI availability, model routing, and human-review controls."
+        title={`${EMERGENCY_OS_BRANDING.aiiosName} Settings`}
+        subtitle="AIIOS routing, context, evidence, workflow support, and human-review controls."
         action={
           <button
             type="button"
@@ -861,7 +863,7 @@ export default function EmergencySettings() {
       <Section
         id="integrations"
         title="Integration Settings"
-        subtitle="EHR, FHIR, HL7, and device telemetry configuration."
+        subtitle="Dispatcher, EMS, EHR, FHIR, HL7, and device telemetry inputs for the shared command center picture."
         action={
           <button
             type="button"

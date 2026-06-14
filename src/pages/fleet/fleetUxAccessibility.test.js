@@ -30,7 +30,7 @@ describe('Fleet shared chrome — keyboard & landmarks', () => {
     expect(fleetPageChrome).toContain('fleet-skip-link');
     expect(fleetPageChrome).toContain('Skip to main content');
     expect(fleetPageChrome).toContain('content.focus');
-    expect(fleetPageChrome).toContain('aria-label="Back to tools catalog"');
+    expect(fleetPageChrome).toContain('aria-label="Back to operations"');
     expect(fleetPageChrome).not.toContain('<main');
     expect(fleetPageChrome).toContain('<section');
     expect(fleetPageChrome).toContain('className="fleet-page-content"');

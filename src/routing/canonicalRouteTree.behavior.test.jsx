@@ -158,6 +158,16 @@ describe('canonical route tree behavior', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });
 
+  it('/emergency/command-center renders the AIIOS command center alias', async () => {
+    renderRoute('/emergency/command-center');
+
+    expect(await findRouteHeading('Command Center')).toBeInTheDocument();
+    expect(screen.getByText(/Emergency OS powered by AIIOS/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dispatcher, EMS, device telemetry/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Board' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/command-center');
+  });
+
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
     renderRoute('/emergency/patients');
 
@@ -223,8 +233,8 @@ describe('canonical route tree behavior', () => {
   it('/emergency/copilot renders the active Copilot route context', async () => {
     renderRoute('/emergency/copilot');
 
-    expect(await screen.findByRole('heading', { name: 'ED Copilot' })).toBeInTheDocument();
-    expect(screen.getByText(/Use the docked ED Copilot/i)).toBeInTheDocument();
+    expect(await findRouteHeading('AIIOS ED Copilot')).toBeInTheDocument();
+    expect(screen.getByText(/Use the docked AIIOS ED Copilot/i)).toBeInTheDocument();
   });
 
   it('/emergency/analytics renders the Emergency OS analytics route', async () => {

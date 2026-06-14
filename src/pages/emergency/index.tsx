@@ -4,6 +4,7 @@ import { useEmergencyStore } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
+import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
@@ -162,15 +163,69 @@ export default function EmergencyWhiteboard() {
   return (
     <section style={{ minHeight: '100%', background: '#0A0E1A' }}>
       <div
-        style={{ padding: '12px 16px', borderBottom: '1px solid #1F2937', background: '#0F172A' }}
+        style={{
+          display: 'grid',
+          gap: 12,
+          padding: '16px',
+          borderBottom: '1px solid #1F2937',
+          background:
+            'linear-gradient(135deg, rgba(37,99,235,0.18), rgba(15,23,42,0.98) 44%, rgba(16,185,129,0.12))',
+        }}
       >
-        <strong style={{ color: '#F9FAFB', fontSize: 13 }}>
-          {centralControl.label} managed dashboard
-        </strong>
-        <p style={{ color: '#9CA3AF', margin: '4px 0 0', fontSize: 12 }}>
-          {centralControl.inputProfile.label} flows into{' '}
-          {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}. Rules, scenarios, and
-          dashboard state are subject to central policy.
+        <div>
+          <span
+            style={{
+              color: '#93C5FD',
+              fontSize: 11,
+              fontWeight: 900,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {EMERGENCY_OS_BRANDING.platformLine}
+          </span>
+          <h1 style={{ color: '#F9FAFB', fontSize: 28, lineHeight: 1.1, margin: '4px 0 0' }}>
+            {EMERGENCY_OS_BRANDING.commandCenterName}
+          </h1>
+          <p style={{ color: '#CBD5E1', margin: '6px 0 0', maxWidth: 920, fontSize: 13 }}>
+            {EMERGENCY_OS_BRANDING.commandCenterSummary}
+          </p>
+        </div>
+        <div
+          aria-label="AIIOS command center status"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          {[
+            `${centralControl.label} managed`,
+            `${centralControl.inputProfile.label} input`,
+            `${stats.total} active ED records`,
+            `${emsArrivals.length + emsIncomingPatients.length} EMS signals`,
+            EMERGENCY_OS_BRANDING.safetyShort,
+          ].map((item) => (
+            <span
+              key={item}
+              style={{
+                border: '1px solid rgba(148,163,184,0.22)',
+                borderRadius: 999,
+                background: 'rgba(15,23,42,0.72)',
+                color: '#E5E7EB',
+                fontSize: 12,
+                fontWeight: 750,
+                padding: '6px 10px',
+              }}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+        <p style={{ color: '#9CA3AF', margin: 0, fontSize: 12 }}>
+          {EMERGENCY_OS_BRANDING.roleFlowSummary} Inputs flow into{' '}
+          {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')} and remain subject to
+          central policy.
         </p>
       </div>
       <CapacityCrisisMode

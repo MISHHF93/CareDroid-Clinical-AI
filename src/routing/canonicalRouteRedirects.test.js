@@ -32,6 +32,7 @@ describe('canonical route tree', () => {
       { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
+      { path: '/emergency/command-center', type: 'page', componentKey: 'EmergencyWhiteboard' },
       { path: '/emergency/pulse', type: 'page', componentKey: 'DepartmentPulse' },
       { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
       { path: '/emergency/journey', type: 'page', componentKey: 'PatientJourneyRoute' },

@@ -6,6 +6,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import {
+  CANONICAL_ROUTES,
+  NON_ED_WORKSPACE_REDIRECT_ROUTES,
+  ROUTE_RECORDS,
+} from '../config/routes.config';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
@@ -18,7 +23,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const fleetDashboardSource = readFileSync(join(__dirname, '../pages/fleet/FleetDashboard.jsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -29,7 +34,7 @@ const patternsSource = readFileSync(
 
 describe('Fleet Command (fleet-command) wiring', () => {
   const id = 'fleet-command';
-  const path = '/fleet/command';
+  const path = CANONICAL_ROUTES.fleetCommand;
 
   it('is listed in PR-FLEET Tier-A audit ids', () => {
     expect(PR_FLEET_TIER_A_REGISTRY_IDS).toContain(id);
@@ -47,9 +52,16 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('registers App.jsx route', () => {
-    expect(appSource).toContain(`path: '${path}'`);
-    expect(appSource).toContain('FleetDashboard');
+  it('documents the future route while the Emergency OS shell redirects fleet paths', () => {
+    const routeRecord = ROUTE_RECORDS.find((record) => record.id === 'fleetCommand');
+    expect(routeRecord).toMatchObject({
+      path,
+      componentKey: 'FleetDashboard',
+      status: 'future',
+      navGroup: 'operations',
+    });
+    expect(fleetDashboardSource).toContain('FleetDashboard');
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

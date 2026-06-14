@@ -292,7 +292,10 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
     aiService = module.get<AIService>(AIService);
     chatService = module.get<ChatService>(ChatService);
     jest.spyOn(unifiedAIClient, 'request').mockResolvedValue({
+      ok: true,
+      status: 200,
       content: 'Default AI response',
+      data: {},
       toolCalls: [],
       usage: { inputTokens: 10, outputTokens: 5, totalTokens: 15 },
       requestType: 'COPILOT_CHAT',
@@ -347,7 +350,10 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should return response with toolCalls array', async () => {
       jest.mocked(unifiedAIClient.request).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
         content: 'I can help you calculate the SOFA score.',
+        data: {},
         toolCalls: [
           {
             id: 'call_123',
@@ -380,7 +386,10 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
       ];
 
       jest.mocked(unifiedAIClient.request).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
         content: 'I found a potential interaction.',
+        data: {},
         toolCalls: [],
         usage: { inputTokens: 200, outputTokens: 50, totalTokens: 250 },
         requestType: 'COPILOT_CHAT',

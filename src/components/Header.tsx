@@ -4,6 +4,7 @@ import { IconBell, IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, type CapacitySnapshot } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -150,9 +151,13 @@ export function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <span
           className="emergency-os-header__wordmark"
+          title={EMERGENCY_OS_BRANDING.platformLine}
           style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
         >
-          Emergency OS
+          {EMERGENCY_OS_BRANDING.productName}
+        </span>
+        <span className="emergency-os-header__aiios-pill">
+          {EMERGENCY_OS_BRANDING.aiiosName}
         </span>
         <Clock />
       </div>

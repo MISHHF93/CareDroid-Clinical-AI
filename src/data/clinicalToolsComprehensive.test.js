@@ -420,9 +420,7 @@ describe('9. Route resolution', () => {
     expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
     expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
     expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
-    expect(appSource).toContain(
-      '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
-    );
+    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
     expect(calculatorsSource).toContain(`case '${id}':`);
   });
 

@@ -112,9 +112,7 @@ function nluApplies(registryId) {
 }
 
 function appUsesRetiredToolsRedirect() {
-  return appSource.includes(
-    '<Route path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />'
-  );
+  return appSource.includes('<Route path="/tools/*" element={<ToolsRedirect />} />');
 }
 
 function appRouteRegistered(registryId, builtinSlug, regPath) {

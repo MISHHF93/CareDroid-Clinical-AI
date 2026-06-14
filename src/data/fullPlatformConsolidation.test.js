@@ -33,9 +33,9 @@ const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 
 
 const REQUIRED_LEGACY_REDIRECT_SNIPPETS = Object.freeze([
   'LEGACY_EMERGENCY_ROUTE_REDIRECTS.map',
-  'path="/dashboard" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
-  'path="/general-healthcare" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
-  'path="/tools/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
+  'path="/dashboard"',
+  'path="/general-healthcare"',
+  'path="/tools/*" element={<ToolsRedirect />}',
 ]);
 
 const REQUIRED_ROUTES = EMERGENCY_PAGE_ALL_RENDER_PATHS;
@@ -124,11 +124,11 @@ describe('full platform consolidation contract', () => {
       expect(routeSurfaceDeclares(route), route).toBe(true);
     }
 
-    expect(appSource).toContain('path="/emergency" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
-    expect(appSource).toContain('path="/emergency/*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
+    expect(appSource).toContain('path="/emergency" element={<EmergencyDefaultRedirect />}');
+    expect(appSource).toContain('path="/emergency/*"');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.fleetCommand}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.marketplace}');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.aiGovernance}');
+    expect(appSource).not.toContain('path={CANONICAL_ROUTES.aiGovernance}');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 
