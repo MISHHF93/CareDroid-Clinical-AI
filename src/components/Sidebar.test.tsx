@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { PatientFlag } from '../types/emergency';
 import { Sidebar } from './Sidebar';
 
 function renderSidebar(role: string, initialPath = '/emergency/whiteboard') {
@@ -11,6 +12,16 @@ function renderSidebar(role: string, initialPath = '/emergency/whiteboard') {
     <UserProvider>
       <MemoryRouter initialEntries={[initialPath]}>
         <Sidebar navigationItems={getVisibleNavigation(role)} />
+      </MemoryRouter>
+    </UserProvider>,
+  );
+}
+
+function renderSidebarWithDefaultNavigation(initialPath = '/emergency/whiteboard') {
+  render(
+    <UserProvider>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Sidebar />
       </MemoryRouter>
     </UserProvider>,
   );
@@ -106,6 +117,55 @@ describe('Sidebar unified navigation rendering', () => {
     }
 
     expect(new Set(iconKeys).size).toBe(iconKeys.length);
+  });
+
+  it('renders store-derived alert and reassessment badges without explicit navigation props', () => {
+    const previousPatients = useEmergencyStore.getState().patients;
+    const previousAlerts = useEmergencyStore.getState().alerts;
+    useEmergencyStore.setState({
+      patients: previousPatients.map((patient, index) => ({
+        ...patient,
+        flags:
+          index < 2
+            ? Array.from(new Set([...patient.flags, PatientFlag.ReassessmentDue]))
+            : patient.flags.filter((flag) => flag !== PatientFlag.ReassessmentDue),
+      })),
+      alerts: [
+        {
+          id: 'sidebar-capacity-alert',
+          type: 'Capacity',
+          severity: 'Warning',
+          title: 'Capacity pressure rising',
+          message: 'Capacity is above target.',
+          createdAt: new Date().toISOString(),
+          dismissed: false,
+          source: 'capacity',
+        },
+      ],
+    });
+
+    try {
+      renderSidebarWithDefaultNavigation();
+      const desktopNav = within(
+        screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
+      );
+
+      expect(
+        within(desktopNav.getByRole('link', { name: 'Whiteboard' })).getByLabelText(
+          '2 active alerts',
+        ),
+      ).toBeTruthy();
+      expect(
+        within(desktopNav.getByRole('link', { name: 'Reassess' })).getByLabelText(
+          '2 active alerts',
+        ),
+      ).toBeTruthy();
+    } finally {
+      useEmergencyStore.setState({
+        patients: previousPatients,
+        alerts: previousAlerts,
+      });
+    }
   });
 
   it('hides feature-gated navigation items when their feature is disabled', async () => {

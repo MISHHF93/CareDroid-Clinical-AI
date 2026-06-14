@@ -72,6 +72,14 @@ Strengthen active Emergency OS wiring without adding new architecture. The pass 
 - After: Patients renders a compact Patient Journey Engine status card from `usePatientJourney`, showing backend state counts and timeline-event count with local fallback.
 - Validation: Frontend typecheck, lint, focused wiring/exposure tests, frontend build, backend build, and backend Emergency OS spec passed.
 
+### 9. Multimodal Copilot Layout
+
+- Issue: The active Emergency OS Copilot composer was text-only, while existing product direction and review-scoped assets referenced richer voice/image-assisted workflows.
+- Why it matters: First-customer demo quality improves when Copilot can accept staff dictation and image context without leaving the central Emergency OS shell.
+- Before: `CopilotPanel.tsx` accepted typed text only.
+- After: `CopilotPanel.tsx` supports typed prompts, browser image attachment metadata/previews, and browser speech-recognition dictation where available. Image content is explicitly treated as human-reviewed metadata until a reviewed vision-model contract is connected.
+- Validation: Focused Copilot test, frontend typecheck, lint, and frontend build passed.
+
 ## Active Endpoint Bridge
 
 | Endpoint | Client/hook | Rendered surface |
@@ -86,7 +94,7 @@ Strengthen active Emergency OS wiring without adding new architecture. The pass 
 | `GET /api/emergency/capacity` | `useCapacityStatus` | Capacity route and header metrics. |
 | `GET /api/emergency/boarding` | `useBoardingStatus` | Boarding route. |
 | `GET /api/emergency/referrals` | `useReferrals` | Referrals route. |
-| `GET /api/emergency/copilot` | `useEDCopilot` | Copilot route/panel. |
+| `GET /api/emergency/copilot` | `useEDCopilot` | Copilot route/panel with text, image metadata, and voice dictation composer. |
 | `GET /api/emergency/analytics` | `emergencyAnalyticsApi`, store fallback | Analytics route. |
 | `GET/PATCH /api/emergency/settings` | settings clients | Settings route. |
 | `GET /api/emergency/workflow-logs` | `fetchEmergencyWorkflowLogs`, store startup hydration | Settings audit view, patient logs, and central store workflow state. |

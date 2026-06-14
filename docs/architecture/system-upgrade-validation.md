@@ -8,6 +8,7 @@ Date: 2026-06-14
 | --- | --- | --- |
 | `npm run typecheck:frontend` | Passed | Frontend TypeScript check completed with no reported errors. |
 | `npm run lint` | Passed | ESLint completed with no reported errors. |
+| `npx vitest run src/components/CopilotPanel.operationalAwareness.test.ts` | Passed | Copilot operational awareness and multimodal safety coverage passed: 1 file, 2 tests. |
 | `npx vitest run src/central-node/careDroidCentralNode.test.ts` | Passed | Central Node contract test passed: 1 file, 3 tests. |
 | `npx eslint src/pages/emergency/EmergencySettings.jsx src/pages/emergency/EmergencySettings.test.jsx src/config/backendApiCapabilities.js src/config/backendApiCapabilities.test.js src/data/frontendApiCallsInventory.js src/components/EMSPipeline.jsx src/components/ReferralPanel.jsx src/store/emergencyStore.ts` | Passed | Final focused lint after the Settings test mock update. |
 | `npx vitest run src/central-node/careDroidCentralNode.test.ts src/services/emergencyOsApi.test.js src/config/backendApiCapabilities.test.js src/pages/emergency/EmergencySettings.test.jsx src/components/R12EndToEndWiring.test.tsx src/data/backendFrontendExposure.test.js` | Passed | Focused wiring and exposure suite passed: 6 files, 46 tests. |
@@ -22,6 +23,9 @@ IDE diagnostics were checked for touched files:
 
 - `src/components/EMSPipeline.jsx`
 - `src/components/ReferralPanel.jsx`
+- `src/components/CopilotPanel.tsx`
+- `src/components/CopilotPanel.css`
+- `src/components/CopilotPanel.operationalAwareness.test.ts`
 - `src/store/emergencyStore.ts`
 - `src/App.jsx`
 - `src/config/backendApiCapabilities.js`

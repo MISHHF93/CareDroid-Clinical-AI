@@ -21,7 +21,7 @@ This pass preserves one CareDroid Emergency OS: one repository, one active Vite 
 | Capacity | `GET /api/emergency/capacity` -> `CapacityService` | `fetchCapacityStatus` -> `useCapacityStatus` -> Capacity route and central status | ACTIVE |
 | Boarding | `GET /api/emergency/boarding` -> `BoardingService` | `fetchBoardingStatus` -> `useBoardingStatus` -> Boarding route | ACTIVE |
 | Referrals | `GET /api/emergency/referrals` -> `ReferralService` | `fetchReferrals` -> `useReferrals` -> `ReferralPanel` | ACTIVE |
-| Copilot and AI Governance | `GET /api/emergency/copilot`, governance endpoints -> `EDCopilotService`, governance controllers/services | `fetchEDCopilot`, governance clients -> Copilot route/panel and Settings AI cards | ACTIVE |
+| Copilot and AI Governance | `GET /api/emergency/copilot`, governance endpoints -> `EDCopilotService`, governance controllers/services | `fetchEDCopilot`, governance clients -> Copilot route/panel with text, image metadata, and browser voice dictation; Settings AI cards | ACTIVE |
 | Analytics | `GET /api/emergency/analytics` -> `EmergencyAnalyticsService` | analytics client/store fallback -> `EmergencyAnalytics` | ACTIVE |
 | Settings | `GET/PATCH /api/emergency/settings` -> `EmergencySettingsService` | settings clients -> `EmergencySettings` | ACTIVE |
 | Workflow Audit | `GET /api/emergency/workflow-logs` -> `WorkflowActionLogService` | `fetchEmergencyWorkflowLogs` -> Settings audit and patient log merge | ACTIVE |
@@ -38,10 +38,12 @@ This pass preserves one CareDroid Emergency OS: one repository, one active Vite 
 - Runtime connectors: Integration Hub and Provincial Health remain visible through Settings runtime cards without adding routes.
 - Capability inventory: active queue/capacity endpoints are separated from optional disabled dashboard/history/analytics routes.
 - Data shape normalization: EMS and referral vitals accept current and legacy vital aliases; analytics fallback remains chart-ready.
+- Copilot multimodal UI: the active docked Copilot now accepts typed prompts, browser image attachment metadata/previews, and speech-recognition dictation without creating another assistant surface.
 
 ## Remaining MANUAL_REVIEW Items
 
 - Optional capacity dashboard/history, queue analytics, shift export, Smart Intake session APIs, referral transfer/diversion history, and advanced AI/ML automation require backend ownership, product acceptance, reliability criteria, and clinical safety review before promotion.
+- Copilot image interpretation remains guarded until a reviewed vision backend contract, model governance, audit payload, storage/retention policy, and human-review workflow are defined.
 - `src/layout/AppShell.jsx` remains a compatibility artifact; the active shell is `src/components/AppShell.tsx`.
 - `_review` future modules remain archived review material and are not active runtime dependencies.
 

@@ -14,4 +14,12 @@ describe('Copilot operational awareness wiring', () => {
     expect(source).toContain('centralSnapshot.operationalAlerts');
     expect(source).toContain('Copilot operational awareness');
   });
+
+  it('keeps multimodal inputs in the active Copilot panel with explicit vision safety boundaries', () => {
+    expect(source).toContain('CareDroid multimodal input controls');
+    expect(source).toContain('Attach image');
+    expect(source).toContain('Voice');
+    expect(source).toContain('visionModelConnected: false');
+    expect(source).toContain('Do not infer clinical findings from image attachments');
+  });
 });

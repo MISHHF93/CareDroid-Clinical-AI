@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   IconActivity,
@@ -129,29 +129,49 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const alerts = useEmergencyStore((state) => state.alerts);
+  const patients = useEmergencyStore((state) => state.patients);
   const activeAlerts = useMemo(() => alerts.filter((alert) => !alert.dismissed), [alerts]);
-  const reassessmentDueCount = useEmergencyStore(
-    (store) =>
-      store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue))
-        .length,
+  const reassessmentDueCount = useMemo(
+    () =>
+      patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
+    [patients],
   );
-  const visibleNav: readonly SidebarNavItem[] =
-    navigationItems || getVisibleNavigation(emergencyRole.role);
-  const desktopPrimaryNav = visibleNav.filter((item) => item.isEmergencyCore !== false);
-  const desktopUtilityNav = visibleNav.filter((item) => item.isEmergencyCore === false);
-  const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
-  const mobilePrimaryNav = mobilePrimaryIds
-    .map((id) => visibleNav.find((item) => item.id === id))
-    .filter((item): item is SidebarNavItem => Boolean(item));
-  const moreNav = visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
-  const moreHasActiveItem = moreNav.some((item) => isActiveRoute(location.pathname, item));
+  const visibleNav: readonly SidebarNavItem[] = useMemo(
+    () => navigationItems || getVisibleNavigation(emergencyRole.role),
+    [emergencyRole.role, navigationItems],
+  );
+  const desktopPrimaryNav = useMemo(
+    () => visibleNav.filter((item) => item.isEmergencyCore !== false),
+    [visibleNav],
+  );
+  const desktopUtilityNav = useMemo(
+    () => visibleNav.filter((item) => item.isEmergencyCore === false),
+    [visibleNav],
+  );
+  const mobilePrimaryNav = useMemo(() => {
+    const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
+    return mobilePrimaryIds
+      .map((id) => visibleNav.find((item) => item.id === id))
+      .filter((item): item is SidebarNavItem => Boolean(item));
+  }, [visibleNav]);
+  const moreNav = useMemo(() => {
+    const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
+    return visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
+  }, [visibleNav]);
+  const moreHasActiveItem = useMemo(
+    () => moreNav.some((item) => isActiveRoute(location.pathname, item)),
+    [location.pathname, moreNav],
+  );
   const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
-  const navAlertCount = (item: SidebarNavItem) => {
-    const alertCount = activeAlerts.filter((alert) => alertMatchesNavigation(alert, item)).length;
-    if (item.id === 'reassessment') return Math.max(alertCount, reassessmentDueCount);
-    if (item.id === 'whiteboard') return Math.max(alertCount, reassessmentDueCount);
-    return alertCount;
-  };
+  const navAlertCount = useCallback(
+    (item: SidebarNavItem) => {
+      const alertCount = activeAlerts.filter((alert) => alertMatchesNavigation(alert, item)).length;
+      if (item.id === 'reassessment') return Math.max(alertCount, reassessmentDueCount);
+      if (item.id === 'whiteboard') return Math.max(alertCount, reassessmentDueCount);
+      return alertCount;
+    },
+    [activeAlerts, reassessmentDueCount],
+  );
 
   const desktopNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;

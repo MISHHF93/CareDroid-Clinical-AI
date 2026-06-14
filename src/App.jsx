@@ -1272,6 +1272,8 @@ function CopilotRoute() {
       >
         Use the docked {EMERGENCY_OS_BRANDING.copilotName} to ask about who needs attention,
         capacity pressure, EMS status, or reassessment priorities.{' '}
+        The active panel supports typed prompts, browser image attachment metadata, and voice dictation
+        for staff-reviewed context.{' '}
         {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
       {cdssSignal || telephoneSignal || federatedSignal || auditSignal ? (

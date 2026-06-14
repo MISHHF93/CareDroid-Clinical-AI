@@ -18,9 +18,32 @@ type CopilotMessage = {
   role: 'staff' | 'copilot';
   content: string;
   timestamp: Date;
+  attachments?: CopilotAttachment[];
 };
 
 type StoreCopilotMessage = ReturnType<typeof useEmergencyStore.getState>['copilotMessages'][number];
+
+type CopilotAttachment = {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  previewUrl?: string;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  start: () => void;
+  stop: () => void;
+  abort?: () => void;
+  onresult: ((event: unknown) => void) | null;
+  onerror: ((event: unknown) => void) | null;
+  onend: (() => void) | null;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
 const QUICK_ACTIONS = [
   'Who needs attention?',
@@ -28,9 +51,42 @@ const QUICK_ACTIONS = [
   'EMS update',
   'Reassessment queue',
 ];
+const MAX_COPILOT_ATTACHMENTS = 3;
+const MAX_COPILOT_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function attachmentSizeLabel(size: number): string {
+  if (size < 1024 * 1024) return `${Math.max(1, Math.round(size / 1024))} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function attachmentPromptSummary(attachments: CopilotAttachment[]): string {
+  if (!attachments.length) return '';
+  return attachments
+    .map((attachment) => `${attachment.name} (${attachment.type || 'unknown type'}, ${attachmentSizeLabel(attachment.size)})`)
+    .join('; ');
+}
+
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === 'undefined') return null;
+  const candidate = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return candidate.SpeechRecognition || candidate.webkitSpeechRecognition || null;
+}
+
+function transcriptFromSpeechEvent(event: unknown): string {
+  const results = (event as { results?: ArrayLike<ArrayLike<{ transcript?: string }>> })?.results;
+  if (!results) return '';
+  return Array.from(results)
+    .flatMap((result) => Array.from(result))
+    .map((item) => item.transcript || '')
+    .join(' ')
+    .trim();
 }
 
 function waitMinutes(arrivalTime: string): number {
@@ -116,12 +172,14 @@ function buildDepartmentPrompt({
   emergencySettings,
   backendCopilotContext,
   centralSnapshot,
+  attachments,
 }: {
   patients: Patient[];
   alerts: Alert[];
   emergencySettings: ReturnType<typeof useEmergencyStore.getState>['emergencySettings'];
   backendCopilotContext?: Record<string, unknown>;
   centralSnapshot: CareDroidCentralNodeSnapshot;
+  attachments?: CopilotAttachment[];
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -129,12 +187,16 @@ function buildDepartmentPrompt({
   const activeAlerts = mergeActiveAlerts(alerts, centralSnapshot);
   const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
   const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
+  const attachmentSummary = attachmentPromptSummary(attachments || []);
 
   return [
     getAIPrompt('ed-copilot').prompt,
     HUMAN_REVIEW_DISCLAIMER,
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
     'Keep answers brief, operationally useful, and explicit about uncertainty.',
+    attachmentSummary
+      ? `Multimodal input attached: ${attachmentSummary}. Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
+      : null,
     '',
     `Patient count: ${activePatients.length}`,
     `High risk count: ${highRiskPatients.length}`,
@@ -254,8 +316,14 @@ export function CopilotPanel() {
     },
   ]);
   const [input, setInput] = useState('');
+  const [attachments, setAttachments] = useState<CopilotAttachment[]>([]);
+  const [composerStatus, setComposerStatus] = useState('');
+  const [voiceListening, setVoiceListening] = useState(false);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const attachmentsRef = useRef<CopilotAttachment[]>([]);
   const backendCopilot = useEDCopilot() as {
     data?: {
       data?: {
@@ -342,15 +410,115 @@ export function CopilotPanel() {
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
   }, [loading, messages]);
 
+  useEffect(() => {
+    attachmentsRef.current = attachments;
+  }, [attachments]);
+
+  useEffect(() => () => {
+    attachmentsRef.current.forEach((attachment) => {
+      if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+    });
+    speechRecognitionRef.current?.abort?.();
+  }, []);
+
+  const addImageAttachments = (files: FileList | null) => {
+    const imageFiles = Array.from(files || []).filter((file) => file.type.startsWith('image/'));
+    if (!imageFiles.length) {
+      setComposerStatus('Attach images only for this Copilot pass.');
+      return;
+    }
+
+    setAttachments((currentAttachments) => {
+      const remainingSlots = Math.max(0, MAX_COPILOT_ATTACHMENTS - currentAttachments.length);
+      const accepted = imageFiles
+        .filter((file) => file.size <= MAX_COPILOT_ATTACHMENT_BYTES)
+        .slice(0, remainingSlots)
+        .map((file) => ({
+          id: createId('attachment'),
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          previewUrl: URL.createObjectURL(file),
+        }));
+
+      const rejectedCount = imageFiles.length - accepted.length;
+      setComposerStatus(
+        rejectedCount > 0
+          ? 'Some images were skipped due to size or attachment limits.'
+          : 'Image context attached for human-reviewed Copilot prompt metadata.',
+      );
+      return [...currentAttachments, ...accepted];
+    });
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const removeAttachment = (attachmentId: string) => {
+    setAttachments((currentAttachments) => {
+      const attachment = currentAttachments.find((candidate) => candidate.id === attachmentId);
+      if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+      return currentAttachments.filter((candidate) => candidate.id !== attachmentId);
+    });
+  };
+
+  const startVoiceDictation = () => {
+    if (voiceListening) {
+      speechRecognitionRef.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+
+    const Recognition = getSpeechRecognitionConstructor();
+    if (!Recognition) {
+      setComposerStatus('Voice dictation is not supported by this browser.');
+      return;
+    }
+
+    const recognition = new Recognition();
+    speechRecognitionRef.current = recognition;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onresult = (event) => {
+      const transcript = transcriptFromSpeechEvent(event);
+      if (transcript) {
+        setInput((current) => (current ? `${current} ${transcript}` : transcript));
+        setComposerStatus('Voice transcript inserted for staff review before sending.');
+      }
+    };
+    recognition.onerror = () => {
+      setComposerStatus('Voice dictation stopped. Confirm microphone permission and try again.');
+      setVoiceListening(false);
+    };
+    recognition.onend = () => setVoiceListening(false);
+    setVoiceListening(true);
+    setComposerStatus('Listening. Speech text remains editable before it is sent.');
+    recognition.start();
+  };
+
   const sendMessage = async (value?: string) => {
+    const submittedAttachments = value ? [] : attachments;
     const text = (value ?? input).trim();
-    if (!text || loading) return;
+    const attachmentSummary = attachmentPromptSummary(submittedAttachments);
+    const messageAttachments = submittedAttachments.map(({ id, name, type, size }) => ({
+      id,
+      name,
+      type,
+      size,
+    }));
+    const promptText =
+      text ||
+      (attachmentSummary
+        ? `Review attached clinical image metadata: ${attachmentSummary}`
+        : '');
+    if ((!promptText && !submittedAttachments.length) || loading) return;
 
     const staffMessage: CopilotMessage = {
       id: createId('staff'),
       role: 'staff',
-      content: text,
+      content: promptText,
       timestamp: new Date(),
+      attachments: messageAttachments,
     };
     const assistantId = createId('copilot');
     const assistantMessage: CopilotMessage = {
@@ -366,15 +534,22 @@ export function CopilotPanel() {
       emergencySettings,
       backendCopilotContext,
       centralSnapshot,
+      attachments: submittedAttachments,
     });
     recordWorkflowAction({
       type: 'copilot_used',
       title: 'Copilot used',
-      summary: `ED Copilot prompt submitted: ${text.slice(0, 80)}${text.length > 80 ? '...' : ''}`,
+      summary: `ED Copilot prompt submitted: ${promptText.slice(0, 80)}${promptText.length > 80 ? '...' : ''}`,
       actorStaffId: 'current-user',
       source: 'ed-copilot-panel',
       metadata: {
-        promptLength: text.length,
+        promptLength: promptText.length,
+        multimodalAttachmentCount: submittedAttachments.length,
+        multimodalAttachmentTypes: submittedAttachments.map((attachment) => attachment.type).join(', '),
+        multimodalSafetyBoundary:
+          submittedAttachments.length > 0
+            ? 'Images are browser-preview metadata only until a reviewed vision model contract is connected.'
+            : undefined,
         activePatientCount: activePatients.length,
         capacityScore: centralSnapshot.capacityStatus.score,
         capacityBand: centralSnapshot.capacityStatus.band,
@@ -389,6 +564,10 @@ export function CopilotPanel() {
     });
 
     setInput('');
+    submittedAttachments.forEach((attachment) => {
+      if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+    });
+    setAttachments([]);
     setLoading(true);
     setMessages((currentMessages) => [...currentMessages, staffMessage, assistantMessage]);
 
@@ -398,12 +577,12 @@ export function CopilotPanel() {
           role: message.role === 'staff' ? 'user' as const : 'assistant' as const,
           content: message.content,
         })),
-        { role: 'user' as const, content: text },
+        { role: 'user' as const, content: promptText },
       ];
       const response = await callAI({
         requestType: 'COPILOT_CHAT',
         systemPrompt,
-        message: text,
+        message: promptText,
         messages: requestMessages,
         context: {
           edCopilot: {
@@ -419,6 +598,17 @@ export function CopilotPanel() {
             activeAlerts: activeOperationalAlerts.length,
             safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
             backendContext: backendCopilotContext,
+            multimodal: {
+              enabledInputs: ['text', 'image-metadata', 'voice-dictation'],
+              attachments: submittedAttachments.map((attachment) => ({
+                name: attachment.name,
+                type: attachment.type,
+                size: attachment.size,
+              })),
+              visionModelConnected: false,
+              safetyBoundary:
+                'Do not infer clinical findings from image attachments unless a reviewed vision model contract is connected.',
+            },
           },
         },
       });
@@ -432,7 +622,7 @@ export function CopilotPanel() {
       await streamIntoMessage(responseText, assistantId, setMessages);
       appendCopilotMessage({
         id: assistantId,
-        query: text,
+        query: promptText,
         response: responseText,
         safetyStatus: 'unknown',
         createdAt: assistantMessage.timestamp.toISOString(),
@@ -447,7 +637,7 @@ export function CopilotPanel() {
       );
       appendCopilotMessage({
         id: assistantId,
-        query: text,
+        query: promptText,
         response: fallbackResponse,
         safetyStatus: 'unknown',
         createdAt: assistantMessage.timestamp.toISOString(),
@@ -653,6 +843,15 @@ export function CopilotPanel() {
                 }}
               >
                 {message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)}
+                {message.attachments?.length ? (
+                  <div className="ed-copilot-panel__message-attachments">
+                    {message.attachments.map((attachment) => (
+                      <span key={attachment.id}>
+                        Image: {attachment.name} · {attachmentSizeLabel(attachment.size)}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <time style={{ color: '#6B7280', fontSize: 10 }}>
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -692,6 +891,67 @@ export function CopilotPanel() {
         ))}
       </div>
 
+      <div
+        className="ed-copilot-panel__multimodal"
+        aria-label="CareDroid multimodal input controls"
+      >
+        <div className="ed-copilot-panel__multimodal-actions">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="ed-copilot-panel__file-input"
+            onChange={(event) => addImageAttachments(event.target.files)}
+            aria-label="Attach clinical image"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || attachments.length >= MAX_COPILOT_ATTACHMENTS}
+            title="Attach an image for human-reviewed Copilot context"
+          >
+            Attach image
+          </button>
+          <button
+            type="button"
+            onClick={startVoiceDictation}
+            disabled={loading}
+            data-listening={voiceListening ? 'true' : 'false'}
+            title="Dictate text into the Copilot composer"
+          >
+            {voiceListening ? 'Stop voice' : 'Voice'}
+          </button>
+          <span>Text + image metadata + voice dictation</span>
+        </div>
+        {attachments.length ? (
+          <div className="ed-copilot-panel__attachment-tray" aria-label="Attached image previews">
+            {attachments.map((attachment) => (
+              <article key={attachment.id}>
+                {attachment.previewUrl ? (
+                  <img src={attachment.previewUrl} alt="" aria-hidden />
+                ) : null}
+                <div>
+                  <strong>{attachment.name}</strong>
+                  <span>{attachment.type || 'image'} · {attachmentSizeLabel(attachment.size)}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(attachment.id)}
+                  aria-label={`Remove ${attachment.name}`}
+                >
+                  Remove
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : null}
+        <p role="status">
+          {composerStatus ||
+            'Image content is not diagnosed here; attach for context and connect reviewed vision models before interpretation.'}
+        </p>
+      </div>
+
       <form
         onSubmit={submitMessage}
         style={{
@@ -723,7 +983,7 @@ export function CopilotPanel() {
         <button
           type="submit"
           aria-label={`Send ${EMERGENCY_OS_BRANDING.copilotName} message`}
-          disabled={loading || !input.trim()}
+          disabled={loading || (!input.trim() && attachments.length === 0)}
           style={{
             width: 36,
             height: 36,
@@ -734,8 +994,8 @@ export function CopilotPanel() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-            opacity: loading || !input.trim() ? 0.6 : 1,
+            cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer',
+            opacity: loading || (!input.trim() && attachments.length === 0) ? 0.6 : 1,
           }}
         >
           <IconSend size={17} stroke={2.2} />

@@ -1,3 +1,129 @@
+ .ed-copilot-panel__message-attachments {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ed-copilot-panel__message-attachments span {
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #0B1120;
+  color: #BFDBFE;
+  font-size: 11px;
+  padding: 5px 7px;
+}
+
+.ed-copilot-panel__multimodal {
+  display: grid;
+  flex-shrink: 0;
+  gap: 8px;
+  border-top: 1px solid #1F2937;
+  background: #0D1117;
+  padding: 10px 12px;
+}
+
+.ed-copilot-panel__multimodal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ed-copilot-panel__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.ed-copilot-panel__multimodal-actions button,
+.ed-copilot-panel__attachment-tray button {
+  border: 1px solid #374151;
+  border-radius: 10px;
+  background: #111827;
+  color: #D1D5DB;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 10px;
+}
+
+.ed-copilot-panel__multimodal-actions button:hover,
+.ed-copilot-panel__multimodal-actions button:focus-visible,
+.ed-copilot-panel__attachment-tray button:hover,
+.ed-copilot-panel__attachment-tray button:focus-visible {
+  border-color: #60A5FA;
+  outline: none;
+}
+
+.ed-copilot-panel__multimodal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.ed-copilot-panel__multimodal-actions button[data-listening='true'] {
+  border-color: #F59E0B;
+  color: #FDE68A;
+}
+
+.ed-copilot-panel__multimodal-actions span,
+.ed-copilot-panel__multimodal p {
+  color: #9CA3AF;
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.ed-copilot-panel__attachment-tray {
+  display: grid;
+  gap: 8px;
+}
+
+.ed-copilot-panel__attachment-tray article {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid #1F2937;
+  border-radius: 12px;
+  background: #0B1120;
+  padding: 8px;
+}
+
+.ed-copilot-panel__attachment-tray img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.ed-copilot-panel__attachment-tray div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ed-copilot-panel__attachment-tray strong,
+.ed-copilot-panel__attachment-tray span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ed-copilot-panel__attachment-tray strong {
+  color: #F9FAFB;
+  font-size: 12px;
+}
+
+.ed-copilot-panel__attachment-tray span {
+  color: #9CA3AF;
+  font-size: 11px;
+}
+
 @media (max-width: 1024px) {
   .ed-copilot-panel {
     position: fixed !important;
