@@ -7,8 +7,10 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  NON_ED_WORKSPACE_REDIRECT_ROUTES,
   ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
 import {
@@ -106,6 +108,16 @@ function buildProductionCorpus() {
 function parseAppRoutePaths() {
   const app = readRepoFile('src/App.jsx');
   const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+  const jsxLiteralPaths = [...app.matchAll(/<Route\b[^>]*\spath=["']([^"']+)["']/g)].map((m) => m[1]);
+  const jsxCanonicalRoutePaths = [...app.matchAll(/path=\{CANONICAL_ROUTES\.([A-Za-z0-9_]+)\}/g)]
+    .map((m) => CANONICAL_ROUTES[m[1]])
+    .filter(Boolean);
+  const canonicalTreePaths = app.includes('CANONICAL_APP_ROUTE_TREE')
+    ? CANONICAL_APP_ROUTE_TREE.map((route) => route.path)
+    : [];
+  const nonEdRedirectPaths = app.includes('NON_ED_WORKSPACE_REDIRECT_ROUTES')
+    ? NON_ED_WORKSPACE_REDIRECT_ROUTES.map((route) => route.path)
+    : [];
   const generatedAliasPaths = app.includes('ROUTE_ALIAS_REDIRECTS') ||
     app.includes('PROTECTED_ROUTE_ALIAS_REDIRECTS')
     ? ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)
@@ -125,7 +137,18 @@ function parseAppRoutePaths() {
     ...app.matchAll(/from\s+['"](\.\/pages\/[^'"]+)['"]/g),
   ].map((m) => m[1]);
   return {
-    paths: [...new Set([...directPaths, ...generatedAliasPaths, ...legacyEmergencyPaths, ...futureReleasePaths])],
+    paths: [
+      ...new Set([
+        ...directPaths,
+        ...jsxLiteralPaths,
+        ...jsxCanonicalRoutePaths,
+        ...canonicalTreePaths,
+        ...nonEdRedirectPaths,
+        ...generatedAliasPaths,
+        ...legacyEmergencyPaths,
+        ...futureReleasePaths,
+      ]),
+    ],
     redirectTargets: [...new Set(redirectTargets.filter((t) => t.startsWith('/')))],
     lazyImports: [...new Set(lazyImports)],
   };
