@@ -71,16 +71,38 @@ function patientSearchText(patient) {
     .toLowerCase();
 }
 
+function latestVitals(vitals) {
+  if (Array.isArray(vitals)) return vitals.at(-1) || null;
+  return vitals || null;
+}
+
+function vitalValue(vitals, ...keys) {
+  for (const key of keys) {
+    const value = vitals?.[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return undefined;
+}
+
 function vitalsSummary(vitals) {
-  if (!vitals) return 'Vitals unavailable';
+  const latest = latestVitals(vitals);
+  if (!latest) return 'Vitals unavailable';
+  const hr = vitalValue(latest, 'hr', 'heartRate');
+  const sbp = vitalValue(latest, 'sbp', 'bpSystolic');
+  const dbp = vitalValue(latest, 'dbp', 'bpDiastolic');
+  const spo2 = vitalValue(latest, 'spo2', 'oxygenSaturation');
+  const rr = vitalValue(latest, 'rr');
+  const temp = vitalValue(latest, 'temp', 'temperature');
+  const gcs = vitalValue(latest, 'gcs');
+  const pain = vitalValue(latest, 'pain', 'painScore');
   return [
-    `HR ${vitals.hr ?? '--'}`,
-    `BP ${vitals.bpSystolic ?? '--'}/${vitals.bpDiastolic ?? '--'}`,
-    `SpO2 ${vitals.spo2 ?? '--'}${vitals.spo2 === null || vitals.spo2 === undefined ? '' : '%'}`,
-    `RR ${vitals.rr ?? '--'}`,
-    `Temp ${vitals.temp ?? '--'}`,
-    `GCS ${vitals.gcs ?? '--'}`,
-    `Pain ${vitals.pain ?? '--'}`,
+    `HR ${hr ?? '--'}`,
+    `BP ${sbp ?? '--'}/${dbp ?? '--'}`,
+    `SpO2 ${spo2 ?? '--'}${spo2 === undefined ? '' : '%'}`,
+    `RR ${rr ?? '--'}`,
+    `Temp ${temp ?? '--'}`,
+    `GCS ${gcs ?? '--'}`,
+    `Pain ${pain ?? '--'}`,
   ].join(', ');
 }
 

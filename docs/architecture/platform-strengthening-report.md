@@ -4,26 +4,29 @@ Date: 2026-06-14
 
 ## Executive Summary
 
-CareDroid Emergency OS remains a single active platform spine. This pass found no P0 blockers and applied one safe P1 frontend upgrade that improves clinical operations usability and first-customer demo clarity without expanding architecture or product scope.
+CareDroid Emergency OS remains a single active platform spine. This expanded pass found no P0 blockers and applied five safe P1 upgrades that improve EMS handoff clarity, referral summary quality, analytics demo readiness, capability inventory accuracy, and Settings connector visibility without expanding architecture or product scope.
 
 ## What Changed
 
 | Strengthening area | Change | Pilot value |
 | --- | --- | --- |
-| Frontend stability | Kept all changes inside existing shared helpers in `src/App.jsx`. | Avoids route drift and reduces repeated state-message logic across inline operational pages. |
-| Real-time awareness | `DataSourceNote` now communicates relative freshness and stale data warnings. | Staff and demo viewers can see when local or feed data needs operational validation. |
-| Loading and empty states | Shared loading, module-empty, and patient-grid-empty states now expose status semantics. | Improves assistive technology feedback without changing workflow behavior. |
-| AppShell consistency | No shell, navigation, or route ownership changes were made. | Preserves the active one-system platform and recent workstream changes. |
+| EMS flow | `EMSPipeline` now reads existing current and legacy vital keys. | EMS rows show available BP/SpO2 context instead of false blanks. |
+| Referral flow | `ReferralPanel` now summarizes the latest vitals from patient vitals arrays/objects. | Specialty and transfer summaries become clearer without new workflow behavior. |
+| Analytics clarity | Store analytics fallback now emits the chart-ready arrays the active analytics page already renders. | Customer walkthroughs keep meaningful daily/hourly/trend/complaint visuals when backend aggregates are fixture-flat or unavailable. |
+| Backend/frontend contract | Queue and capacity capability labels now distinguish active endpoints from optional unmounted analytics/dashboard endpoints. | Contract reports no longer imply phantom routes or disabled active routes. |
+| Settings connector visibility | Settings now renders Integration Hub and Provincial Health runtime status from existing backend envelopes. | Pilot admins see connector/demo status without new pages or duplicate shells. |
+| AppShell consistency | No shell, navigation, route ownership, or route guard changes were made. | Preserves the active one-system platform and recent workstream changes. |
 | Backend correctness | No backend files were changed because no active backend P0 was found. | Avoids unnecessary API churn and preserves canonical `/api/emergency/*` contracts. |
 
 ## Applied P1 Detail
 
-The active inline pages for Patients, Queues, Reassessment, Capacity, Boarding, and Copilot share `ApiStateBanner`, `PatientGrid`, and `DataSourceNote` in `src/App.jsx`. This pass strengthened those helpers so operational pages show:
+The applied changes stay within existing Emergency OS surfaces:
 
-- status-region semantics for loading and empty states,
-- relative freshness such as `updated 3m ago`,
-- stale data warning after five minutes,
-- explicit instruction to validate stale operational data before decisions.
+- `src/components/EMSPipeline.jsx` keeps the current EMS row UI and role-aware actions, but normalizes `hr/heartRate`, `sbp/bpSystolic`, `dbp/bpDiastolic`, `spo2/oxygenSaturation`, and `gcs`.
+- `src/components/ReferralPanel.jsx` keeps the existing referral/transfer form and status workflow, but pulls the latest vital entry before building clinical summaries.
+- `src/store/emergencyStore.ts` keeps the existing analytics state and backend fallback path, but builds seven-day volume, hourly arrivals, wait trend, top complaints, and richer shift KPIs from existing store data.
+- `src/config/backendApiCapabilities.js` and `src/data/frontendApiCallsInventory.js` now align active queue/capacity endpoints with active demo capability names while keeping optional unmounted endpoints disabled.
+- `src/pages/emergency/EmergencySettings.jsx` now surfaces existing Integration Hub and Provincial Health status cards using the existing settings layout.
 
 ## P2/P3 Deferred
 
@@ -36,6 +39,7 @@ The active inline pages for Patients, Queues, Reassessment, Capacity, Boarding, 
 | Capacity/diversion/staffing action automation | P2 | Would cross into operational execution and must remain human-reviewed. |
 | Inpatient bed-management integration | P2 | Requires external bed system contract. |
 | Referral specialty/transport integration | P2 | Requires external service workflow contracts. |
+| Copilot action execution | P2 | Must remain human-reviewed and needs safety/product design. |
 | Analytics executive presentation redesign | P2 | Design and revenue narrative work should be scoped separately. |
 | Settings information architecture cleanup | P2 | Could affect configuration workflows and role expectations. |
 | Role-by-role viewport QA expansion | P3 | Useful coverage expansion, not a blocker. |
@@ -45,7 +49,7 @@ The active inline pages for Patients, Queues, Reassessment, Capacity, Boarding, 
 
 ## Residual Risks
 
-- Current analytics/settings navigation remains intentionally hidden in pilot visible nav while retained as direct routes.
+- Analytics/settings navigation remains intentionally hidden in pilot visible nav while retained as direct routes.
 - Deterministic fixtures and review-only upgrade-harness outputs are demo/pilot posture, not live EHR/EMS/bed-management integrations.
 - Existing build warnings, if still present during validation, are outside this pass unless they become failures.
 - Optional backend route overlap behind environment flags remains a separately documented one-system residual risk.

@@ -9,6 +9,8 @@ import {
   fetchEmergencyAiGovernanceCompliance,
   fetchEmergencyAiGovernanceRegistry,
   fetchEmergencyWorkflowLogs,
+  fetchIntegrationHub,
+  fetchProvincialHealth,
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 
@@ -143,6 +145,8 @@ vi.mock('../../services/emergencyOsApi', () => ({
   fetchEmergencyAiGovernanceCompliance: vi.fn(),
   fetchEmergencyAiGovernanceRegistry: vi.fn(),
   fetchEmergencyWorkflowLogs: vi.fn(),
+  fetchIntegrationHub: vi.fn(),
+  fetchProvincialHealth: vi.fn(),
   validateEmergencyAiGovernancePrompts: vi.fn(),
 }));
 
@@ -167,6 +171,26 @@ describe('EmergencySettings', () => {
           },
         ],
       },
+    });
+    fetchIntegrationHub.mockResolvedValue({
+      module: 'Integration Hub',
+      source: 'fixture',
+      data: {
+        sources: [{ id: 'ehr', label: 'EHR', status: 'manual-review' }],
+        reviewQueue: [{ id: 'integration-review', label: 'FHIR credential review' }],
+      },
+      remainingGaps: ['Live credentials are not connected.'],
+    });
+    fetchProvincialHealth.mockResolvedValue({
+      module: 'Provincial Health',
+      source: 'fixture',
+      data: {
+        connectorStatus: 'Manual review',
+        jurisdiction: 'Ontario',
+        records: [{ id: 'record-1' }],
+        disclaimer: 'External data requires manual review before use.',
+      },
+      remainingGaps: [],
     });
     fetchEmergencyAiGovernanceRegistry.mockResolvedValue({
       services: {

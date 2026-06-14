@@ -28,6 +28,7 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('reportsSchedule')).toBe(false);
     expect(isBackendCapabilityEnabled('clinicalAlertsStream')).toBe(false);
     expect(isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')).toBe(false);
+    expect(isBackendCapabilityEnabled('emergencyCapacityDashboard')).toBe(false);
     expect(isBackendCapabilityEnabled('emergencyCapacityHistory')).toBe(false);
     expect(isBackendCapabilityEnabled('emergencyQueueAnalytics')).toBe(false);
   });
@@ -47,7 +48,11 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('costOptimization')).toBe(true);
     expect(isBackendCapabilityEnabled('clinicalAlerts')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyGovernance')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyQueues')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyCapacity')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencySmartIntake')).toBe(true);
+    expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
   });
 

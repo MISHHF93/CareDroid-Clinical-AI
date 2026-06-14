@@ -4,27 +4,35 @@ Date: 2026-06-14
 
 ## Scope
 
-Validation covers the safe P1 frontend upgrade in `src/App.jsx` and the required product-harness reports. Backend validation was not run because no backend file was changed in this pass.
+Validation covers the safe P1 frontend/store/config/settings upgrades in `src/components/EMSPipeline.jsx`, `src/components/ReferralPanel.jsx`, `src/store/emergencyStore.ts`, `src/config/backendApiCapabilities.js`, `src/data/frontendApiCallsInventory.js`, `src/pages/emergency/EmergencySettings.jsx`, and the product/deep-upgrade reports. Backend source was inspected and backend commands were run because the user requested frontend/backend validation, but no backend file was changed.
 
 ## Command Results
 
 | Command | Result | Notes |
 | --- | --- | --- |
-| `npm run typecheck:frontend` | PASS | TypeScript frontend check completed. |
-| `npm run lint` | PASS | Root frontend ESLint completed. |
-| `npm run build` | PASS with warnings | Asset validation passed and Vite build completed. Existing warnings remained: circular manual chunks (`vendor`/`vendor-react`, `data-tool-registry`/`data-clinical-tools`) and `offlineService.js` static/dynamic import warning. |
-| `npx vitest run src/routing/canonicalRouteRedirects.test.js src/routing/canonicalRouteTree.behavior.test.jsx src/components/R12EndToEndWiring.test.tsx src/config/unified-navigation.config.test.ts` | PASS | 4 files and 44 tests passed. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-single-instance.ps1` | PASS | Confirmed active entrypoint, router, AppShell, Sidebar, Header, store, API facade, Nest app/controller, `/api/emergency` preference, no active `frontend/src` second app import, and no `frontend/package.json` second app. |
+| `npm run typecheck:frontend` | Passed | Frontend TypeScript check completed with no reported errors. |
+| `npm run lint` | Passed | ESLint completed with no reported errors. |
+| `npx eslint src/pages/emergency/EmergencySettings.jsx src/pages/emergency/EmergencySettings.test.jsx src/config/backendApiCapabilities.js src/config/backendApiCapabilities.test.js src/data/frontendApiCallsInventory.js src/components/EMSPipeline.jsx src/components/ReferralPanel.jsx src/store/emergencyStore.ts` | Passed | Focused lint after final Settings test mock update. |
+| `npm run build` | Passed | Vite build passed with existing circular chunk/static-dynamic import warnings. |
+| `npx vitest run src/config/backendApiCapabilities.test.js src/data/backendFrontendExposure.test.js src/services/emergencyOsApi.test.js src/config/unified-navigation.config.test.ts src/components/R12EndToEndWiring.test.tsx src/pages/emergency/EmergencySettings.test.jsx` | Passed | First run exposed stale Settings test mock; rerun passed after adding mocked `fetchIntegrationHub` and `fetchProvincialHealth`. |
+| `cd backend && npm run build` | Passed | Backend Nest build completed. |
+| `cd backend && npm test -- emergency-os.controller.spec.ts --runInBand` | Passed | Emergency OS controller spec passed: 12 tests. |
 
 ## Applied Upgrade Validation
 
 | Upgrade | Validation |
 | --- | --- |
-| Shared Emergency OS route state and freshness messaging | PASS: typecheck, lint, build, focused Vitest route/navigation tests, single-instance verification, and IDE lints for `src/App.jsx`. |
+| EMS vital field normalization | Passed command validation and focused lint. |
+| Referral summary latest-vitals normalization | Passed command validation and focused lint. |
+| Analytics fallback chart readiness | Passed command validation and focused lint. |
+| Active queue/capacity capability alignment | Passed focused frontend tests and focused lint. |
+| Integration/Provincial Health settings runtime status | Passed focused frontend tests and focused lint. |
 
 ## Manual Source Validation
 
 - Confirmed the active route helpers remain in `src/App.jsx`.
+- Confirmed the active analytics screen still reads from existing `emergencyAnalytics` store state.
+- Confirmed the active EMS and referral screens still use existing store data, role gates, and actions.
 - Confirmed no new route, shell, backend module, or API convention was introduced.
 - Confirmed no backend files were edited.
-- Confirmed IDE diagnostics report no linter errors for `src/App.jsx` after the code change.
+- Confirmed IDE diagnostics report no linter errors for touched frontend/store/config/settings/test files after the code change.

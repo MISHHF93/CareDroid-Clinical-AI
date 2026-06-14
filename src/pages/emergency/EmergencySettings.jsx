@@ -20,6 +20,8 @@ import {
   fetchEmergencyAiGovernanceCompliance,
   fetchEmergencyAiGovernanceRegistry,
   fetchEmergencyWorkflowLogs,
+  fetchIntegrationHub,
+  fetchProvincialHealth,
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
@@ -277,6 +279,12 @@ export default function EmergencySettings() {
   const [aiGovernanceRegistry, setAiGovernanceRegistry] = useState(null);
   const [aiGovernanceCompliance, setAiGovernanceCompliance] = useState(null);
   const [aiPromptValidation, setAiPromptValidation] = useState({});
+  const [integrationHubStatus, setIntegrationHubStatus] = useState('loading');
+  const [integrationHubError, setIntegrationHubError] = useState('');
+  const [integrationHubEnvelope, setIntegrationHubEnvelope] = useState(null);
+  const [provincialHealthStatus, setProvincialHealthStatus] = useState('loading');
+  const [provincialHealthError, setProvincialHealthError] = useState('');
+  const [provincialHealthEnvelope, setProvincialHealthEnvelope] = useState(null);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const thresholdTimersRef = useRef({});
@@ -342,6 +350,50 @@ export default function EmergencySettings() {
         if (cancelled) return;
         setAuditError('Workflow audit logs are temporarily unavailable.');
         setAuditStatus('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIntegrationHubStatus('loading');
+    setIntegrationHubError('');
+
+    fetchIntegrationHub()
+      .then((result) => {
+        if (cancelled) return;
+        setIntegrationHubEnvelope(result);
+        setIntegrationHubStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setIntegrationHubError('Integration Hub status is temporarily unavailable.');
+        setIntegrationHubStatus('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setProvincialHealthStatus('loading');
+    setProvincialHealthError('');
+
+    fetchProvincialHealth()
+      .then((result) => {
+        if (cancelled) return;
+        setProvincialHealthEnvelope(result);
+        setProvincialHealthStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setProvincialHealthError('Provincial Health connector status is temporarily unavailable.');
+        setProvincialHealthStatus('error');
       });
 
     return () => {
@@ -467,6 +519,11 @@ export default function EmergencySettings() {
   const copilotService = aiGovernanceRegistry?.services?.copilot || {};
   const deteriorationService = aiGovernanceRegistry?.services?.deteriorationPrediction || {};
   const federatedEmsService = aiGovernanceRegistry?.services?.federatedEmsTriage || {};
+  const integrationHubData = integrationHubEnvelope?.data || {};
+  const integrationSources = integrationHubData.sources || [];
+  const integrationReviewQueue = integrationHubData.reviewQueue || [];
+  const provincialHealthData = provincialHealthEnvelope?.data || {};
+  const provincialRecords = provincialHealthData.records || [];
 
   const updateDraft = (patch) => {
     setDraft((current) => mergeSettings(current, patch));
@@ -670,6 +727,36 @@ export default function EmergencySettings() {
           </button>
         }
       >
+        <div className="emergency-settings__cards" aria-label="Integration Hub runtime status">
+          <article>
+            <div>
+              <strong>Backend status</strong>
+              <p>
+                {integrationHubStatus === 'loading'
+                  ? 'Loading Integration Hub status...'
+                  : integrationHubStatus === 'error'
+                    ? integrationHubError
+                    : `${integrationSources.length} source(s) reported by ${integrationHubEnvelope?.module || 'Integration Hub'}.`}
+              </p>
+              <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Review queue</strong>
+              <p>
+                {integrationReviewQueue.length
+                  ? `${integrationReviewQueue.length} integration review item(s) require staff awareness.`
+                  : 'No integration review items returned.'}
+              </p>
+              <small>
+                {(integrationHubEnvelope?.remainingGaps || ['Live connector credentials remain optional.'])
+                  .slice(0, 1)
+                  .join(' ')}
+              </small>
+            </div>
+          </article>
+        </div>
         <div className="emergency-settings__grid">
           <SettingsField
             type="checkbox"
@@ -983,6 +1070,34 @@ export default function EmergencySettings() {
           </button>
         }
       >
+        <div className="emergency-settings__cards" aria-label="Provincial Health runtime status">
+          <article>
+            <div>
+              <strong>Connector status</strong>
+              <p>
+                {provincialHealthStatus === 'loading'
+                  ? 'Loading Provincial Health status...'
+                  : provincialHealthStatus === 'error'
+                    ? provincialHealthError
+                    : provincialHealthData.connectorStatus || 'Connector status unavailable'}
+              </p>
+              <small>{provincialHealthData.jurisdiction || draft.provincialHealthSettings.jurisdiction}</small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Records reviewed</strong>
+              <p>
+                {provincialRecords.length
+                  ? `${provincialRecords.length} placeholder record(s) are visible for manual review.`
+                  : 'No provincial records returned.'}
+              </p>
+              <small>
+                {provincialHealthData.disclaimer || 'External data requires manual review before use.'}
+              </small>
+            </div>
+          </article>
+        </div>
         <div className="emergency-settings__grid">
           <SettingsField
             type="checkbox"

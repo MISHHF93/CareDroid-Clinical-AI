@@ -38,13 +38,26 @@ function formatEta(remainingMinutes, status) {
   return `${remainingMinutes} min`;
 }
 
+function vitalValue(vitals, ...keys) {
+  for (const key of keys) {
+    const value = vitals?.[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return undefined;
+}
+
 function vitalsStrip(vitals) {
   if (!vitals) return ['HR --', 'BP --/--', 'SpO2 --', 'GCS --'];
+  const hr = vitalValue(vitals, 'hr', 'heartRate');
+  const sbp = vitalValue(vitals, 'sbp', 'bpSystolic');
+  const dbp = vitalValue(vitals, 'dbp', 'bpDiastolic');
+  const spo2 = vitalValue(vitals, 'spo2', 'oxygenSaturation');
+  const gcs = vitalValue(vitals, 'gcs');
   return [
-    `HR ${vitals.hr ?? '--'}`,
-    `BP ${vitals.bpSystolic ?? '--'}/${vitals.bpDiastolic ?? '--'}`,
-    `SpO2 ${vitals.spo2 ?? '--'}${vitals.spo2 === null || vitals.spo2 === undefined ? '' : '%'}`,
-    `GCS ${vitals.gcs ?? '--'}`,
+    `HR ${hr ?? '--'}`,
+    `BP ${sbp ?? '--'}/${dbp ?? '--'}`,
+    `SpO2 ${spo2 ?? '--'}${spo2 === undefined ? '' : '%'}`,
+    `GCS ${gcs ?? '--'}`,
   ];
 }
 

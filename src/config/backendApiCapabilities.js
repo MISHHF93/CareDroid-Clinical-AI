@@ -64,9 +64,10 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   reportsGenerate: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyOperationalAnalytics: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyShiftReportExport: BACKEND_CAPABILITY_STATUS.DISABLED,
-  /** Optional / absent Emergency OS routes; keep frontend clients from calling them until mounted. */
+  /** Mounted Emergency OS module envelopes under /api/emergency/*; currently fixture/demo backed. */
+  emergencyQueues: BACKEND_CAPABILITY_STATUS.DEMO,
+  emergencyCapacity: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyBoarding: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyEmsRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
   aiGovernance: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyGovernance: BACKEND_CAPABILITY_STATUS.REAL,
@@ -75,6 +76,8 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
+  /** Optional / absent Emergency OS routes; keep frontend clients from calling them until mounted. */
+  emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyCapacityHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyQueueAnalytics: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyAdvancedDecisionSupport: BACKEND_CAPABILITY_STATUS.DEMO,
