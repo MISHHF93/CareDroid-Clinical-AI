@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
@@ -41,5 +41,16 @@ describe('Header central control', () => {
     ]) {
       expect(commandContext).toHaveTextContent(label);
     }
+  });
+
+  it('opens the mounted Notification Center from the header bell', () => {
+    renderHeader();
+
+    fireEvent.click(screen.getByRole('button', { name: /notification center/i }));
+
+    const dialog = screen.getByRole('dialog', { name: /notification center/i });
+    expect(within(dialog).getByRole('heading', { name: /notification center/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /mark all read/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /close/i })).toBeInTheDocument();
   });
 });

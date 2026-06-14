@@ -832,13 +832,13 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               >
                 Mark all read
               </button>
-            <button
-              type="button"
-              onClick={() => setAlertDrawerOpen(false)}
-              aria-label="Close alerts"
-            >
-              Close
-            </button>
+              <button
+                type="button"
+                onClick={() => setAlertDrawerOpen(false)}
+                aria-label="Close alerts"
+              >
+                Close
+              </button>
             </div>
           </div>
           {loading && !notificationAlerts.length ? (
