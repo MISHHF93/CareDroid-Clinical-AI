@@ -160,6 +160,21 @@ export interface JourneyEvent {
   metadata?: Record<string, string | number | boolean | null | undefined>;
 }
 
+export type EncounterStatus = 'created' | 'active' | 'completed' | 'cancelled' | string;
+export type EncounterSource = 'smart-intake' | 'ems' | 'walk-in' | 'transfer' | 'referral' | string;
+
+export interface Encounter {
+  id: EntityId;
+  patientId: EntityId;
+  status: EncounterStatus;
+  source: EncounterSource;
+  createdAt: ISODateString;
+  currentState: PatientState;
+  timelineEventIds: EntityId[];
+  closedAt?: ISODateString;
+  metadata?: Record<string, string | number | boolean | null | undefined>;
+}
+
 export type NoteType = 'Clinical' | 'Nursing' | 'Operational' | 'Handoff' | 'Referral' | 'System' | 'Score' | 'Disposition' | string;
 
 export interface Note {
@@ -283,6 +298,8 @@ export interface EMSArrival {
   handoffSummary?: string;
   criticalChecklist?: CriticalChecklistRecord;
 }
+
+export type EMSCase = EMSArrival;
 
 export interface Patient {
   id: EntityId;
@@ -546,6 +563,21 @@ export interface Queue {
   updatedAt: ISODateString;
 }
 
+export type QueueItem = Queue;
+
+export interface QueueSummary {
+  id: EntityId;
+  label: string;
+  count: number;
+  type?: QueueType;
+  name?: string;
+  patientCount?: number;
+  oldestWaitMinutes?: number;
+  targetMinutes?: number;
+  breached?: boolean;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 export type BottleneckSeverity = 'Yellow' | 'Red';
 
 export interface BottleneckAlert {
@@ -617,6 +649,8 @@ export interface CapacitySnapshot {
   reassessmentQueueLength?: number;
 }
 
+export type CapacityStatus = CapacitySnapshot;
+
 export interface CapacityHistoryEntry {
   id: EntityId;
   timestamp: ISODateString;
@@ -626,6 +660,20 @@ export interface CapacityHistoryEntry {
   toBand?: CapacityBand;
   source?: string;
   reason?: string;
+}
+
+export type BoardingStatus =
+  | 'NotBoarded'
+  | 'Boarding'
+  | 'PendingAdmission'
+  | 'BedAssigned'
+  | 'Transferred';
+
+export interface BoardingStatusSnapshot {
+  boarders: number;
+  risk: 'normal' | 'watch' | 'strained' | 'critical';
+  longestBoardingMinutes?: number;
+  updatedAt?: ISODateString;
 }
 
 export type ReassessmentReminderStatus = 'pending' | 'completed' | 'snoozed';

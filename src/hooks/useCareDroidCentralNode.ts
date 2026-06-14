@@ -102,6 +102,7 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
       const envelope = await fetchCareDroidCentralNodeSnapshot();
       setBackendSnapshot(envelope);
       setRefreshError('');
+      dispatchWebSocketEvent({ type: 'central_node_snapshot', payload: envelope });
       setWebSocketStatus({
         status: 'connected',
         mode: 'polling',
@@ -121,7 +122,7 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
       });
       return null;
     }
-  }, [setWebSocketStatus]);
+  }, [dispatchWebSocketEvent, setWebSocketStatus]);
 
   useEffect(() => {
     if (!options.realtime) return undefined;

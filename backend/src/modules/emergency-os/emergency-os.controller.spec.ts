@@ -116,6 +116,43 @@ describe('EmergencyOsController', () => {
     expect(controller.getAnalytics().data.activeCensus).toBeGreaterThan(0);
   });
 
+  it('persists referrals through the Emergency OS referral surface', () => {
+    const createdPatient = controller.createIntakePatient({
+      mrn: 'ED-REF-1',
+      firstName: 'Referral',
+      lastName: 'Patient',
+      chiefComplaint: 'Referral workflow validation',
+      complaintCategory: 'Cardiac',
+    });
+    const createdReferral = controller.createReferral({
+      patientId: createdPatient.data.patient.id,
+      targetDepartment: 'Cardiology',
+      urgency: 'Urgent',
+      reason: 'Cardiology review requested.',
+      clinicalSummary: 'Referral workflow validation patient requires review.',
+      status: 'Sent',
+    });
+
+    expect(createdReferral).toMatchObject({
+      module: 'Referral Created',
+      data: {
+        referral: expect.objectContaining({
+          patientId: createdPatient.data.patient.id,
+          targetDepartment: 'Cardiology',
+          status: 'Sent',
+        }),
+      },
+    });
+    expect(controller.getReferrals().data.referrals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          patientId: createdPatient.data.patient.id,
+          targetDepartment: 'Cardiology',
+        }),
+      ]),
+    );
+  });
+
   it('exposes normalized workflow action logs for admin and patient timeline views', () => {
     const created = controller.createIntakePatient({
       id: 'workflow-log-patient-1',

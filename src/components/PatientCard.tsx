@@ -68,6 +68,8 @@ type StatusSignal = {
   tone: SignalTone;
 };
 
+const CLOSED_REFERRAL_STATUSES = new Set(['Closed', 'Completed', 'Declined', 'PatientDeparted']);
+
 function getSignalBadges({
   patient,
   hasReassessmentDue,
@@ -76,6 +78,9 @@ function getSignalBadges({
   hasLongWait,
   hasLwbsRisk,
   isBoarding,
+  hasReferralPending,
+  hasTransferPending,
+  hasCapacityPressure,
 }: {
   patient: Patient;
   hasReassessmentDue: boolean;
@@ -84,6 +89,9 @@ function getSignalBadges({
   hasLongWait: boolean;
   hasLwbsRisk: boolean;
   isBoarding: boolean;
+  hasReferralPending: boolean;
+  hasTransferPending: boolean;
+  hasCapacityPressure: boolean;
 }): StatusSignal[] {
   return [
     patient.flags.includes(PatientFlag.SepsisAlert)
@@ -105,6 +113,13 @@ function getSignalBadges({
     hasLongWait ? { id: 'long-wait', label: 'Long wait', tone: 'warning' as const } : null,
     hasEmsArrival ? { id: 'ems', label: 'EMS arrival', tone: 'info' as const } : null,
     isBoarding ? { id: 'boarding', label: 'Boarding', tone: 'flow' as const } : null,
+    hasTransferPending ? { id: 'transfer', label: 'Transfer pending', tone: 'flow' as const } : null,
+    !hasTransferPending && hasReferralPending
+      ? { id: 'referral', label: 'Referral pending', tone: 'info' as const }
+      : null,
+    hasCapacityPressure
+      ? { id: 'capacity-pressure', label: 'Capacity pressure', tone: 'warning' as const }
+      : null,
   ].filter(Boolean) as StatusSignal[];
 }
 
@@ -188,6 +203,10 @@ function abnormalVitalsSummary({
   return abnormal.length ? `Abnormal ${abnormal.join(', ')}.` : 'Vitals within displayed thresholds.';
 }
 
+function isOpenReferralStatus(status?: string): boolean {
+  return !CLOSED_REFERRAL_STATUSES.has(String(status || '').trim());
+}
+
 function PatientCard({
   patient: patientProp,
   keyboardSelected = false,
@@ -203,6 +222,8 @@ function PatientCard({
   const movePatientToState = useEmergencyStore((store) => store.movePatientToState);
   const addFlag = useEmergencyStore((store) => store.addFlag);
   const staff = useEmergencyStore((store) => store.staff);
+  const referrals = useEmergencyStore((store) => store.referrals);
+  const capacityBand = useEmergencyStore((store) => store.capacity.band);
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
   const patientName = `${patient.firstName} ${patient.lastName}`.trim();
   // Merged from src/components/EmergencyPatientCard.jsx: tolerate legacy vital field names.
@@ -215,6 +236,14 @@ function PatientCard({
   const hasLwbsRisk = patient.flags.includes(PatientFlag.LWBSRisk);
   const isBoarding = patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission);
   const isDischarged = patient.state === PatientState.Discharge || patient.state === PatientState.Deceased;
+  const openReferral = referrals.find(
+    (referral) => referral.patientId === patient.id && isOpenReferralStatus(referral.status),
+  );
+  const hasReferralPending = Boolean(openReferral);
+  const hasTransferPending = openReferral?.workflow === 'Transfer';
+  const hasCapacityPressure =
+    (capacityBand === 'Orange' || capacityBand === 'Red') &&
+    (isBoarding || hasLongWait || hasReassessmentDue || hasEmsArrival);
   const scores = scoreBadges(patient);
   const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
   const priorityLabel = PriorityLabel[patient.priority] || String(patient.priority);
@@ -226,6 +255,9 @@ function PatientCard({
     hasLongWait,
     hasLwbsRisk,
     isBoarding,
+    hasReferralPending,
+    hasTransferPending,
+    hasCapacityPressure,
   });
   const cardStyle = {
     '--patient-priority-color': priorityColors[patient.priority],
@@ -256,6 +288,8 @@ function PatientCard({
     hasReassessmentDue ? 'reassessment due' : '',
     hasDeteriorationRisk ? 'deterioration risk' : '',
     abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal }),
+    hasTransferPending ? 'transfer pending' : hasReferralPending ? 'referral pending' : '',
+    hasCapacityPressure ? `${capacityBand} capacity pressure` : '',
   ]
     .filter(Boolean)
     .join(', ');

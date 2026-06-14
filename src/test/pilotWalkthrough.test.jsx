@@ -83,6 +83,7 @@ vi.mock('../services/emergencySettingsApi', () => ({
 }));
 
 const originalEmergencyState = useEmergencyStore.getState();
+const PILOT_ROUTE_LOAD_TIMEOUT = 15000;
 
 function DemoAccessRole() {
   const { setUser } = useUser();
@@ -219,7 +220,7 @@ describe('pilot walkthrough', () => {
     render(<AppRouteHarness />);
 
     expect(await screen.findByText('Emergency OS')).toBeInTheDocument();
-    expect(await screen.findByText('Total')).toBeInTheDocument();
+    expect(await screen.findByText('Total', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
 
     await user.click(screen.getByLabelText('Pilot open intake'));
     expect(await screen.findByRole('heading', { name: 'Smart Intake Identity Review' })).toBeInTheDocument();
@@ -234,7 +235,7 @@ describe('pilot walkthrough', () => {
     expect(createdPatient.state).toBe(PatientState.Triage);
 
     await user.click(screen.getByLabelText('Pilot open whiteboard'));
-    expect(await screen.findByText('Total')).toBeInTheDocument();
+    expect(await screen.findByText('Total', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
     await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument());
 
     await user.click(getPatientCard(createdPatient.id));

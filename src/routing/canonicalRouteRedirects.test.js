@@ -42,6 +42,8 @@ describe('canonical route tree', () => {
       { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
       { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
       { path: '/emergency/tools', type: 'page', componentKey: 'ToolsOverview' },
+      { path: '/emergency/pulse', type: 'page', componentKey: 'EmergencyDepartmentPulse' },
+      { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
       { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
       { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
@@ -61,11 +63,14 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('<CapacityRoute />');
     expect(appSource).toContain('<CopilotRoute />');
     expect(appSource).toContain('<ToolsOverview />');
+    expect(appSource).toContain('<EmergencyDepartmentPulse />');
+    expect(appSource).toContain('<EmergencyShiftSummary />');
     expect(appSource).toContain('<EmergencyAnalytics />');
     expect(appSource).toContain('<EmergencySettings />');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyTools}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyPulse}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyPulse}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyShift}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyJourney}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencySimulation}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
@@ -101,9 +106,16 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/emergency/pulse', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/pulse', to: '/emergency/pulse' }),
+        expect.objectContaining({ path: '/shift', to: '/emergency/shift' }),
         expect.objectContaining({ path: '/emergency/simulation', to: '/emergency/whiteboard' }),
         expect.objectContaining({ path: '/emergency/calculators', to: '/emergency/tools' }),
+      ]),
+    );
+    expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/emergency/pulse', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/emergency/shift', to: '/emergency/whiteboard' }),
       ]),
     );
   });

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Bar,
   BarChart,
@@ -15,9 +16,22 @@ import {
 } from 'recharts';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
+import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
+const CENTRAL_COMMAND_METRIC_KEYS = new Set([
+  'patientsToday',
+  'waiting',
+  'longestWait',
+  'averageWait',
+  'emsInbound',
+  'reassessmentsDue',
+  'capacityScore',
+  'boarders',
+  'referralsPending',
+]);
 
 function ChartCard({ title, subtitle, children }) {
   return (
@@ -41,20 +55,36 @@ function ChartEmpty({ children }) {
 
 function analyticsSourceLabel(source) {
   if (source === 'backend') return 'Live aggregate feed';
-  if (source === 'client-fallback') return 'Walkthrough dataset';
+  if (source === 'client-fallback') return 'Walkthrough/local dataset';
   return 'Operational data';
 }
 
 function analyticsStatusMessage(message = '') {
   if (!message) return '';
   if (/fixture|demo|backend|fallback/i.test(message)) {
-    return 'Operational analytics are using the current walkthrough dataset.';
+    return 'Operational analytics are using walkthrough/local data and are not evidence of a live EHR, ADT, EMS CAD, or bed-management integration.';
   }
   return message;
 }
 
+function formatCentralFreshness(snapshot) {
+  const timestamp = snapshot.sync?.lastSyncedAt || snapshot.generatedAt;
+  const parsed = new Date(timestamp).getTime();
+  const source =
+    snapshot.sync?.source === 'backend-snapshot' ? 'backend central node' : 'local store snapshot';
+  if (!Number.isFinite(parsed)) return source;
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
+  if (elapsedMinutes < 1) return `${source} - now`;
+  if (elapsedMinutes < 60) return `${source} - ${elapsedMinutes}m ago`;
+  return `${source} - ${Math.round(elapsedMinutes / 60)}h ago`;
+}
+
 function findUpgradeSignal(signals = [], capability) {
   return signals.find((signal) => signal.capability === capability) || null;
+}
+
+function formatPressure(value = '') {
+  return String(value).charAt(0).toUpperCase() + String(value).slice(1);
 }
 
 function signalMeta(signal) {
@@ -67,6 +97,16 @@ function signalMeta(signal) {
 export default function EmergencyAnalytics() {
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
+  const centralNode = useCareDroidCentralNode({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const centralSnapshot = centralNode.snapshot;
+  const centralFreshness = formatCentralFreshness(centralSnapshot);
+  const centralCommandMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
+    CENTRAL_COMMAND_METRIC_KEYS.has(metric.key)
+  );
+  const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
+  const activeAlerts = centralSnapshot.operationalAlerts.filter((alert) => !alert.dismissed);
+  const firstBreachedQueue = breachedQueues[0];
+  const firstAlert = activeAlerts[0];
   const upgradeHarness = useAdvancedEmergencyOsUpgradeHarness();
   const data = emergencyAnalytics.data?.operationalCommand || {};
   const shift = emergencyAnalytics.data?.shift || {};
@@ -124,9 +164,100 @@ export default function EmergencyAnalytics() {
       ) : null}
       {emergencyAnalytics.status !== 'loading' && !hasOperationalData ? (
         <p className="emergency-analytics__state emergency-analytics__state--empty">
-          Operational analytics will populate when Emergency OS has active patient flow data for this department.
+          Operational analytics will populate when Emergency OS has active patient flow data for this department. Do not present empty charts as connected hospital analytics.
         </p>
       ) : null}
+
+      <section
+        className="emergency-analytics__command-layer"
+        aria-label="Central node operational command layer"
+      >
+        <header>
+          <div>
+            <span>Central Node Metrics</span>
+            <h2>Operational Command Layer</h2>
+          </div>
+          <strong>{centralFreshness}</strong>
+        </header>
+        <div className="emergency-analytics__grid">
+          {centralCommandMetrics.map((metric) => (
+            <ChartCard key={metric.key} title={metric.label} subtitle={centralFreshness}>
+              <strong>{metric.value}</strong>
+              <small className="emergency-analytics__source">Source: {metric.source}</small>
+            </ChartCard>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="emergency-analytics__command-layer"
+        aria-label="Operational awareness intelligence"
+      >
+        <header>
+          <div>
+            <span>Awareness Layer</span>
+            <h2>Operational Awareness</h2>
+          </div>
+          <strong>{centralSnapshot.sync.message}</strong>
+        </header>
+        <div className="emergency-analytics__grid">
+          <ChartCard title="Capacity" subtitle="Central node score and band">
+            <strong>{centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}</strong>
+            <small className="emergency-analytics__source">
+              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied · {centralSnapshot.capacityStatus.totalPatients} active records
+            </small>
+          </ChartCard>
+          <ChartCard title="EMS Pressure" subtitle="Inbound and critical pressure">
+            <strong>{formatPressure(centralSnapshot.emsPressure.status)}</strong>
+            <small className="emergency-analytics__source">
+              {centralSnapshot.emsPressure.inbound} inbound · {centralSnapshot.emsPressure.criticalInbound} critical
+            </small>
+          </ChartCard>
+          <ChartCard title="Boarding" subtitle="Boarding escalation state">
+            <strong>{centralSnapshot.boardingStatus.boarders}</strong>
+            <small className="emergency-analytics__source">
+              {formatPressure(centralSnapshot.boardingStatus.risk)} risk · source central node boardingStatus
+            </small>
+          </ChartCard>
+          <ChartCard title="Queue Health" subtitle="Breaches and oldest wait">
+            <strong>{breachedQueues.length}</strong>
+            <small className="emergency-analytics__source">
+              {firstBreachedQueue
+                ? `${firstBreachedQueue.label}: ${firstBreachedQueue.oldestWaitMinutes}m vs ${firstBreachedQueue.targetMinutes}m`
+                : 'No queue thresholds breached'}
+            </small>
+          </ChartCard>
+          <ChartCard title="Reassessment" subtitle="Due and overdue">
+            <strong>{centralSnapshot.reassessmentStatus.due}</strong>
+            <small className="emergency-analytics__source">
+              {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human reviewed
+            </small>
+          </ChartCard>
+          <ChartCard title="Alerts" subtitle="Active alert/escalation context">
+            <strong>{activeAlerts.length}</strong>
+            <small className="emergency-analytics__source">
+              {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
+            </small>
+          </ChartCard>
+        </div>
+      </section>
+
+      <div className="emergency-analytics__grid" aria-label="Operational hidden artifact links">
+        <ChartCard title="Department Pulse" subtitle="Live command view">
+          <strong>Queues, staff, EMS, alerts</strong>
+          <small>Compact charge-nurse view surfaced from the Emergency OS store.</small>
+          <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
+            Open Department Pulse
+          </Link>
+        </ChartCard>
+        <ChartCard title="Shift Summary" subtitle="Handoff ready">
+          <strong>Shift metrics and brief</strong>
+          <small>Generate a handoff brief from patients, referrals, capacity, alerts, and EMS data.</small>
+          <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyShift}>
+            Open Shift Summary
+          </Link>
+        </ChartCard>
+      </div>
 
       {upgradeHarness.data?.data ? (
         <div className="emergency-analytics__grid" aria-label="Advanced Emergency OS upgrade harness analytics">

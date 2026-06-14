@@ -769,6 +769,26 @@
   width: 8px;
 }
 
+.emergency-whiteboard-page__queue-intelligence {
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-background);
+  padding: 12px 16px;
+}
+
+.emergency-whiteboard-page__queue-intelligence .queue-intel {
+  height: auto;
+  min-height: 214px;
+}
+
+.emergency-whiteboard-page__queue-intelligence .queue-intel--collapsed {
+  min-height: 54px;
+}
+
+.emergency-whiteboard-page__queue-intelligence .queue-intel__rows {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  overflow: visible;
+}
+
 .emergency-whiteboard-page__grid .patient-card {
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--patient-priority-color) 10%, transparent),

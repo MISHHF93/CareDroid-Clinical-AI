@@ -50,4 +50,64 @@ describe('Emergency OS store shim', () => {
     useEmergencyStore.getState().resetThresholds();
     expect(useEmergencyStore.getState().thresholds).toEqual(DEFAULT_EMERGENCY_THRESHOLDS);
   });
+
+  it('routes realtime central node snapshots through canonical Emergency OS state', () => {
+    const store = useEmergencyStore.getState();
+    const generatedAt = '2026-06-14T06:30:00.000Z';
+    const capacity = {
+      ...store.capacity,
+      score: store.capacity.score + 1,
+      updatedAt: generatedAt,
+    };
+
+    store.dispatchWebSocketEvent({
+      type: 'central_node_snapshot',
+      payload: {
+        data: {
+          generatedAt,
+          capacityStatus: capacity,
+          operationalAlerts: [
+            {
+              id: 'alert-realtime-test',
+              type: 'Capacity',
+              severity: 'warning',
+              title: 'Capacity pressure changed',
+              message: 'Central node reported updated pressure.',
+              createdAt: generatedAt,
+              source: 'central-node',
+            },
+          ],
+          recentEvents: [
+            {
+              id: 'workflow-realtime-test',
+              type: 'capacity_score_changed',
+              title: 'Capacity score changed',
+              summary: 'Central node snapshot updated capacity score.',
+              timestamp: generatedAt,
+              source: 'central-node',
+              severity: 'Info',
+              status: 'recorded',
+              metadata: {},
+            },
+          ],
+        },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.capacity.score).toBe(capacity.score);
+    expect(next.alerts.find((alert) => alert.id === 'alert-realtime-test')).toEqual(
+      expect.objectContaining({
+        severity: 'Warning',
+        source: 'central-node',
+      }),
+    );
+    expect(next.workflowLogs.find((log) => log.id === 'workflow-realtime-test')).toEqual(
+      expect.objectContaining({
+        type: 'capacity_score_changed',
+        source: 'central-node',
+      }),
+    );
+    expect(next.websocket.lastEventAt).toEqual(expect.any(String));
+  });
 });

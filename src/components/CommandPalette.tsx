@@ -2,9 +2,11 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import type { Patient } from '../types/emergency';
 
 export type CommandGroup = 'Navigation' | 'Patient' | 'Clinical' | 'Department' | 'Settings';
@@ -18,6 +20,18 @@ export interface Command {
   keywords: string[];
   group: CommandGroup;
 }
+
+type EmergencyCommandPermissions = {
+  can: (action: string) => boolean;
+  canAccessRoute: (path: string) => boolean;
+  nearestRoute: (path: string) => string;
+};
+
+type CommandWithVisibility = Command & {
+  requiredAction?: string;
+  requiredRoute?: string;
+  hiddenInPilotMode?: boolean;
+};
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
 
@@ -245,37 +259,67 @@ function formatPatientWait(patient: Pick<Patient, 'arrivalTime'>, now: Date): st
   return minutes ? `${hours}h ${minutes}m wait` : `${hours}h wait`;
 }
 
-function navigateWithRoleGuard(navigate: ReturnType<typeof useNavigate>, path: string): void {
-  navigate(path);
+function routePermissionPath(path: string): string {
+  return path.split(/[?#]/)[0] || path;
+}
+
+function navigateWithRoleGuard(
+  navigate: ReturnType<typeof useNavigate>,
+  path: string,
+  emergencyRole: EmergencyCommandPermissions,
+): void {
+  const permissionPath = routePermissionPath(path);
+  navigate(
+    emergencyRole.canAccessRoute(permissionPath)
+      ? path
+      : emergencyRole.nearestRoute(permissionPath),
+  );
 }
 
 function dispatchDocumentEvent(name: string): void {
   document.dispatchEvent(new Event(name));
 }
 
-function createEmergencyRouteCommands(navigate: ReturnType<typeof useNavigate>): Command[] {
-  return EMERGENCY_OS_ROUTE_COMMANDS.map((command) => ({
-    id: command.id,
-    label: command.label.replace(/^Open /, ''),
-    description: `${command.label} in the active Emergency OS shell.`,
-    shortcut: command.hint ? `G ${command.hint}` : undefined,
-    group: 'Navigation',
-    keywords: command.keywords,
-    action: () => {
-      const action = command.build();
-      if (action.type === 'OPEN_ROUTE' && action.path) {
-        navigateWithRoleGuard(navigate, action.path);
-      }
-    },
-  }));
+function createEmergencyRouteCommands(
+  navigate: ReturnType<typeof useNavigate>,
+  emergencyRole: EmergencyCommandPermissions,
+): CommandWithVisibility[] {
+  return EMERGENCY_OS_ROUTE_COMMANDS.map((command) => {
+    const action = command.build();
+    return {
+      id: command.id,
+      label: command.label.replace(/^Open /, ''),
+      description: `${command.label} in the active Emergency OS shell.`,
+      shortcut: command.hint ? `G ${command.hint}` : undefined,
+      group: 'Navigation',
+      keywords: command.keywords,
+      requiredRoute: action.path,
+      action: () => {
+        if (action.type === 'OPEN_ROUTE' && action.path) {
+          navigateWithRoleGuard(navigate, action.path, emergencyRole);
+        }
+      },
+    };
+  });
+}
+
+export function isCommandVisibleForEmergencyRole(
+  command: Pick<CommandWithVisibility, 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
+  emergencyRole: EmergencyCommandPermissions,
+): boolean {
+  if (command.hiddenInPilotMode && PILOT_CUSTOMER_MODE.enabled) return false;
+  if (command.requiredAction && !emergencyRole.can(command.requiredAction)) return false;
+  if (command.requiredRoute && !emergencyRole.canAccessRoute(command.requiredRoute)) return false;
+  return true;
 }
 
 function createCommands(
   navigate: ReturnType<typeof useNavigate>,
   toggleCopilot: () => void,
+  emergencyRole: EmergencyCommandPermissions,
 ): Command[] {
-  const commands: Command[] = [
-    ...createEmergencyRouteCommands(navigate),
+  const commands: CommandWithVisibility[] = [
+    ...createEmergencyRouteCommands(navigate, emergencyRole),
     {
       id: 'new-patient',
       label: 'Create Patient',
@@ -283,8 +327,10 @@ function createCommands(
       shortcut: 'N',
       group: 'Patient',
       keywords: ['add', 'new', 'register', 'intake', 'central intake', 'patient create'],
+      requiredAction: EMERGENCY_ACTIONS.createPatient,
+      requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
       action: () => {
-        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard);
+        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole);
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
     },
@@ -294,7 +340,8 @@ function createCommands(
       description: 'Open patient search and census lookup.',
       group: 'Patient',
       keywords: ['find patient', 'lookup', 'mrn', 'search patient', 'census'],
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPatients),
+      requiredRoute: CANONICAL_ROUTES.emergencyPatients,
+      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPatients, emergencyRole),
     },
     {
       id: 'toggle-copilot',
@@ -303,6 +350,8 @@ function createCommands(
       shortcut: 'C',
       group: 'Department',
       keywords: ['copilot', 'ai', 'chat', 'assistant'],
+      requiredAction: EMERGENCY_ACTIONS.useCopilot,
+      requiredRoute: CANONICAL_ROUTES.emergencyCopilot,
       action: toggleCopilot,
     },
     {
@@ -312,6 +361,7 @@ function createCommands(
       shortcut: 'R',
       group: 'Department',
       keywords: ['reassess', 'flag', 'attention'],
+      requiredRoute: CANONICAL_ROUTES.emergencyReassessment,
       action: () => {
         dispatchDocumentEvent('open-reassessment');
         dispatchDocumentEvent('open-reassessment-drawer');
@@ -323,7 +373,10 @@ function createCommands(
       description: 'Create a referral or consult request for human review.',
       group: 'Clinical',
       keywords: ['referral', 'consult', 'transfer', 'specialty', 'send referral'],
-      action: () => navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`),
+      requiredAction: EMERGENCY_ACTIONS.manageReferral,
+      requiredRoute: CANONICAL_ROUTES.emergencyReferrals,
+      action: () =>
+        navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`, emergencyRole),
     },
     {
       id: 'discharge-selected-patient',
@@ -331,13 +384,13 @@ function createCommands(
       description: 'Open discharge confirmation for the selected patient; no autonomous discharge.',
       group: 'Clinical',
       keywords: ['discharge', 'disposition', 'send home', 'close encounter'],
+      requiredAction: EMERGENCY_ACTIONS.dischargePatient,
+      hiddenInPilotMode: true,
       action: () => dispatchDocumentEvent('open-patient-discharge'),
     },
   ];
 
-  return PILOT_CUSTOMER_MODE.enabled
-    ? commands.filter((command) => command.id !== 'discharge-selected-patient')
-    : commands;
+  return commands.filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole));
 }
 
 function buildCommandResults(
@@ -387,6 +440,7 @@ function patientInitials(label: string): string {
 
 export default function CommandPalette({ open, onClose, onExecute }: CommandPaletteProps) {
   const navigate = useNavigate();
+  const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -396,8 +450,8 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const [results, setResults] = useState<PaletteResult[]>([]);
 
   const commands = useMemo(
-    () => createCommands(navigate, toggleCopilot),
-    [navigate, toggleCopilot],
+    () => createCommands(navigate, toggleCopilot, emergencyRole),
+    [emergencyRole, navigate, toggleCopilot],
   );
 
   const computedResults = useMemo(() => {

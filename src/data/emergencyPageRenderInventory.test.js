@@ -4,6 +4,7 @@ import {
   EMERGENCY_PAGE_PRIMARY_PATHS,
   EMERGENCY_PAGE_RENDER_INVENTORY,
   EMERGENCY_PAGE_SCREENSHOT_TARGETS,
+  PATIENT_MOVEMENT_STAGES,
   getCanonicalAppPagePaths,
 } from './emergencyPageRenderInventory';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
@@ -35,6 +36,7 @@ describe('emergencyPageRenderInventory', () => {
       'Boarding',
       'Referrals',
       'Copilot',
+      'Medical Tools',
     ]);
 
     for (const item of APP_SHELL_NAV_ITEMS) {
@@ -65,5 +67,17 @@ describe('emergencyPageRenderInventory', () => {
     expect(EMERGENCY_PAGE_SCREENSHOT_TARGETS.every((target) => target.path.startsWith('/'))).toBe(
       true,
     );
+  });
+
+  it('maps every active page workflow to patient movement stages', () => {
+    const validStages = new Set(PATIENT_MOVEMENT_STAGES);
+
+    for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY) {
+      expect(entry.movementStages.length, entry.id).toBeGreaterThan(0);
+      expect(
+        entry.movementStages.every((stage) => validStages.has(stage)),
+        entry.id,
+      ).toBe(true);
+    }
   });
 });

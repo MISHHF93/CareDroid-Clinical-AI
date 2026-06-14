@@ -27,19 +27,28 @@ describe('Emergency Whiteboard navigation wiring', () => {
 
   it('wires filter chips, queue shortcuts, and view toggles to live whiteboard state', () => {
     expect(whiteboardSource).toContain('const [activeFilter, setActiveFilter]');
-    expect(whiteboardSource).toContain('onClick={() => setActiveFilter(filter)}');
+    expect(whiteboardSource).toContain('setQueueFilter(null);');
+    expect(whiteboardSource).toContain('<QueueIntelligencePanel');
+    expect(whiteboardSource).toContain('matchesActiveQueue(patient, activeQueueFilter, pendingReferralPatientIds)');
     expect(whiteboardSource).toContain('visiblePatients.map((patient)');
     expect(whiteboardSource).toContain('<WhoNextPanel');
   });
 
   it('promotes Whiteboard-first workflow launch points without duplicating workflow logic', () => {
     expect(whiteboardSource).toContain('Critical actions from the board');
+    expect(whiteboardSource).toContain('queue breaches');
+    expect(whiteboardSource).toContain('boarding risk');
+    expect(whiteboardSource).toContain('active alerts');
     expect(whiteboardSource).toContain('openReassessmentTasks');
     expect(whiteboardSource).toContain('convertEMSArrivalToPatient(arrival.id)');
     expect(whiteboardSource).toContain('openReferralWorkflow');
     expect(whiteboardSource).toContain('openQueueReview');
+    expect(whiteboardSource).toContain('Showing the {activeQueueFilter} queue on the Whiteboard.');
     expect(whiteboardSource).toContain('missionControlActions');
     expect(patientCardSource).toContain('missionControlActions?: boolean');
+    expect(patientCardSource).toContain('Referral pending');
+    expect(patientCardSource).toContain('Transfer pending');
+    expect(patientCardSource).toContain('Capacity pressure');
     expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-reassessment-drawer'))");
     expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-patient-discharge'))");
     expect(patientCardSource).toContain('movePatientToState(patient.id, PatientState.Admission');

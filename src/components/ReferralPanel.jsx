@@ -125,6 +125,23 @@ function formatElapsed(minutes) {
   return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
 }
 
+function formatFreshness(timestamp) {
+  if (!timestamp) return 'latest local queue';
+  const parsed = new Date(timestamp).getTime();
+  if (!Number.isFinite(parsed)) return 'latest local queue';
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
+  if (elapsedMinutes < 1) return 'updated now';
+  if (elapsedMinutes < 60) return `updated ${elapsedMinutes}m ago`;
+  return `updated ${Math.round(elapsedMinutes / 60)}h ago`;
+}
+
+function sourceLabel(source) {
+  if (!source) return 'local referral queue - no live referral network integration';
+  return /fixture|demo|fallback|scenario|first-customer/i.test(source)
+    ? 'walkthrough/local dataset - no live referral network integration'
+    : source;
+}
+
 function urgencyTone(urgency) {
   if (urgency === 'Emergent') return 'critical';
   if (urgency === 'Urgent') return 'warning';
@@ -300,6 +317,8 @@ export default function ReferralPanel() {
   const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
   const canManageTransfer = emergencyRole.can(EMERGENCY_ACTIONS.manageTransfer);
   const canUpdateWorkflow = canManageReferral || canManageTransfer;
+  const referralSource = sourceLabel(referralsModule.data?.source);
+  const referralFreshness = formatFreshness(referralsModule.data?.generatedAt);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30_000);
@@ -483,9 +502,8 @@ export default function ReferralPanel() {
           <span>Referral Intelligence</span>
           <h1 id="referral-panel-title">Referrals</h1>
           <p>
-            {referralsModule.data?.source
-              ? `Source: ${referralsModule.data.source}`
-              : 'Specialty requests, transfer workflows, and delay signals.'}
+            Specialty requests, transfer workflows, and delay signals. Source: {referralSource};{' '}
+            {referralFreshness}.
           </p>
         </div>
         <div className="referral-panel__header-actions">
@@ -537,9 +555,12 @@ export default function ReferralPanel() {
       ) : null}
       {referralsModule.error ? (
         <p className="referral-panel__backend-status" role="alert">
-          {referralsModule.error}. Showing the last local referral queue.
+          {referralsModule.error}. Showing the last local referral queue; confirm live referral status before external handoff.
         </p>
       ) : null}
+      <p className="referral-panel__backend-status" role="status">
+        Source: {referralSource}; {referralFreshness}. Referral rows are local Emergency OS workflow records unless a backend confirmation is shown.
+      </p>
 
       <div className="referral-panel__metrics" aria-label="Referral metrics">
         <div>
@@ -713,7 +734,7 @@ export default function ReferralPanel() {
 
       <div className="referral-panel__groups">
         {!referrals.length ? (
-          <p className="referral-group__empty">No active referrals</p>
+          <p className="referral-group__empty">No active referrals in the current Emergency OS workflow state.</p>
         ) : groupedReferrals.map((group) => (
           <section key={group.status} className="referral-group" aria-labelledby={`referrals-${group.status}`}>
             <div className="referral-group__heading">

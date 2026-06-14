@@ -4,6 +4,8 @@ import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
+import useCareDroidCentralNode from '../hooks/useCareDroidCentralNode';
+import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
@@ -61,6 +63,32 @@ function formatAlert(alert: Alert): string {
   return `${alert.severity}: ${alert.title} - ${alert.message}`;
 }
 
+function formatPressure(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function mergeActiveAlerts(alerts: Alert[], centralSnapshot: CareDroidCentralNodeSnapshot): Alert[] {
+  const byId = new Map<string, Alert>();
+  for (const alert of [...centralSnapshot.operationalAlerts, ...alerts]) {
+    if (!alert.dismissed) byId.set(alert.id, alert);
+  }
+  return Array.from(byId.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+function formatQueueHealthForPrompt(centralSnapshot: CareDroidCentralNodeSnapshot): string {
+  const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
+  if (!breachedQueues.length) return 'No queue thresholds breached.';
+  return breachedQueues
+    .slice(0, 4)
+    .map(
+      (queue) =>
+        `${queue.label}: ${queue.count} waiting, oldest ${queue.oldestWaitMinutes}m vs ${queue.targetMinutes}m target`,
+    )
+    .join('; ');
+}
+
 function summarizePatient(patient: Patient): string {
   const latestVitals = patient.vitals.at(-1);
   const vitals = latestVitals
@@ -82,22 +110,23 @@ function summarizePatient(patient: Patient): string {
 
 function buildDepartmentPrompt({
   patients,
-  capacity,
   alerts,
   emergencySettings,
   backendCopilotContext,
+  centralSnapshot,
 }: {
   patients: Patient[];
-  capacity: ReturnType<typeof useEmergencyStore.getState>['capacity'];
   alerts: Alert[];
   emergencySettings: ReturnType<typeof useEmergencyStore.getState>['emergencySettings'];
   backendCopilotContext?: Record<string, unknown>;
+  centralSnapshot: CareDroidCentralNodeSnapshot;
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
   const reassessmentQueue = activePatients.filter(isReassessmentDue);
-  const activeAlerts = alerts.filter((alert) => !alert.dismissed);
+  const activeAlerts = mergeActiveAlerts(alerts, centralSnapshot);
   const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
+  const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
 
   return [
     getAIPrompt('ed-copilot').prompt,
@@ -107,8 +136,12 @@ function buildDepartmentPrompt({
     '',
     `Patient count: ${activePatients.length}`,
     `High risk count: ${highRiskPatients.length}`,
-    `Capacity band: ${capacity.band} (${capacity.score})`,
-    `Reassessment queue count: ${reassessmentQueue.length}`,
+    `Capacity band: ${centralSnapshot.capacityStatus.band} (${centralSnapshot.capacityStatus.score})`,
+    `EMS pressure: ${centralSnapshot.emsPressure.status}; ${centralSnapshot.emsPressure.inbound} inbound, ${centralSnapshot.emsPressure.criticalInbound} critical inbound`,
+    `Boarding pressure: ${centralSnapshot.boardingStatus.risk}; ${centralSnapshot.boardingStatus.boarders} boarders`,
+    `Queue health: ${breachedQueues.length} breached queues. ${formatQueueHealthForPrompt(centralSnapshot)}`,
+    `Reassessment queue count: ${centralSnapshot.reassessmentStatus.due}; overdue ${centralSnapshot.reassessmentStatus.overdue}`,
+    `Active operational alerts: ${activeAlerts.length}`,
     longWaitAttention || null,
     '',
     'Active high risk patients:',
@@ -181,6 +214,8 @@ export function CopilotPanel() {
   const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
   const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
+  const centralNode = useCareDroidCentralNode({ screenMode: 'PHYSICIAN_SCREEN' });
+  const centralSnapshot = centralNode.snapshot;
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: 'copilot-welcome',
@@ -212,6 +247,49 @@ export function CopilotPanel() {
   const activePatients = useMemo(() => patients.filter(isActivePatient), [patients]);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
   const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
+  const activeOperationalAlerts = useMemo(
+    () => mergeActiveAlerts(alerts, centralSnapshot),
+    [alerts, centralSnapshot],
+  );
+  const breachedQueues = useMemo(
+    () => centralSnapshot.queueHealth.filter((queue) => queue.breached),
+    [centralSnapshot.queueHealth],
+  );
+  const firstBreachedQueue = breachedQueues[0];
+  const awarenessCards = [
+    {
+      label: 'Capacity',
+      value: `${centralSnapshot.capacityStatus.score} ${centralSnapshot.capacityStatus.band}`,
+      detail: `Updated ${centralSnapshot.capacityStatus.updatedAt ? new Date(centralSnapshot.capacityStatus.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'locally'}`,
+    },
+    {
+      label: 'EMS',
+      value: formatPressure(centralSnapshot.emsPressure.status),
+      detail: `${centralSnapshot.emsPressure.inbound} inbound, ${centralSnapshot.emsPressure.criticalInbound} critical`,
+    },
+    {
+      label: 'Boarding',
+      value: `${centralSnapshot.boardingStatus.boarders}`,
+      detail: `${formatPressure(centralSnapshot.boardingStatus.risk)} risk`,
+    },
+    {
+      label: 'Queues',
+      value: `${breachedQueues.length}`,
+      detail: firstBreachedQueue
+        ? `${firstBreachedQueue.label} ${firstBreachedQueue.oldestWaitMinutes}m`
+        : 'No breaches',
+    },
+    {
+      label: 'Reassess',
+      value: `${centralSnapshot.reassessmentStatus.due}`,
+      detail: `${centralSnapshot.reassessmentStatus.overdue} overdue`,
+    },
+    {
+      label: 'Alerts',
+      value: `${activeOperationalAlerts.length}`,
+      detail: activeOperationalAlerts[0]?.title || 'All clear',
+    },
+  ];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
@@ -237,10 +315,10 @@ export function CopilotPanel() {
     const history = messages;
     const systemPrompt = buildDepartmentPrompt({
       patients,
-      capacity,
       alerts,
       emergencySettings,
       backendCopilotContext,
+      centralSnapshot,
     });
     recordWorkflowAction({
       type: 'copilot_used',
@@ -251,9 +329,15 @@ export function CopilotPanel() {
       metadata: {
         promptLength: text.length,
         activePatientCount: activePatients.length,
-        capacityScore: capacity.score,
-        capacityBand: capacity.band,
-        reassessmentQueueCount: reassessmentCount,
+        capacityScore: centralSnapshot.capacityStatus.score,
+        capacityBand: centralSnapshot.capacityStatus.band,
+        emsPressure: centralSnapshot.emsPressure.status,
+        emsInbound: centralSnapshot.emsPressure.inbound,
+        boardingRisk: centralSnapshot.boardingStatus.risk,
+        boarders: centralSnapshot.boardingStatus.boarders,
+        breachedQueues: breachedQueues.length,
+        reassessmentQueueCount: centralSnapshot.reassessmentStatus.due,
+        activeAlerts: activeOperationalAlerts.length,
       },
     });
 
@@ -280,8 +364,12 @@ export function CopilotPanel() {
             highRiskCount,
             capacityBand: capacity.band,
             capacityScore: capacity.score,
-            reassessmentQueueCount: reassessmentCount,
-            activeAlerts: alerts.filter((alert) => !alert.dismissed).length,
+            emsPressure: centralSnapshot.emsPressure,
+            boardingStatus: centralSnapshot.boardingStatus,
+            queueHealth: centralSnapshot.queueHealth,
+            reassessmentStatus: centralSnapshot.reassessmentStatus,
+            reassessmentQueueCount: centralSnapshot.reassessmentStatus.due,
+            activeAlerts: activeOperationalAlerts.length,
             safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
             backendContext: backendCopilotContext,
           },
@@ -439,6 +527,43 @@ export function CopilotPanel() {
               : `Backend safety policy: ${backendSafetyRule}`}
           </div>
         ) : null}
+        <section
+          aria-label="Copilot operational awareness"
+          style={{
+            border: '1px solid #1F2937',
+            borderRadius: 12,
+            background: '#0B1120',
+            display: 'grid',
+            gap: 8,
+            padding: 10,
+          }}
+        >
+          <strong style={{ color: '#F9FAFB', fontSize: 12 }}>Operational awareness</strong>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {awarenessCards.map((card) => (
+              <div
+                key={card.label}
+                style={{
+                  border: '1px solid #1F2937',
+                  borderRadius: 10,
+                  background: '#111827',
+                  display: 'grid',
+                  gap: 2,
+                  minWidth: 0,
+                  padding: 8,
+                }}
+              >
+                <span style={{ color: '#9CA3AF', fontSize: 10, fontWeight: 800, textTransform: 'uppercase' }}>
+                  {card.label}
+                </span>
+                <strong style={{ color: '#F9FAFB', fontSize: 14 }}>{card.value}</strong>
+                <small style={{ color: '#9CA3AF', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {card.detail}
+                </small>
+              </div>
+            ))}
+          </div>
+        </section>
         {messages.map((message) => {
           const isStaff = message.role === 'staff';
           return (

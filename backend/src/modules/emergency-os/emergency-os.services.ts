@@ -1026,6 +1026,8 @@ export class BoardingService {
 export class ReferralService {
   constructor(private readonly patientService: EmergencyPatientService) {}
 
+  private readonly createdReferrals: Array<Record<string, unknown>> = [];
+
   getReferrals() {
     const patients = this.patientService
       .listPatients()
@@ -1033,22 +1035,53 @@ export class ReferralService {
         (patient) => patient.state === 'Disposition' || isBoarding(patient) || isHighRisk(patient),
       );
     return envelope('Referral Intelligence', {
-      referrals: patients.map((patient, index) => ({
-        id: `ref-${patient.id}`,
-        patient,
-        specialty:
-          patient.complaintCategory === 'Cardiac'
-            ? 'Cardiology'
-            : patient.complaintCategory === 'Mental Health'
-              ? 'Psychiatry'
-              : index % 2
-                ? 'Internal Medicine'
-                : 'Surgery',
-        status: patient.flags.includes('PendingAdmission')
-          ? 'accepted-waiting-bed'
-          : 'review-needed',
-        elapsedMinutes: minutesSince(patient.arrivalTime),
-      })),
+      referrals: [
+        ...patients.map((patient, index) => ({
+          id: `ref-${patient.id}`,
+          patient,
+          specialty:
+            patient.complaintCategory === 'Cardiac'
+              ? 'Cardiology'
+              : patient.complaintCategory === 'Mental Health'
+                ? 'Psychiatry'
+                : index % 2
+                  ? 'Internal Medicine'
+                  : 'Surgery',
+          status: patient.flags.includes('PendingAdmission')
+            ? 'accepted-waiting-bed'
+            : 'review-needed',
+          elapsedMinutes: minutesSince(patient.arrivalTime),
+        })),
+        ...this.createdReferrals,
+      ],
+    });
+  }
+
+  createReferral(input: Record<string, unknown>) {
+    const patientId = String(input.patientId || '');
+    const patient = this.patientService.listPatients().find((candidate) => candidate.id === patientId);
+    const now = new Date().toISOString();
+    const referral = {
+      id: String(input.id || `ref-${patientId || 'patient'}-${Date.now()}`),
+      patientId,
+      patient,
+      requestingStaffId: String(input.requestingStaffId || 'system-referrals'),
+      targetDepartment: String(input.targetDepartment || 'Other'),
+      specialty: String(input.targetDepartment || input.specialty || 'Other'),
+      urgency: String(input.urgency || 'Routine'),
+      reason: String(input.reason || 'Referral requested from Emergency OS.'),
+      clinicalSummary: String(input.clinicalSummary || input.reason || 'Clinical summary pending.'),
+      status: String(input.status || 'Sent'),
+      workflow: String(input.workflow || 'Referral'),
+      requestedAt: String(input.requestedAt || now),
+      createdAt: now,
+    };
+
+    this.createdReferrals.push(referral);
+
+    return envelope('Referral Created', {
+      referral,
+      referrals: this.getReferrals().data.referrals,
     });
   }
 }

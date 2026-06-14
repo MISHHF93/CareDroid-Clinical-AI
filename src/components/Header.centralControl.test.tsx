@@ -32,6 +32,7 @@ describe('Header central control', () => {
       'Patients Today',
       'Waiting',
       'Longest Wait',
+      'Average Wait',
       'EMS Inbound',
       'Reassessments Due',
       'Capacity Score',

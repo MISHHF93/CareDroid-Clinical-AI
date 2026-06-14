@@ -139,6 +139,9 @@ describe('CareDroidCentralNode contract', () => {
     expect(snapshot.operationalSummary.metrics.map((metric) => metric.key)).toEqual(
       expect.arrayContaining(['capacityScore', 'emsInbound', 'reassessmentsDue']),
     );
+    expect(snapshot.queueHealth.map((queue) => queue.id)).toEqual(
+      expect.arrayContaining(['referral', 'discharge', 'reassessment']),
+    );
   });
 
   it('harmonizes the backend central-node envelope into the visible operational snapshot', () => {
@@ -216,6 +219,7 @@ describe('CareDroidCentralNode contract', () => {
       activePatients: 14,
       waitingPatients: 6,
       longestWait: 88,
+      averageWait: 42,
       capacityBand: 'Red',
       activeAlerts: 1,
     });
@@ -240,6 +244,7 @@ describe('CareDroidCentralNode contract', () => {
     });
     expect(snapshot.operationalSummary.metrics).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({ key: 'averageWait', value: '42m' }),
         expect.objectContaining({ key: 'capacityScore', value: '91 Red' }),
         expect.objectContaining({ key: 'emsInbound', value: 3 }),
         expect.objectContaining({ key: 'reassessmentsDue', value: 5 }),

@@ -1,115 +1,101 @@
 import { CANONICAL_ROUTES } from './routes.config';
-import { isPilotCustomerVisibleNavItemId } from './unified-navigation.config';
+import {
+  NAVIGATION_ITEMS,
+  getPilotCustomerNavigationItems,
+} from './unified-navigation.config';
 
-const EMERGENCY_OS_ROUTE_COMMAND_DEFINITIONS = Object.freeze([
-  {
-    id: 'open-whiteboard',
-    navItemId: 'whiteboard',
+const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
+  whiteboard: {
     label: 'Open Whiteboard',
     hint: 'W',
     keywords: ['whiteboard', 'board', 'patient flow', 'operational screen'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyWhiteboard }),
   },
-  {
-    id: 'open-patients',
-    navItemId: 'patients',
+  patients: {
     label: 'Open Patients',
     hint: 'P',
     keywords: ['patients', 'patient list', 'snapshots'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyPatients }),
   },
-  {
-    id: 'open-ems',
-    navItemId: 'ems',
+  ems: {
     label: 'Open EMS',
     hint: 'E',
     keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyEms }),
   },
-  {
-    id: 'open-intake',
-    navItemId: 'intake',
+  intake: {
     label: 'Open Intake',
     hint: 'I',
     keywords: ['intake', 'arrival', 'identity', 'registration', 'ocr'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyIntake }),
   },
-  {
-    id: 'open-queues',
-    navItemId: 'queues',
+  queues: {
     label: 'Open Queues',
     hint: 'Q',
     keywords: ['queues', 'queue intelligence', 'waiting', 'who next'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyQueues }),
   },
-  {
-    id: 'open-reassessment',
-    navItemId: 'reassessment',
+  reassessment: {
     label: 'Open Reassessment',
     hint: 'R',
     keywords: ['reassessment', 'due', 'safety', 'review'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyReassessment }),
   },
-  {
-    id: 'open-capacity',
-    navItemId: 'capacity',
+  capacity: {
     label: 'Open Capacity',
     hint: 'C',
     keywords: ['capacity', 'rooms', 'pressure', 'occupancy'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyCapacity }),
   },
-  {
-    id: 'open-boarding',
-    navItemId: 'boarding',
+  boarding: {
     label: 'Open Boarding',
     hint: 'B',
     keywords: ['boarding', 'admission pending', 'boarders'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyBoarding }),
   },
-  {
-    id: 'open-referrals',
-    navItemId: 'referrals',
+  referrals: {
     label: 'Open Referrals',
     hint: 'Ref',
     keywords: ['referrals', 'consults', 'transfer', 'specialty'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyReferrals }),
   },
-  {
-    id: 'open-copilot',
-    navItemId: 'copilot',
+  copilot: {
     label: 'Open Copilot',
     hint: 'AI',
     keywords: ['copilot', 'assistant', 'ai', 'chat'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyCopilot }),
   },
-  {
-    id: 'open-tools',
-    navItemId: 'tools',
+  tools: {
     label: 'Open Medical Tools',
     hint: 'T',
     keywords: ['medical tools', 'tools', 'clinical tools', 'calculators', 'scores'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyTools }),
+  },
+});
+
+function routeCommandFromNavigationItem(item) {
+  const metadata = ROUTE_COMMAND_METADATA_BY_NAV_ID[item.id] || {};
+  return Object.freeze({
+    id: `open-${item.id}`,
+    navItemId: item.id,
+    label: metadata.label || `Open ${item.label}`,
+    hint: metadata.hint,
+    keywords: metadata.keywords || [item.label.toLowerCase(), item.id],
+    build: () => ({ type: 'OPEN_ROUTE', path: item.path }),
+  });
+}
+
+const RETAINED_DIRECT_ROUTE_COMMANDS = Object.freeze([
+  {
+    id: 'open-pulse',
+    navItemId: 'pulse',
+    label: 'Open Department Pulse',
+    hint: 'Pulse',
+    keywords: ['pulse', 'department pulse', 'status strip', 'mission control', 'charge nurse'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyPulse }),
   },
   {
-    id: 'open-analytics',
-    navItemId: 'analytics',
-    label: 'Open Analytics',
-    hint: 'A',
-    keywords: ['analytics', 'throughput', 'metrics', 'trends'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyAnalytics }),
-  },
-  {
-    id: 'open-settings',
-    navItemId: 'settings',
-    label: 'Open Settings',
-    hint: 'S',
-    keywords: ['settings', 'thresholds', 'staff', 'configuration'],
-    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencySettings }),
+    id: 'open-shift',
+    navItemId: 'shift',
+    label: 'Open Shift Summary',
+    hint: 'Shift',
+    keywords: ['shift', 'shift summary', 'handoff', 'brief', 'handover'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyShift }),
   },
 ]);
 
 export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
-  EMERGENCY_OS_ROUTE_COMMAND_DEFINITIONS.filter((command) =>
-    isPilotCustomerVisibleNavItemId(command.navItemId),
-  ),
+  [
+    ...getPilotCustomerNavigationItems(NAVIGATION_ITEMS).map(routeCommandFromNavigationItem),
+    ...RETAINED_DIRECT_ROUTE_COMMANDS,
+  ],
 );

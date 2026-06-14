@@ -22,8 +22,8 @@ import {
   IconUsers,
   type Icon,
 } from '@tabler/icons-react';
-import { PatientFlag } from '../types/emergency';
-import { useEmergencyStore } from '../store/emergencyStore';
+import { PatientFlag, type Alert } from '../types/emergency';
+import { selectActiveAlerts, useEmergencyStore } from '../store/emergencyStore';
 import {
   getVisibleNavigation,
   resolveFeatureGate,
@@ -109,12 +109,26 @@ function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
   );
 }
 
+function alertMatchesNavigation(alert: Alert, item: SidebarNavItem): boolean {
+  const id = item.id.toLowerCase();
+  const text = `${alert.type || ''} ${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
+  if (id === 'whiteboard') return true;
+  if (id.includes('capacity')) return text.includes('capacity');
+  if (id.includes('ems')) return text.includes('ems');
+  if (id.includes('boarding')) return text.includes('boarding') || text.includes('boarder');
+  if (id.includes('reassessment')) return text.includes('reassessment') || text.includes('reassess');
+  if (id.includes('referral')) return text.includes('referral') || text.includes('transfer');
+  if (id.includes('queue')) return text.includes('queue') || text.includes('wait');
+  return false;
+}
+
 export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
   const emergencyRole = useEmergencyRolePermissions();
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
+  const activeAlerts = useEmergencyStore(selectActiveAlerts);
   const reassessmentDueCount = useEmergencyStore(
     (store) =>
       store.patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue))
@@ -131,11 +145,17 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const moreNav = visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
   const moreHasActiveItem = moreNav.some((item) => isActiveRoute(location.pathname, item));
   const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
+  const navAlertCount = (item: SidebarNavItem) => {
+    const alertCount = activeAlerts.filter((alert) => alertMatchesNavigation(alert, item)).length;
+    if (item.id === 'reassessment') return Math.max(alertCount, reassessmentDueCount);
+    if (item.id === 'whiteboard') return Math.max(alertCount, reassessmentDueCount);
+    return alertCount;
+  };
 
   const desktopNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
     const active = isActiveRoute(location.pathname, item);
-    const isWhiteboard = item.id === 'whiteboard';
+    const alertCount = navAlertCount(item);
     const navLink = (
       <Link
         key={item.id}
@@ -155,12 +175,12 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         data-icon-key={item.icon}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
-        {isWhiteboard && reassessmentDueCount > 0 ? (
+        {alertCount > 0 ? (
           <span
             className="sidebar-nav-item__badge"
-            aria-label={`${reassessmentDueCount} reassessments due`}
+            aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
           >
-            {reassessmentDueCount}
+            {alertCount}
           </span>
         ) : null}
         <span className="sidebar-nav-item__tooltip">{item.label}</span>
@@ -181,6 +201,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
     const active = isActiveRoute(location.pathname, item);
     const label = item.id === 'whiteboard' ? 'Whiteboard' : item.mobileLabel || item.label;
+    const alertCount = navAlertCount(item);
     const navLink = (
       <Link
         key={item.id}
@@ -194,6 +215,14 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         onClick={() => setMoreOpen(false)}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+        {alertCount > 0 ? (
+          <span
+            className="sidebar-nav-item__badge"
+            aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
+          >
+            {alertCount}
+          </span>
+        ) : null}
         <label>{label}</label>
       </Link>
     );
@@ -290,6 +319,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
               {moreNav.map((item) => {
                 const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
                 const active = isActiveRoute(location.pathname, item);
+                const alertCount = navAlertCount(item);
                 const navLink = (
                   <Link
                     key={item.id}
@@ -306,6 +336,14 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                   >
                     <IconComponent size={18} stroke={2} />
                     <span>{item.label}</span>
+                    {alertCount > 0 ? (
+                      <span
+                        className="sidebar-nav-item__badge"
+                        aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
+                      >
+                        {alertCount}
+                      </span>
+                    ) : null}
                   </Link>
                 );
                 const featureGate = resolveFeatureGate(item.featureGate);

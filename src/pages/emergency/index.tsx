@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } from '../../types/emergency';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
+import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
@@ -13,6 +14,7 @@ import QuickIntake from '../../components/QuickIntake';
 import WhoNextPanel from '../../components/WhoNextPanel';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import CapacityCrisisMode from '../../components/CapacityCrisisMode';
+import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
 import '../../components/EmergencyWhiteboard.css';
 
@@ -26,6 +28,26 @@ type UpgradeHarnessSignal = {
 };
 
 const FILTERS: FilterId[] = ['All', 'Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding'];
+const CLOSED_REFERRAL_STATUSES = new Set(['Closed', 'Completed', 'Declined', 'PatientDeparted']);
+const WHITEBOARD_COMMAND_METRIC_ROUTES: Record<EmergencyOperationalMetricKey, string> = {
+  patientsToday: CANONICAL_ROUTES.emergencyPatients,
+  waiting: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
+  longestWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
+  averageWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
+  emsInbound: CANONICAL_ROUTES.emergencyEms,
+  reassessmentsDue: CANONICAL_ROUTES.emergencyReassessment,
+  capacityScore: CANONICAL_ROUTES.emergencyCapacity,
+  boarders: CANONICAL_ROUTES.emergencyBoarding,
+  referralsPending: CANONICAL_ROUTES.emergencyReferrals,
+};
+const WHITEBOARD_COMMAND_METRIC_KEYS = new Set<EmergencyOperationalMetricKey>([
+  'patientsToday',
+  'averageWait',
+  'emsInbound',
+  'capacityScore',
+  'boarders',
+  'referralsPending',
+]);
 
 function isHighRisk(patient: Patient): boolean {
   return (
@@ -50,6 +72,36 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   if (activeFilter === 'High Risk') return isHighRisk(patient);
   if (activeFilter === 'EMS') return patient.flags.includes(PatientFlag.EMSArrival);
   if (activeFilter === 'Boarding') return isBoarding(patient);
+  return true;
+}
+
+function isOpenReferralStatus(status?: string): boolean {
+  return !CLOSED_REFERRAL_STATUSES.has(String(status || '').trim());
+}
+
+function matchesActiveQueue(
+  patient: Patient,
+  activeQueueFilter: string | null,
+  pendingReferralPatientIds: Set<string>,
+): boolean {
+  if (!activeQueueFilter) return true;
+  const filter = activeQueueFilter.trim().toLowerCase();
+
+  if (filter === 'waiting') return patient.state === PatientState.Waiting;
+  if (filter === 'triage') return patient.state === PatientState.Triage;
+  if (filter === 'provider' || filter === 'assessment') return patient.state === PatientState.Assessment;
+  if (filter === 'results') return patient.state === PatientState.Results;
+  if (filter === 'admission' || filter === 'boarding') return isBoarding(patient);
+  if (filter === 'referral') return pendingReferralPatientIds.has(patient.id);
+  if (filter === 'discharge') return patient.state === PatientState.Disposition;
+  if (filter === 'reassessment') {
+    return (
+      patient.flags.includes(PatientFlag.ReassessmentDue) ||
+      patient.flags.includes(PatientFlag.DeteriorationRisk) ||
+      patient.flags.includes(PatientFlag.SepsisAlert)
+    );
+  }
+
   return true;
 }
 
@@ -125,6 +177,10 @@ function patientName(patient: Patient): string {
   return `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
 }
 
+function routePermissionPath(path: string): string {
+  return path.split(/[?#]/)[0] || path;
+}
+
 function capacityTone(band?: string): 'success' | 'warning' | 'critical' | 'info' {
   if (band === 'Red') return 'critical';
   if (band === 'Orange' || band === 'Yellow') return 'warning';
@@ -197,6 +253,7 @@ export default function EmergencyWhiteboard() {
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
+  const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const centralControlSettings = useEmergencyStore(
@@ -226,6 +283,7 @@ export default function EmergencyWhiteboard() {
   const capacity = whiteboardPayload?.capacity || storeCapacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
+  const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [toast, setToast] = useState('');
   const [clockTick, setClockTick] = useState(() => Date.now());
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
@@ -241,6 +299,12 @@ export default function EmergencyWhiteboard() {
       }),
     [centralControlSettings, emergencyRole],
   );
+  const centralNode = useCareDroidCentralNode({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const centralSnapshot = centralNode.snapshot;
+  const commandLayerMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
+    WHITEBOARD_COMMAND_METRIC_KEYS.has(metric.key),
+  );
+  const breachedQueueCount = centralSnapshot.queueHealth.filter((queue) => queue.breached).length;
   const canUseCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
@@ -287,12 +351,26 @@ export default function EmergencyWhiteboard() {
     };
   }, [capacity.reassessmentDue, capacity.reassessmentDueCount, patients]);
 
+  const pendingReferralPatientIds = useMemo(
+    () =>
+      new Set(
+        referrals
+          .filter((referral) => isOpenReferralStatus(referral.status))
+          .map((referral) => referral.patientId),
+      ),
+    [referrals],
+  );
+
   const visiblePatients = useMemo(
     () =>
       patients
-        .filter((patient) => filterPatient(patient, activeFilter))
+        .filter((patient) =>
+          activeQueueFilter
+            ? matchesActiveQueue(patient, activeQueueFilter, pendingReferralPatientIds)
+            : filterPatient(patient, activeFilter),
+        )
         .sort(sortWhiteboardPatients),
-    [activeFilter, patients],
+    [activeFilter, activeQueueFilter, patients, pendingReferralPatientIds],
   );
 
   useEffect(() => {
@@ -327,10 +405,11 @@ export default function EmergencyWhiteboard() {
   }, [canUseCentralIntake]);
 
   const openRoute = useCallback((path: string) => {
+    const permissionPath = routePermissionPath(path);
     navigate(
-      emergencyRole.canAccessRoute(path)
+      emergencyRole.canAccessRoute(permissionPath)
         ? path
-        : emergencyRole.nearestRoute(path),
+        : emergencyRole.nearestRoute(permissionPath),
     );
   }, [emergencyRole, navigate]);
 
@@ -346,8 +425,7 @@ export default function EmergencyWhiteboard() {
       setActiveFilter(queue);
       setQueueFilter(queue);
     }
-    openRoute(CANONICAL_ROUTES.emergencyQueues);
-  }, [openRoute, setQueueFilter]);
+  }, [setQueueFilter]);
 
   const openReassessmentTasks = useCallback((patientId?: string) => {
     if (patientId) selectPatient(patientId);
@@ -423,6 +501,9 @@ export default function EmergencyWhiteboard() {
             `Updated ${formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}`,
             `${stats.total} active ED records`,
             `${emsArrivals.length + emsIncomingPatients.length} EMS signals`,
+            `${breachedQueueCount} queue breaches`,
+            `${centralSnapshot.boardingStatus.risk} boarding risk`,
+            `${centralSnapshot.currentDepartmentStatus.activeAlerts} active alerts`,
             `${wearableAlertCount} IoMT review alerts`,
             `${virtualVisitCandidateCount} VVT candidates`,
             EMERGENCY_OS_BRANDING.safetyShort,
@@ -457,6 +538,78 @@ export default function EmergencyWhiteboard() {
         emsArrivals={emsArrivals}
         emsIncomingPatients={emsIncomingPatients}
       />
+      <section
+        aria-label="Operational command layer metrics"
+        style={{
+          display: 'grid',
+          gap: 10,
+          padding: '12px 16px',
+          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
+          background: 'var(--color-surface, #111827)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+          <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>
+            Operational command layer
+          </strong>
+          <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12, fontWeight: 750 }}>
+            {centralSnapshot.sync.source === 'backend-snapshot' ? 'Backend snapshot' : 'Local store'} -{' '}
+            {formatFreshness(centralSnapshot.sync.lastSyncedAt || centralSnapshot.generatedAt)}
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 8,
+          }}
+        >
+          {commandLayerMetrics.map((metric) => {
+            const route = WHITEBOARD_COMMAND_METRIC_ROUTES[metric.key];
+            const canOpen = emergencyRole.canAccessRoute(routePermissionPath(route));
+            const toneColor =
+              metric.tone === 'critical'
+                ? 'var(--status-critical, #EF4444)'
+                : metric.tone === 'warning'
+                  ? 'var(--status-warning, #F59E0B)'
+                  : metric.tone === 'success'
+                    ? 'var(--status-stable, #10B981)'
+                    : 'var(--status-info, #60A5FA)';
+
+            return (
+              <button
+                key={metric.key}
+                type="button"
+                onClick={() => {
+                  if (canOpen) openRoute(route);
+                }}
+                disabled={!canOpen}
+                title={`${metric.label}: ${metric.value}. Source: ${metric.source}. ${centralSnapshot.sync.message}`}
+                style={{
+                  border: '1px solid var(--color-border-subtle, #1F2937)',
+                  borderRadius: 12,
+                  background: 'var(--color-card, #172033)',
+                  color: canOpen ? 'var(--color-text-primary, #F9FAFB)' : 'var(--color-text-muted, #9CA3AF)',
+                  cursor: canOpen ? 'pointer' : 'not-allowed',
+                  display: 'grid',
+                  gap: 4,
+                  minHeight: 68,
+                  opacity: canOpen ? 1 : 0.58,
+                  padding: 12,
+                  textAlign: 'left',
+                }}
+              >
+                <strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 22 }}>
+                  {metric.value}
+                </strong>
+                <span style={{ color: toneColor, fontSize: 12, fontWeight: 850 }}>
+                  {metric.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
       <div
         className="emergency-whiteboard-page__stats"
         style={{
@@ -673,7 +826,10 @@ export default function EmergencyWhiteboard() {
               <button
                 key={filter}
                 type="button"
-                onClick={() => setActiveFilter(filter)}
+                onClick={() => {
+                  setActiveFilter(filter);
+                  setQueueFilter(null);
+                }}
                 style={{
                   border: '1px solid var(--color-border-subtle, #1F2937)',
                   borderRadius: 999,
@@ -728,6 +884,52 @@ export default function EmergencyWhiteboard() {
 
       {showIntake && canUseCentralIntake ? (
         <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
+      ) : null}
+
+      <section
+        className="emergency-whiteboard-page__queue-intelligence"
+        aria-label="Whiteboard queue intelligence"
+      >
+        <QueueIntelligencePanel
+          collapsed={queuePanelCollapsed}
+          onCollapsedChange={setQueuePanelCollapsed}
+        />
+      </section>
+
+      {activeQueueFilter ? (
+        <div
+          role="status"
+          style={{
+            alignItems: 'center',
+            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
+            color: 'var(--color-text-primary, #F9FAFB)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 10,
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+          }}
+        >
+          <span style={{ color: '#BFDBFE', fontSize: 13, fontWeight: 850 }}>
+            Showing the {activeQueueFilter} queue on the Whiteboard.
+          </span>
+          <button
+            type="button"
+            onClick={() => setQueueFilter(null)}
+            style={{
+              border: '1px solid var(--color-border-subtle, #1F2937)',
+              borderRadius: 999,
+              background: 'transparent',
+              color: 'var(--color-text-primary, #F9FAFB)',
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 850,
+              padding: '6px 10px',
+            }}
+          >
+            Clear queue filter
+          </button>
+        </div>
       ) : null}
 
       {isInitialLoading ? <SkeletonLoader variant="whiteboard" /> : null}
@@ -796,9 +998,9 @@ export default function EmergencyWhiteboard() {
             textAlign: 'center',
           }}
         >
-          {activeFilter === 'All'
+          {!activeQueueFilter && activeFilter === 'All'
             ? 'No active patients are currently on the board.'
-            : `No patients match the ${activeFilter} filter. Clear filters to return to the active board.`}
+            : `No patients match the ${activeQueueFilter || activeFilter} filter. Clear filters to return to the active board.`}
         </div>
       ) : null}
       <WhoNextPanel mode="floating" />

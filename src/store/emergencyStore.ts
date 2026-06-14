@@ -2,6 +2,7 @@ import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import {
   Alert,
   ActiveShift,
+  BoardingStatus,
   CapacityHistoryEntry,
   CapacitySnapshot,
   CriticalChecklistRecord,
@@ -15,6 +16,7 @@ import {
   PatientFlagRecord,
   PatientState,
   Priority,
+  QueueSummary,
   ReassessmentReminder,
   Referral,
   Room,
@@ -591,10 +593,12 @@ export type EmergencyWebSocketConnectionState =
 export type CopilotSafetyStatus = 'safe' | 'caution' | 'unsafe' | 'blocked' | 'unknown';
 
 export type EmergencyRecord = Record<string, unknown> & { id: string };
-export type EmsIncomingPatient = EmergencyRecord;
-export type EmergencyBoardingPatient = EmergencyRecord & {
+export type EmsIncomingPatient = Partial<EMSArrival> & EmergencyRecord;
+export type EmergencyBoardingPatient = Partial<Patient> &
+  EmergencyRecord & {
   boardingMinutes?: number;
   boardTimeMinutes?: number;
+  boardingStatus?: BoardingStatus;
 };
 
 export type EmergencyRecommendation = {
@@ -724,6 +728,12 @@ const AUDIT_LOG_LIMIT = 200;
 const asRecord = (value: unknown): Record<string, unknown> => (isObject(value) ? value : {});
 
 const asArray = <T = unknown>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+
+const asEntityList = <T = unknown>(value: unknown): T[] => {
+  if (Array.isArray(value)) return value as T[];
+  if (isObject(value)) return [value as T];
+  return [];
+};
 
 const stringFrom = (value: unknown): string | null => {
   if (typeof value === 'string' && value.trim()) return value;
@@ -1013,7 +1023,8 @@ const normalizeReferralStatus = (status: unknown): Referral['status'] => {
 
 const extractReferrals = (raw: unknown): Referral[] => {
   const data = unwrapData(raw);
-  return asArray(firstValue(data, ['referrals'])).map((referral, index) => {
+  const candidates = firstValue(data, ['referrals']) ?? firstValue(data, ['referral']);
+  return asEntityList(candidates).map((referral, index) => {
     const record = asRecord(referral);
     const patient = asRecord(record.patient);
     const patientId =
@@ -1057,6 +1068,380 @@ const extractReferrals = (raw: unknown): Referral[] => {
         'Referral requested.',
     };
   });
+};
+
+const normalizeAlertSeverity = (
+  value: unknown,
+  fallback: Alert['severity'] = 'Info',
+): Alert['severity'] => {
+  const normalized = String(value || '').toLowerCase();
+  if (normalized.includes('critical') || normalized.includes('red')) return 'Critical';
+  if (
+    normalized.includes('warning') ||
+    normalized.includes('orange') ||
+    normalized.includes('yellow') ||
+    normalized.includes('strained')
+  ) {
+    return 'Warning';
+  }
+  return fallback;
+};
+
+const normalizeAlertType = (value: unknown, fallback: Alert['type'] = 'System'): Alert['type'] => {
+  const text = stringFrom(value);
+  return text || fallback;
+};
+
+const normalizeOperationalAlert = (
+  value: unknown,
+  index: number,
+  source: string,
+  generatedAt = nowIso(),
+): Alert | null => {
+  const record = asRecord(value);
+  const title =
+    stringFrom(firstValue(record, ['title', 'label', 'name'])) || 'Operational alert';
+  const message =
+    stringFrom(firstValue(record, ['message', 'summary', 'reason', 'description'])) ||
+    'Emergency OS operational alert requires review.';
+  if (!title && !message) return null;
+
+  return {
+    id: stringFrom(record.id) || `${source}-alert-${index + 1}`,
+    type: normalizeAlertType(record.type, 'System'),
+    severity: normalizeAlertSeverity(record.severity),
+    title,
+    message,
+    patientId: stringFrom(record.patientId) || undefined,
+    reminderId: stringFrom(record.reminderId) || undefined,
+    actionLabel: stringFrom(record.actionLabel) || undefined,
+    actionType: stringFrom(record.actionType) || undefined,
+    createdAt: stringFrom(firstValue(record, ['createdAt', 'detectedAt', 'timestamp'])) || generatedAt,
+    dismissed: Boolean(record.dismissed),
+    source: stringFrom(record.source) || source,
+    metadata: isObject(record.metadata) ? (record.metadata as Alert['metadata']) : undefined,
+  };
+};
+
+const extractOperationalAlerts = (raw: unknown, source: string): Alert[] => {
+  const data = unwrapData(raw);
+  const generatedAt =
+    stringFrom(firstValue(raw, ['generatedAt'])) ||
+    stringFrom(firstValue(data, ['generatedAt'])) ||
+    nowIso();
+  const candidates =
+    firstValue(data, ['alerts', 'operationalAlerts', 'reviewQueue', 'notifications']) ??
+    firstValue(raw, ['alerts', 'operationalAlerts']);
+  return asArray(candidates)
+    .map((alert, index) => normalizeOperationalAlert(alert, index, source, generatedAt))
+    .filter((alert): alert is Alert => Boolean(alert));
+};
+
+const alertIdentity = (alert: Alert): string =>
+  [
+    alert.id,
+    alert.source,
+    alert.type,
+    alert.patientId || '',
+    alert.title,
+    alert.metadata?.dedupeBucket ?? '',
+    alert.metadata?.status ?? '',
+    alert.metadata?.band ?? '',
+  ].join('|');
+
+const mergeEmergencyAlerts = (...groups: Array<Alert[] | undefined>): Alert[] => {
+  const merged: Alert[] = [];
+  const seen = new Set<string>();
+  for (const alert of groups.flatMap((group) => group || [])) {
+    const normalized = normalizeOperationalAlert(alert, merged.length, alert.source || 'emergency-store');
+    if (!normalized) continue;
+    const identity = alertIdentity(normalized);
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    merged.push(normalized);
+  }
+  return merged
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 200);
+};
+
+const buildCapacityAlert = (raw: unknown): Alert | null => {
+  const data = unwrapData(raw);
+  const capacity = asRecord(firstValue(data, ['capacity', 'capacityStatus']) ?? data);
+  const band = stringFrom(capacity.band || capacity.riskLevel);
+  const score = numberFrom(capacity.score, 0);
+  if (!(band && ['Orange', 'Red'].includes(band)) && score < 80) return null;
+
+  return {
+    id: `capacity-${band || score}`,
+    type: 'Capacity',
+    severity: band === 'Red' || score >= 90 ? 'Critical' : 'Warning',
+    title: band ? `Capacity ${band}` : 'Capacity pressure',
+    message: `Score ${score}. Boarding ${numberFrom(capacity.boardingCount, 0)}, reassessment due ${numberFrom(capacity.reassessmentDue ?? capacity.reassessmentDueCount, 0)}.`,
+    createdAt: stringFrom(capacity.updatedAt) || nowIso(),
+    dismissed: false,
+    source: 'capacity-intelligence',
+    metadata: { score, band },
+  };
+};
+
+const buildBoardingAlert = (raw: unknown): Alert | null => {
+  const data = unwrapData(raw);
+  const patients = asArray(firstValue(data, ['patients', 'boarders', 'boardingPatients']));
+  const longestBoardingMinutes = numberFrom(firstValue(data, ['longestBoardingMinutes']), 0);
+  if (!patients.length && longestBoardingMinutes <= 0) return null;
+
+  return {
+    id: 'boarding-escalation-active',
+    type: 'Boarding',
+    severity: longestBoardingMinutes >= DEFAULT_BOARDING_THRESHOLD_MINUTES ? 'Critical' : 'Warning',
+    title: 'Boarding escalation active',
+    message: `${patients.length} boarding patient${patients.length === 1 ? '' : 's'}; longest boarding ${longestBoardingMinutes}min.`,
+    createdAt: nowIso(),
+    dismissed: false,
+    source: 'boarding-intelligence',
+    metadata: { boardingCount: patients.length, longestBoardingMinutes },
+  };
+};
+
+const buildEmsAlert = (raw: unknown): Alert | null => {
+  const arrivals = extractEmsIncomingPatients(raw);
+  if (!arrivals.length) return null;
+  const critical = arrivals.filter((arrival) =>
+    /critical|high|p1|resus|stroke|stemi|trauma/i.test(
+      [
+        arrival.severity,
+        arrival.priority,
+        arrival.acuity,
+        arrival.offloadRisk,
+        arrival.chiefComplaint,
+        arrival.prearrivalComplaint,
+        arrival.complaint,
+      ].join(' '),
+    ),
+  );
+  const focused = critical[0] || arrivals[0];
+  return {
+    id: critical.length ? 'ems-critical-inbound' : 'ems-inbound-active',
+    type: 'EMS',
+    severity: critical.length ? 'Critical' : 'Warning',
+    title: critical.length ? 'Critical EMS inbound' : 'EMS inbound',
+    message: `${arrivals.length} inbound EMS signal${arrivals.length === 1 ? '' : 's'}; ${stringFrom(firstValue(focused, ['chiefComplaint', 'prearrivalComplaint', 'complaint'])) || 'complaint pending'}.`,
+    patientId: stringFrom(firstValue(focused, ['patientId'])) || undefined,
+    createdAt: nowIso(),
+    dismissed: false,
+    source: 'ems-intake',
+    metadata: { inboundCount: arrivals.length, criticalCount: critical.length },
+  };
+};
+
+const buildReassessmentAlert = (raw: unknown): Alert | null => {
+  const data = unwrapData(raw);
+  const patients = asArray(firstValue(data, ['patients', 'reassessmentPatients']));
+  const overdueCount = numberFrom(firstValue(data, ['overdueCount', 'overdue']), 0);
+  if (!patients.length && !overdueCount) return null;
+
+  return {
+    id: overdueCount ? 'reassessment-overdue' : 'reassessment-due',
+    type: 'Reassessment',
+    severity: overdueCount ? 'Critical' : 'Warning',
+    title: overdueCount ? 'Reassessment overdue' : 'Reassessment due',
+    message: `${patients.length} patient${patients.length === 1 ? '' : 's'} need reassessment${overdueCount ? `; ${overdueCount} overdue` : ''}.`,
+    createdAt: nowIso(),
+    dismissed: false,
+    source: 'reassessment-engine',
+    metadata: { patientCount: patients.length, overdueCount },
+  };
+};
+
+const buildReferralAlert = (referrals: Referral[]): Alert | null => {
+  const active = referrals.filter(isPendingReferral);
+  if (!active.length) return null;
+  const emergent = active.filter((referral) => /emergent|stat/i.test(String(referral.urgency)));
+  const transfer = active.filter((referral) => referral.workflow === 'Transfer');
+  return {
+    id: emergent.length ? 'referrals-emergent-active' : 'referrals-active',
+    type: 'Referral',
+    severity: emergent.length ? 'Critical' : 'Warning',
+    title: emergent.length ? 'Emergent referral pending' : 'Referral queue active',
+    message: `${active.length} active referral${active.length === 1 ? '' : 's'}; ${emergent.length} emergent, ${transfer.length} transfer.`,
+    patientId: active[0]?.patientId,
+    createdAt: nowIso(),
+    dismissed: false,
+    source: 'referral-intelligence',
+    metadata: { activeCount: active.length, emergentCount: emergent.length, transferCount: transfer.length },
+  };
+};
+
+const buildQueueAlert = (raw: unknown): Alert | null => {
+  const queues = extractQueueSummaries(raw);
+  const breached = queues.filter((queue) => {
+    const record = queue as Record<string, unknown>;
+    return Boolean(record.breached) || numberFrom(record.oldestWaitMinutes, 0) > numberFrom(record.targetMinutes, Infinity);
+  });
+  if (!breached.length) return null;
+  const queue = breached[0] as Record<string, unknown>;
+  const label = stringFrom(queue.label || queue.name || queue.type) || 'Queue';
+  return {
+    id: `queue-breach-${label.toLowerCase().replace(/\s+/g, '-')}`,
+    type: 'Queue',
+    severity: 'Warning',
+    title: `${label} queue threshold breached`,
+    message: `${numberFrom(queue.count, 0)} patients; oldest wait ${numberFrom(queue.oldestWaitMinutes, 0)}min.`,
+    createdAt: nowIso(),
+    dismissed: false,
+    source: 'queue-intelligence',
+    metadata: { queue: label },
+  };
+};
+
+const extractOperationalAlertsFromEmergencyModules = (payload: EmergencyDashboardRefreshResult): Alert[] => {
+  const referrals = extractReferrals(payload.referrals);
+  return mergeEmergencyAlerts(
+    extractOperationalAlerts(payload.whiteboard, 'emergency-whiteboard'),
+    extractOperationalAlerts(payload.capacity, 'capacity-intelligence'),
+    extractOperationalAlerts(payload.boarding, 'boarding-intelligence'),
+    extractOperationalAlerts(payload.ems, 'ems-intake'),
+    extractOperationalAlerts(payload.queues, 'queue-intelligence'),
+    extractOperationalAlerts(payload.reassessment, 'reassessment-engine'),
+    extractOperationalAlerts(payload.referrals, 'referral-intelligence'),
+    [buildCapacityAlert(payload.capacity)].filter((alert): alert is Alert => Boolean(alert)),
+    [buildBoardingAlert(payload.boarding)].filter((alert): alert is Alert => Boolean(alert)),
+    [buildEmsAlert(payload.ems)].filter((alert): alert is Alert => Boolean(alert)),
+    [buildQueueAlert(payload.queues)].filter((alert): alert is Alert => Boolean(alert)),
+    [buildReassessmentAlert(payload.reassessment)].filter((alert): alert is Alert => Boolean(alert)),
+    [buildReferralAlert(referrals)].filter((alert): alert is Alert => Boolean(alert)),
+  );
+};
+
+const normalizeRealtimeAlert = (value: unknown, index = 0): Alert => {
+  const record = asRecord(value);
+  const title =
+    stringFrom(firstValue(record, ['title', 'headline', 'subject'])) || 'Emergency OS alert';
+  const message =
+    stringFrom(firstValue(record, ['message', 'body', 'summary', 'description'])) ||
+    title;
+  return {
+    id: stringFrom(record.id) || stableId('alert-realtime', value, index),
+    type: stringFrom(firstValue(record, ['type', 'alertType', 'category'])) || 'System',
+    severity: normalizeAlertSeverity(firstValue(record, ['severity', 'priority', 'level', 'type'])),
+    title,
+    message,
+    patientId: stringFrom(firstValue(record, ['patientId', 'patient.id'])) || undefined,
+    reminderId: stringFrom(record.reminderId) || undefined,
+    actionLabel: stringFrom(record.actionLabel) || undefined,
+    actionType: stringFrom(record.actionType) || undefined,
+    createdAt:
+      stringFrom(firstValue(record, ['createdAt', 'timestamp', 'receivedAt'])) || nowIso(),
+    dismissed: Boolean(record.dismissed),
+    dismissedAt: stringFrom(record.dismissedAt) || undefined,
+    autoDismissAfter: Number.isFinite(Number(record.autoDismissAfter))
+      ? Number(record.autoDismissAfter)
+      : undefined,
+    source: stringFrom(record.source) || 'emergency-realtime',
+    metadata: asRecord(record.metadata) as Alert['metadata'],
+  };
+};
+
+const extractRealtimeAlerts = (raw: unknown): Alert[] => {
+  const data = unwrapData(raw);
+  const alerts = firstValue(data, ['alerts', 'operationalAlerts', 'notifications']);
+  return asArray(alerts).map(normalizeRealtimeAlert);
+};
+
+const normalizeWorkflowActionType = (value: unknown): WorkflowActionType => {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s.:/-]+/g, '_');
+  return (normalized && normalized in workflowTitles
+    ? normalized
+    : 'integration_event_received') as WorkflowActionType;
+};
+
+const normalizeWorkflowLog = (value: unknown, index = 0): WorkflowActionLog => {
+  const record = asRecord(value);
+  const type = normalizeWorkflowActionType(firstValue(record, ['type', 'event', 'name', 'topic']));
+  const title = stringFrom(record.title) || workflowTitles[type];
+  const summary =
+    stringFrom(firstValue(record, ['summary', 'message', 'description'])) ||
+    `${title} received from Emergency OS realtime.`;
+  return createWorkflowLog({
+    id: stringFrom(record.id) || stableId('workflow-realtime', value, index),
+    type,
+    title,
+    summary,
+    timestamp:
+      stringFrom(firstValue(record, ['timestamp', 'createdAt', 'receivedAt'])) || nowIso(),
+    actorStaffId: stringFrom(record.actorStaffId) || undefined,
+    actorName: stringFrom(record.actorName) || undefined,
+    patientId: stringFrom(firstValue(record, ['patientId', 'patient.id'])) || undefined,
+    source: stringFrom(record.source) || 'emergency-realtime',
+    severity: normalizeAlertSeverity(record.severity),
+    status: (stringFrom(record.status) as WorkflowActionLog['status']) || 'recorded',
+    metadata: asRecord(record.metadata) as WorkflowActionLog['metadata'],
+  });
+};
+
+const extractRealtimeWorkflowLogs = (raw: unknown): WorkflowActionLog[] => {
+  const data = unwrapData(raw);
+  const logs = firstValue(data, ['workflowLogs', 'workflow_logs', 'recentEvents', 'logs']);
+  return asArray(logs).map(normalizeWorkflowLog);
+};
+
+const buildRealtimeHydrationPayload = (
+  raw: unknown,
+): Parameters<EmergencyStoreState['hydrateFromApi']>[0] => {
+  const data = unwrapData(raw);
+  const record = asRecord(data);
+  const whiteboard = asRecord(firstValue(record, ['whiteboard', 'emergencyWhiteboard']) ?? record);
+  const patients = asEntityList<Patient>(
+    firstValue(whiteboard, ['patients']) ?? firstValue(whiteboard, ['patient']),
+  );
+  const staff = asArray<Staff>(firstValue(whiteboard, ['staff']));
+  const rooms = asArray<Room>(firstValue(whiteboard, ['rooms']));
+  const alerts = extractRealtimeAlerts(whiteboard);
+  const workflowLogs = extractRealtimeWorkflowLogs(whiteboard);
+  const referrals = extractReferrals(whiteboard);
+  const queues = extractQueueSummaries(whiteboard);
+  const emsArrivals = extractEmsIncomingPatients(whiteboard) as unknown as EMSArrival[];
+  const capacity = firstValue(whiteboard, ['capacity', 'capacityStatus']) as
+    | CapacitySnapshot
+    | undefined;
+  const emergencySettings = firstValue(whiteboard, [
+    'emergencySettings',
+    'settings',
+    'tenantSettings',
+  ]) as Partial<EmergencyOsSettings> | undefined;
+
+  return {
+    patients: patients.length ? patients : undefined,
+    staff: staff.length ? staff : undefined,
+    rooms: rooms.length ? rooms : undefined,
+    alerts: alerts.length ? alerts : undefined,
+    workflowLogs: workflowLogs.length ? workflowLogs : undefined,
+    capacity,
+    referrals: referrals.length ? referrals : undefined,
+    queues: queues.length ? queues : undefined,
+    emsArrivals: emsArrivals.length ? emsArrivals : undefined,
+    emergencySettings,
+  };
+};
+
+const mergeById = <T extends { id: string }>(incoming: T[] | undefined, existing: T[]): T[] => {
+  if (!incoming?.length) return existing;
+  const incomingIds = new Set(incoming.map((item) => item.id));
+  return [...incoming, ...existing.filter((item) => !incomingIds.has(item.id))];
+};
+
+const mergeWorkflowLogs = (
+  incoming: WorkflowActionLog[] | undefined,
+  existing: WorkflowActionLog[],
+): WorkflowActionLog[] => {
+  if (!incoming?.length) return existing;
+  return mergeById(incoming, existing).sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 };
 
 const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
@@ -1728,11 +2113,7 @@ type EmergencyScenarioSummary = {
   description?: string;
 };
 
-type EmergencyQueueSummary = {
-  id?: string;
-  label: string;
-  count: number;
-};
+type EmergencyQueueSummary = QueueSummary;
 
 type EmergencyScenarioData = Record<string, unknown> & {
   copilotContext: Record<string, number>;
@@ -1929,6 +2310,7 @@ interface EmergencyStoreState {
       activeQueueFilter: string | null;
       whiteboardSearchQuery: string;
       loading: boolean;
+      emergencySettings: Partial<EmergencyOsSettings>;
       features: EmergencyFeatureFlags;
       flags: FeatureFlags;
       overrides: FeatureOverrides;
@@ -2626,6 +3008,42 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     addFlag: (patientId, flag) =>
       set((state) => {
         const normalizedFlag = getPatientFlagType(flag);
+        const flaggedPatient = state.patients.find((patient) => patient.id === patientId);
+        const flagAlreadyPresent = Boolean(flaggedPatient?.flags.includes(normalizedFlag));
+        const flagAlert: Alert | null =
+          flaggedPatient && !flagAlreadyPresent
+            ? {
+                id: `flag-${normalizedFlag}-${patientId}`,
+                type:
+                  normalizedFlag === PatientFlag.ReassessmentDue
+                    ? 'Reassessment'
+                    : normalizedFlag === PatientFlag.PendingAdmission
+                      ? 'Boarding'
+                      : 'System',
+                severity:
+                  normalizedFlag === PatientFlag.DeteriorationRisk ||
+                  normalizedFlag === PatientFlag.SepsisAlert
+                    ? 'Critical'
+                    : 'Warning',
+                title:
+                  normalizedFlag === PatientFlag.ReassessmentDue
+                    ? 'Reassessment due'
+                    : normalizedFlag === PatientFlag.PendingAdmission
+                      ? 'Boarding escalation'
+                      : `Patient flag: ${normalizedFlag}`,
+                message: `${[flaggedPatient.firstName, flaggedPatient.lastName].filter(Boolean).join(' ') || flaggedPatient.mrn} flagged for ${normalizedFlag}.`,
+                patientId,
+                createdAt: nowIso(),
+                dismissed: false,
+                source:
+                  normalizedFlag === PatientFlag.ReassessmentDue
+                    ? 'reassessment-engine'
+                    : normalizedFlag === PatientFlag.PendingAdmission
+                      ? 'boarding-intelligence'
+                      : 'patient-risk-flags',
+                metadata: { flag: normalizedFlag },
+              }
+            : null;
         const patients = state.patients.map((patient) => {
           if (patient.id !== patientId || patient.flags.includes(normalizedFlag)) return patient;
           return {
@@ -2645,6 +3063,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return {
           patients,
           capacity: buildCapacitySnapshot(patients, state.rooms),
+          alerts: flagAlert ? mergeEmergencyAlerts([flagAlert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'addFlag',
             patientId,
@@ -2788,7 +3207,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return {
           patients,
           capacity: buildCapacitySnapshot(patients, state.rooms),
-          alerts: news2Alert ? [news2Alert, ...state.alerts] : state.alerts,
+          alerts: news2Alert ? mergeEmergencyAlerts([news2Alert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'addVitals',
             patientId,
@@ -2996,6 +3415,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         const backendWorkflowLogs = asArray<WorkflowActionLog>(
           firstValue(unwrapData(result.workflowLogs), ['logs', 'workflowLogs']),
         );
+        const operationalAlerts = mergeEmergencyAlerts(
+          alerts,
+          extractOperationalAlertsFromEmergencyModules(result),
+        );
         const hasBackendErrors = Object.keys(result.errors).length > 0;
 
         if (
@@ -3016,7 +3439,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             patients: patients.length ? patients : undefined,
             staff: staff.length ? staff : undefined,
             rooms: rooms.length ? rooms : undefined,
-            alerts: alerts.length ? alerts : undefined,
+            alerts: operationalAlerts.length ? operationalAlerts : undefined,
             workflowLogs: backendWorkflowLogs.length ? backendWorkflowLogs : workflowLogs.length ? workflowLogs : undefined,
             activeShift,
             capacity,
@@ -3090,6 +3513,17 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           .filter(([, result]) => result.error)
           .map(([key, result]) => [key, result.error as string]),
       );
+      const operationalAlerts = extractOperationalAlertsFromEmergencyModules({
+        whiteboard: whiteboard.data,
+        capacity: capacity.data,
+        boarding: boarding.data,
+        ems: ems.data,
+        queues: queues.data,
+        reassessment: reassessment.data,
+        referrals: referrals.data,
+        workflowLogs: workflowLogs.data,
+        errors,
+      });
 
       set((state) => ({
         capacityMetrics: capacity.data
@@ -3102,6 +3536,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           ? extractEmsIncomingPatients(ems.data)
           : state.emsIncomingPatients,
         queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
+        alerts: operationalAlerts.length
+          ? mergeEmergencyAlerts(operationalAlerts, state.alerts)
+          : state.alerts,
         loading: false,
         ui: {
           ...state.ui,
@@ -3223,18 +3660,146 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       const payload = record.payload ?? record.data ?? record.record ?? event;
       get().setWebSocketStatus({ lastEventAt: nowIso() });
 
+      if (
+        [
+          'emergency_snapshot',
+          'emergency_state',
+          'whiteboard_snapshot',
+          'whiteboard_updated',
+          'central_node_snapshot',
+          'central_node_updated',
+        ].includes(type)
+      ) {
+        get().hydrateFromApi(buildRealtimeHydrationPayload(payload));
+        return;
+      }
+
+      if (['alert_created', 'alert_updated', 'emergency_alert', 'notification'].includes(type)) {
+        get().addAlert(normalizeRealtimeAlert(payload));
+        return;
+      }
+
+      if (
+        ['settings_updated', 'thresholds_updated', 'emergency_settings_updated'].includes(type)
+      ) {
+        const data = unwrapData(payload);
+        const settings =
+          firstValue(data, ['emergencySettings', 'settings', 'tenantSettings']) ?? data;
+        get().saveEmergencySettings(asRecord(settings) as Partial<EmergencyOsSettings>);
+        set((state) => ({
+          workflowLogs: mergeWorkflowLogs(
+            [
+              normalizeWorkflowLog({
+                ...asRecord(payload),
+                type: 'integration_event_received',
+                title: 'Settings updated',
+                summary: 'Emergency OS settings updated from realtime event.',
+                source: 'emergency-realtime',
+              }),
+            ],
+            state.workflowLogs,
+          ),
+        }));
+        return;
+      }
+
+      if (
+        [
+          'workflow_log',
+          'workflow_log_created',
+          'workflow_event',
+          'audit_event',
+          'patient_created',
+          'journey_state_changed',
+          'reassessment_created',
+          'reassessment_completed',
+          'referral_created',
+        ].includes(type)
+      ) {
+        const workflowLog = normalizeWorkflowLog({ ...asRecord(payload), type });
+        const hydrationPayload = buildRealtimeHydrationPayload(payload);
+        if (
+          hydrationPayload.patients ||
+          hydrationPayload.rooms ||
+          hydrationPayload.staff ||
+          hydrationPayload.alerts ||
+          hydrationPayload.capacity ||
+          hydrationPayload.emsArrivals ||
+          hydrationPayload.referrals ||
+          hydrationPayload.queues ||
+          hydrationPayload.emergencySettings
+        ) {
+          get().hydrateFromApi({
+            ...hydrationPayload,
+            workflowLogs: [workflowLog, ...(hydrationPayload.workflowLogs || [])],
+          });
+        } else {
+          set((state) => ({
+            workflowLogs: mergeWorkflowLogs([workflowLog], state.workflowLogs),
+          }));
+        }
+        return;
+      }
+
       if (['capacity_updated', 'capacity_changed', 'capacity_score_changed'].includes(type)) {
-        set({ capacityMetrics: normalizeCapacityMetrics(payload) });
+        const capacity = firstValue(unwrapData(payload), ['capacity', 'capacityStatus']) || payload;
+        const capacityRecord = asRecord(capacity);
+        const capacityAlert = buildCapacityAlert(payload);
+        const hasCapacitySnapshot =
+          capacityRecord.score !== undefined &&
+          capacityRecord.band !== undefined &&
+          capacityRecord.updatedAt !== undefined;
+        set((state) => ({
+          capacityMetrics: normalizeCapacityMetrics(payload),
+          alerts: capacityAlert ? mergeEmergencyAlerts([capacityAlert], state.alerts) : state.alerts,
+          ...(hasCapacitySnapshot
+            ? {
+                capacity: capacity as CapacitySnapshot,
+                capacityHistory: appendCapacityBandChange(
+                  state.capacityHistory,
+                  state.capacity,
+                  capacity as CapacitySnapshot,
+                  type,
+                ),
+              }
+            : {}),
+        }));
         return;
       }
       if (['boarding_updated', 'boarding_changed', 'boarding_started'].includes(type)) {
-        set({ boardingMetrics: normalizeBoardingMetrics(payload) });
+        const boardingAlert = buildBoardingAlert(payload);
+        set((state) => ({
+          boardingMetrics: normalizeBoardingMetrics(payload),
+          alerts: boardingAlert ? mergeEmergencyAlerts([boardingAlert], state.alerts) : state.alerts,
+        }));
         return;
       }
       if (['ems_arrival', 'ems_arrival_created', 'ems_incoming', 'ems_updated'].includes(type)) {
-        get().upsertEmsIncomingPatient(
-          normalizeEmsIncomingPatient(firstValue(payload, ['patient', 'arrival']) ?? payload),
-        );
+        const arrival = firstValue(payload, ['arrival', 'patient']) ?? payload;
+        get().upsertEmsIncomingPatient(normalizeEmsIncomingPatient(arrival));
+        get().addEMSArrival(normalizeEmsIncomingPatient(arrival) as unknown as EMSArrival);
+        return;
+      }
+      if (['queue_updated', 'queue_changed', 'queues_updated'].includes(type)) {
+        const queueAlert = buildQueueAlert(payload);
+        set((state) => ({
+          queues: extractQueueSummaries(payload),
+          alerts: queueAlert ? mergeEmergencyAlerts([queueAlert], state.alerts) : state.alerts,
+        }));
+        return;
+      }
+      if (['referral_updated', 'referrals_updated'].includes(type)) {
+        const referrals = extractReferrals(payload);
+        if (referrals.length) {
+          set((state) => {
+            const nextReferrals = mergeById(referrals, state.referrals);
+            const referralAlert = buildReferralAlert(nextReferrals);
+            return {
+              referrals: nextReferrals,
+              alerts: referralAlert ? mergeEmergencyAlerts([referralAlert], state.alerts) : state.alerts,
+            };
+          });
+        }
         return;
       }
       if (['copilot_message', 'copilot_response', 'copilot_query_completed'].includes(type)) {
@@ -3277,7 +3842,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     addAlert: (alert) =>
       set((state) => ({
-        alerts: [alert, ...state.alerts],
+        alerts: mergeEmergencyAlerts([alert], state.alerts),
         workflowLogs: appendWorkflowLogs(state.workflowLogs, [
           alert.patientId
             ? {
@@ -3338,10 +3903,14 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           prepared.arrival,
           ...state.emsArrivals.filter((candidate) => candidate.id !== arrival.id),
         ];
+        const arrivalAlert = buildEmsAlert({
+          data: { arrivals: [prepared.arrival] },
+        });
 
         return {
           rooms: prepared.rooms,
           emsArrivals: nextArrivals,
+          alerts: arrivalAlert ? mergeEmergencyAlerts([arrivalAlert], state.alerts) : state.alerts,
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {
               type: 'ems_arrival_created',
@@ -3783,8 +4352,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         service: input.service || input.targetDepartment || 'Other',
       } as Referral;
 
-      set((state) => ({
-        referrals: [referral, ...state.referrals],
+      set((state) => {
+        const referrals = [referral, ...state.referrals];
+        const referralAlert = buildReferralAlert([referral]);
+        return {
+        referrals,
         patients: state.patients.map((patient) =>
           patient.id === referral.patientId
             ? {
@@ -3833,7 +4405,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             },
           },
         ]),
-      }));
+        alerts: referralAlert ? mergeEmergencyAlerts([referralAlert], state.alerts) : state.alerts,
+      };
+      });
 
       return referral;
     },
@@ -3842,17 +4416,20 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set((state) => {
         const now = new Date().toISOString();
         const referral = state.referrals.find((candidate) => candidate.id === referralId);
+        const referrals = state.referrals.map((referral) =>
+          referral.id === referralId
+            ? {
+                ...referral,
+                status,
+                responseNote: responseNote || referral.responseNote,
+                respondedAt: status === 'Sent' || status === 'Draft' ? referral.respondedAt : now,
+              }
+            : referral,
+        );
+        const referralAlert = buildReferralAlert(referrals);
         return {
-          referrals: state.referrals.map((referral) =>
-            referral.id === referralId
-              ? {
-                  ...referral,
-                  status,
-                  responseNote: responseNote || referral.responseNote,
-                  respondedAt: status === 'Sent' || status === 'Draft' ? referral.respondedAt : now,
-                }
-              : referral,
-          ),
+          referrals,
+          alerts: referralAlert ? mergeEmergencyAlerts([referralAlert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(
             state.auditLog,
             referral
@@ -3928,11 +4505,16 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             ]
           : state.referrals;
         const capacity = payload.capacity || buildCapacitySnapshot(patients, rooms);
+        const alerts = mergeEmergencyAlerts(payload.alerts, state.alerts);
+        const workflowLogs = mergeWorkflowLogs(payload.workflowLogs, state.workflowLogs);
+        const emergencySettings = payload.emergencySettings
+          ? mergeEmergencyOsSettings(state.emergencySettings, payload.emergencySettings)
+          : state.emergencySettings;
         return {
           patients,
           rooms,
           staff: payload.staff || state.staff,
-          alerts: payload.alerts || state.alerts,
+          alerts,
           capacity,
           capacityHistory:
             payload.capacityHistory ||
@@ -3942,7 +4524,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               capacity,
               'hydrate_from_api',
             ),
-          workflowLogs: payload.workflowLogs || state.workflowLogs,
+          workflowLogs,
           activeShift: payload.activeShift || state.activeShift,
           emsUnits: payload.emsUnits || state.emsUnits,
           emsArrivals: payload.emsArrivals || state.emsArrivals,
@@ -3951,6 +4533,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           activeQueueFilter: payload.activeQueueFilter ?? state.activeQueueFilter,
           whiteboardSearchQuery: payload.whiteboardSearchQuery ?? state.whiteboardSearchQuery,
           loading: payload.loading ?? state.loading,
+          emergencySettings,
+          thresholds: payload.emergencySettings
+            ? thresholdsFromSettings(emergencySettings, state.thresholds)
+            : state.thresholds,
           features: payload.features || payload.flags || state.features,
           flags: payload.flags || payload.features || state.flags,
           overrides: payload.overrides || state.overrides,
@@ -4114,6 +4700,7 @@ export type EmergencyOperationalMetricKey =
   | 'patientsToday'
   | 'waiting'
   | 'longestWait'
+  | 'averageWait'
   | 'emsInbound'
   | 'reassessmentsDue'
   | 'capacityScore'
@@ -4183,6 +4770,11 @@ export const selectEmergencyOperationalSummary = (
       (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
       0,
     );
+  const activePatients = selectActivePatients(state);
+  const activeWaitMinutes = activePatients.map((patient) => minutesSince(patient.arrivalTime));
+  const averageWaitMinutes = activeWaitMinutes.length
+    ? Math.round(activeWaitMinutes.reduce((sum, wait) => sum + wait, 0) / activeWaitMinutes.length)
+    : 0;
   const emsInbound =
     state.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length +
     state.emsIncomingPatients.length +
@@ -4217,6 +4809,13 @@ export const selectEmergencyOperationalSummary = (
         value: formatWaitMinutes(longestWaitMinutes),
         source: 'capacity.longestWaitMinutes or waiting patient arrivalTime',
         tone: longestWaitMinutes >= 60 ? 'critical' : longestWaitMinutes >= 30 ? 'warning' : 'neutral',
+      },
+      {
+        key: 'averageWait',
+        label: 'Average Wait',
+        value: formatWaitMinutes(averageWaitMinutes),
+        source: 'active patient arrivalTime',
+        tone: averageWaitMinutes >= 60 ? 'critical' : averageWaitMinutes >= 30 ? 'warning' : 'neutral',
       },
       {
         key: 'emsInbound',

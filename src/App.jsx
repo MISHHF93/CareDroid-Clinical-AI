@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import {
   BrowserRouter,
   Link,
@@ -30,6 +30,8 @@ const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalyti
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
+const EmergencyDepartmentPulse = lazy(() => import('./pages/emergency/pulse'));
+const EmergencyShiftSummary = lazy(() => import('./pages/emergency/shift'));
 import PatientCard from './components/PatientCard';
 const ReferralPanel = lazy(() => import('./components/ReferralPanel'));
 import { useEmergencyStore } from './store/emergencyStore';
@@ -415,7 +417,7 @@ function dataFreshness(generatedAt) {
 
 function ApiStateBanner({
   moduleState,
-  fallbackText = 'Showing the last local Emergency OS state.',
+  fallbackText = 'Showing the last local Emergency OS state. Verify against the current department record before operational decisions.',
 }) {
   if (moduleState.loading && !moduleState.data) {
     return (
@@ -460,7 +462,7 @@ function ApiStateBanner({
           padding: 'var(--space-3, 12px)',
         }}
       >
-        No active records are available for this module yet.
+        No active records are available for this module yet. Add or load department data before using this view for handoff decisions.
       </div>
     );
   }
@@ -474,7 +476,7 @@ function DataSourceNote({ moduleState }) {
   const freshness = dataFreshness(generatedAt);
   const sourceLabel =
     !source || /fallback|demo|fixture|first-customer/i.test(source)
-      ? 'walkthrough dataset'
+      ? 'walkthrough/local dataset - no live hospital integration'
       : source === 'backend'
         ? 'live Emergency OS feed'
         : source;
@@ -511,6 +513,36 @@ function isBoarding(patient) {
   );
 }
 
+function displayPatientName(patient) {
+  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+}
+
+const REASSESSMENT_ATTENTION_FLAGS = [
+  PatientFlag.DeteriorationRisk,
+  PatientFlag.SepsisAlert,
+  PatientFlag.HighRisk,
+  PatientFlag.ReassessmentDue,
+];
+
+const QUEUE_MOVEMENT_STAGES = Object.freeze({
+  Arrival: ['Arrival'],
+  Registration: ['Arrival'],
+  Triage: ['Triage'],
+  Waiting: ['Waiting'],
+  Assessment: ['Assessment'],
+  Orders: ['Assessment'],
+  Results: ['Results'],
+  Admission: ['Admission'],
+  Boarding: ['Admission'],
+  Referral: ['Disposition', 'Admission'],
+  Discharge: ['Disposition', 'Discharge'],
+  Reassessment: ['Waiting', 'Assessment', 'Results', 'Disposition'],
+});
+
+function needsReassessmentAttention(patient) {
+  return REASSESSMENT_ATTENTION_FLAGS.some((flag) => patient.flags.includes(flag));
+}
+
 function findUpgradeSignal(signals = [], capability) {
   return signals.find((signal) => signal.capability === capability) || null;
 }
@@ -518,10 +550,17 @@ function findUpgradeSignal(signals = [], capability) {
 function PatientsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const storePatients = useEmergencyStore((state) => state.patients);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const patientsModule = useEmergencyPatients();
   const journeyModule = usePatientJourney();
   const patients = patientsModule.data?.data?.patients || storePatients;
-  const query = searchParams.get('q') || '';
+  const patientIdParam = searchParams.get('patientId') || '';
+  const patientSearchParam = searchParams.get('patientSearch') || '';
+  const query = searchParams.get('q') || patientSearchParam || '';
+  const requestedPatient = useMemo(
+    () => (patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null),
+    [patientIdParam, patients],
+  );
   const journeyData = journeyModule.data?.data || {};
   const journeyStateCounts = journeyData.stateCounts || patients.reduce((counts, patient) => {
     counts[patient.state] = (counts[patient.state] || 0) + 1;
@@ -535,7 +574,11 @@ function PatientsRoute() {
     .slice(0, 6);
   const visiblePatients = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) return patients;
+    if (!normalizedQuery) {
+      return requestedPatient
+        ? [requestedPatient, ...patients.filter((patient) => patient.id !== requestedPatient.id)]
+        : patients;
+    }
     return patients.filter((patient) =>
       [
         patient.firstName,
@@ -552,7 +595,11 @@ function PatientsRoute() {
         .toLowerCase()
         .includes(normalizedQuery),
     );
-  }, [patients, query]);
+  }, [patients, query, requestedPatient]);
+
+  useEffect(() => {
+    if (requestedPatient?.id) selectPatient(requestedPatient.id);
+  }, [requestedPatient?.id, selectPatient]);
 
   const updateQuery = (value) => {
     const nextParams = new URLSearchParams(searchParams);
@@ -687,56 +734,122 @@ function PatientsRoute() {
 }
 
 function QueueRoute() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
+  const referrals = useEmergencyStore((state) => state.referrals);
+  const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
+  const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const queues = useEmergencyQueues();
+  const requestedQueueFilter =
+    searchParams.get('queue') || searchParams.get('filter') || searchParams.get('queueFilter') || '';
+  const effectiveQueueFilter = activeQueueFilter || requestedQueueFilter;
+  const pendingReferralPatientIds = useMemo(
+    () =>
+      new Set(
+        referrals
+          .filter((referral) => !['Closed', 'Completed', 'Declined', 'PatientDeparted'].includes(referral.status))
+          .map((referral) => referral.patientId),
+      ),
+    [referrals],
+  );
   const queueRows = useMemo(
     () => [
       {
         label: 'Waiting',
         patients: patients.filter((patient) => patient.state === PatientState.Waiting),
         target: 30,
+        movementStages: QUEUE_MOVEMENT_STAGES.Waiting,
       },
       {
         label: 'Triage',
         patients: patients.filter((patient) => patient.state === PatientState.Triage),
         target: 10,
+        movementStages: QUEUE_MOVEMENT_STAGES.Triage,
       },
       {
         label: 'Assessment',
         patients: patients.filter((patient) => patient.state === PatientState.Assessment),
         target: 45,
+        movementStages: QUEUE_MOVEMENT_STAGES.Assessment,
       },
       {
         label: 'Orders',
         patients: patients.filter((patient) => patient.state === PatientState.Orders),
         target: 60,
+        movementStages: QUEUE_MOVEMENT_STAGES.Orders,
       },
       {
         label: 'Results',
         patients: patients.filter((patient) => patient.state === PatientState.Results),
         target: 90,
+        movementStages: QUEUE_MOVEMENT_STAGES.Results,
       },
       {
         label: 'Admission',
         patients: patients.filter((patient) => patient.state === PatientState.Admission),
         target: 120,
+        movementStages: QUEUE_MOVEMENT_STAGES.Admission,
+      },
+      {
+        label: 'Referral',
+        patients: patients.filter((patient) => pendingReferralPatientIds.has(patient.id)),
+        target: 60,
+        movementStages: QUEUE_MOVEMENT_STAGES.Referral,
+      },
+      {
+        label: 'Discharge',
+        patients: patients.filter((patient) => patient.state === PatientState.Disposition),
+        target: 60,
+        movementStages: QUEUE_MOVEMENT_STAGES.Discharge,
       },
       {
         label: 'Reassessment',
         patients: patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)),
         target: 30,
+        movementStages: QUEUE_MOVEMENT_STAGES.Reassessment,
       },
     ],
-    [patients],
+    [patients, pendingReferralPatientIds],
   );
   const apiQueueRows = queues.data?.data?.queues;
-  const visibleQueueRows = apiQueueRows?.length ? apiQueueRows : queueRows;
+  const visibleQueueRows = useMemo(() => {
+    if (!apiQueueRows?.length) return queueRows;
+    const apiLabels = new Set(apiQueueRows.map((queue) => String(queue.label).toLowerCase()));
+    const supplementalJourneyQueues = queueRows.filter(
+      (queue) => !apiLabels.has(String(queue.label).toLowerCase()),
+    );
+    return [...apiQueueRows, ...supplementalJourneyQueues];
+  }, [apiQueueRows, queueRows]);
+  useEffect(() => {
+    if (requestedQueueFilter && requestedQueueFilter !== activeQueueFilter) {
+      setActiveQueueFilter(requestedQueueFilter);
+    }
+  }, [activeQueueFilter, requestedQueueFilter, setActiveQueueFilter]);
+
+  const clearQueueFilter = () => {
+    setActiveQueueFilter(null);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('queue');
+    nextParams.delete('filter');
+    nextParams.delete('queueFilter');
+    setSearchParams(nextParams, { replace: true });
+  };
+
+  const activeFilterKey = String(effectiveQueueFilter || '').trim().toLowerCase();
+  const filteredQueueRows = useMemo(() => {
+    if (!activeFilterKey) return visibleQueueRows;
+    const exactMatches = visibleQueueRows.filter(
+      (queue) => String(queue.label || queue.type || '').toLowerCase() === activeFilterKey,
+    );
+    return exactMatches.length ? exactMatches : visibleQueueRows;
+  }, [activeFilterKey, visibleQueueRows]);
   const queueMetrics = useMemo(() => {
-    const totalQueued = visibleQueueRows.reduce(
+    const totalQueued = filteredQueueRows.reduce(
       (total, queue) => total + (queue.count ?? queue.patients?.length ?? 0),
       0,
     );
-    const breachedQueues = visibleQueueRows.filter((queue) => {
+    const breachedQueues = filteredQueueRows.filter((queue) => {
       const patientsInQueue = queue.patients || [];
       const oldestWait =
         queue.oldestWaitMinutes ??
@@ -749,7 +862,7 @@ function QueueRoute() {
       return queue.breached ?? oldestWait > target;
     }).length;
     return { totalQueued, breachedQueues };
-  }, [visibleQueueRows]);
+  }, [filteredQueueRows]);
 
   return (
     <EmergencyRoutePage
@@ -766,12 +879,54 @@ function QueueRoute() {
             value: queueMetrics.breachedQueues,
             color: queueMetrics.breachedQueues ? '#EF4444' : '#10B981',
           },
-          { label: 'Tracked queues', value: visibleQueueRows.length },
+          {
+            label: effectiveQueueFilter ? 'Filtered queue' : 'Tracked queues',
+            value: effectiveQueueFilter || visibleQueueRows.length,
+          },
         ]}
       />
+      {effectiveQueueFilter ? (
+        <div
+          role="status"
+          style={{
+            ...emergencyRouteStyles.card,
+            alignItems: 'center',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 10,
+            justifyContent: 'space-between',
+            padding: 'var(--space-3, 12px)',
+          }}
+        >
+          <span style={{ color: '#BFDBFE', fontSize: 13, fontWeight: 800 }}>
+            Showing the {effectiveQueueFilter} queue requested from the whiteboard.
+          </span>
+          <button
+            type="button"
+            onClick={clearQueueFilter}
+            style={{
+              border: '1px solid var(--color-border-subtle, #1F2937)',
+              borderRadius: 999,
+              background: 'transparent',
+              color: 'var(--color-text-primary, #F9FAFB)',
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 800,
+              padding: '6px 10px',
+            }}
+          >
+            Clear queue filter
+          </button>
+        </div>
+      ) : null}
       <div style={{ display: 'grid', gap: 'var(--space-3, 12px)' }}>
-        {visibleQueueRows.map((queue) => {
+        {filteredQueueRows.map((queue) => {
           const patientsInQueue = queue.patients || [];
+          const movementStages =
+            queue.movementStages ||
+            QUEUE_MOVEMENT_STAGES[queue.label] ||
+            QUEUE_MOVEMENT_STAGES[queue.type] ||
+            [];
           const oldestWait =
             queue.oldestWaitMinutes ??
             patientsInQueue.reduce((max, patient) => {
@@ -796,18 +951,46 @@ function QueueRoute() {
             >
               <div>
                 <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>{queue.label}</strong>
-                <p
+                <div
+                  aria-label={`${queue.label} queue patients`}
                   style={{
-                    margin: '4px 0 0',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 6,
+                    margin: '6px 0 0',
                     color: 'var(--color-text-secondary, #9CA3AF)',
                     fontSize: 13,
                   }}
                 >
-                  {patientsInQueue
-                    .slice(0, 3)
-                    .map((patient) => `${patient.firstName} ${patient.lastName}`)
-                    .join(', ') || 'Queue clear'}
-                </p>
+                  {patientsInQueue.length ? (
+                    patientsInQueue.slice(0, 3).map((patient) => (
+                      <button
+                        key={patient.id}
+                        type="button"
+                        onClick={() => selectPatient(patient.id)}
+                        style={{
+                          border: '1px solid var(--color-border-subtle, #1F2937)',
+                          borderRadius: 999,
+                          background: 'var(--color-elevated, #0B1120)',
+                          color: 'var(--color-text-primary, #F9FAFB)',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 800,
+                          padding: '4px 8px',
+                        }}
+                      >
+                        {displayPatientName(patient)}
+                      </button>
+                    ))
+                  ) : (
+                    'Queue clear'
+                  )}
+                </div>
+                {movementStages.length ? (
+                  <small style={{ color: '#BFDBFE', display: 'block', fontSize: 12, fontWeight: 800, marginTop: 4 }}>
+                    Movement stage: {movementStages.join(' / ')}
+                  </small>
+                ) : null}
               </div>
               <strong
                 style={{
@@ -833,11 +1016,39 @@ function QueueRoute() {
 }
 
 function ReassessmentRoute() {
+  const [searchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const reassessment = useReassessmentQueue();
-  const duePatients =
-    reassessment.data?.data?.patients ||
-    patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue));
+  const patientIdParam = searchParams.get('patientId') || '';
+  const requestedPatient = useMemo(
+    () => (patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null),
+    [patientIdParam, patients],
+  );
+  const duePatients = useMemo(() => {
+    const byId = new Map();
+    for (const patient of reassessment.data?.data?.patients || []) {
+      byId.set(patient.id, patient);
+    }
+    for (const patient of patients.filter(needsReassessmentAttention)) {
+      byId.set(patient.id, patient);
+    }
+    return [...byId.values()];
+  }, [patients, reassessment.data]);
+  const prioritizedDuePatients = useMemo(() => {
+    if (!requestedPatient || !duePatients.some((patient) => patient.id === requestedPatient.id)) {
+      return duePatients;
+    }
+    return [requestedPatient, ...duePatients.filter((patient) => patient.id !== requestedPatient.id)];
+  }, [duePatients, requestedPatient]);
+  const overdueCount = Math.max(
+    reassessment.data?.data?.overdueCount ?? 0,
+    patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
+  );
+
+  useEffect(() => {
+    if (requestedPatient?.id) selectPatient(requestedPatient.id);
+  }, [requestedPatient?.id, selectPatient]);
 
   return (
     <EmergencyRoutePage
@@ -850,14 +1061,14 @@ function ReassessmentRoute() {
         metrics={[
           {
             label: 'Due now',
-            value: duePatients.length,
-            color: duePatients.length ? '#F59E0B' : '#10B981',
+            value: prioritizedDuePatients.length,
+            color: prioritizedDuePatients.length ? '#F59E0B' : '#10B981',
           },
-          { label: 'Overdue', value: reassessment.data?.data?.overdueCount ?? 0, color: '#EF4444' },
+          { label: 'Overdue', value: overdueCount, color: '#EF4444' },
           { label: 'Next action', value: reassessment.data?.data?.nextAction || 'Review queue' },
         ]}
       />
-      <PatientGrid patients={duePatients} emptyMessage="No reassessments are due right now." />
+      <PatientGrid patients={prioritizedDuePatients} emptyMessage="No reassessments are due right now." />
       <DataSourceNote moduleState={reassessment} />
     </EmergencyRoutePage>
   );
@@ -1212,6 +1423,26 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
               <LazyRoute label="Loading Medical Tools...">
                 <ToolsOverview />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyPulse}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPulse}>
+              <LazyRoute label="Loading department pulse...">
+                <EmergencyDepartmentPulse />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyShift}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+              <LazyRoute label="Loading shift summary...">
+                <EmergencyShiftSummary />
               </LazyRoute>
             </EmergencyRouteGuard>
           }

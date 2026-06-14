@@ -1,10 +1,22 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { callAI, UNIFIED_AI_MODEL } from './client';
 
+const apiClientMocks = vi.hoisted(() => ({
+  apiFetch: vi.fn(),
+  parseApiResponse: vi.fn(),
+}));
+
+vi.mock('../apiClient', () => ({
+  apiFetch: apiClientMocks.apiFetch,
+  parseApiResponse: apiClientMocks.parseApiResponse,
+}));
+
 describe('canonical AI client', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
+    apiClientMocks.apiFetch.mockReset();
+    apiClientMocks.parseApiResponse.mockReset();
   });
 
   it('routes server calls through the unified Anthropic Messages request shape', async () => {
@@ -36,5 +48,31 @@ describe('canonical AI client', () => {
     expect(body.messages).toEqual([{ role: 'user', content: 'Summarize capacity.' }]);
     expect(response.content).toBe('Ready for human review.');
     expect(response.usage.totalTokens).toBe(19);
+  });
+
+  it('routes browser Emergency OS AI calls through canonical emergency endpoints', async () => {
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('document', {});
+    apiClientMocks.apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    apiClientMocks.parseApiResponse.mockResolvedValue({ response: 'Ready for human review.' });
+
+    const cases = [
+      ['INTAKE_SUGGESTION', '/api/emergency/intake/ai/message'],
+      ['CLINICAL_SUMMARY', '/api/emergency/referrals/ai/message'],
+      ['SHIFT_SUMMARY', '/api/emergency/analytics/ai/message'],
+    ] as const;
+
+    for (const [requestType, endpoint] of cases) {
+      await callAI({
+        requestType,
+        systemPrompt: 'Human review required.',
+        messages: [{ role: 'user', content: 'Summarize the current state.' }],
+      });
+
+      expect(apiClientMocks.apiFetch).toHaveBeenLastCalledWith(
+        endpoint,
+        expect.objectContaining({ method: 'POST' }),
+      );
+    }
   });
 });

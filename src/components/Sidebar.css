@@ -185,6 +185,7 @@
   }
 
   .sidebar-item {
+    position: relative;
     flex: 1;
     height: 60px;
     min-width: 0;
@@ -318,6 +319,7 @@
   }
 
   .sidebar-more-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 10px;

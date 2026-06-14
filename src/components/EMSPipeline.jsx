@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
@@ -36,6 +38,23 @@ function etaTone(remainingMinutes, status) {
 function formatEta(remainingMinutes, status) {
   if (status === 'Arrived' || status === 'Handoff' || remainingMinutes <= 0) return 'Arrived';
   return `${remainingMinutes} min`;
+}
+
+function formatFreshness(timestamp) {
+  if (!timestamp) return 'latest local state';
+  const parsed = new Date(timestamp).getTime();
+  if (!Number.isFinite(parsed)) return 'latest local state';
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
+  if (elapsedMinutes < 1) return 'updated now';
+  if (elapsedMinutes < 60) return `updated ${elapsedMinutes}m ago`;
+  return `updated ${Math.round(elapsedMinutes / 60)}h ago`;
+}
+
+function sourceLabel(source) {
+  if (!source) return 'local Emergency OS state - no live EMS CAD integration';
+  return /fixture|demo|fallback|scenario|first-customer/i.test(source)
+    ? 'walkthrough/local dataset - no live EMS CAD integration'
+    : source;
 }
 
 function vitalValue(vitals, ...keys) {
@@ -82,6 +101,7 @@ function EMSArrivalRow({
   onPrepareBay,
   onConvert,
   onCompleteHandoff,
+  onOpenPatient,
   offloadTargetMinutes,
   canPrepareBay,
   canConvert,
@@ -186,6 +206,16 @@ function EMSArrivalRow({
             Handoff complete
           </button>
         ) : null}
+        {arrival.patientId ? (
+          <button
+            type="button"
+            className="ems-pipeline__handoff"
+            onClick={() => onOpenPatient(arrival.patientId)}
+            title="Open this EMS patient without searching"
+          >
+            Open Patient
+          </button>
+        ) : null}
         {arrival.patientId && arrival.handoffCompletedAt ? (
           <span className="ems-pipeline__prepared">Handoff complete</span>
         ) : null}
@@ -195,11 +225,13 @@ function EMSArrivalRow({
 }
 
 export default function EMSPipeline() {
+  const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const emsModule = useEMSIntake();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const rooms = useEmergencyStore((state) => state.rooms);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
   const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
@@ -224,10 +256,17 @@ export default function EMSPipeline() {
           setFleetSnapshot({
             status: 'ready',
             units: result.data?.units || [],
-            message: result.data?.sourceLabel || 'Live EMS feed connected.',
+            message: [
+              result.data?.sourceLabel || 'Live EMS feed connected.',
+              formatFreshness(result.data?.generatedAt),
+            ].join(' '),
           });
         } else {
-          setFleetSnapshot({ status: 'error', units: [], message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.' });
+          setFleetSnapshot({
+            status: 'error',
+            units: [],
+            message: 'EMS unit feed is unavailable. Use active inbound units below for coordination.',
+          });
         }
       })
       .catch(() => {
@@ -297,11 +336,18 @@ export default function EMSPipeline() {
         15
     ) || 15;
   const offloadBreachCount = offloadSamples.filter((minutes) => minutes > offloadTargetMinutes).length;
+  const emsSource = sourceLabel(emsModule.data?.source);
+  const emsFreshness = formatFreshness(emsModule.data?.generatedAt);
   const completeHandoff = (arrivalId) => {
     updateEMSArrival(arrivalId, {
       status: 'Complete',
       handoffCompletedAt: new Date().toISOString(),
     });
+  };
+  const openPatient = (patientId) => {
+    if (!patientId) return;
+    selectPatient(patientId);
+    navigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
   };
 
   return (
@@ -312,7 +358,7 @@ export default function EMSPipeline() {
           <h1 id="ems-pipeline-title">EMS Pipeline</h1>
           <p className="ems-pipeline__source">
             Track inbound units, bay preparation, handoff timing, and diversion awareness.
-            {emsModule.data?.source ? ` Source: ${emsModule.data.source}.` : ''}
+            {` Source: ${emsSource}; ${emsFreshness}.`}
           </p>
         </div>
         <div className="ems-pipeline__header-actions">
@@ -369,7 +415,7 @@ export default function EMSPipeline() {
                 </article>
               ))
             ) : (
-              <p className="ems-pipeline__empty">No incoming units</p>
+              <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
             )}
           </div>
         </section>
@@ -391,6 +437,7 @@ export default function EMSPipeline() {
                   onPrepareBay={prepareEMSBay}
                   onConvert={convertEMSArrivalToPatient}
                   onCompleteHandoff={completeHandoff}
+                  onOpenPatient={openPatient}
                   offloadTargetMinutes={offloadTargetMinutes}
                   canPrepareBay={canPrepareBay}
                   canConvert={canConvert}
@@ -398,7 +445,7 @@ export default function EMSPipeline() {
                 />
               ))
             ) : (
-              <p className="ems-pipeline__empty">No incoming units</p>
+              <p className="ems-pipeline__empty">No inbound EMS units in the active Emergency OS state.</p>
             )}
           </div>
         </section>
@@ -420,6 +467,7 @@ export default function EMSPipeline() {
                   onPrepareBay={prepareEMSBay}
                   onConvert={convertEMSArrivalToPatient}
                   onCompleteHandoff={completeHandoff}
+                  onOpenPatient={openPatient}
                   offloadTargetMinutes={offloadTargetMinutes}
                   canPrepareBay={canPrepareBay}
                   canConvert={canConvert}

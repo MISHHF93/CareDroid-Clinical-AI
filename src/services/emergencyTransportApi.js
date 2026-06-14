@@ -52,6 +52,11 @@ export async function fetchEmsFleetSnapshot() {
     ok: true,
     data: {
       source: result.data?.source || 'demo-fleet-live-tracking',
+      generatedAt:
+        result.data?.generatedAt ||
+        snapshot.generatedAt ||
+        snapshot.updatedAt ||
+        new Date().toISOString(),
       sourceLabel:
         result.data?.sourceLabel ||
         'Backend demo fleet live tracking - not an EMS CAD/ePCR feed.',
@@ -64,7 +69,7 @@ export async function fetchEmsFleetSnapshot() {
 }
 
 export function persistEmergencyReferral(referral) {
-  return guardedJson('emergencyReferralPersistence', '/api/referrals', {
+  return guardedJson('emergencyReferralPersistence', '/api/emergency/referrals', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(referral),

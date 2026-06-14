@@ -55,7 +55,11 @@ describe('AppShell navigation surfaces', () => {
   it('keeps canonical sidebar destinations reachable from the command palette where command-backed', () => {
     expect(commandPaletteSource).toContain('export const EMERGENCY_OS_ROUTE_COMMANDS');
     const commandPaths = EMERGENCY_OS_ROUTE_COMMANDS.map((command) => command.build().path);
-    expect(commandPaths).toEqual(CANONICAL_SIDEBAR_PATHS);
+    for (const path of CANONICAL_SIDEBAR_PATHS) {
+      expect(commandPaths).toContain(path);
+    }
+    expect(commandPaths).toContain('/emergency/pulse');
+    expect(commandPaths).toContain('/emergency/shift');
     expect(commandPaths).not.toContain('/emergency/analytics');
     expect(commandPaths).not.toContain('/emergency/settings');
   });

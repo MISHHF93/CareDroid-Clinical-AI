@@ -34,7 +34,9 @@ export const PILOT_CUSTOMER_MODE = Object.freeze({
   hiddenNavItemIds: Object.freeze(['analytics', 'settings']),
   retainedDirectRoutes: Object.freeze([
     CANONICAL_ROUTES.emergencyAnalytics,
+    CANONICAL_ROUTES.emergencyPulse,
     CANONICAL_ROUTES.emergencySettings,
+    CANONICAL_ROUTES.emergencyShift,
   ]),
 });
 

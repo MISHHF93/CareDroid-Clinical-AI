@@ -5,7 +5,7 @@ import {
   useEmergencyStore,
   type EmergencyOperationalMetricKey,
 } from '../store/emergencyStore';
-import { PatientFlag, type Patient } from '../types/emergency';
+import { PatientFlag, type Alert, type Patient } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
@@ -28,13 +28,24 @@ const MAX_HEADER_PATIENT_RESULTS = 5;
 
 const OPERATIONAL_METRIC_ROUTES: Record<EmergencyOperationalMetricKey, string> = {
   patientsToday: CANONICAL_ROUTES.emergencyPatients,
-  waiting: CANONICAL_ROUTES.emergencyQueues,
-  longestWait: CANONICAL_ROUTES.emergencyQueues,
+  waiting: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
+  longestWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
+  averageWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
   emsInbound: CANONICAL_ROUTES.emergencyEms,
   reassessmentsDue: CANONICAL_ROUTES.emergencyReassessment,
   capacityScore: CANONICAL_ROUTES.emergencyCapacity,
   boarders: CANONICAL_ROUTES.emergencyBoarding,
   referralsPending: CANONICAL_ROUTES.emergencyReferrals,
+};
+
+const ALERT_TYPE_ROUTES: Record<string, string> = {
+  capacity: CANONICAL_ROUTES.emergencyCapacity,
+  capacity_crisis: CANONICAL_ROUTES.emergencyCapacity,
+  ems: CANONICAL_ROUTES.emergencyEms,
+  boarding: CANONICAL_ROUTES.emergencyBoarding,
+  reassessment: CANONICAL_ROUTES.emergencyReassessment,
+  referral: CANONICAL_ROUTES.emergencyReferrals,
+  queue: CANONICAL_ROUTES.emergencyQueues,
 };
 
 function getHeaderFlagValue(flag: unknown): string {
@@ -65,6 +76,23 @@ function patientLookupText(patient: Patient): string {
     .toLowerCase();
 }
 
+function alertRoute(alert: Alert): string | null {
+  const key = String(alert.type || '').toLowerCase();
+  if (ALERT_TYPE_ROUTES[key]) return ALERT_TYPE_ROUTES[key];
+  const text = `${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
+  if (text.includes('ems')) return CANONICAL_ROUTES.emergencyEms;
+  if (text.includes('board')) return CANONICAL_ROUTES.emergencyBoarding;
+  if (text.includes('reassessment') || text.includes('reassess')) return CANONICAL_ROUTES.emergencyReassessment;
+  if (text.includes('referral') || text.includes('transfer')) return CANONICAL_ROUTES.emergencyReferrals;
+  if (text.includes('queue') || text.includes('wait')) return CANONICAL_ROUTES.emergencyQueues;
+  if (text.includes('capacity')) return CANONICAL_ROUTES.emergencyCapacity;
+  return null;
+}
+
+function routePermissionPath(path: string): string {
+  return path.split(/[?#]/)[0] || path;
+}
+
 function Clock() {
   const [now, setNow] = useState(() => new Date());
 
@@ -84,6 +112,16 @@ function Clock() {
       {now.toLocaleTimeString()}
     </span>
   );
+}
+
+function formatSyncAge(timestamp?: string | null): string {
+  if (!timestamp) return 'no sync';
+  const parsed = new Date(timestamp).getTime();
+  if (!Number.isFinite(parsed)) return 'no sync';
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - parsed) / 60000));
+  if (elapsedMinutes < 1) return 'now';
+  if (elapsedMinutes < 60) return `${elapsedMinutes}m`;
+  return `${Math.round(elapsedMinutes / 60)}h`;
 }
 
 type HeaderProps = {
@@ -124,10 +162,33 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const operationalSummary = centralSnapshot.operationalSummary;
+  const syncMode = centralSnapshot.sync.mode || 'polling';
+  const syncAge = formatSyncAge(centralSnapshot.sync.lastSyncedAt);
+  const syncLabel = centralSnapshot.sync.stale
+    ? `${syncMode.toUpperCase()} stale`
+    : `${syncMode.toUpperCase()} ${syncAge}`;
+  const syncTitle = [
+    `Status: ${centralSnapshot.sync.status}`,
+    `Mode: ${syncMode}`,
+    `Last update: ${syncAge}`,
+    `Source: ${centralSnapshot.sync.source}`,
+    centralSnapshot.sync.message,
+  ]
+    .filter(Boolean)
+    .join('. ');
+  const visibleAlerts = useMemo(() => {
+    const byId = new Map<string, Alert>();
+    for (const alert of [...centralSnapshot.operationalAlerts, ...alerts]) {
+      byId.set(alert.id, alert);
+    }
+    return Array.from(byId.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }, [alerts, centralSnapshot.operationalAlerts]);
 
   const unreadAlertCount = useMemo(
-    () => alerts.filter((alert) => !alert.dismissed).length,
-    [alerts],
+    () => visibleAlerts.filter((alert) => !alert.dismissed).length,
+    [visibleAlerts],
   );
 
   const reassessmentAttentionCount = useMemo(
@@ -149,7 +210,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   }, [patientLookupQuery, patients]);
 
   const navigateEmergencyRoute = (path: string) => {
-    navigate(emergencyRole.canAccessRoute(path) ? path : emergencyRole.nearestRoute(path));
+    const permissionPath = routePermissionPath(path);
+    navigate(
+      emergencyRole.canAccessRoute(permissionPath)
+        ? path
+        : emergencyRole.nearestRoute(permissionPath),
+    );
   };
 
   const openCentralIntake = () => {
@@ -181,7 +247,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const selectLookupPatient = (patientId: string) => {
     selectPatient(patientId);
-    navigateEmergencyRoute(CANONICAL_ROUTES.emergencyPatients);
+    navigateEmergencyRoute(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
     setPatientLookupQuery('');
     setPatientLookupOpen(false);
   };
@@ -276,8 +342,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           <span data-tone={centralSnapshot.currentDepartmentStatus.activeAlerts ? 'critical' : 'success'}>
             ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
           </span>
-          <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'}>
-            {centralSnapshot.sync.stale ? 'Sync stale' : 'Synced'}
+          <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'} title={syncTitle}>
+            {syncLabel}
           </span>
         </div>
       </div>
@@ -514,7 +580,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       >
         {operationalSummary.metrics.map((metric) => {
           const route = OPERATIONAL_METRIC_ROUTES[metric.key];
-          const canOpenRoute = emergencyRole.canAccessRoute(route);
+          const canOpenRoute = emergencyRole.canAccessRoute(routePermissionPath(route));
           return (
             <button
               key={metric.key}
@@ -573,13 +639,17 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               Close
             </button>
           </div>
-          {alerts.length > 0 ? (
-            alerts.map((alert) => (
+          {visibleAlerts.length > 0 ? (
+            visibleAlerts.map((alert) => (
               <button
                 key={alert.id}
                 type="button"
                 onClick={() => {
                   if (alert.patientId) selectPatient(alert.patientId);
+                  const route = alertRoute(alert);
+                  if (!alert.patientId && route && emergencyRole.canAccessRoute(route)) {
+                    navigateEmergencyRoute(route);
+                  }
                   setAlertDrawerOpen(false);
                 }}
                 style={{

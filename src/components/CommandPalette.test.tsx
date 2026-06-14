@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  isCommandVisibleForEmergencyRole,
   matchAndRankCommands,
   readRecentCommandIds,
   recordRecentCommand,
   searchPatientsByName,
   type Command,
 } from './CommandPalette';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
 function command(
@@ -97,5 +100,39 @@ describe('CommandPalette helpers', () => {
 
     expect(nextIds).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
     expect(readRecentCommandIds(storage)).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
+  });
+
+  it('hides command actions that the active Emergency OS role cannot perform', () => {
+    const readOnlyRole = {
+      can: (action: string) => action === EMERGENCY_ACTIONS.viewAnalytics,
+      canAccessRoute: (path: string) => path !== CANONICAL_ROUTES.emergencySettings,
+      nearestRoute: () => CANONICAL_ROUTES.emergencyWhiteboard,
+    };
+
+    expect(
+      isCommandVisibleForEmergencyRole(
+        {
+          requiredAction: EMERGENCY_ACTIONS.createPatient,
+          requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
+        },
+        readOnlyRole,
+      ),
+    ).toBe(false);
+    expect(
+      isCommandVisibleForEmergencyRole(
+        {
+          requiredRoute: CANONICAL_ROUTES.emergencyPatients,
+        },
+        readOnlyRole,
+      ),
+    ).toBe(true);
+    expect(
+      isCommandVisibleForEmergencyRole(
+        {
+          requiredRoute: CANONICAL_ROUTES.emergencySettings,
+        },
+        readOnlyRole,
+      ),
+    ).toBe(false);
   });
 });

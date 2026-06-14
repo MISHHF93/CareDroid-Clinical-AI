@@ -601,8 +601,13 @@ export default function PatientDetailPanel() {
   );
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
-    const params = new URLSearchParams({ open: calculatorId, patientId: selectedPatientId });
-    const nextUrl = `${CANONICAL_ROUTES.emergencyWhiteboard}?${params.toString()}`;
+    const params = new URLSearchParams({
+      source: 'calculators',
+      filter: 'calculator',
+      q: calculatorId,
+      patientId: selectedPatientId,
+    });
+    const nextUrl = `${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`;
     window.history.pushState(null, '', nextUrl);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, [selectedPatientId]);

@@ -250,6 +250,7 @@ export type CareDroidCentralNodeSnapshot = {
         | 'patientsToday'
         | 'waiting'
         | 'longestWait'
+        | 'averageWait'
         | 'emsInbound'
         | 'reassessmentsDue'
         | 'capacityScore'
@@ -387,43 +388,97 @@ function resolveScreenMode(
 
 function buildQueueHealth(source: CareDroidCentralNodeSource) {
   const patients = activePatients(source);
-  const states = [
-    PatientState.Arrival,
-    PatientState.Registration,
-    PatientState.Triage,
-    PatientState.Waiting,
-    PatientState.Assessment,
-    PatientState.Orders,
-    PatientState.Results,
-    PatientState.Disposition,
-    PatientState.Admission,
+  const pendingReferralPatientIds = new Set(
+    source.referrals.filter(isReferralPending).map((referral) => referral.patientId),
+  );
+  const queueDefinitions = [
+    {
+      id: 'arrival',
+      label: PatientState.Arrival,
+      targetMinutes: 5,
+      patients: patients.filter((patient) => patient.state === PatientState.Arrival),
+    },
+    {
+      id: 'registration',
+      label: PatientState.Registration,
+      targetMinutes: 10,
+      patients: patients.filter((patient) => patient.state === PatientState.Registration),
+    },
+    {
+      id: 'triage',
+      label: PatientState.Triage,
+      targetMinutes: 10,
+      patients: patients.filter((patient) => patient.state === PatientState.Triage),
+    },
+    {
+      id: 'waiting',
+      label: PatientState.Waiting,
+      targetMinutes: Number(source.emergencySettings.thresholds?.waitWarningMinutes || 45),
+      patients: patients.filter((patient) => patient.state === PatientState.Waiting),
+    },
+    {
+      id: 'assessment',
+      label: PatientState.Assessment,
+      targetMinutes: 45,
+      patients: patients.filter((patient) => patient.state === PatientState.Assessment),
+    },
+    {
+      id: 'orders',
+      label: PatientState.Orders,
+      targetMinutes: 60,
+      patients: patients.filter((patient) => patient.state === PatientState.Orders),
+    },
+    {
+      id: 'results',
+      label: PatientState.Results,
+      targetMinutes: 90,
+      patients: patients.filter((patient) => patient.state === PatientState.Results),
+    },
+    {
+      id: 'disposition',
+      label: PatientState.Disposition,
+      targetMinutes: 60,
+      patients: patients.filter((patient) => patient.state === PatientState.Disposition),
+    },
+    {
+      id: 'admission',
+      label: PatientState.Admission,
+      targetMinutes: Number(source.emergencySettings.boardingThresholds?.escalationMinutes || 120),
+      patients: patients.filter((patient) => patient.state === PatientState.Admission),
+    },
+    {
+      id: 'referral',
+      label: 'Referral',
+      targetMinutes: 60,
+      patients: patients.filter((patient) => pendingReferralPatientIds.has(patient.id)),
+    },
+    {
+      id: 'discharge',
+      label: 'Discharge',
+      targetMinutes: 60,
+      patients: patients.filter((patient) => patient.state === PatientState.Disposition),
+    },
+    {
+      id: 'reassessment',
+      label: 'Reassessment',
+      targetMinutes: 30,
+      patients: patients.filter((patient) => patientFlags(patient).includes(PatientFlag.ReassessmentDue)),
+    },
   ];
-  const targetByState: Record<string, number> = {
-    Arrival: 5,
-    Registration: 10,
-    Triage: 10,
-    Waiting: Number(source.emergencySettings.thresholds?.waitWarningMinutes || 45),
-    Assessment: 45,
-    Orders: 60,
-    Results: 90,
-    Disposition: 60,
-    Admission: Number(source.emergencySettings.boardingThresholds?.escalationMinutes || 120),
-  };
 
-  return states.map((state) => {
-    const rows = patients.filter((patient) => patient.state === state);
+  return queueDefinitions.map((queue) => {
+    const rows = queue.patients;
     const oldestWaitMinutes = rows.reduce(
       (max, patient) => Math.max(max, minutesSince(patient.arrivalTime)),
       0,
     );
-    const targetMinutes = targetByState[state] || 45;
     return {
-      id: String(state).toLowerCase(),
-      label: String(state),
+      id: queue.id,
+      label: String(queue.label),
       count: rows.length,
       oldestWaitMinutes,
-      targetMinutes,
-      breached: rows.length > 0 && oldestWaitMinutes > targetMinutes,
+      targetMinutes: queue.targetMinutes,
+      breached: rows.length > 0 && oldestWaitMinutes > queue.targetMinutes,
     };
   });
 }
@@ -455,6 +510,18 @@ function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'o
           snapshot.currentDepartmentStatus.longestWait >= 60
             ? ('critical' as const)
             : snapshot.currentDepartmentStatus.longestWait >= 30
+              ? ('warning' as const)
+              : ('neutral' as const),
+      },
+      {
+        key: 'averageWait' as const,
+        label: 'Average Wait',
+        value: formatWaitMinutes(snapshot.currentDepartmentStatus.averageWait),
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.currentDepartmentStatus`,
+        tone:
+          snapshot.currentDepartmentStatus.averageWait >= 60
+            ? ('critical' as const)
+            : snapshot.currentDepartmentStatus.averageWait >= 30
               ? ('warning' as const)
               : ('neutral' as const),
       },

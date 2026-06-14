@@ -105,6 +105,10 @@ function matchesNavigationPath(pathname: string, path: string): boolean {
   return pathname === path || (path !== '/emergency' && pathname.startsWith(`${path}/`));
 }
 
+function routePermissionPath(path: string): string {
+  return path.split(/[?#]/)[0] || path;
+}
+
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -309,12 +313,14 @@ export function AppShell({ children }: AppShellProps) {
         document.dispatchEvent(new Event('open-intake'));
         break;
       case 'OPEN_ROUTE':
-        if (action.path)
+        if (action.path) {
+          const permissionPath = routePermissionPath(action.path);
           navigate(
-            emergencyRole.canAccessRoute(action.path)
+            emergencyRole.canAccessRoute(permissionPath)
               ? action.path
-              : emergencyRole.nearestRoute(action.path),
+              : emergencyRole.nearestRoute(permissionPath),
           );
+        }
         break;
       case 'VIEW_PATIENT':
       case 'FIND_PATIENT':
@@ -333,11 +339,18 @@ export function AppShell({ children }: AppShellProps) {
         break;
       }
       case 'OPEN_PEDIATRIC_DRUGS':
-        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        navigate(`${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=pediatric-dose-safety-checker`);
         break;
-      case 'OPEN_CALCULATOR':
-        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+      case 'OPEN_CALCULATOR': {
+        const params = new URLSearchParams({
+          source: 'calculators',
+          filter: 'calculator',
+        });
+        if (action.calculatorId) params.set('q', action.calculatorId);
+        if (action.patientId) params.set('patientId', action.patientId);
+        navigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
         break;
+      }
       case 'OPEN_CAPACITY':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) break;
         navigate(CANONICAL_ROUTES.emergencyCapacity);

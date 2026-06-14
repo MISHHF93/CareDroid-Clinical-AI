@@ -238,6 +238,11 @@ export default function SmartIntake() {
       <div className="smart-intake__status" role="status">
         <strong>Session:</strong> {sessionId} · {statusMessage}
       </div>
+      <div className="smart-intake__disclosure" role="note">
+        This screen starts with a deterministic walkthrough dataset for product evaluation. Staff
+        confirmation is required before any patient identity, medication, allergy, or referral fact is
+        treated as operational.
+      </div>
       {errorMessage ? (
         <div className="smart-intake__status smart-intake__status--error" role="alert">
           {errorMessage}

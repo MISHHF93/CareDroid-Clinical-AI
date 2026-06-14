@@ -1,5 +1,16 @@
 import { CANONICAL_APP_ROUTE_TREE, CANONICAL_ROUTES } from '../config/routes.config.js';
 
+export const PATIENT_MOVEMENT_STAGES = Object.freeze([
+  'Arrival',
+  'Triage',
+  'Waiting',
+  'Assessment',
+  'Results',
+  'Disposition',
+  'Admission',
+  'Discharge',
+]);
+
 function page({
   id,
   label,
@@ -11,6 +22,7 @@ function page({
   actionEndpoints = [],
   duplicateRenderPaths = [],
   backendContract = 'real',
+  movementStages = [],
   notes = '',
 }) {
   return Object.freeze({
@@ -24,6 +36,7 @@ function page({
     actionEndpoints: Object.freeze(actionEndpoints),
     duplicateRenderPaths: Object.freeze(duplicateRenderPaths),
     backendContract,
+    movementStages: Object.freeze(movementStages),
     notes,
   });
 }
@@ -37,6 +50,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'emergency_whiteboard',
     screenshotSlug: '01-emergency-whiteboard',
     loadEndpoints: ['/api/emergency/whiteboard'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'emergency-patients',
@@ -47,6 +61,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     screenshotSlug: '02-emergency-patients',
     loadEndpoints: ['/api/emergency/patients'],
     actionEndpoints: ['POST /api/emergency/patients'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'ems-pipeline',
@@ -56,6 +71,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'ems_pipeline',
     screenshotSlug: '04-ems-pipeline',
     loadEndpoints: ['/api/emergency/ems'],
+    movementStages: ['Arrival', 'Triage'],
   }),
   page({
     id: 'smart-intake',
@@ -66,6 +82,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     screenshotSlug: '05-smart-intake',
     loadEndpoints: ['/api/emergency/intake'],
     actionEndpoints: ['POST /api/emergency/intake', 'POST /api/emergency/intake/vertical-slice'],
+    movementStages: ['Arrival', 'Triage'],
   }),
   page({
     id: 'queue-intelligence',
@@ -75,6 +92,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'queue_intelligence',
     screenshotSlug: '06-queue-intelligence',
     loadEndpoints: ['/api/emergency/queues'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'reassessment-engine',
@@ -84,6 +102,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'reassessment_engine',
     screenshotSlug: '07-reassessment-engine',
     loadEndpoints: ['/api/emergency/reassessment'],
+    movementStages: ['Waiting', 'Assessment', 'Results', 'Disposition'],
   }),
   page({
     id: 'capacity-intelligence',
@@ -93,6 +112,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'capacity_intelligence',
     screenshotSlug: '08-capacity-intelligence',
     loadEndpoints: ['/api/emergency/capacity'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'boarding-intelligence',
@@ -102,6 +122,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'boarding_intelligence',
     screenshotSlug: '09-boarding-intelligence',
     loadEndpoints: ['/api/emergency/boarding'],
+    movementStages: ['Disposition', 'Admission', 'Discharge'],
   }),
   page({
     id: 'referral-intelligence',
@@ -111,6 +132,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'referral_intelligence',
     screenshotSlug: '10-referral-intelligence',
     loadEndpoints: ['/api/emergency/referrals'],
+    movementStages: ['Assessment', 'Results', 'Disposition', 'Admission', 'Discharge'],
   }),
   page({
     id: 'ed-copilot',
@@ -120,6 +142,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'ed_copilot',
     screenshotSlug: '13-ed-copilot',
     loadEndpoints: ['/api/emergency/copilot'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'medical-tools',
@@ -128,7 +151,28 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     componentKey: 'ToolsOverview',
     navId: 'clinical_calculator_hub',
     screenshotSlug: '14-medical-tools',
+    movementStages: ['Triage', 'Assessment', 'Results', 'Disposition'],
     notes: 'Role-aware Emergency OS tools console mounted in the active AppShell.',
+  }),
+  page({
+    id: 'department-pulse',
+    label: 'Department Pulse',
+    path: CANONICAL_ROUTES.emergencyPulse,
+    componentKey: 'EmergencyDepartmentPulse',
+    navId: 'department_pulse',
+    screenshotSlug: '15-department-pulse',
+    movementStages: PATIENT_MOVEMENT_STAGES,
+    notes: 'Hidden operational pulse artifact now mounted as a direct AppShell route and command-palette surface.',
+  }),
+  page({
+    id: 'shift-summary',
+    label: 'Shift Summary',
+    path: CANONICAL_ROUTES.emergencyShift,
+    componentKey: 'EmergencyShiftSummary',
+    navId: 'shift_summary',
+    screenshotSlug: '16-shift-summary',
+    movementStages: PATIENT_MOVEMENT_STAGES,
+    notes: 'Hidden shift handoff artifact now mounted as a direct AppShell route and command-palette surface.',
   }),
   page({
     id: 'emergency-analytics',
@@ -139,6 +183,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     screenshotSlug: '15-emergency-analytics',
     loadEndpoints: ['/api/emergency/analytics'],
     backendContract: 'demo',
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
     id: 'emergency-settings',
@@ -148,6 +193,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'emergency_settings',
     screenshotSlug: '18-emergency-settings',
     loadEndpoints: ['/api/emergency/settings'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
   }),
 ]);
 

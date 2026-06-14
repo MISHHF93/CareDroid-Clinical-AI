@@ -126,16 +126,23 @@ export const DEFAULT_AI_MAX_TOKENS = 1000;
 const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 
+const EMERGENCY_AI_ROUTES = {
+  copilot: '/api/emergency/copilot/message',
+  intake: '/api/emergency/intake/ai/message',
+  referrals: '/api/emergency/referrals/ai/message',
+  analytics: '/api/emergency/analytics/ai/message',
+} as const;
+
 const ROUTE_BY_TYPE: Record<AIRequestType, string> = {
-  COPILOT_CHAT: '/api/emergency/copilot/message',
+  COPILOT_CHAT: EMERGENCY_AI_ROUTES.copilot,
   HANDOFF_BRIEF: '/api/chat/message',
   SCORE_ASSIST: '/api/chat/message',
-  INTAKE_SUGGEST: '/api/chat/suggest-action',
+  INTAKE_SUGGEST: EMERGENCY_AI_ROUTES.intake,
   PROTOCOL_SUGGEST: '/api/chat/message',
-  CLINICAL_SUMMARY: '/api/chat/message',
-  INTAKE_SUGGESTION: '/api/chat/suggest-action',
+  CLINICAL_SUMMARY: EMERGENCY_AI_ROUTES.referrals,
+  INTAKE_SUGGESTION: EMERGENCY_AI_ROUTES.intake,
   TRIAGE_ASSIST: '/api/chat/message',
-  SHIFT_SUMMARY: '/api/chat/message',
+  SHIFT_SUMMARY: EMERGENCY_AI_ROUTES.analytics,
   STAFF_BALANCE: '/api/chat/message',
   CAPACITY_CRISIS: '/api/chat/message',
 };

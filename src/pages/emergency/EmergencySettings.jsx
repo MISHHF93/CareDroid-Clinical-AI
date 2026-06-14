@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DEFAULT_EMERGENCY_THRESHOLDS,
   useEmergencyStore,
-  useEmergencyStore as useShellEmergencyStore,
 } from '../../store/emergencyStore';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
@@ -248,19 +247,16 @@ function promptValidationIssues(validation = {}) {
 export default function EmergencySettings() {
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
-  const rootWorkflowLogs = useEmergencyStore((state) => state.workflowLogs);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const saveEmergencySettings = useEmergencyStore((state) => state.saveEmergencySettings);
   const activeScenario = useEmergencyStore((state) => state.activeScenario);
-  const setRootActiveScenario = useEmergencyStore((state) => state.setActiveScenario);
-  const rootAuditLog = useEmergencyStore((state) => state.auditLog || []);
-  const setShellActiveScenario = useShellEmergencyStore((state) => state.setActiveScenario);
-  const shellWorkflowLogs = useShellEmergencyStore((state) => state.workflowLogs);
-  const shellAuditLog = useShellEmergencyStore((state) => state.auditLog || []);
-  const thresholds = useShellEmergencyStore(
+  const setActiveScenario = useEmergencyStore((state) => state.setActiveScenario);
+  const auditLog = useEmergencyStore((state) => state.auditLog || []);
+  const thresholds = useEmergencyStore(
     (state) => state.thresholds || DEFAULT_EMERGENCY_THRESHOLDS,
   );
-  const setThreshold = useShellEmergencyStore((state) => state.setThreshold);
-  const resetThresholds = useShellEmergencyStore((state) => state.resetThresholds);
+  const setThreshold = useEmergencyStore((state) => state.setThreshold);
+  const resetThresholds = useEmergencyStore((state) => state.resetThresholds);
 
   const [draft, setDraft] = useState(() => mergeSettings(storeSettings));
   const [loading, setLoading] = useState(true);
@@ -449,27 +445,23 @@ export default function EmergencySettings() {
     const byId = new Map();
     [
       ...(Array.isArray(backendWorkflowLogs) ? backendWorkflowLogs : []),
-      ...(Array.isArray(rootWorkflowLogs) ? rootWorkflowLogs : []),
-      ...(Array.isArray(shellWorkflowLogs) ? shellWorkflowLogs : []),
+      ...(Array.isArray(workflowLogs) ? workflowLogs : []),
     ].forEach((log) => {
       if (log?.id) byId.set(log.id, log);
     });
     return [...byId.values()].sort(
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
-  }, [backendWorkflowLogs, rootWorkflowLogs, shellWorkflowLogs]);
+  }, [backendWorkflowLogs, workflowLogs]);
   const storeAuditLogs = useMemo(() => {
     const byId = new Map();
-    [
-      ...(Array.isArray(rootAuditLog) ? rootAuditLog : []),
-      ...(Array.isArray(shellAuditLog) ? shellAuditLog : []),
-    ].forEach((log) => {
+    (Array.isArray(auditLog) ? auditLog : []).forEach((log) => {
       if (log?.id) byId.set(log.id, log);
     });
     return [...byId.values()].sort(
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
-  }, [rootAuditLog, shellAuditLog]);
+  }, [auditLog]);
   const auditActionOptions = useMemo(
     () => [...new Set(storeAuditLogs.map((log) => log.action).filter(Boolean))].sort(),
     [storeAuditLogs],
@@ -629,15 +621,13 @@ export default function EmergencySettings() {
   const isFirstCustomerDemoActive = activeScenario?.id === FIRST_CUSTOMER_DEMO_MODE.id;
 
   const loadFirstCustomerDemo = () => {
-    setShellActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
-    setRootActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
+    setActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
     setStatus('Department walkthrough dataset loaded for the live customer walkthrough.');
     setError('');
   };
 
   const resetDemoScenario = () => {
-    setShellActiveScenario('normal-day');
-    setRootActiveScenario('normal-day');
+    setActiveScenario('normal-day');
     setStatus('Department walkthrough dataset reset to normal operations.');
     setError('');
   };

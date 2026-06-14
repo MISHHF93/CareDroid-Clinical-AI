@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
@@ -168,6 +168,17 @@ describe('canonical route tree behavior', () => {
     expect(screen.getByText('Total patients')).toBeInTheDocument();
   });
 
+  it('/emergency/patients consumes patientId context without another lookup', async () => {
+    const patient = useEmergencyStore.getState().patients[0];
+
+    renderRoute(`/emergency/patients?patientId=${encodeURIComponent(patient.id)}`);
+
+    expect(await screen.findByRole('heading', { name: 'Emergency Patients' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(useEmergencyStore.getState().selectedPatientId).toBe(patient.id);
+    });
+  });
+
   it('/emergency/ems renders the active EMS summary route', async () => {
     renderRoute('/emergency/ems');
 
@@ -203,6 +214,29 @@ describe('canonical route tree behavior', () => {
     ).toBeGreaterThan(0);
     expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
     expect(screen.getByText('Triage')).toBeInTheDocument();
+    expect(screen.getByText('Movement stage: Waiting')).toBeInTheDocument();
+  });
+
+  it('/emergency/queues consumes the active whiteboard queue filter', async () => {
+    useEmergencyStore.setState({ activeQueueFilter: 'Waiting' });
+
+    renderRoute('/emergency/queues');
+
+    expect(
+      await screen.findByText('Showing the Waiting queue requested from the whiteboard.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clear queue filter' })).toBeEnabled();
+  });
+
+  it('/emergency/queues consumes queue filter search params', async () => {
+    renderRoute('/emergency/queues?queue=Reassessment');
+
+    expect(
+      await screen.findByText('Showing the Reassessment queue requested from the whiteboard.'),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(useEmergencyStore.getState().activeQueueFilter).toBe('Reassessment');
+    });
   });
 
   it('/emergency/reassessment renders a dedicated reassessment queue surface', async () => {
@@ -251,6 +285,20 @@ describe('canonical route tree behavior', () => {
       'page',
     );
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/tools');
+  }, ROUTE_LOAD_TIMEOUT);
+
+  it('/emergency/pulse renders Department Pulse inside the active shell', async () => {
+    renderRoute('/emergency/pulse');
+
+    expect(await screen.findByRole('heading', { name: 'Department Pulse' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/pulse');
+  }, ROUTE_LOAD_TIMEOUT);
+
+  it('/emergency/shift renders Shift Summary inside the active shell', async () => {
+    renderRoute('/emergency/shift');
+
+    expect(await screen.findByRole('heading', { name: 'Emergency Shift Summary' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/shift');
   }, ROUTE_LOAD_TIMEOUT);
 
   it.each([
@@ -327,7 +375,7 @@ describe('canonical route tree behavior', () => {
   });
 
   it('redirects retired Emergency OS routes to the whiteboard', async () => {
-    renderRoute('/emergency/pulse');
+    renderRoute('/emergency/simulation');
 
     expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });

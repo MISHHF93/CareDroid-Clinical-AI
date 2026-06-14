@@ -180,6 +180,11 @@ export class EmergencyOsController {
     return this.referralService.getReferrals();
   }
 
+  @Post('referrals')
+  createReferral(@Body() dto: Record<string, unknown>) {
+    return this.referralService.createReferral(dto);
+  }
+
   @Get('provincial-health')
   getProvincialHealth() {
     return this.provincialHealthService.getProvincialHealth();

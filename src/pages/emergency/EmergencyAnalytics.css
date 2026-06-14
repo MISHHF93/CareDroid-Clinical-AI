@@ -11,6 +11,7 @@
 }
 
 .emergency-analytics__header,
+.emergency-analytics__command-layer,
 .emergency-analytics__card {
   border: 0;
   border-radius: var(--radius-xl);
@@ -31,7 +32,21 @@
   box-shadow: none;
 }
 
+.emergency-analytics__command-layer {
+  display: grid;
+  gap: var(--component-card-gap);
+  padding: var(--component-card-padding);
+}
+
+.emergency-analytics__command-layer > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
 .emergency-analytics__header span,
+.emergency-analytics__command-layer span,
 .emergency-analytics__card header span {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -46,7 +61,15 @@
   font-weight: 650;
 }
 
+.emergency-analytics__command-layer h2 {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: 650;
+}
+
 .emergency-analytics__header p,
+.emergency-analytics__source,
 .emergency-analytics__card header small {
   margin: 0;
   color: var(--color-text-secondary);
@@ -56,6 +79,15 @@
 .emergency-analytics__header strong {
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--status-info) 14%, transparent);
+  color: var(--status-info);
+  padding: 5px 10px;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.emergency-analytics__command-layer > header strong {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 12%, transparent);
   color: var(--status-info);
   padding: 5px 10px;
   font-size: var(--font-size-xs);
@@ -107,6 +139,27 @@
 
 .emergency-analytics__card:hover {
   background: color-mix(in srgb, var(--status-info) 5%, var(--color-card));
+  transform: translateY(-1px);
+}
+
+.emergency-analytics__link {
+  width: fit-content;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 18%, transparent);
+  color: var(--status-info);
+  padding: 8px 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.emergency-analytics__link:hover {
+  background: var(--status-info);
+  color: var(--color-background);
   transform: translateY(-1px);
 }
 

@@ -11,6 +11,7 @@
 .smart-intake__hero,
 .smart-intake__panel,
 .smart-intake__status,
+.smart-intake__disclosure,
 .smart-intake__actions,
 .smart-intake__audit {
   border-radius: var(--component-card-radius);
@@ -109,6 +110,15 @@
 .smart-intake__status {
   padding: var(--space-3);
   color: var(--color-text-secondary);
+}
+
+.smart-intake__disclosure {
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-warning) 35%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-warning) 9%, var(--color-card));
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 650;
 }
 
 .smart-intake__grid {
