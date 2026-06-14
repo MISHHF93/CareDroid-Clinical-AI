@@ -490,6 +490,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   copilot_used: 'Copilot used',
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
+  upgrade_harness_used: 'Upgrade harness used',
 };
 
 type WorkflowActionInput = Omit<

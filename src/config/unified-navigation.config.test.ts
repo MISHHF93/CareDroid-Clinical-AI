@@ -81,6 +81,13 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'tools',
+    label: 'Medical Tools',
+    icon: 'clinical-tools',
+    route: '/emergency/tools',
+    featureGate: null,
+  },
+  {
     id: 'analytics',
     label: 'Analytics',
     icon: 'emergency-analytics',
@@ -129,7 +136,7 @@ describe('unified navigation config', () => {
     }
   });
 
-  it('preserves 12 canonical items while exposing 10 pilot items', () => {
+  it('preserves 13 canonical items while exposing 11 pilot items', () => {
     expect(PILOT_CUSTOMER_MODE.enabled).toBe(true);
     expect(getPilotCustomerNavigationItems().map((item) => item.id)).toEqual(
       PILOT_VISIBLE_ITEMS.map((item) => item.id),
@@ -165,6 +172,7 @@ describe('unified navigation config', () => {
       'Boarding',
       'Referrals',
       'Copilot',
+      'Medical Tools',
     ]);
     expect(readOnlyLabels).not.toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');

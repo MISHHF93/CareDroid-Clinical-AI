@@ -162,9 +162,9 @@ describe('Production routes — tools area fallback redirects', () => {
     expect(redirect).toBeNull();
   });
 
-  it('redirects chat-assisted mistyped subpath to Assistant with legacy tool param', () => {
+  it('redirects chat-assisted mistyped subpath to Emergency Copilot with tool param', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
-    expect(redirect?.pathname).toBe('/assistant');
+    expect(redirect?.pathname).toBe('/emergency/copilot');
     expect(redirect?.search).toBe('?tool=wells-pe');
   });
 

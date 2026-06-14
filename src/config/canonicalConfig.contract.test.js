@@ -38,7 +38,7 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/signin')).toBe('/auth');
     expect(getRouteAliasTarget('/chat')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
-    expect(getRouteAliasTarget('/catalog')).toBe('/emergency/whiteboard');
+    expect(getRouteAliasTarget('/catalog')).toBe('/emergency/tools');
     expect(getRouteAliasTarget('/fleet')).toBeNull();
     expect(getRouteAliasTarget('/home')).toBe('/emergency/whiteboard');
     expect(getRouteAliasTarget('/automation')).toBe('/workflows');
@@ -46,6 +46,9 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/privacy')).toBeNull();
     expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
+    expect(ROUTE_ALIAS_GROUPS.assistant.target).toBe('/emergency/copilot');
+    expect(ROUTE_ALIAS_GROUPS.tools.target).toBe('/emergency/tools');
+    expect(ROUTE_ALIAS_GROUPS.calculators.target).toBe('/emergency/tools');
     expect(ROUTE_ALIAS_GROUPS.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
     expect(new Set(PROTECTED_ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)).size).toBe(
@@ -69,8 +72,8 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/emergency/whiteboard');
     expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
     expect(ROUTE_RECORDS_BY_ID.assistant.path).toBe('/emergency/copilot');
-    expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/whiteboard');
-    expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/whiteboard');
+    expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/tools');
+    expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/tools');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.componentKey).toBe('PackMarketplace');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');

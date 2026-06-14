@@ -16,7 +16,12 @@ import {
   fetchEmergencyOsSettings,
   saveEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
-import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
+import {
+  fetchEmergencyAiGovernanceCompliance,
+  fetchEmergencyAiGovernanceRegistry,
+  fetchEmergencyWorkflowLogs,
+  validateEmergencyAiGovernancePrompts,
+} from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import './EmergencySettings.css';
 
@@ -226,6 +231,18 @@ function auditDetailSummary(details = {}) {
     .join(' | ');
 }
 
+function countByStatus(services = []) {
+  return services.reduce((counts, [, service]) => {
+    const status = service?.status || 'unknown';
+    counts[status] = (counts[status] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+function promptValidationIssues(validation = {}) {
+  return Object.values(validation).flatMap((result) => result?.issues || []);
+}
+
 export default function EmergencySettings() {
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
@@ -255,6 +272,11 @@ export default function EmergencySettings() {
     to: '',
   });
   const [backendWorkflowLogs, setBackendWorkflowLogs] = useState([]);
+  const [aiGovernanceStatus, setAiGovernanceStatus] = useState('loading');
+  const [aiGovernanceError, setAiGovernanceError] = useState('');
+  const [aiGovernanceRegistry, setAiGovernanceRegistry] = useState(null);
+  const [aiGovernanceCompliance, setAiGovernanceCompliance] = useState(null);
+  const [aiPromptValidation, setAiPromptValidation] = useState({});
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const thresholdTimersRef = useRef({});
@@ -327,6 +349,46 @@ export default function EmergencySettings() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    setAiGovernanceStatus('loading');
+    setAiGovernanceError('');
+
+    Promise.allSettled([
+      fetchEmergencyAiGovernanceRegistry(),
+      fetchEmergencyAiGovernanceCompliance(30),
+      validateEmergencyAiGovernancePrompts(),
+    ]).then(([registryResult, complianceResult, validationResult]) => {
+      if (cancelled) return;
+
+      const registry =
+        registryResult.status === 'fulfilled' ? registryResult.value : null;
+      const compliance =
+        complianceResult.status === 'fulfilled' ? complianceResult.value : null;
+      const validation =
+        validationResult.status === 'fulfilled' ? validationResult.value : null;
+
+      if (registry) setAiGovernanceRegistry(registry);
+      if (compliance) setAiGovernanceCompliance(compliance);
+      if (validation) setAiPromptValidation(validation);
+
+      const failed = [registryResult, complianceResult, validationResult].find(
+        (result) => result.status === 'rejected',
+      );
+      if (failed) {
+        setAiGovernanceError('AI governance status is partially unavailable.');
+        setAiGovernanceStatus('partial');
+        return;
+      }
+
+      setAiGovernanceStatus('ready');
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const enabledCount = useMemo(
     () => draft.enabledModules.filter((module) => module.enabled).length,
     [draft.enabledModules],
@@ -380,6 +442,31 @@ export default function EmergencySettings() {
       })
       .slice(0, 50);
   }, [auditFilters, storeAuditLogs]);
+  const aiServiceEntries = useMemo(
+    () => Object.entries(aiGovernanceRegistry?.services || {}),
+    [aiGovernanceRegistry],
+  );
+  const aiStatusCounts = useMemo(() => countByStatus(aiServiceEntries), [aiServiceEntries]);
+  const aiHumanReviewCount = useMemo(
+    () => aiServiceEntries.filter(([, service]) => service?.requiresHumanReview).length,
+    [aiServiceEntries],
+  );
+  const aiBlockedActions = useMemo(
+    () => aiGovernanceRegistry?.safetyRules?.disallowedAutonomousActions || [],
+    [aiGovernanceRegistry],
+  );
+  const aiRequiredDisclaimers = useMemo(
+    () => aiGovernanceRegistry?.safetyRules?.requiredDisclaimers || [],
+    [aiGovernanceRegistry],
+  );
+  const aiValidationIssues = useMemo(
+    () => promptValidationIssues(aiPromptValidation),
+    [aiPromptValidation],
+  );
+  const aiGovernanceFrameworks = aiGovernanceRegistry?.governanceFrameworks || [];
+  const copilotService = aiGovernanceRegistry?.services?.copilot || {};
+  const deteriorationService = aiGovernanceRegistry?.services?.deteriorationPrediction || {};
+  const federatedEmsService = aiGovernanceRegistry?.services?.federatedEmsTriage || {};
 
   const updateDraft = (patch) => {
     setDraft((current) => mergeSettings(current, patch));
@@ -931,6 +1018,90 @@ export default function EmergencySettings() {
             value={draft.aiSettings.humanReviewRequired}
             onChange={(value) => updateNested('aiSettings', 'humanReviewRequired', value)}
           />
+        </div>
+        <div className="emergency-settings__audit-summary" aria-label="AI governance configuration status">
+          <strong>{aiServiceEntries.length || 0}</strong>
+          <span>governed AI services</span>
+          <small>
+            {aiGovernanceStatus === 'ready'
+              ? `Backend registry loaded from ${aiGovernanceRegistry?.storageMode || 'governance service'}`
+              : aiGovernanceStatus === 'loading'
+                ? 'Loading AI governance registry...'
+                : aiGovernanceError || 'AI governance registry partially available'}
+          </small>
+        </div>
+        <div className="emergency-settings__cards" aria-label="AI governance registry status">
+          <article>
+            <div>
+              <strong>Human review coverage</strong>
+              <p>
+                {aiHumanReviewCount}/{aiServiceEntries.length || 0} governed services require human
+                review before clinical or operational action.
+              </p>
+              <small>
+                Required disclaimer: {aiRequiredDisclaimers[0] || 'Human review required'}
+              </small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Blocked autonomous actions</strong>
+              <p>
+                {(aiBlockedActions.length ? aiBlockedActions : ['diagnose', 'prescribe', 'disposition patients'])
+                  .slice(0, 4)
+                  .join(', ')}
+              </p>
+              <small>No autonomous diagnosis, prescribing, disposition, or patient matching.</small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Compliance and audit</strong>
+              <p>
+                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ·{' '}
+                {Math.round((aiGovernanceCompliance?.humanReviewRate || 0) * 100)}% human review rate
+              </p>
+              <small>
+                Storage: {aiGovernanceCompliance?.storageMode || aiGovernanceRegistry?.storageMode || 'backend fixture'}
+              </small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Prompt validation</strong>
+              <p>
+                {aiValidationIssues.length
+                  ? `${aiValidationIssues.length} prompt issue(s) require review.`
+                  : 'All registered prompt templates validate with required disclaimers.'}
+              </p>
+              <small>{aiGovernanceFrameworks.join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}</small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>Copilot runtime config</strong>
+              <p>
+                {copilotService.provider || draft.aiSettings.provider} ·{' '}
+                {copilotService.model || draft.aiSettings.model}
+              </p>
+              <small>
+                {copilotService.auditLevel || 'full'} audit · {copilotService.status || 'settings'} status
+              </small>
+            </div>
+          </article>
+          <article>
+            <div>
+              <strong>ML model governance</strong>
+              <p>
+                Deterioration: {deteriorationService.status || 'future'} · Federated EMS:{' '}
+                {federatedEmsService.status || 'future'}
+              </p>
+              <small>
+                {aiStatusCounts.active || 0} active · {aiStatusCounts.future || 0} future ·{' '}
+                {aiStatusCounts['local-deterministic'] || 0} deterministic
+              </small>
+            </div>
+          </article>
         </div>
       </Section>
 

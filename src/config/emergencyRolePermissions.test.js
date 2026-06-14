@@ -26,6 +26,7 @@ const ALL_OPERATIONAL_SIDEBAR_IDS = [
   'boarding',
   'referrals',
   'copilot',
+  'tools',
 ];
 
 describe('Emergency OS role-based views', () => {
@@ -75,7 +76,7 @@ describe('Emergency OS role-based views', () => {
     ).toBe(true);
     expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencyTools),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       getNearestEmergencyRoute(
         EMERGENCY_ROLE_IDS.registrationClerk,
@@ -127,5 +128,6 @@ describe('Emergency OS role-based views', () => {
     ).toBe(false);
     expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-ems'])).toBe(true);
     expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-intake'])).toBe(true);
+    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.emsUser, byId['open-tools'])).toBe(true);
   });
 });

@@ -12,6 +12,7 @@ import {
   Priority,
   type CapacitySnapshot,
   type Patient,
+  type WorkflowActionLog,
 } from '../types/emergency';
 
 const mocks = vi.hoisted(() => ({
@@ -19,6 +20,11 @@ const mocks = vi.hoisted(() => ({
     error: vi.fn(),
     warning: vi.fn(),
   }),
+  timelineContext: {
+    loading: false,
+    error: '',
+    context: {},
+  },
 }));
 
 vi.mock('sonner', () => ({
@@ -38,11 +44,11 @@ vi.mock('../hooks/useEmergencyRolePermissions', () => ({
 }));
 
 vi.mock('../hooks/usePatientTimelineContext', () => ({
-  usePatientTimelineContext: () => ({
-    loading: false,
-    error: null,
-    context: {},
-  }),
+  usePatientTimelineContext: () => mocks.timelineContext,
+}));
+
+vi.mock('../hooks/useEmergencyOs', () => ({
+  useUpgradeHarnessPatientFlow: () => ({ data: { data: { signals: [] } } }),
 }));
 
 vi.mock('../services/emergencyOsApi', () => ({
@@ -106,6 +112,11 @@ function makeCapacity(overrides: Partial<CapacitySnapshot> = {}): CapacitySnapsh
 afterEach(() => {
   cleanup();
   useEmergencyStore.setState(originalState, true);
+  mocks.timelineContext = {
+    loading: false,
+    error: '',
+    context: {},
+  };
   vi.useRealTimers();
   vi.clearAllMocks();
 });
@@ -157,6 +168,86 @@ describe('R12 complaint routing', () => {
 });
 
 describe('R12 critical vitals and flag reactivity', () => {
+  it('merges backend patient workflow logs with local and generated detail-panel logs', async () => {
+    const patient = makePatient({
+      timeline: [
+        {
+          id: 'journey-local-1',
+          patientId: 'r12-patient-1',
+          timestamp: '2026-06-13T12:05:00.000Z',
+          from: PatientState.Waiting,
+          to: PatientState.Assessment,
+          staffId: 's1',
+          note: 'Moved to assessment from local journey.',
+        },
+      ],
+    });
+    const localLog: WorkflowActionLog = {
+      id: 'local-assignment-log',
+      type: 'clinician_assigned',
+      title: 'Clinician assigned',
+      summary: 'Local clinician assignment preserved.',
+      timestamp: '2026-06-13T12:10:00.000Z',
+      actorStaffId: 's1',
+      patientId: patient.id,
+      source: 'emergency-os-ui',
+      severity: 'Info',
+      status: 'recorded',
+      metadata: {},
+    };
+    const backendOnlyLog: WorkflowActionLog = {
+      id: 'backend-provincial-log',
+      type: 'provincial_data_viewed',
+      title: 'Provincial data viewed',
+      summary: 'Backend-only provincial chart audit.',
+      timestamp: '2026-06-13T12:15:00.000Z',
+      patientId: patient.id,
+      source: 'backend-fixture',
+      severity: 'Info',
+      status: 'recorded',
+      metadata: {},
+    };
+    const backendDuplicateLog: WorkflowActionLog = {
+      ...localLog,
+      id: 'backend-duplicate-assignment-log',
+      summary: 'Backend duplicate should not render.',
+      source: 'backend-fixture',
+    };
+    mocks.timelineContext = {
+      loading: false,
+      error: '',
+      context: {
+        workflowLogs: [backendOnlyLog, backendDuplicateLog],
+      },
+    };
+
+    useEmergencyStore.setState(
+      {
+        ...originalState,
+        patients: [patient],
+        staff: [
+          {
+            id: 's1',
+            name: 'Morgan RN',
+            role: 'RN',
+            active: true,
+          },
+        ],
+        workflowLogs: [localLog],
+        selectedPatientId: patient.id,
+        ui: { ...originalState.ui, selectedPatientId: patient.id },
+      },
+      true,
+    );
+
+    render(<PatientDetailPanel />);
+
+    expect(await screen.findAllByText('Backend-only provincial chart audit.')).not.toHaveLength(0);
+    expect(screen.getAllByText('Local clinician assignment preserved.')).not.toHaveLength(0);
+    expect(screen.getAllByText('Moved to assessment from local journey.')).not.toHaveLength(0);
+    expect(screen.queryByText('Backend duplicate should not render.')).toBeNull();
+  });
+
   it('dispatches a critical vitals alert and adds DeteriorationRisk after vitals save', async () => {
     const patient = makePatient();
     useEmergencyStore.setState(
@@ -209,7 +300,7 @@ describe('R12 critical vitals and flag reactivity', () => {
       useEmergencyStore.getState().addFlag(patient.id, PatientFlag.DeteriorationRisk);
     });
 
-    expect(await screen.findByLabelText(PatientFlag.DeteriorationRisk)).toBeTruthy();
+    expect(await screen.findByTitle(PatientFlag.DeteriorationRisk)).toBeTruthy();
     expect(
       document
         .querySelector('[data-patient-card-id="r12-patient-1"]')
@@ -245,14 +336,12 @@ describe('R12 capacity header flow', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('button', { name: /capacity: 10 green/i }).style.transition).toBe(
-      'background 180ms ease, border-color 180ms ease, color 180ms ease',
-    );
+    expect(screen.getByTitle(/Capacity Score: 10 Green/i)).toBeTruthy();
 
     act(() => {
       useEmergencyStore.getState().movePatientToState(patient.id, PatientState.Admission, 's1');
     });
 
-    expect(await screen.findByRole('button', { name: /capacity: 71 orange/i })).toBeTruthy();
+    expect(await screen.findByTitle(/Capacity Score: 71 Red/i)).toBeTruthy();
   });
 });

@@ -16,12 +16,22 @@ const {
   compareRealTimeSimulationInterventions,
   evaluateHybridDigitalTwinScenario,
   evaluateRealTimeSimulationIntervention,
+  fetchAdvancedEmergencyOsUpgradeHarness,
+  fetchEmergencyAiGovernanceCompliance,
+  fetchEmergencyAiGovernanceRegistry,
+  fetchEmergencyAiGovernanceSafetyRules,
   fetchEmergencyWorkflowLogs,
+  fetchPatientWorkflowLogs,
   fetchCompleteImplementationReadiness,
+  fetchEmergencyAiGovernanceViolations,
   fetchFederatedLearningDashboard,
   fetchFederatedLearningGlobalModel,
   fetchHybridDigitalTwinState,
   fetchRealTimeSimulationRecommendations,
+  fetchUpgradeHarnessAuditSummary,
+  fetchUpgradeHarnessCapacity,
+  fetchUpgradeHarnessClinicalIntelligence,
+  fetchUpgradeHarnessPatientFlow,
   updateEmergencySettings,
   initializeHybridDigitalTwin,
   runSmartIntakeVerticalSlice,
@@ -29,6 +39,7 @@ const {
   simulateHybridDigitalTwin,
   submitFederatedModelUpdate,
   updateRealTimeSimulationState,
+  validateEmergencyAiGovernancePrompts,
 } = await import('./emergencyOsApi');
 
 describe('emergencyOsApi advanced Emergency OS capabilities', () => {
@@ -40,6 +51,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
 
   it('marks active Emergency OS page endpoints separately from review-only capabilities', () => {
     expect(ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual([
+      'centralNodeSnapshot',
       'whiteboard',
       'patients',
       'ems',
@@ -52,7 +64,11 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
       'referrals',
       'copilot',
       'workflowLogs',
+      'patientWorkflowLogs',
       'analytics',
+      'aiGovernanceRegistry',
+      'aiGovernanceCompliance',
+      'aiGovernancePromptValidation',
       'settings',
     ]);
     expect(REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual(
@@ -63,7 +79,14 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
         'simulationUpdateLive',
         'federatedLearningDashboard',
         'digitalTwinState',
+        'aiGovernanceSafetyRules',
+        'aiGovernanceViolations',
         'implementationReadiness',
+        'upgradeHarness',
+        'upgradeHarnessCapacity',
+        'upgradeHarnessPatientFlow',
+        'upgradeHarnessClinicalIntelligence',
+        'upgradeHarnessAuditSummary',
       ]),
     );
   });
@@ -179,12 +202,89 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
+  it('fetches patient-scoped Emergency OS workflow audit logs', async () => {
+    await fetchPatientWorkflowLogs('patient 1');
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/emergency/patients/patient%201/workflow-logs',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+  });
+
   it('fetches the review-only complete implementation readiness contract', async () => {
     await fetchCompleteImplementationReadiness();
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
       '/api/emergency/implementation-readiness',
       expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+  });
+
+  it('fetches the canonical Advanced Emergency OS upgrade harness endpoints', async () => {
+    await fetchAdvancedEmergencyOsUpgradeHarness();
+    await fetchUpgradeHarnessCapacity();
+    await fetchUpgradeHarnessPatientFlow('patient 1');
+    await fetchUpgradeHarnessClinicalIntelligence('patient 1');
+    await fetchUpgradeHarnessAuditSummary();
+
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      1,
+      '/api/emergency/upgrade-harness',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      2,
+      '/api/emergency/upgrade-harness/capacity',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      3,
+      '/api/emergency/upgrade-harness/patient-flow/patient%201',
+      expect.any(Object)
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      4,
+      '/api/emergency/upgrade-harness/clinical-intelligence/patient%201',
+      expect.any(Object)
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      5,
+      '/api/emergency/upgrade-harness/audit-summary',
+      expect.any(Object)
+    );
+  });
+
+  it('fetches the canonical Emergency OS AI governance endpoints', async () => {
+    await fetchEmergencyAiGovernanceRegistry();
+    await fetchEmergencyAiGovernanceSafetyRules();
+    await fetchEmergencyAiGovernanceCompliance(14);
+    await fetchEmergencyAiGovernanceViolations(5);
+    await validateEmergencyAiGovernancePrompts();
+
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      1,
+      '/api/emergency/governance/registry',
+      expect.objectContaining({ headers: expect.objectContaining({ Accept: 'application/json' }) })
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      2,
+      '/api/emergency/governance/safety-rules',
+      expect.any(Object)
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      3,
+      '/api/emergency/governance/compliance?days=14',
+      expect.any(Object)
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      4,
+      '/api/emergency/governance/violations?limit=5',
+      expect.any(Object)
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      5,
+      '/api/emergency/governance/validate-prompts',
+      expect.any(Object)
     );
   });
 

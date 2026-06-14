@@ -5,6 +5,7 @@ import {
   HybridDigitalTwinService,
   RealTimeSimulationService,
 } from './emergency-os.advanced-services';
+import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
 import {
   BoardingService,
   CareDroidCentralNodeService,
@@ -54,6 +55,7 @@ describe('EmergencyOsController', () => {
         RealTimeSimulationService,
         FederatedLearningService,
         HybridDigitalTwinService,
+        EmergencyOsUpgradeHarnessService,
       ],
     }).compile();
 
@@ -82,6 +84,11 @@ describe('EmergencyOsController', () => {
       controller.getSimulationRecommendations(),
       controller.getFederatedDashboard(),
       controller.getDigitalTwinState(),
+      controller.getUpgradeHarness(),
+      controller.getUpgradeHarnessCapacity(),
+      controller.getUpgradeHarnessPatientFlow(),
+      controller.getUpgradeHarnessClinicalIntelligence(),
+      controller.getUpgradeHarnessAuditSummary(),
     ];
 
     for (const envelope of modules) {
@@ -389,5 +396,111 @@ describe('EmergencyOsController', () => {
     expect(simulated.data.metrics.throughput).toBeGreaterThan(0);
     expect(simulated.data.eventTrace.length).toBeGreaterThan(0);
     expect(scenario.data.scenario.metrics.confidenceIntervals.averageWaitMinutes).toHaveLength(2);
+  });
+
+  it('exposes the Advanced Emergency OS upgrade harness with safety and audit metadata', () => {
+    const harness = controller.getUpgradeHarness();
+
+    expect(harness).toMatchObject({
+      module: 'Advanced Emergency OS Upgrade Harness',
+      status: 'placeholder',
+      data: {
+        harnessId: 'advanced-emergency-os-upgrade-harness',
+        mode: 'deterministic-pilot-harness',
+        apiBase: '/api/emergency',
+        blockedAutonomousActions: expect.arrayContaining([
+          'autonomous diagnosis',
+          'autonomous prescribing',
+          'autonomous disposition',
+          'autonomous patient matching',
+        ]),
+        pilotReadiness: expect.objectContaining({
+          totalCapabilities: 10,
+          reviewRequired: 10,
+          externalDependenciesConnected: false,
+          canonicalEndpoints: expect.arrayContaining(['/api/emergency/upgrade-harness']),
+        }),
+      },
+    });
+
+    const allSignals = [
+      ...harness.data.capacityAndForecasting,
+      ...harness.data.patientFlow,
+      ...harness.data.clinicalDecisionSupport,
+      ...harness.data.governance,
+    ];
+
+    expect(allSignals.map((signal) => signal.capability)).toEqual(
+      expect.arrayContaining([
+        'real_time_simulation_adaptive_policy',
+        'brag_forecast_10h',
+        'multimodal_cdss',
+        'modular_mixed_pathology_units',
+        'virtual_visit_track',
+        'nurse_led_split_flow',
+        'wearable_iomt_processing',
+        'federated_learning_harness',
+        'telephone_triage_diversion',
+        'immutable_audit_abstraction',
+      ]),
+    );
+    for (const signal of allSignals) {
+      expect(signal).toMatchObject({
+        confidence: expect.any(Number),
+        provenance: expect.objectContaining({
+          generatedBy: 'EmergencyOsUpgradeHarnessService',
+          provider: expect.any(String),
+          sourceSystems: expect.any(Array),
+          limitations: expect.any(Array),
+        }),
+        safety: expect.objectContaining({
+          status: 'review_required',
+          humanReviewMessage: expect.stringContaining('cannot trigger diagnosis'),
+          autonomousActionsBlocked: expect.arrayContaining(['autonomous disposition']),
+        }),
+        audit: expect.objectContaining({
+          eventId: expect.any(String),
+          immutableLedgerHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+          reviewRequired: true,
+        }),
+      });
+    }
+  });
+
+  it('filters patient-flow and clinical intelligence harness endpoints by patient id', () => {
+    const created = controller.createIntakePatient({
+      id: 'upgrade-harness-patient-1',
+      mrn: 'ED-UPGRADE-1',
+      firstName: 'Upgrade',
+      lastName: 'Harness',
+      priority: 'P2',
+      chiefComplaint: 'Chest pressure with abnormal heart rate',
+      complaintCategory: 'Cardiac',
+      flags: ['HighRisk'],
+    });
+
+    const patientFlow = controller.getUpgradeHarnessPatientFlowForPatient(created.data.patient.id);
+    const clinical = controller.getUpgradeHarnessClinicalIntelligenceForPatient(
+      created.data.patient.id,
+    );
+
+    expect(patientFlow.data.patientId).toBe(created.data.patient.id);
+    expect(
+      patientFlow.data.signals.find(
+        (signal) => signal.capability === 'modular_mixed_pathology_units',
+      )?.data.selectedPatientIds,
+    ).toContain(created.data.patient.id);
+    expect(clinical.data.patientId).toBe(created.data.patient.id);
+    expect(
+      clinical.data.signals.find((signal) => signal.capability === 'multimodal_cdss')?.data
+        .reviewQueue,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          patientId: created.data.patient.id,
+          blockedClinicalClaims: expect.stringContaining('No diagnosis'),
+        }),
+      ]),
+    );
   });
 });

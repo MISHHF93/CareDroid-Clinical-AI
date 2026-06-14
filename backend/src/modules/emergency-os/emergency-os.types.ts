@@ -58,7 +58,8 @@ export type WorkflowActionType =
   | 'referral_created'
   | 'copilot_used'
   | 'provincial_data_viewed'
-  | 'integration_event_received';
+  | 'integration_event_received'
+  | 'upgrade_harness_used';
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
 export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';
@@ -318,6 +319,80 @@ export interface CareDroidCentralNodeSnapshot {
   recentEvents: WorkflowActionLog[];
   tenantSettings: EmergencyOsSettingsContract;
   enabledModules: string[];
+}
+
+export type UpgradeHarnessCapability =
+  | 'real_time_simulation_adaptive_policy'
+  | 'brag_forecast_10h'
+  | 'multimodal_cdss'
+  | 'modular_mixed_pathology_units'
+  | 'virtual_visit_track'
+  | 'nurse_led_split_flow'
+  | 'wearable_iomt_processing'
+  | 'federated_learning_harness'
+  | 'telephone_triage_diversion'
+  | 'immutable_audit_abstraction';
+
+export type UpgradeHarnessSafetyStatus =
+  | 'review_required'
+  | 'autonomous_action_blocked'
+  | 'pilot_only';
+
+export interface UpgradeHarnessProvenance {
+  generatedBy: 'EmergencyOsUpgradeHarnessService';
+  provider: string;
+  sourceSystems: string[];
+  inputSignals: string[];
+  evidenceWindow: string;
+  limitations: string[];
+}
+
+export interface UpgradeHarnessSafety {
+  status: UpgradeHarnessSafetyStatus;
+  humanReviewMessage: string;
+  policyVersion: string;
+  autonomousActionsBlocked: string[];
+}
+
+export interface UpgradeHarnessAuditMetadata {
+  eventId: string;
+  generatedAt: string;
+  actor: 'system-pilot-harness';
+  source: 'emergency-os-upgrade-harness';
+  immutableLedgerHash: string;
+  previousHash: string;
+  retentionLabel: 'pilot-audit-review';
+  reviewRequired: true;
+}
+
+export interface UpgradeHarnessSignal<TData = Record<string, unknown>> {
+  id: string;
+  capability: UpgradeHarnessCapability;
+  label: string;
+  confidence: number;
+  provenance: UpgradeHarnessProvenance;
+  safety: UpgradeHarnessSafety;
+  audit: UpgradeHarnessAuditMetadata;
+  data: TData;
+}
+
+export interface AdvancedEmergencyOsUpgradeHarness {
+  harnessId: 'advanced-emergency-os-upgrade-harness';
+  mode: 'deterministic-pilot-harness';
+  apiBase: '/api/emergency';
+  generatedAt: string;
+  safetyNotice: string;
+  blockedAutonomousActions: string[];
+  capacityAndForecasting: Array<UpgradeHarnessSignal<Record<string, unknown>>>;
+  patientFlow: Array<UpgradeHarnessSignal<Record<string, unknown>>>;
+  clinicalDecisionSupport: Array<UpgradeHarnessSignal<Record<string, unknown>>>;
+  governance: Array<UpgradeHarnessSignal<Record<string, unknown>>>;
+  pilotReadiness: {
+    totalCapabilities: number;
+    reviewRequired: number;
+    externalDependenciesConnected: false;
+    canonicalEndpoints: string[];
+  };
 }
 
 export type EmergencyOsSettingsPatch = {

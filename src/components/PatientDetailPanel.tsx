@@ -26,6 +26,7 @@ import { dispatchAlert } from '../engine/alertEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
 import { buildPatientTimeline } from '../utils/patientTimeline';
 import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
@@ -82,6 +83,28 @@ type VitalsChartPoint = {
   rr?: number;
   gcs?: number;
 };
+type UpgradeHarnessSignal = {
+  capability: string;
+  label?: string;
+  confidence?: number;
+  provenance?: { provider?: string; generatedBy?: string; evidenceWindow?: string };
+  safety?: {
+    status?: string;
+    humanReviewMessage?: string;
+    policyVersion?: string;
+    autonomousActionsBlocked?: string[];
+  };
+  audit?: { immutableLedgerHash?: string; reviewRequired?: boolean };
+  data?: Record<string, unknown>;
+};
+type UpgradePatientFlowEnvelope = {
+  data?: {
+    signals?: UpgradeHarnessSignal[];
+  };
+} | null;
+type UpgradePatientFlowState = {
+  data: UpgradePatientFlowEnvelope;
+};
 
 const vitalsLineConfig: Array<{ key: VitalsLineKey; label: string; color: string }> = [
   { key: 'hr', label: 'HR', color: '#EF4444' },
@@ -130,6 +153,31 @@ function workflowActor(log: WorkflowActionLog, staff: Staff[]): string {
   return log.source;
 }
 
+function workflowLogKeys(log: WorkflowActionLog, patientId: string): string[] {
+  const keys: string[] = [];
+  if (log.id) keys.push(`id:${log.id}`);
+  if (log.timestamp && log.type) {
+    keys.push(`stable:${log.patientId || patientId}:${log.timestamp}:${log.type}`);
+  }
+  return keys;
+}
+
+function mergePatientWorkflowLogs(patientId: string, ...groups: WorkflowActionLog[][]): WorkflowActionLog[] {
+  const merged: WorkflowActionLog[] = [];
+  const seenKeys = new Set<string>();
+
+  groups.flat().forEach((log) => {
+    const keys = workflowLogKeys(log, patientId);
+    if (keys.some((key) => seenKeys.has(key))) return;
+    merged.push(log);
+    keys.forEach((key) => seenKeys.add(key));
+  });
+
+  return merged.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
+}
+
 function journeyTimestamp(patient: Patient, state: PatientState): string | undefined {
   if (state === PatientState.Arrival) return patient.arrivalTime;
   if (state === PatientState.Triage) return patient.triageTime || undefined;
@@ -147,6 +195,29 @@ function hasPatientFlagValue(patient: Patient, flag: PatientFlag | string): bool
 
 function hasStrokeCodeFlag(patient: Patient): boolean {
   return patient.flags.some((flag) => /stroke\s*code|strokecode|stroke_code/i.test(String(flag)));
+}
+
+function findUpgradeSignal(signals: UpgradeHarnessSignal[], capability: string): UpgradeHarnessSignal | null {
+  return signals.find((signal) => signal.capability === capability) || null;
+}
+
+function recordArray(value: unknown): Array<Record<string, unknown>> {
+  return Array.isArray(value) ? (value as Array<Record<string, unknown>>) : [];
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.map(String) : [];
+}
+
+function formatConfidence(value?: number): string {
+  return typeof value === 'number' ? `${Math.round(value * 100)}% confidence` : 'confidence pending';
+}
+
+function formatSignalMeta(signal?: UpgradeHarnessSignal | null): string {
+  if (!signal) return 'review_required';
+  const review = signal.audit?.reviewRequired ? 'review required' : signal.safety?.status || 'pilot';
+  const provider = signal.provenance?.provider || signal.provenance?.generatedBy || 'deterministic provider';
+  return `${review} | ${formatConfidence(signal.confidence)} | ${provider}`;
 }
 
 function vitalTone(label: string, value?: number): string {
@@ -511,6 +582,10 @@ export default function PatientDetailPanel() {
   const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
   const swipeStartYRef = useRef<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const upgradePatientFlow = useUpgradeHarnessPatientFlow(
+    selectedPatientId,
+  ) as UpgradePatientFlowState;
+  const upgradePatientFlowEnvelope = upgradePatientFlow.data;
   const canTransition = emergencyRole.can(EMERGENCY_ACTIONS.transitionPatient);
   const canWriteVitals = emergencyRole.can(EMERGENCY_ACTIONS.writeVitals);
   const canWriteNote = emergencyRole.can(EMERGENCY_ACTIONS.writeNote);
@@ -537,14 +612,12 @@ export default function PatientDetailPanel() {
     const generatedLogs = selectedPatient.timeline.map((event) =>
       workflowLogFromJourneyEvent(event, selectedPatient, staff),
     );
-    const byId = new Map<string, WorkflowActionLog>();
-    [...workflowLogs.filter((log) => log.patientId === selectedPatient.id), ...generatedLogs].forEach((log) => {
-      byId.set(log.id, log);
-    });
-    return [...byId.values()].sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    const localLogs = workflowLogs.filter((log) => log.patientId === selectedPatient.id);
+    const backendLogs = (timelineContextState.context.workflowLogs || []).filter(
+      (log) => !log.patientId || log.patientId === selectedPatient.id,
     );
-  }, [selectedPatient, staff, workflowLogs]);
+    return mergePatientWorkflowLogs(selectedPatient.id, localLogs, generatedLogs, backendLogs);
+  }, [selectedPatient, staff, timelineContextState.context.workflowLogs, workflowLogs]);
   const patientTimeline = useMemo(
     () =>
       selectedPatient
@@ -557,6 +630,65 @@ export default function PatientDetailPanel() {
         : [],
     [alerts, patientWorkflowLogs, selectedPatient, staff, timelineContextState.context],
   );
+  const upgradeFlowSignals = useMemo(
+    () => upgradePatientFlowEnvelope?.data?.signals || [],
+    [upgradePatientFlowEnvelope],
+  );
+  const upgradeFlowCards = useMemo(() => {
+    const modularSignal = findUpgradeSignal(
+      upgradeFlowSignals,
+      'modular_mixed_pathology_units',
+    );
+    const vvtSignal = findUpgradeSignal(upgradeFlowSignals, 'virtual_visit_track');
+    const splitFlowSignal = findUpgradeSignal(upgradeFlowSignals, 'nurse_led_split_flow');
+    const wearableSignal = findUpgradeSignal(upgradeFlowSignals, 'wearable_iomt_processing');
+    const vvtCandidates = recordArray(vvtSignal?.data?.candidates);
+    const splitLanes = recordArray(splitFlowSignal?.data?.lanes);
+    const wearableAlerts = recordArray(wearableSignal?.data?.alerts);
+    const selectedId = selectedPatientId ? String(selectedPatientId) : '';
+    const selectedUnits = recordArray(modularSignal?.data?.units).filter((unit) =>
+      stringArray(unit.patientIds).includes(selectedId),
+    );
+
+    return [
+      modularSignal
+        ? {
+            title: 'Modular unit',
+            body: selectedUnits.length
+              ? `Patient appears in ${selectedUnits.length} mixed-pathology review module.`
+              : 'Patient reviewed against mixed-pathology module rules.',
+            meta: formatSignalMeta(modularSignal),
+          }
+        : null,
+      vvtSignal
+        ? {
+            title: 'Virtual visit track',
+            body: vvtCandidates.length
+              ? 'Virtual-visit candidate held for RN/MD suitability review.'
+              : 'No virtual-visit candidate generated for this patient.',
+            meta: formatSignalMeta(vvtSignal),
+          }
+        : null,
+      splitFlowSignal
+        ? {
+            title: 'Nurse-led split flow',
+            body: `${splitLanes.length} operational lanes evaluated without changing orders or disposition.`,
+            meta: formatSignalMeta(splitFlowSignal),
+          }
+        : null,
+      wearableSignal
+        ? {
+            title: 'Wearable IoMT',
+            body: wearableAlerts.length
+              ? `${wearableAlerts.length} vitals-derived alert(s) require review.`
+              : 'No wearable-style vitals alerts for this patient.',
+            meta: `${formatSignalMeta(wearableSignal)} | audit ${
+              wearableSignal.audit?.immutableLedgerHash?.slice(0, 10) || 'pilot-audit'
+            }`,
+          }
+        : null,
+    ].filter((card): card is { title: string; body: string; meta: string } => Boolean(card));
+  }, [selectedPatientId, upgradeFlowSignals]);
 
   useEffect(() => {
     if (!selectedPatient) {
@@ -1026,6 +1158,35 @@ export default function PatientDetailPanel() {
           </form>
         ) : null}
       </section>
+
+      {upgradeFlowCards.length ? (
+        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+          <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>
+            Advanced Upgrade Harness
+          </h3>
+          <div style={{ display: 'grid', gap: 8 }}>
+            {upgradeFlowCards.map((card) => (
+              <article
+                key={card.title}
+                style={{
+                  background: '#0B1120',
+                  border: '1px solid #1F2937',
+                  borderRadius: 10,
+                  padding: 10,
+                }}
+              >
+                <strong style={{ color: '#BFDBFE', fontSize: 13 }}>{card.title}</strong>
+                <p style={{ margin: '5px 0', color: '#D1D5DB', fontSize: 12 }}>{card.body}</p>
+                <small style={{ color: '#FDE68A' }}>{card.meta}</small>
+              </article>
+            ))}
+          </div>
+          <p style={{ margin: '10px 0 0', color: '#6B7280', fontSize: 11 }}>
+            Pilot-only outputs require human review and cannot diagnose, prescribe, disposition, or
+            match patients autonomously.
+          </p>
+        </section>
+      ) : null}
 
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Active Flags</h3>

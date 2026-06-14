@@ -24,6 +24,7 @@ import {
 } from './toolInventory';
 import { toolRegistryById } from './toolRegistry';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { CALCULATOR_ROUTE_DEFS, KNOWN_TOOL_AREA_PATHS } from '../routes/clinicalToolRoutes';
 import {
   MOBILE_FIRST_VIEWPORT_WIDTHS,
@@ -129,7 +130,7 @@ describe('medical expansion cross-pack validation', () => {
         expect(launch.registryId, id).toBe(id);
         expectNonBlank(launch.chatSeed, `${id} chatSeed`);
         expect(nav.mode, id).toBe('chat-assisted');
-        expect(nav.pathname, id).toBe('/assistant');
+        expect(nav.pathname, id).toBe(CANONICAL_ROUTES.emergencyCopilot);
         expect(launch.orchestratorTool, id).toBeNull();
         expect(launch.chatSeed, id).toMatch(
           /decision support|do not|does not|human review|human approval|must not delay/i

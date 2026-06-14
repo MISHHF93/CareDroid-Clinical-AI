@@ -6,7 +6,6 @@ echo "Auditing non-emergency modules..."
 
 BACKEND_DIR="./backend/src"
 FRONTEND_DIR="./src"
-EXECUTE="${CLEAN_EXECUTE:-false}"
 
 PATTERNS_TO_REMOVE=(
   "ICU"
@@ -55,17 +54,13 @@ DIRS_TO_DELETE=(
   "$FRONTEND_DIR/components/governance"
 )
 
-echo "Mode: $([ "$EXECUTE" = "true" ] && echo "DELETE" || echo "DRY RUN")"
+echo "Mode: VERIFY ONLY"
+echo "This script never deletes files. Use the generated audit output for manual review."
 echo ""
 
 for dir in "${DIRS_TO_DELETE[@]}"; do
   if [ -d "$dir" ]; then
-    if [ "$EXECUTE" = "true" ]; then
-      echo "Deleting: $dir"
-      rm -rf "$dir"
-    else
-      echo "Would delete: $dir"
-    fi
+    echo "Review candidate: $dir"
   fi
 done
 
@@ -84,7 +79,5 @@ done
 
 echo ""
 echo "=== Cleanup audit complete ==="
-if [ "$EXECUTE" != "true" ]; then
-  echo "No files were deleted. Re-run with CLEAN_EXECUTE=true to apply deletions after reviewing the audit."
-fi
-echo "Next: Run route audit to verify only emergency endpoints remain."
+echo "No files were deleted. Archive or remove files only after proving they are inactive and unimported."
+echo "Next: Run route audit to verify active Emergency OS endpoints remain canonical."

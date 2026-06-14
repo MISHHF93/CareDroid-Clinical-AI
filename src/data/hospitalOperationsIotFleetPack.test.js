@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import {
   CANONICAL_TOOL_GROUPS,
@@ -62,7 +63,9 @@ describe('Hospital Operations, Medical IoT, and Fleet Tools Pack', () => {
       expect(registry?.initialCalc, id).toBe(id);
       expect(launch.path, id).toBe(`/tools/calculators/${id}`);
       expect(nav.mode, id).toBe('calculator-route');
-      expect(nav.pathname, id).toBe(`/tools/calculators/${id}`);
+      expect(nav.pathname, id).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(nav.search, id).toContain('filter=calculator');
+      expect(nav.search, id).toContain(`q=${id}`);
     }
   });
 
@@ -94,7 +97,8 @@ describe('Hospital Operations, Medical IoT, and Fleet Tools Pack', () => {
       expect(registry?.path, id).toMatch(/^\/(hospital-map|medical-iot|devices|fleet\/)/);
       expect(launch.path, id).toBe(registry?.path);
       expect(nav.mode, id).toBe('tool-page');
-      expect(nav.pathname, id).toBe(registry?.path);
+      expect(nav.pathname, id).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(nav.search, id).toContain('filter=operations');
     }
   });
 

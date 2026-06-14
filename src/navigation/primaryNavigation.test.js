@@ -26,6 +26,7 @@ const SIDEBAR_MODEL = [
   ['Boarding', '/emergency/boarding'],
   ['Referrals', '/emergency/referrals'],
   ['Copilot', '/emergency/copilot'],
+  ['Medical Tools', '/emergency/tools'],
 ];
 
 describe('primaryNavigation', () => {
@@ -155,15 +156,16 @@ describe('primaryNavigation', () => {
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
       true,
     );
-    expect(PRIMARY_NAV_BY_ID.tools).toBeUndefined();
+    expect(PRIMARY_NAV_BY_ID.tools.path).toBe('/emergency/tools');
     expect(PRIMARY_NAV_BY_ID.settings).toBeUndefined();
   });
 
-  it('keeps calculator routes outside primary nav without a duplicate sidebar destination', () => {
+  it('keeps legacy calculator routes outside primary nav without a duplicate sidebar destination', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(
       false,
     );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools')).toBe(false);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/emergency/tools')).toBe(true);
   });
 
   it('keeps Emergency operations routes under the primary Operations concept', () => {
@@ -195,7 +197,7 @@ describe('primaryNavigation', () => {
       ['/emergency/provincial-health', undefined],
       ['/emergency/integrations', undefined],
       ['/emergency/simulation', undefined],
-      ['/emergency/tools', undefined],
+      ['/emergency/tools', 'tools'],
       ['/emergency/shift', undefined],
       ['/profile', undefined],
       ['/workspaces', undefined],

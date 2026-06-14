@@ -1,5 +1,5 @@
-import { memo, useCallback, type KeyboardEvent, type MouseEvent } from 'react';
-import { Patient, PatientFlag, PatientState } from '../types/emergency';
+import { memo, useCallback, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import { Patient, PatientFlag, PatientState, PriorityLabel } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
@@ -30,13 +30,6 @@ const priorityColors = {
   P5: 'var(--priority-p5)',
 };
 
-const stateColors: Partial<Record<PatientState, string>> = {
-  [PatientState.Waiting]: 'var(--status-warning)',
-  [PatientState.Assessment]: 'var(--status-info)',
-  [PatientState.Orders]: 'var(--color-secondary)',
-  [PatientState.Results]: 'var(--status-success)',
-};
-
 const patientStateOrder = Object.values(PatientState);
 
 const flagColors: Partial<Record<PatientFlag, string>> = {
@@ -52,23 +45,75 @@ const flagColors: Partial<Record<PatientFlag, string>> = {
 };
 
 const flagLabels: Partial<Record<PatientFlag, string>> = {
-  [PatientFlag.SepsisAlert]: 'SEP',
-  [PatientFlag.DeteriorationRisk]: 'DET',
-  [PatientFlag.ReassessmentDue]: 'REA',
-  [PatientFlag.ScoreReassessmentRecommended]: 'SCR',
-  [PatientFlag.LongWait]: 'WAIT',
-  [PatientFlag.LWBSRisk]: 'LWBS',
-  [PatientFlag.HighRisk]: 'RISK',
-  [PatientFlag.EMSArrival]: 'EMS',
-  [PatientFlag.PendingAdmission]: 'ADM',
+  [PatientFlag.SepsisAlert]: 'Sepsis alert',
+  [PatientFlag.DeteriorationRisk]: 'Deterioration risk',
+  [PatientFlag.ReassessmentDue]: 'Reassessment due',
+  [PatientFlag.ScoreReassessmentRecommended]: 'Score review',
+  [PatientFlag.LongWait]: 'Long wait',
+  [PatientFlag.LWBSRisk]: 'LWBS risk',
+  [PatientFlag.HighRisk]: 'High risk',
+  [PatientFlag.EMSArrival]: 'EMS arrival',
+  [PatientFlag.PendingAdmission]: 'Pending admission',
+  [PatientFlag.PsychAlert]: 'Psych alert',
+  [PatientFlag.Isolation]: 'Isolation',
+  [PatientFlag.DeterioratingNeuro]: 'Neuro change',
+  [PatientFlag.StrokeCode]: 'Stroke code',
 };
+
+type SignalTone = 'critical' | 'warning' | 'info' | 'flow';
+
+type StatusSignal = {
+  id: string;
+  label: string;
+  tone: SignalTone;
+};
+
+function getSignalBadges({
+  patient,
+  hasReassessmentDue,
+  hasDeteriorationRisk,
+  hasEmsArrival,
+  hasLongWait,
+  hasLwbsRisk,
+  isBoarding,
+}: {
+  patient: Patient;
+  hasReassessmentDue: boolean;
+  hasDeteriorationRisk: boolean;
+  hasEmsArrival: boolean;
+  hasLongWait: boolean;
+  hasLwbsRisk: boolean;
+  isBoarding: boolean;
+}): StatusSignal[] {
+  return [
+    patient.flags.includes(PatientFlag.SepsisAlert)
+      ? { id: 'sepsis', label: 'Sepsis alert', tone: 'critical' as const }
+      : null,
+    hasDeteriorationRisk
+      ? { id: 'deterioration', label: 'Deterioration risk', tone: 'critical' as const }
+      : null,
+    hasLwbsRisk ? { id: 'lwbs', label: 'LWBS risk', tone: 'critical' as const } : null,
+    patient.flags.includes(PatientFlag.HighRisk)
+      ? { id: 'high-risk', label: 'High risk', tone: 'critical' as const }
+      : null,
+    hasReassessmentDue
+      ? { id: 'reassessment', label: 'Reassessment due', tone: 'warning' as const }
+      : null,
+    patient.flags.includes(PatientFlag.ScoreReassessmentRecommended)
+      ? { id: 'score-review', label: 'Score review', tone: 'warning' as const }
+      : null,
+    hasLongWait ? { id: 'long-wait', label: 'Long wait', tone: 'warning' as const } : null,
+    hasEmsArrival ? { id: 'ems', label: 'EMS arrival', tone: 'info' as const } : null,
+    isBoarding ? { id: 'boarding', label: 'Boarding', tone: 'flow' as const } : null,
+  ].filter(Boolean) as StatusSignal[];
+}
 
 function latestVitals(patient: Patient): LegacyVitals | undefined {
   return patient.vitals.at(-1) as LegacyVitals | undefined;
 }
 
 function truncateComplaint(complaint: string): string {
-  return complaint.length > 30 ? `${complaint.slice(0, 30)}...` : complaint;
+  return complaint.length > 42 ? `${complaint.slice(0, 42)}...` : complaint;
 }
 
 function waitMinutes(arrivalTime: string): number {
@@ -123,6 +168,26 @@ function scoreBadges(patient: Patient): string[] {
   return [...scores].slice(0, 3);
 }
 
+function abnormalVitalsSummary({
+  hrAbnormal,
+  bpAbnormal,
+  spo2Abnormal,
+  tempAbnormal,
+}: {
+  hrAbnormal: boolean;
+  bpAbnormal: boolean;
+  spo2Abnormal: boolean;
+  tempAbnormal: boolean;
+}): string {
+  const abnormal = [
+    hrAbnormal ? 'heart rate' : '',
+    bpAbnormal ? 'blood pressure' : '',
+    spo2Abnormal ? 'oxygen saturation' : '',
+    tempAbnormal ? 'temperature' : '',
+  ].filter(Boolean);
+  return abnormal.length ? `Abnormal ${abnormal.join(', ')}.` : 'Vitals within displayed thresholds.';
+}
+
 function PatientCard({
   patient: patientProp,
   keyboardSelected = false,
@@ -152,6 +217,19 @@ function PatientCard({
   const isDischarged = patient.state === PatientState.Discharge || patient.state === PatientState.Deceased;
   const scores = scoreBadges(patient);
   const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
+  const priorityLabel = PriorityLabel[patient.priority] || String(patient.priority);
+  const signalBadges = getSignalBadges({
+    patient,
+    hasReassessmentDue,
+    hasDeteriorationRisk,
+    hasEmsArrival,
+    hasLongWait,
+    hasLwbsRisk,
+    isBoarding,
+  });
+  const cardStyle = {
+    '--patient-priority-color': priorityColors[patient.priority],
+  } as CSSProperties;
   const canTransition = emergencyRole.can(EMERGENCY_ACTIONS.transitionPatient);
   const canManageFlags = emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
   const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
@@ -169,6 +247,18 @@ function PatientCard({
   const bpAbnormal = sbp !== undefined && (sbp < 90 || sbp > 180);
   const spo2Abnormal = spo2 !== undefined && spo2 < 94;
   const tempAbnormal = temp !== undefined && (temp >= 38 || temp < 36);
+  const patientCardAriaLabel = [
+    patientName,
+    patient.priority,
+    patient.state,
+    patient.chiefComplaint,
+    `wait ${minutesWaiting} minutes`,
+    hasReassessmentDue ? 'reassessment due' : '',
+    hasDeteriorationRisk ? 'deterioration risk' : '',
+    abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal }),
+  ]
+    .filter(Boolean)
+    .join(', ');
   const handleSelect = useCallback(() => selectPatient(patient.id), [patient.id, selectPatient]);
   const handleTimelineClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -219,6 +309,7 @@ function PatientCard({
     <div
       className={[
         'patient-card',
+        `patient-card--priority-${patient.priority}`,
         hasReassessmentDue ? 'patient-card--reassessment-due' : '',
         hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
         hasEmsArrival ? 'patient-card--ems-arrival' : '',
@@ -234,83 +325,74 @@ function PatientCard({
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      style={{
-        background: 'var(--color-card)',
-        border: 0,
-        borderLeft: `4px solid ${priorityColors[patient.priority]}`,
-        borderRadius: 'var(--radius-lg)',
-        minHeight: missionControlActions ? 164 : 108,
-        padding: 'var(--space-3)',
-        cursor: 'pointer',
-        position: 'relative',
-        boxShadow: hasLwbsRisk
-          ? '0 0 0 1px color-mix(in srgb, var(--status-danger) 34%, transparent), var(--app-elevation-card)'
-          : patient.priority === 'P1'
-            ? '0 0 0 1px color-mix(in srgb, var(--status-danger) 28%, transparent), var(--app-elevation-card)'
-            : hasLongWait
-              ? 'inset 0 3px 0 var(--status-warning), var(--app-elevation-card)'
-              : 'var(--app-elevation-card)',
-        overflow: 'hidden',
-      }}
-      aria-label={`${patientName}, ${patient.state}, ${patient.priority}`}
+      style={cardStyle}
+      aria-label={patientCardAriaLabel}
     >
-      {hasLwbsRisk ? <span className="patient-card__lwbs-badge">LWBS RISK</span> : null}
+      <div className="patient-card__priority-strip" aria-label={`${patient.priority} ${priorityLabel}`}>
+        <span className="patient-card__priority-code">{patient.priority}</span>
+        <span className="patient-card__priority-label">{priorityLabel}</span>
+        <span className="patient-card__state-pill">{patient.state}</span>
+      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, paddingRight: hasLwbsRisk ? 76 : 0 }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 650, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {patientName}
-          </div>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)', marginTop: 1 }}>{patient.mrn}</div>
+      <div className="patient-card__identity">
+        <div className="patient-card__identity-main">
+          <strong>{patientName}</strong>
+          <span>{patient.mrn}</span>
         </div>
-        <div style={{ background: 'var(--color-floating-surface)', color: 'var(--color-text-secondary)', borderRadius: 999, padding: '2px 8px', fontSize: 'var(--font-size-xs)', flex: '0 0 auto' }}>
-          {patient.age}/{patient.sex}
+        <div className="patient-card__demographics">
+          <span>{patient.age}</span>
+          <span>{patient.sex}</span>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 6, minWidth: 0 }}>
-        <div style={{ background: 'var(--color-floating-surface)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-primary)', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {truncateComplaint(patient.chiefComplaint)}
-        </div>
-        <div style={{ background: 'var(--color-floating-surface)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', fontSize: 'var(--font-size-xs)', color: stateColors[patient.state] ?? 'var(--color-text-secondary)', flex: '0 0 auto' }}>
-          {patient.state}
-        </div>
-        {hasEmsArrival ? (
-          <div style={{ background: 'color-mix(in srgb, var(--color-secondary) 14%, var(--color-floating-surface))', borderRadius: 'var(--radius-sm)', padding: '2px 8px', fontSize: 'var(--font-size-xs)', color: 'var(--color-secondary)', flex: '0 0 auto' }}>
-            EMS
-          </div>
-        ) : null}
+      <div className="patient-card__complaint" title={patient.chiefComplaint}>
+        {truncateComplaint(patient.chiefComplaint)}
       </div>
 
-      <div className="patient-card__vitals">
-        <span style={{ color: hrAbnormal ? 'var(--status-danger)' : 'var(--color-text-secondary)' }}>HR {hr ?? '--'}</span>
-        <span style={{ color: bpAbnormal ? 'var(--status-warning)' : 'var(--color-text-secondary)' }}>BP {sbp ?? '--'}/{dbp ?? '--'}</span>
-        <span style={{ color: spo2Abnormal ? 'var(--status-danger)' : 'var(--color-text-secondary)' }}>SpO2 {spo2 ?? '--'}%</span>
-        <span className="patient-card__vital-temp" style={{ color: tempAbnormal ? 'var(--status-warning)' : 'var(--color-text-secondary)' }}>T {temp ?? '--'}°</span>
+      <div className="patient-card__signals" aria-label="Patient priority signals">
+        {signalBadges.length ? (
+          signalBadges.map((signal) => (
+            <span key={signal.id} className={`patient-card__signal patient-card__signal--${signal.tone}`}>
+              {signal.label}
+            </span>
+          ))
+        ) : (
+          <span className="patient-card__signal patient-card__signal--stable">No active risk flags</span>
+        )}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 6 }}>
-        <div style={{ color: waitStatusColor, fontSize: 11, fontWeight: hasLongWait || hasLwbsRisk ? 800 : 400 }}>
-          Wait {minutesWaiting}m
+      <div className="patient-card__meta-grid">
+        <div className="patient-card__meta-item">
+          <span>Wait</span>
+          <strong style={{ color: waitStatusColor }}>{minutesWaiting}m</strong>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {patient.roomId ? (
-            <div style={{ background: 'var(--color-floating-surface)', color: 'var(--color-text-secondary)', borderRadius: 999, padding: '2px 8px', fontSize: 'var(--font-size-xs)' }}>
-              {patient.roomId.toUpperCase()}
-            </div>
-          ) : null}
-          <div style={{ width: 24, height: 24, borderRadius: 999, background: 'var(--color-floating-surface)', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--font-size-xs)' }}>
-            {staffInitials(assignedStaff?.name)}
-          </div>
-          <button
-            type="button"
-            className="patient-card__timeline-button"
-            aria-label={`Open timeline for ${patientName}`}
-            onClick={handleTimelineClick}
-          >
-            Timeline
-          </button>
+        <div className="patient-card__meta-item">
+          <span>Room</span>
+          <strong>{patient.roomId ? patient.roomId.toUpperCase() : 'Unassigned'}</strong>
         </div>
+        <div className="patient-card__meta-item">
+          <span>Staff</span>
+          <strong>{staffInitials(assignedStaff?.name)}</strong>
+        </div>
+      </div>
+
+      <div className="patient-card__vitals" aria-label={abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal })}>
+        <span className={hrAbnormal ? 'patient-card__vital patient-card__vital--critical' : 'patient-card__vital'}>
+          <small>HR</small>
+          <strong>{hr ?? '--'}</strong>
+        </span>
+        <span className={bpAbnormal ? 'patient-card__vital patient-card__vital--warning' : 'patient-card__vital'}>
+          <small>BP</small>
+          <strong>{sbp ?? '--'}/{dbp ?? '--'}</strong>
+        </span>
+        <span className={spo2Abnormal ? 'patient-card__vital patient-card__vital--critical' : 'patient-card__vital'}>
+          <small>SpO2</small>
+          <strong>{spo2 ?? '--'}%</strong>
+        </span>
+        <span className={tempAbnormal ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp' : 'patient-card__vital patient-card__vital-temp'}>
+          <small>Temp</small>
+          <strong>{temp ?? '--'}°</strong>
+        </span>
       </div>
 
       {scores.length ? (
@@ -321,45 +403,46 @@ function PatientCard({
         </div>
       ) : null}
 
-      <div className="patient-card__flags" aria-label="Patient flags">
+      <div className="patient-card__flags" aria-label="Patient flags and statuses">
         {patient.flags.map((flag) => {
           const color = flagColors[flag];
-          if (!color) return null;
+          const label = flagLabels[flag];
+          if (!color || !label) return null;
           return (
             <span
               key={flag}
               title={flag}
-              aria-label={flag}
+              aria-label={label}
               style={{
-                minWidth: 7,
-                height: 14,
-                borderRadius: 999,
-                background: color,
-                color: 'var(--app-on-solid)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 8,
-                fontWeight: 800,
-                padding: '0 4px',
-              }}
+                '--patient-flag-color': color,
+              } as CSSProperties}
+              className="patient-card__flag"
             >
-              {flagLabels[flag] || flag.slice(0, 3).toUpperCase()}
+              {label}
             </span>
           );
         })}
       </div>
 
+      <button
+        type="button"
+        className="patient-card__timeline-button"
+        aria-label={`Open timeline for ${patientName}`}
+        onClick={handleTimelineClick}
+      >
+        Timeline
+      </button>
+
       {missionControlActions ? (
         <div className="patient-card__mission-actions" aria-label={`Whiteboard actions for ${patientName}`}>
-          <button type="button" onClick={handleDetailClick}>Detail</button>
+          <button type="button" onClick={handleDetailClick}>Open Detail</button>
           <button
             type="button"
             onClick={handleMoveNext}
             disabled={!canMoveNext}
             title={canMoveNext ? `Move to ${nextState}` : 'Queue move unavailable for this patient or role'}
           >
-            Next
+            Move: {nextState}
           </button>
           <button
             type="button"

@@ -167,10 +167,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     expect(screen.getByRole('heading', { name: /continue into workflow/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /build workflow/i }));
-    expect(navigateMock).toHaveBeenLastCalledWith('/workflows?source=tools&filter=recommended');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/tools?source=workflows&filter=ai-workflows');
 
     fireEvent.click(screen.getByRole('button', { name: /recommended next action/i }));
-    expect(navigateMock).toHaveBeenLastCalledWith('/recommendations?source=tools&filter=recommended');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/tools?source=recommendations&filter=recommended');
   }, 30_000);
 
   it.each([
@@ -229,25 +229,25 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     openTool(container, 'qsofa');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/tools/calculators/qsofa', search: '' },
+      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'drug-check');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/tools/drug-checker', search: '' },
+      { pathname: '/emergency/tools', search: '?source=tools&filter=clinical-tools&q=drug-check' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'fleet-command');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/fleet/command', search: '' },
+      { pathname: '/emergency/tools', search: '?source=operations&filter=operations&q=fleet-command' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'calculators');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/tools/calculators', search: '' },
+      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator' },
       expect.objectContaining({ replace: true })
     );
 
@@ -256,7 +256,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/assistant', search: '' },
+      { pathname: '/emergency/copilot', search: '' },
       expect.objectContaining({ replace: true })
     );
   }, 10000);
@@ -278,6 +278,6 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect.stringMatching(/clinical decision support/i),
       'user'
     );
-    expect(navigateMock).toHaveBeenLastCalledWith('/assistant');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot');
   }, 10000);
 });

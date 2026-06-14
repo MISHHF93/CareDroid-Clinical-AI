@@ -8,22 +8,22 @@ import { UserProfile } from '../users/entities/user-profile.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { ActivityService } from './activity.service';
 import { ProfessionalProfile } from './entities/professional-profile.entity';
-import { UserPreference } from './entities/user-preference.entity';
-import { UserPreferencesService } from './user-preferences.service';
+import { UserPreferencesModule } from './user-preferences.module';
 import { UserProfileController } from './user-profile.controller';
 import { UserProfileService } from './user-profile.service';
 import { WorkspaceService } from './workspace.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserProfile, UserPreference, ProfessionalProfile]),
+    TypeOrmModule.forFeature([User, UserProfile, ProfessionalProfile]),
+    UserPreferencesModule,
     AuditModule,
     WorkspacesModule,
     UserActivityModule,
     PersonalizationModule,
   ],
   controllers: [UserProfileController],
-  providers: [UserProfileService, UserPreferencesService, WorkspaceService, ActivityService],
-  exports: [UserProfileService, UserPreferencesService, WorkspaceService, ActivityService],
+  providers: [UserProfileService, WorkspaceService, ActivityService],
+  exports: [UserProfileService, UserPreferencesModule, WorkspaceService, ActivityService],
 })
 export class UserProfileModule {}

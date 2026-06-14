@@ -14,6 +14,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -52,9 +53,21 @@ function analyticsStatusMessage(message = '') {
   return message;
 }
 
+function findUpgradeSignal(signals = [], capability) {
+  return signals.find((signal) => signal.capability === capability) || null;
+}
+
+function signalMeta(signal) {
+  if (!signal) return 'Review required';
+  const confidence =
+    typeof signal.confidence === 'number' ? `${Math.round(signal.confidence * 100)}% confidence` : 'confidence pending';
+  return `${signal.safety?.status || 'review_required'} | ${confidence}`;
+}
+
 export default function EmergencyAnalytics() {
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
+  const upgradeHarness = useAdvancedEmergencyOsUpgradeHarness();
   const data = emergencyAnalytics.data?.operationalCommand || {};
   const shift = emergencyAnalytics.data?.shift || {};
   const dailyVolume = data.dailyVolume || [];
@@ -66,6 +79,17 @@ export default function EmergencyAnalytics() {
   const hasOperationalData =
     dailyVolume.length || hourlyArrivals.length || waitTrend.length || topComplaints.length;
   const statusMessage = analyticsStatusMessage(emergencyAnalytics.message);
+  const upgradeSignals = [
+    ...(upgradeHarness.data?.data?.capacityAndForecasting || []),
+    ...(upgradeHarness.data?.data?.patientFlow || []),
+    ...(upgradeHarness.data?.data?.clinicalDecisionSupport || []),
+    ...(upgradeHarness.data?.data?.governance || []),
+  ];
+  const bragSignal = findUpgradeSignal(upgradeSignals, 'brag_forecast_10h');
+  const cdssSignal = findUpgradeSignal(upgradeSignals, 'multimodal_cdss');
+  const federatedSignal = findUpgradeSignal(upgradeSignals, 'federated_learning_harness');
+  const auditSignal = findUpgradeSignal(upgradeSignals, 'immutable_audit_abstraction');
+  const blockedActions = upgradeHarness.data?.data?.blockedAutonomousActions || [];
 
   useEffect(() => {
     void loadEmergencyAnalytics({ force: true });
@@ -102,6 +126,45 @@ export default function EmergencyAnalytics() {
         <p className="emergency-analytics__state emergency-analytics__state--empty">
           Operational analytics will populate when Emergency OS has active patient flow data for this department.
         </p>
+      ) : null}
+
+      {upgradeHarness.data?.data ? (
+        <div className="emergency-analytics__grid" aria-label="Advanced Emergency OS upgrade harness analytics">
+          <ChartCard title="Upgrade Harness" subtitle="Pilot readiness">
+            <strong>
+              {upgradeHarness.data.data.pilotReadiness.reviewRequired}/
+              {upgradeHarness.data.data.pilotReadiness.totalCapabilities} review
+            </strong>
+            <small>{upgradeHarness.data.data.mode} | human review required</small>
+          </ChartCard>
+          <ChartCard title="10-hour BRAG" subtitle="Forecast peak">
+            <strong>{bragSignal?.data?.peakBand || 'Review'}</strong>
+            <small>{signalMeta(bragSignal)}</small>
+          </ChartCard>
+          <ChartCard title="CDSS Gate" subtitle="High-risk review cards">
+            <strong>{cdssSignal?.data?.reviewQueue?.length || 0}</strong>
+            <small>{cdssSignal?.safety?.policyVersion || 'safety policy active'}</small>
+          </ChartCard>
+          <ChartCard title="Federated Model" subtitle="Pilot privacy contract">
+            <strong>{federatedSignal?.data?.modelCard?.metrics?.auc || '--'} AUC</strong>
+            <small>{signalMeta(federatedSignal)}</small>
+          </ChartCard>
+          <ChartCard title="Blocked Actions" subtitle="Autonomy guardrail">
+            <strong>{blockedActions.length}</strong>
+            <small>
+              {(blockedActions.length ? blockedActions : ['diagnosis', 'prescribing', 'disposition'])
+                .slice(0, 3)
+                .join(', ')}
+            </small>
+          </ChartCard>
+          <ChartCard title="Audit Ledger" subtitle="Immutable abstraction">
+            <strong>{auditSignal?.data?.ledgerEntries?.length || 0}</strong>
+            <small>
+              {String(auditSignal?.data?.latestHash || '').slice(0, 12) || 'pilot-audit'} |{' '}
+              {auditSignal?.provenance?.provider || 'deterministic provider'}
+            </small>
+          </ChartCard>
+        </div>
       ) : null}
 
       <div className="emergency-analytics__grid" aria-label="Emergency analytics KPIs">

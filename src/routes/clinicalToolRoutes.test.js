@@ -138,10 +138,10 @@ describe('clinicalToolRoutes — archived registry inventory', () => {
     expect(resolveToolsAreaRedirect('/tools/calculators/not-a-real-calc-xyz')).toBeNull();
   });
 
-  it('redirects Tier B hub subpaths to Assistant with ?tool= for chat launch', () => {
+  it('redirects Tier B hub subpaths to Emergency Copilot with ?tool= for chat launch', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
     expect(redirect).toEqual({
-      pathname: '/assistant',
+      pathname: '/emergency/copilot',
       search: '?tool=wells-pe',
     });
   });

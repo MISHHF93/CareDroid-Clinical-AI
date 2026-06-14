@@ -83,6 +83,14 @@ const EMERGENCY_OS_ROUTE_COMMAND_DEFINITIONS = Object.freeze([
     build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyCopilot }),
   },
   {
+    id: 'open-tools',
+    navItemId: 'tools',
+    label: 'Open Medical Tools',
+    hint: 'T',
+    keywords: ['medical tools', 'tools', 'clinical tools', 'calculators', 'scores'],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.emergencyTools }),
+  },
+  {
     id: 'open-analytics',
     navItemId: 'analytics',
     label: 'Open Analytics',

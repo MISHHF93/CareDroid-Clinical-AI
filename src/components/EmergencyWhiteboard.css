@@ -738,8 +738,41 @@
   background: transparent !important;
 }
 
+.emergency-whiteboard-page__card-key {
+  align-items: center;
+  display: flex;
+  flex: 1 1 360px;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.emergency-whiteboard-page__card-key span {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-floating-surface) 76%, transparent);
+  border: 1px solid var(--component-inner-surface-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.emergency-whiteboard-page__card-key i {
+  border-radius: 999px;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+
 .emergency-whiteboard-page__grid .patient-card {
-  box-shadow: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--patient-priority-color) 10%, transparent),
+    var(--app-elevation-card);
 }
 
 @media (max-width: 1180px) {

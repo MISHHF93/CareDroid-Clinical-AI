@@ -16,7 +16,12 @@ import {
   TOOL_SURFACES,
 } from '../data/toolInventory';
 import { getMountedCapabilityGraph } from '../data/mountedCapabilityGraph';
-import { isKnownToolAreaPath, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+
+const ACTIVE_EMERGENCY_LAUNCH_ROUTES = new Set([
+  CANONICAL_ROUTES.emergencyCopilot,
+  CANONICAL_ROUTES.emergencyTools,
+]);
 
 describe('registryToolLaunch', () => {
   beforeEach(() => {
@@ -28,20 +33,21 @@ describe('registryToolLaunch', () => {
   });
 
   it.each([
-    ['qsofa', 'calculator-route', '/tools/calculators/qsofa'],
-    ['sofa-score', 'calculator-route', '/tools/calculators/sofa'],
-    ['drug-check', 'tool-page', '/tools/drug-checker'],
-    ['fleet-command', 'tool-page', '/fleet/command'],
-  ])('getRegistryToolNavigation(%s) → %s %s', (id, mode, pathname) => {
+    ['qsofa', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=qsofa'],
+    ['sofa-score', 'calculator-route', '/emergency/tools', '?source=calculators&filter=calculator&q=sofa'],
+    ['drug-check', 'tool-page', '/emergency/tools', '?source=tools&filter=clinical-tools&q=drug-check'],
+    ['fleet-command', 'tool-page', '/emergency/tools', '?source=operations&filter=operations&q=fleet-command'],
+  ])('getRegistryToolNavigation(%s) → %s %s', (id, mode, pathname, search) => {
     const plan = getRegistryToolNavigation(id);
     expect(plan.mode).toBe(mode);
     expect(plan.pathname).toBe(pathname);
+    expect(plan.search).toBe(search);
   });
 
   it.each(TIER_B_CHAT_CALCULATOR_REGISTRY_IDS)('Tier B %s launches chat-assisted flow', (id) => {
     const plan = getRegistryToolNavigation(id);
     expect(plan.mode).toBe('chat-assisted');
-    expect(plan.pathname).toBe('/assistant');
+    expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyCopilot);
     expect(plan.shouldSeedChat).toBe(true);
     expect(plan.launch.chatSeed?.length).toBeGreaterThan(20);
   });
@@ -49,7 +55,7 @@ describe('registryToolLaunch', () => {
   it('dispatch-ai uses chat-assisted flow', () => {
     const plan = getRegistryToolNavigation('dispatch-ai');
     expect(plan.mode).toBe('chat-assisted');
-    expect(plan.pathname).toBe('/assistant');
+    expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyCopilot);
   });
 
   it.each(NLU_PROFILE_TOOL_IDS)('NLU profile %s resolves via getRegistryToolNavigation', (nluId) => {
@@ -95,18 +101,19 @@ describe('registryToolLaunch', () => {
 
       if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) {
         expect(plan.mode, record.id).toBe('chat-assisted');
-        expect(plan.pathname, record.id).toBe('/assistant');
+        expect(plan.pathname, record.id).toBe(CANONICAL_ROUTES.emergencyCopilot);
         expect(plan.shouldSeedChat, record.id).toBe(true);
         expect(plan.launch.chatSeed, record.id).toBeTruthy();
       }
 
       if (record.surface === TOOL_SURFACES.CALCULATOR_FORM && record.hasDedicatedForm) {
         expect(plan.mode, record.id).toBe('calculator-route');
-        expect(matchCalculatorRoute(plan.pathname), record.id).toBeTruthy();
+        expect(plan.pathname, record.id).toBe(CANONICAL_ROUTES.emergencyTools);
+        expect(plan.search, record.id).toContain('filter=calculator');
       }
 
       if ([TOOL_SURFACES.TOOL_PAGE, TOOL_SURFACES.FLEET_PAGE, TOOL_SURFACES.HUB].includes(record.surface)) {
-        expect(isKnownToolAreaPath(plan.pathname), record.id).toBe(true);
+        expect(ACTIVE_EMERGENCY_LAUNCH_ROUTES.has(plan.pathname), record.id).toBe(true);
       }
     }
   });
@@ -167,7 +174,7 @@ describe('registryToolLaunch', () => {
     expect(handlers.setActiveTool).not.toHaveBeenCalled();
     expect(handlers.addMessage).not.toHaveBeenCalled();
     expect(handlers.navigate).toHaveBeenCalledWith(
-      { pathname: '/tools', search: '?entitlement=denied&reason=locked' },
+      { pathname: '/emergency/tools', search: '?entitlement=denied&reason=locked' },
       { replace: true }
     );
   });

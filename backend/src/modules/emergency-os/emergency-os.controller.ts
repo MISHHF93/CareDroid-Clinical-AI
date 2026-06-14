@@ -4,6 +4,7 @@ import {
   HybridDigitalTwinService,
   RealTimeSimulationService,
 } from './emergency-os.advanced-services';
+import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
 import {
   BoardingService,
   CareDroidCentralNodeService,
@@ -49,6 +50,7 @@ export class EmergencyOsController {
     private readonly realTimeSimulationService: RealTimeSimulationService,
     private readonly federatedLearningService: FederatedLearningService,
     private readonly hybridDigitalTwinService: HybridDigitalTwinService,
+    private readonly upgradeHarnessService: EmergencyOsUpgradeHarnessService,
     private readonly centralNodeService: CareDroidCentralNodeService,
   ) {}
 
@@ -196,6 +198,41 @@ export class EmergencyOsController {
   @Get('analytics')
   getAnalytics() {
     return this.analyticsService.getAnalytics();
+  }
+
+  @Get('upgrade-harness')
+  getUpgradeHarness() {
+    return this.upgradeHarnessService.getHarness();
+  }
+
+  @Get('upgrade-harness/capacity')
+  getUpgradeHarnessCapacity() {
+    return this.upgradeHarnessService.getCapacityAndForecasting();
+  }
+
+  @Get('upgrade-harness/patient-flow')
+  getUpgradeHarnessPatientFlow() {
+    return this.upgradeHarnessService.getPatientFlow();
+  }
+
+  @Get('upgrade-harness/patient-flow/:patientId')
+  getUpgradeHarnessPatientFlowForPatient(@Param('patientId') patientId: string) {
+    return this.upgradeHarnessService.getPatientFlow(patientId);
+  }
+
+  @Get('upgrade-harness/clinical-intelligence')
+  getUpgradeHarnessClinicalIntelligence() {
+    return this.upgradeHarnessService.getClinicalDecisionSupport();
+  }
+
+  @Get('upgrade-harness/clinical-intelligence/:patientId')
+  getUpgradeHarnessClinicalIntelligenceForPatient(@Param('patientId') patientId: string) {
+    return this.upgradeHarnessService.getClinicalDecisionSupport(patientId);
+  }
+
+  @Get('upgrade-harness/audit-summary')
+  getUpgradeHarnessAuditSummary() {
+    return this.upgradeHarnessService.getAuditSummary();
   }
 
   @Get('settings')

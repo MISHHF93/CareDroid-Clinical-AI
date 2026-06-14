@@ -6,11 +6,14 @@ import {
   compareRealTimeSimulationInterventions,
   evaluateHybridDigitalTwinScenario,
   evaluateRealTimeSimulationIntervention,
+  fetchAdvancedEmergencyOsUpgradeHarness,
   fetchBoardingStatus,
   fetchCapacityStatus,
   fetchEDCopilot,
   fetchEMSIntake,
   fetchEmergencyAnalytics,
+  fetchEmergencyAiGovernanceCompliance,
+  fetchEmergencyAiGovernanceRegistry,
   fetchEmergencyPatients,
   fetchEmergencyQueues,
   fetchEmergencySettings,
@@ -23,6 +26,10 @@ import {
   fetchPatientJourney,
   fetchProvincialHealth,
   fetchRealTimeSimulationRecommendations,
+  fetchUpgradeHarnessAuditSummary,
+  fetchUpgradeHarnessCapacity,
+  fetchUpgradeHarnessClinicalIntelligence,
+  fetchUpgradeHarnessPatientFlow,
   initializeHybridDigitalTwin,
   fetchReassessmentQueue,
   fetchReferrals,
@@ -31,6 +38,7 @@ import {
   simulateHybridDigitalTwin,
   submitFederatedModelUpdate,
   updateRealTimeSimulationState,
+  validateEmergencyAiGovernancePrompts,
 } from '../services/emergencyOsApi';
 
 function latestVitals(patient = {}) {
@@ -241,6 +249,29 @@ export const useEDCopilot = () => useEmergencyModule(fetchEDCopilot, 'copilot');
 export const useEmergencyWorkflowLogs = () => useEmergencyModule(fetchEmergencyWorkflowLogs);
 export const useEmergencyAnalytics = () => useEmergencyModule(fetchEmergencyAnalytics, 'analytics');
 export const useEmergencySettings = () => useEmergencyModule(fetchEmergencySettings);
+export const useEmergencyAiGovernanceRegistry = () =>
+  useEmergencyModule(fetchEmergencyAiGovernanceRegistry);
+export const useEmergencyAiGovernanceCompliance = (days = 30) => {
+  const fetcher = useCallback(() => fetchEmergencyAiGovernanceCompliance(days), [days]);
+  return useEmergencyModule(fetcher, undefined);
+};
+export const useEmergencyAiGovernancePromptValidation = () =>
+  useEmergencyModule(validateEmergencyAiGovernancePrompts);
+export const useAdvancedEmergencyOsUpgradeHarness = () =>
+  useEmergencyModule(fetchAdvancedEmergencyOsUpgradeHarness);
+export const useUpgradeHarnessCapacity = () => useEmergencyModule(fetchUpgradeHarnessCapacity);
+export const useUpgradeHarnessPatientFlow = (patientId) => {
+  const fetcher = useCallback(() => fetchUpgradeHarnessPatientFlow(patientId), [patientId]);
+  return useEmergencyModule(fetcher, undefined);
+};
+export const useUpgradeHarnessClinicalIntelligence = (patientId) => {
+  const fetcher = useCallback(
+    () => fetchUpgradeHarnessClinicalIntelligence(patientId),
+    [patientId]
+  );
+  return useEmergencyModule(fetcher, undefined);
+};
+export const useUpgradeHarnessAuditSummary = () => useEmergencyModule(fetchUpgradeHarnessAuditSummary);
 
 function useEmergencyModuleActions(fetcher, actions) {
   const moduleState = useEmergencyModule(fetcher);

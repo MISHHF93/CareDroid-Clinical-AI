@@ -11,6 +11,7 @@ import {
 } from '../data/clinicalCatalogWiring';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import { getCanonicalToolInventory, getFrontendVisibleToolInventory } from '../data/toolInventory';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 /** Overview pages (not in toolRegistry as navigable tools). */
 export const TOOLS_OVERVIEW_PATHS = Object.freeze([
@@ -164,7 +165,7 @@ export function resolveToolsAreaRedirect(pathname) {
     if (navPath && normalizeToolPathname(navPath) !== normalized) {
       if (['/home', '/assistant', '/dashboard', '/chat'].includes(navPath) && launch.chatSeed) {
         return {
-          pathname: '/assistant',
+          pathname: CANONICAL_ROUTES.emergencyCopilot,
           search: `?tool=${encodeURIComponent(registryId || subpathSlug)}`,
         };
       }

@@ -574,7 +574,7 @@ const ToolsOverview = () => {
     const launch = resolveCatalogLaunch(tool.id);
     recordToolAccess(tool.id);
     trackRoleAssetUsage(
-      { registryId: tool.id, mode: 'chat-assisted', pathname: CANONICAL_ROUTES.assistant },
+      { registryId: tool.id, mode: 'chat-assisted', pathname: CANONICAL_ROUTES.emergencyCopilot },
       { profile: roleIntelligenceProfile, source: 'tools-overview-assistant' }
     );
     selectTool(tool.id);
@@ -584,7 +584,7 @@ const ToolsOverview = () => {
         `Help me use ${tool.name} as clinical decision support only. Ask for any context needed before recommending next steps.`,
       'user'
     );
-    navigate(CANONICAL_ROUTES.assistant);
+    navigate(CANONICAL_ROUTES.emergencyCopilot);
   };
 
   const orderedTools = useMemo(() => {
@@ -729,7 +729,7 @@ const ToolsOverview = () => {
           <button
             type="button"
             className="tools-recent-card"
-            onClick={() => navigate(`${CANONICAL_ROUTES.workflows}?source=tools&filter=${toolFilter}`)}
+            onClick={() => navigate(`${CANONICAL_ROUTES.emergencyTools}?source=workflows&filter=ai-workflows`)}
           >
             <span className="tools-recent-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
@@ -743,7 +743,7 @@ const ToolsOverview = () => {
           <button
             type="button"
             className="tools-recent-card"
-            onClick={() => navigate(`${CANONICAL_ROUTES.recommendations}?source=tools&filter=${toolFilter}`)}
+            onClick={() => navigate(`${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`)}
           >
             <span className="tools-recent-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.sparkles} size={22} />

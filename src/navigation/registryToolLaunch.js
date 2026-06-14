@@ -22,6 +22,7 @@ import {
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   getPlatformEntitlementContext,
 } from '../data/assetEntitlements';
@@ -41,6 +42,74 @@ import { trackRoleAssetUsage, trackRoleWorkflowLaunch } from '../services/roleIn
  * @property {boolean} shouldSeedChat
  */
 
+function buildSearch(params) {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value) searchParams.set(key, value);
+  }
+  const search = searchParams.toString();
+  return search ? `?${search}` : '';
+}
+
+function slugFromPath(pathname, prefix) {
+  if (!pathname?.startsWith(prefix)) return '';
+  return pathname.slice(prefix.length).split('/').filter(Boolean)[0] || '';
+}
+
+function resolveEmergencyToolTarget(pathname, registryId, inventoryRecord) {
+  if (!pathname) {
+    return { pathname: CANONICAL_ROUTES.emergencyTools, search: buildSearch({ source: 'tools' }) };
+  }
+
+  if (pathname === TOOL_LAUNCH_PATHS.toolsCatalog) {
+    return {
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({ source: 'catalog', filter: 'all' }),
+    };
+  }
+
+  if (pathname === TOOL_LAUNCH_PATHS.calculatorsHub) {
+    return {
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({ source: 'calculators', filter: 'calculator' }),
+    };
+  }
+
+  if (pathname.startsWith(`${TOOL_LAUNCH_PATHS.calculatorsHub}/`)) {
+    const slug = slugFromPath(pathname, `${TOOL_LAUNCH_PATHS.calculatorsHub}/`);
+    return {
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({ source: 'calculators', filter: 'calculator', q: slug }),
+    };
+  }
+
+  if (pathname.startsWith('/tools/')) {
+    return {
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({
+        source: 'tools',
+        filter: inventoryRecord?.category === 'Calculator' ? 'calculator' : 'clinical-tools',
+        q: registryId || slugFromPath(pathname, '/tools/'),
+      }),
+    };
+  }
+
+  if (
+    pathname.startsWith('/fleet/') ||
+    ['/operations', '/live-map', '/hospital-map', '/medical-iot', '/devices'].includes(pathname)
+  ) {
+    return {
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({ source: 'operations', filter: 'operations', q: registryId }),
+    };
+  }
+
+  return {
+    pathname: CANONICAL_ROUTES.emergencyTools,
+    search: buildSearch({ source: 'tools', q: registryId }),
+  };
+}
+
 /**
  * Resolve how to open a registry or NLU tool id in the SPA.
  * @param {string} toolId
@@ -56,10 +125,11 @@ export function getRegistryToolNavigation(toolId) {
 
   const calcMatch = launchPath ? matchCalculatorRoute(launchPath) : null;
   if (calcMatch) {
+    const target = resolveEmergencyToolTarget(calcMatch.path, registryId, inventoryRecord);
     return {
       mode: 'calculator-route',
-      pathname: calcMatch.path,
-      search: '',
+      pathname: target.pathname,
+      search: target.search,
       registryId: launch.registryId || registryId,
       launch,
       shouldSeedChat: false,
@@ -70,10 +140,11 @@ export function getRegistryToolNavigation(toolId) {
   if (calculatorSlug && isRegisteredCalculatorSlug(calculatorSlug)) {
     const def = getCalculatorRouteBySlug(calculatorSlug);
     if (def) {
+      const target = resolveEmergencyToolTarget(def.path, registryId, inventoryRecord);
       return {
         mode: 'calculator-route',
-        pathname: def.path,
-        search: '',
+        pathname: target.pathname,
+        search: target.search,
         registryId,
         launch,
         shouldSeedChat: false,
@@ -88,7 +159,7 @@ export function getRegistryToolNavigation(toolId) {
   ) {
     return {
       mode: 'chat-assisted',
-      pathname: '/assistant',
+      pathname: CANONICAL_ROUTES.emergencyCopilot,
       search: '',
       registryId: launch.registryId || registryId,
       launch,
@@ -97,10 +168,11 @@ export function getRegistryToolNavigation(toolId) {
   }
 
   if (navPath && isKnownToolAreaPath(navPath)) {
+    const target = resolveEmergencyToolTarget(navPath, registryId, inventoryRecord);
     return {
       mode: 'tool-page',
-      pathname: navPath,
-      search: '',
+      pathname: target.pathname,
+      search: target.search,
       registryId,
       launch,
       shouldSeedChat: false,
@@ -110,8 +182,8 @@ export function getRegistryToolNavigation(toolId) {
   if (calculatorSlug && isCalculatorsHubPath(launchPath)) {
     return {
       mode: 'calculator-hub',
-      pathname: TOOL_LAUNCH_PATHS.calculatorsHub,
-      search: `?calc=${encodeURIComponent(calculatorSlug)}`,
+      pathname: CANONICAL_ROUTES.emergencyTools,
+      search: buildSearch({ source: 'calculators', filter: 'calculator', q: calculatorSlug }),
       registryId,
       launch,
       shouldSeedChat: false,
@@ -119,10 +191,12 @@ export function getRegistryToolNavigation(toolId) {
   }
 
   if (inventoryRecord?.fallbackRoute || reg?.path) {
+    const fallbackPath = inventoryRecord?.fallbackRoute || reg.path;
+    const target = resolveEmergencyToolTarget(fallbackPath, registryId, inventoryRecord);
     return {
       mode: 'fallback',
-      pathname: inventoryRecord?.fallbackRoute || reg.path,
-      search: '',
+      pathname: target.pathname,
+      search: target.search,
       registryId,
       launch,
       shouldSeedChat: false,
@@ -131,8 +205,8 @@ export function getRegistryToolNavigation(toolId) {
 
   return {
     mode: 'fallback',
-    pathname: TOOL_LAUNCH_PATHS.toolsCatalog,
-    search: '',
+    pathname: CANONICAL_ROUTES.emergencyTools,
+    search: buildSearch({ source: 'catalog', filter: 'all' }),
     registryId: launch.registryId || registryId,
     launch,
     shouldSeedChat: Boolean(launch.chatSeed),
@@ -190,7 +264,7 @@ export function applyRegistryToolLaunch(toolId, handlers) {
   if (!launchAccess.allowed) {
     handlers.navigate?.(
       {
-        pathname: TOOL_LAUNCH_PATHS.toolsOverview,
+        pathname: CANONICAL_ROUTES.emergencyTools,
         search: `?entitlement=denied&reason=${encodeURIComponent(launchAccess.accessState)}`,
       },
       { replace: true },

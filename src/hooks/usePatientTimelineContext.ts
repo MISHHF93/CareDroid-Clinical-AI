@@ -4,6 +4,7 @@ import {
   fetchEDCopilot,
   fetchEMSIntake,
   fetchEmergencyQueues,
+  fetchPatientWorkflowLogs,
   fetchPatientJourney,
   fetchProvincialHealth,
   fetchReassessmentQueue,
@@ -11,6 +12,7 @@ import {
 } from '../services/emergencyOsApi';
 import { fetchPatientManagementBundle } from '../services/patientManagementApi';
 import type { PatientTimelineContext } from '../utils/patientTimeline';
+import type { WorkflowActionLog } from '../types/emergency';
 
 type TimelineContextState = {
   loading: boolean;
@@ -40,6 +42,10 @@ function arrayOf(value: unknown): Array<Record<string, unknown>> {
   return Array.isArray(value)
     ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
     : [];
+}
+
+function workflowLogsOf(value: unknown): WorkflowActionLog[] {
+  return arrayOf(value) as unknown as WorkflowActionLog[];
 }
 
 function fulfilledValue(results: PromiseSettledResult<unknown>[], index: number): unknown {
@@ -77,6 +83,7 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
       fetchProvincialHealth(),
       fetchEDCopilot(),
       fetchPatientManagementBundle(patientId),
+      fetchPatientWorkflowLogs(patientId),
     ]).then((results) => {
       if (cancelled) return;
 
@@ -89,6 +96,7 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
       const provincial = dataOf(fulfilledValue(results, 6));
       const copilot = dataOf(fulfilledValue(results, 7));
       const patientManagement = fulfilledValue(results, 8) as { ok?: boolean; data?: { timelineEvents?: unknown[] }; error?: string } | null;
+      const patientWorkflowLogs = dataOf(fulfilledValue(results, 9));
       const failures = rejectedMessages(results);
       if (patientManagement && patientManagement.ok === false && patientManagement.error) {
         failures.push(patientManagement.error);
@@ -107,6 +115,7 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
           provincialRecords: arrayOf(provincial.records),
           copilotContext: dataOf(copilot.promptContext),
           backendTimelineEvents: arrayOf(patientManagement?.data?.timelineEvents),
+          workflowLogs: workflowLogsOf(patientWorkflowLogs.logs),
         },
       });
     });

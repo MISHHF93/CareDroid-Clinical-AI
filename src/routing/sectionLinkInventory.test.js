@@ -66,7 +66,7 @@ describe('section link inventory and route flattening', () => {
   it('keeps developer catalog aliases away from normal clinician links', () => {
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/catalog', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/catalog', to: '/emergency/tools' }),
       ]),
     );
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
@@ -89,7 +89,7 @@ describe('section link inventory and route flattening', () => {
       expect.arrayContaining([
         expect.objectContaining({ path: '/emergency/smart-intake', to: '/emergency/intake' }),
         expect.objectContaining({ path: '/patients/*', to: '/emergency/patients' }),
-        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/tools' }),
       ]),
     );
     expect(app).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');

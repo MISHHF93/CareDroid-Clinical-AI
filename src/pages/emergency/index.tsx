@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { useEmergencyWhiteboard } from '../../hooks/useEmergencyOs';
+import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
@@ -17,6 +17,13 @@ import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
 import '../../components/EmergencyWhiteboard.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding';
+type UpgradeHarnessSignal = {
+  capability: string;
+  data?: {
+    alerts?: unknown[];
+    candidates?: unknown[];
+  };
+};
 
 const FILTERS: FilterId[] = ['All', 'Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding'];
 
@@ -46,10 +53,39 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   return true;
 }
 
-function StatCard({ value, label }: { value: string | number; label: string }) {
+function findUpgradeSignal(
+  signals: UpgradeHarnessSignal[],
+  capability: string,
+): UpgradeHarnessSignal | null {
+  return signals.find((signal) => signal.capability === capability) || null;
+}
+
+function StatCard({
+  value,
+  label,
+  tone = 'default',
+  title,
+}: {
+  value: string | number;
+  label: string;
+  tone?: 'default' | 'info' | 'success' | 'warning' | 'critical';
+  title?: string;
+}) {
+  const toneColor =
+    tone === 'critical'
+      ? 'var(--status-critical, #EF4444)'
+      : tone === 'warning'
+        ? 'var(--status-warning, #F59E0B)'
+        : tone === 'success'
+          ? 'var(--status-stable, #10B981)'
+          : tone === 'info'
+            ? 'var(--status-info, #60A5FA)'
+            : 'var(--color-text-primary, #F9FAFB)';
+
   return (
     <div
       className="emergency-whiteboard-page__stat"
+      title={title}
       style={{
         flex: '1 1 0',
         minWidth: 120,
@@ -68,7 +104,7 @@ function StatCard({ value, label }: { value: string | number; label: string }) {
       >
         {value}
       </div>
-      <div style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12, marginTop: 4 }}>{label}</div>
+      <div style={{ color: toneColor, fontSize: 12, fontWeight: tone === 'default' ? 500 : 800, marginTop: 4 }}>{label}</div>
     </div>
   );
 }
@@ -87,6 +123,23 @@ function formatEta(arrival: EMSArrival): string {
 
 function patientName(patient: Patient): string {
   return `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
+}
+
+function capacityTone(band?: string): 'success' | 'warning' | 'critical' | 'info' {
+  if (band === 'Red') return 'critical';
+  if (band === 'Orange' || band === 'Yellow') return 'warning';
+  if (band === 'Green') return 'success';
+  return 'info';
+}
+
+function formatFreshness(value?: string | null): string {
+  if (!value) return 'local';
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return 'local';
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+  if (elapsedMinutes < 1) return 'now';
+  if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+  return `${Math.round(elapsedMinutes / 60)}h ago`;
 }
 
 function MissionButton({
@@ -150,19 +203,31 @@ export default function EmergencyWhiteboard() {
     (state) => state.emergencySettings.centralControl,
   );
   const whiteboard = useEmergencyWhiteboard();
+  const upgradePatientFlow = useUpgradeHarnessPatientFlow();
   const whiteboardPayload = (
     whiteboard.data as { data?: { patients?: Patient[]; capacity?: typeof storeCapacity } } | null
   )?.data;
+  const whiteboardGeneratedAt = (
+    whiteboard.data as { generatedAt?: string } | null
+  )?.generatedAt;
   const patients = useMemo(() => {
     const payloadPatients = whiteboardPayload?.patients;
     if (!payloadPatients?.length) return storePatients;
     const payloadIds = new Set(payloadPatients.map((patient) => patient.id));
     return [...payloadPatients, ...storePatients.filter((patient) => !payloadIds.has(patient.id))];
   }, [storePatients, whiteboardPayload?.patients]);
+  const upgradeFlowSignals = (
+    upgradePatientFlow.data as { data?: { signals?: UpgradeHarnessSignal[] } } | null
+  )?.data?.signals || [];
+  const wearableSignal = findUpgradeSignal(upgradeFlowSignals, 'wearable_iomt_processing');
+  const vvtSignal = findUpgradeSignal(upgradeFlowSignals, 'virtual_visit_track');
+  const wearableAlertCount = wearableSignal?.data?.alerts?.length || 0;
+  const virtualVisitCandidateCount = vvtSignal?.data?.candidates?.length || 0;
   const capacity = whiteboardPayload?.capacity || storeCapacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
   const [toast, setToast] = useState('');
+  const [clockTick, setClockTick] = useState(() => Date.now());
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
   const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
   const canConvertEmsArrival = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
@@ -183,6 +248,14 @@ export default function EmergencyWhiteboard() {
     () => emsArrivals.filter((arrival) => !['Complete', 'Cancelled'].includes(arrival.status)),
     [emsArrivals],
   );
+  const soonEmsArrivals = useMemo(
+    () =>
+      activeEmsArrivals.filter((arrival) => {
+        const remaining = minutesRemaining(arrival);
+        return arrival.status === 'Inbound' && remaining > 0 && remaining <= 10;
+      }).length,
+    [activeEmsArrivals, clockTick],
+  );
   const reassessmentPatients = useMemo(
     () =>
       patients
@@ -200,14 +273,19 @@ export default function EmergencyWhiteboard() {
     const waiting = patients.filter((patient) => patient.state === PatientState.Waiting).length;
     const highRisk = patients.filter(isHighRisk).length;
     const boarding = patients.filter(isBoarding).length;
+    const reassessmentDue =
+      capacity.reassessmentDueCount ??
+      capacity.reassessmentDue ??
+      patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length;
 
     return {
       total: patients.length,
       waiting,
       highRisk,
       boarding,
+      reassessmentDue,
     };
-  }, [patients]);
+  }, [capacity.reassessmentDue, capacity.reassessmentDueCount, patients]);
 
   const visiblePatients = useMemo(
     () =>
@@ -216,6 +294,11 @@ export default function EmergencyWhiteboard() {
         .sort(sortWhiteboardPatients),
     [activeFilter, patients],
   );
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClockTick(Date.now()), 30000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const openIntake = () => {
@@ -336,8 +419,12 @@ export default function EmergencyWhiteboard() {
           {[
             `${centralControl.label} managed`,
             `${centralControl.inputProfile.label} input`,
+            `${capacity.score} ${capacity.band} capacity`,
+            `Updated ${formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}`,
             `${stats.total} active ED records`,
             `${emsArrivals.length + emsIncomingPatients.length} EMS signals`,
+            `${wearableAlertCount} IoMT review alerts`,
+            `${virtualVisitCandidateCount} VVT candidates`,
             EMERGENCY_OS_BRANDING.safetyShort,
           ].map((item) => (
             <span
@@ -382,8 +469,17 @@ export default function EmergencyWhiteboard() {
       >
         <StatCard value={stats.total} label="Total" />
         <StatCard value={stats.waiting} label="Waiting" />
-        <StatCard value={stats.highRisk} label="High Risk" />
-        <StatCard value={stats.boarding} label="Boarding" />
+        <StatCard value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
+        <StatCard value={`${capacity.score} ${capacity.band}`} label="Capacity" tone={capacityTone(capacity.band)} />
+        <StatCard value={stats.reassessmentDue} label="Reassess Due" tone={stats.reassessmentDue ? 'warning' : 'success'} />
+        <StatCard value={soonEmsArrivals} label="EMS <10m" tone={soonEmsArrivals ? 'critical' : 'success'} />
+        <StatCard value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
+        <StatCard
+          value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
+          label="Data Freshness"
+          tone="info"
+          title="Last Emergency OS capacity or whiteboard update"
+        />
       </div>
 
       <section
@@ -564,6 +660,7 @@ export default function EmergencyWhiteboard() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
           gap: 16,
           padding: 16,
           borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
@@ -592,6 +689,14 @@ export default function EmergencyWhiteboard() {
               </button>
             );
           })}
+        </div>
+
+        <div className="emergency-whiteboard-page__card-key" aria-label="Patient card visual key">
+          <span><i style={{ background: 'var(--priority-p1, #EF4444)' }} /> CTAS band</span>
+          <span><i style={{ background: 'var(--status-danger, #EF4444)' }} /> Critical risk</span>
+          <span><i style={{ background: 'var(--status-warning, #F59E0B)' }} /> Wait/reassess</span>
+          <span><i style={{ background: 'var(--color-secondary, #38BDF8)' }} /> EMS</span>
+          <span><i style={{ background: 'var(--color-accent, #A78BFA)' }} /> Boarding</span>
         </div>
 
         <button
@@ -669,9 +774,9 @@ export default function EmergencyWhiteboard() {
           className="emergency-whiteboard-page__grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))',
-            gap: 10,
-            padding: 12,
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 290px), 1fr))',
+            gap: 14,
+            padding: 14,
           }}
         >
           {visiblePatients.map((patient) => (

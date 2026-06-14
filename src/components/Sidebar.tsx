@@ -43,6 +43,7 @@ type SidebarNavItem = {
   featureGate?: string | null;
   activePaths?: readonly string[];
   mobileLabel?: string;
+  isEmergencyCore?: boolean;
 };
 
 type SidebarProps = {
@@ -85,6 +86,10 @@ const ICONS: Record<string, Icon> = {
   'emergency-settings': IconSettings,
 };
 
+function matchesNavigationPath(pathname: string, path: string): boolean {
+  return pathname === path || (path !== '/emergency' && pathname.startsWith(`${path}/`));
+}
+
 function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
   const route = item.route || item.path;
   if (route === '/emergency' || item.path === '/emergency/whiteboard') {
@@ -92,15 +97,15 @@ function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
       pathname === route ||
       pathname === item.path ||
       pathname === '/emergency' ||
-      Boolean(item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)))
+      Boolean(item.activePaths?.some((path) => matchesNavigationPath(pathname, path)))
     );
   }
   if (item.path === '/emergency/whiteboard')
     return pathname === item.path || pathname === '/emergency';
-  if (pathname === item.path || pathname.startsWith(`${item.path}/`)) return true;
-  if (pathname === route || pathname.startsWith(`${route}/`)) return true;
+  if (matchesNavigationPath(pathname, item.path)) return true;
+  if (matchesNavigationPath(pathname, route)) return true;
   return Boolean(
-    item.activePaths?.some((path) => pathname === path || pathname.startsWith(`${path}/`)),
+    item.activePaths?.some((path) => matchesNavigationPath(pathname, path)),
   );
 }
 
@@ -117,6 +122,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   );
   const visibleNav: readonly SidebarNavItem[] =
     navigationItems || getVisibleNavigation(emergencyRole.role);
+  const desktopPrimaryNav = visibleNav.filter((item) => item.isEmergencyCore !== false);
+  const desktopUtilityNav = visibleNav.filter((item) => item.isEmergencyCore === false);
   const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
   const mobilePrimaryNav = mobilePrimaryIds
     .map((id) => visibleNav.find((item) => item.id === id))
@@ -137,6 +144,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           'sidebar-nav-item',
           active ? 'sidebar-nav-item--active' : '',
           item.id === 'settings' ? 'sidebar-nav-item--settings' : '',
+          item.isEmergencyCore === false ? 'sidebar-nav-item--utility' : '',
         ]
           .filter(Boolean)
           .join(' ')}
@@ -219,7 +227,12 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       aria-label="Emergency navigation"
     >
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
-        {visibleNav.map(desktopNavLink)}
+        {desktopPrimaryNav.map(desktopNavLink)}
+        {desktopUtilityNav.length ? (
+          <div className="sidebar-desktop-nav__utility" aria-label="Emergency utility navigation">
+            {desktopUtilityNav.map(desktopNavLink)}
+          </div>
+        ) : null}
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}

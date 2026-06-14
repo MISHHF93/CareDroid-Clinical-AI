@@ -18,6 +18,7 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'boarding',
   'referrals',
   'copilot',
+  'tools',
 ]);
 
 export const PILOT_CUSTOMER_MODE = Object.freeze({
@@ -59,6 +60,8 @@ export type NavigationItem = Readonly<{
   activePaths?: readonly string[];
   mobileLabel?: string;
 }>;
+
+const UTILITY_NAV_ITEM_IDS = new Set(['tools']);
 
 export const NAV_ITEMS = Object.freeze([
   {
@@ -132,6 +135,13 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
+    id: 'tools',
+    label: 'Medical Tools',
+    icon: 'clinical-tools',
+    route: CANONICAL_ROUTES.emergencyTools,
+    featureGate: null,
+  },
+  {
     id: 'analytics',
     label: 'Analytics',
     icon: 'emergency-analytics',
@@ -160,6 +170,7 @@ const NAV_FEATURE_IDS = Object.freeze({
   boarding: 'boarding_intelligence',
   referrals: 'referral_intelligence',
   copilot: 'ed_copilot',
+  tools: 'clinical_calculator_hub',
   analytics: 'emergency_analytics',
   settings: 'emergency_settings',
 } as const);
@@ -197,7 +208,7 @@ export const NAVIGATION_ITEMS = Object.freeze(
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
       order: index + 1,
       roles: item.id === 'settings' ? rolesForRoute(item.route) : ALL_ROLES,
-      isEmergencyCore: true,
+      isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
         item.id === 'whiteboard'

@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { useEDCopilot } from '../hooks/useEmergencyOs';
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
@@ -84,11 +85,13 @@ function buildDepartmentPrompt({
   capacity,
   alerts,
   emergencySettings,
+  backendCopilotContext,
 }: {
   patients: Patient[];
   capacity: ReturnType<typeof useEmergencyStore.getState>['capacity'];
   alerts: Alert[];
   emergencySettings: ReturnType<typeof useEmergencyStore.getState>['emergencySettings'];
+  backendCopilotContext?: Record<string, unknown>;
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -99,6 +102,7 @@ function buildDepartmentPrompt({
   return [
     getAIPrompt('ed-copilot').prompt,
     HUMAN_REVIEW_DISCLAIMER,
+    typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
     'Keep answers brief, operationally useful, and explicit about uncertainty.',
     '',
     `Patient count: ${activePatients.length}`,
@@ -188,6 +192,22 @@ export function CopilotPanel() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const backendCopilot = useEDCopilot() as {
+    data?: {
+      data?: {
+        promptContext?: Record<string, unknown>;
+        quickActions?: string[];
+      };
+    } | null;
+    error?: string;
+  };
+  const backendCopilotContext = backendCopilot.data?.data?.promptContext;
+  const quickActions = useMemo(() => {
+    const actions = backendCopilot.data?.data?.quickActions;
+    return Array.isArray(actions) && actions.length ? actions : QUICK_ACTIONS;
+  }, [backendCopilot.data]);
+  const backendSafetyRule =
+    typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : '';
 
   const activePatients = useMemo(() => patients.filter(isActivePatient), [patients]);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
@@ -215,7 +235,13 @@ export function CopilotPanel() {
       timestamp: new Date(),
     };
     const history = messages;
-    const systemPrompt = buildDepartmentPrompt({ patients, capacity, alerts, emergencySettings });
+    const systemPrompt = buildDepartmentPrompt({
+      patients,
+      capacity,
+      alerts,
+      emergencySettings,
+      backendCopilotContext,
+    });
     recordWorkflowAction({
       type: 'copilot_used',
       title: 'Copilot used',
@@ -257,6 +283,7 @@ export function CopilotPanel() {
             reassessmentQueueCount: reassessmentCount,
             activeAlerts: alerts.filter((alert) => !alert.dismissed).length,
             safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
+            backendContext: backendCopilotContext,
           },
         },
       });
@@ -394,6 +421,24 @@ export function CopilotPanel() {
           gap: 12,
         }}
       >
+        {backendSafetyRule || backendCopilot.error ? (
+          <div
+            role="status"
+            style={{
+              border: '1px solid #374151',
+              borderRadius: 10,
+              background: '#0B1120',
+              color: backendCopilot.error ? '#FCA5A5' : '#FDE68A',
+              fontSize: 11,
+              lineHeight: 1.4,
+              padding: '8px 10px',
+            }}
+          >
+            {backendCopilot.error
+              ? `${EMERGENCY_OS_BRANDING.copilotName} backend context unavailable; using local board state.`
+              : `Backend safety policy: ${backendSafetyRule}`}
+          </div>
+        ) : null}
         {messages.map((message) => {
           const isStaff = message.role === 'staff';
           return (
@@ -436,7 +481,7 @@ export function CopilotPanel() {
       </div>
 
       <div style={{ padding: '0 12px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {QUICK_ACTIONS.map((action) => (
+        {quickActions.map((action) => (
           <button
             key={action}
             type="button"

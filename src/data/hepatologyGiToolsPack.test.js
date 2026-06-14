@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { builtinUiCalculators, clinicalIntentToolsById } from './clinicalIntentToolCatalog';
 import {
@@ -64,7 +65,9 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       const navigation = getRegistryToolNavigation(registryId);
       expect(launch.path).toBe(`/tools/calculators/${registryId}`);
       expect(navigation.mode).toBe('calculator-route');
-      expect(navigation.pathname).toBe(`/tools/calculators/${registryId}`);
+      expect(navigation.pathname).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(navigation.search).toContain('filter=calculator');
+      expect(navigation.search).toContain(`q=${registryId}`);
     }
   });
 
@@ -79,7 +82,7 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       expect(launch.chatSeed, registryId).toMatch(/decision support|does not diagnose|informational/i);
       expect(launch.chatSeed, registryId).toMatch(/do not recommend|does not recommend|do not delay|does not diagnose/i);
       expect(navigation.mode, registryId).toBe('chat-assisted');
-      expect(navigation.pathname, registryId).toBe('/assistant');
+      expect(navigation.pathname, registryId).toBe(CANONICAL_ROUTES.emergencyCopilot);
     }
   });
 

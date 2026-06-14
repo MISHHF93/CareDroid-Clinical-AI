@@ -25,8 +25,19 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   integrations: '/api/emergency/integrations',
   copilot: '/api/emergency/copilot',
   workflowLogs: '/api/emergency/workflow-logs',
+  patientWorkflowLogs: '/api/emergency/patients',
   implementationReadiness: '/api/emergency/implementation-readiness',
   analytics: '/api/emergency/analytics',
+  aiGovernanceRegistry: '/api/emergency/governance/registry',
+  aiGovernanceSafetyRules: '/api/emergency/governance/safety-rules',
+  aiGovernanceCompliance: '/api/emergency/governance/compliance',
+  aiGovernanceViolations: '/api/emergency/governance/violations',
+  aiGovernancePromptValidation: '/api/emergency/governance/validate-prompts',
+  upgradeHarness: '/api/emergency/upgrade-harness',
+  upgradeHarnessCapacity: '/api/emergency/upgrade-harness/capacity',
+  upgradeHarnessPatientFlow: '/api/emergency/upgrade-harness/patient-flow',
+  upgradeHarnessClinicalIntelligence: '/api/emergency/upgrade-harness/clinical-intelligence',
+  upgradeHarnessAuditSummary: '/api/emergency/upgrade-harness/audit-summary',
   simulationUpdateLive: '/api/emergency/simulation/update-live',
   simulationEvaluate: '/api/emergency/simulation/evaluate',
   simulationCompare: '/api/emergency/simulation/compare',
@@ -57,7 +68,11 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'referrals',
   'copilot',
   'workflowLogs',
+  'patientWorkflowLogs',
   'analytics',
+  'aiGovernanceRegistry',
+  'aiGovernanceCompliance',
+  'aiGovernancePromptValidation',
   'settings',
 ]);
 
@@ -78,7 +93,14 @@ export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'digitalTwinSimulate',
   'digitalTwinState',
   'digitalTwinScenario',
+  'aiGovernanceSafetyRules',
+  'aiGovernanceViolations',
   'implementationReadiness',
+  'upgradeHarness',
+  'upgradeHarnessCapacity',
+  'upgradeHarnessPatientFlow',
+  'upgradeHarnessClinicalIntelligence',
+  'upgradeHarnessAuditSummary',
 ]);
 
 async function requestEmergencyJson(path, options = {}) {
@@ -117,9 +139,45 @@ export const fetchProvincialHealth = () => requestEmergencyJson(EMERGENCY_OS_API
 export const fetchIntegrationHub = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
 export const fetchEmergencyWorkflowLogs = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
+export const fetchPatientWorkflowLogs = (patientId) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.patientWorkflowLogs}/${encodeURIComponent(patientId)}/workflow-logs`
+  );
 export const fetchCompleteImplementationReadiness = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.implementationReadiness);
 export const fetchEmergencyAnalytics = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
+export const fetchEmergencyAiGovernanceRegistry = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernanceRegistry);
+export const fetchEmergencyAiGovernanceSafetyRules = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernanceSafetyRules);
+export const fetchEmergencyAiGovernanceCompliance = (days = 30) => {
+  const params = new URLSearchParams({ days: String(days) });
+  return requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceCompliance}?${params.toString()}`);
+};
+export const fetchEmergencyAiGovernanceViolations = (limit = 50) => {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceViolations}?${params.toString()}`);
+};
+export const validateEmergencyAiGovernancePrompts = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernancePromptValidation);
+export const fetchAdvancedEmergencyOsUpgradeHarness = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.upgradeHarness);
+export const fetchUpgradeHarnessCapacity = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessCapacity);
+export const fetchUpgradeHarnessPatientFlow = (patientId) =>
+  requestEmergencyJson(
+    patientId
+      ? `${EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessPatientFlow}/${encodeURIComponent(patientId)}`
+      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessPatientFlow
+  );
+export const fetchUpgradeHarnessClinicalIntelligence = (patientId) =>
+  requestEmergencyJson(
+    patientId
+      ? `${EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessClinicalIntelligence}/${encodeURIComponent(patientId)}`
+      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessClinicalIntelligence
+  );
+export const fetchUpgradeHarnessAuditSummary = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessAuditSummary);
 export const fetchEmergencySettings = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
 export const updateEmergencySettings = (settings = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings, {
@@ -219,8 +277,19 @@ export default Object.freeze({
   fetchIntegrationHub,
   fetchEDCopilot,
   fetchEmergencyWorkflowLogs,
+  fetchPatientWorkflowLogs,
   fetchCompleteImplementationReadiness,
   fetchEmergencyAnalytics,
+  fetchEmergencyAiGovernanceRegistry,
+  fetchEmergencyAiGovernanceSafetyRules,
+  fetchEmergencyAiGovernanceCompliance,
+  fetchEmergencyAiGovernanceViolations,
+  validateEmergencyAiGovernancePrompts,
+  fetchAdvancedEmergencyOsUpgradeHarness,
+  fetchUpgradeHarnessCapacity,
+  fetchUpgradeHarnessPatientFlow,
+  fetchUpgradeHarnessClinicalIntelligence,
+  fetchUpgradeHarnessAuditSummary,
   fetchEmergencySettings,
   updateEmergencySettings,
   updateRealTimeSimulationState,

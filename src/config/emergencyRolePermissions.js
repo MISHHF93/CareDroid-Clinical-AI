@@ -95,6 +95,7 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.boarding,
   ROUTES.referrals,
   ROUTES.copilot,
+  ROUTES.tools,
   ROUTES.analytics,
   ROUTES.settings,
 ]);
@@ -118,6 +119,7 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.boarding,
   ROUTES.referrals,
   ROUTES.copilot,
+  ROUTES.tools,
   ROUTES.analytics,
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
@@ -131,6 +133,7 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.boarding,
   ROUTES.referrals,
   ROUTES.copilot,
+  ROUTES.tools,
   ROUTES.analytics,
 ]);
 

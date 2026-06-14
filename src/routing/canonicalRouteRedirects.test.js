@@ -41,6 +41,7 @@ describe('canonical route tree', () => {
       { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
       { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
       { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
+      { path: '/emergency/tools', type: 'page', componentKey: 'ToolsOverview' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
       { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
       { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
@@ -59,10 +60,11 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('<ReferralPanel />');
     expect(appSource).toContain('<CapacityRoute />');
     expect(appSource).toContain('<CopilotRoute />');
+    expect(appSource).toContain('<ToolsOverview />');
     expect(appSource).toContain('<EmergencyAnalytics />');
     expect(appSource).toContain('<EmergencySettings />');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyTools}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyTools}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyPulse}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyJourney}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencySimulation}');
@@ -92,12 +94,16 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyWhiteboard}');
     expect(appSource).toContain('path="/tools/*"');
     expect(appSource).toContain('path="/scores/*"');
+    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
+    expect(appSource).toContain('<Route path="/calculators/*" element={<ToolsRedirect />} />');
+    expect(appSource).toContain('<Route path="/workflows" element={<ToolsRedirect />} />');
+    expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/emergency/pulse', to: '/emergency/whiteboard' }),
         expect.objectContaining({ path: '/emergency/simulation', to: '/emergency/whiteboard' }),
-        expect.objectContaining({ path: '/emergency/tools', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/emergency/calculators', to: '/emergency/tools' }),
       ]),
     );
   });

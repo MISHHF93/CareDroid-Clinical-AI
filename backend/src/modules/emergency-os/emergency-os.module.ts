@@ -12,6 +12,7 @@ import {
   HybridDigitalTwinService,
   RealTimeSimulationService,
 } from './emergency-os.advanced-services';
+import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
 import { AICallInterrogationService } from '../../services/ai-call-interrogation.service';
 import { EdgeAIAmbulanceService } from '../../services/edge-ai-ambulance.service';
 import { FederatedEMSService } from '../../services/federated-ems.service';
@@ -70,6 +71,7 @@ import {
     RealTimeSimulationService,
     FederatedLearningService,
     HybridDigitalTwinService,
+    EmergencyOsUpgradeHarnessService,
     ERPulseHandoverService,
     FederatedEMSService,
     LMECSService,

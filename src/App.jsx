@@ -6,6 +6,7 @@ import {
   Outlet,
   Route,
   Routes,
+  useLocation,
   useSearchParams,
 } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -28,6 +29,7 @@ const SmartIntake = lazy(() => import('./pages/emergency/SmartIntake'));
 const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalytics'));
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
+const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
 import PatientCard from './components/PatientCard';
 const ReferralPanel = lazy(() => import('./components/ReferralPanel'));
 import { useEmergencyStore } from './store/emergencyStore';
@@ -45,6 +47,9 @@ import {
   useEDCopilot,
   useEmergencyPatients,
   useEmergencyQueues,
+  useUpgradeHarnessAuditSummary,
+  useUpgradeHarnessCapacity,
+  useUpgradeHarnessClinicalIntelligence,
   useReassessmentQueue,
 } from './hooks/useEmergencyOs';
 
@@ -211,6 +216,85 @@ function EmergencyDefaultRedirect() {
   );
 }
 
+function normalizeRedirectPath(pathname) {
+  return String(pathname || '/').replace(/\/+$/, '') || '/';
+}
+
+function pathSegmentAfter(pathname, prefix) {
+  if (!pathname.startsWith(prefix)) return '';
+  return pathname.slice(prefix.length).split('/').filter(Boolean)[0] || '';
+}
+
+function buildEmergencyToolsRedirect(location) {
+  const pathname = normalizeRedirectPath(location.pathname);
+  const params = new URLSearchParams(location.search);
+  const setDefault = (key, value) => {
+    if (!params.has(key)) params.set(key, value);
+  };
+  const setQueryFromSlug = (slug) => {
+    if (slug && !params.has('q') && !params.has('search')) {
+      params.set('q', decodeURIComponent(slug));
+    }
+  };
+
+  if (pathname === CANONICAL_ROUTES.developerCatalog || pathname === '/catalog') {
+    setDefault('source', 'catalog');
+    setDefault('filter', 'all');
+  } else if (pathname === CANONICAL_ROUTES.recommendations) {
+    setDefault('source', 'recommendations');
+    setDefault('filter', 'recommended');
+  } else if (pathname === CANONICAL_ROUTES.workflows || pathname === CANONICAL_ROUTES.automation) {
+    setDefault('source', 'workflows');
+    setDefault('filter', 'ai-workflows');
+  } else if (
+    pathname === CANONICAL_ROUTES.calculators ||
+    pathname.startsWith(`${CANONICAL_ROUTES.calculators}/`) ||
+    pathname === '/calculators' ||
+    pathname.startsWith('/calculators/') ||
+    pathname === '/scores' ||
+    pathname.startsWith('/scores/') ||
+    pathname === '/emergency/calculators'
+  ) {
+    const slug =
+      pathSegmentAfter(pathname, `${CANONICAL_ROUTES.calculators}/`) ||
+      pathSegmentAfter(pathname, '/calculators/') ||
+      pathSegmentAfter(pathname, '/scores/');
+    setDefault('source', 'calculators');
+    setDefault('filter', 'calculator');
+    setQueryFromSlug(slug);
+  } else if (pathname === '/clinical-tools') {
+    setDefault('source', 'clinical-tools');
+    setDefault('filter', 'clinical-tools');
+  } else if (pathname === '/all-tools') {
+    setDefault('source', 'all-tools');
+    setDefault('filter', 'all');
+  } else {
+    setDefault('source', 'tools');
+  }
+
+  const search = params.toString();
+  return {
+    pathname: CANONICAL_ROUTES.emergencyTools,
+    search: search ? `?${search}` : '',
+  };
+}
+
+function ToolsRedirect() {
+  const location = useLocation();
+  return (
+    <Navigate
+      to={buildEmergencyToolsRedirect(location)}
+      replace
+      state={{ from: location.pathname }}
+    />
+  );
+}
+
+function EmergencyAliasRedirect({ to }) {
+  const location = useLocation();
+  return <Navigate to={{ pathname: to, search: location.search }} replace />;
+}
+
 function MetricGrid({ metrics }) {
   return (
     <div
@@ -264,6 +348,7 @@ function PatientGrid({ patients, emptyMessage }) {
   if (!patients.length) {
     return (
       <div
+        role="status"
         style={{
           ...emergencyRouteStyles.card,
           borderStyle: 'dashed',
@@ -292,6 +377,41 @@ function PatientGrid({ patients, emptyMessage }) {
   );
 }
 
+function dataFreshness(generatedAt) {
+  if (!generatedAt) {
+    return {
+      label: 'latest local state',
+      stale: false,
+    };
+  }
+
+  const timestamp = new Date(generatedAt).getTime();
+  if (!Number.isFinite(timestamp)) {
+    return {
+      label: 'latest local state',
+      stale: false,
+    };
+  }
+
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+  const timeLabel = new Date(timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  if (elapsedMinutes < 1) {
+    return {
+      label: `updated now at ${timeLabel}`,
+      stale: false,
+    };
+  }
+
+  return {
+    label: `updated ${elapsedMinutes < 60 ? `${elapsedMinutes}m ago` : `${Math.round(elapsedMinutes / 60)}h ago`} at ${timeLabel}`,
+    stale: elapsedMinutes >= 5,
+  };
+}
+
 function ApiStateBanner({
   moduleState,
   fallbackText = 'Showing the last local Emergency OS state.',
@@ -299,6 +419,7 @@ function ApiStateBanner({
   if (moduleState.loading && !moduleState.data) {
     return (
       <div
+        role="status"
         style={{
           ...emergencyRouteStyles.card,
           color: 'var(--color-text-secondary, #9CA3AF)',
@@ -330,6 +451,7 @@ function ApiStateBanner({
   if (moduleState.isEmpty) {
     return (
       <div
+        role="status"
         style={{
           ...emergencyRouteStyles.card,
           borderStyle: 'dashed',
@@ -348,6 +470,7 @@ function ApiStateBanner({
 function DataSourceNote({ moduleState }) {
   const generatedAt = moduleState.data?.generatedAt;
   const source = moduleState.data?.source;
+  const freshness = dataFreshness(generatedAt);
   const sourceLabel =
     !source || /fallback|demo|fixture|first-customer/i.test(source)
       ? 'walkthrough dataset'
@@ -355,9 +478,18 @@ function DataSourceNote({ moduleState }) {
         ? 'live Emergency OS feed'
         : source;
   return (
-    <div style={{ color: 'var(--color-text-muted, #6B7280)', fontSize: 12 }}>
-      Source: {sourceLabel}
-      {generatedAt ? ` | Updated ${new Date(generatedAt).toLocaleTimeString()}` : ''}
+    <div
+      role="status"
+      title={freshness.stale ? 'Data may be stale. Validate against current department state.' : undefined}
+      style={{
+        color: freshness.stale
+          ? 'var(--status-warning, #F59E0B)'
+          : 'var(--color-text-muted, #6B7280)',
+        fontSize: 12,
+      }}
+    >
+      Source: {sourceLabel} | {freshness.label}
+      {freshness.stale ? ' | validate before operational decisions' : ''}
     </div>
   );
 }
@@ -376,6 +508,10 @@ function isBoarding(patient) {
   return (
     patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
   );
+}
+
+function findUpgradeSignal(signals = [], capability) {
+  return signals.find((signal) => signal.capability === capability) || null;
 }
 
 function PatientsRoute() {
@@ -687,8 +823,12 @@ function CapacityRoute() {
   const storeRooms = useEmergencyStore((state) => state.rooms);
   const patients = useEmergencyStore((state) => state.patients);
   const capacityStatus = useCapacityStatus();
+  const upgradeCapacity = useUpgradeHarnessCapacity();
   const capacity = capacityStatus.data?.data?.capacity || storeCapacity;
   const rooms = capacityStatus.data?.data?.rooms || storeRooms;
+  const upgradeSignals = upgradeCapacity.data?.data?.signals || [];
+  const simulationSignal = findUpgradeSignal(upgradeSignals, 'real_time_simulation_adaptive_policy');
+  const bragSignal = findUpgradeSignal(upgradeSignals, 'brag_forecast_10h');
   const availableRooms = rooms.filter((room) => room.status === 'Available').length;
   const blockedRooms = rooms.filter((room) => room.status === 'Blocked').length;
   const boardingPatients = patients.filter(isBoarding);
@@ -733,6 +873,33 @@ function CapacityRoute() {
           ))}
         </div>
       ) : null}
+      {simulationSignal || bragSignal ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+          {simulationSignal ? (
+            <article style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
+              <strong style={{ color: '#BFDBFE' }}>Adaptive policy simulation</strong>
+              <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+                Pressure {simulationSignal.data.currentPressureScore};{' '}
+                {simulationSignal.data.recommendedPolicyReview}
+              </p>
+              <small style={{ color: '#FDE68A' }}>{simulationSignal.safety.humanReviewMessage}</small>
+            </article>
+          ) : null}
+          {bragSignal ? (
+            <article style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
+              <strong style={{ color: '#BFDBFE' }}>10-hour BRAG forecast</strong>
+              <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+                Peak band {bragSignal.data.peakBand};{' '}
+                {(bragSignal.data.forecast || []).slice(-1)[0]?.humanReviewTrigger}
+              </p>
+              <small style={{ color: '#FDE68A' }}>
+                Confidence {Math.round((bragSignal.confidence || 0) * 100)}% · Audit{' '}
+                {String(bragSignal.audit.immutableLedgerHash).slice(0, 10)}
+              </small>
+            </article>
+          ) : null}
+        </div>
+      ) : null}
       <PatientGrid
         patients={boardingPatients}
         emptyMessage="No active boarders affecting capacity."
@@ -747,7 +914,14 @@ function CopilotRoute() {
   const capacity = useEmergencyStore((state) => state.capacity);
   const alerts = useEmergencyStore((state) => state.alerts);
   const copilot = useEDCopilot();
+  const upgradeClinical = useUpgradeHarnessClinicalIntelligence();
+  const upgradeAudit = useUpgradeHarnessAuditSummary();
   const promptContext = copilot.data?.data?.promptContext || {};
+  const clinicalSignals = upgradeClinical.data?.data?.signals || [];
+  const cdssSignal = findUpgradeSignal(clinicalSignals, 'multimodal_cdss');
+  const telephoneSignal = findUpgradeSignal(clinicalSignals, 'telephone_triage_diversion');
+  const federatedSignal = findUpgradeSignal(clinicalSignals, 'federated_learning_harness');
+  const auditSignal = upgradeAudit.data?.data?.signals?.[0] || null;
   const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
   const highRiskPatients = activePatients.filter(isHighRisk);
 
@@ -815,6 +989,40 @@ function CopilotRoute() {
         capacity pressure, EMS status, or reassessment priorities.{' '}
         {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
+      {cdssSignal || telephoneSignal || federatedSignal || auditSignal ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+          {[
+            cdssSignal && {
+              title: 'CDSS safety gate',
+              body: `${cdssSignal.data.reviewQueue?.length || 0} high-risk review cards. ${cdssSignal.data.safetyGate}`,
+              meta: cdssSignal.safety.status,
+            },
+            telephoneSignal && {
+              title: 'Telephone triage diversion',
+              body: `${telephoneSignal.data.candidates?.length || 0} candidates held for human approval.`,
+              meta: telephoneSignal.data.diversionStatus,
+            },
+            federatedSignal && {
+              title: 'Federated insights',
+              body: `Pilot model ${federatedSignal.data.modelCard?.modelId}; no PHI leaves the fixture contract.`,
+              meta: `AUC ${federatedSignal.data.modelCard?.metrics?.auc}`,
+            },
+            auditSignal && {
+              title: 'Immutable audit summary',
+              body: `${auditSignal.data.ledgerEntries?.length || 0} linked pilot ledger entries.`,
+              meta: String(auditSignal.data.latestHash || auditSignal.audit.immutableLedgerHash).slice(0, 12),
+            },
+          ]
+            .filter(Boolean)
+            .map((card) => (
+              <article key={card.title} style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
+                <strong style={{ color: '#BFDBFE' }}>{card.title}</strong>
+                <p style={{ margin: '6px 0', color: '#9CA3AF', fontSize: 13 }}>{card.body}</p>
+                <small style={{ color: '#FDE68A' }}>{card.meta}</small>
+              </article>
+            ))}
+        </div>
+      ) : null}
       <DataSourceNote moduleState={copilot} />
     </EmergencyRoutePage>
   );
@@ -925,6 +1133,16 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.emergencyTools}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+              <LazyRoute label="Loading Medical Tools...">
+                <ToolsOverview />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.emergencyAnalytics}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
@@ -952,6 +1170,18 @@ export function AppRoutes() {
           />
         ))}
       </Route>
+      <Route path="/tools" element={<ToolsRedirect />} />
+      <Route path="/tools/*" element={<ToolsRedirect />} />
+      <Route path="/calculators" element={<ToolsRedirect />} />
+      <Route path="/calculators/*" element={<ToolsRedirect />} />
+      <Route path="/scores" element={<ToolsRedirect />} />
+      <Route path="/scores/*" element={<ToolsRedirect />} />
+      <Route path="/catalog" element={<ToolsRedirect />} />
+      <Route path="/all-tools" element={<ToolsRedirect />} />
+      <Route path="/clinical-tools" element={<ToolsRedirect />} />
+      <Route path="/workflows" element={<ToolsRedirect />} />
+      <Route path="/automation" element={<ToolsRedirect />} />
+      <Route path="/recommendations" element={<ToolsRedirect />} />
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
         <Route key={`${path}-${to}`} path={path} element={<Navigate to={to} replace />} />
       ))}
@@ -993,29 +1223,20 @@ export function AppRoutes() {
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
       />
       <Route
-        path="/tools/*"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
-      />
-      <Route
-        path="/calculators/*"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
-      />
-      <Route
-        path="/scores/*"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
-      />
-      <Route
         path="/assistant"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />}
       />
       <Route
         path="/chat"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />}
       />
-      <Route path="/ai" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+      <Route
+        path="/ai"
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />}
+      />
       <Route
         path="/copilot"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />}
       />
       <Route
         path="/emergency/*"

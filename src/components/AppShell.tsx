@@ -56,6 +56,7 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyCapacity]: `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
   [CANONICAL_ROUTES.emergencyBoarding]: `${EMERGENCY_OS_BRANDING.productName} - Boarding`,
   [CANONICAL_ROUTES.emergencyCopilot]: `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
+  [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Medical Tools`,
   [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
   '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
@@ -73,6 +74,7 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyBoarding]: 'Admission boarders and boarding escalation status.',
   [CANONICAL_ROUTES.emergencyReferrals]: 'Referral and transfer queue status.',
   [CANONICAL_ROUTES.emergencyCopilot]: 'Safe Emergency OS Copilot context and actions.',
+  [CANONICAL_ROUTES.emergencyTools]: 'Clinical calculators, tool launchers, and role-aware medical utilities.',
   [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
   '/settings': 'Tenant, module, AI, integration, and threshold controls.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
@@ -97,6 +99,10 @@ function isEditableShortcutTarget(target: EventTarget | null): boolean {
     target.isContentEditable ||
     target.closest('[contenteditable="true"]') !== null
   );
+}
+
+function matchesNavigationPath(pathname: string, path: string): boolean {
+  return pathname === path || (path !== '/emergency' && pathname.startsWith(`${path}/`));
 }
 
 export function AppShell({ children }: AppShellProps) {
@@ -130,9 +136,8 @@ export function AppShell({ children }: AppShellProps) {
   );
   const currentPage = useMemo(() => {
     const activeItem = visibleNavigationItems.find((item) =>
-      item.activePaths?.some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`)) ||
-      location.pathname === item.path ||
-      location.pathname.startsWith(`${item.path}/`),
+      item.activePaths?.some((path) => matchesNavigationPath(location.pathname, path)) ||
+      matchesNavigationPath(location.pathname, item.path),
     );
     const title = EMERGENCY_OS_PAGE_TITLES[location.pathname];
     const labelFromTitle = title?.replace(`${EMERGENCY_OS_BRANDING.productName} - `, '');
@@ -204,7 +209,7 @@ export function AppShell({ children }: AppShellProps) {
     }
 
     const activeItem = visibleNavigationItems.find(
-      (item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
+      (item) => matchesNavigationPath(location.pathname, item.path),
     );
     document.title = activeItem
       ? `${EMERGENCY_OS_BRANDING.productName} - ${activeItem.label}`

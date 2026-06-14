@@ -11,6 +11,7 @@ import {
   TOOL_LAUNCH_PATHS,
 } from './clinicalToolIdContract';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 const HUB = TOOL_LAUNCH_PATHS.calculatorsHub;
@@ -32,12 +33,14 @@ describe('nluLaunchPaths — every NLU profile resolves visibly', () => {
     if (expectation.expectsDedicatedCalculatorPath) {
       expect(matchCalculatorRoute(launch.path)).not.toBeNull();
       expect(plan.mode).toBe('calculator-route');
-      expect(plan.pathname).toBe(launch.path);
+      expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(plan.search).toContain('filter=calculator');
     }
 
     if (expectation.expectsDashboardChat) {
       expect(navPath).toBe('/assistant');
       expect(plan.shouldSeedChat).toBe(true);
+      expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyCopilot);
       expect(launch.chatSeed?.length).toBeGreaterThan(10);
     }
 
@@ -48,7 +51,8 @@ describe('nluLaunchPaths — every NLU profile resolves visibly', () => {
 
     if (expectation.kind === 'fleet-page') {
       expect(plan.mode).toBe('tool-page');
-      expect(plan.pathname).toMatch(/^\/fleet\//);
+      expect(plan.pathname).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(plan.search).toContain('filter=operations');
     }
 
     if (expectation.allowsHubPath) {

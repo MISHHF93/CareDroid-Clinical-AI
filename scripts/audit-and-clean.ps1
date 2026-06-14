@@ -5,7 +5,6 @@ Write-Host 'Auditing non-emergency modules...'
 
 $BackendDir = './backend/src'
 $FrontendDir = './src'
-$Execute = $env:CLEAN_EXECUTE -eq 'true'
 
 $PatternsToRemove = @(
   'ICU',
@@ -54,17 +53,13 @@ $DirsToDelete = @(
   "$FrontendDir/components/governance"
 )
 
-Write-Host ("Mode: " + ($(if ($Execute) { 'DELETE' } else { 'DRY RUN' })))
+Write-Host 'Mode: VERIFY ONLY'
+Write-Host 'This script never deletes files. Use the generated audit output for manual review.'
 Write-Host ''
 
 foreach ($Dir in $DirsToDelete) {
   if (Test-Path $Dir) {
-    if ($Execute) {
-      Write-Host "Deleting: $Dir"
-      Remove-Item -Recurse -Force $Dir
-    } else {
-      Write-Host "Would delete: $Dir"
-    }
+    Write-Host "Review candidate: $Dir"
   }
 }
 
@@ -85,7 +80,5 @@ foreach ($Pattern in $PatternsToRemove) {
 
 Write-Host ''
 Write-Host '=== Cleanup audit complete ==='
-if (-not $Execute) {
-  Write-Host 'No files were deleted. Re-run with CLEAN_EXECUTE=true to apply deletions after reviewing the audit.'
-}
-Write-Host 'Next: Run route audit to verify only emergency endpoints remain.'
+Write-Host 'No files were deleted. Archive or remove files only after proving they are inactive and unimported.'
+Write-Host 'Next: Run route audit to verify active Emergency OS endpoints remain canonical.'

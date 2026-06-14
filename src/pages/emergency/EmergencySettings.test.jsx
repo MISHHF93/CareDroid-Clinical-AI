@@ -5,7 +5,12 @@ import {
   fetchEmergencyOsSettings,
   saveEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
-import { fetchEmergencyWorkflowLogs } from '../../services/emergencyOsApi';
+import {
+  fetchEmergencyAiGovernanceCompliance,
+  fetchEmergencyAiGovernanceRegistry,
+  fetchEmergencyWorkflowLogs,
+  validateEmergencyAiGovernancePrompts,
+} from '../../services/emergencyOsApi';
 
 const { saveEmergencySettings, setThreshold, resetThresholds, mockThresholds } = vi.hoisted(() => ({
   saveEmergencySettings: vi.fn(),
@@ -135,7 +140,10 @@ vi.mock('../../services/emergencySettingsApi', () => ({
 }));
 
 vi.mock('../../services/emergencyOsApi', () => ({
+  fetchEmergencyAiGovernanceCompliance: vi.fn(),
+  fetchEmergencyAiGovernanceRegistry: vi.fn(),
   fetchEmergencyWorkflowLogs: vi.fn(),
+  validateEmergencyAiGovernancePrompts: vi.fn(),
 }));
 
 describe('EmergencySettings', () => {
@@ -159,6 +167,48 @@ describe('EmergencySettings', () => {
           },
         ],
       },
+    });
+    fetchEmergencyAiGovernanceRegistry.mockResolvedValue({
+      services: {
+        copilot: {
+          name: 'ED Copilot',
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-6',
+          requiresHumanReview: true,
+          auditLevel: 'full',
+          status: 'active',
+        },
+        deteriorationPrediction: {
+          name: 'Deterioration Prediction',
+          provider: 'local',
+          model: 'deterioration-v3-deterministic',
+          requiresHumanReview: true,
+          auditLevel: 'full',
+          status: 'future',
+        },
+        federatedEmsTriage: {
+          name: 'Federated EMS Triage',
+          provider: 'local',
+          model: 'fed-ems-edge-v1',
+          requiresHumanReview: true,
+          auditLevel: 'basic',
+          status: 'future',
+        },
+      },
+      safetyRules: {
+        requiredDisclaimers: ['Human review required'],
+        disallowedAutonomousActions: ['diagnose', 'prescribe', 'disposition patients'],
+      },
+      storageMode: 'in-memory-audit-fixture',
+      governanceFrameworks: ['NIST AI RMF', 'WHO AI healthcare guidance'],
+    });
+    fetchEmergencyAiGovernanceCompliance.mockResolvedValue({
+      totalInteractions: 2,
+      humanReviewRate: 1,
+      storageMode: 'in-memory-audit-fixture',
+    });
+    validateEmergencyAiGovernancePrompts.mockResolvedValue({
+      copilot: { valid: true, issues: [] },
     });
     saveEmergencyOsSettings.mockImplementation((payload) =>
       Promise.resolve({
@@ -206,6 +256,10 @@ describe('EmergencySettings', () => {
     expect(screen.getByLabelText('User input mode')).toHaveValue('central-escalation-input');
     expect(screen.getByText('department operating mode')).toBeInTheDocument();
     expect(screen.getByText('patient intake')).toBeInTheDocument();
+    expect(await screen.findByText('governed AI services')).toBeInTheDocument();
+    expect(screen.getByText('Human review coverage')).toBeInTheDocument();
+    expect(screen.getByText('Blocked autonomous actions')).toBeInTheDocument();
+    expect(screen.getByText('Copilot runtime config')).toBeInTheDocument();
   });
 
   it('renders fetched workflow action audit logs', async () => {

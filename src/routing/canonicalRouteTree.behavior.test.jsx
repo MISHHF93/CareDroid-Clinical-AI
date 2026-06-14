@@ -99,7 +99,7 @@ vi.mock('../services/emergencySettingsApi', () => ({
 
 function LocationProbe() {
   const location = useLocation();
-  return <output data-testid="location">{location.pathname}</output>;
+  return <output data-testid="location">{`${location.pathname}${location.search}`}</output>;
 }
 
 function AppRouteHarness({ initialPath }) {
@@ -229,6 +229,45 @@ describe('canonical route tree behavior', () => {
     expect(await findRouteHeading('AIIOS ED Copilot')).toBeInTheDocument();
     expect(screen.getByText(/Use the docked AIIOS ED Copilot/i)).toBeInTheDocument();
   });
+
+  it.each(['/assistant', '/chat', '/ai', '/copilot'])(
+    '%s redirects to the active Emergency Copilot route',
+    async (aliasPath) => {
+      renderRoute(aliasPath);
+
+      expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/copilot');
+      expect(await findRouteHeading('AIIOS ED Copilot')).toBeInTheDocument();
+    },
+  );
+
+  it('/emergency/tools renders Medical Tools inside the active shell', async () => {
+    renderRoute('/emergency/tools');
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /^emergency os console$/i }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/tools');
+  }, ROUTE_LOAD_TIMEOUT);
+
+  it.each([
+    ['/tools/catalog', '/emergency/tools?source=catalog&filter=all'],
+    ['/tools/calculators/qsofa', '/emergency/tools?source=calculators&filter=calculator&q=qsofa'],
+    ['/calculators', '/emergency/tools?source=calculators&filter=calculator'],
+    ['/workflows', '/emergency/tools?source=workflows&filter=ai-workflows'],
+    ['/recommendations', '/emergency/tools?source=recommendations&filter=recommended'],
+  ])('%s redirects to Medical Tools with intent preserved', async (legacyPath, expectedPath) => {
+    renderRoute(legacyPath);
+
+    expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
+    expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  }, ROUTE_LOAD_TIMEOUT);
 
   it('/emergency/analytics renders the Emergency OS analytics route', async () => {
     renderRoute('/emergency/analytics');

@@ -34,6 +34,7 @@ describe('Sidebar unified navigation rendering', () => {
       ['Boarding', '/emergency/boarding'],
       ['Referrals', '/emergency/referrals'],
       ['Copilot', '/emergency/copilot'],
+      ['Medical Tools', '/emergency/tools'],
     ]) {
       const link = desktopNav.getByRole('link', { name: label });
       expect(link).toBeTruthy();
@@ -63,6 +64,21 @@ describe('Sidebar unified navigation rendering', () => {
     expect(desktopNav.queryByRole('link', { name: 'AI Governance' })).toBeNull();
   });
 
+  it('marks Medical Tools active without also activating Whiteboard', () => {
+    renderSidebar('admin', '/emergency/tools');
+    const desktopNav = within(
+      screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
+    );
+
+    expect(desktopNav.getByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(desktopNav.getByRole('link', { name: 'Whiteboard' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('renders distinct icon keys for each pilot sidebar item', () => {
     renderSidebar('admin');
     const desktopNav = within(
@@ -79,6 +95,7 @@ describe('Sidebar unified navigation rendering', () => {
       ['Boarding', 'boarding'],
       ['Referrals', 'referrals'],
       ['Copilot', 'ed-copilot'],
+      ['Medical Tools', 'clinical-tools'],
     ]);
     const iconKeys: string[] = [];
 

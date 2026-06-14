@@ -115,17 +115,17 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'layouts',
     title: 'Layouts',
-    canonical: '`src/layout/AppShell.jsx` (shared app chrome)',
-    secondary: null,
+    canonical: '`src/components/AppShell.tsx` (active Emergency OS app chrome)',
+    secondary: '`src/layout/AppShell.jsx` (legacy/manual-review shell helper, not runtime-mounted)',
     duplicates: [
       {
         name: 'Shell variants',
-        instances: ['AppShell.jsx'],
+        instances: ['src/components/AppShell.tsx', 'src/layout/AppShell.jsx'],
         overlap: null,
-        risk: 'Resolved — AppShell owns route chrome.',
-        action: 'done',
+        risk: 'Legacy shell is not mounted but retained for tests/manual migration review.',
+        action: 'legacy',
         recommendation:
-          'Canonical shell: AppShell; use shared CareDroid primitives inside pages for content width only.',
+          'Canonical shell: src/components/AppShell.tsx; do not wire src/layout/AppShell.jsx back into runtime.',
       },
       {
         name: 'Ops demo layout class',
@@ -140,8 +140,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'sidebars',
     title: 'Sidebars',
-    canonical: '`src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` from navigation.config.js',
-    secondary: null,
+    canonical:
+      '`src/components/AppShell.tsx` + `NAVIGATION_ITEMS` from unified-navigation.config.ts',
+    secondary: '`src/config/navigation.config.js` compatibility projections',
     duplicates: [
       {
         name: 'Sidebar nav item sources',
@@ -151,10 +152,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'QUICK_COMMAND_DESTINATION_ITEMS',
         ],
         overlap: PRIMARY_SIDEBAR_NAV_ITEMS.length,
-        risk: 'Route surfaces can drift if they bypass navigation.config.js',
+        risk: 'Route surfaces can drift if they bypass unified-navigation.config.ts',
         action: 'done',
         recommendation:
-          'Canonical AppShell rail: APP_SHELL_NAV_ITEMS; other navigation projections must derive from navigation.config.js.',
+          'Canonical AppShell rail: NAVIGATION_ITEMS; compatibility projections must derive from unified-navigation.config.ts.',
       },
       {
         name: 'Tool list in sidebar',
@@ -570,9 +571,9 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '|--------|------------------|---------------------|',
     '| Routes | `src/config/routes.config.js` | App.jsx (paths only), TOOL_LAUNCH_PATHS |',
     '| Router mount | `src/App.jsx` | — |',
-    '| Layouts | `src/layout/AppShell.jsx` | Page-level shells |',
-    '| AppShell rail | `src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` | Inline nav arrays |',
-    '| Navigation | `src/config/navigation.config.js` | `primaryNavigation.js` (shim only) |',
+    '| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.jsx`, page-level shells |',
+    '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
+    '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',
     '| Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |',
     '| Tool ids / NLU | `src/data/clinicalToolIdContract.js` | Random string ids in components |',
     '| NLU catalog | `src/data/clinicalIntentToolCatalog.js` | Duplicate registry rows |',
