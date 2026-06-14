@@ -351,14 +351,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       .slice(0, MAX_HEADER_PATIENT_RESULTS);
   }, [patientLookupQuery, patients]);
 
-  const navigateEmergencyRoute = (path: string) => {
+  const navigateEmergencyRoute = useCallback((path: string) => {
     const permissionPath = routePermissionPath(path);
     navigate(
       emergencyRole.canAccessRoute(permissionPath)
         ? path
         : emergencyRole.nearestRoute(permissionPath),
     );
-  };
+  }, [emergencyRole, navigate]);
 
   const openCentralIntake = () => {
     if (!canSubmitCentralIntake) return;
@@ -810,82 +810,125 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       {alertDrawerOpen ? (
         <div
           role="dialog"
-          aria-label="Alert drawer"
-          style={{
-            position: 'absolute',
-            top: 48,
-            right: 52,
-            width: 320,
-            maxHeight: 360,
-            overflowY: 'auto',
-            background: '#111827',
-            border: '1px solid #1F2937',
-            borderRadius: 12,
-            padding: 12,
-            boxShadow: '0 18px 50px rgba(0,0,0,0.35)',
-            zIndex: 120,
-          }}
+          aria-modal="false"
+          aria-labelledby="notification-center-title"
+          className="emergency-os-notification-center"
         >
-          <div style={{ color: '#F9FAFB', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
-            Alerts
+          <div className="emergency-os-notification-center__header">
+            <div>
+              <span>Emergency OS</span>
+              <h2 id="notification-center-title">Notification Center</h2>
+              <p>
+                {unreadAlertCount
+                  ? `${unreadAlertCount} unread operational notice${unreadAlertCount === 1 ? '' : 's'}`
+                  : 'All active notices reviewed'}
+              </p>
+            </div>
+            <div className="emergency-os-notification-center__header-actions">
+              <button
+                type="button"
+                onClick={markAllNotificationsRead}
+                disabled={!notificationAlerts.some((alert) => !alert.read)}
+              >
+                Mark all read
+              </button>
             <button
               type="button"
               onClick={() => setAlertDrawerOpen(false)}
               aria-label="Close alerts"
-              style={{
-                float: 'right',
-                border: '1px solid #374151',
-                borderRadius: 8,
-                background: 'transparent',
-                color: '#9CA3AF',
-                cursor: 'pointer',
-                fontSize: 11,
-                padding: '3px 7px',
-              }}
             >
               Close
             </button>
+            </div>
           </div>
-          {visibleAlerts.length > 0 ? (
-            visibleAlerts.map((alert) => (
-              <button
-                key={alert.id}
-                type="button"
-                onClick={() => {
-                  if (alert.patientId) selectPatient(alert.patientId);
-                  const route = alertRoute(alert);
-                  if (!alert.patientId && route && emergencyRole.canAccessRoute(route)) {
-                    navigateEmergencyRoute(route);
-                  }
-                  setAlertDrawerOpen(false);
-                }}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  background: '#0B1120',
-                  border: '1px solid #1F2937',
-                  borderRadius: 10,
-                  color: '#F9FAFB',
-                  padding: 10,
-                  marginBottom: 8,
-                  cursor: 'pointer',
-                }}
-              >
-                <div
-                  style={{
-                    color: alert.severity === 'Critical' ? '#EF4444' : '#F59E0B',
-                    fontSize: 11,
-                  }}
-                >
-                  {alert.severity}
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>{alert.title}</div>
-                <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>{alert.message}</div>
-              </button>
-            ))
+          {loading && !notificationAlerts.length ? (
+            <div className="emergency-os-notification-center__state" role="status">
+              Loading active Emergency OS notifications...
+            </div>
+          ) : centralNode.refreshError && !notificationAlerts.length ? (
+            <div className="emergency-os-notification-center__state emergency-os-notification-center__state--error" role="alert">
+              Notification data is using local Emergency OS state. {centralNode.refreshError}
+            </div>
+          ) : notificationAlerts.length > 0 ? (
+            <div className="emergency-os-notification-center__list" role="list">
+              {notificationAlerts.map((alert) => {
+                const primaryAction = openAlertRoute(alert);
+                const patientLabel = alertPatientLabel(alert, patientById);
+                const encounterId =
+                  typeof alert.metadata?.encounterId === 'string'
+                    ? alert.metadata.encounterId
+                    : null;
+
+                return (
+                  <article
+                    key={alert.id}
+                    role="listitem"
+                    className="emergency-os-notification-card"
+                    data-severity={alertSeverityTone(alert)}
+                    data-read={alert.read ? 'true' : 'false'}
+                  >
+                    <div className="emergency-os-notification-card__meta">
+                      <span>{alert.severity}</span>
+                      <span>{describeAlertSource(alert)}</span>
+                      <time dateTime={alert.createdAt}>{formatAlertTime(alert.createdAt)}</time>
+                      <span>{alert.read ? 'Read' : 'Unread'}</span>
+                      {alert.acknowledged ? <span>Acknowledged</span> : null}
+                    </div>
+                    <div className="emergency-os-notification-card__content">
+                      <h3>{alert.title}</h3>
+                      <p>{alert.message}</p>
+                      {patientLabel || encounterId ? (
+                        <div className="emergency-os-notification-card__context">
+                          {patientLabel ? <span>{patientLabel}</span> : null}
+                          {encounterId ? <span>Encounter {encounterId}</span> : null}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="emergency-os-notification-card__actions">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          recordAlertRead(alert.id);
+                          primaryAction.onSelect?.();
+                        }}
+                        disabled={primaryAction.disabled}
+                        title={
+                          primaryAction.disabled
+                            ? primaryAction.disabledLabel || 'Action unavailable'
+                            : primaryAction.label
+                        }
+                      >
+                        {primaryAction.disabled
+                          ? primaryAction.disabledLabel || 'Unavailable'
+                          : primaryAction.label}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => recordAlertAcknowledged(alert.id)}
+                        disabled={Boolean(alert.acknowledged)}
+                      >
+                        {alert.acknowledged ? 'Acknowledged' : 'Acknowledge'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => recordAlertRead(alert.id)}
+                        disabled={Boolean(alert.read)}
+                      >
+                        {alert.read ? 'Read' : 'Mark read'}
+                      </button>
+                      <button type="button" onClick={() => recordAlertDismissed(alert.id)}>
+                        Dismiss
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           ) : (
-            <div style={{ color: '#9CA3AF', fontSize: 12 }}>All clear</div>
+            <div className="emergency-os-notification-center__state">
+              No active Emergency OS notifications. Capacity, EMS, reassessment, boarding,
+              referral, sync, AI safety, and integration streams are clear.
+            </div>
           )}
         </div>
       ) : null}
