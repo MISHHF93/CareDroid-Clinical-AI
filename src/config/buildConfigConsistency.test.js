@@ -122,10 +122,12 @@ describe('build and service config consistency', () => {
   it('keeps backend dev scripts pointed at the widened build entrypoint', () => {
     const backendPackageJson = read('backend/package.json');
 
-    expect(backendPackageJson).toContain('"start": "nest start --entryFile backend/src/main"');
+    expect(backendPackageJson).toContain('"start": "npm run build && npm run start:prod"');
+    expect(backendPackageJson).toContain('"start:dev": "npm run build && npm run start:prod"');
     expect(backendPackageJson).toContain(
-      '"start:dev": "nest start --watch --entryFile backend/src/main"',
+      '"start:watch": "nest start --watch --entryFile backend/src/main"',
     );
+    expect(backendPackageJson).toContain('"start:prod": "node dist/backend/src/main.js"');
     expect(read('backend/tsconfig.json')).toContain('"rootDir": ".."');
     expect(read('scripts/clean.mjs')).toContain("'backend/dist'");
     expect(read('scripts/dev-stack.mjs')).toContain("stdio: ['ignore', 'pipe', 'pipe']");
