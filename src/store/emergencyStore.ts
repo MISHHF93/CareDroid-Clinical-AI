@@ -4637,7 +4637,8 @@ export function createPatientFlag(
 }
 
 export function hasPatientFlag(patient: Patient, flag: PatientFlag | string): boolean {
-  return patient.flags.map(getPatientFlagType).includes(getPatientFlagType(flag));
+  const flags = Array.isArray(patient.flags) ? patient.flags : [];
+  return flags.map(getPatientFlagType).includes(getPatientFlagType(flag));
 }
 
 export const selectActivePatients = (state: EmergencyStoreState): Patient[] =>

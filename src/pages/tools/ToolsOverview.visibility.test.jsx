@@ -256,18 +256,25 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     const { container } = renderOverview();
     showAllTools();
 
+    const legend = screen.getByRole('region', { name: /technical and medical execution modes/i });
+    expect(within(legend).getByText(/how tools run/i)).toBeInTheDocument();
+    expect(within(legend).getByText(/each mode connects the technical path/i)).toBeInTheDocument();
+    expect(within(legend).getByText(/runs in this browser/i)).toBeInTheDocument();
+    expect(within(legend).getByText(/uses server validation/i)).toBeInTheDocument();
+    expect(within(legend).getByText(/copilot-guided, human-reviewed/i)).toBeInTheDocument();
+
     await waitFor(() => {
-      expect(toolCard(container, 'drug-check')).toHaveTextContent(/server-backed/i);
+      expect(toolCard(container, 'drug-check')).toHaveTextContent(/uses server validation/i);
     });
 
-    expect(toolCard(container, 'lab-interp')).toHaveTextContent(/server-backed/i);
-    expect(toolCard(container, 'qsofa')).toHaveTextContent(/local calculator/i);
-    expect(toolCard(container, 'wells-dvt-calculator')).toHaveTextContent(/chat-assisted/i);
+    expect(toolCard(container, 'lab-interp')).toHaveTextContent(/uses server validation/i);
+    expect(toolCard(container, 'qsofa')).toHaveTextContent(/runs in this browser/i);
+    expect(toolCard(container, 'wells-dvt-calculator')).toHaveTextContent(/copilot-guided, human-reviewed/i);
     const platformTool = getUserFacingToolRegistryProjection().find(
       (tool) => tool.executorStatus === 'platform' && toolCard(container, tool.id)
     );
     if (platformTool) {
-      expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform api/i);
+      expect(toolCard(container, platformTool.id)).toHaveTextContent(/platform service/i);
     }
   }, 10000);
 
@@ -308,7 +315,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
     expect(within(activeSurface).getByRole('heading', { name: /wells dvt/i })).toBeInTheDocument();
-    expect(within(activeSurface).getByText(/^chat-assisted$/i)).toBeInTheDocument();
+    expect(within(activeSurface).getByText(/^copilot-guided, human-reviewed$/i)).toBeInTheDocument();
 
     fireEvent.click(within(activeSurface).getByRole('button', { name: /ask assistant/i }));
 

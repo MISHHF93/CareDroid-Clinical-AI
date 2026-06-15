@@ -5,6 +5,16 @@ Emergency Department Operating System for high-pressure EDs with small clinical 
 Built for: ~100 patients/day, teams under 10
 Primary screen: Emergency Whiteboard
 
+## Technical And Medical Coverage
+
+CareDroid Emergency OS is a human-reviewed emergency department operating layer for patient flow, queue visibility, EMS and referral coordination, clinical workflow guidance, analytics, and ED Copilot support. It is not positioned as autonomous diagnosis, prescribing, order entry, discharge, admission, acuity assignment, or EHR writeback.
+
+Medical coverage centers on high-pressure ED workflows: triage review, waiting room visibility, reassessment, EMS offload, referral delay, boarding, discharge readiness, protocol and calculator access, evidence retrieval, handoff support, documentation readiness, and simulation/training. The current catalog includes emergency calculators and risk scores such as qSOFA, NEWS2, SOFA, HEART, Wells PE/DVT, Shock Index, NIHSS, GCS, PERC, and related specialty assistants, with many tools running as frontend/local or chat-assisted workflows and a narrower set backed by live executor APIs.
+
+Technically, the app is a React/Vite Emergency OS frontend with a NestJS API, TypeORM persistence, SQLite for local development, PostgreSQL when configured, and optional Redis, Python NLU, observability, and integration services. Platform assets, product packs, feature coverage, tool contracts, AI governance, audit, and demo/live source-state labeling are documented in generated inventory reports under `docs/`.
+
+The first deployment posture is demo/manual-data-first with clear source labels and no live clinical writeback. Integration readiness is tracked for FHIR, HL7, PACS, LIS, EMR/EHR, identity providers, government APIs, and scheduling systems, with production use requiring customer approval, validated connectors, governance controls, and human review.
+
 ## Stack
 
 - Frontend: React 18, Vite, React Router, Zustand, mostly JS/JSX with some TS/TSX.
@@ -42,9 +52,12 @@ Useful focused commands:
 npm run dev:web
 npm run dev:api
 npm run backend:build
+npm run backend:start
 npm run typecheck:frontend
 npm run lint:all
 ```
+
+The backend build emits `backend/dist/backend/src/main.js`; `npm run backend:start` runs that compiled entrypoint.
 
 ## Docker App Stack
 

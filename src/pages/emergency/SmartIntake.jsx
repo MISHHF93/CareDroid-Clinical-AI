@@ -134,7 +134,10 @@ export default function SmartIntake() {
   const addSmartIntakePatientToWhiteboard = (label) => {
     if (!canCreatePatient) return null;
     const patient = buildSmartIntakePatient(sessionId, label);
-    const timeline = patient.timeline.map((event) => ({ ...event, patientId: patient.id }));
+    const timeline = (Array.isArray(patient.timeline) ? patient.timeline : []).map((event) => ({
+      ...event,
+      patientId: patient.id,
+    }));
     addPatient(
       {
         ...patient,

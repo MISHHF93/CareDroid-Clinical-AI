@@ -54,10 +54,21 @@ type ChangeEvent = {
   text: string;
 };
 
-function readPulseSnapshot(): PulseSnapshot {
-  if (typeof localStorage === 'undefined') return { timestamp: null };
+function getPulseStorage(): Storage | null {
   try {
-    const raw = localStorage.getItem(LAST_VIEW_KEY);
+    if (typeof window === 'undefined') return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function readPulseSnapshot(): PulseSnapshot {
+  const storage = getPulseStorage();
+  if (!storage) return { timestamp: null };
+
+  try {
+    const raw = storage.getItem(LAST_VIEW_KEY);
     if (!raw) return { timestamp: null };
     const parsed = JSON.parse(raw);
     if (typeof parsed === 'number') return { timestamp: parsed };
@@ -73,24 +84,33 @@ function readPulseSnapshot(): PulseSnapshot {
         : undefined,
     };
   } catch (_error) {
-    const raw = localStorage.getItem(LAST_VIEW_KEY);
-    const numeric = Number(raw);
-    const parsedDate = raw ? Date.parse(raw) : Number.NaN;
-    return { timestamp: Number.isFinite(numeric) ? numeric : Number.isFinite(parsedDate) ? parsedDate : null };
+    try {
+      const raw = storage.getItem(LAST_VIEW_KEY);
+      const numeric = Number(raw);
+      const parsedDate = raw ? Date.parse(raw) : Number.NaN;
+      return { timestamp: Number.isFinite(numeric) ? numeric : Number.isFinite(parsedDate) ? parsedDate : null };
+    } catch {
+      return { timestamp: null };
+    }
   }
 }
 
 function writePulseSnapshot(snapshot: Required<Pick<PulseSnapshot, 'timestamp' | 'capacityBand' | 'activePatientCount'>>) {
-  if (typeof localStorage === 'undefined' || snapshot.timestamp === null) return;
-  localStorage.setItem(
-    LAST_VIEW_KEY,
-    JSON.stringify({
-      timestamp: snapshot.timestamp,
-      viewedAt: new Date(snapshot.timestamp).toISOString(),
-      capacityBand: snapshot.capacityBand,
-      activePatientCount: snapshot.activePatientCount,
-    }),
-  );
+  const storage = getPulseStorage();
+  if (!storage || snapshot.timestamp === null) return;
+  try {
+    storage.setItem(
+      LAST_VIEW_KEY,
+      JSON.stringify({
+        timestamp: snapshot.timestamp,
+        viewedAt: new Date(snapshot.timestamp).toISOString(),
+        capacityBand: snapshot.capacityBand,
+        activePatientCount: snapshot.activePatientCount,
+      }),
+    );
+  } catch {
+    // Pulse must stay renderable in clinical demo browsers that block storage.
+  }
 }
 
 function minutesSince(timestamp?: string | null, now = Date.now()): number {

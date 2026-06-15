@@ -119,22 +119,31 @@ function patientName(patient: Patient): string {
   return `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
 }
 
+function patientFlags(patient: Patient): PatientFlag[] {
+  return Array.isArray(patient.flags) ? patient.flags : [];
+}
+
+function patientVitals(patient: Patient): Patient['vitals'] {
+  return Array.isArray(patient.vitals) ? patient.vitals : [];
+}
+
 function isActivePatient(patient: Patient): boolean {
   return patient.state !== PatientState.Discharge;
 }
 
 function isHighRiskPatient(patient: Patient): boolean {
+  const flags = patientFlags(patient);
   return (
     patient.priority === Priority.P1 ||
     patient.priority === Priority.P2 ||
-    patient.flags.includes(PatientFlag.HighRisk) ||
-    patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-    patient.flags.includes(PatientFlag.SepsisAlert)
+    flags.includes(PatientFlag.HighRisk) ||
+    flags.includes(PatientFlag.DeteriorationRisk) ||
+    flags.includes(PatientFlag.SepsisAlert)
   );
 }
 
 function isReassessmentDue(patient: Patient): boolean {
-  return patient.flags.includes(PatientFlag.ReassessmentDue);
+  return patientFlags(patient).includes(PatientFlag.ReassessmentDue);
 }
 
 function formatAlert(alert: Alert): string {
@@ -156,7 +165,8 @@ function mergeActiveAlerts(alerts: Alert[], centralSnapshot: CareDroidCentralNod
 }
 
 function formatQueueHealthForPrompt(centralSnapshot: CareDroidCentralNodeSnapshot): string {
-  const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
+  const queueHealth = Array.isArray(centralSnapshot.queueHealth) ? centralSnapshot.queueHealth : [];
+  const breachedQueues = queueHealth.filter((queue) => queue.breached);
   if (!breachedQueues.length) return 'No queue thresholds breached.';
   return breachedQueues
     .slice(0, 4)
@@ -168,7 +178,8 @@ function formatQueueHealthForPrompt(centralSnapshot: CareDroidCentralNodeSnapsho
 }
 
 function summarizePatient(patient: Patient): string {
-  const latestVitals = patient.vitals.at(-1);
+  const latestVitals = patientVitals(patient).at(-1);
+  const flags = patientFlags(patient);
   const vitals = latestVitals
     ? `HR ${latestVitals.hr ?? '--'}, SBP ${latestVitals.sbp ?? '--'}, SpO2 ${latestVitals.spo2 ?? '--'}, Temp ${latestVitals.temp ?? '--'}`
     : 'Vitals unavailable';
@@ -180,7 +191,7 @@ function summarizePatient(patient: Patient): string {
     patient.priority,
     `Wait ${waitMinutes(patient.arrivalTime)}m`,
     vitals,
-    patient.flags.length ? `Flags: ${patient.flags.join(', ')}` : null,
+    flags.length ? `Flags: ${flags.join(', ')}` : null,
   ]
     .filter(Boolean)
     .join(' | ');
@@ -724,7 +735,7 @@ export function CopilotPanel() {
         }}
       >
         <span
-          aria-label="Copilot live"
+          aria-label="Copilot panel active"
           style={{
             width: 10,
             height: 10,

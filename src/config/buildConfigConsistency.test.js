@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
 const root = process.cwd();
@@ -8,9 +9,13 @@ const read = (path) => readFileSync(join(root, path), 'utf8');
 describe('build and service config consistency', () => {
   it('keeps Docker Compose ports aligned with Vite and Nest defaults', () => {
     const compose = read('docker-compose.yml');
+    const packageJson = read('package.json');
 
     expect(compose).toContain('- "3000:3000"');
     expect(compose).toContain('- "8000:8000"');
+    expect(packageJson).toContain('"dev": "vite --port 8000 --strictPort"');
+    expect(packageJson).toContain('"dev:lan": "vite --port 8000 --strictPort --host"');
+    expect(read('vite.config.js')).toContain('strictPort: true');
     expect(compose).toContain(
       'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}',
     );
@@ -55,6 +60,28 @@ describe('build and service config consistency', () => {
     expect(vercel).toContain('VITE_ALLOW_SAME_ORIGIN_API:-false');
     expect(validator).toContain('VITE_SAME_ORIGIN_API_PROXY_VERIFIED');
     expect(validator).toContain('VITE_API_URL is required for Vercel frontend deploys');
+    expect(validator).toContain('!isDemoMode');
+  });
+
+  it('allows static Vercel demo builds without a backend API origin', () => {
+    const result = spawnSync(process.execPath, ['scripts/validate-vercel-env.mjs'], {
+      cwd: root,
+      env: {
+        ...process.env,
+        VERCEL: '1',
+        VERCEL_ENV: 'production',
+        VITE_ALLOW_SAME_ORIGIN_API: 'false',
+        VITE_DEMO_MODE: 'true',
+        VITE_ENABLE_DEV_AUTH_BYPASS: 'false',
+        VITE_API_URL: '',
+        VITE_HIDE_DIVISION_MODE: '',
+        VITE_SAME_ORIGIN_API_PROXY_VERIFIED: '',
+      },
+      encoding: 'utf8',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Vercel environment validation passed.');
   });
 
   it('keeps backend production entrypoint aligned with package.json', () => {
@@ -77,6 +104,22 @@ describe('build and service config consistency', () => {
     expect(backendPackageJson).toContain(
       '"start:dev": "nest start --watch --entryFile backend/src/main"',
     );
+    expect(read('backend/tsconfig.json')).toContain('"rootDir": ".."');
+    expect(read('scripts/clean.mjs')).toContain("'backend/dist'");
+    expect(read('scripts/dev-stack.mjs')).toContain("stdio: ['ignore', 'pipe', 'pipe']");
+    expect(read('scripts/dev-stack.mjs')).toContain("spawn('taskkill'");
+    expect(read('scripts/dev-stack.mjs')).toContain("DEV_LOGIN_EMAIL: 'dev@example.com'");
+  });
+
+  it('keeps anomaly detection optional until a service is explicitly configured', () => {
+    const compose = read('docker-compose.yml');
+
+    expect(read('backend/src/config/anomaly-detection.config.ts')).toContain(
+      "ANOMALY_DETECTION_ENABLED === 'true'",
+    );
+    expect(compose).toContain('ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-false}');
+    expect(compose).not.toContain('\n  anomaly-detection:');
+    expect(compose).not.toContain('./backend/ml-services/anomaly-detection');
   });
 
   it('normalizes NLU defaults to port 8001', () => {

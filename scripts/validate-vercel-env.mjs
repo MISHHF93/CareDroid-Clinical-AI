@@ -10,10 +10,11 @@ const allowSameOriginApi = isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API);
 const sameOriginProxyVerified = isTruthy(process.env.VITE_SAME_ORIGIN_API_PROXY_VERIFIED);
 const hideDivisionMode = trim(process.env.VITE_HIDE_DIVISION_MODE);
 const demoMode = trim(process.env.VITE_DEMO_MODE);
+const isDemoMode = demoMode.toLowerCase() === 'true';
 
 const failures = [];
 
-if (isVercelDeploy && !apiUrl && !allowSameOriginApi) {
+if (isVercelDeploy && !apiUrl && !allowSameOriginApi && !isDemoMode) {
   failures.push(
     'VITE_API_URL is required for Vercel frontend deploys. Same-origin /api is only valid with a verified proxy in front of the SPA.'
   );
@@ -35,7 +36,7 @@ if (isVercelDeploy && hideDivisionMode.toLowerCase() === 'false') {
   failures.push('VITE_HIDE_DIVISION_MODE must not be false for Vercel production deploys.');
 }
 
-if (isVercelDeploy && demoMode.toLowerCase() !== 'true') {
+if (isVercelDeploy && !isDemoMode) {
   failures.push('VITE_DEMO_MODE=true is required so hosted demo deployments show Direct Sign In.');
 }
 

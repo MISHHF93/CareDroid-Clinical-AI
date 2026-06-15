@@ -238,6 +238,42 @@ describe('canonical tool inventory', () => {
     expect(new Set(chatKeys).size).toBe(chatKeys.length);
   });
 
+  it('samples the technical-medical execution bridge across backend, local, chat, and platform tools', () => {
+    expect(resolveToolInventoryRecord('drug-check', records)).toMatchObject({
+      id: 'drug-check',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      executorStatus: TOOL_EXECUTOR_STATUS.REGISTERED,
+      orchestratorToolId: 'drug-interactions',
+      endpoint: '/api/tools/drug-interactions/execute',
+    });
+
+    expect(resolveToolInventoryRecord('qsofa', records)).toMatchObject({
+      id: 'qsofa',
+      calculatorSlug: 'qsofa',
+      component: 'src/pages/tools/Calculators.jsx',
+    });
+    expect(getUserFacingToolInventory(records).find((record) => record.id === 'qsofa')).toMatchObject({
+      id: 'qsofa',
+      hasDedicatedForm: true,
+    });
+
+    expect(resolveToolInventoryRecord('nexus-cspine', records)).toMatchObject({
+      id: 'nexus-cspine',
+      launchType: TOOL_LAUNCH_TYPES.CHAT_ASSISTED,
+    });
+    expect(resolveToolInventoryRecord('nexus-cspine', records)?.chatSeed).toMatch(/decision support/i);
+    expect(getUserFacingToolInventory(records).find((record) => record.id === 'nexus-cspine')).toMatchObject({
+      id: 'nexus-cspine',
+      surface: TOOL_SURFACES.CHAT_ASSISTED,
+    });
+
+    expect(resolveToolInventoryRecord('ambient-scribe', records)).toMatchObject({
+      id: 'ambient-scribe',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      endpoint: '/api/clinical-intelligence/ambient-scribe/generate',
+    });
+  });
+
   it('integrates plugin registrations into canonical and user-facing inventory', () => {
     const pluginIds = PLUGIN_REGISTRY.map((plugin) => plugin.id);
     const canonicalById = new Map(records.map((record) => [record.id, record]));

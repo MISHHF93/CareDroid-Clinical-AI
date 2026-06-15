@@ -119,7 +119,7 @@ export default function EmergencyShiftSummaryPage() {
   };
 
   return (
-    <main className="shift-summary" aria-labelledby="shift-summary-title">
+    <section className="shift-summary" aria-labelledby="shift-summary-title">
       <header className="shift-summary__hero">
         <div>
           <span className="shift-summary__eyebrow">Shift operations</span>
@@ -306,6 +306,6 @@ export default function EmergencyShiftSummaryPage() {
           </ul>
         </aside>
       ) : null}
-    </main>
+    </section>
   );
 }

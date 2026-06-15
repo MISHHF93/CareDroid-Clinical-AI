@@ -1173,7 +1173,7 @@ function aliasesForRoute(id) {
 export const ROUTE_ALIAS_GROUPS = Object.freeze({
   auth: Object.freeze({ target: CANONICAL_ROUTES.auth, aliases: aliasesForRoute('auth') }),
   dashboard: Object.freeze({
-    target: CANONICAL_ROUTES.dashboard,
+    target: CANONICAL_ROUTES.emergencyWhiteboard,
     aliases: aliasesForRoute('dashboard'),
   }),
   assistant: Object.freeze({
@@ -1222,7 +1222,7 @@ export const ROUTE_ALIAS_GROUPS = Object.freeze({
     aliases: aliasesForRoute('fleetMap'),
   }),
   operations: Object.freeze({
-    target: CANONICAL_ROUTES.operations,
+    target: CANONICAL_ROUTES.emergencyQueues,
     aliases: aliasesForRoute('operations'),
   }),
   audit: Object.freeze({ target: CANONICAL_ROUTES.audit, aliases: aliasesForRoute('audit') }),

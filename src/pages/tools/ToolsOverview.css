@@ -57,6 +57,11 @@
   line-height: 1.45;
 }
 
+.tools-active-surface__safety {
+  margin-top: 6px !important;
+  font-size: 0.82rem;
+}
+
 .tools-active-surface__close {
   min-height: var(--compact-control-height, 38px);
   padding: 8px 12px;
@@ -125,6 +130,47 @@
 .tools-execution-badge--catalog {
   border-color: color-mix(in srgb, var(--text-secondary) 34%, var(--panel-border));
   color: var(--text-secondary);
+}
+
+.tools-execution-legend {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--compact-panel-radius, 14px);
+  background: var(--app-surface-1, var(--panel-background));
+}
+
+.tools-execution-legend strong {
+  color: var(--text-primary);
+}
+
+.tools-execution-legend p {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.tools-execution-legend__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.tools-execution-legend__item {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 78%, transparent);
+  border-radius: var(--compact-card-radius, 12px);
+  background: var(--app-surface-2, rgb(255 255 255 / 0.03));
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .header-content h1 {

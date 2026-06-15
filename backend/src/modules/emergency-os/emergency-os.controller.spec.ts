@@ -277,6 +277,32 @@ describe('EmergencyOsController', () => {
     );
   });
 
+  it('handles active Emergency Copilot query requests without optional Mongoose routes', () => {
+    const result = controller.queryCopilot({
+      query: 'Who waited longest?',
+      user_role: 'charge-nurse',
+    });
+
+    expect(result).toMatchObject({
+      module: 'ED Copilot Query',
+      source: 'backend-fixture',
+      data: {
+        query: 'Who waited longest?',
+        response: expect.stringContaining('waited'),
+        safety_check_passed: true,
+        safetyNotice: expect.stringContaining('not a replacement'),
+      },
+    });
+    expect(controller.getWorkflowLogs().data.logs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'copilot_used',
+          source: 'ed-copilot-query',
+        }),
+      ]),
+    );
+  });
+
   it('classifies the complete implementation prompt against the active Emergency OS spine', () => {
     const readiness = controller.getImplementationReadiness();
 

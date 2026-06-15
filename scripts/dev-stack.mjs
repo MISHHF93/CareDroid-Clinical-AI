@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = resolve(rootDir, 'backend');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const useShell = process.platform === 'win32';
 const args = new Set(process.argv.slice(2));
 
 const backendOnly = args.has('--backend-only') || args.has('--api-only');
@@ -44,6 +45,7 @@ const backendEnv = withDefaults({
   RAG_ENABLED: 'false',
   AI_ENABLED: 'false',
   ENCRYPTION_MASTER_KEY: '0000000000000000000000000000000000000000000000000000000000000000',
+  DEV_LOGIN_EMAIL: 'dev@example.com',
 });
 
 const commands = [
@@ -66,6 +68,20 @@ const commands = [
 const children = [];
 let stopping = false;
 
+const terminateChild = (child) => {
+  if (child.killed || child.exitCode !== null || child.signalCode !== null) return;
+
+  if (process.platform === 'win32' && child.pid) {
+    const killer = spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], {
+      stdio: 'ignore',
+    });
+    killer.on('error', () => child.kill());
+    return;
+  }
+
+  child.kill();
+};
+
 const pipeWithPrefix = (stream, name, output) => {
   let buffer = '';
   stream.on('data', (chunk) => {
@@ -87,9 +103,7 @@ const shutdown = (code = 0) => {
   if (stopping) return;
   stopping = true;
   for (const child of children) {
-    if (!child.killed) {
-      child.kill();
-    }
+    terminateChild(child);
   }
   setTimeout(() => process.exit(code), 250);
 };
@@ -101,15 +115,32 @@ console.log('Health:   http://localhost:3000/health');
 console.log('');
 
 for (const entry of commands) {
-  const child = spawn(entry.command, entry.args, {
-    cwd: entry.cwd,
-    env: entry.env,
-    stdio: ['inherit', 'pipe', 'pipe'],
-  });
+  let child;
+  try {
+    child = spawn(entry.command, entry.args, {
+      cwd: entry.cwd,
+      env: entry.env,
+      shell: useShell,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+  } catch (error) {
+    console.error(`[${entry.name}] failed to spawn ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`);
+    console.error(error?.stack || error?.message || error);
+    shutdown(1);
+    break;
+  }
 
   children.push(child);
   pipeWithPrefix(child.stdout, entry.name, process.stdout);
   pipeWithPrefix(child.stderr, entry.name, process.stderr);
+
+  child.on('error', (error) => {
+    if (stopping) return;
+    console.error(`[${entry.name}] failed to start ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`);
+    console.error(error?.stack || error?.message || error);
+    shutdown(1);
+  });
 
   child.on('exit', (code, signal) => {
     if (stopping) return;

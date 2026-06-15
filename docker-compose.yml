@@ -79,7 +79,7 @@ services:
       RAG_MODEL: ${RAG_MODEL:-local-deterministic-embedding}
       # ML Services
       ANOMALY_DETECTION_URL: ${ANOMALY_DETECTION_URL:-http://anomaly-detection:5000}
-      ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-true}
+      ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-false}
       NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-true}
       # Monitoring
       LOG_LEVEL: ${LOG_LEVEL:-debug}
@@ -95,7 +95,6 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
       - /app/node_modules
       - logs:/logs
     networks:
@@ -147,34 +146,6 @@ services:
     #         - driver: nvidia
     #           count: 1
     #           capabilities: [gpu]
-
-  # ============================================================
-  # Python Anomaly Detection Microservice
-  # ============================================================
-  anomaly-detection:
-    build:
-      context: ./backend/ml-services/anomaly-detection
-      dockerfile: Dockerfile
-    container_name: caredroid-anomaly-detection
-    environment:
-      PROMETHEUS_URL: http://prometheus:9090
-      ANOMALY_THRESHOLD: 0.7
-      CHECK_INTERVAL: 300
-      PYTHONUNBUFFERED: 1
-    ports:
-      - "5000:5000"
-    depends_on:
-      - prometheus
-    volumes:
-      - ./backend/ml-services/anomaly-detection:/app
-    networks:
-      - caredroid
-    healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   # ============================================================
   # React Frontend Service

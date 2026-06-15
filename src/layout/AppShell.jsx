@@ -256,12 +256,24 @@ function secondsSince(timestamp, now) {
 }
 
 function latestStateTimestamp(patient, state) {
-  const event = [...patient.timeline].reverse().find((item) => {
+  const timeline = Array.isArray(patient?.timeline) ? patient.timeline : [];
+  const event = [...timeline].reverse().find((item) => {
     const stateTarget = item.toState || item.to;
     return stateTarget === state || item.summary.toLowerCase().includes(state.toLowerCase());
   });
 
   return event?.timestamp || patient.lastAssessedTime || patient.triageTime || patient.arrivalTime;
+}
+
+function hasSeenChargeNursePulseDefault() {
+  try {
+    if (typeof window === 'undefined' || !window.sessionStorage) return false;
+    if (window.sessionStorage.getItem(CHARGE_NURSE_PULSE_DEFAULT_KEY) === 'true') return true;
+    window.sessionStorage.setItem(CHARGE_NURSE_PULSE_DEFAULT_KEY, 'true');
+  } catch {
+    return false;
+  }
+  return false;
 }
 
 function durationTone(minutes, warningAt, criticalAt) {
@@ -1312,10 +1324,7 @@ const AppShell = ({
   );
   useEffect(() => {
     if (!isChargeNurseProfile || location.pathname !== '/emergency/whiteboard') return;
-    if (typeof sessionStorage !== 'undefined') {
-      if (sessionStorage.getItem(CHARGE_NURSE_PULSE_DEFAULT_KEY) === 'true') return;
-      sessionStorage.setItem(CHARGE_NURSE_PULSE_DEFAULT_KEY, 'true');
-    }
+    if (hasSeenChargeNursePulseDefault()) return;
     navigate('/emergency/analytics', { replace: true });
   }, [isChargeNurseProfile, location.pathname, navigate]);
   const staffRebalanceSuggestion = useMemo(

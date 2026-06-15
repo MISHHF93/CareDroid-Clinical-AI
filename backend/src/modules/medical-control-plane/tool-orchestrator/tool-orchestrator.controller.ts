@@ -112,7 +112,7 @@ export class ToolOrchestratorController {
       toolId,
       parameters: body?.parameters ?? {},
       userId: req.user?.id || 'anonymous',
-      conversationId: body.conversationId || 'direct-execution',
+      conversationId: body?.conversationId || 'direct-execution',
     };
 
     return this.toolOrchestratorService.executeTool(dto);

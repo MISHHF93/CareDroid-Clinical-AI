@@ -273,6 +273,19 @@ function operationToolQuery(pathname) {
   return 'fleet-command';
 }
 
+function simulationToolQuery(pathname) {
+  if (pathname === CANONICAL_ROUTES.competencies || pathname.startsWith(`${CANONICAL_ROUTES.competencies}/`)) {
+    return 'competency-platform';
+  }
+  if (pathname === CANONICAL_ROUTES.credentials || pathname.startsWith(`${CANONICAL_ROUTES.credentials}/`)) {
+    return 'credentialing-platform';
+  }
+  if (pathname === CANONICAL_ROUTES.simulationOutcomes || pathname.startsWith(`${CANONICAL_ROUTES.simulationOutcomes}/`)) {
+    return 'simulation-outcomes';
+  }
+  return 'simulation-suite';
+}
+
 export function buildEmergencyToolsRedirect(location) {
   const pathname = normalizeRedirectPath(location.pathname);
   const params = new URLSearchParams(location.search);
@@ -317,6 +330,20 @@ export function buildEmergencyToolsRedirect(location) {
     setDefault('filter', 'laboratory');
     setDefault('q', 'lab-interp');
     setDefault('open', 'lab-interp');
+  } else if (
+    pathname === CANONICAL_ROUTES.simulation ||
+    pathname.startsWith(`${CANONICAL_ROUTES.simulation}/`) ||
+    pathname === '/medical-simulation' ||
+    pathname === CANONICAL_ROUTES.competencies ||
+    pathname.startsWith(`${CANONICAL_ROUTES.competencies}/`) ||
+    pathname === CANONICAL_ROUTES.credentials ||
+    pathname.startsWith(`${CANONICAL_ROUTES.credentials}/`)
+  ) {
+    const query = simulationToolQuery(pathname);
+    setDefault('source', 'simulation');
+    setDefault('filter', 'simulations');
+    setDefault('q', query);
+    setDefault('open', query);
   } else if (pathname === '/pharmacy' || pathname.startsWith('/pharmacy/')) {
     setDefault('source', 'clinical-tools');
     setDefault('filter', 'clinical-tools');
@@ -1623,6 +1650,13 @@ export function AppRoutes() {
       <Route path="/protocols/*" element={<ToolsRedirect />} />
       <Route path="/laboratory" element={<ToolsRedirect />} />
       <Route path="/lab" element={<ToolsRedirect />} />
+      <Route path="/simulation" element={<ToolsRedirect />} />
+      <Route path="/simulation/*" element={<ToolsRedirect />} />
+      <Route path="/medical-simulation" element={<ToolsRedirect />} />
+      <Route path="/competencies" element={<ToolsRedirect />} />
+      <Route path="/competencies/*" element={<ToolsRedirect />} />
+      <Route path="/credentials" element={<ToolsRedirect />} />
+      <Route path="/credentials/*" element={<ToolsRedirect />} />
       <Route path="/hospital-map" element={<ToolsRedirect />} />
       <Route path="/medical-iot" element={<ToolsRedirect />} />
       <Route path="/devices" element={<ToolsRedirect />} />

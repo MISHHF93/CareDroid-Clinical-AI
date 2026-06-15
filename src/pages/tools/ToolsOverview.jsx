@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import ClinicalCalculatorHub from '../../components/ClinicalCalculatorHub';
@@ -39,6 +39,7 @@ import {
   trackRoleSearchBehavior,
 } from '../../services/roleIntelligenceTelemetry';
 import { fetchToolExecutorCatalog } from '../../services/clinicalToolsApi';
+import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import './ToolsOverview.css';
 
 const EmbeddedCalculators = lazy(() => import('./Calculators'));
@@ -73,6 +74,29 @@ const EMBEDDED_TOOL_COMPONENTS = Object.freeze({
   'ai-explainability': AiExplainability,
   'clinical-audit': ClinicalAudit,
 });
+
+const EXECUTION_MODE_LEGEND = Object.freeze([
+  {
+    tone: 'local',
+    label: 'Runs in this browser',
+    detail: 'Deterministic forms and calculators run locally with human review.',
+  },
+  {
+    tone: 'server',
+    label: 'Uses server validation',
+    detail: 'Forms can submit to registered backend executor APIs when available.',
+  },
+  {
+    tone: 'chat',
+    label: 'Copilot-guided, human-reviewed',
+    detail: 'Seeds a guarded Copilot workflow; clinicians confirm context and next steps.',
+  },
+  {
+    tone: 'platform',
+    label: 'Platform service',
+    detail: 'Uses a platform or clinical-intelligence API rather than a tool executor.',
+  },
+]);
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'recommended', label: 'Recommended' },
@@ -358,14 +382,14 @@ function executionModeForTool(tool, executorCatalog) {
 
   if (tool.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED || tool.surface === 'chat-assisted') {
     return {
-      label: 'Chat-assisted',
-      detail: 'Launches Copilot with a guarded clinical decision-support prompt.',
+      label: 'Copilot-guided, human-reviewed',
+      detail: 'Launches Copilot with a guarded clinical decision-support prompt. Human review is required before action.',
       tone: 'chat',
     };
   }
   if (!markedUnsupported && (tool.executorStatus === 'registered' || (executorId && registeredExecutorIds.has(executorId)))) {
     return {
-      label: isCalculatorTool(tool) ? 'Backend validated form' : 'Server-backed',
+      label: isCalculatorTool(tool) ? 'Server-validated calculator' : 'Uses server validation',
       detail: executorId
         ? `Uses the local Medical Tools surface and can execute through /api/tools/${executorId}/execute.`
         : 'Uses the local Medical Tools surface with registered backend validation.',
@@ -374,14 +398,14 @@ function executionModeForTool(tool, executorCatalog) {
   }
   if (tool.executorStatus === 'platform' || (tool.endpoint && tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)) {
     return {
-      label: 'Platform API',
+      label: 'Platform service',
       detail: tool.endpoint ? `Uses ${tool.endpoint}.` : 'Uses a platform API client when launched.',
       tone: 'platform',
     };
   }
   if (isCalculatorTool(tool)) {
     return {
-      label: 'Local calculator',
+      label: 'Runs in this browser',
       detail: 'Runs in the browser with the built-in calculator form; no fake backend executor is called.',
       tone: 'local',
     };
@@ -391,6 +415,34 @@ function executionModeForTool(tool, executorCatalog) {
     detail: tool.endpoint ? `Connected endpoint: ${tool.endpoint}.` : 'Launches through the Medical Tools catalog.',
     tone: 'catalog',
   };
+}
+
+class ActiveToolSurfaceErrorBoundary extends Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const { toolName, onClose } = this.props;
+      return (
+        <div className="tools-active-surface__fallback" role="alert">
+          <strong className="tools-active-surface__fallback-title">Tool surface unavailable</strong>
+          <p>
+            {toolName} could not render in this session. Return to the catalog or launch a different
+            clinical tool while the issue is reviewed.
+          </p>
+          <button type="button" className="btn-open-tool" onClick={onClose}>
+            Back to catalog
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 function ActiveToolSurface({
@@ -468,13 +520,20 @@ function ActiveToolSurface({
           </span>
           <h2>{tool.label || tool.name}</h2>
           <p>{executionMode.detail}</p>
+          <p className="tools-active-surface__safety">{HUMAN_REVIEW_DISCLAIMER}</p>
         </div>
         <button type="button" className="tools-active-surface__close" onClick={onClose}>
           Back to catalog
         </button>
       </header>
       <Suspense fallback={<div className="tools-active-surface__loading">Loading tool surface...</div>}>
-        {body}
+        <ActiveToolSurfaceErrorBoundary
+          key={tool.id}
+          toolName={tool.label || tool.name || 'This tool'}
+          onClose={onClose}
+        >
+          {body}
+        </ActiveToolSurfaceErrorBoundary>
       </Suspense>
     </section>
   );
@@ -956,6 +1015,22 @@ const ToolsOverview = () => {
             <span>{workspaceRecommendedTools.length} recommended</span>
             <span>{profileToolGraph.counts.restricted} restricted</span>
           </div>
+          <section className="tools-execution-legend" aria-label="Technical and medical execution modes">
+            <div>
+              <strong>How tools run</strong>
+              <p>Each mode connects the technical path to the medical safety boundary.</p>
+            </div>
+            <div className="tools-execution-legend__items">
+              {EXECUTION_MODE_LEGEND.map((mode) => (
+                <div key={mode.tone} className="tools-execution-legend__item">
+                  <span className={`tools-execution-badge tools-execution-badge--${mode.tone}`}>
+                    {mode.label}
+                  </span>
+                  <span>{mode.detail}</span>
+                </div>
+              ))}
+            </div>
+          </section>
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
             <select

@@ -68,14 +68,14 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 8000,
-      strictPort: false,
+      strictPort: true,
       host: true,
       proxy: proxyPaths(proxyTarget),
     },
     /** Same proxy as dev so `vite preview` can reach the API on relative /api (direct LAN access). */
     preview: {
       port: 8000,
-      strictPort: false,
+      strictPort: true,
       host: true,
       proxy: proxyPaths(proxyTarget),
     },

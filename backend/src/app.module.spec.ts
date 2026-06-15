@@ -18,10 +18,11 @@ describe('AppModule static asset routing', () => {
     expect(STATIC_ASSET_RENDER_PATH.test('/api/ai/remaining-queries')).toBe(false);
     expect(STATIC_ASSET_RENDER_PATH.test('/health')).toBe(false);
     expect(STATIC_ASSET_RENDER_PATH.test('/metrics')).toBe(false);
-    expect(resolveFrontendDistPath(join('repo', 'backend', 'dist', 'src'))).toBe(
+    expect(resolveFrontendDistPath(join('repo', 'backend', 'src'))).toBe(join('repo', 'dist'));
+    expect(resolveFrontendDistPath(join('repo', 'backend', 'dist', 'backend', 'src'))).toBe(
       join('repo', 'dist'),
     );
-    expect(resolveFrontendIndexPath(join('repo', 'backend', 'dist', 'src'))).toBe(
+    expect(resolveFrontendIndexPath(join('repo', 'backend', 'dist', 'backend', 'src'))).toBe(
       join('repo', 'dist', 'index.html'),
     );
     expect(SWAGGER_DOCS_PATH).toBe('api/docs');
