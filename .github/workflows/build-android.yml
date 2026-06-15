@@ -42,7 +42,7 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: npx --yes @capacitor/cli@5 sync android
         
       - name: Cache Gradle packages
         uses: actions/cache@v3

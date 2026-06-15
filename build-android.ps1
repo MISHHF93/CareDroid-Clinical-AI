@@ -16,7 +16,7 @@ Write-Host "✓ Frontend built successfully" -ForegroundColor Green
 
 # Step 2: Sync with Capacitor
 Write-Host "`n🔄 Step 2: Syncing with Capacitor..." -ForegroundColor Cyan
-npx cap sync android
+npx --yes @capacitor/cli@5 sync android
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Capacitor sync failed!" -ForegroundColor Red
     exit 1

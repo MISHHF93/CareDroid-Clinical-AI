@@ -70,8 +70,8 @@
     "qa:android": "node scripts/run-android-device-qa.mjs",
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest",
-    "android-debug": "npm run build && npx cap sync android && cd android && .\\gradlew.bat assembleDebug",
-    "android-release": "npm run build && npx cap sync android && cd android && .\\gradlew.bat assembleRelease",
+    "android-debug": "npm run build && npx --yes @capacitor/cli@5 sync android && cd android && .\\gradlew.bat assembleDebug",
+    "android-release": "npm run build && npx --yes @capacitor/cli@5 sync android && cd android && .\\gradlew.bat assembleRelease",
     "backend:dev": "node scripts/dev-stack.mjs --backend-only",
     "backend:build": "cd backend && npm run build",
     "backend:start": "cd backend && npm run start:prod",
@@ -116,7 +116,6 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.0.2",
     "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

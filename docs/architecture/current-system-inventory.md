@@ -80,8 +80,8 @@ Configuration inventory:
 
 Notable stack drift:
 
-- `@capacitor/core` and `@capacitor/android` are `5.6.x`, while `@capacitor/cli` is `8.x`.
-- CI uses Node 20; backend Docker uses Node 18.
+- `@capacitor/core` and `@capacitor/android` remain on v5; Android sync commands pin `@capacitor/cli@5` via `npx` so web installs do not pull a mismatched CLI.
+- CI and Docker runtime baselines are standardized on Node 20.
 - Root `.env` mixes frontend `VITE_*` keys with backend-style secrets.
 - Tailwind config exists, but Tailwind is effectively dormant.
 
