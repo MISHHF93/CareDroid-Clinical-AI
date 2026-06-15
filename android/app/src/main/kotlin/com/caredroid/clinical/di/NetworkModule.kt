@@ -21,7 +21,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    
+    private fun normalizedBaseUrl(): String {
+        return BuildConfig.API_BASE_URL.trimEnd('/') + "/"
+    }
+
     /**
      * Provides HttpLoggingInterceptor for request/response logging
      */
@@ -36,7 +39,7 @@ object NetworkModule {
             }
         }
     }
-    
+
     /**
      * Provides TokenInterceptor for adding auth headers
      */
@@ -45,7 +48,7 @@ object NetworkModule {
     fun provideTokenInterceptor(): TokenInterceptor {
         return TokenInterceptor()
     }
-    
+
     /**
      * Provides OkHttpClient with interceptors configured
      */
@@ -63,7 +66,7 @@ object NetworkModule {
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
-    
+
     /**
      * Provides Retrofit instance
      */
@@ -71,12 +74,12 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.API_BASE_URL)
+            .baseUrl(normalizedBaseUrl())
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-    
+
     /**
      * Provides CareDroidApiService
      */

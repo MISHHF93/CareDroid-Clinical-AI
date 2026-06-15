@@ -3,9 +3,13 @@ package com.caredroid.clinical.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.caredroid.clinical.data.remote.NetworkResult
-import com.caredroid.clinical.data.remote.dto.DrugInteractionRequest
-import com.caredroid.clinical.data.remote.dto.LabInterpretationRequest
-import com.caredroid.clinical.data.remote.dto.SofaScoreRequest
+import com.caredroid.clinical.data.remote.dto.CardiovascularData
+import com.caredroid.clinical.data.remote.dto.CnsData
+import com.caredroid.clinical.data.remote.dto.CoagulationData
+import com.caredroid.clinical.data.remote.dto.LiverData
+import com.caredroid.clinical.data.remote.dto.RenalData
+import com.caredroid.clinical.data.remote.dto.RespirationData
+import com.caredroid.clinical.data.remote.dto.SofaCalculatorRequest
 import com.caredroid.clinical.domain.repository.ToolsRepository
 import com.caredroid.clinical.ui.state.ToolsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,9 +41,7 @@ class ToolsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val result = toolsRepository.checkDrugInteractions(
-                DrugInteractionRequest(drugs)
-            )
+            val result = toolsRepository.checkDrugInteractions(drugs)
 
             when (result) {
                 is NetworkResult.Success -> {
@@ -73,9 +75,7 @@ class ToolsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val result = toolsRepository.interpretLab(
-                LabInterpretationRequest(testName, value, unit)
-            )
+            val result = toolsRepository.interpretLab(testName, value.toFloat(), unit)
 
             when (result) {
                 is NetworkResult.Success -> {
@@ -119,15 +119,13 @@ class ToolsViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val result = toolsRepository.calculateSofa(
-                SofaScoreRequest(
-                    pao2 = pao2,
-                    fio2 = fio2,
-                    platelets = platelets,
-                    bilirubin = bilirubin,
-                    meanArterialPressure = map,
-                    glasgowComaScore = gcs,
-                    creatinine = creatinine,
-                    urineOutput = urine
+                SofaCalculatorRequest(
+                    respiration = RespirationData(pao2 = pao2.toFloat(), fio2 = fio2.toFloat()),
+                    coagulation = CoagulationData(platelets = platelets.toFloat()),
+                    liver = LiverData(bilirubin = bilirubin.toFloat()),
+                    cardiovascular = CardiovascularData(map = map.toFloat()),
+                    cns = CnsData(glasgowComaScore = gcs),
+                    renal = RenalData(creatinine = creatinine.toFloat(), urineOutput = urine.toFloat())
                 )
             )
 

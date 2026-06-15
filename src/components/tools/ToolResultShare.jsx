@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getExportService } from '../../services/export/ExportService';
 import { buildSharedSessionUrl, createSharedSession } from '../../utils/sharedSessions';
 import {
@@ -12,6 +12,9 @@ import { getToolIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ToolResultShare.css';
 
 const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousFocusRef = useRef(null);
   const [shareMode, setShareMode] = useState('link'); // 'link' | 'export' | 'email'
   const [selectedFormat, setSelectedFormat] = useState('pdf');
   const [recipientEmail, setRecipientEmail] = useState('');
@@ -23,6 +26,26 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
     csv: CHROME_ICONS.formatCsv,
     pdf: CHROME_ICONS.formatPdf,
   };
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement;
+    window.setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 0);
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocusRef.current?.focus?.();
+    };
+  }, [onClose]);
 
   const createResultShareLink = () => {
     const shareId = createSharedSession({
@@ -63,7 +86,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         exportService.downloadFile(
           JSON.stringify(exportData, null, 2),
           `${filename}.json`,
-          'application/json'
+          'application/json',
         );
       } else if (selectedFormat === 'csv') {
         // Convert results to CSV if it's an array
@@ -80,7 +103,10 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         });
       }
 
-      setFeedback({ text: `Results exported as ${selectedFormat.toUpperCase()}.`, variant: 'success' });
+      setFeedback({
+        text: `Results exported as ${selectedFormat.toUpperCase()}.`,
+        variant: 'success',
+      });
       setTimeout(() => {
         setFeedback({ text: '', variant: 'info' });
         onClose();
@@ -99,7 +125,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
       const fallback = makeDisabledCapabilityResponse(
         'toolsShareResults',
         '/api/tools/share-results',
-        { delivery: 'local-link', shareId: null, url: createResultShareLink() }
+        { delivery: 'local-link', shareId: null, url: createResultShareLink() },
       );
       reportApiError({
         title: 'Tool result email share unavailable',
@@ -129,16 +155,29 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
 
   return (
     <div className="tool-result-share-modal">
-      <div className="share-modal-overlay" onClick={onClose}></div>
-      <div className="share-modal-content">
+      <div className="share-modal-overlay" onClick={onClose} aria-hidden="true"></div>
+      <div
+        ref={dialogRef}
+        className="share-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="share-results-title"
+        tabIndex={-1}
+      >
         <div className="share-modal-header">
-          <h2>
+          <h2 id="share-results-title">
             <span className="share-modal-tool-icon" aria-hidden>
               <NavIcon icon={getToolIcon(toolId)} size={24} />
             </span>{' '}
             Share {toolName} Results
           </h2>
-          <button type="button" className="share-modal-close" onClick={onClose} aria-label="Close">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="share-modal-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <NavIcon icon={CHROME_ICONS.close} size={22} />
           </button>
         </div>
@@ -196,7 +235,8 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                 Copy Share Link
               </button>
               <p className="share-note">
-                This link opens on this browser profile for 30 days. Use Export for cross-device sharing.
+                This link opens on this browser profile for 30 days. Use Export for cross-device
+                sharing.
               </p>
             </div>
           )}
@@ -206,8 +246,11 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
             <div className="share-mode-content">
               <p>Export results in your preferred format:</p>
               <div className="export-format-grid">
-                {['json', 'csv', 'pdf'].map(format => (
-                  <label key={format} className={`export-format-option ${selectedFormat === format ? 'selected' : ''}`}>
+                {['json', 'csv', 'pdf'].map((format) => (
+                  <label
+                    key={format}
+                    className={`export-format-option ${selectedFormat === format ? 'selected' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="exportFormat"
@@ -253,11 +296,16 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
             <div className="share-mode-content">
               {!emailShareAvailable && (
                 <p className="share-note share-note--warning" role="status">
-                  Server email share is not available. Use Share Link or Export, or copy results manually.
+                  Server email share is not available. Use Share Link or Export, or copy results
+                  manually.
                 </p>
               )}
               <p>Send results to a colleague via email:</p>
+              <label className="share-email-label" htmlFor="share-recipient-email">
+                Recipient email
+              </label>
               <input
+                id="share-recipient-email"
                 type="email"
                 className="share-email-input"
                 placeholder="colleague@hospital.com"
@@ -293,14 +341,22 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
 
           {/* Message Display */}
           {feedback.text && (
-            <div className={`share-message share-message--${feedback.variant}`}>{feedback.text}</div>
+            <div
+              className={`share-message share-message--${feedback.variant}`}
+              role={feedback.variant === 'error' ? 'alert' : 'status'}
+            >
+              {feedback.text}
+            </div>
           )}
         </div>
 
         <div className="share-modal-footer">
           <p className="share-privacy-note share-privacy-note--with-icon">
             <NavIcon icon={CHROME_ICONS.lock} size={18} aria-hidden />
-            <span>Local links stay in this browser profile. Use Export when recipients need a portable copy.</span>
+            <span>
+              Local links stay in this browser profile. Use Export when recipients need a portable
+              copy.
+            </span>
           </p>
           <button type="button" className="btn-secondary" onClick={onClose}>
             Close

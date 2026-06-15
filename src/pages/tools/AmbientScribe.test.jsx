@@ -78,7 +78,7 @@ describe('AmbientScribe', () => {
     fireEvent.change(screen.getByLabelText(/clinician instructions/i), {
       target: { value: 'Include return precautions.' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /generate reviewed-required draft/i }));
+    fireEvent.click(screen.getByRole('button', { name: /generate draft for clinician review/i }));
 
     await waitFor(() => {
       expect(generateAmbientScribeDraft).toHaveBeenCalledWith(

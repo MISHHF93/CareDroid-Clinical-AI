@@ -11,6 +11,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    pool: 'threads',
     /** Backend uses Jest (`cd backend && npm test`); exclude Nest specs from this Vite/Vitest project. */
     exclude: [
       '**/node_modules/**',

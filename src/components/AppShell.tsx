@@ -74,7 +74,8 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyBoarding]: 'Admission boarders and boarding escalation status.',
   [CANONICAL_ROUTES.emergencyReferrals]: 'Referral and transfer queue status.',
   [CANONICAL_ROUTES.emergencyCopilot]: 'Safe Emergency OS Copilot context and actions.',
-  [CANONICAL_ROUTES.emergencyTools]: 'Clinical calculators, tool launchers, and role-aware medical utilities.',
+  [CANONICAL_ROUTES.emergencyTools]:
+    'Clinical calculators, tool launchers, and role-aware medical utilities.',
   [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
   '/settings': 'Tenant, module, AI, integration, and threshold controls.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
@@ -148,9 +149,10 @@ export function AppShell({ children }: AppShellProps) {
     [emergencyRole.role],
   );
   const currentPage = useMemo(() => {
-    const activeItem = visibleNavigationItems.find((item) =>
-      item.activePaths?.some((path) => matchesNavigationPath(location.pathname, path)) ||
-      matchesNavigationPath(location.pathname, item.path),
+    const activeItem = visibleNavigationItems.find(
+      (item) =>
+        item.activePaths?.some((path) => matchesNavigationPath(location.pathname, path)) ||
+        matchesNavigationPath(location.pathname, item.path),
     );
     const title = EMERGENCY_OS_PAGE_TITLES[location.pathname];
     const labelFromTitle = title?.replace(`${EMERGENCY_OS_BRANDING.productName} - `, '');
@@ -159,7 +161,9 @@ export function AppShell({ children }: AppShellProps) {
       label: labelFromTitle || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
-        (activeItem ? `Open ${activeItem.label} in Emergency OS.` : EMERGENCY_OS_BRANDING.safetyLine),
+        (activeItem
+          ? `Open ${activeItem.label} in Emergency OS.`
+          : EMERGENCY_OS_BRANDING.safetyLine),
     };
   }, [location.pathname, visibleNavigationItems]);
 
@@ -221,8 +225,8 @@ export function AppShell({ children }: AppShellProps) {
       return;
     }
 
-    const activeItem = visibleNavigationItems.find(
-      (item) => matchesNavigationPath(location.pathname, item.path),
+    const activeItem = visibleNavigationItems.find((item) =>
+      matchesNavigationPath(location.pathname, item.path),
     );
     document.title = activeItem
       ? `${EMERGENCY_OS_BRANDING.productName} - ${activeItem.label}`
@@ -234,10 +238,13 @@ export function AppShell({ children }: AppShellProps) {
       const store = useEmergencyStore.getState();
       const inInput = isEditableShortcutTarget(e.target);
 
+      if (inInput) return;
+
       if (e.key === 'Escape') {
         store.selectPatient(null);
         setShowReassessmentDrawer(false);
         document.dispatchEvent(new Event('close-all-panels'));
+        return;
       }
 
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
@@ -249,8 +256,6 @@ export function AppShell({ children }: AppShellProps) {
         );
         return;
       }
-
-      if (inInput) return;
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -316,7 +321,8 @@ export function AppShell({ children }: AppShellProps) {
 
   useEffect(() => {
     const openTools = (event: Event) => {
-      const detail = (event as CustomEvent<{ filter?: string; query?: string; source?: string }>).detail || {};
+      const detail =
+        (event as CustomEvent<{ filter?: string; query?: string; source?: string }>).detail || {};
       const targetPath = buildEmergencyToolsPath({
         source: detail.source || 'chat',
         filter: detail.filter || 'all',
@@ -388,12 +394,14 @@ export function AppShell({ children }: AppShellProps) {
         break;
       }
       case 'OPEN_PEDIATRIC_DRUGS':
-        navigate(buildEmergencyToolsPath({
-          source: 'calculators',
-          filter: 'calculator',
-          q: 'pediatric-dose-safety-checker',
-          open: 'pediatric-dose-safety-checker',
-        }));
+        navigate(
+          buildEmergencyToolsPath({
+            source: 'calculators',
+            filter: 'calculator',
+            q: 'pediatric-dose-safety-checker',
+            open: 'pediatric-dose-safety-checker',
+          }),
+        );
         break;
       case 'OPEN_CALCULATOR': {
         const params = new URLSearchParams({
@@ -438,11 +446,17 @@ export function AppShell({ children }: AppShellProps) {
         overflow: 'hidden',
       }}
     >
+      <a className="ed-skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <Sidebar navigationItems={visibleNavigationItems} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         <main
+          id="main-content"
+          className="app-shell-main-content"
           role="main"
+          tabIndex={-1}
           style={{
             flex: 1,
             overflow: 'auto',
@@ -450,7 +464,13 @@ export function AppShell({ children }: AppShellProps) {
           }}
         >
           <ErrorBoundary fallbackText="Emergency OS page encountered an error. Refresh to reload.">
-            <Suspense fallback={<div role="status" style={{ padding: 24, color: '#9CA3AF' }}>Loading Emergency OS page...</div>}>
+            <Suspense
+              fallback={
+                <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
+                  Loading Emergency OS page...
+                </div>
+              }
+            >
               {children}
             </Suspense>
           </ErrorBoundary>

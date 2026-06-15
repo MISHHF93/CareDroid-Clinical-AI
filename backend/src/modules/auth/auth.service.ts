@@ -39,13 +39,8 @@ export class AuthService {
     private readonly twoFactorService: TwoFactorService,
   ) {}
 
-  async register(registerDto: {
-    email: string;
-    password: string;
-    fullName: string;
-    role?: UserRole;
-  }) {
-    const { email, password, fullName, role = UserRole.STUDENT } = registerDto;
+  async register(registerDto: { email: string; password: string; fullName: string }) {
+    const { email, password, fullName } = registerDto;
 
     // Check if user exists
     const existing = await this.userRepository.findOne({ where: { email } });
@@ -66,7 +61,7 @@ export class AuthService {
       passwordHash,
       emailVerificationToken,
       emailVerificationExpiry,
-      role,
+      role: UserRole.STUDENT,
     });
 
     await this.userRepository.save(user);

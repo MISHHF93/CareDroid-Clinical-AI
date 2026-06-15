@@ -53,9 +53,29 @@ const proxyPaths = (target) => ({
   },
 });
 
+const readPort = (...values) => {
+  for (const value of values) {
+    const parsed = Number.parseInt(value || '', 10);
+    if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65535) return parsed;
+  }
+  return 8000;
+};
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const proxyTarget = env.VITE_API_PROXY_TARGET || 'http://localhost:3000';
+  const frontendPort = readPort(
+    env.FRONTEND_PORT,
+    env.VITE_DEV_PORT,
+    process.env.FRONTEND_PORT,
+    process.env.VITE_DEV_PORT,
+  );
+  const backendPort = readPort(
+    env.BACKEND_PORT,
+    process.env.BACKEND_PORT,
+    process.env.PORT,
+    '3000',
+  );
+  const proxyTarget = env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`;
   const buildInfo = buildInfoFor(mode, env);
 
   return {
@@ -67,14 +87,14 @@ export default defineConfig(({ mode }) => {
       drop: ['console', 'debugger'],
     },
     server: {
-      port: 8000,
+      port: frontendPort,
       strictPort: true,
       host: true,
       proxy: proxyPaths(proxyTarget),
     },
     /** Same proxy as dev so `vite preview` can reach the API on relative /api (direct LAN access). */
     preview: {
-      port: 8000,
+      port: frontendPort,
       strictPort: true,
       host: true,
       proxy: proxyPaths(proxyTarget),

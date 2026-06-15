@@ -1,4 +1,4 @@
-import { buildApiUrl, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 /**
  * Canonical Emergency OS frontend facade.
@@ -105,7 +105,7 @@ export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
 
 async function requestEmergencyJson(path, options = {}) {
   try {
-    const response = await fetch(buildApiUrl(path), {
+    const response = await apiFetch(path, {
       ...options,
       headers: {
         Accept: 'application/json',
@@ -123,40 +123,51 @@ async function requestEmergencyJson(path, options = {}) {
   }
 }
 
-export const fetchEmergencyWhiteboard = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
+export const fetchEmergencyWhiteboard = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
 export const fetchCareDroidCentralNodeSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot);
-export const fetchEmergencyPatients = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
+export const fetchEmergencyPatients = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
 export const fetchSmartIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake);
 export const fetchEmergencyQueues = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.queues);
-export const fetchReassessmentQueue = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.reassessment);
+export const fetchReassessmentQueue = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.reassessment);
 export const fetchCapacityStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.capacity);
 export const fetchBoardingStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.boarding);
 export const fetchReferrals = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.referrals);
-export const fetchProvincialHealth = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.provincialHealth);
-export const fetchIntegrationHub = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
+export const fetchProvincialHealth = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.provincialHealth);
+export const fetchIntegrationHub = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
-export const fetchEmergencyWorkflowLogs = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
+export const fetchEmergencyWorkflowLogs = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
 export const fetchPatientWorkflowLogs = (patientId) =>
   requestEmergencyJson(
-    `${EMERGENCY_OS_API_ENDPOINTS.patientWorkflowLogs}/${encodeURIComponent(patientId)}/workflow-logs`
+    `${EMERGENCY_OS_API_ENDPOINTS.patientWorkflowLogs}/${encodeURIComponent(patientId)}/workflow-logs`,
   );
 export const fetchCompleteImplementationReadiness = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.implementationReadiness);
-export const fetchEmergencyAnalytics = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
+export const fetchEmergencyAnalytics = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
 export const fetchEmergencyAiGovernanceRegistry = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernanceRegistry);
 export const fetchEmergencyAiGovernanceSafetyRules = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernanceSafetyRules);
 export const fetchEmergencyAiGovernanceCompliance = (days = 30) => {
   const params = new URLSearchParams({ days: String(days) });
-  return requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceCompliance}?${params.toString()}`);
+  return requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceCompliance}?${params.toString()}`,
+  );
 };
 export const fetchEmergencyAiGovernanceViolations = (limit = 50) => {
   const params = new URLSearchParams({ limit: String(limit) });
-  return requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceViolations}?${params.toString()}`);
+  return requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.aiGovernanceViolations}?${params.toString()}`,
+  );
 };
 export const validateEmergencyAiGovernancePrompts = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernancePromptValidation);
@@ -168,17 +179,18 @@ export const fetchUpgradeHarnessPatientFlow = (patientId) =>
   requestEmergencyJson(
     patientId
       ? `${EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessPatientFlow}/${encodeURIComponent(patientId)}`
-      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessPatientFlow
+      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessPatientFlow,
   );
 export const fetchUpgradeHarnessClinicalIntelligence = (patientId) =>
   requestEmergencyJson(
     patientId
       ? `${EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessClinicalIntelligence}/${encodeURIComponent(patientId)}`
-      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessClinicalIntelligence
+      : EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessClinicalIntelligence,
   );
 export const fetchUpgradeHarnessAuditSummary = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.upgradeHarnessAuditSummary);
-export const fetchEmergencySettings = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
+export const fetchEmergencySettings = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings);
 export const updateEmergencySettings = (settings = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.settings, {
     method: 'PATCH',
@@ -218,7 +230,7 @@ export const aggregateFederatedLearningRound = () =>
   });
 export const fetchFederatedLearningGlobalModel = (hospitalId) =>
   requestEmergencyJson(
-    `${EMERGENCY_OS_API_ENDPOINTS.federatedLearningGlobalModel}/${encodeURIComponent(hospitalId)}`
+    `${EMERGENCY_OS_API_ENDPOINTS.federatedLearningGlobalModel}/${encodeURIComponent(hospitalId)}`,
   );
 export const fetchFederatedLearningDashboard = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.federatedLearningDashboard);

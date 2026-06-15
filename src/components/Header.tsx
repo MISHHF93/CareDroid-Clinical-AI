@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconBell, IconSearch } from '@tabler/icons-react';
-import {
-  useEmergencyStore,
-  type EmergencyOperationalMetricKey,
-} from '../store/emergencyStore';
+import { useEmergencyStore, type EmergencyOperationalMetricKey } from '../store/emergencyStore';
 import { PatientFlag, type Alert, type Patient } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
@@ -52,8 +49,8 @@ const ALERT_TYPE_ROUTES: Record<string, string> = {
   queue: CANONICAL_ROUTES.emergencyQueues,
   sync: CANONICAL_ROUTES.emergencySettings,
   system: CANONICAL_ROUTES.emergencySettings,
-  integration: CANONICAL_ROUTES.emergencyIntegrations,
-  provincial: CANONICAL_ROUTES.emergencyProvincialHealth,
+  integration: `${CANONICAL_ROUTES.emergencySettings}#integrations`,
+  provincial: `${CANONICAL_ROUTES.emergencySettings}#provincial-health`,
   ai: CANONICAL_ROUTES.emergencyCopilot,
   copilot: CANONICAL_ROUTES.emergencyCopilot,
 };
@@ -110,7 +107,9 @@ function getHeaderFlagValue(flag: unknown): string {
 }
 
 function getPatientDisplayName(patient: Patient): string {
-  return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn;
+  return (
+    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
+  );
 }
 
 function patientLookupText(patient: Patient): string {
@@ -134,12 +133,15 @@ function alertRoute(alert: Alert): string | null {
   const text = `${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
   if (text.includes('ems')) return CANONICAL_ROUTES.emergencyEms;
   if (text.includes('board')) return CANONICAL_ROUTES.emergencyBoarding;
-  if (text.includes('reassessment') || text.includes('reassess')) return CANONICAL_ROUTES.emergencyReassessment;
-  if (text.includes('referral') || text.includes('transfer')) return CANONICAL_ROUTES.emergencyReferrals;
+  if (text.includes('reassessment') || text.includes('reassess'))
+    return CANONICAL_ROUTES.emergencyReassessment;
+  if (text.includes('referral') || text.includes('transfer'))
+    return CANONICAL_ROUTES.emergencyReferrals;
   if (text.includes('queue') || text.includes('wait')) return CANONICAL_ROUTES.emergencyQueues;
   if (text.includes('capacity')) return CANONICAL_ROUTES.emergencyCapacity;
-  if (text.includes('provincial')) return CANONICAL_ROUTES.emergencyProvincialHealth;
-  if (text.includes('integration') || text.includes('sync')) return CANONICAL_ROUTES.emergencyIntegrations;
+  if (text.includes('provincial')) return `${CANONICAL_ROUTES.emergencySettings}#provincial-health`;
+  if (text.includes('integration') || text.includes('sync'))
+    return `${CANONICAL_ROUTES.emergencySettings}#integrations`;
   if (text.includes('ai') || text.includes('copilot')) return CANONICAL_ROUTES.emergencyCopilot;
   return null;
 }
@@ -257,7 +259,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         type: 'System',
         severity: centralSnapshot.sync.stale ? 'Warning' : 'Info',
         title: centralSnapshot.sync.stale ? 'System sync delayed' : 'System sync status',
-        message: centralSnapshot.sync.message || `Central node sync is ${centralSnapshot.sync.status}.`,
+        message:
+          centralSnapshot.sync.message || `Central node sync is ${centralSnapshot.sync.status}.`,
         createdAt: centralSnapshot.sync.lastSyncedAt || generatedAt,
         dismissed: false,
         source: 'central-node-sync',
@@ -351,14 +354,17 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       .slice(0, MAX_HEADER_PATIENT_RESULTS);
   }, [patientLookupQuery, patients]);
 
-  const navigateEmergencyRoute = useCallback((path: string) => {
-    const permissionPath = routePermissionPath(path);
-    navigate(
-      emergencyRole.canAccessRoute(permissionPath)
-        ? path
-        : emergencyRole.nearestRoute(permissionPath),
-    );
-  }, [emergencyRole, navigate]);
+  const navigateEmergencyRoute = useCallback(
+    (path: string) => {
+      const permissionPath = routePermissionPath(path);
+      navigate(
+        emergencyRole.canAccessRoute(permissionPath)
+          ? path
+          : emergencyRole.nearestRoute(permissionPath),
+      );
+    },
+    [emergencyRole, navigate],
+  );
 
   const openCentralIntake = () => {
     if (!canSubmitCentralIntake) return;
@@ -389,7 +395,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const selectLookupPatient = (patientId: string) => {
     selectPatient(patientId);
-    navigateEmergencyRoute(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
+    navigateEmergencyRoute(
+      `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`,
+    );
     setPatientLookupQuery('');
     setPatientLookupOpen(false);
   };
@@ -519,266 +527,294 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           padding: '0 16px',
         }}
       >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <span
-          className="emergency-os-header__wordmark"
-          title={EMERGENCY_OS_BRANDING.platformLine}
-          style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
-        >
-          {EMERGENCY_OS_BRANDING.productName}
-        </span>
-        <span className="emergency-os-header__aiios-pill">
-          {EMERGENCY_OS_BRANDING.aiiosName}
-        </span>
-        <Clock />
-      </div>
-
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 10,
-        }}
-      >
-        <div
-          className="emergency-os-header__page-title"
-          aria-label="Current Emergency OS page"
-          style={{ display: 'grid', minWidth: 0, justifyItems: 'center' }}
-        >
-          <strong>{pageTitle || EMERGENCY_OS_BRANDING.productName}</strong>
-          {pageSubtitle ? <span>{pageSubtitle}</span> : null}
-        </div>
-        {!PILOT_CUSTOMER_MODE.enabled ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <span
-            className="emergency-os-header__central-node"
-            title={`${centralControl.statusLabel}. ${centralControl.dashboardControlLabel}. ${centralControl.inputProfile.label}. ${centralControl.contributorMode ? 'Users submit inputs only.' : 'This role can operate central controls.'}`}
+            className="emergency-os-header__wordmark"
+            title={EMERGENCY_OS_BRANDING.platformLine}
+            style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
           >
-            {centralControl.label}: {centralControl.contributorMode ? 'Input only' : 'Controller'} ·{' '}
-            {centralControl.inputProfile.label}
+            {EMERGENCY_OS_BRANDING.productName}
           </span>
-        ) : null}
-        <div
-          className="emergency-os-header__central-status"
-          aria-label="CareDroid central node live status"
-        >
-          <span data-tone={centralSnapshot.operationalSummary.metrics.find((metric) => metric.key === 'capacityScore')?.tone || 'neutral'}>
-            CAP {centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}
-          </span>
-          <span data-tone={centralSnapshot.emsPressure.status === 'critical' ? 'critical' : centralSnapshot.emsPressure.inbound ? 'warning' : 'success'}>
-            EMS {centralSnapshot.emsPressure.inbound}
-          </span>
-          <span data-tone={centralSnapshot.reassessmentStatus.due ? 'critical' : 'success'}>
-            REA {centralSnapshot.reassessmentStatus.due}
-          </span>
-          <span data-tone={centralSnapshot.currentDepartmentStatus.activeAlerts ? 'critical' : 'success'}>
-            ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
-          </span>
-          <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'} title={syncTitle}>
-            {syncLabel}
-          </span>
+          <span className="emergency-os-header__aiios-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
+          <Clock />
         </div>
-      </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <div className="emergency-os-header__primary-actions" aria-label="Emergency OS primary actions">
-          <button
-            type="button"
-            className="emergency-os-header__action emergency-os-header__action--primary"
-            onClick={openCentralIntake}
-            disabled={!canSubmitCentralIntake}
-            aria-label="Create patient"
-            title={
-              canSubmitCentralIntake
-                ? 'Create a patient intake'
-                : `${emergencyRole.roleLabel} cannot create patients`
-            }
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          <div
+            className="emergency-os-header__page-title"
+            aria-label="Current Emergency OS page"
+            style={{ display: 'grid', minWidth: 0, justifyItems: 'center' }}
           >
-            Create
-          </button>
-          <button
-            type="button"
-            className="emergency-os-header__action"
-            onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
-            aria-label="Open reassessment queue"
-            title="Open reassessment queue"
-          >
-            Reassess
-          </button>
-          <button
-            type="button"
-            className="emergency-os-header__action"
-            onClick={openReferralWorkflow}
-            disabled={!canCreateReferral}
-            aria-label="Create referral"
-            title={
-              canCreateReferral
-                ? 'Create referral or consult request'
-                : `${emergencyRole.roleLabel} cannot create referrals`
-            }
-          >
-            Referral
-          </button>
+            <strong>{pageTitle || EMERGENCY_OS_BRANDING.productName}</strong>
+            {pageSubtitle ? <span>{pageSubtitle}</span> : null}
+          </div>
           {!PILOT_CUSTOMER_MODE.enabled ? (
+            <span
+              className="emergency-os-header__central-node"
+              title={`${centralControl.statusLabel}. ${centralControl.dashboardControlLabel}. ${centralControl.inputProfile.label}. ${centralControl.contributorMode ? 'Users submit inputs only.' : 'This role can operate central controls.'}`}
+            >
+              {centralControl.label}: {centralControl.contributorMode ? 'Input only' : 'Controller'}{' '}
+              · {centralControl.inputProfile.label}
+            </span>
+          ) : null}
+          <div
+            className="emergency-os-header__central-status"
+            aria-label="CareDroid central node live status"
+          >
+            <span
+              data-tone={
+                centralSnapshot.operationalSummary.metrics.find(
+                  (metric) => metric.key === 'capacityScore',
+                )?.tone || 'neutral'
+              }
+            >
+              CAP {centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}
+            </span>
+            <span
+              data-tone={
+                centralSnapshot.emsPressure.status === 'critical'
+                  ? 'critical'
+                  : centralSnapshot.emsPressure.inbound
+                    ? 'warning'
+                    : 'success'
+              }
+            >
+              EMS {centralSnapshot.emsPressure.inbound}
+            </span>
+            <span data-tone={centralSnapshot.reassessmentStatus.due ? 'critical' : 'success'}>
+              REA {centralSnapshot.reassessmentStatus.due}
+            </span>
+            <span
+              data-tone={
+                centralSnapshot.currentDepartmentStatus.activeAlerts ? 'critical' : 'success'
+              }
+            >
+              ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
+            </span>
+            <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'} title={syncTitle}>
+              {syncLabel}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          <div
+            className="emergency-os-header__primary-actions"
+            aria-label="Emergency OS primary actions"
+          >
+            <button
+              type="button"
+              className="emergency-os-header__action emergency-os-header__action--primary"
+              onClick={openCentralIntake}
+              disabled={!canSubmitCentralIntake}
+              aria-label="Create patient"
+              title={
+                canSubmitCentralIntake
+                  ? 'Create a patient intake'
+                  : `${emergencyRole.roleLabel} cannot create patients`
+              }
+            >
+              Create
+            </button>
             <button
               type="button"
               className="emergency-os-header__action"
-              onClick={openSelectedPatientDischarge}
-              disabled={!canDischarge || !selectedPatientId}
-              aria-label="Discharge selected patient"
+              onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
+              aria-label="Open reassessment queue"
+              title="Open reassessment queue"
+            >
+              Reassess
+            </button>
+            <button
+              type="button"
+              className="emergency-os-header__action"
+              onClick={openReferralWorkflow}
+              disabled={!canCreateReferral}
+              aria-label="Create referral"
               title={
-                canDischarge
-                  ? selectedPatientId
-                    ? 'Open discharge confirmation for the selected patient'
-                    : 'Select a patient before discharge'
-                  : `${emergencyRole.roleLabel} cannot discharge patients`
+                canCreateReferral
+                  ? 'Create referral or consult request'
+                  : `${emergencyRole.roleLabel} cannot create referrals`
               }
             >
-              Discharge
+              Referral
             </button>
-          ) : null}
-        </div>
+            {!PILOT_CUSTOMER_MODE.enabled ? (
+              <button
+                type="button"
+                className="emergency-os-header__action"
+                onClick={openSelectedPatientDischarge}
+                disabled={!canDischarge || !selectedPatientId}
+                aria-label="Discharge selected patient"
+                title={
+                  canDischarge
+                    ? selectedPatientId
+                      ? 'Open discharge confirmation for the selected patient'
+                      : 'Select a patient before discharge'
+                    : `${emergencyRole.roleLabel} cannot discharge patients`
+                }
+              >
+                Discharge
+              </button>
+            ) : null}
+          </div>
 
-        <div className="emergency-os-header__lookup">
-          <IconSearch size={15} stroke={2} aria-hidden />
-          <input
-            type="search"
-            value={patientLookupQuery}
-            placeholder="Patient lookup"
-            aria-label="Patient lookup"
-            onFocus={() => setPatientLookupOpen(true)}
-            onChange={(event) => {
-              setPatientLookupQuery(event.target.value);
-              setPatientLookupOpen(true);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].id);
-                else openPatientLookupRoute();
-              }
-              if (event.key === 'Escape') {
-                event.preventDefault();
-                setPatientLookupOpen(false);
-              }
-            }}
-          />
-          {patientLookupOpen && patientLookupQuery.trim() ? (
-            <div className="emergency-os-header__lookup-results" role="listbox" aria-label="Patient lookup results">
-              {patientLookupResults.length ? (
-                patientLookupResults.map((patient) => (
+          <div className="emergency-os-header__lookup">
+            <IconSearch size={15} stroke={2} aria-hidden />
+            <input
+              type="search"
+              value={patientLookupQuery}
+              placeholder="Patient lookup"
+              aria-label="Patient lookup"
+              onFocus={() => setPatientLookupOpen(true)}
+              onChange={(event) => {
+                setPatientLookupQuery(event.target.value);
+                setPatientLookupOpen(true);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].id);
+                  else openPatientLookupRoute();
+                }
+                if (event.key === 'Escape') {
+                  event.preventDefault();
+                  setPatientLookupOpen(false);
+                }
+              }}
+            />
+            {patientLookupOpen && patientLookupQuery.trim() ? (
+              <div
+                className="emergency-os-header__lookup-results"
+                role="listbox"
+                aria-label="Patient lookup results"
+              >
+                {patientLookupResults.length ? (
+                  patientLookupResults.map((patient) => (
+                    <button
+                      key={patient.id}
+                      type="button"
+                      role="option"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => selectLookupPatient(patient.id)}
+                    >
+                      <strong>{getPatientDisplayName(patient)}</strong>
+                      <span>
+                        {patient.mrn} ·{' '}
+                        {patient.chiefComplaint || patient.complaint || 'Complaint not set'}
+                      </span>
+                    </button>
+                  ))
+                ) : (
                   <button
-                    key={patient.id}
                     type="button"
-                    role="option"
                     onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => selectLookupPatient(patient.id)}
+                    onClick={openPatientLookupRoute}
                   >
-                    <strong>{getPatientDisplayName(patient)}</strong>
-                    <span>
-                      {patient.mrn} · {patient.chiefComplaint || patient.complaint || 'Complaint not set'}
-                    </span>
+                    Search all patients for "{patientLookupQuery.trim()}"
                   </button>
-                ))
-              ) : (
-                <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={openPatientLookupRoute}>
-                  Search all patients for "{patientLookupQuery.trim()}"
-                </button>
-              )}
-            </div>
-          ) : null}
-        </div>
+                )}
+              </div>
+            ) : null}
+          </div>
 
-        <button
-          type="button"
-          onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
-          aria-label="Open command palette"
-          title="Search patients and actions"
-          style={{
-            width: 32,
-            height: 32,
-            border: '1px solid #1F2937',
-            borderRadius: 8,
-            background: '#111827',
-            color: '#9CA3AF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <IconSearch size={18} stroke={2} />
-        </button>
-
-        {reassessmentAttentionCount > 0 ? (
           <button
             type="button"
-            className="reassessment-header-badge"
-            onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
-            aria-label={`Open reassessment drawer: ${reassessmentAttentionCount} patients need attention`}
-            title={`${reassessmentAttentionCount} patients need attention`}
-          >
-            {reassessmentAttentionCount}
-          </button>
-        ) : null}
-
-        <button
-          type="button"
-          className="emergency-os-header__icon-button emergency-os-header__notification-trigger"
-          onClick={() => setAlertDrawerOpen((open) => !open)}
-          aria-label={`Notification Center${unreadAlertCount ? `: ${unreadAlertCount} unread` : ''}`}
-          aria-haspopup="dialog"
-          aria-expanded={alertDrawerOpen}
-          title="Open Notification Center"
-        >
-          <IconBell size={18} stroke={2} aria-hidden />
-          {unreadAlertCount > 0 ? (
-            <span className="emergency-os-header__notification-badge">
-              {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
-            </span>
-          ) : null}
-        </button>
-
-        {!PILOT_CUSTOMER_MODE.enabled ? (
-          <button
-            type="button"
-            onClick={() => {
-              if (canManageWorkload) setStaffWorkloadOpen((open) => !open);
-            }}
-            onContextMenu={(event) => {
-              event.preventDefault();
-              if (canManageWorkload) setStaffWorkloadOpen(true);
-            }}
-            aria-label="Staff workload"
-            aria-haspopup="dialog"
-            aria-expanded={staffWorkloadOpen}
-            disabled={!canManageWorkload}
-            title={
-              canManageWorkload
-                ? 'Staff workload'
-                : `${emergencyRole.roleLabel} cannot reassign workload`
-            }
+            onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
+            aria-label="Open command palette"
+            title="Search patients and actions"
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 999,
+              width: 32,
+              height: 32,
               border: '1px solid #1F2937',
-              background: '#1C2333',
+              borderRadius: 8,
+              background: '#111827',
               color: '#9CA3AF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 10,
-              fontWeight: 700,
-              cursor: canManageWorkload ? 'pointer' : 'not-allowed',
-              opacity: canManageWorkload ? 1 : 0.6,
+              cursor: 'pointer',
             }}
           >
-            DA
+            <IconSearch size={18} stroke={2} />
           </button>
-        ) : null}
-      </div>
+
+          {reassessmentAttentionCount > 0 ? (
+            <button
+              type="button"
+              className="reassessment-header-badge"
+              onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
+              aria-label={`Open reassessment drawer: ${reassessmentAttentionCount} patients need attention`}
+              title={`${reassessmentAttentionCount} patients need attention`}
+            >
+              {reassessmentAttentionCount}
+            </button>
+          ) : null}
+
+          <button
+            type="button"
+            className="emergency-os-header__icon-button emergency-os-header__notification-trigger"
+            onClick={() => setAlertDrawerOpen((open) => !open)}
+            aria-label={`Notification Center${unreadAlertCount ? `: ${unreadAlertCount} unread` : ''}`}
+            aria-haspopup="dialog"
+            aria-expanded={alertDrawerOpen}
+            title="Open Notification Center"
+          >
+            <IconBell size={18} stroke={2} aria-hidden />
+            {unreadAlertCount > 0 ? (
+              <span className="emergency-os-header__notification-badge">
+                {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
+              </span>
+            ) : null}
+          </button>
+
+          {!PILOT_CUSTOMER_MODE.enabled ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (canManageWorkload) setStaffWorkloadOpen((open) => !open);
+              }}
+              onContextMenu={(event) => {
+                event.preventDefault();
+                if (canManageWorkload) setStaffWorkloadOpen(true);
+              }}
+              aria-label="Staff workload"
+              aria-haspopup="dialog"
+              aria-expanded={staffWorkloadOpen}
+              disabled={!canManageWorkload}
+              title={
+                canManageWorkload
+                  ? 'Staff workload'
+                  : `${emergencyRole.roleLabel} cannot reassign workload`
+              }
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 999,
+                border: '1px solid #1F2937',
+                background: '#1C2333',
+                color: '#9CA3AF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 10,
+                fontWeight: 700,
+                cursor: canManageWorkload ? 'pointer' : 'not-allowed',
+                opacity: canManageWorkload ? 1 : 0.6,
+              }}
+            >
+              DA
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <nav
@@ -846,7 +882,10 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               Loading active Emergency OS notifications...
             </div>
           ) : centralNode.refreshError && !notificationAlerts.length ? (
-            <div className="emergency-os-notification-center__state emergency-os-notification-center__state--error" role="alert">
+            <div
+              className="emergency-os-notification-center__state emergency-os-notification-center__state--error"
+              role="alert"
+            >
               Notification data is using local Emergency OS state. {centralNode.refreshError}
             </div>
           ) : notificationAlerts.length > 0 ? (
@@ -926,8 +965,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             </div>
           ) : (
             <div className="emergency-os-notification-center__state">
-              No active Emergency OS notifications. Capacity, EMS, reassessment, boarding,
-              referral, sync, AI safety, and integration streams are clear.
+              No active Emergency OS notifications. Capacity, EMS, reassessment, boarding, referral,
+              sync, AI safety, and integration streams are clear.
             </div>
           )}
         </div>

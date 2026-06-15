@@ -3,7 +3,6 @@ package com.caredroid.clinical.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.caredroid.clinical.data.remote.NetworkResult
-import com.caredroid.clinical.data.remote.dto.MessageRequest
 import com.caredroid.clinical.domain.repository.ChatRepository
 import com.caredroid.clinical.domain.repository.HealthRepository
 import com.caredroid.clinical.ui.state.ChatUiState
@@ -50,12 +49,7 @@ class ChatViewModel @Inject constructor(
             // Show typing indicator
             _uiState.update { it.copy(isTyping = true) }
 
-            val result = chatRepository.sendMessage(
-                MessageRequest(
-                    message = message,
-                    conversationId = conversationId
-                )
-            )
+            val result = chatRepository.sendMessage(message, conversationId)
 
             when (result) {
                 is NetworkResult.Success -> {
@@ -102,7 +96,7 @@ class ChatViewModel @Inject constructor(
                 is NetworkResult.Success -> {
                     _uiState.update {
                         it.copy(
-                            conversations = result.data,
+                            conversations = result.data.conversations,
                             isLoading = false,
                             error = null
                         )

@@ -206,7 +206,7 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded } = {}
                 onClick={handleGenerate}
                 disabled={loading}
               >
-                {loading ? 'Generating draft...' : 'Generate reviewed-required draft'}
+                {loading ? 'Generating draft...' : 'Generate draft for clinician review'}
               </button>
               <button type="button" className="btn-diagnosis-secondary" onClick={handleDictation}>
                 {listening ? 'Stop dictation' : speechSupported ? 'Start speech-to-text' : 'Speech-to-text unavailable'}

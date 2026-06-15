@@ -11,7 +11,7 @@ import com.caredroid.clinical.data.remote.dto.*
  * Chat Screen State
  */
 data class ChatUiState(
-    val messages: List<MessageDto> = emptyList(),
+    val messages: List<MessageResponse> = emptyList(),
     val conversations: List<ConversationDto> = emptyList(),
     val currentConversationId: String? = null,
     val inputText: String = "",
@@ -71,9 +71,9 @@ data class ProfileUiState(
  * Tools Screen State
  */
 data class ToolsUiState(
-    val drugInteractions: List<DrugInteractionDto>? = null,
-    val labResult: LabResultDto? = null,
-    val sofaScore: SofaResultDto? = null,
+    val drugInteractions: DrugInteractionResponse? = null,
+    val labResult: LabInterpreterResponse? = null,
+    val sofaScore: SofaCalculatorResponse? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )

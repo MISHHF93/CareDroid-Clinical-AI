@@ -17,7 +17,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
     color: '#4ECDC4',
     description: 'Interpret lab values and diagnostic tests',
     shortcut: 'Ctrl+2',
-    category: 'Diagnostic'
+    category: 'Diagnostic',
   };
 
   const [labValues, setLabValues] = useState([]);
@@ -60,7 +60,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
       ...(patientSex && { patientSex }),
       ...(clinicalContext && { clinicalContext }),
     }),
-    [clinicalContext, labValues, patientAge, patientSex]
+    [clinicalContext, labValues, patientAge, patientSex],
   );
 
   const handleAddLab = () => {
@@ -69,11 +69,14 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
     const value = parseFloat(currentLab.value);
     if (isNaN(value)) return;
 
-    setLabValues([...labValues, {
-      name: currentLab.name,
-      value: value,
-      unit: currentLab.unit
-    }]);
+    setLabValues([
+      ...labValues,
+      {
+        name: currentLab.name,
+        value: value,
+        unit: currentLab.unit,
+      },
+    ]);
 
     setCurrentLab({ name: '', value: '', unit: '' });
   };
@@ -175,8 +178,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
           {/* Patient Context */}
           <div className="patient-context">
             <div className="context-group">
-              <label className="context-label">Age</label>
+              <label className="context-label" htmlFor="lab-context-age">
+                Age
+              </label>
               <input
+                id="lab-context-age"
                 type="number"
                 className="context-input"
                 placeholder="Years"
@@ -187,8 +193,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
               />
             </div>
             <div className="context-group">
-              <label className="context-label">Sex</label>
+              <label className="context-label" htmlFor="lab-context-sex">
+                Sex
+              </label>
               <select
+                id="lab-context-sex"
                 className="context-select"
                 value={patientSex}
                 onChange={(e) => setPatientSex(e.target.value)}
@@ -200,8 +209,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
               </select>
             </div>
             <div className="context-group">
-              <label className="context-label">Clinical Context</label>
+              <label className="context-label" htmlFor="lab-context-clinical-context">
+                Clinical Context
+              </label>
               <textarea
+                id="lab-context-clinical-context"
                 className="context-textarea"
                 placeholder="e.g., Sepsis evaluation, routine check-up..."
                 value={clinicalContext}
@@ -213,31 +225,37 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
           {/* Lab Entry Form */}
           <div className="lab-entry-form">
             <div className="lab-input-group">
-              <label className="lab-input-label">Lab Name</label>
+              <label className="lab-input-label" htmlFor="lab-entry-name">
+                Lab Name
+              </label>
               <input
+                id="lab-entry-name"
                 type="text"
                 list="common-labs"
                 className="lab-input-field"
                 placeholder="e.g., Sodium, WBC"
                 value={currentLab.name}
                 onChange={(e) => {
-                  const selected = commonLabs.find(l => l.name === e.target.value);
+                  const selected = commonLabs.find((l) => l.name === e.target.value);
                   setCurrentLab({
                     ...currentLab,
                     name: e.target.value,
-                    unit: selected ? selected.unit : currentLab.unit
+                    unit: selected ? selected.unit : currentLab.unit,
                   });
                 }}
               />
               <datalist id="common-labs">
-                {commonLabs.map(lab => (
+                {commonLabs.map((lab) => (
                   <option key={lab.name} value={lab.name} />
                 ))}
               </datalist>
             </div>
             <div className="lab-input-group">
-              <label className="lab-input-label">Value</label>
+              <label className="lab-input-label" htmlFor="lab-entry-value">
+                Value
+              </label>
               <input
+                id="lab-entry-value"
                 type="number"
                 step="0.1"
                 className="lab-input-field"
@@ -247,8 +265,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
               />
             </div>
             <div className="lab-input-group">
-              <label className="lab-input-label">Unit</label>
+              <label className="lab-input-label" htmlFor="lab-entry-unit">
+                Unit
+              </label>
               <input
+                id="lab-entry-unit"
                 type="text"
                 className="lab-input-field"
                 placeholder="mg/dL"
@@ -257,6 +278,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
               />
             </div>
             <button
+              type="button"
               className="lab-add-button"
               onClick={handleAddLab}
               disabled={!currentLab.name || !currentLab.value}
@@ -277,6 +299,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
                     </span>
                   </div>
                   <button
+                    type="button"
                     className="lab-value-remove"
                     onClick={() => handleRemoveLab(index)}
                   >
@@ -313,7 +336,10 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
             >
               {loading ? (
                 <>
-                  <div className="lab-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>
+                  <div
+                    className="lab-spinner"
+                    style={{ width: '20px', height: '20px', borderWidth: '2px' }}
+                  ></div>
                   Interpreting...
                 </>
               ) : (
@@ -360,7 +386,13 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
                 unsupported={unsupported}
                 error={!unsupported ? error : null}
               />
-              {unsupported ? <p>{error}</p> : <p><strong>Error:</strong> {error}</p>}
+              {unsupported ? (
+                <p>{error}</p>
+              ) : (
+                <p>
+                  <strong>Error:</strong> {error}
+                </p>
+              )}
             </div>
           ) : results ? (
             <LabResults results={results} />
@@ -385,7 +417,15 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
  * Lab Results Display Component
  */
 const LabResults = ({ results }) => {
-  const { summary, criticalValues, interpretation, groupedByCategory, interpretations, disclaimer, warnings } = results;
+  const {
+    summary,
+    criticalValues,
+    interpretation,
+    groupedByCategory,
+    interpretations,
+    disclaimer,
+    warnings,
+  } = results;
 
   return (
     <>
@@ -397,11 +437,15 @@ const LabResults = ({ results }) => {
             <div className="lab-stat-label">Total Values</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: 'var(--accent-1)' }}>{summary.normal}</div>
+            <div className="lab-stat-value" style={{ color: 'var(--accent-1)' }}>
+              {summary.normal}
+            </div>
             <div className="lab-stat-label">Normal</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: 'var(--warning)' }}>{summary.abnormal}</div>
+            <div className="lab-stat-value" style={{ color: 'var(--warning)' }}>
+              {summary.abnormal}
+            </div>
             <div className="lab-stat-label">Abnormal</div>
           </div>
           <div className="lab-stat-card critical">
@@ -423,7 +467,8 @@ const LabResults = ({ results }) => {
           <ul className="lab-critical-values-list">
             {criticalValues.map((lab, index) => (
               <li key={index}>
-                <strong>{lab.name}</strong>: {lab.value} {lab.unit} (Status: {lab.status.replace('-', ' ')})
+                <strong>{lab.name}</strong>: {lab.value} {lab.unit} (Status:{' '}
+                {lab.status.replace('-', ' ')})
               </li>
             ))}
           </ul>
@@ -435,7 +480,9 @@ const LabResults = ({ results }) => {
 
       {/* Overall Interpretation */}
       {interpretation && (
-        <div className={`lab-overall-interpretation ${criticalValues?.length > 0 ? 'critical' : ''}`}>
+        <div
+          className={`lab-overall-interpretation ${criticalValues?.length > 0 ? 'critical' : ''}`}
+        >
           {interpretation}
         </div>
       )}
@@ -452,86 +499,89 @@ const LabResults = ({ results }) => {
       )}
 
       {/* Category-wise Results */}
-      {groupedByCategory && Object.entries(groupedByCategory).map(([category, labs]) => {
-        const categoryInterpretation = interpretations?.find(i => i.category === category);
+      {groupedByCategory &&
+        Object.entries(groupedByCategory).map(([category, labs]) => {
+          const categoryInterpretation = interpretations?.find((i) => i.category === category);
 
-        return (
-          <div key={category} className="lab-category-section">
-            <div className="lab-category-header">
-              <span className="lab-category-header-icon" aria-hidden>
-                <NavIcon icon={getLabCategoryIcon(category)} size={18} />
-              </span>
-              <span>{category}</span>
-            </div>
-
-            {/* Lab Values Table */}
-            <table className="lab-values-table">
-              <thead>
-                <tr>
-                  <th>Lab</th>
-                  <th>Value</th>
-                  <th>Reference Range</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {labs.map((lab, index) => (
-                  <tr key={index}>
-                    <td style={{ fontWeight: 500 }}>{lab.name}</td>
-                    <td style={{ fontFamily: 'monospace', color: 'var(--accent-2)' }}>
-                      {lab.value} {lab.unit}
-                    </td>
-                    <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                      {lab.referenceRange}
-                    </td>
-                    <td>
-                      <span className={`lab-status-badge ${lab.status}`}>
-                        {lab.status.replace('-', ' ')}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Category Interpretation */}
-            {categoryInterpretation && (
-              <div className="lab-interpretation-box">
-                {categoryInterpretation.findings && categoryInterpretation.findings.length > 0 && (
-                  <div className="lab-interpretation-section">
-                    <div className="lab-interpretation-heading">Key Findings</div>
-                    <ul className="lab-interpretation-list">
-                      {categoryInterpretation.findings.map((finding, i) => (
-                        <li key={i}>{finding}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {categoryInterpretation.clinicalSignificance && (
-                  <div className="lab-interpretation-section">
-                    <div className="lab-interpretation-heading">Clinical Significance</div>
-                    <div className="lab-interpretation-content">
-                      {categoryInterpretation.clinicalSignificance}
-                    </div>
-                  </div>
-                )}
-
-                {categoryInterpretation.suggestedActions && categoryInterpretation.suggestedActions.length > 0 && (
-                  <div className="lab-interpretation-section">
-                    <div className="lab-interpretation-heading">Suggested Actions</div>
-                    <ul className="lab-interpretation-list">
-                      {categoryInterpretation.suggestedActions.map((action, i) => (
-                        <li key={i}>{action}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+          return (
+            <div key={category} className="lab-category-section">
+              <div className="lab-category-header">
+                <span className="lab-category-header-icon" aria-hidden>
+                  <NavIcon icon={getLabCategoryIcon(category)} size={18} />
+                </span>
+                <span>{category}</span>
               </div>
-            )}
-          </div>
-        );
-      })}
+
+              {/* Lab Values Table */}
+              <table className="lab-values-table">
+                <thead>
+                  <tr>
+                    <th>Lab</th>
+                    <th>Value</th>
+                    <th>Reference Range</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {labs.map((lab, index) => (
+                    <tr key={index}>
+                      <td style={{ fontWeight: 500 }}>{lab.name}</td>
+                      <td style={{ fontFamily: 'monospace', color: 'var(--accent-2)' }}>
+                        {lab.value} {lab.unit}
+                      </td>
+                      <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        {lab.referenceRange}
+                      </td>
+                      <td>
+                        <span className={`lab-status-badge ${lab.status}`}>
+                          {lab.status.replace('-', ' ')}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Category Interpretation */}
+              {categoryInterpretation && (
+                <div className="lab-interpretation-box">
+                  {categoryInterpretation.findings &&
+                    categoryInterpretation.findings.length > 0 && (
+                      <div className="lab-interpretation-section">
+                        <div className="lab-interpretation-heading">Key Findings</div>
+                        <ul className="lab-interpretation-list">
+                          {categoryInterpretation.findings.map((finding, i) => (
+                            <li key={i}>{finding}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                  {categoryInterpretation.clinicalSignificance && (
+                    <div className="lab-interpretation-section">
+                      <div className="lab-interpretation-heading">Clinical Significance</div>
+                      <div className="lab-interpretation-content">
+                        {categoryInterpretation.clinicalSignificance}
+                      </div>
+                    </div>
+                  )}
+
+                  {categoryInterpretation.suggestedActions &&
+                    categoryInterpretation.suggestedActions.length > 0 && (
+                      <div className="lab-interpretation-section">
+                        <div className="lab-interpretation-heading">Suggested Actions</div>
+                        <ul className="lab-interpretation-list">
+                          {categoryInterpretation.suggestedActions.map((action, i) => (
+                            <li key={i}>{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                </div>
+              )}
+            </div>
+          );
+        })}
 
       {/* Disclaimer */}
       <div className="lab-disclaimer">
@@ -541,7 +591,11 @@ const LabResults = ({ results }) => {
           </span>
           Clinical Disclaimer:
         </strong>{' '}
-        Clinical decision support only — does not establish a diagnosis. {disclaimer || 'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.'} This tool provides educational information only and is not a substitute for professional medical judgment.
+        Clinical decision support only — does not establish a diagnosis.{' '}
+        {disclaimer ||
+          'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.'}{' '}
+        This tool provides educational information only and is not a substitute for professional
+        medical judgment.
       </div>
     </>
   );

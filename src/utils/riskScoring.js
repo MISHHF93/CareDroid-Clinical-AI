@@ -14,7 +14,7 @@ export const computeRiskScore = (tool, results) => {
   // SOFA Score Risk Assessment
   if (tool === 'sofa' || results.sofaScore !== undefined) {
     const sofaScore = results.sofaScore || 0;
-    
+
     if (sofaScore >= 13) {
       riskScore = Math.min(0.95, 0.7 + (sofaScore - 13) * 0.02);
       severity = 'critical';
@@ -35,17 +35,20 @@ export const computeRiskScore = (tool, results) => {
   }
 
   // Critical result risk assessment for ED decision support
-  if ((tool === 'lab-interpreter' || tool === 'lab-interp') && results.criticalCount !== undefined) {
+  if (
+    (tool === 'lab-interpreter' || tool === 'lab-interp') &&
+    results.criticalCount !== undefined
+  ) {
     const criticalCount = results.criticalCount || 0;
     const abnormalCount = results.abnormalCount || 0;
-    
+
     if (criticalCount > 0) {
       const criticalRisk = Math.min(0.9, 0.5 + criticalCount * 0.2);
       riskScore = Math.max(riskScore, criticalRisk);
       severity = 'critical';
       riskFactors.push(`${criticalCount} critical lab value${criticalCount > 1 ? 's' : ''}`);
     } else if (abnormalCount >= 3) {
-      const abnormalRisk = 0.5 + (abnormalCount * 0.05);
+      const abnormalRisk = 0.5 + abnormalCount * 0.05;
       riskScore = Math.max(riskScore, abnormalRisk);
       if (severity !== 'critical') severity = 'high';
       riskFactors.push(`${abnormalCount} abnormal lab values`);
@@ -62,7 +65,7 @@ export const computeRiskScore = (tool, results) => {
   // GFR Risk Assessment (Kidney function)
   if (tool === 'gfr' && results.gfr !== undefined) {
     const gfr = results.gfr || 0;
-    
+
     if (gfr < 15) {
       riskScore = Math.max(riskScore, 0.85);
       severity = 'critical';
@@ -81,7 +84,7 @@ export const computeRiskScore = (tool, results) => {
   // BMI Risk Assessment
   if (tool === 'bmi' && results.bmi !== undefined) {
     const bmi = results.bmi || 0;
-    
+
     if (bmi > 40 || bmi < 18.5) {
       riskScore = Math.max(riskScore, 0.45);
       if (severity === 'low') severity = 'moderate';
@@ -92,12 +95,14 @@ export const computeRiskScore = (tool, results) => {
   // CHA2DS2-VASc Risk Assessment (Stroke risk)
   if (tool === 'cha2ds2-vasc' && results.score !== undefined) {
     const score = results.score || 0;
-    
+
     if (score >= 4) {
       riskScore = Math.max(riskScore, 0.75);
       severity = 'high';
       riskFactors.push(`CHA2DS2-VASc ≥ 4 (High stroke risk)`);
-      riskFactors.push('Anticoagulation therapy recommended');
+      riskFactors.push(
+        'Review anticoagulation indications and contraindications per local protocol',
+      );
     } else if (score >= 2) {
       riskScore = Math.max(riskScore, 0.5);
       if (severity === 'low') severity = 'moderate';
@@ -118,7 +123,6 @@ export const computeRiskScore = (tool, results) => {
     severity,
     riskFactors,
     anomalies,
-    confidence: 0.75 + (Math.random() * 0.2) // Simulate confidence (75-95%)
   };
 };
 
@@ -135,17 +139,14 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
         severity: 'critical',
         title: 'Critical SOFA Score',
         description: 'Patient shows signs of multiple organ dysfunction',
-        findings: [
-          `SOFA Score: ${results.sofaScore}/24`,
-          'Mortality risk: High'
-        ],
+        findings: [`SOFA Score: ${results.sofaScore}/24`, 'Mortality risk: High'],
         recommendations: [
-          'Escalate to intensive care unit',
-          'Initiate organ support measures',
-          'Contact critical care team immediately'
+          'Review ICU or critical-care escalation criteria with the responsible clinician',
+          'Evaluate organ-support needs per institutional pathway',
+          'Request critical-care review if clinically indicated',
         ],
         timestamp: new Date(),
-        acknowledged: false
+        acknowledged: false,
       });
     }
 
@@ -155,16 +156,14 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
         severity: 'critical',
         title: 'Critical Laboratory Values',
         description: `${results.criticalCount} critical lab value${results.criticalCount > 1 ? 's' : ''} detected`,
-        findings: results.criticalValues || [
-          'One or more lab values require immediate attention'
-        ],
+        findings: results.criticalValues || ['One or more lab values require immediate attention'],
         recommendations: [
-          'Review critical values immediately',
+          'Confirm critical values promptly through local critical-result workflow',
           'Assess patient clinical status',
-          'Consider intervention if clinically indicated'
+          'Review intervention options with the responsible clinician if clinically indicated',
         ],
         timestamp: new Date(),
-        acknowledged: false
+        acknowledged: false,
       });
     }
   }
@@ -177,17 +176,14 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
         severity: 'high',
         title: 'High Stroke Risk',
         description: `CHA2DS2-VASc score of ${results.score} indicates significant stroke risk`,
-        findings: [
-          `Score: ${results.score}`,
-          'Patient has multiple stroke risk factors'
-        ],
+        findings: [`Score: ${results.score}`, 'Patient has multiple stroke risk factors'],
         recommendations: [
-          'Consider anticoagulation therapy',
-          'Review contraindications',
-          'Discuss risk/benefit with patient'
+          'Review anticoagulation indications and contraindications per local protocol',
+          'Review bleeding risk, contraindications, and patient-specific factors',
+          'Discuss risk/benefit with patient',
         ],
         timestamp: new Date(),
-        acknowledged: false
+        acknowledged: false,
       });
     }
 
@@ -195,20 +191,20 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       alerts.push({
         id: `alert-kidney-${Date.now()}`,
         severity: 'high',
-        title: 'Significant Kidney Dysfunction',
-        description: `GFR ${results.gfr} indicates moderate to severe kidney disease`,
+        title: 'Reduced Kidney Function Signal',
+        description: `GFR ${results.gfr} is in a reduced kidney-function range; confirm chronicity and clinical context before labeling CKD.`,
         findings: [
           `GFR: ${results.gfr} mL/min/1.73m²`,
-          'CKD Stage: ' + getKidneyStage(results.gfr)
+          'CKD Stage: ' + getKidneyStage(results.gfr),
         ],
         recommendations: [
-          'Adjust medication dosing for renal function',
+          'Review medication dosing for renal function',
           'Monitor electrolytes regularly',
           'Consider nephrology referral',
-          'Assess protein intake'
+          'Review nutrition considerations when clinically relevant',
         ],
         timestamp: new Date(),
-        acknowledged: false
+        acknowledged: false,
       });
     }
   }
@@ -224,10 +220,10 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       recommendations: [
         'Verify lab specimen quality',
         'Consider repeat testing if appropriate',
-        'Review patient context for explanation'
+        'Review patient context for explanation',
       ],
       timestamp: new Date(),
-      acknowledged: false
+      acknowledged: false,
     });
   }
 

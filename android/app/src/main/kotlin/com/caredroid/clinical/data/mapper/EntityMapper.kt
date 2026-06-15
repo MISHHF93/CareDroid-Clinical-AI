@@ -14,25 +14,27 @@ private val gson = Gson()
 /**
  * Message Mappers
  */
-fun MessageDto.toEntity(conversationId: String): MessageEntity {
+fun MessageResponse.toEntity(conversationId: String): MessageEntity {
     return MessageEntity(
-        id = id ?: System.currentTimeMillis().toString(),
+        id = id,
         conversationId = conversationId,
         content = content,
         role = role,
-        timestamp = System.currentTimeMillis(),
+        timestamp = timestamp,
         citationsJson = citations?.let { gson.toJson(it) },
         isSynced = true,
         isPending = false
     )
 }
 
-fun MessageEntity.toDto(): MessageDto {
-    return MessageDto(
+fun MessageEntity.toDto(): MessageResponse {
+    return MessageResponse(
         id = id,
         content = content,
         role = role,
-        citations = citationsJson?.let { 
+        timestamp = timestamp,
+        conversationId = conversationId,
+        citations = citationsJson?.let {
             try {
                 gson.fromJson(it, Array<CitationDto>::class.java).toList()
             } catch (e: Exception) {
@@ -49,17 +51,19 @@ fun ConversationDto.toEntity(): ConversationEntity {
     return ConversationEntity(
         id = id,
         title = title,
-        lastMessageAt = System.currentTimeMillis(),
-        messageCount = messages.size,
+        lastMessageAt = updatedAt,
+        messageCount = messageCount,
         isSynced = true
     )
 }
 
-fun ConversationEntity.toDto(messages: List<MessageDto> = emptyList()): ConversationDto {
+fun ConversationEntity.toDto(messages: List<MessageResponse> = emptyList()): ConversationDto {
     return ConversationDto(
         id = id,
         title = title,
-        messages = messages
+        createdAt = lastMessageAt,
+        updatedAt = lastMessageAt,
+        messageCount = messages.size
     )
 }
 

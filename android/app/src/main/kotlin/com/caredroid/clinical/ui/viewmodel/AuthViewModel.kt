@@ -3,8 +3,6 @@ package com.caredroid.clinical.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.caredroid.clinical.data.remote.NetworkResult
-import com.caredroid.clinical.data.remote.dto.LoginRequest
-import com.caredroid.clinical.data.remote.dto.RegisterRequest
 import com.caredroid.clinical.domain.repository.AuthRepository
 import com.caredroid.clinical.ui.state.AuthUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,7 +54,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, validationErrors = emptyMap()) }
 
-            val result = authRepository.login(LoginRequest(email, password))
+            val result = authRepository.login(email, password)
 
             when (result) {
                 is NetworkResult.Success -> {
@@ -117,16 +115,14 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, validationErrors = emptyMap()) }
 
-            val result = authRepository.register(RegisterRequest(name, email, password))
+            val result = authRepository.register(email, password, name)
 
             when (result) {
                 is NetworkResult.Success -> {
-                    val response = result.data
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            isAuthenticated = true,
-                            user = response.user,
+                            isAuthenticated = false,
                             error = null
                         )
                     }
@@ -197,21 +193,7 @@ class AuthViewModel @Inject constructor(
      * Enable two-factor authentication
      */
     fun enableTwoFactor() {
-        viewModelScope.launch {
-            val result = authRepository.enableTwoFactor()
-
-            when (result) {
-                is NetworkResult.Success -> {
-                    // Handle success (show QR code, etc.)
-                }
-                is NetworkResult.Error -> {
-                    _uiState.update { it.copy(error = result.message) }
-                }
-                is NetworkResult.Loading -> {
-                    // No action needed
-                }
-            }
-        }
+        _uiState.update { it.copy(error = "Two-factor setup is available from account security settings.") }
     }
 
     /**
@@ -221,7 +203,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val result = authRepository.requestPasswordReset(email)
+            val result = authRepository.resetPassword(email)
 
             when (result) {
                 is NetworkResult.Success -> {

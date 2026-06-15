@@ -17,7 +17,7 @@ data class LoginRequest(
  * Login response with token and user data
  */
 data class LoginResponse(
-    val token: String,
+    val accessToken: String,
     val refreshToken: String? = null,
     val user: UserDto,
     val expiresIn: Long? = null
@@ -29,16 +29,17 @@ data class LoginResponse(
 data class SignupRequest(
     val email: String,
     val password: String,
-    val name: String,
-    val role: String = "clinician"
+    val fullName: String
 )
 
 /**
  * Registration response
  */
 data class SignupResponse(
-    val token: String,
-    val user: UserDto
+    val userId: String,
+    val email: String,
+    val verificationToken: String? = null,
+    val verificationRequired: Boolean = true
 )
 
 /**
@@ -52,7 +53,7 @@ data class RefreshTokenRequest(
  * Token refresh response
  */
 data class RefreshTokenResponse(
-    val token: String,
+    val accessToken: String,
     val refreshToken: String? = null,
     val expiresIn: Long? = null
 )
@@ -112,5 +113,5 @@ data class TwoFactorRequest(
  */
 data class TwoFactorResponse(
     val success: Boolean,
-    val token: String? = null
+    val accessToken: String? = null
 )

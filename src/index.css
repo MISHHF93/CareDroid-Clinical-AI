@@ -682,6 +682,30 @@ textarea {
   -webkit-tap-highlight-color: transparent;
 }
 
+.ed-skip-link {
+  position: fixed;
+  inset-block-start: var(--space-2, 8px);
+  inset-inline-start: var(--space-2, 8px);
+  z-index: var(--z-toast, 1200);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--status-info, #60a5fa);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-elevated, #111827);
+  color: var(--color-text-primary, #f9fafb);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-4, 16px)));
+  transition: transform 160ms var(--ease-smooth, ease);
+}
+
+.ed-skip-link:focus,
+.ed-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--status-info, #60a5fa);
+  outline-offset: 2px;
+}
+
 @media (max-width: 768px) {
   .emergency-app-shell button,
   .emergency-app-shell [role='button'],

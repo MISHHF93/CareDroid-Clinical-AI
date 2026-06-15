@@ -7,7 +7,8 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = resolve(rootDir, 'backend');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const useShell = process.platform === 'win32';
-const args = new Set(process.argv.slice(2));
+const rawArgs = process.argv.slice(2);
+const args = new Set(rawArgs);
 
 const backendOnly = args.has('--backend-only') || args.has('--api-only');
 const frontendOnly = args.has('--frontend-only') || args.has('--web-only');
@@ -16,6 +17,37 @@ if (backendOnly && frontendOnly) {
   console.error('Choose either --backend-only or --frontend-only, not both.');
   process.exit(1);
 }
+
+const argValue = (name) => {
+  const inline = rawArgs.find((arg) => arg.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
+  const index = rawArgs.indexOf(name);
+  if (index >= 0) return rawArgs[index + 1];
+  return undefined;
+};
+
+const parsePort = (value, fallback, label) => {
+  const candidate = value || fallback;
+  const port = Number.parseInt(candidate, 10);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    console.error(`Invalid ${label} port "${candidate}". Choose a value from 1 to 65535.`);
+    process.exit(1);
+  }
+  return String(port);
+};
+
+const frontendPort = parsePort(
+  argValue('--frontend-port') || process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT,
+  '8000',
+  'frontend',
+);
+const backendPort = parsePort(
+  argValue('--backend-port') || process.env.BACKEND_PORT || process.env.PORT,
+  '3000',
+  'backend',
+);
+const frontendOrigin = process.env.FRONTEND_URL || `http://localhost:${frontendPort}`;
+const backendOrigin = process.env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`;
 
 const withDefaults = (defaults) => {
   const env = { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR || '1' };
@@ -29,14 +61,18 @@ const withDefaults = (defaults) => {
 
 const frontendEnv = withDefaults({
   VITE_API_URL: '',
-  VITE_API_PROXY_TARGET: 'http://localhost:3000',
+  VITE_API_PROXY_TARGET: backendOrigin,
+  VITE_DEV_PORT: frontendPort,
+  FRONTEND_PORT: frontendPort,
+  BACKEND_PORT: backendPort,
 });
 
 const backendEnv = withDefaults({
   NODE_ENV: 'development',
-  PORT: '3000',
-  FRONTEND_URL: 'http://localhost:8000',
-  CORS_ORIGIN: 'http://localhost:8000',
+  PORT: backendPort,
+  BACKEND_PORT: backendPort,
+  FRONTEND_URL: frontendOrigin,
+  CORS_ORIGIN: frontendOrigin,
   DATABASE_CLIENT: 'sqlite',
   SQLITE_PATH: 'caredroid.dev.sqlite',
   ENABLE_MONGOOSE_EMERGENCY_OS: 'false',
@@ -109,9 +145,9 @@ const shutdown = (code = 0) => {
 };
 
 console.log('Starting CareDroid local stack...');
-console.log('Frontend: http://localhost:8000');
-console.log('Backend:  http://localhost:3000');
-console.log('Health:   http://localhost:3000/health');
+console.log(`Frontend: ${frontendOrigin}`);
+console.log(`Backend:  http://localhost:${backendPort}`);
+console.log(`Health:   http://localhost:${backendPort}/health`);
 console.log('');
 
 for (const entry of commands) {
@@ -125,7 +161,9 @@ for (const entry of commands) {
       windowsHide: true,
     });
   } catch (error) {
-    console.error(`[${entry.name}] failed to spawn ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`);
+    console.error(
+      `[${entry.name}] failed to spawn ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`,
+    );
     console.error(error?.stack || error?.message || error);
     shutdown(1);
     break;
@@ -137,7 +175,9 @@ for (const entry of commands) {
 
   child.on('error', (error) => {
     if (stopping) return;
-    console.error(`[${entry.name}] failed to start ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`);
+    console.error(
+      `[${entry.name}] failed to start ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`,
+    );
     console.error(error?.stack || error?.message || error);
     shutdown(1);
   });
@@ -145,7 +185,9 @@ for (const entry of commands) {
   child.on('exit', (code, signal) => {
     if (stopping) return;
     const exitCode = code ?? (signal ? 1 : 0);
-    console.error(`[${entry.name}] exited${signal ? ` with signal ${signal}` : ` with code ${exitCode}`}`);
+    console.error(
+      `[${entry.name}] exited${signal ? ` with signal ${signal}` : ` with code ${exitCode}`}`,
+    );
     shutdown(exitCode);
   });
 }

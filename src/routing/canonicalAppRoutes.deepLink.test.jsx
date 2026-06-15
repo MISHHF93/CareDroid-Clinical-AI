@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
@@ -90,10 +90,11 @@ describe('canonical App routes deep links', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/settings');
   });
 
-  it('redirects the retired assistant alias to the Emergency OS whiteboard', async () => {
+  it('redirects the retired assistant alias to Emergency OS Copilot', async () => {
     render(<AppRouteHarness initialPath="/assistant?agent=agent-emergency" />);
 
-    expect(await screen.findByText('Total')).toBeInTheDocument();
-    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+    await waitFor(() =>
+      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/copilot'),
+    );
   });
 });

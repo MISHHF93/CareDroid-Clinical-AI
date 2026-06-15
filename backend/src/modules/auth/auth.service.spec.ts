@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { OAuthAccount } from '../users/entities/oauth-account.entity';
 import { Subscription } from '../subscriptions/entities/subscription.entity';
@@ -230,6 +230,7 @@ describe('AuthService', () => {
         email: 'new@example.com',
         password: 'password123',
         fullName: 'John Doe',
+        role: UserRole.ADMIN,
       };
 
       const hashedPassword = '$2b$10$hashedpassword';
@@ -257,6 +258,9 @@ describe('AuthService', () => {
       expect(result).toHaveProperty('userId');
       expect(result).toHaveProperty('email');
       expect(result).toHaveProperty('verificationToken');
+      expect(mockUserRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: UserRole.STUDENT }),
+      );
       expect(mockUserRepository.save).toHaveBeenCalled();
     });
 

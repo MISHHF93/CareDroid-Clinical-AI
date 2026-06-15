@@ -24,11 +24,14 @@ describe('auth canonical flow wiring', () => {
     expect(appSource).not.toContain('LegacyOAuthCallbackRedirect');
   });
 
-  it('redirects duplicate calculators route aliases into the Emergency Whiteboard', () => {
+  it('redirects duplicate calculators route aliases into Medical Tools', () => {
     expect(appSource).toContain('path="/tools/*"');
-    expect(appSource).not.toContain('<ToolsRedirect />');
-    expect(routeConfigSource).toContain("export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])");
+    expect(appSource).toContain('<ToolsRedirect />');
+    expect(routeConfigSource).toContain(
+      "export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])",
+    );
     expect(routeConfigSource).toContain('aliases: CALCULATORS_ROUTE_ALIASES');
-    expect(routeConfigSource).toContain("['/calculators', CANONICAL_ROUTES.emergencyWhiteboard]");
+    expect(appSource).toContain('path="/calculators" element={<ToolsRedirect />}');
+    expect(appSource).toContain('path="/calculators/*" element={<ToolsRedirect />}');
   });
 });
