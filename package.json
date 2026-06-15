@@ -5,7 +5,6 @@
   "description": "CareDroid-Clinical-AI - Medical AI clinical co-pilot with emergency escalation and RBAC",
   "type": "module",
   "engines": {
-    "node": "20.x",
     "npm": ">=10"
   },
   "scripts": {
