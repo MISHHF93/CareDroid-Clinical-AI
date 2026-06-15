@@ -91,7 +91,7 @@ describe('build and service config consistency', () => {
 
   it('keeps frontend and backend Node runtime baselines aligned', () => {
     expect(read('.node-version').trim()).toBe('20');
-    expect(read('package.json')).toContain('"node": ">=20.19.0"');
+    expect(read('package.json')).toContain('"node": "20.x"');
     expect(read('backend/package.json')).toContain('"node": ">=20.19.0"');
     expect(read('Dockerfile')).toContain('FROM node:20-alpine');
     expect(read('backend/Dockerfile')).toContain('FROM node:20-alpine');
