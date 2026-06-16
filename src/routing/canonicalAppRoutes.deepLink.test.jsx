@@ -107,6 +107,13 @@ describe('canonical App routes deep links', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/auth-callback');
   });
 
+  it('mounts the auth route before wildcard redirects', async () => {
+    render(<AppRouteHarness initialPath="/auth" />);
+
+    expect(await screen.findByRole('heading', { name: /^sign in$/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/auth');
+  });
+
   it('mounts local shared tool sessions before wildcard redirects', async () => {
     render(<AppRouteHarness initialPath="/shared/tools/missing-share" />);
 

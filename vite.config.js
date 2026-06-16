@@ -120,15 +120,6 @@ export default defineConfig(({ mode }) => {
             const normalizedId = id.replaceAll('\\', '/');
 
             if (normalizedId.includes('node_modules')) {
-              if (
-                normalizedId.includes('/react/') ||
-                normalizedId.includes('/react-dom/') ||
-                normalizedId.includes('/react-router-dom/') ||
-                normalizedId.includes('/@remix-run/router/') ||
-                normalizedId.includes('/scheduler/')
-              ) {
-                return 'vendor-react';
-              }
               if (normalizedId.includes('recharts')) {
                 return 'vendor-charts';
               }
@@ -154,21 +145,6 @@ export default defineConfig(({ mode }) => {
               return 'vendor';
             }
 
-            if (
-              normalizedId.includes('/src/data/clinicalIntentToolCatalog') ||
-              normalizedId.includes('/src/data/clinicalToolIdContract') ||
-              normalizedId.includes('/src/data/clinicalCatalogWiring') ||
-              normalizedId.includes('/src/data/chatAssistedHubGroups')
-            ) {
-              return 'data-clinical-tools';
-            }
-            if (
-              normalizedId.includes('/src/data/toolInventory') ||
-              normalizedId.includes('/src/data/toolRegistry') ||
-              normalizedId.includes('/src/data/sidebarToolPresentation')
-            ) {
-              return 'data-tool-registry';
-            }
             if (
               normalizedId.includes('/src/config/unified-navigation') ||
               normalizedId.includes('/src/config/navigation') ||

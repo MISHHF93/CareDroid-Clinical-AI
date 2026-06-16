@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ApiStateBanner from '../components/ApiStateBanner';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
@@ -14,24 +14,69 @@ function getAssistantText(response) {
   return response?.data?.response || response?.data?.message || response?.message?.content || response?.message || '';
 }
 
+const EMPTY_KNOWLEDGE_GRAPH_SNAPSHOT = Object.freeze({
+  summary: { nodes: 0, edges: 0 },
+  coverage: {
+    connectedAssetIds: [],
+    totalAssets: 0,
+    allAssetsConnected: false,
+    orphanAssetIds: [],
+  },
+  nodes: [],
+  edges: [],
+  visibleNodeCount: 0,
+  matchingNodeCount: 0,
+  selectedNode: null,
+  neighbors: [],
+  relationshipRows: [],
+  orphanNodes: [],
+  duplicateGroups: [],
+  recommendations: [],
+  counts: Object.fromEntries(ARTIFACT_KNOWLEDGE_GRAPH_NODE_TYPES.map((nodeType) => [nodeType, 0])),
+});
+
 export default function ClinicalKnowledgeGraph() {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
   const [relationship, setRelationship] = useState('all');
   const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [snapshot, setSnapshot] = useState(null);
   const [assistantExplanation, setAssistantExplanation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const graphService = useMemo(() => createArtifactKnowledgeGraphService(), []);
 
-  const snapshot = useMemo(
-    () => graphService.buildSnapshot({ query, type, relationship, selectedNodeId }),
-    [graphService, query, relationship, selectedNodeId, type]
-  );
-  const selectedNode = snapshot.selectedNode;
-  const visibleRelationships = snapshot.relationshipRows.slice(0, 12);
-  const visibleOrphans = snapshot.orphanNodes.slice(0, 6);
-  const visibleDuplicateGroups = snapshot.duplicateGroups.slice(0, 4);
+  useEffect(() => {
+    let active = true;
+    let cancelBuild = () => {};
+
+    setSnapshot(null);
+
+    const buildSnapshot = () => {
+      const nextSnapshot = graphService.buildSnapshot({ query, type, relationship, selectedNodeId });
+      if (active) setSnapshot(nextSnapshot);
+    };
+
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(buildSnapshot, { timeout: 1500 });
+      cancelBuild = () => window.cancelIdleCallback(idleId);
+    } else {
+      const timeoutId = window.setTimeout(buildSnapshot, 75);
+      cancelBuild = () => window.clearTimeout(timeoutId);
+    }
+
+    return () => {
+      active = false;
+      cancelBuild();
+    };
+  }, [graphService, query, relationship, selectedNodeId, type]);
+
+  const activeSnapshot = snapshot || EMPTY_KNOWLEDGE_GRAPH_SNAPSHOT;
+  const graphLoading = !snapshot;
+  const selectedNode = activeSnapshot.selectedNode;
+  const visibleRelationships = activeSnapshot.relationshipRows.slice(0, 12);
+  const visibleOrphans = activeSnapshot.orphanNodes.slice(0, 6);
+  const visibleDuplicateGroups = activeSnapshot.duplicateGroups.slice(0, 4);
 
   const explainWithAi = async () => {
     if (!selectedNode) return;
@@ -41,7 +86,7 @@ export default function ClinicalKnowledgeGraph() {
     try {
       const response = await sendClinicalChatMessage({
         tool: 'artifact-knowledge-graph',
-        message: buildKnowledgeGraphAiPrompt(selectedNode, snapshot.neighbors),
+        message: buildKnowledgeGraphAiPrompt(selectedNode, activeSnapshot.neighbors),
       });
       if (!response?.ok) {
         throw new Error(response?.data?.message || response?.message || 'Unable to explain graph relationship.');
@@ -76,19 +121,23 @@ export default function ClinicalKnowledgeGraph() {
 
       <section className="knowledge-graph-stats" aria-label="Artifact graph summary">
         <article className="knowledge-graph-card">
-          <strong>{snapshot.summary.nodes}</strong>
+          <strong>{graphLoading ? '...' : activeSnapshot.summary.nodes}</strong>
           <span>Nodes</span>
         </article>
         <article className="knowledge-graph-card">
-          <strong>{snapshot.summary.edges}</strong>
+          <strong>{graphLoading ? '...' : activeSnapshot.summary.edges}</strong>
           <span>Relationships</span>
         </article>
         <article className="knowledge-graph-card">
-          <strong>{snapshot.coverage.connectedAssetIds.length}/{snapshot.coverage.totalAssets}</strong>
+          <strong>
+            {graphLoading
+              ? '...'
+              : `${activeSnapshot.coverage.connectedAssetIds.length}/${activeSnapshot.coverage.totalAssets}`}
+          </strong>
           <span>Connected assets</span>
         </article>
         <article className="knowledge-graph-card">
-          <strong>{snapshot.coverage.allAssetsConnected ? 'Pass' : 'Review'}</strong>
+          <strong>{graphLoading ? 'Loading' : activeSnapshot.coverage.allAssetsConnected ? 'Pass' : 'Review'}</strong>
           <span>Acceptance</span>
         </article>
       </section>
@@ -142,12 +191,15 @@ export default function ClinicalKnowledgeGraph() {
         <div className="knowledge-graph-panel" aria-labelledby="knowledge-graph-visualization">
           <div>
             <p className="knowledge-graph-eyebrow">
-              Showing {snapshot.visibleNodeCount} of {snapshot.matchingNodeCount} matching nodes
+              {graphLoading
+                ? 'Preparing graph explorer'
+                : `Showing ${activeSnapshot.visibleNodeCount} of ${activeSnapshot.matchingNodeCount} matching nodes`}
             </p>
             <h2 id="knowledge-graph-visualization">Graph explorer</h2>
           </div>
           <div className="knowledge-graph-canvas" aria-label="Artifact knowledge graph nodes">
-            {snapshot.nodes.map((node) => (
+            {graphLoading && <div className="knowledge-graph-card">Loading graph relationships...</div>}
+            {activeSnapshot.nodes.map((node) => (
               <button
                 key={node.id}
                 type="button"
@@ -163,8 +215,8 @@ export default function ClinicalKnowledgeGraph() {
             ))}
           </div>
           <div className="knowledge-graph-edge-list" aria-label="Visible graph relationships">
-            {snapshot.edges.length ? (
-              snapshot.edges.map((edge) => (
+            {activeSnapshot.edges.length ? (
+              activeSnapshot.edges.map((edge) => (
                 <div key={edge.id} className="knowledge-graph-edge">
                   <strong>{edge.type}</strong>
                   <span>
@@ -174,7 +226,9 @@ export default function ClinicalKnowledgeGraph() {
                 </div>
               ))
             ) : (
-              <div className="knowledge-graph-edge">No visible relationships match the current filters.</div>
+              <div className="knowledge-graph-edge">
+                {graphLoading ? 'Preparing visible relationships...' : 'No visible relationships match the current filters.'}
+              </div>
             )}
           </div>
         </div>
@@ -198,7 +252,7 @@ export default function ClinicalKnowledgeGraph() {
               <article className="knowledge-graph-card">
                 <strong>Connected relationships</strong>
                 <ul>
-                  {snapshot.neighbors.map(({ edge, node }) => (
+                  {activeSnapshot.neighbors.map(({ edge, node }) => (
                     <li key={edge.id}>
                       <strong>{edge.type}</strong> {node.label}: {edge.rationale}
                     </li>
@@ -208,7 +262,7 @@ export default function ClinicalKnowledgeGraph() {
               <article className="knowledge-graph-card">
                 <strong>Recommendations</strong>
                 <ul>
-                  {snapshot.recommendations.map(({ node, relationship: recommendationType, reason }) => (
+                  {activeSnapshot.recommendations.map(({ node, relationship: recommendationType, reason }) => (
                     <li key={node.id}>
                       <strong>{recommendationType}</strong> {node.label}: {reason}
                     </li>
@@ -220,7 +274,7 @@ export default function ClinicalKnowledgeGraph() {
                 <ul>
                   {ARTIFACT_KNOWLEDGE_GRAPH_NODE_TYPES.map((nodeType) => (
                     <li key={nodeType}>
-                      {nodeType}: {snapshot.counts[nodeType]}
+                      {nodeType}: {activeSnapshot.counts[nodeType]}
                     </li>
                   ))}
                 </ul>
@@ -265,9 +319,9 @@ export default function ClinicalKnowledgeGraph() {
           <article className="knowledge-graph-card">
             <strong>Orphan detection</strong>
             <p>
-              {snapshot.coverage.allAssetsConnected
+              {activeSnapshot.coverage.allAssetsConnected
                 ? 'Every mounted asset is connected to the graph.'
-                : `${snapshot.coverage.orphanAssetIds.length} mounted assets need graph relationships.`}
+                : `${activeSnapshot.coverage.orphanAssetIds.length} mounted assets need graph relationships.`}
             </p>
             <ul>
               {visibleOrphans.map((node) => (
@@ -279,7 +333,7 @@ export default function ClinicalKnowledgeGraph() {
           </article>
           <article className="knowledge-graph-card">
             <strong>Duplicate detection</strong>
-            <p>{snapshot.duplicateGroups.length} duplicate label groups detected across node types.</p>
+            <p>{activeSnapshot.duplicateGroups.length} duplicate label groups detected across node types.</p>
             <ul>
               {visibleDuplicateGroups.map((group) => (
                 <li key={`${group[0].type}-${group[0].label}`}>

@@ -7,6 +7,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
   useSearchParams,
 } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';

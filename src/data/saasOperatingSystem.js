@@ -36,10 +36,10 @@ function countFromContext(primary, fallback = 0) {
 
 export function buildSaasOperatingSystemModel(context = {}) {
   const {
-    tenantContext = {},
-    platformContext = {},
-    organization = {},
-    subscription = {},
+    tenantContext: rawTenantContext = {},
+    platformContext: rawPlatformContext = {},
+    organization: rawOrganization = {},
+    subscription: rawSubscription = {},
     products = [],
     packs = [],
     assets = [],
@@ -47,6 +47,10 @@ export function buildSaasOperatingSystemModel(context = {}) {
     users = [],
     integrations = [],
   } = context;
+  const tenantContext = rawTenantContext || {};
+  const platformContext = rawPlatformContext || {};
+  const organization = rawOrganization || {};
+  const subscription = rawSubscription || {};
 
   const effectiveOrganization = organization?.id
     ? organization

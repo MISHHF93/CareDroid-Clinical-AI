@@ -7,7 +7,7 @@
  * - Periodic API sync when connection restored
  */
 
-const CACHE_NAME = 'caredroid-v6-offline-shell';
+const CACHE_NAME = 'caredroid-v7-offline-shell';
 const IS_LOCAL_DEV =
   self.location.hostname === 'localhost' ||
   self.location.hostname === '127.0.0.1' ||

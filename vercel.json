@@ -6,7 +6,11 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:path((?!api$|api/|assets/|health$|socket\\.io$|socket\\.io/|sw\\.js$|firebase-messaging-sw\\.js$|favicon\\.svg$|site\\.webmanifest$|logo\\.svg$|icon\\.svg$|badge\\.svg$).*)",
       "destination": "/index.html"
     }
   ],
