@@ -13,10 +13,10 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "npm run build && npm run start:prod",
+    "start": "npm run start:prod",
     "start:dev": "npm run build && npm run start:prod",
-    "start:watch": "nest start --watch --entryFile backend/src/main",
-    "start:debug": "nest start --debug --watch --entryFile backend/src/main",
+    "start:watch": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/backend/src/main.js",
     "lint": "node scripts/run-eslint.mjs",
     "lint:fix": "node scripts/run-eslint.mjs --fix",
@@ -150,7 +150,9 @@
       ]
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.ts",
+      "!src/**/*.spec.ts",
+      "!src/**/index.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",

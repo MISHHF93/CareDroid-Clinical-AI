@@ -8,7 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 
 // Configuration
-import { databaseConfig } from './config/database.config';
+import { buildPostgresOptions } from './config/database-url.config';
 import { jwtConfig, oauthConfig, sessionConfig } from './config/auth.config';
 import emailConfig from './config/email.config';
 import redisConfig from './config/redis.config';
@@ -147,7 +147,14 @@ function resolveDatabaseClient() {
             logging: false,
           };
         }
-        return databaseConfig;
+        return {
+          ...buildPostgresOptions({
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: config.server.nodeEnv === 'development' && client !== 'postgres',
+            migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
+          }),
+          migrationsRun: true,
+        };
       },
     }),
 

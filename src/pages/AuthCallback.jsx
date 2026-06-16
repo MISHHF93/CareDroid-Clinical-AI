@@ -14,8 +14,11 @@ const AuthCallback = () => {
   const navigate = useNavigate();
   const { setAuthToken } = useUser();
   const { info } = useNotificationActions();
-  const initialToken = params.get('token') || '';
-  const nextPath = params.get('next') || '/dashboard';
+  const fragmentParams = new URLSearchParams(
+    typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '',
+  );
+  const initialToken = fragmentParams.get('token') || params.get('token') || '';
+  const nextPath = fragmentParams.get('next') || params.get('next') || '/dashboard';
   const [token, setToken] = useState(initialToken);
   const autoHandled = useRef(false);
   const safeNextPath = nextPath.startsWith('/') && !nextPath.startsWith('//') && !nextPath.startsWith('/auth')
@@ -23,12 +26,12 @@ const AuthCallback = () => {
     : '/dashboard';
 
   useEffect(() => {
-    const fromUrl = params.get('token');
+    const fromUrl = initialToken;
     if (!fromUrl || autoHandled.current) return;
     autoHandled.current = true;
     setAuthToken(fromUrl);
     navigate(safeNextPath, { replace: true });
-  }, [params, setAuthToken, navigate, safeNextPath]);
+  }, [initialToken, setAuthToken, navigate, safeNextPath]);
 
   const handleSave = () => {
     const trimmed = token.trim();

@@ -31,8 +31,11 @@ data class MessageEntity(
     val content: String,
     val timestamp: Long,
     val citations: String? = null, // JSON string
+    val citationsJson: String? = null,
     val confidence: Float? = null,
-    val metadata: String? = null // JSON string for extra data
+    val metadata: String? = null, // JSON string for extra data
+    val isSynced: Boolean = true,
+    val isPending: Boolean = false
 )
 
 /**
@@ -49,10 +52,12 @@ data class ConversationEntity(
     @PrimaryKey
     val id: String,
     val title: String,
-    val createdAt: Long,
-    val updatedAt: Long,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
+    val lastMessageAt: Long = System.currentTimeMillis(),
     val messageCount: Int = 0,
-    val summary: String? = null
+    val summary: String? = null,
+    val isSynced: Boolean = true
 )
 
 /**
@@ -71,5 +76,7 @@ data class UserEntity(
     val name: String,
     val role: String,
     val permissions: String = "[]", // JSON array
-    val lastSyncTime: Long = 0
+    val lastSyncTime: Long = 0,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
 )

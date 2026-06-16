@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Socket } from 'net';
 import { connect as connectTls } from 'tls';
 import type { Server as SocketIOServer } from 'socket.io';
+import type { DataSource } from 'typeorm';
 import { checkServiceHealth } from '../services/service-registry';
 
 type ComponentStatus = 'healthy' | 'degraded' | 'unhealthy' | 'not-configured';
@@ -133,6 +134,45 @@ async function checkDatabaseConnectivity(): Promise<ComponentHealth> {
         readyState,
         stateName,
         ping,
+      },
+    };
+  });
+}
+
+async function checkSqlDatabaseConnectivity(req: Request): Promise<ComponentHealth> {
+  return timedComponent(true, async () => {
+    const dataSource = req.app.get('typeormDataSource') as DataSource | undefined;
+
+    if (!dataSource) {
+      return {
+        status: 'not-configured',
+        configured: false,
+        details: {
+          connector: 'typeorm',
+          message: 'TypeORM DataSource is not registered on the Express app.',
+        },
+      };
+    }
+
+    if (!dataSource.isInitialized) {
+      return {
+        status: 'unhealthy',
+        configured: true,
+        details: {
+          connector: 'typeorm',
+          isInitialized: false,
+        },
+        error: 'TypeORM DataSource is not initialized.',
+      };
+    }
+
+    await dataSource.query('SELECT 1');
+    return {
+      status: 'healthy',
+      configured: true,
+      details: {
+        connector: 'typeorm',
+        type: dataSource.options.type,
       },
     };
   });
@@ -417,8 +457,9 @@ function determineOverallStatus(components: HealthComponents): OverallStatus {
 
 router.get('/', async (req, res) => {
   const startedAt = Date.now();
-  const [database, services, websocket, mqtt, mohFhirApi, wearableApi] = await Promise.all([
+  const [database, sqlDatabase, services, websocket, mqtt, mohFhirApi, wearableApi] = await Promise.all([
     checkDatabaseConnectivity(),
+    checkSqlDatabaseConnectivity(req),
     checkRegisteredServices(),
     checkWebSocketStatus(req),
     checkMqttBroker(),
@@ -437,6 +478,7 @@ router.get('/', async (req, res) => {
   ]);
   const components: HealthComponents = {
     database,
+    sqlDatabase,
     services,
     websocket,
     mqtt,

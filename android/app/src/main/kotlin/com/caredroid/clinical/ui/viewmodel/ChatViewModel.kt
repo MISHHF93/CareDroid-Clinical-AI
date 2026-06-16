@@ -42,6 +42,7 @@ class ChatViewModel @Inject constructor(
      */
     fun sendMessage(message: String, conversationId: String? = null) {
         if (message.isBlank()) return
+        if (_uiState.value.isSending) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSending = true, error = null) }
@@ -223,7 +224,7 @@ class ChatViewModel @Inject constructor(
      * Check backend health
      */
     private suspend fun checkHealth() {
-        val result = healthRepository.checkHealth()
+        val result = healthRepository.healthCheck()
         when (result) {
             is NetworkResult.Success -> {
                 val health = result.data

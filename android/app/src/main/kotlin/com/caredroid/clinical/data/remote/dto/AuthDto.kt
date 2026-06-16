@@ -17,10 +17,13 @@ data class LoginRequest(
  * Login response with token and user data
  */
 data class LoginResponse(
-    val accessToken: String,
+    val accessToken: String? = null,
     val refreshToken: String? = null,
-    val user: UserDto,
-    val expiresIn: Long? = null
+    val user: UserDto? = null,
+    val expiresIn: Long? = null,
+    val requiresTwoFactor: Boolean = false,
+    val userId: String? = null,
+    val twoFactorChallenge: String? = null
 )
 
 /**
@@ -38,7 +41,6 @@ data class SignupRequest(
 data class SignupResponse(
     val userId: String,
     val email: String,
-    val verificationToken: String? = null,
     val verificationRequired: Boolean = true
 )
 
@@ -63,19 +65,18 @@ data class RefreshTokenResponse(
  */
 data class UserDto(
     val id: String,
-    val name: String,
+    val name: String? = null,
+    val profile: UserProfileDto? = null,
     val email: String,
     val role: String,
     val permissions: List<String> = emptyList(),
     val createdAt: String? = null,
-    val lastLogin: String? = null
+    val lastLogin: String? = null,
+    val lastLoginAt: String? = null
 )
 
-/**
- * Get current user response
- */
-data class MeResponse(
-    val user: UserDto
+data class UserProfileDto(
+    val fullName: String? = null
 )
 
 /**
@@ -100,18 +101,25 @@ data class ResetPasswordRequest(
     val email: String
 )
 
+data class MagicLinkResponse(
+    val status: String
+)
+
 /**
  * Two-factor authentication request
  */
 data class TwoFactorRequest(
-    val code: String,
-    val token: String
+    val userId: String,
+    val token: String,
+    val challengeToken: String
 )
 
 /**
  * Two-factor authentication response
  */
 data class TwoFactorResponse(
-    val success: Boolean,
-    val accessToken: String? = null
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val user: UserDto? = null,
+    val expiresIn: Long? = null
 )

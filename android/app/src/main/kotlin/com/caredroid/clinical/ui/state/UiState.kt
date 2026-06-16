@@ -35,6 +35,9 @@ data class AuthUiState(
     val isLoading: Boolean = false,
     val isAuthenticated: Boolean = false,
     val user: UserDto? = null,
+    val requiresTwoFactor: Boolean = false,
+    val twoFactorUserId: String? = null,
+    val twoFactorChallenge: String? = null,
     val error: String? = null,
     val validationErrors: Map<String, String> = emptyMap()
 )

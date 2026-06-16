@@ -59,12 +59,13 @@ export function calculateAge(dob) {
   if (!Number.isFinite(birthDate.getTime())) return null;
 
   const today = new Date();
+  if (birthDate > today) return null;
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDelta = today.getMonth() - birthDate.getMonth();
   if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) {
     age -= 1;
   }
-  return Math.max(0, age);
+  return age;
 }
 
 function parseNumber(value) {

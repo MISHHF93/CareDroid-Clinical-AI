@@ -39,8 +39,13 @@ export class AuthService {
     private readonly twoFactorService: TwoFactorService,
   ) {}
 
-  async register(registerDto: { email: string; password: string; fullName: string }) {
-    const { email, password, fullName } = registerDto;
+  private normalizeEmail(email: string): string {
+    return String(email || '').trim().toLowerCase();
+  }
+
+  async register(registerDto: { email: string; password: string; fullName: string; role?: UserRole }) {
+    const email = this.normalizeEmail(registerDto.email);
+    const { password, fullName } = registerDto;
 
     // Check if user exists
     const existing = await this.userRepository.findOne({ where: { email } });
@@ -95,12 +100,13 @@ export class AuthService {
     return {
       userId: user.id,
       email: user.email,
-      verificationToken: emailVerificationToken,
+      verificationRequired: true,
     };
   }
 
   async login(loginDto: { email: string; password: string }, ipAddress: string, userAgent: string) {
-    const { email, password } = loginDto;
+    const email = this.normalizeEmail(loginDto.email);
+    const { password } = loginDto;
 
     // Find user
     const user = await this.userRepository.findOne({
@@ -142,6 +148,7 @@ export class AuthService {
       return {
         requiresTwoFactor: true,
         userId: user.id,
+        twoFactorChallenge: this.generateTwoFactorChallenge(user, ipAddress, userAgent),
       };
     }
 
@@ -258,7 +265,7 @@ export class AuthService {
       );
     }
 
-    const email = authConfig.devLoginEmail || 'dev@caredroid.local';
+    const email = this.normalizeEmail(authConfig.devLoginEmail || 'dev@caredroid.local');
     let user = await this.userRepository.findOne({
       where: { email },
       relations: ['profile', 'subscription', 'twoFactor'],
@@ -315,18 +322,25 @@ export class AuthService {
   }
 
   async generateTokens(user: User) {
-    const payload = {
+    const accessPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
+      tokenUse: 'access',
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(accessPayload);
 
     const config = this.configService.get<any>('jwt');
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: config.refreshTokenExpiry,
-    });
+    const refreshToken = this.jwtService.sign(
+      {
+        ...accessPayload,
+        tokenUse: 'refresh',
+      },
+      {
+        expiresIn: config.refreshTokenExpiry,
+      },
+    );
 
     return {
       accessToken,
@@ -336,8 +350,13 @@ export class AuthService {
   }
 
   async verifyEmail(token: string) {
+    const verificationToken = String(token || '').trim();
+    if (!/^[a-f0-9]{64}$/i.test(verificationToken)) {
+      throw new BadRequestException('Invalid verification token');
+    }
+
     const user = await this.userRepository.findOne({
-      where: { emailVerificationToken: token },
+      where: { emailVerificationToken: verificationToken },
     });
 
     if (!user) {
@@ -366,7 +385,13 @@ export class AuthService {
     return { success: true };
   }
 
-  async verifyTwoFactorLogin(userId: string, token: string, ipAddress: string, userAgent: string) {
+  async verifyTwoFactorLogin(
+    userId: string,
+    token: string,
+    challengeToken: string,
+    ipAddress: string,
+    userAgent: string,
+  ) {
     // Find user
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -381,6 +406,8 @@ export class AuthService {
     if (!user.twoFactor?.enabled) {
       throw new UnauthorizedException('2FA is not enabled for this user');
     }
+
+    this.verifyTwoFactorChallenge(userId, challengeToken, ipAddress, userAgent);
 
     // Verify token
     const isValid = await this.twoFactorService.verifyToken(userId, token);
@@ -417,13 +444,14 @@ export class AuthService {
   }
 
   async requestMagicLink(email: string) {
-    if (!email) {
+    const normalizedEmail = this.normalizeEmail(email);
+    if (!normalizedEmail) {
       throw new BadRequestException('Email is required');
     }
 
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email: normalizedEmail } });
     if (!user) {
-      throw new BadRequestException('No account found for this email');
+      return { status: 'sent' };
     }
 
     await this.auditService.log({
@@ -437,13 +465,61 @@ export class AuthService {
     return { status: 'sent' };
   }
 
+  private generateTwoFactorChallenge(user: User, ipAddress: string, userAgent: string) {
+    const config = this.configService.get<any>('jwt');
+    return this.jwtService.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        tokenUse: '2fa-challenge',
+        ipAddress,
+        userAgent,
+      },
+      {
+        expiresIn: '5m',
+        secret: config.secret,
+      },
+    );
+  }
+
+  private verifyTwoFactorChallenge(
+    userId: string,
+    challengeToken: string,
+    ipAddress: string,
+    userAgent: string,
+  ) {
+    if (!challengeToken) {
+      throw new UnauthorizedException('2FA challenge is required');
+    }
+
+    try {
+      const config = this.configService.get<any>('jwt');
+      const payload = this.jwtService.verify(challengeToken, { secret: config.secret });
+      if (
+        payload?.sub !== userId ||
+        payload?.tokenUse !== '2fa-challenge' ||
+        payload?.ipAddress !== ipAddress ||
+        payload?.userAgent !== userAgent
+      ) {
+        throw new UnauthorizedException('Invalid 2FA challenge');
+      }
+    } catch (error) {
+      if (error instanceof UnauthorizedException) throw error;
+      throw new UnauthorizedException('Invalid 2FA challenge');
+    }
+  }
+
   private sanitizeUser(user: User) {
-    const {
-      passwordHash: _passwordHash,
-      emailVerificationToken: _emailVerificationToken,
-      passwordResetToken: _passwordResetToken,
-      ...sanitized
-    } = user;
-    return sanitized;
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      emailVerified: user.emailVerified,
+      lastLoginAt: user.lastLoginAt,
+      profile: user.profile,
+      subscription: user.subscription,
+    };
   }
 }

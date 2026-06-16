@@ -19,24 +19,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20.19.0'
           
       - name: Update frontend dependencies
         run: |
           npm update
-          npm audit fix --force
+          npm audit fix
           
       - name: Update backend dependencies
         run: |
           cd backend
           npm update
-          npm audit fix --force
+          npm audit fix
           
       - name: Run tests
         run: |
           npm test
           cd backend && npm test
-        continue-on-error: true
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5

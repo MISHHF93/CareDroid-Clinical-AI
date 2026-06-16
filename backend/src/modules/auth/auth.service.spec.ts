@@ -257,7 +257,8 @@ describe('AuthService', () => {
 
       expect(result).toHaveProperty('userId');
       expect(result).toHaveProperty('email');
-      expect(result).toHaveProperty('verificationToken');
+      expect(result).toHaveProperty('verificationRequired', true);
+      expect(result).not.toHaveProperty('verificationToken');
       expect(mockUserRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ role: UserRole.STUDENT }),
       );

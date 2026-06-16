@@ -15,9 +15,9 @@ const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 const OPEN_ACCESS_USER = Object.freeze({
   id: 'open-access-user',
   email: 'open-access@caredroid.local',
-  name: 'CareDroid Clinician',
-  fullName: 'CareDroid Clinician',
-  role: 'physician',
+  name: 'CareDroid Viewer',
+  fullName: 'CareDroid Viewer',
+  role: 'read_only_viewer',
   authMode: 'open-access',
   isEmailVerified: true,
   twoFactorEnabled: false,

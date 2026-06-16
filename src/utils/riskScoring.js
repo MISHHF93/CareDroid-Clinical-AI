@@ -6,14 +6,18 @@
 export const computeRiskScore = (tool, results) => {
   if (!results) return null;
 
+  const effectiveTool = normalizeToolId(tool, results);
   let riskScore = 0;
   let riskFactors = [];
   let severity = 'low';
   let anomalies = [];
+  let scored = false;
 
   // SOFA Score Risk Assessment
-  if (tool === 'sofa' || results.sofaScore !== undefined) {
-    const sofaScore = results.sofaScore || 0;
+  if (effectiveTool === 'sofa' || results.sofaScore !== undefined || results.totalScore !== undefined) {
+    const sofaScore = finiteNumber(results.sofaScore ?? results.totalScore);
+    if (sofaScore === null || sofaScore < 0) return null;
+    scored = true;
 
     if (sofaScore >= 13) {
       riskScore = Math.min(0.95, 0.7 + (sofaScore - 13) * 0.02);
@@ -36,11 +40,11 @@ export const computeRiskScore = (tool, results) => {
 
   // Critical result risk assessment for ED decision support
   if (
-    (tool === 'lab-interpreter' || tool === 'lab-interp') &&
-    results.criticalCount !== undefined
+    (effectiveTool === 'lab-interpreter' || effectiveTool === 'lab-interp') &&
+    getLabCounts(results).isScored
   ) {
-    const criticalCount = results.criticalCount || 0;
-    const abnormalCount = results.abnormalCount || 0;
+    const { criticalCount, abnormalCount } = getLabCounts(results);
+    scored = true;
 
     if (criticalCount > 0) {
       const criticalRisk = Math.min(0.9, 0.5 + criticalCount * 0.2);
@@ -54,7 +58,7 @@ export const computeRiskScore = (tool, results) => {
       riskFactors.push(`${abnormalCount} abnormal lab values`);
     }
 
-    if (results.interpretation) {
+    if (typeof results.interpretation === 'string') {
       const lowerInterp = results.interpretation.toLowerCase();
       if (lowerInterp.includes('hyperkalemia') || lowerInterp.includes('acidosis')) {
         riskFactors.push('Electrolyte abnormality detected');
@@ -63,8 +67,10 @@ export const computeRiskScore = (tool, results) => {
   }
 
   // GFR Risk Assessment (Kidney function)
-  if (tool === 'gfr' && results.gfr !== undefined) {
-    const gfr = results.gfr || 0;
+  if (effectiveTool === 'gfr' && results.gfr !== undefined) {
+    const gfr = finiteNumber(results.gfr);
+    if (gfr === null || gfr < 0) return null;
+    scored = true;
 
     if (gfr < 15) {
       riskScore = Math.max(riskScore, 0.85);
@@ -82,8 +88,10 @@ export const computeRiskScore = (tool, results) => {
   }
 
   // BMI Risk Assessment
-  if (tool === 'bmi' && results.bmi !== undefined) {
-    const bmi = results.bmi || 0;
+  if (effectiveTool === 'bmi' && results.bmi !== undefined) {
+    const bmi = finiteNumber(results.bmi);
+    if (bmi === null || bmi <= 0) return null;
+    scored = true;
 
     if (bmi > 40 || bmi < 18.5) {
       riskScore = Math.max(riskScore, 0.45);
@@ -93,8 +101,10 @@ export const computeRiskScore = (tool, results) => {
   }
 
   // CHA2DS2-VASc Risk Assessment (Stroke risk)
-  if (tool === 'cha2ds2-vasc' && results.score !== undefined) {
-    const score = results.score || 0;
+  if (effectiveTool === 'cha2ds2-vasc' && results.score !== undefined) {
+    const score = finiteNumber(results.score);
+    if (score === null || score < 0) return null;
+    scored = true;
 
     if (score >= 4) {
       riskScore = Math.max(riskScore, 0.75);
@@ -115,8 +125,11 @@ export const computeRiskScore = (tool, results) => {
     anomalies = results.outliers;
     if (anomalies.length > 0) {
       riskScore = Math.min(0.95, riskScore + 0.15);
+      scored = true;
     }
   }
+
+  if (!scored) return null;
 
   return {
     riskScore: Math.min(0.99, riskScore),
@@ -128,18 +141,21 @@ export const computeRiskScore = (tool, results) => {
 
 export const generateClinicalAlerts = (tool, results, riskData) => {
   const alerts = [];
+  const effectiveTool = normalizeToolId(tool, results);
+  const { criticalCount } = getLabCounts(results || {});
+  const sofaScore = finiteNumber(results?.sofaScore ?? results?.totalScore);
 
   if (!results || !riskData) return alerts;
 
   // Critical alerts
   if (riskData.severity === 'critical') {
-    if (tool === 'sofa' && results.sofaScore >= 13) {
+    if (effectiveTool === 'sofa' && sofaScore >= 13) {
       alerts.push({
-        id: `alert-sofa-${Date.now()}`,
+        id: 'alert-sofa-critical',
         severity: 'critical',
         title: 'Critical SOFA Score',
         description: 'Patient shows signs of multiple organ dysfunction',
-        findings: [`SOFA Score: ${results.sofaScore}/24`, 'Mortality risk: High'],
+        findings: [`SOFA Score: ${sofaScore}/24`, 'Mortality risk: High'],
         recommendations: [
           'Review ICU or critical-care escalation criteria with the responsible clinician',
           'Evaluate organ-support needs per institutional pathway',
@@ -150,12 +166,12 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       });
     }
 
-    if ((tool === 'lab-interpreter' || tool === 'lab-interp') && results.criticalCount > 0) {
+    if ((effectiveTool === 'lab-interpreter' || effectiveTool === 'lab-interp') && criticalCount > 0) {
       alerts.push({
-        id: `alert-lab-${Date.now()}`,
+        id: 'alert-lab-critical',
         severity: 'critical',
         title: 'Critical Laboratory Values',
-        description: `${results.criticalCount} critical lab value${results.criticalCount > 1 ? 's' : ''} detected`,
+        description: `${criticalCount} critical lab value${criticalCount > 1 ? 's' : ''} detected`,
         findings: results.criticalValues || ['One or more lab values require immediate attention'],
         recommendations: [
           'Confirm critical values promptly through local critical-result workflow',
@@ -170,9 +186,9 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
 
   // High-risk alerts
   if (riskData.severity === 'high') {
-    if (tool === 'cha2ds2-vasc' && results.score >= 4) {
+    if (effectiveTool === 'cha2ds2-vasc' && results.score >= 4) {
       alerts.push({
-        id: `alert-stroke-${Date.now()}`,
+        id: 'alert-stroke-high',
         severity: 'high',
         title: 'High Stroke Risk',
         description: `CHA2DS2-VASc score of ${results.score} indicates significant stroke risk`,
@@ -187,9 +203,9 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       });
     }
 
-    if (tool === 'gfr' && results.gfr < 30) {
+    if (effectiveTool === 'gfr' && results.gfr < 30) {
       alerts.push({
-        id: `alert-kidney-${Date.now()}`,
+        id: 'alert-kidney-high',
         severity: 'high',
         title: 'Reduced Kidney Function Signal',
         description: `GFR ${results.gfr} is in a reduced kidney-function range; confirm chronicity and clinical context before labeling CKD.`,
@@ -212,7 +228,7 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
   // Anomaly alerts
   if (riskData.anomalies && riskData.anomalies.length > 0) {
     alerts.push({
-      id: `alert-anomaly-${Date.now()}`,
+      id: 'alert-anomaly-values',
       severity: 'warning',
       title: 'Anomalous Values Detected',
       description: `${riskData.anomalies.length} statistical outlier${riskData.anomalies.length > 1 ? 's' : ''} found in results`,
@@ -229,6 +245,44 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
 
   return alerts;
 };
+
+const TOOL_ALIASES = Object.freeze({
+  calculators: null,
+  chads2vasc: 'cha2ds2-vasc',
+  'cha2ds2vasc': 'cha2ds2-vasc',
+  'cha2ds2-vasc': 'cha2ds2-vasc',
+  lab: 'lab-interp',
+  'lab-interpreter': 'lab-interpreter',
+  'lab-interp': 'lab-interp',
+});
+
+function normalizeToolId(tool, results = {}) {
+  const resultTool = results.calculator || results.toolId || results.id;
+  const raw = String(resultTool || tool || '').toLowerCase();
+  return TOOL_ALIASES[raw] || raw;
+}
+
+function finiteNumber(value) {
+  if (value === '' || value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getLabCounts(results) {
+  const criticalFromValues = Array.isArray(results.criticalValues)
+    ? results.criticalValues.length
+    : undefined;
+  const criticalCount = finiteNumber(
+    results.criticalCount ?? results.summary?.critical ?? criticalFromValues,
+  );
+  const abnormalCount = finiteNumber(results.abnormalCount ?? results.summary?.abnormal);
+
+  return {
+    criticalCount: criticalCount ?? 0,
+    abnormalCount: abnormalCount ?? 0,
+    isScored: criticalCount !== null || abnormalCount !== null,
+  };
+}
 
 const getKidneyStage = (gfr) => {
   if (gfr >= 90) return '1 (Normal)';

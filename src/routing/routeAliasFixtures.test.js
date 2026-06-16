@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { buildEmergencyToolsRedirect } from '../App';
 
-function redirectFor(pathname, search = '') {
-  const target = buildEmergencyToolsRedirect({ pathname, search });
-  return `${target.pathname}${target.search}`;
+function redirectFor(pathname, search = '', hash = '') {
+  const target = buildEmergencyToolsRedirect({ pathname, search, hash });
+  return `${target.pathname}${target.search}${target.hash || ''}`;
 }
 
 describe('Medical Tools route alias fixtures', () => {
@@ -31,6 +31,12 @@ describe('Medical Tools route alias fixtures', () => {
   it('preserves unrelated query params while adding redirect intent', () => {
     expect(redirectFor('/laboratory', '?patientId=p1')).toBe(
       '/emergency/tools?patientId=p1&source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+    );
+  });
+
+  it('preserves hashes while adding redirect intent', () => {
+    expect(redirectFor('/tools/calculator/qsofa', '', '#result')).toBe(
+      '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa#result',
     );
   });
 

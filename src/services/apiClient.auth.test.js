@@ -128,6 +128,30 @@ describe('apiFetch auth header', () => {
       }),
     );
   });
+
+  it('lets public Emergency OS API routes reach fetch without a token', async () => {
+    localStorage.clear();
+
+    await apiFetch('/api/emergency/whiteboard');
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/emergency/whiteboard',
+      expect.objectContaining({
+        headers: expect.not.objectContaining({
+          Authorization: expect.any(String),
+        }),
+      }),
+    );
+  });
+
+  it('short-circuits protected API routes without a token', async () => {
+    localStorage.clear();
+
+    const response = await apiFetch('/api/subscriptions/current');
+
+    expect(response.status).toBe(401);
+    expect(fetch).not.toHaveBeenCalled();
+  });
 });
 
 describe('buildStreamUrl', () => {

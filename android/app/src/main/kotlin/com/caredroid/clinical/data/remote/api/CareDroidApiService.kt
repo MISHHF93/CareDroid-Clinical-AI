@@ -27,39 +27,21 @@ interface CareDroidApiService {
     suspend fun register(@Body request: SignupRequest): Response<SignupResponse>
     
     /**
-     * Refresh authentication token
-     */
-    @POST("api/auth/refresh")
-    suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<RefreshTokenResponse>
-    
-    /**
      * Get current authenticated user
      */
     @GET("api/auth/me")
-    suspend fun getCurrentUser(): Response<MeResponse>
-    
-    /**
-     * Logout current user
-     */
-    @POST("api/auth/logout")
-    suspend fun logout(@Body request: LogoutRequest? = null): Response<Unit>
-    
-    /**
-     * Change password
-     */
-    @POST("api/auth/change-password")
-    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<Unit>
+    suspend fun getCurrentUser(): Response<UserDto>
     
     /**
      * Request password reset
      */
-    @POST("api/auth/reset-password")
-    suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<Unit>
+    @POST("api/auth/magic-link")
+    suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<MagicLinkResponse>
     
     /**
      * Verify two-factor authentication code
      */
-    @POST("api/auth/2fa/verify")
+    @POST("api/auth/verify-2fa")
     suspend fun verifyTwoFactor(@Body request: TwoFactorRequest): Response<TwoFactorResponse>
     
     // ============================================

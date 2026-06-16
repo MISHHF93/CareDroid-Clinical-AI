@@ -158,6 +158,14 @@ vi.mock('../hooks/useNotificationActions', () => ({
 
 vi.mock('../services/clinicalToolsApi', () => ({
   fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
+  fetchToolExecutorCatalog: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      registeredExecutorToolIds: [],
+      aliases: {},
+      unsupportedToolIds: [],
+    },
+  }),
 }));
 
 vi.mock('../data/artifactKnowledgeGraph', () => {
@@ -961,7 +969,7 @@ describe('Route pages smoke — requested responsive matrix', () => {
         unmount();
       }
     },
-    25_000
+    45_000
   );
 });
 

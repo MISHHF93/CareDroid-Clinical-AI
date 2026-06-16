@@ -3,6 +3,9 @@ package com.caredroid.clinical.data.repository
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.caredroid.clinical.di.dataStore
 import com.caredroid.clinical.data.remote.NetworkResult
 import com.caredroid.clinical.data.remote.api.CareDroidApiService
 import com.caredroid.clinical.data.remote.dto.*
@@ -29,14 +32,18 @@ class AuthRepositoryImpl @Inject constructor(
     private var authToken: String? = null
     private var refreshToken: String? = null
 
+    private companion object {
+        val AUTH_TOKEN_KEY = stringPreferencesKey("auth_token")
+    }
+
     override suspend fun login(email: String, password: String): NetworkResult<LoginResponse> {
         return executeApiCall {
             apiService.login(LoginRequest(email, password))
         }.also { result ->
             if (result is NetworkResult.Success) {
-                saveAuthToken(result.data.accessToken)
+                result.data.accessToken?.let { saveAuthToken(it) }
                 refreshToken = result.data.refreshToken
-                _authStateFlow.value = true
+                _authStateFlow.value = result.data.accessToken != null
             }
         }
     }
@@ -48,49 +55,42 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshToken(refreshToken: String): NetworkResult<RefreshTokenResponse> {
-        return executeApiCall {
-            apiService.refreshToken(RefreshTokenRequest(refreshToken))
-        }.also { result ->
-            if (result is NetworkResult.Success) {
-                saveAuthToken(result.data.accessToken)
-                this.refreshToken = result.data.refreshToken
-            }
-        }
+        return NetworkResult.Error("Refresh token endpoint is not available on this backend", code = 501)
     }
 
     override suspend fun getCurrentUser(): NetworkResult<UserDto> {
         return executeApiCall {
             apiService.getCurrentUser()
-        }.map { it.user }
+        }
     }
 
     override suspend fun logout(): NetworkResult<Unit> {
-        return executeApiCall {
-            apiService.logout(authToken?.let { LogoutRequest(it) })
-        }.also {
-            clearAuthToken()
-            _authStateFlow.value = false
-        }
+        clearAuthToken()
+        _authStateFlow.value = false
+        return NetworkResult.Success(Unit)
     }
 
     override suspend fun changePassword(currentPassword: String, newPassword: String): NetworkResult<Unit> {
-        return executeApiCall {
-            apiService.changePassword(ChangePasswordRequest(currentPassword, newPassword))
-        }
+        return NetworkResult.Error("Change password endpoint is not available on this backend", code = 501)
     }
 
     override suspend fun resetPassword(email: String): NetworkResult<Unit> {
         return executeApiCall {
             apiService.resetPassword(ResetPasswordRequest(email))
-        }
+        }.map { Unit }
     }
 
-    override suspend fun verifyTwoFactor(code: String, token: String): NetworkResult<TwoFactorResponse> {
+    override suspend fun verifyTwoFactor(
+        userId: String,
+        code: String,
+        challengeToken: String
+    ): NetworkResult<TwoFactorResponse> {
         return executeApiCall {
-            apiService.verifyTwoFactor(TwoFactorRequest(code, token))
+            apiService.verifyTwoFactor(TwoFactorRequest(userId, code, challengeToken))
         }.also { result ->
             if (result is NetworkResult.Success && result.data.accessToken != null) {
                 saveAuthToken(result.data.accessToken)
+                refreshToken = result.data.refreshToken
                 _authStateFlow.value = true
             }
         }
@@ -106,13 +106,17 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun saveAuthToken(token: String) {
         authToken = token
-        // TODO: Phase 5 - Save to DataStore for persistence
+        context.dataStore.edit { preferences ->
+            preferences[AUTH_TOKEN_KEY] = token
+        }
     }
 
     override suspend fun clearAuthToken() {
         authToken = null
         refreshToken = null
-        // TODO: Phase 5 - Clear from DataStore
+        context.dataStore.edit { preferences ->
+            preferences.remove(AUTH_TOKEN_KEY)
+        }
     }
 
     override fun observeAuthState(): Flow<Boolean> {

@@ -9,7 +9,7 @@ on:
 
 env:
   NODE_VERSION: '20.19.0'
-  JAVA_VERSION: '11'
+  JAVA_VERSION: '17'
 
 jobs:
   build-and-test:
@@ -125,7 +125,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: com.caredroid.app
+          packageName: com.caredroid.clinical
           releaseFiles: 'android/app/build/outputs/bundle/release/app-release.aab'
           track: internal
 

@@ -29,7 +29,7 @@ export const API_ROUTES = Object.freeze({
     plans: '/api/subscriptions/plans',
   }),
   auth: Object.freeze({
-    profile: '/api/auth/profile',
+    profile: '/api/auth/me',
     devSession: '/api/auth/dev-session',
   }),
   users: Object.freeze({

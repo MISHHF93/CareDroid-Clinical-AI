@@ -7,6 +7,7 @@ import * as express from 'express';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import mongoose from 'mongoose';
+import { DataSource } from 'typeorm';
 import { AppModule } from './app.module';
 import {
   registerEdgeAIAmbulanceWebSocketSupport,
@@ -24,6 +25,7 @@ import {
   resolveFrontendIndexPath,
   STATIC_ASSET_RENDER_PATH,
 } from './static-asset-excludes';
+import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 
 function shouldServeFrontendAssets(config: EnvironmentConfig) {
   return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
@@ -48,7 +50,7 @@ async function registerEmergencyMongooseRuntime(
   const expressApp = app.getHttpAdapter().getInstance();
   const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false });
   registerAllRoutes(expressApp, { apiPrefix: '/api/emergency', mountDiscovery: false });
-  registerEMSWebSocketSupport(expressApp, app.getHttpServer());
+  registerEMSWebSocketSupport(expressApp, app.getHttpServer(), config.server.corsOrigins);
   reassessmentScheduler.start();
   const initialization = await initializeAllServices();
   if (initialization.totals.failed > 0) {
@@ -186,6 +188,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.useGlobalFilters(new ApiExceptionFilter());
 
   if (shouldServeFrontendAssets(environment)) {
     registerProductionFrontendAssets(app);
@@ -194,12 +197,18 @@ async function bootstrap() {
   // API prefix (health and root endpoints will be at /)
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
   const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('typeormDataSource', app.get(DataSource));
   registerAllRoutes(expressApp, { mountRoutes: false });
   expressApp.use('/api/health', healthRoutes);
   expressApp.use('/health', healthRoutes);
 
   await registerEmergencyMongooseRuntime(app, logger, environment);
-  registerEdgeAIAmbulanceWebSocketSupport(expressApp, app.getHttpServer());
+  registerEdgeAIAmbulanceWebSocketSupport(
+    expressApp,
+    app.getHttpServer(),
+    undefined,
+    environment.server.corsOrigins,
+  );
 
   // Swagger documentation
   const config = new DocumentBuilder()

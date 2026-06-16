@@ -22,7 +22,7 @@ import com.caredroid.clinical.data.local.entity.PendingMessageEntity
         UserEntity::class,
         PendingMessageEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class CareDroidDatabase : RoomDatabase() {

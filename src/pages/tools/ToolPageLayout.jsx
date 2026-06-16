@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -69,16 +69,30 @@ const ToolPageLayout = ({
   const [clinicalAlerts, setClinicalAlerts] = useState([]);
   const [dismissedAnomalies, setDismissedAnomalies] = useState(new Set());
 
-  const clinicalInsights = results ? buildClinicalInsights(tool, results) : null;
-  const riskData = results ? computeRiskScore(tool.id, results) : null;
+  const clinicalInsights = useMemo(
+    () => (results ? buildClinicalInsights(tool, results) : null),
+    [results, tool],
+  );
+  const riskData = useMemo(
+    () => (results ? computeRiskScore(tool.id, results) : null),
+    [results, tool.id],
+  );
+  const generatedClinicalAlerts = useMemo(
+    () => (riskData ? generateClinicalAlerts(tool.id, results, riskData) : []),
+    [riskData, results, tool.id],
+  );
 
   // Generate clinical alerts based on risk data
   useEffect(() => {
-    if (riskData) {
-      const alerts = generateClinicalAlerts(tool.id, results, riskData);
-      setClinicalAlerts(alerts);
-    }
-  }, [riskData, results, tool.id]);
+    setClinicalAlerts((currentAlerts) =>
+      generatedClinicalAlerts.map((alert) => ({
+        ...alert,
+        acknowledged:
+          currentAlerts.find((currentAlert) => currentAlert.id === alert.id)?.acknowledged ??
+          alert.acknowledged,
+      })),
+    );
+  }, [generatedClinicalAlerts]);
 
   useEffect(() => {
     if (tool?.id) {

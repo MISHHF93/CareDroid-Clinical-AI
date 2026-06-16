@@ -27,7 +27,7 @@ vi.mock('../services/clinicalChatService', () => ({
 
 function LocationProbe() {
   const location = useLocation();
-  return <output data-testid="location">{location.pathname}</output>;
+  return <output data-testid="location">{`${location.pathname}${location.hash}`}</output>;
 }
 
 function AppRouteHarness({ initialPath }) {
@@ -84,10 +84,12 @@ describe('canonical App routes deep links', () => {
   });
 
   it('redirects /settings/features to Emergency OS settings', async () => {
-    render(<AppRouteHarness initialPath="/settings/features" />);
+    render(<AppRouteHarness initialPath="/settings/features#feature-toolsShareResults" />);
 
     expect(await screen.findByRole('main')).toBeInTheDocument();
-    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/settings');
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/emergency/settings#feature-toolsShareResults',
+    );
   });
 
   it('redirects the retired assistant alias to Emergency OS Copilot', async () => {
@@ -96,5 +98,19 @@ describe('canonical App routes deep links', () => {
     await waitFor(() =>
       expect(screen.getByTestId('location')).toHaveTextContent('/emergency/copilot'),
     );
+  }, 20_000);
+
+  it('mounts the OAuth callback route before wildcard redirects', async () => {
+    render(<AppRouteHarness initialPath="/auth-callback" />);
+
+    expect(await screen.findByRole('heading', { name: /complete sign-in/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/auth-callback');
+  });
+
+  it('mounts local shared tool sessions before wildcard redirects', async () => {
+    render(<AppRouteHarness initialPath="/shared/tools/missing-share" />);
+
+    expect(await screen.findByRole('heading', { name: /session not found/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/shared/tools/missing-share');
   });
 });

@@ -26,6 +26,9 @@ class VerifyTwoFactorLoginDto {
 
   @IsString()
   token: string;
+
+  @IsString()
+  challengeToken: string;
 }
 
 class MagicLinkRequestDto {
@@ -55,7 +58,7 @@ export class AuthController {
     if (!accessToken) {
       return res.redirect(`${this.getFrontendBaseUrl()}/auth?error=oauth`);
     }
-    const target = `${this.getFrontendBaseUrl()}/auth-callback?token=${encodeURIComponent(accessToken)}`;
+    const target = `${this.getFrontendBaseUrl()}/auth-callback#token=${encodeURIComponent(accessToken)}`;
     return res.redirect(target);
   }
 
@@ -97,7 +100,13 @@ export class AuthController {
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
 
-    return this.authService.verifyTwoFactorLogin(body.userId, body.token, ipAddress, userAgent);
+    return this.authService.verifyTwoFactorLogin(
+      body.userId,
+      body.token,
+      body.challengeToken,
+      ipAddress,
+      userAgent,
+    );
   }
 
   @Get('verify-email')

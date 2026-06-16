@@ -21,6 +21,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     
     steps:
       - name: Checkout code
@@ -31,7 +32,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20.19.0'
           
       - name: Determine version
         id: version
@@ -107,7 +108,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20.19.0'
           
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -160,7 +161,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: com.caredroid.app
+          packageName: com.caredroid.clinical
           releaseFiles: android/app/build/outputs/apk/release/app-release-signed.apk
           track: production
           status: completed

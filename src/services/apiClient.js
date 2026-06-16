@@ -81,10 +81,20 @@ const hasUsableAuthorization = (headers) => {
   return !/^Bearer\s*(undefined|null)?$/i.test(value);
 };
 
+const PUBLIC_API_PATH_PATTERNS = [
+  /^\/api\/auth(\/|$)/,
+  /^\/api\/config\/system$/,
+  /^\/api\/emergency(\/|$)/,
+  /^\/api\/governance(\/|$)/,
+];
+
+const isPublicApiPath = (apiPath) =>
+  PUBLIC_API_PATH_PATTERNS.some((pattern) => pattern.test(apiPath));
+
 const shouldShortCircuitProtectedApi = (path, headers) => {
   const apiPath = normalizeApiPath(path);
   if (!apiPath.startsWith('/api/')) return false;
-  if (/^\/api\/auth(\/|$)/.test(apiPath)) return false;
+  if (isPublicApiPath(apiPath)) return false;
   return !hasUsableAuthorization(headers);
 };
 

@@ -70,6 +70,7 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      const showErrorDetails = Boolean(import.meta?.env?.DEV);
       if (this.props.fallbackText || this.props.fallback) {
         return (
           this.props.fallback || (
@@ -102,11 +103,11 @@ class ErrorBoundary extends Component {
               textAlign: 'center',
             }}
           >
-            <h1 style={{ color: '#FF0000', marginBottom: '20px' }}>⚠️ Something went wrong</h1>
+            <h1 style={{ color: '#FF0000', marginBottom: '20px' }}>Something went wrong</h1>
             <p style={{ marginBottom: '20px', fontSize: '16px' }}>
               The application encountered an unexpected error. This has been automatically reported.
             </p>
-            {this.state.error && (
+            {showErrorDetails && this.state.error && (
               <details
                 style={{
                   marginBottom: '20px',
@@ -136,7 +137,7 @@ class ErrorBoundary extends Component {
                 fontWeight: 'bold',
               }}
             >
-              🔄 Reload Application
+              Reload Application
             </button>
           </div>
         </div>

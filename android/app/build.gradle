@@ -144,11 +144,11 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$androidxConstraintLayoutVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$androidxLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$androidxLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidxLifecycleVersion"
 
     // Material Design 3
     implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.compose.material3:material3:$material3Version"
 
     // Accompanist (System UI, Permissions, etc)
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
@@ -157,7 +157,6 @@ dependencies {
     // Hilt Dependency Injection
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-compiler:$hiltVersion"
-    implementation "androidx.hilt:hilt-navigation-compose:$hiltAndroidxVersion"
 
     // Networking
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
@@ -177,6 +176,9 @@ dependencies {
 
     // DataStore Preferences
     implementation "androidx.datastore:datastore-preferences:$dataStoreVersion"
+
+    // Biometric authentication
+    implementation "androidx.biometric:biometric:1.1.0"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
@@ -200,5 +202,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     androidTestImplementation platform("androidx.compose:compose-bom:$composeBomVersion")
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    kaptAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
 }
 

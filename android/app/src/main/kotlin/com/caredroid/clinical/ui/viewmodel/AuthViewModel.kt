@@ -42,8 +42,8 @@ class AuthViewModel @Inject constructor(
         }
         if (password.isBlank()) {
             errors["password"] = "Password is required"
-        } else if (password.length < 6) {
-            errors["password"] = "Password must be at least 6 characters"
+        } else if (password.length < 8) {
+            errors["password"] = "Password must be at least 8 characters"
         }
 
         if (errors.isNotEmpty()) {
@@ -59,11 +59,29 @@ class AuthViewModel @Inject constructor(
             when (result) {
                 is NetworkResult.Success -> {
                     val response = result.data
+                    if (response.requiresTwoFactor) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isAuthenticated = false,
+                                requiresTwoFactor = true,
+                                twoFactorUserId = response.userId,
+                                twoFactorChallenge = response.twoFactorChallenge,
+                                user = null,
+                                error = null
+                            )
+                        }
+                        return@launch
+                    }
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            isAuthenticated = true,
+                            isAuthenticated = response.accessToken != null && response.user != null,
                             user = response.user,
+                            requiresTwoFactor = false,
+                            twoFactorUserId = null,
+                            twoFactorChallenge = null,
                             error = null
                         )
                     }
@@ -100,8 +118,8 @@ class AuthViewModel @Inject constructor(
         }
         if (password.isBlank()) {
             errors["password"] = "Password is required"
-        } else if (password.length < 6) {
-            errors["password"] = "Password must be at least 6 characters"
+        } else if (password.length < 8) {
+            errors["password"] = "Password must be at least 8 characters"
         }
         if (password != confirmPassword) {
             errors["confirmPassword"] = "Passwords do not match"
@@ -196,10 +214,65 @@ class AuthViewModel @Inject constructor(
         _uiState.update { it.copy(error = "Two-factor setup is available from account security settings.") }
     }
 
+    fun verifyTwoFactor(code: String) {
+        val current = _uiState.value
+        val userId = current.twoFactorUserId
+        val challenge = current.twoFactorChallenge
+
+        if (code.isBlank()) {
+            _uiState.update { it.copy(validationErrors = mapOf("twoFactor" to "Code is required")) }
+            return
+        }
+
+        if (userId.isNullOrBlank() || challenge.isNullOrBlank()) {
+            _uiState.update { it.copy(error = "Two-factor login challenge expired. Sign in again.") }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, validationErrors = emptyMap()) }
+
+            when (val result = authRepository.verifyTwoFactor(userId, code, challenge)) {
+                is NetworkResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isAuthenticated = result.data.accessToken != null && result.data.user != null,
+                            user = result.data.user,
+                            requiresTwoFactor = false,
+                            twoFactorUserId = null,
+                            twoFactorChallenge = null,
+                            error = null
+                        )
+                    }
+                }
+                is NetworkResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isAuthenticated = false,
+                            error = result.message
+                        )
+                    }
+                }
+                is NetworkResult.Loading -> {
+                    // Already handled
+                }
+            }
+        }
+    }
+
     /**
      * Request password reset
      */
     fun requestPasswordReset(email: String) {
+        if (email.isBlank() || !isValidEmail(email)) {
+            _uiState.update {
+                it.copy(validationErrors = mapOf("email" to "Enter a valid email address"))
+            }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 

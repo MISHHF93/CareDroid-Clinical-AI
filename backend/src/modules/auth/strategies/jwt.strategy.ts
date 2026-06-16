@@ -23,7 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; email: string; role: string }) {
+  async validate(payload: { sub: string; email: string; role: string; tokenUse?: string }) {
+    if (payload.tokenUse !== 'access') {
+      throw new UnauthorizedException();
+    }
+
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
       relations: ['profile', 'subscription'],

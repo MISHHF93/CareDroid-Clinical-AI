@@ -6,8 +6,14 @@ import {
   type VitalSignStream,
 } from '../services/edge-ai-ambulance.service';
 
-export function registerEMSWebSocketSupport(app: Express, server: HttpServer): Server {
-  const io = new Server(server, { cors: { origin: '*' } });
+type CorsOrigin = string | string[] | boolean;
+
+export function registerEMSWebSocketSupport(
+  app: Express,
+  server: HttpServer,
+  corsOrigins: CorsOrigin = false,
+): Server {
+  const io = new Server(server, { cors: { origin: corsOrigins, credentials: true } });
   const connections = new Map<string, string>();
 
   io.on('connection', (socket) => {
@@ -34,10 +40,11 @@ export function registerEdgeAIAmbulanceWebSocketSupport(
   app: Express,
   server: HttpServer,
   service = edgeAIAmbulanceService,
+  corsOrigins: CorsOrigin = false,
 ): Server {
   const io = new Server(server, {
     path: '/ws/edge-ai/ambulance',
-    cors: { origin: '*' },
+    cors: { origin: corsOrigins, credentials: true },
   });
 
   io.on('connection', (socket) => {

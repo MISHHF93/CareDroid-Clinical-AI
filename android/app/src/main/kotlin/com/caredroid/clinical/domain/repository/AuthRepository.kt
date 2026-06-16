@@ -48,7 +48,11 @@ interface AuthRepository {
     /**
      * Verify two-factor authentication
      */
-    suspend fun verifyTwoFactor(code: String, token: String): NetworkResult<TwoFactorResponse>
+    suspend fun verifyTwoFactor(
+        userId: String,
+        code: String,
+        challengeToken: String
+    ): NetworkResult<TwoFactorResponse>
     
     /**
      * Check if user is authenticated (has valid token)

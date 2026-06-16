@@ -73,7 +73,7 @@ fun ConversationEntity.toDto(messages: List<MessageResponse> = emptyList()): Con
 fun UserDto.toEntity(): UserEntity {
     return UserEntity(
         id = id,
-        name = name,
+        name = name ?: profile?.fullName ?: email,
         email = email,
         role = role,
         createdAt = System.currentTimeMillis(),

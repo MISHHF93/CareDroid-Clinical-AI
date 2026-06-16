@@ -488,26 +488,32 @@ export function AppShell({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      <Suspense fallback={null}>
-        <EMSCriticalBroadcast />
-      </Suspense>
-      {showReassessmentDrawer ? (
+      <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>
-          <ReassessmentDrawer
-            open={showReassessmentDrawer}
-            count={reassessmentCount}
-            onClose={() => setShowReassessmentDrawer(false)}
-          />
+          <EMSCriticalBroadcast />
         </Suspense>
+      </ErrorBoundary>
+      {showReassessmentDrawer ? (
+        <ErrorBoundary fallbackText="Reassessment drawer encountered an error.">
+          <Suspense fallback={null}>
+            <ReassessmentDrawer
+              open={showReassessmentDrawer}
+              count={reassessmentCount}
+              onClose={() => setShowReassessmentDrawer(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
       {showPalette ? (
-        <Suspense fallback={null}>
-          <CommandPalette
-            open={showPalette}
-            onClose={() => setShowPalette(false)}
-            onExecute={handleCommandExecute}
-          />
-        </Suspense>
+        <ErrorBoundary fallbackText="Command palette encountered an error.">
+          <Suspense fallback={null}>
+            <CommandPalette
+              open={showPalette}
+              onClose={() => setShowPalette(false)}
+              onExecute={handleCommandExecute}
+            />
+          </Suspense>
+        </ErrorBoundary>
       ) : null}
       <Toaster richColors closeButton position="top-right" />
     </div>

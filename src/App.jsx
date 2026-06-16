@@ -30,6 +30,8 @@ const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalyti
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const SharedToolSession = lazy(() => import('./pages/tools/SharedToolSession'));
 const EmergencyDepartmentPulse = lazy(() => import('./pages/emergency/pulse'));
 const EmergencyShiftSummary = lazy(() => import('./pages/emergency/shift'));
 import PatientCard from './components/PatientCard';
@@ -413,6 +415,7 @@ export function buildEmergencyToolsRedirect(location) {
   return {
     pathname: CANONICAL_ROUTES.emergencyTools,
     search: search ? `?${search}` : '',
+    hash: location.hash || '',
   };
 }
 
@@ -431,7 +434,12 @@ function NonEmergencyWorkspaceRedirect() {
   const location = useLocation();
   const pathname = normalizeRedirectPath(location.pathname);
   if (pathname === '/analytics') {
-    return <Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />;
+    return (
+      <Navigate
+        to={{ pathname: CANONICAL_ROUTES.emergencyAnalytics, hash: location.hash || '' }}
+        replace
+      />
+    );
   }
   if (pathname === '/governance' || pathname.startsWith('/governance/')) {
     return (
@@ -439,6 +447,7 @@ function NonEmergencyWorkspaceRedirect() {
         to={{
           pathname: CANONICAL_ROUTES.emergencyTools,
           search: '?source=governance&filter=governance',
+          hash: location.hash || '',
         }}
         replace
       />
@@ -455,7 +464,7 @@ function NonEmergencyWorkspaceRedirect() {
 
 function EmergencyAliasRedirect({ to }) {
   const location = useLocation();
-  return <Navigate to={{ pathname: to, search: location.search }} replace />;
+  return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
 }
 
 function MetricGrid({ metrics }) {
@@ -1487,6 +1496,22 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<EmergencyDefaultRedirect />} />
+      <Route
+        path={CANONICAL_ROUTES.authCallback}
+        element={
+          <LazyRoute label="Completing sign-in...">
+            <AuthCallback />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/shared/tools/:shareId"
+        element={
+          <LazyRoute label="Loading shared tool session...">
+            <SharedToolSession />
+          </LazyRoute>
+        }
+      />
       <Route element={<RootLayout />}>
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
         <Route
@@ -1679,7 +1704,7 @@ export function AppRoutes() {
       <Route path="/automation" element={<ToolsRedirect />} />
       <Route path="/recommendations" element={<ToolsRedirect />} />
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
-        <Route key={`${path}-${to}`} path={path} element={<Navigate to={to} replace />} />
+        <Route key={`${path}-${to}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
       ))}
       <Route
         path="/dashboard"

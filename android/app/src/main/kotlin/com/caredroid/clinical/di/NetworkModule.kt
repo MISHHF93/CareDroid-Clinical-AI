@@ -1,5 +1,6 @@
 package com.caredroid.clinical.di
 
+import android.content.Context
 import com.caredroid.clinical.BuildConfig
 import com.caredroid.clinical.data.remote.api.CareDroidApiService
 import com.caredroid.clinical.data.remote.interceptor.TokenInterceptor
@@ -11,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -45,8 +47,10 @@ object NetworkModule {
      */
     @Singleton
     @Provides
-    fun provideTokenInterceptor(): TokenInterceptor {
-        return TokenInterceptor()
+    fun provideTokenInterceptor(
+        @ApplicationContext context: Context
+    ): TokenInterceptor {
+        return TokenInterceptor(context)
     }
 
     /**

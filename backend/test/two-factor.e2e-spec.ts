@@ -190,6 +190,7 @@ describe('Two-Factor Authentication (e2e)', () => {
 
       expect(response.body.requiresTwoFactor).toBe(true);
       expect(response.body.userId).toBeTruthy();
+      expect(response.body.twoFactorChallenge).toBeTruthy();
       expect(response.body.accessToken).toBeUndefined(); // No access token without 2FA
     }, 30000);
 
@@ -204,6 +205,7 @@ describe('Two-Factor Authentication (e2e)', () => {
         .expect(200);
 
       const userId = loginResponse.body.userId;
+      const challengeToken = loginResponse.body.twoFactorChallenge;
 
       // Generate valid TOTP token
       const token = speakeasy.totp({
@@ -213,7 +215,7 @@ describe('Two-Factor Authentication (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/auth/verify-2fa')
-        .send({ userId, token })
+        .send({ userId, token, challengeToken })
         .expect(200);
 
       expect(response.body.accessToken).toBeTruthy();
@@ -231,10 +233,11 @@ describe('Two-Factor Authentication (e2e)', () => {
         .expect(200);
 
       const userId = loginResponse.body.userId;
+      const challengeToken = loginResponse.body.twoFactorChallenge;
 
       const response = await request(app.getHttpServer())
         .post('/auth/verify-2fa')
-        .send({ userId, token: '000000' })
+        .send({ userId, token: '000000', challengeToken })
         .expect(401);
 
       expect(response.body.message).toBeTruthy();
@@ -253,13 +256,14 @@ describe('Two-Factor Authentication (e2e)', () => {
         .expect(200);
 
       const userId = loginResponse.body.userId;
+      const challengeToken = loginResponse.body.twoFactorChallenge;
 
       // Use first backup code
       const backupCode = testBackupCodes[0];
 
       const response = await request(app.getHttpServer())
         .post('/auth/verify-2fa')
-        .send({ userId, token: backupCode })
+        .send({ userId, token: backupCode, challengeToken })
         .expect(200);
 
       expect(response.body.accessToken).toBeTruthy();
@@ -276,12 +280,13 @@ describe('Two-Factor Authentication (e2e)', () => {
         .expect(200);
 
       const userId = loginResponse.body.userId;
+      const challengeToken = loginResponse.body.twoFactorChallenge;
       const usedCode = testBackupCodes[0];
 
       // First use should succeed
       await request(app.getHttpServer())
         .post('/auth/verify-2fa')
-        .send({ userId, token: usedCode })
+        .send({ userId, token: usedCode, challengeToken })
         .expect(200);
 
       // Second login attempt
@@ -296,7 +301,11 @@ describe('Two-Factor Authentication (e2e)', () => {
       // Trying to reuse same code should fail
       await request(app.getHttpServer())
         .post('/auth/verify-2fa')
-        .send({ userId: secondLogin.body.userId, token: usedCode })
+        .send({
+          userId: secondLogin.body.userId,
+          token: usedCode,
+          challengeToken: secondLogin.body.twoFactorChallenge,
+        })
         .expect(401);
 
       testBackupCodes.shift();
@@ -337,7 +346,7 @@ describe('Two-Factor Authentication (e2e)', () => {
         .expect(200);
 
       expect(response.body).toBeDefined();
-      expect(response.body.role).toBe(UserRole.PHYSICIAN);
+      expect(response.body.role).toBe(UserRole.STUDENT);
     }, 30000);
 
     it('should deny access to admin endpoints without 2FA enabled', async () => {
@@ -387,7 +396,11 @@ describe('Two-Factor Authentication (e2e)', () => {
       if (response.body.requiresTwoFactor) {
         await request(app.getHttpServer())
           .post('/auth/verify-2fa')
-          .send({ userId: response.body.userId, token: '000000' })
+          .send({
+            userId: response.body.userId,
+            token: '000000',
+            challengeToken: response.body.twoFactorChallenge,
+          })
           .expect(401);
       }
     }, 30000);

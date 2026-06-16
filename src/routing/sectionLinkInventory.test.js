@@ -94,7 +94,7 @@ describe('section link inventory and route flattening', () => {
     );
     expect(app).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(app).toContain('path="/tools/*"');
-    expect(app).not.toContain('<ToolsRedirect />');
+    expect(app).toContain('<ToolsRedirect />');
     expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");
