@@ -46,6 +46,8 @@ describe('Sidebar unified navigation rendering', () => {
       ['Referrals', '/emergency/referrals'],
       ['Copilot', '/emergency/copilot'],
       ['Medical Tools', '/emergency/tools'],
+      ['Analytics', '/emergency/analytics'],
+      ['Settings', '/emergency/settings'],
     ]) {
       const link = desktopNav.getByRole('link', { name: label });
       expect(link).toBeTruthy();
@@ -53,7 +55,7 @@ describe('Sidebar unified navigation rendering', () => {
       expect(link.getAttribute('title')).toBe(label);
     }
 
-    for (const hiddenLabel of ['Analytics', 'Settings', 'Pulse', 'Provincial', 'Integrations']) {
+    for (const hiddenLabel of ['Pulse', 'Provincial', 'Integrations']) {
       expect(desktopNav.queryByRole('link', { name: hiddenLabel })).toBeNull();
     }
     expect(desktopNav.queryByRole('link', { name: 'AI Governance' })).toBeNull();
@@ -107,6 +109,8 @@ describe('Sidebar unified navigation rendering', () => {
       ['Referrals', 'referrals'],
       ['Copilot', 'ed-copilot'],
       ['Medical Tools', 'clinical-tools'],
+      ['Analytics', 'emergency-analytics'],
+      ['Settings', 'settings'],
     ]);
     const iconKeys: string[] = [];
 
@@ -168,7 +172,7 @@ describe('Sidebar unified navigation rendering', () => {
     }
   });
 
-  it('hides feature-gated navigation items when their feature is disabled', async () => {
+  it('keeps feature-gated navigation items visible when their feature is disabled', async () => {
     const previousFlags = useEmergencyStore.getState().flags;
     const previousOverrides = useEmergencyStore.getState().overrides;
     useEmergencyStore.setState({
@@ -183,7 +187,10 @@ describe('Sidebar unified navigation rendering', () => {
       );
 
       await waitFor(() => {
-        expect(desktopNav.queryByRole('link', { name: 'EMS' })).toBeNull();
+        expect(desktopNav.getByRole('link', { name: 'EMS' })).toHaveAttribute(
+          'href',
+          '/emergency/ems',
+        );
       });
       expect(desktopNav.getByRole('link', { name: 'Whiteboard' })).toBeTruthy();
     } finally {

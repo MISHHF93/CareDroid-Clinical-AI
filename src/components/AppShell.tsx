@@ -58,6 +58,8 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyCopilot]: `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
   [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Medical Tools`,
   [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
+  [CANONICAL_ROUTES.workspace]: `${EMERGENCY_OS_BRANDING.productName} - Platform`,
+  [CANONICAL_ROUTES.workspaces]: `${EMERGENCY_OS_BRANDING.productName} - Workspaces`,
   '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
 };
@@ -77,6 +79,8 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyTools]:
     'Clinical calculators, tool launchers, and role-aware medical utilities.',
   [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
+  [CANONICAL_ROUTES.workspace]: 'App map for platform, product, operations, and admin routes.',
+  [CANONICAL_ROUTES.workspaces]: 'Workspace registry and platform operating model.',
   '/settings': 'Tenant, module, AI, integration, and threshold controls.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
 };

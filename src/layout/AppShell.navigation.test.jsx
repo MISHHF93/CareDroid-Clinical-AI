@@ -144,8 +144,8 @@ describe('AppShell navigation surfaces', () => {
     }
     expect(commandPaths).toContain('/emergency/pulse');
     expect(commandPaths).toContain('/emergency/shift');
-    expect(commandPaths).not.toContain('/emergency/analytics');
-    expect(commandPaths).not.toContain('/emergency/settings');
+    expect(commandPaths).toContain('/emergency/analytics');
+    expect(commandPaths).toContain('/emergency/settings');
   });
 
   it('renders required header and content regions once', () => {

@@ -27,7 +27,7 @@ describe('workspace subpage routes', () => {
       ])
     );
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
-    expect(appSource).toContain('path="/workspace"');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
     expect(appSource).not.toContain('function WorkspaceRouteRedirect');
   });
 

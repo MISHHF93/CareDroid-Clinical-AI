@@ -76,6 +76,7 @@ const ROUTES = Object.freeze({
   // Future module
   digitalTwin: CANONICAL_ROUTES.emergencyDigitalTwin,
   tools: CANONICAL_ROUTES.emergencyTools,
+  platform: CANONICAL_ROUTES.workspace,
   shift: CANONICAL_ROUTES.emergencyShift,
   // Future module
   aiGovernance: CANONICAL_ROUTES.emergencyAiGovernance,
@@ -97,6 +98,7 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.referrals,
   ROUTES.copilot,
   ROUTES.tools,
+  ROUTES.platform,
   ROUTES.shift,
   ROUTES.analytics,
   ROUTES.settings,
@@ -119,6 +121,7 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.referrals,
   ROUTES.copilot,
   ROUTES.tools,
+  ROUTES.platform,
   ROUTES.analytics,
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
@@ -134,6 +137,7 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.referrals,
   ROUTES.copilot,
   ROUTES.tools,
+  ROUTES.platform,
   ROUTES.shift,
   ROUTES.analytics,
 ]);
@@ -212,6 +216,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.reassessment,
       ROUTES.copilot,
       ROUTES.tools,
+      ROUTES.platform,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
@@ -260,6 +265,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.intake,
       ROUTES.queues,
       ROUTES.tools,
+      ROUTES.platform,
     ],
     actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.verifyIntake],
     defaultRoute: ROUTES.intake,
@@ -269,7 +275,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -294,6 +300,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.referrals,
       ROUTES.copilot,
       ROUTES.tools,
+      ROUTES.platform,
       ROUTES.analytics,
     ],
     actions: [EMERGENCY_ACTIONS.viewAnalytics],

@@ -365,8 +365,14 @@ describe('canonical route tree behavior', () => {
     const desktopNavigation = screen.getByRole('navigation', {
       name: 'Emergency desktop navigation',
     });
-    expect(within(desktopNavigation).queryByRole('link', { name: 'Analytics' })).toBeNull();
-    expect(within(desktopNavigation).queryByRole('link', { name: 'Settings' })).toBeNull();
+    expect(within(desktopNavigation).getByRole('link', { name: 'Analytics' })).toHaveAttribute(
+      'href',
+      '/emergency/analytics',
+    );
+    expect(within(desktopNavigation).getByRole('link', { name: 'Settings' })).toHaveAttribute(
+      'href',
+      '/emergency/settings',
+    );
 
     for (const label of ['Whiteboard', 'Patients', 'Queues']) {
       const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
@@ -378,10 +384,11 @@ describe('canonical route tree behavior', () => {
     }
   }, ROUTE_LOAD_TIMEOUT);
 
-  it('redirects retired platform roots to the Emergency OS whiteboard', async () => {
-    renderRoute('/marketplace');
+  it('mounts the Platform hub instead of bouncing workspace navigation back to the whiteboard', async () => {
+    renderRoute('/workspace');
 
-    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+    expect(await screen.findByRole('heading', { name: 'CareDroid App Map' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace');
   });
 
   it('redirects retired Emergency OS routes to the whiteboard', async () => {

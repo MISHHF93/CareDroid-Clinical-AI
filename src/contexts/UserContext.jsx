@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import logger from '../utils/logger';
 
@@ -10,18 +11,48 @@ import logger from '../utils/logger';
  */
 
 const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
+const LEGACY_AUTH_TOKEN_KEY = AUTH_CONFIG.legacyTokenStorageKey;
 const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
+const OPEN_ACCESS_TOKEN = appConfig.dev.bearerToken || 'dev-bypass-token';
 
 const OPEN_ACCESS_USER = Object.freeze({
   id: 'open-access-user',
   email: 'open-access@caredroid.local',
-  name: 'CareDroid Viewer',
-  fullName: 'CareDroid Viewer',
-  role: 'read_only_viewer',
+  name: 'CareDroid Clinician',
+  fullName: 'CareDroid Clinician',
+  role: 'admin',
   authMode: 'open-access',
   isEmailVerified: true,
   twoFactorEnabled: false,
 });
+
+const canUseStorage = () => typeof localStorage !== 'undefined';
+
+const readStoredUser = () => {
+  if (!canUseStorage()) return null;
+  const raw = localStorage.getItem(USER_PROFILE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    localStorage.removeItem(USER_PROFILE_KEY);
+    return null;
+  }
+};
+
+const readStoredToken = () => {
+  if (!canUseStorage()) return '';
+  return localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(LEGACY_AUTH_TOKEN_KEY) || '';
+};
+
+const persistSession = (nextUser, nextToken) => {
+  if (!canUseStorage()) return;
+  const userToPersist = nextUser || OPEN_ACCESS_USER;
+  const tokenToPersist = nextToken || OPEN_ACCESS_TOKEN;
+  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userToPersist));
+  localStorage.setItem(AUTH_TOKEN_KEY, tokenToPersist);
+  localStorage.removeItem(LEGACY_AUTH_TOKEN_KEY);
+};
 
 // Permission enum (matches backend)
 export const Permission = {
@@ -217,35 +248,35 @@ export const useUser = () => {
 };
 
 export const UserProvider = ({ children }) => {
-  const [user, setUserState] = useState(OPEN_ACCESS_USER);
-  const [authToken, setAuthTokenState] = useState('');
+  const [user, setUserState] = useState(() => readStoredUser() || OPEN_ACCESS_USER);
+  const [authToken, setAuthTokenState] = useState(() => readStoredToken() || OPEN_ACCESS_TOKEN);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Public product mode: the frontend opens directly without auth or team verification.
+  // Public product mode opens directly, but still seeds a local session so platform providers hydrate.
   useEffect(() => {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(USER_PROFILE_KEY);
-    logger.info('Open access mode initialized without auth token');
-  }, []);
+    persistSession(user, authToken);
+    logger.info('Open access platform session initialized');
+  }, [authToken, user]);
 
   const setUser = (newUser) => {
-    setUserState(newUser || OPEN_ACCESS_USER);
+    const nextUser = newUser || OPEN_ACCESS_USER;
+    setUserState(nextUser);
     setIsLoading(false);
-    localStorage.removeItem(USER_PROFILE_KEY);
+    persistSession(nextUser, authToken);
   };
 
   const setAuthToken = (token) => {
-    setAuthTokenState(token || '');
+    const nextToken = token || OPEN_ACCESS_TOKEN;
+    setAuthTokenState(nextToken);
     setIsLoading(false);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    persistSession(user, nextToken);
   };
 
   const signOut = () => {
     setUserState(OPEN_ACCESS_USER);
-    setAuthTokenState('');
+    setAuthTokenState(OPEN_ACCESS_TOKEN);
     setIsLoading(false);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(USER_PROFILE_KEY);
+    persistSession(OPEN_ACCESS_USER, OPEN_ACCESS_TOKEN);
   };
 
   /**
@@ -275,7 +306,7 @@ export const UserProvider = ({ children }) => {
     return permissions.every((permission) => rolePermissions.includes(permission));
   };
 
-  const isAuthenticated = false;
+  const isAuthenticated = Boolean(user && authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'platform-access' ||

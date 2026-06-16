@@ -101,11 +101,16 @@ const REQUESTED_ITEMS = [
     route: '/emergency/settings',
     featureGate: null,
   },
+  {
+    id: 'platform',
+    label: 'Platform',
+    icon: 'platform',
+    route: '/workspace',
+    featureGate: null,
+  },
 ];
 
-const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS.filter(
-  (item) => !['analytics', 'settings'].includes(item.id),
-);
+const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS;
 
 describe('unified navigation config', () => {
   it('exports the exact requested Emergency OS nav items in order', () => {
@@ -136,12 +141,12 @@ describe('unified navigation config', () => {
     }
   });
 
-  it('preserves 13 canonical items while exposing 11 pilot items', () => {
+  it('preserves the complete canonical navigation in pilot mode', () => {
     expect(PILOT_CUSTOMER_MODE.enabled).toBe(true);
     expect(getPilotCustomerNavigationItems().map((item) => item.id)).toEqual(
       PILOT_VISIBLE_ITEMS.map((item) => item.id),
     );
-    expect(PILOT_CUSTOMER_MODE.hiddenNavItemIds).toEqual(['analytics', 'settings']);
+    expect(PILOT_CUSTOMER_MODE.hiddenNavItemIds).toEqual([]);
     expect(PILOT_CUSTOMER_MODE.retainedDirectRoutes).toEqual([
       '/emergency/analytics',
       '/emergency/pulse',
@@ -175,8 +180,10 @@ describe('unified navigation config', () => {
       'Referrals',
       'Copilot',
       'Medical Tools',
+      'Analytics',
+      'Platform',
     ]);
-    expect(readOnlyLabels).not.toContain('Analytics');
+    expect(readOnlyLabels).toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
   });
 

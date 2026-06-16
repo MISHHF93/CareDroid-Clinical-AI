@@ -43,6 +43,26 @@ function page({
 
 export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
   page({
+    id: 'auth-callback',
+    label: 'Auth Callback',
+    path: CANONICAL_ROUTES.authCallback,
+    componentKey: 'AuthCallback',
+    navId: 'auth_callback',
+    screenshotSlug: '00-auth-callback',
+    backendContract: 'local',
+    notes: 'Public OAuth callback route mounted before AppShell redirects.',
+  }),
+  page({
+    id: 'shared-tool-session',
+    label: 'Shared Tool Session',
+    path: '/shared/tools/:shareId',
+    componentKey: 'SharedToolSession',
+    navId: 'shared_tool_session',
+    screenshotSlug: '00-shared-tool-session',
+    backendContract: 'local',
+    notes: 'Public shared tool route mounted before AppShell redirects.',
+  }),
+  page({
     id: 'emergency-whiteboard',
     label: 'Board',
     path: CANONICAL_ROUTES.emergencyWhiteboard,

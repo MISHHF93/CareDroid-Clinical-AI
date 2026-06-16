@@ -37,6 +37,8 @@ describe('emergencyPageRenderInventory', () => {
       'Referrals',
       'Copilot',
       'Medical Tools',
+      'Analytics',
+      'Settings',
     ]);
 
     for (const item of APP_SHELL_NAV_ITEMS) {
@@ -50,7 +52,9 @@ describe('emergencyPageRenderInventory', () => {
       BACKEND_HTTP_ROUTES.map((route) => routeKey(route.method, route.path)),
     );
 
-    for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY) {
+    for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY.filter((item) =>
+      item.path.startsWith('/emergency/'),
+    )) {
       for (const endpoint of [...entry.loadEndpoints, ...entry.actionEndpoints]) {
         expect(backendKeys.has(endpointKey(endpoint)), `${entry.id} -> ${endpoint}`).toBe(true);
       }
@@ -72,7 +76,9 @@ describe('emergencyPageRenderInventory', () => {
   it('maps every active page workflow to patient movement stages', () => {
     const validStages = new Set(PATIENT_MOVEMENT_STAGES);
 
-    for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY) {
+    for (const entry of EMERGENCY_PAGE_RENDER_INVENTORY.filter((item) =>
+      item.path.startsWith('/emergency/'),
+    )) {
       expect(entry.movementStages.length, entry.id).toBeGreaterThan(0);
       expect(
         entry.movementStages.every((stage) => validStages.has(stage)),

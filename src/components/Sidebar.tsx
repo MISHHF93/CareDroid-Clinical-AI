@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   IconActivity,
   IconAmbulance,
+  IconApps,
   IconArrowsExchange,
   IconBed,
   IconChartBar,
@@ -26,12 +27,10 @@ import { PatientFlag, type Alert } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   getVisibleNavigation,
-  resolveFeatureGate,
   type NavigationItem,
 } from '../config/unified-navigation.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import FeatureGate from './FeatureGate';
 import './Sidebar.css';
 
 type SidebarNavItem = {
@@ -84,6 +83,7 @@ const ICONS: Record<string, Icon> = {
   'wearable-monitor': IconReport,
   settings: IconSettings,
   'emergency-settings': IconSettings,
+  platform: IconApps,
 };
 
 function matchesNavigationPath(pathname: string, path: string): boolean {
@@ -208,14 +208,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       </Link>
     );
 
-    const featureGate = resolveFeatureGate(item.featureGate);
-    return featureGate ? (
-      <FeatureGate key={item.id} feature={featureGate}>
-        {navLink}
-      </FeatureGate>
-    ) : (
-      navLink
-    );
+    return navLink;
   };
 
   const mobileNavLink = (item: SidebarNavItem) => {
@@ -248,14 +241,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       </Link>
     );
 
-    const featureGate = resolveFeatureGate(item.featureGate);
-    return featureGate ? (
-      <FeatureGate key={item.id} feature={featureGate}>
-        {navLink}
-      </FeatureGate>
-    ) : (
-      navLink
-    );
+    return navLink;
   };
 
   return (
@@ -367,14 +353,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                     ) : null}
                   </Link>
                 );
-                const featureGate = resolveFeatureGate(item.featureGate);
-                return featureGate ? (
-                  <FeatureGate key={item.id} feature={featureGate}>
-                    {navLink}
-                  </FeatureGate>
-                ) : (
-                  navLink
-                );
+                return navLink;
               })}
             </div>
           </section>

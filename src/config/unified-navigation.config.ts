@@ -19,6 +19,9 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'referrals',
   'copilot',
   'tools',
+  'analytics',
+  'settings',
+  'platform',
 ]);
 
 export const PILOT_CUSTOMER_MODE = Object.freeze({
@@ -31,7 +34,7 @@ export const PILOT_CUSTOMER_MODE = Object.freeze({
     trainingLevel: 'limited',
   }),
   visibleNavItemIds: PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS,
-  hiddenNavItemIds: Object.freeze(['analytics', 'settings']),
+  hiddenNavItemIds: Object.freeze([]),
   retainedDirectRoutes: Object.freeze([
     CANONICAL_ROUTES.emergencyAnalytics,
     CANONICAL_ROUTES.emergencyPulse,
@@ -63,7 +66,7 @@ export type NavigationItem = Readonly<{
   mobileLabel?: string;
 }>;
 
-const UTILITY_NAV_ITEM_IDS = new Set(['tools']);
+const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform']);
 
 export const NAV_ITEMS = Object.freeze([
   {
@@ -157,6 +160,13 @@ export const NAV_ITEMS = Object.freeze([
     route: CANONICAL_ROUTES.emergencySettings,
     featureGate: null,
   },
+  {
+    id: 'platform',
+    label: 'Platform',
+    icon: 'platform',
+    route: CANONICAL_ROUTES.workspace,
+    featureGate: null,
+  },
 ] satisfies readonly NavItem[]);
 
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
@@ -175,6 +185,7 @@ const NAV_FEATURE_IDS = Object.freeze({
   tools: 'clinical_calculator_hub',
   analytics: 'emergency_analytics',
   settings: 'emergency_settings',
+  platform: 'platform_navigation',
 } as const);
 
 export const FEATURE_GATE_ALIASES = Object.freeze({
@@ -220,6 +231,8 @@ export const NAVIGATION_ITEMS = Object.freeze(
             ]
           : item.id === 'settings'
             ? [CANONICAL_ROUTES.emergencySettings, '/settings']
+            : item.id === 'platform'
+              ? [CANONICAL_ROUTES.workspace, CANONICAL_ROUTES.workspaces, '/app']
             : undefined,
     }),
   ),

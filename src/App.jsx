@@ -24,12 +24,213 @@ import { TenantContextProvider } from './contexts/TenantContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AppShell } from './components/AppShell';
+const lazyNamed = (loader, exportName) =>
+  lazy(() => loader().then((module) => ({ default: module[exportName] })));
 const EmergencyWhiteboard = lazy(() => import('./components/EmergencyWhiteboard'));
 const SmartIntake = lazy(() => import('./pages/emergency/SmartIntake'));
 const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalytics'));
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
+const PlatformNavigationPage = lazy(() => import('./pages/PlatformNavigationPage'));
+const WorkspacesIndexPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'WorkspacesIndexPage',
+);
+const SearchResultsPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'SearchResultsPage',
+);
+const HealthcareKnowledgeHubPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'HealthcareKnowledgeHubPage',
+);
+const ClinicalTimelinePage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'ClinicalTimelinePage',
+);
+const NotificationCenterPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'NotificationCenterPage',
+);
+const DigitalTwinPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'DigitalTwinPage',
+);
+const WorkflowBuilderPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'WorkflowBuilderPage',
+);
+const DepartmentIntelligencePage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'DepartmentIntelligencePage',
+);
+const WorkflowMiningEnginePage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'WorkflowMiningEnginePage',
+);
+const CareDroidBusinessBrainPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'CareDroidBusinessBrainPage',
+);
+const WorkspaceDependencyGraphPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'WorkspaceDependencyGraphPage',
+);
+const AssetLibraryPage = lazyNamed(
+  () => import('./pages/PlatformOSPages'),
+  'AssetLibraryPage',
+);
+const CustomerExpansionOpportunitiesPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'CustomerExpansionOpportunitiesPage',
+);
+const ProductIntelligenceLayerPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'ProductIntelligenceLayerPage',
+);
+const ProductsIndexPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'ProductsIndexPage',
+);
+const ProductDetailPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'ProductDetailPage',
+);
+const SpecialtiesIndexPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'SpecialtiesIndexPage',
+);
+const SpecialtyDetailPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'SpecialtyDetailPage',
+);
+const CarePathwaysIndexPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'CarePathwaysIndexPage',
+);
+const CarePathwayDetailPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'CarePathwayDetailPage',
+);
+const AgentsRegistryPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'AgentsRegistryPage',
+);
+const MaturityAssessmentPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'MaturityAssessmentPage',
+);
+const OutcomesDashboardPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'OutcomesDashboardPage',
+);
+const ValueTrackingPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'ValueTrackingPage',
+);
+const IntegrationsMarketplacePage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'IntegrationsMarketplacePage',
+);
+const IntegrationReadinessPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'IntegrationReadinessPage',
+);
+const HospitalSolutionBuilderPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'HospitalSolutionBuilderPage',
+);
+const ConfigurationStudioPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'ConfigurationStudioPage',
+);
+const CommercialPlansPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'CommercialPlansPage',
+);
+const OrganizationOnboardingPage = lazyNamed(
+  () => import('./pages/commercial/CommercialPages'),
+  'OrganizationOnboardingPage',
+);
+const OrganizationDashboard = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'OrganizationDashboard',
+);
+const OrganizationSettings = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'OrganizationSettings',
+);
+const PackMarketplace = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'PackMarketplace',
+);
+const PlatformAnalyticsPage = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'PlatformAnalyticsPage',
+);
+const CustomerSuccessDashboard = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'CustomerSuccessDashboard',
+);
+const OrganizationIntelligenceProfile = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'OrganizationIntelligenceProfile',
+);
+const AssetLifecycleAdmin = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'AssetLifecycleAdmin',
+);
+const DepartmentsPage = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'DepartmentsPage',
+);
+const ServiceLinesPage = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'ServiceLinesPage',
+);
+const TenantAdministrationCenter = lazyNamed(
+  () => import('./pages/organization/OrganizationPages'),
+  'TenantAdministrationCenter',
+);
+const KnowledgeBasePage = lazy(() => import('./pages/KnowledgeBasePage'));
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
+const EnterpriseReadinessPage = lazy(() => import('./pages/EnterpriseReadinessPage'));
+const PlatformAdminPage = lazy(() => import('./pages/PlatformAdminPage'));
+const CustomerPortalPage = lazy(() => import('./pages/customer-portal/CustomerPortalPage'));
+const BillingPage = lazy(() => import('./pages/BillingPage'));
+const UsagePage = lazy(() => import('./pages/UsagePage'));
+const SystemHealth = lazy(() => import('./pages/SystemHealth'));
+const SaasHealthCenter = lazy(() => import('./pages/SaasHealthCenter'));
+const FeatureManagement = lazy(() => import('./pages/settings/FeatureManagement'));
+const PluginMarketplace = lazy(() => import('./pages/PluginMarketplace'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ProfileSettings = lazy(() => import('./pages/ProfileSettings'));
+const ProfileActivity = lazy(() => import('./pages/profile/ProfileActivity'));
+const ProfilePreferences = lazy(() => import('./pages/profile/ProfilePreferences'));
+const ProfileSecurity = lazy(() => import('./pages/profile/ProfileSecurity'));
+const ProfileToolPreferences = lazy(() => import('./pages/profile/ProfileToolPreferences'));
+const ProfileWorkspaces = lazy(() => import('./pages/profile/ProfileWorkspaces'));
+const TwoFactorSetup = lazy(() => import('./pages/TwoFactorSetup'));
+const BiometricSetup = lazy(() => import('./pages/BiometricSetup'));
+const DependencyMap = lazy(() => import('./pages/DependencyMap'));
+const DependencyGraph = lazy(() => import('./pages/DependencyGraph'));
+const DataLineageExplorer = lazy(() => import('./pages/DataLineageExplorer'));
+const PlatformSelfDiagnostics = lazy(() => import('./pages/PlatformSelfDiagnostics'));
+const PlatformLearningEngine = lazy(() => import('./pages/PlatformLearningEngine'));
+const CareDroidBrainDashboard = lazy(() => import('./pages/CareDroidBrainDashboard'));
+const AiEvaluationDashboard = lazy(() => import('./pages/AiEvaluationDashboard'));
+const AiModelsPage = lazy(() => import('./pages/AiModelsPage'));
+const AIGovernanceDashboard = lazy(() => import('./pages/AIGovernanceDashboard'));
+const GovernanceRegistry = lazy(() => import('./pages/GovernanceRegistry'));
+const AutomationAuditTrail = lazy(() => import('./pages/AutomationAuditTrail'));
+const ClinicalDecisionSupport = lazy(() => import('./pages/ClinicalDecisionSupport'));
+const Protocols = lazy(() => import('./pages/tools/Protocols'));
+const MedicalSimulationSuite = lazy(() => import('./pages/MedicalSimulationSuite'));
+const SimulationOutcomes = lazy(() => import('./pages/SimulationOutcomes'));
+const Competencies = lazy(() => import('./pages/Competencies'));
+const Credentials = lazy(() => import('./pages/Credentials'));
+const Artifacts = lazy(() => import('./pages/Artifacts'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const SharedToolSession = lazy(() => import('./pages/tools/SharedToolSession'));
 const EmergencyDepartmentPulse = lazy(() => import('./pages/emergency/pulse'));
@@ -1654,6 +1855,675 @@ export function AppRoutes() {
             </EmergencyRouteGuard>
           }
         />
+        <Route
+          path={CANONICAL_ROUTES.workspace}
+          element={
+            <LazyRoute label="Loading platform navigation...">
+              <PlatformNavigationPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.workspaces}
+          element={
+            <LazyRoute label="Loading workspaces...">
+              <WorkspacesIndexPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.search}
+          element={
+            <LazyRoute label="Loading search...">
+              <SearchResultsPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.knowledgeHub}
+          element={
+            <LazyRoute label="Loading knowledge hub...">
+              <HealthcareKnowledgeHubPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.knowledgeBase}
+          element={
+            <LazyRoute label="Loading knowledge base...">
+              <KnowledgeBasePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.notifications}
+          element={
+            <LazyRoute label="Loading notifications...">
+              <NotificationCenterPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.timeline}
+          element={
+            <LazyRoute label="Loading timeline...">
+              <ClinicalTimelinePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.customerPortal}
+          element={
+            <LazyRoute label="Loading customer portal...">
+              <CustomerPortalPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.marketplace}
+          element={
+            <LazyRoute label="Loading marketplace...">
+              <MarketplacePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.enterpriseReadiness}
+          element={
+            <LazyRoute label="Loading enterprise readiness...">
+              <EnterpriseReadinessPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.platformAdmin}
+          element={
+            <LazyRoute label="Loading platform admin...">
+              <PlatformAdminPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.tenantAdmin}
+          element={
+            <LazyRoute label="Loading tenant admin...">
+              <TenantAdministrationCenter />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.billing}
+          element={
+            <LazyRoute label="Loading billing...">
+              <BillingPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.usage}
+          element={
+            <LazyRoute label="Loading usage...">
+              <UsagePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.profile}
+          element={
+            <LazyRoute label="Loading profile...">
+              <Profile />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.profileSettings}
+          element={
+            <LazyRoute label="Loading profile settings...">
+              <ProfileSettings />
+            </LazyRoute>
+          }
+        />
+        <Route path="/profile-settings" element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.profileToolPreferences}
+          element={
+            <LazyRoute label="Loading tool preferences...">
+              <ProfileToolPreferences />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/profile/activity"
+          element={
+            <LazyRoute label="Loading profile activity...">
+              <ProfileActivity />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/profile/preferences"
+          element={
+            <LazyRoute label="Loading profile preferences...">
+              <ProfilePreferences />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/profile/security"
+          element={
+            <LazyRoute label="Loading profile security...">
+              <ProfileSecurity />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/profile/workspaces"
+          element={
+            <LazyRoute label="Loading profile workspaces...">
+              <ProfileWorkspaces />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/two-factor-setup"
+          element={
+            <LazyRoute label="Loading two-factor setup...">
+              <TwoFactorSetup />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/biometric-setup"
+          element={
+            <LazyRoute label="Loading biometric setup...">
+              <BiometricSetup />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.products}
+          element={
+            <LazyRoute label="Loading products...">
+              <ProductsIndexPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={`${CANONICAL_ROUTES.products}/:productId`}
+          element={
+            <LazyRoute label="Loading product detail...">
+              <ProductDetailPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.plans}
+          element={
+            <LazyRoute label="Loading commercial plans...">
+              <CommercialPlansPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.assetPacks}
+          element={
+            <LazyRoute label="Loading asset packs...">
+              <PackMarketplace />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.departments}
+          element={
+            <LazyRoute label="Loading departments...">
+              <DepartmentsPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.serviceLines}
+          element={
+            <LazyRoute label="Loading service lines...">
+              <ServiceLinesPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.departmentIntelligence}
+          element={
+            <LazyRoute label="Loading department intelligence...">
+              <DepartmentIntelligencePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.productIntelligence}
+          element={
+            <LazyRoute label="Loading product intelligence...">
+              <ProductIntelligenceLayerPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.expansionOpportunities}
+          element={
+            <LazyRoute label="Loading expansion opportunities...">
+              <CustomerExpansionOpportunitiesPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.integrationsMarketplace}
+          element={
+            <LazyRoute label="Loading integrations marketplace...">
+              <IntegrationsMarketplacePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.integrationReadiness}
+          element={
+            <LazyRoute label="Loading integration readiness...">
+              <IntegrationReadinessPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.solutionBuilder}
+          element={
+            <LazyRoute label="Loading solution builder...">
+              <HospitalSolutionBuilderPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.valueTracking}
+          element={
+            <LazyRoute label="Loading value tracking...">
+              <ValueTrackingPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.outcomes}
+          element={
+            <LazyRoute label="Loading outcomes...">
+              <OutcomesDashboardPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.maturityAssessment}
+          element={
+            <LazyRoute label="Loading maturity assessment...">
+              <MaturityAssessmentPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.successCenter}
+          element={
+            <LazyRoute label="Loading success center...">
+              <CustomerSuccessDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.customerSuccess}
+          element={
+            <LazyRoute label="Loading customer success...">
+              <CustomerSuccessDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.specialties}
+          element={
+            <LazyRoute label="Loading specialties...">
+              <SpecialtiesIndexPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={`${CANONICAL_ROUTES.specialties}/:specialtyId`}
+          element={
+            <LazyRoute label="Loading specialty...">
+              <SpecialtyDetailPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.carePathways}
+          element={
+            <LazyRoute label="Loading care pathways...">
+              <CarePathwaysIndexPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={`${CANONICAL_ROUTES.carePathways}/:pathwayId`}
+          element={
+            <LazyRoute label="Loading care pathway...">
+              <CarePathwayDetailPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.agents}
+          element={
+            <LazyRoute label="Loading AI agents...">
+              <AgentsRegistryPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.organization}
+          element={
+            <LazyRoute label="Loading organization...">
+              <OrganizationDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/organization/settings"
+          element={
+            <LazyRoute label="Loading organization settings...">
+              <OrganizationSettings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.organizationSettings}
+          element={
+            <LazyRoute label="Loading organization settings...">
+              <OrganizationSettings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.organizationPacks}
+          element={
+            <LazyRoute label="Loading organization packs...">
+              <PackMarketplace />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.organizationAssets}
+          element={
+            <LazyRoute label="Loading organization assets...">
+              <AssetLifecycleAdmin />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.organizationIntelligence}
+          element={
+            <LazyRoute label="Loading organization intelligence...">
+              <OrganizationIntelligenceProfile />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.workflowMining}
+          element={
+            <LazyRoute label="Loading workflow mining...">
+              <WorkflowMiningEnginePage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.workspaceDependencyGraph}
+          element={
+            <LazyRoute label="Loading workspace dependency graph...">
+              <WorkspaceDependencyGraphPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.digitalTwin}
+          element={
+            <LazyRoute label="Loading digital twin...">
+              <DigitalTwinPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.digitalTwinIntelligence}
+          element={
+            <LazyRoute label="Loading digital twin intelligence...">
+              <WorkspaceDependencyGraphPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.workflows}
+          element={
+            <LazyRoute label="Loading workflows...">
+              <WorkflowBuilderPage />
+            </LazyRoute>
+          }
+        />
+        <Route path={CANONICAL_ROUTES.automation} element={<Navigate to={CANONICAL_ROUTES.workflows} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.platformAnalytics}
+          element={
+            <LazyRoute label="Loading platform analytics...">
+              <PlatformAnalyticsPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.configurationStudio}
+          element={
+            <LazyRoute label="Loading configuration studio...">
+              <ConfigurationStudioPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.protocols}
+          element={
+            <LazyRoute label="Loading protocols...">
+              <Protocols />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.clinicalDecisionSupport}
+          element={
+            <LazyRoute label="Loading clinical decision support...">
+              <ClinicalDecisionSupport />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.simulation}
+          element={
+            <LazyRoute label="Loading simulation suite...">
+              <MedicalSimulationSuite />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.simulationOutcomes}
+          element={
+            <LazyRoute label="Loading simulation outcomes...">
+              <SimulationOutcomes />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.competencies}
+          element={
+            <LazyRoute label="Loading competencies...">
+              <Competencies />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.credentials}
+          element={
+            <LazyRoute label="Loading credentials...">
+              <Credentials />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.onboarding}
+          element={
+            <LazyRoute label="Loading onboarding...">
+              <OrganizationOnboardingPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.systemHealth}
+          element={
+            <LazyRoute label="Loading system health...">
+              <SystemHealth />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.saasHealth}
+          element={
+            <LazyRoute label="Loading SaaS health...">
+              <SaasHealthCenter />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.featureFlags}
+          element={
+            <LazyRoute label="Loading feature flags...">
+              <FeatureManagement />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.plugins}
+          element={
+            <LazyRoute label="Loading plugins...">
+              <PluginMarketplace />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.dependencyMap}
+          element={
+            <LazyRoute label="Loading dependency map...">
+              <DependencyMap />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.governanceRegistry}
+          element={
+            <LazyRoute label="Loading governance registry...">
+              <GovernanceRegistry />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.dependencyGraph}
+          element={
+            <LazyRoute label="Loading dependency graph...">
+              <DependencyGraph />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.audit}
+          element={
+            <LazyRoute label="Loading audit trail...">
+              <AutomationAuditTrail />
+            </LazyRoute>
+          }
+        />
+        <Route path="/audit-logs" element={<Navigate to={CANONICAL_ROUTES.audit} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.dataLineage}
+          element={
+            <LazyRoute label="Loading data lineage...">
+              <DataLineageExplorer />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.selfDiagnostics}
+          element={
+            <LazyRoute label="Loading self diagnostics...">
+              <PlatformSelfDiagnostics />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.platformLearningEngine}
+          element={
+            <LazyRoute label="Loading platform learning engine...">
+              <PlatformLearningEngine />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.brain}
+          element={
+            <LazyRoute label="Loading CareDroid brain...">
+              <CareDroidBrainDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.businessBrain}
+          element={
+            <LazyRoute label="Loading business brain...">
+              <CareDroidBusinessBrainPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiModels}
+          element={
+            <LazyRoute label="Loading AI models...">
+              <AiModelsPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiEvaluation}
+          element={
+            <LazyRoute label="Loading AI evaluation...">
+              <AiEvaluationDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiGovernance}
+          element={
+            <LazyRoute label="Loading AI governance...">
+              <AIGovernanceDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route path={CANONICAL_ROUTES.security} element={<Navigate to={CANONICAL_ROUTES.aiGovernance} replace />} />
+        <Route path={CANONICAL_ROUTES.regulatory} element={<Navigate to={CANONICAL_ROUTES.aiGovernance} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.assets}
+          element={
+            <LazyRoute label="Loading assets...">
+              <AssetLibraryPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.artifacts}
+          element={
+            <LazyRoute label="Loading artifacts...">
+              <Artifacts />
+            </LazyRoute>
+          }
+        />
         {NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (
           <Route
             key={`${path}-${moduleName}`}
@@ -1700,8 +2570,6 @@ export function AppRoutes() {
       <Route path="/pharmacy/*" element={<ToolsRedirect />} />
       <Route path="/radiology" element={<ToolsRedirect />} />
       <Route path="/radiology/*" element={<ToolsRedirect />} />
-      <Route path="/workflows" element={<ToolsRedirect />} />
-      <Route path="/automation" element={<ToolsRedirect />} />
       <Route path="/recommendations" element={<ToolsRedirect />} />
       {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
         <Route key={`${path}-${to}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
@@ -1714,11 +2582,7 @@ export function AppRoutes() {
         path="/home"
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
       />
-      <Route path="/app" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-      <Route
-        path="/workspace"
-        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
-      />
+      <Route path="/app" element={<Navigate to={CANONICAL_ROUTES.workspace} replace />} />
       <Route
         path="/mobile"
         element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}

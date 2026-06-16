@@ -67,7 +67,7 @@ describe('Emergency OS open access state', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('starts open access automatically when no stored auth exists', async () => {
+  it('seeds open access automatically when no stored auth exists', async () => {
     render(
       <UserProvider>
         <AuthStateProbe />
@@ -75,13 +75,16 @@ describe('Emergency OS open access state', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
+      expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:open:admin');
     });
-    expect(localStorage.getItem('caredroid_access_token')).toBeNull();
-    expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
+    expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
+    expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toMatchObject({
+      authMode: 'open-access',
+      role: 'admin',
+    });
   });
 
-  it('clears persisted auth and keeps open access after refresh-compatible remounts', async () => {
+  it('preserves persisted platform access after refresh-compatible remounts', async () => {
     localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
     localStorage.setItem(
       'caredroid_user_profile',
@@ -101,9 +104,12 @@ describe('Emergency OS open access state', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
+      expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:platform:physician');
     });
-    expect(localStorage.getItem('caredroid_access_token')).toBeNull();
-    expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
+    expect(localStorage.getItem('caredroid_access_token')).toBe('persisted-demo-token');
+    expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toMatchObject({
+      authMode: 'platform-access',
+      role: 'physician',
+    });
   });
 });

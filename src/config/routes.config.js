@@ -292,12 +292,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/live-map', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/operations', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/operations/*', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/workspaces', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/marketplace', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/integrations-marketplace', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/customer-portal', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/enterprise-readiness', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/success-center', CANONICAL_ROUTES.emergencyWhiteboard],
   ].map(([path, to]) =>
     Object.freeze({
       path,
@@ -311,7 +305,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
 export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
   Object.freeze({ path: '/analytics', moduleName: 'Analytics' }),
   Object.freeze({ path: '/federated-learning', moduleName: 'Federated Learning' }),
-  Object.freeze({ path: '/digital-twin', moduleName: 'Digital Twin' }),
   Object.freeze({ path: '/governance', moduleName: 'Governance' }),
   Object.freeze({ path: '/governance/*', moduleName: 'Governance' }),
   Object.freeze({ path: CANONICAL_ROUTES.laboratory, moduleName: 'Laboratory' }),
@@ -324,8 +317,6 @@ export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
   Object.freeze({ path: '/research/*', moduleName: 'Research' }),
   Object.freeze({ path: '/education', moduleName: 'Education' }),
   Object.freeze({ path: '/education/*', moduleName: 'Education' }),
-  Object.freeze({ path: CANONICAL_ROUTES.platformAdmin, moduleName: 'Platform Admin' }),
-  Object.freeze({ path: CANONICAL_ROUTES.tenantAdmin, moduleName: 'Tenant Admin' }),
   Object.freeze({ path: '/pharmacy', moduleName: 'Pharmacy' }),
   Object.freeze({ path: '/pharmacy/*', moduleName: 'Pharmacy' }),
   Object.freeze({ path: '/radiology', moduleName: 'Radiology' }),

@@ -30,6 +30,8 @@ describe('canonical route tree', () => {
   it('exports the clean Emergency OS route tree', () => {
     expect(CANONICAL_APP_ROUTE_TREE).toEqual([
       { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
+      { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
+      { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
       { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
       { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
@@ -75,7 +77,8 @@ describe('canonical route tree', () => {
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencySimulation}');
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
     expect(appSource).not.toContain('ComingSoonPage');
-    expect(appSource).not.toContain('<AIGovernanceDashboard');
+    expect(appSource).toContain('<PlatformNavigationPage />');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {
@@ -101,7 +104,6 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('path="/scores/*"');
     expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
     expect(appSource).toContain('<Route path="/calculators/*" element={<ToolsRedirect />} />');
-    expect(appSource).toContain('<Route path="/workflows" element={<ToolsRedirect />} />');
     expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
@@ -122,7 +124,7 @@ describe('canonical route tree', () => {
 
   it('redirects non-ED workspace routes while preserving Emergency OS fallbacks', () => {
     expect(appSource).toContain('path="/app"');
-    expect(appSource).toContain('path="/workspace"');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
     expect(appSource).toContain('path="/mobile"');
     expect(appSource).toContain('path="/emergency/*"');
     expect(appSource).toContain('NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (');
@@ -135,7 +137,12 @@ describe('canonical route tree', () => {
         expect.objectContaining({ path: '/fleet/*', moduleName: 'Fleet' }),
         expect.objectContaining({ path: '/lab', moduleName: 'Laboratory' }),
         expect.objectContaining({ path: '/governance/*', moduleName: 'Governance' }),
-        expect.objectContaining({ path: '/platform-admin', moduleName: 'Platform Admin' }),
+      ]),
+    );
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: CANONICAL_ROUTES.platformAdmin }),
+        expect.objectContaining({ path: CANONICAL_ROUTES.tenantAdmin }),
       ]),
     );
   });
