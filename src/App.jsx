@@ -10,7 +10,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { UserProvider } from './contexts/UserContext';
+import { UserProvider, useUser } from './contexts/UserContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ConversationProvider } from './contexts/ConversationContext';
 import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
@@ -32,7 +32,23 @@ const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalyti
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
+const ClinicalToolCatalog = lazy(() => import('./pages/tools/ClinicalToolCatalog'));
 const PlatformNavigationPage = lazy(() => import('./pages/PlatformNavigationPage'));
+const Auth = lazy(() => import('./pages/Auth'));
+const ExecutiveCommandCenter = lazy(() => import('./pages/ExecutiveCommandCenter'));
+const DigitalTwinIntelligence = lazy(() => import('./pages/DigitalTwinIntelligence'));
+const SuccessCenterPage = lazy(() => import('./pages/success-center/SuccessCenterPage'));
+const LaboratoryDashboard = lazy(() => import('./pages/LaboratoryDashboard'));
+const SimulationScenarioPlayer = lazy(() => import('./pages/SimulationScenarioPlayer'));
+const AutomationAnalytics = lazy(() => import('./pages/AutomationAnalytics'));
+const FeatureFlagCenter = lazy(() => import('./pages/FeatureFlagCenter'));
+const NotificationPreferences = lazy(() => import('./pages/NotificationPreferences'));
+const TeamManagement = lazy(() => import('./pages/team/TeamManagement'));
+const ClinicalDocumentationAssistant = lazy(() => import('./pages/ClinicalDocumentationAssistant'));
+const ClinicalKnowledgeGraph = lazy(() => import('./pages/ClinicalKnowledgeGraph'));
+const PredictiveAnalyticsDashboard = lazy(() => import('./pages/PredictiveAnalyticsDashboard'));
+const ResearchEvidenceHub = lazy(() => import('./pages/ResearchEvidenceHub'));
+const Medical3DViewer = lazy(() => import('./pages/Medical3DViewer'));
 const WorkspacesIndexPage = lazyNamed(
   () => import('./pages/PlatformOSPages'),
   'WorkspacesIndexPage',
@@ -202,7 +218,6 @@ const BillingPage = lazy(() => import('./pages/BillingPage'));
 const UsagePage = lazy(() => import('./pages/UsagePage'));
 const SystemHealth = lazy(() => import('./pages/SystemHealth'));
 const SaasHealthCenter = lazy(() => import('./pages/SaasHealthCenter'));
-const FeatureManagement = lazy(() => import('./pages/settings/FeatureManagement'));
 const PluginMarketplace = lazy(() => import('./pages/PluginMarketplace'));
 const Profile = lazy(() => import('./pages/Profile'));
 const ProfileSettings = lazy(() => import('./pages/ProfileSettings'));
@@ -336,6 +351,23 @@ function RouteLoadingFallback({ label = 'Loading Emergency OS module...' }) {
 
 function LazyRoute({ children, label }) {
   return <Suspense fallback={<RouteLoadingFallback label={label} />}>{children}</Suspense>;
+}
+
+function AuthRoute() {
+  const navigate = useNavigate();
+  const { setAuthToken, setUser } = useUser();
+
+  const handleAuthSuccess = (accessToken, user) => {
+    if (user) setUser(user);
+    if (accessToken) setAuthToken(accessToken);
+    navigate(CANONICAL_ROUTES.emergencyWhiteboard, { replace: true });
+  };
+
+  return (
+    <LazyRoute label="Loading sign-in...">
+      <Auth onAuthSuccess={handleAuthSuccess} />
+    </LazyRoute>
+  );
 }
 
 function EmergencyAccessDenied({ requestedPath }) {
@@ -604,7 +636,12 @@ export function buildEmergencyToolsRedirect(location) {
     setDefault('source', 'all-tools');
     setDefault('filter', 'all');
   } else if (pathname.startsWith('/tools/')) {
-    const slug = pathSegmentAfter(pathname, '/tools/');
+    const slug =
+      pathname
+        .replace(/^\/tools\//, '')
+        .split('/')
+        .filter(Boolean)
+        .pop() || pathSegmentAfter(pathname, '/tools/');
     setDefault('source', 'tools');
     setDefault('filter', 'clinical-tools');
     setQueryFromSlug(slug);
@@ -1697,6 +1734,15 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<EmergencyDefaultRedirect />} />
+      <Route path={CANONICAL_ROUTES.auth} element={<AuthRoute />} />
+      <Route path="/login" element={<AuthRoute />} />
+      <Route path="/log-in" element={<AuthRoute />} />
+      <Route path="/signin" element={<AuthRoute />} />
+      <Route path="/sign-in" element={<AuthRoute />} />
+      <Route path="/signup" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
+      <Route path="/sign-up" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
+      <Route path="/register" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
+      <Route path="/join" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
       <Route
         path={CANONICAL_ROUTES.authCallback}
         element={
@@ -1864,10 +1910,26 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.discover}
+          element={
+            <LazyRoute label="Loading platform discovery...">
+              <PlatformNavigationPage />
+            </LazyRoute>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.workspaces}
           element={
             <LazyRoute label="Loading workspaces...">
               <WorkspacesIndexPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.executive}
+          element={
+            <LazyRoute label="Loading executive command center...">
+              <ExecutiveCommandCenter />
             </LazyRoute>
           }
         />
@@ -1900,6 +1962,14 @@ export function AppRoutes() {
           element={
             <LazyRoute label="Loading notifications...">
               <NotificationCenterPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/notification-preferences"
+          element={
+            <LazyRoute label="Loading notification preferences...">
+              <NotificationPreferences />
             </LazyRoute>
           }
         />
@@ -2049,7 +2119,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={`${CANONICAL_ROUTES.products}/:productId`}
+          path={`${CANONICAL_ROUTES.products}/:slug`}
           element={
             <LazyRoute label="Loading product detail...">
               <ProductDetailPage />
@@ -2164,7 +2234,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.successCenter}
           element={
             <LazyRoute label="Loading success center...">
-              <CustomerSuccessDashboard />
+              <SuccessCenterPage />
             </LazyRoute>
           }
         />
@@ -2185,7 +2255,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={`${CANONICAL_ROUTES.specialties}/:specialtyId`}
+          path={`${CANONICAL_ROUTES.specialties}/:slug`}
           element={
             <LazyRoute label="Loading specialty...">
               <SpecialtyDetailPage />
@@ -2201,7 +2271,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={`${CANONICAL_ROUTES.carePathways}/:pathwayId`}
+          path={`${CANONICAL_ROUTES.carePathways}/:slug`}
           element={
             <LazyRoute label="Loading care pathway...">
               <CarePathwayDetailPage />
@@ -2292,7 +2362,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.digitalTwinIntelligence}
           element={
             <LazyRoute label="Loading digital twin intelligence...">
-              <WorkspaceDependencyGraphPage />
+              <DigitalTwinIntelligence />
             </LazyRoute>
           }
         />
@@ -2305,6 +2375,14 @@ export function AppRoutes() {
           }
         />
         <Route path={CANONICAL_ROUTES.automation} element={<Navigate to={CANONICAL_ROUTES.workflows} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.automationAnalytics}
+          element={
+            <LazyRoute label="Loading automation analytics...">
+              <AutomationAnalytics />
+            </LazyRoute>
+          }
+        />
         <Route
           path={CANONICAL_ROUTES.platformAnalytics}
           element={
@@ -2338,10 +2416,74 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.documentation}
+          element={
+            <LazyRoute label="Loading clinical documentation...">
+              <ClinicalDocumentationAssistant />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.knowledgeGraph}
+          element={
+            <LazyRoute label="Loading knowledge graph...">
+              <ClinicalKnowledgeGraph />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.predictiveAnalytics}
+          element={
+            <LazyRoute label="Loading predictive analytics...">
+              <PredictiveAnalyticsDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.research}
+          element={
+            <LazyRoute label="Loading research evidence hub...">
+              <ResearchEvidenceHub />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.laboratory}
+          element={
+            <LazyRoute label="Loading laboratory dashboard...">
+              <LaboratoryDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.developerCatalog}
+          element={
+            <LazyRoute label="Loading developer catalog...">
+              <ClinicalToolCatalog />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.medical3dViewer}
+          element={
+            <LazyRoute label="Loading 3D viewer...">
+              <Medical3DViewer />
+            </LazyRoute>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.simulation}
           element={
             <LazyRoute label="Loading simulation suite...">
               <MedicalSimulationSuite />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={`${CANONICAL_ROUTES.simulation}/:scenarioId`}
+          element={
+            <LazyRoute label="Loading simulation scenario...">
+              <SimulationScenarioPlayer />
             </LazyRoute>
           }
         />
@@ -2397,7 +2539,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.featureFlags}
           element={
             <LazyRoute label="Loading feature flags...">
-              <FeatureManagement />
+              <FeatureFlagCenter />
             </LazyRoute>
           }
         />
@@ -2437,6 +2579,14 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.audit}
           element={
             <LazyRoute label="Loading audit trail...">
+              <AutomationAuditTrail />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.automationAudit}
+          element={
+            <LazyRoute label="Loading automation audit...">
               <AutomationAuditTrail />
             </LazyRoute>
           }
@@ -2498,6 +2648,7 @@ export function AppRoutes() {
             </LazyRoute>
           }
         />
+        <Route path="/ai/evaluation" element={<Navigate to={CANONICAL_ROUTES.aiEvaluation} replace />} />
         <Route
           path={CANONICAL_ROUTES.aiGovernance}
           element={
@@ -2524,6 +2675,15 @@ export function AppRoutes() {
             </LazyRoute>
           }
         />
+        <Route path="/platform-learning" element={<Navigate to={CANONICAL_ROUTES.platformLearningEngine} replace />} />
+        <Route
+          path="/team"
+          element={
+            <LazyRoute label="Loading team management...">
+              <TeamManagement />
+            </LazyRoute>
+          }
+        />
         {NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (
           <Route
             key={`${path}-${moduleName}`}
@@ -2541,17 +2701,8 @@ export function AppRoutes() {
       <Route path="/catalog" element={<ToolsRedirect />} />
       <Route path="/all-tools" element={<ToolsRedirect />} />
       <Route path="/clinical-tools" element={<ToolsRedirect />} />
-      <Route path="/protocols" element={<ToolsRedirect />} />
-      <Route path="/protocols/*" element={<ToolsRedirect />} />
-      <Route path="/laboratory" element={<ToolsRedirect />} />
       <Route path="/lab" element={<ToolsRedirect />} />
-      <Route path="/simulation" element={<ToolsRedirect />} />
-      <Route path="/simulation/*" element={<ToolsRedirect />} />
       <Route path="/medical-simulation" element={<ToolsRedirect />} />
-      <Route path="/competencies" element={<ToolsRedirect />} />
-      <Route path="/competencies/*" element={<ToolsRedirect />} />
-      <Route path="/credentials" element={<ToolsRedirect />} />
-      <Route path="/credentials/*" element={<ToolsRedirect />} />
       <Route path="/hospital-map" element={<ToolsRedirect />} />
       <Route path="/medical-iot" element={<ToolsRedirect />} />
       <Route path="/devices" element={<ToolsRedirect />} />
@@ -2638,29 +2789,29 @@ export default function App() {
       <ThemeProvider>
         <UserProvider>
           <NotificationProvider>
-            <ConversationProvider>
-              <ToolPreferencesProvider>
-                <WorkspaceProvider>
-                  <OrganizationContextProvider>
-                    <WhiteLabelProvider>
-                      <UserIdentityProvider>
-                        <CostTrackingProvider>
-                          <SystemConfigProvider>
-                            <TenantContextProvider>
+            <WorkspaceProvider>
+              <CostTrackingProvider>
+                <ToolPreferencesProvider>
+                  <TenantContextProvider>
+                    <UserIdentityProvider>
+                      <OrganizationContextProvider>
+                        <WhiteLabelProvider>
+                          <ConversationProvider>
+                            <SystemConfigProvider>
                               <OfflineProvider>
                                 <BrowserRouter>
                                   <AppRoutes />
                                 </BrowserRouter>
                               </OfflineProvider>
-                            </TenantContextProvider>
-                          </SystemConfigProvider>
-                        </CostTrackingProvider>
-                      </UserIdentityProvider>
-                    </WhiteLabelProvider>
-                  </OrganizationContextProvider>
-                </WorkspaceProvider>
-              </ToolPreferencesProvider>
-            </ConversationProvider>
+                            </SystemConfigProvider>
+                          </ConversationProvider>
+                        </WhiteLabelProvider>
+                      </OrganizationContextProvider>
+                    </UserIdentityProvider>
+                  </TenantContextProvider>
+                </ToolPreferencesProvider>
+              </CostTrackingProvider>
+            </WorkspaceProvider>
           </NotificationProvider>
         </UserProvider>
       </ThemeProvider>

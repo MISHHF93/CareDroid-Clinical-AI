@@ -78,9 +78,14 @@
 
 .context-insight-card__action {
   width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--app-link, #38bdf8);
+  font: inherit;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .context-insight-card__action:hover {

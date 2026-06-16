@@ -108,7 +108,7 @@ export function SystemHealth() {
       else setLoading((current) => current && !health);
 
       try {
-        const response = await fetch('/api/health', {
+        const response = await fetch('/health', {
           headers: { accept: 'application/json' },
         });
         const payload = (await response.json()) as SystemHealthResponse;

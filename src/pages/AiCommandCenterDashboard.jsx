@@ -291,7 +291,7 @@ export default function AiCommandCenterDashboard() {
           source="Backend snapshot"
           status={Object.values(sourceStatus).some((value) => value === 'fallback') ? 'unavailable' : 'live'}
           actionLabel="Refresh"
-          actionRoute="/ai-command-center"
+          actionOnClick={loadSnapshot}
           timestamp={lastUpdated}
         />
         <ContextInsightCard

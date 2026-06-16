@@ -16,14 +16,17 @@ describe('PlatformNavigationPage route resolver', () => {
     });
   });
 
-  it('maps legacy catalog and unmounted routes to active destinations', () => {
+  it('keeps the developer catalog direct and maps governance aliases', () => {
     expect(
       resolvePlatformNavigationDestination({
         id: 'developer-audit',
         label: 'Developer Catalog',
         path: CANONICAL_ROUTES.developerCatalog,
-      }).to,
-    ).toBe('/emergency/tools?source=catalog&filter=all');
+      }),
+    ).toMatchObject({
+      to: CANONICAL_ROUTES.developerCatalog,
+      direct: true,
+    });
 
     expect(
       resolvePlatformNavigationDestination({

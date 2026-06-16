@@ -24,6 +24,7 @@ const Auth = ({ onAuthSuccess }) => {
   const [magicEmail, setMagicEmail] = useState('');
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [twoFactorChallengeToken, setTwoFactorChallengeToken] = useState('');
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const enableDevAuthBypass = isDevAuthBypassEnabled();
   const { success, error, info } = useNotificationActions();
@@ -75,6 +76,7 @@ const Auth = ({ onAuthSuccess }) => {
       if (data?.requiresTwoFactor) {
         setRequiresTwoFactor(true);
         setUserId(data.userId);
+        setTwoFactorChallengeToken(data.twoFactorChallenge || data.challengeToken || '');
         info('Two-factor required', 'Enter the code from your authenticator app.');
         return;
       }
@@ -101,7 +103,11 @@ const Auth = ({ onAuthSuccess }) => {
       const { response, data } = await apiFetchJson('/api/auth/verify-2fa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, token: twoFactorToken }),
+        body: JSON.stringify({
+          userId,
+          token: twoFactorToken,
+          challengeToken: twoFactorChallengeToken,
+        }),
       });
 
       if (!response.ok) {
@@ -120,6 +126,7 @@ const Auth = ({ onAuthSuccess }) => {
   const handleCancelTwoFactor = () => {
     setRequiresTwoFactor(false);
     setUserId(null);
+    setTwoFactorChallengeToken('');
     setTwoFactorToken('');
   };
 

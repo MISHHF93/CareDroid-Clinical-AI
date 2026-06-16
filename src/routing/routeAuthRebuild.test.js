@@ -17,10 +17,13 @@ const nonEdRedirectPaths = new Set(
 );
 
 describe('canonical route/auth architecture', () => {
-  it('bypasses retired auth routes into the Emergency Whiteboard', () => {
+  it('mounts auth routes without reintroducing tenant-required wrappers', () => {
+    expect(appSource).toContain('function AuthRoute()');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
+    expect(appSource).toContain('path="/login" element={<AuthRoute />}');
     expect(appSource).not.toContain('function AuthPathRedirect()');
     expect(appSource).not.toContain('<TenantRequired>');
-    expect(redirectsByPath['/auth']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
+    expect(redirectsByPath['/auth']).toBeUndefined();
   });
 
   it('keeps one AppShell owner for canonical Emergency OS routes', () => {
@@ -33,7 +36,7 @@ describe('canonical route/auth architecture', () => {
     ).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
   });
 
-  it('uses redirects for retired assistant and login aliases', () => {
+  it('uses redirects for retired assistant aliases', () => {
     for (const path of ['/assistant', '/chat', '/ai', '/copilot']) {
       expect(appSource).toContain(`path="${path}"`);
       expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
@@ -50,8 +53,6 @@ describe('canonical route/auth architecture', () => {
       '/devices',
       '/operations',
       '/operations/*',
-      '/marketplace',
-      '/platform-admin',
     ]) {
       expect(
         redirectsByPath[path] ||

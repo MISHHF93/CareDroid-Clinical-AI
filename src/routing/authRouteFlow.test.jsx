@@ -8,19 +8,19 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
 describe('auth canonical flow wiring', () => {
-  it('bypasses the auth page and redirects auth aliases into the Emergency Whiteboard', () => {
-    expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
-    expect(routeConfigSource).toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
+  it('mounts the auth page and keeps auth aliases out of legacy Emergency redirects', () => {
+    expect(appSource).toContain('function AuthRoute()');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
+    expect(appSource).toContain('path="/login" element={<AuthRoute />}');
+    expect(routeConfigSource).not.toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
     expect(appSource).not.toContain('function AuthPathRedirect()');
   });
 
   it('keeps Emergency OS routes inside the AppShell while UserProvider supplies platform access', () => {
     expect(appSource).not.toContain('buildAuthRedirectSearch(location)');
-    expect(appSource).not.toContain("pathname: '/auth'");
     expect(appSource).toContain('function RootLayout()');
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
-    expect(appSource).not.toContain('<AuthCallback');
     expect(appSource).not.toContain('LegacyOAuthCallbackRedirect');
   });
 

@@ -5,9 +5,11 @@ import './BiometricSetup.css';
 import appConfig from '../config/appConfig';
 import logger from '../utils/logger';
 import { reportApiError } from '../services/apiErrorHandling';
+import { useNotificationActions } from '../hooks/useNotificationActions';
 
 const BiometricSetup = () => {
   const navigate = useNavigate();
+  const { success } = useNotificationActions();
   const [loading, setLoading] = useState(false);
   const [configLoading, setConfigLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -143,7 +145,7 @@ const BiometricSetup = () => {
       setEnrolled(true);
       setError(null);
 
-      alert('Biometric authentication enabled successfully!');
+      success('Biometric authentication enabled', 'This device is now enrolled for biometric sign-in.');
       loadBiometricConfig();
     } catch (err) {
       logger.error('Failed to enroll biometric', { err });
@@ -194,7 +196,7 @@ const BiometricSetup = () => {
       });
 
       logger.info('Biometric verification successful', { data: response.data });
-      alert('Biometric authentication test passed!');
+      success('Biometric test passed', 'This device can verify biometric authentication.');
     } catch (err) {
       logger.error('Biometric test failed', { err });
       reportApiError({
@@ -237,7 +239,7 @@ const BiometricSetup = () => {
       setEnrolled(false);
       setError(null);
 
-      alert('Biometric authentication disabled');
+      success('Biometric authentication disabled', 'This device is no longer enrolled.');
       loadBiometricConfig();
     } catch (err) {
       logger.error('Failed to disable biometric', { err });
@@ -254,8 +256,16 @@ const BiometricSetup = () => {
   };
 
   const getDeviceId = async () => {
-    // In production, use a proper device ID from Capacitor Device plugin
-    return `device_${Date.now()}`;
+    const storageKey = 'caredroid_biometric_device_id';
+    const existing = localStorage.getItem(storageKey);
+    if (existing) return existing;
+
+    const generated =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? `device_${crypto.randomUUID()}`
+        : `device_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(storageKey, generated);
+    return generated;
   };
 
   const getDeviceName = async () => {

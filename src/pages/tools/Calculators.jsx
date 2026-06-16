@@ -60,6 +60,7 @@ import {
 } from '../../utils/timiUaNstemiCalculator';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { useNotificationActions } from '../../hooks/useNotificationActions';
 import { Phq9Calculator, Gad7Calculator } from './mentalHealthCalculators';
 import {
   AscvdRiskCalculator,
@@ -2936,6 +2937,7 @@ const SOFACalculator = ({ onResultChange }) => {
  * Legacy eGFR route kept for deep links; uses race-free CKD-EPI 2021.
  */
 const GFRCalculator = ({ onResultChange }) => {
+  const { warning } = useNotificationActions();
   const [inputs, setInputs] = useState({
     age: '',
     sex: '',
@@ -2953,7 +2955,7 @@ const GFRCalculator = ({ onResultChange }) => {
     const { age, sex, creatinine } = inputs;
 
     if (!age || !sex || !creatinine) {
-      alert('Please fill in all required fields');
+      warning('Missing eGFR inputs', 'Please fill in age, sex, and serum creatinine.');
       return;
     }
 
@@ -2964,7 +2966,7 @@ const GFRCalculator = ({ onResultChange }) => {
       creatinineUnit: 'mg_dl',
     });
     if (!computed.ok) {
-      alert(computed.errors.join('\n'));
+      warning('Check eGFR inputs', computed.errors.join(' '));
       return;
     }
 
@@ -3084,6 +3086,7 @@ const GFRCalculator = ({ onResultChange }) => {
  * BMI Calculator (simplified)
  */
 const BMICalculator = ({ onResultChange }) => {
+  const { warning } = useNotificationActions();
   const [inputs, setInputs] = useState({
     weight: '',
     height: '',
@@ -3101,7 +3104,7 @@ const BMICalculator = ({ onResultChange }) => {
     let { weight, height, unit } = inputs;
     
     if (!weight || !height) {
-      alert('Please enter weight and height');
+      warning('Missing BMI inputs', 'Please enter weight and height.');
       return;
     }
 

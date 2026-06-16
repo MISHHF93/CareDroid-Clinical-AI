@@ -290,7 +290,7 @@ export default function DeviceFleetManagement() {
               source={snapshot.sourceLabel}
               status={summary.maintenanceDue ? 'action-required' : 'generated'}
               actionLabel="Filter maintenance"
-              actionRoute="/devices"
+              actionOnClick={() => setMaintenanceFilter('due-soon')}
               timestamp={snapshot.generatedAt}
             />
             <ContextInsightCard

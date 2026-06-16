@@ -9,6 +9,7 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
   CANONICAL_ROUTES.workspace,
+  CANONICAL_ROUTES.discover,
   CANONICAL_ROUTES.workspaces,
   CANONICAL_ROUTES.search,
   CANONICAL_ROUTES.knowledgeHub,
@@ -25,6 +26,7 @@ const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
   CANONICAL_ROUTES.profile,
   CANONICAL_ROUTES.profileSettings,
   CANONICAL_ROUTES.profileToolPreferences,
+  CANONICAL_ROUTES.executive,
   CANONICAL_ROUTES.products,
   CANONICAL_ROUTES.plans,
   CANONICAL_ROUTES.assetPacks,
@@ -55,11 +57,19 @@ const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
   CANONICAL_ROUTES.digitalTwinIntelligence,
   CANONICAL_ROUTES.workflows,
   CANONICAL_ROUTES.automation,
+  CANONICAL_ROUTES.automationAnalytics,
   CANONICAL_ROUTES.platformAnalytics,
   CANONICAL_ROUTES.configurationStudio,
   CANONICAL_ROUTES.onboarding,
   CANONICAL_ROUTES.protocols,
   CANONICAL_ROUTES.clinicalDecisionSupport,
+  CANONICAL_ROUTES.documentation,
+  CANONICAL_ROUTES.knowledgeGraph,
+  CANONICAL_ROUTES.predictiveAnalytics,
+  CANONICAL_ROUTES.research,
+  CANONICAL_ROUTES.laboratory,
+  CANONICAL_ROUTES.medical3dViewer,
+  CANONICAL_ROUTES.developerCatalog,
   CANONICAL_ROUTES.simulation,
   CANONICAL_ROUTES.simulationOutcomes,
   CANONICAL_ROUTES.competencies,
@@ -85,19 +95,16 @@ const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
 ]);
 
 const PLATFORM_ROUTE_DESTINATION_OVERRIDES = Object.freeze({
-  [CANONICAL_ROUTES.discover]: CANONICAL_ROUTES.workspace,
   [CANONICAL_ROUTES.recommendations]: `${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`,
-  [CANONICAL_ROUTES.developerCatalog]: `${CANONICAL_ROUTES.emergencyTools}?source=catalog&filter=all`,
   [CANONICAL_ROUTES.hospitalMap]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=hospital-map`,
-  [CANONICAL_ROUTES.medicalIot]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=medical-iot`,
-  [CANONICAL_ROUTES.devices]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=devices`,
+  [CANONICAL_ROUTES.medicalIot]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=medical-iot-dashboard&open=medical-iot-dashboard`,
+  [CANONICAL_ROUTES.devices]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=device-fleet-management&open=device-fleet-management`,
   [CANONICAL_ROUTES.fleetMap]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map`,
   [CANONICAL_ROUTES.liveMap]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map`,
   [CANONICAL_ROUTES.fleetCommand]: `${CANONICAL_ROUTES.emergencyTools}?source=operations&filter=operations&q=fleet-command&open=fleet-command`,
   [CANONICAL_ROUTES.emergencyAiGovernance]: CANONICAL_ROUTES.aiGovernance,
   [CANONICAL_ROUTES.security]: `${CANONICAL_ROUTES.emergencyTools}?source=governance&filter=all&q=security`,
   [CANONICAL_ROUTES.regulatory]: `${CANONICAL_ROUTES.emergencyTools}?source=governance&filter=all&q=regulatory`,
-  [CANONICAL_ROUTES.executive]: CANONICAL_ROUTES.platformAnalytics,
 });
 
 const SECTIONS = Object.freeze([

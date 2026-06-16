@@ -31,9 +31,6 @@ const RETIRED_PLATFORM_PATHS = [
   '/platform-admin',
   '/success-center',
   '/fleet/command',
-  '/hospital-map',
-  '/medical-iot',
-  '/devices',
 ];
 
 describe('App Emergency OS route contract', () => {
@@ -58,10 +55,8 @@ describe('App Emergency OS route contract', () => {
     );
 
     for (const path of [
-      '/auth',
       '/dashboard',
       '/home',
-      '/workspace',
       '/mobile',
       '/general-healthcare',
       '/tools',
@@ -74,13 +69,6 @@ describe('App Emergency OS route contract', () => {
       '/live-map',
       '/operations',
       '/operations/*',
-      '/workspaces',
-      '/marketplace',
-      '/integrations-marketplace',
-      '/platform-admin',
-      '/customer-portal',
-      '/enterprise-readiness',
-      '/success-center',
     ]) {
       expect(
         redirectsByPath[path] ||

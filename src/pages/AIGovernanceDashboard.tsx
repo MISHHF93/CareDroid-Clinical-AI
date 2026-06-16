@@ -171,6 +171,7 @@ export default function AIGovernanceDashboard() {
     LOCAL_AI_GOVERNANCE_REGISTRY as GovernanceRegistry
   );
   const [promptValidation, setPromptValidation] = useState<Record<string, { valid: boolean; issues: string[] }>>({});
+  const [promptValidationAvailable, setPromptValidationAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -199,10 +200,16 @@ export default function AIGovernanceDashboard() {
         }
         if (validationResult.ok && validationResult.data) {
           setPromptValidation(validationResult.data);
+          setPromptValidationAvailable(true);
+        } else {
+          setPromptValidation({});
+          setPromptValidationAvailable(false);
         }
       } catch (err) {
         if (!alive) return;
         setError(err instanceof Error ? err.message : 'AI governance compliance report is unavailable.');
+        setPromptValidation({});
+        setPromptValidationAvailable(false);
       } finally {
         if (alive) setLoading(false);
       }
@@ -345,6 +352,8 @@ export default function AIGovernanceDashboard() {
                   <li key={issue}>{issue}</li>
                 ))}
               </ul>
+            ) : !promptValidationAvailable ? (
+              <p style={{ color: '#FBBF24' }}>Prompt validation is unavailable; keep human review enabled until the validation API responds.</p>
             ) : (
               <p style={{ color: '#34D399' }}>All registered prompt templates include required variables and human-review language.</p>
             )}

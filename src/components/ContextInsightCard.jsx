@@ -27,6 +27,7 @@ export default function ContextInsightCard({
   confidence,
   actionLabel,
   actionRoute,
+  actionOnClick,
   demo = false,
   loading = false,
   error = '',
@@ -51,8 +52,12 @@ export default function ContextInsightCard({
         {typeof confidence === 'number' ? <span>{Math.round(confidence * 100)}% confidence</span> : null}
         {timestamp ? <time dateTime={timestamp}>{new Date(timestamp).toLocaleString()}</time> : null}
       </div>
-      {actionLabel && actionRoute ? (
-        actionRoute.startsWith('/') ? (
+      {actionLabel && (actionOnClick || actionRoute) ? (
+        actionOnClick ? (
+          <button type="button" className="context-insight-card__action" onClick={actionOnClick}>
+            {actionLabel}
+          </button>
+        ) : actionRoute.startsWith('/') ? (
           <Link className="context-insight-card__action" to={actionRoute}>
             {actionLabel}
           </Link>

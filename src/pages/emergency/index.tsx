@@ -705,8 +705,22 @@ export default function EmergencyWhiteboard() {
             <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>EMS arrivals</strong>
             <button
               type="button"
+              disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)}
               onClick={() => openRoute(CANONICAL_ROUTES.emergencyEms)}
-              style={{ border: 0, background: 'transparent', color: 'var(--status-info, #93C5FD)', cursor: 'pointer', fontWeight: 850 }}
+              title={
+                emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)
+                  ? 'Open EMS arrivals'
+                  : 'EMS is restricted for this role'
+              }
+              style={{
+                border: 0,
+                background: 'transparent',
+                color: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)
+                  ? 'var(--status-info, #93C5FD)'
+                  : 'var(--color-text-muted, #94A3B8)',
+                cursor: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms) ? 'pointer' : 'not-allowed',
+                fontWeight: 850,
+              }}
             >
               Open EMS
             </button>

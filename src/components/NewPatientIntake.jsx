@@ -303,7 +303,6 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
                 <button
                   key={category.value}
                   type="button"
-                  tabIndex={-1}
                   className={
                     complaintCategory === category.value
                       ? 'new-patient-intake__complaint--active'
@@ -433,7 +432,6 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
           <div className="new-patient-intake__priority-panel">
             <button
               type="button"
-              tabIndex={-1}
               className={`new-patient-intake__ctas new-patient-intake__ctas--${selectedPriority.toLowerCase()}`}
               aria-expanded={priorityPickerOpen}
               onClick={() => setPriorityPickerOpen((current) => !current)}

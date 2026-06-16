@@ -296,7 +296,8 @@ export function AppShell({ children }: AppShellProps) {
         !e.ctrlKey &&
         emergencyRole.can(EMERGENCY_ACTIONS.createPatient)
       ) {
-        document.dispatchEvent(new Event('open-intake'));
+        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        window.setTimeout(() => document.dispatchEvent(new Event('open-intake')), 0);
       }
     };
 

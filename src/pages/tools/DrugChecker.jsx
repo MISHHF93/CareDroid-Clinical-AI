@@ -6,6 +6,7 @@ import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
 import ToolPageLayout from './ToolPageLayout';
+import { useNotificationActions } from '../../hooks/useNotificationActions';
 import './DrugChecker.css';
 
 function normalizeDrugCheckResults(apiData) {
@@ -42,6 +43,7 @@ function normalizeDrugCheckResults(apiData) {
 
 const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   const { user } = useUser();
+  const { warning } = useNotificationActions();
   const [medications, setMedications] = useState(['']);
   const [results, setResults] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -85,7 +87,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
 
   const handleCheck = async () => {
     if (!preflightReady || activeMeds.length < 2) {
-      alert('Please enter at least 2 medications to check for interactions');
+      warning('Add more medications', 'Enter at least 2 medications to check for interactions.');
       return;
     }
 

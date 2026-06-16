@@ -18,6 +18,7 @@ import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
 import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -95,6 +96,7 @@ function signalMeta(signal) {
 }
 
 export default function EmergencyAnalytics() {
+  const emergencyRole = useEmergencyRolePermissions();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const centralNode = useCareDroidCentralNode({ screenMode: 'COMMAND_CENTER_DISPLAY' });
@@ -246,16 +248,24 @@ export default function EmergencyAnalytics() {
         <ChartCard title="Department Pulse" subtitle="Live command view">
           <strong>Queues, staff, EMS, alerts</strong>
           <small>Compact charge-nurse view surfaced from the Emergency OS store.</small>
-          <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
-            Open Department Pulse
-          </Link>
+          {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse) ? (
+            <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
+              Open Department Pulse
+            </Link>
+          ) : (
+            <small>Department Pulse is restricted for this role.</small>
+          )}
         </ChartCard>
         <ChartCard title="Shift Summary" subtitle="Handoff ready">
           <strong>Shift metrics and brief</strong>
           <small>Generate a handoff brief from patients, referrals, capacity, alerts, and EMS data.</small>
-          <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyShift}>
-            Open Shift Summary
-          </Link>
+          {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyShift) ? (
+            <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyShift}>
+              Open Shift Summary
+            </Link>
+          ) : (
+            <small>Shift Summary is restricted for this role.</small>
+          )}
         </ChartCard>
       </div>
 

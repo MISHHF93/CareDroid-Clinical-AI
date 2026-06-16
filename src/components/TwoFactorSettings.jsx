@@ -5,6 +5,7 @@ import Card from '../components/ui/card';
 import { apiFetch, apiFetchJson } from '../services/apiClient';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
+import { useUser } from '../contexts/UserContext';
 
 /**
  * TwoFactorSettings Component
@@ -13,6 +14,8 @@ import logger from '../utils/logger';
  */
 const TwoFactorSettings = ({ authToken }) => {
   const navigate = useNavigate();
+  const { authToken: contextAuthToken } = useUser();
+  const effectiveAuthToken = authToken || contextAuthToken;
   const [twoFactorStatus, setTwoFactorStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [disabling, setDisabling] = useState(false);
@@ -28,9 +31,7 @@ const TwoFactorSettings = ({ authToken }) => {
     setLoading(true);
     try {
       const { response, data } = await apiFetchJson('/api/two-factor/status', {
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-        },
+        headers: effectiveAuthToken ? { Authorization: `Bearer ${effectiveAuthToken}` } : undefined,
       });
 
       if (!response.ok) {
@@ -60,7 +61,7 @@ const TwoFactorSettings = ({ authToken }) => {
       const response = await apiFetch('/api/two-factor/disable', {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${authToken}`,
+          ...(effectiveAuthToken ? { Authorization: `Bearer ${effectiveAuthToken}` } : {}),
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token: disableToken }),

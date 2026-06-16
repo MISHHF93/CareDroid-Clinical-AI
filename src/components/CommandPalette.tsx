@@ -337,6 +337,7 @@ function createCommands(
   navigate: ReturnType<typeof useNavigate>,
   toggleCopilot: () => void,
   emergencyRole: EmergencyCommandPermissions,
+  selectedPatientId: string | null,
 ): Command[] {
   const commands: CommandWithVisibility[] = [
     ...createEmergencyRouteCommands(navigate, emergencyRole),
@@ -403,16 +404,20 @@ function createCommands(
       action: () =>
         navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`, emergencyRole),
     },
-    {
-      id: 'discharge-selected-patient',
-      label: 'Discharge Selected Patient',
-      description: 'Open discharge confirmation for the selected patient; no autonomous discharge.',
-      group: 'Clinical',
-      keywords: ['discharge', 'disposition', 'send home', 'close encounter'],
-      requiredAction: EMERGENCY_ACTIONS.dischargePatient,
-      hiddenInPilotMode: true,
-      action: () => dispatchDocumentEvent('open-patient-discharge'),
-    },
+    ...(selectedPatientId
+      ? [
+          {
+            id: 'discharge-selected-patient',
+            label: 'Discharge Selected Patient',
+            description: 'Open discharge confirmation for the selected patient; no autonomous discharge.',
+            group: 'Clinical' as const,
+            keywords: ['discharge', 'disposition', 'send home', 'close encounter'],
+            requiredAction: EMERGENCY_ACTIONS.dischargePatient,
+            hiddenInPilotMode: true,
+            action: () => dispatchDocumentEvent('open-patient-discharge'),
+          },
+        ]
+      : []),
   ];
 
   return commands.filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole));
@@ -467,6 +472,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
+  const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
@@ -475,8 +481,8 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const [results, setResults] = useState<PaletteResult[]>([]);
 
   const commands = useMemo(
-    () => createCommands(navigate, toggleCopilot, emergencyRole),
-    [emergencyRole, navigate, toggleCopilot],
+    () => createCommands(navigate, toggleCopilot, emergencyRole, selectedPatientId),
+    [emergencyRole, navigate, selectedPatientId, toggleCopilot],
   );
 
   const computedResults = useMemo(() => {

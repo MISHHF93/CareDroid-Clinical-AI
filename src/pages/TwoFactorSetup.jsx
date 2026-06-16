@@ -6,6 +6,7 @@ import Input from '../components/ui/input';
 import { apiFetchJson } from '../services/apiClient';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
+import { useUser } from '../contexts/UserContext';
 
 /**
  * TwoFactorSetup Component
@@ -18,6 +19,8 @@ import logger from '../utils/logger';
  */
 const TwoFactorSetup = ({ authToken }) => {
   const navigate = useNavigate();
+  const { authToken: contextAuthToken } = useUser();
+  const effectiveAuthToken = authToken || contextAuthToken;
   const [step, setStep] = useState('generate'); // 'generate', 'verify', 'backup'
   const [qrCode, setQrCode] = useState(null);
   const [secret, setSecret] = useState(null);
@@ -34,9 +37,7 @@ const TwoFactorSetup = ({ authToken }) => {
     setLoading(true);
     try {
       const { response, data } = await apiFetchJson('/api/two-factor/generate', {
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-        },
+        headers: effectiveAuthToken ? { Authorization: `Bearer ${effectiveAuthToken}` } : undefined,
       });
 
       if (!response.ok) {
@@ -65,7 +66,7 @@ const TwoFactorSetup = ({ authToken }) => {
       const { response, data } = await apiFetchJson('/api/two-factor/enable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${authToken}`,
+          ...(effectiveAuthToken ? { Authorization: `Bearer ${effectiveAuthToken}` } : {}),
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ secret, token }),

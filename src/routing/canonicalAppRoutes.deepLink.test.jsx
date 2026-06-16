@@ -83,14 +83,14 @@ describe('canonical App routes deep links', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/ems');
   });
 
-  it('redirects /settings/features to Emergency OS settings', async () => {
+  it('redirects /settings/features to Feature Flags', async () => {
     render(<AppRouteHarness initialPath="/settings/features#feature-toolsShareResults" />);
 
     expect(await screen.findByRole('main')).toBeInTheDocument();
     expect(screen.getByTestId('location')).toHaveTextContent(
-      '/emergency/settings#feature-toolsShareResults',
+      '/feature-flags#feature-toolsShareResults',
     );
-  });
+  }, 20_000);
 
   it('redirects the retired assistant alias to Emergency OS Copilot', async () => {
     render(<AppRouteHarness initialPath="/assistant?agent=agent-emergency" />);

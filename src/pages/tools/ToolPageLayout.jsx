@@ -14,6 +14,7 @@ import analyticsService from '../../services/analyticsService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
+import { useNotificationActions } from '../../hooks/useNotificationActions';
 import {
   ActionRow,
   PageShell,
@@ -68,6 +69,7 @@ const ToolPageLayout = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [clinicalAlerts, setClinicalAlerts] = useState([]);
   const [dismissedAnomalies, setDismissedAnomalies] = useState(new Set());
+  const { success } = useNotificationActions();
 
   const clinicalInsights = useMemo(
     () => (results ? buildClinicalInsights(tool, results) : null),
@@ -129,7 +131,10 @@ const ToolPageLayout = ({
 
     try {
       await navigator.clipboard.writeText(url);
-      alert('Local session link copied. It opens on this browser profile for 30 days.');
+      success(
+        'Local session link copied',
+        'It opens on this browser profile for 30 days.',
+      );
     } catch (_error) {
       window.prompt('Copy this link to share:', url);
     }

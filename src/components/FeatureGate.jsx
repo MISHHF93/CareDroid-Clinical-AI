@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import { useFeature } from '../hooks/useFeature';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import './FeatureGate.css';
 
 export default function FeatureGate({
@@ -25,7 +26,7 @@ export default function FeatureGate({
         <strong>{label} — Enable in Settings</strong>
       </div>
       <p>This feature is currently disabled and will stay hidden until enabled.</p>
-      <Link to={`/settings/features#feature-${feature}`}>Enable in Settings</Link>
+      <Link to={`${CANONICAL_ROUTES.featureFlags}#feature-${feature}`}>Enable in Settings</Link>
     </div>
   );
 }
