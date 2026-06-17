@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   DEFAULT_EMERGENCY_THRESHOLDS,
   useEmergencyStore,
 } from '../../store/emergencyStore';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
+  DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS,
   EMERGENCY_CTAS_PRIORITIES as CTAS_PRIORITIES,
   EMERGENCY_SETTINGS_GROUP_LABELS as SETTING_GROUP_LABELS,
   EMERGENCY_WORKSPACE_OPTIONS as WORKSPACE_OPTIONS,
@@ -112,6 +115,12 @@ function mergeSettings(base = {}, patch = {}) {
       ...DEFAULT_CENTRAL_CONTROL_SETTINGS,
       ...(base.centralControl || {}),
       ...(patch.centralControl || {}),
+    },
+    operationalIntelligenceSettings: {
+      ...DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS,
+      ...(base.operationalIntelligenceSettings || {}),
+      ...(patch.operationalIntelligenceSettings || {}),
+      humanReviewRequired: true,
     },
   };
 }
@@ -729,6 +738,11 @@ export default function EmergencySettings() {
                     : `${integrationSources.length} source(s) reported by ${integrationHubEnvelope?.module || 'Integration Hub'}.`}
               </p>
               <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
+              <p>
+                <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>
+                {' · '}
+                <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
+              </p>
             </div>
           </article>
           <article>
@@ -1043,6 +1057,99 @@ export default function EmergencySettings() {
               <small>Configured module</small>
             </article>
           ))}
+        </div>
+      </Section>
+
+      <Section
+        id="operational-intelligence"
+        title="Operational Intelligence"
+        subtitle="Always-on advisory layer for capacity, queues, EMS, boarding, data freshness, and model health."
+        action={
+          <button
+            type="button"
+            disabled={savingGroup === 'operational-intelligence'}
+            onClick={() =>
+              saveGroup('operational-intelligence', {
+                operationalIntelligenceSettings: draft.operationalIntelligenceSettings,
+              })
+            }
+          >
+            Save Operational Intelligence
+          </button>
+        }
+      >
+        <p className="emergency-settings__notice">
+          Operational intelligence is advisory. Human review required. This layer does not diagnose,
+          prescribe, triage, discharge, or override staff.
+        </p>
+        <div className="emergency-settings__grid">
+          <SettingsField
+            type="checkbox"
+            label="Operational intelligence enabled"
+            value={draft.operationalIntelligenceSettings?.operationalIntelligenceEnabled ?? true}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'operationalIntelligenceEnabled', value)
+            }
+          />
+          <SettingsField
+            label="Mode"
+            value={draft.operationalIntelligenceSettings?.operationalIntelligenceMode || 'rule_based'}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'operationalIntelligenceMode', value)
+            }
+          />
+          <SettingsField
+            type="checkbox"
+            label="Model monitoring enabled"
+            value={draft.operationalIntelligenceSettings?.modelMonitoringEnabled ?? true}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'modelMonitoringEnabled', value)
+            }
+          />
+          <SettingsField
+            type="checkbox"
+            label="Drift monitoring enabled"
+            value={draft.operationalIntelligenceSettings?.driftMonitoringEnabled ?? false}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'driftMonitoringEnabled', value)
+            }
+          />
+          <SettingsField
+            type="checkbox"
+            label="Recommendations enabled"
+            value={draft.operationalIntelligenceSettings?.recommendationsEnabled ?? true}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'recommendationsEnabled', value)
+            }
+          />
+          <SettingsField
+            type="checkbox"
+            label="Auto alerting enabled"
+            value={draft.operationalIntelligenceSettings?.autoAlertingEnabled ?? true}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'autoAlertingEnabled', value)
+            }
+          />
+          <SettingsField
+            type="checkbox"
+            label="Data freshness visible"
+            value={draft.operationalIntelligenceSettings?.dataFreshnessVisible ?? true}
+            onChange={(value) =>
+              updateNested('operationalIntelligenceSettings', 'dataFreshnessVisible', value)
+            }
+          />
+          <SettingsField
+            type="number"
+            label="Polling interval (ms)"
+            value={draft.operationalIntelligenceSettings?.operationalIntelligencePollingInterval ?? 30000}
+            onChange={(value) =>
+              updateNested(
+                'operationalIntelligenceSettings',
+                'operationalIntelligencePollingInterval',
+                Number(value),
+              )
+            }
+          />
         </div>
       </Section>
 

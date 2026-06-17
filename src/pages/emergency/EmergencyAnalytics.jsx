@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
-import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
+import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import './EmergencyAnalytics.css';
@@ -99,8 +99,9 @@ export default function EmergencyAnalytics() {
   const emergencyRole = useEmergencyRolePermissions();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
-  const centralNode = useCareDroidCentralNode({ screenMode: 'COMMAND_CENTER_DISPLAY' });
-  const centralSnapshot = centralNode.snapshot;
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const centralSnapshot = operationalIntelligence.centralSnapshot;
+  const intelligenceSnapshot = operationalIntelligence.snapshot;
   const centralFreshness = formatCentralFreshness(centralSnapshot);
   const centralCommandMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
     CENTRAL_COMMAND_METRIC_KEYS.has(metric.key)
@@ -241,6 +242,15 @@ export default function EmergencyAnalytics() {
               {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
             </small>
           </ChartCard>
+          {intelligenceSnapshot.modelHealth ? (
+            <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
+              <strong>{intelligenceSnapshot.modelHealth.status}</strong>
+              <small className="emergency-analytics__source">
+                {intelligenceSnapshot.mode} · {intelligenceSnapshot.recommendations.length} advisory recommendations ·{' '}
+                {intelligenceSnapshot.disclaimers.operational}
+              </small>
+            </ChartCard>
+          ) : null}
         </div>
       </section>
 

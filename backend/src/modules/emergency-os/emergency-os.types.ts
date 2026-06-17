@@ -283,6 +283,7 @@ export interface EmergencyOsSettingsContract {
   };
   departmentCapacityTarget: number;
   alertRules: Record<string, { enabled: boolean; severity: string }>;
+  operationalIntelligenceSettings: OperationalIntelligenceSettings;
   updatedAt: string;
 }
 
@@ -393,6 +394,214 @@ export interface AdvancedEmergencyOsUpgradeHarness {
     externalDependenciesConnected: false;
     canonicalEndpoints: string[];
   };
+}
+
+export type OperationalIntelligenceMode = 'rule_based' | 'ml_assisted' | 'hybrid';
+
+export interface OperationalIntelligenceSettings {
+  operationalIntelligenceEnabled: boolean;
+  operationalIntelligenceMode: OperationalIntelligenceMode;
+  modelMonitoringEnabled: boolean;
+  driftMonitoringEnabled: boolean;
+  recommendationsEnabled: boolean;
+  autoAlertingEnabled: boolean;
+  humanReviewRequired: true;
+  modelHealthVisibleToAdmins: boolean;
+  dataFreshnessVisible: boolean;
+  operationalIntelligencePollingInterval: number;
+}
+
+export type OperationalInputEventType =
+  | 'patient_journey'
+  | 'queue'
+  | 'ems'
+  | 'offload'
+  | 'reassessment'
+  | 'capacity'
+  | 'boarding'
+  | 'referral'
+  | 'intake'
+  | 'provincial_external'
+  | 'iot_device'
+  | 'notification'
+  | 'user_action'
+  | 'audit'
+  | 'frontend_health'
+  | 'api_health'
+  | 'model_prediction'
+  | 'data_artifact';
+
+export interface OperationalInputEvent {
+  id: string;
+  type: OperationalInputEventType;
+  source: string;
+  timestamp: string;
+  tenantId: string;
+  payload: Record<string, string | number | boolean | null>;
+  humanReviewRequired: true;
+}
+
+export interface OperationalSignal {
+  id: string;
+  category: string;
+  label: string;
+  value: string | number;
+  tone: 'neutral' | 'info' | 'success' | 'warning' | 'critical';
+  sourceModule: string;
+  timestamp: string;
+}
+
+export interface OperationalFeatureVector {
+  activePatients: number;
+  waitingPatients: number;
+  longestWaitMinutes: number;
+  averageWaitMinutes: number;
+  emsInbound: number;
+  reassessmentsDue: number;
+  capacityScore: number;
+  capacityBand: CapacityBand;
+  boarders: number;
+  referralsPending: number;
+  breachedQueues: number;
+  activeAlerts: number;
+  syncStale: boolean;
+}
+
+export interface OperationalScore {
+  id: string;
+  label: string;
+  value: number;
+  band: string;
+  modelOrRuleId: string;
+  version: string;
+  confidence: number;
+  reasonCodes: string[];
+  timestamp: string;
+  humanReviewRequired: true;
+}
+
+export interface OperationalPrediction {
+  id: string;
+  modelOrRuleId: string;
+  version: string;
+  inputSummary: string;
+  output: string;
+  confidence: number;
+  reasonCodes: string[];
+  timestamp: string;
+  tenantId: string;
+  sourceModules: string[];
+  humanReviewRequired: true;
+}
+
+export interface OperationalAnomaly {
+  id: string;
+  category: string;
+  severity: 'Info' | 'Warning' | 'Critical';
+  title: string;
+  message: string;
+  reasonCodes: string[];
+  detectedAt: string;
+  humanReviewRequired: true;
+}
+
+export interface OperationalRecommendation {
+  id: string;
+  action: string;
+  rationale: string;
+  route?: string;
+  patientId?: string;
+  modelOrRuleId: string;
+  version: string;
+  confidence: number;
+  reasonCodes: string[];
+  timestamp: string;
+  humanReviewRequired: true;
+}
+
+export interface OperationalAlert extends EmergencyAlert {
+  source: 'operational-intelligence';
+  category: string;
+  reasonCodes: string[];
+  humanReviewRequired: true;
+  advisoryOnly: true;
+}
+
+export interface OperationalModelHealth {
+  status: 'healthy' | 'degraded' | 'fallback' | 'unavailable';
+  mode: OperationalIntelligenceMode;
+  models: Array<{
+    modelOrRuleId: string;
+    version: string;
+    status: 'active' | 'fallback' | 'unavailable';
+    inputSchemaValid: boolean;
+    missingValues: number;
+    dataFreshnessMinutes: number;
+    errorRate: number;
+    latencyMs: number;
+    lastTrainedAt: string | null;
+    lastEvaluatedAt: string;
+    fallbackMode: boolean;
+    driftDetected: boolean;
+  }>;
+  generatedAt: string;
+}
+
+export interface OperationalDataDriftReport {
+  enabled: boolean;
+  driftDetected: boolean;
+  featureDistributionShift: boolean;
+  predictionDistributionShift: boolean;
+  confidenceDistributionShift: boolean;
+  summary: string;
+  generatedAt: string;
+}
+
+export interface OperationalAuditEvent {
+  id: string;
+  type: string;
+  summary: string;
+  timestamp: string;
+  source: string;
+  humanReviewRequired: true;
+}
+
+export interface OperationalIntelligenceSnapshot {
+  layer: 'CareDroidOperationalIntelligence';
+  generatedAt: string;
+  tenantId: string;
+  mode: OperationalIntelligenceMode;
+  enabled: boolean;
+  disclaimers: {
+    operational: string;
+    clinical: string;
+    externalData: string;
+  };
+  centralNodeLinked: boolean;
+  featureVector: OperationalFeatureVector;
+  scores: OperationalScore[];
+  signals: OperationalSignal[];
+  predictions: OperationalPrediction[];
+  anomalies: OperationalAnomaly[];
+  recommendations: OperationalRecommendation[];
+  alerts: OperationalAlert[];
+  modelHealth: OperationalModelHealth;
+  dataDrift: OperationalDataDriftReport;
+  dataFreshness: {
+    status: 'fresh' | 'aging' | 'stale';
+    lastSyncedAt: string | null;
+    ageMinutes: number;
+    visible: boolean;
+  };
+  badges: Array<{
+    id: string;
+    label: string;
+    tone: 'info' | 'warning' | 'critical';
+    module: string;
+  }>;
+  blockedAutonomousActions: string[];
+  recentAuditEvents: OperationalAuditEvent[];
+  copilotContext: Record<string, string | number | boolean | null>;
 }
 
 export type EmergencyOsSettingsPatch = {

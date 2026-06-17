@@ -13,6 +13,7 @@ import {
   RealTimeSimulationService,
 } from './emergency-os.advanced-services';
 import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
+import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 import { AICallInterrogationService } from '../../services/ai-call-interrogation.service';
 import { EdgeAIAmbulanceService } from '../../services/edge-ai-ambulance.service';
 import { FederatedEMSService } from '../../services/federated-ems.service';
@@ -61,6 +62,7 @@ import {
     CapacityService,
     BoardingService,
     CareDroidCentralNodeService,
+    OperationalIntelligenceService,
     ReferralService,
     ProvincialHealthService,
     IntegrationHubService,

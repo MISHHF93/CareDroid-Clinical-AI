@@ -8,6 +8,84 @@ import {
 import { movePatientToState as movePatientWithJourneyRules } from '../engine/journeyEngine';
 import { PatientState, Priority } from '../types/emergency';
 
+function seedPt005WalkthroughFixtures() {
+  useEmergencyStore.setState((state) => {
+    if (state.patients.some((patient) => patient.id === 'pt-005')) {
+      return state;
+    }
+
+    const staffIds = new Set(state.staff.map((member) => member.id));
+    const extraStaff = [
+      {
+        id: 'staff-priya-nair',
+        name: 'Priya Nair',
+        role: 'MD',
+        active: true,
+        assignedPatientIds: ['pt-005'],
+      },
+      {
+        id: 'staff-michael-chen',
+        name: 'Michael Chen',
+        role: 'MD',
+        active: true,
+        assignedPatientIds: [],
+      },
+      {
+        id: 'staff-aisha-thompson',
+        name: 'Aisha Thompson',
+        role: 'RN',
+        active: true,
+        assignedPatientIds: [],
+      },
+    ].filter((member) => !staffIds.has(member.id));
+
+    return {
+      ...state,
+      staff: [...state.staff, ...extraStaff],
+      patients: [
+        ...state.patients,
+        {
+          id: 'pt-005',
+          mrn: 'ED-400005',
+          firstName: 'Aarav',
+          lastName: 'Patel',
+          name: 'Aarav Patel',
+          dob: '1971-04-12',
+          age: 54,
+          sex: 'Male',
+          arrivalTime: new Date(Date.now() - 25 * 60_000).toISOString(),
+          triageTime: new Date(Date.now() - 20 * 60_000).toISOString(),
+          lastAssessedTime: new Date(Date.now() - 15 * 60_000).toISOString(),
+          chiefComplaint: 'Chest pain',
+          complaintCategory: 'Cardiac',
+          state: PatientState.Assessment,
+          priority: Priority.P2,
+          vitals: [
+            {
+              hr: 92,
+              sbp: 122,
+              dbp: 76,
+              spo2: 97,
+              temp: 36.7,
+              rr: 18,
+              gcs: 15,
+              pain: 2,
+              recordedAt: new Date(Date.now() - 15 * 60_000).toISOString(),
+            },
+          ],
+          assignedStaffId: 'staff-priya-nair',
+          roomId: 'r3',
+          flags: [],
+          timeline: [],
+          notes: [],
+          reassessmentReminders: [],
+          vitalsAlerts: [],
+        },
+      ],
+    };
+  });
+}
+
 const originalState = useEmergencyStore.getState();
 
 afterEach(() => {
@@ -261,6 +339,7 @@ describe('first customer walkthrough', () => {
 
 describe('emergencyStore manual escalation', () => {
   it('flags patient, dispatches critical alert, logs timeline, and tops reassessment queue', () => {
+    seedPt005WalkthroughFixtures();
     const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'pt-005');
 
     expect(patient).toBeTruthy();
@@ -297,6 +376,7 @@ describe('emergencyStore manual escalation', () => {
   });
 
   it('cancels manual escalation and logs cancellation', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
     useEmergencyStore.getState().escalatePatient(patientId, {
       staffId: 'staff-priya-nair',
@@ -324,6 +404,7 @@ describe('emergencyStore manual escalation', () => {
   });
 
   it('prevents non-escalating non-charge staff from cancelling escalation', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
     useEmergencyStore.getState().escalatePatient(patientId, {
       staffId: 'staff-priya-nair',
@@ -357,14 +438,15 @@ describe('emergencyStore crisis staffing requests', () => {
       requestedByStaffId: 'staff-priya-nair',
       reason: 'Capacity crisis Orange at 68/100',
       capacityScore: 68,
-      capacityRiskLevel: 'Orange',
-      status: 'Open',
+      capacityBand: 'Orange',
+      status: 'Requested',
     });
   });
 });
 
 describe('emergencyStore staff reassignment', () => {
   it('updates assigned staff lists and logs reassignment context', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
 
     useEmergencyStore.getState().assignStaff(patientId, 'staff-michael-chen', {
@@ -397,6 +479,7 @@ describe('emergencyStore staff reassignment', () => {
 
 describe('emergencyStore fast referrals', () => {
   it('sends referral from patient record and raises immediate receiving-service alert', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
 
     useEmergencyStore.getState().createReferral({
@@ -437,6 +520,7 @@ describe('emergencyStore fast referrals', () => {
   });
 
   it('escalates urgent referrals when they remain unacknowledged', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
     useEmergencyStore.getState().createReferral({
       patientId,
@@ -472,6 +556,7 @@ describe('emergencyStore fast referrals', () => {
 
 describe('emergencyStore long wait rescue', () => {
   it('flags a P3 waiting 45 minutes as critical and moves them to the top of reassessment', () => {
+    seedPt005WalkthroughFixtures();
     const basePatient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === 'pt-005');
     expect(basePatient).toBeTruthy();
     const arrivalTime = new Date(Date.now() - 45 * 60_000).toISOString();
@@ -522,6 +607,7 @@ describe('emergencyStore long wait rescue', () => {
 
 describe('emergencyStore reassessment reminders', () => {
   it('schedules a reminder, alerts when due, and adds patient to reassessment queue', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
     const reminder = useEmergencyStore.getState().scheduleReassessmentReminder(patientId, {
       scheduledBy: 'staff-priya-nair',
@@ -551,6 +637,7 @@ describe('emergencyStore reassessment reminders', () => {
   });
 
   it('snoozes and completes reminders while logging timeline events', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
     const reminder = useEmergencyStore.getState().scheduleReassessmentReminder(patientId, {
       scheduledBy: 'staff-priya-nair',
@@ -588,6 +675,7 @@ describe('emergencyStore reassessment reminders', () => {
 
 describe('emergencyStore vitals alert pipeline', () => {
   it('fires critical response, flags patient, and broadcasts alert for SpO2 below 88', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
 
     useEmergencyStore.getState().addVitals(patientId, {
@@ -623,6 +711,7 @@ describe('emergencyStore vitals alert pipeline', () => {
   });
 
   it('fires warning response and can mark vitals alert addressed', () => {
+    seedPt005WalkthroughFixtures();
     const patientId = 'pt-005';
 
     useEmergencyStore.getState().addVitals(patientId, {

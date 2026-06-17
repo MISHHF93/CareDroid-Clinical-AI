@@ -17,9 +17,9 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 const SIDEBAR_MODEL = [
   ['Whiteboard', '/emergency/whiteboard'],
-  ['Patients', '/emergency/patients'],
-  ['EMS', '/emergency/ems'],
   ['Intake', '/emergency/intake'],
+  ['EMS', '/emergency/ems'],
+  ['Patients', '/emergency/patients'],
   ['Queues', '/emergency/queues'],
   ['Reassess', '/emergency/reassessment'],
   ['Capacity', '/emergency/capacity'],
@@ -27,6 +27,9 @@ const SIDEBAR_MODEL = [
   ['Referrals', '/emergency/referrals'],
   ['Copilot', '/emergency/copilot'],
   ['Medical Tools', '/emergency/tools'],
+  ['Analytics', '/emergency/analytics'],
+  ['Settings', '/emergency/settings'],
+  ['Platform', '/workspace'],
 ];
 
 describe('primaryNavigation', () => {
@@ -157,7 +160,7 @@ describe('primaryNavigation', () => {
       true,
     );
     expect(PRIMARY_NAV_BY_ID.tools.path).toBe('/emergency/tools');
-    expect(PRIMARY_NAV_BY_ID.settings).toBeUndefined();
+    expect(PRIMARY_NAV_BY_ID.settings.path).toBe('/emergency/settings');
   });
 
   it('keeps legacy calculator routes outside primary nav without a duplicate sidebar destination', () => {
@@ -180,18 +183,18 @@ describe('primaryNavigation', () => {
     const expected = [
       ['/emergency', 'whiteboard'],
       ['/emergency/whiteboard', 'whiteboard'],
-      ['/emergency/patients', 'patients'],
-      ['/emergency/ems', 'ems'],
       ['/emergency/intake', 'intake'],
+      ['/emergency/ems', 'ems'],
+      ['/emergency/patients', 'patients'],
       ['/emergency/queues', 'queues'],
       ['/emergency/reassessment', 'reassessment'],
       ['/emergency/capacity', 'capacity'],
       ['/emergency/boarding', 'boarding'],
       ['/emergency/referrals', 'referrals'],
       ['/emergency/copilot', 'copilot'],
-      ['/emergency/analytics', undefined],
-      ['/emergency/settings', undefined],
-      ['/settings', undefined],
+      ['/emergency/analytics', 'analytics'],
+      ['/emergency/settings', 'settings'],
+      ['/settings', 'settings'],
       ['/emergency/pulse', undefined],
       ['/emergency/journey', undefined],
       ['/emergency/provincial-health', undefined],
@@ -200,7 +203,8 @@ describe('primaryNavigation', () => {
       ['/emergency/tools', 'tools'],
       ['/emergency/shift', undefined],
       ['/profile', undefined],
-      ['/workspaces', undefined],
+      ['/workspaces', 'platform'],
+      ['/workspace', 'platform'],
       ['/tenant-admin', 'tenant-admin'],
     ];
 
@@ -245,8 +249,8 @@ describe('primaryNavigation', () => {
     expect(byId.home).toBeUndefined();
     expect(byId.profile).toBeUndefined();
     expect(canExposeNavigationItem(byId.whiteboard)).toBe(true);
-    expect(byId.analytics).toBeUndefined();
-    expect(byId.settings).toBeUndefined();
+    expect(canExposeNavigationItem(byId.analytics)).toBe(true);
+    expect(canExposeNavigationItem(byId.settings)).toBe(true);
     expect(canExposeNavigationItem(byId.search)).toBe(true);
     expect(canExposeNavigationItem(byId['workflow-mining'])).toBe(false);
     expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(

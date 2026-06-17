@@ -10,6 +10,10 @@ import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
  */
 export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   centralNodeSnapshot: '/api/emergency/central-node/snapshot',
+  operationalIntelligenceSnapshot: '/api/emergency/operational-intelligence/snapshot',
+  operationalIntelligenceModelHealth: '/api/emergency/operational-intelligence/model-health',
+  operationalIntelligenceAlerts: '/api/emergency/operational-intelligence/alerts',
+  operationalIntelligenceEvaluate: '/api/emergency/operational-intelligence/evaluate',
   whiteboard: '/api/emergency/whiteboard',
   patients: '/api/emergency/patients',
   journey: '/api/emergency/journey',
@@ -56,6 +60,10 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
 
 export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'centralNodeSnapshot',
+  'operationalIntelligenceSnapshot',
+  'operationalIntelligenceModelHealth',
+  'operationalIntelligenceAlerts',
+  'operationalIntelligenceEvaluate',
   'whiteboard',
   'patients',
   'journey',
@@ -127,6 +135,17 @@ export const fetchEmergencyWhiteboard = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.whiteboard);
 export const fetchCareDroidCentralNodeSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.centralNodeSnapshot);
+export const fetchOperationalIntelligenceSnapshot = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceSnapshot);
+export const fetchOperationalIntelligenceModelHealth = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceModelHealth);
+export const fetchOperationalIntelligenceAlerts = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceAlerts);
+export const evaluateOperationalIntelligence = (events = []) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.operationalIntelligenceEvaluate, {
+    method: 'POST',
+    body: JSON.stringify({ events }),
+  });
 export const fetchEmergencyPatients = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
@@ -275,6 +294,10 @@ export default Object.freeze({
   ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS,
   REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS,
   fetchCareDroidCentralNodeSnapshot,
+  fetchOperationalIntelligenceSnapshot,
+  fetchOperationalIntelligenceModelHealth,
+  fetchOperationalIntelligenceAlerts,
+  evaluateOperationalIntelligence,
   fetchEmergencyWhiteboard,
   fetchEmergencyPatients,
   fetchPatientJourney,

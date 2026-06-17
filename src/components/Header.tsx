@@ -9,7 +9,7 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import useCareDroidCentralNode from '../hooks/useCareDroidCentralNode';
+import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
 import './Header.css';
@@ -189,8 +189,10 @@ type HeaderProps = {
 export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
-  const centralNode = useCareDroidCentralNode({ realtime: true });
-  const centralSnapshot = centralNode.snapshot;
+  const operationalIntelligence = useOperationalIntelligence({ realtime: true });
+  const centralSnapshot = operationalIntelligence.centralSnapshot;
+  const intelligenceSnapshot = operationalIntelligence.snapshot;
+  const refreshError = operationalIntelligence.refreshError;
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
   const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
@@ -311,9 +313,34 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     }
     return notices;
   }, [centralSnapshot, integrationEvents]);
+  const intelligenceAlerts = useMemo<Alert[]>(
+    () =>
+      intelligenceSnapshot.alerts.map((alert) => ({
+        id: alert.id,
+        type: 'OperationalIntelligence',
+        severity: alert.severity,
+        title: alert.title,
+        message: alert.message,
+        createdAt: alert.createdAt,
+        dismissed: alert.dismissed,
+        source: alert.source,
+        actionType: 'operational-intelligence',
+        metadata: {
+          category: alert.category,
+          reasonCodes: alert.reasonCodes.join(', '),
+          advisoryOnly: true,
+        },
+      })),
+    [intelligenceSnapshot.alerts],
+  );
   const notificationAlerts = useMemo(() => {
     const byId = new Map<string, Alert>();
-    for (const alert of [...supplementalAlerts, ...centralSnapshot.operationalAlerts, ...alerts]) {
+    for (const alert of [
+      ...supplementalAlerts,
+      ...intelligenceAlerts,
+      ...centralSnapshot.operationalAlerts,
+      ...alerts,
+    ]) {
       const read = Boolean(alert.read || alert.dismissed || localReadAlertIds.has(alert.id));
       const acknowledged = Boolean(alert.acknowledged || localAcknowledgedAlertIds.has(alert.id));
       const dismissed = Boolean(alert.dismissed || localDismissedAlertIds.has(alert.id));
@@ -325,6 +352,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   }, [
     alerts,
     centralSnapshot.operationalAlerts,
+    intelligenceAlerts,
     localAcknowledgedAlertIds,
     localDismissedAlertIds,
     localReadAlertIds,
@@ -602,6 +630,24 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'} title={syncTitle}>
               {syncLabel}
             </span>
+            {intelligenceSnapshot.enabled ? (
+              <span
+                className="emergency-os-header__aiios-pill"
+                data-tone={
+                  intelligenceSnapshot.dataFreshness.status === 'stale'
+                    ? 'warning'
+                    : intelligenceSnapshot.anomalies.length
+                      ? 'critical'
+                      : 'success'
+                }
+                title={intelligenceSnapshot.disclaimers.operational}
+              >
+                OI {intelligenceSnapshot.mode.replace('_', ' ')}
+                {intelligenceSnapshot.dataFreshness.visible
+                  ? ` · ${intelligenceSnapshot.dataFreshness.status}`
+                  : ''}
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -881,12 +927,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             <div className="emergency-os-notification-center__state" role="status">
               Loading active Emergency OS notifications...
             </div>
-          ) : centralNode.refreshError && !notificationAlerts.length ? (
+          ) : refreshError && !notificationAlerts.length ? (
             <div
               className="emergency-os-notification-center__state emergency-os-notification-center__state--error"
               role="alert"
             >
-              Notification data is using local Emergency OS state. {centralNode.refreshError}
+              Notification data is using local Emergency OS state. {refreshError}
             </div>
           ) : notificationAlerts.length > 0 ? (
             <div className="emergency-os-notification-center__list" role="list">

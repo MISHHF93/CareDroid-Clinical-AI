@@ -270,6 +270,18 @@ const DEFAULT_EMERGENCY_OS_SETTINGS: EmergencyOsSettingsContract = {
     System: { enabled: true, severity: 'Info' },
     CAPACITY_CRISIS: { enabled: true, severity: 'Critical' },
   },
+  operationalIntelligenceSettings: {
+    operationalIntelligenceEnabled: true,
+    operationalIntelligenceMode: 'rule_based',
+    modelMonitoringEnabled: true,
+    driftMonitoringEnabled: false,
+    recommendationsEnabled: true,
+    autoAlertingEnabled: true,
+    humanReviewRequired: true,
+    modelHealthVisibleToAdmins: true,
+    dataFreshnessVisible: true,
+    operationalIntelligencePollingInterval: 30000,
+  },
   updatedAt: new Date(0).toISOString(),
 };
 

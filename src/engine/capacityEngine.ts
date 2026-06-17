@@ -233,6 +233,11 @@ export function deriveCapacityCrisisBreakdown(input: {
   return fallbackFactors.map((factor) => mergeSnapshotDeduction(factor, capacity));
 }
 
+export function runCapacityIntelligence(): void {
+  const snapshot = calculateCapacity();
+  useEmergencyStore.getState().setCapacity(snapshot);
+}
+
 export function startCapacityEngine() {
   const update = () => {
     const snapshot = calculateCapacity();

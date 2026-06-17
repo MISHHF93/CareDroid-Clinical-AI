@@ -192,3 +192,74 @@ export function startReassessmentEngine() {
     });
   }, 60000);
 }
+
+export function runEmergencyReassessment(now = new Date()): void {
+  const { patients, addFlag, removeFlag, emergencySettings, thresholds } =
+    useEmergencyStore.getState();
+
+  patients.forEach((patient) => {
+    const arrivalMins = (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
+    const latestVitals = Array.isArray(patient.vitals)
+      ? patient.vitals[patient.vitals.length - 1]
+      : patient.vitals;
+    const hasFlag = (f: PatientFlag) => patient.flags.includes(f);
+
+    if (patient.state === PatientState.Waiting) {
+      const status = longWaitStatus(patient, now, emergencySettings);
+      const waitMins = status.waitMinutesExact;
+      const target = status.thresholdMinutes;
+      const name = `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
+
+      if (waitMins >= status.warningAt && !hasFlag(PatientFlag.LongWait)) {
+        addFlag(patient.id, PatientFlag.LongWait);
+        dispatchAlert({
+          id: `long-wait-warning-${patient.id}-${longWaitAlertBucket(waitMins)}`,
+          type: 'Queue',
+          severity: 'Warning',
+          title: `Wait threshold — ${name}`,
+          message: `${patient.priority} patient. ${Math.round(waitMins)}min wait. Target: ${target}min`,
+          patientId: patient.id,
+          source: LONG_WAIT_ALERT_SOURCE,
+        });
+      }
+    }
+
+    if (
+      patient.state === PatientState.Waiting &&
+      arrivalMins > thresholds.waitTimeWarningMin &&
+      !hasFlag(PatientFlag.ReassessmentDue)
+    ) {
+      addFlag(patient.id, PatientFlag.ReassessmentDue);
+    }
+
+    if (latestVitals) {
+      const vitalRecordedAt = new Date(latestVitals.recordedAt || patient.arrivalTime).getTime();
+      const vitalAgeMins = Number.isFinite(vitalRecordedAt)
+        ? (now.getTime() - vitalRecordedAt) / 60000
+        : arrivalMins;
+      const priorityThresholdMins = reassessmentThresholdForPriority(patient.priority, thresholds);
+      if (vitalAgeMins > priorityThresholdMins && !hasFlag(PatientFlag.ReassessmentDue)) {
+        addFlag(patient.id, PatientFlag.ReassessmentDue);
+      }
+    }
+
+    if (
+      [Priority.P1, Priority.P2].includes(patient.priority) &&
+      ![
+        PatientState.Assessment,
+        PatientState.Orders,
+        PatientState.Results,
+        PatientState.Disposition,
+        PatientState.Admission,
+        PatientState.Discharge,
+      ].includes(patient.state) &&
+      !hasFlag(PatientFlag.HighRisk)
+    ) {
+      addFlag(patient.id, PatientFlag.HighRisk);
+    }
+
+    if (patient.state !== PatientState.Waiting && hasFlag(PatientFlag.LongWait)) {
+      removeFlag(patient.id, PatientFlag.LongWait);
+    }
+  });
+}

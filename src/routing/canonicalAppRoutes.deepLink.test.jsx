@@ -114,6 +114,43 @@ describe('canonical App routes deep links', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/auth');
   });
 
+  it('mounts configured sign-in and signup aliases before wildcard redirects', async () => {
+    render(<AppRouteHarness initialPath="/account/login" />);
+
+    expect(await screen.findByRole('heading', { name: /^sign in$/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/account/login');
+  });
+
+  it('redirects configured account creation aliases to signup mode', async () => {
+    render(<AppRouteHarness initialPath="/create-account" />);
+
+    expect(await screen.findByRole('heading', { name: /create account for/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/auth');
+  });
+
+  it('mounts the welcome onboarding route before wildcard redirects', async () => {
+    render(<AppRouteHarness initialPath="/welcome" />);
+
+    expect(await screen.findByRole('heading', { name: /choose your role/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/welcome');
+  });
+
+  it('mounts personalized discovery instead of the route inventory page', async () => {
+    render(<AppRouteHarness initialPath="/discover" />);
+
+    expect(
+      await screen.findByRole('heading', { name: /discover caredroid capabilities/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/discover');
+  });
+
+  it('mounts the AI command center and aliases', async () => {
+    render(<AppRouteHarness initialPath="/ai-command-center" />);
+
+    expect(await screen.findByRole('heading', { name: /^ai command center$/i })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/ai-command-center');
+  });
+
   it('mounts local shared tool sessions before wildcard redirects', async () => {
     render(<AppRouteHarness initialPath="/shared/tools/missing-share" />);
 

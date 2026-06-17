@@ -1,6 +1,8 @@
 import { DEFAULT_CENTRAL_CONTROL_SETTINGS } from './centralControl.config';
+import { DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS } from '../operational-intelligence/operationalIntelligence.types';
 
 export { DEFAULT_CENTRAL_CONTROL_SETTINGS };
+export { DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS };
 
 export const EMERGENCY_CTAS_PRIORITIES = Object.freeze(['P1', 'P2', 'P3', 'P4', 'P5']);
 
@@ -42,6 +44,7 @@ export const EMERGENCY_SETTINGS_GROUP_LABELS = Object.freeze({
   boarding: 'Boarding Thresholds',
   alerts: 'Alert Rules',
   central: 'Central Control Node',
+  operationalIntelligence: 'Operational Intelligence',
 });
 
 export const DEFAULT_EMERGENCY_ALERT_RULES = Object.freeze({

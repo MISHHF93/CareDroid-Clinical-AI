@@ -18,10 +18,10 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
-    id: 'patients',
-    label: 'Patients',
-    icon: 'emergency-patients',
-    route: '/emergency/patients',
+    id: 'intake',
+    label: 'Intake',
+    icon: 'intake',
+    route: '/emergency/intake',
     featureGate: null,
   },
   {
@@ -32,10 +32,10 @@ const REQUESTED_ITEMS = [
     featureGate: 'ems_pipeline',
   },
   {
-    id: 'intake',
-    label: 'Intake',
-    icon: 'intake',
-    route: '/emergency/intake',
+    id: 'patients',
+    label: 'Patients',
+    icon: 'emergency-patients',
+    route: '/emergency/patients',
     featureGate: null,
   },
   {
@@ -170,9 +170,9 @@ describe('unified navigation config', () => {
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
     expect(readOnlyLabels).toEqual([
       'Whiteboard',
-      'Patients',
-      'EMS',
       'Intake',
+      'EMS',
+      'Patients',
       'Queues',
       'Reassess',
       'Capacity',

@@ -35,8 +35,11 @@ const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazy(() => import('./pages/tools/ClinicalToolCatalog'));
 const PlatformNavigationPage = lazy(() => import('./pages/PlatformNavigationPage'));
+const CapabilityDiscovery = lazy(() => import('./pages/CapabilityDiscovery'));
 const Auth = lazy(() => import('./pages/Auth'));
+const Welcome = lazy(() => import('./pages/Welcome'));
 const ExecutiveCommandCenter = lazy(() => import('./pages/ExecutiveCommandCenter'));
+const AiCommandCenterDashboard = lazy(() => import('./pages/AiCommandCenterDashboard'));
 const DigitalTwinIntelligence = lazy(() => import('./pages/DigitalTwinIntelligence'));
 const SuccessCenterPage = lazy(() => import('./pages/success-center/SuccessCenterPage'));
 const LaboratoryDashboard = lazy(() => import('./pages/LaboratoryDashboard'));
@@ -47,6 +50,8 @@ const NotificationPreferences = lazy(() => import('./pages/NotificationPreferenc
 const TeamManagement = lazy(() => import('./pages/team/TeamManagement'));
 const ClinicalDocumentationAssistant = lazy(() => import('./pages/ClinicalDocumentationAssistant'));
 const ClinicalKnowledgeGraph = lazy(() => import('./pages/ClinicalKnowledgeGraph'));
+const IntegrationHubPage = lazy(() => import('./pages/integrations/IntegrationHubPage'));
+const CosmosViewer = lazy(() => import('./pages/cosmos/CosmosViewer'));
 const PredictiveAnalyticsDashboard = lazy(() => import('./pages/PredictiveAnalyticsDashboard'));
 const ResearchEvidenceHub = lazy(() => import('./pages/ResearchEvidenceHub'));
 const Medical3DViewer = lazy(() => import('./pages/Medical3DViewer'));
@@ -256,6 +261,8 @@ const ReferralPanel = lazy(() => import('./components/ReferralPanel'));
 import { useEmergencyStore } from './store/emergencyStore';
 import { PatientFlag, PatientState } from './types/emergency';
 import {
+  AUTH_PATH_ALIASES,
+  AUTH_SIGNUP_PATH_ALIASES,
   CANONICAL_ROUTES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
@@ -1732,23 +1739,37 @@ function RootLayout() {
 }
 
 export function AppRoutes() {
+  const signInAliases = AUTH_PATH_ALIASES.filter(
+    (path) => !AUTH_SIGNUP_PATH_ALIASES.includes(path),
+  );
+
   return (
     <Routes>
       <Route path="/" element={<EmergencyDefaultRedirect />} />
       <Route path={CANONICAL_ROUTES.auth} element={<AuthRoute />} />
-      <Route path="/login" element={<AuthRoute />} />
-      <Route path="/log-in" element={<AuthRoute />} />
-      <Route path="/signin" element={<AuthRoute />} />
-      <Route path="/sign-in" element={<AuthRoute />} />
-      <Route path="/signup" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
-      <Route path="/sign-up" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
-      <Route path="/register" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
-      <Route path="/join" element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />} />
+      {signInAliases.map((path) => (
+        <Route key={`auth-signin-${path}`} path={path} element={<AuthRoute />} />
+      ))}
+      {AUTH_SIGNUP_PATH_ALIASES.map((path) => (
+        <Route
+          key={`auth-signup-${path}`}
+          path={path}
+          element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />}
+        />
+      ))}
       <Route
         path={CANONICAL_ROUTES.authCallback}
         element={
           <LazyRoute label="Completing sign-in...">
             <AuthCallback />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path={CANONICAL_ROUTES.welcome}
+        element={
+          <LazyRoute label="Loading welcome...">
+            <Welcome />
           </LazyRoute>
         }
       />
@@ -1903,6 +1924,24 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.integrationHub}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
+              <LazyRoute label="Loading Integration Hub...">
+                <IntegrationHubPage />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.cosmosViewer}
+          element={
+            <LazyRoute label="Loading Cosmos Viewer...">
+              <CosmosViewer />
+            </LazyRoute>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.workspace}
           element={
             <LazyRoute label="Loading platform navigation...">
@@ -1914,7 +1953,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.discover}
           element={
             <LazyRoute label="Loading platform discovery...">
-              <PlatformNavigationPage />
+              <CapabilityDiscovery />
             </LazyRoute>
           }
         />
@@ -1931,6 +1970,14 @@ export function AppRoutes() {
           element={
             <LazyRoute label="Loading executive command center...">
               <ExecutiveCommandCenter />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiCommandCenter}
+          element={
+            <LazyRoute label="Loading AI command center...">
+              <AiCommandCenterDashboard />
             </LazyRoute>
           }
         />
@@ -2774,6 +2821,14 @@ export function AppRoutes() {
       <Route
         path="/copilot"
         element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />}
+      />
+      <Route
+        path="/ai/command-center"
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.aiCommandCenter} />}
+      />
+      <Route
+        path="/ai-command"
+        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.aiCommandCenter} />}
       />
       <Route
         path="/emergency/*"

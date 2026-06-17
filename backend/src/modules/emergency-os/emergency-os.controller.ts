@@ -5,6 +5,7 @@ import {
   RealTimeSimulationService,
 } from './emergency-os.advanced-services';
 import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
+import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 import {
   BoardingService,
   CareDroidCentralNodeService,
@@ -52,6 +53,7 @@ export class EmergencyOsController {
     private readonly hybridDigitalTwinService: HybridDigitalTwinService,
     private readonly upgradeHarnessService: EmergencyOsUpgradeHarnessService,
     private readonly centralNodeService: CareDroidCentralNodeService,
+    private readonly operationalIntelligenceService: OperationalIntelligenceService,
   ) {}
 
   @Get('whiteboard')
@@ -62,6 +64,29 @@ export class EmergencyOsController {
   @Get('central-node/snapshot')
   getCentralNodeSnapshot() {
     return this.centralNodeService.getSnapshot();
+  }
+
+  @Get('operational-intelligence/snapshot')
+  getOperationalIntelligenceSnapshot() {
+    return this.operationalIntelligenceService.getSnapshotEnvelope();
+  }
+
+  @Get('operational-intelligence/model-health')
+  getOperationalIntelligenceModelHealth() {
+    return this.operationalIntelligenceService.getModelHealthEnvelope();
+  }
+
+  @Get('operational-intelligence/alerts')
+  getOperationalIntelligenceAlerts() {
+    return this.operationalIntelligenceService.getAlertsEnvelope();
+  }
+
+  @Post('operational-intelligence/evaluate')
+  evaluateOperationalIntelligence(@Body() body: { events?: unknown[] }) {
+    const events = Array.isArray(body?.events) ? body.events : [];
+    return this.operationalIntelligenceService.evaluate(
+      events as import('./emergency-os.types').OperationalInputEvent[],
+    );
   }
 
   @Get('patients')

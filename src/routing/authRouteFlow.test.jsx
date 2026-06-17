@@ -11,7 +11,10 @@ describe('auth canonical flow wiring', () => {
   it('mounts the auth page and keeps auth aliases out of legacy Emergency redirects', () => {
     expect(appSource).toContain('function AuthRoute()');
     expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
-    expect(appSource).toContain('path="/login" element={<AuthRoute />}');
+    expect(appSource).toContain('AUTH_PATH_ALIASES');
+    expect(appSource).toContain('AUTH_SIGNUP_PATH_ALIASES');
+    expect(appSource).toContain('key={`auth-signin-${path}`}');
+    expect(appSource).toContain('key={`auth-signup-${path}`}');
     expect(routeConfigSource).not.toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
     expect(appSource).not.toContain('function AuthPathRedirect()');
   });

@@ -60,11 +60,24 @@ import {
   DEFAULT_EMERGENCY_ALERT_RULES,
   DEFAULT_EMERGENCY_CTAS_TARGETS,
   DEFAULT_EMERGENCY_MODULES,
+  DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS,
   buildEmergencySettingsPatchFromThresholds,
 } from '../config/emergencySettings.config';
 import { syncEmergencyAuditEvent } from '../services/emergencyStaffingApi';
 import { calculateNews2FromVitals } from '../utils/news2';
 import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
+import {
+  buildAcknowledgeVitalsAlertPatch,
+  buildAddVitalsPatch,
+  buildCancelEscalationPatch,
+  buildEscalatePatientPatch,
+  buildReassessmentQueueItems,
+  buildSnoozeReassessmentReminderPatch,
+  buildUpdateAlertsPatch,
+  type EscalationInput,
+} from './emergencyOperationalSync';
+import { calculateCapacity } from '../engine/capacityEngine';
+import { normalizeAlert } from '../engine/alertEngineDerived';
 
 export function tMinus(mins: number): string {
   return new Date(Date.now() - mins * 60000).toISOString();
@@ -2163,6 +2176,7 @@ type EmergencyOsSettings = {
   departmentCapacityTarget: number;
   alertRules: Record<string, { enabled: boolean; severity: Alert['severity'] }>;
   centralControl: typeof DEFAULT_CENTRAL_CONTROL_SETTINGS;
+  operationalIntelligenceSettings?: Record<string, string | number | boolean>;
   demoMode?: unknown;
 };
 
@@ -2224,7 +2238,17 @@ interface EmergencyStoreState {
     note?: string,
   ) => void;
   dischargePatient: (patientId: string, options?: { staffId?: string; note?: string }) => void;
-  assignStaff: (patientId: string, staffId: string) => void;
+  assignStaff: (
+    patientId: string,
+    staffId: string,
+    options?: {
+      actorStaffId?: string;
+      actorName?: string;
+      fromStaffName?: string;
+      toStaffName?: string;
+      reason?: string;
+    },
+  ) => void;
   assignRoom: (patientId: string, roomId: string) => void;
   addFlag: (patientId: string, flag: PatientFlag | string | PatientFlagRecord, options?: Partial<Alert>) => void;
   removeFlag: (patientId: string, flag: PatientFlag) => void;
@@ -2237,8 +2261,14 @@ interface EmergencyStoreState {
   completeReassessmentReminder: (
     patientId: string,
     reminderId: string,
-    options?: { completedBy?: string; completedAt?: string },
+    options?: { completedBy?: string; completedAt?: string; timestamp?: string },
   ) => void;
+  snoozeReassessmentReminder: (patientId: string, reminderId: string, minutes?: number) => void;
+  escalatePatient: (patientId: string, input: EscalationInput) => void;
+  cancelEscalation: (patientId: string, input: EscalationInput) => void;
+  acknowledgeVitalsAlert: (patientId: string, alertId: string, acknowledgedBy: string) => void;
+  updateCapacity: () => void;
+  updateAlerts: () => void;
   selectPatient: (patientId: string | null) => void;
   clearPatientSelection: () => void;
   setActiveQueueFilter: (filter: string | null) => void;
@@ -2440,6 +2470,7 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
     Object.entries(DEFAULT_EMERGENCY_ALERT_RULES).map(([rule, config]) => [rule, { ...config }]),
   ),
   centralControl: DEFAULT_CENTRAL_CONTROL_SETTINGS,
+  operationalIntelligenceSettings: { ...DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS },
 };
 
 function mergeCtasThresholds(
@@ -2505,6 +2536,12 @@ function mergeEmergencyOsSettings(
     },
     alertRules: { ...base.alertRules, ...(patch.alertRules || {}) },
     centralControl: { ...base.centralControl, ...(patch.centralControl || {}) },
+    operationalIntelligenceSettings: {
+      ...DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS,
+      ...(base.operationalIntelligenceSettings || {}),
+      ...(patch.operationalIntelligenceSettings || {}),
+      humanReviewRequired: true,
+    },
   };
 }
 
@@ -2920,48 +2957,80 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    assignStaff: (patientId, staffId) =>
+    assignStaff: (patientId, staffId, options = {}) =>
       set((state) => {
-        const staffName = state.staff.find((member) => member.id === staffId)?.name || staffId;
+        const previousStaffId =
+          state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ?? null;
+        const fromStaffName =
+          options.fromStaffName ||
+          state.staff.find((member) => member.id === previousStaffId)?.name ||
+          previousStaffId ||
+          'Unassigned';
+        const toStaffName =
+          options.toStaffName ||
+          state.staff.find((member) => member.id === staffId)?.name ||
+          staffId;
+        const summary =
+          previousStaffId && previousStaffId !== staffId
+            ? `Reassigned from ${fromStaffName} to ${toStaffName}.`
+            : `Assigned clinician ${toStaffName}.`;
+        const patients = state.patients.map((patient) =>
+          patient.id === patientId
+            ? {
+                ...patient,
+                assignedStaffId: staffId,
+                timeline: [
+                  ...patient.timeline,
+                  createPatientTimelineEvent(patient, 'StaffAssignment', summary, {
+                    staffId: options.actorStaffId || staffId,
+                    metadata: {
+                      fromStaffId: previousStaffId,
+                      toStaffId: staffId,
+                      fromStaffName,
+                      toStaffName,
+                      actorName: options.actorName,
+                      reason: options.reason || 'Workload rebalance',
+                    },
+                  }),
+                ],
+              }
+            : patient,
+        );
+        const staff = state.staff.map((member) => {
+          const assignedPatientIds = member.assignedPatientIds || [];
+          if (member.id === previousStaffId) {
+            return {
+              ...member,
+              assignedPatientIds: assignedPatientIds.filter((id) => id !== patientId),
+            };
+          }
+          if (member.id === staffId && !assignedPatientIds.includes(patientId)) {
+            return {
+              ...member,
+              assignedPatientIds: [...assignedPatientIds, patientId],
+            };
+          }
+          return member;
+        });
         return {
-          patients: state.patients.map((patient) =>
-            patient.id === patientId
-              ? {
-                  ...patient,
-                  assignedStaffId: staffId,
-                  timeline: [
-                    ...patient.timeline,
-                    createPatientTimelineEvent(
-                      patient,
-                      'StaffAssignment',
-                      `Assigned clinician ${staffName}.`,
-                      {
-                        staffId,
-                        metadata: {
-                          fromStaffId: patient.assignedStaffId || null,
-                          toStaffId: staffId,
-                        },
-                      },
-                    ),
-                  ],
-                }
-              : patient,
-          ),
+          patients,
+          staff,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'assignStaff',
             patientId,
             staffId,
-            details: { toStaffId: staffId, staffName },
+            details: { toStaffId: staffId, staffName: toStaffName },
           }),
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {
               type: 'clinician_assigned',
               title: 'Clinician assigned',
-              summary: `Assigned clinician ${staffName}.`,
+              summary,
               patientId,
-              actorStaffId: staffId,
+              actorStaffId: options.actorStaffId || staffId,
               source: 'staff-assignment',
               metadata: {
+                fromStaffId: previousStaffId,
                 toStaffId: staffId,
               },
             },
@@ -3164,6 +3233,24 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     addVitals: (patientId, vitals) =>
       set((state) => {
+        const pipelinePatch = buildAddVitalsPatch(state, patientId, vitals);
+        if (pipelinePatch?.patients) {
+          const patients = pipelinePatch.patients;
+          return {
+            ...pipelinePatch,
+            capacity: buildCapacitySnapshot(patients, state.rooms),
+            auditLog: appendAuditLog(state.auditLog, {
+              action: 'addVitals',
+              patientId,
+              staffId:
+                vitals.recordedBy ||
+                state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
+                'system',
+              details: { recordedAt: vitals.recordedAt || null, pipeline: true },
+            }),
+          };
+        }
+
         const news2 = calculateNews2FromVitals(vitals);
         const shouldFlagForReassessment = news2.total >= 5;
         const news2Alert: Alert | null = news2.response.alertSeverity
@@ -3337,34 +3424,81 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     },
 
     completeReassessmentReminder: (patientId, reminderId, options = {}) =>
+      set((state) => {
+        const timestamp = options.completedAt || options.timestamp || new Date().toISOString();
+        return {
+          patients: state.patients.map((patient) =>
+            patient.id === patientId
+              ? {
+                  ...patient,
+                  reassessmentReminders: (patient.reassessmentReminders || []).map((reminder) =>
+                    reminder.id === reminderId
+                      ? {
+                          ...reminder,
+                          status: 'completed',
+                          completedBy: options.completedBy,
+                          completedAt: timestamp,
+                        }
+                      : reminder,
+                  ),
+                  timeline: [
+                    ...(patient.timeline || []),
+                    ...(patient.reassessmentReminders?.some((reminder) => reminder.id === reminderId)
+                      ? [
+                          createPatientTimelineEvent(
+                            patient,
+                            'ReassessmentReminderCompleted',
+                            'Reassessment reminder completed.',
+                            {
+                              timestamp,
+                              staffId: options.completedBy,
+                              metadata: { reminderId },
+                            },
+                          ),
+                        ]
+                      : []),
+                  ],
+                }
+              : patient,
+          ),
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'completeReassessmentReminder',
+            patientId,
+            staffId:
+              options.completedBy ||
+              state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
+              'system',
+            details: { reminderId, completedAt: timestamp },
+          }),
+        };
+      }),
+
+    snoozeReassessmentReminder: (patientId, reminderId, minutes = 10) =>
+      set((state) => buildSnoozeReassessmentReminderPatch(state, patientId, reminderId, minutes) || {}),
+
+    escalatePatient: (patientId, input) =>
+      set((state) => buildEscalatePatientPatch(state, patientId, input) || state),
+
+    cancelEscalation: (patientId, input) =>
+      set((state) => buildCancelEscalationPatch(state, patientId, input) || state),
+
+    acknowledgeVitalsAlert: (patientId, alertId, acknowledgedBy) =>
+      set((state) => buildAcknowledgeVitalsAlertPatch(state, patientId, alertId, acknowledgedBy)),
+
+    updateCapacity: () =>
       set((state) => ({
-        patients: state.patients.map((patient) =>
-          patient.id === patientId
-            ? {
-                ...patient,
-                reassessmentReminders: (patient.reassessmentReminders || []).map((reminder) =>
-                  reminder.id === reminderId
-                    ? {
-                        ...reminder,
-                        status: 'completed',
-                        completedBy: options.completedBy,
-                        completedAt: options.completedAt || new Date().toISOString(),
-                      }
-                    : reminder,
-                ),
-              }
-            : patient,
-        ),
-        auditLog: appendAuditLog(state.auditLog, {
-          action: 'completeReassessmentReminder',
-          patientId,
-          staffId:
-            options.completedBy ||
-            state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
-            'system',
-          details: { reminderId, completedAt: options.completedAt || null },
-        }),
+        capacity: calculateCapacity(),
       })),
+
+    updateAlerts: () =>
+      set((state) => {
+        try {
+          return buildUpdateAlertsPatch(state);
+        } catch (error) {
+          console.error('[emergencyStore] updateAlerts failed', error);
+          return {};
+        }
+      }),
 
     selectPatient: (patientId) =>
       set((state) => ({
@@ -4319,7 +4453,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         reason:
           input.reason || `Capacity crisis ${state.capacity.band} at ${state.capacity.score}/100`,
         capacityScore: input.capacityScore ?? state.capacity.score,
-        capacityBand: input.capacityBand || state.capacity.band,
+        capacityBand:
+          (input.capacityBand ||
+            (input as { capacityRiskLevel?: string }).capacityRiskLevel ||
+            state.capacity.band) as StaffingRequest['capacityBand'],
         status: 'Requested',
         source: input.source || 'capacity-crisis-mode',
         metadata: input.metadata || {},
@@ -4400,6 +4537,22 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       set((state) => {
         const referrals = [referral, ...state.referrals];
+        const patient = state.patients.find((candidate) => candidate.id === referral.patientId);
+        const patientLabel =
+          patient?.name || [patient?.firstName, patient?.lastName].filter(Boolean).join(' ') || 'Patient';
+        const sentAlert =
+          referral.status === 'Sent'
+            ? normalizeAlert({
+                id: `alert-referral-sent-${referral.id}`,
+                type: 'Referral',
+                severity: referral.urgency === 'Emergent' ? 'Warning' : 'Info',
+                title: `Referral sent to ${referral.targetDepartment}`,
+                message: `${patientLabel} referral is awaiting ${referral.targetDepartment} acknowledgement.`,
+                patientId: referral.patientId,
+                actionLabel: 'View Patient',
+                actionType: 'VIEW_PATIENT',
+              })
+            : null;
         const referralAlert = buildReferralAlert([referral]);
         return {
         referrals,
@@ -4451,7 +4604,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             },
           },
         ]),
-        alerts: referralAlert ? mergeEmergencyAlerts([referralAlert], state.alerts) : state.alerts,
+        alerts: mergeEmergencyAlerts(
+          [sentAlert, referralAlert].filter((alert): alert is Alert => Boolean(alert)),
+          state.alerts,
+        ),
       };
       });
 
@@ -4648,13 +4804,13 @@ export const selectSelectedPatient = (state: EmergencyStoreState): Patient | nul
   state.patients.find((patient) => patient.id === state.selectedPatientId) || null;
 
 export const selectActiveAlerts = (state: EmergencyStoreState): Alert[] =>
-  state.alerts.filter((alert) => !alert.dismissed);
+  state.alerts.filter((alert) => !alert.dismissed && !alert.dismissedAt);
 
 export const selectReassessmentCount = (state: EmergencyStoreState): number =>
-  state.patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue)).length;
+  buildReassessmentQueueItems(state.patients).length;
 
-export const selectReassessmentQueue = (state: EmergencyStoreState): Patient[] =>
-  state.patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue));
+export const selectReassessmentQueue = (state: EmergencyStoreState) =>
+  buildReassessmentQueueItems(state.patients);
 
 export const selectQueueCounts = (state: EmergencyStoreState): Record<string, number> =>
   state.patients.reduce<Record<string, number>>((counts, patient) => {

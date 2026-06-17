@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } from '../../types/emergency';
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
-import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
+import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
@@ -299,8 +299,9 @@ export default function EmergencyWhiteboard() {
       }),
     [centralControlSettings, emergencyRole],
   );
-  const centralNode = useCareDroidCentralNode({ screenMode: 'COMMAND_CENTER_DISPLAY' });
-  const centralSnapshot = centralNode.snapshot;
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const centralSnapshot = operationalIntelligence.centralSnapshot;
+  const intelligenceSnapshot = operationalIntelligence.snapshot;
   const commandLayerMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
     WHITEBOARD_COMMAND_METRIC_KEYS.has(metric.key),
   );
@@ -555,6 +556,9 @@ export default function EmergencyWhiteboard() {
           <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12, fontWeight: 750 }}>
             {centralSnapshot.sync.source === 'backend-snapshot' ? 'Backend snapshot' : 'Local store'} -{' '}
             {formatFreshness(centralSnapshot.sync.lastSyncedAt || centralSnapshot.generatedAt)}
+            {intelligenceSnapshot.badges.length
+              ? ` · ${intelligenceSnapshot.badges.map((badge) => badge.label).join(' · ')}`
+              : ''}
           </span>
         </div>
         <div

@@ -179,9 +179,14 @@ export function AppShell({ children }: AppShellProps) {
     let stopSimulation: (() => void) | undefined;
 
     void useEmergencyStore.getState().initializeFromBackend();
+    useEmergencyStore.getState().updateAlerts();
 
     const reassessmentInterval = startReassessmentEngine();
     const capacityInterval = startCapacityEngine();
+    const alertsInterval = window.setInterval(
+      () => useEmergencyStore.getState().updateAlerts(),
+      30_000,
+    );
 
     const isDevelopment = Boolean(
       (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV,
@@ -198,6 +203,7 @@ export function AppShell({ children }: AppShellProps) {
       cancelled = true;
       window.clearInterval(reassessmentInterval);
       window.clearInterval(capacityInterval);
+      window.clearInterval(alertsInterval);
       stopSimulation?.();
       startupStartedRef.current = false;
     };
@@ -445,9 +451,9 @@ export function AppShell({ children }: AppShellProps) {
       style={{
         display: 'flex',
         height: 'var(--app-viewport-height, 100dvh)',
-        background: '#0A0E1A',
-        color: '#F9FAFB',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        background: 'var(--color-background, var(--app-bg, #0A0E1A))',
+        color: 'var(--color-text-primary, var(--app-fg, #F9FAFB))',
+        fontFamily: 'var(--font-ui, Inter, system-ui, sans-serif)',
         overflow: 'hidden',
       }}
     >
@@ -455,7 +461,7 @@ export function AppShell({ children }: AppShellProps) {
         Skip to main content
       </a>
       <Sidebar navigationItems={visibleNavigationItems} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         <main
           id="main-content"
@@ -464,7 +470,12 @@ export function AppShell({ children }: AppShellProps) {
           tabIndex={-1}
           style={{
             flex: 1,
+            minWidth: 0,
+            minHeight: 0,
             overflow: 'auto',
+            overscrollBehavior: 'contain',
+            scrollbarGutter: 'stable',
+            WebkitOverflowScrolling: 'touch',
             paddingBottom: isMobileViewport ? 'calc(60px + env(safe-area-inset-bottom, 0px))' : 0,
           }}
         >

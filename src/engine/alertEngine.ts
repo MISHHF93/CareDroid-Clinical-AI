@@ -2,6 +2,14 @@ import { toast } from 'sonner';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert, Patient } from '../types/emergency';
 
+export {
+  deriveAlerts,
+  isDerivedAlertId,
+  normalizeAlert,
+  type AlertDispatchInput,
+  type AlertEngineInputs,
+} from './alertEngineDerived';
+
 type AlertInput = Omit<Alert, 'id' | 'createdAt' | 'dismissed'> &
   Partial<Pick<Alert, 'id' | 'createdAt' | 'dismissed'>>;
 
@@ -65,13 +73,19 @@ export function dispatchAlert(input: AlertInput): string {
 export const dispatch = dispatchAlert;
 
 export function dispatchCriticalVitalsAlerts(patient: Patient): string[] {
-  const latestVitals = patient.vitals.at(-1);
+  const latestVitals = Array.isArray(patient.vitals)
+    ? patient.vitals.at(-1)
+    : patient.vitals;
   if (!latestVitals) return [];
 
   const findings = [
     latestVitals.spo2 !== undefined && latestVitals.spo2 < 94 ? `SpO2 ${latestVitals.spo2}%` : null,
-    latestVitals.hr !== undefined && (latestVitals.hr > 120 || latestVitals.hr < 50) ? `HR ${latestVitals.hr}` : null,
-    latestVitals.sbp !== undefined && (latestVitals.sbp < 90 || latestVitals.sbp > 180) ? `SBP ${latestVitals.sbp}` : null,
+    latestVitals.hr !== undefined && (latestVitals.hr > 120 || latestVitals.hr < 50)
+      ? `HR ${latestVitals.hr}`
+      : null,
+    latestVitals.sbp !== undefined && (latestVitals.sbp < 90 || latestVitals.sbp > 180)
+      ? `SBP ${latestVitals.sbp}`
+      : null,
   ].filter((finding): finding is string => Boolean(finding));
 
   if (!findings.length) return [];

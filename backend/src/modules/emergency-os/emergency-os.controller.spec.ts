@@ -26,6 +26,7 @@ import {
   SmartIntakeService,
   WorkflowActionLogService,
 } from './emergency-os.services';
+import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
@@ -45,6 +46,7 @@ describe('EmergencyOsController', () => {
         CapacityService,
         BoardingService,
         CareDroidCentralNodeService,
+        OperationalIntelligenceService,
         ReferralService,
         ProvincialHealthService,
         IntegrationHubService,
@@ -66,6 +68,9 @@ describe('EmergencyOsController', () => {
     const modules = [
       controller.getWhiteboard(),
       controller.getCentralNodeSnapshot(),
+      controller.getOperationalIntelligenceSnapshot(),
+      controller.getOperationalIntelligenceModelHealth(),
+      controller.getOperationalIntelligenceAlerts(),
       controller.getPatients(),
       controller.getJourney(),
       controller.getEMS(),

@@ -4,13 +4,14 @@ import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
-import useCareDroidCentralNode from '../hooks/useCareDroidCentralNode';
+import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import './CopilotPanel.css';
+import type { OperationalIntelligenceSnapshot } from '../operational-intelligence/operationalIntelligence.types';
 import { formatLongWaitAttentionForCopilot } from '../utils/longWaitRescue';
 
 type CopilotMessage = {
@@ -203,6 +204,7 @@ function buildDepartmentPrompt({
   emergencySettings,
   backendCopilotContext,
   centralSnapshot,
+  intelligenceSnapshot,
   attachments,
 }: {
   patients: Patient[];
@@ -210,6 +212,7 @@ function buildDepartmentPrompt({
   emergencySettings: ReturnType<typeof useEmergencyStore.getState>['emergencySettings'];
   backendCopilotContext?: Record<string, unknown>;
   centralSnapshot: CareDroidCentralNodeSnapshot;
+  intelligenceSnapshot: OperationalIntelligenceSnapshot;
   attachments?: CopilotAttachment[];
 }) {
   const activePatients = patients.filter(isActivePatient);
@@ -247,6 +250,14 @@ function buildDepartmentPrompt({
     '',
     'Active alerts:',
     activeAlerts.length ? activeAlerts.map((alert) => `- ${formatAlert(alert)}`).join('\n') : '- None',
+    '',
+    'Operational intelligence snapshot:',
+    `- Mode: ${intelligenceSnapshot.mode}`,
+    `- Data freshness: ${intelligenceSnapshot.dataFreshness.status}`,
+    `- Anomalies: ${intelligenceSnapshot.anomalies.length}`,
+    `- Advisory recommendations: ${intelligenceSnapshot.recommendations.map((rec) => rec.action).join('; ') || 'None'}`,
+    `- ${intelligenceSnapshot.disclaimers.operational}`,
+    `- ${intelligenceSnapshot.disclaimers.clinical}`,
   ].filter((line): line is string => Boolean(line)).join('\n');
 }
 
@@ -261,6 +272,12 @@ function extractResponseText(data: unknown): string {
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function tokenDelay(token: string): number {
+  if (/[.!?]\s*$/.test(token)) return 14;
+  if (/[,;:]\s*$/.test(token)) return 10;
+  return 7;
 }
 
 async function streamIntoMessage(
@@ -278,7 +295,7 @@ async function streamIntoMessage(
         message.id === messageId ? { ...message, content: nextContent } : message,
       ),
     );
-    await delay(18);
+    await delay(tokenDelay(token));
   }
 }
 
@@ -336,8 +353,9 @@ export function CopilotPanel() {
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
   const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
-  const centralNode = useCareDroidCentralNode({ screenMode: 'PHYSICIAN_SCREEN' });
-  const centralSnapshot = centralNode.snapshot;
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'PHYSICIAN_SCREEN' });
+  const centralSnapshot = operationalIntelligence.centralSnapshot;
+  const intelligenceSnapshot = operationalIntelligence.snapshot;
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: 'copilot-welcome',
@@ -565,6 +583,7 @@ export function CopilotPanel() {
       emergencySettings,
       backendCopilotContext,
       centralSnapshot,
+      intelligenceSnapshot,
       attachments: submittedAttachments,
     });
     recordWorkflowAction({
@@ -693,75 +712,17 @@ export function CopilotPanel() {
   };
 
   return (
-    <aside
-      className="ed-copilot-panel"
-      style={{
-        width: 380,
-        height: '100vh',
-        flexShrink: 0,
-        background: '#111827',
-        borderLeft: '1px solid #1F2937',
-        color: '#F9FAFB',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <style>
-        {`
-          @keyframes ed-copilot-live-pulse {
-            0%, 100% { opacity: 0.45; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1); }
-          }
-
-          @keyframes ed-copilot-typing {
-            0%, 80%, 100% { opacity: 0.35; transform: translateY(0); }
-            40% { opacity: 1; transform: translateY(-3px); }
-          }
-
-          .ed-copilot-typing-dot {
-            animation: ed-copilot-typing 900ms infinite ease-in-out;
-          }
-        `}
-      </style>
-      <header
-        style={{
-          height: 48,
-          flexShrink: 0,
-          borderBottom: '1px solid #1F2937',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '0 10px',
-        }}
-      >
-        <span
-          aria-label="Copilot panel active"
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 999,
-            background: '#10B981',
-            animation: 'ed-copilot-live-pulse 1200ms infinite ease-in-out',
-            flexShrink: 0,
-          }}
-        />
-        <span style={{ fontSize: 14, fontWeight: 500, marginRight: 2 }}>
-          {EMERGENCY_OS_BRANDING.copilotName}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, flex: 1, minWidth: 0 }}>
+    <aside className="ed-copilot-panel">
+      <header className="ed-copilot-panel__header">
+        <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
+        <div className="ed-copilot-panel__identity">
+          <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
+          <strong>Human review required</strong>
+        </div>
+        <div className="ed-copilot-panel__status-strip" aria-label="Copilot context snapshot">
           {[activePatients.length, capacity.band, reassessmentCount].map((value, index) => (
             <span
               key={`${value}-${index}`}
-              style={{
-                border: '1px solid #1F2937',
-                borderRadius: 999,
-                background: '#0B1120',
-                color: '#9CA3AF',
-                padding: '3px 6px',
-                fontSize: 10,
-                fontWeight: 700,
-                whiteSpace: 'nowrap',
-              }}
             >
               {value}
             </span>
@@ -771,16 +732,7 @@ export function CopilotPanel() {
           type="button"
           onClick={toggleCopilot}
           aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            border: '1px solid #374151',
-            background: 'transparent',
-            color: '#F9FAFB',
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
+          className="ed-copilot-panel__close"
         >
           X
         </button>
@@ -788,27 +740,13 @@ export function CopilotPanel() {
 
       <div
         aria-label={`${EMERGENCY_OS_BRANDING.copilotName} messages`}
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-        }}
+        className="ed-copilot-panel__messages"
       >
         {backendSafetyRule || backendCopilot.error ? (
           <div
             role="status"
-            style={{
-              border: '1px solid #374151',
-              borderRadius: 10,
-              background: '#0B1120',
-              color: backendCopilot.error ? '#FCA5A5' : '#FDE68A',
-              fontSize: 11,
-              lineHeight: 1.4,
-              padding: '8px 10px',
-            }}
+            className="ed-copilot-panel__policy"
+            data-state={backendCopilot.error ? 'error' : 'policy'}
           >
             {backendCopilot.error
               ? `${EMERGENCY_OS_BRANDING.copilotName} backend context unavailable; using local board state.`
@@ -817,65 +755,28 @@ export function CopilotPanel() {
         ) : null}
         <section
           aria-label="Copilot operational awareness"
-          style={{
-            border: '1px solid #1F2937',
-            borderRadius: 12,
-            background: '#0B1120',
-            display: 'grid',
-            gap: 8,
-            padding: 10,
-          }}
+          className="ed-copilot-panel__awareness"
         >
-          <strong style={{ color: '#F9FAFB', fontSize: 12 }}>Operational awareness</strong>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <strong>Operational awareness</strong>
+          <div className="ed-copilot-panel__awareness-grid">
             {awarenessCards.map((card) => (
-              <div
-                key={card.label}
-                style={{
-                  border: '1px solid #1F2937',
-                  borderRadius: 10,
-                  background: '#111827',
-                  display: 'grid',
-                  gap: 2,
-                  minWidth: 0,
-                  padding: 8,
-                }}
-              >
-                <span style={{ color: '#9CA3AF', fontSize: 10, fontWeight: 800, textTransform: 'uppercase' }}>
-                  {card.label}
-                </span>
-                <strong style={{ color: '#F9FAFB', fontSize: 14 }}>{card.value}</strong>
-                <small style={{ color: '#9CA3AF', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {card.detail}
-                </small>
+              <div key={card.label} className="ed-copilot-panel__awareness-card">
+                <span>{card.label}</span>
+                <strong>{card.value}</strong>
+                <small>{card.detail}</small>
               </div>
             ))}
           </div>
         </section>
         {messages.map((message) => {
-          const isStaff = message.role === 'staff';
           return (
             <div
               key={message.id}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: isStaff ? 'flex-end' : 'flex-start',
-                gap: 4,
-              }}
+              className="ed-copilot-panel__message"
+              data-role={message.role}
             >
               <div
-                style={{
-                  maxWidth: '86%',
-                  background: isStaff ? '#1C2333' : '#111827',
-                  border: isStaff ? 'none' : '1px solid #1F2937',
-                  borderRadius: isStaff ? '12px 12px 0 12px' : '12px 12px 12px 0',
-                  padding: '8px 12px',
-                  color: '#F9FAFB',
-                  fontSize: 13,
-                  lineHeight: 1.45,
-                  whiteSpace: 'pre-wrap',
-                }}
+                className="ed-copilot-panel__bubble"
               >
                 {message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)}
                 {message.attachments?.length ? (
@@ -888,7 +789,7 @@ export function CopilotPanel() {
                   </div>
                 ) : null}
               </div>
-              <time style={{ color: '#6B7280', fontSize: 10 }}>
+              <time>
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </time>
             </div>
@@ -902,24 +803,13 @@ export function CopilotPanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div style={{ padding: '0 12px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+      <div className="ed-copilot-panel__quick-actions">
         {quickActions.map((action) => (
           <button
             key={action}
             type="button"
             onClick={() => sendQuickAction(action)}
             disabled={loading}
-            style={{
-              border: '1px solid #1F2937',
-              borderRadius: 10,
-              background: '#0B1120',
-              color: '#D1D5DB',
-              padding: '8px 9px',
-              fontSize: 12,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.65 : 1,
-              textAlign: 'left',
-            }}
           >
             {action}
           </button>
@@ -1004,49 +894,18 @@ export function CopilotPanel() {
 
       <form
         onSubmit={submitMessage}
-        style={{
-          height: 56,
-          flexShrink: 0,
-          borderTop: '1px solid #1F2937',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '0 12px',
-        }}
+        className="ed-copilot-panel__composer"
       >
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder={`Ask ${EMERGENCY_OS_BRANDING.copilotName}...`}
           aria-label={`Message ${EMERGENCY_OS_BRANDING.copilotName}`}
-          style={{
-            flex: 1,
-            minWidth: 0,
-            border: '1px solid #374151',
-            borderRadius: 10,
-            background: '#0B1120',
-            color: '#F9FAFB',
-            padding: '9px 10px',
-            outline: 'none',
-          }}
         />
         <button
           type="submit"
           aria-label={`Send ${EMERGENCY_OS_BRANDING.copilotName} message`}
           disabled={loading || (!input.trim() && attachments.length === 0)}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            border: '1px solid #2563EB',
-            background: '#2563EB',
-            color: '#F9FAFB',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: loading || (!input.trim() && attachments.length === 0) ? 'not-allowed' : 'pointer',
-            opacity: loading || (!input.trim() && attachments.length === 0) ? 0.6 : 1,
-          }}
         >
           <IconSend size={17} stroke={2.2} />
         </button>

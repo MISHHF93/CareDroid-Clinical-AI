@@ -20,7 +20,9 @@ describe('canonical route/auth architecture', () => {
   it('mounts auth routes without reintroducing tenant-required wrappers', () => {
     expect(appSource).toContain('function AuthRoute()');
     expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
-    expect(appSource).toContain('path="/login" element={<AuthRoute />}');
+    expect(appSource).toContain('AUTH_PATH_ALIASES');
+    expect(appSource).toContain('AUTH_SIGNUP_PATH_ALIASES');
+    expect(appSource).toContain('key={`auth-signin-${path}`}');
     expect(appSource).not.toContain('function AuthPathRedirect()');
     expect(appSource).not.toContain('<TenantRequired>');
     expect(redirectsByPath['/auth']).toBeUndefined();
