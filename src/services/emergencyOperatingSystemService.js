@@ -26,6 +26,7 @@ import EmergencyResourceBoardService from './emergencyResourceBoardService';
 import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
 import EmergencyWhiteboardService from './emergencyWhiteboardService';
 import QueueIntelligenceService from './queueIntelligenceService';
+import { getLiveQueueDashboard } from './queueAssignment';
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
 import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
@@ -60,7 +61,8 @@ export const EmergencyOperatingSystemService = Object.freeze({
       bottlenecks: PatientJourneyEngine.getJourneyBottlenecks(),
       recommendations: PatientJourneyEngine.getJourneyRecommendations({ automations }),
     });
-    const queueFlow = QueueIntelligenceService.getQueueDashboard();
+    const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
+    const queueFlow = getLiveQueueDashboard(demoEnvironment.patients);
     const doorToDoctor = DoorToDoctorIntelligenceService.getDashboard();
     const waitingRoom = WaitingRoomIntelligenceService.getWaitingRoomDashboard();
     const reassessment = ReassessmentAutomationService.getDashboard();
@@ -74,7 +76,6 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const escalationEngine = EmergencyEscalationEngineService.getEscalationDashboard();
     const kpiLayer = EmergencyKPILayerService.getKpiLayer();
     const simulationScenarios = EmergencySimulationScenariosService.getScenarioDashboard();
-    const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
     const automationMarketplace = EdAutomationMarketplace.getMarketplaceDashboard(marketplaceAutomations);
     const automationRoi = AutomationROIService.getAutomationRoiDashboard(marketplaceAutomations);
     const digitalWhiteboard = EmergencyWhiteboardService.getWhiteboard();

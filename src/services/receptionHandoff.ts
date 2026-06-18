@@ -1,12 +1,20 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { postReceptionHandoff } from './emergencyOsApi';
+import { ensureEncounterAfterIntake } from './intakeEncounter';
+import { enterTriageQueue } from './queueAssignment';
 import { PatientState } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
 
 type ReceptionHandoffStore = Pick<
   ReturnType<typeof useEmergencyStore.getState>,
-  'selectPatient' | 'setQueueFilter' | 'recordWorkflowAction' | 'movePatientToState' | 'patients'
+  | 'selectPatient'
+  | 'setQueueFilter'
+  | 'recordWorkflowAction'
+  | 'movePatientToState'
+  | 'patients'
+  | 'emergencySettings'
+  | 'updatePatient'
 >;
 
 export type ReceptionHandoffSource =
@@ -15,6 +23,14 @@ export type ReceptionHandoffSource =
   | 'reception'
   | 'ems-convert'
   | 'prepare-patient';
+
+const HANDOFF_ENCOUNTER_SOURCE: Record<ReceptionHandoffSource, 'walk-in' | 'smart-intake' | 'ems'> = {
+  'quick-intake': 'walk-in',
+  'smart-intake': 'smart-intake',
+  reception: 'walk-in',
+  'ems-convert': 'ems',
+  'prepare-patient': 'smart-intake',
+};
 
 export type ReceptionHandoffOptions = {
   patientId: string;
@@ -33,17 +49,17 @@ export function completeReceptionHandoff(
   options: ReceptionHandoffOptions,
 ): ReceptionHandoffResult {
   const { patientId, source = 'reception', actorName } = options;
-  const patient = store.patients.find((entry) => entry.id === patientId);
 
-  if (patient && patient.state !== PatientState.Triage) {
-    store.movePatientToState(patientId, PatientState.Triage, {
-      staffId: 'reception-handoff',
-      note: `Reception handoff to triage queue (${source}).`,
-    });
-  }
+  enterTriageQueue(store, {
+    patientId,
+    source,
+    actorName,
+    actorId: 'reception-handoff',
+    note: `Reception handoff to triage queue (${source}).`,
+    recordWorkflow: false,
+  });
 
   store.selectPatient(patientId);
-  store.setQueueFilter('Triage');
   store.recordWorkflowAction({
     type: 'journey_state_changed',
     summary: `Patient handed off from reception to triage queue (${source}).`,
@@ -56,6 +72,12 @@ export function completeReceptionHandoff(
       queue: 'Triage',
       targetState: PatientState.Triage,
     },
+  });
+
+  ensureEncounterAfterIntake(store, {
+    patientId,
+    source: HANDOFF_ENCOUNTER_SOURCE[source],
+    actorName,
   });
 
   if (isBackendCapabilityEnabled('emergencyReceptionHandoff')) {

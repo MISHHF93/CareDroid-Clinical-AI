@@ -11,6 +11,7 @@ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermiss
 import { fetchSmartIntake, runSmartIntakeVerticalSlice } from '../../services/emergencyOsApi';
 import SmartIntakeApi from '../../services/smartIntakeApi';
 import { completeReceptionHandoff } from '../../services/receptionHandoff';
+import { findDuplicateCandidates, mergeDuplicateCandidates } from '../../utils/patientDuplicateDetection';
 import './SmartIntake.css';
 
 const STEP_INDEX_BY_QUERY = Object.freeze({
@@ -95,7 +96,7 @@ export default function SmartIntake() {
     return STEP_INDEX_BY_QUERY[stepParam] ?? 0;
   });
   const [selectedCandidateId, setSelectedCandidateId] = useState(
-    SMART_INTAKE_DEMO.candidates[0]?.patientId || null,
+    () => SMART_INTAKE_DEMO.candidates[0]?.patientId || null,
   );
   const [sessionId, setSessionId] = useState(SMART_INTAKE_DEMO.sessionId);
   const [statusMessage, setStatusMessage] = useState(
@@ -103,7 +104,9 @@ export default function SmartIntake() {
   );
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
   const [pendingAction, setPendingAction] = useState('');
+  const [remoteMatchCandidates, setRemoteMatchCandidates] = useState([]);
   const [fieldDecisions, setFieldDecisions] = useState(() =>
     Object.fromEntries(
       SMART_INTAKE_DEMO.extractedFields.map((field) => [field.field, field.status]),
@@ -111,6 +114,47 @@ export default function SmartIntake() {
   );
   const canVerifyIntake = emergencyRole.can(EMERGENCY_ACTIONS.verifyIntake);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+
+  const intakeDemographics = useMemo(
+    () => ({
+      firstName: extractedFieldValue('firstName'),
+      lastName: extractedFieldValue('lastName'),
+      dateOfBirth: extractedFieldValue('dateOfBirth'),
+      sex: extractedFieldValue('sex'),
+      phone: extractedFieldValue('phone'),
+      healthCardNumber: extractedFieldValue('healthCardNumber'),
+      address: extractedFieldValue('address'),
+    }),
+    [],
+  );
+
+  const matchCandidates = useMemo(() => {
+    const localCandidates = findDuplicateCandidates(patients, intakeDemographics);
+    const merged = mergeDuplicateCandidates(localCandidates, remoteMatchCandidates);
+    return merged.length ? merged : [...SMART_INTAKE_DEMO.candidates];
+  }, [patients, intakeDemographics, remoteMatchCandidates]);
+
+  useEffect(() => {
+    if (!sessionReady || !canVerifyIntake) return;
+    if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) return;
+    void SmartIntakeApi.matchPatient(sessionId, emergencyRole.roleLabel)
+      .then((result) => {
+        const apiCandidates = result?.candidates || result?.data?.candidates || [];
+        setRemoteMatchCandidates(Array.isArray(apiCandidates) ? apiCandidates : []);
+      })
+      .catch(() => setRemoteMatchCandidates([]));
+  }, [sessionReady, sessionId, canVerifyIntake, emergencyRole.roleLabel]);
+
+  useEffect(() => {
+    if (contextPatientId) return;
+    const topCandidate = matchCandidates[0];
+    if (!topCandidate) return;
+    setSelectedCandidateId((current) =>
+      matchCandidates.some((candidate) => candidate.patientId === current)
+        ? current
+        : topCandidate.patientId,
+    );
+  }, [contextPatientId, matchCandidates]);
 
   useEffect(() => {
     if (!fromReception && prefersReceptionForPatientCreate(emergencyRole.role)) {
@@ -137,11 +181,11 @@ export default function SmartIntake() {
       );
       return;
     }
-    const matchedCandidate = SMART_INTAKE_DEMO.candidates.find(
+    const matchedCandidate = matchCandidates.find(
       (candidate) => candidate.patientId === contextPatientId,
     );
     if (matchedCandidate) setSelectedCandidateId(matchedCandidate.patientId);
-  }, [contextPatientId, patients, selectPatient]);
+  }, [contextPatientId, matchCandidates, patients, selectPatient]);
 
   useEffect(() => {
     if (!fromReception || searchParams.get('mode') !== 'unknown') return;
@@ -163,8 +207,9 @@ export default function SmartIntake() {
   const sessionBootstrapped = useRef(false);
   useEffect(() => {
     if (!fromReception || !canVerifyIntake || sessionBootstrapped.current) return;
+    const mode = searchParams.get('mode');
     const stepParam = searchParams.get('step');
-    if (!stepParam || stepParam === 'finalize') return;
+    if (mode === 'unknown' || stepParam === 'finalize') return;
     sessionBootstrapped.current = true;
     void startBackendSession();
   }, [fromReception, canVerifyIntake, searchParams]);
@@ -228,6 +273,7 @@ export default function SmartIntake() {
       setActiveStep(resolveSessionStartStep());
     } finally {
       setIsStarting(false);
+      setSessionReady(true);
     }
   };
 
@@ -306,7 +352,7 @@ export default function SmartIntake() {
     }
   };
 
-  const selectedCandidate = SMART_INTAKE_DEMO.candidates.find(
+  const selectedCandidate = matchCandidates.find(
     (candidate) => candidate.patientId === selectedCandidateId,
   );
   const selectedCandidateOnBoard = Boolean(
@@ -327,10 +373,10 @@ export default function SmartIntake() {
         <button
           type="button"
           onClick={startBackendSession}
-          disabled={isStarting || !canVerifyIntake}
+          disabled={isStarting || !canVerifyIntake || sessionReady}
         >
           <FileScan size={18} aria-hidden />
-          {isStarting ? 'Starting...' : 'Start Intake'}
+          {isStarting ? 'Starting...' : sessionReady ? 'Session active' : 'Start Intake'}
         </button>
         {fromReception ? (
           <button type="button" onClick={() => navigate(CANONICAL_ROUTES.emergencyReception)}>
@@ -432,7 +478,7 @@ export default function SmartIntake() {
             <p>Ranked candidates only. The system never auto-links without staff confirmation.</p>
           </header>
           <div className="smart-intake__candidate-list">
-            {SMART_INTAKE_DEMO.candidates.map((candidate) => (
+            {matchCandidates.map((candidate) => (
               <button
                 key={candidate.patientId}
                 type="button"

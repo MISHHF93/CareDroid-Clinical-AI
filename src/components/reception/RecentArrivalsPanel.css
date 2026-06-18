@@ -1,0 +1,56 @@
+.recent-arrivals {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 14px;
+  background: var(--color-card, #172033);
+}
+
+.recent-arrivals__header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.recent-arrivals__header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.recent-arrivals__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-arrivals__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 10px;
+  background: var(--color-elevated, #0b1120);
+  color: var(--color-text-primary, #f9fafb);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.recent-arrivals__item span:last-child {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.recent-arrivals__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+}

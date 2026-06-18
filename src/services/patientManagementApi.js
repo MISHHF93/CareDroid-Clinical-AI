@@ -450,21 +450,10 @@ export function importPatientObservations(patientId, payload = {}, options = {})
   return postPatientImport(PATIENT_MANAGEMENT_ENDPOINTS.importObservations(patientId), payload, options);
 }
 
+import { patientMatchesSearch } from '../utils/patientSearch';
+
 function patientMatchesQuery(patient, query) {
-  const normalized = String(query || '').trim().toLowerCase();
-  if (!normalized) return false;
-  return [
-    patient.id,
-    patient.mrn,
-    patient.firstName,
-    patient.lastName,
-    patient.name,
-    `${patient.firstName || ''} ${patient.lastName || ''}`,
-    patient.chiefComplaint,
-    patient.complaintCategory,
-  ]
-    .filter(Boolean)
-    .some((field) => String(field).toLowerCase().includes(normalized));
+  return patientMatchesSearch(patient, query);
 }
 
 export async function searchPatientsFromBackend(query, { localPatients = [], limit = 8 } = {}) {

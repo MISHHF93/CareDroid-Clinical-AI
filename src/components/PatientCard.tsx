@@ -4,6 +4,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { enterWaitingQueue } from '../services/queueAssignment';
 import './PatientCard.css';
 
 type PatientCardProps = {
@@ -305,6 +306,14 @@ function PatientCard({
   const handleMoveNext = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (!canMoveNext) return;
+    if (nextState === PatientState.Waiting) {
+      enterWaitingQueue(useEmergencyStore.getState(), {
+        patientId: patient.id,
+        actorId: patient.assignedStaffId || 'whiteboard-command',
+        note: 'Moved from Whiteboard mission control into waiting queue.',
+      });
+      return;
+    }
     movePatientToState(patient.id, nextState, patient.assignedStaffId || 'whiteboard-command', 'Moved from Whiteboard mission control');
   }, [canMoveNext, movePatientToState, nextState, patient.assignedStaffId, patient.id]);
   const handleReassessment = useCallback((event: MouseEvent<HTMLButtonElement>) => {

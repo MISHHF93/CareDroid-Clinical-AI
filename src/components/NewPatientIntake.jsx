@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from 'lucide-react';
 import { Priority } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { enterTriageQueue } from '../services/queueAssignment';
 import { TriageSuggestionEngine } from '../engine/triageEngine';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
 import { runSmartIntakeVerticalSlice } from '../services/emergencyOsApi';
@@ -109,7 +110,6 @@ function fieldLabel(field) {
 
 export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const addPatient = useEmergencyStore((state) => state.addPatient);
-  const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter || noop);
   const setWhiteboardSearchQuery = useEmergencyStore(
     (state) => state.setWhiteboardSearchQuery || noop,
   );
@@ -251,7 +251,11 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
     }
 
     addPatient(patientToAdd, { syncToBackend: !syncedThroughVerticalSlice });
-    setQueueFilter(null);
+    enterTriageQueue(useEmergencyStore.getState(), {
+      patientId: patientToAdd.id,
+      source: 'whiteboard-intake',
+      actorId: 'whiteboard-intake',
+    });
     setWhiteboardSearchQuery('');
     onPatientAdded?.(patientToAdd.id);
     resetDraft();

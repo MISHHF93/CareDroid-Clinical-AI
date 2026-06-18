@@ -335,6 +335,11 @@ export interface Patient {
   emsUnitId?: EntityId;
   emsArrival?: EMSArrival;
   criticalChecklist?: CriticalChecklistRecord;
+  phone?: string;
+  mobilePhone?: string;
+  healthCardNumber?: string;
+  healthCard?: string;
+  phn?: string;
 }
 
 export type StaffRole =
@@ -467,6 +472,7 @@ export interface EMSUnit {
 
 export type WorkflowActionType =
   | 'patient_created'
+  | 'encounter_created'
   | 'journey_state_changed'
   | 'clinician_assigned'
   | 'reassessment_created'

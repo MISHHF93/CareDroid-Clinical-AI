@@ -43,6 +43,7 @@ export const EMERGENCY_SETTINGS_GROUP_LABELS = Object.freeze({
   ems: 'EMS Thresholds',
   boarding: 'Boarding Thresholds',
   alerts: 'Alert Rules',
+  intake: 'Intake Settings',
   central: 'Central Control Node',
   operationalIntelligence: 'Operational Intelligence',
 });

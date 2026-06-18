@@ -7,6 +7,12 @@ import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { routeComplaint } from '../engine/complaintRouter';
+import { ensureEncounterAfterIntake } from '../services/intakeEncounter';
+import {
+  DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
+  findDuplicateCandidates,
+  type PatientDuplicateCandidate,
+} from '../utils/patientDuplicateDetection';
 
 type QuickIntakeVariant = 'whiteboard' | 'reception';
 
@@ -159,6 +165,7 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
   const copy = QUICK_INTAKE_COPY[variant];
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
+  const patients = useEmergencyStore((state) => state.patients);
   const centralControlSettings = useEmergencyStore(
     (state) => state.emergencySettings.centralControl,
   );
@@ -175,8 +182,29 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [duplicateAcknowledged, setDuplicateAcknowledged] = useState(false);
   const [protocolSuggestions, setProtocolSuggestions] = useState<string[]>([]);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+
+  const duplicateCandidates = useMemo<PatientDuplicateCandidate[]>(() => {
+    if (variant !== 'reception') return [];
+    if (!firstName.trim() && !lastName.trim() && !dob) return [];
+    return findDuplicateCandidates(patients, {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      dateOfBirth: dob || undefined,
+      sex,
+      mrn,
+    });
+  }, [variant, patients, firstName, lastName, dob, sex, mrn]);
+
+  const highConfidenceDuplicate = duplicateCandidates.find(
+    (candidate) => candidate.matchScore >= DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
+  );
+
+  useEffect(() => {
+    setDuplicateAcknowledged(false);
+  }, [firstName, lastName, dob, sex]);
   const centralControl = useMemo(
     () =>
       getCentralControlPolicy({
@@ -238,6 +266,12 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
       setSubmitError(`${emergencyRole.roleLabel} cannot submit central intake inputs.`);
       return;
     }
+    if (variant === 'reception' && highConfidenceDuplicate && !duplicateAcknowledged) {
+      setSubmitError(
+        `Possible duplicate: ${highConfidenceDuplicate.displayName} (${highConfidenceDuplicate.matchScore}%). Open the existing chart or acknowledge before creating a new record.`,
+      );
+      return;
+    }
     const now = new Date().toISOString();
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
@@ -283,12 +317,24 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
       const response = await createSmartIntakePatient(patient);
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
+      if (variant !== 'reception') {
+        ensureEncounterAfterIntake(useEmergencyStore.getState(), {
+          patientId: persistedPatient.id,
+          source: 'walk-in',
+        });
+      }
       onAdded(persistedPatient);
       onClose();
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : 'Unable to save intake to the Emergency OS API.',
-      );
+    } catch {
+      addPatient(patient);
+      if (variant !== 'reception') {
+        ensureEncounterAfterIntake(useEmergencyStore.getState(), {
+          patientId: patient.id,
+          source: 'walk-in',
+        });
+      }
+      onAdded(patient);
+      onClose();
     } finally {
       setSubmitting(false);
     }
@@ -441,6 +487,50 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
           style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}
         >
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {variant === 'reception' && duplicateCandidates.length ? (
+              <div
+                role="alert"
+                style={{
+                  border: '1px solid rgba(245, 158, 11, 0.45)',
+                  borderRadius: 12,
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  padding: 12,
+                  color: '#FCD34D',
+                  fontSize: 13,
+                }}
+              >
+                <strong style={{ display: 'block', color: '#F9FAFB', marginBottom: 6 }}>
+                  Possible duplicate patients
+                </strong>
+                <ul style={{ margin: '0 0 8px', paddingLeft: 18 }}>
+                  {duplicateCandidates.map((candidate) => (
+                    <li key={candidate.patientId}>
+                      {candidate.displayName} · {candidate.matchScore}% match
+                    </li>
+                  ))}
+                </ul>
+                {highConfidenceDuplicate && !duplicateAcknowledged ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDuplicateAcknowledged(true);
+                      setSubmitError('');
+                    }}
+                    style={{
+                      border: 0,
+                      borderRadius: 8,
+                      background: '#1F2937',
+                      color: '#F9FAFB',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                    }}
+                  >
+                    Not a duplicate — create anyway
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
             {copy.showCentralBanner ? (
             <div
               aria-label="Central node input mode"

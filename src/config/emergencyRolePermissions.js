@@ -406,7 +406,22 @@ export function getEmergencyRoleHomeRoute(role) {
   return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyWhiteboard;
 }
 
+export function getReceptionSmartIntakePath(options = {}) {
+  const params = new URLSearchParams({ from: 'reception', autostart: '1' });
+  if (options.step) params.set('step', options.step);
+  if (options.mode) params.set('mode', options.mode);
+  if (options.patientId) params.set('patientId', options.patientId);
+  if (options.emsArrivalId) params.set('emsArrivalId', options.emsArrivalId);
+  return `${CANONICAL_ROUTES.emergencyIntake}?${params.toString()}`;
+}
+
+/** Primary reception create path — Smart Intake first. */
 export function getReceptionQuickCreatePath() {
+  return getReceptionSmartIntakePath();
+}
+
+/** Walk-in demographics shortcut without the identity wizard. */
+export function getReceptionWalkInQuickPath() {
   return `${CANONICAL_ROUTES.emergencyReception}?quickCreate=1`;
 }
 

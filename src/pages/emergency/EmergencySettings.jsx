@@ -1655,6 +1655,42 @@ export default function EmergencySettings() {
       </Section>
 
       <Section
+        id="intake"
+        title="Intake Settings"
+        subtitle="Automatic encounter creation after successful patient intake."
+        action={
+          <button
+            type="button"
+            disabled={savingGroup === 'intake'}
+            onClick={() => saveGroup('intake', { intakeSettings: draft.intakeSettings })}
+          >
+            Save Intake
+          </button>
+        }
+      >
+        <div className="emergency-settings__grid">
+          <SettingsField
+            type="checkbox"
+            label="Auto-create encounter after intake"
+            value={draft.intakeSettings?.autoCreateEncounter ?? true}
+            onChange={(value) => updateNested('intakeSettings', 'autoCreateEncounter', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Auto-assign triage queue after intake"
+            value={draft.intakeSettings?.autoAssignTriageQueue ?? true}
+            onChange={(value) => updateNested('intakeSettings', 'autoAssignTriageQueue', value)}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Sync waiting queue on triage completion"
+            value={draft.intakeSettings?.autoAssignWaitingQueue ?? true}
+            onChange={(value) => updateNested('intakeSettings', 'autoAssignWaitingQueue', value)}
+          />
+        </div>
+      </Section>
+
+      <Section
         id="ems"
         title="EMS Thresholds"
         subtitle="Offload targets and inbound critical ETA controls."

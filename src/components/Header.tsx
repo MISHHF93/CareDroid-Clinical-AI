@@ -18,6 +18,11 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
+import {
+  formatPatientSearchHint,
+  getPatientDisplayName,
+  rankPatientsBySearch,
+} from '../utils/patientSearch';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
 import './Header.css';
@@ -112,27 +117,6 @@ function getHeaderFlagValue(flag: unknown): string {
   }
 
   return typeof flag === 'string' ? flag : '';
-}
-
-function getPatientDisplayName(patient: Patient): string {
-  return (
-    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
-  );
-}
-
-function patientLookupText(patient: Patient): string {
-  return [
-    getPatientDisplayName(patient),
-    patient.mrn,
-    patient.chiefComplaint,
-    patient.complaint,
-    patient.complaintCategory,
-    patient.state,
-    patient.priority,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
 }
 
 function alertRoute(alert: Alert): string | null {
@@ -401,14 +385,13 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       ).length,
     [patients],
   );
-  const patientLookupResults = useMemo(() => {
-    const query = patientLookupQuery.trim().toLowerCase();
-    if (!query) return [];
-
-    return patients
-      .filter((patient) => patientLookupText(patient).includes(query))
-      .slice(0, MAX_HEADER_PATIENT_RESULTS);
-  }, [patientLookupQuery, patients]);
+  const patientLookupResults = useMemo(
+    () =>
+      rankPatientsBySearch(patients, patientLookupQuery, MAX_HEADER_PATIENT_RESULTS).map(
+        (result) => result,
+      ),
+    [patientLookupQuery, patients],
+  );
 
   const navigateEmergencyRoute = useCallback(
     (path: string) => {
@@ -426,7 +409,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     if (!canSubmitCentralIntake) return;
     if (isReceptionRoute || prefersReceptionForPatientCreate(emergencyRole.role)) {
       if (isReceptionRoute) {
-        document.dispatchEvent(new Event('open-reception-prepare'));
+        document.dispatchEvent(new Event('open-reception-intake'));
         return;
       }
       navigateEmergencyRoute(getReceptionQuickCreatePath());
@@ -754,16 +737,16 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               className="emergency-os-header__action emergency-os-header__action--primary"
               onClick={openCentralIntake}
               disabled={!canSubmitCentralIntake}
-              aria-label={isReceptionRoute ? 'Prepare patient' : 'Create patient'}
+              aria-label={isReceptionRoute ? 'Start Smart Intake' : 'Create patient'}
               title={
                 canSubmitCentralIntake
                   ? isReceptionRoute
-                    ? 'Open prepare patient options'
+                    ? 'Start Smart Intake for the next arrival'
                     : 'Create a patient intake'
                   : `${emergencyRole.roleLabel} cannot create patients`
               }
             >
-              {isReceptionRoute ? 'Prepare' : 'Create'}
+              {isReceptionRoute ? 'Intake' : 'Create'}
             </button>
             {screenCapabilities.showReassessAction ? (
             <button
@@ -822,7 +805,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               value={patientLookupQuery}
               placeholder={
                 isReceptionRoute
-                  ? 'Search patients by name, MRN, or complaint...'
+                  ? 'Name, MRN, DOB, phone, or health card...'
                   : 'Patient lookup'
               }
               aria-label="Patient lookup"
@@ -834,7 +817,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   event.preventDefault();
-                  if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].id);
+                  if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].patient.id);
                   else openPatientLookupRoute();
                 }
                 if (event.key === 'Escape') {
@@ -850,7 +833,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                 aria-label="Patient lookup results"
               >
                 {patientLookupResults.length ? (
-                  patientLookupResults.map((patient) => (
+                  patientLookupResults.map(({ patient, matchKind }) => (
                     <button
                       key={patient.id}
                       type="button"
@@ -859,10 +842,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                       onClick={() => selectLookupPatient(patient.id)}
                     >
                       <strong>{getPatientDisplayName(patient)}</strong>
-                      <span>
-                        {patient.mrn} ·{' '}
-                        {patient.chiefComplaint || patient.complaint || 'Complaint not set'}
-                      </span>
+                      <span>{formatPatientSearchHint(patient, matchKind)}</span>
                     </button>
                   ))
                 ) : (

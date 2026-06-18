@@ -10,6 +10,9 @@ import {
   getEmergencyDemoRoles,
   getEmergencyRoleDefinition,
   getEmergencyRoleHomeRoute,
+  getReceptionQuickCreatePath,
+  getReceptionSmartIntakePath,
+  getReceptionWalkInQuickPath,
   prefersReceptionForPatientCreate,
   shouldHideStandaloneIntakeNav,
   getNearestEmergencyRoute,
@@ -99,6 +102,11 @@ describe('Emergency OS role-based views', () => {
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.physician)).toBe(false);
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.emsUser)).toBe(false);
     expect(shouldHideStandaloneIntakeNav(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
+    expect(getReceptionSmartIntakePath()).toContain('/emergency/intake?');
+    expect(getReceptionSmartIntakePath()).toContain('from=reception');
+    expect(getReceptionSmartIntakePath()).toContain('autostart=1');
+    expect(getReceptionQuickCreatePath()).toBe(getReceptionSmartIntakePath());
+    expect(getReceptionWalkInQuickPath()).toContain('quickCreate=1');
     expect(
       getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencySettings),
     ).toBe(CANONICAL_ROUTES.emergencyEms);

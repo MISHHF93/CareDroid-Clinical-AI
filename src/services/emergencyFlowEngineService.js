@@ -1,7 +1,7 @@
 import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
-import QueueIntelligenceService from './queueIntelligenceService';
+import { getLiveQueueDashboard } from './queueAssignment';
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
 
@@ -201,7 +201,7 @@ function buildNextRecommendedActions(detections) {
 export const EmergencyFlowEngineService = Object.freeze({
   getFlowEngine() {
     const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
-    const queueDashboard = QueueIntelligenceService.getQueueDashboard();
+    const queueDashboard = getLiveQueueDashboard(demoEnvironment.patients);
     const referralDashboard = ReferralHub.getReferralDashboard();
     const reassessmentDashboard = ReassessmentAutomationService.getDashboard();
     const boardingDashboard = BoardingIntelligenceEngine.getBoardingDashboard();

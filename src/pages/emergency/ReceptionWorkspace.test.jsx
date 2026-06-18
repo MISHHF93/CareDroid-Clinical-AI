@@ -14,19 +14,26 @@ describe('Reception-first experience wiring', () => {
     expect(receptionSource).toContain('EmsPreArrivalPanel');
     expect(receptionSource).toContain('useReceptionSnapshotPolling');
     expect(receptionSource).toContain('PreparePatientChooser');
-    expect(receptionSource).not.toContain('className="reception-workspace__search"');
+    expect(receptionSource).toContain('ReceptionSearchHint');
+    expect(receptionSource).toContain('RecentArrivalsPanel');
+    expect(receptionSource).toContain('receptionQueueModel');
     expect(receptionSource).not.toContain('reception-workspace__hero');
     expect(receptionSource).toContain('ReceptionWorkQueues');
-    expect(receptionSource).not.toContain('reception-workspace__actions--secondary');
-    expect(receptionSource).not.toContain('reception-workspace__actions"');
-    expect(receptionSource).toContain('open-reception-prepare');
+    expect(receptionSource).toContain('reception-workspace__actions--secondary');
+    expect(receptionSource).toContain('Start Smart Intake');
+    expect(receptionSource).toContain('Quick walk-in');
+    expect(receptionSource).toContain('open-reception-intake');
+    expect(receptionSource).toContain('DuplicatePatientBanner');
+    expect(receptionSource).toContain('enterEmsRegistrationQueue');
+    expect(receptionSource).toContain('findDuplicateCandidatesFromQuery');
   });
 
   it('uses header lookup as the primary reception search surface', () => {
     expect(headerSource).toContain('useScreenModeCapabilities');
     expect(headerSource).toContain('syncPatientLookupQuery');
     expect(headerSource).toContain('focus-reception-search');
-    expect(headerSource).toContain('open-reception-prepare');
+    expect(headerSource).toContain('open-reception-intake');
+    expect(headerSource).toContain('Start Smart Intake');
     expect(headerSource).toContain('screenCapabilities.productLabel');
   });
 

@@ -11,6 +11,7 @@ import {
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import type { Patient } from '../types/emergency';
+import { getPatientDisplayName, scorePatientSearch } from '../utils/patientSearch';
 
 export type CommandGroup = 'Navigation' | 'Patient' | 'Clinical' | 'Department' | 'Settings';
 
@@ -145,52 +146,13 @@ export function matchAndRankCommands(commands: Command[], query: string): Comman
     .map((item) => item.command);
 }
 
-export function getPatientDisplayName(
-  patient: Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'>,
-): string {
-  return (
-    `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
-  );
-}
+export { getPatientDisplayName } from '../utils/patientSearch';
 
 export function patientNameMatchScore(
   patient: PatientLookupFields,
   query: string,
 ): number {
-  const normalizedQuery = normalizeSearch(query);
-  if (!normalizedQuery) return -1;
-
-  const name = normalizeSearch(getPatientDisplayName(patient));
-  const mrn = normalizeSearch(patient.mrn);
-  const clinicalContext = normalizeSearch(
-    [
-      patient.chiefComplaint,
-      patient.complaint,
-      patient.complaintCategory,
-      patient.state,
-      patient.priority,
-    ]
-      .filter(Boolean)
-      .join(' '),
-  );
-  const lookupText = normalizeSearch([name, mrn, clinicalContext].filter(Boolean).join(' '));
-  if (name === normalizedQuery) return 1000;
-  if (name.startsWith(normalizedQuery)) return 900 - name.indexOf(normalizedQuery);
-  if (mrn === normalizedQuery) return 880;
-  if (mrn.startsWith(normalizedQuery)) return 820 - mrn.indexOf(normalizedQuery);
-  const nameIndex = name.indexOf(normalizedQuery);
-  if (nameIndex >= 0) return 800 - nameIndex;
-  const clinicalIndex = clinicalContext.indexOf(normalizedQuery);
-  if (clinicalIndex >= 0) return 620 - clinicalIndex;
-
-  const initials = name
-    .split(' ')
-    .map((part) => part[0])
-    .join('');
-  if (initials.startsWith(normalizedQuery)) return 600;
-
-  const queryTokens = normalizedQuery.split(' ').filter(Boolean);
-  return queryTokens.every((token) => lookupText.includes(token)) ? 480 - queryTokens.length : -1;
+  return scorePatientSearch(patient, query)?.score ?? -1;
 }
 
 export function searchPatientsByName(
@@ -352,14 +314,14 @@ function createCommands(
     })),
     {
       id: 'new-patient',
-      label: 'Create Patient',
+      label: 'Start Smart Intake',
       description:
         prefersReceptionForPatientCreate(emergencyRole.role)
-          ? 'Open Reception and prepare a new patient card.'
+          ? 'Open Smart Intake from Reception — the primary arrival workflow.'
           : 'Start central intake on the Operations Board; human review remains required.',
       shortcut: 'N',
       group: 'Patient',
-      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'patient create', 'prepare patient'],
+      keywords: ['add', 'new', 'register', 'intake', 'smart intake', 'patient create', 'identity'],
       requiredAction: EMERGENCY_ACTIONS.createPatient,
       requiredRoute:
         prefersReceptionForPatientCreate(emergencyRole.role)

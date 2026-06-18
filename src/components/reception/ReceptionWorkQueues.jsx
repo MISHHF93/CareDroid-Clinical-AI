@@ -1,22 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { PatientFlag, PatientState } from '../../types/emergency';
+import { PatientState } from '../../types/emergency';
+import { patientLabel, selectReceptionQueues } from './receptionQueueModel';
 import './ReceptionWorkQueues.css';
-
-function patientLabel(patient) {
-  const name = [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim();
-  return name || patient.name || patient.mrn || 'Unknown patient';
-}
-
-function isEmsRegistrationPatient(patient) {
-  return patient.flags?.some((flag) =>
-    typeof flag === 'string' ? flag === PatientFlag.EMSArrival : flag?.type === PatientFlag.EMSArrival,
-  );
-}
 
 export const RECEPTION_QUEUE_TABS = [
   { id: 'ems', label: 'EMS registration' },
   { id: 'verification', label: 'Verification' },
-  { id: 'pretriage', label: 'Pre-triage' },
+  { id: 'pretriage', label: 'Awaiting triage' },
 ];
 
 export default function ReceptionWorkQueues({
@@ -32,43 +22,19 @@ export default function ReceptionWorkQueues({
     setActiveTab(activeTabProp);
   }, [activeTabProp]);
 
-  const queues = useMemo(() => {
-    const emsRegistration = patients
-      .filter(
-        (patient) =>
-          isEmsRegistrationPatient(patient) &&
-          (patient.state === PatientState.Registration || patient.state === PatientState.Arrival),
-      )
-      .sort((a, b) => new Date(b.arrivalTime).getTime() - new Date(a.arrivalTime).getTime())
-      .slice(0, 8);
-
-    const verification = patients
-      .filter(
-        (patient) =>
-          patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient),
-      )
-      .sort((a, b) => new Date(b.arrivalTime).getTime() - new Date(a.arrivalTime).getTime())
-      .slice(0, 8);
-
-    const preTriage = patients
-      .filter((patient) => patient.state === PatientState.Triage)
-      .sort((a, b) => new Date(b.arrivalTime).getTime() - new Date(a.arrivalTime).getTime())
-      .slice(0, 8);
-
-    return { ems: emsRegistration, verification, pretriage: preTriage };
-  }, [patients]);
+  const queues = useMemo(() => selectReceptionQueues(patients), [patients]);
 
   const counts = {
-    ems: queues.ems.length,
-    verification: queues.verification.length,
-    pretriage: queues.pretriage.length,
+    ems: queues.counts.ems,
+    verification: queues.counts.verification,
+    pretriage: queues.counts.pretriage,
   };
 
   const activePatients = queues[activeTab] || [];
   const emptyCopy = {
     ems: 'No EMS patients awaiting registration.',
     verification: 'No patients awaiting verification.',
-    pretriage: 'No patients in pre-triage queue.',
+    pretriage: 'No patients awaiting triage.',
   };
 
   const selectTab = (tabId) => {
@@ -80,7 +46,7 @@ export default function ReceptionWorkQueues({
     <section className="reception-work-queues" aria-labelledby="reception-work-queues-title">
       <header className="reception-work-queues__header">
         <h2 id="reception-work-queues-title">Registration queues</h2>
-        <p>Work the next patient card without leaving the arrival dashboard.</p>
+        <p>Verification, triage handoff, and EMS registration cards in one place.</p>
       </header>
 
       <div className="reception-work-queues__tabs" role="tablist" aria-label="Registration queue views">
@@ -130,7 +96,7 @@ export default function ReceptionWorkQueues({
                       ? patient.emsUnitId || 'EMS card'
                       : activeTab === 'verification'
                         ? 'Verify'
-                        : patient.priority || 'Triage'}
+                        : patient.priority || PatientState.Triage}
                   </span>
                 </button>
               </li>

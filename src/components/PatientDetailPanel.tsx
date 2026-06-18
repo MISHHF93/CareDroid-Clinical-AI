@@ -28,6 +28,7 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
+import { enterWaitingQueue } from '../services/queueAssignment';
 import { buildPatientTimeline } from '../utils/patientTimeline';
 import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
 import { findMatchingChecklists, type Checklist } from '../config/criticalChecklists';
@@ -945,7 +946,18 @@ export default function PatientDetailPanel() {
           ) : null}
           <button
             type="button"
-            onClick={() => movePatientToState(selectedPatient.id, nextPatientState(selectedPatient.state), actorStaffId)}
+            onClick={() => {
+              const nextState = nextPatientState(selectedPatient.state);
+              if (nextState === PatientState.Waiting) {
+                enterWaitingQueue(useEmergencyStore.getState(), {
+                  patientId: selectedPatient.id,
+                  actorId: actorStaffId,
+                  note: 'Advanced from patient detail panel into waiting queue.',
+                });
+                return;
+              }
+              movePatientToState(selectedPatient.id, nextState, actorStaffId);
+            }}
             disabled={!canTransition}
             title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
             style={{

@@ -18,6 +18,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import CapacityCrisisMode from '../../components/CapacityCrisisMode';
 import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
+import { enterEmsRegistrationQueue, enterTriageQueue } from '../../services/queueAssignment';
 import '../../components/EmergencyWhiteboard.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding';
@@ -474,6 +475,15 @@ export default function EmergencyWhiteboard() {
   const convertArrival = useCallback((arrival: EMSArrival) => {
     if (!canConvertEmsArrival || arrival.patientId) return;
     convertEMSArrivalToPatient(arrival.id);
+    const converted = useEmergencyStore
+      .getState()
+      .emsArrivals.find((entry) => entry.id === arrival.id);
+    if (converted?.patientId) {
+      enterEmsRegistrationQueue(useEmergencyStore.getState(), {
+        patientId: converted.patientId,
+        emsArrivalId: arrival.id,
+      });
+    }
     setToast(`${arrival.unitId} added to whiteboard`);
     window.setTimeout(() => setToast(''), 2400);
     setActiveFilter('EMS');
@@ -484,6 +494,11 @@ export default function EmergencyWhiteboard() {
 
   const handlePatientAdded = useCallback(
     (patient: Patient) => {
+      enterTriageQueue(useEmergencyStore.getState(), {
+        patientId: patient.id,
+        source: 'whiteboard-central-intake',
+        actorId: 'whiteboard-intake',
+      });
       setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
       window.setTimeout(() => setToast(''), 2400);
       setActiveFilter('All');

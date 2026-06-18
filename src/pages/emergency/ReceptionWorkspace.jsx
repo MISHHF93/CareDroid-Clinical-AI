@@ -1,29 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import QuickIntake from '../../components/QuickIntake';
 import ArrivalMetricsPanel from '../../components/reception/ArrivalMetricsPanel';
 import EmsPreArrivalPanel from '../../components/reception/EmsPreArrivalPanel';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
+import RecentArrivalsPanel from '../../components/reception/RecentArrivalsPanel';
+import DuplicatePatientBanner from '../../components/reception/DuplicatePatientBanner';
+import ReceptionSearchHint from '../../components/reception/ReceptionSearchHint';
 import ReceptionWorkQueues from '../../components/reception/ReceptionWorkQueues';
+import {
+  filterPatientsByQuery,
+  patientLabel,
+  selectReceptionQueues,
+} from '../../components/reception/receptionQueueModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { useReceptionSnapshotPolling } from '../../hooks/useEmergencyOs';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { completeReceptionHandoff } from '../../services/receptionHandoff';
-import { PatientFlag, PatientState } from '../../types/emergency';
+import { enterEmsRegistrationQueue } from '../../services/queueAssignment';
+import { PatientState } from '../../types/emergency';
+import { findDuplicateCandidatesFromQuery } from '../../utils/patientDuplicateDetection';
 import './ReceptionWorkspace.css';
-
-function patientLabel(patient) {
-  const name = [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim();
-  return name || patient.name || patient.mrn || 'Unknown patient';
-}
-
-function isEmsRegistrationPatient(patient) {
-  return patient.flags?.some((flag) =>
-    typeof flag === 'string' ? flag === PatientFlag.EMSArrival : flag?.type === PatientFlag.EMSArrival,
-  );
-}
 
 export default function ReceptionWorkspace() {
   const navigate = useNavigate();
@@ -48,45 +47,19 @@ export default function ReceptionWorkspace() {
   const canVerifyIntake = emergencyRole.can(EMERGENCY_ACTIONS.verifyIntake);
   const canConvertEmsArrival = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
 
-  const filteredPatients = useMemo(() => {
-    if (!query.trim()) return patients;
-    const normalizedQuery = query.trim().toLowerCase();
-    return patients.filter((patient) =>
-      [patient.firstName, patient.lastName, patient.name, patient.mrn, patient.chiefComplaint, patient.complaint]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedQuery),
-    );
-  }, [patients, query]);
+  const filteredPatients = useMemo(
+    () => filterPatientsByQuery(patients, query),
+    [patients, query],
+  );
 
-  const emsRegistrationQueue = useMemo(
-    () =>
-      filteredPatients.filter(
-        (patient) =>
-          isEmsRegistrationPatient(patient) &&
-          (patient.state === PatientState.Registration || patient.state === PatientState.Arrival),
-      ),
+  const receptionQueues = useMemo(
+    () => selectReceptionQueues(filteredPatients),
     [filteredPatients],
   );
 
-  const verificationQueue = useMemo(
-    () =>
-      filteredPatients.filter(
-        (patient) =>
-          patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient),
-      ),
-    [filteredPatients],
-  );
-
-  const preTriageQueue = useMemo(
-    () => filteredPatients.filter((patient) => patient.state === PatientState.Triage),
-    [filteredPatients],
-  );
-
-  const queuePatients = useMemo(
-    () => [...emsRegistrationQueue, ...verificationQueue, ...preTriageQueue],
-    [emsRegistrationQueue, preTriageQueue, verificationQueue],
+  const duplicateCandidates = useMemo(
+    () => (query.trim().length >= 2 ? findDuplicateCandidatesFromQuery(patients, query) : []),
+    [patients, query],
   );
 
   const arrivedPatient = useMemo(
@@ -94,31 +67,42 @@ export default function ReceptionWorkspace() {
     [arrivedPatientId, patients],
   );
 
+  const openSmartIntake = useCallback((step, patientId, extraParams = {}) => {
+    const params = new URLSearchParams({ from: 'reception', autostart: '1', ...extraParams });
+    if (step) params.set('step', step);
+    if (patientId) params.set('patientId', patientId);
+    navigate(`${CANONICAL_ROUTES.emergencyIntake}?${params.toString()}`);
+  }, [navigate]);
+
   useEffect(() => {
-    const openQuickCreate = () => setShowPrepareChooser(true);
-    document.addEventListener('open-reception-quick-create', openQuickCreate);
-    document.addEventListener('open-reception-prepare', openQuickCreate);
+    const openPrimaryIntake = () => openSmartIntake();
+    document.addEventListener('open-reception-quick-create', openPrimaryIntake);
+    document.addEventListener('open-reception-prepare', openPrimaryIntake);
+    document.addEventListener('open-reception-intake', openPrimaryIntake);
     return () => {
-      document.removeEventListener('open-reception-quick-create', openQuickCreate);
-      document.removeEventListener('open-reception-prepare', openQuickCreate);
+      document.removeEventListener('open-reception-quick-create', openPrimaryIntake);
+      document.removeEventListener('open-reception-prepare', openPrimaryIntake);
+      document.removeEventListener('open-reception-intake', openPrimaryIntake);
     };
-  }, []);
+  }, [openSmartIntake]);
+
+  useEffect(() => {
+    if (searchParams.get('intake') === '1' && canCreatePatient) {
+      openSmartIntake();
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('intake');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [canCreatePatient, openSmartIntake, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (searchParams.get('quickCreate') === '1' && canCreatePatient) {
-      setShowPrepareChooser(true);
+      setShowQuickIntake(true);
       const nextParams = new URLSearchParams(searchParams);
       nextParams.delete('quickCreate');
       setSearchParams(nextParams, { replace: true });
     }
   }, [canCreatePatient, searchParams, setSearchParams]);
-
-  const openSmartIntake = (step, patientId, extraParams = {}) => {
-    const params = new URLSearchParams({ from: 'reception', ...extraParams });
-    if (step) params.set('step', step);
-    if (patientId) params.set('patientId', patientId);
-    navigate(`${CANONICAL_ROUTES.emergencyIntake}?${params.toString()}`);
-  };
 
   const handlePatientSelect = (patientId) => {
     const patient = patients.find((entry) => entry.id === patientId);
@@ -158,6 +142,12 @@ export default function ReceptionWorkspace() {
     const converted = useEmergencyStore
       .getState()
       .emsArrivals.find((entry) => entry.id === arrival.id);
+    if (converted?.patientId) {
+      enterEmsRegistrationQueue(store, {
+        patientId: converted.patientId,
+        emsArrivalId: arrival.id,
+      });
+    }
     if (converted?.patientId && canVerifyIntake) {
       openSmartIntake('verify', converted.patientId, {
         emsArrivalId: arrival.id,
@@ -170,10 +160,31 @@ export default function ReceptionWorkspace() {
 
   return (
     <section className="reception-workspace" aria-labelledby="reception-workspace-title">
-      {query.trim() ? (
-        <p className="reception-workspace__search-context" role="status">
-          Showing results for <strong>{query.trim()}</strong> — use Header search to refine.
-        </p>
+      <header className="reception-workspace__intro">
+        <div>
+          <p className="reception-workspace__eyebrow">Arrival dashboard</p>
+          <h1 id="reception-workspace-title">Reception workspace</h1>
+          <p className="reception-workspace__description">
+            Start Smart Intake for every arrival, verify identity when needed, and hand patients to
+            triage from one surface.
+          </p>
+        </div>
+      </header>
+
+      <ReceptionSearchHint query={query} />
+
+      {duplicateCandidates.length ? (
+        <DuplicatePatientBanner
+          candidates={duplicateCandidates}
+          onOpenPatient={(patientId) => {
+            if (canVerifyIntake) {
+              openSmartIntake('verify', patientId);
+              return;
+            }
+            handlePatientSelect(patientId);
+          }}
+          onContinueCreate={() => openSmartIntake()}
+        />
       ) : null}
 
       <EmsPreArrivalPanel
@@ -186,12 +197,55 @@ export default function ReceptionWorkspace() {
         onRefresh={() => void refreshReceptionSnapshot()}
       />
 
+      {canCreatePatient ? (
+        <div className="reception-workspace__actions" aria-label="Patient arrival actions">
+          <button
+            type="button"
+            className="reception-workspace__action reception-workspace__action--primary reception-workspace__action--wide"
+            onClick={() => openSmartIntake()}
+          >
+            Start Smart Intake
+          </button>
+          <div className="reception-workspace__actions reception-workspace__actions--secondary">
+            <button
+              type="button"
+              className="reception-workspace__action"
+              onClick={() => openSmartIntake('ocr')}
+            >
+              Scan / OCR
+            </button>
+            <button
+              type="button"
+              className="reception-workspace__action"
+              onClick={() => setShowQuickIntake(true)}
+            >
+              Quick walk-in
+            </button>
+            <button
+              type="button"
+              className="reception-workspace__action"
+              onClick={() => setShowPrepareChooser(true)}
+            >
+              More options
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {arrivedPatient ? (
         <div className="reception-workspace__banner" role="status">
           <span>
             <strong>{patientLabel(arrivedPatient)}</strong> handed off to triage queue.
           </span>
           <div className="reception-workspace__banner-actions">
+            <button
+              type="button"
+              onClick={() =>
+                navigate(completeReceptionHandoff(store, { patientId: arrivedPatient.id }).whiteboardPath)
+              }
+            >
+              View on Whiteboard
+            </button>
             <button
               type="button"
               onClick={() => navigate(completeReceptionHandoff(store, { patientId: arrivedPatient.id }).queuesPath)}
@@ -204,6 +258,7 @@ export default function ReceptionWorkspace() {
                 const nextParams = new URLSearchParams(searchParams);
                 nextParams.delete('arrived');
                 setSearchParams(nextParams, { replace: true });
+                openSmartIntake();
               }}
             >
               Start next arrival
@@ -214,8 +269,13 @@ export default function ReceptionWorkspace() {
 
       <ArrivalMetricsPanel />
 
+      <RecentArrivalsPanel
+        patients={receptionQueues.recentArrivals}
+        onSelectPatient={handlePatientSelect}
+      />
+
       <ReceptionWorkQueues
-        patients={queuePatients}
+        patients={filteredPatients}
         activeTab={activeQueueTab}
         onTabChange={(tabId) => {
           const nextParams = new URLSearchParams(searchParams);

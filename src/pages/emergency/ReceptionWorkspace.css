@@ -4,10 +4,9 @@
   padding: 4px 0 24px;
 }
 
-.reception-workspace__search-context {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-secondary, #9ca3af);
+.reception-workspace__intro {
+  display: grid;
+  gap: 4px;
 }
 
 .reception-workspace__hero {

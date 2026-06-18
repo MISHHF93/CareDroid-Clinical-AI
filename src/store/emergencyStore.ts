@@ -416,6 +416,8 @@ const SEED_PATIENTS: Patient[] = [
     flags: [],
     notes: [],
     timeline: [],
+    phone: '416-555-0177',
+    healthCardNumber: 'HC-9922-441',
   },
 
   {
@@ -1747,6 +1749,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   reassessment_completed: 'Reassessment completed',
   ems_arrival_created: 'EMS arrival created',
   ems_converted_to_patient: 'EMS converted to patient',
+  encounter_created: 'Encounter created',
   capacity_score_changed: 'Capacity score changed',
   boarding_started: 'Boarding started',
   staffing_request_created: 'Staffing request created',
@@ -2163,6 +2166,7 @@ type EmergencyOsSettings = {
   reassessmentThresholds: Record<string, number>;
   capacityThresholds: Record<string, number>;
   emsThresholds: Record<string, number | boolean>;
+  intakeSettings: Record<string, boolean>;
   boardingThresholds: Record<string, number>;
   ctasThresholds: EmergencyCtasThresholds;
   thresholds: Record<string, unknown> & {
@@ -2444,6 +2448,11 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
     criticalEtaMinutes: 10,
     autoCreateArrival: true,
   },
+  intakeSettings: {
+    autoCreateEncounter: true,
+    autoAssignTriageQueue: true,
+    autoAssignWaitingQueue: true,
+  },
   boardingThresholds: {
     escalationMinutes: 120,
     criticalMinutes: 240,
@@ -2523,6 +2532,7 @@ function mergeEmergencyOsSettings(
     },
     capacityThresholds: { ...base.capacityThresholds, ...(patch.capacityThresholds || {}) },
     emsThresholds: { ...base.emsThresholds, ...(patch.emsThresholds || {}) },
+    intakeSettings: { ...base.intakeSettings, ...(patch.intakeSettings || {}) },
     boardingThresholds: { ...base.boardingThresholds, ...(patch.boardingThresholds || {}) },
     ctasThresholds,
     thresholds: {
