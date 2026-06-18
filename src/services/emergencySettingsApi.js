@@ -103,6 +103,41 @@ export function saveEmergencyOsSettings(payload) {
     .catch((error) => ({ ok: false, data: null, message: getApiErrorMessage(error) }));
 }
 
+/**
+ * Persist Emergency OS settings to the active organization when tenant context exists.
+ * Falls back to the global emergency settings endpoint.
+ * @param {Partial<import('./emergencySettingsApi').EmergencyOsSettings>} payload
+ */
+export function saveOrganizationEmergencyOsSettings(payload) {
+  const orgId = organizationId();
+  if (!orgId) return saveEmergencyOsSettings(payload);
+  return guardedJson('tenantAdministration', `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      settings: {
+        emergencyOs: {
+          ...payload,
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    }),
+  });
+}
+
+export function fetchOrganizationEmergencyOsSettings() {
+  const orgId = organizationId();
+  if (!orgId) {
+    return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });
+  }
+  return guardedJson('tenantAdministration', `/api/organizations/${encodeURIComponent(orgId)}/tenant-admin`).then(
+    (result) => {
+      if (!result.ok) return result;
+      const emergencyOs = result.data?.emergencyOs || result.data?.settings?.emergencyOs || null;
+      return { ...result, data: emergencyOs };
+    },
+  );
+}
+
 function saveTenantEmergencySettings(section, payload) {
   const orgId = organizationId();
   if (!orgId) return Promise.resolve({ ok: false, data: null, message: 'No organization context available.' });

@@ -11,6 +11,7 @@ import { Workspace, WorkspaceType } from '../workspaces/entities/workspace.entit
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { getWorkspaceDefinition, workspaceSettingsForType } from '../workspaces/workspace-taxonomy';
 import { OrganizationMembership } from './entities/organization-membership.entity';
+import { buildEmergencyOsOnboardingSeed } from '../emergency-os/emergency-os-onboarding.defaults';
 
 type WorkspaceProvisioningInput = {
   id?: string;
@@ -132,6 +133,15 @@ export class TenantProvisioningService {
       primaryLanding: '/customer-portal',
       customerRoutes: ['/customer-portal', '/success-center', '/billing', '/usage'],
     };
+
+    if (!settings.emergencyOs) {
+      settings.emergencyOs = buildEmergencyOsOnboardingSeed({
+        organizationName: organization.name,
+        organizationType: organization.organizationType,
+        defaultRoleProfileId: roleProfileId,
+      });
+      workflow.push('emergency-os-configured');
+    }
     workflow.push('dashboard-configured');
 
     settings.provisioning = {

@@ -1,5 +1,8 @@
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { filterPatientsBySearch } from '../../utils/patientSearch';
+import { RECEPTION_COPY } from './receptionCopy';
+import { summarizeDataQualityRisks } from '../../config/dataQualityModel';
+import { auditReceptionQueues, summarizeQueueAudit } from '../../config/queueAuditModel';
 
 export const RECENT_ARRIVAL_MINUTES = 30;
 export const RECEPTION_QUEUE_PREVIEW_LIMIT = 8;
@@ -104,37 +107,60 @@ export function selectReceptionOperationalStripMetrics(patients = [], emsInbound
   const arrivalsToday = patients.filter(
     (patient) => localDateKey(patient.arrivalTime) === today,
   ).length;
+  const dataQualitySummary = summarizeDataQualityRisks(patients);
+  const receptionAudit = summarizeQueueAudit(auditReceptionQueues(patients, { emsInbound }));
 
   return [
     {
       id: 'arrivals-today',
-      label: 'Arrivals today',
+      label: RECEPTION_COPY.metrics.arrivalsToday,
       value: arrivalsToday,
       queueTab: null,
     },
     {
       id: 'awaiting-verification',
-      label: 'Waiting verification',
+      label: RECEPTION_COPY.metrics.awaitingVerification,
       value: counts.awaitingVerification,
       queueTab: 'verification',
     },
     {
       id: 'awaiting-triage',
-      label: 'Waiting triage',
+      label: RECEPTION_COPY.metrics.awaitingTriage,
       value: counts.awaitingTriage,
       queueTab: 'pretriage',
     },
     {
       id: 'ems-inbound',
-      label: 'EMS inbound',
+      label: RECEPTION_COPY.metrics.emsInbound,
       value: emsInbound,
       queueTab: 'ems',
     },
     {
       id: 'queue-size',
-      label: 'Queue size',
+      label: RECEPTION_COPY.metrics.queueSize,
       value: counts.queueTotal,
       queueTab: 'verification',
+    },
+    {
+      id: 'data-quality-risks',
+      label: RECEPTION_COPY.metrics.dataQualityRisks,
+      value: dataQualitySummary.patientsWithRisks,
+      queueTab: 'verification',
+    },
+    {
+      id: 'queue-overdue',
+      label: RECEPTION_COPY.metrics.queueOverdue,
+      value: receptionAudit.totalOverdue,
+      queueTab: 'verification',
+      hint: receptionAudit.primaryBottleneck
+        ? `Bottleneck: ${receptionAudit.primaryBottleneck.label}`
+        : undefined,
+    },
+    {
+      id: 'longest-wait',
+      label: RECEPTION_COPY.metrics.longestWait,
+      value: receptionAudit.longestWaitLabel,
+      queueTab: 'pretriage',
     },
   ];
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import './AISourcePanel.css';
 
 function formatPercent(value) {
@@ -29,7 +30,11 @@ function metadataEntries(metadata) {
 export default function AISourcePanel({ sourcePanel }) {
   const references = Array.isArray(sourcePanel?.references) ? sourcePanel.references : [];
   if (references.length === 0) {
-    return null;
+    return (
+      <p className="ai-source-panel__empty" role="status">
+        {EMPTY_STATE_COPY.clinical.noSources.guidance}
+      </p>
+    );
   }
 
   const retrieval = sourcePanel?.retrieval || {};

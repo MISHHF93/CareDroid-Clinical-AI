@@ -38,3 +38,11 @@
     grid-template-columns: 1fr;
   }
 }
+
+.arrival-dashboard__data-quality {
+  margin-top: 12px;
+}
+
+.arrival-dashboard__queue-audit {
+  margin-top: 12px;
+}

@@ -50,9 +50,10 @@ export class PatientOrchestrationService {
 
     const operationalContext = this.buildOperationalContext();
     const patientInput = patientInputFromEmergencyRecord({
-      ...patient,
-      chiefComplaint: handoffContext.arrivalReason || patient.chiefComplaint,
       complaintCategory: handoffContext.complaintCategory || patient.complaintCategory,
+      chiefComplaint: handoffContext.arrivalReason || patient.chiefComplaint,
+      priority: patient.priority,
+      vitals: patient.vitals as unknown as Array<Record<string, unknown>>,
     });
 
     let envelope = buildTriageAssistEnvelope(patientInput, {

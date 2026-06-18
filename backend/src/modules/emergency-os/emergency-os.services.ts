@@ -1373,7 +1373,7 @@ export class EDCopilotService {
         capacity: this.patientService.computeCapacity(),
         safetyRule: HUMAN_REVIEW_DISCLAIMER,
       },
-      quickActions: ['Who needs attention?', 'Capacity status', 'EMS update', 'Reassessment queue'],
+      quickActions: ['Queue bottlenecks', 'Capacity status', 'Boarding pressure', 'Reassessment queue'],
     });
   }
 
@@ -1523,25 +1523,40 @@ export class CompleteImplementationReadinessService {
 
 @Injectable()
 export class EmergencySettingsService {
-  private settings: EmergencyOsSettingsContract = clone(DEFAULT_EMERGENCY_OS_SETTINGS);
+  private readonly defaultSettings = clone(DEFAULT_EMERGENCY_OS_SETTINGS);
+  private readonly byOrganization = new Map<string, EmergencyOsSettingsContract>();
 
-  getSettings() {
-    return envelope('Settings', clone(this.settings));
+  private organizationKey(organizationId?: string): string {
+    const normalized = String(organizationId || '').trim();
+    return normalized || '__global__';
   }
 
-  updateSettings(patch: EmergencyOsSettingsPatch) {
+  private materializeSettings(organizationId?: string): EmergencyOsSettingsContract {
+    const key = this.organizationKey(organizationId);
+    if (!this.byOrganization.has(key)) {
+      this.byOrganization.set(key, clone(this.defaultSettings));
+    }
+    return this.byOrganization.get(key)!;
+  }
+
+  getSettings(organizationId?: string) {
+    return envelope('Settings', clone(this.materializeSettings(organizationId)));
+  }
+
+  updateSettings(patch: EmergencyOsSettingsPatch, organizationId?: string) {
+    const key = this.organizationKey(organizationId);
+    const current = this.materializeSettings(organizationId);
     const next = mergeSettings(
-      this.settings,
+      current,
       (patch || {}) as Partial<EmergencyOsSettingsContract>,
     );
     const reassessmentIntervals =
-      next.thresholds?.reassessmentIntervals || this.settings.thresholds.reassessmentIntervals;
-    const reassessmentThresholds =
-      next.reassessmentThresholds || this.settings.reassessmentThresholds;
-    const capacityThresholds = next.capacityThresholds || this.settings.capacityThresholds;
-    const emsThresholds = next.emsThresholds || this.settings.emsThresholds;
+      next.thresholds?.reassessmentIntervals || current.thresholds.reassessmentIntervals;
+    const reassessmentThresholds = next.reassessmentThresholds || current.reassessmentThresholds;
+    const capacityThresholds = next.capacityThresholds || current.capacityThresholds;
+    const emsThresholds = next.emsThresholds || current.emsThresholds;
 
-    this.settings = {
+    const merged: EmergencyOsSettingsContract = {
       ...next,
       departmentCapacityTarget:
         capacityThresholds.departmentCapacityTarget || next.departmentCapacityTarget,
@@ -1561,7 +1576,8 @@ export class EmergencySettingsService {
       updatedAt: new Date().toISOString(),
     };
 
-    return this.getSettings();
+    this.byOrganization.set(key, merged);
+    return this.getSettings(organizationId);
   }
 }
 

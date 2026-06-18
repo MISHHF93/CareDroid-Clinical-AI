@@ -11,6 +11,7 @@ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermiss
 import { fetchSmartIntake, runSmartIntakeVerticalSlice } from '../../services/emergencyOsApi';
 import SmartIntakeApi from '../../services/smartIntakeApi';
 import { completeIntakeHandoff } from '../../services/receptionHandoff';
+import { ERROR_RECOVERY_COPY, formatApiRecoveryMessage } from '../../config/errorRecoveryModel';
 import { applyIntakeArrivalContext } from '../../services/intakeEncounterChain';
 import {
   completeProvisionalIntake,
@@ -29,6 +30,22 @@ import {
 import { callAI } from '../../lib/ai/client';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
+import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
+import {
+  SMART_INTAKE_STEP_INDEX,
+  SMART_INTAKE_STREAMLINED_STEPS,
+  buildAutoApprovedFieldDecisions,
+  canContinueSmartIntakeStep,
+  countBulkApprovableFields,
+  mapInternalStepToStreamlined,
+  resolveSmartIntakeContinueStep,
+  resolveSmartIntakeStartStep,
+} from '../../config/smartIntakeFlowModel';
+import {
+  recordSmartIntakeClick,
+  recordSmartIntakeTransition,
+  startSmartIntakeTelemetry,
+} from '../../utils/smartIntakeTelemetry';
 
 const STEP_INDEX_BY_QUERY = VERIFICATION_STEP_QUERY_INDEX;
 
@@ -116,17 +133,38 @@ export default function SmartIntake({
   const [sessionReady, setSessionReady] = useState(false);
   const [pendingAction, setPendingAction] = useState('');
   const [remoteMatchCandidates, setRemoteMatchCandidates] = useState([]);
+  const [matchError, setMatchError] = useState('');
   const [ocrUploadStatus, setOcrUploadStatus] = useState('');
   const [isUploadingDocument, setIsUploadingDocument] = useState(false);
   const [fieldDecisions, setFieldDecisions] = useState(() =>
-    Object.fromEntries(
-      SMART_INTAKE_DEMO.extractedFields.map((field) => [field.field, field.status]),
-    ),
+    buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields),
   );
+  const [documentCaptured, setDocumentCaptured] = useState(false);
   const [aiVerificationHint, setAiVerificationHint] = useState('');
   const [aiHintLoading, setAiHintLoading] = useState(false);
   const canVerifyIntake = emergencyRole.can(EMERGENCY_ACTIONS.verifyIntake);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+
+  const boardPatient = useMemo(
+    () => (contextPatientId ? patients.find((candidate) => candidate.id === contextPatientId) || null : null),
+    [contextPatientId, patients],
+  );
+
+  useEffect(() => {
+    startSmartIntakeTelemetry({
+      embedded,
+      fromReception,
+      intakeStep,
+      contextPatientId,
+    });
+  }, [embedded, fromReception, intakeStep, contextPatientId]);
+
+  const setActiveStepTracked = (nextStep, reason = 'manual') => {
+    setActiveStep((current) => {
+      if (current !== nextStep) recordSmartIntakeTransition(current, nextStep, reason);
+      return nextStep;
+    });
+  };
 
   const intakeDemographics = useMemo(
     () => ({
@@ -154,8 +192,11 @@ export default function SmartIntake({
       .then((result) => {
         const apiCandidates = result?.candidates || result?.data?.candidates || [];
         setRemoteMatchCandidates(Array.isArray(apiCandidates) ? apiCandidates : []);
+        setMatchError('');
       })
-      .catch(() => setRemoteMatchCandidates([]));
+      .catch((error) => {
+        setMatchError(`${formatApiRecoveryMessage(error, 'duplicate search')} ${ERROR_RECOVERY_COPY.matchFailed}`);
+      });
   }, [sessionReady, sessionId, canVerifyIntake, emergencyRole.roleLabel]);
 
   useEffect(() => {
@@ -204,14 +245,7 @@ export default function SmartIntake({
     const boardPatient = patients.find((candidate) => candidate.id === contextPatientId);
     if (boardPatient) {
       setSelectedCandidateId(contextPatientId);
-      setFieldDecisions((current) => ({
-        ...current,
-        firstName: boardPatient.firstName ? 'verified' : current.firstName,
-        lastName: boardPatient.lastName ? 'verified' : current.lastName,
-        dateOfBirth: boardPatient.dob ? 'verified' : current.dateOfBirth,
-        healthCardNumber: boardPatient.mrn ? 'verified' : current.healthCardNumber,
-        sex: boardPatient.sex ? 'verified' : current.sex,
-      }));
+      setFieldDecisions(buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields, boardPatient));
       setStatusMessage(
         `Verifying ${[boardPatient.firstName, boardPatient.lastName].filter(Boolean).join(' ') || boardPatient.mrn || 'selected patient'} from reception queue.`,
       );
@@ -269,15 +303,17 @@ export default function SmartIntake({
 
   useEffect(() => {
     if (intakeStep && STEP_INDEX_BY_QUERY[intakeStep] !== undefined) {
-      setActiveStep(STEP_INDEX_BY_QUERY[intakeStep]);
+      setActiveStepTracked(STEP_INDEX_BY_QUERY[intakeStep], 'query-step');
     }
   }, [intakeStep]);
 
-  const resolveSessionStartStep = () => {
-    return intakeStep && STEP_INDEX_BY_QUERY[intakeStep] !== undefined
-      ? STEP_INDEX_BY_QUERY[intakeStep]
-      : 1;
-  };
+  const resolveSessionStartStep = () =>
+    resolveSmartIntakeStartStep({
+      intakeStep,
+      contextPatientId,
+      autostart: shouldAutostartSession,
+      hasBoardPatient: Boolean(boardPatient),
+    });
 
   const finishIntakeNavigation = (patientId) => {
     if (!patientId) return;
@@ -319,13 +355,13 @@ export default function SmartIntake({
         setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);
         setStatusMessage('Backend Smart Intake contract loaded for staff review.');
       }
-      setActiveStep(resolveSessionStartStep());
+      setActiveStepTracked(resolveSessionStartStep(), 'session-start');
     } catch (error) {
       setErrorMessage(
         `${error?.message || 'Backend Smart Intake contract is not reachable.'} Continue verification in safeguarded review mode.`,
       );
       setStatusMessage('Safeguarded identity review is active for this session.');
-      setActiveStep(resolveSessionStartStep());
+      setActiveStepTracked(resolveSessionStartStep(), 'session-start-fallback');
     } finally {
       setIsStarting(false);
       setSessionReady(true);
@@ -334,6 +370,7 @@ export default function SmartIntake({
 
   const updateDecision = (field, decision) => {
     if (!canVerifyIntake) return;
+    recordSmartIntakeClick('field-decision', { field, decision });
     const nextStatus = mapFieldReviewDecision(decision);
     setFieldDecisions((current) => ({
       ...current,
@@ -375,12 +412,14 @@ export default function SmartIntake({
           emergencyRole.roleLabel,
         );
         setOcrUploadStatus(`Document "${file.name}" uploaded for OCR extraction.`);
-        setActiveStep(STEP_INDEX_BY_QUERY.ocr);
+        setDocumentCaptured(true);
+        setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload');
       } else {
         setOcrUploadStatus(
           `Document "${file.name}" captured locally. Continue with safeguarded review fields.`,
         );
-        setActiveStep(STEP_INDEX_BY_QUERY.ocr);
+        setDocumentCaptured(true);
+        setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload-local');
       }
     } catch {
       setOcrUploadStatus('Document upload failed. Continue with manual field verification.');
@@ -444,14 +483,12 @@ export default function SmartIntake({
       setStatusMessage(
         `${actionLabel} confirmed for session ${result.sessionId || sessionId}. Identity audit trail updated for human review.`,
       );
-    } catch {
-      localCompletion?.(null);
-      setErrorMessage('Live confirmation is pending. Staff review remains required before downstream record changes.');
-      setStatusMessage(
-        `${actionLabel} recorded for session ${sessionId}. Confirmation is pending human review.`,
-      );
+      setActiveStepTracked(SMART_INTAKE_DEMO.steps.length - 1, 'finalize-complete');
+    } catch (error) {
+      setErrorMessage(formatApiRecoveryMessage(error, 'intake confirmation'));
+      setStatusMessage(`${actionLabel} not confirmed — review the error and retry.`);
+      return;
     } finally {
-      setActiveStep(SMART_INTAKE_DEMO.steps.length - 1);
       setPendingAction('');
     }
   };
@@ -474,6 +511,52 @@ export default function SmartIntake({
     const result = completeProvisionalIntake(store, kind, { sessionId });
     setPendingAction('');
     finishIntakeNavigation(result.patient.id);
+  };
+
+  const bulkApprovableCount = useMemo(
+    () => countBulkApprovableFields(SMART_INTAKE_DEMO.extractedFields, fieldDecisions),
+    [fieldDecisions],
+  );
+
+  const approveMatchingFields = () => {
+    if (!canVerifyIntake) return;
+    recordSmartIntakeClick('approve-matching-fields', { count: bulkApprovableCount });
+    setFieldDecisions((current) => {
+      const next = { ...current };
+      SMART_INTAKE_DEMO.extractedFields.forEach((field) => {
+        const extracted = String(field.extracted || '').trim();
+        const existing = String(field.existing || '').trim();
+        if (
+          extracted &&
+          existing &&
+          extracted.toLowerCase() === existing.toLowerCase() &&
+          !['verified', 'overridden'].includes(next[field.field])
+        ) {
+          next[field.field] = 'verified';
+        }
+      });
+      return next;
+    });
+  };
+
+  const intakeCanContinue = canContinueSmartIntakeStep(activeStep, {
+    sessionReady,
+    selectedCandidateId,
+    verificationComplete,
+    documentCaptured,
+  });
+
+  const handleContinue = () => {
+    recordSmartIntakeClick('continue', { fromStep: activeStep });
+    const nextStep = resolveSmartIntakeContinueStep(activeStep, { verificationComplete });
+    setActiveStepTracked(nextStep, 'continue');
+  };
+
+  const mapDisplayStepToInternal = (displayIndex) => {
+    if (displayIndex <= 0) return SMART_INTAKE_STEP_INDEX.capture;
+    if (displayIndex === 1) return SMART_INTAKE_STEP_INDEX.match;
+    if (displayIndex === 2) return SMART_INTAKE_STEP_INDEX.verify;
+    return SMART_INTAKE_STEP_INDEX.finalize;
   };
 
   const selectedCandidate = matchCandidates.find(
@@ -530,39 +613,74 @@ export default function SmartIntake({
     >
       <header className="smart-intake__hero">
         <div>
-          <span>Emergency OS{fromReception ? ' · Reception workflow' : ''}</span>
-          <h1 id="smart-intake-title">Patient Verification</h1>
-          <p>
-            One workflow for identity, OCR, duplicate detection, and manual review before
-            creating, linking, or continuing as an unknown patient.
-          </p>
+          {fromReception || embedded ? (
+            <>
+              <span>Reception</span>
+              <h1 id="smart-intake-title">{RECEPTION_COPY.identityCheck.title}</h1>
+              <p>{RECEPTION_COPY.identityCheck.description}</p>
+            </>
+          ) : (
+            <>
+              <span>Emergency OS</span>
+              <h1 id="smart-intake-title">Patient Verification</h1>
+              <p>
+                One workflow for identity, OCR, duplicate detection, and manual review before
+                creating, linking, or continuing as an unknown patient.
+              </p>
+            </>
+          )}
         </div>
         <button
           type="button"
-          onClick={startBackendSession}
+          onClick={() => {
+            recordSmartIntakeClick('start-session');
+            void startBackendSession();
+          }}
           disabled={isStarting || !canVerifyIntake || sessionReady}
         >
           <FileScan size={18} aria-hidden />
-          {isStarting ? 'Starting...' : sessionReady ? 'Session active' : 'Start Intake'}
+          {isStarting
+            ? fromReception || embedded
+              ? RECEPTION_COPY.identityCheck.starting
+              : 'Starting...'
+            : sessionReady
+              ? fromReception || embedded
+                ? RECEPTION_COPY.identityCheck.sessionActive
+                : 'Session active'
+              : fromReception || embedded
+                ? RECEPTION_COPY.identityCheck.begin
+                : 'Start Intake'}
         </button>
         {embedded ? (
           <button type="button" onClick={onClose}>
-            Close
+            {RECEPTION_COPY.identityCheck.close}
           </button>
         ) : fromReception ? (
           <button type="button" onClick={() => navigate(CANONICAL_ROUTES.emergencyReception)}>
-            Back to Reception
+            {RECEPTION_COPY.identityCheck.backToReception}
           </button>
         ) : null}
       </header>
 
+      {!embedded && !fromReception ? (
       <div className="smart-intake__status" role="status">
         <strong>Session:</strong> {sessionId} · {statusMessage}
       </div>
+      ) : statusMessage ? (
+        <div className="smart-intake__status" role="status">
+          {statusMessage}
+        </div>
+      ) : null}
       {canVerifyIntake ? (
         <div className="smart-intake__ai-hint" data-testid="smart-intake-ai-hint">
           <button type="button" onClick={() => void requestVerificationHint()} disabled={aiHintLoading}>
-            {aiHintLoading ? 'AI help…' : 'AI verification help'}
+            {aiHintLoading
+              ? fromReception || embedded
+                ? RECEPTION_COPY.identityCheck.aiHelpLoading
+                : 'AI help…'
+              : fromReception || embedded
+                ? RECEPTION_COPY.identityCheck.aiHelp
+                : 'AI verification help'}
           </button>
           {aiVerificationHint ? <p>{aiVerificationHint}</p> : null}
         </div>
@@ -572,22 +690,39 @@ export default function SmartIntake({
           {errorMessage}
         </div>
       ) : null}
+      {matchError ? (
+        <div className="smart-intake__status smart-intake__status--error" role="alert">
+          {matchError}
+        </div>
+      ) : null}
 
       <PatientVerificationExperience
         activeStep={activeStep}
-        onStepChange={setActiveStep}
+        onStepChange={(stepIndex) => {
+          recordSmartIntakeClick('step-nav', { stepIndex });
+          if (fromReception || embedded) {
+            setActiveStepTracked(mapDisplayStepToInternal(stepIndex), 'step-nav');
+            return;
+          }
+          setActiveStepTracked(stepIndex, 'step-nav');
+        }}
         extractedFields={SMART_INTAKE_DEMO.extractedFields}
         fieldDecisions={fieldDecisions}
         canVerifyIntake={canVerifyIntake}
         canCreatePatient={canCreatePatient}
         onFieldDecision={updateDecision}
+        onApproveMatching={approveMatchingFields}
+        bulkApprovableCount={bulkApprovableCount}
         matchCandidates={matchCandidates}
         selectedCandidateId={selectedCandidateId}
-        onSelectCandidate={setSelectedCandidateId}
+        onSelectCandidate={(patientId) => {
+          recordSmartIntakeClick('select-candidate', { patientId });
+          setSelectedCandidateId(patientId);
+        }}
         onOpenPatient={(patientId) => {
           selectPatient(patientId);
           setSelectedCandidateId(patientId);
-          setActiveStep(STEP_INDEX_BY_QUERY.verify);
+          setActiveStepTracked(SMART_INTAKE_STEP_INDEX.verify, 'open-patient');
         }}
         ocrUploadStatus={ocrUploadStatus}
         isUploadingDocument={isUploadingDocument}
@@ -598,6 +733,18 @@ export default function SmartIntake({
         warnings={SMART_INTAKE_DEMO.warnings}
         auditLog={SMART_INTAKE_DEMO.auditLog}
         highlightProvisional={Boolean(provisionalKindFromIntakeMode(intakeMode))}
+        steps={fromReception || embedded ? RECEPTION_COPY.identityCheck.steps : undefined}
+        displaySteps={fromReception || embedded ? SMART_INTAKE_STREAMLINED_STEPS : null}
+        mapDisplayStep={fromReception || embedded ? mapInternalStepToStreamlined : null}
+        introTitle={fromReception || embedded ? RECEPTION_COPY.identityCheck.title : undefined}
+        introDescription={fromReception || embedded ? RECEPTION_COPY.identityCheck.description : undefined}
+        onContinue={handleContinue}
+        canContinue={intakeCanContinue}
+        continueLabel={
+          activeStep >= SMART_INTAKE_STEP_INDEX.verify && verificationComplete
+            ? 'Review finish'
+            : 'Continue'
+        }
         onProvisionalIntake={handleProvisionalIntake}
         onLinkPatient={() =>
           completeFinalAction(

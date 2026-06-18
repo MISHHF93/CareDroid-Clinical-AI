@@ -1,0 +1,1301 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.777Z",
+  "goal": "Score architecture, frontend, backend, responsiveness, integrations, security, auditability, operational awareness, pilot readiness",
+  "exposure": {
+    "dimensions": [
+      "architecture",
+      "frontend",
+      "backend",
+      "responsiveness",
+      "integrations",
+      "securityControls",
+      "auditability",
+      "operationalAwareness",
+      "pilotReadiness"
+    ],
+    "qaReports": [
+      "multi-tenant-readiness-audit-report.json",
+      "clinic-onboarding-simulation-report.json",
+      "copilot-recommendation-audit-report.json",
+      "whiteboard-density-audit-report.json",
+      "integration-discovery-report.json",
+      "operational-audit-discovery-report.json",
+      "error-recovery-audit-report.json"
+    ],
+    "auditScripts": [
+      "scripts/production-readiness-audit.mjs",
+      "scripts/multi-tenant-readiness-audit.mjs",
+      "scripts/clinic-onboarding-simulation.mjs"
+    ]
+  },
+  "beforeFixes": {
+    "scores": {
+      "dimensions": {
+        "architecture": {
+          "score": 77,
+          "baseScore": 62,
+          "grade": "pilot"
+        },
+        "frontend": {
+          "score": 74,
+          "baseScore": 74,
+          "grade": "pilot"
+        },
+        "backend": {
+          "score": 58,
+          "baseScore": 58,
+          "grade": "risk"
+        },
+        "responsiveness": {
+          "score": 71,
+          "baseScore": 71,
+          "grade": "pilot"
+        },
+        "integrations": {
+          "score": 38,
+          "baseScore": 38,
+          "grade": "blocked"
+        },
+        "securityControls": {
+          "score": 52,
+          "baseScore": 52,
+          "grade": "risk"
+        },
+        "auditability": {
+          "score": 65,
+          "baseScore": 65,
+          "grade": "pilot"
+        },
+        "operationalAwareness": {
+          "score": 78,
+          "baseScore": 78,
+          "grade": "pilot"
+        },
+        "pilotReadiness": {
+          "score": 70,
+          "baseScore": 70,
+          "grade": "pilot"
+        }
+      },
+      "overall": 65,
+      "grade": "staging-only",
+      "signals": {
+        "multiTenantScore": 100,
+        "clinicReadinessPercent": 17,
+        "emergencyApiAuthenticated": false,
+        "orgScopedSettings": false,
+        "storeHydration": false,
+        "clinicProvisioned": false,
+        "edRbacWired": false
+      }
+    },
+    "summary": {
+      "riskCount": 50,
+      "quickWinCount": 50,
+      "blockerCount": 50,
+      "criticalRiskCount": 4,
+      "criticalBlockerCount": 5,
+      "unresolvedCriticalBlockerCount": 5,
+      "unresolvedSignalBlockerIds": [
+        "B001",
+        "B002",
+        "B003",
+        "B004"
+      ],
+      "p0QuickWinCount": 4,
+      "completedQuickWins": 23,
+      "passesProductionAudit": false
+    },
+    "pilotRecommendation": "Address critical security and multi-tenant blockers before external pilot."
+  },
+  "afterFixes": {
+    "scores": {
+      "dimensions": {
+        "architecture": {
+          "score": 77,
+          "baseScore": 62,
+          "grade": "pilot"
+        },
+        "frontend": {
+          "score": 74,
+          "baseScore": 74,
+          "grade": "pilot"
+        },
+        "backend": {
+          "score": 70,
+          "baseScore": 58,
+          "grade": "pilot"
+        },
+        "responsiveness": {
+          "score": 71,
+          "baseScore": 71,
+          "grade": "pilot"
+        },
+        "integrations": {
+          "score": 38,
+          "baseScore": 38,
+          "grade": "blocked"
+        },
+        "securityControls": {
+          "score": 67,
+          "baseScore": 52,
+          "grade": "pilot"
+        },
+        "auditability": {
+          "score": 65,
+          "baseScore": 65,
+          "grade": "pilot"
+        },
+        "operationalAwareness": {
+          "score": 78,
+          "baseScore": 78,
+          "grade": "pilot"
+        },
+        "pilotReadiness": {
+          "score": 78,
+          "baseScore": 70,
+          "grade": "pilot"
+        }
+      },
+      "overall": 69,
+      "grade": "staging-only",
+      "signals": {
+        "multiTenantScore": 100,
+        "clinicReadinessPercent": 100,
+        "emergencyApiAuthenticated": true,
+        "orgScopedSettings": true,
+        "storeHydration": true,
+        "clinicProvisioned": true,
+        "edRbacWired": true
+      }
+    },
+    "summary": {
+      "riskCount": 50,
+      "quickWinCount": 50,
+      "blockerCount": 50,
+      "criticalRiskCount": 4,
+      "criticalBlockerCount": 5,
+      "unresolvedCriticalBlockerCount": 3,
+      "unresolvedSignalBlockerIds": [
+        "B002",
+        "B004"
+      ],
+      "p0QuickWinCount": 4,
+      "completedQuickWins": 23,
+      "passesProductionAudit": false
+    },
+    "pilotRecommendation": "Address critical security and multi-tenant blockers before external pilot.",
+    "mitigationsApplied": [
+      "JWT AuthGuard on EmergencyOsController",
+      "resolveEmergencyRoleId wired via useEmergencyRolePermissions",
+      "Org-scoped emergencyOs save/load via tenant-admin",
+      "Provisioning seeds settings.emergencyOs",
+      "OrganizationContext hydrates emergencyStore",
+      "EmergencySettingsService scoped by organizationId",
+      "permissionsOverrides merged in hasEmergencyActionPermission"
+    ]
+  },
+  "dimensions": {
+    "architecture": {
+      "score": 77,
+      "baseScore": 62,
+      "grade": "pilot"
+    },
+    "frontend": {
+      "score": 74,
+      "baseScore": 74,
+      "grade": "pilot"
+    },
+    "backend": {
+      "score": 70,
+      "baseScore": 58,
+      "grade": "pilot"
+    },
+    "responsiveness": {
+      "score": 71,
+      "baseScore": 71,
+      "grade": "pilot"
+    },
+    "integrations": {
+      "score": 38,
+      "baseScore": 38,
+      "grade": "blocked"
+    },
+    "securityControls": {
+      "score": 67,
+      "baseScore": 52,
+      "grade": "pilot"
+    },
+    "auditability": {
+      "score": 65,
+      "baseScore": 65,
+      "grade": "pilot"
+    },
+    "operationalAwareness": {
+      "score": 78,
+      "baseScore": 78,
+      "grade": "pilot"
+    },
+    "pilotReadiness": {
+      "score": 78,
+      "baseScore": 70,
+      "grade": "pilot"
+    }
+  },
+  "topRisks": [
+    {
+      "id": "R001",
+      "severity": "critical",
+      "domain": "security",
+      "summary": "Emergency OS API lacks JWT authentication",
+      "mitigation": "Add AuthGuard to EmergencyOsController"
+    },
+    {
+      "id": "R002",
+      "severity": "critical",
+      "domain": "security",
+      "summary": "EmergencySettingsService singleton shared across tenants",
+      "mitigation": "Scope settings by organizationId"
+    },
+    {
+      "id": "R003",
+      "severity": "critical",
+      "domain": "pilot",
+      "summary": "Vercel frontend-only deploy serves /api as index.html",
+      "mitigation": "Set VITE_API_URL to Nest backend"
+    },
+    {
+      "id": "R004",
+      "severity": "critical",
+      "domain": "security",
+      "summary": "TenantIsolationGuard passes unauthenticated requests",
+      "mitigation": "Require auth before tenant scope or fail closed"
+    },
+    {
+      "id": "R005",
+      "severity": "high",
+      "domain": "backend",
+      "summary": "ED patient/workflow state is in-memory only",
+      "mitigation": "Persist to Postgres per org"
+    },
+    {
+      "id": "R006",
+      "severity": "high",
+      "domain": "integrations",
+      "summary": "FHIR/HL7 connectors not org-scoped",
+      "mitigation": "Scope integration config by organizationId"
+    },
+    {
+      "id": "R007",
+      "severity": "high",
+      "domain": "integrations",
+      "summary": "17/25 integration registry points are placeholder",
+      "mitigation": "Phase integrations per first-customer blueprint"
+    },
+    {
+      "id": "R008",
+      "severity": "high",
+      "domain": "security",
+      "summary": "ED RBAC ignores tenant-admin permissionsOverrides",
+      "mitigation": "Merge overrides in hasEmergencyActionPermission"
+    },
+    {
+      "id": "R009",
+      "severity": "high",
+      "domain": "auditability",
+      "summary": "Workflow logs lost on backend restart",
+      "mitigation": "Durable workflow log store"
+    },
+    {
+      "id": "R010",
+      "severity": "high",
+      "domain": "architecture",
+      "summary": "Dual ED persistence planes (Nest in-memory vs Mongoose)",
+      "mitigation": "Converge on one durable path"
+    },
+    {
+      "id": "R011",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "Multi-tenant ED config not org-isolated",
+      "mitigation": "Wire tenant-admin emergencyOs read/write"
+    },
+    {
+      "id": "R012",
+      "severity": "medium",
+      "domain": "security",
+      "summary": "CSP allows unsafe-inline scripts",
+      "mitigation": "Tighten Helmet CSP for production"
+    },
+    {
+      "id": "R013",
+      "severity": "medium",
+      "domain": "security",
+      "summary": "Swagger exposed in all environments",
+      "mitigation": "Gate /api/docs behind admin auth"
+    },
+    {
+      "id": "R014",
+      "severity": "medium",
+      "domain": "backend",
+      "summary": "SQLite synchronize:true in development",
+      "mitigation": "Disable outside local dev"
+    },
+    {
+      "id": "R015",
+      "severity": "medium",
+      "domain": "frontend",
+      "summary": "CI codecov upload disabled",
+      "mitigation": "Enable coverage gate in test.yml"
+    },
+    {
+      "id": "R016",
+      "severity": "medium",
+      "domain": "responsiveness",
+      "summary": "Whiteboard readability 26 under stress load",
+      "mitigation": "Apply density mitigations under load"
+    },
+    {
+      "id": "R017",
+      "severity": "medium",
+      "domain": "responsiveness",
+      "summary": "Playwright Edge responsive timeouts",
+      "mitigation": "Fix responsive-qa.spec timeouts"
+    },
+    {
+      "id": "R018",
+      "severity": "medium",
+      "domain": "architecture",
+      "summary": "Static queue wait targets in queueAuditModel",
+      "mitigation": "Org override resolver"
+    },
+    {
+      "id": "R019",
+      "severity": "medium",
+      "domain": "architecture",
+      "summary": "EMERGENCY_OS_BRANDING hardcoded globally",
+      "mitigation": "Org branding copy override"
+    },
+    {
+      "id": "R020",
+      "severity": "medium",
+      "domain": "frontend",
+      "summary": "Large App.jsx coupling (~2900 lines)",
+      "mitigation": "Continue route extraction"
+    },
+    {
+      "id": "R021",
+      "severity": "medium",
+      "domain": "backend",
+      "summary": "Global throttle 100 req/min may be loose for auth",
+      "mitigation": "Per-route rate limits"
+    },
+    {
+      "id": "R022",
+      "severity": "medium",
+      "domain": "auditability",
+      "summary": "Workflow logs not tenant-partitioned in ED service",
+      "mitigation": "Add organizationId to log records"
+    },
+    {
+      "id": "R023",
+      "severity": "medium",
+      "domain": "integrations",
+      "summary": "SMART on FHIR OAuth placeholder only",
+      "mitigation": "Implement SMART launch for pilot phase 5"
+    },
+    {
+      "id": "R024",
+      "severity": "medium",
+      "domain": "integrations",
+      "summary": "FHIR Bundle ingestion placeholder",
+      "mitigation": "Defer or implement ingestion pipeline"
+    },
+    {
+      "id": "R025",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Staff onboarding still manual after provisioning seed",
+      "mitigation": "Staff roster editor UI"
+    },
+    {
+      "id": "R026",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Onboarding wizard skips ED configuration steps",
+      "mitigation": "Surface ED setup in wizard finish"
+    },
+    {
+      "id": "R027",
+      "severity": "medium",
+      "domain": "security",
+      "summary": "Docker compose default JWT_SECRET placeholder",
+      "mitigation": "Enforce secret in production deploy"
+    },
+    {
+      "id": "R028",
+      "severity": "medium",
+      "domain": "security",
+      "summary": "ALLOW_DEMO_AUTH_IN_PRODUCTION flag exists",
+      "mitigation": "Restrict to demo tenants only"
+    },
+    {
+      "id": "R029",
+      "severity": "low",
+      "domain": "architecture",
+      "summary": "Express legacy route registry coexists with Nest",
+      "mitigation": "Continue Nest migration"
+    },
+    {
+      "id": "R030",
+      "severity": "low",
+      "domain": "architecture",
+      "summary": "Frontend/backend reassessment P1 default mismatch (5 vs 15 min)",
+      "mitigation": "Single canonical defaults module"
+    },
+    {
+      "id": "R031",
+      "severity": "low",
+      "domain": "frontend",
+      "summary": "Mixed JS/TS on hot ED paths",
+      "mitigation": "Incremental TS migration"
+    },
+    {
+      "id": "R032",
+      "severity": "low",
+      "domain": "backend",
+      "summary": "Research ED endpoints on production controller tree",
+      "mitigation": "Feature-flag advanced modules"
+    },
+    {
+      "id": "R033",
+      "severity": "low",
+      "domain": "responsiveness",
+      "summary": "Android QA failures JSON present",
+      "mitigation": "Triage android-device-qa failures"
+    },
+    {
+      "id": "R034",
+      "severity": "low",
+      "domain": "integrations",
+      "summary": "MQTT/wearables config placeholders",
+      "mitigation": "Out of first-customer scope"
+    },
+    {
+      "id": "R035",
+      "severity": "low",
+      "domain": "auditability",
+      "summary": "No production event bus for central node",
+      "mitigation": "Future Kafka/NATS bridge"
+    },
+    {
+      "id": "R036",
+      "severity": "low",
+      "domain": "operational",
+      "summary": "Duplicate EMS/reassess chrome under load",
+      "mitigation": "Whiteboard density tiers active"
+    },
+    {
+      "id": "R037",
+      "severity": "low",
+      "domain": "operational",
+      "summary": "Copilot generic responses without rule path",
+      "mitigation": "Rule-based quick actions first"
+    },
+    {
+      "id": "R038",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Large uncommitted delta vs production branch",
+      "mitigation": "Commit and deploy parity"
+    },
+    {
+      "id": "R039",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Demo local fallback masks onboarding API failure",
+      "mitigation": "Surface API errors in wizard"
+    },
+    {
+      "id": "R040",
+      "severity": "low",
+      "domain": "security",
+      "summary": "Example postgres password in .env.example",
+      "mitigation": "Document secret management only"
+    },
+    {
+      "id": "R041",
+      "severity": "medium",
+      "domain": "architecture",
+      "summary": "Store initializeFromBackend skips org emergencyOs",
+      "mitigation": "Hydrate on OrganizationContext load"
+    },
+    {
+      "id": "R042",
+      "severity": "medium",
+      "domain": "frontend",
+      "summary": "ErrorBoundary not on all ED routes",
+      "mitigation": "Wrap emergency route tree"
+    },
+    {
+      "id": "R043",
+      "severity": "medium",
+      "domain": "backend",
+      "summary": "Provisioning swallows pack install errors",
+      "mitigation": "Surface partial provisioning status"
+    },
+    {
+      "id": "R044",
+      "severity": "medium",
+      "domain": "integrations",
+      "summary": "ED integrationSettings on global settings path",
+      "mitigation": "Org-scoped connector credentials"
+    },
+    {
+      "id": "R045",
+      "severity": "medium",
+      "domain": "auditability",
+      "summary": "Client-only audit when backend unavailable",
+      "mitigation": "Show sync status in settings"
+    },
+    {
+      "id": "R046",
+      "severity": "medium",
+      "domain": "operational",
+      "summary": "Queue audit static targets differ from org thresholds",
+      "mitigation": "Align queue model with org config"
+    },
+    {
+      "id": "R047",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "roleProfileId not mapped to EMERGENCY_ROLE_IDS",
+      "mitigation": "resolveEmergencyRoleId from org mapping"
+    },
+    {
+      "id": "R048",
+      "severity": "low",
+      "domain": "frontend",
+      "summary": "Trivy scan continue-on-error in CI",
+      "mitigation": "Fail build on critical CVEs"
+    },
+    {
+      "id": "R049",
+      "severity": "low",
+      "domain": "backend",
+      "summary": "Optional RAG/NLU disabled in docker app",
+      "mitigation": "Document ML stack requirements"
+    },
+    {
+      "id": "R050",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Phase 5 integrations deferred but visible in hub",
+      "mitigation": "Label roadmap vs live clearly"
+    }
+  ],
+  "topQuickWins": [
+    {
+      "id": "Q001",
+      "priority": "P0",
+      "domain": "security",
+      "summary": "Add JWT AuthGuard to EmergencyOsController",
+      "effort": "low"
+    },
+    {
+      "id": "Q002",
+      "priority": "P0",
+      "domain": "pilot",
+      "summary": "Set VITE_API_URL for hosted pilot",
+      "effort": "low"
+    },
+    {
+      "id": "Q003",
+      "priority": "P0",
+      "domain": "architecture",
+      "summary": "Wire EmergencySettings to org tenant-admin PATCH",
+      "effort": "medium"
+    },
+    {
+      "id": "Q004",
+      "priority": "P0",
+      "domain": "architecture",
+      "summary": "Hydrate emergencyStore from org engine on login",
+      "effort": "medium"
+    },
+    {
+      "id": "Q005",
+      "priority": "P1",
+      "domain": "architecture",
+      "summary": "Seed emergencyOs during tenant provisioning",
+      "effort": "low"
+    },
+    {
+      "id": "Q006",
+      "priority": "P1",
+      "domain": "security",
+      "summary": "Apply resolveEmergencyRoleId from org role mapping",
+      "effort": "low"
+    },
+    {
+      "id": "Q007",
+      "priority": "P1",
+      "domain": "security",
+      "summary": "Deep-merge emergencyOs on tenant-admin PATCH",
+      "effort": "low"
+    },
+    {
+      "id": "Q008",
+      "priority": "P1",
+      "domain": "pilot",
+      "summary": "Expose emergencyOs on tenant-admin GET",
+      "effort": "low"
+    },
+    {
+      "id": "Q009",
+      "priority": "P1",
+      "domain": "frontend",
+      "summary": "Fix TenantAdministrationCenter users ReferenceError",
+      "effort": "low"
+    },
+    {
+      "id": "Q010",
+      "priority": "P1",
+      "domain": "frontend",
+      "summary": "Enable codecov in CI test.yml",
+      "effort": "low"
+    },
+    {
+      "id": "Q011",
+      "priority": "P1",
+      "domain": "operational",
+      "summary": "Whiteboard 24-card cap under waiting-wall load",
+      "effort": "low"
+    },
+    {
+      "id": "Q012",
+      "priority": "P1",
+      "domain": "operational",
+      "summary": "Consolidate ops-detail strip on whiteboard",
+      "effort": "low"
+    },
+    {
+      "id": "Q013",
+      "priority": "P1",
+      "domain": "operational",
+      "summary": "Copilot rule-based quick actions before LLM",
+      "effort": "low"
+    },
+    {
+      "id": "Q014",
+      "priority": "P2",
+      "domain": "operational",
+      "summary": "Prioritize copilot queue/capacity/boarding/reassess recs",
+      "effort": "low"
+    },
+    {
+      "id": "Q015",
+      "priority": "P2",
+      "domain": "responsiveness",
+      "summary": "Collapse mission control under elevated load",
+      "effort": "low"
+    },
+    {
+      "id": "Q016",
+      "priority": "P2",
+      "domain": "responsiveness",
+      "summary": "Fix 2 Edge Playwright responsive timeouts",
+      "effort": "low"
+    },
+    {
+      "id": "Q017",
+      "priority": "P2",
+      "domain": "security",
+      "summary": "Gate Swagger behind admin in production",
+      "effort": "medium"
+    },
+    {
+      "id": "Q018",
+      "priority": "P2",
+      "domain": "auditability",
+      "summary": "Surface operational history on patient detail",
+      "effort": "done"
+    },
+    {
+      "id": "Q019",
+      "priority": "P2",
+      "domain": "auditability",
+      "summary": "Queue audit strip on whiteboard",
+      "effort": "done"
+    },
+    {
+      "id": "Q020",
+      "priority": "P2",
+      "domain": "auditability",
+      "summary": "Data quality risk badges in reception",
+      "effort": "done"
+    },
+    {
+      "id": "Q021",
+      "priority": "P2",
+      "domain": "frontend",
+      "summary": "ApiConfigDegradedBanner for misconfigured API",
+      "effort": "done"
+    },
+    {
+      "id": "Q022",
+      "priority": "P2",
+      "domain": "frontend",
+      "summary": "validate-vercel-env.mjs for demo deploy",
+      "effort": "done"
+    },
+    {
+      "id": "Q023",
+      "priority": "P2",
+      "domain": "pilot",
+      "summary": "First-customer demo mode dataset",
+      "effort": "done"
+    },
+    {
+      "id": "Q024",
+      "priority": "P2",
+      "domain": "pilot",
+      "summary": "Clinic onboarding simulation script",
+      "effort": "done"
+    },
+    {
+      "id": "Q025",
+      "priority": "P2",
+      "domain": "architecture",
+      "summary": "multi-tenant-readiness audit script",
+      "effort": "done"
+    },
+    {
+      "id": "Q026",
+      "priority": "P2",
+      "domain": "operational",
+      "summary": "Smart intake click reduction 22→8",
+      "effort": "done"
+    },
+    {
+      "id": "Q027",
+      "priority": "P2",
+      "domain": "operational",
+      "summary": "Reception worker swarm 12/12",
+      "effort": "done"
+    },
+    {
+      "id": "Q028",
+      "priority": "P2",
+      "domain": "operational",
+      "summary": "Error recovery audit 10/10 surfaces",
+      "effort": "done"
+    },
+    {
+      "id": "Q029",
+      "priority": "P2",
+      "domain": "frontend",
+      "summary": "Lazy routes with retry",
+      "effort": "done"
+    },
+    {
+      "id": "Q030",
+      "priority": "P2",
+      "domain": "frontend",
+      "summary": "Mobile performance contract tests",
+      "effort": "done"
+    },
+    {
+      "id": "Q031",
+      "priority": "P2",
+      "domain": "backend",
+      "summary": "TenantIsolationGuard on organizations API",
+      "effort": "done"
+    },
+    {
+      "id": "Q032",
+      "priority": "P2",
+      "domain": "backend",
+      "summary": "HIPAA audit module with permission checks",
+      "effort": "done"
+    },
+    {
+      "id": "Q033",
+      "priority": "P2",
+      "domain": "backend",
+      "summary": "Helmet + HSTS on Nest bootstrap",
+      "effort": "done"
+    },
+    {
+      "id": "Q034",
+      "priority": "P2",
+      "domain": "backend",
+      "summary": "Joi env validation",
+      "effort": "done"
+    },
+    {
+      "id": "Q035",
+      "priority": "P2",
+      "domain": "integrations",
+      "summary": "Integration discovery report script",
+      "effort": "done"
+    },
+    {
+      "id": "Q036",
+      "priority": "P2",
+      "domain": "integrations",
+      "summary": "Org-scoped marketplace enablement",
+      "effort": "done"
+    },
+    {
+      "id": "Q037",
+      "priority": "P2",
+      "domain": "pilot",
+      "summary": "Onboarding wizard with clinic presets",
+      "effort": "done"
+    },
+    {
+      "id": "Q038",
+      "priority": "P2",
+      "domain": "pilot",
+      "summary": "Phased first-customer deployment blueprint doc",
+      "effort": "done"
+    },
+    {
+      "id": "Q039",
+      "priority": "P2",
+      "domain": "security",
+      "summary": "Human review disclaimers on copilot/intake",
+      "effort": "done"
+    },
+    {
+      "id": "Q040",
+      "priority": "P2",
+      "domain": "auditability",
+      "summary": "Operational audit classifier model",
+      "effort": "done"
+    },
+    {
+      "id": "Q041",
+      "priority": "P3",
+      "domain": "architecture",
+      "summary": "Org override for queueAuditModel targets",
+      "effort": "medium"
+    },
+    {
+      "id": "Q042",
+      "priority": "P3",
+      "domain": "architecture",
+      "summary": "Merge EMERGENCY_OS_BRANDING from org settings",
+      "effort": "medium"
+    },
+    {
+      "id": "Q043",
+      "priority": "P3",
+      "domain": "backend",
+      "summary": "Persist workflow logs to audit table",
+      "effort": "high"
+    },
+    {
+      "id": "Q044",
+      "priority": "P3",
+      "domain": "backend",
+      "summary": "Scope EmergencySettingsService by org",
+      "effort": "high"
+    },
+    {
+      "id": "Q045",
+      "priority": "P3",
+      "domain": "integrations",
+      "summary": "Org-scoped FHIR test endpoints",
+      "effort": "medium"
+    },
+    {
+      "id": "Q046",
+      "priority": "P3",
+      "domain": "frontend",
+      "summary": "Wrap all ED routes in ErrorBoundary",
+      "effort": "medium"
+    },
+    {
+      "id": "Q047",
+      "priority": "P3",
+      "domain": "frontend",
+      "summary": "Consolidate App.jsx route modules",
+      "effort": "high"
+    },
+    {
+      "id": "Q048",
+      "priority": "P3",
+      "domain": "security",
+      "summary": "Tighten CSP for production builds",
+      "effort": "medium"
+    },
+    {
+      "id": "Q049",
+      "priority": "P3",
+      "domain": "pilot",
+      "summary": "Staff roster editor in Emergency Settings",
+      "effort": "medium"
+    },
+    {
+      "id": "Q050",
+      "priority": "P3",
+      "domain": "pilot",
+      "summary": "ED setup step in onboarding wizard finish",
+      "effort": "medium"
+    }
+  ],
+  "topDeploymentBlockers": [
+    {
+      "id": "B001",
+      "severity": "critical",
+      "domain": "security",
+      "summary": "Unauthenticated /api/emergency/* in production",
+      "resolution": "Deploy with JWT guards enabled"
+    },
+    {
+      "id": "B002",
+      "severity": "critical",
+      "domain": "pilot",
+      "summary": "No VITE_API_URL on Vercel — API calls hit SPA",
+      "resolution": "Deploy backend + set env"
+    },
+    {
+      "id": "B003",
+      "severity": "critical",
+      "domain": "security",
+      "summary": "Shared ED settings singleton across tenants",
+      "resolution": "Org-scoped settings service"
+    },
+    {
+      "id": "B004",
+      "severity": "critical",
+      "domain": "pilot",
+      "summary": "JWT_SECRET left at CHANGE_ME_IN_PRODUCTION",
+      "resolution": "Rotate secrets in prod"
+    },
+    {
+      "id": "B005",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "Multi-tenant readiness audit fails (score 50)",
+      "resolution": "All domains org-configurable"
+    },
+    {
+      "id": "B006",
+      "severity": "high",
+      "domain": "backend",
+      "summary": "ED state not durable — data loss on restart",
+      "resolution": "Postgres persistence layer"
+    },
+    {
+      "id": "B007",
+      "severity": "high",
+      "domain": "auditability",
+      "summary": "Workflow logs in-memory only",
+      "resolution": "Durable audit storage"
+    },
+    {
+      "id": "B008",
+      "severity": "high",
+      "domain": "integrations",
+      "summary": "Live clinical write path via FHIR not implemented",
+      "resolution": "Scope pilot to standalone ED"
+    },
+    {
+      "id": "B009",
+      "severity": "high",
+      "domain": "security",
+      "summary": "permissionsOverrides not enforced in ED RBAC",
+      "resolution": "Wire resolveEmergencyRole"
+    },
+    {
+      "id": "B010",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "Production commit parity unknown",
+      "resolution": "Deploy tested commit SHA"
+    },
+    {
+      "id": "B011",
+      "severity": "medium",
+      "domain": "architecture",
+      "summary": "Global /api/emergency/settings endpoint",
+      "resolution": "Deprecate for org tenant-admin"
+    },
+    {
+      "id": "B012",
+      "severity": "medium",
+      "domain": "architecture",
+      "summary": "Store does not load org emergencyOs without context refresh",
+      "resolution": "Hydrate on login"
+    },
+    {
+      "id": "B013",
+      "severity": "medium",
+      "domain": "integrations",
+      "summary": "FHIR/HL7 not tenant-scoped",
+      "resolution": "Per-org connector config"
+    },
+    {
+      "id": "B014",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Staff configuration has no UI",
+      "resolution": "Accept seed roster or build editor"
+    },
+    {
+      "id": "B015",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "ED RBAC mapping stored but not applied",
+      "resolution": "resolveEmergencyRoleId wiring"
+    },
+    {
+      "id": "B016",
+      "severity": "medium",
+      "domain": "responsiveness",
+      "summary": "Stress whiteboard unreadable without filters",
+      "resolution": "Enforce density mode in prod"
+    },
+    {
+      "id": "B017",
+      "severity": "medium",
+      "domain": "frontend",
+      "summary": "No enforced test coverage in CI",
+      "resolution": "Enable codecov gate"
+    },
+    {
+      "id": "B018",
+      "severity": "medium",
+      "domain": "security",
+      "summary": "Demo auth flags in production schema",
+      "resolution": "Lock down ALLOW_DEMO_AUTH"
+    },
+    {
+      "id": "B019",
+      "severity": "medium",
+      "domain": "backend",
+      "summary": "Swagger public",
+      "resolution": "Protect or disable in prod"
+    },
+    {
+      "id": "B020",
+      "severity": "medium",
+      "domain": "auditability",
+      "summary": "Cross-tenant workflow log leakage risk",
+      "resolution": "Partition logs by org"
+    },
+    {
+      "id": "B021",
+      "severity": "low",
+      "domain": "architecture",
+      "summary": "Mongoose ED optional path diverges",
+      "resolution": "Document single prod path"
+    },
+    {
+      "id": "B022",
+      "severity": "low",
+      "domain": "architecture",
+      "summary": "Static operational model thresholds",
+      "resolution": "Org override layer"
+    },
+    {
+      "id": "B023",
+      "severity": "low",
+      "domain": "frontend",
+      "summary": "Mixed JS/TS reduces compile-time safety",
+      "resolution": "TS migration backlog"
+    },
+    {
+      "id": "B024",
+      "severity": "low",
+      "domain": "responsiveness",
+      "summary": "Edge responsive E2E failures",
+      "resolution": "Fix before mobile pilot"
+    },
+    {
+      "id": "B025",
+      "severity": "low",
+      "domain": "integrations",
+      "summary": "17 placeholder integration points visible",
+      "resolution": "UX label as roadmap"
+    },
+    {
+      "id": "B026",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Onboarding wizard docs vs code step mismatch",
+      "resolution": "Update operator docs"
+    },
+    {
+      "id": "B027",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Local demo fallback hides API errors",
+      "resolution": "Fail visibly in staging"
+    },
+    {
+      "id": "B028",
+      "severity": "low",
+      "domain": "security",
+      "summary": "CSP unsafe-inline",
+      "resolution": "Harden before public internet"
+    },
+    {
+      "id": "B029",
+      "severity": "low",
+      "domain": "backend",
+      "summary": "Trivy continue-on-error",
+      "resolution": "Fail on critical CVE"
+    },
+    {
+      "id": "B030",
+      "severity": "low",
+      "domain": "operational",
+      "summary": "Queue targets not aligned with org thresholds",
+      "resolution": "Resolver function"
+    },
+    {
+      "id": "B031",
+      "severity": "critical",
+      "domain": "pilot",
+      "summary": "Postgres/Redis not provisioned for prod stack",
+      "resolution": "docker-compose.app or cloud DB"
+    },
+    {
+      "id": "B032",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "CORS_ORIGIN/FRONTEND_URL not set for split deploy",
+      "resolution": "Configure CORS"
+    },
+    {
+      "id": "B033",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "No health check monitoring on /api/health",
+      "resolution": "Wire uptime checks"
+    },
+    {
+      "id": "B034",
+      "severity": "high",
+      "domain": "pilot",
+      "summary": "Sentry/Datadog keys missing in prod",
+      "resolution": "Configure observability"
+    },
+    {
+      "id": "B035",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Stripe/billing not required for ED pilot but may block org create",
+      "resolution": "Verify billing flow"
+    },
+    {
+      "id": "B036",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "OAuth providers not configured",
+      "resolution": "Email/password or dev session only"
+    },
+    {
+      "id": "B037",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Email SMTP not configured for notifications",
+      "resolution": "Disable or configure SMTP"
+    },
+    {
+      "id": "B038",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Redis cache optional — perf under load unknown",
+      "resolution": "Load test with Redis"
+    },
+    {
+      "id": "B039",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "ML/RAG stack optional — copilot may degrade",
+      "resolution": "Document AI provider keys"
+    },
+    {
+      "id": "B040",
+      "severity": "medium",
+      "domain": "pilot",
+      "summary": "Android Capacitor build not in ED pilot scope",
+      "resolution": "Web-only pilot OK"
+    },
+    {
+      "id": "B041",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Fleet/IoT modules in codebase confuse scope",
+      "resolution": "Nav/feature flag hide"
+    },
+    {
+      "id": "B042",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Federated learning endpoints on ED controller",
+      "resolution": "Disable in prod"
+    },
+    {
+      "id": "B043",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "Digital twin endpoints on ED controller",
+      "resolution": "Disable in prod"
+    },
+    {
+      "id": "B044",
+      "severity": "low",
+      "domain": "architecture",
+      "summary": "Branding ED copy not org-scoped",
+      "resolution": "Pilot uses default copy"
+    },
+    {
+      "id": "B045",
+      "severity": "low",
+      "domain": "auditability",
+      "summary": "Automation audit separate from ED workflow logs",
+      "resolution": "Unified operator view"
+    },
+    {
+      "id": "B046",
+      "severity": "low",
+      "domain": "operational",
+      "summary": "Copilot LLM fallback when rules miss",
+      "resolution": "Monitor generic responses"
+    },
+    {
+      "id": "B047",
+      "severity": "low",
+      "domain": "frontend",
+      "summary": "Large bundle — verify budget tests pass",
+      "resolution": "Run bundleBudget.test"
+    },
+    {
+      "id": "B048",
+      "severity": "low",
+      "domain": "backend",
+      "summary": "Rate limit may block burst intake",
+      "resolution": "Tune throttle for reception"
+    },
+    {
+      "id": "B049",
+      "severity": "low",
+      "domain": "security",
+      "summary": "Crash report endpoint auth unverified",
+      "resolution": "Audit /api/crashes"
+    },
+    {
+      "id": "B050",
+      "severity": "low",
+      "domain": "pilot",
+      "summary": "QA screenshots not in CI gate",
+      "resolution": "Optional visual regression"
+    }
+  ]
+}

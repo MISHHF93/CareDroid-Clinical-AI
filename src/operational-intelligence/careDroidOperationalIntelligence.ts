@@ -231,16 +231,63 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
   }
 
   const recommendations: OperationalRecommendation[] = [];
+  if (breachedQueues.length > 0) {
+    const primaryQueue = [...breachedQueues].sort(
+      (left, right) => (right.oldestWaitMinutes || 0) - (left.oldestWaitMinutes || 0),
+    )[0];
+    recommendations.push({
+      id: 'rec-review-queues',
+      action: `Open ${primaryQueue.label} queue`,
+      rationale: `${breachedQueues.length} queue(s) breached; oldest wait ${primaryQueue.oldestWaitMinutes}m vs ${primaryQueue.targetMinutes}m target.`,
+      route: '/emergency/queues',
+      modelOrRuleId: 'rule-queue-bottleneck-v1',
+      version: OI_RULE_BASELINE_VERSION,
+      confidence: 0.94,
+      reasonCodes: ['queue_target_breach'],
+      timestamp: generatedAt,
+      humanReviewRequired: true,
+    });
+  }
+  if (centralSnapshot.capacityStatus.band === 'Red' || centralSnapshot.capacityStatus.band === 'Orange') {
+    recommendations.push({
+      id: 'rec-review-capacity',
+      action: 'Open capacity dashboard',
+      rationale: `Capacity score ${centralSnapshot.capacityStatus.score} is in ${centralSnapshot.capacityStatus.band} band.`,
+      route: '/emergency/capacity',
+      modelOrRuleId: 'rule-capacity-pressure-v1',
+      version: OI_RULE_BASELINE_VERSION,
+      confidence: 0.91,
+      reasonCodes: [`capacity_${centralSnapshot.capacityStatus.band.toLowerCase()}_band`],
+      timestamp: generatedAt,
+      humanReviewRequired: true,
+    });
+  }
+  if (centralSnapshot.boardingStatus.boarders > 0) {
+    recommendations.push({
+      id: 'rec-review-boarders',
+      action: 'Review boarders',
+      rationale: `${centralSnapshot.boardingStatus.boarders} patients boarding · ${centralSnapshot.boardingStatus.risk} risk.`,
+      route: '/emergency/boarding',
+      modelOrRuleId: 'rule-boarding-risk-v1',
+      version: OI_RULE_BASELINE_VERSION,
+      confidence: 0.89,
+      reasonCodes: ['boarding_pressure'],
+      timestamp: generatedAt,
+      humanReviewRequired: true,
+    });
+  }
   if (centralSnapshot.reassessmentStatus.due > 0) {
     recommendations.push({
       id: 'rec-review-reassessment',
-      action: 'Review reassessment queue',
-      rationale: `${centralSnapshot.reassessmentStatus.due} patients have reassessment due flags.`,
+      action: 'Open reassessment queue',
+      rationale: `${centralSnapshot.reassessmentStatus.due} due${centralSnapshot.reassessmentStatus.overdue ? ` · ${centralSnapshot.reassessmentStatus.overdue} overdue` : ''}.`,
       route: '/emergency/reassessment',
       modelOrRuleId: 'rule-reassessment-priority-v1',
       version: OI_RULE_BASELINE_VERSION,
       confidence: 0.93,
-      reasonCodes: ['reassessment_due'],
+      reasonCodes: centralSnapshot.reassessmentStatus.overdue
+        ? ['reassessment_overdue']
+        : ['reassessment_due'],
       timestamp: generatedAt,
       humanReviewRequired: true,
     });
@@ -255,20 +302,6 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
       version: OI_RULE_BASELINE_VERSION,
       confidence: 0.87,
       reasonCodes: ['ems_inbound'],
-      timestamp: generatedAt,
-      humanReviewRequired: true,
-    });
-  }
-  if (centralSnapshot.boardingStatus.boarders > 0) {
-    recommendations.push({
-      id: 'rec-review-boarders',
-      action: 'Review boarders',
-      rationale: `${centralSnapshot.boardingStatus.boarders} patients are boarding.`,
-      route: '/emergency/boarding',
-      modelOrRuleId: 'rule-boarding-risk-v1',
-      version: OI_RULE_BASELINE_VERSION,
-      confidence: 0.89,
-      reasonCodes: ['boarding_pressure'],
       timestamp: generatedAt,
       humanReviewRequired: true,
     });

@@ -490,6 +490,7 @@ export type WorkflowActionType =
   | 'boarding_started'
   | 'staffing_request_created'
   | 'referral_created'
+  | 'referral_status_changed'
   | 'copilot_used'
   | 'provincial_data_viewed'
   | 'integration_event_received';

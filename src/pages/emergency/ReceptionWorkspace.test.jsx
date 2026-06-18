@@ -22,7 +22,10 @@ describe('Reception-first experience wiring', () => {
     expect(receptionSource).toContain('convertEmsArrivalForReception');
     expect(receptionSource).toContain('findDuplicateCandidatesFromQuery');
     expect(receptionSource).toContain('ReceptionSearchHint');
-    expect(receptionSource).toContain('Start Smart Intake');
+    expect(receptionSource).toContain('RECEPTION_COPY');
+    expect(receptionSource).toContain('registerWalkIn');
+    expect(receptionSource).toContain('checkIdentity');
+    expect(receptionSource).toContain('isRegistrationClerkRole');
     expect(receptionSource).not.toContain('buildPostHandoffNavigationPaths');
   });
 
@@ -32,14 +35,14 @@ describe('Reception-first experience wiring', () => {
     expect(headerSource).toContain('focus-reception-search');
     expect(headerSource).toContain('open-reception-intake');
     expect(headerSource).toContain('PatientSearchResults');
-    expect(headerSource).toContain('Patient search');
+    expect(headerSource).toContain('Operational search');
     expect(headerSource).toContain('screenCapabilities.productLabel');
   });
 
   it('gates clinical overlays for registration screen mode', () => {
     expect(appShellSource).toContain('useScreenModeCapabilities');
     expect(appShellSource).toContain('showEmsCriticalOverlay');
-    expect(appShellSource).toContain('showReassessmentEngine');
+    expect(appShellSource).toContain('getReceptionPrimaryCreatePath');
   });
 
   it('redirects registration clerk away from whiteboard routes', () => {

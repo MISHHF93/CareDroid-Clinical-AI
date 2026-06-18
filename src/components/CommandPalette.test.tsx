@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  buildCommandResults,
   isCommandVisibleForEmergencyRole,
   matchAndRankCommands,
   readRecentCommandIds,
@@ -7,6 +8,7 @@ import {
   searchPatientsByName,
   type Command,
 } from './CommandPalette';
+import { COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS, COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS } from '../config/commandPaletteHighValueModel';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
@@ -113,8 +115,7 @@ describe('CommandPalette helpers', () => {
 
     expect(routePathsById['open-pulse']).toBe(CANONICAL_ROUTES.emergencyPulse);
     expect(routePathsById['open-shift']).toBe(CANONICAL_ROUTES.emergencyShift);
-    expect(routePathsById['open-analytics']).toBeUndefined();
-    expect(routePathsById['open-settings']).toBeUndefined();
+    expect(routePathsById['open-analytics']).toBe(CANONICAL_ROUTES.emergencyAnalytics);
 
     expect(toolPathsById).toEqual(
       expect.objectContaining({
@@ -124,6 +125,38 @@ describe('CommandPalette helpers', () => {
         'open-nihss': `${CANONICAL_ROUTES.emergencyTools}?source=calculators&filter=calculator&q=nihss&open=nihss`,
       }),
     );
+  });
+
+  it('pins quick actions on empty query before recent commands', () => {
+    const commands = [
+      ...COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS.map((id) =>
+        command({
+          id,
+          label: id,
+          group: 'Quick actions',
+          keywords: [id],
+        }),
+      ),
+      command({
+        id: 'open-pulse',
+        label: 'Pulse',
+        group: 'Navigation',
+        keywords: ['pulse'],
+      }),
+    ];
+
+    const results = buildCommandResults(commands, '', ['open-pulse', 'create-patient']);
+    expect(results[0]?.group).toBe('Quick actions');
+    expect(results.map((entry) => entry.id)).toEqual([
+      ...COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS,
+      'open-pulse',
+    ]);
+  });
+
+  it('suppresses navigation duplicates covered by quick actions', () => {
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-whiteboard')).toBe(true);
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-ems')).toBe(true);
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-reassessment')).toBe(true);
   });
 
   it('hides command actions that the active Emergency OS role cannot perform', () => {

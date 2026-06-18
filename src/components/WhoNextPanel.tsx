@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
+import OperationalEmptyState from './ui/OperationalEmptyState';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { Patient, PatientFlag, PatientState, Priority, Room } from '../types/emergency';
 
@@ -383,11 +385,26 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
             ) : null}
           </>
         ) : (
-          <div style={{ color: '#D1D5DB', fontSize: 13, lineHeight: 1.4, marginTop: 10 }}>
-            {assignedPatients.length
-              ? 'All assigned patients snoozed. Recommendations refresh automatically.'
-              : 'No patients assigned. Check department list.'}
-          </div>
+          <OperationalEmptyState
+            size="inline"
+            icon="◎"
+            title={
+              assignedPatients.length
+                ? EMPTY_STATE_COPY.whoNext.snoozed.title
+                : EMPTY_STATE_COPY.whoNext.unassigned.title
+            }
+            guidance={
+              assignedPatients.length
+                ? EMPTY_STATE_COPY.whoNext.snoozed.guidance
+                : EMPTY_STATE_COPY.whoNext.unassigned.guidance
+            }
+            status={assignedPatients.length ? EMPTY_STATE_COPY.whoNext.snoozed.status : undefined}
+            nextSteps={
+              assignedPatients.length
+                ? EMPTY_STATE_COPY.whoNext.snoozed.nextSteps
+                : EMPTY_STATE_COPY.whoNext.unassigned.nextSteps
+            }
+          />
         )}
       </div>
     </aside>

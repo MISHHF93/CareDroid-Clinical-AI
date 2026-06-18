@@ -12,7 +12,8 @@ import {
   patientLabel,
   selectEmsInboundCount,
 } from '../../components/reception/receptionQueueModel';
-import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, isRegistrationClerkRole } from '../../config/emergencyRolePermissions';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { useReceptionSnapshotPolling } from '../../hooks/useEmergencyOs';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -26,14 +27,30 @@ import {
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import { PatientState } from '../../types/emergency';
 import { findDuplicateCandidatesFromQuery } from '../../utils/patientDuplicateDetection';
+import ToolApiErrorBanner from '../../components/ToolApiErrorBanner';
+import { ERROR_RECOVERY_COPY } from '../../config/errorRecoveryModel';
+import { OPERATIONAL_AUDIT_DOMAIN } from '../../config/operationalAuditModel';
+import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
+import { buildDataQualitySnapshot } from '../../services/dataQualityDiscovery';
+import { buildQueueAuditSnapshot } from '../../services/queueAuditDiscovery';
+import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
+import {
+  RECEPTION_PIPELINE_STAGE,
+  resolvePipelineStageFromSearchParams,
+} from '../../config/emergencyPipelineModel';
+import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
+import ReceptionPipelineShell from './ReceptionPipelineShell';
 import './ReceptionWorkspace.css';
 
 export default function ReceptionWorkspace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
-  const { loading: receptionLoading, refresh: refreshReceptionSnapshot } = useReceptionSnapshotPolling(15000);
+  const { loading: receptionLoading, error: receptionError, refresh: refreshReceptionSnapshot } =
+    useReceptionSnapshotPolling(15000);
+  const [handoffSyncWarning, setHandoffSyncWarning] = useState('');
   const patients = useEmergencyStore((state) => state.patients);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const store = useEmergencyStore();
@@ -68,6 +85,12 @@ export default function ReceptionWorkspace() {
   const duplicateCandidates = useMemo(
     () => (query.trim().length >= 2 ? findDuplicateCandidatesFromQuery(patients, query) : []),
     [patients, query],
+  );
+
+  const dataQualitySnapshot = useMemo(() => buildDataQualitySnapshot(patients), [patients]);
+  const queueAuditSnapshot = useMemo(
+    () => buildQueueAuditSnapshot({ patients, emsInbound, referrals: store.referrals }),
+    [emsInbound, patients, store.referrals],
   );
 
   const arrivedPatient = useMemo(
@@ -120,7 +143,13 @@ export default function ReceptionWorkspace() {
   );
 
   useEffect(() => {
-    const openPrimaryIntake = () => openSmartIntake();
+    const openPrimaryIntake = () => {
+      if (isRegistrationClerkRole(emergencyRole.role)) {
+        setShowExpressRegistration(true);
+        return;
+      }
+      openSmartIntake();
+    };
     const openPrepareChooser = () => setShowPrepareChooser(true);
     const openSmartIntakeFromEvent = (event) => {
       const detail = event?.detail || {};
@@ -129,14 +158,15 @@ export default function ReceptionWorkspace() {
     document.addEventListener('open-reception-intake', openPrimaryIntake);
     document.addEventListener('open-reception-smart-intake', openSmartIntakeFromEvent);
     document.addEventListener('open-reception-prepare', openPrepareChooser);
-    document.addEventListener('open-reception-quick-create', openPrimaryIntake);
+    const openQuickCreate = () => setShowQuickIntake(true);
+    document.addEventListener('open-reception-quick-create', openQuickCreate);
     return () => {
       document.removeEventListener('open-reception-intake', openPrimaryIntake);
       document.removeEventListener('open-reception-smart-intake', openSmartIntakeFromEvent);
       document.removeEventListener('open-reception-prepare', openPrepareChooser);
-      document.removeEventListener('open-reception-quick-create', openPrimaryIntake);
+      document.removeEventListener('open-reception-quick-create', openQuickCreate);
     };
-  }, [openSmartIntake]);
+  }, [emergencyRole.role, openSmartIntake]);
 
   useEffect(() => {
     if (searchParams.get('intake') === '1' && canCreatePatient) {
@@ -193,11 +223,25 @@ export default function ReceptionWorkspace() {
     setSearchParams(nextParams, { replace: true });
   }, [contextPatientId]);
 
+  useEffect(() => {
+    if (!arrivedPatientId) return undefined;
+    const timer = window.setTimeout(() => {
+      const nextParams = new URLSearchParams(searchParams);
+      if (nextParams.get('arrived') !== arrivedPatientId) return;
+      nextParams.delete('arrived');
+      setSearchParams(nextParams, { replace: true });
+    }, 2500);
+    return () => window.clearTimeout(timer);
+  }, [arrivedPatientId, searchParams, setSearchParams]);
+
   const handleExpressRegistrationAdded = (patient) => {
     const handoff = completeReceptionHandoff(store, {
       patientId: patient.id,
       source: 'express-register',
     });
+    if (handoff.syncPending) {
+      setHandoffSyncWarning(ERROR_RECOVERY_COPY.handoffPending);
+    }
     setShowExpressRegistration(false);
     navigate(handoff.receptionPath);
   };
@@ -207,6 +251,9 @@ export default function ReceptionWorkspace() {
       patientId: patient.id,
       source: 'quick-intake',
     });
+    if (handoff.syncPending) {
+      setHandoffSyncWarning(ERROR_RECOVERY_COPY.handoffPending);
+    }
     setShowQuickIntake(false);
     navigate(handoff.receptionPath);
   };
@@ -234,6 +281,33 @@ export default function ReceptionWorkspace() {
     void refreshReceptionSnapshot();
   };
 
+  const activePipelineStage = useMemo(
+    () => resolvePipelineStageFromSearchParams(searchParams),
+    [searchParams],
+  );
+
+  const handlePipelineStageChange = useCallback(
+    (stageId) => {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('express');
+      nextParams.delete('intake');
+      nextParams.delete('quickCreate');
+      nextParams.delete('autostart');
+      if (stageId === RECEPTION_PIPELINE_STAGE.ARRIVAL) {
+        nextParams.delete('queue');
+      } else if (stageId === RECEPTION_PIPELINE_STAGE.REGISTER) {
+        nextParams.delete('queue');
+        nextParams.set('express', '1');
+      } else if (stageId === RECEPTION_PIPELINE_STAGE.VERIFY) {
+        nextParams.set('queue', 'verification');
+      } else if (stageId === RECEPTION_PIPELINE_STAGE.HANDOFF) {
+        nextParams.set('queue', 'pretriage');
+      }
+      setSearchParams(nextParams, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
   const handleMetricSelect = (metric) => {
     if (!metric.queueTab) return;
     const nextParams = new URLSearchParams(searchParams);
@@ -245,19 +319,41 @@ export default function ReceptionWorkspace() {
   return (
     <section className="reception-workspace" aria-labelledby="reception-workspace-title">
       <header className="reception-workspace__intro">
-        <h1 id="reception-workspace-title">Reception</h1>
-        <p className="reception-workspace__description">
-          Register arrivals, verify identity, and hand off to triage.
-        </p>
+        <h1 id="reception-workspace-title">{RECEPTION_COPY.workspace.title}</h1>
+        <p className="reception-workspace__description">{RECEPTION_COPY.workspace.description}</p>
       </header>
 
       <ReceptionOperationalStrip
         patients={patients}
         emsInbound={emsInbound}
         onMetricSelect={handleMetricSelect}
+        shiftSummaryPath={
+          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyShift)
+            ? CANONICAL_ROUTES.emergencyShift
+            : null
+        }
       />
 
       <ReceptionSearchHint query={query} />
+
+      {receptionError ? (
+        <ToolApiErrorBanner
+          message={`${receptionError}. ${ERROR_RECOVERY_COPY.syncStale}`}
+          onRetry={() => void refreshReceptionSnapshot()}
+          retryLabel="Refresh reception feed"
+        />
+      ) : null}
+
+      {handoffSyncWarning ? (
+        <ToolApiErrorBanner
+          message={handoffSyncWarning}
+          onRetry={() => {
+            setHandoffSyncWarning('');
+            void refreshReceptionSnapshot();
+          }}
+          retryLabel="Retry sync"
+        />
+      ) : null}
 
       {duplicateCandidates.length ? (
         <DuplicatePatientBanner
@@ -274,35 +370,40 @@ export default function ReceptionWorkspace() {
       ) : null}
 
       {canCreatePatient ? (
-        <div className="reception-workspace__actions" aria-label="Patient arrival actions">
+        <div className="reception-workspace__actions" aria-label={RECEPTION_COPY.workspace.actionsLabel}>
           <button
             type="button"
             className="reception-workspace__action reception-workspace__action--primary reception-workspace__action--wide"
-            onClick={() => openSmartIntake()}
+            onClick={() => setShowExpressRegistration(true)}
           >
-            Start Smart Intake
+            {RECEPTION_COPY.workspace.registerWalkIn}
           </button>
           <div className="reception-workspace__actions reception-workspace__actions--secondary">
             <button
               type="button"
               className="reception-workspace__action"
-              onClick={() => setShowExpressRegistration(true)}
+              onClick={() => openSmartIntake()}
             >
-              Express register
+              {RECEPTION_COPY.workspace.checkIdentity}
             </button>
             <button
               type="button"
               className="reception-workspace__action"
               onClick={() => setShowPrepareChooser(true)}
             >
-              More options
+              {RECEPTION_COPY.workspace.otherArrivals}
             </button>
           </div>
         </div>
       ) : null}
 
+      <ReceptionPipelineShell
+        activeStage={activePipelineStage}
+        onStageChange={handlePipelineStageChange}
+        showStageRail={isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.pipelineShellEnabled}
+      >
       <ArrivalDashboard
-        patients={filteredPatients}
+        patients={patients}
         emsArrivals={emsArrivals}
         activeQueueTab={activeQueueTab}
         receptionLoading={receptionLoading}
@@ -321,14 +422,40 @@ export default function ReceptionWorkspace() {
         onPrepareRegistration={handlePrepareEmsRegistration}
         onConvertArrival={handleConvertEmsArrival}
         onRefreshEms={() => void refreshReceptionSnapshot()}
+        emsFeedError={receptionError}
         expandedPatientId={expandedPretriagePatientId}
         onExpandPatient={setExpandedPretriagePatientId}
+        onRegisterWalkIn={() => setShowExpressRegistration(true)}
+        onOpenEms={() => {
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.set('tab', 'ems');
+          setSearchParams(nextParams, { replace: true });
+        }}
+        dataQualitySnapshot={dataQualitySnapshot}
+        queueAuditSnapshot={queueAuditSnapshot}
+        onVerifyPatient={(patientId) => openSmartIntake('verify', patientId)}
+        onCaptureComplaint={(patientId) => {
+          selectPatient(patientId);
+          openSmartIntake('verify', patientId);
+        }}
+        onReviewDuplicate={(patientId) => openVerificationFromDuplicate(patientId)}
+      />
+      </ReceptionPipelineShell>
+
+      <OperationalHistoryPanel
+        logs={workflowLogs}
+        title="Reception operational history"
+        description="Recent patient intake and queue handoff actions from workflow audit data."
+        domains={[OPERATIONAL_AUDIT_DOMAIN.PATIENT, OPERATIONAL_AUDIT_DOMAIN.QUEUE]}
+        limit={6}
+        compact
+        className="reception-workspace__history"
       />
 
       {arrivedPatient ? (
         <div className="reception-workspace__banner" role="status">
           <span>
-            <strong>{patientLabel(arrivedPatient)}</strong> sent to triage.
+            <strong>{patientLabel(arrivedPatient)}</strong> {RECEPTION_COPY.workspace.sentToTriage}.
           </span>
           <div className="reception-workspace__banner-actions">
             <button
@@ -342,7 +469,7 @@ export default function ReceptionWorkspace() {
                 setExpandedPretriagePatientId(arrivedPatient.id);
               }}
             >
-              View in queue
+              {RECEPTION_COPY.workspace.seeInList}
             </button>
             <button
               type="button"
@@ -350,10 +477,14 @@ export default function ReceptionWorkspace() {
                 const nextParams = new URLSearchParams(searchParams);
                 nextParams.delete('arrived');
                 setSearchParams(nextParams, { replace: true });
+                if (isRegistrationClerkRole(emergencyRole.role)) {
+                  setShowExpressRegistration(true);
+                  return;
+                }
                 openSmartIntake();
               }}
             >
-              Next arrival
+              {RECEPTION_COPY.workspace.registerNext}
             </button>
           </div>
         </div>

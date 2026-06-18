@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PatientFlag, type Note, type Patient, type Room } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
+import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
 import './ReassessmentDrawer.css';
 
 export type ReassessmentSortMode = 'severity' | 'wait';
@@ -264,6 +266,7 @@ type ReassessmentDrawerProps = {
 export default function ReassessmentDrawer({ open, count, onClose }: ReassessmentDrawerProps) {
   const patients = useEmergencyStore((state) => state.patients);
   const rooms = useEmergencyStore((state) => state.rooms);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const [sortMode, setSortMode] = useState<ReassessmentSortMode>('severity');
 
@@ -416,6 +419,16 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
           </div>
         )}
       </section>
+
+      <OperationalHistoryPanel
+        logs={workflowLogs}
+        title="Reassessment history"
+        description="Recent reassessment reminders and completions from workflow audit data."
+        domains={[OPERATIONAL_AUDIT_DOMAIN.REASSESSMENT]}
+        limit={6}
+        compact
+        className="reassessment-drawer__history"
+      />
     </div>
   );
 }

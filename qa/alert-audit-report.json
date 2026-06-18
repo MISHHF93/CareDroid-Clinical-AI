@@ -1,0 +1,256 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.771Z",
+  "taxonomy": [
+    "critical",
+    "high",
+    "medium",
+    "informational"
+  ],
+  "registryCount": 19,
+  "registry": [
+    {
+      "id": "vitals-critical",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "alert drawer",
+        "PatientDetailPanel"
+      ]
+    },
+    {
+      "id": "deterioration-risk",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReassessmentDrawer",
+        "OperationalHandoffDomainBar"
+      ]
+    },
+    {
+      "id": "reassessment-overdue",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReassessmentDrawer"
+      ]
+    },
+    {
+      "id": "reassessment-due",
+      "domain": "Patient",
+      "defaultTier": "high",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReassessmentDrawer"
+      ]
+    },
+    {
+      "id": "long-wait-lwbs",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "QueueIntelligencePanel"
+      ]
+    },
+    {
+      "id": "long-wait-critical",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "QueueIntelligencePanel"
+      ]
+    },
+    {
+      "id": "long-wait-warning",
+      "domain": "Patient",
+      "defaultTier": "medium",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header"
+      ]
+    },
+    {
+      "id": "capacity-red",
+      "domain": "Capacity",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "CapacityCrisisMode",
+        "OperationalHandoffDomainBar"
+      ]
+    },
+    {
+      "id": "capacity-orange",
+      "domain": "Capacity",
+      "defaultTier": "high",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "CapacityCrisisMode"
+      ]
+    },
+    {
+      "id": "capacity-yellow",
+      "domain": "Capacity",
+      "defaultTier": "informational",
+      "suppressGlobal": true,
+      "surfaces": [
+        "Capacity page"
+      ]
+    },
+    {
+      "id": "ems-critical-inbound",
+      "domain": "EMS",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "EMSCriticalBroadcast",
+        "OperationalHandoffDomainBar"
+      ]
+    },
+    {
+      "id": "referral-escalation",
+      "domain": "Referral",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReferralPanel",
+        "OperationalHandoffDomainBar"
+      ]
+    },
+    {
+      "id": "referral-emergent-pager",
+      "domain": "Referral",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReferralPanel"
+      ]
+    },
+    {
+      "id": "referral-unacknowledged",
+      "domain": "Referral",
+      "defaultTier": "high",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "ReferralPanel"
+      ]
+    },
+    {
+      "id": "referral-sent",
+      "domain": "Referral",
+      "defaultTier": "informational",
+      "suppressGlobal": true,
+      "surfaces": [
+        "ReferralPanel"
+      ]
+    },
+    {
+      "id": "queue-breach-critical",
+      "domain": "Queue",
+      "defaultTier": "high",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "QueueIntelligencePanel"
+      ]
+    },
+    {
+      "id": "queue-bottleneck",
+      "domain": "Queue",
+      "defaultTier": "high",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "QueueIntelligencePanel"
+      ]
+    },
+    {
+      "id": "manual-escalation",
+      "domain": "Patient",
+      "defaultTier": "critical",
+      "suppressGlobal": false,
+      "surfaces": [
+        "Header",
+        "PatientCard"
+      ]
+    },
+    {
+      "id": "operational-intelligence",
+      "domain": "System",
+      "defaultTier": "informational",
+      "suppressGlobal": true,
+      "surfaces": [
+        "Header"
+      ]
+    }
+  ],
+  "sampleClassification": [
+    {
+      "id": "alert-ems-critical-1",
+      "title": "Critical EMS inbound",
+      "tier": "critical"
+    },
+    {
+      "id": "alert-capacity-yellow",
+      "title": "Capacity degradation detected",
+      "tier": "informational"
+    },
+    {
+      "id": "alert-referral-sent-1",
+      "title": "Referral sent to Cardiology",
+      "tier": "informational"
+    },
+    {
+      "id": "alert-reassessment-reminder-upcoming-r1",
+      "title": "Recheck due in 2min - Jane Doe",
+      "tier": "medium"
+    },
+    {
+      "id": "alert-long-wait-warning-p1",
+      "title": "Wait time approaching limit",
+      "tier": "medium"
+    },
+    {
+      "id": "alert-referral-unacknowledged-1",
+      "title": "Referral unacknowledged",
+      "tier": "high"
+    }
+  ],
+  "triage": {
+    "registryCount": 19,
+    "inputCount": 6,
+    "retainedCount": 4,
+    "visibleCount": 3,
+    "suppressedCount": 1,
+    "counts": {
+      "critical": 1,
+      "high": 1,
+      "medium": 1,
+      "informational": 1
+    },
+    "suppressedIds": [
+      "alert-referral-sent-1"
+    ],
+    "recommendation": "Suppressed 1 noisy alerts; critical/high remain in drawer and toasts."
+  },
+  "noiseReduced": [
+    "alert-referral-sent-1"
+  ],
+  "importantRetained": 3
+}

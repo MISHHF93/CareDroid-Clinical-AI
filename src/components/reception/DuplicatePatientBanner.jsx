@@ -1,5 +1,6 @@
 import React from 'react';
 import DuplicateCandidatePanel from '../verification/DuplicateCandidatePanel';
+import { RECEPTION_COPY } from './receptionCopy';
 import './DuplicatePatientBanner.css';
 
 export default function DuplicatePatientBanner({
@@ -9,14 +10,16 @@ export default function DuplicatePatientBanner({
 }) {
   if (!candidates.length) return null;
 
+  const copy = RECEPTION_COPY.duplicate;
+
   return (
     <section className="duplicate-patient-banner" aria-labelledby="duplicate-patient-banner-title">
       <DuplicateCandidatePanel
         candidates={candidates}
         onOpenPatient={onOpenPatient}
         onContinueCreate={onContinueCreate}
-        title="Possible duplicate patients"
-        description="Matching uses the same MPI-style rules as Smart Intake verification. Link an existing chart before creating a new record."
+        title={copy.bannerTitle}
+        description={copy.bannerDescription}
       />
     </section>
   );

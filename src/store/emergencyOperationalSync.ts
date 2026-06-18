@@ -10,6 +10,7 @@ import {
   type VitalsAlert,
 } from '../types/emergency';
 import { deriveAlerts, isDerivedAlertId, normalizeAlert } from '../engine/alertEngineDerived';
+import { triageOperationalAlerts } from '../engine/alertClassificationModel';
 import { calculateCapacity } from '../engine/capacityEngine';
 import {
   isLongWaitRescueReason,
@@ -325,9 +326,11 @@ export function buildUpdateAlertsPatch(state: {
   return {
     ...(patients === state.patients ? {} : { patients }),
     capacity,
-    alerts: [...derivedAlerts, ...manualAlerts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    ),
+    alerts: triageOperationalAlerts(
+      [...derivedAlerts, ...manualAlerts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
+    ).visible,
   };
 }
 

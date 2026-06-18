@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.833Z",
+  "goal": "Find patient, encounter, referral, EMS case, and queue item from one search experience",
+  "entities": [
+    "patient",
+    "encounter",
+    "referral",
+    "ems",
+    "queue"
+  ],
+  "before": {
+    "surfaces": [
+      "Header patient lookup",
+      "Command palette"
+    ],
+    "patient": true,
+    "encounter": "partial via patient row action only",
+    "referral": false,
+    "ems": false,
+    "queue": "reception footer filter only",
+    "passesSingleSearchTest": false
+  },
+  "after": {
+    "surfaces": [
+      "Header operational search",
+      "Command palette operational search"
+    ],
+    "patient": true,
+    "encounter": true,
+    "referral": true,
+    "ems": true,
+    "queue": true,
+    "passesSingleSearchTest": true,
+    "implementation": [
+      "src/services/unifiedOperationalSearch.ts",
+      "src/components/PatientSearchResults.tsx",
+      "src/components/Header.tsx",
+      "src/components/CommandPalette.tsx",
+      "src/services/patientSearchActions.ts"
+    ]
+  },
+  "navigation": {
+    "patient": "/emergency/patients?patientId=… or reception scoped",
+    "encounter": "/emergency/whiteboard?patient=…&encounter=…",
+    "referral": "/emergency/referrals?patientId=…",
+    "ems": "/emergency/ems?emsArrivalId=…",
+    "queue": "/emergency/queues?queue=…&patient=…"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "scenario": {
+    "waitingPatients": 40,
+    "emsArrivals": 5,
+    "reassessmentsDue": 10,
+    "referralsPending": 8
+  },
+  "evaluation": {
+    "loadLevel": "critical",
+    "prioritizeAwareness": true,
+    "compactChrome": true,
+    "hideMissionControl": true,
+    "hideCommandLayer": true,
+    "hideHeroDetail": true,
+    "hideDuplicateEmsBanner": true,
+    "hideChargeNurseStrip": true,
+    "collapseQueueIntelligence": true,
+    "maxVisibleCards": 24,
+    "suggestedFilter": "Waiting",
+    "attentionSignals": 4,
+    "overloadScore": 87,
+    "readabilityScore": 26,
+    "issues": [
+      {
+        "id": "waiting-wall",
+        "severity": "critical",
+        "summary": "40 patients waiting — full board grid reduces signal."
+      },
+      {
+        "id": "duplicate-chrome",
+        "severity": "warning",
+        "summary": "EMS, reassessment, and referral signals repeat across hero, stats, strips, and mission control."
+      },
+      {
+        "id": "card-flood",
+        "severity": "critical",
+        "summary": "Rendering 55 cards hides reassess, EMS, and referral priorities."
+      }
+    ],
+    "primaryFocus": [
+      {
+        "id": "reassess",
+        "label": "Reassessments due",
+        "value": 10,
+        "rank": 1
+      },
+      {
+        "id": "ems",
+        "label": "EMS arrivals",
+        "value": 5,
+        "rank": 2
+      },
+      {
+        "id": "referrals",
+        "label": "Referrals pending",
+        "value": 8,
+        "rank": 3
+      },
+      {
+        "id": "waiting",
+        "label": "Patients waiting",
+        "value": 40,
+        "rank": 4
+      }
+    ]
+  },
+  "beforeReadability": 26,
+  "afterReadability": 54,
+  "mitigations": [
+    "Collapse mission control and command-layer metrics when load is elevated",
+    "Show one attention strip per signal (EMS, reassess, referral) instead of duplicating stats",
+    "Cap unfiltered patient grid at 24 cards with a filter prompt",
+    "Prioritize Waiting / Reassess / EMS filters over All"
+  ],
+  "generatedAt": "2026-06-18T18:55:52.578Z",
+  "readability": {
+    "beforeMitigations": 26,
+    "afterMitigations": 54,
+    "issues": [
+      {
+        "id": "waiting-wall",
+        "severity": "critical",
+        "summary": "40 patients waiting — full board grid reduces signal."
+      },
+      {
+        "id": "duplicate-chrome",
+        "severity": "warning",
+        "summary": "EMS, reassessment, and referral signals repeat across hero, stats, strips, and mission control."
+      },
+      {
+        "id": "card-flood",
+        "severity": "critical",
+        "summary": "Rendering 55 cards hides reassess, EMS, and referral priorities."
+      }
+    ],
+    "primaryFocus": [
+      {
+        "id": "reassess",
+        "label": "Reassessments due",
+        "value": 10,
+        "rank": 1
+      },
+      {
+        "id": "ems",
+        "label": "EMS arrivals",
+        "value": 5,
+        "rank": 2
+      },
+      {
+        "id": "referrals",
+        "label": "Referrals pending",
+        "value": 8,
+        "rank": 3
+      },
+      {
+        "id": "waiting",
+        "label": "Patients waiting",
+        "value": 40,
+        "rank": 4
+      }
+    ]
+  }
+}

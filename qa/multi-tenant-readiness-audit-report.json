@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.488Z",
+  "goal": "Verify settings, branding, thresholds, integrations, and roles can be configured per organization",
+  "passesAudit": true,
+  "overallReadinessScore": 100,
+  "conclusion": "All domains are org-configurable.",
+  "domainVerdict": {
+    "settings": {
+      "canConfigurePerOrganization": true,
+      "partiallyConfigured": false,
+      "readiness": "ready",
+      "readySurfaces": 2,
+      "totalSurfaces": 2,
+      "blockers": []
+    },
+    "branding": {
+      "canConfigurePerOrganization": true,
+      "partiallyConfigured": false,
+      "readiness": "ready",
+      "readySurfaces": 2,
+      "totalSurfaces": 2,
+      "blockers": []
+    },
+    "thresholds": {
+      "canConfigurePerOrganization": true,
+      "partiallyConfigured": false,
+      "readiness": "ready",
+      "readySurfaces": 2,
+      "totalSurfaces": 2,
+      "blockers": []
+    },
+    "integrations": {
+      "canConfigurePerOrganization": true,
+      "partiallyConfigured": false,
+      "readiness": "ready",
+      "readySurfaces": 2,
+      "totalSurfaces": 2,
+      "blockers": []
+    },
+    "roles": {
+      "canConfigurePerOrganization": true,
+      "partiallyConfigured": false,
+      "readiness": "ready",
+      "readySurfaces": 2,
+      "totalSurfaces": 2,
+      "blockers": []
+    }
+  },
+  "evaluation": {
+    "totals": {
+      "surfaces": 10,
+      "ready": 10,
+      "partial": 0,
+      "notReady": 0,
+      "orgScopedWrite": 10
+    },
+    "domains": [
+      {
+        "domain": "settings",
+        "surfaceCount": 2,
+        "readyCount": 2,
+        "orgScopedWriteCount": 2,
+        "readiness": "ready",
+        "surfaces": [
+          "settings-modules",
+          "settings-feature-flags"
+        ],
+        "blockers": []
+      },
+      {
+        "domain": "branding",
+        "surfaceCount": 2,
+        "readyCount": 2,
+        "orgScopedWriteCount": 2,
+        "readiness": "ready",
+        "surfaces": [
+          "branding-white-label",
+          "branding-emergency-os-copy"
+        ],
+        "blockers": []
+      },
+      {
+        "domain": "thresholds",
+        "surfaceCount": 2,
+        "readyCount": 2,
+        "orgScopedWriteCount": 2,
+        "readiness": "ready",
+        "surfaces": [
+          "thresholds-ed-wait-capacity",
+          "thresholds-operational-models"
+        ],
+        "blockers": []
+      },
+      {
+        "domain": "integrations",
+        "surfaceCount": 2,
+        "readyCount": 2,
+        "orgScopedWriteCount": 2,
+        "readiness": "ready",
+        "surfaces": [
+          "integrations-marketplace",
+          "integrations-ed-connectors"
+        ],
+        "blockers": []
+      },
+      {
+        "domain": "roles",
+        "surfaceCount": 2,
+        "readyCount": 2,
+        "orgScopedWriteCount": 2,
+        "readiness": "ready",
+        "surfaces": [
+          "roles-emergency-rbac",
+          "roles-tenant-admin-overrides"
+        ],
+        "blockers": []
+      }
+    ],
+    "isolationGaps": [
+      "FHIR/HL7 connector test endpoints are not yet scoped by organizationId",
+      "ED patient/workflow state remains in-memory per backend process (not durable per org)"
+    ],
+    "mitigations": [
+      "EmergencySettingsService resolves settings by organizationId with deep-merge over defaults",
+      "EmergencySettings.jsx persists via saveOrganizationEmergencyOsSettings → tenant-admin",
+      "OrganizationContext hydrates emergencyStore from organization.settings.emergencyOs on login",
+      "resolveEmergencyRoleId maps platform roleProfileId via org emergencyOs.roles",
+      "hasEmergencyActionPermission merges permissionsOverrides from org settings",
+      "getOrgEmergencyBranding partial override of EMERGENCY_OS_BRANDING",
+      "resolveOrgOperationalThresholds merges org threshold overrides"
+    ]
+  },
+  "tenantInfrastructure": [
+    "TenantContext / tenantContextStore",
+    "TenantIsolationGuard",
+    "OrganizationsService tenant-admin",
+    "WhiteLabelProvider",
+    "organization.settings JSON storage"
+  ],
+  "orgSettingsShape": {
+    "emergencyOs": "department, thresholds, alertRules, staff, featureFlags, integrations",
+    "branding": "displayName, logoUrl, primaryColor, theme, loginTitle",
+    "permissionsOverrides": "role → permission[] map",
+    "integrations": "marketplace enablement + request status"
+  }
+}

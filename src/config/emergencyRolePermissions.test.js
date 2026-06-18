@@ -12,6 +12,7 @@ import {
   getEmergencyRoleHomeRoute,
   getReceptionEmbeddedIntakePath,
   getReceptionExpressCreatePath,
+  getReceptionPrimaryCreatePath,
   getReceptionQuickCreatePath,
   getReceptionSmartIntakePath,
   getReceptionWalkInQuickPath,
@@ -21,9 +22,42 @@ import {
   hasEmergencyActionPermission,
   isEmergencyReadOnlyRole,
   normalizeEmergencyRole,
+  resolveEmergencyRoleId,
 } from './emergencyRolePermissions';
 
 describe('Emergency OS role-based views', () => {
+  it('merges tenant permission overrides into action checks', () => {
+    expect(
+      hasEmergencyActionPermission(
+        EMERGENCY_ROLE_IDS.readOnlyViewer,
+        EMERGENCY_ACTIONS.createPatient,
+        { [EMERGENCY_ROLE_IDS.readOnlyViewer]: [EMERGENCY_ACTIONS.createPatient] },
+      ),
+    ).toBe(true);
+  });
+
+  it('maps platform roleProfileId to Emergency OS role via org settings', () => {
+    const emergencyOs = {
+      roles: {
+        defaultRoleProfileId: 'physician',
+        emergencyRoleMapping: {
+          nurse: 'triage_nurse',
+          physician: 'physician',
+          'clinic-administrator': 'admin',
+        },
+      },
+    };
+    expect(
+      resolveEmergencyRoleId({ profile: { roleProfileId: 'nurse' } }, emergencyOs),
+    ).toBe(EMERGENCY_ROLE_IDS.triageNurse);
+    expect(
+      resolveEmergencyRoleId({ profile: { roleProfileId: 'clinic-administrator' } }, emergencyOs),
+    ).toBe(EMERGENCY_ROLE_IDS.admin);
+    expect(resolveEmergencyRoleId({ role: 'Registration Clerk' }, emergencyOs)).toBe(
+      EMERGENCY_ROLE_IDS.registrationClerk,
+    );
+  });
+
   it('defines the requested demo roles with stable ids', () => {
     expect(getEmergencyDemoRoles().map((role) => role.label)).toEqual([
       'Admin',
@@ -43,7 +77,8 @@ describe('Emergency OS role-based views', () => {
     const clerkNavIds = getVisibleNavigation(EMERGENCY_ROLE_IDS.registrationClerk).map(
       (item) => item.id,
     );
-    expect(clerkNavIds).toEqual(['reception', 'patients']);
+    expect(clerkNavIds).toContain('reception');
+    expect(clerkNavIds).toContain('patients');
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('settings');
     expect(clerkNavIds).not.toContain('queues');
@@ -108,6 +143,12 @@ describe('Emergency OS role-based views', () => {
     expect(getReceptionSmartIntakePath()).toContain('intake=1');
     expect(getReceptionSmartIntakePath()).toContain('autostart=1');
     expect(getReceptionQuickCreatePath()).toBe(getReceptionEmbeddedIntakePath());
+    expect(getReceptionPrimaryCreatePath(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
+      getReceptionExpressCreatePath(),
+    );
+    expect(getReceptionPrimaryCreatePath(EMERGENCY_ROLE_IDS.chargeNurse)).toBe(
+      getReceptionEmbeddedIntakePath(),
+    );
     expect(getReceptionEmbeddedIntakePath()).toContain('intake=1');
     expect(getReceptionWalkInQuickPath()).toContain('quickCreate=1');
     expect(
@@ -141,6 +182,9 @@ describe('Emergency OS role-based views', () => {
     expect(
       hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
     ).toBe(false);
+    expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.physician).defaultRoute).toBe(
+      CANONICAL_ROUTES.emergencyReception,
+    );
     expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.registrationClerk).defaultRoute).toBe(
       CANONICAL_ROUTES.emergencyReception,
     );

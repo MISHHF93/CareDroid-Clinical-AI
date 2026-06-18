@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.877Z",
+  "goal": "Reception <60s · Charge nurse <30s · Director throughput <2min",
+  "kpis": {
+    "reception": {
+      "targetSeconds": 60,
+      "expressWalkInSeconds": 13,
+      "weightedAverageSeconds": 15,
+      "passes": true,
+      "workflow": "express-register",
+      "evidence": [
+        {
+          "id": "express-primary",
+          "summary": "Express register promoted to primary CTA; N shortcut opens express modal.",
+          "clicksSaved": 105,
+          "minutesSaved": 5.1
+        },
+        {
+          "id": "auto-dismiss-handoff",
+          "summary": "Handoff success banner auto-clears — no \"Next arrival\" click per patient.",
+          "clicksSavedPerPatient": 1
+        },
+        {
+          "id": "quick-create-shortcut",
+          "summary": "open-reception-quick-create and ?quickCreate=1 open QuickIntake directly (skip chooser).",
+          "chooserStepsRemoved": 1
+        },
+        {
+          "id": "automated-encounter-queue",
+          "summary": "completeIntakeHandoff creates encounter and assigns triage queue in software time.",
+          "encounterMs": 28,
+          "queueMs": 22
+        }
+      ]
+    },
+    "chargeNurse": {
+      "targetSeconds": 30,
+      "estimatedReadSeconds": 18,
+      "visibleSignals": 9,
+      "requiredSignals": 6,
+      "clickDepth": 1,
+      "passes": true,
+      "surfaces": [
+        "ShiftHandoffStrip",
+        "OperationalHandoffDomainBar"
+      ]
+    },
+    "director": {
+      "targetSeconds": 120,
+      "estimatedReadSeconds": 75,
+      "metricCount": 6,
+      "clickDepth": 1,
+      "passes": true,
+      "surfaces": [
+        "ChargeNurseOperationalStrip / ShiftHandoffStrip",
+        "QueueOperationalPanel",
+        "Emergency analytics throughput tiles"
+      ]
+    }
+  },
+  "passedCount": 3,
+  "totalCount": 3,
+  "passesAll": true,
+  "pilotReady": true
+}

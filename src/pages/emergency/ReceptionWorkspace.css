@@ -195,3 +195,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+.reception-workspace__history {
+  margin-top: 12px;
+}

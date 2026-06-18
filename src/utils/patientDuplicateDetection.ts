@@ -249,3 +249,46 @@ export function mergeDuplicateCandidates(
   }
   return [...merged.values()].sort((left, right) => right.matchScore - left.matchScore);
 }
+
+export type DuplicatePatientPair = {
+  patientIdA: string;
+  patientIdB: string;
+  displayNameA: string;
+  displayNameB: string;
+  matchScore: number;
+  matchedFields: string[];
+  recommendedAction: DuplicateRecommendedAction;
+};
+
+export function discoverDuplicatePatientPairs(
+  patients: Patient[],
+  { minScore = DUPLICATE_REVIEW_THRESHOLD } = {},
+): DuplicatePatientPair[] {
+  const pairs: DuplicatePatientPair[] = [];
+  const seen = new Set<string>();
+
+  patients.forEach((source) => {
+    const candidates = findDuplicateCandidates(
+      patients.filter((patient) => patient.id !== source.id),
+      patientToDemographics(source),
+      { minScore, limit: 3 },
+    );
+
+    candidates.forEach((candidate) => {
+      const pairKey = [source.id, candidate.patientId].sort().join('::');
+      if (seen.has(pairKey)) return;
+      seen.add(pairKey);
+      pairs.push({
+        patientIdA: source.id,
+        patientIdB: candidate.patientId,
+        displayNameA: getPatientDisplayName(source),
+        displayNameB: candidate.displayName,
+        matchScore: candidate.matchScore,
+        matchedFields: candidate.matchedFields,
+        recommendedAction: candidate.recommendedAction,
+      });
+    });
+  });
+
+  return pairs.sort((left, right) => right.matchScore - left.matchScore);
+}

@@ -42,7 +42,7 @@ describe('patientSearchActions', () => {
       '/emergency/reception?patientId=patient-1',
     );
     expect(buildViewEncounterPath('patient-1', 'encounter-patient-1')).toContain(
-      'patient=patient-1',
+      '/emergency/reception',
     );
     expect(buildViewEncounterPath('patient-1', 'encounter-patient-1')).toContain(
       'encounter=encounter-patient-1',

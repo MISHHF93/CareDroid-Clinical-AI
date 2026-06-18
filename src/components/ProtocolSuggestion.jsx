@@ -5,6 +5,8 @@ import ClinicalScoreCalculator, {
   isClinicalCalculatorSuggestion,
 } from './ClinicalScoreCalculator';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
+import OperationalEmptyState from './ui/OperationalEmptyState';
 import './ProtocolSuggestion.css';
 
 export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
@@ -263,7 +265,29 @@ export default function ProtocolSuggestion({
     };
   }, [complaintCategory, patient]);
 
-  if (!complaintCategory || displayedSuggestions.length === 0) return null;
+  if (!complaintCategory) {
+    return (
+      <OperationalEmptyState
+        size="inline"
+        icon="◇"
+        title={EMPTY_STATE_COPY.protocol.noComplaint.title}
+        guidance={EMPTY_STATE_COPY.protocol.noComplaint.guidance}
+        nextSteps={EMPTY_STATE_COPY.protocol.noComplaint.nextSteps}
+      />
+    );
+  }
+
+  if (displayedSuggestions.length === 0) {
+    return (
+      <OperationalEmptyState
+        size="inline"
+        icon="◇"
+        title={EMPTY_STATE_COPY.protocol.noMatch.title}
+        guidance={EMPTY_STATE_COPY.protocol.noMatch.guidance}
+        nextSteps={EMPTY_STATE_COPY.protocol.noMatch.nextSteps}
+      />
+    );
+  }
 
   return (
     <>

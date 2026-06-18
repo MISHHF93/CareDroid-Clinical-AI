@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.009Z",
+  "goal": "Recover from API, validation, network, and sync failures without losing workflow context",
+  "pattern": "Preserve form/state + inline alert + retry; never close intake on API failure",
+  "surfaces": [
+    {
+      "id": "quick-intake-api",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "api"
+    },
+    {
+      "id": "express-register-api",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "api"
+    },
+    {
+      "id": "new-patient-intake-api",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "api"
+    },
+    {
+      "id": "smart-intake-match",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "api"
+    },
+    {
+      "id": "smart-intake-finalize",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "api"
+    },
+    {
+      "id": "reception-handoff-sync",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "sync"
+    },
+    {
+      "id": "reception-snapshot",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "network"
+    },
+    {
+      "id": "whiteboard-refresh",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "sync"
+    },
+    {
+      "id": "ems-prearrival",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "network"
+    },
+    {
+      "id": "store-init-backend",
+      "preservesContext": true,
+      "hasRetry": true,
+      "category": "sync"
+    }
+  ],
+  "audit": {
+    "surfaceCount": 10,
+    "completeCount": 10,
+    "incompleteIds": [],
+    "passesAudit": true
+  },
+  "fixes": [
+    "QuickIntake / ExpressRegistration keep form open on API failure",
+    "NewPatientIntake aborts handoff on vertical-slice failure",
+    "receptionHandoff surfaces sync errors on patient record",
+    "ReceptionWorkspace + whiteboard + EMS show retry banners",
+    "SmartIntake distinguishes match API errors from empty results",
+    "emergencyStore preserves ui.error on backend init failure"
+  ]
+}

@@ -11,6 +11,8 @@ export default function ChargeNurseOperationalStrip({
   metrics: metricsOverride = null,
   eyebrow = 'Charge command',
   className = '',
+  emptyLabel = 'All clear',
+  emptyHint = 'No operational signals need attention right now.',
 }) {
   const metrics = useMemo(
     () =>
@@ -23,7 +25,26 @@ export default function ChargeNurseOperationalStrip({
     [activeEmsArrivals, centralSnapshot, metricsOverride, patients],
   );
 
-  if (!metrics.length) return null;
+  if (!metrics.length) {
+    return (
+      <nav
+        className={['charge-nurse-operational-strip', 'charge-nurse-operational-strip--clear', className]
+          .filter(Boolean)
+          .join(' ')}
+        aria-label={eyebrow}
+      >
+        <span className="charge-nurse-operational-strip__eyebrow">{eyebrow}</span>
+        <span
+          className="charge-nurse-operational-strip__metric charge-nurse-operational-strip__metric--clear"
+          data-tone="stable"
+          title={emptyHint}
+        >
+          <strong>{emptyLabel}</strong>
+          <span>{emptyHint}</span>
+        </span>
+      </nav>
+    );
+  }
 
   return (
     <nav

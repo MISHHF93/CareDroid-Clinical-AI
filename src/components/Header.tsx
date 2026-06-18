@@ -10,15 +10,22 @@ import {
   groupOperationalAlertsByMetric,
   resolveOperationalAlertRoute,
 } from '../config/operationalMetricsModel';
+import {
+  getAlertClassificationTier,
+  sortAlertsByClassification,
+  triageOperationalAlerts,
+} from '../engine/alertClassificationModel';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
   getReceptionEmbeddedIntakePath,
   getReceptionQuickCreatePath,
+  isRegistrationClerkRole,
   prefersReceptionForPatientCreate,
   prefersReceptionForPatientSearch,
 } from '../config/emergencyRolePermissions';
+import { RECEPTION_COPY } from './reception/receptionCopy';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -32,10 +39,19 @@ import {
 import { searchPatientsFromBackend } from '../services/patientManagementApi';
 import PatientSearchResults from './PatientSearchResults';
 import {
+  buildEncounterSearchPath,
+  buildEmsCasePath,
+  buildQueueItemPath,
+  buildReferralSearchPath,
   buildReceptionSearchFilterPath,
   buildViewEncounterPath,
   createEncounterForPatient,
 } from '../services/patientSearchActions';
+import {
+  groupOperationalSearchHits,
+  searchOperationalEntities,
+  type OperationalSearchHit,
+} from '../services/unifiedOperationalSearch';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
 import './Header.css';
@@ -65,9 +81,18 @@ function normalizeAlertKey(value: unknown): string {
 }
 
 function alertSeverityTone(alert: Alert): 'info' | 'warning' | 'critical' {
-  if (alert.severity === 'Critical') return 'critical';
-  if (alert.severity === 'Warning') return 'warning';
+  const tier = getAlertClassificationTier(alert);
+  if (tier === 'critical' || tier === 'high') return 'critical';
+  if (tier === 'medium' || alert.severity === 'Warning') return 'warning';
   return 'info';
+}
+
+function formatClassificationLabel(alert: Alert): string {
+  const tier = getAlertClassificationTier(alert);
+  if (tier === 'critical') return 'Critical';
+  if (tier === 'high') return 'High';
+  if (tier === 'medium') return 'Medium';
+  return 'Info';
 }
 
 function formatAlertTime(timestamp?: string): string {
@@ -162,6 +187,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const refreshError = operationalIntelligence.refreshError;
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
+  const referrals = useEmergencyStore((store) => store.referrals);
+  const emsArrivals = useEmergencyStore((store) => store.emsArrivals);
+  const queues = useEmergencyStore((store) => store.queues);
   const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
   const loading = useEmergencyStore((store) => store.loading);
   const integrationEvents = useEmergencyStore((store) => store.integrationEvents);
@@ -173,6 +201,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     (store) => store.emergencySettings.centralControl,
   );
   const [alertDrawerOpen, setAlertDrawerOpen] = useState(false);
+  const [showInformationalAlerts, setShowInformationalAlerts] = useState(false);
   const [localReadAlertIds, setLocalReadAlertIds] = useState<Set<string>>(() => new Set());
   const [localAcknowledgedAlertIds, setLocalAcknowledgedAlertIds] = useState<Set<string>>(
     () => new Set(),
@@ -337,19 +366,33 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     supplementalAlerts,
   ]);
 
+  const alertTriage = useMemo(
+    () => triageOperationalAlerts(notificationAlerts),
+    [notificationAlerts],
+  );
+
   const visibleNotificationAlerts = useMemo(() => {
-    if (!screenCapabilities.isRegistrationScreen) return notificationAlerts;
-    return notificationAlerts.filter((alert) => {
+    const base = sortAlertsByClassification(
+      showInformationalAlerts ? alertTriage.all : alertTriage.visible,
+    );
+    if (!screenCapabilities.isRegistrationScreen) return base;
+    return base.filter((alert) => {
       const haystack = `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
-      if (alert.severity === 'Critical' && !/ems|ambulance|pre-arrival|inbound/.test(haystack)) {
+      if (getAlertClassificationTier(alert) === 'critical' && !/ems|ambulance|pre-arrival|inbound/.test(haystack)) {
         return false;
       }
       return true;
     });
-  }, [notificationAlerts, screenCapabilities.isRegistrationScreen]);
+  }, [alertTriage, screenCapabilities.isRegistrationScreen, showInformationalAlerts]);
 
   const unreadAlertCount = useMemo(
-    () => visibleNotificationAlerts.filter((alert) => !alert.read && !alert.dismissed).length,
+    () =>
+      visibleNotificationAlerts.filter(
+        (alert) =>
+          !alert.read &&
+          !alert.dismissed &&
+          ['critical', 'high'].includes(getAlertClassificationTier(alert)),
+      ).length,
     [visibleNotificationAlerts],
   );
 
@@ -374,6 +417,30 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       ),
     [patientLookupQuery, patients],
   );
+
+  const operationalSearchGroups = useMemo(
+    () =>
+      groupOperationalSearchHits(
+        searchOperationalEntities({
+          query: patientLookupQuery,
+          patients,
+          referrals,
+          emsArrivals,
+          queues,
+        }),
+      ),
+    [emsArrivals, patientLookupQuery, patients, queues, referrals],
+  );
+
+  const firstOperationalHit = useMemo(() => {
+    const ordered = [
+      ...operationalSearchGroups.encounter,
+      ...operationalSearchGroups.referral,
+      ...operationalSearchGroups.ems,
+      ...operationalSearchGroups.queue,
+    ];
+    return ordered[0] || null;
+  }, [operationalSearchGroups]);
 
   const navigateEmergencyRoute = useCallback(
     (path: string) => {
@@ -489,6 +556,29 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     navigateEmergencyRoute(buildReceptionSearchFilterPath(query));
     setPatientLookupOpen(false);
   };
+
+  const handleOpenOperationalHit = useCallback(
+    (hit: OperationalSearchHit) => {
+      if (hit.patientId) selectPatient(hit.patientId);
+
+      if (hit.entityType === 'encounter' && hit.patientId) {
+        navigateEmergencyRoute(buildEncounterSearchPath(hit.patientId, hit.encounterId));
+      } else if (hit.entityType === 'referral' && hit.referralId) {
+        navigateEmergencyRoute(buildReferralSearchPath(hit.referralId, hit.patientId));
+      } else if (hit.entityType === 'ems' && hit.emsArrivalId) {
+        navigateEmergencyRoute(buildEmsCasePath(hit.emsArrivalId));
+      } else if (hit.entityType === 'queue') {
+        navigateEmergencyRoute(buildQueueItemPath(hit.queueType || 'Waiting', hit.patientId));
+      } else if (hit.entityType === 'patient' && hit.patientId) {
+        selectLookupPatient(hit.patientId);
+        return;
+      }
+
+      setPatientLookupQuery('');
+      setPatientLookupOpen(false);
+    },
+    [navigateEmergencyRoute, selectLookupPatient, selectPatient],
+  );
 
   const recordAlertRead = useCallback(
     (alertId: string) => {
@@ -782,16 +872,24 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               className="emergency-os-header__action emergency-os-header__action--primary"
               onClick={openCentralIntake}
               disabled={!canSubmitCentralIntake}
-              aria-label={isReceptionRoute ? 'Start Smart Intake' : 'Create patient'}
+              aria-label={
+                isReceptionRoute
+                  ? isRegistrationClerkRole(emergencyRole.role)
+                    ? RECEPTION_COPY.header.registerTitle
+                    : RECEPTION_COPY.identityCheck.title
+                  : 'Create patient'
+              }
               title={
                 canSubmitCentralIntake
                   ? isReceptionRoute
-                    ? 'Smart Intake on reception — identity, OCR, verify, register'
+                    ? isRegistrationClerkRole(emergencyRole.role)
+                      ? RECEPTION_COPY.header.registerTitle
+                      : RECEPTION_COPY.identityCheck.description
                     : 'Create a patient intake'
                   : `${emergencyRole.roleLabel} cannot create patients`
               }
             >
-              {isReceptionRoute ? 'Intake' : 'Create'}
+              {isReceptionRoute ? RECEPTION_COPY.header.register : 'Create'}
             </button>
             {screenCapabilities.showReassessAction ? (
             <button
@@ -848,12 +946,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               ref={patientLookupInputRef}
               type="search"
               value={patientLookupQuery}
-              placeholder={
-                isReceptionRoute
-                  ? 'Search patients — find, intake, encounter...'
-                  : 'Search patients — find, intake, encounter...'
-              }
-              aria-label="Patient search"
+              placeholder="Search patient, encounter, referral, EMS, queue..."
+              aria-label="Operational search"
               onFocus={() => setPatientLookupOpen(true)}
               onChange={(event) => {
                 syncPatientLookupQuery(event.target.value);
@@ -863,6 +957,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                 if (event.key === 'Enter') {
                   event.preventDefault();
                   if (patientLookupResults[0]) selectLookupPatient(patientLookupResults[0].patient.id);
+                  else if (firstOperationalHit) handleOpenOperationalHit(firstOperationalHit);
                   else openPatientLookupRoute();
                 }
                 if (event.key === 'Escape') {
@@ -876,6 +971,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                 <PatientSearchResults
                   query={patientLookupQuery}
                   results={patientLookupResults}
+                  operationalGroups={operationalSearchGroups}
                   backendVerifiedPatientIds={backendVerifiedPatientIds}
                   canCreatePatient={canCreatePatient}
                   isReceptionRoute={isReceptionRoute}
@@ -885,6 +981,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                   }
                   onViewEncounter={handleSearchViewEncounter}
                   onCreateEncounter={handleSearchCreateEncounter}
+                  onOpenOperationalHit={handleOpenOperationalHit}
                   onFilterQueues={handleSearchFilterQueues}
                   onStartNewIntake={() => openSmartIntakeFromSearch()}
                 />
@@ -897,7 +994,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             type="button"
             onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
             aria-label="Open command palette"
-            title="Search patients and actions"
+            title="Search patients, encounters, referrals, EMS, and queues"
             style={{
               width: 32,
               height: 32,
@@ -1026,8 +1123,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               <h2 id="notification-center-title">Notification Center</h2>
               <p>
                 {unreadAlertCount
-                  ? `${unreadAlertCount} unread operational notice${unreadAlertCount === 1 ? '' : 's'}`
-                  : 'All active notices reviewed'}
+                  ? `${unreadAlertCount} unread critical/high notice${unreadAlertCount === 1 ? '' : 's'}`
+                  : 'All priority notices reviewed'}
+                {alertTriage.counts.critical || alertTriage.counts.high ? (
+                  <>
+                    {' '}
+                    · {alertTriage.counts.critical} critical · {alertTriage.counts.high} high
+                  </>
+                ) : null}
               </p>
             </div>
             {alertsSurfaceMetrics.length > 0 ? (
@@ -1052,6 +1155,16 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               </div>
             ) : null}
             <div className="emergency-os-notification-center__header-actions">
+              {alertTriage.suppressed.length ? (
+                <button
+                  type="button"
+                  onClick={() => setShowInformationalAlerts((open) => !open)}
+                >
+                  {showInformationalAlerts
+                    ? 'Hide informational'
+                    : `Show informational (${alertTriage.suppressed.length})`}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={markAllNotificationsRead}
@@ -1098,7 +1211,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                     data-read={alert.read ? 'true' : 'false'}
                   >
                     <div className="emergency-os-notification-card__meta">
-                      <span>{alert.severity}</span>
+                      <span>{formatClassificationLabel(alert)}</span>
                       <span>{describeAlertSource(alert)}</span>
                       <time dateTime={alert.createdAt}>{formatAlertTime(alert.createdAt)}</time>
                       <span>{alert.read ? 'Read' : 'Unread'}</span>

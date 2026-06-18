@@ -32,7 +32,7 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)');
     expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
     expect(whiteboardSource).toContain('operational awareness only');
-    expect(whiteboardSource).toContain('visiblePatients.map((patient)');
+    expect(whiteboardSource).toContain('boardPatients.map((patient)');
     expect(whiteboardSource).toContain('<WhoNextPanel');
   });
 
@@ -76,13 +76,15 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('isRegistrationClerk');
     expect(whiteboardSource).toContain('ChargeNurseOperationalStrip');
     expect(whiteboardSource).toContain('shouldShowChargeNurseOperationalStrip');
-    expect(whiteboardSource).toContain('handleChargeNurseMetricSelect');
+    expect(whiteboardSource).toContain('handleOperationalStripMetricSelect');
     expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
     expect(whiteboardSource).toContain('display.refreshIntervalMs');
   });
 
   it('shows non-blank loading and empty states for filtered views', () => {
     expect(whiteboardSource).toContain('<SkeletonLoader');
-    expect(whiteboardSource).toContain('No active patients are currently on the board.');
+    expect(whiteboardSource).toContain('<OperationalEmptyState');
+    expect(whiteboardSource).toContain('EMPTY_STATE_COPY.whiteboard');
+    expect(whiteboardSource).toContain('Clear filters');
   });
 });

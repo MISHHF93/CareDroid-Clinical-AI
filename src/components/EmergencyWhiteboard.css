@@ -716,7 +716,29 @@
   }
 }
 
-.emergency-whiteboard-page__stat {
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__hero p:last-child {
+  max-width: 720px;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__stats {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__grid {
+  gap: 10px;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__card-key {
+  display: none;
+}
+
+.emergency-whiteboard-page__awareness-banner button:hover,
+.emergency-whiteboard-page__board-limit button:hover {
+  filter: brightness(1.08);
+}
+
   background: transparent !important;
   box-shadow: none !important;
 }

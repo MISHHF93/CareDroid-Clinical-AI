@@ -1,0 +1,11 @@
+.data-quality-risk-strip {
+  margin: 0 14px 12px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-card, #111827) 94%, #0f172a);
+  padding: 10px 12px;
+}
+
+.data-quality-risk-strip__panel {
+  gap: 8px;
+}

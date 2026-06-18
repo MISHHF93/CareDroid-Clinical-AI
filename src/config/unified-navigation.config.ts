@@ -5,7 +5,12 @@ import {
   normalizeEmergencyRole,
   shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
-import { PHYSICIAN_NAV_EXCLUDED_IDS, PHYSICIAN_NAV_ORDER } from '../components/whiteboard/physicianWorkflowModel';
+import { PHYSICIAN_NAV_EXCLUDED_IDS } from '../components/whiteboard/physicianWorkflowModel';
+import { getReceptionNavActivePaths } from './emergencyPipelineModel.js';
+import {
+  getHiddenNavItemIdsForRole,
+  sortNavigationItemsForRole,
+} from './emergencyNavPolicy.js';
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
@@ -27,6 +32,8 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'integrations',
   'cosmos',
   'platform',
+  'pulse',
+  'shift',
 ]);
 
 export const PILOT_CUSTOMER_MODE = Object.freeze({
@@ -71,7 +78,7 @@ export type NavigationItem = Readonly<{
   mobileLabel?: string;
 }>;
 
-const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform']);
+const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform', 'pulse', 'shift']);
 
 export const NAV_ITEMS = Object.freeze([
   {
@@ -193,6 +200,20 @@ export const NAV_ITEMS = Object.freeze([
     route: CANONICAL_ROUTES.workspace,
     featureGate: null,
   },
+  {
+    id: 'pulse',
+    label: 'Pulse',
+    icon: 'activity',
+    route: CANONICAL_ROUTES.emergencyPulse,
+    featureGate: null,
+  },
+  {
+    id: 'shift',
+    label: 'Shift',
+    icon: 'clock',
+    route: CANONICAL_ROUTES.emergencyShift,
+    featureGate: null,
+  },
 ] satisfies readonly NavItem[]);
 
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
@@ -215,6 +236,8 @@ const NAV_FEATURE_IDS = Object.freeze({
   integrations: 'integration_hub',
   cosmos: 'cosmos_viewer',
   platform: 'platform_navigation',
+  pulse: 'department_pulse',
+  shift: 'shift_summary',
 } as const);
 
 export const FEATURE_GATE_ALIASES = Object.freeze({
@@ -253,7 +276,9 @@ export const NAVIGATION_ITEMS = Object.freeze(
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
-        item.id === 'whiteboard'
+        item.id === 'reception'
+          ? getReceptionNavActivePaths()
+          : item.id === 'whiteboard'
           ? [
               CANONICAL_ROUTES.emergencyWhiteboard,
               '/emergency',
@@ -277,47 +302,13 @@ export function getPilotCustomerNavigationItems(
   return items.filter((item) => isPilotCustomerVisibleNavItemId(item.id));
 }
 
-const ROLE_NAV_ORDER_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
-  triage_nurse: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'copilot', 'tools', 'platform', 'ems'],
-  charge_nurse: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
-  ed_manager: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
-  read_only_viewer: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'integrations', 'cosmos', 'platform', 'ems'],
-  physician: PHYSICIAN_NAV_ORDER,
-  ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'platform'],
-  registration_clerk: ['reception', 'patients'],
-});
-
-const ROLE_NAV_EXCLUDED_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
-  registration_clerk: ['queues', 'tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot'],
-  physician: PHYSICIAN_NAV_EXCLUDED_IDS,
-});
-
-function sortNavigationForRole(items: readonly NavigationItem[], role: string): readonly NavigationItem[] {
-  const override = ROLE_NAV_ORDER_OVERRIDES[normalizeEmergencyRole(role)];
-  if (!override?.length) {
-    return [...items].sort((first, second) => first.order - second.order);
-  }
-
-  const orderIndex = new Map(override.map((id, index) => [id, index]));
-  return [...items].sort((first, second) => {
-    const firstIndex = orderIndex.get(first.id) ?? Number.MAX_SAFE_INTEGER;
-    const secondIndex = orderIndex.get(second.id) ?? Number.MAX_SAFE_INTEGER;
-    if (firstIndex !== secondIndex) return firstIndex - secondIndex;
-    return first.order - second.order;
-  });
-}
-
 export function getVisibleNavigation(
   userRole: string | null | undefined,
 ): readonly NavigationItem[] {
   const normalizedRole = normalizeEmergencyRole(userRole);
-  const hiddenForRole = shouldHideStandaloneIntakeNav(normalizedRole)
-    ? new Set(['intake'])
-    : new Set<string>();
-
-  for (const itemId of ROLE_NAV_EXCLUDED_OVERRIDES[normalizedRole] || []) {
-    hiddenForRole.add(itemId);
-  }
+  const hiddenForRole = getHiddenNavItemIdsForRole(normalizedRole, {
+    hideStandaloneIntake: shouldHideStandaloneIntakeNav(normalizedRole),
+  });
 
   const visibleItems = getPilotCustomerNavigationItems(
     NAVIGATION_ITEMS.filter(
@@ -325,9 +316,5 @@ export function getVisibleNavigation(
     ),
   );
 
-  const sortedItems = sortNavigationForRole(visibleItems, normalizedRole);
-  const hasSettingsNav = sortedItems.some((item) => item.id === 'settings');
-  if (!hasSettingsNav) return sortedItems;
-
-  return sortedItems.filter((item) => item.id !== 'integrations');
+  return sortNavigationItemsForRole(visibleItems, normalizedRole);
 }

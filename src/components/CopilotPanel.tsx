@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -10,9 +11,16 @@ import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
+import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
+import OperationalEmptyState, { OperationalEmptyAction } from './ui/OperationalEmptyState';
 import './CopilotPanel.css';
 import type { OperationalIntelligenceSnapshot } from '../operational-intelligence/operationalIntelligence.types';
 import { formatLongWaitAttentionForCopilot } from '../utils/longWaitRescue';
+import { formatCopilotRecommendationsForPrompt } from '../config/copilotRecommendationModel';
+import {
+  buildCopilotRecommendationSnapshot,
+  resolveCopilotQuickActionFromSnapshot,
+} from '../services/copilotRecommendationDiscovery';
 
 type CopilotMessage = {
   id: string;
@@ -47,9 +55,9 @@ type SpeechRecognitionLike = {
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
 const QUICK_ACTIONS = [
-  'Who needs attention?',
+  'Queue bottlenecks',
   'Capacity status',
-  'EMS update',
+  'Boarding pressure',
   'Reassessment queue',
 ];
 const TOOL_ACTIONS = Object.freeze([
@@ -207,6 +215,7 @@ function buildDepartmentPrompt({
   intelligenceSnapshot,
   attachments,
   selectedPatient,
+  copilotRecommendations,
 }: {
   patients: Patient[];
   alerts: Alert[];
@@ -216,6 +225,7 @@ function buildDepartmentPrompt({
   intelligenceSnapshot: OperationalIntelligenceSnapshot;
   attachments?: CopilotAttachment[];
   selectedPatient?: Patient | null;
+  copilotRecommendations: ReturnType<typeof buildCopilotRecommendationSnapshot>['recommendations'];
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -230,6 +240,8 @@ function buildDepartmentPrompt({
     HUMAN_REVIEW_DISCLAIMER,
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
     'Keep answers brief, operationally useful, and explicit about uncertainty.',
+    'Do not repeat generic advice. Every suggestion must name a queue, count, route, or filter.',
+    formatCopilotRecommendationsForPrompt(copilotRecommendations),
     attachmentSummary
       ? `Multimodal input attached: ${attachmentSummary}. Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
       : null,
@@ -257,7 +269,7 @@ function buildDepartmentPrompt({
     `- Mode: ${intelligenceSnapshot.mode}`,
     `- Data freshness: ${intelligenceSnapshot.dataFreshness.status}`,
     `- Anomalies: ${intelligenceSnapshot.anomalies.length}`,
-    `- Advisory recommendations: ${intelligenceSnapshot.recommendations.map((rec) => rec.action).join('; ') || 'None'}`,
+    `- Advisory recommendations: ${intelligenceSnapshot.recommendations.map((rec) => `${rec.action} (${rec.route || 'no route'})`).join('; ') || 'None'}`,
     `- ${intelligenceSnapshot.disclaimers.operational}`,
     `- ${intelligenceSnapshot.disclaimers.clinical}`,
     selectedPatient?.triageAssist
@@ -358,7 +370,9 @@ function TypingIndicator() {
 }
 
 export function CopilotPanel() {
+  const navigate = useNavigate();
   const patients = useEmergencyStore((store) => store.patients);
+  const referrals = useEmergencyStore((store) => store.referrals);
   const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
@@ -374,7 +388,7 @@ export function CopilotPanel() {
     {
       id: 'copilot-welcome',
       role: 'copilot',
-      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Ask about attention needs, capacity, EMS, or reassessment queue. ${HUMAN_REVIEW_DISCLAIMER}`,
+      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Priority: queue → capacity → boarding → reassessment. Use quick actions or tap a recommendation card. ${HUMAN_REVIEW_DISCLAIMER}`,
       timestamp: new Date(),
     },
   ]);
@@ -409,6 +423,22 @@ export function CopilotPanel() {
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
     [patients, selectedPatientId],
   );
+  const copilotSnapshot = useMemo(
+    () =>
+      buildCopilotRecommendationSnapshot({
+        centralSnapshot,
+        patients,
+        referrals,
+        emsInbound: centralSnapshot.emsPressure.inbound,
+      }),
+    [centralSnapshot, patients, referrals],
+  );
+  const copilotRecommendations = copilotSnapshot.recommendations;
+
+  const openRecommendation = (route?: string) => {
+    if (!route) return;
+    navigate(route);
+  };
 
   useEffect(() => {
     const handlePrefill = (event: Event) => {
@@ -615,6 +645,13 @@ export function CopilotPanel() {
       intelligenceSnapshot,
       attachments: submittedAttachments,
       selectedPatient,
+      copilotRecommendations,
+    });
+    const quickActionResolution = resolveCopilotQuickActionFromSnapshot(promptText, {
+      centralSnapshot,
+      patients,
+      referrals,
+      emsInbound: centralSnapshot.emsPressure.inbound,
     });
     recordWorkflowAction({
       type: 'copilot_used',
@@ -650,6 +687,20 @@ export function CopilotPanel() {
     setAttachments([]);
     setLoading(true);
     setMessages((currentMessages) => [...currentMessages, staffMessage, assistantMessage]);
+
+    if (quickActionResolution.handled && quickActionResolution.response) {
+      await streamIntoMessage(quickActionResolution.response, assistantId, setMessages);
+      appendCopilotMessage({
+        id: assistantId,
+        query: promptText,
+        response: quickActionResolution.response,
+        safetyStatus: 'unknown',
+        createdAt: assistantMessage.timestamp.toISOString(),
+        raw: { source: quickActionResolution.source || 'rule' },
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const requestMessages = [
@@ -787,7 +838,30 @@ export function CopilotPanel() {
           aria-label="Copilot operational awareness"
           className="ed-copilot-panel__awareness"
         >
-          <strong>Operational awareness</strong>
+          <strong>Priority actions</strong>
+          {copilotRecommendations.length ? (
+            <div className="ed-copilot-panel__recommendations" aria-label="Copilot recommendations">
+              {copilotRecommendations.map((recommendation) => (
+                <button
+                  key={recommendation.id}
+                  type="button"
+                  className="ed-copilot-panel__recommendation"
+                  data-domain={recommendation.domain}
+                  data-severity={recommendation.severity}
+                  onClick={() => openRecommendation(recommendation.route)}
+                  disabled={loading}
+                >
+                  <span>{recommendation.domain}</span>
+                  <strong>{recommendation.action}</strong>
+                  <small>{recommendation.detail}</small>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="ed-copilot-panel__recommendations-empty">
+              No queue, capacity, boarding, or reassessment actions flagged.
+            </p>
+          )}
           <div className="ed-copilot-panel__awareness-grid">
             {awarenessCards.map((card) => (
               <div key={card.label} className="ed-copilot-panel__awareness-card">
@@ -825,6 +899,21 @@ export function CopilotPanel() {
             </div>
           );
         })}
+        {!messages.length && !loading ? (
+          <OperationalEmptyState
+            size="inline"
+            icon="💬"
+            title={EMPTY_STATE_COPY.copilot.noMessages.title}
+            guidance={EMPTY_STATE_COPY.copilot.noMessages.guidance}
+            status={EMPTY_STATE_COPY.copilot.noMessages.status}
+            nextSteps={EMPTY_STATE_COPY.copilot.noMessages.nextSteps}
+            actions={EMPTY_STATE_COPY.copilot.noMessages.nextSteps.map((prompt) => (
+              <OperationalEmptyAction key={prompt} secondary onClick={() => sendQuickAction(prompt)}>
+                {prompt}
+              </OperationalEmptyAction>
+            ))}
+          />
+        ) : null}
         {loading && messages[messages.length - 1]?.content ? (
           <div style={{ alignSelf: 'flex-start' }}>
             <TypingIndicator />

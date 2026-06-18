@@ -8,11 +8,24 @@ import {
   hasEmergencyActionPermission,
   isEmergencyReadOnlyRole,
   normalizeEmergencyRole,
+  resolveEmergencyRoleId,
 } from '../config/emergencyRolePermissions';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 export function useEmergencyRolePermissions() {
   const { user, setUser } = useUser();
-  const role = normalizeEmergencyRole(user?.role);
+  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const permissionsOverrides = useMemo(
+    () =>
+      emergencySettings?.permissionsOverrides ||
+      emergencySettings?.roles?.permissionsOverrides ||
+      {},
+    [emergencySettings],
+  );
+  const role = useMemo(
+    () => resolveEmergencyRoleId(user, emergencySettings),
+    [user, emergencySettings],
+  );
   const roleDefinition = getEmergencyRoleDefinition(role);
 
   return useMemo(
@@ -27,7 +40,7 @@ export function useEmergencyRolePermissions() {
       demoRoles: getEmergencyDemoRoles(),
       canAccessRoute: (path) => canAccessEmergencyRoute(role, path),
       nearestRoute: (path) => getNearestEmergencyRoute(role, path),
-      can: (action) => hasEmergencyActionPermission(role, action),
+      can: (action) => hasEmergencyActionPermission(role, action, permissionsOverrides),
       switchDemoRole: (nextRole) => {
         const normalizedRole = normalizeEmergencyRole(nextRole);
         setUser({
@@ -40,7 +53,7 @@ export function useEmergencyRolePermissions() {
         });
       },
     }),
-    [role, roleDefinition, setUser, user],
+    [permissionsOverrides, role, roleDefinition, setUser, user],
   );
 }
 

@@ -8,6 +8,7 @@ import {
   IconBed,
   IconChartBar,
   IconClipboardPlus,
+  IconClock,
   IconDots,
   IconGauge,
   IconLayoutDashboard,
@@ -25,12 +26,15 @@ import {
   type Icon,
 } from '@tabler/icons-react';
 import { PatientFlag, type Alert } from '../types/emergency';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   getVisibleNavigation,
   type NavigationItem,
 } from '../config/unified-navigation.config';
-import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, shouldHideStandaloneIntakeNav } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
+import { isReceptionPipelinePath } from '../config/emergencyPipelineModel';
+import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import './Sidebar.css';
@@ -86,14 +90,22 @@ const ICONS: Record<string, Icon> = {
   settings: IconSettings,
   'emergency-settings': IconSettings,
   platform: IconApps,
+  activity: IconActivity,
+  clock: IconClock,
 };
 
 function matchesNavigationPath(pathname: string, path: string): boolean {
   return pathname === path || (path !== '/emergency' && pathname.startsWith(`${path}/`));
 }
 
-function isActiveRoute(pathname: string, item: SidebarNavItem): boolean {
+function isActiveRoute(pathname: string, item: SidebarNavItem, search = ''): boolean {
   const route = item.route || item.path;
+  if (item.id === 'reception') {
+    return (
+      pathname === CANONICAL_ROUTES.emergencyReception &&
+      (isReceptionPipelinePath(pathname, search) || !search)
+    );
+  }
   if (route === '/emergency' || item.path === '/emergency/whiteboard') {
     return (
       pathname === route ||
@@ -152,14 +164,17 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     [visibleNav],
   );
   const mobilePrimaryIds = useMemo(() => {
+    if (isReceptionFirstUxEnabled()) {
+      return visibleNav
+        .filter((item) => item.isEmergencyCore !== false)
+        .slice(0, 3)
+        .map((item) => item.id);
+    }
     if (emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk) {
       return ['reception', 'patients'];
     }
-    if (shouldHideStandaloneIntakeNav(emergencyRole.role)) {
-      return ['reception', 'whiteboard', 'patients'];
-    }
-    return ['whiteboard', 'patients', 'intake'];
-  }, [emergencyRole.role]);
+    return ['reception', 'whiteboard', 'patients'];
+  }, [emergencyRole.role, visibleNav]);
   const mobilePrimaryNav = useMemo(() => {
     return mobilePrimaryIds
       .map((id) => visibleNav.find((item) => item.id === id))
@@ -169,8 +184,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     return visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
   }, [mobilePrimaryIds, visibleNav]);
   const moreHasActiveItem = useMemo(
-    () => moreNav.some((item) => isActiveRoute(location.pathname, item)),
-    [location.pathname, moreNav],
+    () => moreNav.some((item) => isActiveRoute(location.pathname, item, location.search)),
+    [location.pathname, location.search, moreNav],
   );
   const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
   const navAlertCount = useCallback(
@@ -185,12 +200,14 @@ export function Sidebar({ navigationItems }: SidebarProps) {
 
   const desktopNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
-    const active = isActiveRoute(location.pathname, item);
+    const active = isActiveRoute(location.pathname, item, location.search);
     const alertCount = navAlertCount(item);
+    const destination =
+      item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
     const navLink = (
       <Link
         key={item.id}
-        to={item.route || item.path}
+        to={destination}
         className={[
           'sidebar-nav-item',
           active ? 'sidebar-nav-item--active' : '',
@@ -223,13 +240,15 @@ export function Sidebar({ navigationItems }: SidebarProps) {
 
   const mobileNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
-    const active = isActiveRoute(location.pathname, item);
+    const active = isActiveRoute(location.pathname, item, location.search);
     const label = item.id === 'whiteboard' ? 'Whiteboard' : item.mobileLabel || item.label;
     const alertCount = navAlertCount(item);
+    const destination =
+      item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
     const navLink = (
       <Link
         key={item.id}
-        to={item.route || item.path}
+        to={destination}
         className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
         aria-label={label}
         aria-current={active ? 'page' : undefined}

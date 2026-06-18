@@ -1,0 +1,276 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.599Z",
+  "goal": "Simulate onboarding a new clinic — configure staff, queues, thresholds, alerts, roles",
+  "clinicDefaults": {
+    "tenantName": "Riverside Walk-In Clinic",
+    "defaultWorkspace": "emergency-whiteboard",
+    "thresholds": {
+      "waitWarningMinutes": 30,
+      "waitCriticalMinutes": 45,
+      "capacityWarningPercent": 75,
+      "capacityOrangePercent": 85,
+      "capacityRedPercent": 92,
+      "emsOffloadTargetMinutes": 20,
+      "reassessmentIntervals": {
+        "P1": 0,
+        "P2": 15,
+        "P3": 30,
+        "P4": 60,
+        "P5": 120
+      },
+      "ctasTargets": {
+        "P1": 0,
+        "P2": 15,
+        "P3": 30,
+        "P4": 60,
+        "P5": 120
+      }
+    },
+    "alertRules": {
+      "longWait": {
+        "enabled": true,
+        "severity": "Warning"
+      },
+      "lwbsRisk": {
+        "enabled": true,
+        "severity": "Critical"
+      },
+      "reassessmentDue": {
+        "enabled": true,
+        "severity": "Warning"
+      },
+      "capacity": {
+        "enabled": true,
+        "severity": "Warning"
+      },
+      "emsCritical": {
+        "enabled": true,
+        "severity": "Critical"
+      }
+    },
+    "staff": {
+      "seedRoster": [
+        {
+          "roleId": "registration_clerk",
+          "label": "Front desk",
+          "capacity": 1
+        },
+        {
+          "roleId": "triage_nurse",
+          "label": "Triage nurse",
+          "capacity": 1
+        },
+        {
+          "roleId": "physician",
+          "label": "Clinic physician",
+          "capacity": 2
+        }
+      ]
+    },
+    "queues": {
+      "enabledQueueIds": [
+        "waiting-room",
+        "triage-queue",
+        "provider-queue",
+        "discharge-queue"
+      ],
+      "clinicScale": true
+    },
+    "roles": {
+      "defaultRoleProfileId": "nurse",
+      "emergencyRoleMapping": {
+        "nurse": "triage_nurse",
+        "physician": "physician",
+        "clinic-administrator": "admin"
+      }
+    },
+    "featureFlags": {
+      "smartIntake": true,
+      "copilot": true,
+      "queueIntelligence": true
+    }
+  },
+  "exposure": {
+    "wizardRoute": "/onboarding",
+    "postWizardRoutes": [
+      "/tenant-admin",
+      "/emergency/settings",
+      "/emergency/queues"
+    ],
+    "provisionedDomains": [
+      "thresholds",
+      "alertRules",
+      "staff",
+      "queues",
+      "roles"
+    ],
+    "manualDomains": [
+      "staff-ui"
+    ]
+  },
+  "beforeFixes": {
+    "summary": {
+      "totalSteps": 6,
+      "completeSteps": 1,
+      "manualSteps": 1,
+      "totalFriction": 6,
+      "readinessPercent": 17
+    },
+    "frictionPoints": [
+      "No staff onboarding UI — seed roster or settings form required",
+      "Queue wait targets remain static in queueAuditModel until org overrides exist",
+      "No thresholds seeded during provisioning",
+      "No alert rules seeded during provisioning",
+      "Platform role profile assigned but emergencyOs.roles not seeded",
+      "1 step(s) require manual navigation outside onboarding wizard",
+      "Emergency store does not hydrate from organization.settings.emergencyOs on login"
+    ],
+    "steps": [
+      {
+        "id": "organization",
+        "label": "Create clinic organization",
+        "status": "complete",
+        "automated": true,
+        "route": "/onboarding",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "staff",
+        "label": "Configure staff roster",
+        "status": "manual",
+        "automated": false,
+        "route": "/emergency/settings",
+        "blockers": [
+          "No staff onboarding UI — seed roster or settings form required"
+        ],
+        "frictionScore": 2
+      },
+      {
+        "id": "queues",
+        "label": "Enable queue targets",
+        "status": "partial",
+        "automated": true,
+        "route": "/emergency/queues",
+        "blockers": [
+          "Queue wait targets remain static in queueAuditModel until org overrides exist"
+        ],
+        "frictionScore": 1
+      },
+      {
+        "id": "thresholds",
+        "label": "Set wait & capacity thresholds",
+        "status": "pending",
+        "automated": true,
+        "route": "/emergency/settings",
+        "blockers": [
+          "No thresholds seeded during provisioning"
+        ],
+        "frictionScore": 1
+      },
+      {
+        "id": "alerts",
+        "label": "Enable alert rules",
+        "status": "pending",
+        "automated": true,
+        "route": "/emergency/settings",
+        "blockers": [
+          "No alert rules seeded during provisioning"
+        ],
+        "frictionScore": 1
+      },
+      {
+        "id": "roles",
+        "label": "Assign roles & permissions",
+        "status": "partial",
+        "automated": true,
+        "route": "/tenant-admin",
+        "blockers": [
+          "Platform role profile assigned but emergencyOs.roles not seeded"
+        ],
+        "frictionScore": 1
+      }
+    ]
+  },
+  "afterFixes": {
+    "summary": {
+      "totalSteps": 6,
+      "completeSteps": 5,
+      "manualSteps": 0,
+      "totalFriction": 1,
+      "readinessPercent": 83
+    },
+    "frictionPoints": [
+      "ED RBAC still uses static matrix — role mapping stored but not applied"
+    ],
+    "steps": [
+      {
+        "id": "organization",
+        "label": "Create clinic organization",
+        "status": "complete",
+        "automated": true,
+        "route": "/onboarding",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "staff",
+        "label": "Configure staff roster",
+        "status": "complete",
+        "automated": true,
+        "route": "/emergency/settings",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "queues",
+        "label": "Enable queue targets",
+        "status": "complete",
+        "automated": true,
+        "route": "/emergency/queues",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "thresholds",
+        "label": "Set wait & capacity thresholds",
+        "status": "complete",
+        "automated": true,
+        "route": "/emergency/settings",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "alerts",
+        "label": "Enable alert rules",
+        "status": "complete",
+        "automated": true,
+        "route": "/emergency/settings",
+        "blockers": [],
+        "frictionScore": 0
+      },
+      {
+        "id": "roles",
+        "label": "Assign roles & permissions",
+        "status": "partial",
+        "automated": true,
+        "route": "/tenant-admin",
+        "blockers": [
+          "ED RBAC still uses static matrix — role mapping stored but not applied"
+        ],
+        "frictionScore": 1
+      }
+    ],
+    "mitigationsApplied": [
+      "Seed settings.emergencyOs during tenant provisioning",
+      "Save Emergency Settings to organization tenant-admin",
+      "Hydrate emergencyStore from organization engine",
+      "Deep-merge emergencyOs on tenant-admin PATCH",
+      "Expose emergencyOs on tenant-admin GET",
+      "Fix TenantAdministrationCenter save ReferenceError on users"
+    ]
+  },
+  "remainingFriction": [
+    "ED RBAC still uses static matrix — role mapping stored but not applied"
+  ]
+}

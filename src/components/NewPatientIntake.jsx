@@ -10,6 +10,7 @@ import { CheckCircle2, X } from 'lucide-react';
 import { Priority } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { completeIntakeHandoff } from '../services/receptionHandoff';
+import { formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import { TriageSuggestionEngine } from '../engine/triageEngine';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
 import { runSmartIntakeVerticalSlice } from '../services/emergencyOsApi';
@@ -129,6 +130,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
   const [priorityPickerOpen, setPriorityPickerOpen] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const age = useMemo(() => calculateAge(identity.dob), [identity.dob]);
   const autoSuggestion = useMemo(
@@ -235,6 +237,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
     });
 
     setIsSubmitting(true);
+    setSubmitError('');
     let patientToAdd = patient;
     let syncedThroughVerticalSlice = false;
     try {
@@ -252,8 +255,10 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
         };
         syncedThroughVerticalSlice = true;
       }
-    } catch {
-      syncedThroughVerticalSlice = false;
+    } catch (error) {
+      setSubmitError(formatApiRecoveryMessage(error, 'intake draft'));
+      setIsSubmitting(false);
+      return;
     }
 
     addPatient(patientToAdd, { syncToBackend: !syncedThroughVerticalSlice });
@@ -477,6 +482,11 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
               </div>
             ) : null}
           </div>
+          {submitError ? (
+            <p className="new-patient-intake__error" role="alert">
+              {submitError}
+            </p>
+          ) : null}
           <button
             type="submit"
             className="new-patient-intake__add"

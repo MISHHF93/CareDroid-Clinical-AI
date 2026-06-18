@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.359Z",
+  "goal": "Reduce whiteboard clutter and increase signal via tiered visibility",
+  "alwaysVisible": [
+    "hero-title",
+    "primary-stats",
+    "filters",
+    "patient-grid"
+  ],
+  "progressiveDisclosure": [
+    "hero-detail",
+    "secondary-stats",
+    "command-layer",
+    "mission-control",
+    "queue-intelligence",
+    "ops-detail"
+  ],
+  "contextual": [
+    "capacity-crisis",
+    "shift-handoff",
+    "awareness-banner",
+    "ems-attention",
+    "ems-inbound-banner",
+    "reassess-attention",
+    "referral-attention",
+    "charge-nurse-strip"
+  ],
+  "stressScenario": {
+    "clutterScore": 8,
+    "signalScore": 47,
+    "visibleSurfaceCount": 6,
+    "hiddenUnderLoad": 7,
+    "recommendations": [
+      "Keep primary stats + awareness banner visible; hide duplicate domain strips.",
+      "Fold audit history, data quality, and queue pressure into one ops-detail drawer.",
+      "Cap unfiltered grid at 24 cards with filter prompt.",
+      "Progressive disclosure active — expand ops detail or queue intelligence when bandwidth allows."
+    ]
+  },
+  "calmScenario": {
+    "clutterScore": 70,
+    "signalScore": 95,
+    "visibleSurfaceCount": 13
+  },
+  "mitigations": [
+    "Always visible: title, primary stats, filters, patient grid (capped under load).",
+    "Progressive: command layer, mission control, queue intelligence, ops-detail drawer.",
+    "Contextual: domain attention strips only when signal active and not duplicated."
+  ]
+}

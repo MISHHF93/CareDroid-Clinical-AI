@@ -7,12 +7,24 @@ export default function IdentityFieldReview({
   fieldDecisions = {},
   canVerify = true,
   onFieldDecision,
+  onApproveMatching,
+  bulkApprovableCount = 0,
 }) {
   return (
     <section className="identity-field-review" aria-labelledby="identity-field-review-title">
       <header>
         <h3 id="identity-field-review-title">Identity manual review</h3>
         <p>Approve, reject, or mark edited before finalizing intake.</p>
+        {bulkApprovableCount > 0 ? (
+          <button
+            type="button"
+            className="identity-field-review__bulk"
+            disabled={!canVerify}
+            onClick={onApproveMatching}
+          >
+            Approve {bulkApprovableCount} matching field{bulkApprovableCount === 1 ? '' : 's'}
+          </button>
+        ) : null}
       </header>
 
       <div className="identity-field-review__list">

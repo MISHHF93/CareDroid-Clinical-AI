@@ -8,6 +8,10 @@ import {
   unitLabel,
   vitalsStrip,
 } from '../../utils/emsArrivalDisplay';
+import { RECEPTION_COPY } from './receptionCopy';
+import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
+import { ERROR_RECOVERY_COPY } from '../../config/errorRecoveryModel';
+import OperationalEmptyState, { OperationalEmptyAction } from '../ui/OperationalEmptyState';
 import './EmsPreArrivalPanel.css';
 
 function severityClass(severity) {
@@ -22,6 +26,7 @@ export default function EmsPreArrivalPanel({
   onPrepareRegistration,
   onConvertArrival,
   onRefresh,
+  feedError = '',
 }) {
   const [now, setNow] = useState(Date.now());
 
@@ -38,33 +43,71 @@ export default function EmsPreArrivalPanel({
     [arrivals, now],
   );
 
+  const copy = RECEPTION_COPY.ems;
+
   return (
     <section className="ems-pre-arrival" aria-labelledby="ems-pre-arrival-title">
       <header className="ems-pre-arrival__header">
         <div>
           <p className="ems-pre-arrival__eyebrow">
             <Ambulance size={16} aria-hidden />
-            Pre-arrival intelligence
+            {copy.eyebrow}
           </p>
-          <h2 id="ems-pre-arrival-title">Inbound ambulances</h2>
-          <p className="ems-pre-arrival__description">
-            Know what is coming before units reach the front door. Prepare registration and notify
-            clinical teams from one reception view.
-          </p>
+          <h2 id="ems-pre-arrival-title">{copy.title}</h2>
+          <p className="ems-pre-arrival__description">{copy.description}</p>
         </div>
         {onRefresh ? (
           <button type="button" className="ems-pre-arrival__refresh" onClick={onRefresh} disabled={loading}>
-            {loading ? 'Refreshing…' : 'Refresh feed'}
+            {loading ? copy.refreshing : copy.refresh}
           </button>
         ) : null}
       </header>
 
+      {feedError && !loading ? (
+        <OperationalEmptyState
+          size="inline"
+          icon="!"
+          title="Could not refresh EMS feed"
+          guidance={`${feedError}. ${ERROR_RECOVERY_COPY.syncStale}`}
+          status={inboundArrivals.length ? `Showing ${inboundArrivals.length} cached unit(s).` : 'No cached inbound units.'}
+          actions={
+            onRefresh ? (
+              <OperationalEmptyAction onClick={onRefresh}>Retry EMS refresh</OperationalEmptyAction>
+            ) : null
+          }
+          className="ems-pre-arrival__empty"
+        />
+      ) : null}
+
       {loading && !inboundArrivals.length ? (
-        <p className="ems-pre-arrival__empty">Loading inbound EMS feed…</p>
+        <OperationalEmptyState
+          size="inline"
+          icon="↻"
+          title={copy.loading}
+          guidance="Syncing inbound EMS units from the active feed."
+          status="EMS pre-arrival feed loading"
+          statusTone="neutral"
+          className="ems-pre-arrival__empty"
+        />
       ) : null}
 
       {!loading && !inboundArrivals.length ? (
-        <p className="ems-pre-arrival__empty">No inbound ambulances right now.</p>
+        <OperationalEmptyState
+          size="inline"
+          icon="✓"
+          title={copy.empty}
+          guidance={EMPTY_STATE_COPY.reception.emsPreArrival.guidance}
+          status="No inbound units on the feed."
+          nextSteps={EMPTY_STATE_COPY.reception.emsPreArrival.nextSteps}
+          actions={
+            onRefresh ? (
+              <OperationalEmptyAction secondary onClick={onRefresh}>
+                {copy.refresh}
+              </OperationalEmptyAction>
+            ) : null
+          }
+          className="ems-pre-arrival__empty"
+        />
       ) : null}
 
       <ul className="ems-pre-arrival__list">
@@ -110,7 +153,7 @@ export default function EmsPreArrivalPanel({
                     className="ems-pre-arrival__action ems-pre-arrival__action--primary"
                     onClick={() => onPrepareRegistration?.(arrival)}
                   >
-                    Prepare registration
+                    {copy.prepareChart}
                   </button>
                 ) : null}
                 {canConvertArrival && remaining <= 0 && !arrival.patientId ? (
@@ -119,7 +162,7 @@ export default function EmsPreArrivalPanel({
                     className="ems-pre-arrival__action"
                     onClick={() => onConvertArrival?.(arrival)}
                   >
-                    Unit arrived — register now
+                    {copy.registerNow}
                   </button>
                 ) : null}
               </div>

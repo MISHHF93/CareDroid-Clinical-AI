@@ -1,106 +1,130 @@
 {
-  "generatedAt": "2026-06-18T03:22:29.098Z",
+  "generatedAt": "2026-06-18T14:09:30.435Z",
   "baseURL": "http://localhost:8000",
   "role": "registration_clerk",
   "workers": 12,
-  "passed": 12,
-  "failed": 0,
+  "passed": 0,
+  "failed": 12,
   "results": [
     {
       "id": "clerk-01-arrival-landing",
       "name": "Amina Reyes",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 7757,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 2233,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "Reception title not found (#reception-workspace-title)",
+      "jsErrors": []
     },
     {
       "id": "clerk-02-smart-intake",
       "name": "Jordan Park",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 8632,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 32255,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Check ID & documents' })\n",
+      "jsErrors": []
     },
     {
       "id": "clerk-03-express-register",
       "name": "Sofia Mendez",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 8475,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 32254,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.reception-workspace__action--wide')\n",
+      "jsErrors": []
     },
     {
       "id": "clerk-04-quick-create",
       "name": "Chris Okafor",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 10854,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 32499,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Other arrivals' })\n",
+      "jsErrors": []
     },
     {
       "id": "clerk-05-prepare-chooser",
       "name": "Priya Nair",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 10112,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 32556,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Other arrivals' })\n",
+      "jsErrors": []
     },
     {
       "id": "clerk-06-ems-tab",
       "name": "Liam Chen",
       "path": "/emergency/reception?queue=ems",
-      "status": "pass",
-      "durationMs": 9540,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=ems"
+      "status": "fail",
+      "durationMs": 2555,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=ems",
+      "error": "EMS registration tab not found (#reception-queue-tab-ems)",
+      "jsErrors": []
     },
     {
       "id": "clerk-07-verification-tab",
       "name": "Elena Volkov",
       "path": "/emergency/reception?queue=verification",
-      "status": "pass",
-      "durationMs": 9541,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=verification"
+      "status": "fail",
+      "durationMs": 2729,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=verification",
+      "error": "Verification tab not found (role=tab[name=/Need ID check/i])",
+      "jsErrors": []
     },
     {
       "id": "clerk-08-pretriage-tab",
       "name": "Marcus Bell",
       "path": "/emergency/reception?queue=pretriage",
-      "status": "pass",
-      "durationMs": 9625,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
+      "status": "fail",
+      "durationMs": 2731,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage",
+      "error": "Awaiting triage tab not found (role=tab[name=/Waiting for nurse/i])",
+      "jsErrors": []
     },
     {
       "id": "clerk-09-patients-route",
       "name": "Hannah Brooks",
       "path": "/emergency/patients",
-      "status": "pass",
-      "durationMs": 9541,
-      "finalUrl": "http://localhost:8000/emergency/patients"
+      "status": "fail",
+      "durationMs": 2731,
+      "finalUrl": "http://localhost:8000/emergency/patients",
+      "error": "Patients page content not found (text=/patient/i)",
+      "jsErrors": []
     },
     {
       "id": "clerk-10-whiteboard-guard",
       "name": "Noah Singh",
       "path": "/emergency/whiteboard",
-      "status": "pass",
-      "durationMs": 8873,
-      "finalUrl": "http://localhost:8000/emergency/reception"
+      "status": "fail",
+      "durationMs": 3980,
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "error": "Clerk should be redirected to reception, got http://localhost:8000/emergency/whiteboard",
+      "jsErrors": []
     },
     {
       "id": "clerk-11-no-triage-assist",
       "name": "Riley Ortiz",
       "path": "/emergency/reception?queue=pretriage",
-      "status": "pass",
-      "durationMs": 9624,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
+      "status": "fail",
+      "durationMs": 2732,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage",
+      "error": "Awaiting triage tab not found (role=tab[name=/Waiting for nurse/i])",
+      "jsErrors": []
     },
     {
       "id": "clerk-12-search-dominance",
       "name": "Tessa Grant",
       "path": "/emergency/reception",
-      "status": "pass",
-      "durationMs": 10053,
-      "finalUrl": "http://localhost:8000/emergency/reception?q=Amara"
+      "status": "fail",
+      "durationMs": 32796,
+      "finalUrl": "http://localhost:8000/emergency/reception",
+      "error": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('searchbox', { name: 'Patient search' })\n",
+      "jsErrors": []
     }
   ],
   "simplicity": {
@@ -108,15 +132,15 @@
       "reception",
       "patients"
     ],
-    "primaryAction": "Start Smart Intake",
+    "primaryAction": "Register walk-in",
     "blockedRoutes": [
       "/emergency/whiteboard"
     ],
     "intakeSurfaces": [
-      "embedded Smart Intake",
-      "Express register",
-      "Full quick create",
-      "More options"
+      "Check ID & documents",
+      "Register walk-in",
+      "Register with symptoms",
+      "Other arrivals"
     ]
   }
 }

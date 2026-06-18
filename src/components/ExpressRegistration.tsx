@@ -5,6 +5,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
+import { ERROR_RECOVERY_COPY, formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import {
   DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
   findDuplicateCandidates,
@@ -12,6 +13,7 @@ import {
 } from '../utils/patientDuplicateDetection';
 
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
+import { RECEPTION_COPY } from './reception/receptionCopy';
 
 type ExpressRegistrationProps = {
   onClose: () => void;
@@ -173,10 +175,10 @@ export default function ExpressRegistration({
       addPatient(persistedPatient);
       onAdded(persistedPatient);
       onClose();
-    } catch {
-      addPatient(patient);
-      onAdded(patient);
-      onClose();
+    } catch (error) {
+      setSubmitError(
+        `${formatApiRecoveryMessage(error, 'registration form')} ${ERROR_RECOVERY_COPY.intakeForm}`,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -237,10 +239,10 @@ export default function ExpressRegistration({
         >
           <div>
             <h2 id="express-registration-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
-              Register arrival
+              {RECEPTION_COPY.express.title}
             </h2>
             <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 12 }}>
-              Tab through fields · Enter to register · sent to triage
+              {RECEPTION_COPY.express.subtitle}
             </p>
           </div>
           <button
@@ -413,7 +415,7 @@ export default function ExpressRegistration({
               fontSize: 15,
             }}
           >
-            {submitting ? 'Registering...' : 'Register & send to triage'}
+            {submitting ? RECEPTION_COPY.express.submitting : RECEPTION_COPY.express.submit}
           </button>
         </footer>
       </form>

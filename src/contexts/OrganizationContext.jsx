@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from './UserContext';
 import { useUserIdentity } from './UserIdentityContext';
 import logger from '../utils/logger';
@@ -47,6 +48,10 @@ export function OrganizationContextProvider({ children }) {
         : await PlatformAssetsApi.getCurrentOrganizationEngine();
       const normalized = engine?.engine || engine;
       setOrganizationEngine(normalized || null);
+      const emergencyOs = normalized?.settings?.emergencyOs;
+      if (emergencyOs && typeof emergencyOs === 'object') {
+        useEmergencyStore.getState().saveEmergencySettings(emergencyOs);
+      }
       setError('');
       return normalized || null;
     } catch (engineError) {

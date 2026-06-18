@@ -65,6 +65,16 @@ const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
     hint: 'T',
     keywords: ['medical tools', 'tools', 'clinical tools', 'calculators', 'scores'],
   },
+  pulse: {
+    label: 'Open Department Pulse',
+    hint: 'Pulse',
+    keywords: ['pulse', 'department pulse', 'status strip', 'mission control', 'charge nurse'],
+  },
+  shift: {
+    label: 'Open Shift Summary',
+    hint: 'Shift',
+    keywords: ['shift', 'shift summary', 'handoff', 'brief', 'handover'],
+  },
 });
 
 function routeCommandFromNavigationItem(item) {

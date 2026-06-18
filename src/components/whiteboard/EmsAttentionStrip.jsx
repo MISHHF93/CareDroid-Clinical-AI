@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildEmsAttentionStripMetrics, summarizeEmsAwareness } from './emsAwarenessModel';
 import './ChargeNurseOperationalStrip.css';
@@ -14,7 +15,7 @@ export default function EmsAttentionStrip({
     return buildEmsAttentionStripMetrics(summary);
   }, [emsArrivals, now]);
 
-  if (!metrics.length) return null;
+  const clearCopy = EMPTY_STATE_COPY.strips.emsClear;
 
   return (
     <ChargeNurseOperationalStrip
@@ -23,6 +24,8 @@ export default function EmsAttentionStrip({
       className="charge-nurse-operational-strip--ems"
       onMetricSelect={onMetricSelect}
       readOnly={readOnly}
+      emptyLabel={clearCopy.label}
+      emptyHint={clearCopy.hint}
     />
   );
 }

@@ -10,6 +10,7 @@
   type Referral,
 } from '../types/emergency';
 import { getLongWaitPatients } from '../utils/longWaitRescue';
+import { triageOperationalAlerts } from './alertClassificationModel';
 
 export interface AlertEngineInputs {
   patients: Patient[];
@@ -442,5 +443,5 @@ export function deriveAlerts(
     ...deriveQueueAlerts(inputs.queues, inputs.bottleneckAlert, now),
   ].map((alert) => preserveAlertState(alert, previousAlerts));
 
-  return nextAlerts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return triageOperationalAlerts(nextAlerts).visible;
 }

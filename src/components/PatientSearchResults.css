@@ -19,6 +19,28 @@
   font-size: 12px;
 }
 
+.patient-search-results__section {
+  border-bottom: 1px solid #1f2937;
+}
+
+.patient-search-results__section:last-of-type {
+  border-bottom: 0;
+}
+
+.patient-search-results__section-title {
+  margin: 0;
+  padding: 8px 12px 4px;
+  color: #93c5fd;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.patient-search-results__primary--entity {
+  grid-template-columns: 1fr;
+}
+
 .patient-search-results__list {
   margin: 0;
   padding: 0;

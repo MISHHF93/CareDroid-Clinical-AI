@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.126Z",
+  "goal": "Expose operational history for patient actions, queue changes, reassessments, and referrals",
+  "domains": [
+    "patient",
+    "queue",
+    "reassessment",
+    "referral"
+  ],
+  "surfaces": [
+    {
+      "id": "patient-detail",
+      "domains": [
+        "patient",
+        "queue",
+        "reassessment",
+        "referral"
+      ]
+    },
+    {
+      "id": "reassessment-drawer",
+      "domains": [
+        "reassessment"
+      ]
+    },
+    {
+      "id": "referral-panel",
+      "domains": [
+        "referral"
+      ]
+    },
+    {
+      "id": "reception-workspace",
+      "domains": [
+        "patient",
+        "queue"
+      ]
+    },
+    {
+      "id": "whiteboard-strip",
+      "domains": [
+        "patient",
+        "queue",
+        "reassessment",
+        "referral"
+      ]
+    },
+    {
+      "id": "emergency-settings",
+      "domains": [
+        "patient",
+        "queue",
+        "reassessment",
+        "referral"
+      ]
+    }
+  ],
+  "domainCoverage": [
+    {
+      "domain": "patient",
+      "sampleCount": 1
+    },
+    {
+      "domain": "queue",
+      "sampleCount": 1
+    },
+    {
+      "domain": "reassessment",
+      "sampleCount": 1
+    },
+    {
+      "domain": "referral",
+      "sampleCount": 1
+    }
+  ],
+  "summary": [
+    {
+      "domain": "patient",
+      "label": "Patient actions",
+      "count": 1,
+      "latest": {
+        "id": "sample-patient",
+        "type": "patient_created",
+        "title": "Patient created",
+        "summary": "Walk-in registered.",
+        "timestamp": "2026-06-17T10:00:00.000Z",
+        "patientId": "p-1",
+        "source": "reception-workspace"
+      }
+    },
+    {
+      "domain": "queue",
+      "label": "Queue changes",
+      "count": 1,
+      "latest": {
+        "id": "sample-queue",
+        "type": "journey_state_changed",
+        "title": "Journey state changed",
+        "summary": "Moved to Waiting.",
+        "timestamp": "2026-06-17T10:05:00.000Z",
+        "patientId": "p-1",
+        "source": "queue-assignment",
+        "metadata": {
+          "queue": "pretriage",
+          "targetState": "Waiting"
+        }
+      }
+    },
+    {
+      "domain": "reassessment",
+      "label": "Reassessments",
+      "count": 1,
+      "latest": {
+        "id": "sample-reassessment",
+        "type": "reassessment_completed",
+        "title": "Reassessment completed",
+        "summary": "Reminder completed.",
+        "timestamp": "2026-06-17T10:20:00.000Z",
+        "patientId": "p-1",
+        "source": "reassessment-workflow"
+      }
+    },
+    {
+      "domain": "referral",
+      "label": "Referrals",
+      "count": 1,
+      "latest": {
+        "id": "sample-referral",
+        "type": "referral_status_changed",
+        "title": "Referral status changed",
+        "summary": "Cardiology referral moved to Acknowledged.",
+        "timestamp": "2026-06-17T10:30:00.000Z",
+        "patientId": "p-1",
+        "source": "referral-workflow",
+        "metadata": {
+          "status": "Acknowledged"
+        }
+      }
+    }
+  ],
+  "audit": {
+    "surfaceCount": 6,
+    "domains": [
+      "patient",
+      "queue",
+      "reassessment",
+      "referral"
+    ],
+    "passesAudit": true
+  },
+  "recommendations": []
+}

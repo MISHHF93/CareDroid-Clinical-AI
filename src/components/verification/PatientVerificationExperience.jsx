@@ -15,6 +15,8 @@ export default function PatientVerificationExperience({
   canVerifyIntake = false,
   canCreatePatient = false,
   onFieldDecision,
+  onApproveMatching,
+  bulkApprovableCount = 0,
   matchCandidates = [],
   selectedCandidateId = null,
   onSelectCandidate,
@@ -31,21 +33,31 @@ export default function PatientVerificationExperience({
   onCreatePatient,
   onProvisionalIntake,
   highlightProvisional = false,
+  steps = VERIFICATION_STEPS,
+  displaySteps = null,
+  mapDisplayStep = null,
+  introTitle = 'Unified verification workflow',
+  introDescription = 'Confirm identity with documents, duplicate checks, and staff review before registering or linking a chart.',
+  onContinue,
+  canContinue = false,
+  continueLabel = 'Continue',
 }) {
+  const visibleSteps = displaySteps || steps;
+  const resolveDisplayIndex = (internalStep) =>
+    typeof mapDisplayStep === 'function' ? mapDisplayStep(internalStep) : internalStep;
+
   const renderStepContent = () => {
     if (activeStep <= 0) {
       return (
         <section className="patient-verification__intro">
-          <h3>Unified verification workflow</h3>
-          <p>
-            Identity evidence flows through OCR extraction, duplicate detection, manual field review,
-            and staff-confirmed finalize actions.
-          </p>
+          <h3>{introTitle}</h3>
+          <p>{introDescription}</p>
           <ol>
-            <li>Capture documents and review OCR output</li>
-            <li>Resolve duplicate candidates with MPI-style matching</li>
-            <li>Approve or override identity fields manually</li>
-            <li>Link, create, or use provisional identity intake without blocking triage</li>
+            <li>Add documents or type patient details</li>
+            <li>Review scanned information</li>
+            <li>Match to an existing chart if found</li>
+            <li>Confirm name, date of birth, and health card</li>
+            <li>Register the patient or link to an existing chart</li>
           </ol>
         </section>
       );
@@ -80,6 +92,8 @@ export default function PatientVerificationExperience({
           fieldDecisions={fieldDecisions}
           canVerify={canVerifyIntake}
           onFieldDecision={onFieldDecision}
+          onApproveMatching={onApproveMatching}
+          bulkApprovableCount={bulkApprovableCount}
         />
       );
     }
@@ -109,21 +123,42 @@ export default function PatientVerificationExperience({
       />
 
       <ol className="patient-verification__steps" aria-label="Verification steps">
-        {VERIFICATION_STEPS.map((step, index) => (
-          <li key={step} className={index <= activeStep ? 'patient-verification__step--active' : ''}>
+        {visibleSteps.map((step, index) => {
+          const activeDisplayIndex = resolveDisplayIndex(activeStep);
+          const isActive = index === activeDisplayIndex;
+          const isComplete = index < activeDisplayIndex;
+          return (
+          <li
+            key={step}
+            className={[
+              isActive ? 'patient-verification__step--active' : '',
+              isComplete ? 'patient-verification__step--complete' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
             <button
               type="button"
               onClick={() => onStepChange?.(index)}
-              aria-current={index === activeStep ? 'step' : undefined}
+              aria-current={isActive ? 'step' : undefined}
             >
               <span>{index + 1}</span>
               {step}
             </button>
           </li>
-        ))}
+        );
+        })}
       </ol>
 
       <div className="patient-verification__content">{renderStepContent()}</div>
+
+      {onContinue ? (
+        <div className="patient-verification__continue">
+          <button type="button" disabled={!canContinue || Boolean(pendingAction)} onClick={onContinue}>
+            {continueLabel}
+          </button>
+        </div>
+      ) : null}
 
       {warnings.length ? (
         <div className="patient-verification__warnings" role="note">

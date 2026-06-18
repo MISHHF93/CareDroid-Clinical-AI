@@ -1,4 +1,5 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { getExistingEncounterId } from './intakeEncounter';
 import { completeIntakeHandoff, type IntakeHandoffStore } from './receptionHandoff';
 import type { Patient } from '../types/emergency';
@@ -22,6 +23,10 @@ export function buildFindPatientPath(
 export function buildViewEncounterPath(patientId: string, encounterId?: string | null): string {
   const params = new URLSearchParams({ patient: patientId });
   if (encounterId) params.set('encounter', encounterId);
+  if (isReceptionFirstUxEnabled()) {
+    params.set('patientId', patientId);
+    return `${CANONICAL_ROUTES.emergencyReception}?${params.toString()}`;
+  }
   return `${CANONICAL_ROUTES.emergencyWhiteboard}?${params.toString()}`;
 }
 
@@ -31,6 +36,28 @@ export function buildReceptionSearchFilterPath(query: string): string {
   return params.toString()
     ? `${CANONICAL_ROUTES.emergencyReception}?${params.toString()}`
     : CANONICAL_ROUTES.emergencyReception;
+}
+
+export function buildReferralSearchPath(referralId: string, patientId?: string | null): string {
+  const params = new URLSearchParams();
+  if (patientId) params.set('patientId', patientId);
+  params.set('patientSearch', referralId);
+  return `${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`;
+}
+
+export function buildEmsCasePath(emsArrivalId: string): string {
+  const params = new URLSearchParams({ emsArrivalId });
+  return `${CANONICAL_ROUTES.emergencyEms}?${params.toString()}`;
+}
+
+export function buildQueueItemPath(queueType: string, patientId?: string | null): string {
+  const params = new URLSearchParams({ queue: queueType });
+  if (patientId) params.set('patient', patientId);
+  return `${CANONICAL_ROUTES.emergencyQueues}?${params.toString()}`;
+}
+
+export function buildEncounterSearchPath(patientId: string, encounterId?: string | null): string {
+  return buildViewEncounterPath(patientId, encounterId);
 }
 
 export function createEncounterForPatient(

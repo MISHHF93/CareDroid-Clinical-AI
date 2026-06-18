@@ -1,0 +1,406 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.068Z",
+  "goal": "Discover integration points and normalize implemented / partial / placeholder visibility",
+  "statusDefinitions": {
+    "implemented": "Live connector or production behavior active",
+    "partial": "Contracts, UI, or local behavior — production feed incomplete",
+    "placeholder": "Demo, catalog, or stub — not production-connected"
+  },
+  "categoryRollup": [
+    {
+      "category": "FHIR",
+      "status": "partial",
+      "pointCount": 5,
+      "counts": {
+        "partial": 2,
+        "placeholder": 3
+      },
+      "guidance": "Contracts, UI, or local behavior exist — production feed or routing incomplete."
+    },
+    {
+      "category": "HL7",
+      "status": "partial",
+      "pointCount": 4,
+      "counts": {
+        "placeholder": 3,
+        "partial": 1
+      },
+      "guidance": "Contracts, UI, or local behavior exist — production feed or routing incomplete."
+    },
+    {
+      "category": "Provincial",
+      "status": "partial",
+      "pointCount": 3,
+      "counts": {
+        "placeholder": 1,
+        "partial": 2
+      },
+      "guidance": "Contracts, UI, or local behavior exist — production feed or routing incomplete."
+    },
+    {
+      "category": "Notification",
+      "status": "partial",
+      "pointCount": 7,
+      "counts": {
+        "implemented": 2,
+        "partial": 1,
+        "placeholder": 4
+      },
+      "guidance": "Contracts, UI, or local behavior exist — production feed or routing incomplete."
+    },
+    {
+      "category": "Identity",
+      "status": "partial",
+      "pointCount": 6,
+      "counts": {
+        "implemented": 3,
+        "placeholder": 3
+      },
+      "guidance": "Contracts, UI, or local behavior exist — production feed or routing incomplete."
+    }
+  ],
+  "integrationPoints": [
+    {
+      "id": "fhir-r4-connector",
+      "category": "FHIR",
+      "label": "FHIR R4 connector",
+      "status": "partial",
+      "capability": "integrationStatus",
+      "surfaces": [
+        "IntegrationHub",
+        "EmergencySettings",
+        "PlatformSystemPage"
+      ],
+      "summary": "Demo connection state and test/sync APIs; no live SMART/OAuth launch."
+    },
+    {
+      "id": "fhir-hub-normalization",
+      "category": "FHIR",
+      "label": "FHIR hub normalization",
+      "status": "partial",
+      "capability": "emergencyIntegrationHub",
+      "surfaces": [
+        "IntegrationHub",
+        "interoperability/events"
+      ],
+      "summary": "Patient, Observation, Encounter normalization into durable hub records."
+    },
+    {
+      "id": "fhir-smart-oauth",
+      "category": "FHIR",
+      "label": "SMART on FHIR / OAuth",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [
+        "CommercialPages"
+      ],
+      "summary": "Catalog and readiness UI only; no token exchange or launch context."
+    },
+    {
+      "id": "fhir-bundle-ingestion",
+      "category": "FHIR",
+      "label": "FHIR Bundle ingestion",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [],
+      "summary": "Individual resource events only; no Bundle consumer."
+    },
+    {
+      "id": "fhir-ed-consumer",
+      "category": "FHIR",
+      "label": "Emergency OS FHIR consumer",
+      "status": "placeholder",
+      "capability": "emergencySmartIntake",
+      "surfaces": [
+        "SmartIntake"
+      ],
+      "summary": "Smart Intake normalizes snapshots when backend path is enabled."
+    },
+    {
+      "id": "hl7-adt-interface",
+      "category": "HL7",
+      "label": "HL7 v2 ADT interface",
+      "status": "placeholder",
+      "capability": "integrationStatus",
+      "surfaces": [
+        "IntegrationHub",
+        "EmergencySettings",
+        "PlatformSystemPage"
+      ],
+      "summary": "Demo interface metadata; no MLLP listener or ADT parser."
+    },
+    {
+      "id": "hl7-oru-interface",
+      "category": "HL7",
+      "label": "HL7 v2 ORU results",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [
+        "IntegrationHub"
+      ],
+      "summary": "Placeholder ORU normalization in hub registry."
+    },
+    {
+      "id": "hl7-mllp-listener",
+      "category": "HL7",
+      "label": "HL7 MLLP listener",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [],
+      "summary": "Not implemented — no ACK/NACK or interface engine adapter."
+    },
+    {
+      "id": "hl7-hub-persistence",
+      "category": "HL7",
+      "label": "HL7 hub event persistence",
+      "status": "partial",
+      "capability": "emergencyIntegrationHub",
+      "surfaces": [
+        "IntegrationHub"
+      ],
+      "summary": "Durable ingest/trace for HL7-shaped events when posted to hub API."
+    },
+    {
+      "id": "provincial-ohip-connector",
+      "category": "Provincial",
+      "label": "Provincial / OHIP connector",
+      "status": "placeholder",
+      "capability": "emergencyProvincialHealth",
+      "surfaces": [
+        "EmergencySettings",
+        "PatientTimeline"
+      ],
+      "summary": "placeholder-unavailable Ontario/OHIP demo envelope; no HIE feed."
+    },
+    {
+      "id": "moh-fhir-health-probe",
+      "category": "Provincial",
+      "label": "MOH FHIR health probe",
+      "status": "partial",
+      "capability": null,
+      "surfaces": [
+        "backend health"
+      ],
+      "summary": "Env-gated connector health check; not wired to ED workflows."
+    },
+    {
+      "id": "provincial-timeline-labels",
+      "category": "Provincial",
+      "label": "Provincial timeline surfacing",
+      "status": "partial",
+      "capability": null,
+      "surfaces": [
+        "PatientDetailPanel",
+        "patientTimeline.ts"
+      ],
+      "summary": "Timeline category with demo vs unavailable labels for staff review."
+    },
+    {
+      "id": "ed-operational-alerts",
+      "category": "Notification",
+      "label": "ED operational alerts (local)",
+      "status": "implemented",
+      "capability": null,
+      "surfaces": [
+        "Header",
+        "alertEngine",
+        "AppShell"
+      ],
+      "summary": "In-app drawer and tiered toasts for reassessment, EMS, capacity."
+    },
+    {
+      "id": "notifications-rest",
+      "category": "Notification",
+      "label": "Notification REST API",
+      "status": "implemented",
+      "capability": "notificationsRest",
+      "surfaces": [
+        "NotificationPreferences"
+      ],
+      "summary": "Device registration, preferences, history, unread state."
+    },
+    {
+      "id": "push-fcm-delivery",
+      "category": "Notification",
+      "label": "Firebase push delivery",
+      "status": "partial",
+      "capability": "notificationsRest",
+      "surfaces": [
+        "NotificationService.js"
+      ],
+      "summary": "FCM when credentials configured; ED events not routed through backend."
+    },
+    {
+      "id": "notification-stream",
+      "category": "Notification",
+      "label": "Notification SSE stream",
+      "status": "placeholder",
+      "capability": "notificationStream",
+      "surfaces": [],
+      "summary": "Capability disabled — do not call /api/notifications/stream."
+    },
+    {
+      "id": "email-delivery",
+      "category": "Notification",
+      "label": "Email delivery",
+      "status": "placeholder",
+      "capability": "notificationSendChannel",
+      "surfaces": [
+        "NotificationPreferences",
+        "EmergencySettings"
+      ],
+      "summary": "Preference fields exist; no ED alert → email routing."
+    },
+    {
+      "id": "sms-delivery",
+      "category": "Notification",
+      "label": "SMS delivery",
+      "status": "placeholder",
+      "capability": "notificationSendChannel",
+      "surfaces": [
+        "NotificationPreferences"
+      ],
+      "summary": "Preference toggle only; no SMS provider."
+    },
+    {
+      "id": "pager-escalation",
+      "category": "Notification",
+      "label": "Pager / PagerDuty escalation",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [
+        "docker-compose Alertmanager"
+      ],
+      "summary": "Ops config only; not connected to ED alert engine."
+    },
+    {
+      "id": "identity-verification-ui",
+      "category": "Identity",
+      "label": "Identity verification workflow",
+      "status": "implemented",
+      "capability": null,
+      "surfaces": [
+        "SmartIntake",
+        "PatientVerificationExperience",
+        "ReceptionWorkspace"
+      ],
+      "summary": "Five-step OCR → duplicate → field review → finalize UI."
+    },
+    {
+      "id": "client-duplicate-detection",
+      "category": "Identity",
+      "label": "Client duplicate detection (MPI-style)",
+      "status": "implemented",
+      "capability": null,
+      "surfaces": [
+        "patientDuplicateDetection.ts",
+        "DuplicatePatientBanner"
+      ],
+      "summary": "Local scoring with health card, name, DOB thresholds."
+    },
+    {
+      "id": "health-card-search",
+      "category": "Identity",
+      "label": "Health card / PHN search",
+      "status": "implemented",
+      "capability": null,
+      "surfaces": [
+        "patientSearch.ts",
+        "Header lookup"
+      ],
+      "summary": "Operational search includes health card fields."
+    },
+    {
+      "id": "backend-mpi-session",
+      "category": "Identity",
+      "label": "Backend MPI match session",
+      "status": "placeholder",
+      "capability": "emergencySmartIntakeIdentitySession",
+      "surfaces": [
+        "SmartIntake"
+      ],
+      "summary": "Capability disabled — frontend falls back to local duplicate rules."
+    },
+    {
+      "id": "backend-ocr-provider",
+      "category": "Identity",
+      "label": "Backend OCR provider",
+      "status": "placeholder",
+      "capability": "emergencySmartIntakeIdentitySession",
+      "surfaces": [
+        "SmartIntake",
+        "OcrCapturePanel"
+      ],
+      "summary": "Placeholder normalize only; no vision provider contract."
+    },
+    {
+      "id": "sso-identity-providers",
+      "category": "Identity",
+      "label": "SSO / SAML / OIDC registry",
+      "status": "placeholder",
+      "capability": null,
+      "surfaces": [
+        "identity-provider-registry.service.ts"
+      ],
+      "summary": "Planned providers in registry; Google OAuth config-detect only."
+    }
+  ],
+  "audit": {
+    "totalPoints": 25,
+    "categoryCount": 5,
+    "byStatus": {
+      "partial": 6,
+      "placeholder": 14,
+      "implemented": 5
+    },
+    "categories": [
+      {
+        "category": "FHIR",
+        "status": "partial",
+        "pointCount": 5,
+        "counts": {
+          "partial": 2,
+          "placeholder": 3
+        }
+      },
+      {
+        "category": "HL7",
+        "status": "partial",
+        "pointCount": 4,
+        "counts": {
+          "placeholder": 3,
+          "partial": 1
+        }
+      },
+      {
+        "category": "Provincial",
+        "status": "partial",
+        "pointCount": 3,
+        "counts": {
+          "placeholder": 1,
+          "partial": 2
+        }
+      },
+      {
+        "category": "Notification",
+        "status": "partial",
+        "pointCount": 7,
+        "counts": {
+          "implemented": 2,
+          "partial": 1,
+          "placeholder": 4
+        }
+      },
+      {
+        "category": "Identity",
+        "status": "partial",
+        "pointCount": 6,
+        "counts": {
+          "implemented": 3,
+          "placeholder": 3
+        }
+      }
+    ],
+    "passesAudit": true
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.889Z",
+  "goal": "Expose high-value actions without relying on sidebar navigation",
+  "requiredQuickActions": [
+    "create-patient",
+    "start-intake",
+    "open-whiteboard",
+    "open-ems",
+    "open-reassessment",
+    "create-referral"
+  ],
+  "suppressedNavigationDuplicates": [
+    "open-whiteboard",
+    "open-ems",
+    "open-reassessment",
+    "open-intake"
+  ],
+  "emptyQueryBehavior": "Quick actions pinned first, then recent commands",
+  "audit": {
+    "requiredActionCount": 6,
+    "exposedCount": 6,
+    "missingIds": [],
+    "exposed": [
+      {
+        "id": "create-patient",
+        "label": "create patient",
+        "group": "Quick actions",
+        "shortcut": null
+      },
+      {
+        "id": "start-intake",
+        "label": "start intake",
+        "group": "Quick actions",
+        "shortcut": null
+      },
+      {
+        "id": "open-whiteboard",
+        "label": "open whiteboard",
+        "group": "Quick actions",
+        "shortcut": null
+      },
+      {
+        "id": "open-ems",
+        "label": "open ems",
+        "group": "Quick actions",
+        "shortcut": null
+      },
+      {
+        "id": "open-reassessment",
+        "label": "open reassessment",
+        "group": "Quick actions",
+        "shortcut": null
+      },
+      {
+        "id": "create-referral",
+        "label": "create referral",
+        "group": "Quick actions",
+        "shortcut": null
+      }
+    ],
+    "navigationRouteCount": 0,
+    "suppressedRouteDuplicates": [
+      "open-whiteboard",
+      "open-ems",
+      "open-reassessment"
+    ],
+    "passesAudit": true,
+    "emptyQueryShowsQuickActions": true
+  },
+  "recommendations": []
+}

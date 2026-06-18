@@ -1,0 +1,33 @@
+.reception-pipeline-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reception-pipeline-shell__rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.reception-pipeline-shell__stage {
+  border: 1px solid #1f2937;
+  background: #111827;
+  color: #d1d5db;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reception-pipeline-shell__stage--active {
+  border-color: #2563eb;
+  background: #1e3a8a;
+  color: #eff6ff;
+}
+
+.reception-pipeline-shell__panel {
+  min-width: 0;
+}

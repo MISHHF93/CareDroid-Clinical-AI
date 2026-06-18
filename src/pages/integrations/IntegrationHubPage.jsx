@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { mapLiveSourceStatusToNormalized } from '../../config/integrationStatusModel';
+import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
+import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
 import { useIntegrationHub } from '../../hooks/useIntegrationHub';
 import './IntegrationHubPage.css';
 
@@ -38,6 +41,8 @@ export default function IntegrationHubPage() {
           </button>
         </div>
       </header>
+
+      <IntegrationStatusPanel liveSources={sources} />
 
       <div className="integration-hub-page__cards" aria-label="Integration Hub summary">
         <article>
@@ -85,7 +90,16 @@ export default function IntegrationHubPage() {
               {sources.map((source) => (
                 <tr key={String(source.id)}>
                   <td>{sourceLabel(source)}</td>
-                  <td>{String(source.status || 'unknown')}</td>
+                  <td>
+                    <IntegrationStatusBadge
+                      status={
+                        mapLiveSourceStatusToNormalized(source.status) || 'placeholder'
+                      }
+                    />
+                    <small style={{ display: 'block', marginTop: 4, color: '#64748b' }}>
+                      {String(source.status || 'unknown')}
+                    </small>
+                  </td>
                   <td>{source.lastEventAt ? String(source.lastEventAt) : '—'}</td>
                 </tr>
               ))}

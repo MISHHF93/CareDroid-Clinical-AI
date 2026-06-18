@@ -80,9 +80,16 @@ const backendEnv = withDefaults({
   ANOMALY_DETECTION_ENABLED: 'false',
   RAG_ENABLED: 'false',
   AI_ENABLED: 'false',
+  REDIS_ENABLED: 'false',
+  REDIS_HOST: '',
   ENCRYPTION_MASTER_KEY: '0000000000000000000000000000000000000000000000000000000000000000',
   DEV_LOGIN_EMAIL: 'dev@example.com',
 });
+
+if (backendEnv.REDIS_ENABLED !== 'true') {
+  backendEnv.REDIS_ENABLED = 'false';
+  backendEnv.REDIS_HOST = '';
+}
 
 const commands = [
   !frontendOnly && {

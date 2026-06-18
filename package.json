@@ -101,7 +101,11 @@
     "plans:scan-battery": "node scripts/run-plan-scan-battery.mjs",
     "plans:write-progress": "node scripts/write-plan-progress-dashboard.mjs",
     "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.js",
-    "migrate:unified": "node scripts/run-unified-migration.js"
+    "migrate:unified": "node scripts/run-unified-migration.js",
+    "qa:operational-survivability": "node scripts/run-operational-survivability-audits.mjs",
+    "qa:reception-throughput": "node scripts/reception-throughput-simulation.mjs",
+    "qa:reception-training": "node scripts/reception-training-audit.mjs",
+    "qa:survivability-kpis": "node scripts/operational-survivability-kpis.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^5.6.0",

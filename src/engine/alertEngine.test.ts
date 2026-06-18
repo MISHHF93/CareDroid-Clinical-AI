@@ -76,11 +76,11 @@ describe('dispatchAlert', () => {
     expect(mocks.selectPatient).toHaveBeenCalledWith('p1');
   });
 
-  it('uses warning and default toast durations by severity', () => {
+  it('toasts high-tier warnings and suppresses informational notices', () => {
     dispatchAlert({
       severity: 'Warning',
-      title: 'Capacity Orange',
-      message: 'Score 58',
+      title: 'Referral unacknowledged',
+      message: 'Cardiology - 20m unacknowledged.',
     });
     dispatchAlert({
       severity: 'Info',
@@ -89,12 +89,12 @@ describe('dispatchAlert', () => {
     });
 
     expect(toast.warning).toHaveBeenCalledWith(
-      'Capacity Orange',
-      expect.objectContaining({ description: 'Score 58', duration: 10000 }),
+      'Referral unacknowledged',
+      expect.objectContaining({ description: 'Cardiology - 20m unacknowledged.', duration: 10000 }),
     );
-    expect(toast).toHaveBeenCalledWith(
+    expect(toast).not.toHaveBeenCalledWith(
       'Saved',
-      expect.objectContaining({ description: 'Preferences saved', duration: 5000 }),
+      expect.objectContaining({ description: 'Preferences saved' }),
     );
   });
 });

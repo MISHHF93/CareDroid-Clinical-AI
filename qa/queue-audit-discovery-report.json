@@ -1,0 +1,323 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.297Z",
+  "goal": "Audit all queues and expose length, longest wait, bottlenecks, and overdue items",
+  "metrics": [
+    "length",
+    "longestWait",
+    "bottleneck",
+    "overdue"
+  ],
+  "summary": {
+    "queueCount": 12,
+    "activeQueueCount": 7,
+    "totalLength": 8,
+    "totalOverdue": 6,
+    "longestWaitMinutes": 70,
+    "longestWaitLabel": "1h 10m",
+    "bottlenecks": [
+      {
+        "id": "ems",
+        "label": "Ambulance arrivals",
+        "domain": "reception",
+        "tab": "ems",
+        "type": "EMS",
+        "length": 2,
+        "longestWaitMinutes": 0,
+        "averageWaitMinutes": 0,
+        "overdueCount": 0,
+        "overdueItems": [],
+        "targetWaitMinutes": 20,
+        "isBottleneck": true,
+        "bottleneckSeverity": "critical",
+        "bottleneckReason": "2 inbound not yet registered"
+      },
+      {
+        "id": "verification",
+        "label": "Need ID check",
+        "domain": "reception",
+        "tab": "verification",
+        "type": "Verification",
+        "length": 1,
+        "longestWaitMinutes": 25,
+        "averageWaitMinutes": 25,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-2",
+            "label": "Verify Pending",
+            "waitMinutes": 25
+          }
+        ],
+        "targetWaitMinutes": 15,
+        "isBottleneck": true,
+        "bottleneckSeverity": "warning",
+        "bottleneckReason": "1 overdue · longest 25m"
+      },
+      {
+        "id": "pretriage",
+        "label": "Waiting for nurse",
+        "domain": "reception",
+        "tab": "pretriage",
+        "type": "Pre-triage",
+        "length": 1,
+        "longestWaitMinutes": 55,
+        "averageWaitMinutes": 55,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-1",
+            "label": "Long Wait",
+            "waitMinutes": 55
+          }
+        ],
+        "targetWaitMinutes": 20,
+        "isBottleneck": true,
+        "bottleneckSeverity": "critical",
+        "bottleneckReason": "1 overdue · longest 55m"
+      },
+      {
+        "id": "waiting-room",
+        "label": "Waiting Room",
+        "domain": "ed",
+        "tab": null,
+        "type": "Waiting Room",
+        "length": 1,
+        "longestWaitMinutes": 25,
+        "averageWaitMinutes": 25,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-2",
+            "label": "Verify Pending",
+            "waitMinutes": 25
+          }
+        ],
+        "targetWaitMinutes": 20,
+        "isBottleneck": true,
+        "bottleneckSeverity": "warning",
+        "bottleneckReason": "1 overdue · longest 25m"
+      },
+      {
+        "id": "triage-queue",
+        "label": "Triage Queue",
+        "domain": "ed",
+        "tab": null,
+        "type": "Triage",
+        "length": 1,
+        "longestWaitMinutes": 55,
+        "averageWaitMinutes": 55,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-1",
+            "label": "Long Wait",
+            "waitMinutes": 55
+          }
+        ],
+        "targetWaitMinutes": 15,
+        "isBottleneck": true,
+        "bottleneckSeverity": "critical",
+        "bottleneckReason": "1 overdue · longest 55m"
+      },
+      {
+        "id": "provider-queue",
+        "label": "Provider Queue",
+        "domain": "ed",
+        "tab": null,
+        "type": "Provider",
+        "length": 1,
+        "longestWaitMinutes": 70,
+        "averageWaitMinutes": 70,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-3",
+            "label": "Reassess Due",
+            "waitMinutes": 70
+          }
+        ],
+        "targetWaitMinutes": 35,
+        "isBottleneck": true,
+        "bottleneckSeverity": "critical",
+        "bottleneckReason": "1 overdue · longest 1h 10m"
+      },
+      {
+        "id": "reassessment-queue",
+        "label": "Reassessment Queue",
+        "domain": "ed",
+        "tab": null,
+        "type": "Reassessment",
+        "length": 1,
+        "longestWaitMinutes": 70,
+        "averageWaitMinutes": 70,
+        "overdueCount": 1,
+        "overdueItems": [
+          {
+            "patientId": "qa-3",
+            "label": "Reassess Due",
+            "waitMinutes": 70
+          }
+        ],
+        "targetWaitMinutes": 30,
+        "isBottleneck": true,
+        "bottleneckSeverity": "warning",
+        "bottleneckReason": "1 reassessments overdue"
+      }
+    ],
+    "primaryBottleneck": {
+      "id": "provider-queue",
+      "label": "Provider Queue",
+      "domain": "ed",
+      "tab": null,
+      "type": "Provider",
+      "length": 1,
+      "longestWaitMinutes": 70,
+      "averageWaitMinutes": 70,
+      "overdueCount": 1,
+      "overdueItems": [
+        {
+          "patientId": "qa-3",
+          "label": "Reassess Due",
+          "waitMinutes": 70
+        }
+      ],
+      "targetWaitMinutes": 35,
+      "isBottleneck": true,
+      "bottleneckSeverity": "critical",
+      "bottleneckReason": "1 overdue · longest 1h 10m"
+    }
+  },
+  "queues": [
+    {
+      "id": "ems",
+      "label": "Ambulance arrivals",
+      "domain": "reception",
+      "length": 2,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": true,
+      "bottleneckReason": "2 inbound not yet registered"
+    },
+    {
+      "id": "verification",
+      "label": "Need ID check",
+      "domain": "reception",
+      "length": 1,
+      "longestWaitMinutes": 25,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 overdue · longest 25m"
+    },
+    {
+      "id": "pretriage",
+      "label": "Waiting for nurse",
+      "domain": "reception",
+      "length": 1,
+      "longestWaitMinutes": 55,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 overdue · longest 55m"
+    },
+    {
+      "id": "waiting-room",
+      "label": "Waiting Room",
+      "domain": "ed",
+      "length": 1,
+      "longestWaitMinutes": 25,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 overdue · longest 25m"
+    },
+    {
+      "id": "triage-queue",
+      "label": "Triage Queue",
+      "domain": "ed",
+      "length": 1,
+      "longestWaitMinutes": 55,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 overdue · longest 55m"
+    },
+    {
+      "id": "provider-queue",
+      "label": "Provider Queue",
+      "domain": "ed",
+      "length": 1,
+      "longestWaitMinutes": 70,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 overdue · longest 1h 10m"
+    },
+    {
+      "id": "results-queue",
+      "label": "Results Queue",
+      "domain": "ed",
+      "length": 0,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": false,
+      "bottleneckReason": null
+    },
+    {
+      "id": "reassessment-queue",
+      "label": "Reassessment Queue",
+      "domain": "ed",
+      "length": 1,
+      "longestWaitMinutes": 70,
+      "overdueCount": 1,
+      "isBottleneck": true,
+      "bottleneckReason": "1 reassessments overdue"
+    },
+    {
+      "id": "referral-queue",
+      "label": "Referral Queue",
+      "domain": "ed",
+      "length": 0,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": false,
+      "bottleneckReason": null
+    },
+    {
+      "id": "admission-queue",
+      "label": "Admission Queue",
+      "domain": "ed",
+      "length": 0,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": false,
+      "bottleneckReason": null
+    },
+    {
+      "id": "discharge-queue",
+      "label": "Discharge Queue",
+      "domain": "ed",
+      "length": 0,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": false,
+      "bottleneckReason": null
+    },
+    {
+      "id": "ems-pre-arrival-queue",
+      "label": "EMS Pre-Arrival",
+      "domain": "ed",
+      "length": 0,
+      "longestWaitMinutes": 0,
+      "overdueCount": 0,
+      "isBottleneck": false,
+      "bottleneckReason": null
+    }
+  ],
+  "surfaces": {
+    "surfaceCount": 6,
+    "requiredMetrics": [
+      "length",
+      "longestWait",
+      "bottleneck",
+      "overdue"
+    ],
+    "passesAudit": true
+  },
+  "recommendations": []
+}

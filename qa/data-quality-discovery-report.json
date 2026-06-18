@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.182Z",
+  "goal": "Discover registration data quality risks and expose them in existing workflows",
+  "riskCategories": [
+    "missing_demographics",
+    "duplicate_patient",
+    "missing_arrival_reason",
+    "missing_verification"
+  ],
+  "samplePatientCount": 3,
+  "sampleRiskCount": 7,
+  "summary": {
+    "activePatientCount": 3,
+    "patientsWithRisks": 3,
+    "totalRisks": 7,
+    "byCategory": {
+      "missing_demographics": 2,
+      "duplicate_patient": 2,
+      "missing_arrival_reason": 2,
+      "missing_verification": 1
+    },
+    "byPatient": {
+      "dq-1": [
+        {
+          "id": "dq-1:missing_demographics",
+          "category": "missing_demographics",
+          "label": "Missing demographics",
+          "summary": "Missing date of birth, sex, legal name, permanent MRN, contact or health card.",
+          "missingFields": [
+            "date of birth",
+            "sex",
+            "legal name",
+            "permanent MRN",
+            "contact or health card"
+          ],
+          "severity": "warning",
+          "recommendedAction": "verify_identity"
+        },
+        {
+          "id": "dq-1:missing_arrival_reason",
+          "category": "missing_arrival_reason",
+          "label": "Missing arrival reason",
+          "summary": "Chief complaint or arrival reason is missing or still a placeholder.",
+          "severity": "warning",
+          "recommendedAction": "capture_complaint"
+        },
+        {
+          "id": "dq-1:missing_verification",
+          "category": "missing_verification",
+          "label": "Missing verification",
+          "summary": "Identity verification is incomplete or deferred.",
+          "severity": "warning",
+          "recommendedAction": "verify_identity"
+        }
+      ],
+      "dq-2": [
+        {
+          "id": "dq-2:missing_demographics",
+          "category": "missing_demographics",
+          "label": "Missing demographics",
+          "summary": "Missing contact or health card.",
+          "missingFields": [
+            "contact or health card"
+          ],
+          "severity": "info",
+          "recommendedAction": "verify_identity"
+        },
+        {
+          "id": "dq-2:missing_arrival_reason",
+          "category": "missing_arrival_reason",
+          "label": "Missing arrival reason",
+          "summary": "Chief complaint or arrival reason is missing or still a placeholder.",
+          "severity": "warning",
+          "recommendedAction": "capture_complaint"
+        },
+        {
+          "id": "dq-2:duplicate_patient",
+          "category": "duplicate_patient",
+          "label": "Possible duplicate",
+          "summary": "May match another active patient — confirm before creating a new chart.",
+          "severity": "warning",
+          "recommendedAction": "review_duplicate"
+        }
+      ],
+      "dq-3": [
+        {
+          "id": "dq-3:duplicate_patient",
+          "category": "duplicate_patient",
+          "label": "Possible duplicate",
+          "summary": "May match another active patient — confirm before creating a new chart.",
+          "severity": "warning",
+          "recommendedAction": "review_duplicate"
+        }
+      ]
+    }
+  },
+  "sampleRisks": [
+    {
+      "category": "missing_demographics",
+      "label": "Missing demographics",
+      "summary": "Missing date of birth, sex, legal name, permanent MRN, contact or health card.",
+      "recommendedAction": "verify_identity"
+    },
+    {
+      "category": "missing_arrival_reason",
+      "label": "Missing arrival reason",
+      "summary": "Chief complaint or arrival reason is missing or still a placeholder.",
+      "recommendedAction": "capture_complaint"
+    },
+    {
+      "category": "missing_verification",
+      "label": "Missing verification",
+      "summary": "Identity verification is incomplete or deferred.",
+      "recommendedAction": "verify_identity"
+    },
+    {
+      "category": "missing_demographics",
+      "label": "Missing demographics",
+      "summary": "Missing contact or health card.",
+      "recommendedAction": "verify_identity"
+    },
+    {
+      "category": "missing_arrival_reason",
+      "label": "Missing arrival reason",
+      "summary": "Chief complaint or arrival reason is missing or still a placeholder.",
+      "recommendedAction": "capture_complaint"
+    },
+    {
+      "category": "duplicate_patient",
+      "label": "Possible duplicate",
+      "summary": "May match another active patient — confirm before creating a new chart.",
+      "recommendedAction": "review_duplicate"
+    },
+    {
+      "category": "duplicate_patient",
+      "label": "Possible duplicate",
+      "summary": "May match another active patient — confirm before creating a new chart.",
+      "recommendedAction": "review_duplicate"
+    }
+  ],
+  "surfaces": {
+    "surfaceCount": 5,
+    "requiredRisks": [
+      "missing_demographics",
+      "duplicate_patient",
+      "missing_arrival_reason",
+      "missing_verification"
+    ],
+    "coveredRisks": [
+      "missing_demographics",
+      "duplicate_patient",
+      "missing_arrival_reason",
+      "missing_verification"
+    ],
+    "passesAudit": true
+  },
+  "recommendations": []
+}

@@ -19,6 +19,11 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
     copilotOpen: false,
     selectPatient: vi.fn(),
     initializeFromBackend: vi.fn().mockResolvedValue(undefined),
+    updateAlerts: vi.fn(),
+    emergencySettings: {
+      defaultScreenMode: 'clinical',
+      readOnlyDisplayMode: false,
+    },
   },
 }));
 
@@ -28,6 +33,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => navigateMock,
     useLocation: () => shellLocation,
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
 

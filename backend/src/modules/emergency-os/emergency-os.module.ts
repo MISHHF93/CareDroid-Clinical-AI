@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuditModule } from '../audit/audit.module';
+import { AuthModule } from '../auth/auth.module';
 import { ChatModule } from '../chat/chat.module';
 import { EmergencyOsController } from './emergency-os.controller';
 import {
@@ -46,7 +48,7 @@ import {
 } from './emergency-os.services';
 
 @Module({
-  imports: [ConfigModule, ChatModule],
+  imports: [ConfigModule, AuthModule, AuditModule, ChatModule],
   controllers: [
     EmergencyOsController,
     ERPulseHandoverController,

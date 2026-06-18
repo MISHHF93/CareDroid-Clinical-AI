@@ -114,3 +114,28 @@
   color: var(--color-text-secondary, #9ca3af);
   font-size: 11px;
 }
+
+.patient-verification__continue {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.patient-verification__continue button {
+  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 45%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--status-info, #38bdf8) 14%, transparent);
+  color: #dbeafe;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.patient-verification__continue button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.patient-verification__step--complete button {
+  opacity: 0.85;
+}

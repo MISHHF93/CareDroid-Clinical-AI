@@ -1,4 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { TenantContext } from '../tenant-context/tenant-context.decorator';
+import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import {
   FederatedLearningService,
   HybridDigitalTwinService,
@@ -30,6 +35,9 @@ import {
 } from './emergency-os.services';
 import type { EmergencyOsSettingsPatch, EmergencyPatient } from './emergency-os.types';
 
+@ApiTags('emergency')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 @Controller('emergency')
 export class EmergencyOsController {
   constructor(
@@ -350,13 +358,16 @@ export class EmergencyOsController {
   }
 
   @Get('settings')
-  getSettings() {
-    return this.settingsService.getSettings();
+  getSettings(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.settingsService.getSettings(tenantContext?.organizationId);
   }
 
   @Patch('settings')
-  updateSettings(@Body() dto: EmergencyOsSettingsPatch) {
-    return this.settingsService.updateSettings(dto);
+  updateSettings(
+    @Body() dto: EmergencyOsSettingsPatch,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.settingsService.updateSettings(dto, tenantContext?.organizationId);
   }
 
   @Post('simulation/update-live')

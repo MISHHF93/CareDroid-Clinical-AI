@@ -1,4 +1,4 @@
-import { memo, useCallback, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import { memo, useCallback, useMemo, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
 import { Patient, PatientFlag, PatientState, PriorityLabel } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
@@ -6,6 +6,7 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { advancePatientJourneyState, advancePatientToBoarding, getDefaultNextPatientState } from '../services/queueAssignment';
 import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
+import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -87,6 +88,7 @@ function getSignalBadges({
   referralAwarenessLabel,
   referralAwarenessTone,
   hasCapacityPressure,
+  dataQualityRisks = [],
 }: {
   patient: Patient;
   hasReassessmentDue: boolean;
@@ -100,6 +102,7 @@ function getSignalBadges({
   referralAwarenessLabel?: string | null;
   referralAwarenessTone?: SignalTone | null;
   hasCapacityPressure: boolean;
+  dataQualityRisks?: Array<{ id: string; label: string; severity?: string }>;
 }): StatusSignal[] {
   return [
     patient.flags.includes(PatientFlag.SepsisAlert)
@@ -132,6 +135,11 @@ function getSignalBadges({
     hasCapacityPressure
       ? { id: 'capacity-pressure', label: 'Capacity pressure', tone: 'warning' as const }
       : null,
+    ...dataQualityRisks.slice(0, 2).map((risk) => ({
+      id: `dq-${risk.id}`,
+      label: risk.label,
+      tone: (risk.severity === 'warning' ? 'warning' : 'info') as SignalTone,
+    })),
   ].filter(Boolean) as StatusSignal[];
 }
 
@@ -232,6 +240,15 @@ function PatientCard({
   const staff = useEmergencyStore((store) => store.staff);
   const referrals = useEmergencyStore((store) => store.referrals);
   const capacityBand = useEmergencyStore((store) => store.capacity.band);
+  const allPatients = useEmergencyStore((store) => store.patients);
+  const dataQualitySnapshot = useMemo(
+    () => buildDataQualitySnapshot(allPatients),
+    [allPatients],
+  );
+  const dataQualityRisks = useMemo(
+    () => getPatientDataQualityRisks(patient, dataQualitySnapshot),
+    [dataQualitySnapshot, patient],
+  );
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
   const patientName = `${patient.firstName} ${patient.lastName}`.trim();
   // Merged from src/components/EmergencyPatientCard.jsx: tolerate legacy vital field names.
@@ -280,6 +297,7 @@ function PatientCard({
     referralAwarenessLabel,
     referralAwarenessTone,
     hasCapacityPressure,
+    dataQualityRisks,
   });
   const cardStyle = {
     '--patient-priority-color': priorityColors[patient.priority],

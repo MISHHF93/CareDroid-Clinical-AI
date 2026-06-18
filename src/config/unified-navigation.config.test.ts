@@ -129,6 +129,20 @@ const REQUESTED_ITEMS = [
     route: '/workspace',
     featureGate: null,
   },
+  {
+    id: 'pulse',
+    label: 'Pulse',
+    icon: 'activity',
+    route: '/emergency/pulse',
+    featureGate: null,
+  },
+  {
+    id: 'shift',
+    label: 'Shift',
+    icon: 'clock',
+    route: '/emergency/shift',
+    featureGate: null,
+  },
 ];
 
 const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS;
@@ -185,11 +199,10 @@ describe('unified navigation config', () => {
 
   it('shows the pilot surface to admin and read-only users', () => {
     const adminLabels = getVisibleNavigation('admin').map((item) => item.label);
-    expect(adminLabels).toEqual(
-      PILOT_VISIBLE_ITEMS.map((item) => item.label).filter(
-        (label) => label !== 'Intake' && label !== 'Integrations',
-      ),
+    const expectedAdminLabels = PILOT_VISIBLE_ITEMS.map((item) => item.label).filter(
+      (label) => label !== 'Intake',
     );
+    expect(adminLabels.sort()).toEqual(expectedAdminLabels.sort());
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
     expect(readOnlyLabels).toEqual([
@@ -222,7 +235,7 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients']);
+    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift']);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -230,10 +243,10 @@ describe('unified navigation config', () => {
     expect(clerkNavIds).not.toContain('platform');
   });
 
-  it('hides duplicate integrations nav when settings is visible', () => {
+  it('shows integrations alongside settings for admin users', () => {
     const adminNavIds = getVisibleNavigation('admin').map((item) => item.id);
     expect(adminNavIds).toContain('settings');
-    expect(adminNavIds).not.toContain('integrations');
+    expect(adminNavIds).toContain('integrations');
   });
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {

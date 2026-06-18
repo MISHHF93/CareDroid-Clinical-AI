@@ -1,0 +1,406 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.708Z",
+  "goal": "Expose concise Patient, EMS, Referral, and Admission operational summaries without route hunting",
+  "discovery": {
+    "domainCount": 4,
+    "totalArtifacts": 26,
+    "byDomain": {
+      "patient": {
+        "label": "Patient",
+        "artifactCount": 8,
+        "artifacts": [
+          "intake-handoff",
+          "encounter-chain",
+          "queue-assignment",
+          "shift-snapshot",
+          "whiteboard-filters",
+          "patient-card",
+          "who-next",
+          "reassessment-surfaces"
+        ],
+        "surfaces": [
+          "receptionHandoff.ts",
+          "ReceptionWorkspace",
+          "SmartIntake",
+          "QuickIntake",
+          "intakeEncounter.ts",
+          "intakeEncounterChain.ts",
+          "queueAssignment.ts",
+          "ReceptionWorkQueues",
+          "ShiftHandoffStrip",
+          "OperationalHandoffDomainBar",
+          "emergency/index",
+          "PatientCard",
+          "PatientDetailPanel",
+          "WhoNextPanel",
+          "AppShell",
+          "Header",
+          "CommandPalette",
+          "CapacityCrisisMode"
+        ]
+      },
+      "ems": {
+        "label": "EMS",
+        "artifactCount": 6,
+        "artifacts": [
+          "ems-pipeline",
+          "pre-arrival-panel",
+          "pressure-score",
+          "whiteboard-mission",
+          "charge-strip",
+          "operational-domain-bar"
+        ],
+        "surfaces": [
+          "EMSPipeline",
+          "App",
+          "EmsPreArrivalPanel",
+          "EMSPressureScore",
+          "ChatInterface",
+          "emergency/index",
+          "ChargeNurseOperationalStrip",
+          "OperationalHandoffDomainBar"
+        ]
+      },
+      "referral": {
+        "label": "Referral",
+        "artifactCount": 6,
+        "artifacts": [
+          "referral-panel",
+          "patient-card",
+          "whiteboard-queue",
+          "operational-metric",
+          "referral-hub",
+          "operational-domain-bar"
+        ],
+        "surfaces": [
+          "ReferralPanel",
+          "App",
+          "PatientCard",
+          "emergency/index",
+          "queueAssignment",
+          "emergencyStore",
+          "Header",
+          "referralHub.js",
+          "OperationalHandoffDomainBar"
+        ]
+      },
+      "admission": {
+        "label": "Admission",
+        "artifactCount": 6,
+        "artifacts": [
+          "boarding-route",
+          "boarding-intelligence",
+          "shift-boarders",
+          "charge-boarding",
+          "pending-admission-flag",
+          "capacity-crisis"
+        ],
+        "surfaces": [
+          "App",
+          "emergency/boarding",
+          "boardingIntelligenceEngine.js",
+          "shiftHandoffSnapshotModel",
+          "OperationalHandoffDomainBar",
+          "ChargeNurseOperationalStrip",
+          "chargeNurseWorkflowModel",
+          "PatientCard",
+          "emergencyStore",
+          "CapacityCrisisMode"
+        ]
+      }
+    },
+    "recommendation": "Mount OperationalHandoffDomainBar on the whiteboard so clinicians read Patient, EMS, Referral, and Admission summaries in one row."
+  },
+  "artifacts": [
+    {
+      "id": "intake-handoff",
+      "label": "Post-intake handoff",
+      "surfaces": [
+        "receptionHandoff.ts",
+        "ReceptionWorkspace",
+        "SmartIntake",
+        "QuickIntake"
+      ],
+      "mechanism": "completeIntakeHandoff → triage queue + encounter",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "encounter-chain",
+      "label": "Encounter chain",
+      "surfaces": [
+        "intakeEncounter.ts",
+        "intakeEncounterChain.ts"
+      ],
+      "mechanism": "ensureEncounterAfterIntake",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "queue-assignment",
+      "label": "Queue assignment",
+      "surfaces": [
+        "queueAssignment.ts",
+        "ReceptionWorkQueues"
+      ],
+      "mechanism": "enterTriageQueue / enterWaitingQueue",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "shift-snapshot",
+      "label": "Shift snapshot patient metrics",
+      "surfaces": [
+        "ShiftHandoffStrip",
+        "OperationalHandoffDomainBar"
+      ],
+      "mechanism": "waiting · high risk · reassess due",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "whiteboard-filters",
+      "label": "Whiteboard patient filters",
+      "surfaces": [
+        "emergency/index"
+      ],
+      "mechanism": "Waiting · High Risk · Reassess filters",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "patient-card",
+      "label": "Patient card workflow",
+      "surfaces": [
+        "PatientCard",
+        "PatientDetailPanel"
+      ],
+      "mechanism": "resolvePatientCardWorkflowProfile",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "who-next",
+      "label": "Who next panel",
+      "surfaces": [
+        "WhoNextPanel"
+      ],
+      "mechanism": "priority scoring + select patient",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "reassessment-surfaces",
+      "label": "Reassessment attention",
+      "surfaces": [
+        "AppShell",
+        "Header",
+        "PatientCard",
+        "CommandPalette",
+        "CapacityCrisisMode"
+      ],
+      "mechanism": "reassessment drawer + flags",
+      "domainId": "patient",
+      "domainLabel": "Patient"
+    },
+    {
+      "id": "ems-pipeline",
+      "label": "EMS pipeline route",
+      "surfaces": [
+        "EMSPipeline",
+        "App"
+      ],
+      "mechanism": "emergencyEms route",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "pre-arrival-panel",
+      "label": "Reception pre-arrival panel",
+      "surfaces": [
+        "EmsPreArrivalPanel"
+      ],
+      "mechanism": "emsArrivalDisplay ETA + severity",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "pressure-score",
+      "label": "EMS pressure score",
+      "surfaces": [
+        "EMSPressureScore",
+        "ChatInterface"
+      ],
+      "mechanism": "calculateEMSPressureScore",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "whiteboard-mission",
+      "label": "Whiteboard mission EMS card",
+      "surfaces": [
+        "emergency/index"
+      ],
+      "mechanism": "prepareEMSBay + convertEMSArrivalToPatient",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "charge-strip",
+      "label": "Charge nurse EMS metric",
+      "surfaces": [
+        "ChargeNurseOperationalStrip"
+      ],
+      "mechanism": "filter-ems",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "operational-domain-bar",
+      "label": "Operational handoff EMS domain",
+      "surfaces": [
+        "OperationalHandoffDomainBar"
+      ],
+      "mechanism": "inbound · handoff · high risk",
+      "domainId": "ems",
+      "domainLabel": "EMS"
+    },
+    {
+      "id": "referral-panel",
+      "label": "Referral panel queues",
+      "surfaces": [
+        "ReferralPanel",
+        "App"
+      ],
+      "mechanism": "emergencyReferrals route",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "patient-card",
+      "label": "Patient card referral signals",
+      "surfaces": [
+        "PatientCard"
+      ],
+      "mechanism": "store.referrals by patientId",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "whiteboard-queue",
+      "label": "Referral queue filter",
+      "surfaces": [
+        "emergency/index",
+        "queueAssignment"
+      ],
+      "mechanism": "referral queue filter",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "operational-metric",
+      "label": "Referrals pending metric",
+      "surfaces": [
+        "emergencyStore",
+        "Header"
+      ],
+      "mechanism": "referralsPending operational summary",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "referral-hub",
+      "label": "ReferralHub delay analytics",
+      "surfaces": [
+        "referralHub.js"
+      ],
+      "mechanism": "stage elapsed thresholds",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "operational-domain-bar",
+      "label": "Operational handoff referral domain",
+      "surfaces": [
+        "OperationalHandoffDomainBar"
+      ],
+      "mechanism": "pending · delayed · accepted",
+      "domainId": "referral",
+      "domainLabel": "Referral"
+    },
+    {
+      "id": "boarding-route",
+      "label": "Boarding route",
+      "surfaces": [
+        "App",
+        "emergency/boarding"
+      ],
+      "mechanism": "emergencyBoarding canonical route",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    },
+    {
+      "id": "boarding-intelligence",
+      "label": "Boarding intelligence",
+      "surfaces": [
+        "boardingIntelligenceEngine.js"
+      ],
+      "mechanism": "getBoardingDashboard pending beds + longest boarders",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    },
+    {
+      "id": "shift-boarders",
+      "label": "Shift snapshot boarders",
+      "surfaces": [
+        "shiftHandoffSnapshotModel",
+        "OperationalHandoffDomainBar"
+      ],
+      "mechanism": "filter-boarding",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    },
+    {
+      "id": "charge-boarding",
+      "label": "Charge nurse boarding metric",
+      "surfaces": [
+        "ChargeNurseOperationalStrip",
+        "chargeNurseWorkflowModel"
+      ],
+      "mechanism": "filter-boarding + central boardingStatus",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    },
+    {
+      "id": "pending-admission-flag",
+      "label": "Pending admission flag",
+      "surfaces": [
+        "PatientCard",
+        "emergencyStore"
+      ],
+      "mechanism": "PatientFlag.PendingAdmission + PatientState.Admission",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    },
+    {
+      "id": "capacity-crisis",
+      "label": "Capacity crisis boarding CTA",
+      "surfaces": [
+        "CapacityCrisisMode"
+      ],
+      "mechanism": "boarding pressure escalation",
+      "domainId": "admission",
+      "domainLabel": "Admission"
+    }
+  ],
+  "sampleDomainHeadlines": {
+    "patient": "12 waiting · 3 high risk · 4 reassess",
+    "ems": "5 inbound · 2 handoff",
+    "referral": "3 pending · 1 delayed",
+    "admission": "8 boarders · 9 beds pending"
+  },
+  "hunting": {
+    "passesSingleSurfaceTest": true,
+    "recommendation": "Mount OperationalHandoffDomainBar on the whiteboard so clinicians read Patient, EMS, Referral, and Admission summaries in one row."
+  }
+}

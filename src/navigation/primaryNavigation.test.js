@@ -33,6 +33,8 @@ const SIDEBAR_MODEL = [
   ['Integrations', '/integrations/hub'],
   ['Cosmos', '/cosmos'],
   ['Platform', '/workspace'],
+  ['Pulse', '/emergency/pulse'],
+  ['Shift', '/emergency/shift'],
 ];
 
 describe('primaryNavigation', () => {
@@ -198,13 +200,13 @@ describe('primaryNavigation', () => {
       ['/emergency/analytics', 'analytics'],
       ['/emergency/settings', 'settings'],
       ['/settings', 'settings'],
-      ['/emergency/pulse', undefined],
+      ['/emergency/pulse', 'pulse'],
       ['/emergency/journey', undefined],
       ['/emergency/provincial-health', undefined],
       ['/emergency/integrations', undefined],
       ['/emergency/simulation', undefined],
       ['/emergency/tools', 'tools'],
-      ['/emergency/shift', undefined],
+      ['/emergency/shift', 'shift'],
       ['/profile', undefined],
       ['/workspaces', 'platform'],
       ['/workspace', 'platform'],

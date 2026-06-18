@@ -99,6 +99,7 @@ describe('TenantProvisioningService', () => {
       'default-roles-created',
       'asset-packs-assigned',
       'ai-agents-assigned',
+      'emergency-os-configured',
       'dashboard-configured',
     ]);
     expect(membershipRepository.save).toHaveBeenCalledWith(
@@ -135,6 +136,14 @@ describe('TenantProvisioningService', () => {
             ]),
           }),
           provisioning: expect.objectContaining({ status: 'configured' }),
+          emergencyOs: expect.objectContaining({
+            tenantName: 'North Health',
+            thresholds: expect.any(Object),
+            alertRules: expect.any(Object),
+            staff: expect.any(Object),
+            queues: expect.any(Object),
+            roles: expect.any(Object),
+          }),
           tenantProfile: expect.objectContaining({
             provisioningStatus: 'configured',
             enabledPackIds: expect.arrayContaining(['core-platform']),

@@ -1,0 +1,101 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.646Z",
+  "goal": "New clinician understands waiting, high-risk, EMS, reassess, and boarders within 60 seconds",
+  "signals": [
+    "Waiting",
+    "High risk",
+    "EMS inbound",
+    "Reassess due",
+    "Boarders"
+  ],
+  "roles": {
+    "physician": {
+      "roleId": "physician",
+      "before": {
+        "passes60SecondTest": false,
+        "missing": [
+          "highRisk",
+          "referrals"
+        ],
+        "visibleCount": 4,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 3,
+        "recommendation": "Add high-risk count to the primary shift snapshot — it is buried in filters today."
+      },
+      "after": {
+        "passes60SecondTest": true,
+        "missing": [],
+        "visibleCount": 9,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 1,
+        "recommendation": "Operational handoff domain bar surfaces Patient, EMS, Referral, and Admission summaries at login."
+      }
+    },
+    "charge_nurse": {
+      "roleId": "charge_nurse",
+      "before": {
+        "passes60SecondTest": false,
+        "missing": [
+          "highRisk",
+          "referrals"
+        ],
+        "visibleCount": 4,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 2,
+        "recommendation": "Add high-risk count to the primary shift snapshot — it is buried in filters today."
+      },
+      "after": {
+        "passes60SecondTest": true,
+        "missing": [],
+        "visibleCount": 9,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 1,
+        "recommendation": "Operational handoff domain bar surfaces Patient, EMS, Referral, and Admission summaries at login."
+      }
+    },
+    "triage_nurse": {
+      "roleId": "triage_nurse",
+      "before": {
+        "passes60SecondTest": false,
+        "missing": [
+          "highRisk",
+          "referrals"
+        ],
+        "visibleCount": 4,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 2,
+        "recommendation": "Add high-risk count to the primary shift snapshot — it is buried in filters today."
+      },
+      "after": {
+        "passes60SecondTest": true,
+        "missing": [],
+        "visibleCount": 9,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 1,
+        "recommendation": "Operational handoff domain bar surfaces Patient, EMS, Referral, and Admission summaries at login."
+      }
+    },
+    "ed_manager": {
+      "roleId": "ed_manager",
+      "before": {
+        "passes60SecondTest": false,
+        "missing": [
+          "highRisk",
+          "referrals"
+        ],
+        "visibleCount": 4,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 2,
+        "recommendation": "Add high-risk count to the primary shift snapshot — it is buried in filters today."
+      },
+      "after": {
+        "passes60SecondTest": true,
+        "missing": [],
+        "visibleCount": 9,
+        "requiredCount": 6,
+        "clickDepthToAllSignals": 1,
+        "recommendation": "Operational handoff domain bar surfaces Patient, EMS, Referral, and Admission summaries at login."
+      }
+    }
+  }
+}

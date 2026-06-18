@@ -25,6 +25,7 @@ import { useEmergencyStore, workflowLogFromJourneyEvent } from '../store/emergen
 import { dispatchAlert } from '../engine/alertEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
@@ -38,6 +39,9 @@ import StrokeCodeProtocol from './StrokeCodeProtocol';
 import WhoNextPanel from './WhoNextPanel';
 import ErrorBoundary from './ErrorBoundary';
 import AiTriageAssistPanel from './reception/AiTriageAssistPanel';
+import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
+import DataQualityRiskPanel from './dataQuality/DataQualityRiskPanel';
+import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -145,12 +149,6 @@ function initials(nameOrId: string): string {
 function staffName(staff: Staff[], staffId?: string | null): string {
   if (!staffId) return '';
   return staff.find((member) => member.id === staffId)?.name || staffId;
-}
-
-function workflowActor(log: WorkflowActionLog, staff: Staff[]): string {
-  if (log.actorName) return log.actorName;
-  if (log.actorStaffId) return staffName(staff, log.actorStaffId);
-  return log.source;
 }
 
 function workflowLogKeys(log: WorkflowActionLog, patientId: string): string[] {
@@ -312,10 +310,21 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
   });
 
   if (vitals.length === 0) {
-    return <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }}>No vitals recorded</p>;
+    return (
+      <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+        {EMPTY_STATE_COPY.vitals.none.title} — {EMPTY_STATE_COPY.vitals.none.guidance}
+      </p>
+    );
   }
 
-  if (vitals.length === 1) return null;
+  if (vitals.length === 1) {
+    return (
+      <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }} role="status">
+        <strong style={{ color: '#D1D5DB' }}>{EMPTY_STATE_COPY.vitals.single.title}.</strong>{' '}
+        {EMPTY_STATE_COPY.vitals.single.guidance} {EMPTY_STATE_COPY.vitals.single.nextSteps[0]}
+      </p>
+    );
+  }
 
   const chartData: VitalsChartPoint[] = [...vitals].reverse().map((vital) => ({
     timestamp: vital.recordedAt,
@@ -618,6 +627,39 @@ export default function PatientDetailPanel() {
     );
     return mergePatientWorkflowLogs(selectedPatient.id, localLogs, generatedLogs, backendLogs);
   }, [selectedPatient, staff, timelineContextState.context.workflowLogs, workflowLogs]);
+
+  const dataQualitySnapshot = useMemo(() => buildDataQualitySnapshot(patients), [patients]);
+  const patientQualitySnapshot = useMemo(() => {
+    if (!selectedPatient) return null;
+    const risks = getPatientDataQualityRisks(selectedPatient, dataQualitySnapshot).map((risk) => ({
+      ...risk,
+      patientId: selectedPatient.id,
+      patientLabel:
+        [selectedPatient.firstName, selectedPatient.lastName].filter(Boolean).join(' ').trim() ||
+        selectedPatient.name ||
+        selectedPatient.mrn,
+    }));
+    const byCategory = risks.reduce(
+      (counts, risk) => {
+        counts[risk.category] = (counts[risk.category] || 0) + 1;
+        return counts;
+      },
+      {} as Record<string, number>,
+    );
+    return {
+      duplicatePairs: dataQualitySnapshot.duplicatePairs.filter(
+        (pair) => pair.patientIdA === selectedPatient.id || pair.patientIdB === selectedPatient.id,
+      ),
+      duplicatePatientIds: dataQualitySnapshot.duplicatePatientIds,
+      summary: {
+        byCategory,
+        patientsWithRisks: risks.length ? 1 : 0,
+        totalRisks: risks.length,
+      },
+      topRisks: risks,
+    };
+  }, [dataQualitySnapshot, selectedPatient]);
+
   const patientTimeline = useMemo(
     () =>
       selectedPatient
@@ -1075,28 +1117,35 @@ export default function PatientDetailPanel() {
         )}
       </section>
 
+      {patientQualitySnapshot?.summary.patientsWithRisks ? (
+        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+          <DataQualityRiskPanel
+            snapshot={patientQualitySnapshot}
+            title="Data quality"
+            description="Registration gaps for this patient — demographics, arrival reason, verification, or duplicate match."
+            limit={6}
+            onVerifyPatient={() => {
+              const params = new URLSearchParams({
+                step: 'verify',
+                patient: selectedPatient.id,
+              });
+              window.history.pushState(null, '', `${CANONICAL_ROUTES.emergencyReception}?${params}`);
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            onCaptureComplaint={() => selectPatient(selectedPatient.id)}
+            onReviewDuplicate={() => selectPatient(selectedPatient.id)}
+          />
+        </section>
+      ) : null}
+
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Workflow Actions</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {patientWorkflowLogs.length ? (
-            patientWorkflowLogs.slice(0, 8).map((log) => (
-              <article key={log.id} className="patient-detail-workflow-log">
-                <div>
-                  <strong>{log.title}</strong>
-                  <p>{log.summary}</p>
-                </div>
-                <div>
-                  <span>{workflowActor(log, staff)}</span>
-                  <time dateTime={log.timestamp}>{formatTime(log.timestamp)}</time>
-                </div>
-              </article>
-            ))
-          ) : (
-            <p style={{ margin: 0, color: '#9CA3AF', fontSize: 13 }}>
-              No workflow action logs for this patient yet.
-            </p>
-          )}
-        </div>
+        <OperationalHistoryPanel
+          logs={patientWorkflowLogs}
+          patientId={selectedPatient.id}
+          title="Operational history"
+          description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
+          limit={10}
+        />
       </section>
 
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>

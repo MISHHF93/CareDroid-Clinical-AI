@@ -5,6 +5,7 @@ import { ensureEncounterAfterIntake, type IntakeEncounterSource } from './intake
 import { getArrivalReasonFromPatient } from './intakeEncounterChain';
 import { enterTriageQueue, WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { buildClientTriageAssist, refreshTriageAssistFromBackend } from './triageAssist';
+import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
 import { PatientState } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
 
@@ -73,6 +74,8 @@ export type IntakeHandoffResult = {
   createdEncounter: boolean;
   queue: string;
   arrivalReason: string;
+  syncPending?: boolean;
+  syncErrors?: string[];
 };
 
 /** @deprecated Use IntakeHandoffOptions */
@@ -238,10 +241,17 @@ export function completeIntakeHandoff(
           store.updatePatient(patientId, {
             triageAssist: backendAssist,
             triageAssistGeneratedAt: backendAssist.generatedAt,
+            handoffSyncPending: false,
+            handoffSyncError: undefined,
           });
         }
       })
-      .catch(() => undefined);
+      .catch((error) => {
+        store.updatePatient(patientId, {
+          handoffSyncPending: true,
+          handoffSyncError: formatSyncRecoveryMessage(error),
+        });
+      });
   }
 
   if (isBackendCapabilityEnabled('emergencyReceptionHandoff')) {
@@ -255,8 +265,17 @@ export function completeIntakeHandoff(
       queue,
       triageAssist,
       triageAssistGeneratedAt: triageAssist.generatedAt,
-    }).catch(() => undefined);
+    }).catch((error) => {
+      store.updatePatient(patientId, {
+        handoffSyncPending: true,
+        handoffSyncError: formatSyncRecoveryMessage(error),
+      });
+    });
   }
+
+  const syncPending =
+    isBackendCapabilityEnabled('emergencyTriageAssist') ||
+    isBackendCapabilityEnabled('emergencyReceptionHandoff');
 
   return {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,
@@ -266,6 +285,7 @@ export function completeIntakeHandoff(
     createdEncounter: encounterResult.created,
     queue,
     arrivalReason,
+    syncPending,
   };
 }
 

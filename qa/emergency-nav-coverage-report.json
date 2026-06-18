@@ -1,0 +1,168 @@
+{
+  "generatedAt": "2026-06-18T14:08:25.627Z",
+  "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
+  "exposure": {
+    "stages": [
+      "arrival",
+      "register",
+      "verify",
+      "handoff"
+    ],
+    "surfaces": [
+      "reception",
+      "intake",
+      "ems",
+      "patients",
+      "queues",
+      "whiteboard",
+      "reassessment",
+      "capacity",
+      "boarding",
+      "referrals",
+      "copilot",
+      "tools",
+      "analytics",
+      "settings",
+      "integrations",
+      "cosmos",
+      "platform",
+      "pulse",
+      "shift"
+    ],
+    "targetRoutes": [
+      "/auth-callback",
+      "/shared/tools/:shareId",
+      "/emergency/whiteboard",
+      "/emergency/patients",
+      "/emergency/ems",
+      "/emergency/reception",
+      "/emergency/intake",
+      "/emergency/queues",
+      "/emergency/reassessment",
+      "/emergency/capacity",
+      "/emergency/boarding",
+      "/emergency/referrals",
+      "/emergency/copilot",
+      "/emergency/tools",
+      "/emergency/pulse",
+      "/emergency/shift",
+      "/emergency/analytics",
+      "/emergency/settings"
+    ]
+  },
+  "coverage": {
+    "covered": [
+      {
+        "route": "/emergency/whiteboard",
+        "surfaceId": "whiteboard",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/patients",
+        "surfaceId": "patients",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/ems",
+        "surfaceId": "ems",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/reception",
+        "surfaceId": "reception",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/intake",
+        "surfaceId": "intake",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/queues",
+        "surfaceId": "queues",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/reassessment",
+        "surfaceId": "reassessment",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/capacity",
+        "surfaceId": "capacity",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/boarding",
+        "surfaceId": "boarding",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/referrals",
+        "surfaceId": "referrals",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/copilot",
+        "surfaceId": "copilot",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/tools",
+        "surfaceId": "tools",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/pulse",
+        "surfaceId": "pulse",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/shift",
+        "surfaceId": "shift",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/analytics",
+        "surfaceId": "analytics",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/settings",
+        "surfaceId": "settings",
+        "via": "sidebar"
+      }
+    ],
+    "orphans": [],
+    "navNotInPalette": [],
+    "passesAudit": true,
+    "receptionFirstEnabled": true
+  },
+  "palette": {
+    "commandCount": 21,
+    "navItemIds": [
+      "reception",
+      "whiteboard",
+      "intake",
+      "ems",
+      "patients",
+      "queues",
+      "reassessment",
+      "capacity",
+      "boarding",
+      "referrals",
+      "copilot",
+      "tools",
+      "analytics",
+      "settings",
+      "integrations",
+      "cosmos",
+      "platform",
+      "pulse",
+      "shift"
+    ],
+    "missingFromPalette": []
+  },
+  "receptionImportIssues": [],
+  "passesAudit": true
+}

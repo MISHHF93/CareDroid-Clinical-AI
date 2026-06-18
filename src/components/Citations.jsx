@@ -1,4 +1,5 @@
 import React from 'react';
+import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 
 /**
  * CitationBadge Component
@@ -47,7 +48,11 @@ const CitationBadge = ({ citation, index, onClick }) => {
  */
 const Citations = ({ citations, onViewDetails }) => {
   if (!citations || citations.length === 0) {
-    return null;
+    return (
+      <p style={{ marginTop: 12, fontSize: 12, color: '#9CA3AF' }} role="status">
+        {EMPTY_STATE_COPY.clinical.noCitations.guidance}
+      </p>
+    );
   }
 
   return (

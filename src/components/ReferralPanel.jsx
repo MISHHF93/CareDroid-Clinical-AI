@@ -11,6 +11,8 @@ import {
   updateEmergencyTransferWorkflow,
 } from '../services/emergencyTransportApi';
 import { summarizeReferralAwareness } from './whiteboard/referralAwarenessModel';
+import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
+import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
 import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
@@ -302,6 +304,7 @@ export default function ReferralPanel() {
   const referralsModule = useReferrals();
   const referrals = useEmergencyStore((state) => state.referrals);
   const patients = useEmergencyStore((state) => state.patients);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const createReferral = useEmergencyStore((state) => state.createReferral);
@@ -604,6 +607,14 @@ export default function ReferralPanel() {
           <small>{metrics.acknowledgementDepartment}</small>
         </div>
       </div>
+
+      <OperationalHistoryPanel
+        logs={workflowLogs}
+        title="Referral history"
+        description="Referral creation and status changes from workflow audit data."
+        domains={[OPERATIONAL_AUDIT_DOMAIN.REFERRAL]}
+        limit={8}
+      />
 
       {statusFilter ? (
         <p className="referral-panel__backend-status" role="status">

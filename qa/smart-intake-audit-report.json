@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.239Z",
+  "goal": "Reduce Smart Intake time while preserving identity validation",
+  "metrics": [
+    "clicks",
+    "screen transitions",
+    "verification friction"
+  ],
+  "streamlinedSteps": [
+    "Document & details",
+    "Find match",
+    "Confirm fields",
+    "Finish"
+  ],
+  "baselinePath": {
+    "path": "baseline",
+    "clicks": 22,
+    "transitions": 6,
+    "frictionScore": 58,
+    "breakdown": {
+      "introClicks": 1,
+      "sessionStartClicks": 1,
+      "stepNavigationClicks": 5,
+      "ocrTransitionClicks": 1,
+      "matchingBulkClicks": 6,
+      "conflictingReviewClicks": 6,
+      "finalizeClicks": 2
+    }
+  },
+  "optimizedPath": {
+    "path": "optimized",
+    "clicks": 8,
+    "transitions": 4,
+    "frictionScore": 32,
+    "breakdown": {
+      "introClicks": 0,
+      "sessionStartClicks": 0,
+      "stepNavigationClicks": 3,
+      "ocrTransitionClicks": 0,
+      "matchingBulkClicks": 1,
+      "conflictingReviewClicks": 2,
+      "finalizeClicks": 2
+    }
+  },
+  "audit": {
+    "baseline": {
+      "path": "baseline",
+      "clicks": 22,
+      "transitions": 6,
+      "frictionScore": 58,
+      "breakdown": {
+        "introClicks": 1,
+        "sessionStartClicks": 1,
+        "stepNavigationClicks": 5,
+        "ocrTransitionClicks": 1,
+        "matchingBulkClicks": 6,
+        "conflictingReviewClicks": 6,
+        "finalizeClicks": 2
+      }
+    },
+    "optimized": {
+      "path": "optimized",
+      "clicks": 8,
+      "transitions": 4,
+      "frictionScore": 32,
+      "breakdown": {
+        "introClicks": 0,
+        "sessionStartClicks": 0,
+        "stepNavigationClicks": 3,
+        "ocrTransitionClicks": 0,
+        "matchingBulkClicks": 1,
+        "conflictingReviewClicks": 2,
+        "finalizeClicks": 2
+      }
+    },
+    "clickReduction": 14,
+    "transitionReduction": 2,
+    "frictionReduction": 26,
+    "passesAudit": true
+  },
+  "optimizations": [
+    "Autostart skips intro and opens capture directly",
+    "Continue advances capture → match → verify → finalize",
+    "Document upload jumps to match (skips OCR-only screen)",
+    "Bulk approve only exact extracted/existing matches",
+    "Queue verify opens directly on field review"
+  ],
+  "validationPreserved": [
+    "Conflicting fields still require individual staff review",
+    "Finalize still requires verificationComplete",
+    "Link/create actions unchanged",
+    "Duplicate match selection still required"
+  ]
+}

@@ -15,6 +15,18 @@
   font-size: 12px;
 }
 
+.identity-field-review__bulk {
+  margin-top: 8px;
+  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 40%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--status-info, #38bdf8) 12%, transparent);
+  color: #bae6fd;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
 .identity-field-review__list {
   display: grid;
   gap: 8px;

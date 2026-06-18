@@ -1,13 +1,18 @@
 import React from 'react';
+import OperationalEmptyState, { OperationalEmptyAction } from '../ui/OperationalEmptyState';
+import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import { patientLabel } from './receptionQueueModel';
+import { RECEPTION_COPY } from './receptionCopy';
 import './RecentArrivalsPanel.css';
 
-export default function RecentArrivalsPanel({ patients = [], onSelectPatient }) {
+export default function RecentArrivalsPanel({ patients = [], onSelectPatient, onRegisterWalkIn }) {
+  const copy = RECEPTION_COPY.recentArrivals;
+
   return (
     <section className="recent-arrivals" aria-labelledby="recent-arrivals-title">
       <header className="recent-arrivals__header">
-        <h2 id="recent-arrivals-title">Recent arrivals</h2>
-        <p>Patients who arrived in the last 30 minutes.</p>
+        <h2 id="recent-arrivals-title">{copy.title}</h2>
+        <p>{copy.subtitle}</p>
       </header>
 
       {patients.length ? (
@@ -26,7 +31,20 @@ export default function RecentArrivalsPanel({ patients = [], onSelectPatient }) 
           ))}
         </ul>
       ) : (
-        <p className="recent-arrivals__empty">No arrivals in the last 30 minutes.</p>
+        <OperationalEmptyState
+          size="inline"
+          icon="○"
+          title={copy.empty}
+          guidance={EMPTY_STATE_COPY.reception.recentArrivals.guidance}
+          status="No registrations in the last 30 minutes."
+          nextSteps={EMPTY_STATE_COPY.reception.recentArrivals.nextSteps}
+          actions={
+            onRegisterWalkIn ? (
+              <OperationalEmptyAction onClick={onRegisterWalkIn}>Register walk-in</OperationalEmptyAction>
+            ) : null
+          }
+          className="recent-arrivals__empty"
+        />
       )}
     </section>
   );

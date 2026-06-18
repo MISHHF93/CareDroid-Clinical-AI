@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
+import { RECEPTION_COPY } from './receptionCopy';
 import './ReceptionSearchHint.css';
 
 function focusHeaderSearch() {
@@ -8,6 +9,7 @@ function focusHeaderSearch() {
 
 export default function ReceptionSearchHint({ query = '' }) {
   const trimmedQuery = String(query || '').trim();
+  const copy = RECEPTION_COPY.search;
 
   return (
     <div className="reception-search-hint">
@@ -16,17 +18,17 @@ export default function ReceptionSearchHint({ query = '' }) {
         <p>
           {trimmedQuery ? (
             <>
-              Filtering for <strong>{trimmedQuery}</strong> — use header search for patient actions.
+              {copy.filtering} <strong>{trimmedQuery}</strong> {copy.filteringSuffix}
             </>
           ) : (
             <>
-              Patient search in the header — press <kbd>/</kbd> to focus.
+              {copy.idle} <kbd>/</kbd> {copy.focus.toLowerCase()}.
             </>
           )}
         </p>
       </div>
       <button type="button" className="reception-search-hint__action" onClick={focusHeaderSearch}>
-        {trimmedQuery ? 'Refine' : 'Focus search'}
+        {trimmedQuery ? copy.refine : copy.focus}
       </button>
     </div>
   );

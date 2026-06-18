@@ -1,0 +1,151 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.460Z",
+  "patientsPerDay": 100,
+  "mix": {
+    "expressRegister": 0.62,
+    "returningVerify": 0.12,
+    "emsArrival": 0.08,
+    "smartIntakeFull": 0.07,
+    "quickCreateVitals": 0.05,
+    "provisionalUnknown": 0.04,
+    "duplicateResolution": 0.02
+  },
+  "baseline": {
+    "averages": {
+      "clicksPerRegistration": 4.97,
+      "screensVisited": 3.41,
+      "timeToCreatePatientMs": 11182,
+      "timeToCreateEncounterMs": 28,
+      "timeToAssignQueueMs": 22,
+      "totalRegistrationMs": 17701,
+      "totalRegistrationMinutes": 0.3
+    },
+    "dayTotals": {
+      "clicks": 497,
+      "screens": 341,
+      "registrationMinutes": 29.5,
+      "humanHours": 0.49
+    }
+  },
+  "harmonized": {
+    "averages": {
+      "clicksPerRegistration": 3.92,
+      "screensVisited": 2.28,
+      "timeToCreatePatientMs": 10741,
+      "timeToCreateEncounterMs": 28,
+      "timeToAssignQueueMs": 22,
+      "totalRegistrationMs": 14650,
+      "totalRegistrationMinutes": 0.24
+    },
+    "dayTotals": {
+      "clicks": 392,
+      "screens": 228,
+      "registrationMinutes": 24.4,
+      "humanHours": 0.4
+    },
+    "byWorkflow": {
+      "expressRegister": {
+        "count": 62,
+        "share": 0.62,
+        "averages": {
+          "clicksPerRegistration": 3,
+          "screensVisited": 2,
+          "totalRegistrationMs": 12571
+        }
+      },
+      "returningVerify": {
+        "count": 12,
+        "share": 0.12,
+        "averages": {
+          "clicksPerRegistration": 5,
+          "screensVisited": 2,
+          "totalRegistrationMs": 12159
+        }
+      },
+      "emsArrival": {
+        "count": 8,
+        "share": 0.08,
+        "averages": {
+          "clicksPerRegistration": 6,
+          "screensVisited": 2,
+          "totalRegistrationMs": 16171
+        }
+      },
+      "smartIntakeFull": {
+        "count": 7,
+        "share": 0.07,
+        "averages": {
+          "clicksPerRegistration": 8,
+          "screensVisited": 6,
+          "totalRegistrationMs": 28847
+        }
+      },
+      "quickCreateVitals": {
+        "count": 5,
+        "share": 0.05,
+        "averages": {
+          "clicksPerRegistration": 4,
+          "screensVisited": 2,
+          "totalRegistrationMs": 27871
+        }
+      },
+      "provisionalUnknown": {
+        "count": 4,
+        "share": 0.04,
+        "averages": {
+          "clicksPerRegistration": 3,
+          "screensVisited": 2,
+          "totalRegistrationMs": 5785
+        }
+      },
+      "duplicateResolution": {
+        "count": 2,
+        "share": 0.02,
+        "averages": {
+          "clicksPerRegistration": 5,
+          "screensVisited": 2,
+          "totalRegistrationMs": 22971
+        }
+      }
+    }
+  },
+  "improvement": {
+    "clicksPerRegistration": 1.05,
+    "screensVisited": 1.13,
+    "totalRegistrationMinutes": 0.06,
+    "dayClicksSaved": 105,
+    "dayMinutesSaved": 5.1
+  },
+  "optimizations": [
+    {
+      "id": "express-primary",
+      "summary": "Express register promoted to primary CTA; N shortcut opens express modal.",
+      "clicksSaved": 105,
+      "minutesSaved": 5.1
+    },
+    {
+      "id": "auto-dismiss-handoff",
+      "summary": "Handoff success banner auto-clears — no \"Next arrival\" click per patient.",
+      "clicksSavedPerPatient": 1
+    },
+    {
+      "id": "quick-create-shortcut",
+      "summary": "open-reception-quick-create and ?quickCreate=1 open QuickIntake directly (skip chooser).",
+      "chooserStepsRemoved": 1
+    },
+    {
+      "id": "automated-encounter-queue",
+      "summary": "completeIntakeHandoff creates encounter and assigns triage queue in software time.",
+      "encounterMs": 28,
+      "queueMs": 22
+    }
+  ],
+  "workflowsUsed": [
+    "ExpressRegistration (express-register)",
+    "QuickIntake reception variant (quick-create)",
+    "ReceptionSmartIntakeOverlay + SmartIntake (smart-intake)",
+    "completeReceptionHandoff → ensureEncounterAfterIntake + enterTriageQueue",
+    "convertEmsArrivalForReception (ems)",
+    "completeProvisionalIntake (unknown)"
+  ]
+}

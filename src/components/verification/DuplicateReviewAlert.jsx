@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { duplicateActionLabel } from '../../utils/patientDuplicateDetection';
+import { RECEPTION_COPY } from '../reception/receptionCopy';
 import './DuplicateReviewAlert.css';
 
 export default function DuplicateReviewAlert({
@@ -14,14 +15,15 @@ export default function DuplicateReviewAlert({
   if (!candidates.length) return null;
 
   const topCandidate = candidates[0];
+  const copy = RECEPTION_COPY.duplicate;
 
   return (
     <div className="duplicate-review-alert" role="alert">
       <header className="duplicate-review-alert__header">
         <AlertTriangle size={16} aria-hidden />
         <div>
-          <strong>Possible duplicate — verification required</strong>
-          <p>Same MPI rules as Smart Intake. Open verification before creating a new chart.</p>
+          <strong>{copy.alertTitle}</strong>
+          <p>{copy.alertDescription}</p>
         </div>
       </header>
 
@@ -34,7 +36,7 @@ export default function DuplicateReviewAlert({
             </span>
             {onOpenPatient ? (
               <button type="button" onClick={() => onOpenPatient(candidate.patientId)}>
-                Open
+                {copy.openChart}
               </button>
             ) : null}
           </li>
@@ -48,17 +50,17 @@ export default function DuplicateReviewAlert({
             className="duplicate-review-alert__primary"
             onClick={() => onOpenVerification(topCandidate?.patientId)}
           >
-            Open verification
+            {copy.openVerification}
           </button>
         ) : null}
         {onProvisionalIntake ? (
           <button type="button" onClick={() => onProvisionalIntake()}>
-            Identity pending — send to triage
+            {copy.identityPending}
           </button>
         ) : null}
         {onAcknowledge && !acknowledged ? (
           <button type="button" onClick={onAcknowledge}>
-            Not a duplicate — continue
+            {copy.notDuplicate}
           </button>
         ) : null}
       </footer>

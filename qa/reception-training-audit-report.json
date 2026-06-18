@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-06-18T18:55:52.520Z",
+  "goal": "New receptionist understands primary workflows within five minutes",
+  "passesAudit": true,
+  "copy": {
+    "usesPlainLanguage": true,
+    "jargonHits": [],
+    "primaryActionLabel": "Register walk-in",
+    "queueTabsUnderstandable": true
+  },
+  "workflows": {
+    "workflows": [
+      {
+        "id": "express-walk-in",
+        "label": "Register walk-in",
+        "screens": 2,
+        "clicks": 3,
+        "primaryCta": true,
+        "passesFiveMinuteRule": true,
+        "estimatedSeconds": 10
+      },
+      {
+        "id": "symptoms-register",
+        "label": "Register with symptoms",
+        "screens": 2,
+        "clicks": 4,
+        "primaryCta": false,
+        "passesFiveMinuteRule": true,
+        "estimatedSeconds": 11
+      },
+      {
+        "id": "identity-check",
+        "label": "Check patient identity",
+        "screens": 4,
+        "clicks": 8,
+        "primaryCta": false,
+        "passesFiveMinuteRule": true,
+        "note": "Four labeled steps; used for returning patients and ambulance arrivals.",
+        "estimatedSeconds": 17
+      },
+      {
+        "id": "ambulance-arrival",
+        "label": "Ambulance arrivals",
+        "screens": 2,
+        "clicks": 6,
+        "primaryCta": false,
+        "passesFiveMinuteRule": true,
+        "estimatedSeconds": 14
+      }
+    ],
+    "failing": [],
+    "passesAudit": true,
+    "harmonizedExpressProfile": {
+      "id": "express-register",
+      "label": "Express register (primary CTA or N shortcut)",
+      "screens": [
+        "reception",
+        "express-modal"
+      ],
+      "clicks": 3,
+      "fields": 3,
+      "usesChooser": false,
+      "handoffBannerDismiss": false,
+      "entryClicks": 1
+    }
+  },
+  "recommendation": "Primary walk-in registration is one click; secondary flows use plain labels."
+}

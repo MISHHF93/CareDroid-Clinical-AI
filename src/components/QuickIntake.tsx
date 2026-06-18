@@ -6,6 +6,7 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
+import { ERROR_RECOVERY_COPY, formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import { routeComplaint } from '../engine/complaintRouter';
 import {
   DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
@@ -34,12 +35,12 @@ const QUICK_INTAKE_COPY = {
     closeLabel: 'Close quick intake',
   },
   reception: {
-    title: 'Quick Create',
-    submit: 'Register & send to triage',
+    title: 'Register with symptoms',
+    submit: 'Register & send to nurse',
     submitting: 'Registering...',
-    priorityPrefix: 'CTAS',
+    priorityPrefix: 'Urgency',
     showCentralBanner: false,
-    closeLabel: 'Close quick create',
+    closeLabel: 'Close registration form',
   },
 } as const;
 
@@ -328,10 +329,10 @@ export default function QuickIntake({
       addPatient(persistedPatient);
       onAdded(persistedPatient);
       onClose();
-    } catch {
-      addPatient(patient);
-      onAdded(patient);
-      onClose();
+    } catch (error) {
+      setSubmitError(
+        `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.intakeForm}`,
+      );
     } finally {
       setSubmitting(false);
     }

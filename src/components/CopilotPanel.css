@@ -205,6 +205,53 @@
   white-space: nowrap;
 }
 
+.ed-copilot-panel__recommendations {
+  display: grid;
+  gap: 8px;
+}
+
+.ed-copilot-panel__recommendation {
+  display: grid;
+  gap: 3px;
+  border: 1px solid color-mix(in srgb, var(--copilot-border) 78%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--copilot-bg) 80%, var(--copilot-surface-soft));
+  color: var(--copilot-text);
+  cursor: pointer;
+  padding: 9px;
+  text-align: left;
+}
+
+.ed-copilot-panel__recommendation[data-severity='critical'] {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 42%, var(--copilot-border));
+  box-shadow: inset 3px 0 0 var(--status-critical, #ef4444);
+}
+
+.ed-copilot-panel__recommendation span {
+  color: var(--copilot-ai);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.ed-copilot-panel__recommendation strong {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.ed-copilot-panel__recommendation small {
+  color: var(--copilot-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.ed-copilot-panel__recommendations-empty {
+  color: var(--copilot-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
 .ed-copilot-panel__message {
   display: flex;
   flex-direction: column;

@@ -6,13 +6,21 @@ const source = readFileSync(join(process.cwd(), 'src/components/CopilotPanel.tsx
 
 describe('Copilot operational awareness wiring', () => {
   it('feeds central node pressure, queue, reassessment, and alert context into Copilot', () => {
-    expect(source).toContain("useCareDroidCentralNode({ screenMode: 'PHYSICIAN_SCREEN' })");
+    expect(source).toContain('useOperationalIntelligence({ screenMode: \'PHYSICIAN_SCREEN\' })');
     expect(source).toContain('centralSnapshot.emsPressure');
     expect(source).toContain('centralSnapshot.boardingStatus');
     expect(source).toContain('centralSnapshot.queueHealth');
     expect(source).toContain('centralSnapshot.reassessmentStatus');
-    expect(source).toContain('centralSnapshot.operationalAlerts');
     expect(source).toContain('Copilot operational awareness');
+  });
+
+  it('prioritizes actionable queue, capacity, boarding, and reassessment recommendations', () => {
+    expect(source).toContain('buildCopilotRecommendationSnapshot');
+    expect(source).toContain('resolveCopilotQuickActionFromSnapshot');
+    expect(source).toContain('ed-copilot-panel__recommendations');
+    expect(source).toContain('Priority actions');
+    expect(source).toContain('formatCopilotRecommendationsForPrompt');
+    expect(source).toContain('Queue bottlenecks');
   });
 
   it('keeps multimodal inputs in the active Copilot panel with explicit vision safety boundaries', () => {

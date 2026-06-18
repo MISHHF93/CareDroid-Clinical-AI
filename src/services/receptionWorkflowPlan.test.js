@@ -74,7 +74,9 @@ describe('reception architecture plan execution', () => {
     const queueModel = read('components/reception/receptionQueueModel.js');
 
     expect(permissions).toContain('getReceptionEmbeddedIntakePath');
-    expect(reception).toContain('Start Smart Intake');
+    expect(reception).toContain('RECEPTION_COPY');
+    expect(reception).toContain('registerWalkIn');
+    expect(reception).toContain('checkIdentity');
     expect(reception).toContain('ArrivalDashboard');
     expect(reception).toContain('ReceptionOperationalStrip');
     expect(queueModel).toContain('selectArrivalDashboardMetrics');

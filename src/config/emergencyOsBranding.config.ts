@@ -20,3 +20,15 @@ export const EMERGENCY_OS_BRANDING = Object.freeze({
 } as const);
 
 export type EmergencyOsBranding = typeof EMERGENCY_OS_BRANDING;
+
+/**
+ * Merge organization.settings.emergencyOs.branding over global Emergency OS copy.
+ */
+export function getOrgEmergencyBranding(emergencyOsSettings: Record<string, unknown> = {}) {
+  const orgBranding =
+    (emergencyOsSettings?.branding as Partial<EmergencyOsBranding> | undefined) || {};
+  return Object.freeze({
+    ...EMERGENCY_OS_BRANDING,
+    ...orgBranding,
+  });
+}

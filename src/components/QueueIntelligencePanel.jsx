@@ -17,6 +17,8 @@ import {
   selectQueuePanelRows,
   useEmergencyStore,
 } from '../store/emergencyStore';
+import { buildQueueAuditSnapshot } from '../services/queueAuditDiscovery';
+import { QUEUE_AUDIT_DOMAIN } from '../config/queueAuditModel';
 import './QueueIntelligencePanel.css';
 
 const QUEUE_CONFIG = [
@@ -74,6 +76,21 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
   const queues = useEmergencyStore((state) => state.queues);
   const alerts = useEmergencyStore((state) => state.alerts);
   const patients = useEmergencyStore((state) => state.patients);
+  const referrals = useEmergencyStore((state) => state.referrals);
+  const queueAuditSnapshot = useMemo(
+    () => buildQueueAuditSnapshot({ patients, referrals }),
+    [patients, referrals],
+  );
+  const edAuditByType = useMemo(() => {
+    const map = new Map();
+    queueAuditSnapshot.rows
+      .filter((row) => row.domain === QUEUE_AUDIT_DOMAIN.ED)
+      .forEach((row) => {
+        map.set(row.type, row);
+        map.set(row.label.replace(' Queue', ''), row);
+      });
+    return map;
+  }, [queueAuditSnapshot.rows]);
   const storeQueueRows = useMemo(
     () => selectQueuePanelRows({ queues, alerts, patients }),
     [alerts, patients, queues]
@@ -96,17 +113,25 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
     () =>
       QUEUE_CONFIG.map((config) => {
         const queue = storeQueueRows.find((candidate) => candidate.type === config.type);
+        const auditRow = edAuditByType.get(config.type);
         return {
           ...config,
           name: queue?.name || config.name,
-          count: queue?.count || 0,
-          averageWaitMinutes: queue?.averageWaitMinutes || 0,
-          oldestWaitMinutes: queue?.oldestWaitMinutes || 0,
+          count: queue?.count || auditRow?.length || 0,
+          averageWaitMinutes: queue?.averageWaitMinutes || auditRow?.averageWaitMinutes || 0,
+          oldestWaitMinutes: queue?.oldestWaitMinutes || auditRow?.longestWaitMinutes || 0,
+          overdueCount: auditRow?.overdueCount || 0,
           updatedAt: queue?.updatedAt,
-          health: queue?.health || 'green',
+          health:
+            queue?.health ||
+            (auditRow?.isBottleneck
+              ? auditRow.bottleneckSeverity === 'critical'
+                ? 'red'
+                : 'yellow'
+              : 'green'),
         };
       }),
-    [storeQueueRows]
+    [edAuditByType, storeQueueRows]
   );
 
   useEffect(() => {
@@ -172,6 +197,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
               <span className={`queue-intel__health queue-intel__health--${queue.health}`} />
               <small>Avg {formatWait(queue.averageWaitMinutes)}</small>
               <em>Oldest {formatWait(queue.oldestWaitMinutes)}</em>
+              {queue.overdueCount ? <em>{queue.overdueCount} overdue</em> : null}
             </button>
           );
         })}

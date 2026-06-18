@@ -22,7 +22,7 @@ const WORKERS = [
     async run(page) {
       await expectVisible(page, '#reception-workspace-title', 'Reception title');
       await expectVisible(page, 'text=Queues & arrivals', 'Arrival section');
-      await expectVisible(page, 'text=Start Smart Intake', 'Primary Smart Intake action');
+      await expectVisible(page, 'text=Register walk-in', 'Primary register action');
       const navIds = await page.locator('[data-nav-id]').evaluateAll((nodes) =>
         nodes.map((node) => node.getAttribute('data-nav-id')),
       );
@@ -36,7 +36,7 @@ const WORKERS = [
     name: 'Jordan Park',
     path: '/emergency/reception',
     async run(page) {
-      await page.locator('.reception-workspace__action--wide').click();
+      await page.getByRole('button', { name: 'Check ID & documents' }).click();
       await page.waitForTimeout(800);
       const overlay = await page.locator('.reception-smart-intake-overlay, .smart-intake').count();
       if (overlay === 0) throw new Error('Smart Intake overlay did not open');
@@ -47,9 +47,9 @@ const WORKERS = [
     name: 'Sofia Mendez',
     path: '/emergency/reception',
     async run(page) {
-      await page.getByRole('button', { name: 'Express register' }).click();
+      await page.locator('.reception-workspace__action--wide').click();
       await page.waitForTimeout(600);
-      const modal = await page.getByText('Register arrival').count();
+      const modal = await page.getByText('Register walk-in').count();
       if (modal === 0) throw new Error('Express registration did not open');
     },
   },
@@ -58,9 +58,9 @@ const WORKERS = [
     name: 'Chris Okafor',
     path: '/emergency/reception',
     async run(page) {
-      await page.getByRole('button', { name: 'More options' }).click();
+      await page.getByRole('button', { name: 'Other arrivals' }).click();
       await page.waitForTimeout(500);
-      await page.getByRole('button', { name: 'Full quick create' }).click();
+      await page.getByRole('button', { name: 'Register with symptoms' }).click();
       await page.waitForTimeout(600);
       const modal = await page.getByText(/quick create|register & send/i).count();
       if (modal === 0) throw new Error('Quick create did not open');
@@ -71,9 +71,9 @@ const WORKERS = [
     name: 'Priya Nair',
     path: '/emergency/reception',
     async run(page) {
-      await page.getByRole('button', { name: 'More options' }).click();
+      await page.getByRole('button', { name: 'Other arrivals' }).click();
       await page.waitForTimeout(500);
-      const chooser = await page.getByText('Choose an intake path').count();
+      const chooser = await page.getByText('How is this patient arriving?').count();
       if (chooser === 0) throw new Error('Prepare patient chooser did not open');
     },
   },
@@ -83,7 +83,7 @@ const WORKERS = [
     path: '/emergency/reception?queue=ems',
     async run(page) {
       await expectVisible(page, '#reception-queue-tab-ems', 'EMS registration tab');
-      await expectVisible(page, 'text=Inbound ambulances', 'EMS pre-arrival panel');
+      await expectVisible(page, 'text=Incoming ambulances', 'EMS pre-arrival panel');
     },
   },
   {
@@ -91,7 +91,7 @@ const WORKERS = [
     name: 'Elena Volkov',
     path: '/emergency/reception?queue=verification',
     async run(page) {
-      await expectVisible(page, 'role=tab[name=/Verification/i]', 'Verification tab');
+      await expectVisible(page, 'role=tab[name=/Need ID check/i]', 'Verification tab');
       const selected = await page.locator('#reception-queue-tab-verification[aria-selected="true"]').count();
       if (selected === 0) throw new Error('Verification tab not active from deep link');
     },
@@ -101,7 +101,7 @@ const WORKERS = [
     name: 'Marcus Bell',
     path: '/emergency/reception?queue=pretriage',
     async run(page) {
-      await expectVisible(page, 'role=tab[name=/Awaiting triage/i]', 'Awaiting triage tab');
+      await expectVisible(page, 'role=tab[name=/Waiting for nurse/i]', 'Awaiting triage tab');
       const selected = await page.locator('#reception-queue-tab-pretriage[aria-selected="true"]').count();
       if (selected === 0) throw new Error('Pre-triage tab not active from deep link');
     },
@@ -133,7 +133,7 @@ const WORKERS = [
     name: 'Riley Ortiz',
     path: '/emergency/reception?queue=pretriage',
     async run(page) {
-      await expectVisible(page, 'role=tab[name=/Awaiting triage/i]', 'Awaiting triage tab');
+      await expectVisible(page, 'role=tab[name=/Waiting for nurse/i]', 'Awaiting triage tab');
       const assistPanel = await page.locator('[data-testid="ai-triage-assist-panel"]').count();
       if (assistPanel > 0) {
         throw new Error('Registration clerk must not see AI triage assist panel');
@@ -297,9 +297,9 @@ async function main() {
     results,
     simplicity: {
       navItems: ['reception', 'patients'],
-      primaryAction: 'Start Smart Intake',
+      primaryAction: 'Register walk-in',
       blockedRoutes: ['/emergency/whiteboard'],
-      intakeSurfaces: ['embedded Smart Intake', 'Express register', 'Full quick create', 'More options'],
+      intakeSurfaces: ['Check ID & documents', 'Register walk-in', 'Register with symptoms', 'Other arrivals'],
     },
   };
 

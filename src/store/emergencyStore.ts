@@ -1778,6 +1778,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   boarding_started: 'Boarding started',
   staffing_request_created: 'Staffing request created',
   referral_created: 'Referral created',
+  referral_status_changed: 'Referral status changed',
   copilot_used: 'Copilot used',
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
@@ -3108,6 +3109,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             : patient,
         );
 
+        const assignedPatient = patients.find((patient) => patient.id === patientId);
+        const fromRoomId = state.patients.find((patient) => patient.id === patientId)?.roomId || null;
+
         return {
           rooms,
           patients,
@@ -3115,11 +3119,24 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           auditLog: appendAuditLog(state.auditLog, {
             action: 'assignRoom',
             patientId,
-            staffId:
-              state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
-              'system',
+            staffId: assignedPatient?.assignedStaffId || 'system',
             details: { roomId },
           }),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'journey_state_changed',
+              title: 'Room assigned',
+              summary: `Assigned room ${roomId}.`,
+              patientId,
+              actorStaffId: assignedPatient?.assignedStaffId,
+              source: 'queue-assignment',
+              metadata: {
+                fromRoomId,
+                toRoomId: roomId,
+                queue: 'room-assignment',
+              },
+            },
+          ]),
         };
       }),
 
@@ -3460,6 +3477,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     completeReassessmentReminder: (patientId, reminderId, options = {}) =>
       set((state) => {
         const timestamp = options.completedAt || options.timestamp || new Date().toISOString();
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        const reminder = patient?.reassessmentReminders?.find((item) => item.id === reminderId);
         return {
           patients: state.patients.map((patient) =>
             patient.id === patientId
@@ -3500,10 +3519,24 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             patientId,
             staffId:
               options.completedBy ||
-              state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
+              patient?.assignedStaffId ||
               'system',
             details: { reminderId, completedAt: timestamp },
           }),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'reassessment_completed',
+              title: 'Reassessment completed',
+              summary: reminder?.note || 'Reassessment reminder completed.',
+              patientId,
+              actorStaffId: options.completedBy || patient?.assignedStaffId,
+              source: 'reassessment-workflow',
+              metadata: {
+                reminderId,
+                completedAt: timestamp,
+              },
+            },
+          ]),
         };
       }),
 
@@ -3653,7 +3686,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           ui: {
             ...state.ui,
             loading: false,
-            error: null,
+            error: message,
           },
         }));
 
@@ -4682,6 +4715,24 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                 }
               : null,
           ),
+          workflowLogs: referral
+            ? appendWorkflowLogs(state.workflowLogs, [
+                {
+                  type: 'referral_status_changed',
+                  title: 'Referral status changed',
+                  summary: `${referral.targetDepartment} referral moved to ${status}.`,
+                  patientId: referral.patientId,
+                  actorStaffId: referral.requestingStaffId,
+                  source: 'referral-workflow',
+                  metadata: {
+                    referralId,
+                    status,
+                    previousStatus: referral.status,
+                    hasResponseNote: Boolean(responseNote),
+                  },
+                },
+              ])
+            : state.workflowLogs,
         };
       }),
 

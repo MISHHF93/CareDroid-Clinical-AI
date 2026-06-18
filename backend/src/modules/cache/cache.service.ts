@@ -15,6 +15,11 @@ export class CacheService implements OnModuleInit {
 
   private async connect() {
     try {
+      if (process.env.REDIS_ENABLED === 'false' || process.env.REDIS_ENABLED === '0') {
+        this.logger.warn('Redis disabled (REDIS_ENABLED=false). Cache service disabled.');
+        return;
+      }
+
       // Check if Redis is explicitly disabled or not configured
       if (process.env.REDIS_HOST === undefined || process.env.REDIS_HOST === '') {
         this.logger.warn('Redis not configured (REDIS_HOST not set). Cache service disabled.');
@@ -45,7 +50,8 @@ export class CacheService implements OnModuleInit {
       });
 
       this.client.on('error', (err) => {
-        this.logger.error('Redis client error:', err);
+        if (!this.client) return;
+        this.logger.warn(`Redis unavailable: ${(err as Error).message || 'connection error'}`);
       });
 
       this.client.on('connect', () => {

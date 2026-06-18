@@ -16,7 +16,8 @@ import {
 } from '../../config/emergencySettings.config';
 import {
   fetchEmergencyOsSettings,
-  saveEmergencyOsSettings,
+  fetchOrganizationEmergencyOsSettings,
+  saveOrganizationEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
 import {
   fetchEmergencyAiGovernanceCompliance,
@@ -27,6 +28,10 @@ import {
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
+import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
+import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
+import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
+import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
@@ -300,17 +305,28 @@ export default function EmergencySettings() {
     setLoading(true);
     setError('');
 
-    fetchEmergencyOsSettings()
-      .then((result) => {
+    fetchOrganizationEmergencyOsSettings()
+      .then((orgResult) => {
+        if (cancelled || !orgResult.ok || !orgResult.data) return null;
+        return orgResult.data;
+      })
+      .then((orgEmergencyOs) =>
+        fetchEmergencyOsSettings().then((result) => ({ result, orgEmergencyOs })),
+      )
+      .then(({ result, orgEmergencyOs }) => {
         if (cancelled) return;
-        if (!result.ok) {
+        if (!result.ok && !orgEmergencyOs) {
           setError(
             'Live settings service unavailable. Local settings remain editable.',
           );
           setDraft(mergeSettings(storeSettings));
           return;
         }
-        const nextSettings = mergeSettings(storeSettings, payloadFromEnvelope(result));
+        const nextSettings = mergeSettings(
+          storeSettings,
+          orgEmergencyOs || {},
+          result.ok ? payloadFromEnvelope(result) : {},
+        );
         setDraft(nextSettings);
         saveEmergencySettings?.(normalizePatchForStore(nextSettings));
       })
@@ -611,7 +627,7 @@ export default function EmergencySettings() {
     setStatus('');
     setError('');
 
-    const result = await saveEmergencyOsSettings(patch);
+    const result = await saveOrganizationEmergencyOsSettings(patch);
     if (result.ok) {
       const nextSettings = mergeSettings(draft, payloadFromEnvelope(result));
       setDraft(nextSettings);
@@ -918,7 +934,17 @@ export default function EmergencySettings() {
           <p className="emergency-settings__audit-state">No workflow action logs recorded yet.</p>
         ) : null}
         {auditLogs.length ? (
-          <div className="emergency-settings__audit-list" aria-label="Workflow action audit logs">
+          <OperationalHistoryPanel
+            logs={auditLogs}
+            title="Operational history by domain"
+            description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
+            limit={12}
+          />
+        ) : null}
+        {auditLogs.length ? (
+          <details className="emergency-settings__audit-details">
+            <summary>Raw workflow log entries</summary>
+            <div className="emergency-settings__audit-list" aria-label="Workflow action audit logs">
             {auditLogs.slice(0, 12).map((log) => (
               <article key={log.id}>
                 <div>
@@ -935,6 +961,7 @@ export default function EmergencySettings() {
               </article>
             ))}
           </div>
+          </details>
         ) : null}
       </Section>
 
@@ -1170,7 +1197,10 @@ export default function EmergencySettings() {
         <div className="emergency-settings__cards" aria-label="Provincial Health runtime status">
           <article>
             <div>
-              <strong>Connector status</strong>
+              <strong>
+                Connector status{' '}
+                <IntegrationStatusBadge status={INTEGRATION_STATUS.PLACEHOLDER} />
+              </strong>
               <p>
                 {provincialHealthStatus === 'loading'
                   ? 'Loading Provincial Health status...'
@@ -1333,6 +1363,11 @@ export default function EmergencySettings() {
           </button>
         }
       >
+        <IntegrationStatusPanel
+          liveSources={integrationSources}
+          showDetailTable={false}
+          className="emergency-settings__integration-status"
+        />
         <div className="emergency-settings__grid">
           <SettingsField
             type="checkbox"

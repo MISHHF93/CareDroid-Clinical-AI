@@ -1,7 +1,14 @@
 import './RiskFactorsList.css';
+import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 
 const RiskFactorsList = ({ factors = [] }) => {
-  if (!factors || factors.length === 0) return null;
+  if (!factors || factors.length === 0) {
+    return (
+      <p className="risk-factors-list__empty" role="status">
+        {EMPTY_STATE_COPY.clinical.noRiskFactors.guidance}
+      </p>
+    );
+  }
 
   const parseRiskFactor = (factor) => {
     // Parse factors like "SOFA ≥ 13", "K+ = 6.8 mEq/L"

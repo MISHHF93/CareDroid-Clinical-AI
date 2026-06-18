@@ -1673,7 +1673,9 @@ export function TenantAdministrationCenter() {
         enabledWorkspaces: workspaceDefaults.map((workspace) => workspace.id || workspace.type).filter(Boolean),
         enabledAssetPacks: workspaceDefaults.flatMap((workspace) => workspace.enabledAssetPacks || []),
         defaultWorkspace: workspaceDefaults[0]?.id || workspaceDefaults[0]?.type || 'emergency',
-        roles: users.map((user) => user.roleProfileId || user.membershipRole).filter(Boolean),
+        roles: (result.users || admin?.users || [])
+          .map((user) => user.roleProfileId || user.membershipRole)
+          .filter(Boolean),
         departments: payload.departments,
         integrations: payload.integrations,
         branding: payload.branding,

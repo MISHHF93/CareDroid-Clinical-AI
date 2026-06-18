@@ -10,12 +10,19 @@ import { startCapacityEngine } from '../engine/capacityEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import {
+  getPlatformHomeRoute,
+  isReceptionFirstUxEnabled,
+  RECEPTION_FIRST_UX,
+} from '../config/receptionFirstUx.config';
+import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
+  getReceptionPrimaryCreatePath,
   getReceptionQuickCreatePath,
   prefersReceptionForPatientCreate,
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
+import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { PatientFlag, type Patient } from '../types/emergency';
@@ -69,6 +76,8 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.workspaces]: `${EMERGENCY_OS_BRANDING.productName} - Workspaces`,
   '/settings': `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
+  [CANONICAL_ROUTES.emergencyPulse]: `${EMERGENCY_OS_BRANDING.productName} - Pulse`,
+  [CANONICAL_ROUTES.emergencyShift]: `${EMERGENCY_OS_BRANDING.productName} - Shift`,
 };
 
 const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
@@ -162,8 +171,10 @@ export function AppShell({ children }: AppShellProps) {
     [emergencyRole.role],
   );
   const currentPage = useMemo(() => {
+    const surface = getEmergencySurface(location.pathname);
     const activeItem = visibleNavigationItems.find(
       (item) =>
+        item.id === surface?.sidebarNavId ||
         item.activePaths?.some((path) => matchesNavigationPath(location.pathname, path)) ||
         matchesNavigationPath(location.pathname, item.path),
     );
@@ -275,9 +286,11 @@ export function AppShell({ children }: AppShellProps) {
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
         e.preventDefault();
         navigate(
-          emergencyRole.defaultRoute ||
-            emergencyRole.allowedRoutes[0] ||
-            CANONICAL_ROUTES.emergencyWhiteboard,
+          isReceptionFirstUxEnabled()
+            ? getPlatformHomeRoute()
+            : emergencyRole.defaultRoute ||
+                emergencyRole.allowedRoutes[0] ||
+                CANONICAL_ROUTES.emergencyReception,
         );
         return;
       }
@@ -325,7 +338,7 @@ export function AppShell({ children }: AppShellProps) {
       ) {
         e.preventDefault();
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigate(getReceptionQuickCreatePath());
+          navigate(getReceptionPrimaryCreatePath(emergencyRole.role));
           return;
         }
         navigate(CANONICAL_ROUTES.emergencyWhiteboard);
@@ -404,7 +417,7 @@ export function AppShell({ children }: AppShellProps) {
       case 'OPEN_INTAKE':
         if (!emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) break;
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigate(getReceptionQuickCreatePath());
+          navigate(getReceptionPrimaryCreatePath(emergencyRole.role));
           break;
         }
         navigate(CANONICAL_ROUTES.emergencyWhiteboard);
@@ -531,7 +544,9 @@ export function AppShell({ children }: AppShellProps) {
         </Suspense>
       </ErrorBoundary>
       ) : null}
-      {canUseCopilot && (!isTabletViewport || copilotOpen) ? (
+      {canUseCopilot &&
+      !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
+      (!isTabletViewport || copilotOpen) ? (
         <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
           <Suspense fallback={null}>
             <CopilotPanel />

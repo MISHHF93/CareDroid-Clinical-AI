@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-06-18T18:55:53.420Z",
+  "goal": "Audit Copilot recommendations for actionability; prioritize queue, capacity, boarding, reassessment",
+  "priorityOrder": [
+    "queue",
+    "capacity",
+    "boarding",
+    "reassessment"
+  ],
+  "quickActions": [
+    "Queue bottlenecks",
+    "Capacity status",
+    "Boarding pressure",
+    "Reassessment queue"
+  ],
+  "stressScenario": {
+    "recommendations": [
+      {
+        "id": "queue-bottleneck-waiting-room",
+        "domain": "queue",
+        "action": "Clear Waiting Room bottleneck",
+        "detail": "12 waiting · oldest 47m · 4 overdue · 4 overdue in waiting room",
+        "route": "/emergency/queues",
+        "whiteboardFilter": "Waiting",
+        "severity": "critical",
+        "reasonCodes": [
+          "queue_bottleneck"
+        ],
+        "timestamp": "2026-06-18T18:55:53.419Z",
+        "actionable": true,
+        "generic": false
+      },
+      {
+        "id": "capacity-pressure",
+        "domain": "capacity",
+        "action": "Open capacity dashboard",
+        "detail": "Score 84 · Red band · act before grid saturates",
+        "route": "/emergency/capacity",
+        "severity": "critical",
+        "reasonCodes": [
+          "capacity_red_band"
+        ],
+        "timestamp": "2026-06-18T18:55:53.419Z",
+        "actionable": true,
+        "generic": false
+      },
+      {
+        "id": "boarding-pressure",
+        "domain": "boarding",
+        "action": "Review boarding list",
+        "detail": "3 boarders · high risk",
+        "route": "/emergency/boarding",
+        "whiteboardFilter": "Boarding",
+        "severity": "critical",
+        "reasonCodes": [
+          "boarding_pressure"
+        ],
+        "timestamp": "2026-06-18T18:55:53.419Z",
+        "actionable": true,
+        "generic": false
+      },
+      {
+        "id": "reassessment-queue",
+        "domain": "reassessment",
+        "action": "Open reassessment queue",
+        "detail": "5 due · 2 overdue",
+        "route": "/emergency/reassessment",
+        "whiteboardFilter": "Reassess",
+        "severity": "critical",
+        "reasonCodes": [
+          "reassessment_overdue"
+        ],
+        "timestamp": "2026-06-18T18:55:53.419Z",
+        "actionable": true,
+        "generic": false
+      }
+    ],
+    "audit": {
+      "total": 4,
+      "actionableCount": 4,
+      "genericCount": 0,
+      "byDomain": {
+        "queue": 1,
+        "capacity": 1,
+        "boarding": 1,
+        "reassessment": 1
+      },
+      "passesAudit": true,
+      "issues": []
+    },
+    "quickActionResponse": "Top operational actions (confirm before acting):\n1. [queue] Clear Waiting Room bottleneck — 12 waiting · oldest 47m · 4 overdue → /emergency/queues\n2. [capacity] Open capacity dashboard — Score 84 · Red band · act before grid saturates → /emergency/capacity\n3. [boarding] Review boarding list — 3 boarders · high risk → /emergency/boarding"
+  },
+  "calmScenario": {
+    "recommendations": [],
+    "audit": {
+      "total": 0,
+      "actionableCount": 0,
+      "genericCount": 0,
+      "byDomain": {
+        "queue": 0,
+        "capacity": 0,
+        "boarding": 0,
+        "reassessment": 0
+      },
+      "passesAudit": false,
+      "issues": []
+    }
+  },
+  "mitigations": [
+    "Serve rule-based quick-action answers before LLM when domain signals exist.",
+    "Expose clickable recommendation cards with routes and whiteboard filters.",
+    "Block generic phrasing in prompt guidance and quick-action fallbacks."
+  ]
+}

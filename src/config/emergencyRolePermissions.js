@@ -1,4 +1,9 @@
 import { CANONICAL_ROUTES } from './routes.config';
+import {
+  getPlatformHomeRoute,
+  isReceptionFirstUxEnabled,
+  RECEPTION_FIRST_UX,
+} from './receptionFirstUx.config';
 
 export const EMERGENCY_ROLE_IDS = Object.freeze({
   admin: 'admin',
@@ -260,14 +265,14 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
     ],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.registrationClerk]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.registrationClerk,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Registration role for identity review and patient creation without clinical state management.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.verifyIntake,
@@ -362,6 +367,39 @@ export function normalizeEmergencyRole(role) {
   );
 }
 
+/**
+ * Map platform membership roleProfileId to an Emergency OS role via org settings.
+ * @param {object} [user]
+ * @param {object} [emergencyOsSettings]
+ */
+export function resolveEmergencyRoleId(user, emergencyOsSettings = {}) {
+  const rolesConfig = emergencyOsSettings?.roles || {};
+  const mapping = rolesConfig.emergencyRoleMapping || {};
+  const explicitProfileId = user?.profile?.roleProfileId || user?.roleProfileId;
+
+  if (explicitProfileId && mapping[explicitProfileId]) {
+    return normalizeEmergencyRole(mapping[explicitProfileId]);
+  }
+
+  if (user?.role) {
+    return normalizeEmergencyRole(user.role);
+  }
+
+  const fallbackProfileId = explicitProfileId || rolesConfig.defaultRoleProfileId;
+  if (fallbackProfileId && mapping[fallbackProfileId]) {
+    return normalizeEmergencyRole(mapping[fallbackProfileId]);
+  }
+
+  if (
+    fallbackProfileId &&
+    Object.values(EMERGENCY_ROLE_IDS).includes(normalizeEmergencyRole(fallbackProfileId))
+  ) {
+    return normalizeEmergencyRole(fallbackProfileId);
+  }
+
+  return normalizeEmergencyRole(fallbackProfileId);
+}
+
 export function getEmergencyRoleDefinition(role) {
   return EMERGENCY_ROLE_DEFINITIONS[normalizeEmergencyRole(role)];
 }
@@ -378,9 +416,18 @@ export function isEmergencyReadOnlyRole(role) {
   return Boolean(getEmergencyRoleDefinition(role)?.readOnly);
 }
 
-export function hasEmergencyActionPermission(role, action) {
+export function hasEmergencyActionPermission(role, action, permissionsOverrides = {}) {
   const definition = getEmergencyRoleDefinition(role);
   if (!definition || !action) return false;
+  const roleKey = definition.id;
+  const extra =
+    permissionsOverrides?.[roleKey] ||
+    permissionsOverrides?.[role] ||
+    permissionsOverrides?.[normalizeEmergencyRole(role)];
+  if (Array.isArray(extra) && extra.length) {
+    const merged = new Set([...definition.actions, ...extra]);
+    return merged.has(action);
+  }
   return definition.actions.includes(action);
 }
 
@@ -395,12 +442,18 @@ export function canAccessEmergencyRoute(role, path) {
 
 export function getNearestEmergencyRoute(role, preferredPath) {
   const definition = getEmergencyRoleDefinition(role);
-  if (!definition) return CANONICAL_ROUTES.emergencyWhiteboard;
+  if (!definition) return getPlatformHomeRoute();
   if (preferredPath && canAccessEmergencyRoute(role, preferredPath)) return preferredPath;
   return getEmergencyRoleHomeRoute(role);
 }
 
 export function getEmergencyRoleHomeRoute(role) {
+  if (isReceptionFirstUxEnabled()) {
+    const definition = getEmergencyRoleDefinition(role);
+    if (definition && canAccessEmergencyRoute(role, RECEPTION_FIRST_UX.platformHomeRoute)) {
+      return RECEPTION_FIRST_UX.platformHomeRoute;
+    }
+  }
   const definition = getEmergencyRoleDefinition(role);
   if (!definition) return CANONICAL_ROUTES.emergencyReception;
   return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyReception;
@@ -425,8 +478,16 @@ export function getReceptionSmartIntakePath(options = {}) {
   return getReceptionEmbeddedIntakePath(options);
 }
 
-/** Primary reception create path — embedded Smart Intake. */
+/** Primary reception create path — embedded Smart Intake (legacy alias). */
 export function getReceptionQuickCreatePath() {
+  return getReceptionEmbeddedIntakePath();
+}
+
+/** Role-aware fastest create path — express for registration clerk, Smart Intake for others. */
+export function getReceptionPrimaryCreatePath(role) {
+  if (isRegistrationClerkRole(role)) {
+    return getReceptionExpressCreatePath();
+  }
   return getReceptionEmbeddedIntakePath();
 }
 
@@ -442,10 +503,24 @@ export function isRegistrationClerkRole(role) {
 export function prefersReceptionForPatientCreate(role) {
   const normalizedRole = normalizeEmergencyRole(role);
   if (normalizedRole === EMERGENCY_ROLE_IDS.emsUser) return false;
+  if (
+    isReceptionFirstUxEnabled() &&
+    RECEPTION_FIRST_UX.routeAllIntakeThroughReception &&
+    canAccessEmergencyRoute(role, RECEPTION_FIRST_UX.platformHomeRoute)
+  ) {
+    return hasEmergencyActionPermission(role, EMERGENCY_ACTIONS.createPatient);
+  }
   return hasEmergencyActionPermission(role, EMERGENCY_ACTIONS.createPatient);
 }
 
 export function prefersReceptionForPatientSearch(role) {
+  if (
+    isReceptionFirstUxEnabled() &&
+    RECEPTION_FIRST_UX.routePatientSearchThroughReception &&
+    canAccessEmergencyRoute(role, RECEPTION_FIRST_UX.platformHomeRoute)
+  ) {
+    return true;
+  }
   return isRegistrationClerkRole(role);
 }
 

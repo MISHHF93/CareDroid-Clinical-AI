@@ -304,10 +304,25 @@ export class OrganizationsService {
       },
       org.name,
     );
+    const currentSettings = (org.settings || {}) as Record<string, unknown>;
+    const incomingSettings = (updates.settings as Record<string, unknown>) || {};
+    const mergedSettings = {
+      ...currentSettings,
+      ...incomingSettings,
+    };
+    if (this.isRecord(incomingSettings.emergencyOs) || this.isRecord(currentSettings.emergencyOs)) {
+      mergedSettings.emergencyOs = {
+        ...(this.isRecord(currentSettings.emergencyOs)
+          ? (currentSettings.emergencyOs as Record<string, unknown>)
+          : {}),
+        ...(this.isRecord(incomingSettings.emergencyOs)
+          ? (incomingSettings.emergencyOs as Record<string, unknown>)
+          : {}),
+      };
+    }
     org.settings = this.normalizeSettings(
       {
-        ...(org.settings || {}),
-        ...((updates.settings as Record<string, unknown>) || {}),
+        ...mergedSettings,
         subscription: updates.subscription ?? (org.settings || {}).subscription,
         integrations: updates.integrations ?? (org.settings || {}).integrations,
       },
@@ -348,6 +363,7 @@ export class OrganizationsService {
       },
       departments: Array.isArray(settings.departments) ? settings.departments : [],
       workspaces: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
+      emergencyOs: this.isRecord(settings.emergencyOs) ? settings.emergencyOs : null,
       users: memberships.map((membership) => {
         const profile = profileByUserId.get(membership.userId);
         return {

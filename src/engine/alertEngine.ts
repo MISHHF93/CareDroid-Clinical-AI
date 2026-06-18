@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert, Patient } from '../types/emergency';
+import { classifyOperationalAlert, shouldToastOperationalAlert } from './alertClassificationModel';
 
 export {
   deriveAlerts,
@@ -46,26 +47,36 @@ export function dispatchAlert(input: AlertInput): string {
 
   useEmergencyStore.getState().addAlert(alert);
 
-  switch (alert.severity) {
-    case 'Critical':
-      toast.error(alert.title, {
-        description: alert.message,
-        duration: Infinity,
-        action: resolveAction(alert),
-      });
-      break;
-    case 'Warning':
-      toast.warning(alert.title, {
-        description: alert.message,
-        duration: 10000,
-      });
-      break;
-    default:
-      toast(alert.title, {
-        description: alert.message,
-        duration: 5000,
-      });
+  if (!shouldToastOperationalAlert(alert)) {
+    return alert.id;
   }
+
+  const tier = classifyOperationalAlert(alert);
+  const action = resolveAction(alert);
+
+  if (tier === 'critical' || alert.severity === 'Critical') {
+    toast.error(alert.title, {
+      description: alert.message,
+      duration: Infinity,
+      action,
+    });
+    return alert.id;
+  }
+
+  if (tier === 'high' || alert.severity === 'Warning') {
+    toast.warning(alert.title, {
+      description: alert.message,
+      duration: 10000,
+      action,
+    });
+    return alert.id;
+  }
+
+  toast(alert.title, {
+    description: alert.message,
+    duration: 5000,
+    action,
+  });
 
   return alert.id;
 }

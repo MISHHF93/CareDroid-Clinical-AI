@@ -90,3 +90,17 @@
   font-size: 13px;
   color: var(--color-text-secondary, #9ca3af);
 }
+
+.reception-work-queues__tab {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.reception-work-queues__item span:first-child {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}

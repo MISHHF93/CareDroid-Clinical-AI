@@ -24,6 +24,35 @@ export const RECEPTION_INTAKE_URL_KEYS = [
 ];
 
 /**
+ * Reception pipeline URL contract (deep links into ReceptionWorkspace panels).
+ *
+ * | Param              | Panel / behavior                          |
+ * |--------------------|-------------------------------------------|
+ * | express=1          | Express registration modal                |
+ * | intake=1           | Smart intake overlay                      |
+ * | quickCreate=1      | QuickIntake modal                         |
+ * | queue=ems          | Work queues — EMS tab                     |
+ * | queue=verification | Work queues — identity verification tab   |
+ * | queue=pretriage    | Work queues — pre-triage / handoff tab    |
+ * | patientId          | Search context + selected patient         |
+ * | q                  | Patient search query                      |
+ * | arrived            | Arrival confirmation banner context       |
+ * | patient            | Expanded pretriage queue row              |
+ */
+export const RECEPTION_PIPELINE_URL_CONTRACT = Object.freeze({
+  express: 'Express registration',
+  intake: 'Smart intake overlay',
+  quickCreate: 'QuickIntake modal',
+  'queue=ems': 'EMS work queue tab',
+  'queue=verification': 'Identity verification queue tab',
+  'queue=pretriage': 'Pre-triage / handoff queue tab',
+  patientId: 'Selected patient search context',
+  q: 'Patient search query',
+  arrived: 'Arrival confirmation context',
+  patient: 'Expanded pretriage queue row',
+});
+
+/**
  * Canonical EMS convert chain: chart shell → EMS registration queue → reception verify.
  * Keeps arrival-first continuity across whiteboard, EMS pipeline, and broadcast surfaces.
  */
