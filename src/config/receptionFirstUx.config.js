@@ -14,6 +14,7 @@ export const RECEPTION_FIRST_UX = Object.freeze({
   redirectStandaloneIntake: true,
   redirectStandaloneQueues: false,
   redirectStandalonePatientsForClerk: true,
+  deskUiEnabled: true,
 });
 
 export function isReceptionFirstUxEnabled() {

@@ -101,7 +101,11 @@ export const RECEPTION_STRIP_TO_OPERATIONAL_KEY = Object.freeze({
   'queue-size': null,
 });
 
-export function selectReceptionOperationalStripMetrics(patients = [], emsInbound = 0) {
+export function selectReceptionOperationalStripMetrics(
+  patients = [],
+  emsInbound = 0,
+  { metricIds = null } = {},
+) {
   const { counts } = selectReceptionQueues(patients);
   const today = localDateKey();
   const arrivalsToday = patients.filter(
@@ -162,7 +166,7 @@ export function selectReceptionOperationalStripMetrics(patients = [], emsInbound
       value: receptionAudit.longestWaitLabel,
       queueTab: 'pretriage',
     },
-  ];
+  ].filter((metric) => !metricIds?.length || metricIds.includes(metric.id));
 }
 
 /** Normalized arrival dashboard metrics from store patients + EMS inbound feed. */

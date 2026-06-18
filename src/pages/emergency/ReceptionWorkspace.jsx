@@ -39,6 +39,8 @@ import {
   resolvePipelineStageFromSearchParams,
 } from '../../config/emergencyPipelineModel';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
+import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
+import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
 import './ReceptionWorkspace.css';
 
@@ -46,6 +48,7 @@ export default function ReceptionWorkspace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
+  const deskUi = useReceptionDeskUi();
   const { loading: receptionLoading, error: receptionError, refresh: refreshReceptionSnapshot } =
     useReceptionSnapshotPolling(15000);
   const [handoffSyncWarning, setHandoffSyncWarning] = useState('');
@@ -317,16 +320,25 @@ export default function ReceptionWorkspace() {
   };
 
   return (
-    <section className="reception-workspace" aria-labelledby="reception-workspace-title">
+    <section
+      className={`reception-workspace${deskUi.slim ? ' reception-workspace--desk-slim' : ''}`}
+      aria-labelledby="reception-workspace-title"
+    >
       <header className="reception-workspace__intro">
         <h1 id="reception-workspace-title">{RECEPTION_COPY.workspace.title}</h1>
-        <p className="reception-workspace__description">{RECEPTION_COPY.workspace.description}</p>
+        <p className="reception-workspace__description">
+          {deskUi.slim
+            ? RECEPTION_COPY.workspace.deskDescription
+            : RECEPTION_COPY.workspace.description}
+        </p>
       </header>
 
       <ReceptionOperationalStrip
         patients={patients}
         emsInbound={emsInbound}
         onMetricSelect={handleMetricSelect}
+        stripMetricIds={deskUi.stripMetricIds}
+        showShiftLink={deskUi.show(RECEPTION_DESK_UI.surfaces.shiftStripLink)}
         shiftSummaryPath={
           emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyShift)
             ? CANONICAL_ROUTES.emergencyShift
@@ -334,7 +346,9 @@ export default function ReceptionWorkspace() {
         }
       />
 
-      <ReceptionSearchHint query={query} />
+      {deskUi.show(RECEPTION_DESK_UI.surfaces.searchHint) || query.trim() ? (
+        <ReceptionSearchHint query={query} />
+      ) : null}
 
       {receptionError ? (
         <ToolApiErrorBanner
@@ -442,6 +456,7 @@ export default function ReceptionWorkspace() {
       />
       </ReceptionPipelineShell>
 
+      {deskUi.show(RECEPTION_DESK_UI.surfaces.operationalHistory) ? (
       <OperationalHistoryPanel
         logs={workflowLogs}
         title="Reception operational history"
@@ -451,6 +466,7 @@ export default function ReceptionWorkspace() {
         compact
         className="reception-workspace__history"
       />
+      ) : null}
 
       {arrivedPatient ? (
         <div className="reception-workspace__banner" role="status">

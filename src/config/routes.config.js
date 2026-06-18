@@ -83,6 +83,9 @@ export const CANONICAL_ROUTES = Object.freeze({
   knowledgeBase: '/knowledge-base',
   marketplace: '/marketplace',
   enterpriseReadiness: '/enterprise-readiness',
+  trackMindMaturity: '/trackmind-maturity',
+  enterprisePlatform: '/enterprise-platform',
+  platformIntelligence: '/platform-intelligence',
   platformAdmin: '/platform-admin',
   billing: '/billing',
   usage: '/usage',
@@ -483,6 +486,42 @@ export const ROUTE_RECORDS = Object.freeze([
     navGroup: 'account',
     notes:
       'Enterprise readiness center with weighted SSO, RBAC, tenant isolation, audit, governance, integration, and security scoring.',
+  }),
+  Object.freeze({
+    id: 'trackMindMaturity',
+    path: CANONICAL_ROUTES.trackMindMaturity,
+    componentKey: 'TrackMindMaturityDashboard',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'account',
+    notes:
+      'TrackMind Operating System Maturity Framework — nine-domain scoring for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.',
+  }),
+  Object.freeze({
+    id: 'enterprisePlatform',
+    path: CANONICAL_ROUTES.enterprisePlatform,
+    componentKey: 'EnterpriseOperatingPlatformHub',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'account',
+    notes:
+      'TrackMind Enterprise Operating Platform — Prompts 99–116: benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
+  }),
+  Object.freeze({
+    id: 'platformIntelligence',
+    path: CANONICAL_ROUTES.platformIntelligence,
+    componentKey: 'PlatformIntelligenceHub',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'account',
+    notes:
+      'TrackMind Platform Intelligence — Prompts 117–136: artifact registry, lineage, metadata, KPI intelligence, observability, technical debt, convergence review.',
   }),
   // Future module
   Object.freeze({
@@ -963,13 +1002,14 @@ export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
     id: 'customerSuccess',
     path: CANONICAL_ROUTES.customerSuccess,
-    componentKey: 'CustomerSuccessDashboard',
+    componentKey: 'CustomerSuccessPlatformPage',
     layout: 'app',
     auth: 'required',
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Customer health and retention dashboard for adoption and usage signals.',
+    notes:
+      'Customer success platform — onboarding progress, adoption metrics, feature utilization, health scores, support tracking, renewal readiness, and KPIs.',
   }),
   Object.freeze({
     id: 'customerPortal',
@@ -1212,6 +1252,18 @@ export const ROUTE_ALIAS_GROUPS = Object.freeze({
   enterpriseReadiness: Object.freeze({
     target: CANONICAL_ROUTES.enterpriseReadiness,
     aliases: aliasesForRoute('enterpriseReadiness'),
+  }),
+  trackMindMaturity: Object.freeze({
+    target: CANONICAL_ROUTES.trackMindMaturity,
+    aliases: aliasesForRoute('trackMindMaturity'),
+  }),
+  enterprisePlatform: Object.freeze({
+    target: CANONICAL_ROUTES.enterprisePlatform,
+    aliases: aliasesForRoute('enterprisePlatform'),
+  }),
+  platformIntelligence: Object.freeze({
+    target: CANONICAL_ROUTES.platformIntelligence,
+    aliases: aliasesForRoute('platformIntelligence'),
   }),
   platformAdmin: Object.freeze({
     target: CANONICAL_ROUTES.platformAdmin,

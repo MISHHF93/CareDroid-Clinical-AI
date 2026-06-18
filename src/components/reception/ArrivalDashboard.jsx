@@ -8,6 +8,8 @@ import QueueOperationalPanel from '../queues/QueueOperationalPanel';
 import { buildQueueAuditSnapshot } from '../../services/queueAuditDiscovery';
 import { QUEUE_AUDIT_DOMAIN } from '../../config/queueAuditModel';
 import { RECEPTION_COPY } from './receptionCopy';
+import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
+import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import './ArrivalDashboard.css';
 
 export default function ArrivalDashboard({
@@ -34,10 +36,17 @@ export default function ArrivalDashboard({
   onCaptureComplaint,
   onReviewDuplicate,
 }) {
+  const deskUi = useReceptionDeskUi();
   const queues = useMemo(() => selectReceptionQueues(patients), [patients]);
+  const showQueueAudit = deskUi.show(RECEPTION_DESK_UI.surfaces.queueAuditPanel);
+  const showDataQuality = deskUi.show(RECEPTION_DESK_UI.surfaces.dataQualityPanel);
+  const showTabBadges = deskUi.show(RECEPTION_DESK_UI.surfaces.queueTabBadges);
 
   return (
-    <section className="arrival-dashboard" aria-labelledby="arrival-dashboard-title">
+    <section
+      className={`arrival-dashboard${deskUi.slim ? ' arrival-dashboard--desk-slim' : ''}`}
+      aria-labelledby="arrival-dashboard-title"
+    >
       <h2 id="arrival-dashboard-title" className="arrival-dashboard__title">
         {RECEPTION_COPY.queues.sectionTitle}
       </h2>
@@ -65,6 +74,7 @@ export default function ArrivalDashboard({
         activeTab={activeQueueTab}
         dataQualitySnapshot={dataQualitySnapshot}
         queueAuditSnapshot={queueAuditSnapshot}
+        showTabBadges={showTabBadges}
         onTabChange={onTabChange}
         onOpenVerification={onOpenVerification}
         onOpenPatient={onSelectPatient}
@@ -74,6 +84,7 @@ export default function ArrivalDashboard({
         onOpenEms={onOpenEms}
       />
 
+      {showQueueAudit ? (
       <QueueOperationalPanel
         snapshot={queueAuditSnapshot}
         title="Reception queue audit"
@@ -82,7 +93,9 @@ export default function ArrivalDashboard({
         limit={6}
         className="arrival-dashboard__queue-audit"
       />
+      ) : null}
 
+      {showDataQuality ? (
       <DataQualityRiskPanel
         snapshot={dataQualitySnapshot}
         title="Registration data quality"
@@ -92,6 +105,7 @@ export default function ArrivalDashboard({
         onReviewDuplicate={onReviewDuplicate}
         className="arrival-dashboard__data-quality"
       />
+      ) : null}
     </section>
   );
 }

@@ -1,0 +1,470 @@
+{
+  "generatedAt": "2026-06-18T21:27:59.457Z",
+  "goal": "Enterprise operating platform audit — Prompts 99–116",
+  "promptsCovered": [
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116
+  ],
+  "overallScore": 83,
+  "overallStatus": "ready",
+  "summary": {
+    "moduleCount": 18,
+    "readyModules": 9,
+    "watchOrAtRisk": 2,
+    "kpisPassed": 40,
+    "kpisTotal": 47,
+    "lowestModule": {
+      "id": "sustainability_esg",
+      "prompt": 115,
+      "label": "Sustainability & ESG",
+      "description": "Sustainability metrics, welfare metrics, and efficiency indicators.",
+      "route": "/enterprise-platform#esg",
+      "relatedRoutes": [
+        "/trackmind-maturity",
+        "/equity-monitoring"
+      ],
+      "assessment": {
+        "id": "sustainability_esg",
+        "label": "Sustainability & ESG",
+        "score": 53,
+        "status": "watch",
+        "kpis": [
+          {
+            "id": "welfare-score",
+            "label": "Equine welfare score",
+            "value": 52,
+            "target": 65,
+            "unit": "",
+            "maxTarget": false,
+            "passes": false
+          },
+          {
+            "id": "facilities-efficiency",
+            "label": "Facilities efficiency",
+            "value": 56,
+            "target": 60,
+            "unit": "",
+            "maxTarget": false,
+            "passes": false
+          },
+          {
+            "id": "resource-tracking",
+            "label": "Resource tracking maturity",
+            "value": 50,
+            "target": 55,
+            "unit": "",
+            "maxTarget": false,
+            "passes": false
+          }
+        ],
+        "artifacts": {
+          "esgMetrics": [
+            {
+              "id": "ESG-001",
+              "label": "Welfare incidents per meet",
+              "value": 0.2,
+              "target": 0.5,
+              "unit": ""
+            },
+            {
+              "id": "ESG-002",
+              "label": "Water reuse rate",
+              "value": 68,
+              "target": 60,
+              "unit": "%"
+            },
+            {
+              "id": "ESG-003",
+              "label": "Energy per raceday",
+              "value": 420,
+              "target": 500,
+              "unit": "kWh"
+            }
+          ]
+        },
+        "passedKpis": 0,
+        "totalKpis": 3
+      }
+    },
+    "highestModule": {
+      "id": "enterprise_asset_registry",
+      "prompt": 105,
+      "label": "Enterprise asset registry",
+      "description": "Unified asset model for facilities, systems, equipment, and infrastructure.",
+      "route": "/enterprise-platform#assets",
+      "relatedRoutes": [
+        "/assets",
+        "/devices"
+      ],
+      "assessment": {
+        "id": "enterprise_asset_registry",
+        "label": "Enterprise asset registry",
+        "score": 100,
+        "status": "ready",
+        "kpis": [
+          {
+            "id": "asset-types-covered",
+            "label": "Asset types covered",
+            "value": 4,
+            "target": 4,
+            "unit": "",
+            "maxTarget": false,
+            "passes": true
+          },
+          {
+            "id": "assets-tracked",
+            "label": "Assets tracked",
+            "value": 6,
+            "target": 5,
+            "unit": "",
+            "maxTarget": false,
+            "passes": true
+          },
+          {
+            "id": "watch-assets",
+            "label": "Assets on watch",
+            "value": 1,
+            "target": 1,
+            "unit": "",
+            "maxTarget": true,
+            "passes": true
+          }
+        ],
+        "artifacts": {
+          "taxonomy": [
+            {
+              "type": "facility",
+              "label": "Facilities",
+              "examples": [
+                "Main grandstand",
+                "Barn complex",
+                "Track surface"
+              ]
+            },
+            {
+              "type": "system",
+              "label": "Systems",
+              "examples": [
+                "Timing system",
+                "Video patrol",
+                "PA/communications"
+              ]
+            },
+            {
+              "type": "equipment",
+              "label": "Equipment",
+              "examples": [
+                "Starting gate",
+                "Ambulance cart",
+                "Water truck"
+              ]
+            },
+            {
+              "type": "infrastructure",
+              "label": "Infrastructure",
+              "examples": [
+                "Power feed",
+                "Network edge",
+                "Irrigation"
+              ]
+            }
+          ],
+          "assets": [
+            {
+              "id": "AST-001",
+              "type": "facility",
+              "name": "Main track surface",
+              "zone": "Racing",
+              "status": "operational",
+              "lastInspection": "2026-06-01"
+            },
+            {
+              "id": "AST-002",
+              "type": "system",
+              "name": "Timing & results feed",
+              "zone": "Technology",
+              "status": "operational",
+              "lastInspection": "2026-06-10"
+            },
+            {
+              "id": "AST-003",
+              "type": "equipment",
+              "name": "Starting gate A",
+              "zone": "Racing",
+              "status": "operational",
+              "lastInspection": "2026-06-12"
+            },
+            {
+              "id": "AST-004",
+              "type": "infrastructure",
+              "name": "Track irrigation loop",
+              "zone": "Grounds",
+              "status": "watch",
+              "lastInspection": "2026-05-20"
+            },
+            {
+              "id": "AST-005",
+              "type": "system",
+              "name": "Emergency OS platform",
+              "zone": "Operations",
+              "status": "operational",
+              "lastInspection": "2026-06-15"
+            },
+            {
+              "id": "AST-006",
+              "type": "equipment",
+              "name": "Ambulance staging cart",
+              "zone": "Medical",
+              "status": "operational",
+              "lastInspection": "2026-06-14"
+            }
+          ],
+          "byType": [
+            {
+              "type": "facility",
+              "label": "Facilities",
+              "examples": [
+                "Main grandstand",
+                "Barn complex",
+                "Track surface"
+              ],
+              "count": 1
+            },
+            {
+              "type": "system",
+              "label": "Systems",
+              "examples": [
+                "Timing system",
+                "Video patrol",
+                "PA/communications"
+              ],
+              "count": 2
+            },
+            {
+              "type": "equipment",
+              "label": "Equipment",
+              "examples": [
+                "Starting gate",
+                "Ambulance cart",
+                "Water truck"
+              ],
+              "count": 2
+            },
+            {
+              "type": "infrastructure",
+              "label": "Infrastructure",
+              "examples": [
+                "Power feed",
+                "Network edge",
+                "Irrigation"
+              ],
+              "count": 1
+            }
+          ]
+        },
+        "passedKpis": 3,
+        "totalKpis": 3
+      }
+    }
+  },
+  "moduleScores": {
+    "operational_benchmarking": 75,
+    "franchise_readiness": 86,
+    "track_certification": 75,
+    "risk_management": 79,
+    "business_continuity": 94,
+    "disaster_recovery": 87,
+    "enterprise_asset_registry": 100,
+    "workforce_management": 100,
+    "training_competency": 100,
+    "knowledge_management": 100,
+    "operational_playbook": 80,
+    "decision_support": 77,
+    "scenario_planning": 94,
+    "strategic_planning": 64,
+    "portfolio_management": 76,
+    "executive_governance": 77,
+    "sustainability_esg": 53,
+    "architecture_governance": 73
+  },
+  "modules": [
+    {
+      "prompt": 99,
+      "id": "operational_benchmarking",
+      "label": "Operational benchmarking",
+      "score": 75,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 100,
+      "id": "franchise_readiness",
+      "label": "Franchise readiness",
+      "score": 86,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 101,
+      "id": "track_certification",
+      "label": "Track certification",
+      "score": 75,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 102,
+      "id": "risk_management",
+      "label": "Risk management",
+      "score": 79,
+      "status": "developing",
+      "kpisPassed": 1,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 103,
+      "id": "business_continuity",
+      "label": "Business continuity",
+      "score": 94,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 104,
+      "id": "disaster_recovery",
+      "label": "Disaster recovery",
+      "score": 87,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 105,
+      "id": "enterprise_asset_registry",
+      "label": "Enterprise asset registry",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 106,
+      "id": "workforce_management",
+      "label": "Workforce management",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 107,
+      "id": "training_competency",
+      "label": "Training & competency",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 108,
+      "id": "knowledge_management",
+      "label": "Knowledge management",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 109,
+      "id": "operational_playbook",
+      "label": "Operational playbook engine",
+      "score": 80,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 110,
+      "id": "decision_support",
+      "label": "Decision support",
+      "score": 77,
+      "status": "developing",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 111,
+      "id": "scenario_planning",
+      "label": "Scenario planning",
+      "score": 94,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 112,
+      "id": "strategic_planning",
+      "label": "Strategic planning",
+      "score": 64,
+      "status": "watch",
+      "kpisPassed": 1,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 113,
+      "id": "portfolio_management",
+      "label": "Portfolio management",
+      "score": 76,
+      "status": "developing",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 114,
+      "id": "executive_governance",
+      "label": "Executive governance",
+      "score": 77,
+      "status": "developing",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 115,
+      "id": "sustainability_esg",
+      "label": "Sustainability & ESG",
+      "score": 53,
+      "status": "watch",
+      "kpisPassed": 0,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 116,
+      "id": "architecture_governance",
+      "label": "Architecture governance",
+      "score": 73,
+      "status": "developing",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    }
+  ]
+}

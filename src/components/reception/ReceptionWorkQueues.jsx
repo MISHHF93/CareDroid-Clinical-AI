@@ -32,6 +32,7 @@ export default function ReceptionWorkQueues({
   onExpandPatient,
   onRegisterWalkIn,
   onOpenEms,
+  showTabBadges = true,
 }) {
   const [activeTab, setActiveTab] = useState(activeTabProp);
   const emergencyRole = useEmergencyRolePermissions();
@@ -99,7 +100,7 @@ export default function ReceptionWorkQueues({
           >
             {tab.label}
             <span className="reception-work-queues__count">{counts[tab.id]}</span>
-            {queueRowByTab[tab.id] ? (
+            {showTabBadges && queueRowByTab[tab.id] ? (
               <QueueAuditBadge row={queueRowByTab[tab.id]} limit={1} />
             ) : null}
           </button>
@@ -135,7 +136,7 @@ export default function ReceptionWorkQueues({
                 >
                   <span>
                     {patientLabel(patient)}
-                    {qualityRisks.length ? (
+                    {showTabBadges && qualityRisks.length ? (
                       <DataQualityRiskBadge risks={qualityRisks} limit={2} />
                     ) : null}
                   </span>

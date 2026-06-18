@@ -947,7 +947,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               type="search"
               value={patientLookupQuery}
               placeholder="Search patient, encounter, referral, EMS, queue..."
-              aria-label="Operational search"
+              aria-label={
+                screenCapabilities.isRegistrationScreen ? 'Patient search' : 'Operational search'
+              }
               onFocus={() => setPatientLookupOpen(true)}
               onChange={(event) => {
                 syncPatientLookupQuery(event.target.value);

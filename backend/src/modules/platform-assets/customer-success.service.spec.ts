@@ -161,5 +161,10 @@ describe('CustomerSuccessService', () => {
     expect(result.signals.map((signal: any) => signal.id)).toEqual(
       expect.arrayContaining(['adoption', 'engagement', 'ai-usage', 'enablement']),
     );
+    expect(result.onboardingProgress.percent).toBeGreaterThan(0);
+    expect(result.featureUtilization.utilizationRate).toBeGreaterThanOrEqual(0);
+    expect(result.supportTracking.openCount).toBeGreaterThanOrEqual(0);
+    expect(result.renewalReadiness.score).toBeGreaterThan(0);
+    expect(result.kpis.totalCount).toBe(7);
   });
 });

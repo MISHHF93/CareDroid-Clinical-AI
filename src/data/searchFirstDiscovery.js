@@ -99,6 +99,38 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     aliases: ['readiness', 'maturity', 'assessment', 'recommendations'],
   },
   {
+    id: 'trackmind-maturity',
+    title: 'TrackMind Maturity Dashboard',
+    description:
+      'Nine-domain operating system maturity for operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality.',
+    path: CANONICAL_ROUTES.trackMindMaturity,
+    aliases: ['trackmind', 'operating system maturity', 'equine welfare', 'maturity framework'],
+  },
+  {
+    id: 'customer-success',
+    title: 'Customer Success Platform',
+    description:
+      'Onboarding progress, adoption metrics, feature utilization, health scores, support tracking, and renewal readiness.',
+    path: CANONICAL_ROUTES.customerSuccess,
+    aliases: ['customer success', 'renewal readiness', 'adoption metrics', 'health score'],
+  },
+  {
+    id: 'enterprise-platform',
+    title: 'Enterprise Operating Platform',
+    description:
+      'Prompts 99–116 — benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
+    path: CANONICAL_ROUTES.enterprisePlatform,
+    aliases: ['enterprise platform', 'benchmarking', 'franchise readiness', 'risk register', 'ESG', 'portfolio'],
+  },
+  {
+    id: 'platform-intelligence',
+    title: 'Platform Intelligence Hub',
+    description:
+      'Prompts 117–136 — artifact registry, lineage, metadata, KPI intelligence, observability, technical debt, platform convergence.',
+    path: CANONICAL_ROUTES.platformIntelligence,
+    aliases: ['platform intelligence', 'data catalog', 'data lineage', 'technical debt', 'convergence review'],
+  },
+  {
     id: 'outcomes',
     title: 'Outcome Tracking',
     description: 'Open leadership outcome metrics and value tracking signals.',

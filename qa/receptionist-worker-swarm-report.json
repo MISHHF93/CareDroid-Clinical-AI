@@ -1,136 +1,195 @@
 {
-  "generatedAt": "2026-06-18T14:09:30.435Z",
+  "generatedAt": "2026-06-18T23:15:47.767Z",
   "baseURL": "http://localhost:8000",
   "role": "registration_clerk",
-  "workers": 12,
-  "passed": 0,
-  "failed": 12,
+  "workers": 20,
+  "staticWorkers": 8,
+  "browserWorkers": 12,
+  "passed": 20,
+  "failed": 0,
+  "techStack": {
+    "frontend": "React 18 + Vite + React Router + Zustand",
+    "backend": "NestJS Emergency OS modules",
+    "qa": "Playwright reception swarm + vitest audits",
+    "receptionFirst": "receptionFirstUx.config.js enabled",
+    "governanceDeck": "TrackMind / Customer Success / Enterprise / Platform Intelligence hubs"
+  },
   "results": [
+    {
+      "id": "stack-01-frontend",
+      "name": "React + Vite frontend",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 1
+    },
+    {
+      "id": "stack-02-backend",
+      "name": "NestJS backend module",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 2
+    },
+    {
+      "id": "stack-03-reception-first-config",
+      "name": "Reception-first UX enabled",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 0
+    },
+    {
+      "id": "stack-04-reception-workspace",
+      "name": "Reception workspace + copy deck",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 0
+    },
+    {
+      "id": "stack-05-clerk-nav-policy",
+      "name": "Clerk nav demotes governance surfaces",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 1
+    },
+    {
+      "id": "stack-06-route-guards",
+      "name": "Whiteboard guard + patients redirect",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 2
+    },
+    {
+      "id": "stack-07-governance-hubs",
+      "name": "Text-deck hubs wired (maturity + platform intelligence)",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 0
+    },
+    {
+      "id": "stack-08-qa-tooling",
+      "name": "Playwright swarm + store stack",
+      "kind": "static",
+      "status": "pass",
+      "durationMs": 1
+    },
     {
       "id": "clerk-01-arrival-landing",
       "name": "Amina Reyes",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 2233,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "Reception title not found (#reception-workspace-title)",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8011,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-02-smart-intake",
       "name": "Jordan Park",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 32255,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Check ID & documents' })\n",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8886,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-03-express-register",
       "name": "Sofia Mendez",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 32254,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.reception-workspace__action--wide')\n",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8719,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-04-quick-create",
       "name": "Chris Okafor",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 32499,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Other arrivals' })\n",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 9523,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-05-prepare-chooser",
       "name": "Priya Nair",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 32556,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Other arrivals' })\n",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8595,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-06-ems-tab",
       "name": "Liam Chen",
+      "kind": "browser",
       "path": "/emergency/reception?queue=ems",
-      "status": "fail",
-      "durationMs": 2555,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=ems",
-      "error": "EMS registration tab not found (#reception-queue-tab-ems)",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 7975,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=ems"
     },
     {
       "id": "clerk-07-verification-tab",
       "name": "Elena Volkov",
+      "kind": "browser",
       "path": "/emergency/reception?queue=verification",
-      "status": "fail",
-      "durationMs": 2729,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=verification",
-      "error": "Verification tab not found (role=tab[name=/Need ID check/i])",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 7997,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=verification"
     },
     {
       "id": "clerk-08-pretriage-tab",
       "name": "Marcus Bell",
+      "kind": "browser",
       "path": "/emergency/reception?queue=pretriage",
-      "status": "fail",
-      "durationMs": 2731,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage",
-      "error": "Awaiting triage tab not found (role=tab[name=/Waiting for nurse/i])",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8000,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
     },
     {
       "id": "clerk-09-patients-route",
       "name": "Hannah Brooks",
+      "kind": "browser",
       "path": "/emergency/patients",
-      "status": "fail",
-      "durationMs": 2731,
-      "finalUrl": "http://localhost:8000/emergency/patients",
-      "error": "Patients page content not found (text=/patient/i)",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8260,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-10-whiteboard-guard",
       "name": "Noah Singh",
+      "kind": "browser",
       "path": "/emergency/whiteboard",
-      "status": "fail",
-      "durationMs": 3980,
-      "finalUrl": "http://localhost:8000/emergency/whiteboard",
-      "error": "Clerk should be redirected to reception, got http://localhost:8000/emergency/whiteboard",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8002,
+      "finalUrl": "http://localhost:8000/emergency/reception"
     },
     {
       "id": "clerk-11-no-triage-assist",
       "name": "Riley Ortiz",
+      "kind": "browser",
       "path": "/emergency/reception?queue=pretriage",
-      "status": "fail",
-      "durationMs": 2732,
-      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage",
-      "error": "Awaiting triage tab not found (role=tab[name=/Waiting for nurse/i])",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8007,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
     },
     {
       "id": "clerk-12-search-dominance",
       "name": "Tessa Grant",
+      "kind": "browser",
       "path": "/emergency/reception",
-      "status": "fail",
-      "durationMs": 32796,
-      "finalUrl": "http://localhost:8000/emergency/reception",
-      "error": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('searchbox', { name: 'Patient search' })\n",
-      "jsErrors": []
+      "status": "pass",
+      "durationMs": 8720,
+      "finalUrl": "http://localhost:8000/emergency/reception?q=Amara"
     }
   ],
+  "browserSummary": {
+    "passed": 12,
+    "failed": 0
+  },
   "simplicity": {
     "navItems": [
       "reception",
-      "patients"
+      "patients",
+      "pulse",
+      "shift"
     ],
     "primaryAction": "Register walk-in",
     "blockedRoutes": [

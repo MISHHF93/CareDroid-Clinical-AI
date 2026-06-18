@@ -1,0 +1,405 @@
+{
+  "generatedAt": "2026-06-18T21:27:58.586Z",
+  "goal": "Score TrackMind operating system maturity across operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality",
+  "framework": "TrackMind Operating System Maturity",
+  "maturityLevels": [
+    {
+      "id": "initial",
+      "level": 1,
+      "label": "Initial",
+      "minScore": 0,
+      "summary": "Reactive and undocumented — outcomes depend on individual effort."
+    },
+    {
+      "id": "emerging",
+      "level": 2,
+      "label": "Emerging",
+      "minScore": 21,
+      "summary": "Basic awareness exists but practices are inconsistent across shifts."
+    },
+    {
+      "id": "defined",
+      "level": 3,
+      "label": "Defined",
+      "minScore": 41,
+      "summary": "Documented standards, assigned ownership, and repeatable workflows."
+    },
+    {
+      "id": "managed",
+      "level": 4,
+      "label": "Managed",
+      "minScore": 61,
+      "summary": "Measured KPIs, audit trails, and corrective action loops are active."
+    },
+    {
+      "id": "optimizing",
+      "level": 5,
+      "label": "Optimizing",
+      "minScore": 81,
+      "summary": "Continuous improvement culture with predictive signals and benchmarking."
+    }
+  ],
+  "domains": [
+    {
+      "id": "operations",
+      "label": "Operations",
+      "weight": 14,
+      "owner": "Track director / operations lead"
+    },
+    {
+      "id": "safety",
+      "label": "Safety",
+      "weight": 14,
+      "owner": "Chief medical officer / safety officer"
+    },
+    {
+      "id": "compliance",
+      "label": "Compliance",
+      "weight": 11,
+      "owner": "Compliance / privacy officer"
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "weight": 12,
+      "owner": "CISO / security lead"
+    },
+    {
+      "id": "equine_welfare",
+      "label": "Equine welfare",
+      "weight": 12,
+      "owner": "Equine welfare officer / track veterinarian"
+    },
+    {
+      "id": "facilities",
+      "label": "Facilities",
+      "weight": 10,
+      "owner": "Facilities / track superintendent"
+    },
+    {
+      "id": "finance",
+      "label": "Finance",
+      "weight": 9,
+      "owner": "CFO / finance controller"
+    },
+    {
+      "id": "ai_governance",
+      "label": "AI governance",
+      "weight": 9,
+      "owner": "AI governance lead / clinical informatics"
+    },
+    {
+      "id": "data_quality",
+      "label": "Data quality",
+      "weight": 9,
+      "owner": "Data steward / registration lead"
+    }
+  ],
+  "baseline": {
+    "overall": 68,
+    "level": "Managed",
+    "dimensions": {
+      "operations": {
+        "score": 76,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "safety": {
+        "score": 72,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "compliance": {
+        "score": 100,
+        "level": "Optimizing",
+        "levelId": "optimizing"
+      },
+      "security": {
+        "score": 60,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "equine_welfare": {
+        "score": 52,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "facilities": {
+        "score": 56,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "finance": {
+        "score": 50,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "ai_governance": {
+        "score": 66,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "data_quality": {
+        "score": 78,
+        "level": "Managed",
+        "levelId": "managed"
+      }
+    }
+  },
+  "current": {
+    "overall": 69,
+    "level": "Managed",
+    "dimensions": {
+      "operations": {
+        "score": 76,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "safety": {
+        "score": 72,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "compliance": {
+        "score": 100,
+        "level": "Optimizing",
+        "levelId": "optimizing"
+      },
+      "security": {
+        "score": 70,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "equine_welfare": {
+        "score": 52,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "facilities": {
+        "score": 56,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "finance": {
+        "score": 50,
+        "level": "Defined",
+        "levelId": "defined"
+      },
+      "ai_governance": {
+        "score": 66,
+        "level": "Managed",
+        "levelId": "managed"
+      },
+      "data_quality": {
+        "score": 78,
+        "level": "Managed",
+        "levelId": "managed"
+      }
+    },
+    "summary": {
+      "passesManagedThreshold": true,
+      "passesOptimizingThreshold": false,
+      "managedDomainCount": 6,
+      "lowestDomain": "Finance",
+      "highestDomain": "Compliance",
+      "improvementCount": 9
+    }
+  },
+  "platformSignals": {
+    "survivabilityKpis": {
+      "kpis": {
+        "reception": {
+          "targetSeconds": 60,
+          "expressWalkInSeconds": 13,
+          "weightedAverageSeconds": 15,
+          "passes": true,
+          "workflow": "express-register",
+          "evidence": [
+            {
+              "id": "express-primary",
+              "summary": "Express register promoted to primary CTA; N shortcut opens express modal.",
+              "clicksSaved": 105,
+              "minutesSaved": 5.1
+            },
+            {
+              "id": "auto-dismiss-handoff",
+              "summary": "Handoff success banner auto-clears — no \"Next arrival\" click per patient.",
+              "clicksSavedPerPatient": 1
+            },
+            {
+              "id": "quick-create-shortcut",
+              "summary": "open-reception-quick-create and ?quickCreate=1 open QuickIntake directly (skip chooser).",
+              "chooserStepsRemoved": 1
+            },
+            {
+              "id": "automated-encounter-queue",
+              "summary": "completeIntakeHandoff creates encounter and assigns triage queue in software time.",
+              "encounterMs": 28,
+              "queueMs": 22
+            }
+          ]
+        },
+        "chargeNurse": {
+          "targetSeconds": 30,
+          "estimatedReadSeconds": 18,
+          "visibleSignals": 9,
+          "requiredSignals": 6,
+          "clickDepth": 1,
+          "passes": true,
+          "surfaces": [
+            "ShiftHandoffStrip",
+            "OperationalHandoffDomainBar"
+          ]
+        },
+        "director": {
+          "targetSeconds": 120,
+          "estimatedReadSeconds": 75,
+          "metricCount": 6,
+          "clickDepth": 1,
+          "passes": true,
+          "surfaces": [
+            "ChargeNurseOperationalStrip / ShiftHandoffStrip",
+            "QueueOperationalPanel",
+            "Emergency analytics throughput tiles"
+          ]
+        }
+      },
+      "passedCount": 3,
+      "totalCount": 3,
+      "passesAll": true,
+      "pilotReady": true
+    },
+    "dataQualityAudit": {
+      "surfaceCount": 5,
+      "requiredRisks": [
+        "missing_demographics",
+        "duplicate_patient",
+        "missing_arrival_reason",
+        "missing_verification"
+      ],
+      "coveredRisks": [
+        "missing_demographics",
+        "duplicate_patient",
+        "missing_arrival_reason",
+        "missing_verification"
+      ],
+      "passesAudit": true
+    },
+    "multiTenantReadiness": {
+      "overallReadinessScore": 100,
+      "passesAudit": true
+    }
+  },
+  "prioritizedImprovements": [
+    {
+      "id": "TM-001",
+      "domain": "operations",
+      "priority": "P0",
+      "summary": "Pass all three operational survivability KPIs (reception, charge nurse, director).",
+      "effort": "medium"
+    },
+    {
+      "id": "TM-002",
+      "domain": "security",
+      "priority": "P0",
+      "summary": "Enforce JWT auth and org-scoped emergency settings on all API paths.",
+      "effort": "medium"
+    },
+    {
+      "id": "TM-003",
+      "domain": "data_quality",
+      "priority": "P1",
+      "summary": "Surface all four data quality risk categories in reception and whiteboard workflows.",
+      "effort": "low"
+    },
+    {
+      "id": "TM-004",
+      "domain": "equine_welfare",
+      "priority": "P1",
+      "summary": "Standardize pre-race vet clearance and post-incident welfare review checklists.",
+      "effort": "medium"
+    },
+    {
+      "id": "TM-005",
+      "domain": "ai_governance",
+      "priority": "P1",
+      "summary": "Wire human-review queue and prompt registry to all AI-assisted workflows.",
+      "effort": "medium"
+    },
+    {
+      "id": "TM-009",
+      "domain": "safety",
+      "priority": "P1",
+      "summary": "Ensure reassessment and safety attention strips pass readability audits under load.",
+      "effort": "low"
+    },
+    {
+      "id": "TM-006",
+      "domain": "compliance",
+      "priority": "P2",
+      "summary": "Complete multi-tenant readiness audit and close org-scoping blockers.",
+      "effort": "medium"
+    },
+    {
+      "id": "TM-007",
+      "domain": "facilities",
+      "priority": "P2",
+      "summary": "Connect facilities maintenance registry to operations command surfaces.",
+      "effort": "high"
+    },
+    {
+      "id": "TM-008",
+      "domain": "finance",
+      "priority": "P2",
+      "summary": "Link usage metering and value tracking to operational throughput KPIs.",
+      "effort": "medium"
+    }
+  ],
+  "radar": [
+    {
+      "domain": "Operations",
+      "score": 76,
+      "level": "Managed"
+    },
+    {
+      "domain": "Safety",
+      "score": 72,
+      "level": "Managed"
+    },
+    {
+      "domain": "Compliance",
+      "score": 100,
+      "level": "Optimizing"
+    },
+    {
+      "domain": "Security",
+      "score": 70,
+      "level": "Managed"
+    },
+    {
+      "domain": "Equine welfare",
+      "score": 52,
+      "level": "Defined"
+    },
+    {
+      "domain": "Facilities",
+      "score": 56,
+      "level": "Defined"
+    },
+    {
+      "domain": "Finance",
+      "score": 50,
+      "level": "Defined"
+    },
+    {
+      "domain": "AI governance",
+      "score": 66,
+      "level": "Managed"
+    },
+    {
+      "domain": "Data quality",
+      "score": 78,
+      "level": "Managed"
+    }
+  ]
+}

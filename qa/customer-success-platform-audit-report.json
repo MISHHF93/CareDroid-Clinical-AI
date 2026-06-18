@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-06-18T21:27:58.977Z",
+  "goal": "Customer success platform — onboarding, adoption, feature utilization, health, support, renewal KPIs",
+  "summary": {
+    "healthScore": 79,
+    "healthStatus": "healthy",
+    "renewalReadiness": 72,
+    "renewalStatus": "preparing",
+    "onboardingPercent": 91,
+    "adoptionScore": 75,
+    "featureUtilizationRate": 33,
+    "openSupportItems": 3,
+    "kpisPassed": 6,
+    "kpisTotal": 7
+  },
+  "kpiEvaluation": {
+    "kpis": [
+      {
+        "id": "onboardingCompletePercent",
+        "label": "Onboarding complete",
+        "value": 91,
+        "target": 80,
+        "passes": true,
+        "unit": "%"
+      },
+      {
+        "id": "adoptionScore",
+        "label": "Adoption score",
+        "value": 75,
+        "target": 70,
+        "passes": true,
+        "unit": "%"
+      },
+      {
+        "id": "activeUsers",
+        "label": "Active users",
+        "value": 42,
+        "target": 5,
+        "passes": true,
+        "unit": ""
+      },
+      {
+        "id": "featureUtilizationRate",
+        "label": "Feature utilization rate",
+        "value": 33,
+        "target": 60,
+        "passes": false,
+        "unit": "%"
+      },
+      {
+        "id": "healthScore",
+        "label": "Customer health score",
+        "value": 79,
+        "target": 75,
+        "passes": true,
+        "unit": ""
+      },
+      {
+        "id": "supportOpenItems",
+        "label": "Open support items",
+        "value": 3,
+        "target": 3,
+        "passes": true,
+        "unit": "",
+        "maxTarget": true
+      },
+      {
+        "id": "renewalReadiness",
+        "label": "Renewal readiness",
+        "value": 72,
+        "target": 70,
+        "passes": true,
+        "unit": ""
+      }
+    ],
+    "passedCount": 6,
+    "totalCount": 7,
+    "passesAll": false,
+    "renewalReady": true
+  },
+  "capabilities": {
+    "onboardingPercent": 91,
+    "adoptionScore": 75,
+    "featureUtilizationRate": 33,
+    "healthScore": 79,
+    "openSupportItems": 3,
+    "renewalReadiness": 72
+  },
+  "kpiTargets": {
+    "onboardingCompletePercent": {
+      "target": 80,
+      "label": "Onboarding complete"
+    },
+    "adoptionScore": {
+      "target": 70,
+      "label": "Adoption score"
+    },
+    "activeUsers": {
+      "target": 5,
+      "label": "Active users"
+    },
+    "featureUtilizationRate": {
+      "target": 60,
+      "label": "Feature utilization rate"
+    },
+    "healthScore": {
+      "target": 75,
+      "label": "Customer health score"
+    },
+    "supportOpenItems": {
+      "target": 3,
+      "label": "Open support items",
+      "max": true
+    },
+    "renewalReadiness": {
+      "target": 70,
+      "label": "Renewal readiness"
+    }
+  },
+  "featureRegistryCount": 12,
+  "supportOpenItems": [
+    {
+      "id": "CS-001",
+      "type": "enablement",
+      "priority": "medium",
+      "status": "open",
+      "subject": "Enable Laboratory Intelligence",
+      "summary": "4 entitled assets with zero usage this period.",
+      "owner": "Customer success",
+      "route": "/products/laboratory"
+    },
+    {
+      "id": "CS-002",
+      "type": "health-follow-up",
+      "priority": "medium",
+      "status": "open",
+      "subject": "Underused products",
+      "summary": "1 product needs review.",
+      "owner": "Customer success"
+    },
+    {
+      "id": "CS-003",
+      "type": "implementation",
+      "priority": "high",
+      "status": "open",
+      "subject": "Onboarding blocker",
+      "summary": "ED RBAC still uses static matrix — role mapping stored but not applied",
+      "owner": "Implementation",
+      "route": "/onboarding"
+    }
+  ],
+  "renewalFactors": [
+    {
+      "id": "health",
+      "label": "Customer health",
+      "score": 79,
+      "weight": 30,
+      "passes": true
+    },
+    {
+      "id": "adoption",
+      "label": "Product adoption",
+      "score": 75,
+      "weight": 25,
+      "passes": true
+    },
+    {
+      "id": "onboarding",
+      "label": "Onboarding completion",
+      "score": 91,
+      "weight": 20,
+      "passes": true
+    },
+    {
+      "id": "utilization",
+      "label": "Feature breadth",
+      "score": 33,
+      "weight": 15,
+      "passes": false
+    },
+    {
+      "id": "support",
+      "label": "Support load",
+      "score": 64,
+      "weight": 10,
+      "passes": true
+    }
+  ]
+}

@@ -19,10 +19,12 @@ export default function ReceptionOperationalStrip({
   emsInbound = 0,
   onMetricSelect,
   shiftSummaryPath = null,
+  stripMetricIds = null,
+  showShiftLink = true,
 }) {
   const metrics = useMemo(
-    () => selectReceptionOperationalStripMetrics(patients, emsInbound),
-    [patients, emsInbound],
+    () => selectReceptionOperationalStripMetrics(patients, emsInbound, { metricIds: stripMetricIds }),
+    [patients, emsInbound, stripMetricIds],
   );
 
   return (
@@ -44,7 +46,7 @@ export default function ReceptionOperationalStrip({
           </button>
         );
       })}
-      {shiftSummaryPath ? (
+      {shiftSummaryPath && showShiftLink ? (
         <Link
           to={shiftSummaryPath}
           className="reception-operational-strip__metric reception-operational-strip__metric--link"

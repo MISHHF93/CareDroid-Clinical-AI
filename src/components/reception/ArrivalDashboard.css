@@ -46,3 +46,16 @@
 .arrival-dashboard__queue-audit {
   margin-top: 12px;
 }
+
+.arrival-dashboard--desk-slim .arrival-dashboard__feeds {
+  grid-template-columns: 1fr;
+}
+
+.arrival-dashboard--desk-slim .reception-work-queues__list {
+  gap: 6px;
+}
+
+.arrival-dashboard--desk-slim .reception-work-queues__item {
+  min-height: 48px;
+  font-size: 14px;
+}

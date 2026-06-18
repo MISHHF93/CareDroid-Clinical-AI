@@ -219,6 +219,10 @@ const TenantAdministrationCenter = lazyNamed(
 const KnowledgeBasePage = lazy(() => import('./pages/KnowledgeBasePage'));
 const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
 const EnterpriseReadinessPage = lazy(() => import('./pages/EnterpriseReadinessPage'));
+const TrackMindMaturityDashboard = lazy(() => import('./pages/TrackMindMaturityDashboard'));
+const CustomerSuccessPlatformPage = lazy(() => import('./pages/CustomerSuccessPlatformPage'));
+const EnterpriseOperatingPlatformHub = lazy(() => import('./pages/EnterpriseOperatingPlatformHub'));
+const PlatformIntelligenceHub = lazy(() => import('./pages/PlatformIntelligenceHub'));
 const PlatformAdminPage = lazy(() => import('./pages/PlatformAdminPage'));
 const CustomerPortalPage = lazy(() => import('./pages/customer-portal/CustomerPortalPage'));
 const BillingPage = lazy(() => import('./pages/BillingPage'));
@@ -1016,6 +1020,30 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.trackMindMaturity}
+          element={
+            <LazyRoute label="Loading TrackMind maturity...">
+              <TrackMindMaturityDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.enterprisePlatform}
+          element={
+            <LazyRoute label="Loading enterprise platform...">
+              <EnterpriseOperatingPlatformHub />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.platformIntelligence}
+          element={
+            <LazyRoute label="Loading platform intelligence...">
+              <PlatformIntelligenceHub />
+            </LazyRoute>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.platformAdmin}
           element={
             <LazyRoute label="Loading platform admin...">
@@ -1252,7 +1280,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.customerSuccess}
           element={
             <LazyRoute label="Loading customer success...">
-              <CustomerSuccessDashboard />
+              <CustomerSuccessPlatformPage />
             </LazyRoute>
           }
         />

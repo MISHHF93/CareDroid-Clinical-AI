@@ -7,6 +7,7 @@ export const RECEPTION_COPY = Object.freeze({
   workspace: {
     title: 'Reception',
     description: 'Register patients, confirm who they are, and send them to the triage nurse.',
+    deskDescription: 'Register patients and send them to the triage nurse.',
     actionsLabel: 'Register a patient',
     registerWalkIn: 'Register walk-in',
     checkIdentity: 'Check ID & documents',

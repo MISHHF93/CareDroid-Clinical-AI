@@ -83,6 +83,44 @@ export class CustomerSuccessService {
       underusedProducts,
     });
 
+    const onboardingProgress = this.buildOnboardingProgress(entitlements, products);
+    const featureUtilization = this.buildFeatureUtilization(
+      assetUsage,
+      assetById,
+      aiUsage,
+      simulationsCompleted,
+      workflowsCompleted,
+    );
+    const supportTracking = this.buildSupportTracking(
+      underusedProducts,
+      this.customerSignals({
+        adoptionScore,
+        activeUsers,
+        totalAssetUsage,
+        aiUsage,
+        simulationsCompleted,
+        workflowsCompleted,
+        underusedProducts,
+      }),
+      healthScore,
+    );
+    const renewalReadiness = this.buildRenewalReadiness({
+      healthScore,
+      adoptionScore,
+      onboardingPercent: onboardingProgress.percent,
+      featureUtilizationRate: featureUtilization.utilizationRate,
+      openSupportCount: supportTracking.openCount,
+    });
+    const kpis = this.evaluateCustomerSuccessKpis({
+      onboardingPercent: onboardingProgress.percent,
+      adoptionScore,
+      activeUsers,
+      featureUtilizationRate: featureUtilization.utilizationRate,
+      healthScore,
+      openSupportCount: supportTracking.openCount,
+      renewalReadinessScore: renewalReadiness.score,
+    });
+
     return {
       organizationId,
       generatedAt: new Date().toISOString(),
@@ -119,6 +157,11 @@ export class CustomerSuccessService {
         workflowsCompleted,
         underusedProducts,
       }),
+      onboardingProgress,
+      featureUtilization,
+      supportTracking,
+      renewalReadiness,
+      kpis,
       sources: {
         usageEvents: usageEvents.length,
         auditEvents: auditLogs.length,
@@ -400,5 +443,191 @@ export class CustomerSuccessService {
     const start = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
     const end = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1);
     return { key: 'month', start, end };
+  }
+
+  private buildOnboardingProgress(
+    entitlements: OrganizationEntitlement[],
+    products: Product[],
+  ) {
+    const steps = [
+      {
+        id: 'asset-packs',
+        label: 'Asset packs enabled',
+        complete: entitlements.length > 0,
+      },
+      {
+        id: 'products',
+        label: 'Products entitled',
+        complete: products.some((product) =>
+          (product.packIds || []).some((packId) =>
+            entitlements.some((entitlement) => entitlement.packId === packId),
+          ),
+        ),
+      },
+      {
+        id: 'usage-telemetry',
+        label: 'Usage telemetry observed',
+        complete: entitlements.length > 0,
+      },
+    ];
+    const completeCount = steps.filter((step) => step.complete).length;
+    return {
+      percent: steps.length ? Math.round((completeCount / steps.length) * 100) : 0,
+      steps,
+      completeCount,
+      totalCount: steps.length,
+    };
+  }
+
+  private buildFeatureUtilization(
+    assetUsage: Map<string, number>,
+    assetById: Map<string, PlatformAsset>,
+    aiUsage: number,
+    simulationsCompleted: number,
+    workflowsCompleted: number,
+  ) {
+    const registry = [
+      { id: 'whiteboard', label: 'Emergency whiteboard', match: ['whiteboard'] },
+      { id: 'copilot', label: 'ED Copilot', match: ['copilot', 'assistant', 'agent'] },
+      { id: 'simulation', label: 'Simulation training', match: ['simulation'] },
+      { id: 'workflow', label: 'Workflow completion', match: ['workflow'] },
+      { id: 'calculator', label: 'Clinical calculators', match: ['calculator', 'qsofa', 'news'] },
+    ];
+    const haystack = [...assetUsage.keys()]
+      .map((assetId) => {
+        const asset = assetById.get(assetId);
+        return `${assetId} ${asset?.title || ''} ${asset?.route || ''}`.toLowerCase();
+      })
+      .join(' ');
+    const features = registry.map((feature) => {
+      const utilized =
+        feature.match.some((token) => haystack.includes(token)) ||
+        (feature.id === 'copilot' && aiUsage > 0) ||
+        (feature.id === 'simulation' && simulationsCompleted > 0) ||
+        (feature.id === 'workflow' && workflowsCompleted > 0);
+      return { ...feature, utilized };
+    });
+    const utilizedCount = features.filter((feature) => feature.utilized).length;
+    return {
+      features,
+      utilizedCount,
+      totalFeatures: registry.length,
+      utilizationRate: registry.length
+        ? Math.round((utilizedCount / registry.length) * 100)
+        : 0,
+    };
+  }
+
+  private buildSupportTracking(
+    underusedProducts: Array<{ name: string; usageCount: number; enabledAssetCount: number }>,
+    signals: Array<{ id: string; label: string; status: string; message: string }>,
+    healthScore: number,
+  ) {
+    const items: Array<{
+      id: string;
+      type: string;
+      priority: string;
+      status: string;
+      subject: string;
+      summary: string;
+    }> = [];
+    let counter = 1;
+    underusedProducts
+      .filter((product) => product.usageCount === 0)
+      .slice(0, 4)
+      .forEach((product) => {
+        items.push({
+          id: `CS-${String(counter++).padStart(3, '0')}`,
+          type: 'enablement',
+          priority: 'medium',
+          status: 'open',
+          subject: `Enable ${product.name}`,
+          summary: `${product.enabledAssetCount} entitled assets with zero usage this period.`,
+        });
+      });
+    signals
+      .filter((signal) => signal.status !== 'healthy')
+      .forEach((signal) => {
+        items.push({
+          id: `CS-${String(counter++).padStart(3, '0')}`,
+          type: 'health-follow-up',
+          priority: signal.status === 'at-risk' ? 'high' : 'medium',
+          status: 'open',
+          subject: signal.label,
+          summary: signal.message,
+        });
+      });
+    if (healthScore < 50) {
+      items.push({
+        id: `CS-${String(counter++).padStart(3, '0')}`,
+        type: 'retention',
+        priority: 'critical',
+        status: 'escalated',
+        subject: 'Retention risk review',
+        summary: 'Customer health score indicates high retention risk.',
+      });
+    }
+    const openItems = items.filter((item) => item.status === 'open' || item.status === 'escalated');
+    return {
+      items,
+      openCount: openItems.length,
+      escalatedCount: items.filter((item) => item.status === 'escalated').length,
+      openItems,
+    };
+  }
+
+  private buildRenewalReadiness(input: {
+    healthScore: number;
+    adoptionScore: number;
+    onboardingPercent: number;
+    featureUtilizationRate: number;
+    openSupportCount: number;
+  }) {
+    const factors = [
+      { id: 'health', score: input.healthScore, weight: 30 },
+      { id: 'adoption', score: input.adoptionScore, weight: 25 },
+      { id: 'onboarding', score: input.onboardingPercent, weight: 20 },
+      { id: 'utilization', score: input.featureUtilizationRate, weight: 15 },
+      { id: 'support', score: Math.max(0, 100 - input.openSupportCount * 12), weight: 10 },
+    ];
+    const score = Math.round(
+      factors.reduce((total, factor) => total + factor.score * factor.weight, 0) / 100,
+    );
+    return {
+      score,
+      status: score >= 80 ? 'ready' : score >= 60 ? 'preparing' : score >= 40 ? 'at-risk' : 'critical',
+      factors,
+    };
+  }
+
+  private evaluateCustomerSuccessKpis(input: {
+    onboardingPercent: number;
+    adoptionScore: number;
+    activeUsers: number;
+    featureUtilizationRate: number;
+    healthScore: number;
+    openSupportCount: number;
+    renewalReadinessScore: number;
+  }) {
+    const rows = [
+      { id: 'onboardingCompletePercent', value: input.onboardingPercent, target: 80, max: false },
+      { id: 'adoptionScore', value: input.adoptionScore, target: 70, max: false },
+      { id: 'activeUsers', value: input.activeUsers, target: 5, max: false },
+      { id: 'featureUtilizationRate', value: input.featureUtilizationRate, target: 60, max: false },
+      { id: 'healthScore', value: input.healthScore, target: 75, max: false },
+      { id: 'supportOpenItems', value: input.openSupportCount, target: 3, max: true },
+      { id: 'renewalReadiness', value: input.renewalReadinessScore, target: 70, max: false },
+    ];
+    const kpis = rows.map((row) => ({
+      ...row,
+      passes: row.max ? row.value <= row.target : row.value >= row.target,
+    }));
+    const passedCount = kpis.filter((kpi) => kpi.passes).length;
+    return {
+      kpis,
+      passedCount,
+      totalCount: kpis.length,
+      passesAll: passedCount === kpis.length,
+    };
   }
 }

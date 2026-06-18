@@ -1,0 +1,352 @@
+{
+  "generatedAt": "2026-06-18T21:27:59.874Z",
+  "goal": "Platform intelligence audit — Prompts 117–136",
+  "promptsCovered": [
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136
+  ],
+  "overallScore": 79,
+  "overallStatus": "developing",
+  "summary": {
+    "moduleCount": 20,
+    "readyModules": 9,
+    "kpisPassed": 41,
+    "kpisTotal": 50,
+    "convergenceActions": [
+      {
+        "id": "CA-001",
+        "gap": "GAP-001",
+        "action": "Complete org-scoped emergency settings convergence",
+        "priority": "P0",
+        "owner": "Platform engineering"
+      },
+      {
+        "id": "CA-002",
+        "gap": "GAP-002",
+        "action": "Close customer success enablement queue items before renewal",
+        "priority": "P1",
+        "owner": "Customer success"
+      },
+      {
+        "id": "CA-003",
+        "gap": "GAP-003",
+        "action": "Apply whiteboard density mitigations under stress load",
+        "priority": "P1",
+        "owner": "Operations UX"
+      },
+      {
+        "id": "CA-004",
+        "gap": "GAP-004",
+        "action": "Persist workflow logs and partition by tenant",
+        "priority": "P0",
+        "owner": "Backend platform"
+      },
+      {
+        "id": "CA-005",
+        "gap": "GAP-005",
+        "action": "Raise lowest enterprise modules to developing threshold",
+        "priority": "P2",
+        "owner": "Program management"
+      }
+    ]
+  },
+  "moduleScores": {
+    "unified_artifact_registry": 100,
+    "artifact_relationship_mapping": 100,
+    "enterprise_metadata": 88,
+    "data_catalog": 94,
+    "data_lineage": 76,
+    "kpi_intelligence": 88,
+    "operational_intelligence_graph": 100,
+    "cross_domain_analytics": 70,
+    "forecasting_readiness": 75,
+    "reporting_studio": 100,
+    "tenant_health": 60,
+    "track_health": 69,
+    "executive_cockpit": 57,
+    "federation_intelligence": 73,
+    "saas_operations": 73,
+    "integration_governance": 64,
+    "api_governance": 100,
+    "platform_observability": 84,
+    "technical_debt_registry": 40,
+    "platform_convergence": 68
+  },
+  "convergence": {
+    "score": 68,
+    "gaps": [
+      {
+        "id": "GAP-001",
+        "domain": "architecture",
+        "summary": "Architecture score vs implementation parity",
+        "severity": "high",
+        "score": 77
+      },
+      {
+        "id": "GAP-002",
+        "domain": "business",
+        "summary": "Customer health vs renewal readiness alignment",
+        "severity": "medium",
+        "score": 72
+      },
+      {
+        "id": "GAP-003",
+        "domain": "operations",
+        "summary": "Survivability KPIs vs whiteboard load",
+        "severity": "medium",
+        "score": 76
+      },
+      {
+        "id": "GAP-004",
+        "domain": "governance",
+        "summary": "Certification evidence vs audit durability",
+        "severity": "high",
+        "score": 58
+      },
+      {
+        "id": "GAP-005",
+        "domain": "platform",
+        "summary": "Enterprise module readiness dispersion",
+        "severity": "medium",
+        "score": 83
+      }
+    ],
+    "correctiveActions": [
+      {
+        "id": "CA-001",
+        "gap": "GAP-001",
+        "action": "Complete org-scoped emergency settings convergence",
+        "priority": "P0",
+        "owner": "Platform engineering"
+      },
+      {
+        "id": "CA-002",
+        "gap": "GAP-002",
+        "action": "Close customer success enablement queue items before renewal",
+        "priority": "P1",
+        "owner": "Customer success"
+      },
+      {
+        "id": "CA-003",
+        "gap": "GAP-003",
+        "action": "Apply whiteboard density mitigations under stress load",
+        "priority": "P1",
+        "owner": "Operations UX"
+      },
+      {
+        "id": "CA-004",
+        "gap": "GAP-004",
+        "action": "Persist workflow logs and partition by tenant",
+        "priority": "P0",
+        "owner": "Backend platform"
+      },
+      {
+        "id": "CA-005",
+        "gap": "GAP-005",
+        "action": "Raise lowest enterprise modules to developing threshold",
+        "priority": "P2",
+        "owner": "Program management"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "prompt": 117,
+      "id": "unified_artifact_registry",
+      "label": "Unified artifact registry",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 118,
+      "id": "artifact_relationship_mapping",
+      "label": "Artifact relationship mapping",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 119,
+      "id": "enterprise_metadata",
+      "label": "Enterprise metadata framework",
+      "score": 88,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 120,
+      "id": "data_catalog",
+      "label": "Data catalog platform",
+      "score": 94,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 121,
+      "id": "data_lineage",
+      "label": "Data lineage platform",
+      "score": 76,
+      "status": "developing",
+      "kpisPassed": 1,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 122,
+      "id": "kpi_intelligence",
+      "label": "KPI intelligence layer",
+      "score": 88,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 123,
+      "id": "operational_intelligence_graph",
+      "label": "Operational intelligence graph",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 124,
+      "id": "cross_domain_analytics",
+      "label": "Cross-domain analytics",
+      "score": 70,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 125,
+      "id": "forecasting_readiness",
+      "label": "Forecasting readiness",
+      "score": 75,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 126,
+      "id": "reporting_studio",
+      "label": "Advanced reporting studio",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 127,
+      "id": "tenant_health",
+      "label": "Tenant health dashboard",
+      "score": 60,
+      "status": "watch",
+      "kpisPassed": 1,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 128,
+      "id": "track_health",
+      "label": "Track health dashboard",
+      "score": 69,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 129,
+      "id": "executive_cockpit",
+      "label": "Executive cockpit",
+      "score": 57,
+      "status": "watch",
+      "kpisPassed": 2,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 130,
+      "id": "federation_intelligence",
+      "label": "Federation intelligence",
+      "score": 73,
+      "status": "developing",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 131,
+      "id": "saas_operations",
+      "label": "SaaS operations dashboard",
+      "score": 73,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 132,
+      "id": "integration_governance",
+      "label": "Integration governance",
+      "score": 64,
+      "status": "watch",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 133,
+      "id": "api_governance",
+      "label": "API governance platform",
+      "score": 100,
+      "status": "ready",
+      "kpisPassed": 3,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 134,
+      "id": "platform_observability",
+      "label": "Platform observability center",
+      "score": 84,
+      "status": "ready",
+      "kpisPassed": 2,
+      "kpisTotal": 2
+    },
+    {
+      "prompt": 135,
+      "id": "technical_debt_registry",
+      "label": "Technical debt registry",
+      "score": 40,
+      "status": "at-risk",
+      "kpisPassed": 1,
+      "kpisTotal": 3
+    },
+    {
+      "prompt": 136,
+      "id": "platform_convergence",
+      "label": "Platform convergence review",
+      "score": 68,
+      "status": "developing",
+      "kpisPassed": 2,
+      "kpisTotal": 3
+    }
+  ]
+}

@@ -199,3 +199,15 @@
 .reception-workspace__history {
   margin-top: 12px;
 }
+
+.reception-workspace--desk-slim .reception-operational-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.reception-workspace--desk-slim .reception-workspace__intro h1 {
+  font-size: 20px;
+}
+
+.reception-workspace--desk-slim .reception-workspace__description {
+  margin: 0;
+}
