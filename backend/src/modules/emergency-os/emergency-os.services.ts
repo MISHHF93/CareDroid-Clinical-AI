@@ -840,18 +840,66 @@ export class EMSIntakeService {
           patient.flags.includes('EMSArrival') ||
           /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
       );
+    const arrivals = patients.map((patient) => ({
+      patient,
+      etaMinutes: Math.max(1, 14 - minutesSince(patient.arrivalTime)),
+      offloadRisk: isHighRisk(patient) ? 'high' : 'medium',
+      handoffStatus: patient.state === 'Arrival' ? 'pre-arrival' : 'converted-to-patient',
+    }));
+    const emsArrivals = arrivals
+      .filter((row) => row.handoffStatus === 'pre-arrival')
+      .map((row, index) => buildInboundEmsRecord(row, index));
     return envelope('EMS Intake', {
-      arrivals: patients.map((patient) => ({
-        patient,
-        etaMinutes: Math.max(1, 14 - minutesSince(patient.arrivalTime)),
-        offloadRisk: isHighRisk(patient) ? 'high' : 'medium',
-        handoffStatus: patient.state === 'Arrival' ? 'pre-arrival' : 'converted-to-patient',
-      })),
+      arrivals,
+      emsArrivals,
+      incomingPatients: emsArrivals,
       availableResusRooms: this.patientService
         .listRooms()
         .filter((room) => room.type === 'Resus' && room.status === 'Available').length,
     });
   }
+}
+
+function emsSeverityFromPatient(patient: EmergencyPatient, offloadRisk: string): string {
+  if (patient.priority === 'P1' || offloadRisk === 'high') return 'Critical';
+  if (patient.priority === 'P2') return 'High';
+  if (patient.priority === 'P4' || patient.priority === 'P5') return 'Low';
+  return 'Moderate';
+}
+
+function buildInboundEmsRecord(
+  row: {
+    patient: EmergencyPatient;
+    etaMinutes: number;
+    offloadRisk: string;
+    handoffStatus: string;
+  },
+  index: number,
+) {
+  const { patient, etaMinutes, offloadRisk } = row;
+  const estimatedArrivalTime = new Date(Date.now() + etaMinutes * 60000).toISOString();
+  const latestVitals = patient.vitals?.[patient.vitals.length - 1];
+  return {
+    id: `ems-arrival-${patient.id || index}`,
+    patientId: undefined,
+    unitId: patient.mrn || `EMS-${index + 1}`,
+    unitName: patient.mrn || `EMS Unit ${index + 1}`,
+    crewNames: ['EMS crew en route'],
+    patientAge: patient.age,
+    patientSex: patient.sex,
+    chiefComplaint: patient.chiefComplaint.replace(/^EMS pre-arrival:\s*/i, ''),
+    prearrivalComplaint: patient.chiefComplaint,
+    vitals: latestVitals,
+    eta: etaMinutes,
+    etaMinutes,
+    severity: emsSeverityFromPatient(patient, offloadRisk),
+    dispatchTime: patient.arrivalTime,
+    estimatedArrivalTime,
+    status: 'Inbound' as const,
+    priority: patient.priority,
+    notes: patient.timeline?.[patient.timeline.length - 1]?.note || patient.chiefComplaint,
+    mechanismOfInjury: patient.complaintCategory,
+  };
 }
 
 @Injectable()
@@ -977,6 +1025,83 @@ export class QueueIntelligenceService {
           patients: rows,
         };
       }),
+    });
+  }
+}
+
+@Injectable()
+export class ReceptionWorkspaceService {
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    private readonly emsIntakeService: EMSIntakeService,
+    private readonly queueService: QueueIntelligenceService,
+    private readonly workflowLogService: WorkflowActionLogService,
+  ) {}
+
+  getSnapshot() {
+    const patients = this.patientService.listPatients();
+    const emsData = this.emsIntakeService.getEMSIntake().data as {
+      emsArrivals?: ReturnType<typeof buildInboundEmsRecord>[];
+      availableResusRooms?: number;
+    };
+    const inboundEms = emsData.emsArrivals || [];
+    const queues = (this.queueService.getQueues().data as { queues?: unknown[] }).queues || [];
+
+    const metrics = {
+      recentArrivals: patients.filter((patient) => minutesSince(patient.arrivalTime) <= 30).length,
+      waiting: patients.filter((patient) => patient.state === 'Waiting').length,
+      awaitingVerification: patients.filter((patient) => patient.state === 'Registration').length,
+      awaitingTriage: patients.filter((patient) => patient.state === 'Triage').length,
+      emsInbound: inboundEms.length,
+      availableResusRooms: emsData.availableResusRooms ?? 0,
+    };
+
+    return envelope('Reception Snapshot', {
+      generatedAt: new Date().toISOString(),
+      metrics,
+      inboundEms,
+      emsArrivals: inboundEms,
+      awaitingVerificationPatients: patients
+        .filter((patient) => patient.state === 'Registration')
+        .slice(0, 12),
+      preTriagePatients: patients.filter((patient) => patient.state === 'Triage').slice(0, 12),
+      queues,
+    });
+  }
+
+  completeHandoff(input: { patientId?: string; source?: string; actorName?: string }) {
+    const patientId = String(input.patientId || '').trim();
+    if (!patientId) {
+      return envelope('Reception Handoff', { ok: false, error: 'patientId is required' });
+    }
+
+    const patient = this.patientService.movePatientToState(patientId, 'Triage', {
+      staffId: 'reception-handoff',
+      note: `Reception handoff to triage queue (${input.source || 'reception'}).`,
+    });
+
+    this.workflowLogService.record({
+      type: 'journey_state_changed',
+      title: 'Reception handoff',
+      summary: `Patient handed off from reception to triage queue (${input.source || 'reception'}).`,
+      patientId,
+      actorName: input.actorName,
+      source: 'reception-workspace',
+      metadata: {
+        handoff: 'reception.handoff',
+        source: input.source || 'reception',
+        queue: 'Triage',
+        targetState: 'Triage',
+      },
+    });
+
+    return envelope('Reception Handoff', {
+      ok: true,
+      patientId,
+      patient,
+      receptionPath: `/emergency/reception?arrived=${encodeURIComponent(patientId)}`,
+      queuesPath: `/emergency/queues?queue=Triage&patient=${encodeURIComponent(patientId)}`,
+      whiteboardPath: `/emergency/whiteboard?patient=${encodeURIComponent(patientId)}`,
     });
   }
 }

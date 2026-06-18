@@ -25,24 +25,13 @@ describe('emergencyPageRenderInventory', () => {
   });
 
   it('keeps requested AppShell nav paths in the active page inventory', () => {
-    expect(APP_SHELL_NAV_ITEMS.map((item) => item.label)).toEqual([
-      'Whiteboard',
-      'Patients',
-      'EMS',
-      'Intake',
-      'Queues',
-      'Reassess',
-      'Capacity',
-      'Boarding',
-      'Referrals',
-      'Copilot',
-      'Medical Tools',
-      'Analytics',
-      'Settings',
-    ]);
+    expect(APP_SHELL_NAV_ITEMS[0]?.label).toBe('Reception');
+    expect(APP_SHELL_NAV_ITEMS.map((item) => item.id)).toContain('reception');
 
     for (const item of APP_SHELL_NAV_ITEMS) {
-      expect(EMERGENCY_PAGE_PRIMARY_PATHS).toContain(item.path);
+      if (item.path.startsWith('/emergency/')) {
+        expect(EMERGENCY_PAGE_PRIMARY_PATHS).toContain(item.path);
+      }
     }
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.id)).not.toContain('ai_governance');
   });

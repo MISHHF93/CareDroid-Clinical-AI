@@ -1952,7 +1952,7 @@ function emsArrivalToPatient(arrival: EMSArrival, timestamp = nowIso()): Patient
     chiefComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint,
     complaint: arrival.prearrivalComplaint,
     complaintCategory: 'EMS',
-    state: PatientState.Arrival,
+    state: PatientState.Registration,
     priority: arrival.priority,
     vitals,
     flags: [
@@ -3684,6 +3684,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         emsIncomingPatients: ems.data
           ? extractEmsIncomingPatients(ems.data)
           : state.emsIncomingPatients,
+        emsArrivals: (() => {
+          if (!ems.data) return state.emsArrivals;
+          const nextArrivals = extractEmsIncomingPatients(ems.data) as unknown as EMSArrival[];
+          return nextArrivals.length ? nextArrivals : state.emsArrivals;
+        })(),
         queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
         alerts: operationalAlerts.length
           ? mergeEmergencyAlerts(operationalAlerts, state.alerts)

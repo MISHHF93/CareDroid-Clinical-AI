@@ -8,10 +8,32 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { routeComplaint } from '../engine/complaintRouter';
 
+type QuickIntakeVariant = 'whiteboard' | 'reception';
+
 type QuickIntakeProps = {
   onClose: () => void;
   onAdded: (patient: Patient) => void;
+  variant?: QuickIntakeVariant;
 };
+
+const QUICK_INTAKE_COPY = {
+  whiteboard: {
+    title: 'Central Node Intake',
+    submit: 'Send to Central Node',
+    submitting: 'Sending...',
+    priorityPrefix: 'Central CTAS',
+    showCentralBanner: true,
+    closeLabel: 'Close quick intake',
+  },
+  reception: {
+    title: 'Quick Create',
+    submit: 'Register & send to triage',
+    submitting: 'Registering...',
+    priorityPrefix: 'CTAS',
+    showCentralBanner: false,
+    closeLabel: 'Close quick create',
+  },
+} as const;
 
 type ComplaintCategory =
   | 'Chest pain'
@@ -133,7 +155,8 @@ function buildVitals(form: {
   };
 }
 
-export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
+export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }: QuickIntakeProps) {
+  const copy = QUICK_INTAKE_COPY[variant];
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const centralControlSettings = useEmergencyStore(
@@ -387,16 +410,18 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
         >
           <div>
             <h2 id="quick-intake-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
-              Central Node Intake
+              {copy.title}
             </h2>
             <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
-              Unified input and escalation for {centralControl.inputProfile.label}
+              {variant === 'reception'
+                ? 'Fast registration for front desk — patient enters triage queue after submit.'
+                : `Unified input and escalation for ${centralControl.inputProfile.label}`}
             </div>
           </div>
           <button
             type="button"
             onClick={closeWithConfirm}
-            aria-label="Close quick intake"
+            aria-label={copy.closeLabel}
             style={{
               width: 32,
               height: 32,
@@ -416,6 +441,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
           style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}
         >
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {copy.showCentralBanner ? (
             <div
               aria-label="Central node input mode"
               style={{
@@ -432,6 +458,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
               {centralControl.label} receives this as {centralControl.inputProfile.label}.
               Escalation path: {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}.
             </div>
+            ) : null}
             <div
               className="quick-intake-category-grid"
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}
@@ -654,7 +681,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
                 fontWeight: 800,
               }}
             >
-              Central CTAS {priority}
+              {copy.priorityPrefix} {priority}
               {priorityOverride ? ' override' : ''}
             </button>
             {showPriorityPicker ? (
@@ -721,7 +748,7 @@ export default function QuickIntake({ onClose, onAdded }: QuickIntakeProps) {
               minWidth: 170,
             }}
           >
-            {submitting ? 'Sending...' : 'Send to Central Node'}
+            {submitting ? copy.submitting : copy.submit}
           </button>
         </footer>
       </form>

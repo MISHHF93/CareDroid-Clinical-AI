@@ -49,7 +49,7 @@ export const CARE_DROID_SCREEN_MODE_CONFIG: Record<
   },
   REGISTRATION_SCREEN: {
     label: 'Registration screen',
-    visibleWidgets: ['smart-intake', 'patient-lookup', 'queues'],
+    visibleWidgets: ['smart-intake', 'patient-lookup', 'queues', 'ems-pre-arrival'],
     availableActions: ['create-patient', 'verify-identity'],
     density: 'comfortable',
     readOnly: false,

@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-06-18T00:14:50.643Z",
+  "workerCount": 20,
+  "durationMs": 134,
+  "passed": 20,
+  "failed": 0,
+  "plans": [
+    "receptionist-only_layout_29938d64.plan.md",
+    "reception-first_refactor_80aaa8b3.plan.md"
+  ],
+  "results": [
+    {
+      "workerId": "W01-screen-mode-hook",
+      "index": 0,
+      "id": "W01-screen-mode-hook",
+      "plan": "receptionist-only_layout",
+      "criterion": "useScreenModeCapabilities() exists and exports resolveScreenModeCapabilities",
+      "status": "pass"
+    },
+    {
+      "workerId": "W02-registration-screen-flags",
+      "index": 1,
+      "id": "W02-registration-screen-flags",
+      "plan": "receptionist-only_layout",
+      "criterion": "REGISTRATION_SCREEN hides ops strip, overlay, capacity engine",
+      "status": "pass"
+    },
+    {
+      "workerId": "W03-slim-header-gating",
+      "index": 2,
+      "id": "W03-slim-header-gating",
+      "plan": "receptionist-only_layout",
+      "criterion": "Header gates central-node badge and operational strip",
+      "status": "pass"
+    },
+    {
+      "workerId": "W04-header-single-search",
+      "index": 3,
+      "id": "W04-header-single-search",
+      "plan": "receptionist-only_layout",
+      "criterion": "Header lookup syncs ?q=; command palette hidden on registration screen",
+      "status": "pass"
+    },
+    {
+      "workerId": "W05-no-hero-search",
+      "index": 4,
+      "id": "W05-no-hero-search",
+      "plan": "receptionist-only_layout",
+      "criterion": "ReceptionWorkspace has no hero search or duplicate action row",
+      "status": "pass"
+    },
+    {
+      "workerId": "W06-appshell-overlay-gating",
+      "index": 5,
+      "id": "W06-appshell-overlay-gating",
+      "plan": "receptionist-only_layout",
+      "criterion": "AppShell conditionally mounts EMSCriticalBroadcast and skips engines",
+      "status": "pass"
+    },
+    {
+      "workerId": "W07-clerk-nav-minimal",
+      "index": 6,
+      "id": "W07-clerk-nav-minimal",
+      "plan": "receptionist-only_layout",
+      "criterion": "Clerk nav is reception + patients only",
+      "status": "pass"
+    },
+    {
+      "workerId": "W08-clerk-whiteboard-redirect",
+      "index": 7,
+      "id": "W08-clerk-whiteboard-redirect",
+      "plan": "receptionist-only_layout",
+      "criterion": "Clerk whiteboard URL redirects to reception",
+      "status": "pass"
+    },
+    {
+      "workerId": "W09-clerk-routes-trimmed",
+      "index": 8,
+      "id": "W09-clerk-routes-trimmed",
+      "plan": "receptionist-only_layout",
+      "criterion": "Clerk routes exclude whiteboard, queues, tools, platform",
+      "status": "pass"
+    },
+    {
+      "workerId": "W10-ems-pre-arrival-widget",
+      "index": 9,
+      "id": "W10-ems-pre-arrival-widget",
+      "plan": "receptionist-only_layout",
+      "criterion": "REGISTRATION_SCREEN visibleWidgets includes ems-pre-arrival",
+      "status": "pass"
+    },
+    {
+      "workerId": "W11-reception-route",
+      "index": 10,
+      "id": "W11-reception-route",
+      "plan": "reception-first_refactor",
+      "criterion": "/emergency/reception route mounts ReceptionWorkspace",
+      "status": "pass"
+    },
+    {
+      "workerId": "W12-reception-handoff",
+      "index": 11,
+      "id": "W12-reception-handoff",
+      "plan": "reception-first_refactor",
+      "criterion": "receptionHandoff.ts completes handoff to triage",
+      "status": "pass"
+    },
+    {
+      "workerId": "W13-clerk-default-route",
+      "index": 12,
+      "id": "W13-clerk-default-route",
+      "plan": "reception-first_refactor",
+      "criterion": "registration_clerk defaultRoute is /emergency/reception",
+      "status": "pass"
+    },
+    {
+      "workerId": "W14-demo-clerk-default",
+      "index": 13,
+      "id": "W14-demo-clerk-default",
+      "plan": "receptionist-only_layout",
+      "criterion": "Open-access demo user defaults to registration_clerk",
+      "status": "pass"
+    },
+    {
+      "workerId": "W15-tabbed-queues",
+      "index": 14,
+      "id": "W15-tabbed-queues",
+      "plan": "receptionist-only_layout",
+      "criterion": "Registration queues consolidated into tabbed ReceptionWorkQueues",
+      "status": "pass"
+    },
+    {
+      "workerId": "W16-metrics-stable",
+      "index": 15,
+      "id": "W16-metrics-stable",
+      "plan": "receptionist-only_layout",
+      "criterion": "ArrivalMetricsPanel avoids unstable operational summary selector",
+      "status": "pass"
+    },
+    {
+      "workerId": "W17-branding-arrival-dashboard",
+      "index": 16,
+      "id": "W17-branding-arrival-dashboard",
+      "plan": "receptionist-only_layout",
+      "criterion": "Registration screen uses Arrival Dashboard product label",
+      "status": "pass"
+    },
+    {
+      "workerId": "W18-plan-tests",
+      "index": 17,
+      "id": "W18-plan-tests",
+      "plan": "receptionist-only_layout",
+      "criterion": "Plan-mandated test files exist and assert key behaviors",
+      "status": "pass"
+    },
+    {
+      "workerId": "W19-plan-docs",
+      "index": 18,
+      "id": "W19-plan-docs",
+      "plan": "reception-first_refactor",
+      "criterion": "Architecture docs exist for reception strategy",
+      "status": "pass"
+    },
+    {
+      "workerId": "W20-clinical-no-regression",
+      "index": 19,
+      "id": "W20-clinical-no-regression",
+      "plan": "receptionist-only_layout",
+      "criterion": "Clinical roles retain whiteboard + ops strip (not registration-gated globally)",
+      "status": "pass"
+    }
+  ]
+}

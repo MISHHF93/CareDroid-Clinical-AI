@@ -313,10 +313,16 @@ const NAVIGATION_DESTINATION_ALIASES = Object.freeze({
 
 const EMERGENCY_OS_DESTINATIONS = Object.freeze([
   {
+    id: 'emergency-reception',
+    title: 'Reception',
+    path: CANONICAL_ROUTES.emergencyReception,
+    aliases: ['reception', 'arrival', 'front desk', 'registration', 'check in', 'prepare patient'],
+  },
+  {
     id: 'emergency-whiteboard',
     title: 'Emergency Whiteboard',
     path: CANONICAL_ROUTES.emergencyWhiteboard,
-    aliases: ['whiteboard', 'board', 'patient flow', 'operational screen'],
+    aliases: ['whiteboard', 'board', 'patient flow', 'operational screen', 'operations board'],
   },
   {
     id: 'emergency-patients',
@@ -334,7 +340,7 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     id: 'emergency-intake',
     title: 'Smart Intake',
     path: CANONICAL_ROUTES.emergencyIntake,
-    aliases: ['intake', 'arrival', 'ocr', 'identity', 'registration'],
+    aliases: ['intake', 'ocr', 'identity', 'smart intake'],
   },
   {
     id: 'emergency-queues',

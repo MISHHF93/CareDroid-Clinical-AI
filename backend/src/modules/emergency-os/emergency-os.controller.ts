@@ -21,6 +21,7 @@ import {
   PatientJourneyService,
   ProvincialHealthService,
   QueueIntelligenceService,
+  ReceptionWorkspaceService,
   ReassessmentService,
   ReferralService,
   SmartIntakeService,
@@ -54,6 +55,7 @@ export class EmergencyOsController {
     private readonly upgradeHarnessService: EmergencyOsUpgradeHarnessService,
     private readonly centralNodeService: CareDroidCentralNodeService,
     private readonly operationalIntelligenceService: OperationalIntelligenceService,
+    private readonly receptionWorkspaceService: ReceptionWorkspaceService,
   ) {}
 
   @Get('whiteboard')
@@ -122,6 +124,18 @@ export class EmergencyOsController {
   @Get('ems')
   getEMS() {
     return this.emsIntakeService.getEMSIntake();
+  }
+
+  @Get('reception/snapshot')
+  getReceptionSnapshot() {
+    return this.receptionWorkspaceService.getSnapshot();
+  }
+
+  @Post('reception/handoff')
+  postReceptionHandoff(
+    @Body() body: { patientId?: string; source?: string; actorName?: string },
+  ) {
+    return this.receptionWorkspaceService.completeHandoff(body);
   }
 
   @Get('intake')

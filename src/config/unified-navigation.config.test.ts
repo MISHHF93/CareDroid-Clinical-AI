@@ -11,6 +11,13 @@ import {
 
 const REQUESTED_ITEMS = [
   {
+    id: 'reception',
+    label: 'Reception',
+    icon: 'user-check',
+    route: '/emergency/reception',
+    featureGate: null,
+  },
+  {
     id: 'whiteboard',
     label: 'Whiteboard',
     icon: 'layout-dashboard',
@@ -102,6 +109,20 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'integrations',
+    label: 'Integrations',
+    icon: 'integrations',
+    route: '/integrations/hub',
+    featureGate: null,
+  },
+  {
+    id: 'cosmos',
+    label: 'Cosmos',
+    icon: 'chart-bar',
+    route: '/cosmos',
+    featureGate: null,
+  },
+  {
     id: 'platform',
     label: 'Platform',
     icon: 'platform',
@@ -163,15 +184,17 @@ describe('unified navigation config', () => {
   });
 
   it('shows the pilot surface to admin and read-only users', () => {
-    expect(getVisibleNavigation('admin').map((item) => item.label)).toEqual(
-      PILOT_VISIBLE_ITEMS.map((item) => item.label),
+    const adminLabels = getVisibleNavigation('admin').map((item) => item.label);
+    expect(adminLabels).toEqual(
+      PILOT_VISIBLE_ITEMS.map((item) => item.label).filter(
+        (label) => label !== 'Intake' && label !== 'Integrations',
+      ),
     );
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
     expect(readOnlyLabels).toEqual([
       'Whiteboard',
-      'Intake',
-      'EMS',
+      'Reception',
       'Patients',
       'Queues',
       'Reassess',
@@ -181,7 +204,10 @@ describe('unified navigation config', () => {
       'Copilot',
       'Medical Tools',
       'Analytics',
+      'Integrations',
+      'Cosmos',
       'Platform',
+      'EMS',
     ]);
     expect(readOnlyLabels).toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
@@ -192,6 +218,22 @@ describe('unified navigation config', () => {
     expect(resolveFeatureGate('referral_intel')).toBe('referral_intelligence');
     expect(resolveFeatureGate('capacity_intel')).toBe('capacity_intelligence');
     expect(resolveFeatureGate(null)).toBeNull();
+  });
+
+  it('hides standalone intake nav for registration clerks', () => {
+    const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
+    expect(clerkNavIds).toEqual(['reception', 'patients']);
+    expect(clerkNavIds).not.toContain('whiteboard');
+    expect(clerkNavIds).not.toContain('intake');
+    expect(clerkNavIds).not.toContain('queues');
+    expect(clerkNavIds).not.toContain('tools');
+    expect(clerkNavIds).not.toContain('platform');
+  });
+
+  it('hides duplicate integrations nav when settings is visible', () => {
+    const adminNavIds = getVisibleNavigation('admin').map((item) => item.id);
+    expect(adminNavIds).toContain('settings');
+    expect(adminNavIds).not.toContain('integrations');
   });
 
   it('normalizes aliases and defaults unknown roles consistently', () => {

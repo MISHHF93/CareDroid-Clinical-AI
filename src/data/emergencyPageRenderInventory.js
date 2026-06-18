@@ -94,6 +94,17 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     movementStages: ['Arrival', 'Triage'],
   }),
   page({
+    id: 'reception-workspace',
+    label: 'Reception',
+    path: CANONICAL_ROUTES.emergencyReception,
+    componentKey: 'ReceptionWorkspace',
+    navId: 'reception_workspace',
+    screenshotSlug: '05-reception-workspace',
+    loadEndpoints: ['/api/emergency/intake'],
+    actionEndpoints: ['POST /api/emergency/intake', 'POST /api/emergency/intake/vertical-slice'],
+    movementStages: ['Arrival', 'Triage'],
+  }),
+  page({
     id: 'smart-intake',
     label: 'Smart Intake',
     path: CANONICAL_ROUTES.emergencyIntake,

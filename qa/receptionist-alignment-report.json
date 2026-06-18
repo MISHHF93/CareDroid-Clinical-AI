@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-06-18T00:15:01.585Z",
+  "passed": 22,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "default-role",
+      "status": "pass",
+      "detail": "Open access defaults to registration_clerk"
+    },
+    {
+      "id": "clerk-nav-order",
+      "status": "pass",
+      "detail": "Clerk nav order is reception + patients"
+    },
+    {
+      "id": "clerk-routes-trim",
+      "status": "pass",
+      "detail": "Clerk routes: ROUTES.reception, ROUTES.patients, ROUTES.intake"
+    },
+    {
+      "id": "no-hero",
+      "status": "pass",
+      "detail": "No reception hero block"
+    },
+    {
+      "id": "no-secondary-actions",
+      "status": "pass",
+      "detail": "No duplicate secondary action row"
+    },
+    {
+      "id": "tabbed-queues",
+      "status": "pass",
+      "detail": "Tabbed registration queues in use"
+    },
+    {
+      "id": "header-gating",
+      "status": "pass",
+      "detail": "Header uses screen mode + prepare event"
+    },
+    {
+      "id": "single-search",
+      "status": "pass",
+      "detail": "Command palette hidden on registration screen"
+    },
+    {
+      "id": "metrics-stable",
+      "status": "pass",
+      "detail": "ArrivalMetricsPanel uses stable selector"
+    },
+    {
+      "id": "metrics-reception-routes",
+      "status": "pass",
+      "detail": "Metrics stay on reception for clerk"
+    },
+    {
+      "id": "overlay-gating",
+      "status": "pass",
+      "detail": "AppShell gates EMS overlay and patient panel"
+    },
+    {
+      "id": "platform-guard",
+      "status": "pass",
+      "detail": "Platform route uses EmergencyRouteGuard"
+    },
+    {
+      "id": "whiteboard-redirect",
+      "status": "pass",
+      "detail": "Clerk whiteboard redirect present"
+    },
+    {
+      "id": "sidebar-mobile-trim",
+      "status": "pass",
+      "detail": "Sidebar hides copilot on registration screen"
+    },
+    {
+      "id": "live-no-crash",
+      "status": "pass",
+      "detail": "Reception page renders without error boundary"
+    },
+    {
+      "id": "live-no-js-errors",
+      "status": "pass",
+      "detail": "No page JavaScript errors"
+    },
+    {
+      "id": "live-nav-minimal",
+      "status": "pass",
+      "detail": "Sidebar nav ids: reception, patients"
+    },
+    {
+      "id": "live-branding",
+      "status": "pass",
+      "detail": "Header shows Arrival Dashboard branding"
+    },
+    {
+      "id": "live-no-ops-strip",
+      "status": "pass",
+      "detail": "No CAP/EMS ops strip on clerk reception"
+    },
+    {
+      "id": "live-ems-panel",
+      "status": "pass",
+      "detail": "EMS pre-arrival panel visible"
+    },
+    {
+      "id": "live-single-search",
+      "status": "pass",
+      "detail": "No command palette search button on registration header"
+    },
+    {
+      "id": "live-prepare-entry",
+      "status": "pass",
+      "detail": "Single header Prepare entry (EMS cards use contextual Prepare registration)"
+    }
+  ]
+}

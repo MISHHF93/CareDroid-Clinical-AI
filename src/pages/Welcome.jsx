@@ -8,7 +8,7 @@ const steps = [
   {
     title: 'Choose your role',
     description: 'Help us tailor CareDroid to your workflow.',
-    options: ['Physician', 'Nurse', 'Pharmacist', 'Student'],
+    options: ['Receptionist / Registration Clerk', 'Physician', 'Nurse', 'Pharmacist', 'Student'],
   },
   {
     title: 'Set your focus',
@@ -35,7 +35,7 @@ const Welcome = () => {
       return;
     }
     success('Welcome complete', 'Profile preferences saved.');
-    navigate('/dashboard');
+    navigate('/');
   };
 
   return (

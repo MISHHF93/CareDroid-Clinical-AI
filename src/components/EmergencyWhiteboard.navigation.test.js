@@ -54,6 +54,13 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(patientCardSource).toContain('movePatientToState(patient.id, PatientState.Admission');
   });
 
+  it('promotes reception-first workflow launch points on the whiteboard', () => {
+    expect(whiteboardSource).toContain('Open Reception');
+    expect(whiteboardSource).toContain('isRegistrationClerk');
+    expect(whiteboardSource).toContain('useRouteScreenMode');
+    expect(whiteboardSource).toContain('wallDisplayRefreshInterval');
+  });
+
   it('shows non-blank loading and empty states for filtered views', () => {
     expect(whiteboardSource).toContain('<SkeletonLoader');
     expect(whiteboardSource).toContain('No active patients are currently on the board.');

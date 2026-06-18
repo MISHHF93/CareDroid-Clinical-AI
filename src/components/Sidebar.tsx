@@ -13,6 +13,7 @@ import {
   IconLayoutDashboard,
   IconListDetails,
   IconNotes,
+  IconPlugConnected,
   IconRefresh,
   IconReport,
   IconRobot,
@@ -29,8 +30,9 @@ import {
   getVisibleNavigation,
   type NavigationItem,
 } from '../config/unified-navigation.config';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, shouldHideStandaloneIntakeNav } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import './Sidebar.css';
 
 type SidebarNavItem = {
@@ -61,7 +63,7 @@ const ICONS: Record<string, Icon> = {
   intake: IconClipboardPlus,
   referrals: IconArrowsExchange,
   'provincial-health': IconShieldCheck,
-  integrations: IconSettings,
+  integrations: IconPlugConnected,
   'chart-bar': IconChartBar,
   capacity: IconGauge,
   'emergency-analytics': IconChartBar,
@@ -126,6 +128,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
   const emergencyRole = useEmergencyRolePermissions();
+  const screenCapabilities = useScreenModeCapabilities();
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const alerts = useEmergencyStore((state) => state.alerts);
@@ -148,16 +151,23 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     () => visibleNav.filter((item) => item.isEmergencyCore === false),
     [visibleNav],
   );
+  const mobilePrimaryIds = useMemo(() => {
+    if (emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk) {
+      return ['reception', 'patients'];
+    }
+    if (shouldHideStandaloneIntakeNav(emergencyRole.role)) {
+      return ['reception', 'whiteboard', 'patients'];
+    }
+    return ['whiteboard', 'patients', 'intake'];
+  }, [emergencyRole.role]);
   const mobilePrimaryNav = useMemo(() => {
-    const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
     return mobilePrimaryIds
       .map((id) => visibleNav.find((item) => item.id === id))
       .filter((item): item is SidebarNavItem => Boolean(item));
-  }, [visibleNav]);
+  }, [mobilePrimaryIds, visibleNav]);
   const moreNav = useMemo(() => {
-    const mobilePrimaryIds = ['whiteboard', 'patients', 'intake'];
     return visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
-  }, [visibleNav]);
+  }, [mobilePrimaryIds, visibleNav]);
   const moreHasActiveItem = useMemo(
     () => moreNav.some((item) => isActiveRoute(location.pathname, item)),
     [location.pathname, moreNav],
@@ -272,6 +282,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}
+        {canUseCopilot && !screenCapabilities.isRegistrationScreen ? (
         <button
           type="button"
           className={['sidebar-item', copilotOpen ? 'sidebar-item--active' : '']
@@ -286,6 +297,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           <IconRobot size={20} stroke={2} className="sidebar-nav-item__icon" />
           <label>Copilot</label>
         </button>
+        ) : null}
+        {moreNav.length ? (
         <button
           type="button"
           className={['sidebar-item', moreOpen || moreHasActiveItem ? 'sidebar-item--active' : '']
@@ -299,6 +312,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           <IconDots size={20} stroke={2} className="sidebar-nav-item__icon" />
           <label>More</label>
         </button>
+        ) : null}
       </nav>
       {moreOpen ? (
         <div

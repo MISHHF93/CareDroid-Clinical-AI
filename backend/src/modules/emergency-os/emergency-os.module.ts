@@ -35,8 +35,10 @@ import {
   PatientJourneyService,
   ProvincialHealthService,
   QueueIntelligenceService,
+  ReceptionWorkspaceService,
   ReassessmentService,
   ReferralService,
+  ReceptionWorkspaceService,
   SmartIntakeService,
   WorkflowActionLogService,
 } from './emergency-os.services';
@@ -64,6 +66,7 @@ import {
     CareDroidCentralNodeService,
     OperationalIntelligenceService,
     ReferralService,
+    ReceptionWorkspaceService,
     ProvincialHealthService,
     IntegrationHubService,
     EDCopilotService,

@@ -11,6 +11,7 @@ import {
   fetchCapacityStatus,
   fetchEDCopilot,
   fetchEMSIntake,
+  fetchReceptionSnapshot,
   fetchEmergencyAnalytics,
   fetchEmergencyAiGovernanceCompliance,
   fetchEmergencyAiGovernanceRegistry,
@@ -178,9 +179,11 @@ function normalizeEmergencyData(data = {}) {
   const patient = data.patient ? normalizePatientRecord(data.patient) : undefined;
   const emsArrivals = data.emsArrivals
     ? asArray(data.emsArrivals).map(normalizeEmsArrivalRecord)
-    : data.arrivals
-      ? asArray(data.arrivals).map(normalizeEmsArrival)
-      : undefined;
+    : data.inboundEms
+      ? asArray(data.inboundEms).map(normalizeEmsArrivalRecord)
+      : data.arrivals
+        ? asArray(data.arrivals).map(normalizeEmsArrival)
+        : undefined;
   const referrals = data.referrals ? asArray(data.referrals).map(normalizeReferral) : undefined;
   const queues = data.queues ? asArray(data.queues).map(normalizeQueueSummary) : undefined;
 
@@ -204,7 +207,10 @@ function normalizeEmergencyEnvelope(envelope) {
 
 function pickHydrationPayload(envelope) {
   const data = envelope?.data || {};
-  const emsArrivals = data.emsArrivals || data.arrivals?.map(normalizeEmsArrival);
+  const emsArrivals =
+    data.emsArrivals ||
+    data.inboundEms ||
+    data.arrivals?.map(normalizeEmsArrival);
   const referrals = data.referrals?.map(normalizeReferral);
   const workflowLogs = data.workflowLogs || data.logs;
   const emergencySettings =
@@ -333,6 +339,19 @@ export const useEmergencyWhiteboard = () => useEmergencyModule(fetchEmergencyWhi
 export const useEmergencyPatients = () => useEmergencyModule(fetchEmergencyPatients, 'patients');
 export const usePatientJourney = () => useEmergencyModule(fetchPatientJourney, 'journey');
 export const useEMSIntake = () => useEmergencyModule(fetchEMSIntake, 'ems');
+export const useReceptionSnapshot = () => useEmergencyModule(fetchReceptionSnapshot, 'reception');
+
+export function useReceptionSnapshotPolling(intervalMs = 15000) {
+  const snapshot = useReceptionSnapshot();
+  useEffect(() => {
+    if (!intervalMs) return undefined;
+    const timer = window.setInterval(() => {
+      void snapshot.refresh();
+    }, intervalMs);
+    return () => window.clearInterval(timer);
+  }, [intervalMs, snapshot.refresh]);
+  return snapshot;
+}
 export const useSmartIntake = () => useEmergencyModule(fetchSmartIntake);
 export const useEmergencyQueues = () => useEmergencyModule(fetchEmergencyQueues, 'queues');
 export const useReassessmentQueue = () => useEmergencyModule(fetchReassessmentQueue, 'reassessment');

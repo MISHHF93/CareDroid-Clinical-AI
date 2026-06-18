@@ -3,11 +3,13 @@ import {
   EMERGENCY_ROLE_IDS,
   getEmergencyRoleDefinition,
   normalizeEmergencyRole,
+  shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyWhiteboard;
 
 export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'reception',
   'whiteboard',
   'intake',
   'ems',
@@ -71,6 +73,13 @@ export type NavigationItem = Readonly<{
 const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform']);
 
 export const NAV_ITEMS = Object.freeze([
+  {
+    id: 'reception',
+    label: 'Reception',
+    icon: 'user-check',
+    route: CANONICAL_ROUTES.emergencyReception,
+    featureGate: null,
+  },
   {
     id: 'whiteboard',
     label: 'Whiteboard',
@@ -188,6 +197,7 @@ export const NAV_ITEMS = Object.freeze([
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
 const ALL_ROLES = Object.freeze(Object.values(ROLES));
 const NAV_FEATURE_IDS = Object.freeze({
+  reception: 'reception_workspace',
   whiteboard: 'emergency_whiteboard',
   patients: 'emergency_patients',
   ems: 'ems_pipeline',
@@ -266,13 +276,56 @@ export function getPilotCustomerNavigationItems(
   return items.filter((item) => isPilotCustomerVisibleNavItemId(item.id));
 }
 
+const ROLE_NAV_ORDER_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
+  triage_nurse: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'copilot', 'tools', 'platform', 'ems'],
+  charge_nurse: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  ed_manager: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  read_only_viewer: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'integrations', 'cosmos', 'platform', 'ems'],
+  physician: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'platform'],
+  registration_clerk: ['reception', 'patients'],
+});
+
+const ROLE_NAV_EXCLUDED_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
+  registration_clerk: ['queues', 'tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot'],
+});
+
+function sortNavigationForRole(items: readonly NavigationItem[], role: string): readonly NavigationItem[] {
+  const override = ROLE_NAV_ORDER_OVERRIDES[normalizeEmergencyRole(role)];
+  if (!override?.length) {
+    return [...items].sort((first, second) => first.order - second.order);
+  }
+
+  const orderIndex = new Map(override.map((id, index) => [id, index]));
+  return [...items].sort((first, second) => {
+    const firstIndex = orderIndex.get(first.id) ?? Number.MAX_SAFE_INTEGER;
+    const secondIndex = orderIndex.get(second.id) ?? Number.MAX_SAFE_INTEGER;
+    if (firstIndex !== secondIndex) return firstIndex - secondIndex;
+    return first.order - second.order;
+  });
+}
+
 export function getVisibleNavigation(
   userRole: string | null | undefined,
 ): readonly NavigationItem[] {
   const normalizedRole = normalizeEmergencyRole(userRole);
-  return [
-    ...getPilotCustomerNavigationItems(
-      NAVIGATION_ITEMS.filter((item) => item.roles.includes(normalizedRole)),
+  const hiddenForRole = shouldHideStandaloneIntakeNav(normalizedRole)
+    ? new Set(['intake'])
+    : new Set<string>();
+
+  for (const itemId of ROLE_NAV_EXCLUDED_OVERRIDES[normalizedRole] || []) {
+    hiddenForRole.add(itemId);
+  }
+
+  const visibleItems = getPilotCustomerNavigationItems(
+    NAVIGATION_ITEMS.filter(
+      (item) => item.roles.includes(normalizedRole) && !hiddenForRole.has(item.id),
     ),
-  ].sort((first, second) => first.order - second.order);
+  );
+
+  const sortedItems = sortNavigationForRole(visibleItems, normalizedRole);
+  const hasSettingsNav = sortedItems.some((item) => item.id === 'settings');
+  if (!hasSettingsNav) return sortedItems;
+
+  return sortedItems.filter((item) => item.id !== 'integrations');
 }

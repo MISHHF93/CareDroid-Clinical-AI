@@ -4,10 +4,12 @@ import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } fr
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
-import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import useRouteScreenMode from '../../hooks/useRouteScreenMode';
+import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, getReceptionQuickCreatePath, prefersReceptionForPatientCreate } from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
-import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
@@ -259,6 +261,9 @@ export default function EmergencyWhiteboard() {
   const centralControlSettings = useEmergencyStore(
     (state) => state.emergencySettings.centralControl,
   );
+  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
+  const routeScreenMode = useRouteScreenMode();
   const whiteboard = useEmergencyWhiteboard();
   const upgradePatientFlow = useUpgradeHarnessPatientFlow();
   const whiteboardPayload = (
@@ -299,15 +304,22 @@ export default function EmergencyWhiteboard() {
       }),
     [centralControlSettings, emergencyRole],
   );
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
+  const isReadOnlyDisplay =
+    routeScreenMode === CARE_DROID_SCREEN_MODES.readOnly ||
+    routeScreenMode === CARE_DROID_SCREEN_MODES.waitingRoom;
+  const isRegistrationClerk = emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk;
+  const canMutateWhiteboard = !isReadOnlyDisplay && !emergencyRole.readOnly;
   const commandLayerMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
     WHITEBOARD_COMMAND_METRIC_KEYS.has(metric.key),
   );
   const breachedQueueCount = centralSnapshot.queueHealth.filter((queue) => queue.breached).length;
   const canUseCentralIntake =
-    canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
+    canMutateWhiteboard &&
+    !isRegistrationClerk &&
+    (canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly));
   const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
   const activeEmsArrivals = useMemo(
     () => emsArrivals.filter((arrival) => !['Complete', 'Cancelled'].includes(arrival.status)),
@@ -380,7 +392,29 @@ export default function EmergencyWhiteboard() {
   }, []);
 
   useEffect(() => {
+    if (!isReadOnlyDisplay) return undefined;
+    const intervalMs = Math.max(
+      15000,
+      Number(emergencySettings.wallDisplayRefreshInterval) || 30000,
+    );
+    const timer = window.setInterval(() => {
+      void initializeFromBackend();
+      void whiteboard.refresh();
+    }, intervalMs);
+    return () => window.clearInterval(timer);
+  }, [
+    emergencySettings.wallDisplayRefreshInterval,
+    initializeFromBackend,
+    isReadOnlyDisplay,
+    whiteboard.refresh,
+  ]);
+
+  useEffect(() => {
     const openIntake = () => {
+      if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+        navigate(getReceptionQuickCreatePath());
+        return;
+      }
       if (canUseCentralIntake) setShowIntake(true);
     };
     const closePanels = () => setShowIntake(false);
@@ -390,7 +424,7 @@ export default function EmergencyWhiteboard() {
       document.removeEventListener('open-intake', openIntake);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, [canUseCentralIntake]);
+  }, [canUseCentralIntake, emergencyRole.role, navigate]);
 
   useEffect(() => {
     const clearFilters = () => {
@@ -402,8 +436,12 @@ export default function EmergencyWhiteboard() {
   }, [setQueueFilter]);
 
   const openIntake = useCallback(() => {
+    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+      navigate(getReceptionQuickCreatePath());
+      return;
+    }
     if (canUseCentralIntake) setShowIntake(true);
-  }, [canUseCentralIntake]);
+  }, [canUseCentralIntake, emergencyRole.role, navigate]);
 
   const openRoute = useCallback((path: string) => {
     const permissionPath = routePermissionPath(path);
@@ -667,30 +705,46 @@ export default function EmergencyWhiteboard() {
             Critical actions from the board
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-            <MissionButton
-              label="Central Intake"
-              onClick={openIntake}
-              disabled={!canUseCentralIntake}
-              title={canUseCentralIntake ? 'Create patient using the existing quick intake modal' : 'Central intake unavailable for this role'}
-              tone="primary"
-            />
+            {isRegistrationClerk ? (
+              <MissionButton
+                label="Open Reception"
+                onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
+                disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
+                title="Patient creation originates from the Reception arrival dashboard"
+                tone="primary"
+              />
+            ) : (
+              <MissionButton
+                label="Central Intake"
+                onClick={openIntake}
+                disabled={!canUseCentralIntake}
+                title={canUseCentralIntake ? 'Create patient using the existing quick intake modal' : 'Central intake unavailable for this role'}
+                tone="primary"
+              />
+            )}
             <MissionButton
               label="Identity Review"
-              onClick={() => openRoute(CANONICAL_ROUTES.emergencyIntake)}
+              onClick={() =>
+                openRoute(
+                  emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)
+                    ? `${CANONICAL_ROUTES.emergencyIntake}?from=reception`
+                    : CANONICAL_ROUTES.emergencyIntake,
+                )
+              }
               disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyIntake)}
               title="Open existing Smart Intake identity workflow"
             />
             <MissionButton
               label={`Reassessment Tasks (${reassessmentPatients.length})`}
               onClick={() => openReassessmentTasks()}
-              disabled={!reassessmentPatients.length}
+              disabled={!canMutateWhiteboard || !reassessmentPatients.length}
               title={reassessmentPatients.length ? 'Open reassessment drawer' : 'No reassessment tasks are due'}
               tone={reassessmentPatients.length ? 'warning' : 'default'}
             />
             <MissionButton
               label="New Referral"
               onClick={() => openReferralWorkflow()}
-              disabled={!canManageReferral}
+              disabled={!canMutateWhiteboard || !canManageReferral}
               title={canManageReferral ? 'Open existing referral form' : 'Referral workflow unavailable for this role'}
             />
           </div>
@@ -755,24 +809,28 @@ export default function EmergencyWhiteboard() {
                     </p>
                   </div>
                   <div style={{ display: 'grid', gap: 6 }}>
-                    <button
-                      type="button"
-                      onClick={() => prepareEMSBay(arrival.id)}
-                      disabled={!isIncoming || !canPrepareBay || Boolean(arrival.preparedRoomId)}
-                      title={arrival.preparedRoomId ? 'Bay already prepared' : 'Prepare a bay for this inbound EMS unit'}
-                      style={{ border: '1px solid color-mix(in srgb, var(--status-info, #38BDF8) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'var(--color-floating-surface, #1E293B)', color: '#BAE6FD', cursor: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 'pointer' : 'not-allowed', opacity: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
-                    >
-                      {arrival.preparedRoomId ? 'Bay Ready' : 'Prepare Bay'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => convertArrival(arrival)}
-                      disabled={!canConvertNow || !canConvertEmsArrival}
-                      title={canConvertNow ? 'Convert arrived EMS unit to a whiteboard patient' : 'Conversion is available after arrival'}
-                      style={{ border: '1px solid color-mix(in srgb, var(--status-stable, #10B981) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'color-mix(in srgb, var(--status-stable, #10B981) 12%, var(--color-card, #172033))', color: '#A7F3D0', cursor: canConvertNow && canConvertEmsArrival ? 'pointer' : 'not-allowed', opacity: canConvertNow && canConvertEmsArrival ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
-                    >
-                      Add to Board
-                    </button>
+                    {canMutateWhiteboard ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => prepareEMSBay(arrival.id)}
+                          disabled={!isIncoming || !canPrepareBay || Boolean(arrival.preparedRoomId)}
+                          title={arrival.preparedRoomId ? 'Bay already prepared' : 'Prepare a bay for this inbound EMS unit'}
+                          style={{ border: '1px solid color-mix(in srgb, var(--status-info, #38BDF8) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'var(--color-floating-surface, #1E293B)', color: '#BAE6FD', cursor: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 'pointer' : 'not-allowed', opacity: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
+                        >
+                          {arrival.preparedRoomId ? 'Bay Ready' : 'Prepare Bay'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => convertArrival(arrival)}
+                          disabled={!canConvertNow || !canConvertEmsArrival}
+                          title={canConvertNow ? 'Convert arrived EMS unit to a whiteboard patient' : 'Conversion is available after arrival'}
+                          style={{ border: '1px solid color-mix(in srgb, var(--status-stable, #10B981) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'color-mix(in srgb, var(--status-stable, #10B981) 12%, var(--color-card, #172033))', color: '#A7F3D0', cursor: canConvertNow && canConvertEmsArrival ? 'pointer' : 'not-allowed', opacity: canConvertNow && canConvertEmsArrival ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
+                        >
+                          Add to Board
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 </article>
               );
@@ -801,6 +859,7 @@ export default function EmergencyWhiteboard() {
                 key={patient.id}
                 type="button"
                 onClick={() => openReassessmentTasks(patient.id)}
+                disabled={!canMutateWhiteboard}
                 style={{
                   border: '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-default, #1F2937))',
                   borderRadius: 12,
@@ -820,7 +879,11 @@ export default function EmergencyWhiteboard() {
             )) : (
               <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 13 }}>No reassessment tasks are due.</p>
             )}
-            <MissionButton label="Filter Waiting Queue" onClick={() => openQueueReview('Waiting')} />
+            <MissionButton
+              label="Filter Waiting Queue"
+              onClick={() => openQueueReview('Waiting')}
+              disabled={!canMutateWhiteboard}
+            />
           </div>
         </div>
       </section>
@@ -873,31 +936,54 @@ export default function EmergencyWhiteboard() {
           <span><i style={{ background: 'var(--color-accent, #A78BFA)' }} /> Boarding</span>
         </div>
 
-        <button
-          className="emergency-whiteboard-page__intake-button"
-          type="button"
-          onClick={openIntake}
-          disabled={!canUseCentralIntake}
-          title={
-            canUseCentralIntake
-              ? 'Send a new patient input to the Central Node'
-              : `${emergencyRole.roleLabel} cannot submit central intake inputs`
-          }
-          style={{
-            border: '1px solid var(--color-border-subtle, #1F2937)',
-            borderRadius: 12,
-            background: 'var(--component-button-primary-bg, #2563EB)',
-            color: 'var(--component-button-primary-fg, #F9FAFB)',
-            padding: '10px 14px',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: canUseCentralIntake ? 'pointer' : 'not-allowed',
-            opacity: canUseCentralIntake ? 1 : 0.58,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          + Central Intake
-        </button>
+        {isRegistrationClerk ? (
+          <button
+            className="emergency-whiteboard-page__intake-button"
+            type="button"
+            onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
+            disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
+            title="Open the Reception arrival dashboard for patient creation"
+            style={{
+              border: '1px solid var(--color-border-subtle, #1F2937)',
+              borderRadius: 12,
+              background: 'var(--component-button-primary-bg, #2563EB)',
+              color: 'var(--component-button-primary-fg, #F9FAFB)',
+              padding: '10px 14px',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Open Reception
+          </button>
+        ) : (
+          <button
+            className="emergency-whiteboard-page__intake-button"
+            type="button"
+            onClick={openIntake}
+            disabled={!canUseCentralIntake}
+            title={
+              canUseCentralIntake
+                ? 'Send a new patient input to the Central Node'
+                : `${emergencyRole.roleLabel} cannot submit central intake inputs`
+            }
+            style={{
+              border: '1px solid var(--color-border-subtle, #1F2937)',
+              borderRadius: 12,
+              background: 'var(--component-button-primary-bg, #2563EB)',
+              color: 'var(--component-button-primary-fg, #F9FAFB)',
+              padding: '10px 14px',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: canUseCentralIntake ? 'pointer' : 'not-allowed',
+              opacity: canUseCentralIntake ? 1 : 0.58,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            + Central Intake
+          </button>
+        )}
       </div>
 
       {showIntake && canUseCentralIntake ? (
@@ -1000,7 +1086,11 @@ export default function EmergencyWhiteboard() {
           }}
         >
           {visiblePatients.map((patient) => (
-            <PatientCard key={patient.id} patient={patient} missionControlActions />
+            <PatientCard
+              key={patient.id}
+              patient={patient}
+              missionControlActions={canMutateWhiteboard && !isRegistrationClerk}
+            />
           ))}
         </div>
       ) : !whiteboard.loading ? (

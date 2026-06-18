@@ -1,0 +1,92 @@
+.reception-work-queues {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 14px;
+  background: var(--color-card, #172033);
+}
+
+.reception-work-queues__header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.reception-work-queues__header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.reception-work-queues__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reception-work-queues__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 999px;
+  background: var(--color-elevated, #0b1120);
+  color: var(--color-text-secondary, #9ca3af);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reception-work-queues__tab--active {
+  border-color: var(--status-info, #2563eb);
+  color: var(--color-text-primary, #f9fafb);
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.reception-work-queues__count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  text-align: center;
+}
+
+.reception-work-queues__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reception-work-queues__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 10px;
+  background: var(--color-elevated, #0b1120);
+  color: var(--color-text-primary, #f9fafb);
+  font: inherit;
+  cursor: pointer;
+}
+
+.reception-work-queues__item span:last-child {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reception-work-queues__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+}

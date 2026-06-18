@@ -1,15 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IconBell, IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore, type EmergencyOperationalMetricKey } from '../store/emergencyStore';
 import { PatientFlag, type Alert, type Patient } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import {
+  EMERGENCY_ACTIONS,
+  EMERGENCY_ROLE_IDS,
+  getReceptionQuickCreatePath,
+  prefersReceptionForPatientCreate,
+  prefersReceptionForPatientSearch,
+} from '../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+import useRouteScreenMode from '../hooks/useRouteScreenMode';
+import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
 import './Header.css';
@@ -188,8 +196,17 @@ type HeaderProps = {
 
 export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
-  const operationalIntelligence = useOperationalIntelligence({ realtime: true });
+  const routeScreenMode = useRouteScreenMode();
+  const screenCapabilities = useScreenModeCapabilities();
+  const patientLookupInputRef = useRef<HTMLInputElement>(null);
+  const isReceptionRoute = location.pathname === CANONICAL_ROUTES.emergencyReception;
+  const operationalIntelligence = useOperationalIntelligence({
+    realtime: true,
+    screenMode: routeScreenMode,
+  });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const refreshError = operationalIntelligence.refreshError;
@@ -359,9 +376,20 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     supplementalAlerts,
   ]);
 
+  const visibleNotificationAlerts = useMemo(() => {
+    if (!screenCapabilities.isRegistrationScreen) return notificationAlerts;
+    return notificationAlerts.filter((alert) => {
+      const haystack = `${alert.type || ''} ${alert.title || ''} ${alert.message || ''}`.toLowerCase();
+      if (alert.severity === 'Critical' && !/ems|ambulance|pre-arrival|inbound/.test(haystack)) {
+        return false;
+      }
+      return true;
+    });
+  }, [notificationAlerts, screenCapabilities.isRegistrationScreen]);
+
   const unreadAlertCount = useMemo(
-    () => notificationAlerts.filter((alert) => !alert.read && !alert.dismissed).length,
-    [notificationAlerts],
+    () => visibleNotificationAlerts.filter((alert) => !alert.read && !alert.dismissed).length,
+    [visibleNotificationAlerts],
   );
 
   const reassessmentAttentionCount = useMemo(
@@ -396,6 +424,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const openCentralIntake = () => {
     if (!canSubmitCentralIntake) return;
+    if (isReceptionRoute || prefersReceptionForPatientCreate(emergencyRole.role)) {
+      if (isReceptionRoute) {
+        document.dispatchEvent(new Event('open-reception-prepare'));
+        return;
+      }
+      navigateEmergencyRoute(getReceptionQuickCreatePath());
+      return;
+    }
     navigateEmergencyRoute(CANONICAL_ROUTES.emergencyWhiteboard);
     window.setTimeout(() => document.dispatchEvent(new Event('open-intake')), 0);
   };
@@ -412,7 +448,24 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const openPatientLookupRoute = () => {
     const query = patientLookupQuery.trim();
-    if (!canOpenPatients) return;
+    if (!canOpenPatients && !isReceptionRoute) return;
+    if (isReceptionRoute || prefersReceptionForPatientSearch(emergencyRole.role)) {
+      const nextParams = new URLSearchParams(searchParams);
+      if (query) nextParams.set('q', query);
+      else nextParams.delete('q');
+      setSearchParams(nextParams, { replace: true });
+      setPatientLookupOpen(false);
+      return;
+    }
+    if (emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk) {
+      navigateEmergencyRoute(
+        query
+          ? `${CANONICAL_ROUTES.emergencyReception}?q=${encodeURIComponent(query)}`
+          : CANONICAL_ROUTES.emergencyReception,
+      );
+      setPatientLookupOpen(false);
+      return;
+    }
     navigateEmergencyRoute(
       query
         ? `${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(query)}`
@@ -423,6 +476,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const selectLookupPatient = (patientId: string) => {
     selectPatient(patientId);
+    if (prefersReceptionForPatientSearch(emergencyRole.role)) {
+      navigateEmergencyRoute(
+        `${CANONICAL_ROUTES.emergencyReception}?patientId=${encodeURIComponent(patientId)}`,
+      );
+      setPatientLookupQuery('');
+      setPatientLookupOpen(false);
+      return;
+    }
     navigateEmergencyRoute(
       `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`,
     );
@@ -516,10 +577,32 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   );
 
   const markAllNotificationsRead = () => {
-    for (const alert of notificationAlerts) {
+    for (const alert of visibleNotificationAlerts) {
       recordAlertRead(alert.id);
     }
   };
+
+  const syncPatientLookupQuery = (value: string) => {
+    setPatientLookupQuery(value);
+    if (!isReceptionRoute) return;
+    const nextParams = new URLSearchParams(searchParams);
+    if (value.trim()) nextParams.set('q', value.trim());
+    else nextParams.delete('q');
+    setSearchParams(nextParams, { replace: true });
+  };
+
+  useEffect(() => {
+    if (!isReceptionRoute) return;
+    const urlQuery = searchParams.get('q') || '';
+    setPatientLookupQuery(urlQuery);
+  }, [isReceptionRoute, searchParams]);
+
+  useEffect(() => {
+    const focusLookup = () => patientLookupInputRef.current?.focus();
+    document.addEventListener('focus-reception-search', focusLookup);
+    if (isReceptionRoute) focusLookup();
+    return () => document.removeEventListener('focus-reception-search', focusLookup);
+  }, [isReceptionRoute]);
 
   useEffect(() => {
     const closePanels = () => {
@@ -534,12 +617,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     <header
       className="emergency-os-header"
       style={{
-        height: 92,
+        height: screenCapabilities.showOperationalStrip ? 92 : 48,
         width: '100%',
         background: '#0D1117',
         borderBottom: '1px solid #1F2937',
         display: 'grid',
-        gridTemplateRows: '48px 44px',
+        gridTemplateRows: screenCapabilities.showOperationalStrip ? '48px 44px' : '48px',
         flexShrink: 0,
         boxSizing: 'border-box',
         position: 'relative',
@@ -561,9 +644,11 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             title={EMERGENCY_OS_BRANDING.platformLine}
             style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
           >
-            {EMERGENCY_OS_BRANDING.productName}
+            {screenCapabilities.productLabel}
           </span>
-          <span className="emergency-os-header__aiios-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
+          {!screenCapabilities.isRegistrationScreen ? (
+            <span className="emergency-os-header__aiios-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
+          ) : null}
           <Clock />
         </div>
 
@@ -581,10 +666,16 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             aria-label="Current Emergency OS page"
             style={{ display: 'grid', minWidth: 0, justifyItems: 'center' }}
           >
-            <strong>{pageTitle || EMERGENCY_OS_BRANDING.productName}</strong>
-            {pageSubtitle ? <span>{pageSubtitle}</span> : null}
+            {screenCapabilities.isRegistrationScreen ? (
+              pageSubtitle ? <span>{pageSubtitle}</span> : null
+            ) : (
+              <>
+                <strong>{pageTitle || screenCapabilities.productLabel}</strong>
+                {pageSubtitle ? <span>{pageSubtitle}</span> : null}
+              </>
+            )}
           </div>
-          {!PILOT_CUSTOMER_MODE.enabled ? (
+          {screenCapabilities.showCentralNodeBadge && !PILOT_CUSTOMER_MODE.enabled ? (
             <span
               className="emergency-os-header__central-node"
               title={`${centralControl.statusLabel}. ${centralControl.dashboardControlLabel}. ${centralControl.inputProfile.label}. ${centralControl.contributorMode ? 'Users submit inputs only.' : 'This role can operate central controls.'}`}
@@ -593,6 +684,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               · {centralControl.inputProfile.label}
             </span>
           ) : null}
+          {screenCapabilities.showOperationalStrip ? (
           <div
             className="emergency-os-header__central-status"
             aria-label="CareDroid central node live status"
@@ -649,6 +741,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               </span>
             ) : null}
           </div>
+          ) : null}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
@@ -661,15 +754,18 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               className="emergency-os-header__action emergency-os-header__action--primary"
               onClick={openCentralIntake}
               disabled={!canSubmitCentralIntake}
-              aria-label="Create patient"
+              aria-label={isReceptionRoute ? 'Prepare patient' : 'Create patient'}
               title={
                 canSubmitCentralIntake
-                  ? 'Create a patient intake'
+                  ? isReceptionRoute
+                    ? 'Open prepare patient options'
+                    : 'Create a patient intake'
                   : `${emergencyRole.roleLabel} cannot create patients`
               }
             >
-              Create
+              {isReceptionRoute ? 'Prepare' : 'Create'}
             </button>
+            {screenCapabilities.showReassessAction ? (
             <button
               type="button"
               className="emergency-os-header__action"
@@ -679,6 +775,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             >
               Reassess
             </button>
+            ) : null}
+            {!screenCapabilities.isRegistrationScreen ? (
+            <>
             <button
               type="button"
               className="emergency-os-header__action"
@@ -711,18 +810,25 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                 Discharge
               </button>
             ) : null}
+            </>
+            ) : null}
           </div>
 
-          <div className="emergency-os-header__lookup">
+          <div className={`emergency-os-header__lookup${isReceptionRoute ? ' emergency-os-header__lookup--primary' : ''}`}>
             <IconSearch size={15} stroke={2} aria-hidden />
             <input
+              ref={patientLookupInputRef}
               type="search"
               value={patientLookupQuery}
-              placeholder="Patient lookup"
+              placeholder={
+                isReceptionRoute
+                  ? 'Search patients by name, MRN, or complaint...'
+                  : 'Patient lookup'
+              }
               aria-label="Patient lookup"
               onFocus={() => setPatientLookupOpen(true)}
               onChange={(event) => {
-                setPatientLookupQuery(event.target.value);
+                syncPatientLookupQuery(event.target.value);
                 setPatientLookupOpen(true);
               }}
               onKeyDown={(event) => {
@@ -772,6 +878,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
           </div>
 
+          {!screenCapabilities.isRegistrationScreen ? (
           <button
             type="button"
             onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
@@ -792,8 +899,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           >
             <IconSearch size={18} stroke={2} />
           </button>
+          ) : null}
 
-          {reassessmentAttentionCount > 0 ? (
+          {screenCapabilities.showReassessAction && reassessmentAttentionCount > 0 ? (
             <button
               type="button"
               className="reassessment-header-badge"
@@ -822,7 +930,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
           </button>
 
-          {!PILOT_CUSTOMER_MODE.enabled ? (
+          {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen ? (
             <button
               type="button"
               onClick={() => {
@@ -863,6 +971,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         </div>
       </div>
 
+      {screenCapabilities.showOperationalStrip ? (
       <nav
         className="emergency-os-header__operational-strip"
         aria-label="Operational command context"
@@ -888,6 +997,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           );
         })}
       </nav>
+      ) : null}
 
       {alertDrawerOpen ? (
         <div
@@ -898,7 +1008,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         >
           <div className="emergency-os-notification-center__header">
             <div>
-              <span>Emergency OS</span>
+              <span>{screenCapabilities.productLabel}</span>
               <h2 id="notification-center-title">Notification Center</h2>
               <p>
                 {unreadAlertCount
@@ -910,7 +1020,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               <button
                 type="button"
                 onClick={markAllNotificationsRead}
-                disabled={!notificationAlerts.some((alert) => !alert.read)}
+                disabled={!visibleNotificationAlerts.some((alert) => !alert.read)}
               >
                 Mark all read
               </button>
@@ -923,20 +1033,20 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               </button>
             </div>
           </div>
-          {loading && !notificationAlerts.length ? (
+          {loading && !visibleNotificationAlerts.length ? (
             <div className="emergency-os-notification-center__state" role="status">
-              Loading active Emergency OS notifications...
+              Loading active {screenCapabilities.productLabel} notifications...
             </div>
-          ) : refreshError && !notificationAlerts.length ? (
+          ) : refreshError && !visibleNotificationAlerts.length ? (
             <div
               className="emergency-os-notification-center__state emergency-os-notification-center__state--error"
               role="alert"
             >
               Notification data is using local Emergency OS state. {refreshError}
             </div>
-          ) : notificationAlerts.length > 0 ? (
+          ) : visibleNotificationAlerts.length > 0 ? (
             <div className="emergency-os-notification-center__list" role="list">
-              {notificationAlerts.map((alert) => {
+              {visibleNotificationAlerts.map((alert) => {
                 const primaryAction = openAlertRoute(alert);
                 const patientLabel = alertPatientLabel(alert, patientById);
                 const encounterId =
@@ -1018,7 +1128,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         </div>
       ) : null}
 
-      <StaffWorkloadPanel open={staffWorkloadOpen} onClose={() => setStaffWorkloadOpen(false)} />
+      {!screenCapabilities.isRegistrationScreen ? (
+        <StaffWorkloadPanel open={staffWorkloadOpen} onClose={() => setStaffWorkloadOpen(false)} />
+      ) : null}
     </header>
   );
 }

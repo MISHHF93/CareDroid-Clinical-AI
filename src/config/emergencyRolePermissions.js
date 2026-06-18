@@ -61,6 +61,7 @@ const ROUTES = Object.freeze({
   journey: CANONICAL_ROUTES.emergencyJourney,
   ems: CANONICAL_ROUTES.emergencyEms,
   intake: CANONICAL_ROUTES.emergencyIntake,
+  reception: CANONICAL_ROUTES.emergencyReception,
   queues: CANONICAL_ROUTES.emergencyQueues,
   reassessment: CANONICAL_ROUTES.emergencyReassessment,
   capacity: CANONICAL_ROUTES.emergencyCapacity,
@@ -82,6 +83,8 @@ const ROUTES = Object.freeze({
   aiGovernance: CANONICAL_ROUTES.emergencyAiGovernance,
   // Future module
   aiGovernanceGlobal: CANONICAL_ROUTES.aiGovernance,
+  integrations: CANONICAL_ROUTES.integrationHub,
+  cosmos: CANONICAL_ROUTES.cosmosViewer,
   settings: CANONICAL_ROUTES.emergencySettings,
 });
 
@@ -90,6 +93,7 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.pulse,
   ROUTES.patients,
   ROUTES.ems,
+  ROUTES.reception,
   ROUTES.intake,
   ROUTES.queues,
   ROUTES.reassessment,
@@ -101,6 +105,8 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.platform,
   ROUTES.shift,
   ROUTES.analytics,
+  ROUTES.integrations,
+  ROUTES.cosmos,
   ROUTES.settings,
 ]);
 const FUTURE_MODULE_ACTIONS = Object.freeze([
@@ -129,6 +135,7 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.pulse,
   ROUTES.patients,
   ROUTES.ems,
+  ROUTES.reception,
   ROUTES.intake,
   ROUTES.queues,
   ROUTES.reassessment,
@@ -211,6 +218,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.whiteboard,
       ROUTES.patients,
       ROUTES.ems,
+      ROUTES.reception,
       ROUTES.intake,
       ROUTES.queues,
       ROUTES.reassessment,
@@ -239,7 +247,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.physician],
     description:
       'Clinical decision role for patient review, state movement, referrals, reassessment, tools, and AI support.',
-    routes: [...CLINICAL_VIEW_ROUTES, ROUTES.ems, ROUTES.intake, ROUTES.copilot, ROUTES.analytics],
+    routes: [...CLINICAL_VIEW_ROUTES, ROUTES.reception, ROUTES.ems, ROUTES.intake, ROUTES.copilot, ROUTES.analytics],
     actions: [
       EMERGENCY_ACTIONS.transitionPatient,
       EMERGENCY_ACTIONS.writeVitals,
@@ -259,16 +267,13 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Registration role for identity review and patient creation without clinical state management.',
-    routes: [
-      ROUTES.whiteboard,
-      ROUTES.patients,
-      ROUTES.intake,
-      ROUTES.queues,
-      ROUTES.tools,
-      ROUTES.platform,
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake],
+    actions: [
+      EMERGENCY_ACTIONS.createPatient,
+      EMERGENCY_ACTIONS.verifyIntake,
+      EMERGENCY_ACTIONS.convertEmsArrival,
     ],
-    actions: [EMERGENCY_ACTIONS.createPatient, EMERGENCY_ACTIONS.verifyIntake],
-    defaultRoute: ROUTES.intake,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.emsUser]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.emsUser,
@@ -289,6 +294,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.readOnlyViewer],
     description: 'Observer role with Emergency OS visibility and no mutating actions.',
     routes: [
+      ROUTES.reception,
       ROUTES.whiteboard,
       ROUTES.patients,
       ROUTES.ems,
@@ -301,6 +307,8 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.copilot,
       ROUTES.tools,
       ROUTES.platform,
+      ROUTES.integrations,
+      ROUTES.cosmos,
       ROUTES.analytics,
     ],
     actions: [EMERGENCY_ACTIONS.viewAnalytics],
@@ -389,14 +397,54 @@ export function getNearestEmergencyRoute(role, preferredPath) {
   const definition = getEmergencyRoleDefinition(role);
   if (!definition) return CANONICAL_ROUTES.emergencyWhiteboard;
   if (preferredPath && canAccessEmergencyRoute(role, preferredPath)) return preferredPath;
+  return getEmergencyRoleHomeRoute(role);
+}
+
+export function getEmergencyRoleHomeRoute(role) {
+  const definition = getEmergencyRoleDefinition(role);
+  if (!definition) return CANONICAL_ROUTES.emergencyWhiteboard;
   return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyWhiteboard;
+}
+
+export function getReceptionQuickCreatePath() {
+  return `${CANONICAL_ROUTES.emergencyReception}?quickCreate=1`;
+}
+
+export function isRegistrationClerkRole(role) {
+  return normalizeEmergencyRole(role) === EMERGENCY_ROLE_IDS.registrationClerk;
+}
+
+export function prefersReceptionForPatientCreate(role) {
+  const normalizedRole = normalizeEmergencyRole(role);
+  if (normalizedRole === EMERGENCY_ROLE_IDS.emsUser) return false;
+  return hasEmergencyActionPermission(role, EMERGENCY_ACTIONS.createPatient);
+}
+
+export function prefersReceptionForPatientSearch(role) {
+  return isRegistrationClerkRole(role);
+}
+
+export function shouldHideStandaloneIntakeNav(role) {
+  const normalizedRole = normalizeEmergencyRole(role);
+  return (
+    isRegistrationClerkRole(normalizedRole) ||
+    normalizedRole === EMERGENCY_ROLE_IDS.triageNurse ||
+    normalizedRole === EMERGENCY_ROLE_IDS.chargeNurse ||
+    normalizedRole === EMERGENCY_ROLE_IDS.edManager ||
+    normalizedRole === EMERGENCY_ROLE_IDS.admin ||
+    normalizedRole === EMERGENCY_ROLE_IDS.physician ||
+    normalizedRole === EMERGENCY_ROLE_IDS.readOnlyViewer
+  );
 }
 
 export function getVisibleEmergencyNavigationItems(role, items) {
   const normalizedRole = normalizeEmergencyRole(role);
-  return (items || []).filter((item) =>
-    item.roles?.length ? item.roles.includes(normalizedRole) : canAccessEmergencyRoute(role, item.path),
-  );
+  return (items || []).filter((item) => {
+    if (item.id === 'intake' && shouldHideStandaloneIntakeNav(normalizedRole)) return false;
+    return item.roles?.length
+      ? item.roles.includes(normalizedRole)
+      : canAccessEmergencyRoute(role, item.path);
+  });
 }
 
 export function canExecuteEmergencyCommand(role, command) {

@@ -1,13 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, FileScan, Link2, UserPlus, UserRoundX } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, prefersReceptionForPatientCreate } from '../../config/emergencyRolePermissions';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import { SMART_INTAKE_DEMO } from '../../data/smartIntakeFixtures';
 import { buildSmartIntakeVerticalSlicePatient } from '../../data/smartIntakeVerticalSlice';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { fetchSmartIntake, runSmartIntakeVerticalSlice } from '../../services/emergencyOsApi';
+import SmartIntakeApi from '../../services/smartIntakeApi';
+import { completeReceptionHandoff } from '../../services/receptionHandoff';
 import './SmartIntake.css';
+
+const STEP_INDEX_BY_QUERY = Object.freeze({
+  capture: 1,
+  ocr: 2,
+  match: 3,
+  verify: 4,
+  finalize: 5,
+});
 
 const STATUS_LABEL = {
   verified: 'Verified',
@@ -70,11 +82,18 @@ function buildSmartIntakePatient(sessionId, label = 'Smart Intake patient') {
 export default function SmartIntake() {
   const emergencyRole = useEmergencyRolePermissions();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const store = useEmergencyStore();
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
   const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const [activeStep, setActiveStep] = useState(0);
+  const fromReception = searchParams.get('from') === 'reception';
+  const contextPatientId = searchParams.get('patientId') || '';
+  const [activeStep, setActiveStep] = useState(() => {
+    const stepParam = searchParams.get('step');
+    return STEP_INDEX_BY_QUERY[stepParam] ?? 0;
+  });
   const [selectedCandidateId, setSelectedCandidateId] = useState(
     SMART_INTAKE_DEMO.candidates[0]?.patientId || null,
   );
@@ -93,6 +112,90 @@ export default function SmartIntake() {
   const canVerifyIntake = emergencyRole.can(EMERGENCY_ACTIONS.verifyIntake);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
 
+  useEffect(() => {
+    if (!fromReception && prefersReceptionForPatientCreate(emergencyRole.role)) {
+      navigate(CANONICAL_ROUTES.emergencyReception, { replace: true });
+    }
+  }, [emergencyRole.role, fromReception, navigate]);
+
+  useEffect(() => {
+    if (!contextPatientId) return;
+    selectPatient(contextPatientId);
+    const boardPatient = patients.find((candidate) => candidate.id === contextPatientId);
+    if (boardPatient) {
+      setSelectedCandidateId(contextPatientId);
+      setFieldDecisions((current) => ({
+        ...current,
+        firstName: boardPatient.firstName ? 'verified' : current.firstName,
+        lastName: boardPatient.lastName ? 'verified' : current.lastName,
+        dateOfBirth: boardPatient.dob ? 'verified' : current.dateOfBirth,
+        healthCardNumber: boardPatient.mrn ? 'verified' : current.healthCardNumber,
+        sex: boardPatient.sex ? 'verified' : current.sex,
+      }));
+      setStatusMessage(
+        `Verifying ${[boardPatient.firstName, boardPatient.lastName].filter(Boolean).join(' ') || boardPatient.mrn || 'selected patient'} from reception queue.`,
+      );
+      return;
+    }
+    const matchedCandidate = SMART_INTAKE_DEMO.candidates.find(
+      (candidate) => candidate.patientId === contextPatientId,
+    );
+    if (matchedCandidate) setSelectedCandidateId(matchedCandidate.patientId);
+  }, [contextPatientId, patients, selectPatient]);
+
+  useEffect(() => {
+    if (!fromReception || searchParams.get('mode') !== 'unknown') return;
+    setActiveStep(STEP_INDEX_BY_QUERY.finalize);
+    setStatusMessage('Unknown patient arrival — staff must confirm before creating a record.');
+  }, [fromReception, searchParams]);
+
+  useEffect(() => {
+    if (!fromReception || searchParams.get('mode') !== 'ems-prearrival') return;
+    const emsArrivalId = searchParams.get('emsArrivalId');
+    setActiveStep(STEP_INDEX_BY_QUERY.capture);
+    setStatusMessage(
+      emsArrivalId
+        ? `Preparing registration for inbound EMS unit ${emsArrivalId} before arrival.`
+        : 'Preparing registration for inbound EMS unit before arrival.',
+    );
+  }, [fromReception, searchParams]);
+
+  const sessionBootstrapped = useRef(false);
+  useEffect(() => {
+    if (!fromReception || !canVerifyIntake || sessionBootstrapped.current) return;
+    const stepParam = searchParams.get('step');
+    if (!stepParam || stepParam === 'finalize') return;
+    sessionBootstrapped.current = true;
+    void startBackendSession();
+  }, [fromReception, canVerifyIntake, searchParams]);
+
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam && STEP_INDEX_BY_QUERY[stepParam] !== undefined) {
+      setActiveStep(STEP_INDEX_BY_QUERY[stepParam]);
+    }
+  }, [searchParams]);
+
+  const resolveSessionStartStep = () => {
+    const stepParam = searchParams.get('step');
+    return stepParam && STEP_INDEX_BY_QUERY[stepParam] !== undefined
+      ? STEP_INDEX_BY_QUERY[stepParam]
+      : 1;
+  };
+
+  const finishIntakeNavigation = (patientId) => {
+    if (!patientId) return;
+    if (fromReception) {
+      const handoff = completeReceptionHandoff(store, {
+        patientId,
+        source: 'smart-intake',
+      });
+      navigate(handoff.receptionPath);
+      return;
+    }
+    navigate(CANONICAL_ROUTES.emergencyPatients);
+  };
+
   const verificationComplete = useMemo(
     () =>
       Object.values(fieldDecisions).every((status) => ['verified', 'overridden'].includes(status)),
@@ -107,16 +210,22 @@ export default function SmartIntake() {
     setIsStarting(true);
     setErrorMessage('');
     try {
-      const result = await fetchSmartIntake();
-      setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);
-      setStatusMessage('Backend Smart Intake contract loaded for staff review.');
-      setActiveStep(1);
+      if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
+        const result = await SmartIntakeApi.createSession(emergencyRole.roleLabel);
+        setSessionId(result?.sessionId || result?.data?.sessionId || SMART_INTAKE_DEMO.sessionId);
+        setStatusMessage('Identity session started with backend OCR and match pipeline.');
+      } else {
+        const result = await fetchSmartIntake();
+        setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);
+        setStatusMessage('Backend Smart Intake contract loaded for staff review.');
+      }
+      setActiveStep(resolveSessionStartStep());
     } catch (error) {
       setErrorMessage(
         `${error?.message || 'Backend Smart Intake contract is not reachable.'} Continue verification in safeguarded review mode.`,
       );
       setStatusMessage('Safeguarded identity review is active for this session.');
-      setActiveStep(1);
+      setActiveStep(resolveSessionStartStep());
     } finally {
       setIsStarting(false);
     }
@@ -147,7 +256,7 @@ export default function SmartIntake() {
       { syncToBackend: false },
     );
     selectPatient(patient.id);
-    navigate('/emergency/patients');
+    finishIntakeNavigation(patient.id);
     return patient;
   };
 
@@ -163,8 +272,10 @@ export default function SmartIntake() {
       alerts: whiteboard.alerts,
       capacity: whiteboard.capacity || capacity,
     });
-    if (patient?.id) selectPatient(patient.id);
-    navigate('/emergency/patients');
+    if (patient?.id) {
+      selectPatient(patient.id);
+      finishIntakeNavigation(patient.id);
+    }
     return patient;
   };
 
@@ -206,7 +317,7 @@ export default function SmartIntake() {
     <section className="smart-intake" aria-labelledby="smart-intake-title">
       <header className="smart-intake__hero">
         <div>
-          <span>Emergency OS</span>
+          <span>Emergency OS{fromReception ? ' · Reception workflow' : ''}</span>
           <h1 id="smart-intake-title">Smart Intake Identity Review</h1>
           <p>
             Verify extracted identity, medication, allergy, EMS, and referral evidence before
@@ -221,6 +332,11 @@ export default function SmartIntake() {
           <FileScan size={18} aria-hidden />
           {isStarting ? 'Starting...' : 'Start Intake'}
         </button>
+        {fromReception ? (
+          <button type="button" onClick={() => navigate(CANONICAL_ROUTES.emergencyReception)}>
+            Back to Reception
+          </button>
+        ) : null}
       </header>
 
       <ol className="smart-intake__steps" aria-label="Smart Intake steps">
@@ -380,7 +496,15 @@ export default function SmartIntake() {
                 }),
               () => {
                 selectPatient(selectedCandidate.patientId);
-                navigate('/emergency/patients');
+                if (fromReception) {
+                  const handoff = completeReceptionHandoff(store, {
+                    patientId: selectedCandidate.patientId,
+                    source: 'smart-intake',
+                  });
+                  navigate(handoff.receptionPath);
+                  return;
+                }
+                navigate(CANONICAL_ROUTES.emergencyPatients);
               },
             )
           }

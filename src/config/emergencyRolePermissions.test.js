@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from './commandPalette.config';
-import { APP_SHELL_NAV_ITEMS } from './navigation.config';
+import { getVisibleNavigation } from './unified-navigation.config';
 import { CANONICAL_ROUTES } from './routes.config';
 import {
   EMERGENCY_ACTIONS,
@@ -9,8 +9,10 @@ import {
   canExecuteEmergencyCommand,
   getEmergencyDemoRoles,
   getEmergencyRoleDefinition,
+  getEmergencyRoleHomeRoute,
+  prefersReceptionForPatientCreate,
+  shouldHideStandaloneIntakeNav,
   getNearestEmergencyRoute,
-  getVisibleEmergencyNavigationItems,
   hasEmergencyActionPermission,
   isEmergencyReadOnlyRole,
   normalizeEmergencyRole,
@@ -33,18 +35,28 @@ describe('Emergency OS role-based views', () => {
   });
 
   it('filters Emergency OS navigation by role', () => {
-    const clerkNavIds = getVisibleEmergencyNavigationItems(
-      EMERGENCY_ROLE_IDS.registrationClerk,
-      APP_SHELL_NAV_ITEMS,
-    ).map((item) => item.id);
-    expect(clerkNavIds).toEqual(['whiteboard', 'patients', 'intake', 'queues', 'tools']);
+    const clerkNavIds = getVisibleNavigation(EMERGENCY_ROLE_IDS.registrationClerk).map(
+      (item) => item.id,
+    );
+    expect(clerkNavIds).toEqual(['reception', 'patients']);
+    expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('settings');
+    expect(clerkNavIds).not.toContain('queues');
+    expect(clerkNavIds).not.toContain('tools');
+    expect(clerkNavIds).not.toContain('platform');
 
-    const emsNavIds = getVisibleEmergencyNavigationItems(
-      EMERGENCY_ROLE_IDS.emsUser,
-      APP_SHELL_NAV_ITEMS,
-    ).map((item) => item.id);
-    expect(emsNavIds).toEqual(['whiteboard', 'patients', 'ems', 'capacity', 'tools']);
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyQueues),
+    ).toBe(false);
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyTools),
+    ).toBe(false);
+    expect(
+      canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.workspace),
+    ).toBe(false);
+
+    const emsNavIds = getVisibleNavigation(EMERGENCY_ROLE_IDS.emsUser).map((item) => item.id);
+    expect(emsNavIds).toEqual(['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'platform']);
     expect(emsNavIds).not.toContain('settings');
   });
 
@@ -59,6 +71,12 @@ describe('Emergency OS role-based views', () => {
       ),
     ).toBe(false);
     expect(
+      canAccessEmergencyRoute(
+        EMERGENCY_ROLE_IDS.registrationClerk,
+        CANONICAL_ROUTES.emergencyWhiteboard,
+      ),
+    ).toBe(false);
+    expect(
       canAccessEmergencyRoute(EMERGENCY_ROLE_IDS.registrationClerk, CANONICAL_ROUTES.emergencyEms),
     ).toBe(false);
     expect(
@@ -69,7 +87,18 @@ describe('Emergency OS role-based views', () => {
         EMERGENCY_ROLE_IDS.registrationClerk,
         CANONICAL_ROUTES.emergencySettings,
       ),
-    ).toBe(CANONICAL_ROUTES.emergencyIntake);
+    ).toBe(CANONICAL_ROUTES.emergencyReception);
+    expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
+      CANONICAL_ROUTES.emergencyReception,
+    );
+    expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.chargeNurse)).toBe(
+      CANONICAL_ROUTES.emergencyWhiteboard,
+    );
+    expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(true);
+    expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
+    expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.physician)).toBe(false);
+    expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.emsUser)).toBe(false);
+    expect(shouldHideStandaloneIntakeNav(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
     expect(
       getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencySettings),
     ).toBe(CANONICAL_ROUTES.emergencyEms);
@@ -101,15 +130,18 @@ describe('Emergency OS role-based views', () => {
     expect(
       hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
     ).toBe(false);
+    expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.registrationClerk).defaultRoute).toBe(
+      CANONICAL_ROUTES.emergencyReception,
+    );
   });
 
   it('filters route commands to role-accessible destinations', () => {
     const byId = Object.fromEntries(
       EMERGENCY_OS_ROUTE_COMMANDS.map((command) => [command.id, command]),
     );
-    expect(byId['open-analytics']).toBeUndefined();
-    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics'])).toBe(false);
-    expect(byId['open-settings']).toBeUndefined();
+    expect(byId['open-analytics']).toBeDefined();
+    expect(canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-analytics'])).toBe(true);
+    expect(byId['open-settings']).toBeDefined();
     expect(
       canExecuteEmergencyCommand(EMERGENCY_ROLE_IDS.readOnlyViewer, byId['open-settings']),
     ).toBe(false);
@@ -121,7 +153,7 @@ describe('Emergency OS role-based views', () => {
   it('keeps role route fixtures aligned across sidebar, direct access, and commands', () => {
     for (const { id: role } of getEmergencyDemoRoles()) {
       const definition = getEmergencyRoleDefinition(role);
-      const visibleNav = getVisibleEmergencyNavigationItems(role, APP_SHELL_NAV_ITEMS);
+      const visibleNav = getVisibleNavigation(role);
 
       for (const item of visibleNav) {
         expect(canAccessEmergencyRoute(role, item.path), `${role}:${item.id}`).toBe(true);

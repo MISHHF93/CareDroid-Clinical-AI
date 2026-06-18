@@ -18,9 +18,9 @@ const OPEN_ACCESS_TOKEN = appConfig.dev.bearerToken || 'dev-bypass-token';
 const OPEN_ACCESS_USER = Object.freeze({
   id: 'open-access-user',
   email: 'open-access@caredroid.local',
-  name: 'CareDroid Clinician',
-  fullName: 'CareDroid Clinician',
-  role: 'admin',
+  name: 'CareDroid Reception',
+  fullName: 'CareDroid Reception',
+  role: 'registration_clerk',
   authMode: 'open-access',
   isEmailVerified: true,
   twoFactorEnabled: false,

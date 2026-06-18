@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, getReceptionQuickCreatePath, prefersReceptionForPatientCreate, shouldHideStandaloneIntakeNav, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   EMERGENCY_OS_ROUTE_COMMANDS,
@@ -25,6 +25,7 @@ export interface Command {
 }
 
 type EmergencyCommandPermissions = {
+  role: string;
   can: (action: string) => boolean;
   canAccessRoute: (path: string) => boolean;
   nearestRoute: (path: string) => string;
@@ -324,10 +325,13 @@ function createEmergencyRouteCommands(
 }
 
 export function isCommandVisibleForEmergencyRole(
-  command: Pick<CommandWithVisibility, 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
+  command: Pick<CommandWithVisibility, 'id' | 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
   emergencyRole: EmergencyCommandPermissions,
 ): boolean {
   if (command.hiddenInPilotMode && PILOT_CUSTOMER_MODE.enabled) return false;
+  if (command.id === 'open-intake' && shouldHideStandaloneIntakeNav(emergencyRole.role)) {
+    return false;
+  }
   if (command.requiredAction && !emergencyRole.can(command.requiredAction)) return false;
   if (command.requiredRoute && !emergencyRole.canAccessRoute(command.requiredRoute)) return false;
   return true;
@@ -349,13 +353,23 @@ function createCommands(
     {
       id: 'new-patient',
       label: 'Create Patient',
-      description: 'Start central intake on the Whiteboard; human review remains required.',
+      description:
+        prefersReceptionForPatientCreate(emergencyRole.role)
+          ? 'Open Reception and prepare a new patient card.'
+          : 'Start central intake on the Operations Board; human review remains required.',
       shortcut: 'N',
       group: 'Patient',
-      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'patient create'],
+      keywords: ['add', 'new', 'register', 'intake', 'central intake', 'patient create', 'prepare patient'],
       requiredAction: EMERGENCY_ACTIONS.createPatient,
-      requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
+      requiredRoute:
+        prefersReceptionForPatientCreate(emergencyRole.role)
+          ? CANONICAL_ROUTES.emergencyReception
+          : CANONICAL_ROUTES.emergencyWhiteboard,
       action: () => {
+        if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+          navigateWithRoleGuard(navigate, getReceptionQuickCreatePath(), emergencyRole);
+          return;
+        }
         navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole);
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
@@ -363,11 +377,24 @@ function createCommands(
     {
       id: 'patient-lookup',
       label: 'Patient Lookup',
-      description: 'Open patient search and census lookup.',
+      description:
+        emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk
+          ? 'Search arriving patients from Reception.'
+          : 'Open patient search and census lookup.',
       group: 'Patient',
       keywords: ['find patient', 'lookup', 'mrn', 'search patient', 'census'],
-      requiredRoute: CANONICAL_ROUTES.emergencyPatients,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyPatients, emergencyRole),
+      requiredRoute:
+        emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk
+          ? CANONICAL_ROUTES.emergencyReception
+          : CANONICAL_ROUTES.emergencyPatients,
+      action: () =>
+        navigateWithRoleGuard(
+          navigate,
+          emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk
+            ? CANONICAL_ROUTES.emergencyReception
+            : CANONICAL_ROUTES.emergencyPatients,
+          emergencyRole,
+        ),
     },
     {
       id: 'toggle-copilot',

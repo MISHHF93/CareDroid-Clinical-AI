@@ -25,6 +25,11 @@ const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
     hint: 'I',
     keywords: ['intake', 'arrival', 'identity', 'registration', 'ocr'],
   },
+  reception: {
+    label: 'Open Reception',
+    hint: 'Rec',
+    keywords: ['reception', 'arrival', 'front desk', 'registration', 'check in'],
+  },
   queues: {
     label: 'Open Queues',
     hint: 'Q',

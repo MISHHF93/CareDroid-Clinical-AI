@@ -73,6 +73,8 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyCapacity: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyBoarding: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyEmsRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
+  emergencyReceptionSnapshot: BACKEND_CAPABILITY_STATUS.DEMO,
+  emergencyReceptionHandoff: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyWorkflowAudit: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyIntegrationHub: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyProvincialHealth: BACKEND_CAPABILITY_STATUS.DEMO,

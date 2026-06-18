@@ -18,12 +18,12 @@ const AuthCallback = () => {
     typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '',
   );
   const initialToken = fragmentParams.get('token') || params.get('token') || '';
-  const nextPath = fragmentParams.get('next') || params.get('next') || '/dashboard';
+  const nextPath = fragmentParams.get('next') || params.get('next') || '/';
   const [token, setToken] = useState(initialToken);
   const autoHandled = useRef(false);
   const safeNextPath = nextPath.startsWith('/') && !nextPath.startsWith('//') && !nextPath.startsWith('/auth')
     ? nextPath
-    : '/dashboard';
+    : '/';
 
   useEffect(() => {
     const fromUrl = initialToken;

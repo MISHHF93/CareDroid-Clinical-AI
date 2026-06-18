@@ -9,9 +9,15 @@ import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import {
+  EMERGENCY_ACTIONS,
+  EMERGENCY_ROLE_IDS,
+  getReceptionQuickCreatePath,
+  prefersReceptionForPatientCreate,
+} from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { PatientFlag, type Patient } from '../types/emergency';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
@@ -50,6 +56,7 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
   [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS`,
   [CANONICAL_ROUTES.emergencyIntake]: `${EMERGENCY_OS_BRANDING.productName} - Intake`,
+  [CANONICAL_ROUTES.emergencyReception]: EMERGENCY_OS_BRANDING.receptionName,
   [CANONICAL_ROUTES.emergencyQueues]: `${EMERGENCY_OS_BRANDING.productName} - Queues`,
   [CANONICAL_ROUTES.emergencyReassessment]: `${EMERGENCY_OS_BRANDING.productName} - Reassessment`,
   [CANONICAL_ROUTES.emergencyReferrals]: `${EMERGENCY_OS_BRANDING.productName} - Referrals`,
@@ -66,10 +73,11 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
 
 const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
-  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Patient flow, capacity, EMS, and reassessment status.',
+  [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
   [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS, offload pressure, and handoff actions.',
   [CANONICAL_ROUTES.emergencyIntake]: 'Identity verification and patient creation workflow.',
+  [CANONICAL_ROUTES.emergencyReception]: EMERGENCY_OS_BRANDING.receptionSummary,
   [CANONICAL_ROUTES.emergencyQueues]: 'Queue bottlenecks and queue-level operating metrics.',
   [CANONICAL_ROUTES.emergencyReassessment]: 'Due and overdue reassessment tasks.',
   [CANONICAL_ROUTES.emergencyCapacity]: 'Capacity score, rooms, boarders, and pressure inputs.',
@@ -127,6 +135,7 @@ export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
+  const screenCapabilities = useScreenModeCapabilities();
   const startupStartedRef = useRef(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
@@ -159,7 +168,9 @@ export function AppShell({ children }: AppShellProps) {
         matchesNavigationPath(location.pathname, item.path),
     );
     const title = EMERGENCY_OS_PAGE_TITLES[location.pathname];
-    const labelFromTitle = title?.replace(`${EMERGENCY_OS_BRANDING.productName} - `, '');
+    const labelFromTitle = title?.includes(' - ')
+      ? title.split(' - ').slice(1).join(' - ')
+      : title;
 
     return {
       label: labelFromTitle || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
@@ -181,8 +192,12 @@ export function AppShell({ children }: AppShellProps) {
     void useEmergencyStore.getState().initializeFromBackend();
     useEmergencyStore.getState().updateAlerts();
 
-    const reassessmentInterval = startReassessmentEngine();
-    const capacityInterval = startCapacityEngine();
+    const reassessmentInterval = screenCapabilities.showReassessmentEngine
+      ? startReassessmentEngine()
+      : undefined;
+    const capacityInterval = screenCapabilities.showCapacityEngine
+      ? startCapacityEngine()
+      : undefined;
     const alertsInterval = window.setInterval(
       () => useEmergencyStore.getState().updateAlerts(),
       30_000,
@@ -201,13 +216,13 @@ export function AppShell({ children }: AppShellProps) {
 
     return () => {
       cancelled = true;
-      window.clearInterval(reassessmentInterval);
-      window.clearInterval(capacityInterval);
+      if (reassessmentInterval !== undefined) window.clearInterval(reassessmentInterval);
+      if (capacityInterval !== undefined) window.clearInterval(capacityInterval);
       window.clearInterval(alertsInterval);
       stopSimulation?.();
       startupStartedRef.current = false;
     };
-  }, []);
+  }, [screenCapabilities.showCapacityEngine, screenCapabilities.showReassessmentEngine]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return undefined;
@@ -260,9 +275,9 @@ export function AppShell({ children }: AppShellProps) {
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
         e.preventDefault();
         navigate(
-          emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyWhiteboard)
-            ? CANONICAL_ROUTES.emergencyWhiteboard
-            : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyWhiteboard),
+          emergencyRole.defaultRoute ||
+            emergencyRole.allowedRoutes[0] ||
+            CANONICAL_ROUTES.emergencyWhiteboard,
         );
         return;
       }
@@ -287,14 +302,20 @@ export function AppShell({ children }: AppShellProps) {
       }
 
       if (e.key.toLowerCase() === 'r' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
-        e.preventDefault();
-        setShowReassessmentDrawer((open) => !open);
+        if (screenCapabilities.showReassessAction) {
+          e.preventDefault();
+          setShowReassessmentDrawer((open) => !open);
+        }
         return;
       }
 
       if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        document.dispatchEvent(new Event('open-command-palette'));
+        if (location.pathname === CANONICAL_ROUTES.emergencyReception) {
+          document.dispatchEvent(new Event('focus-reception-search'));
+        } else {
+          document.dispatchEvent(new Event('open-command-palette'));
+        }
       }
       if (
         e.key === 'n' &&
@@ -302,6 +323,11 @@ export function AppShell({ children }: AppShellProps) {
         !e.ctrlKey &&
         emergencyRole.can(EMERGENCY_ACTIONS.createPatient)
       ) {
+        e.preventDefault();
+        if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+          navigate(getReceptionQuickCreatePath());
+          return;
+        }
         navigate(CANONICAL_ROUTES.emergencyWhiteboard);
         window.setTimeout(() => document.dispatchEvent(new Event('open-intake')), 0);
       }
@@ -309,7 +335,7 @@ export function AppShell({ children }: AppShellProps) {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [canUseCopilot, emergencyRole, navigate]);
+  }, [canUseCopilot, emergencyRole, location.pathname, navigate, screenCapabilities.showReassessAction]);
 
   useEffect(() => {
     const openPalette = () => setShowPalette(true);
@@ -317,7 +343,9 @@ export function AppShell({ children }: AppShellProps) {
       setShowPalette(false);
       setShowReassessmentDrawer(false);
     };
-    const openReassessmentDrawer = () => setShowReassessmentDrawer(true);
+    const openReassessmentDrawer = () => {
+      if (screenCapabilities.showReassessAction) setShowReassessmentDrawer(true);
+    };
     document.addEventListener('open-command-palette', openPalette);
     document.addEventListener('open-reassessment', openReassessmentDrawer);
     document.addEventListener('open-reassessment-drawer', openReassessmentDrawer);
@@ -328,7 +356,7 @@ export function AppShell({ children }: AppShellProps) {
       document.removeEventListener('open-reassessment-drawer', openReassessmentDrawer);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, []);
+  }, [screenCapabilities.showReassessAction]);
 
   useEffect(() => {
     const openTools = (event: Event) => {
@@ -375,6 +403,10 @@ export function AppShell({ children }: AppShellProps) {
     switch (action.type) {
       case 'OPEN_INTAKE':
         if (!emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) break;
+        if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+          navigate(getReceptionQuickCreatePath());
+          break;
+        }
         navigate(CANONICAL_ROUTES.emergencyWhiteboard);
         document.dispatchEvent(new Event('open-intake'));
         break;
@@ -479,11 +511,11 @@ export function AppShell({ children }: AppShellProps) {
             paddingBottom: isMobileViewport ? 'calc(60px + env(safe-area-inset-bottom, 0px))' : 0,
           }}
         >
-          <ErrorBoundary fallbackText="Emergency OS page encountered an error. Refresh to reload.">
+          <ErrorBoundary fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}>
             <Suspense
               fallback={
                 <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
-                  Loading Emergency OS page...
+                  Loading {screenCapabilities.productLabel} page...
                 </div>
               }
             >
@@ -492,11 +524,13 @@ export function AppShell({ children }: AppShellProps) {
           </ErrorBoundary>
         </main>
       </div>
+      {!screenCapabilities.isRegistrationScreen ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>
           <PatientDetailPanel />
         </Suspense>
       </ErrorBoundary>
+      ) : null}
       {canUseCopilot && (!isTabletViewport || copilotOpen) ? (
         <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
           <Suspense fallback={null}>
@@ -506,10 +540,10 @@ export function AppShell({ children }: AppShellProps) {
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>
-          <EMSCriticalBroadcast />
+          {screenCapabilities.showEmsCriticalOverlay ? <EMSCriticalBroadcast /> : null}
         </Suspense>
       </ErrorBoundary>
-      {showReassessmentDrawer ? (
+      {showReassessmentDrawer && screenCapabilities.showReassessAction ? (
         <ErrorBoundary fallbackText="Reassessment drawer encountered an error.">
           <Suspense fallback={null}>
             <ReassessmentDrawer
