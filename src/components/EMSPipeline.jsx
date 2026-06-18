@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useEMSIntake } from '../hooks/useEmergencyOs';
+import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
 import './EMSPipeline.css';
 
@@ -234,7 +235,6 @@ export default function EMSPipeline() {
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
-  const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const [now, setNow] = useState(() => new Date());
   const [fleetSnapshot, setFleetSnapshot] = useState({ status: 'loading', units: [], message: '' });
   const [diversionStatus, setDiversionStatus] = useState({ status: 'idle', data: null, message: '' });
@@ -309,10 +309,25 @@ export default function EMSPipeline() {
       if (arrival.status !== 'Inbound') return;
       if (minutesRemaining(arrival, now) <= 0) {
         if (!canConvert) return;
-        convertEMSArrivalToPatient(arrival.id);
+        convertEmsArrivalForReception(arrival.id, { actorName: emergencyRole.roleLabel });
       }
     });
-  }, [activeArrivals, canConvert, convertEMSArrivalToPatient, now]);
+  }, [activeArrivals, canConvert, emergencyRole.roleLabel, now]);
+
+  const handleConvertEmsArrival = (arrivalId) => {
+    const result = convertEmsArrivalForReception(arrivalId, { actorName: emergencyRole.roleLabel });
+    if (!result.ok) return;
+    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+      navigate(
+        result.receptionVerifyPath ||
+          getReceptionEmbeddedIntakePath({
+            step: 'verify',
+            patientId: result.patientId,
+            emsArrivalId: result.emsArrivalId,
+          }),
+      );
+    }
+  };
 
   const incoming = activeArrivals
     .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0)
@@ -435,7 +450,7 @@ export default function EMSPipeline() {
                   now={now}
                   rooms={rooms}
                   onPrepareBay={prepareEMSBay}
-                  onConvert={convertEMSArrivalToPatient}
+                  onConvert={handleConvertEmsArrival}
                   onCompleteHandoff={completeHandoff}
                   onOpenPatient={openPatient}
                   offloadTargetMinutes={offloadTargetMinutes}
@@ -465,7 +480,7 @@ export default function EMSPipeline() {
                   now={now}
                   rooms={rooms}
                   onPrepareBay={prepareEMSBay}
-                  onConvert={convertEMSArrivalToPatient}
+                  onConvert={handleConvertEmsArrival}
                   onCompleteHandoff={completeHandoff}
                   onOpenPatient={openPatient}
                   offloadTargetMinutes={offloadTargetMinutes}

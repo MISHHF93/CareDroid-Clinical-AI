@@ -39,6 +39,8 @@ describe('intakeEncounter', () => {
     expect(encounterId).toBe('encounter-patient-1');
     expect(timelineEvent.type).toBe('EncounterCreated');
     expect(timelineEvent.metadata?.encounterId).toBe(encounterId);
+    expect(timelineEvent.metadata?.arrivalReason).toBe('Chest pain');
+    expect(timelineEvent.metadata?.patientId).toBe('patient-1');
   });
 
   it('creates an encounter after intake when configured', () => {

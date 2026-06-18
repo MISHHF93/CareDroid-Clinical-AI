@@ -710,6 +710,19 @@ export class EmergencyPatientService {
     return clone(this.patients[index]);
   }
 
+  patchPatient(
+    patientId: string,
+    patch: Partial<Pick<EmergencyPatient, 'triageAssist' | 'triageAssistGeneratedAt' | 'priority'>>,
+  ): EmergencyPatient {
+    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    this.patients[index] = {
+      ...this.patients[index],
+      ...patch,
+    };
+    return clone(this.patients[index]);
+  }
+
   computeCapacity(): CapacitySnapshot {
     const occupiedRooms = this.rooms.filter((room) => room.status === 'Occupied').length;
     const boardingCount = this.patients.filter(isBoarding).length;
@@ -1069,7 +1082,17 @@ export class ReceptionWorkspaceService {
     });
   }
 
-  completeHandoff(input: { patientId?: string; source?: string; actorName?: string }) {
+  completeHandoff(input: {
+    patientId?: string;
+    source?: string;
+    actorName?: string;
+    encounterId?: string | null;
+    arrivalReason?: string;
+    complaintCategory?: string;
+    verificationSummary?: string;
+    triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope;
+    triageAssistGeneratedAt?: string;
+  }) {
     const patientId = String(input.patientId || '').trim();
     if (!patientId) {
       return envelope('Reception Handoff', { ok: false, error: 'patientId is required' });
@@ -1095,13 +1118,23 @@ export class ReceptionWorkspaceService {
       },
     });
 
+    if (input.triageAssist) {
+      this.patientService.patchPatient(patientId, {
+        triageAssist: input.triageAssist,
+        triageAssistGeneratedAt: input.triageAssistGeneratedAt || input.triageAssist.generatedAt,
+      });
+    }
+
     return envelope('Reception Handoff', {
       ok: true,
       patientId,
-      patient,
+      patient: this.patientService.listPatients().find((entry) => entry.id === patientId) || patient,
+      triageAssist: input.triageAssist || patient.triageAssist || null,
+      triageAssistGeneratedAt:
+        input.triageAssistGeneratedAt || input.triageAssist?.generatedAt || patient.triageAssistGeneratedAt || null,
       receptionPath: `/emergency/reception?arrived=${encodeURIComponent(patientId)}`,
-      queuesPath: `/emergency/queues?queue=Triage&patient=${encodeURIComponent(patientId)}`,
-      whiteboardPath: `/emergency/whiteboard?patient=${encodeURIComponent(patientId)}`,
+      queuesPath: `/emergency/reception?queue=pretriage&patient=${encodeURIComponent(patientId)}`,
+      whiteboardPath: `/emergency/whiteboard?patient=${encodeURIComponent(patientId)}${input.encounterId ? `&encounter=${encodeURIComponent(input.encounterId)}` : ''}`,
     });
   }
 }

@@ -157,7 +157,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       'Full Emergency OS administration, settings, governance, and clinical operations access.',
     routes: ALL_ROUTES,
     actions: ALL_ACTIONS,
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.edManager]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.edManager,
@@ -178,7 +178,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.viewAnalytics,
       EMERGENCY_ACTIONS.runSimulation,
     ],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.chargeNurse]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.chargeNurse,
@@ -207,7 +207,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
     ],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.triageNurse]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.triageNurse,
@@ -240,7 +240,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.completeEmsHandoff,
       EMERGENCY_ACTIONS.useCopilot,
     ],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: ROUTES.reception,
   }),
   [EMERGENCY_ROLE_IDS.physician]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.physician,
@@ -402,22 +402,32 @@ export function getNearestEmergencyRoute(role, preferredPath) {
 
 export function getEmergencyRoleHomeRoute(role) {
   const definition = getEmergencyRoleDefinition(role);
-  if (!definition) return CANONICAL_ROUTES.emergencyWhiteboard;
-  return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyWhiteboard;
+  if (!definition) return CANONICAL_ROUTES.emergencyReception;
+  return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyReception;
 }
 
-export function getReceptionSmartIntakePath(options = {}) {
-  const params = new URLSearchParams({ from: 'reception', autostart: '1' });
+/** Fastest reception create — express registration modal on reception workspace. */
+export function getReceptionExpressCreatePath() {
+  return `${CANONICAL_ROUTES.emergencyReception}?express=1`;
+}
+
+/** Embedded Smart Intake on reception — zero route hops from arrival dashboard. */
+export function getReceptionEmbeddedIntakePath(options = {}) {
+  const params = new URLSearchParams({ intake: '1', autostart: '1' });
   if (options.step) params.set('step', options.step);
   if (options.mode) params.set('mode', options.mode);
   if (options.patientId) params.set('patientId', options.patientId);
   if (options.emsArrivalId) params.set('emsArrivalId', options.emsArrivalId);
-  return `${CANONICAL_ROUTES.emergencyIntake}?${params.toString()}`;
+  return `${CANONICAL_ROUTES.emergencyReception}?${params.toString()}`;
 }
 
-/** Primary reception create path — Smart Intake first. */
+export function getReceptionSmartIntakePath(options = {}) {
+  return getReceptionEmbeddedIntakePath(options);
+}
+
+/** Primary reception create path — embedded Smart Intake. */
 export function getReceptionQuickCreatePath() {
-  return getReceptionSmartIntakePath();
+  return getReceptionEmbeddedIntakePath();
 }
 
 /** Walk-in demographics shortcut without the identity wizard. */

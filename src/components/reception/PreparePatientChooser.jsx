@@ -7,6 +7,7 @@ export default function PreparePatientChooser({
   onManual,
   onScan,
   onSmartIntake,
+  onQuickCreate,
   onUnknown,
 }) {
   return (
@@ -17,8 +18,7 @@ export default function PreparePatientChooser({
             <p className="reception-prepare__eyebrow">Smart Intake options</p>
             <h2 id="prepare-patient-title">Choose an intake path</h2>
             <p className="reception-prepare__description">
-              Smart Intake is the default arrival workflow. Use these options when you need OCR,
-              walk-in quick entry, or unknown-patient handling.
+              Alternate paths when Smart Intake or express register are not the right fit.
             </p>
           </div>
           <button type="button" className="reception-prepare__close" onClick={onClose} aria-label="Close">
@@ -44,15 +44,24 @@ export default function PreparePatientChooser({
           <button type="button" className="reception-prepare__option" onClick={onManual}>
             <UserPlus size={20} aria-hidden />
             <span>
-              <strong>Quick walk-in</strong>
-              <small>Demographics, complaint, vitals, priority only</small>
+              <strong>Express registration</strong>
+              <small>Minimal fields — fastest walk-in</small>
             </span>
           </button>
+          {typeof onQuickCreate === 'function' ? (
+            <button type="button" className="reception-prepare__option" onClick={onQuickCreate}>
+              <UserPlus size={20} aria-hidden />
+              <span>
+                <strong>Full quick create</strong>
+                <small>Demographics, complaint, vitals, and triage handoff</small>
+              </span>
+            </button>
+          ) : null}
           <button type="button" className="reception-prepare__option" onClick={onUnknown}>
             <UserRoundX size={20} aria-hidden />
             <span>
               <strong>Unknown patient</strong>
-              <small>Minimal identity, send to triage queue</small>
+              <small>Provisional intake — send to triage without blocking on identity</small>
             </span>
           </button>
         </div>

@@ -1,0 +1,13 @@
+.reception-smart-intake-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #0b1120;
+  overflow-y: auto;
+}
+
+.reception-smart-intake-overlay .smart-intake--embedded {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-3);
+}

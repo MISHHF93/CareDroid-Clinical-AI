@@ -1,10 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
 import { CRITICAL_CHECKLISTS } from '../config/criticalChecklists';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import {
+  EMERGENCY_ACTIONS,
+  getReceptionEmbeddedIntakePath,
+  prefersReceptionForPatientCreate,
+} from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { staffDisplayName } from '../utils/staffManagement';
 import './EMSCriticalBroadcast.css';
 
@@ -125,6 +131,7 @@ export function EMSCriticalCountdownBadge() {
 }
 
 export default function EMSCriticalBroadcast() {
+  const navigate = useNavigate();
   const { user } = useUser();
   const emergencyRole = useEmergencyRolePermissions();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -133,7 +140,6 @@ export default function EMSCriticalBroadcast() {
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const checkCriticalEMSChecklistItem = useEmergencyStore((state) => state.checkCriticalEMSChecklistItem);
   const completeCriticalEMSChecklist = useEmergencyStore((state) => state.completeCriticalEMSChecklist);
-  const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const now = useNow();
   const arrival = activeCriticalArrivals(emsArrivals)[0];
   const currentStaff = useMemo(
@@ -201,7 +207,20 @@ export default function EMSCriticalBroadcast() {
 
   const addToWhiteboard = () => {
     if (!canConvert) return;
-    convertEMSArrivalToPatient(arrival.id);
+    const result = convertEmsArrivalForReception(arrival.id, {
+      actorName: emergencyRole.roleLabel,
+    });
+    if (!result.ok) return;
+    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+      navigate(
+        result.receptionVerifyPath ||
+          getReceptionEmbeddedIntakePath({
+            step: 'verify',
+            patientId: result.patientId,
+            emsArrivalId: arrival.id,
+          }),
+      );
+    }
   };
 
   return (

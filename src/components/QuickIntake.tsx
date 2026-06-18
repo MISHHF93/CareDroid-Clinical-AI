@@ -7,18 +7,20 @@ import { getCentralControlPolicy } from '../config/centralControl.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { routeComplaint } from '../engine/complaintRouter';
-import { ensureEncounterAfterIntake } from '../services/intakeEncounter';
 import {
   DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
   findDuplicateCandidates,
   type PatientDuplicateCandidate,
 } from '../utils/patientDuplicateDetection';
+import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 
 type QuickIntakeVariant = 'whiteboard' | 'reception';
 
 type QuickIntakeProps = {
   onClose: () => void;
   onAdded: (patient: Patient) => void;
+  onOpenVerification?: (patientId?: string) => void;
+  onProvisionalIntake?: () => void;
   variant?: QuickIntakeVariant;
 };
 
@@ -161,7 +163,13 @@ function buildVitals(form: {
   };
 }
 
-export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }: QuickIntakeProps) {
+export default function QuickIntake({
+  onClose,
+  onAdded,
+  onOpenVerification,
+  onProvisionalIntake,
+  variant = 'whiteboard',
+}: QuickIntakeProps) {
   const copy = QUICK_INTAKE_COPY[variant];
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
@@ -273,6 +281,7 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
       return;
     }
     const now = new Date().toISOString();
+    const isReceptionIntake = variant === 'reception';
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
       : [];
@@ -285,10 +294,10 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
       age,
       sex,
       arrivalTime: now,
-      triageTime: now,
+      triageTime: isReceptionIntake ? undefined : now,
       chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
       complaintCategory: complaintCategory || 'Other',
-      state: PatientState.Triage,
+      state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
       priority,
       vitals: completeVitals,
       flags: priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [],
@@ -317,22 +326,10 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
       const response = await createSmartIntakePatient(patient);
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
-      if (variant !== 'reception') {
-        ensureEncounterAfterIntake(useEmergencyStore.getState(), {
-          patientId: persistedPatient.id,
-          source: 'walk-in',
-        });
-      }
       onAdded(persistedPatient);
       onClose();
     } catch {
       addPatient(patient);
-      if (variant !== 'reception') {
-        ensureEncounterAfterIntake(useEmergencyStore.getState(), {
-          patientId: patient.id,
-          source: 'walk-in',
-        });
-      }
       onAdded(patient);
       onClose();
     } finally {
@@ -488,48 +485,17 @@ export default function QuickIntake({ onClose, onAdded, variant = 'whiteboard' }
         >
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {variant === 'reception' && duplicateCandidates.length ? (
-              <div
-                role="alert"
-                style={{
-                  border: '1px solid rgba(245, 158, 11, 0.45)',
-                  borderRadius: 12,
-                  background: 'rgba(245, 158, 11, 0.1)',
-                  padding: 12,
-                  color: '#FCD34D',
-                  fontSize: 13,
+              <DuplicateReviewAlert
+                candidates={duplicateCandidates}
+                acknowledged={duplicateAcknowledged}
+                onAcknowledge={() => {
+                  setDuplicateAcknowledged(true);
+                  setSubmitError('');
                 }}
-              >
-                <strong style={{ display: 'block', color: '#F9FAFB', marginBottom: 6 }}>
-                  Possible duplicate patients
-                </strong>
-                <ul style={{ margin: '0 0 8px', paddingLeft: 18 }}>
-                  {duplicateCandidates.map((candidate) => (
-                    <li key={candidate.patientId}>
-                      {candidate.displayName} · {candidate.matchScore}% match
-                    </li>
-                  ))}
-                </ul>
-                {highConfidenceDuplicate && !duplicateAcknowledged ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDuplicateAcknowledged(true);
-                      setSubmitError('');
-                    }}
-                    style={{
-                      border: 0,
-                      borderRadius: 8,
-                      background: '#1F2937',
-                      color: '#F9FAFB',
-                      padding: '8px 12px',
-                      cursor: 'pointer',
-                      fontWeight: 700,
-                    }}
-                  >
-                    Not a duplicate — create anyway
-                  </button>
-                ) : null}
-              </div>
+                onOpenPatient={(patientId) => onOpenVerification?.(patientId)}
+                onOpenVerification={(patientId) => onOpenVerification?.(patientId)}
+                onProvisionalIntake={onProvisionalIntake}
+              />
             ) : null}
             {copy.showCentralBanner ? (
             <div

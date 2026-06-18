@@ -1,0 +1,92 @@
+.ai-triage-assist {
+  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 36%, var(--color-border-default, #1f2937));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--status-info, #38bdf8) 10%, var(--color-card, #172033));
+  box-shadow: inset 3px 0 0 var(--status-info, #38bdf8);
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.ai-triage-assist--compact {
+  margin-top: 8px;
+}
+
+.ai-triage-assist__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.ai-triage-assist__eyebrow {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ai-triage-assist__title {
+  color: var(--color-text-primary, #f8fafc);
+  font-size: 15px;
+  margin: 2px 0 0;
+}
+
+.ai-triage-assist__confidence {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--status-info, #38bdf8) 18%, transparent);
+  color: #e0f2fe;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.ai-triage-assist__rationale {
+  color: var(--color-text-secondary, #cbd5e1);
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ai-triage-assist__context,
+.ai-triage-assist__disclaimer {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 12px;
+  margin: 0;
+}
+
+.ai-triage-assist__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-triage-assist__action {
+  border: 1px solid var(--color-border-subtle, #334155);
+  border-radius: 999px;
+  background: var(--color-surface, #111827);
+  color: var(--color-text-primary, #f8fafc);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 12px;
+}
+
+.ai-triage-assist__action--primary {
+  background: var(--component-button-primary-bg, #2563eb);
+  border-color: transparent;
+}
+
+.ai-triage-assist__action--ghost {
+  background: transparent;
+}
+
+.ai-triage-assist__action:hover {
+  filter: brightness(1.05);
+}

@@ -12,24 +12,21 @@ export default function ReceptionSearchHint({ query = '' }) {
   return (
     <div className="reception-search-hint">
       <div className="reception-search-hint__copy">
-        <Search size={16} aria-hidden />
-        <div>
-          <strong>Patient search</strong>
-          <p>
-            {trimmedQuery
-              ? (
-                <>
-                  Filtering queues for <strong>{trimmedQuery}</strong>. Use the header lookup to refine
-                  or clear.
-                </>
-              )
-              : 'Search by name, MRN, DOB, phone, or health card in the header lookup. Press / to focus instantly.'}
-          </p>
-        </div>
+        <Search size={15} aria-hidden />
+        <p>
+          {trimmedQuery ? (
+            <>
+              Filtering for <strong>{trimmedQuery}</strong> — use header search for patient actions.
+            </>
+          ) : (
+            <>
+              Patient search in the header — press <kbd>/</kbd> to focus.
+            </>
+          )}
+        </p>
       </div>
       <button type="button" className="reception-search-hint__action" onClick={focusHeaderSearch}>
-        {trimmedQuery ? 'Refine search' : 'Focus search'}
-        <kbd aria-hidden>/</kbd>
+        {trimmedQuery ? 'Refine' : 'Focus search'}
       </button>
     </div>
   );

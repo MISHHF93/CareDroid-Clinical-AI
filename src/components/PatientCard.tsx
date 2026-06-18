@@ -4,14 +4,18 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import { enterWaitingQueue } from '../services/queueAssignment';
+import { advancePatientJourneyState, advancePatientToBoarding, getDefaultNextPatientState } from '../services/queueAssignment';
+import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
 import './PatientCard.css';
+
+type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
 
 type PatientCardProps = {
   patient: Patient;
   keyboardSelected?: boolean;
   highlighted?: boolean;
-  missionControlActions?: boolean;
+  workflowProfile?: PatientCardWorkflowProfile;
+  readOnlyDisplay?: boolean;
   onKeyboardFocus?: () => void;
 };
 
@@ -30,8 +34,6 @@ const priorityColors = {
   P4: 'var(--priority-p4)',
   P5: 'var(--priority-p5)',
 };
-
-const patientStateOrder = Object.values(PatientState);
 
 const flagColors: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.SepsisAlert]: 'var(--status-danger)',
@@ -59,6 +61,7 @@ const flagLabels: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.Isolation]: 'Isolation',
   [PatientFlag.DeterioratingNeuro]: 'Neuro change',
   [PatientFlag.StrokeCode]: 'Stroke code',
+  [PatientFlag.IdentityPending]: 'Identity pending',
 };
 
 type SignalTone = 'critical' | 'warning' | 'info' | 'flow';
@@ -81,6 +84,8 @@ function getSignalBadges({
   isBoarding,
   hasReferralPending,
   hasTransferPending,
+  referralAwarenessLabel,
+  referralAwarenessTone,
   hasCapacityPressure,
 }: {
   patient: Patient;
@@ -92,6 +97,8 @@ function getSignalBadges({
   isBoarding: boolean;
   hasReferralPending: boolean;
   hasTransferPending: boolean;
+  referralAwarenessLabel?: string | null;
+  referralAwarenessTone?: SignalTone | null;
   hasCapacityPressure: boolean;
 }): StatusSignal[] {
   return [
@@ -116,7 +123,11 @@ function getSignalBadges({
     isBoarding ? { id: 'boarding', label: 'Boarding', tone: 'flow' as const } : null,
     hasTransferPending ? { id: 'transfer', label: 'Transfer pending', tone: 'flow' as const } : null,
     !hasTransferPending && hasReferralPending
-      ? { id: 'referral', label: 'Referral pending', tone: 'info' as const }
+      ? {
+          id: 'referral',
+          label: referralAwarenessLabel || 'Referral pending',
+          tone: referralAwarenessTone || ('info' as const),
+        }
       : null,
     hasCapacityPressure
       ? { id: 'capacity-pressure', label: 'Capacity pressure', tone: 'warning' as const }
@@ -142,11 +153,6 @@ function waitColor(minutes: number): string {
   if (minutes > 60) return 'var(--status-danger)';
   if (minutes > 45) return 'var(--status-warning)';
   return 'var(--color-text-secondary)';
-}
-
-function nextPatientState(current: PatientState): PatientState {
-  const index = patientStateOrder.indexOf(current);
-  return patientStateOrder[Math.min(index + 1, patientStateOrder.length - 1)];
 }
 
 function navigateTo(path: string): void {
@@ -212,7 +218,8 @@ function PatientCard({
   patient: patientProp,
   keyboardSelected = false,
   highlighted = false,
-  missionControlActions = false,
+  workflowProfile = 'none',
+  readOnlyDisplay = false,
   onKeyboardFocus,
 }: PatientCardProps) {
   const emergencyRole = useEmergencyRolePermissions();
@@ -220,7 +227,7 @@ function PatientCard({
     store.patients.find((candidate) => candidate.id === patientProp.id)
   ) || patientProp;
   const selectPatient = useEmergencyStore((store) => store.selectPatient);
-  const movePatientToState = useEmergencyStore((store) => store.movePatientToState);
+  const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const addFlag = useEmergencyStore((store) => store.addFlag);
   const staff = useEmergencyStore((store) => store.staff);
   const referrals = useEmergencyStore((store) => store.referrals);
@@ -240,7 +247,19 @@ function PatientCard({
   const openReferral = referrals.find(
     (referral) => referral.patientId === patient.id && isOpenReferralStatus(referral.status),
   );
-  const hasReferralPending = Boolean(openReferral);
+  const referralAwareness = findPatientReferralAwareness(referrals, patient.id);
+  const hasReferralPending = Boolean(referralAwareness);
+  const referralAwarenessLabel = referralAwareness
+    ? `Referral ${referralAwareness.label.toLowerCase()}`
+    : null;
+  const referralAwarenessTone =
+    referralAwareness?.bucket === 'delayed'
+      ? ('critical' as const)
+      : referralAwareness?.bucket === 'accepted'
+        ? ('flow' as const)
+        : referralAwareness?.bucket === 'pending'
+          ? ('warning' as const)
+          : null;
   const hasTransferPending = openReferral?.workflow === 'Transfer';
   const hasCapacityPressure =
     (capacityBand === 'Orange' || capacityBand === 'Red') &&
@@ -258,6 +277,8 @@ function PatientCard({
     isBoarding,
     hasReferralPending,
     hasTransferPending,
+    referralAwarenessLabel,
+    referralAwarenessTone,
     hasCapacityPressure,
   });
   const cardStyle = {
@@ -267,8 +288,10 @@ function PatientCard({
   const canManageFlags = emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
   const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
   const canDischarge = emergencyRole.can(EMERGENCY_ACTIONS.dischargePatient);
-  const nextState = nextPatientState(patient.state);
-  const canMoveNext = canTransition && nextState !== patient.state && !isDischarged;
+  const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
+  const showWorkflowActions = workflowProfile !== 'none';
+  const nextState = getDefaultNextPatientState(patient);
+  const canMoveNext = canTransition && Boolean(nextState) && !isDischarged;
   const canBoardPatient = canTransition && !isBoarding && !isDischarged;
 
   const hr = vitals?.hr ?? vitals?.heartRate;
@@ -289,12 +312,15 @@ function PatientCard({
     hasReassessmentDue ? 'reassessment due' : '',
     hasDeteriorationRisk ? 'deterioration risk' : '',
     abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal }),
-    hasTransferPending ? 'transfer pending' : hasReferralPending ? 'referral pending' : '',
+    hasTransferPending ? 'transfer pending' : hasReferralPending ? referralAwarenessLabel || 'referral pending' : '',
     hasCapacityPressure ? `${capacityBand} capacity pressure` : '',
   ]
     .filter(Boolean)
     .join(', ');
-  const handleSelect = useCallback(() => selectPatient(patient.id), [patient.id, selectPatient]);
+  const handleSelect = useCallback(() => {
+    if (readOnlyDisplay) return;
+    selectPatient(patient.id);
+  }, [patient.id, readOnlyDisplay, selectPatient]);
   const handleTimelineClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     selectPatient(patient.id);
@@ -305,17 +331,15 @@ function PatientCard({
   }, [patient.id, selectPatient]);
   const handleMoveNext = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (!canMoveNext) return;
-    if (nextState === PatientState.Waiting) {
-      enterWaitingQueue(useEmergencyStore.getState(), {
-        patientId: patient.id,
-        actorId: patient.assignedStaffId || 'whiteboard-command',
-        note: 'Moved from Whiteboard mission control into waiting queue.',
-      });
-      return;
-    }
-    movePatientToState(patient.id, nextState, patient.assignedStaffId || 'whiteboard-command', 'Moved from Whiteboard mission control');
-  }, [canMoveNext, movePatientToState, nextState, patient.assignedStaffId, patient.id]);
+    if (!canMoveNext || !nextState) return;
+    advancePatientJourneyState(patient.id, nextState, {
+      actorId: patient.assignedStaffId || 'whiteboard-command',
+      note:
+        nextState === PatientState.Waiting
+          ? 'Moved from Whiteboard mission control into waiting queue.'
+          : 'Moved from Whiteboard mission control',
+    });
+  }, [canMoveNext, nextState, patient.assignedStaffId, patient.id]);
   const handleReassessment = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (!hasReassessmentDue && !canManageFlags) return;
@@ -333,14 +357,23 @@ function PatientCard({
   const handleBoarding = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (!canBoardPatient) return;
-    movePatientToState(patient.id, PatientState.Admission, patient.assignedStaffId || 'whiteboard-command', 'Boarding launched from Whiteboard mission control');
-  }, [canBoardPatient, movePatientToState, patient.assignedStaffId, patient.id]);
+    advancePatientToBoarding(patient.id, {
+      actorId: patient.assignedStaffId || 'whiteboard-command',
+      note: 'Boarding launched from Whiteboard mission control',
+    });
+  }, [canBoardPatient, patient.assignedStaffId, patient.id]);
   const handleDischarge = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (!canDischarge || isDischarged) return;
     selectPatient(patient.id);
     window.setTimeout(() => document.dispatchEvent(new Event('open-patient-discharge')), 0);
   }, [canDischarge, isDischarged, patient.id, selectPatient]);
+  const handleCopilot = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!canUseCopilot) return;
+    selectPatient(patient.id);
+    toggleCopilot();
+  }, [canUseCopilot, patient.id, selectPatient, toggleCopilot]);
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -358,16 +391,16 @@ function PatientCard({
         hasEmsArrival ? 'patient-card--ems-arrival' : '',
         hasLongWait ? 'patient-card--long-wait' : '',
         hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
-        missionControlActions ? 'patient-card--mission-control' : '',
+        showWorkflowActions ? 'patient-card--mission-control' : '',
         keyboardSelected ? 'patient-card--keyboard-selected' : '',
         highlighted ? 'patient-card--highlighted' : '',
       ].filter(Boolean).join(' ')}
       data-patient-card-id={patient.id}
-      onClick={handleSelect}
+      onClick={readOnlyDisplay ? undefined : handleSelect}
       onFocus={onKeyboardFocus}
-      role="button"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
+      role={readOnlyDisplay ? 'article' : 'button'}
+      tabIndex={readOnlyDisplay ? -1 : 0}
+      onKeyDown={readOnlyDisplay ? undefined : handleKeyDown}
       style={cardStyle}
       aria-label={patientCardAriaLabel}
     >
@@ -476,9 +509,11 @@ function PatientCard({
         Timeline
       </button>
 
-      {missionControlActions ? (
+      {showWorkflowActions ? (
         <div className="patient-card__mission-actions" aria-label={`Whiteboard actions for ${patientName}`}>
-          <button type="button" onClick={handleDetailClick}>Open Detail</button>
+          <button type="button" onClick={handleDetailClick}>
+            {workflowProfile === 'physician' ? 'Review' : 'Open Detail'}
+          </button>
           <button
             type="button"
             onClick={handleMoveNext}
@@ -491,6 +526,7 @@ function PatientCard({
             type="button"
             onClick={handleReassessment}
             disabled={!hasReassessmentDue && !canManageFlags}
+            className={hasReassessmentDue ? 'patient-card__action--reassess-due' : undefined}
             title={
               hasReassessmentDue
                 ? 'Open reassessment task'
@@ -509,14 +545,16 @@ function PatientCard({
           >
             Refer
           </button>
-          <button
-            type="button"
-            onClick={handleBoarding}
-            disabled={!canBoardPatient}
-            title={canBoardPatient ? 'Move patient to boarding/admission state' : 'Boarding action unavailable for this patient or role'}
-          >
-            {isBoarding ? 'Boarded' : 'Board'}
-          </button>
+          {workflowProfile === 'charge' ? (
+            <button
+              type="button"
+              onClick={handleBoarding}
+              disabled={!canBoardPatient}
+              title={canBoardPatient ? 'Move patient to boarding/admission state' : 'Boarding action unavailable for this patient or role'}
+            >
+              {isBoarding ? 'Boarded' : 'Board'}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={handleDischarge}
@@ -525,6 +563,15 @@ function PatientCard({
           >
             Discharge
           </button>
+          {workflowProfile === 'physician' && canUseCopilot ? (
+            <button
+              type="button"
+              onClick={handleCopilot}
+              title="Open ED Copilot for this patient"
+            >
+              AI
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PatientState } from '../../types/emergency';
+import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import AiTriageAssistPanel from './AiTriageAssistPanel';
 import { patientLabel, selectReceptionQueues } from './receptionQueueModel';
 import './ReceptionWorkQueues.css';
 
@@ -15,8 +18,12 @@ export default function ReceptionWorkQueues({
   onTabChange,
   onOpenVerification,
   onOpenPatient,
+  expandedPatientId = null,
+  onExpandPatient,
 }) {
   const [activeTab, setActiveTab] = useState(activeTabProp);
+  const emergencyRole = useEmergencyRolePermissions();
+  const canReviewTriage = emergencyRole.can(EMERGENCY_ACTIONS.triage);
 
   useEffect(() => {
     setActiveTab(activeTabProp);
@@ -45,8 +52,7 @@ export default function ReceptionWorkQueues({
   return (
     <section className="reception-work-queues" aria-labelledby="reception-work-queues-title">
       <header className="reception-work-queues__header">
-        <h2 id="reception-work-queues-title">Registration queues</h2>
-        <p>Verification, triage handoff, and EMS registration cards in one place.</p>
+        <h2 id="reception-work-queues-title">Work queues</h2>
       </header>
 
       <div className="reception-work-queues__tabs" role="tablist" aria-label="Registration queue views">
@@ -86,8 +92,12 @@ export default function ReceptionWorkQueues({
                   type="button"
                   className="reception-work-queues__item"
                   onClick={() => {
-                    if (activeTab === 'pretriage') onOpenPatient?.(patient.id);
-                    else onOpenVerification?.(patient.id, activeTab === 'ems' ? patient.emsUnitId : '');
+                    if (activeTab === 'pretriage') {
+                      onExpandPatient?.(patient.id);
+                      onOpenPatient?.(patient.id);
+                    } else {
+                      onOpenVerification?.(patient.id, activeTab === 'ems' ? patient.emsUnitId : '');
+                    }
                   }}
                 >
                   <span>{patientLabel(patient)}</span>
@@ -99,6 +109,15 @@ export default function ReceptionWorkQueues({
                         : patient.priority || PatientState.Triage}
                   </span>
                 </button>
+                {activeTab === 'pretriage' &&
+                canReviewTriage &&
+                expandedPatientId === patient.id ? (
+                  <AiTriageAssistPanel
+                    patient={patient}
+                    compact
+                    onEdit={(patientId) => onOpenPatient?.(patientId)}
+                  />
+                ) : null}
               </li>
             ))}
           </ul>

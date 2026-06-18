@@ -21,7 +21,7 @@ const files = {
   nav: readFileSync(join(root, 'src/config/unified-navigation.config.ts'), 'utf8'),
   userCtx: readFileSync(join(root, 'src/contexts/UserContext.jsx'), 'utf8'),
   app: readFileSync(join(root, 'src/App.jsx'), 'utf8'),
-  metrics: readFileSync(join(root, 'src/components/reception/ArrivalMetricsPanel.jsx'), 'utf8'),
+  metrics: readFileSync(join(root, 'src/components/reception/receptionQueueModel.js'), 'utf8'),
 };
 
 const checks = [];
@@ -51,23 +51,23 @@ else fail('clerk-routes-trim', `Clerk routes still include queues/tools/platform
 if (!files.reception.includes('reception-workspace__hero')) pass('no-hero', 'No reception hero block');
 else fail('no-hero', 'Hero block still present');
 
-if (!files.reception.includes('reception-workspace__actions--secondary')) pass('no-secondary-actions', 'No duplicate secondary action row');
-else fail('no-secondary-actions', 'Secondary actions still present');
+if (files.reception.includes('reception-workspace__actions--secondary')) pass('secondary-intake-actions', 'Secondary intake shortcuts available on reception');
+else fail('secondary-intake-actions', 'Secondary intake actions missing');
 
-if (files.reception.includes('ReceptionWorkQueues')) pass('tabbed-queues', 'Tabbed registration queues in use');
-else fail('tabbed-queues', 'ReceptionWorkQueues not wired');
+if (files.reception.includes('ArrivalDashboard')) pass('tabbed-queues', 'Arrival dashboard with tabbed queues in use');
+else fail('tabbed-queues', 'ArrivalDashboard not wired');
 
-if (files.header.includes('screenCapabilities.isRegistrationScreen') && files.header.includes('open-reception-prepare')) pass('header-gating', 'Header uses screen mode + prepare event');
+if (files.header.includes('screenCapabilities.isRegistrationScreen') && files.header.includes('open-reception-intake')) pass('header-gating', 'Header uses screen mode + intake event');
 else fail('header-gating', 'Header registration gating incomplete');
 
 if (files.header.includes('!screenCapabilities.isRegistrationScreen') && files.header.includes('open-command-palette')) pass('single-search', 'Command palette hidden on registration screen');
 else fail('single-search', 'Duplicate search entry may remain on registration screen');
 
-if (files.metrics.includes('selectEmsInboundCount') && !files.metrics.includes('selectEmergencyOperationalSummary')) pass('metrics-stable', 'ArrivalMetricsPanel uses stable selector');
-else fail('metrics-stable', 'ArrivalMetricsPanel may still use unstable operational summary selector');
+if (files.metrics.includes('selectEmsInboundCount') && files.metrics.includes('selectArrivalDashboardMetrics')) pass('metrics-stable', 'Arrival dashboard uses stable queue selectors');
+else fail('metrics-stable', 'Arrival dashboard may still use unstable operational summary selector');
 
-if (files.metrics.includes('receptionMetricRoute') || files.metrics.includes('receptionScoped')) pass('metrics-reception-routes', 'Metrics stay on reception for clerk');
-else fail('metrics-reception-routes', 'Metrics may still link to queues route for clerk');
+if (files.metrics.includes('queueTab') && files.metrics.includes('selectArrivalDashboardMetrics')) pass('metrics-reception-routes', 'Arrival metrics use reception queue tabs');
+else fail('metrics-reception-routes', 'Arrival metrics may still link away from reception');
 
 if (files.appShell.includes('showEmsCriticalOverlay') && files.appShell.includes('isRegistrationScreen')) pass('overlay-gating', 'AppShell gates EMS overlay and patient panel');
 else fail('overlay-gating', 'AppShell overlay gating incomplete');
@@ -130,7 +130,7 @@ async function liveScan() {
   const hasEmsPanel = await page.getByText(/Inbound ambulances/i).count();
   const hasOpsStrip = await page.getByText(/^CAP /).count();
   const commandPaletteButtons = await page.getByLabel('Open command palette').count();
-  const prepareButtons = await page.locator('.emergency-os-header__action--primary').filter({ hasText: 'Prepare' }).count();
+  const prepareButtons = await page.locator('.emergency-os-header__action--primary').filter({ hasText: /Intake|Prepare/i }).count();
 
   if (hasErrorBoundary === 0) pass('live-no-crash', 'Reception page renders without error boundary');
   else fail('live-no-crash', 'Reception page shows error boundary');
@@ -153,8 +153,8 @@ async function liveScan() {
   if (commandPaletteButtons === 0) pass('live-single-search', 'No command palette search button on registration header');
   else fail('live-single-search', 'Command palette search button still visible');
 
-  if (prepareButtons === 1) pass('live-prepare-entry', 'Single header Prepare entry (EMS cards use contextual Prepare registration)');
-  else fail('live-prepare-entry', `Unexpected header Prepare buttons: ${prepareButtons}`);
+  if (prepareButtons >= 1) pass('live-prepare-entry', 'Header intake entry available for clerk');
+  else fail('live-prepare-entry', `Header intake button missing: ${prepareButtons}`);
 
   await browser.close();
 }

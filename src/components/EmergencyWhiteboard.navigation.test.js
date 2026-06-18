@@ -12,8 +12,8 @@ describe('Emergency Whiteboard navigation wiring', () => {
   it('opens and closes patient detail through the primary emergency store', () => {
     expect(patientCardSource).toContain('const handleSelect = useCallback(');
     expect(patientCardSource).toContain('selectPatient(patient.id);');
-    expect(patientCardSource).toContain('onClick={handleSelect}');
-    expect(patientCardSource).toContain('role="button"');
+    expect(patientCardSource).toContain('onClick={readOnlyDisplay ? undefined : handleSelect}');
+    expect(patientCardSource).toContain("role={readOnlyDisplay ? 'article' : 'button'}");
     expect(patientCardSource).toContain("event.key === 'Enter' || event.key === ' '");
     expect(patientDetailPanelSource).toContain('onClick={() => selectPatient(null)}');
     expect(patientDetailPanelSource).toContain('aria-label="Close patient detail"');
@@ -29,7 +29,9 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('const [activeFilter, setActiveFilter]');
     expect(whiteboardSource).toContain('setQueueFilter(null);');
     expect(whiteboardSource).toContain('<QueueIntelligencePanel');
-    expect(whiteboardSource).toContain('matchesActiveQueue(patient, activeQueueFilter, pendingReferralPatientIds)');
+    expect(whiteboardSource).toContain('matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)');
+    expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
+    expect(whiteboardSource).toContain('operational awareness only');
     expect(whiteboardSource).toContain('visiblePatients.map((patient)');
     expect(whiteboardSource).toContain('<WhoNextPanel');
   });
@@ -40,25 +42,43 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('boarding risk');
     expect(whiteboardSource).toContain('active alerts');
     expect(whiteboardSource).toContain('openReassessmentTasks');
-    expect(whiteboardSource).toContain('convertEMSArrivalToPatient(arrival.id)');
+    expect(whiteboardSource).toContain('convertEmsArrivalForReception');
     expect(whiteboardSource).toContain('openReferralWorkflow');
     expect(whiteboardSource).toContain('openQueueReview');
     expect(whiteboardSource).toContain('Showing the {activeQueueFilter} queue on the Whiteboard.');
-    expect(whiteboardSource).toContain('missionControlActions');
-    expect(patientCardSource).toContain('missionControlActions?: boolean');
+    expect(whiteboardSource).toContain('EmsAttentionStrip');
+    expect(whiteboardSource).toContain('summarizeEmsAwareness');
+    expect(whiteboardSource).toContain('EMS ETA');
+    expect(whiteboardSource).toContain('EMS Offload');
+    expect(whiteboardSource).toContain('ReferralAttentionStrip');
+    expect(whiteboardSource).toContain('ReassessmentAttentionStrip');
+    expect(whiteboardSource).toContain('summarizeReferralAwareness');
+    expect(whiteboardSource).toContain('Referrals Pending');
+    expect(whiteboardSource).toContain('Referrals Delayed');
+    expect(whiteboardSource).toContain('patientMatchesReassessmentAttention');
+    expect(whiteboardSource).toContain("'Reassess'");
+    expect(whiteboardSource).toContain('focusReassessmentOnBoard');
+    expect(whiteboardSource).toContain('workflowProfile={patientCardWorkflowProfile}');
+    expect(whiteboardSource).toContain('resolvePatientCardWorkflowProfile');
+    expect(patientCardSource).toContain('workflowProfile?: PatientCardWorkflowProfile');
+    expect(patientCardSource).toContain('readOnlyDisplay?: boolean');
+    expect(patientCardSource).toContain('toggleCopilot');
     expect(patientCardSource).toContain('Referral pending');
     expect(patientCardSource).toContain('Transfer pending');
     expect(patientCardSource).toContain('Capacity pressure');
     expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-reassessment-drawer'))");
     expect(patientCardSource).toContain("document.dispatchEvent(new Event('open-patient-discharge'))");
-    expect(patientCardSource).toContain('movePatientToState(patient.id, PatientState.Admission');
+    expect(patientCardSource).toContain('advancePatientToBoarding');
   });
 
   it('promotes reception-first workflow launch points on the whiteboard', () => {
     expect(whiteboardSource).toContain('Open Reception');
     expect(whiteboardSource).toContain('isRegistrationClerk');
-    expect(whiteboardSource).toContain('useRouteScreenMode');
-    expect(whiteboardSource).toContain('wallDisplayRefreshInterval');
+    expect(whiteboardSource).toContain('ChargeNurseOperationalStrip');
+    expect(whiteboardSource).toContain('shouldShowChargeNurseOperationalStrip');
+    expect(whiteboardSource).toContain('handleChargeNurseMetricSelect');
+    expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
+    expect(whiteboardSource).toContain('display.refreshIntervalMs');
   });
 
   it('shows non-blank loading and empty states for filtered views', () => {

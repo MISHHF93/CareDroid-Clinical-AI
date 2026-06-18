@@ -5,8 +5,9 @@ import {
   normalizeEmergencyRole,
   shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
+import { PHYSICIAN_NAV_EXCLUDED_IDS, PHYSICIAN_NAV_ORDER } from '../components/whiteboard/physicianWorkflowModel';
 
-export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyWhiteboard;
+export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
 export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'reception',
@@ -277,17 +278,18 @@ export function getPilotCustomerNavigationItems(
 }
 
 const ROLE_NAV_ORDER_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
-  triage_nurse: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'copilot', 'tools', 'platform', 'ems'],
-  charge_nurse: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
-  ed_manager: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  triage_nurse: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'copilot', 'tools', 'platform', 'ems'],
+  charge_nurse: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  ed_manager: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
   read_only_viewer: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'integrations', 'cosmos', 'platform', 'ems'],
-  physician: ['whiteboard', 'reception', 'patients', 'queues', 'reassessment', 'capacity', 'boarding', 'referrals', 'copilot', 'tools', 'analytics', 'platform', 'ems'],
+  physician: PHYSICIAN_NAV_ORDER,
   ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'platform'],
   registration_clerk: ['reception', 'patients'],
 });
 
 const ROLE_NAV_EXCLUDED_OVERRIDES: Partial<Record<string, readonly string[]>> = Object.freeze({
   registration_clerk: ['queues', 'tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot'],
+  physician: PHYSICIAN_NAV_EXCLUDED_IDS,
 });
 
 function sortNavigationForRole(items: readonly NavigationItem[], role: string): readonly NavigationItem[] {

@@ -250,6 +250,30 @@ const SEED_PATIENTS: Patient[] = [
     assignedStaffId: 's2',
     notes: [],
     timeline: [],
+    triageAssist: {
+      suggestedPriority: Priority.P2,
+      suggestedQueue: 'Emergent',
+      rationale: [
+        'P2 suggested - HR 142',
+        '1 patient(s) currently awaiting triage.',
+      ],
+      confidence: 'high',
+      ruleTriggered: 'p2-hr-emergent',
+      disclaimers: ['Human review required. This is not a replacement for clinical judgment.'],
+      requiresHumanReview: true,
+      generatedAt: new Date().toISOString(),
+      source: 'rules+oi',
+      llmEnrichment: null,
+      operationalContext: {
+        triageQueueCount: 1,
+        waitingQueueCount: 0,
+        emsInboundCount: 0,
+        queuePressure: 'low',
+      },
+      dismissedAt: null,
+      acceptedAt: null,
+    },
+    triageAssistGeneratedAt: new Date().toISOString(),
   },
 
   {
@@ -4761,6 +4785,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
   }));
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  (window as Window & { __CAREDROID_EMERGENCY_STORE__?: typeof useEmergencyStore }).__CAREDROID_EMERGENCY_STORE__ =
+    useEmergencyStore;
+}
 
 export type { EmergencyStoreState, FeatureFlags, FeatureOverrides, FeaturePersistenceMode };
 

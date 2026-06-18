@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ChatModule } from '../chat/chat.module';
 import { EmergencyOsController } from './emergency-os.controller';
 import {
   AICallInterrogationController,
@@ -14,6 +16,7 @@ import {
 } from './emergency-os.advanced-services';
 import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
 import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
+import { PatientOrchestrationService } from './emergency-os.orchestration.service';
 import { AICallInterrogationService } from '../../services/ai-call-interrogation.service';
 import { EdgeAIAmbulanceService } from '../../services/edge-ai-ambulance.service';
 import { FederatedEMSService } from '../../services/federated-ems.service';
@@ -38,12 +41,12 @@ import {
   ReceptionWorkspaceService,
   ReassessmentService,
   ReferralService,
-  ReceptionWorkspaceService,
   SmartIntakeService,
   WorkflowActionLogService,
 } from './emergency-os.services';
 
 @Module({
+  imports: [ConfigModule, ChatModule],
   controllers: [
     EmergencyOsController,
     ERPulseHandoverController,
@@ -67,6 +70,7 @@ import {
     OperationalIntelligenceService,
     ReferralService,
     ReceptionWorkspaceService,
+    PatientOrchestrationService,
     ProvincialHealthService,
     IntegrationHubService,
     EDCopilotService,

@@ -16,6 +16,7 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 const SIDEBAR_MODEL = [
+  ['Reception', '/emergency/reception'],
   ['Whiteboard', '/emergency/whiteboard'],
   ['Intake', '/emergency/intake'],
   ['EMS', '/emergency/ems'],
@@ -29,6 +30,8 @@ const SIDEBAR_MODEL = [
   ['Medical Tools', '/emergency/tools'],
   ['Analytics', '/emergency/analytics'],
   ['Settings', '/emergency/settings'],
+  ['Integrations', '/integrations/hub'],
+  ['Cosmos', '/cosmos'],
   ['Platform', '/workspace'],
 ];
 

@@ -1,0 +1,122 @@
+{
+  "generatedAt": "2026-06-18T03:22:29.098Z",
+  "baseURL": "http://localhost:8000",
+  "role": "registration_clerk",
+  "workers": 12,
+  "passed": 12,
+  "failed": 0,
+  "results": [
+    {
+      "id": "clerk-01-arrival-landing",
+      "name": "Amina Reyes",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 7757,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-02-smart-intake",
+      "name": "Jordan Park",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 8632,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-03-express-register",
+      "name": "Sofia Mendez",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 8475,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-04-quick-create",
+      "name": "Chris Okafor",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 10854,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-05-prepare-chooser",
+      "name": "Priya Nair",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 10112,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-06-ems-tab",
+      "name": "Liam Chen",
+      "path": "/emergency/reception?queue=ems",
+      "status": "pass",
+      "durationMs": 9540,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=ems"
+    },
+    {
+      "id": "clerk-07-verification-tab",
+      "name": "Elena Volkov",
+      "path": "/emergency/reception?queue=verification",
+      "status": "pass",
+      "durationMs": 9541,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=verification"
+    },
+    {
+      "id": "clerk-08-pretriage-tab",
+      "name": "Marcus Bell",
+      "path": "/emergency/reception?queue=pretriage",
+      "status": "pass",
+      "durationMs": 9625,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
+    },
+    {
+      "id": "clerk-09-patients-route",
+      "name": "Hannah Brooks",
+      "path": "/emergency/patients",
+      "status": "pass",
+      "durationMs": 9541,
+      "finalUrl": "http://localhost:8000/emergency/patients"
+    },
+    {
+      "id": "clerk-10-whiteboard-guard",
+      "name": "Noah Singh",
+      "path": "/emergency/whiteboard",
+      "status": "pass",
+      "durationMs": 8873,
+      "finalUrl": "http://localhost:8000/emergency/reception"
+    },
+    {
+      "id": "clerk-11-no-triage-assist",
+      "name": "Riley Ortiz",
+      "path": "/emergency/reception?queue=pretriage",
+      "status": "pass",
+      "durationMs": 9624,
+      "finalUrl": "http://localhost:8000/emergency/reception?queue=pretriage"
+    },
+    {
+      "id": "clerk-12-search-dominance",
+      "name": "Tessa Grant",
+      "path": "/emergency/reception",
+      "status": "pass",
+      "durationMs": 10053,
+      "finalUrl": "http://localhost:8000/emergency/reception?q=Amara"
+    }
+  ],
+  "simplicity": {
+    "navItems": [
+      "reception",
+      "patients"
+    ],
+    "primaryAction": "Start Smart Intake",
+    "blockedRoutes": [
+      "/emergency/whiteboard"
+    ],
+    "intakeSurfaces": [
+      "embedded Smart Intake",
+      "Express register",
+      "Full quick create",
+      "More options"
+    ]
+  }
+}

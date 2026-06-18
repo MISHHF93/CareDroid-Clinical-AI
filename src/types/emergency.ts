@@ -1,6 +1,10 @@
+import type { TriageAssistEnvelope } from '../../lib/patient-orchestration/types';
+
 export type EntityId = string;
 export type ISODateString = string;
 export type LocalDateString = string;
+
+export type { TriageAssistEnvelope };
 
 export enum PatientState {
   Arrival = 'Arrival',
@@ -71,6 +75,7 @@ export enum PatientFlag {
   Isolation = 'Isolation',
   DeterioratingNeuro = 'DeterioratingNeuro',
   StrokeCode = 'StrokeCode',
+  IdentityPending = 'IdentityPending',
 }
 
 export type PatientFlagType = `${PatientFlag}`;
@@ -340,6 +345,8 @@ export interface Patient {
   healthCardNumber?: string;
   healthCard?: string;
   phn?: string;
+  triageAssist?: TriageAssistEnvelope | null;
+  triageAssistGeneratedAt?: ISODateString | null;
 }
 
 export type StaffRole =

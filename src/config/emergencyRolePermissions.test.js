@@ -10,6 +10,8 @@ import {
   getEmergencyDemoRoles,
   getEmergencyRoleDefinition,
   getEmergencyRoleHomeRoute,
+  getReceptionEmbeddedIntakePath,
+  getReceptionExpressCreatePath,
   getReceptionQuickCreatePath,
   getReceptionSmartIntakePath,
   getReceptionWalkInQuickPath,
@@ -95,17 +97,18 @@ describe('Emergency OS role-based views', () => {
       CANONICAL_ROUTES.emergencyReception,
     );
     expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.chargeNurse)).toBe(
-      CANONICAL_ROUTES.emergencyWhiteboard,
+      CANONICAL_ROUTES.emergencyReception,
     );
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(true);
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.physician)).toBe(false);
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.emsUser)).toBe(false);
     expect(shouldHideStandaloneIntakeNav(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
-    expect(getReceptionSmartIntakePath()).toContain('/emergency/intake?');
-    expect(getReceptionSmartIntakePath()).toContain('from=reception');
+    expect(getReceptionSmartIntakePath()).toContain('/emergency/reception?');
+    expect(getReceptionSmartIntakePath()).toContain('intake=1');
     expect(getReceptionSmartIntakePath()).toContain('autostart=1');
-    expect(getReceptionQuickCreatePath()).toBe(getReceptionSmartIntakePath());
+    expect(getReceptionQuickCreatePath()).toBe(getReceptionEmbeddedIntakePath());
+    expect(getReceptionEmbeddedIntakePath()).toContain('intake=1');
     expect(getReceptionWalkInQuickPath()).toContain('quickCreate=1');
     expect(
       getNearestEmergencyRoute(EMERGENCY_ROLE_IDS.emsUser, CANONICAL_ROUTES.emergencySettings),

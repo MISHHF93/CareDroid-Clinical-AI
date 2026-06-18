@@ -10,6 +10,7 @@ import {
   persistEmergencyReferral,
   updateEmergencyTransferWorkflow,
 } from '../services/emergencyTransportApi';
+import { summarizeReferralAwareness } from './whiteboard/referralAwarenessModel';
 import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
@@ -356,6 +357,9 @@ export default function ReferralPanel() {
     [referrals]
   );
 
+  const awareness = useMemo(() => summarizeReferralAwareness(referrals), [referrals]);
+  const statusFilter = (searchParams.get('status') || '').toLowerCase();
+
   const metrics = useMemo(() => {
     const acknowledgementSamples = referrals.map(acknowledgementMinutes).filter(Number.isFinite);
     const avgAcknowledgement = acknowledgementSamples.length
@@ -373,13 +377,14 @@ export default function ReferralPanel() {
       emergent: referrals.filter(
         (referral) => referral.urgency === 'Emergent' && !['Completed', 'Declined'].includes(referral.status)
       ).length,
-      awaitingResponse: referrals.filter((referral) => referral.status === 'Sent').length,
-      accepted: referrals.filter((referral) => referral.status === 'Accepted').length,
+      pending: awareness.buckets.pending,
+      accepted: awareness.buckets.accepted,
+      delayed: awareness.buckets.delayed,
       transfers: referrals.filter((referral) => referral.workflow === 'Transfer').length,
       avgAcknowledgement,
       acknowledgementDepartment: department || 'All services',
     };
-  }, [referrals]);
+  }, [awareness.buckets.accepted, awareness.buckets.delayed, awareness.buckets.pending, referrals]);
 
   const selectFormPatient = (patient) => {
     setForm((current) => ({
@@ -578,27 +583,33 @@ export default function ReferralPanel() {
           <strong>{metrics.active}</strong>
         </div>
         <div>
-          <span>Awaiting Response</span>
-          <strong>{metrics.awaitingResponse}</strong>
-        </div>
-        <div>
-          <span>Emergent</span>
-          <strong>{metrics.emergent}</strong>
+          <span>Pending</span>
+          <strong>{metrics.pending}</strong>
         </div>
         <div>
           <span>Accepted</span>
           <strong>{metrics.accepted}</strong>
         </div>
         <div>
+          <span>Delayed</span>
+          <strong>{metrics.delayed}</strong>
+        </div>
+        <div>
+          <span>Emergent</span>
+          <strong>{metrics.emergent}</strong>
+        </div>
+        <div>
           <span>Avg acknowledgement</span>
           <strong>{metrics.avgAcknowledgement}m</strong>
           <small>{metrics.acknowledgementDepartment}</small>
         </div>
-        <div>
-          <span>Transfers</span>
-          <strong>{metrics.transfers}</strong>
-        </div>
       </div>
+
+      {statusFilter ? (
+        <p className="referral-panel__backend-status" role="status">
+          Showing {statusFilter} referrals from whiteboard awareness.
+        </p>
+      ) : null}
 
       {backendStatus || backendPending ? (
         <p className="referral-panel__backend-status" role={backendStatus?.includes('failed') ? 'alert' : 'status'}>
@@ -745,6 +756,30 @@ export default function ReferralPanel() {
       <div className="referral-panel__groups">
         {!referrals.length ? (
           <p className="referral-group__empty">No active referrals in the current Emergency OS workflow state.</p>
+        ) : statusFilter && awareness.grouped[statusFilter]?.length ? (
+          <section className="referral-group" aria-labelledby={`referrals-filter-${statusFilter}`}>
+            <div className="referral-group__heading">
+              <h2 id={`referrals-filter-${statusFilter}`}>{statusLabel(statusFilter)} referrals</h2>
+              <span>{awareness.grouped[statusFilter].length}</span>
+            </div>
+            <div className="referral-group__rows">
+              {awareness.grouped[statusFilter].map((referral) => (
+                <ReferralRow
+                  key={referral.id}
+                  referral={referral}
+                  patient={patients.find((patient) => patient.id === referral.patientId)}
+                  now={now}
+                  note={responseNotes[referral.id] || ''}
+                  onNoteChange={(referralId, value) =>
+                    setResponseNotes((current) => ({ ...current, [referralId]: value }))
+                  }
+                  onStatusChange={handleStatusChange}
+                  onSelectPatient={handleSelectPatient}
+                  canUpdateWorkflow={canUpdateWorkflow}
+                />
+              ))}
+            </div>
+          </section>
         ) : groupedReferrals.map((group) => (
           <section key={group.status} className="referral-group" aria-labelledby={`referrals-${group.status}`}>
             <div className="referral-group__heading">

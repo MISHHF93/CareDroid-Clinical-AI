@@ -1,9 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+/**
+ * @deprecated Legacy whiteboard central intake modal. Production paths use
+ * `QuickIntake` (reception/whiteboard) and embedded Smart Intake. Retained for
+ * tests and optional whiteboard emergency create; always hands off via
+ * `completeIntakeHandoff` with source `whiteboard-central-intake`.
+ */
 import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from 'lucide-react';
 import { Priority } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { enterTriageQueue } from '../services/queueAssignment';
+import { completeIntakeHandoff } from '../services/receptionHandoff';
 import { TriageSuggestionEngine } from '../engine/triageEngine';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
 import { runSmartIntakeVerticalSlice } from '../services/emergencyOsApi';
@@ -251,10 +257,9 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
     }
 
     addPatient(patientToAdd, { syncToBackend: !syncedThroughVerticalSlice });
-    enterTriageQueue(useEmergencyStore.getState(), {
+    completeIntakeHandoff(useEmergencyStore.getState(), {
       patientId: patientToAdd.id,
-      source: 'whiteboard-intake',
-      actorId: 'whiteboard-intake',
+      source: 'whiteboard-central-intake',
     });
     setWhiteboardSearchQuery('');
     onPatientAdded?.(patientToAdd.id);

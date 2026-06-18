@@ -117,6 +117,8 @@ export interface EmergencyPatient {
   roomId?: string;
   notes: Array<{ id: string; text: string; authorId: string; timestamp: string }>;
   timeline: JourneyEvent[];
+  triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope | null;
+  triageAssistGeneratedAt?: string | null;
 }
 
 export interface EmergencyRoom {

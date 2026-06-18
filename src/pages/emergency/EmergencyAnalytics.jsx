@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bar,
@@ -18,21 +18,14 @@ import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import {
+  filterOperationalMetrics,
+  groupOperationalAlertsByMetric,
+} from '../../config/operationalMetricsModel';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
-const CENTRAL_COMMAND_METRIC_KEYS = new Set([
-  'patientsToday',
-  'waiting',
-  'longestWait',
-  'averageWait',
-  'emsInbound',
-  'reassessmentsDue',
-  'capacityScore',
-  'boarders',
-  'referralsPending',
-]);
 
 function ChartCard({ title, subtitle, children }) {
   return (
@@ -103,11 +96,27 @@ export default function EmergencyAnalytics() {
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const centralFreshness = formatCentralFreshness(centralSnapshot);
-  const centralCommandMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
-    CENTRAL_COMMAND_METRIC_KEYS.has(metric.key)
-  );
   const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
   const activeAlerts = centralSnapshot.operationalAlerts.filter((alert) => !alert.dismissed);
+  const centralCommandMetrics = useMemo(
+    () => filterOperationalMetrics(centralSnapshot.operationalSummary.metrics, 'analytics'),
+    [centralSnapshot.operationalSummary.metrics],
+  );
+  const groupedOperationalAlerts = useMemo(
+    () => groupOperationalAlertsByMetric(activeAlerts),
+    [activeAlerts],
+  );
+  const metricLinkedAlerts = useMemo(
+    () =>
+      centralCommandMetrics
+        .map((metric) => ({
+          key: metric.key,
+          label: metric.label,
+          count: groupedOperationalAlerts.byMetric[metric.key]?.length || 0,
+        }))
+        .filter((entry) => entry.count > 0),
+    [centralCommandMetrics, groupedOperationalAlerts.byMetric],
+  );
   const firstBreachedQueue = breachedQueues[0];
   const firstAlert = activeAlerts[0];
   const upgradeHarness = useAdvancedEmergencyOsUpgradeHarness();
@@ -240,6 +249,12 @@ export default function EmergencyAnalytics() {
             <strong>{activeAlerts.length}</strong>
             <small className="emergency-analytics__source">
               {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
+              {metricLinkedAlerts.length
+                ? ` · ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' · ')}`
+                : ''}
+              {groupedOperationalAlerts.unmapped.length
+                ? ` · ${groupedOperationalAlerts.unmapped.length} other`
+                : ''}
             </small>
           </ChartCard>
           {intelligenceSnapshot.modelHealth ? (

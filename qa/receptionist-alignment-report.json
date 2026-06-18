@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-18T00:15:01.585Z",
+  "generatedAt": "2026-06-18T03:09:23.762Z",
   "passed": 22,
   "failed": 0,
   "checks": [
@@ -24,19 +24,19 @@
       "detail": "No reception hero block"
     },
     {
-      "id": "no-secondary-actions",
+      "id": "secondary-intake-actions",
       "status": "pass",
-      "detail": "No duplicate secondary action row"
+      "detail": "Secondary intake shortcuts available on reception"
     },
     {
       "id": "tabbed-queues",
       "status": "pass",
-      "detail": "Tabbed registration queues in use"
+      "detail": "Arrival dashboard with tabbed queues in use"
     },
     {
       "id": "header-gating",
       "status": "pass",
-      "detail": "Header uses screen mode + prepare event"
+      "detail": "Header uses screen mode + intake event"
     },
     {
       "id": "single-search",
@@ -46,12 +46,12 @@
     {
       "id": "metrics-stable",
       "status": "pass",
-      "detail": "ArrivalMetricsPanel uses stable selector"
+      "detail": "Arrival dashboard uses stable queue selectors"
     },
     {
       "id": "metrics-reception-routes",
       "status": "pass",
-      "detail": "Metrics stay on reception for clerk"
+      "detail": "Arrival metrics use reception queue tabs"
     },
     {
       "id": "overlay-gating",
@@ -111,7 +111,7 @@
     {
       "id": "live-prepare-entry",
       "status": "pass",
-      "detail": "Single header Prepare entry (EMS cards use contextual Prepare registration)"
+      "detail": "Header intake entry available for clerk"
     }
   ]
 }

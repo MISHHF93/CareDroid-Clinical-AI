@@ -17,7 +17,7 @@ export const VALID_TRANSITIONS: Readonly<Record<PatientState, readonly PatientSt
   [PatientState.Orders]: [PatientState.Results],
   [PatientState.Results]: [PatientState.Disposition, PatientState.Assessment],
   [PatientState.Disposition]: [PatientState.Discharge, PatientState.Admission],
-  [PatientState.Admission]: [],
+  [PatientState.Admission]: [PatientState.Discharge],
   [PatientState.Discharge]: [],
   [PatientState.Deceased]: [],
 };

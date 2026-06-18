@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IconBell, IconSearch } from '@tabler/icons-react';
-import { useEmergencyStore, type EmergencyOperationalMetricKey } from '../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, type Alert, type Patient } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import {
+  filterOperationalMetrics,
+  getOperationalMetricRoute,
+  groupOperationalAlertsByMetric,
+  resolveOperationalAlertRoute,
+} from '../config/operationalMetricsModel';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
+  getReceptionEmbeddedIntakePath,
   getReceptionQuickCreatePath,
   prefersReceptionForPatientCreate,
   prefersReceptionForPatientSearch,
@@ -19,10 +26,16 @@ import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import {
-  formatPatientSearchHint,
   getPatientDisplayName,
   rankPatientsBySearch,
 } from '../utils/patientSearch';
+import { searchPatientsFromBackend } from '../services/patientManagementApi';
+import PatientSearchResults from './PatientSearchResults';
+import {
+  buildReceptionSearchFilterPath,
+  buildViewEncounterPath,
+  createEncounterForPatient,
+} from '../services/patientSearchActions';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import './ReassessmentDrawer.css';
 import './Header.css';
@@ -35,38 +48,6 @@ const reassessmentBadgeFlags = new Set<string>([
 ]);
 
 const MAX_HEADER_PATIENT_RESULTS = 5;
-
-const OPERATIONAL_METRIC_ROUTES: Record<EmergencyOperationalMetricKey, string> = {
-  patientsToday: CANONICAL_ROUTES.emergencyPatients,
-  waiting: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  longestWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  averageWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  emsInbound: CANONICAL_ROUTES.emergencyEms,
-  reassessmentsDue: CANONICAL_ROUTES.emergencyReassessment,
-  capacityScore: CANONICAL_ROUTES.emergencyCapacity,
-  boarders: CANONICAL_ROUTES.emergencyBoarding,
-  referralsPending: CANONICAL_ROUTES.emergencyReferrals,
-};
-
-const ALERT_TYPE_ROUTES: Record<string, string> = {
-  capacity: CANONICAL_ROUTES.emergencyCapacity,
-  capacity_crisis: CANONICAL_ROUTES.emergencyCapacity,
-  capacity_crunch: CANONICAL_ROUTES.emergencyCapacity,
-  ems: CANONICAL_ROUTES.emergencyEms,
-  eta: CANONICAL_ROUTES.emergencyEms,
-  boarding: CANONICAL_ROUTES.emergencyBoarding,
-  reassessment: CANONICAL_ROUTES.emergencyReassessment,
-  reassessment_overdue: CANONICAL_ROUTES.emergencyReassessment,
-  referral: CANONICAL_ROUTES.emergencyReferrals,
-  referral_delay: CANONICAL_ROUTES.emergencyReferrals,
-  queue: CANONICAL_ROUTES.emergencyQueues,
-  sync: CANONICAL_ROUTES.emergencySettings,
-  system: CANONICAL_ROUTES.emergencySettings,
-  integration: `${CANONICAL_ROUTES.emergencySettings}#integrations`,
-  provincial: `${CANONICAL_ROUTES.emergencySettings}#provincial-health`,
-  ai: CANONICAL_ROUTES.emergencyCopilot,
-  copilot: CANONICAL_ROUTES.emergencyCopilot,
-};
 
 type NotificationCenterAction = {
   key: string;
@@ -120,22 +101,7 @@ function getHeaderFlagValue(flag: unknown): string {
 }
 
 function alertRoute(alert: Alert): string | null {
-  const key = normalizeAlertKey(alert.actionType || alert.type);
-  if (ALERT_TYPE_ROUTES[key]) return ALERT_TYPE_ROUTES[key];
-  const text = `${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
-  if (text.includes('ems')) return CANONICAL_ROUTES.emergencyEms;
-  if (text.includes('board')) return CANONICAL_ROUTES.emergencyBoarding;
-  if (text.includes('reassessment') || text.includes('reassess'))
-    return CANONICAL_ROUTES.emergencyReassessment;
-  if (text.includes('referral') || text.includes('transfer'))
-    return CANONICAL_ROUTES.emergencyReferrals;
-  if (text.includes('queue') || text.includes('wait')) return CANONICAL_ROUTES.emergencyQueues;
-  if (text.includes('capacity')) return CANONICAL_ROUTES.emergencyCapacity;
-  if (text.includes('provincial')) return `${CANONICAL_ROUTES.emergencySettings}#provincial-health`;
-  if (text.includes('integration') || text.includes('sync'))
-    return `${CANONICAL_ROUTES.emergencySettings}#integrations`;
-  if (text.includes('ai') || text.includes('copilot')) return CANONICAL_ROUTES.emergencyCopilot;
-  return null;
+  return resolveOperationalAlertRoute(alert);
 }
 
 function routePermissionPath(path: string): string {
@@ -217,6 +183,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const [staffWorkloadOpen, setStaffWorkloadOpen] = useState(false);
   const [patientLookupQuery, setPatientLookupQuery] = useState('');
   const [patientLookupOpen, setPatientLookupOpen] = useState(false);
+  const [backendVerifiedPatientIds, setBackendVerifiedPatientIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
   const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
   const canCreateReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
@@ -234,6 +203,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const operationalSummary = centralSnapshot.operationalSummary;
+  const headerOperationalMetrics = useMemo(
+    () => filterOperationalMetrics(operationalSummary.metrics, 'header'),
+    [operationalSummary.metrics],
+  );
+  const alertsSurfaceMetrics = useMemo(
+    () => filterOperationalMetrics(operationalSummary.metrics, 'alerts'),
+    [operationalSummary.metrics],
+  );
   const syncMode = centralSnapshot.sync.mode || 'polling';
   const syncAge = formatSyncAge(centralSnapshot.sync.lastSyncedAt);
   const syncLabel = centralSnapshot.sync.stale
@@ -376,6 +353,11 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     [visibleNotificationAlerts],
   );
 
+  const groupedOperationalAlerts = useMemo(
+    () => groupOperationalAlertsByMetric(visibleNotificationAlerts),
+    [visibleNotificationAlerts],
+  );
+
   const reassessmentAttentionCount = useMemo(
     () =>
       patients.filter((patient) =>
@@ -404,6 +386,24 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     },
     [emergencyRole, navigate],
   );
+
+  const openSmartIntakeFromSearch = (options: { step?: string; patientId?: string } = {}) => {
+    if (!canCreatePatient) return;
+    if (isReceptionRoute) {
+      document.dispatchEvent(
+        new CustomEvent('open-reception-smart-intake', { detail: options }),
+      );
+      setPatientLookupOpen(false);
+      return;
+    }
+    navigateEmergencyRoute(
+      getReceptionEmbeddedIntakePath({
+        step: options.step,
+        patientId: options.patientId,
+      }),
+    );
+    setPatientLookupOpen(false);
+  };
 
   const openCentralIntake = () => {
     if (!canSubmitCentralIntake) return;
@@ -471,6 +471,22 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`,
     );
     setPatientLookupQuery('');
+    setPatientLookupOpen(false);
+  };
+
+  const handleSearchViewEncounter = (patientId: string, encounterId: string | null) => {
+    selectPatient(patientId);
+    navigateEmergencyRoute(buildViewEncounterPath(patientId, encounterId));
+    setPatientLookupOpen(false);
+  };
+
+  const handleSearchCreateEncounter = (patientId: string) => {
+    const handoff = createEncounterForPatient(useEmergencyStore.getState(), patientId);
+    handleSearchViewEncounter(patientId, handoff.encounterId);
+  };
+
+  const handleSearchFilterQueues = (query: string) => {
+    navigateEmergencyRoute(buildReceptionSearchFilterPath(query));
     setPatientLookupOpen(false);
   };
 
@@ -579,6 +595,35 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     const urlQuery = searchParams.get('q') || '';
     setPatientLookupQuery(urlQuery);
   }, [isReceptionRoute, searchParams]);
+
+  useEffect(() => {
+    if (!isReceptionRoute) {
+      setBackendVerifiedPatientIds(new Set());
+      return;
+    }
+    const query = patientLookupQuery.trim();
+    if (query.length < 2) {
+      setBackendVerifiedPatientIds(new Set());
+      return;
+    }
+    let cancelled = false;
+    void searchPatientsFromBackend(query, { localPatients: patients, limit: MAX_HEADER_PATIENT_RESULTS })
+      .then((response) => {
+        if (cancelled) return;
+        const verified = new Set(
+          (response.results || [])
+            .filter((entry) => entry.backendVerified)
+            .map((entry) => entry.patientId),
+        );
+        setBackendVerifiedPatientIds(verified);
+      })
+      .catch(() => {
+        if (!cancelled) setBackendVerifiedPatientIds(new Set());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isReceptionRoute, patientLookupQuery, patients]);
 
   useEffect(() => {
     const focusLookup = () => patientLookupInputRef.current?.focus();
@@ -741,7 +786,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               title={
                 canSubmitCentralIntake
                   ? isReceptionRoute
-                    ? 'Start Smart Intake for the next arrival'
+                    ? 'Smart Intake on reception — identity, OCR, verify, register'
                     : 'Create a patient intake'
                   : `${emergencyRole.roleLabel} cannot create patients`
               }
@@ -805,10 +850,10 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               value={patientLookupQuery}
               placeholder={
                 isReceptionRoute
-                  ? 'Name, MRN, DOB, phone, or health card...'
-                  : 'Patient lookup'
+                  ? 'Search patients — find, intake, encounter...'
+                  : 'Search patients — find, intake, encounter...'
               }
-              aria-label="Patient lookup"
+              aria-label="Patient search"
               onFocus={() => setPatientLookupOpen(true)}
               onChange={(event) => {
                 syncPatientLookupQuery(event.target.value);
@@ -827,33 +872,22 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               }}
             />
             {patientLookupOpen && patientLookupQuery.trim() ? (
-              <div
-                className="emergency-os-header__lookup-results"
-                role="listbox"
-                aria-label="Patient lookup results"
-              >
-                {patientLookupResults.length ? (
-                  patientLookupResults.map(({ patient, matchKind }) => (
-                    <button
-                      key={patient.id}
-                      type="button"
-                      role="option"
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => selectLookupPatient(patient.id)}
-                    >
-                      <strong>{getPatientDisplayName(patient)}</strong>
-                      <span>{formatPatientSearchHint(patient, matchKind)}</span>
-                    </button>
-                  ))
-                ) : (
-                  <button
-                    type="button"
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={openPatientLookupRoute}
-                  >
-                    Search all patients for "{patientLookupQuery.trim()}"
-                  </button>
-                )}
+              <div className="emergency-os-header__lookup-results">
+                <PatientSearchResults
+                  query={patientLookupQuery}
+                  results={patientLookupResults}
+                  backendVerifiedPatientIds={backendVerifiedPatientIds}
+                  canCreatePatient={canCreatePatient}
+                  isReceptionRoute={isReceptionRoute}
+                  onFindPatient={selectLookupPatient}
+                  onStartIntake={(patientId) =>
+                    openSmartIntakeFromSearch({ patientId, step: 'verify' })
+                  }
+                  onViewEncounter={handleSearchViewEncounter}
+                  onCreateEncounter={handleSearchCreateEncounter}
+                  onFilterQueues={handleSearchFilterQueues}
+                  onStartNewIntake={() => openSmartIntakeFromSearch()}
+                />
               </div>
             ) : null}
           </div>
@@ -956,9 +990,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         className="emergency-os-header__operational-strip"
         aria-label="Operational command context"
       >
-        {operationalSummary.metrics.map((metric) => {
-          const route = OPERATIONAL_METRIC_ROUTES[metric.key];
-          const canOpenRoute = emergencyRole.canAccessRoute(routePermissionPath(route));
+        {headerOperationalMetrics.map((metric) => {
+          const route = getOperationalMetricRoute(metric.key);
+          const canOpenRoute = route ? emergencyRole.canAccessRoute(routePermissionPath(route)) : false;
           return (
             <button
               key={metric.key}
@@ -996,6 +1030,27 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                   : 'All active notices reviewed'}
               </p>
             </div>
+            {alertsSurfaceMetrics.length > 0 ? (
+              <div className="emergency-os-notification-center__metric-chips" aria-label="Alerts by operational metric">
+                {alertsSurfaceMetrics.map((metric) => {
+                  const bucket = groupedOperationalAlerts.byMetric[metric.key] ?? [];
+                  if (!bucket.length) return null;
+                  const route = getOperationalMetricRoute(metric.key);
+                  return (
+                    <button
+                      key={metric.key}
+                      type="button"
+                      className="emergency-os-notification-center__metric-chip"
+                      onClick={() => route && navigateEmergencyRoute(route)}
+                      title={`${metric.label}: ${bucket.length} alert(s)`}
+                    >
+                      <strong>{bucket.length}</strong>
+                      <span>{metric.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
             <div className="emergency-os-notification-center__header-actions">
               <button
                 type="button"

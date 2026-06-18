@@ -4,10 +4,21 @@ import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } fr
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
-import useRouteScreenMode from '../../hooks/useRouteScreenMode';
-import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
+import useWhiteboardDisplayMode from '../../hooks/useWhiteboardDisplayMode';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, getReceptionQuickCreatePath, prefersReceptionForPatientCreate } from '../../config/emergencyRolePermissions';
+import {
+  canOpenOperationalMetricOnWhiteboard,
+  filterOperationalMetrics,
+  getOperationalMetricRoute,
+  getWhiteboardMetricHandler,
+} from '../../config/operationalMetricsModel';
+import {
+  EMERGENCY_ACTIONS,
+  EMERGENCY_ROLE_IDS,
+  getReceptionEmbeddedIntakePath,
+  getReceptionQuickCreatePath,
+  prefersReceptionForPatientCreate,
+} from '../../config/emergencyRolePermissions';
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
@@ -17,11 +28,34 @@ import WhoNextPanel from '../../components/WhoNextPanel';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import CapacityCrisisMode from '../../components/CapacityCrisisMode';
 import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
+import ChargeNurseOperationalStrip from '../../components/whiteboard/ChargeNurseOperationalStrip';
+import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
+import ReferralAttentionStrip from '../../components/whiteboard/ReferralAttentionStrip';
+import EmsAttentionStrip from '../../components/whiteboard/EmsAttentionStrip';
+import { shouldShowChargeNurseOperationalStrip } from '../../components/whiteboard/chargeNurseWorkflowModel';
+import {
+  patientMatchesReassessmentAttention,
+  shouldShowReassessmentAttentionStrip,
+} from '../../components/whiteboard/reassessmentVisibilityModel';
+import {
+  summarizeReferralAwareness,
+  shouldShowReferralAttentionStrip,
+} from '../../components/whiteboard/referralAwarenessModel';
+import {
+  getArrivalOffloadMinutes,
+  shouldShowEmsAttentionStrip,
+  summarizeEmsAwareness,
+} from '../../components/whiteboard/emsAwarenessModel';
+import { formatEta as formatEmsEta } from '../../utils/emsArrivalDisplay';
+import { resolvePatientCardWorkflowProfile } from '../../components/whiteboard/physicianWorkflowModel';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
-import { enterEmsRegistrationQueue, enterTriageQueue } from '../../services/queueAssignment';
+import { completeIntakeHandoff } from '../../services/receptionHandoff';
+import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
+import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
+import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
 import '../../components/EmergencyWhiteboard.css';
 
-type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding';
+type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
 type UpgradeHarnessSignal = {
   capability: string;
   data?: {
@@ -30,27 +64,15 @@ type UpgradeHarnessSignal = {
   };
 };
 
-const FILTERS: FilterId[] = ['All', 'Waiting', 'Assessment', 'High Risk', 'EMS', 'Boarding'];
+const FILTERS: FilterId[] = ['All', 'Waiting', 'Assessment', 'High Risk', 'Reassess', 'EMS', 'Boarding'];
 const CLOSED_REFERRAL_STATUSES = new Set(['Closed', 'Completed', 'Declined', 'PatientDeparted']);
-const WHITEBOARD_COMMAND_METRIC_ROUTES: Record<EmergencyOperationalMetricKey, string> = {
-  patientsToday: CANONICAL_ROUTES.emergencyPatients,
-  waiting: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  longestWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  averageWait: `${CANONICAL_ROUTES.emergencyQueues}?queue=Waiting`,
-  emsInbound: CANONICAL_ROUTES.emergencyEms,
-  reassessmentsDue: CANONICAL_ROUTES.emergencyReassessment,
-  capacityScore: CANONICAL_ROUTES.emergencyCapacity,
-  boarders: CANONICAL_ROUTES.emergencyBoarding,
-  referralsPending: CANONICAL_ROUTES.emergencyReferrals,
-};
-const WHITEBOARD_COMMAND_METRIC_KEYS = new Set<EmergencyOperationalMetricKey>([
-  'patientsToday',
-  'averageWait',
-  'emsInbound',
-  'capacityScore',
-  'boarders',
-  'referralsPending',
-]);
+const WHITEBOARD_CHARGE_ROUTES = {
+  queues: CANONICAL_ROUTES.emergencyQueues,
+  reassessment: CANONICAL_ROUTES.emergencyReassessment,
+  ems: CANONICAL_ROUTES.emergencyEms,
+  capacity: CANONICAL_ROUTES.emergencyCapacity,
+  boarding: CANONICAL_ROUTES.emergencyBoarding,
+} as const;
 
 function isHighRisk(patient: Patient): boolean {
   return (
@@ -75,37 +97,12 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   if (activeFilter === 'High Risk') return isHighRisk(patient);
   if (activeFilter === 'EMS') return hasPatientFlag(patient, PatientFlag.EMSArrival);
   if (activeFilter === 'Boarding') return isBoarding(patient);
+  if (activeFilter === 'Reassess') return patientMatchesReassessmentAttention(patient);
   return true;
 }
 
 function isOpenReferralStatus(status?: string): boolean {
   return !CLOSED_REFERRAL_STATUSES.has(String(status || '').trim());
-}
-
-function matchesActiveQueue(
-  patient: Patient,
-  activeQueueFilter: string | null,
-  pendingReferralPatientIds: Set<string>,
-): boolean {
-  if (!activeQueueFilter) return true;
-  const filter = activeQueueFilter.trim().toLowerCase();
-
-  if (filter === 'waiting') return patient.state === PatientState.Waiting;
-  if (filter === 'triage') return patient.state === PatientState.Triage;
-  if (filter === 'provider' || filter === 'assessment') return patient.state === PatientState.Assessment;
-  if (filter === 'results') return patient.state === PatientState.Results;
-  if (filter === 'admission' || filter === 'boarding') return isBoarding(patient);
-  if (filter === 'referral') return pendingReferralPatientIds.has(patient.id);
-  if (filter === 'discharge') return patient.state === PatientState.Disposition;
-  if (filter === 'reassessment') {
-    return (
-      hasPatientFlag(patient, PatientFlag.ReassessmentDue) ||
-      hasPatientFlag(patient, PatientFlag.DeteriorationRisk) ||
-      hasPatientFlag(patient, PatientFlag.SepsisAlert)
-    );
-  }
-
-  return true;
 }
 
 function findUpgradeSignal(
@@ -120,11 +117,15 @@ function StatCard({
   label,
   tone = 'default',
   title,
+  onClick,
+  emphasized = false,
 }: {
   value: string | number;
   label: string;
   tone?: 'default' | 'info' | 'success' | 'warning' | 'critical';
   title?: string;
+  onClick?: () => void;
+  emphasized?: boolean;
 }) {
   const toneColor =
     tone === 'critical'
@@ -137,16 +138,58 @@ function StatCard({
             ? 'var(--status-info, #60A5FA)'
             : 'var(--color-text-primary, #F9FAFB)';
 
+  const sharedStyle = {
+    flex: '1 1 0',
+    minWidth: 120,
+    padding: '14px 16px',
+    borderRight: '1px solid var(--color-border-subtle, #1F2937)',
+    background: emphasized
+      ? 'color-mix(in srgb, var(--status-warning, #F59E0B) 10%, var(--color-surface, #111827))'
+      : undefined,
+    boxShadow: emphasized
+      ? 'inset 0 3px 0 color-mix(in srgb, var(--status-warning, #F59E0B) 72%, transparent)'
+      : undefined,
+  } as const;
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className="emergency-whiteboard-page__stat emergency-whiteboard-page__stat--interactive"
+        title={title}
+        onClick={onClick}
+        style={{
+          ...sharedStyle,
+          border: emphasized ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-subtle, #1F2937))' : '0',
+          borderRight: emphasized
+            ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-subtle, #1F2937))'
+            : '1px solid var(--color-border-subtle, #1F2937)',
+          color: 'inherit',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <div
+          style={{
+            color: 'var(--color-text-primary, #F9FAFB)',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            fontSize: 24,
+            lineHeight: 1.1,
+            fontWeight: 700,
+          }}
+        >
+          {value}
+        </div>
+        <div style={{ color: toneColor, fontSize: 12, fontWeight: tone === 'default' ? 500 : 800, marginTop: 4 }}>{label}</div>
+      </button>
+    );
+  }
+
   return (
     <div
       className="emergency-whiteboard-page__stat"
       title={title}
-      style={{
-        flex: '1 1 0',
-        minWidth: 120,
-        padding: '14px 16px',
-        borderRight: '1px solid var(--color-border-subtle, #1F2937)',
-      }}
+      style={sharedStyle}
     >
       <div
         style={{
@@ -255,16 +298,16 @@ export default function EmergencyWhiteboard() {
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
-  const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const centralControlSettings = useEmergencyStore(
     (state) => state.emergencySettings.centralControl,
   );
-  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
-  const routeScreenMode = useRouteScreenMode();
+  const display = useWhiteboardDisplayMode();
+  const routeScreenMode = display.screenMode;
   const whiteboard = useEmergencyWhiteboard();
   const upgradePatientFlow = useUpgradeHarnessPatientFlow();
   const whiteboardPayload = (
@@ -296,6 +339,7 @@ export default function EmergencyWhiteboard() {
   const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
   const canConvertEmsArrival = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
   const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
+  const canReviewTriage = emergencyRole.can(EMERGENCY_ACTIONS.triage);
   const centralControl = useMemo(
     () =>
       getCentralControlPolicy({
@@ -308,13 +352,11 @@ export default function EmergencyWhiteboard() {
   const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
-  const isReadOnlyDisplay =
-    routeScreenMode === CARE_DROID_SCREEN_MODES.readOnly ||
-    routeScreenMode === CARE_DROID_SCREEN_MODES.waitingRoom;
   const isRegistrationClerk = emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk;
-  const canMutateWhiteboard = !isReadOnlyDisplay && !emergencyRole.readOnly;
-  const commandLayerMetrics = centralSnapshot.operationalSummary.metrics.filter((metric) =>
-    WHITEBOARD_COMMAND_METRIC_KEYS.has(metric.key),
+  const canMutateWhiteboard = display.canMutate && !emergencyRole.readOnly;
+  const commandLayerMetrics = useMemo(
+    () => filterOperationalMetrics(centralSnapshot.operationalSummary.metrics, 'whiteboard'),
+    [centralSnapshot.operationalSummary.metrics],
   );
   const breachedQueueCount = centralSnapshot.queueHealth.filter((queue) => queue.breached).length;
   const canUseCentralIntake =
@@ -326,26 +368,28 @@ export default function EmergencyWhiteboard() {
     () => emsArrivals.filter((arrival) => !['Complete', 'Cancelled'].includes(arrival.status)),
     [emsArrivals],
   );
-  const soonEmsArrivals = useMemo(
-    () =>
-      activeEmsArrivals.filter((arrival) => {
-        const remaining = minutesRemaining(arrival);
-        return arrival.status === 'Inbound' && remaining > 0 && remaining <= 10;
-      }).length,
-    [activeEmsArrivals, clockTick],
+  const emsAwareness = useMemo(
+    () => summarizeEmsAwareness(emsArrivals, clockTick),
+    [clockTick, emsArrivals],
   );
+  const showEmsAttentionStrip = shouldShowEmsAttentionStrip({
+    displayMode: display.isDisplayMode,
+    summary: emsAwareness,
+  });
   const reassessmentPatients = useMemo(
-    () =>
-      patients
-        .filter(
-          (patient) =>
-            patient.flags.includes(PatientFlag.ReassessmentDue) ||
-            patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-            patient.flags.includes(PatientFlag.SepsisAlert),
-        )
-        .sort(sortWhiteboardPatients),
+    () => patients.filter(patientMatchesReassessmentAttention).sort(sortWhiteboardPatients),
     [patients],
   );
+  const reassessmentAttentionCount = reassessmentPatients.length;
+  const referralAwareness = useMemo(() => summarizeReferralAwareness(referrals), [referrals]);
+  const showReassessmentAttentionStrip = shouldShowReassessmentAttentionStrip({
+    displayMode: display.isDisplayMode,
+    attentionCount: reassessmentAttentionCount,
+  });
+  const showReferralAttentionStrip = shouldShowReferralAttentionStrip({
+    displayMode: display.isDisplayMode,
+    total: referralAwareness.total,
+  });
 
   const stats = useMemo(() => {
     const waiting = patients.filter((patient) => patient.state === PatientState.Waiting).length;
@@ -354,7 +398,7 @@ export default function EmergencyWhiteboard() {
     const reassessmentDue =
       capacity.reassessmentDueCount ??
       capacity.reassessmentDue ??
-      patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length;
+      reassessmentAttentionCount;
 
     return {
       total: patients.length,
@@ -363,7 +407,7 @@ export default function EmergencyWhiteboard() {
       boarding,
       reassessmentDue,
     };
-  }, [capacity.reassessmentDue, capacity.reassessmentDueCount, patients]);
+  }, [capacity.reassessmentDue, capacity.reassessmentDueCount, patients, reassessmentAttentionCount]);
 
   const pendingReferralPatientIds = useMemo(
     () =>
@@ -380,7 +424,7 @@ export default function EmergencyWhiteboard() {
       patients
         .filter((patient) =>
           activeQueueFilter
-            ? matchesActiveQueue(patient, activeQueueFilter, pendingReferralPatientIds)
+            ? matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)
             : filterPatient(patient, activeFilter),
         )
         .sort(sortWhiteboardPatients),
@@ -393,24 +437,21 @@ export default function EmergencyWhiteboard() {
   }, []);
 
   useEffect(() => {
-    if (!isReadOnlyDisplay) return undefined;
-    const intervalMs = Math.max(
-      15000,
-      Number(emergencySettings.wallDisplayRefreshInterval) || 30000,
-    );
+    if (!display.autoRefresh) return undefined;
     const timer = window.setInterval(() => {
       void initializeFromBackend();
       void whiteboard.refresh();
-    }, intervalMs);
+    }, display.refreshIntervalMs);
     return () => window.clearInterval(timer);
   }, [
-    emergencySettings.wallDisplayRefreshInterval,
+    display.autoRefresh,
+    display.refreshIntervalMs,
     initializeFromBackend,
-    isReadOnlyDisplay,
     whiteboard.refresh,
   ]);
 
   useEffect(() => {
+    if (!canUseCentralIntake) return undefined;
     const openIntake = () => {
       if (prefersReceptionForPatientCreate(emergencyRole.role)) {
         navigate(getReceptionQuickCreatePath());
@@ -436,6 +477,27 @@ export default function EmergencyWhiteboard() {
     return () => document.removeEventListener('clear-whiteboard-filters', clearFilters);
   }, [setQueueFilter]);
 
+  const showChargeNurseStrip = useMemo(
+    () =>
+      shouldShowChargeNurseOperationalStrip({
+        screenMode: routeScreenMode,
+        roleId: emergencyRole.role,
+        displayMode: display.isDisplayMode,
+      }),
+    [display.isDisplayMode, emergencyRole.role, routeScreenMode],
+  );
+
+  const patientCardWorkflowProfile = useMemo(
+    () =>
+      resolvePatientCardWorkflowProfile({
+        roleId: emergencyRole.role,
+        displayMode: display.isDisplayMode,
+        canMutateWhiteboard,
+        isRegistrationClerk,
+      }),
+    [canMutateWhiteboard, display.isDisplayMode, emergencyRole.role, isRegistrationClerk],
+  );
+
   const openIntake = useCallback(() => {
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
       navigate(getReceptionQuickCreatePath());
@@ -453,12 +515,55 @@ export default function EmergencyWhiteboard() {
     );
   }, [emergencyRole, navigate]);
 
-  const openReferralWorkflow = useCallback((patientId?: string) => {
-    if (!canManageReferral) return;
-    const params = new URLSearchParams({ new: '1' });
-    if (patientId) params.set('patientId', patientId);
-    navigate(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
+  const openReferralWorkflow = useCallback((patientId?: string, status?: string) => {
+    if (!patientId && !status && !canManageReferral) return;
+    const params = new URLSearchParams();
+    if (patientId) {
+      params.set('patientId', patientId);
+      params.set('new', '1');
+    }
+    if (status) params.set('status', status.toLowerCase());
+    const query = params.toString();
+    navigate(query ? `${CANONICAL_ROUTES.emergencyReferrals}?${query}` : CANONICAL_ROUTES.emergencyReferrals);
   }, [canManageReferral, navigate]);
+
+  const handleReferralAttentionSelect = useCallback(
+    (metric: { whiteboardAction?: string }) => {
+      if (display.isDisplayMode) return;
+      if (metric.whiteboardAction === 'filter-referral-pending') {
+        setActiveFilter('All');
+        setQueueFilter('referral');
+        return;
+      }
+      if (metric.whiteboardAction === 'open-referrals-accepted') {
+        openReferralWorkflow(undefined, 'accepted');
+        return;
+      }
+      if (metric.whiteboardAction === 'open-referrals-delayed') {
+        openReferralWorkflow(undefined, 'delayed');
+      }
+    },
+    [display.isDisplayMode, openReferralWorkflow, setQueueFilter],
+  );
+
+  const handleEmsAttentionSelect = useCallback(
+    (metric: { whiteboardAction?: string }) => {
+      if (display.isDisplayMode) return;
+      if (metric.whiteboardAction === 'filter-ems' || metric.whiteboardAction === 'filter-ems-risk') {
+        setActiveFilter('EMS');
+        setQueueFilter(null);
+        return;
+      }
+      if (metric.whiteboardAction === 'focus-ems-offload') {
+        setActiveFilter('EMS');
+        setQueueFilter(null);
+        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
+          openRoute(CANONICAL_ROUTES.emergencyEms);
+        }
+      }
+    },
+    [display.isDisplayMode, emergencyRole, openRoute, setQueueFilter],
+  );
 
   const openQueueReview = useCallback((queue: FilterId | null = null) => {
     if (queue) {
@@ -472,32 +577,140 @@ export default function EmergencyWhiteboard() {
     document.dispatchEvent(new Event('open-reassessment-drawer'));
   }, [selectPatient]);
 
+  const focusReassessmentOnBoard = useCallback((patientId?: string) => {
+    setActiveFilter('Reassess');
+    setQueueFilter(null);
+    openReassessmentTasks(patientId);
+  }, [openReassessmentTasks, setQueueFilter]);
+
+  const handleOperationalMetricClick = useCallback(
+    (metricKey: EmergencyOperationalMetricKey) => {
+      if (display.isDisplayMode) return;
+      const handler = getWhiteboardMetricHandler(metricKey);
+      if (handler === 'reassessment-board') {
+        focusReassessmentOnBoard();
+        return;
+      }
+      if (handler === 'referral-awareness') {
+        if (referralAwareness.buckets.delayed > 0) {
+          openReferralWorkflow(undefined, 'delayed');
+        } else if (referralAwareness.buckets.pending > 0) {
+          setActiveFilter('All');
+          setQueueFilter('referral');
+        } else {
+          openReferralWorkflow();
+        }
+        return;
+      }
+      if (handler === 'ems-awareness') {
+        setActiveFilter('EMS');
+        setQueueFilter(null);
+        return;
+      }
+      const route = getOperationalMetricRoute(metricKey);
+      if (route) openRoute(route);
+    },
+    [
+      display.isDisplayMode,
+      focusReassessmentOnBoard,
+      openReferralWorkflow,
+      openRoute,
+      referralAwareness.buckets.delayed,
+      referralAwareness.buckets.pending,
+      setActiveFilter,
+      setQueueFilter,
+    ],
+  );
+
+  const handleReassessmentAttentionSelect = useCallback(
+    (metric: { whiteboardAction?: string }) => {
+      if (display.isDisplayMode) return;
+      if (metric.whiteboardAction === 'filter-reassess') {
+        setActiveFilter('Reassess');
+        setQueueFilter(null);
+        return;
+      }
+      if (metric.whiteboardAction === 'open-reassessment') {
+        focusReassessmentOnBoard();
+      }
+    },
+    [display.isDisplayMode, focusReassessmentOnBoard, setQueueFilter],
+  );
+
+  const handleChargeNurseMetricSelect = useCallback(
+    (metric: { whiteboardAction?: string; routeKey?: string }) => {
+      if (!canMutateWhiteboard) return;
+
+      if (metric.whiteboardAction === 'focus-queues') {
+        setQueuePanelCollapsed(false);
+        setActiveFilter('All');
+        setQueueFilter('Triage');
+        return;
+      }
+
+      if (metric.whiteboardAction === 'open-reassessment') {
+        focusReassessmentOnBoard();
+        return;
+      }
+
+      if (metric.whiteboardAction === 'filter-ems') {
+        setActiveFilter('EMS');
+        setQueueFilter(null);
+        return;
+      }
+
+      if (metric.whiteboardAction === 'focus-capacity') {
+        const route = WHITEBOARD_CHARGE_ROUTES.capacity;
+        if (emergencyRole.canAccessRoute(routePermissionPath(route))) {
+          openRoute(route);
+        }
+        return;
+      }
+
+      if (metric.whiteboardAction === 'filter-boarding') {
+        setActiveFilter('Boarding');
+        setQueueFilter(null);
+      }
+    },
+    [canMutateWhiteboard, emergencyRole, focusReassessmentOnBoard, openRoute, setQueueFilter],
+  );
+
   const convertArrival = useCallback((arrival: EMSArrival) => {
     if (!canConvertEmsArrival || arrival.patientId) return;
-    convertEMSArrivalToPatient(arrival.id);
-    const converted = useEmergencyStore
-      .getState()
-      .emsArrivals.find((entry) => entry.id === arrival.id);
-    if (converted?.patientId) {
-      enterEmsRegistrationQueue(useEmergencyStore.getState(), {
-        patientId: converted.patientId,
-        emsArrivalId: arrival.id,
-      });
+    const result = convertEmsArrivalForReception(arrival.id, {
+      actorName: emergencyRole.roleLabel,
+    });
+    if (!result.ok) return;
+    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+      navigate(
+        result.receptionVerifyPath ||
+          getReceptionEmbeddedIntakePath({
+            step: 'verify',
+            patientId: result.patientId,
+            emsArrivalId: arrival.id,
+          }),
+      );
+      return;
     }
-    setToast(`${arrival.unitId} added to whiteboard`);
-    window.setTimeout(() => setToast(''), 2400);
+    setToast(`${arrival.unitId} added — complete EMS registration at reception`);
+    window.setTimeout(() => setToast(''), 3200);
     setActiveFilter('EMS');
     whiteboard.refresh();
-  }, [canConvertEmsArrival, convertEMSArrivalToPatient, whiteboard.refresh]);
+  }, [
+    canConvertEmsArrival,
+    emergencyRole.role,
+    emergencyRole.roleLabel,
+    navigate,
+    whiteboard.refresh,
+  ]);
 
   const closeIntake = useCallback(() => setShowIntake(false), []);
 
   const handlePatientAdded = useCallback(
     (patient: Patient) => {
-      enterTriageQueue(useEmergencyStore.getState(), {
+      completeIntakeHandoff(useEmergencyStore.getState(), {
         patientId: patient.id,
         source: 'whiteboard-central-intake',
-        actorId: 'whiteboard-intake',
       });
       setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
       window.setTimeout(() => setToast(''), 2400);
@@ -591,7 +804,36 @@ export default function EmergencyWhiteboard() {
         referrals={referrals}
         emsArrivals={emsArrivals}
         emsIncomingPatients={emsIncomingPatients}
+        readOnly={display.isDisplayMode}
       />
+      {display.isDisplayMode ? (
+        <section
+          aria-label="Whiteboard display mode"
+          role="status"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
+            background: 'color-mix(in srgb, var(--status-info, #2563EB) 14%, var(--color-surface, #111827))',
+          }}
+        >
+          <div style={{ display: 'grid', gap: 2 }}>
+            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>
+              {display.label} · operational awareness only
+            </strong>
+            <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12 }}>
+              Read-only wall display · auto-refresh every {Math.round(display.refreshIntervalMs / 1000)}s · no editing actions
+            </span>
+          </div>
+          <span style={{ color: 'var(--color-text-secondary, #CBD5E1)', fontSize: 12, fontWeight: 750 }}>
+            Updated {formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
+          </span>
+        </section>
+      ) : null}
       <section
         aria-label="Operational command layer metrics"
         style={{
@@ -622,8 +864,10 @@ export default function EmergencyWhiteboard() {
           }}
         >
           {commandLayerMetrics.map((metric) => {
-            const route = WHITEBOARD_COMMAND_METRIC_ROUTES[metric.key];
-            const canOpen = emergencyRole.canAccessRoute(routePermissionPath(route));
+            const canOpen = canOpenOperationalMetricOnWhiteboard(metric.key, {
+              displayMode: display.isDisplayMode,
+              canAccessRoute: (path) => emergencyRole.canAccessRoute(path),
+            });
             const toneColor =
               metric.tone === 'critical'
                 ? 'var(--status-critical, #EF4444)'
@@ -633,13 +877,34 @@ export default function EmergencyWhiteboard() {
                     ? 'var(--status-stable, #10B981)'
                     : 'var(--status-info, #60A5FA)';
 
-            return (
+            return display.isDisplayMode ? (
+              <div
+                key={metric.key}
+                title={`${metric.label}: ${metric.value}. Source: ${metric.source}.`}
+                style={{
+                  border: '1px solid var(--color-border-subtle, #1F2937)',
+                  borderRadius: 12,
+                  background: 'var(--color-card, #172033)',
+                  color: 'var(--color-text-primary, #F9FAFB)',
+                  display: 'grid',
+                  gap: 4,
+                  minHeight: 68,
+                  padding: 12,
+                  textAlign: 'left',
+                }}
+              >
+                <strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 22 }}>
+                  {metric.value}
+                </strong>
+                <span style={{ color: toneColor, fontSize: 12, fontWeight: 850 }}>
+                  {metric.label}
+                </span>
+              </div>
+            ) : (
               <button
                 key={metric.key}
                 type="button"
-                onClick={() => {
-                  if (canOpen) openRoute(route);
-                }}
+                onClick={() => handleOperationalMetricClick(metric.key)}
                 disabled={!canOpen}
                 title={`${metric.label}: ${metric.value}. Source: ${metric.source}. ${centralSnapshot.sync.message}`}
                 style={{
@@ -681,9 +946,125 @@ export default function EmergencyWhiteboard() {
         <StatCard value={stats.waiting} label="Waiting" />
         <StatCard value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
         <StatCard value={`${capacity.score} ${capacity.band}`} label="Capacity" tone={capacityTone(capacity.band)} />
-        <StatCard value={stats.reassessmentDue} label="Reassess Due" tone={stats.reassessmentDue ? 'warning' : 'success'} />
-        <StatCard value={soonEmsArrivals} label="EMS <10m" tone={soonEmsArrivals ? 'critical' : 'success'} />
+        <StatCard
+          value={stats.reassessmentDue}
+          label="Reassess Due"
+          tone={stats.reassessmentDue ? 'warning' : 'success'}
+          emphasized={Boolean(stats.reassessmentDue) && !display.isDisplayMode}
+          title={
+            stats.reassessmentDue
+              ? 'Open reassessment drawer and filter board to flagged patients'
+              : 'No reassessment patients are due'
+          }
+          onClick={display.isDisplayMode || !stats.reassessmentDue ? undefined : () => focusReassessmentOnBoard()}
+        />
+        <StatCard
+          value={emsAwareness.soonestEtaLabel || emsAwareness.inboundCount || '—'}
+          label="EMS ETA"
+          tone={
+            emsAwareness.soonestEtaMinutes !== null && emsAwareness.soonestEtaMinutes <= 10
+              ? 'critical'
+              : emsAwareness.inboundCount
+                ? 'info'
+                : 'success'
+          }
+          emphasized={Boolean(emsAwareness.inboundCount) && !display.isDisplayMode}
+          title={
+            emsAwareness.inboundCount
+              ? `${emsAwareness.inboundCount} inbound unit${emsAwareness.inboundCount === 1 ? '' : 's'}${emsAwareness.soonestEtaLabel ? ` · soonest ${emsAwareness.soonestEtaLabel}` : ''}`
+              : 'No inbound EMS units'
+          }
+          onClick={
+            display.isDisplayMode || !emsAwareness.inboundCount
+              ? undefined
+              : () => {
+                  setActiveFilter('EMS');
+                  setQueueFilter(null);
+                }
+          }
+        />
+        <StatCard
+          value={emsAwareness.riskCount}
+          label="EMS Risk"
+          tone={emsAwareness.riskCount ? 'critical' : 'success'}
+          emphasized={Boolean(emsAwareness.riskCount) && !display.isDisplayMode}
+          title="Critical/high severity or P1/P2 inbound EMS"
+          onClick={
+            display.isDisplayMode || !emsAwareness.riskCount
+              ? undefined
+              : () => {
+                  setActiveFilter('EMS');
+                  setQueueFilter(null);
+                }
+          }
+        />
+        <StatCard
+          value={
+            emsAwareness.awaitingHandoff
+              ? `${emsAwareness.offloadMinutes}m`
+              : emsAwareness.offloadMinutes || 0
+          }
+          label="EMS Offload"
+          tone={
+            emsAwareness.offloadMinutes >= 15
+              ? 'critical'
+              : emsAwareness.awaitingHandoff
+                ? 'warning'
+                : 'success'
+          }
+          emphasized={Boolean(emsAwareness.awaitingHandoff) && !display.isDisplayMode}
+          title={`${emsAwareness.awaitingHandoff} unit${emsAwareness.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`}
+          onClick={
+            display.isDisplayMode || !emsAwareness.awaitingHandoff
+              ? undefined
+              : () => {
+                  setActiveFilter('EMS');
+                  setQueueFilter(null);
+                  if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
+                    openRoute(CANONICAL_ROUTES.emergencyEms);
+                  }
+                }
+          }
+        />
         <StatCard value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
+        <StatCard
+          value={referralAwareness.buckets.pending}
+          label="Referrals Pending"
+          tone={referralAwareness.buckets.pending ? 'warning' : 'success'}
+          emphasized={Boolean(referralAwareness.buckets.pending) && !display.isDisplayMode}
+          title="Referrals awaiting specialty response"
+          onClick={
+            display.isDisplayMode || !referralAwareness.buckets.pending
+              ? undefined
+              : () => {
+                  setActiveFilter('All');
+                  setQueueFilter('referral');
+                }
+          }
+        />
+        <StatCard
+          value={referralAwareness.buckets.accepted}
+          label="Referrals Accepted"
+          tone={referralAwareness.buckets.accepted ? 'success' : 'default'}
+          title="Referrals accepted in workflow"
+          onClick={
+            display.isDisplayMode || !referralAwareness.buckets.accepted
+              ? undefined
+              : () => openReferralWorkflow(undefined, 'accepted')
+          }
+        />
+        <StatCard
+          value={referralAwareness.buckets.delayed}
+          label="Referrals Delayed"
+          tone={referralAwareness.buckets.delayed ? 'critical' : 'success'}
+          emphasized={Boolean(referralAwareness.buckets.delayed) && !display.isDisplayMode}
+          title="Referrals flagged delayed"
+          onClick={
+            display.isDisplayMode || !referralAwareness.buckets.delayed
+              ? undefined
+              : () => openReferralWorkflow(undefined, 'delayed')
+          }
+        />
         <StatCard
           value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
           label="Data Freshness"
@@ -692,6 +1073,96 @@ export default function EmergencyWhiteboard() {
         />
       </div>
 
+      {showEmsAttentionStrip ? (
+        <EmsAttentionStrip
+          emsArrivals={emsArrivals}
+          now={clockTick}
+          onMetricSelect={handleEmsAttentionSelect}
+          readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {!display.isDisplayMode && emsAwareness.inboundArrivals.length ? (
+        <section
+          aria-label="Inbound EMS operational awareness"
+          style={{
+            display: 'grid',
+            gap: 8,
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
+            background: 'color-mix(in srgb, var(--color-secondary, #38BDF8) 8%, var(--color-surface, #111827))',
+          }}
+        >
+          <strong style={{ color: '#BAE6FD', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            Inbound EMS · operational awareness
+          </strong>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+            {emsAwareness.inboundArrivals.slice(0, 3).map((arrival) => {
+              const remaining = minutesRemaining(arrival);
+              const offloadMinutes = getArrivalOffloadMinutes(arrival, clockTick);
+              return (
+                <button
+                  key={arrival.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveFilter('EMS');
+                    setQueueFilter(null);
+                  }}
+                  style={{
+                    border: '1px solid color-mix(in srgb, var(--color-secondary, #38BDF8) 34%, var(--color-border-default, #1F2937))',
+                    borderRadius: 12,
+                    background: 'var(--color-card, #172033)',
+                    boxShadow: 'inset 3px 0 0 var(--color-secondary, #38BDF8)',
+                    color: '#E0F2FE',
+                    cursor: 'pointer',
+                    display: 'grid',
+                    gap: 4,
+                    padding: 10,
+                    textAlign: 'left',
+                  }}
+                >
+                  <strong>{arrival.unitId} · {formatEmsEta(remaining, arrival.status)}</strong>
+                  <span style={{ color: '#93C5FD', fontSize: 12 }}>
+                    Risk {arrival.severity}
+                    {offloadMinutes !== null ? ` · Offload ${offloadMinutes}m` : ''}
+                  </span>
+                  <span style={{ color: '#9CA3AF', fontSize: 12 }}>
+                    {arrival.chiefComplaint || arrival.prearrivalComplaint}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {showReferralAttentionStrip ? (
+        <ReferralAttentionStrip
+          referrals={referrals}
+          onMetricSelect={handleReferralAttentionSelect}
+          readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {showReassessmentAttentionStrip ? (
+        <ReassessmentAttentionStrip
+          patients={patients}
+          onMetricSelect={handleReassessmentAttentionSelect}
+          readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {showChargeNurseStrip ? (
+        <ChargeNurseOperationalStrip
+          patients={patients}
+          centralSnapshot={centralSnapshot}
+          activeEmsArrivals={activeEmsArrivals.length}
+          onMetricSelect={handleChargeNurseMetricSelect}
+          readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {!display.operationalAwarenessOnly ? (
       <section
         className="emergency-whiteboard-page__mission"
         aria-labelledby="whiteboard-mission-control-title"
@@ -750,11 +1221,11 @@ export default function EmergencyWhiteboard() {
               title="Open existing Smart Intake identity workflow"
             />
             <MissionButton
-              label={`Reassessment Tasks (${reassessmentPatients.length})`}
-              onClick={() => openReassessmentTasks()}
-              disabled={!canMutateWhiteboard || !reassessmentPatients.length}
-              title={reassessmentPatients.length ? 'Open reassessment drawer' : 'No reassessment tasks are due'}
-              tone={reassessmentPatients.length ? 'warning' : 'default'}
+              label={`Reassessment Tasks (${reassessmentAttentionCount})`}
+              onClick={() => focusReassessmentOnBoard()}
+              disabled={!reassessmentAttentionCount}
+              title={reassessmentAttentionCount ? 'Open reassessment drawer and filter board' : 'No reassessment tasks are due'}
+              tone={reassessmentAttentionCount ? 'warning' : 'default'}
             />
             <MissionButton
               label="New Referral"
@@ -864,17 +1335,75 @@ export default function EmergencyWhiteboard() {
             padding: 12,
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>Immediate tasks</strong>
-            <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12 }}>{referrals.length} referrals</span>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Pending', value: referralAwareness.buckets.pending, tone: '#FDE68A' },
+                { label: 'Accepted', value: referralAwareness.buckets.accepted, tone: '#A7F3D0' },
+                { label: 'Delayed', value: referralAwareness.buckets.delayed, tone: '#FCA5A5' },
+              ].map((item) => (
+                <span
+                  key={item.label}
+                  style={{
+                    border: '1px solid var(--color-border-subtle, #1F2937)',
+                    borderRadius: 999,
+                    background: 'var(--color-floating-surface, #1E293B)',
+                    color: item.tone,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    padding: '4px 8px',
+                  }}
+                >
+                  {item.label} {item.value}
+                </span>
+              ))}
+            </div>
           </div>
           <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+            {[...referralAwareness.grouped.delayed, ...referralAwareness.grouped.pending, ...referralAwareness.grouped.accepted]
+              .slice(0, 3)
+              .map((referral) => {
+                const patient = patients.find((entry) => entry.id === referral.patientId);
+                const bucket =
+                  referral.status === 'Delayed'
+                    ? 'Delayed'
+                    : referral.status === 'Accepted'
+                      ? 'Accepted'
+                      : 'Pending';
+                return (
+                  <button
+                    key={referral.id}
+                    type="button"
+                    onClick={() => openReferralWorkflow(referral.patientId, bucket.toLowerCase())}
+                    style={{
+                      border: '1px solid color-mix(in srgb, var(--color-accent, #A78BFA) 34%, var(--color-border-default, #1F2937))',
+                      borderRadius: 12,
+                      background: 'color-mix(in srgb, var(--color-accent, #A78BFA) 12%, var(--color-card, #172033))',
+                      boxShadow: 'inset 3px 0 0 var(--color-accent, #A78BFA)',
+                      color: '#EDE9FE',
+                      cursor: 'pointer',
+                      display: 'grid',
+                      gap: 2,
+                      padding: 10,
+                      textAlign: 'left',
+                    }}
+                  >
+                    <strong>{patient ? patientName(patient) : referral.patientId} · {bucket}</strong>
+                    <span style={{ color: 'var(--color-text-secondary, #D1D5DB)', fontSize: 12 }}>
+                      {referral.targetDepartment || referral.service || 'Specialty'} · {referral.reason || referral.summary || 'Referral active'}
+                    </span>
+                  </button>
+                );
+              })}
+            {!referralAwareness.total ? (
+              <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 13 }}>No active referrals in workflow.</p>
+            ) : null}
             {reassessmentPatients.length ? reassessmentPatients.slice(0, 3).map((patient) => (
               <button
                 key={patient.id}
                 type="button"
-                onClick={() => openReassessmentTasks(patient.id)}
-                disabled={!canMutateWhiteboard}
+                onClick={() => focusReassessmentOnBoard(patient.id)}
                 style={{
                   border: '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-default, #1F2937))',
                   borderRadius: 12,
@@ -902,6 +1431,7 @@ export default function EmergencyWhiteboard() {
           </div>
         </div>
       </section>
+      ) : null}
 
       <div
         className="emergency-whiteboard-page__controls"
@@ -918,6 +1448,9 @@ export default function EmergencyWhiteboard() {
         <div className="emergency-whiteboard-page__filters" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {FILTERS.map((filter) => {
             const active = filter === activeFilter;
+            const reassessCount = filter === 'Reassess' ? reassessmentAttentionCount : 0;
+            const label = reassessCount > 0 ? `Reassess (${reassessCount})` : filter;
+            const highlightReassess = filter === 'Reassess' && reassessCount > 0;
             return (
               <button
                 key={filter}
@@ -925,19 +1458,39 @@ export default function EmergencyWhiteboard() {
                 onClick={() => {
                   setActiveFilter(filter);
                   setQueueFilter(null);
+                  if (filter === 'Reassess' && reassessCount > 0) {
+                    document.dispatchEvent(new Event('open-reassessment-drawer'));
+                  }
                 }}
                 style={{
-                  border: '1px solid var(--color-border-subtle, #1F2937)',
+                  border: highlightReassess
+                    ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 52%, var(--color-border-subtle, #1F2937))'
+                    : '1px solid var(--color-border-subtle, #1F2937)',
                   borderRadius: 999,
-                  background: active ? 'var(--color-text-primary, #F9FAFB)' : 'transparent',
-                  color: active ? 'var(--color-background, #111827)' : 'var(--color-text-muted, #9CA3AF)',
+                  background: active
+                    ? highlightReassess
+                      ? 'var(--status-warning, #F59E0B)'
+                      : 'var(--color-text-primary, #F9FAFB)'
+                    : highlightReassess
+                      ? 'color-mix(in srgb, var(--status-warning, #F59E0B) 14%, transparent)'
+                      : 'transparent',
+                  color: active
+                    ? highlightReassess
+                      ? 'var(--color-background, #111827)'
+                      : 'var(--color-background, #111827)'
+                    : highlightReassess
+                      ? '#FDE68A'
+                      : 'var(--color-text-muted, #9CA3AF)',
                   padding: '8px 14px',
                   fontSize: 13,
-                  fontWeight: 600,
+                  fontWeight: highlightReassess ? 800 : 600,
                   cursor: 'pointer',
+                  boxShadow: highlightReassess && !active
+                    ? '0 0 0 1px color-mix(in srgb, var(--status-warning, #F59E0B) 24%, transparent)'
+                    : undefined,
                 }}
               >
-                {filter}
+                {label}
               </button>
             );
           })}
@@ -951,7 +1504,7 @@ export default function EmergencyWhiteboard() {
           <span><i style={{ background: 'var(--color-accent, #A78BFA)' }} /> Boarding</span>
         </div>
 
-        {isRegistrationClerk ? (
+        {display.isDisplayMode ? null : isRegistrationClerk ? (
           <button
             className="emergency-whiteboard-page__intake-button"
             type="button"
@@ -1090,7 +1643,14 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : null}
 
+      {!whiteboard.loading && activeQueueFilter === 'Triage' && canReviewTriage && selectedPatientId ? (
+        <div style={{ padding: '0 14px', marginTop: 12 }}>
+          <AiTriageAssistPanelForPatientId patientId={selectedPatientId} />
+        </div>
+      ) : null}
+
       {!whiteboard.loading && visiblePatients.length > 0 ? (
+        <>
         <div
           className="emergency-whiteboard-page__grid"
           style={{
@@ -1104,10 +1664,12 @@ export default function EmergencyWhiteboard() {
             <PatientCard
               key={patient.id}
               patient={patient}
-              missionControlActions={canMutateWhiteboard && !isRegistrationClerk}
+              workflowProfile={patientCardWorkflowProfile}
+              readOnlyDisplay={display.isDisplayMode}
             />
           ))}
         </div>
+        </>
       ) : !whiteboard.loading ? (
         <div
           style={{
@@ -1126,7 +1688,7 @@ export default function EmergencyWhiteboard() {
             : `No patients match the ${activeQueueFilter || activeFilter} filter. Clear filters to return to the active board.`}
         </div>
       ) : null}
-      <WhoNextPanel mode="floating" />
+      {!display.isDisplayMode ? <WhoNextPanel mode="floating" /> : null}
     </section>
   );
 }

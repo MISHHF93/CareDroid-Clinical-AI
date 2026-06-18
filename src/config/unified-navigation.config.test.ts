@@ -135,7 +135,7 @@ const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS;
 
 describe('unified navigation config', () => {
   it('exports the exact requested Emergency OS nav items in order', () => {
-    expect(DEFAULT_ROUTE).toBe('/emergency/whiteboard');
+    expect(DEFAULT_ROUTE).toBe('/emergency/reception');
     expect(NAV_ITEMS).toEqual(REQUESTED_ITEMS);
     expect(
       NAVIGATION_ITEMS.map(({ id, label, icon, route, featureGate }) => ({
@@ -234,6 +234,16 @@ describe('unified navigation config', () => {
     const adminNavIds = getVisibleNavigation('admin').map((item) => item.id);
     expect(adminNavIds).toContain('settings');
     expect(adminNavIds).not.toContain('integrations');
+  });
+
+  it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
+    const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
+    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'platform']);
+    expect(physicianNavIds).not.toContain('reception');
+    expect(physicianNavIds).not.toContain('queues');
+    expect(physicianNavIds).not.toContain('reassessment');
+    expect(physicianNavIds).not.toContain('referrals');
+    expect(physicianNavIds).not.toContain('boarding');
   });
 
   it('normalizes aliases and defaults unknown roles consistently', () => {

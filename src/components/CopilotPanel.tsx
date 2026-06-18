@@ -206,6 +206,7 @@ function buildDepartmentPrompt({
   centralSnapshot,
   intelligenceSnapshot,
   attachments,
+  selectedPatient,
 }: {
   patients: Patient[];
   alerts: Alert[];
@@ -214,6 +215,7 @@ function buildDepartmentPrompt({
   centralSnapshot: CareDroidCentralNodeSnapshot;
   intelligenceSnapshot: OperationalIntelligenceSnapshot;
   attachments?: CopilotAttachment[];
+  selectedPatient?: Patient | null;
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -258,6 +260,17 @@ function buildDepartmentPrompt({
     `- Advisory recommendations: ${intelligenceSnapshot.recommendations.map((rec) => rec.action).join('; ') || 'None'}`,
     `- ${intelligenceSnapshot.disclaimers.operational}`,
     `- ${intelligenceSnapshot.disclaimers.clinical}`,
+    selectedPatient?.triageAssist
+      ? [
+          '',
+          'Selected patient triage assist (staff must confirm):',
+          `- Patient: ${summarizePatient(selectedPatient)}`,
+          `- Suggested priority: ${selectedPatient.triageAssist.suggestedPriority}`,
+          `- Suggested queue: ${selectedPatient.triageAssist.suggestedQueue}`,
+          `- Rationale: ${selectedPatient.triageAssist.rationale.join(' | ')}`,
+          `- ${selectedPatient.triageAssist.disclaimers?.[0] || HUMAN_REVIEW_DISCLAIMER}`,
+        ].join('\n')
+      : null,
   ].filter((line): line is string => Boolean(line)).join('\n');
 }
 
@@ -346,6 +359,7 @@ function TypingIndicator() {
 
 export function CopilotPanel() {
   const patients = useEmergencyStore((store) => store.patients);
+  const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
   const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
@@ -391,6 +405,21 @@ export function CopilotPanel() {
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : '';
 
   const activePatients = useMemo(() => patients.filter(isActivePatient), [patients]);
+  const selectedPatient = useMemo(
+    () => patients.find((patient) => patient.id === selectedPatientId) || null,
+    [patients, selectedPatientId],
+  );
+
+  useEffect(() => {
+    const handlePrefill = (event: Event) => {
+      const detail = (event as CustomEvent<{ message?: string }>).detail;
+      if (detail?.message) {
+        setInput(detail.message);
+      }
+    };
+    window.addEventListener('ed:copilot-prefill', handlePrefill);
+    return () => window.removeEventListener('ed:copilot-prefill', handlePrefill);
+  }, []);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
   const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
   const activeOperationalAlerts = useMemo(
@@ -585,6 +614,7 @@ export function CopilotPanel() {
       centralSnapshot,
       intelligenceSnapshot,
       attachments: submittedAttachments,
+      selectedPatient,
     });
     recordWorkflowAction({
       type: 'copilot_used',

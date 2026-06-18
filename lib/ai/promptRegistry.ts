@@ -4,6 +4,7 @@ import { HUMAN_REVIEW_DISCLAIMER } from './safetyPolicy';
 export type AIPromptId =
   | 'ed-copilot'
   | 'smart-intake-assistant'
+  | 'triage-assistant'
   | 'clinical-workflow-launcher'
   | 'referral-summarizer'
   | 'analytics-assistant'
@@ -33,6 +34,14 @@ export const AI_PROMPT_REGISTRY: Record<AIPromptId, AIPromptDefinition> = Object
     requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
     prompt:
       'Help staff verify intake information, identify missing fields, and suggest next verification steps. Do not auto-merge identities, auto-import outside records, or make triage decisions without human review.',
+  },
+  'triage-assistant': {
+    id: 'triage-assistant',
+    requestType: 'TRIAGE_ASSIST',
+    productRole: 'AI Triage Assistant = CTAS suggestion helper for nurse review',
+    requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
+    prompt:
+      'Suggest CTAS priority, waiting queue placement, and reassessment flags for triage nurse review. Provide concise rationale bullets. Never auto-triage, auto-route, or make disposition decisions — staff must confirm every action.',
   },
   'clinical-workflow-launcher': {
     id: 'clinical-workflow-launcher',

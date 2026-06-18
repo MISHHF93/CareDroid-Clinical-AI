@@ -6,6 +6,12 @@ import type {
   PatientState,
 } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
+import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
+import {
+  buildEncounterLinkageMetadata,
+  enrichEncounterTimeline,
+  getArrivalReasonFromPatient,
+} from './intakeEncounterChain';
 
 export type IntakeEncounterSource = EncounterSource;
 
@@ -39,15 +45,22 @@ export function buildEncounterArtifacts(
 ) {
   const timestamp = new Date().toISOString();
   const encounterId = `encounter-${patient.id}`;
+  const linkage = buildEncounterLinkageMetadata(patient, {
+    encounterId,
+    intakeSource: source,
+    queue: String(metadata.queue || WHITEBOARD_QUEUE_FILTER.triage),
+    sessionId: typeof metadata.sessionId === 'string' ? metadata.sessionId : undefined,
+  });
+
   const timelineEvent: JourneyEvent = {
     id: `evt-${patient.id}-encounter-${Date.now()}`,
     patientId: patient.id,
     type: 'EncounterCreated',
     timestamp,
     to: patient.state,
-    summary: `Encounter ${encounterId} created from ${source}.`,
+    summary: `Encounter ${encounterId} created for ${linkage.arrivalReason}.`,
     metadata: {
-      encounterId,
+      ...linkage,
       source,
       ...metadata,
     },
@@ -60,10 +73,14 @@ export function buildEncounterArtifacts(
     createdAt: timestamp,
     currentState: patient.state as PatientState,
     timelineEventIds: [timelineEvent.id],
-    metadata,
+    metadata: {
+      ...linkage,
+      source,
+      ...metadata,
+    },
   };
 
-  return { encounterId, encounter, timelineEvent };
+  return { encounterId, encounter, timelineEvent, linkage };
 }
 
 export function ensureEncounterAfterIntake(
@@ -73,6 +90,7 @@ export function ensureEncounterAfterIntake(
     source: IntakeEncounterSource;
     sessionId?: string;
     actorName?: string;
+    queue?: string;
   },
 ): { encounterId: string | null; created: boolean } {
   if (!isAutoCreateEncounterEnabled(store.emergencySettings)) {
@@ -84,14 +102,33 @@ export function ensureEncounterAfterIntake(
     return { encounterId: null, created: false };
   }
 
+  const queue = options.queue || WHITEBOARD_QUEUE_FILTER.triage;
   const existingEncounterId = getExistingEncounterId(patient);
   if (existingEncounterId) {
+    const linkage = buildEncounterLinkageMetadata(patient, {
+      encounterId: existingEncounterId,
+      intakeSource: options.source,
+      queue,
+      sessionId: options.sessionId,
+    });
+    store.updatePatient(patient.id, {
+      timeline: enrichEncounterTimeline(patient.timeline || [], existingEncounterId, linkage),
+    });
+    store.recordWorkflowAction({
+      type: 'encounter_created',
+      summary: `Encounter ${existingEncounterId} linked to ${getArrivalReasonFromPatient(patient)} (${queue}).`,
+      patientId: patient.id,
+      actorName: options.actorName,
+      source: 'intake-encounter',
+      metadata: linkage,
+    });
     return { encounterId: existingEncounterId, created: false };
   }
 
-  const { encounterId, timelineEvent } = buildEncounterArtifacts(patient, options.source, {
+  const { encounterId, timelineEvent, linkage } = buildEncounterArtifacts(patient, options.source, {
     sessionId: options.sessionId,
     intakeSource: options.source,
+    queue,
   });
 
   store.updatePatient(patient.id, {
@@ -99,15 +136,11 @@ export function ensureEncounterAfterIntake(
   });
   store.recordWorkflowAction({
     type: 'encounter_created',
-    summary: `Encounter ${encounterId} opened after ${options.source} intake.`,
+    summary: `Encounter ${encounterId} opened for ${linkage.arrivalReason} (${queue}).`,
     patientId: patient.id,
     actorName: options.actorName,
     source: 'intake-encounter',
-    metadata: {
-      encounterId,
-      intakeSource: options.source,
-      sessionId: options.sessionId,
-    },
+    metadata: linkage,
   });
 
   return { encounterId, created: true };

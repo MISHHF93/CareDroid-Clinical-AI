@@ -285,6 +285,14 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
     ]);
   };
 
+  const openReassessment = () => {
+    if (!recommendation) return;
+    selectPatient(recommendation.patient.id);
+    document.dispatchEvent(new Event('open-reassessment-drawer'));
+  };
+
+  const recommendationNeedsReassessment = recommendation?.patient.flags.includes(PatientFlag.ReassessmentDue);
+
   return (
     <aside style={containerStyle} aria-label="See next patient recommendation">
       <div
@@ -341,7 +349,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
             <div style={{ color: '#BFDBFE', fontSize: 12, fontWeight: 700, marginTop: 6 }}>
               {recommendation.reason || 'Assigned patient needs review'}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: recommendationNeedsReassessment ? '1fr 1fr' : '1fr 1fr', gap: 8, marginTop: 12 }}>
               <button
                 type="button"
                 onClick={() => selectPatient(recommendation.patient.id)}
@@ -349,10 +357,30 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
               >
                 Go to Patient
               </button>
-              <button type="button" onClick={skipPatient} style={buttonStyle}>
+              {recommendationNeedsReassessment ? (
+                <button
+                  type="button"
+                  onClick={openReassessment}
+                  style={{
+                    ...buttonStyle,
+                    background: 'color-mix(in srgb, #F59E0B 18%, #1C2333)',
+                    borderColor: '#F59E0B',
+                    color: '#FDE68A',
+                  }}
+                >
+                  Reassess now
+                </button>
+              ) : (
+                <button type="button" onClick={skipPatient} style={buttonStyle}>
+                  Skip — next
+                </button>
+              )}
+            </div>
+            {recommendationNeedsReassessment ? (
+              <button type="button" onClick={skipPatient} style={{ ...buttonStyle, marginTop: 8, width: '100%' }}>
                 Skip — next
               </button>
-            </div>
+            ) : null}
           </>
         ) : (
           <div style={{ color: '#D1D5DB', fontSize: 13, lineHeight: 1.4, marginTop: 10 }}>

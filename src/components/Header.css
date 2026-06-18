@@ -354,9 +354,9 @@
 }
 
 .emergency-os-header__lookup--primary {
-  width: min(28vw, 360px);
-  min-width: 220px;
-  height: 36px;
+  width: min(36vw, 420px);
+  min-width: 260px;
+  height: 38px;
   border-color: rgba(59, 130, 246, 0.45);
   background: rgba(37, 99, 235, 0.12);
 }
@@ -381,11 +381,11 @@
 
 .emergency-os-header__lookup-results {
   position: absolute;
-  top: 38px;
+  top: 42px;
   right: 0;
   z-index: 140;
   display: grid;
-  width: min(340px, calc(100vw - 24px));
+  width: min(420px, calc(100vw - 24px));
   overflow: hidden;
   border: 1px solid #1f2937;
   border-radius: 12px;

@@ -1,0 +1,110 @@
+.duplicate-candidate-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.duplicate-candidate-panel header h3 {
+  margin: 0;
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 15px;
+}
+
+.duplicate-candidate-panel header p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.duplicate-candidate-panel__empty {
+  margin: 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+}
+
+.duplicate-candidate-panel__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.duplicate-candidate-panel__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 10px;
+  background: var(--color-elevated, #0b1120);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+button.duplicate-candidate-panel__item {
+  cursor: pointer;
+}
+
+.duplicate-candidate-panel__item--selected {
+  border-color: var(--status-info, #60a5fa);
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.35);
+}
+
+.duplicate-candidate-panel__item strong {
+  display: block;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.duplicate-candidate-panel__item span,
+.duplicate-candidate-panel__item small {
+  display: block;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+}
+
+.duplicate-candidate-panel__open {
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-subtle, #374151);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-primary, #f9fafb);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.duplicate-candidate-panel__explanation {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd34d;
+  font-size: 12px;
+}
+
+.duplicate-candidate-panel__explanation p {
+  margin: 0;
+}
+
+.duplicate-candidate-panel__footer button {
+  border: 0;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.duplicate-candidate-panel--compact .duplicate-candidate-panel__item {
+  padding: 8px 10px;
+}

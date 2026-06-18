@@ -11,21 +11,19 @@ const appSource = readFileSync(join(__dirname, '../../App.jsx'), 'utf8');
 
 describe('Reception-first experience wiring', () => {
   it('exposes the arrival dashboard without duplicate page search', () => {
-    expect(receptionSource).toContain('EmsPreArrivalPanel');
+    expect(receptionSource).toContain('ArrivalDashboard');
+    expect(receptionSource).toContain('ReceptionOperationalStrip');
+    expect(receptionSource).toContain('handleProvisionalIntake');
     expect(receptionSource).toContain('useReceptionSnapshotPolling');
     expect(receptionSource).toContain('PreparePatientChooser');
-    expect(receptionSource).toContain('ReceptionSearchHint');
-    expect(receptionSource).toContain('RecentArrivalsPanel');
-    expect(receptionSource).toContain('receptionQueueModel');
-    expect(receptionSource).not.toContain('reception-workspace__hero');
-    expect(receptionSource).toContain('ReceptionWorkQueues');
-    expect(receptionSource).toContain('reception-workspace__actions--secondary');
-    expect(receptionSource).toContain('Start Smart Intake');
-    expect(receptionSource).toContain('Quick walk-in');
-    expect(receptionSource).toContain('open-reception-intake');
+    expect(receptionSource).toContain('onQuickCreate');
+    expect(receptionSource).toContain('open-reception-quick-create');
     expect(receptionSource).toContain('DuplicatePatientBanner');
-    expect(receptionSource).toContain('enterEmsRegistrationQueue');
+    expect(receptionSource).toContain('convertEmsArrivalForReception');
     expect(receptionSource).toContain('findDuplicateCandidatesFromQuery');
+    expect(receptionSource).toContain('ReceptionSearchHint');
+    expect(receptionSource).toContain('Start Smart Intake');
+    expect(receptionSource).not.toContain('buildPostHandoffNavigationPaths');
   });
 
   it('uses header lookup as the primary reception search surface', () => {
@@ -33,7 +31,8 @@ describe('Reception-first experience wiring', () => {
     expect(headerSource).toContain('syncPatientLookupQuery');
     expect(headerSource).toContain('focus-reception-search');
     expect(headerSource).toContain('open-reception-intake');
-    expect(headerSource).toContain('Start Smart Intake');
+    expect(headerSource).toContain('PatientSearchResults');
+    expect(headerSource).toContain('Patient search');
     expect(headerSource).toContain('screenCapabilities.productLabel');
   });
 
@@ -46,5 +45,10 @@ describe('Reception-first experience wiring', () => {
   it('redirects registration clerk away from whiteboard routes', () => {
     expect(appSource).toContain('EMERGENCY_ROLE_IDS.registrationClerk');
     expect(appSource).toContain('CANONICAL_ROUTES.emergencyReception');
+  });
+
+  it('routes standalone intake through reception for arrival-first roles', () => {
+    expect(appSource).toContain('EmergencyIntakeEntry');
+    expect(appSource).toContain('getReceptionEmbeddedIntakePath');
   });
 });

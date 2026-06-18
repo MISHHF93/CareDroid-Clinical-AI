@@ -28,7 +28,7 @@ import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
-import { enterWaitingQueue } from '../services/queueAssignment';
+import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatientState } from '../services/queueAssignment';
 import { buildPatientTimeline } from '../utils/patientTimeline';
 import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
 import { findMatchingChecklists, type Checklist } from '../config/criticalChecklists';
@@ -37,6 +37,7 @@ import SepsisBundleTracker from './SepsisBundleTracker';
 import StrokeCodeProtocol from './StrokeCodeProtocol';
 import WhoNextPanel from './WhoNextPanel';
 import ErrorBoundary from './ErrorBoundary';
+import AiTriageAssistPanel from './reception/AiTriageAssistPanel';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -50,8 +51,6 @@ const priorityColors: Record<Priority, string> = {
   [Priority.P4]: '#10B981',
   [Priority.P5]: '#6B7280',
 };
-
-const patientStateOrder = Object.values(PatientState);
 
 const emptyVitalsForm = {
   hr: '',
@@ -183,11 +182,6 @@ function journeyTimestamp(patient: Patient, state: PatientState): string | undef
   if (state === PatientState.Arrival) return patient.arrivalTime;
   if (state === PatientState.Triage) return patient.triageTime || undefined;
   return patient.timeline.find((event) => event.to === state)?.timestamp;
-}
-
-function nextPatientState(current: PatientState): PatientState {
-  const index = patientStateOrder.indexOf(current);
-  return patientStateOrder[Math.min(index + 1, patientStateOrder.length - 1)];
 }
 
 function hasPatientFlagValue(patient: Patient, flag: PatientFlag | string): boolean {
@@ -928,6 +922,15 @@ export default function PatientDetailPanel() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
           <Badge color="#9CA3AF">{selectedPatient.state}</Badge>
+        </div>
+
+        {selectedPatient.state === PatientState.Triage ? (
+          <div style={{ marginTop: 12 }}>
+            <AiTriageAssistPanel patient={selectedPatient} />
+          </div>
+        ) : null}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           {!isSepsisChecklistBlocked ? (
             <button
               type="button"
@@ -947,18 +950,17 @@ export default function PatientDetailPanel() {
           <button
             type="button"
             onClick={() => {
-              const nextState = nextPatientState(selectedPatient.state);
-              if (nextState === PatientState.Waiting) {
-                enterWaitingQueue(useEmergencyStore.getState(), {
-                  patientId: selectedPatient.id,
-                  actorId: actorStaffId,
-                  note: 'Advanced from patient detail panel into waiting queue.',
-                });
-                return;
-              }
-              movePatientToState(selectedPatient.id, nextState, actorStaffId);
+              const nextState = getDefaultNextPatientState(selectedPatient);
+              if (!nextState) return;
+              advancePatientJourneyState(selectedPatient.id, nextState, {
+                actorId: actorStaffId,
+                note:
+                  nextState === PatientState.Waiting
+                    ? 'Advanced from patient detail panel into waiting queue.'
+                    : 'Advanced from patient detail panel',
+              });
             }}
-            disabled={!canTransition}
+            disabled={!canTransition || !getDefaultNextPatientState(selectedPatient)}
             title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
             style={{
               marginLeft: 'auto',
@@ -1350,7 +1352,10 @@ export default function PatientDetailPanel() {
               <FieldButton
                 onClick={() => {
                   if (!canDischarge) return;
-                  movePatientToState(selectedPatient.id, PatientState.Discharge, actorStaffId, 'Discharged from detail panel');
+                  dischargePatientSafely(selectedPatient.id, {
+                    actorId: actorStaffId,
+                    note: 'Discharged from detail panel',
+                  });
                   setActionMode(null);
                 }}
                 disabled={!canDischarge}

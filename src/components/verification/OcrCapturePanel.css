@@ -1,0 +1,42 @@
+.ocr-capture-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.ocr-capture-panel header h3 {
+  margin: 0;
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 15px;
+}
+
+.ocr-capture-panel header p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+}
+
+.ocr-capture-panel__upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px dashed var(--color-border-subtle, #374151);
+  border-radius: 10px;
+  background: var(--color-elevated, #0b1120);
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.ocr-capture-panel__upload input {
+  display: none;
+}
+
+.ocr-capture-panel__status {
+  margin: 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+}

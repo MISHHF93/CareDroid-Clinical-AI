@@ -4,7 +4,10 @@ import {
   buildLiveQueueStateFromPatients,
   enterEmsRegistrationQueue,
   enterTriageQueue,
+  getDefaultNextPatientState,
   isPatientInEmsRegistrationQueue,
+  isPatientInVerificationQueue,
+  matchesWhiteboardQueueFilter,
 } from './queueAssignment';
 
 const triagePatient: Patient = {
@@ -96,8 +99,76 @@ describe('queueAssignment', () => {
     const state = buildLiveQueueStateFromPatients([
       { ...triagePatient, state: PatientState.Triage },
       { ...triagePatient, id: 'p-wait', state: PatientState.Waiting },
+      { ...triagePatient, id: 'p-reg', state: PatientState.Registration },
     ]);
     expect(state['triage-queue'].count).toBe(1);
-    expect(state['waiting-room'].count).toBe(1);
+    expect(state['waiting-room'].count).toBe(2);
+  });
+
+  it('matches EMS whiteboard filter for EMS registration patients', () => {
+    const emsPatient: Patient = {
+      ...triagePatient,
+      flags: [PatientFlag.EMSArrival],
+      state: PatientState.Registration,
+    };
+    expect(matchesWhiteboardQueueFilter(emsPatient, 'EMS')).toBe(true);
+    expect(matchesWhiteboardQueueFilter(triagePatient, 'EMS')).toBe(false);
+  });
+
+  it('rejects triage assignment from non-journey states', () => {
+    const store = {
+      patients: [{ ...triagePatient, state: PatientState.Assessment }],
+      emergencySettings: {},
+      movePatientToState: vi.fn(),
+      updatePatient: vi.fn(),
+      setQueueFilter: vi.fn(),
+      selectPatient: vi.fn(),
+      recordWorkflowAction: vi.fn(),
+    };
+
+    const result = enterTriageQueue(store, { patientId: triagePatient.id });
+    expect(result).toEqual({ ok: false, reason: 'invalid_state' });
+  });
+
+  it('identifies verification queue membership', () => {
+    expect(isPatientInVerificationQueue(triagePatient)).toBe(true);
+    expect(
+      isPatientInVerificationQueue({
+        ...triagePatient,
+        flags: [PatientFlag.EMSArrival],
+      }),
+    ).toBe(false);
+  });
+
+  it('splits referral and discharge disposition queues', () => {
+    const referralIds = new Set(['p-ref']);
+    const state = buildLiveQueueStateFromPatients(
+      [
+        { ...triagePatient, id: 'p-ref', state: PatientState.Disposition },
+        { ...triagePatient, id: 'p-dc', state: PatientState.Disposition },
+      ],
+      referralIds,
+    );
+    expect(state['referral-queue'].count).toBe(1);
+    expect(state['discharge-queue'].count).toBe(1);
+  });
+
+  it('picks journey-legal default next states instead of enum order', () => {
+    expect(
+      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Admission }),
+    ).toBe(PatientState.Discharge);
+    expect(
+      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Disposition }),
+    ).toBe(PatientState.Discharge);
+    expect(
+      getDefaultNextPatientState({
+        ...triagePatient,
+        state: PatientState.Disposition,
+        flags: [PatientFlag.PendingAdmission],
+      }),
+    ).toBe(PatientState.Admission);
+    expect(
+      getDefaultNextPatientState({ ...triagePatient, state: PatientState.Results }),
+    ).toBe(PatientState.Disposition);
   });
 });

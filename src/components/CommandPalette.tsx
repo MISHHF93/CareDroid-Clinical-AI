@@ -11,7 +11,7 @@ import {
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import type { Patient } from '../types/emergency';
-import { getPatientDisplayName, scorePatientSearch } from '../utils/patientSearch';
+import { getPatientDisplayName, rankPatientsBySearch, scorePatientSearch } from '../utils/patientSearch';
 
 export type CommandGroup = 'Navigation' | 'Patient' | 'Clinical' | 'Department' | 'Settings';
 
@@ -163,24 +163,15 @@ export function searchPatientsByName(
   const normalizedQuery = normalizeSearch(query);
   if (!normalizedQuery) return [];
 
-  return patients
-    .map((patient, order) => ({
-      patient,
-      order,
-      score: patientNameMatchScore(patient, normalizedQuery),
-    }))
-    .filter((item) => item.score >= 0)
-    .sort((a, b) => b.score - a.score || a.order - b.order)
-    .slice(0, MAX_PATIENT_RESULTS)
-    .map(({ patient }) => ({
-      type: 'patient',
-      id: `patient-${patient.id}`,
-      label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
-      description: `Select patient ${patient.mrn}`,
-      group: 'Patients',
-      icon: 'person',
-      action: () => useEmergencyStore.getState().selectPatient(patient.id),
-    }));
+  return rankPatientsBySearch(patients, normalizedQuery, MAX_PATIENT_RESULTS).map(({ patient }) => ({
+    type: 'patient',
+    id: `patient-${patient.id}`,
+    label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
+    description: `Select patient ${patient.mrn}`,
+    group: 'Patients',
+    icon: 'person',
+    action: () => useEmergencyStore.getState().selectPatient(patient.id),
+  }));
 }
 
 export function readRecentCommandIds(storage: StorageLike | null = getBrowserStorage()): string[] {
@@ -315,10 +306,9 @@ function createCommands(
     {
       id: 'new-patient',
       label: 'Start Smart Intake',
-      description:
-        prefersReceptionForPatientCreate(emergencyRole.role)
-          ? 'Open Smart Intake from Reception — the primary arrival workflow.'
-          : 'Start central intake on the Operations Board; human review remains required.',
+      description: prefersReceptionForPatientCreate(emergencyRole.role)
+        ? 'Embedded on reception — OCR, identity match, verify, and register without leaving arrival.'
+        : 'Start central intake on the Operations Board; human review remains required.',
       shortcut: 'N',
       group: 'Patient',
       keywords: ['add', 'new', 'register', 'intake', 'smart intake', 'patient create', 'identity'],

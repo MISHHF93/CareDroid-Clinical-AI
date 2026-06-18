@@ -256,7 +256,17 @@ flowchart TD
 | Renamed pretriage tab label | “Awaiting triage” matches product language |
 | Removed inline search-context paragraph | Replaced by `ReceptionSearchHint` |
 
-**Not created:** new store, new API routes, new intake form, page-level search field, or `NewPatientIntake` wiring.
+**Not created:** new store, new API routes, new intake form, or page-level search field.
+
+### Convergence pass (prompts 21–40)
+
+| Asset | Status | Notes |
+| --- | --- | --- |
+| `NewPatientIntake.jsx` | **Deprecated / unwired** | Legacy whiteboard modal; production uses `QuickIntake` + Smart Intake. Handoff source `whiteboard-central-intake` when used in tests. |
+| `ExpressRegistration` | **Wired** | Fast path; handoff source `express-register` (distinct from `quick-intake`). |
+| `QuickIntake` | **Wired** | Secondary full create; handoff source `quick-intake`. |
+| Header search | **Single surface** | `ReceptionSearchHint` focuses header lookup; no duplicate input. |
+| AI triage assist | **Post-handoff only** | Clerks do not see panel; triage nurses on pretriage tab + whiteboard Triage filter. |
 
 ---
 

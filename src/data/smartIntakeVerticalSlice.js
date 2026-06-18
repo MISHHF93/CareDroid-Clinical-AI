@@ -140,7 +140,15 @@ export function buildSmartIntakeVerticalSlicePatient({
         type: 'EncounterCreated',
         timestamp,
         summary: `Encounter ${encounterId} created from Smart Intake.`,
-        metadata: { encounterId, sessionId },
+        metadata: {
+          patientId: id,
+          encounterId,
+          sessionId,
+          arrivalReason: complaintText.trim() || complaintCategory,
+          complaintCategory,
+          queue: 'Triage',
+          intakeSource: 'smart-intake',
+        },
       },
       {
         id: `evt-${id}-triage`,

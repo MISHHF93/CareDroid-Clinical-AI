@@ -1,9 +1,73 @@
 import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
-import { movePatientToState as moveWithJourneyRules } from '../../engine/journeyEngine';
+import {
+  getNextStates,
+  isLegalTransition,
+  movePatientToState as moveWithJourneyRules,
+} from '../../engine/journeyEngine';
 import { PatientFlag, PatientState, type Patient } from '../types/emergency';
-import type { useEmergencyStore } from '../store/emergencyStore';
+import { useEmergencyStore, type useEmergencyStore as UseEmergencyStoreType } from '../store/emergencyStore';
 import QueueIntelligenceService from './queueIntelligenceService';
 import { getPatientDisplayName } from '../utils/patientSearch';
+
+/** Trace registry: how patients enter, leave, and what triggers movement. */
+export const QUEUE_MOVEMENT_REGISTRY = Object.freeze({
+  receptionVerification: Object.freeze({
+    id: 'verification',
+    label: 'Verification',
+    membership: 'Registration without EMSArrival flag',
+    enter: ['Walk-in registration', 'Smart Intake capture before verify'],
+    exit: ['completeIntakeHandoff → Triage'],
+    exitTrigger: 'Identity verified / intake completed',
+  }),
+  receptionPretriage: Object.freeze({
+    id: 'pretriage',
+    label: 'Awaiting triage',
+    membership: 'PatientState.Triage',
+    enter: ['completeIntakeHandoff', 'enterTriageQueue', 'Express/Quick intake'],
+    exit: ['enterWaitingQueue → Waiting'],
+    exitTrigger: 'Triage completed (staff Move next)',
+  }),
+  receptionEms: Object.freeze({
+    id: 'ems',
+    label: 'EMS registration',
+    membership: 'EMSArrival flag + Registration or Arrival',
+    enter: ['convertEMSArrivalToPatient', 'enterEmsRegistrationQueue'],
+    exit: ['Smart Intake verify → completeIntakeHandoff → Triage'],
+    exitTrigger: 'EMS registration verified',
+  }),
+  whiteboardTriage: Object.freeze({
+    id: 'Triage',
+    label: 'Triage',
+    membership: 'PatientState.Triage',
+    enter: ['enterTriageQueue', 'completeIntakeHandoff'],
+    exit: ['enterWaitingQueue'],
+    exitTrigger: 'Staff advances Triage → Waiting',
+  }),
+  whiteboardWaiting: Object.freeze({
+    id: 'Waiting',
+    label: 'Waiting',
+    membership: 'PatientState.Waiting',
+    enter: ['enterWaitingQueue'],
+    exit: ['journeyEngine → Assessment'],
+    exitTrigger: 'Provider pickup / Move next',
+  }),
+  whiteboardEms: Object.freeze({
+    id: 'EMS',
+    label: 'EMS',
+    membership: 'EMSArrival flag or EMS registration queue',
+    enter: ['EMS convert', 'Provisional temporary intake'],
+    exit: ['Handoff to triage clears flag on later states'],
+    exitTrigger: 'Registration complete',
+  }),
+  whiteboardReassessment: Object.freeze({
+    id: 'Reassessment',
+    label: 'Reassessment',
+    membership: 'ReassessmentDue / DeteriorationRisk / SepsisAlert flags',
+    enter: ['Reassessment engine flags', 'Staff flag actions'],
+    exit: ['Reassessment completed / flag cleared on state change'],
+    exitTrigger: 'Reassessment addressed',
+  }),
+});
 
 export const WHITEBOARD_QUEUE_FILTER = Object.freeze({
   triage: 'Triage',
@@ -19,7 +83,7 @@ export const RECEPTION_QUEUE_TAB = Object.freeze({
 });
 
 export type QueueAssignmentStore = Pick<
-  ReturnType<typeof useEmergencyStore.getState>,
+  ReturnType<typeof UseEmergencyStoreType.getState>,
   | 'patients'
   | 'movePatientToState'
   | 'updatePatient'
@@ -60,6 +124,236 @@ export function isPatientInEmsRegistrationQueue(patient: {
   );
 }
 
+export function isPatientInVerificationQueue(patient: Patient): boolean {
+  return patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient);
+}
+
+export function matchesWhiteboardQueueFilter(
+  patient: Patient,
+  activeQueueFilter: string | null,
+  pendingReferralPatientIds: Set<string> = new Set(),
+): boolean {
+  if (!activeQueueFilter) return true;
+  const filter = activeQueueFilter.trim().toLowerCase();
+
+  if (filter === 'waiting') return patient.state === PatientState.Waiting;
+  if (filter === 'triage') return patient.state === PatientState.Triage;
+  if (filter === 'provider' || filter === 'assessment') {
+    return patient.state === PatientState.Assessment;
+  }
+  if (filter === 'orders') return patient.state === PatientState.Orders;
+  if (filter === 'results') return patient.state === PatientState.Results;
+  if (filter === 'admission' || filter === 'boarding') {
+    return (
+      patient.state === PatientState.Admission ||
+      hasFlag(patient, PatientFlag.PendingAdmission)
+    );
+  }
+  if (filter === 'referral') return pendingReferralPatientIds.has(patient.id);
+  if (filter === 'discharge') {
+    return (
+      patient.state === PatientState.Disposition &&
+      !pendingReferralPatientIds.has(patient.id)
+    );
+  }
+  if (filter === 'ems') {
+    return hasFlag(patient, PatientFlag.EMSArrival) || isPatientInEmsRegistrationQueue(patient);
+  }
+  if (filter === 'reassessment') {
+    return (
+      hasFlag(patient, PatientFlag.ReassessmentDue) ||
+      hasFlag(patient, PatientFlag.DeteriorationRisk) ||
+      hasFlag(patient, PatientFlag.SepsisAlert)
+    );
+  }
+
+  return true;
+}
+
+function hasFlag(patient: Patient, flag: PatientFlag): boolean {
+  return patient.flags?.some((entry) =>
+    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+  );
+}
+
+function findPatient(store: QueueAssignmentStore, patientId: string): Patient | undefined {
+  return store.patients.find((entry) => entry.id === patientId);
+}
+
+/** Picks the default "Move next" target using journey rules, not enum order. */
+export function getDefaultNextPatientState(patient: Patient): PatientState | null {
+  const nextStates = getNextStates(patient.state);
+  if (!nextStates.length) return null;
+
+  if (patient.state === PatientState.Disposition) {
+    if (nextStates.includes(PatientState.Admission) && hasFlag(patient, PatientFlag.PendingAdmission)) {
+      return PatientState.Admission;
+    }
+    if (nextStates.includes(PatientState.Discharge)) {
+      return PatientState.Discharge;
+    }
+  }
+
+  if (patient.state === PatientState.Results && nextStates.includes(PatientState.Disposition)) {
+    return PatientState.Disposition;
+  }
+
+  return nextStates[0] || null;
+}
+
+export function hasAdvanceablePatientState(patient: Patient): boolean {
+  return getDefaultNextPatientState(patient) !== null;
+}
+
+function getBoardingPathStep(patient: Patient): PatientState | null {
+  if (isLegalTransition(patient.state, PatientState.Admission)) {
+    return PatientState.Admission;
+  }
+  if (isLegalTransition(patient.state, PatientState.Disposition)) {
+    return PatientState.Disposition;
+  }
+
+  const nextStates = getNextStates(patient.state);
+  if (nextStates.includes(PatientState.Disposition)) return PatientState.Disposition;
+  if (nextStates.includes(PatientState.Orders)) return PatientState.Orders;
+  if (nextStates.includes(PatientState.Results)) return PatientState.Results;
+  return nextStates[0] || null;
+}
+
+export function advancePatientToBoarding(
+  patientId: string,
+  options: {
+    actorId?: string;
+    actorName?: string;
+    note?: string;
+  } = {},
+) {
+  const store = useEmergencyStore.getState();
+  let patient = findPatient(store, patientId);
+  if (!patient) return { ok: false as const, reason: 'not_found' as const };
+  if (patient.state === PatientState.Admission) return { ok: true as const };
+
+  for (let step = 0; step < 5; step += 1) {
+    if (!patient) return { ok: false as const, reason: 'not_found' as const };
+    if (patient.state === PatientState.Admission) return { ok: true as const };
+
+    const target = getBoardingPathStep(patient);
+    if (!target) {
+      return {
+        ok: false as const,
+        reason: 'transition_blocked' as const,
+        currentState: patient.state,
+      };
+    }
+
+    const moved = advancePatientJourneyState(patientId, target, {
+      ...options,
+      note:
+        options.note ||
+        (target === PatientState.Admission
+          ? 'Boarding launched from Whiteboard mission control.'
+          : 'Advanced toward boarding/admission.'),
+    });
+    if (!moved.ok) return moved;
+    patient = findPatient(store, patientId);
+  }
+
+  return { ok: false as const, reason: 'path_too_long' as const };
+}
+
+export function dischargePatientSafely(
+  patientId: string,
+  options: {
+    actorId?: string;
+    note?: string;
+  } = {},
+) {
+  const store = useEmergencyStore.getState();
+  const patient = findPatient(store, patientId);
+  if (!patient) return { ok: false as const, reason: 'not_found' as const };
+
+  const staffId = options.actorId || 'queue-assignment';
+  const note = options.note || 'Patient discharged from Emergency OS.';
+
+  if (isLegalTransition(patient.state, PatientState.Discharge)) {
+    try {
+      moveWithJourneyRules(patientId, PatientState.Discharge, { staffId, note });
+      return { ok: true as const };
+    } catch {
+      // Fall through to clinical override discharge below.
+    }
+  }
+
+  store.dischargePatient(patientId, { staffId, note });
+  useEmergencyStore.getState().updateCapacity();
+  return { ok: true as const, override: true as const };
+}
+
+
+function assignPatientToTriageState(
+  store: QueueAssignmentStore,
+  patientId: string,
+  staffId: string,
+  note: string,
+): { ok: true } | { ok: false; reason: 'not_found' | 'invalid_state' | 'transition_blocked' } {
+  let patient = findPatient(store, patientId);
+  if (!patient) return { ok: false, reason: 'not_found' };
+  if (patient.state === PatientState.Triage) return { ok: true };
+
+  if (
+    patient.state === PatientState.Arrival &&
+    isLegalTransition(PatientState.Arrival, PatientState.Registration)
+  ) {
+    store.movePatientToState(patientId, PatientState.Registration, {
+      staffId,
+      note: 'Registered before triage queue assignment.',
+    });
+    patient = findPatient(store, patientId);
+    if (!patient) return { ok: false, reason: 'not_found' };
+  }
+
+  if (patient.state === PatientState.Triage) return { ok: true };
+  if (!isLegalTransition(patient.state, PatientState.Triage)) {
+    return { ok: false, reason: 'invalid_state' };
+  }
+
+  store.movePatientToState(patientId, PatientState.Triage, { staffId, note });
+  return { ok: true };
+}
+
+export function advancePatientJourneyState(
+  patientId: string,
+  targetState: PatientState,
+  options: {
+    actorId?: string;
+    actorName?: string;
+    note?: string;
+    syncWhiteboardFilter?: boolean;
+  } = {},
+) {
+  const store = useEmergencyStore.getState();
+
+  if (targetState === PatientState.Waiting) {
+    return enterWaitingQueue(store, {
+      patientId,
+      actorId: options.actorId,
+      actorName: options.actorName,
+      note: options.note,
+      syncWhiteboardFilter: options.syncWhiteboardFilter,
+    });
+  }
+
+  try {
+    moveWithJourneyRules(patientId, targetState, {
+      staffId: options.actorId || 'queue-assignment',
+      note: options.note,
+    });
+    return { ok: true as const };
+  } catch {
+    return { ok: false as const, reason: 'transition_blocked' as const };
+  }
+}
+
 export function enterTriageQueue(
   store: QueueAssignmentStore,
   options: {
@@ -82,11 +376,9 @@ export function enterTriageQueue(
     options.note ||
     `Assigned to triage queue${options.source ? ` (${options.source})` : ''}.`;
 
-  if (patient.state !== PatientState.Triage) {
-    store.movePatientToState(options.patientId, PatientState.Triage, {
-      staffId,
-      note,
-    });
+  const transition = assignPatientToTriageState(store, options.patientId, staffId, note);
+  if (!transition.ok) {
+    return transition;
   }
 
   if (!patient.triageTime) {
@@ -228,12 +520,6 @@ export function enterEmsRegistrationQueue(
   return { ok: true as const, queue: RECEPTION_QUEUE_TAB.ems };
 }
 
-function hasFlag(patient: Patient, flag: PatientFlag): boolean {
-  return patient.flags?.some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
-  );
-}
-
 function waitMinutesSince(isoTime?: string | null): number {
   if (!isoTime) return 0;
   const timestamp = new Date(isoTime).getTime();
@@ -281,13 +567,22 @@ function buildQueueSnapshot(
   };
 }
 
-export function buildLiveQueueStateFromPatients(patients: Patient[] = []) {
-  const active = patients.filter((patient) => patient.state !== PatientState.Discharge);
+export function buildLiveQueueStateFromPatients(
+  patients: Patient[] = [],
+  openReferralPatientIds: Set<string> = new Set(),
+) {
+  const active = patients.filter(
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+  );
 
   return {
     'waiting-room': buildQueueSnapshot(
       active,
-      (patient) => patient.state === PatientState.Waiting,
+      (patient) =>
+        patient.state === PatientState.Waiting ||
+        patient.state === PatientState.Registration ||
+        patient.state === PatientState.Arrival,
       20,
     ),
     'triage-queue': buildQueueSnapshot(
@@ -312,7 +607,7 @@ export function buildLiveQueueStateFromPatients(patients: Patient[] = []) {
     ),
     'referral-queue': buildQueueSnapshot(
       active,
-      (patient) => patient.state === PatientState.Disposition,
+      (patient) => openReferralPatientIds.has(patient.id),
       45,
     ),
     'admission-queue': buildQueueSnapshot(
@@ -322,7 +617,9 @@ export function buildLiveQueueStateFromPatients(patients: Patient[] = []) {
     ),
     'discharge-queue': buildQueueSnapshot(
       active,
-      (patient) => patient.state === PatientState.Disposition,
+      (patient) =>
+        patient.state === PatientState.Disposition &&
+        !openReferralPatientIds.has(patient.id),
       45,
     ),
     'ems-pre-arrival-queue': buildQueueSnapshot(

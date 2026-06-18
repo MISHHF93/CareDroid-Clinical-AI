@@ -30,7 +30,6 @@ const CLINICAL_COMMAND_MODES = new Set<CareDroidScreenMode>([
   CARE_DROID_SCREEN_MODES.physician,
   CARE_DROID_SCREEN_MODES.ems,
   CARE_DROID_SCREEN_MODES.commandCenter,
-  CARE_DROID_SCREEN_MODES.readOnly,
 ]);
 
 export function resolveScreenModeCapabilities(

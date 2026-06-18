@@ -6,6 +6,7 @@ import {
 } from './emergency-os.advanced-services';
 import { EmergencyOsUpgradeHarnessService } from './emergency-os.upgrade-harness.service';
 import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
+import { PatientOrchestrationService } from './emergency-os.orchestration.service';
 import {
   BoardingService,
   CareDroidCentralNodeService,
@@ -56,6 +57,7 @@ export class EmergencyOsController {
     private readonly centralNodeService: CareDroidCentralNodeService,
     private readonly operationalIntelligenceService: OperationalIntelligenceService,
     private readonly receptionWorkspaceService: ReceptionWorkspaceService,
+    private readonly orchestrationService: PatientOrchestrationService,
   ) {}
 
   @Get('whiteboard')
@@ -132,10 +134,73 @@ export class EmergencyOsController {
   }
 
   @Post('reception/handoff')
-  postReceptionHandoff(
-    @Body() body: { patientId?: string; source?: string; actorName?: string },
+  async postReceptionHandoff(
+    @Body()
+    body: {
+      patientId?: string;
+      source?: string;
+      actorName?: string;
+      encounterId?: string | null;
+      arrivalReason?: string;
+      complaintCategory?: string;
+      verificationSummary?: string;
+      triageAssist?: unknown;
+      triageAssistGeneratedAt?: string;
+    },
   ) {
-    return this.receptionWorkspaceService.completeHandoff(body);
+    let triageAssist = body.triageAssist as Awaited<
+      ReturnType<PatientOrchestrationService['buildTriageAssist']>
+    > | null;
+    if (!triageAssist && body.patientId) {
+      try {
+        triageAssist = await this.orchestrationService.buildTriageAssist(body.patientId, body);
+      } catch {
+        triageAssist = null;
+      }
+    }
+    return this.receptionWorkspaceService.completeHandoff({
+      ...body,
+      triageAssist: triageAssist || undefined,
+      triageAssistGeneratedAt: triageAssist?.generatedAt,
+    });
+  }
+
+  @Post('triage/assist')
+  async postTriageAssist(
+    @Body()
+    body: {
+      patientId?: string;
+      arrivalReason?: string;
+      complaintCategory?: string;
+      encounterId?: string | null;
+      verificationSummary?: string;
+    },
+  ) {
+    const patientId = String(body.patientId || '').trim();
+    if (!patientId) {
+      return {
+        module: 'Triage Assist',
+        generatedAt: new Date().toISOString(),
+        source: 'backend-fixture',
+        status: 'placeholder',
+        data: { ok: false, error: 'patientId is required' },
+        remainingGaps: [],
+      };
+    }
+    const triageAssist = await this.orchestrationService.buildTriageAssist(patientId, body);
+    return {
+      module: 'Triage Assist',
+      generatedAt: new Date().toISOString(),
+      source: 'backend-fixture',
+      status: 'active',
+      data: {
+        ok: true,
+        patientId,
+        triageAssist,
+        triageAssistGeneratedAt: triageAssist.generatedAt,
+      },
+      remainingGaps: [],
+    };
   }
 
   @Get('intake')

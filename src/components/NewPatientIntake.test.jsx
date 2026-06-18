@@ -102,7 +102,7 @@ describe('NewPatientIntake quick flow', () => {
     await waitFor(() => {
       expect(
         selectReassessmentQueue(useEmergencyStore.getState()).some(
-          (item) => item.id === patient?.id,
+          (item) => item.patientId === patient?.id,
         ),
       ).toBe(true);
     });

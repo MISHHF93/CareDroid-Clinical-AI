@@ -262,3 +262,19 @@ npm test -- queueAssignment.test.ts receptionHandoff.test.ts receptionQueueModel
 | `engine/journeyEngine.ts` | Legal state transitions |
 | `src/pages/emergency/index.tsx` | Whiteboard queue filters |
 | `src/services/queueIntelligenceService.js` | Analytics queue definitions |
+
+---
+
+## Convergence validation (prompt 31)
+
+| Queue | Enter | Leave | Status |
+| --- | --- | --- | --- |
+| Reception verification | `Registration` + non-EMS | Smart Intake verify → handoff | **Pass** |
+| Reception pretriage | `completeIntakeHandoff` / `enterTriageQueue` | `enterWaitingQueue` (triage assist accept) | **Pass** |
+| Reception EMS | `enterEmsRegistrationQueue` / EMS convert | Verify → handoff | **Pass** |
+| Whiteboard Triage | `setQueueFilter('Triage')` on handoff | `enterWaitingQueue` | **Pass** |
+| Whiteboard Waiting | Triage complete | Assessment transition | **Pass** |
+| Whiteboard EMS | `PatientFlag.EMSArrival` | Post-verify handoff | **Pass** |
+| Whiteboard Reassessment | Flag-based filter | Staff reassess workflow | **Pass** |
+| Whiteboard Referral | `pendingReferralPatientIds` | Referral workflow | **Pass** |
+| Discharge | `dischargePatientSafely` | Journey `Admission → Discharge` | **Pass** (see `arrival-to-discharge-trace.md`) |

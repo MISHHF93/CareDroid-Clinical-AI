@@ -23,6 +23,7 @@ type CapacityCrisisModeProps = {
   referrals: Referral[];
   emsArrivals: unknown[];
   emsIncomingPatients: unknown[];
+  readOnly?: boolean;
 };
 
 type AiRequestSnapshot = {
@@ -100,6 +101,7 @@ export default function CapacityCrisisMode({
   referrals,
   emsArrivals,
   emsIncomingPatients,
+  readOnly = false,
 }: CapacityCrisisModeProps) {
   const addNote = useEmergencyStore((state) => state.addNote);
   const movePatientToState = useEmergencyStore((state) => state.movePatientToState);
@@ -254,10 +256,14 @@ export default function CapacityCrisisMode({
               <span>{crisis.boardingPatients.length} boarding</span>
               <span aria-hidden>·</span>
               <span>{crisis.dischargeReady.length} discharge-ready</span>
-              <button type="button" onClick={openDrawer}>
-                View Actions
-              </button>
+              {readOnly ? null : (
+                <button type="button" onClick={openDrawer}>
+                  View Actions
+                </button>
+              )}
             </>
+          ) : readOnly ? (
+            <span>Operational awareness only</span>
           ) : (
             <button type="button" onClick={openDrawer}>
               View Emergency Actions
@@ -266,7 +272,7 @@ export default function CapacityCrisisMode({
         </div>
       </section>
 
-      {drawerOpen ? (
+      {!readOnly && drawerOpen ? (
         <aside className="capacity-crisis-drawer" aria-label="Capacity crisis action panel">
           <header className="capacity-crisis-drawer__header">
             <div>

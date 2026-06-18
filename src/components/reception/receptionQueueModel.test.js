@@ -3,6 +3,9 @@ import { PatientFlag, PatientState } from '../../types/emergency';
 import {
   filterPatientsByQuery,
   isEmsRegistrationPatient,
+  RECEPTION_STRIP_TO_OPERATIONAL_KEY,
+  selectArrivalDashboardMetrics,
+  selectReceptionOperationalStripMetrics,
   selectReceptionQueues,
 } from './receptionQueueModel';
 
@@ -53,5 +56,36 @@ describe('receptionQueueModel', () => {
     expect(queues.ems).toHaveLength(1);
     expect(queues.counts.awaitingVerification).toBe(2);
     expect(queues.counts.awaitingTriage).toBe(1);
+    expect(queues.counts.queueTotal).toBe(3);
+  });
+
+  it('normalizes arrival dashboard metrics from store patients and EMS inbound', () => {
+    const { metrics } = selectArrivalDashboardMetrics(patients, 2);
+    const byId = Object.fromEntries(metrics.map((metric) => [metric.id, metric]));
+
+    expect(byId['recent-arrivals'].value).toBe(3);
+    expect(byId['awaiting-verification'].value).toBe(2);
+    expect(byId['awaiting-triage'].value).toBe(1);
+    expect(byId['ems-arrivals'].value).toBe(3);
+    expect(byId['queue-total'].value).toBe(3);
+  });
+
+  it('builds compact reception operational strip metrics', () => {
+    const metrics = selectReceptionOperationalStripMetrics(patients, 2);
+    const byId = Object.fromEntries(metrics.map((metric) => [metric.id, metric]));
+
+    expect(byId['arrivals-today'].value).toBe(3);
+    expect(byId['awaiting-verification'].value).toBe(2);
+    expect(byId['awaiting-triage'].value).toBe(1);
+    expect(byId['ems-inbound'].value).toBe(2);
+    expect(byId['queue-size'].value).toBe(3);
+    expect(byId['awaiting-verification'].queueTab).toBe('verification');
+    expect(byId['awaiting-triage'].queueTab).toBe('pretriage');
+  });
+
+  it('maps reception strip ids to operational metric keys', () => {
+    expect(RECEPTION_STRIP_TO_OPERATIONAL_KEY['arrivals-today']).toBe('patientsToday');
+    expect(RECEPTION_STRIP_TO_OPERATIONAL_KEY['ems-inbound']).toBe('emsInbound');
+    expect(RECEPTION_STRIP_TO_OPERATIONAL_KEY['awaiting-triage']).toBe('waiting');
   });
 });

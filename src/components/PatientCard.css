@@ -243,6 +243,13 @@
   opacity: 0.62;
 }
 
+.patient-card__mission-actions button.patient-card__action--reassess-due {
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 24%, transparent);
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 58%, var(--color-border-default));
+  color: #fde68a;
+  font-weight: 800;
+}
+
 /* Visual QA clarity pass: make triage/state/risk readable without relying on tiny color marks. */
 .patient-card {
   --patient-priority-color: var(--status-info);

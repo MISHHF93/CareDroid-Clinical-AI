@@ -271,7 +271,7 @@ import {
 import { resolveRegistryId } from './data/clinicalCatalogWiring';
 import { EMERGENCY_OS_BRANDING } from './config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
-import { getEmergencyRoleHomeRoute, EMERGENCY_ROLE_IDS } from './config/emergencyRolePermissions';
+import { getEmergencyRoleHomeRoute, EMERGENCY_ROLE_IDS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from './config/emergencyRolePermissions';
 import {
   useBoardingStatus,
   useCapacityStatus,
@@ -463,10 +463,33 @@ function EmergencyDefaultRedirect() {
       to={
         emergencyRole.defaultRoute ||
         emergencyRole.allowedRoutes[0] ||
-        CANONICAL_ROUTES.emergencyWhiteboard
+        CANONICAL_ROUTES.emergencyReception
       }
       replace
     />
+  );
+}
+
+function EmergencyIntakeEntry() {
+  const emergencyRole = useEmergencyRolePermissions();
+  const [searchParams] = useSearchParams();
+  if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+    return (
+      <Navigate
+        to={getReceptionEmbeddedIntakePath({
+          step: searchParams.get('step') || undefined,
+          mode: searchParams.get('mode') || undefined,
+          patientId: searchParams.get('patientId') || undefined,
+          emsArrivalId: searchParams.get('emsArrivalId') || undefined,
+        })}
+        replace
+      />
+    );
+  }
+  return (
+    <LazyRoute label="Loading intake...">
+      <SmartIntake />
+    </LazyRoute>
   );
 }
 
@@ -1834,9 +1857,7 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyIntake}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
-              <LazyRoute label="Loading intake...">
-                <SmartIntake />
-              </LazyRoute>
+              <EmergencyIntakeEntry />
             </EmergencyRouteGuard>
           }
         />

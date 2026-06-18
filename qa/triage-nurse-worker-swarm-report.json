@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-06-18T03:11:41.064Z",
+  "baseURL": "http://localhost:8000",
+  "durationMs": 7542,
+  "workers": [
+    {
+      "id": "triage-nurse-01-assist-accept",
+      "name": "Casey Morgan",
+      "role": "triage_nurse",
+      "status": "pass",
+      "error": null,
+      "jsErrors": []
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0
+  }
+}
