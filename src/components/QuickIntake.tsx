@@ -198,7 +198,8 @@ export default function QuickIntake({
   const [submitError, setSubmitError] = useState('');
   const [duplicateAcknowledged, setDuplicateAcknowledged] = useState(false);
   const [protocolSuggestions, setProtocolSuggestions] = useState<string[]>([]);
-  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
+  const canCreatePatient = createPatientPresentation.enabled;
 
   const duplicateCandidates = useMemo<PatientDuplicateCandidate[]>(() => {
     if (variant !== 'reception') return [];
@@ -229,7 +230,8 @@ export default function QuickIntake({
     [centralControlSettings, emergencyRole],
   );
   const canSubmitCentralInput =
-    canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
+    (createPatientPresentation.visible && canCreatePatient) ||
+    (centralControl.enabled && !emergencyRole.readOnly);
 
   const age = useMemo(() => calculateAge(dob), [dob]);
   const vitals = useMemo(() => buildVitals(vitalsForm), [vitalsForm]);

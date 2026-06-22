@@ -26,7 +26,9 @@ export const TRIAGE_SCREEN_WIDGETS = Object.freeze({
   reassessment: 'reassessment',
   alerts: 'alerts',
   triageBreach: 'triage-breach',
+  waitingRoomSafetyEscalation: 'waiting-room-safety-escalation',
   aiTriageAssist: 'ai-triage-assist',
+  communicationStatus: 'communication-status',
 });
 
 export const TRIAGE_SCREEN_ACTIONS = Object.freeze({
@@ -76,6 +78,7 @@ export type TriageScreenCapabilities = {
   showAiTriageAssist: boolean;
   showClinicalTriageAssist: boolean;
   showWaitingRoomSafetyBoard: boolean;
+  showTriageBreach: boolean;
 };
 
 export function getTriagePendingQueuePath(patientId?: string | null): string {
@@ -156,5 +159,7 @@ export function resolveTriageScreenCapabilities(
       showWidget(TRIAGE_SCREEN_WIDGETS.aiTriageAssist) && canAssignAcuity,
     showClinicalTriageAssist: isTriageScreen && canAssignAcuity,
     showWaitingRoomSafetyBoard: showWidget(TRIAGE_SCREEN_WIDGETS.waitingRoomSafetyBoard),
+    showWaitingRoomSafetyEscalation: showWidget(TRIAGE_SCREEN_WIDGETS.waitingRoomSafetyEscalation),
+    showTriageBreach: showWidget(TRIAGE_SCREEN_WIDGETS.triageBreach),
   };
 }

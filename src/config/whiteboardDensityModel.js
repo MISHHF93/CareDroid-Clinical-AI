@@ -163,8 +163,11 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
  * @param {boolean} [context.signals.waitingRoomSafety]
  * @param {boolean} [context.signals.inboundEmsBanner]
  * @param {number} [context.signals.opsDetailCount]
+ * @param {string} [context.screenMode]
+ * @param {object} [context.densityProfile]
  */
 export function evaluateWhiteboardDensity(context = {}) {
+  const densityProfile = context.densityProfile || null;
   const operationalLoad =
     context.operationalLoad ||
     evaluateWhiteboardOperationalLoad({
@@ -179,6 +182,7 @@ export function evaluateWhiteboardDensity(context = {}) {
   const publicWaitingDisplay = Boolean(context.publicWaitingDisplay);
   const commandCenterScreen = Boolean(context.commandCenterScreen);
   const wallKioskDisplay = displayMode;
+  const publicWaitingKiosk = publicWaitingDisplay;
   const showShiftHandoffStrip = Boolean(context.showShiftHandoffStrip);
   const prioritizeAwareness =
     Boolean(context.prioritizeAwareness) || operationalLoad.prioritizeAwareness;
@@ -186,10 +190,22 @@ export function evaluateWhiteboardDensity(context = {}) {
   const opsDetailCount = Number(signals.opsDetailCount) || 0;
   const duplicateDomainChrome = showShiftHandoffStrip || prioritizeAwareness;
   const departmentScreen = wallKioskDisplay && !publicWaitingDisplay;
+  const preferOperationalStrips = Boolean(densityProfile?.whiteboard?.preferOperationalStrips);
+  const profileMaxCards = densityProfile?.whiteboard?.maxVisibleCards;
+  const suppressMissionControl =
+    densityProfile && !densityProfile.whiteboard.showMissionControl;
+  const suppressQueueIntelligence =
+    densityProfile && !densityProfile.whiteboard.showQueueIntelligence;
+  const suppressSecondaryStats =
+    densityProfile && !densityProfile.whiteboard.showSecondaryStats;
+  const suppressWaitingRoomSafety =
+    densityProfile && !densityProfile.whiteboard.showWaitingRoomSafety;
+  const suppressAttentionStrips =
+    densityProfile && !densityProfile.whiteboard.showAttentionStrips;
 
   const surfaces = Object.freeze({
     heroTitle: Object.freeze({
-      visible: !departmentScreen,
+      visible: !departmentScreen && !publicWaitingKiosk,
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
     heroDetail: Object.freeze({
@@ -197,7 +213,7 @@ export function evaluateWhiteboardDensity(context = {}) {
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     capacityCrisis: Object.freeze({
-      visible: Boolean(context.showCapacityCrisis) && !departmentScreen,
+      visible: Boolean(context.showCapacityCrisis) && !departmentScreen && !publicWaitingKiosk,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     shiftHandoff: Object.freeze({
@@ -226,7 +242,10 @@ export function evaluateWhiteboardDensity(context = {}) {
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
     secondaryStats: Object.freeze({
-      visible: !wallKioskDisplay && !prioritizeAwareness,
+      visible:
+        !wallKioskDisplay &&
+        !prioritizeAwareness &&
+        !suppressSecondaryStats,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     commandLayer: Object.freeze({
@@ -241,8 +260,9 @@ export function evaluateWhiteboardDensity(context = {}) {
       visible:
         Boolean(signals.emsAttention) &&
         !showShiftHandoffStrip &&
-        !prioritizeAwareness &&
-        !displayMode,
+        (!prioritizeAwareness || preferOperationalStrips) &&
+        !displayMode &&
+        !suppressAttentionStrips,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     emsInboundBanner: Object.freeze({
@@ -258,21 +278,23 @@ export function evaluateWhiteboardDensity(context = {}) {
       visible:
         Boolean(signals.reassessAttention) &&
         !duplicateDomainChrome &&
-        !displayMode,
+        !displayMode &&
+        !suppressAttentionStrips,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     referralAttention: Object.freeze({
       visible:
         Boolean(signals.referralAttention) &&
         !showShiftHandoffStrip &&
-        !prioritizeAwareness &&
-        !displayMode,
+        (!prioritizeAwareness || preferOperationalStrips) &&
+        !displayMode &&
+        !suppressAttentionStrips,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     chargeNurseStrip: Object.freeze({
       visible:
         Boolean(signals.chargeNurseStrip) &&
-        !operationalLoad.hideChargeNurseStrip &&
+        (!operationalLoad.hideChargeNurseStrip || preferOperationalStrips) &&
         !showShiftHandoffStrip &&
         !displayMode &&
         !commandCenterScreen,
@@ -283,18 +305,24 @@ export function evaluateWhiteboardDensity(context = {}) {
         !wallKioskDisplay &&
         !commandCenterScreen &&
         Boolean(signals.waitingRoomSafety) &&
-        !operationalLoad.hideMissionControl,
+        !suppressWaitingRoomSafety &&
+        (!operationalLoad.hideMissionControl || preferOperationalStrips),
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     missionControl: Object.freeze({
       visible:
-        !wallKioskDisplay && !commandCenterScreen && !prioritizeAwareness && !operationalLoad.hideMissionControl,
+        !wallKioskDisplay &&
+        !commandCenterScreen &&
+        !suppressMissionControl &&
+        (!prioritizeAwareness || preferOperationalStrips) &&
+        (!operationalLoad.hideMissionControl || preferOperationalStrips),
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     queueIntelligence: Object.freeze({
       visible:
         !wallKioskDisplay &&
         !commandCenterScreen &&
+        !suppressQueueIntelligence &&
         !prioritizeAwareness &&
         !operationalLoad.collapseQueueIntelligence,
       defaultCollapsed: operationalLoad.collapseQueueIntelligence,
@@ -309,7 +337,10 @@ export function evaluateWhiteboardDensity(context = {}) {
     filters: Object.freeze({ visible: !wallKioskDisplay, tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE }),
     patientGrid: Object.freeze({
       visible: !wallKioskDisplay && !commandCenterScreen,
-      maxVisibleCards: operationalLoad.maxVisibleCards,
+      maxVisibleCards:
+        densityProfile?.whiteboard != null
+          ? profileMaxCards
+          : operationalLoad.maxVisibleCards,
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
   });
@@ -357,6 +388,7 @@ export function evaluateWhiteboardDensity(context = {}) {
   return Object.freeze({
     operationalLoad,
     prioritizeAwareness,
+    densityProfile,
     surfaces,
     tiers: Object.freeze({
       alwaysVisible: Object.freeze(alwaysVisible),

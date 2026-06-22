@@ -65,6 +65,12 @@ describe('emergencyDisplayPrivacyPolicy', () => {
 
     expect(operational.showPatientName).toBe(true);
     expect(restricted.showPatientName).toBe(false);
+    expect(restricted.showHealthCard).toBe(false);
+    expect(restricted.showNotes).toBe(false);
+    expect(restricted.showStaffComments).toBe(false);
+    expect(restricted.showRoomAssignment).toBe(false);
+    expect(restricted.showClinicalFlags).toBe(false);
+    expect(restricted.aggregateMetricsOnly).toBe(true);
     expect(restricted.centralNodeRedaction).toBe('identifiers');
     expect(minimal.centralNodeRedaction).toBe('full');
     expect(shouldRedactSensitiveEmergencyData(restricted)).toBe(true);

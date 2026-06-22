@@ -3,6 +3,7 @@ import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   QUEUE_REASON_DEFINITIONS,
   buildQueueReasonBoardSummary,
+  isWaitingOrQueuedPatient,
   resolveQueueReason,
   summarizeQueueReasonBoard,
 } from './queueReasonVisibility';
@@ -28,17 +29,26 @@ function buildPatient(overrides = {}) {
 const STABLE_NOW = new Date('2026-06-20T10:35:00.000Z');
 
 describe('queueReasonVisibility', () => {
-  it('exposes all queue reason definitions', () => {
+  it('exposes the eight canonical queue reason definitions', () => {
     expect(QUEUE_REASON_DEFINITIONS.map((reason) => reason.id)).toEqual([
       'verification-incomplete',
-      'registration-incomplete',
       'triage-pending',
-      'reassessment-pending',
-      'admission-bed-pending',
-      'referral-pending',
-      'result-pending',
-      'room-pending',
       'provider-pending',
+      'room-pending',
+      'result-pending',
+      'referral-pending',
+      'admission-bed-pending',
+      'discharge-paperwork-pending',
+    ]);
+    expect(QUEUE_REASON_DEFINITIONS.map((reason) => reason.label)).toEqual([
+      'Verification incomplete',
+      'Awaiting triage',
+      'Awaiting clinician',
+      'Awaiting room',
+      'Awaiting results',
+      'Awaiting referral',
+      'Awaiting admission bed',
+      'Awaiting discharge paperwork',
     ]);
   });
 
@@ -55,7 +65,7 @@ describe('queueReasonVisibility', () => {
     expect(snapshot?.labels).toContain('Verification incomplete');
   });
 
-  it('flags registration incomplete before triage', () => {
+  it('flags awaiting triage for incomplete registration before triage', () => {
     const snapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Registration,
@@ -67,10 +77,11 @@ describe('queueReasonVisibility', () => {
       { now: STABLE_NOW },
     );
 
-    expect(snapshot?.reasons.map((reason) => reason.id)).toContain('registration-incomplete');
+    expect(snapshot?.primaryReason.id).toBe('triage-pending');
+    expect(snapshot?.labels).toContain('Awaiting triage');
   });
 
-  it('flags triage pending for triage queue patients', () => {
+  it('flags awaiting triage for triage queue patients', () => {
     const snapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Triage,
@@ -81,7 +92,7 @@ describe('queueReasonVisibility', () => {
     expect(snapshot?.primaryReason.id).toBe('triage-pending');
   });
 
-  it('flags provider pending for waiting patients without assignee', () => {
+  it('flags awaiting clinician for waiting patients without assignee', () => {
     const snapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Waiting,
@@ -93,9 +104,10 @@ describe('queueReasonVisibility', () => {
     );
 
     expect(snapshot?.primaryReason.id).toBe('provider-pending');
+    expect(snapshot?.primaryReason.label).toBe('Awaiting clinician');
   });
 
-  it('does not flag room pending for routine waiting-room patients without treatment room', () => {
+  it('does not flag awaiting room for routine waiting-room patients without treatment room', () => {
     const snapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Waiting,
@@ -108,9 +120,10 @@ describe('queueReasonVisibility', () => {
     );
 
     expect(snapshot?.reasons.map((reason) => reason.id)).not.toContain('room-pending');
+    expect(snapshot?.primaryReason.id).toBe('provider-pending');
   });
 
-  it('flags room pending when immediate room is required or assessment lacks room', () => {
+  it('flags awaiting room when immediate room is required or assessment lacks room', () => {
     const immediateRoomSnapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Waiting,
@@ -141,7 +154,7 @@ describe('queueReasonVisibility', () => {
     expect(assessmentSnapshot?.primaryReason.id).toBe('room-pending');
   });
 
-  it('flags result pending for results state and outstanding orders', () => {
+  it('flags awaiting results for results state and outstanding orders', () => {
     const reviewSnapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Results,
@@ -160,7 +173,7 @@ describe('queueReasonVisibility', () => {
     expect(ordersSnapshot?.primaryReason.id).toBe('result-pending');
   });
 
-  it('flags referral and admission bed pending from existing referral and flag data', () => {
+  it('flags awaiting referral and admission bed from referral and admission state', () => {
     const referralSnapshot = resolveQueueReason(buildPatient(), {
       referrals: [
         {
@@ -184,6 +197,37 @@ describe('queueReasonVisibility', () => {
     expect(admissionSnapshot?.primaryReason.id).toBe('admission-bed-pending');
   });
 
+  it('flags awaiting discharge paperwork for disposition patients', () => {
+    const snapshot = resolveQueueReason(
+      buildPatient({
+        state: PatientState.Disposition,
+      }),
+      { now: STABLE_NOW },
+    );
+
+    expect(snapshot?.primaryReason.id).toBe('discharge-paperwork-pending');
+    expect(snapshot?.primaryReason.label).toBe('Awaiting discharge paperwork');
+  });
+
+  it('assigns a queue reason for every waiting or queued patient', () => {
+    const patients = [
+      buildPatient({ state: PatientState.Triage, triagePending: true, triageTime: null, lastAssessedTime: null }),
+      buildPatient({
+        id: 'patient-2',
+        state: PatientState.Waiting,
+        triageTime: '2026-06-20T10:30:00.000Z',
+        lastAssessedTime: '2026-06-20T10:32:00.000Z',
+        assignedStaffId: null,
+      }),
+      buildPatient({ id: 'patient-3', state: PatientState.Disposition }),
+    ];
+
+    patients.forEach((patient) => {
+      expect(isWaitingOrQueuedPatient(patient)).toBe(true);
+      expect(resolveQueueReason(patient, { now: STABLE_NOW })?.primaryReason.id).toBeTruthy();
+    });
+  });
+
   it('summarizes primary queue reasons across patients', () => {
     const summary = summarizeQueueReasonBoard(
       [
@@ -200,11 +244,10 @@ describe('queueReasonVisibility', () => {
       { now: STABLE_NOW },
     );
 
-    expect(summary['triage-pending']).toBe(1);
-    expect(summary['registration-incomplete']).toBe(1);
+    expect(summary['triage-pending']).toBe(2);
   });
 
-  it('flags reassessment pending from due reminders and overdue timers', () => {
+  it('maps reassessment due waiting patients to awaiting clinician', () => {
     const snapshot = resolveQueueReason(
       buildPatient({
         state: PatientState.Waiting,
@@ -216,7 +259,7 @@ describe('queueReasonVisibility', () => {
       { now: STABLE_NOW },
     );
 
-    expect(snapshot?.reasons.map((reason) => reason.id)).toContain('reassessment-pending');
+    expect(snapshot?.reasons.map((reason) => reason.id)).toContain('provider-pending');
   });
 
   it('builds board summary lines for active queue reasons', () => {

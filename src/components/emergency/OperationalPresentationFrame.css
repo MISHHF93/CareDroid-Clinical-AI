@@ -56,6 +56,35 @@
   line-height: 1.45;
 }
 
+.operational-presentation-frame--screen-density-simple-fast {
+  gap: 0.65rem;
+}
+
+.operational-presentation-frame--screen-density-medium-safety {
+  gap: 0.8rem;
+}
+
+.operational-presentation-frame--screen-density-high-operational {
+  gap: 0.5rem;
+}
+
+.operational-presentation-frame--screen-density-patient-clinical {
+  gap: 0.85rem;
+}
+
+.operational-presentation-frame--screen-density-public-aggregate,
+.operational-presentation-frame--screen-density-metric-aggregate {
+  gap: 1.15rem;
+}
+
 .operational-presentation-frame--density-wall .operational-presentation-frame__title {
   font-size: clamp(1.75rem, 3vw, 2.35rem);
+}
+
+.emergency-app-shell--density-compact .app-shell-main-content {
+  font-size: 0.94rem;
+}
+
+.emergency-app-shell--density-wall .app-shell-main-content {
+  font-size: 1.05rem;
 }

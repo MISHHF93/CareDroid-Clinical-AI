@@ -187,7 +187,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     () => moreNav.some((item) => isActiveRoute(location.pathname, item, location.search)),
     [location.pathname, location.search, moreNav],
   );
-  const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
+  const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
+  const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
   const navAlertCount = useCallback(
     (item: SidebarNavItem) => {
       const alertCount = activeAlerts.filter((alert) => alertMatchesNavigation(alert, item)).length;

@@ -90,7 +90,7 @@ describe('emergencyMultiScreenConvergence', () => {
 
   it('assigns role-appropriate data density per screen mode', () => {
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.reception)).toBe('comfortable');
-    expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.triage)).toBe('compact');
+    expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.triage)).toBe('comfortable');
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.chargeNurse)).toBe('compact');
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.publicWaiting)).toBe('wall');
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard)).toBe('wall');

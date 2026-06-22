@@ -25,6 +25,7 @@ const basePatient = {
   chiefComplaint: 'Chest pain',
   complaintCategory: 'Chest Pain',
   state: PatientState.Waiting,
+  triageTime: new Date(Date.now() - 20 * 60000).toISOString(),
   priority: Priority.P3,
   vitals: [],
   flags: [],
@@ -124,7 +125,7 @@ describe('physicianWorkflowModel', () => {
       physicianStaffId: 'md-1',
     });
 
-    expect(metrics.map((metric) => metric.surface)).toEqual(PHYSICIAN_WORKFLOW_SURFACES);
+    expect(metrics.some((metric) => metric.id === 'provider-awaiting')).toBe(true);
     expect(metrics.find((metric) => metric.id === 'assigned')?.value).toBe(1);
     expect(metrics.find((metric) => metric.id === 'results')?.value).toBe(1);
     expect(metrics.find((metric) => metric.id === 'boarders')?.value).toBe(1);

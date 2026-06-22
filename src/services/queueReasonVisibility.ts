@@ -1,3 +1,7 @@
+/**
+ * Patient queue reason layer — for every waiting or queued patient, derive why they
+ * remain in the operational queue (staff-facing only; not shown on public displays).
+ */
 import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
 import {
   classifyReferralBucket,
@@ -20,15 +24,14 @@ import {
 import { hasDueReassessmentReminder } from '../utils/reassessmentScheduler';
 
 export type QueueReasonId =
+  | 'verification-incomplete'
   | 'triage-pending'
   | 'provider-pending'
   | 'room-pending'
   | 'result-pending'
   | 'referral-pending'
   | 'admission-bed-pending'
-  | 'reassessment-pending'
-  | 'registration-incomplete'
-  | 'verification-incomplete';
+  | 'discharge-paperwork-pending';
 
 export type QueueReasonTone = 'neutral' | 'info' | 'watch' | 'critical';
 
@@ -47,52 +50,46 @@ export const QUEUE_REASON_DEFINITIONS: readonly QueueReasonDefinition[] = Object
     tone: 'watch',
   },
   {
-    id: 'registration-incomplete',
-    label: 'Registration incomplete',
-    shortLabel: 'Register',
-    tone: 'watch',
-  },
-  {
     id: 'triage-pending',
-    label: 'Triage pending',
+    label: 'Awaiting triage',
     shortLabel: 'Triage',
     tone: 'watch',
   },
   {
-    id: 'reassessment-pending',
-    label: 'Reassessment pending',
-    shortLabel: 'Reassess',
-    tone: 'critical',
-  },
-  {
-    id: 'admission-bed-pending',
-    label: 'Admission bed pending',
-    shortLabel: 'Bed',
+    id: 'provider-pending',
+    label: 'Awaiting clinician',
+    shortLabel: 'Clinician',
     tone: 'watch',
-  },
-  {
-    id: 'referral-pending',
-    label: 'Referral pending',
-    shortLabel: 'Referral',
-    tone: 'watch',
-  },
-  {
-    id: 'result-pending',
-    label: 'Result pending',
-    shortLabel: 'Results',
-    tone: 'info',
   },
   {
     id: 'room-pending',
-    label: 'Room pending',
+    label: 'Awaiting room',
     shortLabel: 'Room',
     tone: 'watch',
   },
   {
-    id: 'provider-pending',
-    label: 'Provider pending',
-    shortLabel: 'Provider',
+    id: 'result-pending',
+    label: 'Awaiting results',
+    shortLabel: 'Results',
+    tone: 'info',
+  },
+  {
+    id: 'referral-pending',
+    label: 'Awaiting referral',
+    shortLabel: 'Referral',
     tone: 'watch',
+  },
+  {
+    id: 'admission-bed-pending',
+    label: 'Awaiting admission bed',
+    shortLabel: 'Admit bed',
+    tone: 'watch',
+  },
+  {
+    id: 'discharge-paperwork-pending',
+    label: 'Awaiting discharge paperwork',
+    shortLabel: 'Discharge',
+    tone: 'info',
   },
 ]);
 
@@ -100,14 +97,13 @@ const REASON_BY_ID = new Map(QUEUE_REASON_DEFINITIONS.map((reason) => [reason.id
 
 const REASON_PRIORITY: Record<QueueReasonId, number> = {
   'verification-incomplete': 1,
-  'registration-incomplete': 2,
-  'triage-pending': 3,
-  'reassessment-pending': 4,
-  'admission-bed-pending': 5,
-  'referral-pending': 6,
-  'result-pending': 7,
-  'room-pending': 8,
-  'provider-pending': 9,
+  'triage-pending': 2,
+  'admission-bed-pending': 3,
+  'referral-pending': 4,
+  'discharge-paperwork-pending': 5,
+  'result-pending': 6,
+  'room-pending': 7,
+  'provider-pending': 8,
 };
 
 const QUEUE_FLOW_STATES = new Set<PatientState>([
@@ -145,6 +141,11 @@ function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   );
 }
 
+/** Waiting or actively queued in the ED operational flow (staff-facing queues). */
+export function isWaitingOrQueuedPatient(patient: Patient | null | undefined): boolean {
+  return isInQueueFlow(patient);
+}
+
 export function isInQueueFlow(patient: Patient | null | undefined): boolean {
   if (!patient) return false;
   return QUEUE_FLOW_STATES.has(patient.state);
@@ -180,6 +181,68 @@ function needsTreatmentRoom(patient: Patient): boolean {
   return patient.state === PatientState.Assessment;
 }
 
+function needsClinicianReview(patient: Patient, now: Date): boolean {
+  const timer = buildReassessmentTimerSnapshot(patient, { now });
+  return (
+    hasFlag(patient, PatientFlag.ReassessmentDue) ||
+    hasDueReassessmentReminder(patient, now) ||
+    timer.isOverdue
+  );
+}
+
+function defaultQueueReason(
+  patient: Patient,
+): { id: QueueReasonId; staffDetail: string } {
+  switch (patient.state) {
+    case PatientState.Disposition:
+      return {
+        id: 'discharge-paperwork-pending',
+        staffDetail: 'Disposition queue · discharge paperwork outstanding',
+      };
+    case PatientState.Admission:
+      return {
+        id: 'admission-bed-pending',
+        staffDetail: 'Admission queue · inpatient bed placement',
+      };
+    case PatientState.Results:
+      return {
+        id: 'result-pending',
+        staffDetail: 'Results returned · clinician review outstanding',
+      };
+    case PatientState.Orders:
+      return {
+        id: 'result-pending',
+        staffDetail: 'Orders placed · awaiting results',
+      };
+    case PatientState.Assessment:
+      return {
+        id: 'room-pending',
+        staffDetail: 'Assessment queue · treatment space required',
+      };
+    case PatientState.Waiting:
+      return {
+        id: 'provider-pending',
+        staffDetail: 'Waiting room queue · clinician visit pending',
+      };
+    case PatientState.Triage:
+      return {
+        id: 'triage-pending',
+        staffDetail: 'Triage queue',
+      };
+    case PatientState.Registration:
+    case PatientState.Arrival:
+      return {
+        id: 'triage-pending',
+        staffDetail: 'Pre-triage queue',
+      };
+    default:
+      return {
+        id: 'triage-pending',
+        staffDetail: `Operational queue · ${patient.state}`,
+      };
+  }
+}
+
 function detectReasons(
   patient: Patient,
   context: QueueReasonContext,
@@ -207,38 +270,17 @@ function detectReasons(
   }
 
   if (
-    (patient.state === PatientState.Arrival || patient.state === PatientState.Registration) &&
-    registrationStatus !== 'complete'
-  ) {
-    reasons.push({
-      id: 'registration-incomplete',
-      staffDetail: `Registration ${registrationStatus} · ${patient.state}`,
-    });
-  }
-
-  if (
     patient.state === PatientState.Triage ||
     deriveTriagePending(patient) ||
     ((queueDestination === 'triage-queue' || queueDestination === 'rapid-review') &&
-      !patient.triageTime)
+      !patient.triageTime) ||
+    ((patient.state === PatientState.Registration || patient.state === PatientState.Arrival) &&
+      registrationStatus !== 'complete' &&
+      !reasons.some((reason) => reason.id === 'verification-incomplete'))
   ) {
     reasons.push({
       id: 'triage-pending',
       staffDetail: `Awaiting triage · ${queueDestination}`,
-    });
-  }
-
-  const timer = buildReassessmentTimerSnapshot(patient, { now });
-  if (
-    hasFlag(patient, PatientFlag.ReassessmentDue) ||
-    hasDueReassessmentReminder(patient, now) ||
-    timer.isOverdue
-  ) {
-    reasons.push({
-      id: 'reassessment-pending',
-      staffDetail: timer.isOverdue
-        ? `Reassessment overdue · last ${timer.lastReassessmentAgeLabel}`
-        : `Reassessment due · ${timer.dueInLabel}`,
     });
   }
 
@@ -257,6 +299,13 @@ function detectReasons(
     reasons.push({
       id: 'referral-pending',
       staffDetail: `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` · ${referral.service || referral.targetDepartment}` : ''}`,
+    });
+  }
+
+  if (patient.state === PatientState.Disposition) {
+    reasons.push({
+      id: 'discharge-paperwork-pending',
+      staffDetail: 'Disposition queue · discharge paperwork and instructions',
     });
   }
 
@@ -282,21 +331,21 @@ function detectReasons(
   }
 
   const provider = deriveProviderWaitingStatus(patient, staff);
-  if (
-    patient.state === PatientState.Waiting &&
-    (provider.label === 'Awaiting provider' ||
+  if (patient.state === PatientState.Waiting) {
+    if (
+      provider.label === 'Awaiting provider' ||
       provider.label.includes('not seen') ||
-      provider.label.includes('Return'))
-  ) {
-    reasons.push({
-      id: 'provider-pending',
-      staffDetail: provider.label,
-    });
-  } else if (patient.state === PatientState.Waiting && !patient.assignedStaffId) {
-    reasons.push({
-      id: 'provider-pending',
-      staffDetail: 'No assigned clinician',
-    });
+      provider.label.includes('Return') ||
+      !patient.assignedStaffId ||
+      needsClinicianReview(patient, now)
+    ) {
+      reasons.push({
+        id: 'provider-pending',
+        staffDetail: needsClinicianReview(patient, now)
+          ? `Reassessment due · ${provider.label}`
+          : provider.label,
+      });
+    }
   }
 
   if (
@@ -304,13 +353,16 @@ function detectReasons(
       patient.state === PatientState.Arrival ||
       isEmsRegistrationPatient(patient)) &&
     !reasons.some((reason) => reason.id === 'triage-pending') &&
-    !reasons.some((reason) => reason.id === 'registration-incomplete') &&
     !reasons.some((reason) => reason.id === 'verification-incomplete')
   ) {
     reasons.push({
       id: 'triage-pending',
       staffDetail: `Route to triage · ${queueDestination}`,
     });
+  }
+
+  if (!reasons.length) {
+    reasons.push(defaultQueueReason(patient));
   }
 
   return reasons;
@@ -334,6 +386,8 @@ export function resolveQueueReason(
   patient: Patient,
   context: QueueReasonContext = {},
 ): QueueReasonSnapshot | null {
+  if (!isInQueueFlow(patient)) return null;
+
   const detected = sortReasons(detectReasons(patient, context));
   if (!detected.length) return null;
 

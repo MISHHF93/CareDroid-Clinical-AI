@@ -96,7 +96,8 @@ export default function ReceptionQuickIntake({
   const [duplicateAcknowledged, setDuplicateAcknowledged] = useState(false);
 
   const isInline = variant === 'inline';
-  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
+  const canCreatePatient = createPatientPresentation.enabled;
   const age = useMemo(() => calculateAgeFromDob(dob), [dob]);
   const parsedName = useMemo(() => splitPatientName(patientName), [patientName]);
 

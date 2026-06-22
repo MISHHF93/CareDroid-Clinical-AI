@@ -33,6 +33,7 @@ export type EmergencyDisplayPrivacyPolicy = Readonly<{
   source: string;
   showPatientName: boolean;
   showMrn: boolean;
+  showHealthCard: boolean;
   showDemographics: boolean;
   showChiefComplaint: boolean;
   showComplaintFlags: boolean;
@@ -40,6 +41,8 @@ export type EmergencyDisplayPrivacyPolicy = Readonly<{
   showRoomAssignment: boolean;
   showStaffAssignment: boolean;
   showClinicalFlags: boolean;
+  showNotes: boolean;
+  showStaffComments: boolean;
   pseudonymizePatients: boolean;
   aggregateMetricsOnly: boolean;
   centralNodeRedaction: CentralNodeRedactionLevel;
@@ -58,6 +61,7 @@ const PUBLIC_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
   source: 'public waiting display',
   showPatientName: false,
   showMrn: false,
+  showHealthCard: false,
   showDemographics: false,
   showChiefComplaint: false,
   showComplaintFlags: false,
@@ -65,6 +69,8 @@ const PUBLIC_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
   showRoomAssignment: false,
   showStaffAssignment: false,
   showClinicalFlags: false,
+  showNotes: false,
+  showStaffComments: false,
   pseudonymizePatients: true,
   aggregateMetricsOnly: true,
   centralNodeRedaction: 'full',
@@ -73,20 +79,23 @@ const PUBLIC_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
 
 const IDENTIFIER_REDACTION_BASE: EmergencyDisplayPrivacyPolicy = Object.freeze({
   tier: 'restricted',
-  source: 'hallway monitor restricted privacy',
+  source: 'hallway monitor semi-private privacy',
   showPatientName: false,
   showMrn: false,
+  showHealthCard: false,
   showDemographics: false,
   showChiefComplaint: false,
   showComplaintFlags: false,
   showVitals: false,
-  showRoomAssignment: true,
+  showRoomAssignment: false,
   showStaffAssignment: false,
-  showClinicalFlags: true,
+  showClinicalFlags: false,
+  showNotes: false,
+  showStaffComments: false,
   pseudonymizePatients: true,
-  aggregateMetricsOnly: false,
+  aggregateMetricsOnly: true,
   centralNodeRedaction: 'identifiers',
-  redactOperationalAlerts: false,
+  redactOperationalAlerts: true,
 });
 
 const FULL_CLINICAL: EmergencyDisplayPrivacyPolicy = Object.freeze({
@@ -94,6 +103,7 @@ const FULL_CLINICAL: EmergencyDisplayPrivacyPolicy = Object.freeze({
   source: 'clinical screen mode',
   showPatientName: true,
   showMrn: true,
+  showHealthCard: true,
   showDemographics: true,
   showChiefComplaint: true,
   showComplaintFlags: true,
@@ -101,6 +111,8 @@ const FULL_CLINICAL: EmergencyDisplayPrivacyPolicy = Object.freeze({
   showRoomAssignment: true,
   showStaffAssignment: true,
   showClinicalFlags: true,
+  showNotes: true,
+  showStaffComments: true,
   pseudonymizePatients: false,
   aggregateMetricsOnly: false,
   centralNodeRedaction: 'none',
@@ -133,6 +145,7 @@ const NONE_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
   source: 'no patient-visible surfaces',
   showPatientName: false,
   showMrn: false,
+  showHealthCard: false,
   showDemographics: false,
   showChiefComplaint: false,
   showComplaintFlags: false,
@@ -140,6 +153,8 @@ const NONE_POLICY: EmergencyDisplayPrivacyPolicy = Object.freeze({
   showRoomAssignment: false,
   showStaffAssignment: false,
   showClinicalFlags: false,
+  showNotes: false,
+  showStaffComments: false,
   pseudonymizePatients: true,
   aggregateMetricsOnly: true,
   centralNodeRedaction: 'full',

@@ -1,5 +1,9 @@
 import React, { useMemo } from 'react';
 import { buildProviderWaitBreachAttentionSnapshot } from '../../services/providerWaitBreachTimer';
+import {
+  buildProviderWaitVisibilitySnapshot,
+  hasProviderWaitVisibilityActivity,
+} from '../../services/providerWaitVisibilityModel';
 import ProviderWaitBreachBadge from './ProviderWaitBreachBadge';
 import './ProviderWaitBreachBadge.css';
 
@@ -8,15 +12,26 @@ export default function ProviderWaitBreachStrip({
   settings = null,
   onSelectPatient,
   className = '',
+  alwaysShowWhenActive = true,
 }) {
   const context = useMemo(() => ({ settings: settings || undefined }), [settings]);
+
+  const visibility = useMemo(
+    () => buildProviderWaitVisibilitySnapshot(patients, context),
+    [context, patients],
+  );
 
   const snapshot = useMemo(
     () => buildProviderWaitBreachAttentionSnapshot(patients, context),
     [context, patients],
   );
 
-  if (!snapshot.summary.approachingThresholdCount && !snapshot.summary.breachedCount) return null;
+  if (!alwaysShowWhenActive && !snapshot.summary.approachingThresholdCount && !snapshot.summary.breachedCount) {
+    return null;
+  }
+  if (alwaysShowWhenActive && !hasProviderWaitVisibilityActivity(visibility)) {
+    return null;
+  }
 
   const previewPatients = patients.filter((patient) =>
     snapshot.previewRows.some((row) => row.patientId === patient.id),
@@ -32,30 +47,31 @@ export default function ProviderWaitBreachStrip({
         <h3>Provider wait breach timer</h3>
         <p className="provider-wait-breach-strip__subtitle">
           Triage-to-provider elapsed time against CTAS thresholds — {snapshot.summary.breachedCount}{' '}
-          breached · {snapshot.summary.approachingThresholdCount} approaching ·{' '}
-          {snapshot.summary.highRiskExceptionCount} high-risk exceptions
+          breached · {snapshot.summary.approachingThresholdCount} approaching · avg{' '}
+          {visibility.averageProviderWaitLabel} · {snapshot.summary.highRiskExceptionCount} high-risk
+          exceptions
         </p>
       </header>
       <div className="provider-wait-breach-strip__counts">
-        <div className="provider-wait-breach-strip__count" data-tone="critical">
-          <strong>{snapshot.summary.breachedCount}</strong>
-          <span>Breached</span>
-        </div>
-        <div className="provider-wait-breach-strip__count" data-tone="watch">
-          <strong>{snapshot.summary.approachingThresholdCount}</strong>
-          <span>Approaching</span>
+        <div className="provider-wait-breach-strip__count">
+          <strong>{visibility.awaitingClinicianCount}</strong>
+          <span>Awaiting clinician</span>
         </div>
         <div className="provider-wait-breach-strip__count">
-          <strong>{snapshot.summary.longestElapsedLabel}</strong>
+          <strong>{visibility.longestProviderWaitLabel}</strong>
           <span>Longest wait</span>
         </div>
         <div className="provider-wait-breach-strip__count">
-          <strong>{snapshot.summary.awaitingProviderCount}</strong>
-          <span>Awaiting provider</span>
+          <strong>{visibility.averageProviderWaitLabel}</strong>
+          <span>Average wait</span>
         </div>
-        <div className="provider-wait-breach-strip__count" data-tone={snapshot.summary.highRiskExceptionCount ? 'watch' : undefined}>
-          <strong>{snapshot.summary.highRiskExceptionCount}</strong>
-          <span>High-risk exceptions</span>
+        <div className="provider-wait-breach-strip__count" data-tone="watch">
+          <strong>{visibility.approachingThresholdCount}</strong>
+          <span>Approaching</span>
+        </div>
+        <div className="provider-wait-breach-strip__count" data-tone="critical">
+          <strong>{visibility.breachedCount}</strong>
+          <span>Breached</span>
         </div>
       </div>
       {previewPatients.length ? (

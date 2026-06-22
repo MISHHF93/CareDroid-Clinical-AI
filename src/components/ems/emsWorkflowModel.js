@@ -1,13 +1,13 @@
 import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
 import { EMS_SCREEN_WIDGETS } from '../../config/emsScreenModel';
+import { selectEmsOffloadVisibilityMetrics } from '../../services/emsOffloadVisibilityModel';
 import { summarizeEmsAwareness } from '../whiteboard/emsAwarenessModel';
 
 export const EMS_WORKFLOW_SURFACES = Object.freeze([
   EMS_SCREEN_WIDGETS.inboundAmbulances,
-  EMS_SCREEN_WIDGETS.etaDisplay,
-  EMS_SCREEN_WIDGETS.receivingArea,
   EMS_SCREEN_WIDGETS.offloadTimers,
+  EMS_SCREEN_WIDGETS.receivingArea,
   EMS_SCREEN_WIDGETS.emsPressure,
 ]);
 
@@ -39,59 +39,57 @@ export function selectEmsOperationalStrip({
     offloadTargetMinutes,
   });
 
+  const visibilityMetrics = selectEmsOffloadVisibilityMetrics(emsArrivals, {
+    patients,
+    staff,
+    rooms,
+    now: new Date(now),
+    offloadTargetMinutes,
+    surface: 'ems',
+  });
+
+  const visibilityById = Object.fromEntries(visibilityMetrics.map((metric) => [metric.id, metric]));
+
   const metrics = [
     {
       id: 'inbound',
-      label: 'Inbound',
-      hint: 'Active ambulance units en route',
-      value: summary.inboundCount,
+      label: visibilityById.inbound?.label || 'Inbound',
+      hint: visibilityById.inbound?.hint || 'Active ambulance units en route',
+      value: visibilityById.inbound?.value ?? summary.inboundCount,
       surface: EMS_SCREEN_WIDGETS.inboundAmbulances,
-      tone: summary.inboundCount >= 3 ? 'warning' : summary.inboundCount ? 'info' : 'neutral',
+      tone: visibilityById.inbound?.tone || (summary.inboundCount ? 'info' : 'neutral'),
       whiteboardAction: 'focus-inbound',
       routeKey: 'inbound',
     },
     {
-      id: 'eta',
-      label: 'Next ETA',
-      hint: summary.soonestEtaLabel ? `Soonest arrival ${summary.soonestEtaLabel}` : 'No inbound ETA',
-      value: summary.soonestEtaLabel || '—',
-      surface: EMS_SCREEN_WIDGETS.etaDisplay,
-      tone:
-        summary.soonestEtaMinutes !== null && summary.soonestEtaMinutes <= 10
-          ? 'critical'
-          : summary.soonestEtaMinutes !== null && summary.soonestEtaMinutes <= 20
-            ? 'warning'
-            : 'info',
-      whiteboardAction: 'focus-inbound',
-      routeKey: 'eta',
-    },
-    {
-      id: 'receiving',
-      label: 'Receiving',
-      hint: 'Crews awaiting handoff in the receiving area',
-      value: summary.awaitingHandoff,
-      surface: EMS_SCREEN_WIDGETS.receivingArea,
-      tone: summary.awaitingHandoff >= 2 ? 'warning' : summary.awaitingHandoff ? 'info' : 'neutral',
-      whiteboardAction: 'focus-receiving-area',
-      routeKey: 'receiving',
-    },
-    {
-      id: 'offload',
-      label: 'Offload',
-      hint:
-        summary.longestOffloadMinutes != null
-          ? `Longest offload ${summary.longestOffloadMinutes}m`
-          : 'Offload timer status',
-      value: summary.delayedOffloadCount || summary.awaitingHandoff || 0,
+      id: 'offload-delays',
+      label: visibilityById.offload?.label || 'Offload delays',
+      hint: visibilityById.offload?.hint || 'Units past offload target',
+      value: visibilityById.offload?.value ?? summary.delayedOffloadCount,
       surface: EMS_SCREEN_WIDGETS.offloadTimers,
-      tone:
-        (summary.longestOffloadMinutes ?? 0) >= offloadTargetMinutes
-          ? 'critical'
-          : summary.delayedOffloadCount
-            ? 'warning'
-            : 'neutral',
+      tone: visibilityById.offload?.tone || 'neutral',
       whiteboardAction: 'open-offload-tracker',
       routeKey: 'offload',
+    },
+    {
+      id: 'offload-duration',
+      label: visibilityById['offload-duration']?.label || 'Offload duration',
+      hint: visibilityById['offload-duration']?.hint || 'Mean scene-to-handoff offload time',
+      value: visibilityById['offload-duration']?.value ?? '—',
+      surface: EMS_SCREEN_WIDGETS.offloadTimers,
+      tone: visibilityById['offload-duration']?.tone || 'neutral',
+      whiteboardAction: 'open-offload-tracker',
+      routeKey: 'offload-duration',
+    },
+    {
+      id: 'handoff-pending',
+      label: visibilityById.receiving?.label || 'Handoff pending',
+      hint: visibilityById.receiving?.hint || 'Crews awaiting handoff completion',
+      value: visibilityById.receiving?.value ?? summary.awaitingHandoff,
+      surface: EMS_SCREEN_WIDGETS.receivingArea,
+      tone: visibilityById.receiving?.tone || (summary.awaitingHandoff ? 'info' : 'neutral'),
+      whiteboardAction: 'focus-receiving-area',
+      routeKey: 'receiving',
     },
     {
       id: 'pressure',

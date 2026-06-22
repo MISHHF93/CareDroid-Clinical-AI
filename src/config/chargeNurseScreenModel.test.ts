@@ -51,7 +51,7 @@ describe('chargeNurseScreenModel', () => {
     expect(charge.showWidget(CHARGE_NURSE_SCREEN_WIDGETS.referralsPending)).toBe(true);
     expect(charge.showWidget(CHARGE_NURSE_SCREEN_WIDGETS.capacityStatus)).toBe(true);
     expect(charge.showOperationalStrip).toBe(true);
-    expect(charge.visibleOperationalSurfaces).toHaveLength(8);
+    expect(charge.visibleOperationalSurfaces).toHaveLength(11);
     expect(charge.canMovePatient).toBe(true);
     expect(charge.canManageCapacity).toBe(true);
     expect(charge.canOpenReferrals).toBe(true);

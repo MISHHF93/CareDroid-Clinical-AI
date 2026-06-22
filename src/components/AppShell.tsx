@@ -23,6 +23,10 @@ import { getVisibleNavigation } from '../config/unified-navigation.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
+import {
+  resolveScreenDensityProfile,
+  screenDensityShellClassName,
+} from '../config/screenDensityModeModel';
 import { PatientFlag, type Patient } from '../types/emergency';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
@@ -143,11 +147,25 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
+  const screenDensityProfile = useMemo(
+    () => resolveScreenDensityProfile(screenCapabilities.screenMode),
+    [screenCapabilities.screenMode],
+  );
   const isEmergencyBoardRoute =
     location.pathname === CANONICAL_ROUTES.emergencyWhiteboard ||
     location.pathname === '/emergency';
+  const isPublicWaitingKiosk =
+    screenCapabilities.isPublicDisplay && isEmergencyBoardRoute;
+  const isReadOnlyWhiteboardKiosk =
+    screenCapabilities.isWallKiosk &&
+    !screenCapabilities.isPublicDisplay &&
+    isEmergencyBoardRoute;
   const useWallKioskChrome =
-    screenCapabilities.useMinimalAppChrome && isEmergencyBoardRoute;
+    screenCapabilities.useMinimalAppChrome &&
+    isEmergencyBoardRoute &&
+    !isPublicWaitingKiosk &&
+    !isReadOnlyWhiteboardKiosk;
+  const useKioskShell = useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk;
   const startupStartedRef = useRef(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
@@ -168,7 +186,8 @@ export function AppShell({ children }: AppShellProps) {
     () => patients.filter(isPatientFlaggedForReassessment).length,
     [patients],
   );
-  const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
+  const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
+  const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
   const visibleNavigationItems = useMemo(
     () => getVisibleNavigation(emergencyRole.role),
     [emergencyRole.role],
@@ -527,7 +546,14 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div
-      className="emergency-app-shell"
+      className={[
+        'emergency-app-shell',
+        screenDensityShellClassName(screenCapabilities.screenMode),
+        isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
+        isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         display: 'flex',
         height: 'var(--app-viewport-height, 100dvh)',
@@ -540,7 +566,7 @@ export function AppShell({ children }: AppShellProps) {
       <a className="ed-skip-link" href="#main-content">
         Skip to main content
       </a>
-      {useWallKioskChrome ? null : <Sidebar navigationItems={visibleNavigationItems} />}
+      {useKioskShell ? null : <Sidebar navigationItems={visibleNavigationItems} />}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {useWallKioskChrome ? (
           <header
@@ -556,7 +582,7 @@ export function AppShell({ children }: AppShellProps) {
               {EMERGENCY_OS_BRANDING.safetyLine}
             </span>
           </header>
-        ) : (
+        ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
           <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         )}
         <main
@@ -564,6 +590,7 @@ export function AppShell({ children }: AppShellProps) {
           className="app-shell-main-content"
           role="main"
           tabIndex={-1}
+          data-screen-density-mode={screenDensityProfile.id}
           style={{
             flex: 1,
             minWidth: 0,
@@ -588,7 +615,7 @@ export function AppShell({ children }: AppShellProps) {
           </ErrorBoundary>
         </main>
       </div>
-      {!screenCapabilities.isRegistrationScreen && !useWallKioskChrome ? (
+      {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>
           <PatientDetailPanel />
@@ -596,7 +623,7 @@ export function AppShell({ children }: AppShellProps) {
       </ErrorBoundary>
       ) : null}
       {canUseCopilot &&
-      !useWallKioskChrome &&
+      !useKioskShell &&
       !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
       (!isTabletViewport || copilotOpen) ? (
         <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
@@ -610,7 +637,7 @@ export function AppShell({ children }: AppShellProps) {
           {screenCapabilities.showEmsCriticalOverlay ? <EMSCriticalBroadcast /> : null}
         </Suspense>
       </ErrorBoundary>
-      {showReassessmentDrawer && screenCapabilities.showReassessAction && !useWallKioskChrome ? (
+      {showReassessmentDrawer && screenCapabilities.showReassessAction && !useKioskShell ? (
         <ErrorBoundary fallbackText="Reassessment drawer encountered an error.">
           <Suspense fallback={null}>
             <ReassessmentDrawer
@@ -621,7 +648,7 @@ export function AppShell({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      {showPalette && !useWallKioskChrome ? (
+      {showPalette && !useKioskShell ? (
         <ErrorBoundary fallbackText="Command palette encountered an error.">
           <Suspense fallback={null}>
             <CommandPalette

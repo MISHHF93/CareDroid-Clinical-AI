@@ -32,6 +32,7 @@ import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
 import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatientState } from '../services/queueAssignment';
 import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
+import { isInQueueFlow } from '../services/queueReasonVisibility';
 import DeteriorationWatchBadge from './waiting-room/DeteriorationWatchBadge';
 import WhatHappensNextPanel from './guidance/WhatHappensNextPanel';
 import { buildPatientTimeline } from '../utils/patientTimeline';
@@ -608,14 +609,22 @@ export default function PatientDetailPanel() {
     selectedPatientId,
   ) as UpgradePatientFlowState;
   const upgradePatientFlowEnvelope = upgradePatientFlow.data;
-  const canTransition = emergencyRole.can(EMERGENCY_ACTIONS.transitionPatient);
-  const canWriteVitals = emergencyRole.can(EMERGENCY_ACTIONS.writeVitals);
-  const canWriteNote = emergencyRole.can(EMERGENCY_ACTIONS.writeNote);
-  const canManageFlags = emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
-  const canAssignStaff = emergencyRole.can(EMERGENCY_ACTIONS.assignStaff);
-  const canAssignRoom = emergencyRole.can(EMERGENCY_ACTIONS.assignRoom);
-  const canEscalate = emergencyRole.can(EMERGENCY_ACTIONS.escalatePatient);
-  const canDischarge = emergencyRole.can(EMERGENCY_ACTIONS.dischargePatient);
+  const transitionPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.transitionPatient);
+  const vitalsPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.writeVitals);
+  const notePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.writeNote);
+  const flagsPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageFlags);
+  const assignStaffPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.assignStaff);
+  const assignRoomPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.assignRoom);
+  const escalatePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.escalatePatient);
+  const dischargePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.dischargePatient);
+  const canTransition = transitionPresentation.enabled;
+  const canWriteVitals = vitalsPresentation.enabled;
+  const canWriteNote = notePresentation.enabled;
+  const canManageFlags = flagsPresentation.enabled;
+  const canAssignStaff = assignStaffPresentation.enabled;
+  const canAssignRoom = assignRoomPresentation.enabled;
+  const canEscalate = escalatePresentation.enabled;
+  const canDischarge = dischargePresentation.enabled;
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
@@ -1004,12 +1013,14 @@ export default function PatientDetailPanel() {
             referrals={referrals}
             showStaffDetail
           />
-          <QueueReasonBadge
-            patient={selectedPatient}
-            referrals={referrals}
-            staff={staff}
-            showAll
-          />
+          {isInQueueFlow(selectedPatient) ? (
+            <QueueReasonBadge
+              patient={selectedPatient}
+              referrals={referrals}
+              staff={staff}
+              showAll
+            />
+          ) : null}
           <DeteriorationWatchBadge
             patient={selectedPatient}
             emsArrivals={emsArrivals}
@@ -1045,11 +1056,12 @@ export default function PatientDetailPanel() {
               Open Checklist
             </button>
           ) : null}
+          {transitionPresentation.visible ? (
           <button
             type="button"
             onClick={() => {
               const nextState = getDefaultNextPatientState(selectedPatient);
-              if (!nextState) return;
+              if (!nextState || !canTransition) return;
               advancePatientJourneyState(selectedPatient.id, nextState, {
                 actorId: actorStaffId,
                 note:
@@ -1073,6 +1085,7 @@ export default function PatientDetailPanel() {
           >
             Move to Next State
           </button>
+          ) : null}
         </div>
       </header>
 
@@ -1237,7 +1250,9 @@ export default function PatientDetailPanel() {
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <h3 style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>Latest Vitals</h3>
+          {vitalsPresentation.visible ? (
           <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
+          ) : null}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
@@ -1553,10 +1568,18 @@ export default function PatientDetailPanel() {
       >
         <WhoNextPanel />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {assignStaffPresentation.visible ? (
           <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
+          ) : null}
+          {assignRoomPresentation.visible ? (
           <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
+          ) : null}
+          {escalatePresentation.visible ? (
           <FieldButton disabled={!canEscalate} onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
+          ) : null}
+          {dischargePresentation.visible ? (
           <FieldButton disabled={!canDischarge} onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
+          ) : null}
         </div>
       </div>
       {heartScoreOpen ? (

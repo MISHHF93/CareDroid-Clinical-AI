@@ -1,14 +1,22 @@
 import React, { useMemo } from 'react';
-import { summarizeProviderWaitBreachBoard } from '../../services/providerWaitBreachTimer';
+import {
+  buildProviderWaitVisibilitySnapshot,
+  hasProviderWaitVisibilityActivity,
+} from '../../services/providerWaitVisibilityModel';
 import './ProviderWaitBreachBadge.css';
 
 export default function ProviderWaitBreachPanel({ patients = [], settings = null, className = '' }) {
-  const summary = useMemo(
-    () => summarizeProviderWaitBreachBoard(patients, { settings: settings || undefined }),
+  const visibility = useMemo(
+    () =>
+      buildProviderWaitVisibilitySnapshot(patients, {
+        settings: settings ? { emergencySettings: settings } : undefined,
+      }),
     [patients, settings],
   );
 
-  if (!summary.awaitingProviderCount) return null;
+  if (!hasProviderWaitVisibilityActivity(visibility)) return null;
+
+  const { summary } = visibility;
 
   return (
     <section
@@ -25,24 +33,27 @@ export default function ProviderWaitBreachPanel({ patients = [], settings = null
       </header>
       <div className="provider-wait-breach-panel__grid">
         <div className="provider-wait-breach-panel__metric" data-tone="neutral">
-          <strong>{summary.awaitingProviderCount}</strong>
-          <span>Awaiting provider</span>
+          <strong>{visibility.awaitingClinicianCount}</strong>
+          <span>Awaiting clinician</span>
+        </div>
+        <div
+          className="provider-wait-breach-panel__metric"
+          data-tone={visibility.breachedCount ? 'critical' : 'neutral'}
+        >
+          <strong>{visibility.longestProviderWaitLabel}</strong>
+          <span>Longest provider wait</span>
+        </div>
+        <div className="provider-wait-breach-panel__metric" data-tone="neutral">
+          <strong>{visibility.averageProviderWaitLabel}</strong>
+          <span>Average provider wait</span>
         </div>
         <div className="provider-wait-breach-panel__metric" data-tone="watch">
-          <strong>{summary.approachingThresholdCount}</strong>
-          <span>Approaching</span>
+          <strong>{visibility.approachingThresholdCount}</strong>
+          <span>Approaching threshold</span>
         </div>
         <div className="provider-wait-breach-panel__metric" data-tone="critical">
-          <strong>{summary.breachedCount}</strong>
-          <span>Breached</span>
-        </div>
-        <div className="provider-wait-breach-panel__metric" data-tone={summary.highRiskExceptionCount ? 'watch' : 'neutral'}>
-          <strong>{summary.highRiskExceptionCount}</strong>
-          <span>High-risk exceptions</span>
-        </div>
-        <div className="provider-wait-breach-panel__metric" data-tone={summary.breachedCount ? 'critical' : 'neutral'}>
-          <strong>{summary.longestElapsedLabel}</strong>
-          <span>Longest elapsed</span>
+          <strong>{visibility.breachedCount}</strong>
+          <span>Breached threshold</span>
         </div>
       </div>
     </section>

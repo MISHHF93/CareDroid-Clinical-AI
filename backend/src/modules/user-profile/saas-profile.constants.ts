@@ -13,6 +13,13 @@ export const SAAS_USER_ROLES = Object.freeze([
   'student',
   'compliance-officer',
   'platform-admin',
+  'racetrack-admin',
+  'race-day-operations-manager',
+  'steward',
+  'equine-welfare-officer',
+  'veterinarian',
+  'executive-leadership',
+  'auditor-regulator',
 ] as const);
 
 export type SaasUserRole = (typeof SAAS_USER_ROLES)[number];
@@ -26,6 +33,7 @@ export const SAAS_ORGANIZATION_TYPES = Object.freeze([
   'long-term-care',
   'telehealth',
   'government',
+  'racetrack',
 ] as const);
 
 export type SaasOrganizationType = (typeof SAAS_ORGANIZATION_TYPES)[number];
@@ -102,6 +110,49 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
     'VIEW_AUDIT_LOGS',
     'MANAGE_ORGANIZATION',
     'CONFIGURE_SYSTEM',
+    'VIEW_TRACKMIND',
+    'MANAGE_PLATFORM_TENANTS',
+  ],
+  'racetrack-admin': [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_TRACKMIND_MATURITY',
+    'VIEW_TRACKMIND_ENTERPRISE',
+    'MANAGE_ORGANIZATION',
+    'VIEW_AUDIT_LOGS',
+  ],
+  'race-day-operations-manager': [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_TRACKMIND_INTELLIGENCE',
+    'MANAGE_RACEDAY_OPERATIONS',
+  ],
+  steward: ['VIEW_DASHBOARD', 'VIEW_TRACKMIND', 'MANAGE_STEWARDING', 'VIEW_AUDIT_LOGS'],
+  'equine-welfare-officer': [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_TRACKMIND_MATURITY',
+    'MANAGE_EQUINE_WELFARE',
+  ],
+  veterinarian: [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_VETERINARY_RECORDS',
+    'WRITE_VETERINARY_RECORDS',
+  ],
+  'executive-leadership': [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_TRACKMIND_ENTERPRISE',
+    'VIEW_TRACKMIND_INTELLIGENCE',
+    'VIEW_ANALYTICS',
+  ],
+  'auditor-regulator': [
+    'VIEW_DASHBOARD',
+    'VIEW_TRACKMIND',
+    'VIEW_AUDIT_LOGS',
+    'EXPORT_TRACKMIND_AUDIT',
+    'VIEW_GOVERNANCE',
   ],
 });
 
@@ -110,6 +161,14 @@ export function normalizeSaasRole(role?: string | null): SaasUserRole {
   if (role === 'physician') return 'emergency-physician';
   if (role === 'admin') return 'hospital-administrator';
   if (role === 'nurse') return 'nurse';
+  if (role === 'platform_super_admin' || role === 'platform-admin') return 'platform-admin';
+  if (role === 'organization_admin' || role === 'racetrack_admin') return 'racetrack-admin';
+  if (role === 'race_day_operations_manager') return 'race-day-operations-manager';
+  if (role === 'steward' || role === 'racing_steward') return 'steward';
+  if (role === 'equine_welfare_officer') return 'equine-welfare-officer';
+  if (role === 'veterinarian' || role === 'vet') return 'veterinarian';
+  if (role === 'executive_leadership') return 'executive-leadership';
+  if (role === 'auditor_regulator') return 'auditor-regulator';
   return DEFAULT_SAAS_PROFILE.role;
 }
 

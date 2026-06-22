@@ -48,6 +48,6 @@ describe('emergencyOperationalPresentationModel', () => {
 
   it('derives presentation density from the canonical screen mode registry', () => {
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).density).toBe('wall');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).density).toBe('compact');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).density).toBe('comfortable');
   });
 });

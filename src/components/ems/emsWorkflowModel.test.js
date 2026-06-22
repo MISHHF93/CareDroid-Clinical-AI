@@ -22,9 +22,8 @@ describe('emsWorkflowModel', () => {
   it('defines EMS workflow surfaces aligned to screen widgets', () => {
     expect(EMS_WORKFLOW_SURFACES).toEqual([
       EMS_SCREEN_WIDGETS.inboundAmbulances,
-      EMS_SCREEN_WIDGETS.etaDisplay,
-      EMS_SCREEN_WIDGETS.receivingArea,
       EMS_SCREEN_WIDGETS.offloadTimers,
+      EMS_SCREEN_WIDGETS.receivingArea,
       EMS_SCREEN_WIDGETS.emsPressure,
     ]);
   });
@@ -64,9 +63,16 @@ describe('emsWorkflowModel', () => {
       ],
     });
 
-    expect(metrics.map((metric) => metric.surface)).toEqual(EMS_WORKFLOW_SURFACES);
+    expect(metrics).toHaveLength(5);
+    expect(metrics.map((metric) => metric.id)).toEqual([
+      'inbound',
+      'offload-delays',
+      'offload-duration',
+      'handoff-pending',
+      'pressure',
+    ]);
     expect(metrics.find((metric) => metric.id === 'inbound')?.value).toBeGreaterThan(0);
-    expect(metrics.find((metric) => metric.id === 'receiving')?.value).toBeGreaterThan(0);
+    expect(metrics.find((metric) => metric.id === 'handoff-pending')?.value).toBeGreaterThan(0);
     expect(metrics.find((metric) => metric.id === 'pressure')).toBeTruthy();
   });
 

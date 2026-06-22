@@ -4,6 +4,7 @@ import { RECEPTION_COPY } from './receptionCopy';
 import { summarizeDataQualityRisks } from '../../config/dataQualityModel';
 import { auditReceptionQueues, summarizeQueueAudit } from '../../config/queueAuditModel';
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
+import { buildCrowdLevelSnapshot, crowdLevelToneToOperationalTone } from '../../engine/crowdLevelEngine';
 import { buildEmsOffloadTrackerSummary } from '../../services/emsOffloadTracker';
 import { summarizeTriageBreachBoard } from '../../services/triageBreachTimer';
 import {
@@ -115,7 +116,7 @@ export const RECEPTION_STRIP_TO_OPERATIONAL_KEY = Object.freeze({
 export function selectReceptionOperationalStripMetrics(
   patients = [],
   emsInbound = 0,
-  { metricIds = null, settings = null, emsArrivals = [] } = {},
+  { metricIds = null, settings = null, emsArrivals = [], capacity = null } = {},
 ) {
   const { counts } = selectReceptionQueues(patients);
   const today = localDateKey();
@@ -133,6 +134,14 @@ export function selectReceptionOperationalStripMetrics(
     offloadTargetMinutes:
       Number(settings?.thresholds?.emsOffloadTargetMinutes ?? settings?.emsThresholds?.offloadTargetMinutes) ||
       15,
+  });
+  const crowdLevel = buildCrowdLevelSnapshot({
+    patients,
+    capacity,
+    emsArrivals,
+    emsInbound,
+    emsOffloadDelays: offloadSummary.delayedCount ?? offloadSummary.delayed ?? 0,
+    settings,
   });
 
   return [
@@ -222,6 +231,14 @@ export function selectReceptionOperationalStripMetrics(
       hint: offloadSummary.longestOffloadMinutes
         ? `Longest ${offloadSummary.longestOffloadMinutes}m`
         : undefined,
+    },
+    {
+      id: 'crowd-level',
+      label: RECEPTION_COPY.metrics.crowdLevel,
+      value: crowdLevel.staffLabel,
+      queueTab: null,
+      hint: crowdLevel.detail,
+      tone: crowdLevelToneToOperationalTone(crowdLevel.tone),
     },
   ].filter((metric) => !metricIds?.length || metricIds.includes(metric.id));
 }

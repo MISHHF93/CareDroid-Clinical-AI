@@ -46,10 +46,11 @@ describe('physicianScreenModel', () => {
     expect(physician.showPatientJourneyTimeline).toBe(true);
     expect(physician.showCopilotActions).toBe(true);
     expect(physician.showComplaintWorkflowLaunchers).toBe(true);
+    expect(physician.showProviderWaitBreaches).toBe(true);
     expect(physician.hideCentralIntake).toBe(true);
     expect(physician.hideReceptionControls).toBe(true);
     expect(physician.hideChargeNurseStrip).toBe(true);
-    expect(physician.visibleOperationalSurfaces).toHaveLength(5);
+    expect(physician.visibleOperationalSurfaces).toHaveLength(6);
     expect(physician.canReviewPatient).toBe(true);
     expect(physician.canRefer).toBe(true);
     expect(physician.canOpenCopilot).toBe(true);

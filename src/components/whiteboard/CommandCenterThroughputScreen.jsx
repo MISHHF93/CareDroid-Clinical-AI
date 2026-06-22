@@ -1,79 +1,146 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import { buildCommandCenterFallbackSnapshot } from '../../config/displayAutoRefreshModel';
+import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
+import OperationalPresentationFrame from '../emergency/OperationalPresentationFrame';
+import DisplayRefreshStatusBar from '../emergency/DisplayRefreshStatusBar';
+import { sortCommandCenterMetrics } from './commandCenterThroughputModel';
 import './CommandCenterThroughputScreen.css';
 
-function formatUpdatedAt(timestamp) {
-  if (!timestamp) return '—';
-  try {
-    return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  } catch {
-    return '—';
-  }
+function trendGlyph(direction) {
+  if (direction === 'up') return '↑';
+  if (direction === 'down') return '↓';
+  return '→';
 }
 
 export default function CommandCenterThroughputScreen({
   snapshot,
   title = 'Command center',
   refreshIntervalMs = 30000,
+  refreshStatus = null,
+  performanceMode = false,
+  showTriageAwaiting = true,
+  showLongestUntriagedWait = true,
+  showTriageApproachingBreach = true,
+  showTriageBreached = true,
+  showRapidReviewFlags = true,
+  showProviderAwaiting = true,
+  showLongestProviderWait = true,
+  showProviderApproachingBreach = true,
+  showProviderBreached = true,
   showArrivalsByHour = true,
-  showWaitingRoomOccupancy = true,
+  showWaitingCount = true,
+  showWaitingRoomOccupancy = false,
+  showLongestWait = true,
   showAvgWaitTriage = true,
   showAvgWaitProvider = true,
+  showEmsInbound = true,
   showEmsOffloadDelays = true,
+  showOffloadDuration = true,
+  showHandoffPending = true,
   showBoardingDuration = true,
   showReferralsBacklog = true,
-  showLwbsRisk = true,
+  showCapacityScore = true,
+  showCrowdLevel = true,
+  showTrendIndicators = true,
+  showLwbsRisk = false,
   showCrowdingForecast = true,
   showSystemHealth = true,
   className = '',
 }) {
-  if (!snapshot) return null;
+  const presentation = resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter);
+  const resolvedSnapshot = useMemo(() => {
+    if (snapshot?.metrics?.length) return snapshot;
+    if (snapshot) return snapshot;
+    return buildCommandCenterFallbackSnapshot(refreshStatus?.lastUpdatedAt || null);
+  }, [refreshStatus?.lastUpdatedAt, snapshot]);
+
+  if (!resolvedSnapshot) return null;
 
   const visibleMetricIds = new Set(
     [
+      showTriageAwaiting ? 'triage-awaiting' : null,
+      showLongestUntriagedWait ? 'longest-untriaged-wait' : null,
+      showTriageApproachingBreach ? 'triage-approaching-breach' : null,
+      showTriageBreached ? 'triage-breached' : null,
+      showRapidReviewFlags ? 'rapid-review-flags' : null,
+      showProviderAwaiting ? 'provider-awaiting' : null,
+      showLongestProviderWait ? 'longest-provider-wait' : null,
+      showAvgWaitProvider ? 'avg-wait-provider' : null,
+      showProviderApproachingBreach ? 'provider-approaching-breach' : null,
+      showProviderBreached ? 'provider-breached' : null,
+      showWaitingCount ? 'waiting-count' : null,
       showWaitingRoomOccupancy ? 'waiting-room-occupancy' : null,
+      showLongestWait ? 'longest-wait' : null,
       showAvgWaitTriage ? 'avg-wait-triage' : null,
       showAvgWaitProvider ? 'avg-wait-provider' : null,
+      showEmsInbound ? 'ems-inbound' : null,
       showEmsOffloadDelays ? 'ems-offload-delays' : null,
+      showOffloadDuration ? 'offload-duration' : null,
+      showHandoffPending ? 'handoff-pending' : null,
       showBoardingDuration ? 'boarding-duration' : null,
       showReferralsBacklog ? 'referrals-backlog' : null,
+      showCapacityScore ? 'capacity-score' : null,
+      showCrowdLevel ? 'crowd-level' : null,
       showLwbsRisk ? 'lwbs-risk' : null,
     ].filter(Boolean),
   );
 
-  const metrics = snapshot.metrics.filter((metric) => visibleMetricIds.has(metric.id));
-  const maxHourlyCount = Math.max(1, ...snapshot.hourlyArrivals.map((entry) => entry.count));
+  const metrics = sortCommandCenterMetrics(
+    resolvedSnapshot.metrics.filter((metric) => visibleMetricIds.has(metric.id)),
+  );
+  const maxHourlyCount = Math.max(1, ...resolvedSnapshot.hourlyArrivals.map((entry) => entry.count));
 
   return (
-    <section
-      className={['command-center-throughput', className].filter(Boolean).join(' ')}
+    <OperationalPresentationFrame
+      screenMode={CARE_DROID_SCREEN_MODES.commandCenter}
+      as="section"
+      className={[
+        'command-center-throughput',
+        performanceMode ? 'command-center-throughput--performance' : '',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       aria-label="Emergency department command center throughput"
     >
       <header className="command-center-throughput__header">
         <div>
-          <p className="command-center-throughput__eyebrow">Throughput command center</p>
-          <h2>{title}</h2>
-          <p className="command-center-throughput__subtitle">
-            Manager and director operational view · aggregate metrics for flow decisions
-          </p>
+          <p className="command-center-throughput__eyebrow">{presentation.pageEyebrow}</p>
+          <h2>{title || presentation.pageTitle}</h2>
+          <p className="command-center-throughput__subtitle">{presentation.pageSubtitle}</p>
         </div>
         <div className="command-center-throughput__meta">
-          <span>Updated {formatUpdatedAt(snapshot.updatedAt)}</span>
-          <span>Refresh every {Math.round(refreshIntervalMs / 1000)}s</span>
+          <DisplayRefreshStatusBar
+            refreshStatus={
+              refreshStatus || {
+                enabled: true,
+                refreshIntervalMs,
+                lastUpdatedAt: resolvedSnapshot.updatedAt,
+                lastAttemptAt: null,
+                isRefreshing: false,
+                errorMessage: null,
+                tone: 'ok',
+                showStaleBanner: false,
+                hasCachedContent: Boolean(snapshot?.metrics?.length),
+              }
+            }
+          />
         </div>
       </header>
 
       <p className="command-center-throughput__summary" role="status">
-        {snapshot.summaryLine}
+        {resolvedSnapshot.summaryLine}
       </p>
 
-      {showArrivalsByHour && snapshot.hourlyArrivals.length ? (
+      {showArrivalsByHour && resolvedSnapshot.hourlyArrivals.length ? (
         <section className="command-center-throughput__arrivals" aria-label="Arrivals by hour">
           <div className="command-center-throughput__section-heading">
             <h3>Arrivals by hour</h3>
-            <span>{snapshot.peakHourLabel}</span>
+            <span>{resolvedSnapshot.peakHourLabel}</span>
           </div>
           <div className="command-center-throughput__hourly-chart">
-            {snapshot.hourlyArrivals.map((entry) => (
+            {resolvedSnapshot.hourlyArrivals.map((entry) => (
               <div key={entry.hour} className="command-center-throughput__hourly-bar">
                 <div
                   className="command-center-throughput__hourly-fill"
@@ -88,6 +155,34 @@ export default function CommandCenterThroughputScreen({
         </section>
       ) : null}
 
+      {showTrendIndicators && resolvedSnapshot.trendIndicators?.length ? (
+        <section className="command-center-throughput__trends" aria-label="Operational trend indicators">
+          <div className="command-center-throughput__section-heading">
+            <h3>Trend indicators</h3>
+            <span>Analytics and operational snapshot deltas</span>
+          </div>
+          <div className="command-center-throughput__trend-grid">
+            {resolvedSnapshot.trendIndicators.map((trend) => (
+              <article
+                key={trend.id}
+                className="command-center-throughput__trend-card"
+                data-tone={trend.tone}
+                aria-label={`${trend.label}: ${trend.value}`}
+              >
+                <span className="command-center-throughput__trend-direction" aria-hidden="true">
+                  {trendGlyph(trend.direction)}
+                </span>
+                <div>
+                  <strong className="command-center-throughput__trend-value">{trend.value}</strong>
+                  <span className="command-center-throughput__trend-label">{trend.label}</span>
+                  <small className="command-center-throughput__trend-detail">{trend.detail}</small>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {metrics.length ? (
         <div className="command-center-throughput__grid">
           {metrics.map((metric) => (
@@ -97,7 +192,18 @@ export default function CommandCenterThroughputScreen({
               data-tone={metric.tone}
               aria-label={`${metric.label}: ${metric.value}`}
             >
-              <strong className="command-center-throughput__value">{metric.value}</strong>
+              <div className="command-center-throughput__tile-top">
+                <strong className="command-center-throughput__value">{metric.value}</strong>
+                {metric.trend ? (
+                  <span
+                    className="command-center-throughput__metric-trend"
+                    data-direction={metric.trend.direction}
+                    title={metric.trend.label}
+                  >
+                    {trendGlyph(metric.trend.direction)} {metric.trend.label}
+                  </span>
+                ) : null}
+              </div>
               <span className="command-center-throughput__label">{metric.label}</span>
               <small className="command-center-throughput__detail">{metric.detail}</small>
             </article>
@@ -106,31 +212,31 @@ export default function CommandCenterThroughputScreen({
       ) : null}
 
       <div className="command-center-throughput__footer-grid">
-        {showCrowdingForecast ? (
+        {showCrowdingForecast && resolvedSnapshot.crowdingForecast ? (
           <section
             className="command-center-throughput__forecast"
-            data-tone={snapshot.crowdingForecast.tone}
+            data-tone={resolvedSnapshot.crowdingForecast.tone}
             aria-label="Crowding forecast"
           >
-            <h3>Crowding forecast</h3>
-            <strong>{snapshot.crowdingForecast.label}</strong>
-            <p>{snapshot.crowdingForecast.detail}</p>
+            <h3>Crowding outlook</h3>
+            <strong>{resolvedSnapshot.crowdLevel?.staffLabel ?? resolvedSnapshot.crowdingForecast.label}</strong>
+            <p>{resolvedSnapshot.crowdingForecast.detail}</p>
           </section>
         ) : null}
-        {showSystemHealth ? (
+        {showSystemHealth && resolvedSnapshot.systemHealth ? (
           <section
             className="command-center-throughput__health"
-            data-tone={snapshot.systemHealth.tone}
+            data-tone={resolvedSnapshot.systemHealth.tone}
             aria-label="Data freshness and system health"
           >
             <h3>Data freshness / system health</h3>
-            <strong>{snapshot.systemHealth.label}</strong>
+            <strong>{resolvedSnapshot.systemHealth.label}</strong>
             <p>
-              {snapshot.systemHealth.freshness} · {snapshot.systemHealth.detail}
+              {resolvedSnapshot.systemHealth.freshness} · {resolvedSnapshot.systemHealth.detail}
             </p>
           </section>
         ) : null}
       </div>
-    </section>
+    </OperationalPresentationFrame>
   );
 }

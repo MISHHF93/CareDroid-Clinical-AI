@@ -17,6 +17,36 @@ export const WALL_DISPLAY_MONITOR_PRIVACY = Object.freeze({
 export type WallDisplayMonitorPrivacy =
   (typeof WALL_DISPLAY_MONITOR_PRIVACY)[keyof typeof WALL_DISPLAY_MONITOR_PRIVACY];
 
+/** User-facing read-only whiteboard privacy modes (maps to hallway monitor settings). */
+export const READ_ONLY_WHITEBOARD_PRIVACY_MODE = Object.freeze({
+  staffPrivate: WALL_DISPLAY_MONITOR_PRIVACY.operational,
+  semiPrivateHallway: WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+  publicSafeAggregate: WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+} as const);
+
+export type ReadOnlyWhiteboardPrivacyMode =
+  (typeof READ_ONLY_WHITEBOARD_PRIVACY_MODE)[keyof typeof READ_ONLY_WHITEBOARD_PRIVACY_MODE];
+
+const PRIVACY_MODE_ALIASES: Record<string, WallDisplayMonitorPrivacy> = {
+  [WALL_DISPLAY_MONITOR_PRIVACY.operational]: WALL_DISPLAY_MONITOR_PRIVACY.operational,
+  [WALL_DISPLAY_MONITOR_PRIVACY.restricted]: WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+  [WALL_DISPLAY_MONITOR_PRIVACY.minimal]: WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+  'staff-private': WALL_DISPLAY_MONITOR_PRIVACY.operational,
+  staff_private: WALL_DISPLAY_MONITOR_PRIVACY.operational,
+  'semi-private-hallway': WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+  semi_private_hallway: WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+  'semi-private': WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+  'public-safe-aggregate': WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+  public_safe_aggregate: WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+  'public-safe': WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+};
+
+const PRIVACY_MODE_LABELS: Record<WallDisplayMonitorPrivacy, string> = {
+  [WALL_DISPLAY_MONITOR_PRIVACY.operational]: 'Staff-private mode',
+  [WALL_DISPLAY_MONITOR_PRIVACY.restricted]: 'Semi-private hallway mode',
+  [WALL_DISPLAY_MONITOR_PRIVACY.minimal]: 'Public-safe aggregate mode',
+};
+
 export const WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS: ReadonlyArray<{
   id: WallDisplayMonitorPrivacy;
   label: string;
@@ -24,18 +54,21 @@ export const WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS: ReadonlyArray<{
 }> = Object.freeze([
   {
     id: WALL_DISPLAY_MONITOR_PRIVACY.operational,
-    label: 'Operational',
-    description: 'Aggregate ED metrics with operational detail for staff hallway monitors.',
+    label: PRIVACY_MODE_LABELS.operational,
+    description:
+      'Staff hallway monitors — aggregate ED metrics with operational timing; no patient roster.',
   },
   {
     id: WALL_DISPLAY_MONITOR_PRIVACY.restricted,
-    label: 'Restricted',
-    description: 'Aggregate counts only — hides timing and arrival detail that could imply patient identity.',
+    label: PRIVACY_MODE_LABELS.restricted,
+    description:
+      'Semi-private hallway — aggregate counts and bucketed waits; redacts names, MRNs, health cards, complaints, notes, and staff comments.',
   },
   {
     id: WALL_DISPLAY_MONITOR_PRIVACY.minimal,
-    label: 'Minimal',
-    description: 'Highest privacy — bucketed wait ranges and generic labels for shared nurse stations.',
+    label: PRIVACY_MODE_LABELS.minimal,
+    description:
+      'Public-safe aggregate — highest privacy for shared nurse stations; generic labels and bucketed wait ranges only.',
   },
 ]);
 
@@ -85,14 +118,15 @@ function redactMetricForPrivacy(
   }
 
   if (privacy === WALL_DISPLAY_MONITOR_PRIVACY.restricted) {
+    if (metric.id === 'longest-wait') {
+      value = bucketLongestWait(metric.value);
+      return { ...metric, value, detail: 'Longest active wait — bucketed duration only' };
+    }
     if (metric.id === 'ems-inbound') {
       return { ...metric, value, detail: 'Ambulance units en route — no unit identifiers' };
     }
     if (metric.id === 'offload-delays') {
       return { ...metric, value, detail: 'Units awaiting EMS handoff completion' };
-    }
-    if (metric.id === 'longest-wait') {
-      return { ...metric, value, detail: 'Longest active wait — aggregate duration only' };
     }
   }
 
@@ -104,16 +138,22 @@ export function normalizeWallDisplayMonitorPrivacy(
   fallback: WallDisplayMonitorPrivacy = WALL_DISPLAY_MONITOR_PRIVACY.operational,
 ): WallDisplayMonitorPrivacy {
   const normalized = String(value || '').trim().toLowerCase();
-  if (normalized === WALL_DISPLAY_MONITOR_PRIVACY.restricted) {
-    return WALL_DISPLAY_MONITOR_PRIVACY.restricted;
-  }
-  if (normalized === WALL_DISPLAY_MONITOR_PRIVACY.minimal) {
-    return WALL_DISPLAY_MONITOR_PRIVACY.minimal;
-  }
-  if (normalized === WALL_DISPLAY_MONITOR_PRIVACY.operational) {
-    return WALL_DISPLAY_MONITOR_PRIVACY.operational;
-  }
-  return fallback;
+  return PRIVACY_MODE_ALIASES[normalized] || fallback;
+}
+
+export function resolveReadOnlyWhiteboardPrivacyMode(
+  value: unknown,
+  fallback: ReadOnlyWhiteboardPrivacyMode = READ_ONLY_WHITEBOARD_PRIVACY_MODE.staffPrivate,
+): ReadOnlyWhiteboardPrivacyMode {
+  return normalizeWallDisplayMonitorPrivacy(value, fallback);
+}
+
+export function resolveReadOnlyWhiteboardPrivacyLabel(
+  value: unknown,
+  fallback: WallDisplayMonitorPrivacy = WALL_DISPLAY_MONITOR_PRIVACY.operational,
+): string {
+  const privacy = normalizeWallDisplayMonitorPrivacy(value, fallback);
+  return PRIVACY_MODE_LABELS[privacy];
 }
 
 export function shouldRedactCentralNodeForMonitorPrivacy(

@@ -14,6 +14,7 @@ import {
 export const PHYSICIAN_SCREEN_WIDGETS = Object.freeze({
   assignedPatients: 'assigned-patients',
   providerWaitingQueue: 'provider-waiting-queue',
+  providerWaitBreaches: 'provider-wait-breaches',
   resultsPending: 'results-pending',
   referralsPending: 'referrals-pending',
   dispositionBoarders: 'disposition-boarders',
@@ -92,6 +93,7 @@ export type PhysicianScreenCapabilities = {
   canPerform: (actionId: string) => boolean;
   showAssignedPatients: boolean;
   showProviderWaitingQueue: boolean;
+  showProviderWaitBreaches: boolean;
   showResultsPending: boolean;
   showReferralsPending: boolean;
   showDispositionBoarders: boolean;
@@ -162,6 +164,7 @@ export function resolvePhysicianScreenCapabilities(
 
   const showAssignedPatients = showWidget(PHYSICIAN_SCREEN_WIDGETS.assignedPatients);
   const showProviderWaitingQueue = showWidget(PHYSICIAN_SCREEN_WIDGETS.providerWaitingQueue);
+  const showProviderWaitBreaches = showWidget(PHYSICIAN_SCREEN_WIDGETS.providerWaitBreaches);
   const showResultsPending = showWidget(PHYSICIAN_SCREEN_WIDGETS.resultsPending);
   const showReferralsPending = showWidget(PHYSICIAN_SCREEN_WIDGETS.referralsPending);
   const showDispositionBoarders = showWidget(PHYSICIAN_SCREEN_WIDGETS.dispositionBoarders);
@@ -171,6 +174,7 @@ export function resolvePhysicianScreenCapabilities(
   const showOperationalStrip = showWidget(PHYSICIAN_SCREEN_WIDGETS.operationalStrip);
 
   const visibleOperationalSurfaces = [
+    showProviderWaitBreaches ? PHYSICIAN_SCREEN_WIDGETS.providerWaitBreaches : null,
     showAssignedPatients ? PHYSICIAN_SCREEN_WIDGETS.assignedPatients : null,
     showProviderWaitingQueue ? PHYSICIAN_SCREEN_WIDGETS.providerWaitingQueue : null,
     showResultsPending ? PHYSICIAN_SCREEN_WIDGETS.resultsPending : null,
@@ -190,6 +194,7 @@ export function resolvePhysicianScreenCapabilities(
     canPerform,
     showAssignedPatients,
     showProviderWaitingQueue,
+    showProviderWaitBreaches,
     showResultsPending,
     showReferralsPending,
     showDispositionBoarders,

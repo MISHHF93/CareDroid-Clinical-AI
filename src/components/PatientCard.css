@@ -744,3 +744,48 @@
     transform: none;
   }
 }
+
+/* Screen density variants — same PatientCard, role-tuned disclosure */
+.patient-card--density-simple {
+  --patient-card-padding: 10px 12px;
+}
+
+.patient-card--density-simple .patient-card__priority-strip {
+  gap: 4px;
+}
+
+.patient-card--density-simple .patient-card__signals,
+.patient-card--density-simple .patient-card__vitals,
+.patient-card--density-simple .patient-card__scores,
+.patient-card--density-simple .patient-card__timer-grid {
+  display: none;
+}
+
+.patient-card--density-balanced .patient-card__priority-strip {
+  flex-wrap: wrap;
+}
+
+.patient-card--density-operational {
+  --patient-card-padding: 10px 12px;
+}
+
+.patient-card--density-operational .patient-card__meta-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.patient-card--density-clinical .patient-card__complaint {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.patient-card--density-clinical .patient-card__vitals {
+  border-width: 2px;
+}
+
+.emergency-app-shell--density-compact .patient-card {
+  font-size: 0.92rem;
+}
+
+.emergency-app-shell--density-wall .patient-card {
+  display: none;
+}

@@ -40,7 +40,8 @@ describe('resolveWhiteboardDisplayProfile', () => {
 
     expect(profile.isDisplayMode).toBe(false);
     expect(profile.canMutate).toBe(true);
-    expect(profile.autoRefresh).toBe(false);
+    expect(profile.autoRefresh).toBe(true);
+    expect(profile.refreshIntervalMs).toBe(45000);
   });
 
   it('clamps refresh interval to a safe minimum', () => {

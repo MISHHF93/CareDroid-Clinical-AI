@@ -84,7 +84,8 @@ export default function ExpressRegistration({
   const [submitError, setSubmitError] = useState('');
   const [duplicateAcknowledged, setDuplicateAcknowledged] = useState(false);
 
-  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
+  const canCreatePatient = createPatientPresentation.enabled;
   const age = useMemo(() => calculateAge(dob), [dob]);
 
   const duplicateCandidates = useMemo<PatientDuplicateCandidate[]>(() => {

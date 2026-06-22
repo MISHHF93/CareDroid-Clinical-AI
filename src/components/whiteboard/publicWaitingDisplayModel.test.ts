@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type Patient } from '../../types/emergency';
 import {
+  PUBLIC_WAIT_URGENCY_DISCLAIMER,
   PUBLIC_WAITING_ESCALATION_MESSAGE,
+  assertPublicWaitingDisplaySnapshotIsPhiSafe,
   buildPublicWaitingDisplaySnapshot,
   derivePublicCrowdLevel,
   formatPublicWaitDuration,
@@ -27,35 +29,36 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
 }
 
 describe('publicWaitingDisplayModel', () => {
-  it('formats public wait durations without identifiers', () => {
-    expect(formatPublicWaitDuration(42)).toBe('42 min');
-    expect(formatPublicWaitDuration(95)).toBe('1 hr 35 min');
-    expect(formatPublicWaitRange(30, 75)).toBe('30 min – 1 hr 15 min');
-    expect(formatPublicWaitRange(20, 22)).toBe('About 20 min');
+  it('formats public wait durations as patient-safe buckets', () => {
+    expect(formatPublicWaitDuration(42)).toBe('30–60 minutes');
+    expect(formatPublicWaitDuration(95)).toBe('1–2 hours');
+    expect(formatPublicWaitRange(30, 75)).toBe('30–60 minutes to 1–2 hours');
+    expect(formatPublicWaitRange(20, 22)).toBe('Less than 30 minutes');
   });
 
   it('derives crowd level from waiting count and capacity band', () => {
-    expect(derivePublicCrowdLevel(3, 'Green').label).toBe('Calm');
-    expect(derivePublicCrowdLevel(8, 'Yellow').label).toBe('Moderate');
-    expect(derivePublicCrowdLevel(14, 'Orange').label).toBe('Busy');
-    expect(derivePublicCrowdLevel(22, 'Red').label).toBe('Very busy');
+    expect(derivePublicCrowdLevel(2, 'Green').label).toBe('Low');
+    expect(derivePublicCrowdLevel(8, 'Yellow').label).toBe('Busy');
+    expect(derivePublicCrowdLevel(14, 'Orange').label).toBe('Very busy');
+    expect(derivePublicCrowdLevel(22, 'Red').label).toBe('Critical');
   });
 
   it('builds PHI-safe aggregate snapshot for waiting-room display', () => {
     const now = new Date('2026-06-20T10:00:00.000Z');
+    const patients = [
+      buildPatient({ id: 'w1', state: PatientState.Waiting }),
+      buildPatient({
+        id: 'w2',
+        state: PatientState.Waiting,
+        arrivalTime: '2026-06-20T07:00:00.000Z',
+      }),
+      buildPatient({ id: 't1', state: PatientState.Triage, arrivalTime: '2026-06-20T09:30:00.000Z' }),
+      buildPatient({ id: 'r1', state: PatientState.Registration }),
+    ];
     const snapshot = buildPublicWaitingDisplaySnapshot({
       now,
       updatedAt: now.toISOString(),
-      patients: [
-        buildPatient({ id: 'w1', state: PatientState.Waiting }),
-        buildPatient({
-          id: 'w2',
-          state: PatientState.Waiting,
-          arrivalTime: '2026-06-20T07:00:00.000Z',
-        }),
-        buildPatient({ id: 't1', state: PatientState.Triage, arrivalTime: '2026-06-20T09:30:00.000Z' }),
-        buildPatient({ id: 'r1', state: PatientState.Registration }),
-      ],
+      patients,
       capacity: {
         score: 78,
         band: 'Orange',
@@ -70,18 +73,19 @@ describe('publicWaitingDisplayModel', () => {
       },
     });
 
-    const serialized = JSON.stringify(snapshot);
-    expect(serialized).not.toContain('Alex');
-    expect(serialized).not.toContain('Lee');
-    expect(serialized).not.toContain('MRN-SECRET');
-    expect(serialized).not.toContain('Chest pain');
+    expect(assertPublicWaitingDisplaySnapshotIsPhiSafe(snapshot, patients)).toBe(true);
 
-    expect(snapshot.waitRange.value).toBe('45 min – 3 hr');
-    expect(snapshot.crowdLevel.label).toBe('Busy');
+    expect(snapshot.waitRange.value).toBe('30–60 minutes to 2–4 hours');
+    expect(snapshot.waitRange.disclaimer).toBe(PUBLIC_WAIT_URGENCY_DISCLAIMER);
+    expect(snapshot.waitDisclaimer).toBe(PUBLIC_WAIT_URGENCY_DISCLAIMER);
+    expect(snapshot.crowdLevel.label).toBe('Critical');
     expect(snapshot.triageWait.available).toBe(true);
     expect(snapshot.triageWait.value).not.toBe('Not available');
     expect(snapshot.careStages.length).toBeGreaterThan(0);
     expect(snapshot.careStages.every((stage) => stage.count > 0)).toBe(true);
+    expect(snapshot.processEducation.steps).toHaveLength(7);
+    expect(snapshot.processEducation.steps[0]?.label).toBe('Registration');
+    expect(snapshot.processEducation.steps[6]?.label).toBe('Discharge / Admission');
     expect(snapshot.guidanceMessages.length).toBeGreaterThan(0);
     expect(snapshot.statusMessaging.statusLines.length).toBeGreaterThan(0);
     expect(snapshot.statusMessaging.advisories.some((line) => line.id === 'symptom-escalation')).toBe(

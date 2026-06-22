@@ -16,6 +16,7 @@ import FitToWaitBadge from './waiting-room/FitToWaitBadge';
 import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
 import WhatHappensNextBadge from './guidance/WhatHappensNextBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
+import { isInQueueFlow } from '../services/queueReasonVisibility';
 import LwbsRiskBadge from './waiting-room/LwbsRiskBadge';
 import DeteriorationWatchBadge from './waiting-room/DeteriorationWatchBadge';
 import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicationBadge';
@@ -25,6 +26,8 @@ import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEn
 import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import useEmergencyDisplayPrivacy from '../hooks/useEmergencyDisplayPrivacy';
+import useScreenDensityMode from '../hooks/useScreenDensityMode';
+import type { PatientCardDensityVariant } from '../config/screenDensityModeModel';
 import {
   formatPrivacySafeComplaint,
   formatPrivacySafeDemographic,
@@ -43,6 +46,7 @@ type PatientCardProps = {
   workflowProfile?: PatientCardWorkflowProfile;
   readOnlyDisplay?: boolean;
   privacyPolicy?: EmergencyDisplayPrivacyPolicy;
+  densityVariant?: PatientCardDensityVariant;
   onKeyboardFocus?: () => void;
 };
 
@@ -268,9 +272,13 @@ function PatientCard({
   workflowProfile = 'none',
   readOnlyDisplay = false,
   privacyPolicy: privacyPolicyProp,
+  densityVariant: densityVariantProp,
   onKeyboardFocus,
 }: PatientCardProps) {
   const emergencyRole = useEmergencyRolePermissions();
+  const screenDensity = useScreenDensityMode();
+  const densityVariant = densityVariantProp ?? screenDensity.patientCardVariant;
+  const cardDensity = screenDensity.patientCard;
   const defaultPrivacyPolicy = useEmergencyDisplayPrivacy();
   const privacyPolicy = privacyPolicyProp ?? defaultPrivacyPolicy;
   const patient = useEmergencyStore((store) =>
@@ -357,10 +365,12 @@ function PatientCard({
     '--patient-priority-color': priorityColors[patient.priority],
   } as CSSProperties;
   const canTransition = emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.moveQueue);
-  const canManageFlags = emergencyRole.can(EMERGENCY_ACTIONS.manageFlags);
+  const flagsPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageFlags);
+  const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
+  const canManageFlags = flagsPresentation.enabled;
   const canManageReferral = emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.createReferral);
   const canDischarge = emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.disposition);
-  const canUseCopilot = emergencyRole.can(EMERGENCY_ACTIONS.useCopilot);
+  const canUseCopilot = copilotPresentation.enabled;
   const dispositionPresentation = emergencyRole.presentAction(EMERGENCY_ROLE_ACTIONS.disposition);
   const moveQueuePresentation = emergencyRole.presentAction(EMERGENCY_ROLE_ACTIONS.moveQueue);
   const referralPresentation = emergencyRole.presentAction(EMERGENCY_ROLE_ACTIONS.createReferral);
@@ -462,6 +472,7 @@ function PatientCard({
     <div
       className={[
         'patient-card',
+        `patient-card--density-${densityVariant}`,
         `patient-card--priority-${patient.priority}`,
         hasReassessmentDue ? 'patient-card--reassessment-due' : '',
         hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
@@ -485,19 +496,23 @@ function PatientCard({
         <span className="patient-card__priority-code">{patient.priority}</span>
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{patient.state}</span>
-        <PatientExperienceStatusBadge patient={patient} referrals={referrals} compact showStaffDetail />
-        <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
-        {patient.state === PatientState.Waiting ? (
+        {cardDensity.showExperienceBadge ? (
+          <PatientExperienceStatusBadge patient={patient} referrals={referrals} compact showStaffDetail />
+        ) : null}
+        {cardDensity.showWhatHappensNext ? (
+          <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
+        ) : null}
+        {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
           <LwbsRiskBadge
             patient={patient}
             waitingPatientCount={allPatients.filter((candidate) => candidate.state === PatientState.Waiting).length}
             compact
           />
         ) : null}
-        {patient.state === PatientState.Waiting ? (
+        {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
           <DeteriorationWatchBadge patient={patient} emsArrivals={emsArrivals} compact />
         ) : null}
-        {patient.state === PatientState.Waiting ? (
+        {cardDensity.showCommunicationBadge && patient.state === PatientState.Waiting ? (
           <WaitingRoomCommunicationBadge
             patient={patient}
             workflowLogs={workflowLogs}
@@ -505,7 +520,7 @@ function PatientCard({
             compact
           />
         ) : null}
-        {isAwaitingTriage(patient) ? (
+        {cardDensity.showSafetyFlags && isAwaitingTriage(patient) ? (
           <TriageBreachBadge patient={patient} settings={emergencySettings} compact showElapsed />
         ) : null}
       </div>
@@ -533,10 +548,13 @@ function PatientCard({
         </div>
       )}
 
-      <div className="patient-card__queue-reason" aria-label="Why patient is in queue">
-        <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} showAll />
-      </div>
+      {cardDensity.showQueueReason && isInQueueFlow(patient) ? (
+        <div className="patient-card__queue-reason" aria-label="Why patient is in queue">
+          <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} showAll />
+        </div>
+      ) : null}
 
+      {cardDensity.showSignalsRow ? (
       <div className="patient-card__signals" aria-label="Patient priority signals">
         {privacyPolicy.showComplaintFlags ? (
           <HighRiskComplaintFlagBadge patient={patient} compact />
@@ -551,13 +569,17 @@ function PatientCard({
         ) : (
           <span className="patient-card__signal patient-card__signal--stable">No active risk flags</span>
         )}
-        {patient.state === PatientState.Waiting ? <ReassessmentTimerBadge patient={patient} /> : null}
+        {cardDensity.showReassessmentTimer && patient.state === PatientState.Waiting ? (
+          <ReassessmentTimerBadge patient={patient} />
+        ) : null}
       </div>
+      ) : null}
 
-      {reassessmentTimer ? (
+      {cardDensity.showReassessmentTimer && reassessmentTimer ? (
         <ReassessmentTimerStrip timer={reassessmentTimer} className="patient-card__timer-grid" />
       ) : null}
 
+      {cardDensity.showMetaGrid ? (
       <div className="patient-card__meta-grid">
         <div className="patient-card__meta-item">
           <span>Wait</span>
@@ -576,8 +598,9 @@ function PatientCard({
           </div>
         ) : null}
       </div>
+      ) : null}
 
-      {privacyPolicy.showVitals ? (
+      {cardDensity.showVitalsGrid && privacyPolicy.showVitals ? (
         <div
           className="patient-card__vitals"
           aria-label={abnormalVitalsSummary({ hrAbnormal, bpAbnormal, spo2Abnormal, tempAbnormal })}
@@ -601,7 +624,7 @@ function PatientCard({
         </div>
       ) : null}
 
-      {scores.length ? (
+      {cardDensity.showScores && scores.length ? (
         <div className="patient-card__scores" aria-label="Saved score badges">
           {scores.map((score) => (
             <span key={score}>{score}</span>
@@ -654,6 +677,7 @@ function PatientCard({
               Move: {nextState}
             </button>
           ) : null}
+          {flagsPresentation.visible ? (
           <button
             type="button"
             onClick={handleReassessment}
@@ -669,6 +693,7 @@ function PatientCard({
           >
             {hasReassessmentDue ? 'Reassess' : '+Reassess'}
           </button>
+          ) : null}
           {referralPresentation.visible ? (
             <button
               type="button"
@@ -711,11 +736,12 @@ function PatientCard({
               Discharge
             </button>
           ) : null}
-          {workflowProfile === 'physician' && canUseCopilot ? (
+          {workflowProfile === 'physician' && copilotPresentation.visible ? (
             <button
               type="button"
               onClick={handleCopilot}
-              title="Open ED Copilot for this patient"
+              disabled={!canUseCopilot}
+              title={canUseCopilot ? 'Open ED Copilot for this patient' : 'Copilot unavailable for this role'}
             >
               AI
             </button>

@@ -17,6 +17,8 @@ export const READ_ONLY_WHITEBOARD_SCREEN_WIDGETS = Object.freeze({
   reassessmentsDue: 'reassessments-due',
   emsInbound: 'ems-inbound',
   offloadDelays: 'offload-delays',
+  offloadDuration: 'offload-duration',
+  handoffPending: 'handoff-pending',
   boarders: 'boarders',
   referralsPending: 'referrals-pending',
   capacityStatus: 'capacity-status',
@@ -30,6 +32,8 @@ export const READ_ONLY_WHITEBOARD_METRIC_IDS: readonly DepartmentStatusMetricId[
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.reassessmentsDue,
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.emsInbound,
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.offloadDelays,
+  READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.offloadDuration,
+  READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.handoffPending,
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.boarders,
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.referralsPending,
   READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.capacityStatus,
@@ -51,6 +55,7 @@ export type ReadOnlyWhiteboardScreenCapabilitiesInput = {
 
 export type ReadOnlyWhiteboardScreenCapabilities = {
   isReadOnlyWhiteboardScreen: boolean;
+  isKioskMode: boolean;
   screenMode: CareDroidScreenMode;
   role: string;
   roleLabel: string;
@@ -126,6 +131,7 @@ export function resolveReadOnlyWhiteboardScreenCapabilities(
 
   return {
     isReadOnlyWhiteboardScreen,
+    isKioskMode: isReadOnlyWhiteboardScreen,
     screenMode: input.screenMode,
     role: input.role || '',
     roleLabel: input.roleLabel || 'Read-only display',
@@ -146,3 +152,10 @@ export function resolveReadOnlyWhiteboardScreenCapabilities(
     visibleMetricIds,
   };
 }
+
+export {
+  READ_ONLY_WHITEBOARD_PRIVACY_MODE,
+  WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS as READ_ONLY_WHITEBOARD_PRIVACY_OPTIONS,
+  resolveReadOnlyWhiteboardPrivacyLabel,
+  resolveReadOnlyWhiteboardPrivacyMode,
+} from './wallDisplayMonitorPrivacyModel';

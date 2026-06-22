@@ -83,6 +83,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   knowledgeBase: '/knowledge-base',
   marketplace: '/marketplace',
   enterpriseReadiness: '/enterprise-readiness',
+  trackMindWorkspace: '/trackmind',
   trackMindMaturity: '/trackmind-maturity',
   enterprisePlatform: '/enterprise-platform',
   platformIntelligence: '/platform-intelligence',

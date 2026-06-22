@@ -201,6 +201,19 @@ export const EMERGENCY_ROLE_ACTION_MATRIX: Record<
     [H.settingsEdit]: X,
     [H.publicDisplayPublish]: R,
   }),
+  [EMERGENCY_ROLE_ID.publicDisplay]: Object.freeze({
+    [H.patientCreate]: X,
+    [H.demographicsEdit]: X,
+    [H.encounterCreate]: X,
+    [H.assignAcuity]: X,
+    [H.moveQueue]: X,
+    [H.completeReassessment]: X,
+    [H.completeEmsHandoff]: X,
+    [H.createReferral]: X,
+    [H.disposition]: X,
+    [H.settingsEdit]: X,
+    [H.publicDisplayPublish]: R,
+  }),
 });
 
 export function resolveRoleActionId(

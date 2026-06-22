@@ -13,6 +13,10 @@ import {
   isReadOnlyOperationalContext,
 } from '../config/emergencyPermissionRegistry';
 import {
+  DISPLAY_AUTO_REFRESH_SCREEN_MODES,
+  resolveDisplayRefreshIntervalMs,
+} from '../config/displayAutoRefreshModel';
+import {
   DISPLAY_QUERY_MODES,
   isPublicDisplayScreenMode,
   isWallKioskScreenMode,
@@ -44,15 +48,16 @@ export function resolveWhiteboardDisplayProfile(options: {
     options.screenMode === CARE_DROID_SCREEN_MODES.readOnlyWhiteboard;
   const isDisplayMode =
     config.readOnly || options.displayQueryReadOnly || isWallKioskScreenMode(options.screenMode);
-  const refreshIntervalMs = Math.max(
-    15000,
-    Number(options.wallDisplayRefreshInterval) || 30000,
-  );
+  const refreshIntervalMs = resolveDisplayRefreshIntervalMs(options.screenMode, {
+    wallDisplayRefreshInterval: options.wallDisplayRefreshInterval,
+  });
+  const autoRefresh =
+    DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(options.screenMode) || isDisplayMode;
 
   return {
     isDisplayMode,
     canMutate: !isDisplayMode,
-    autoRefresh: isDisplayMode,
+    autoRefresh,
     operationalAwarenessOnly: isDisplayMode,
     isPublicDisplay,
     isWaitingRoomDisplay,
@@ -95,7 +100,13 @@ export function useWhiteboardDisplayMode(): WhiteboardDisplayProfile {
           !deviceContext.isKiosk &&
           !isPublicDisplayContext(displayContext) &&
           !isReadOnlyOperationalContext(displayContext),
-        autoRefresh: profile.autoRefresh || deviceContext.isKiosk,
+        autoRefresh:
+          profile.autoRefresh ||
+          DISPLAY_AUTO_REFRESH_SCREEN_MODES.has(screenMode) ||
+          deviceContext.isKiosk,
+        refreshIntervalMs: resolveDisplayRefreshIntervalMs(screenMode, {
+          wallDisplayRefreshInterval,
+        }),
       };
     },
     [

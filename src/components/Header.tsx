@@ -36,6 +36,7 @@ import {
 import { buildHighRiskComplaintAlerts } from '../services/highRiskComplaintFlags';
 import { buildLwbsRiskAdvisoryAlerts } from '../services/lwbsRiskLayer';
 import { buildDeteriorationWatchAlerts } from '../services/waitingRoomDeteriorationWatch';
+import { buildWaitingRoomSafetyEscalationAlerts } from '../services/waitingRoomSafetyEscalationVisibilityModel';
 import { buildTriageBreachAlerts } from '../services/triageBreachTimer';
 import { buildProviderWaitBreachAlerts } from '../services/providerWaitBreachTimer';
 import {
@@ -247,7 +248,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const [backendVerifiedPatientIds, setBackendVerifiedPatientIds] = useState<Set<string>>(
     () => new Set(),
   );
-  const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
+  const workloadPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.reassignWorkload);
+  const canManageWorkload = workloadPresentation.enabled;
   const createPatientAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
   const createReferralAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
   const dispositionAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.completeDisposition);
@@ -322,6 +324,17 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const deteriorationWatchAlerts = useMemo(
     () => buildDeteriorationWatchAlerts(patients, { emsArrivals }),
     [patients, emsArrivals],
+  );
+  const waitingRoomSafetyEscalationAlerts = useMemo(
+    () =>
+      buildWaitingRoomSafetyEscalationAlerts(patients, {
+        workflowLogs,
+        staff,
+        alerts,
+        communicationOverdueMinutes:
+          Number(thresholds?.communicationOverdueMinutes ?? 30) || 30,
+      }),
+    [alerts, patients, staff, thresholds, workflowLogs],
   );
   const triageBreachAlerts = useMemo(
     () =>
@@ -436,6 +449,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       ...highRiskComplaintAlerts,
       ...lwbsRiskAdvisoryAlerts,
       ...deteriorationWatchAlerts,
+      ...waitingRoomSafetyEscalationAlerts,
       ...triageBreachAlerts,
       ...providerWaitBreachAlerts,
       ...emsOffloadAlerts,
@@ -462,6 +476,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     highRiskComplaintAlerts,
     lwbsRiskAdvisoryAlerts,
     deteriorationWatchAlerts,
+    waitingRoomSafetyEscalationAlerts,
     triageBreachAlerts,
     providerWaitBreachAlerts,
     emsOffloadAlerts,
@@ -1182,7 +1197,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
           </button>
 
-          {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen ? (
+          {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen && workloadPresentation.visible ? (
             <button
               type="button"
               onClick={() => {

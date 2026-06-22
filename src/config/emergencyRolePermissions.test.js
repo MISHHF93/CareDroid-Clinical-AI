@@ -68,9 +68,12 @@ describe('Emergency OS role-based views', () => {
       'Physician',
       'Registration Clerk',
       'EMS User',
-      'Read-Only Viewer',
+      'Read-Only Display',
+      'Public Display',
     ]);
     expect(normalizeEmergencyRole('Read-Only Viewer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('Read-Only Display')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('public display')).toBe(EMERGENCY_ROLE_IDS.publicDisplay);
     expect(normalizeEmergencyRole('paramedic')).toBe(EMERGENCY_ROLE_IDS.emsUser);
     expect(normalizeEmergencyRole('np')).toBe(EMERGENCY_ROLE_IDS.physician);
     expect(normalizeEmergencyRole('flow nurse')).toBe(EMERGENCY_ROLE_IDS.chargeNurse);

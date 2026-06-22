@@ -1,0 +1,29 @@
+.display-refresh-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  color: rgba(203, 213, 225, 0.92);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.display-refresh-status__clock {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.display-refresh-status__warning {
+  flex-basis: 100%;
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.display-refresh-status--error .display-refresh-status__warning {
+  color: #fecaca;
+}
+
+.display-refresh-status--refreshing {
+  opacity: 0.92;
+}

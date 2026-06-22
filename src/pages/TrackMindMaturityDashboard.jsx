@@ -18,6 +18,9 @@ import {
   TRACKMIND_MATURITY_QUESTIONNAIRE,
   buildTrackMindMaturityAssessment,
 } from '../config/trackMindMaturityModel';
+import { filterTrackMindMaturityDomainsForRole } from '../config/trackMindKpiPolicy';
+import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
+import { TRACKMIND_PERMISSION_KEYS } from '../config/trackMindPermissionRegistry';
 import './TrackMindMaturityDashboard.css';
 
 function levelClass(levelId) {
@@ -25,6 +28,7 @@ function levelClass(levelId) {
 }
 
 export default function TrackMindMaturityDashboard() {
+  const trackMind = useTrackMindRolePermissions();
   const { tenantContext } = useTenantContext();
   const { organization: identityOrganization, platformContext } = useUserIdentity();
   const organizationContext = useOrganizationContext();
@@ -54,7 +58,17 @@ export default function TrackMindMaturityDashboard() {
     [answers, organizationName],
   );
 
-  const radarData = assessment.dimensions.map((dimension) => ({
+  const visibleDimensions = useMemo(
+    () =>
+      filterTrackMindMaturityDomainsForRole(
+        assessment.dimensions,
+        trackMind.can,
+        trackMind.can(TRACKMIND_PERMISSION_KEYS.maturityView),
+      ),
+    [assessment.dimensions, trackMind],
+  );
+
+  const radarData = visibleDimensions.map((dimension) => ({
     domain: dimension.label,
     score: dimension.score,
     fullMark: 100,
@@ -197,7 +211,7 @@ export default function TrackMindMaturityDashboard() {
       ) : null}
 
       <section className="trackmind-grid" aria-label="TrackMind maturity domains">
-        {assessment.dimensions.map((dimension) => (
+        {visibleDimensions.map((dimension) => (
           <article key={dimension.id} className="trackmind-card">
             <div className="trackmind-card-header">
               <div>

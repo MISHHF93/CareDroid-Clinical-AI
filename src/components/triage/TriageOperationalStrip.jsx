@@ -5,8 +5,11 @@ import OperationalStrip from '../emergency/OperationalStrip';
 import { selectTriageOperationalStripMetrics } from './triageWorkflowModel';
 
 function metricTone(metric) {
+  if (metric.tone) return metric.tone;
   if (metric.id === 'triage-pending' && metric.value >= 4) return 'critical';
   if (metric.id === 'triage-pending' && metric.value >= 2) return 'warning';
+  if (metric.id === 'triage-breach-approaching' && metric.value > 0) return 'warning';
+  if (metric.id === 'triage-breached' && metric.value > 0) return 'critical';
   if (metric.id === 'longest-untriaged-wait' && String(metric.value).includes('h')) return 'warning';
   if (metric.id === 'rapid-review-flags' && metric.value > 0) return 'warning';
   if (metric.id === 'ems-handoffs-pending' && metric.value > 0) return 'info';

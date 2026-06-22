@@ -6,6 +6,8 @@ import {
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { filterTrackMindNavItems } from '../config/trackMindModuleAccess';
+import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
 
 const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
   CANONICAL_ROUTES.workspace,
@@ -92,6 +94,10 @@ const DIRECT_PLATFORM_ROUTE_PATHS = new Set([
   CANONICAL_ROUTES.aiGovernance,
   CANONICAL_ROUTES.assets,
   CANONICAL_ROUTES.artifacts,
+  CANONICAL_ROUTES.trackMindWorkspace,
+  CANONICAL_ROUTES.trackMindMaturity,
+  CANONICAL_ROUTES.enterprisePlatform,
+  CANONICAL_ROUTES.platformIntelligence,
 ]);
 
 const PLATFORM_ROUTE_DESTINATION_OVERRIDES = Object.freeze({
@@ -201,7 +207,15 @@ function PlatformSection({ section }) {
 }
 
 export default function PlatformNavigationPage() {
-  const totalRoutes = SECTIONS.reduce((count, section) => count + uniqueItems(section.items).length, 0);
+  const trackMind = useTrackMindRolePermissions();
+  const sections = SECTIONS.map((section) => {
+    if (section.id !== 'account') return section;
+    return {
+      ...section,
+      items: filterTrackMindNavItems(section.items, trackMind.can),
+    };
+  });
+  const totalRoutes = sections.reduce((count, section) => count + uniqueItems(section.items).length, 0);
 
   return (
     <section className="platform-navigation-page" aria-labelledby="platform-navigation-title">
@@ -296,7 +310,7 @@ export default function PlatformNavigationPage() {
         <strong className="platform-navigation-route-count">{totalRoutes} routes</strong>
       </header>
 
-      {SECTIONS.map((section) => (
+      {sections.map((section) => (
         <PlatformSection key={section.id} section={section} />
       ))}
     </section>

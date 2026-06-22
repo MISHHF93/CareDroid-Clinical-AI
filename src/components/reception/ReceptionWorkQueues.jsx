@@ -22,6 +22,7 @@ import DeteriorationWatchBadge from '../waiting-room/DeteriorationWatchBadge';
 import FitToWaitBadge from '../waiting-room/FitToWaitBadge';
 import PatientExperienceStatusBadge from '../patient-experience/PatientExperienceStatusBadge';
 import ReassessmentTimerBadge from '../reassessment/ReassessmentTimerBadge';
+import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import './ReceptionWorkQueues.css';
 
 export const RECEPTION_QUEUE_TABS = [
@@ -48,6 +49,8 @@ export default function ReceptionWorkQueues({
   const [activeTab, setActiveTab] = useState(activeTabProp);
   const reception = useReceptionScreen();
   const triage = useTriageScreen();
+  const screenDensity = useScreenDensityMode();
+  const queueDensity = screenDensity.queue;
   const canReviewTriage = triage.showClinicalTriageAssist;
   const staff = useEmergencyStore((state) => state.staff);
   const referrals = useEmergencyStore((state) => state.referrals);
@@ -132,7 +135,12 @@ export default function ReceptionWorkQueues({
         id={`reception-queue-panel-${activeTab}`}
         role="tabpanel"
         aria-labelledby={`reception-queue-tab-${activeTab}`}
-        className="reception-work-queues__panel"
+        className={[
+          'reception-work-queues__panel',
+          queueDensity.compact ? 'reception-work-queues__panel--compact' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {activePatients.length ? (
           <ul className="reception-work-queues__list">
@@ -162,21 +170,29 @@ export default function ReceptionWorkQueues({
                         <DataQualityRiskBadge risks={qualityRisks} limit={2} />
                       ) : null}
                       <HighRiskComplaintFlagBadge patient={patient} compact />
-                      <PatientExperienceStatusBadge
-                        patient={patient}
-                        referrals={referrals}
-                        compact
-                        showStaffDetail
-                      />
-                      <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} compact showAll />
-                      <WhatHappensNextBadge
-                        patient={patient}
-                        referrals={referrals}
-                        staff={staff}
-                        compact
-                      />
-                      <TriageBreachBadge patient={patient} settings={settings} compact showElapsed />
-                      {activeTab === 'pretriage' ? (
+                      {queueDensity.showSafetyBadges ? (
+                        <>
+                          <PatientExperienceStatusBadge
+                            patient={patient}
+                            referrals={referrals}
+                            compact
+                            showStaffDetail
+                          />
+                          <TriageBreachBadge patient={patient} settings={settings} compact showElapsed />
+                        </>
+                      ) : null}
+                      {queueDensity.showQueueReason ? (
+                        <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} compact showAll />
+                      ) : null}
+                      {queueDensity.showSafetyBadges ? (
+                        <WhatHappensNextBadge
+                          patient={patient}
+                          referrals={referrals}
+                          staff={staff}
+                          compact
+                        />
+                      ) : null}
+                      {queueDensity.showSafetyBadges && activeTab === 'pretriage' ? (
                         <>
                           <DeteriorationWatchBadge
                             patient={patient}

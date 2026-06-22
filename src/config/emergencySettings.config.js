@@ -45,6 +45,7 @@ export const EMERGENCY_SETTINGS_GROUP_LABELS = Object.freeze({
   alerts: 'Alert Rules',
   intake: 'Intake Settings',
   central: 'Central Control Node',
+  screenModes: 'Screen Modes',
   operationalIntelligence: 'Operational Intelligence',
 });
 

@@ -10,7 +10,10 @@ export default function ChargeNurseOperationalStrip({
   activeEmsArrivals = 0,
   referrals = [],
   emsArrivals = [],
+  capacity = null,
   settings = {},
+  workflowLogs = [],
+  alerts = [],
   visibleSurfaces = null,
   kpiMetricIds = null,
   onMetricSelect,
@@ -31,14 +34,19 @@ export default function ChargeNurseOperationalStrip({
         activeEmsArrivals,
         referrals,
         emsArrivals,
+        capacity,
         settings,
+        workflowLogs,
+        alerts,
         visibleSurfaces,
         kpiMetricIds,
       });
     return normalizeOperationalStripMetrics(selected, { onMetricSelect });
   }, [
     activeEmsArrivals,
+    alerts,
     centralSnapshot,
+    capacity,
     emsArrivals,
     metricsOverride,
     onMetricSelect,
@@ -47,6 +55,7 @@ export default function ChargeNurseOperationalStrip({
     settings,
     visibleSurfaces,
     kpiMetricIds,
+    workflowLogs,
   ]);
 
   return (

@@ -9,6 +9,7 @@ import {
 } from '../../services/queueReasonVisibility';
 import { summarizeTriageBreachBoard } from '../../services/triageBreachTimer';
 import { summarizeProviderWaitBreachBoard } from '../../services/providerWaitBreachTimer';
+import { buildEmsOffloadVisibilitySnapshot } from '../../services/emsOffloadVisibilityModel';
 import { summarizeEmsAwareness } from './emsAwarenessModel';
 import { summarizeReferralAwareness } from './referralAwarenessModel';
 import { patientMatchesReassessmentAttention } from './reassessmentVisibilityModel';
@@ -27,6 +28,8 @@ export type DepartmentStatusMetricId =
   | 'queue-pressure'
   | 'ems-inbound'
   | 'offload-delays'
+  | 'offload-duration'
+  | 'handoff-pending'
   | 'boarders'
   | 'referrals-pending'
   | 'capacity-status';
@@ -128,6 +131,13 @@ export function buildDepartmentStatusSnapshot(input: {
     staff: input.staff,
     rooms: input.rooms,
     offloadTargetMinutes: input.offloadTargetMinutes,
+  });
+  const emsVisibility = buildEmsOffloadVisibilitySnapshot(input.emsArrivals || [], {
+    patients,
+    staff: input.staff,
+    rooms: input.rooms,
+    now,
+    offloadTargetMinutes: input.offloadTargetMinutes ?? 15,
   });
   const longestWaitMinutes =
     capacity?.longestWaitMinutes ??
@@ -242,19 +252,43 @@ export function buildDepartmentStatusSnapshot(input: {
     {
       id: 'offload-delays',
       label: 'Offload delays',
-      value: emsAwareness.delayedOffloadCount || emsAwareness.awaitingHandoff,
+      value: emsVisibility.offloadDelaysCount,
       tone:
-        (emsAwareness.longestOffloadMinutes ?? 0) >= (input.offloadTargetMinutes ?? 15)
+        (emsVisibility.longestOffloadMinutes ?? 0) >= (input.offloadTargetMinutes ?? 15)
           ? 'critical'
-          : emsAwareness.delayedOffloadCount
+          : emsVisibility.offloadDelaysCount
             ? 'warning'
-            : emsAwareness.awaitingHandoff
+            : 'stable',
+      detail:
+        emsVisibility.longestOffloadMinutes != null
+          ? `Longest offload ${formatDepartmentDuration(emsVisibility.longestOffloadMinutes)}`
+          : 'Units past offload target',
+    },
+    {
+      id: 'offload-duration',
+      label: 'Offload duration',
+      value: emsVisibility.offloadDurationLabel,
+      tone:
+        emsVisibility.longestOffloadMinutes >= (input.offloadTargetMinutes ?? 15)
+          ? 'critical'
+          : emsVisibility.averageOffloadMinutes >= 10
+            ? 'warning'
+            : emsVisibility.handoffPendingCount
               ? 'watch'
               : 'stable',
-      detail:
-        emsAwareness.longestOffloadMinutes != null
-          ? `Longest offload ${formatDepartmentDuration(emsAwareness.longestOffloadMinutes)}`
-          : 'Units awaiting EMS handoff completion',
+      detail: `Average ${formatDepartmentDuration(emsVisibility.averageOffloadMinutes)} · target ${emsVisibility.offloadTargetMinutes}m`,
+    },
+    {
+      id: 'handoff-pending',
+      label: 'Handoff pending',
+      value: emsVisibility.handoffPendingCount,
+      tone:
+        emsVisibility.handoffPendingCount >= 2
+          ? 'warning'
+          : emsVisibility.handoffPendingCount
+            ? 'watch'
+            : 'stable',
+      detail: 'Crews on scene awaiting triage handoff completion',
     },
     {
       id: 'boarders',

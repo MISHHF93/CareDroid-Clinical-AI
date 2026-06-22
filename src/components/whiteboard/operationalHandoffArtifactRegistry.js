@@ -28,7 +28,7 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
     id: 'queue-reason-visibility',
     label: 'Queue reason visibility',
     surfaces: ['QueueReasonBadge', 'QueueReasonAttentionStrip', 'ReceptionWorkQueues', 'ReceptionThroughputAttentionCluster', 'PatientCard', 'queueReasonVisibility.ts'],
-    mechanism: 'resolveQueueReason from registration, triage, provider, room, and result state',
+    mechanism: 'resolveQueueReason — awaiting triage, clinician, room, results, referral, admission bed, discharge paperwork, or verification incomplete',
   }),
   Object.freeze({
     id: 'lwbs-risk-advisory',
@@ -57,7 +57,7 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'waiting-room-communication-log',
     label: 'Waiting-room communication log',
-    surfaces: ['WaitingRoomCommunicationPanel', 'WaitingRoomCommunicationBadge', 'WaitingRoomSafetyBoard', 'PatientDetailPanel', 'waitingRoomCommunicationLog.ts'],
+    surfaces: ['WaitingRoomCommunicationPanel', 'WaitingRoomCommunicationBadge', 'WaitingRoomSafetyBoard', 'PatientDetailPanel', 'waitingRoomCommunicationLog.ts', 'PatientCommunicationStatusPanel', 'patientCommunicationStatus.ts'],
     mechanism: 'resolveCommunicationRecency from workflow audit logs, notes, and timeline — patient updated, vitals, reassess, delay informed, queue move, escalation',
   }),
   Object.freeze({

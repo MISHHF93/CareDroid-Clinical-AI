@@ -172,6 +172,21 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.VIEW_OBSERVABILITY,
     Permission.MANAGE_INCIDENTS,
 
+    // TrackMind Nexus
+    Permission.VIEW_TRACKMIND,
+    Permission.VIEW_TRACKMIND_MATURITY,
+    Permission.VIEW_TRACKMIND_ENTERPRISE,
+    Permission.VIEW_TRACKMIND_INTELLIGENCE,
+    Permission.MANAGE_RACEDAY_OPERATIONS,
+    Permission.MANAGE_STEWARDING,
+    Permission.MANAGE_EQUINE_WELFARE,
+    Permission.VIEW_VETERINARY_RECORDS,
+    Permission.WRITE_VETERINARY_RECORDS,
+    Permission.MANAGE_SECURITY_OPERATIONS,
+    Permission.EXPORT_TRACKMIND_AUDIT,
+    Permission.MANAGE_TRACKMIND_APPROVALS,
+    Permission.MANAGE_PLATFORM_TENANTS,
+
     // Emergency & Safety
     Permission.TRIGGER_EMERGENCY_PROTOCOL,
     Permission.OVERRIDE_SAFETY_CHECKS,

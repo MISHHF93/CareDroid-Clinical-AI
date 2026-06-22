@@ -319,9 +319,13 @@ export default function ReferralPanel() {
   const [formError, setFormError] = useState('');
   const [backendStatus, setBackendStatus] = useState('');
   const [backendPending, setBackendPending] = useState(false);
-  const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
-  const canManageTransfer = emergencyRole.can(EMERGENCY_ACTIONS.manageTransfer);
-  const canUpdateWorkflow = canManageReferral || canManageTransfer;
+  const referralPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
+  const transferPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageTransfer);
+  const canManageReferral = referralPresentation.enabled;
+  const canManageTransfer = transferPresentation.enabled;
+  const canUpdateWorkflow =
+    (referralPresentation.visible && referralPresentation.enabled) ||
+    (transferPresentation.visible && transferPresentation.enabled);
   const referralSource = sourceLabel(referralsModule.data?.source);
   const referralFreshness = formatFreshness(referralsModule.data?.generatedAt);
 
@@ -525,6 +529,7 @@ export default function ReferralPanel() {
           </p>
         </div>
         <div className="referral-panel__header-actions">
+          {referralPresentation.visible ? (
           <button
             type="button"
             disabled={!canManageReferral}
@@ -542,6 +547,8 @@ export default function ReferralPanel() {
             <FilePlus2 size={16} aria-hidden />
             New Referral
           </button>
+          ) : null}
+          {transferPresentation.visible ? (
           <button
             type="button"
             disabled={!canManageTransfer}
@@ -563,6 +570,7 @@ export default function ReferralPanel() {
           >
             New Transfer
           </button>
+          ) : null}
         </div>
       </header>
 

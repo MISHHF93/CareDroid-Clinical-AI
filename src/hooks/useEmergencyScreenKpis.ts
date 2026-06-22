@@ -52,6 +52,10 @@ export function useEmergencyScreenKpis(
   const operationalMetrics = centralSnapshot.operationalSummary?.metrics || [];
 
   return useMemo(() => {
+    const kpiSettings = {
+      screenModeKpiVisibility: emergencySettings.screenModeKpiVisibility,
+      publicDisplayPrivacy: emergencySettings.publicDisplayPrivacy,
+    };
     const snapshot = buildScreenModeKpiSnapshot({
       screenMode: resolvedScreenMode,
       patients,
@@ -69,15 +73,18 @@ export function useEmergencyScreenKpis(
     return {
       ...snapshot,
       screenMode: resolvedScreenMode,
-      kpiIds: resolveScreenModeKpiIds(resolvedScreenMode),
-      receptionStripMetricIds: resolveReceptionStripMetricIds(resolvedScreenMode),
-      triageStripMetricIds: resolveTriageStripMetricIds(resolvedScreenMode),
-      chargeNurseStripMetricIds: resolveChargeNurseStripMetricIds(resolvedScreenMode),
-      chargeNurseStripSurfaces: resolveChargeNurseStripSurfaces(resolvedScreenMode),
+      kpiIds: resolveScreenModeKpiIds(resolvedScreenMode, kpiSettings),
+      receptionStripMetricIds: resolveReceptionStripMetricIds(resolvedScreenMode, kpiSettings),
+      triageStripMetricIds: resolveTriageStripMetricIds(resolvedScreenMode, kpiSettings),
+      chargeNurseStripMetricIds: resolveChargeNurseStripMetricIds(resolvedScreenMode, kpiSettings),
+      chargeNurseStripSurfaces: resolveChargeNurseStripSurfaces(resolvedScreenMode, kpiSettings),
       headerOperationalMetricKeys: headerKeys,
-      publicWaitingWidgets: resolvePublicWaitingKpiWidgets(resolvedScreenMode),
-      commandCenterMetricIds: resolveCommandCenterMetricIds(resolvedScreenMode),
-      commandCenterWidgetVisibility: resolveCommandCenterWidgetVisibility(resolvedScreenMode),
+      publicWaitingWidgets: resolvePublicWaitingKpiWidgets(resolvedScreenMode, kpiSettings),
+      commandCenterMetricIds: resolveCommandCenterMetricIds(resolvedScreenMode, kpiSettings),
+      commandCenterWidgetVisibility: resolveCommandCenterWidgetVisibility(
+        resolvedScreenMode,
+        kpiSettings,
+      ),
       headerOperationalMetrics,
     };
   }, [

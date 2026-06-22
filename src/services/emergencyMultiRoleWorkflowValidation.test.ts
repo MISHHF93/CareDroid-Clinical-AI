@@ -134,7 +134,6 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
 
     const triageQueued = buildPatient({
       state: PatientState.Triage,
-      triageTime: '2026-06-20T09:45:00.000Z',
       encounterId: 'enc-001',
     });
     const triageQueues = selectReceptionQueues([triageQueued]);
@@ -181,7 +180,7 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
       physicianStaffId: 'physician-1',
       now: NOW,
     });
-    expect(physicianMetrics.find((metric) => metric.id === 'provider-wait')?.value).toBeGreaterThan(0);
+    expect(physicianMetrics.find((metric) => metric.id === 'provider-awaiting')?.value).toBeGreaterThan(0);
     expect(
       shouldShowPhysicianOperationalStrip({
         screenMode: CARE_DROID_SCREEN_MODES.physician,

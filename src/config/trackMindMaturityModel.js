@@ -73,7 +73,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Operations',
     weight: 14,
     baseScore: 68,
-    owner: 'Track director / operations lead',
+    owner: 'race_day_operations_manager',
+    ownerLabel: 'Track director / operations lead',
     description: 'Shift handoff, queue visibility, throughput, and daily operating rhythm.',
     levelCriteria: [
       'No shared operating picture; decisions are ad hoc.',
@@ -93,7 +94,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Safety',
     weight: 14,
     baseScore: 62,
-    owner: 'Chief medical officer / safety officer',
+    owner: 'steward',
+    ownerLabel: 'Chief medical officer / safety officer',
     description: 'Clinical safety guardrails, reassessment discipline, and harm-prevention workflows.',
     levelCriteria: [
       'Safety incidents handled reactively without shared taxonomy.',
@@ -109,7 +111,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Compliance',
     weight: 11,
     baseScore: 58,
-    owner: 'Compliance / privacy officer',
+    owner: 'compliance_officer',
+    ownerLabel: 'Compliance / privacy officer',
     description: 'Regulatory evidence, audit readiness, privacy workflows, and policy attestation.',
     levelCriteria: [
       'Policies live in email or binders; evidence is scattered.',
@@ -125,7 +128,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Security',
     weight: 12,
     baseScore: 54,
-    owner: 'CISO / security lead',
+    owner: 'security_manager',
+    ownerLabel: 'CISO / security lead',
     description: 'Authentication, tenant isolation, RBAC, secrets management, and API hardening.',
     levelCriteria: [
       'Shared credentials; no tenant isolation model.',
@@ -141,7 +145,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Equine welfare',
     weight: 12,
     baseScore: 52,
-    owner: 'Equine welfare officer / track veterinarian',
+    owner: 'equine_welfare_officer',
+    ownerLabel: 'Equine welfare officer / track veterinarian',
     description: 'Horse health monitoring, withdrawal protocols, injury response, and welfare audits.',
     levelCriteria: [
       'Welfare incidents logged informally; no central registry.',
@@ -161,7 +166,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Facilities',
     weight: 10,
     baseScore: 56,
-    owner: 'Facilities / track superintendent',
+    owner: 'facilities_manager',
+    ownerLabel: 'Facilities / track superintendent',
     description: 'Track surface, barns, equipment maintenance, and incident-ready infrastructure.',
     levelCriteria: [
       'Maintenance requests handled verbally; no asset registry.',
@@ -177,7 +183,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Finance',
     weight: 9,
     baseScore: 50,
-    owner: 'CFO / finance controller',
+    owner: 'finance_manager',
+    ownerLabel: 'CFO / finance controller',
     description: 'Revenue capture, cost visibility, billing readiness, and value tracking.',
     levelCriteria: [
       'Financial reporting is manual and lagging.',
@@ -193,7 +200,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'AI governance',
     weight: 9,
     baseScore: 60,
-    owner: 'AI governance lead / clinical informatics',
+    owner: 'organization_admin',
+    ownerLabel: 'AI governance lead / clinical informatics',
     description: 'Model registry, human review, prompt governance, and AI safety controls.',
     levelCriteria: [
       'AI tools used without inventory or review requirements.',
@@ -209,7 +217,8 @@ export const TRACKMIND_MATURITY_DOMAINS = Object.freeze([
     label: 'Data quality',
     weight: 9,
     baseScore: 64,
-    owner: 'Data steward / registration lead',
+    owner: 'data_analytics_user',
+    ownerLabel: 'Data steward / registration lead',
     description: 'Identity verification, duplicate detection, demographics, and arrival reason completeness.',
     levelCriteria: [
       'Registration data quality issues discovered only at discharge.',

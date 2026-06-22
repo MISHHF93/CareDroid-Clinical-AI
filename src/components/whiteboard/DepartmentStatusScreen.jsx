@@ -1,38 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
+import { buildDepartmentStatusFallbackSnapshot } from '../../config/displayAutoRefreshModel';
+import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
+import OperationalPresentationFrame from '../emergency/OperationalPresentationFrame';
+import DisplayRefreshStatusBar from '../emergency/DisplayRefreshStatusBar';
 import './DepartmentStatusScreen.css';
-
-function formatUpdatedAt(timestamp) {
-  if (!timestamp) return '—';
-  try {
-    return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  } catch {
-    return '—';
-  }
-}
-
-function formatLiveClock(timestamp) {
-  if (!timestamp) return '—';
-  try {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  } catch {
-    return '—';
-  }
-}
 
 export default function DepartmentStatusScreen({
   snapshot,
   title = 'Department status',
   refreshIntervalMs = 30000,
+  refreshStatus = null,
   privacyLabel,
   layout = 'default',
+  kioskMode = false,
   liveClock: liveClockProp,
   className = '',
 }) {
-  const isWallLayout = layout === 'wall';
+  const isWallLayout = layout === 'wall' || kioskMode;
+  const presentation = resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard);
+  const displayTitle = title || presentation.pageTitle;
   const [liveClock, setLiveClock] = useState(() => liveClockProp || Date.now());
 
   useEffect(() => {
@@ -42,13 +30,33 @@ export default function DepartmentStatusScreen({
     return () => window.clearInterval(timer);
   }, [isWallLayout, liveClockProp]);
 
-  if (!snapshot?.metrics?.length) return null;
+  useEffect(() => {
+    if (!kioskMode || typeof document === 'undefined') return undefined;
+    const previousTitle = document.title;
+    document.title = `${displayTitle} · ${EMERGENCY_OS_BRANDING.productName}`;
+    document.documentElement.classList.add('read-only-whiteboard-kiosk-active');
+    return () => {
+      document.title = previousTitle;
+      document.documentElement.classList.remove('read-only-whiteboard-kiosk-active');
+    };
+  }, [displayTitle, kioskMode]);
+
+  const resolvedSnapshot = useMemo(() => {
+    if (snapshot?.metrics?.length) return snapshot;
+    if (snapshot) return snapshot;
+    return buildDepartmentStatusFallbackSnapshot(refreshStatus?.lastUpdatedAt || null);
+  }, [refreshStatus?.lastUpdatedAt, snapshot]);
+
+  if (!resolvedSnapshot?.metrics?.length) return null;
 
   return (
-    <section
+    <OperationalPresentationFrame
+      screenMode={CARE_DROID_SCREEN_MODES.readOnlyWhiteboard}
+      as="section"
       className={[
         'department-status-screen',
         isWallLayout ? 'department-status-screen--wall' : '',
+        kioskMode ? 'department-status-screen--kiosk' : '',
         className,
       ]
         .filter(Boolean)
@@ -57,30 +65,45 @@ export default function DepartmentStatusScreen({
     >
       <header className="department-status-screen__header">
         <div>
-          <p className="department-status-screen__eyebrow">Live departmental status</p>
-          <h2>{title}</h2>
+          <p className="department-status-screen__eyebrow">
+            {kioskMode ? presentation.pageEyebrow : 'Live departmental status'}
+          </p>
+          <h2>{displayTitle}</h2>
           <p className="department-status-screen__subtitle">
-            Aggregate operational metrics only · no patient names or clinical details
+            {kioskMode ? presentation.pageSubtitle : 'Aggregate operational metrics only · no patient names or clinical details'}
             {privacyLabel ? ` · ${privacyLabel}` : ''}
           </p>
         </div>
         <div className="department-status-screen__meta">
-          {isWallLayout && liveClock ? (
-            <span className="department-status-screen__live-clock" aria-live="polite">
-              {formatLiveClock(liveClock)}
-            </span>
+          <DisplayRefreshStatusBar
+            refreshStatus={
+              refreshStatus || {
+                enabled: true,
+                refreshIntervalMs,
+                lastUpdatedAt: resolvedSnapshot.updatedAt,
+                lastAttemptAt: null,
+                isRefreshing: false,
+                errorMessage: null,
+                tone: 'ok',
+                showStaleBanner: false,
+                hasCachedContent: Boolean(snapshot?.metrics?.length),
+              }
+            }
+            liveClock={isWallLayout ? liveClock : null}
+            showLiveClock={isWallLayout}
+          />
+          {kioskMode ? (
+            <span className="department-status-screen__kiosk-note">Read-only operations wall</span>
           ) : null}
-          <span>Updated {formatUpdatedAt(snapshot.updatedAt)}</span>
-          <span>Refresh every {Math.round(refreshIntervalMs / 1000)}s</span>
         </div>
       </header>
 
       <p className="department-status-screen__summary" role="status">
-        {snapshot.summaryLine}
+        {resolvedSnapshot.summaryLine}
       </p>
 
       <div className="department-status-screen__grid">
-        {snapshot.metrics.map((metric) => (
+        {resolvedSnapshot.metrics.map((metric) => (
           <article
             key={metric.id}
             className="department-status-screen__tile"
@@ -93,6 +116,16 @@ export default function DepartmentStatusScreen({
           </article>
         ))}
       </div>
-    </section>
+
+      {kioskMode ? (
+        <footer className="department-status-screen__footer" aria-label="Department monitor notice">
+          <p>
+            {privacyLabel
+              ? `${privacyLabel} · ${EMERGENCY_OS_BRANDING.safetyLine}`
+              : EMERGENCY_OS_BRANDING.safetyLine}
+          </p>
+        </footer>
+      ) : null}
+    </OperationalPresentationFrame>
   );
 }

@@ -261,6 +261,11 @@ export const ROLE_PERMISSION_GRANTS: Record<EmergencyRoleId, readonly string[]> 
   [EMERGENCY_ROLE_ID.readOnlyViewer]: Object.freeze([
     K.analyticsView,
     K.displayPublicWaitboard,
+    K.displayWhiteboardReadonly,
+    K.displayPublicPublish,
+  ]),
+  [EMERGENCY_ROLE_ID.publicDisplay]: Object.freeze([
+    K.displayPublicWaitboard,
     K.displayPublicPublish,
   ]),
 });
@@ -310,6 +315,9 @@ export function getEmergencyPermissionDefinition(
 
 export function normalizeEmergencyRoleId(role: string): EmergencyRoleId {
   const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
+  if (normalized === 'public_display' || normalized === 'public_waiting_display') {
+    return EMERGENCY_ROLE_ID.publicDisplay;
+  }
   const values = Object.values(EMERGENCY_ROLE_ID);
   if (values.includes(normalized as EmergencyRoleId)) return normalized as EmergencyRoleId;
   return EMERGENCY_ROLE_ID.physician;

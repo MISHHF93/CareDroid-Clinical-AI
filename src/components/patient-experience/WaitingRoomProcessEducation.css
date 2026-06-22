@@ -1,0 +1,95 @@
+.waiting-room-process-education {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.waiting-room-process-education__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.waiting-room-process-education__header h3 {
+  margin: 0;
+  font-size: 17px;
+  color: #f8fafc;
+}
+
+.waiting-room-process-education__intro {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.waiting-room-process-education__steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.waiting-room-process-education__step {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.waiting-room-process-education__step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #34d399;
+}
+
+.waiting-room-process-education__step-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.waiting-room-process-education__step-copy strong {
+  font-size: 14px;
+  color: #f8fafc;
+}
+
+.waiting-room-process-education__step-copy p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(203, 213, 225, 0.92);
+}
+
+.waiting-room-process-education--compact .waiting-room-process-education__steps {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.waiting-room-process-education--compact .waiting-room-process-education__step {
+  min-height: 100%;
+}
+
+.public-waiting-display .waiting-room-process-education {
+  border-color: #334155;
+  background: #111827;
+}
+
+.public-waiting-display .waiting-room-process-education__step {
+  background: #0f172a;
+}

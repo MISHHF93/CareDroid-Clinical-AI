@@ -29,6 +29,18 @@ import {
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { listScreenModesForSettings } from '../../config/careDroidScreenModes';
+import {
+  PUBLIC_DISPLAY_PRIVACY_OPTIONS,
+  SCREEN_MODE_ROLE_OPTIONS,
+  buildDefaultAllowedRolesByScreenMode,
+  listConfigurableScreenModes,
+  normalizeCareDroidScreenModeSettings,
+} from '../../config/careDroidScreenModeSettingsModel';
+import {
+  EMERGENCY_SCREEN_KPI_LABELS,
+  EMERGENCY_SCREEN_KPI_POLICY,
+} from '../../config/emergencyScreenKpiPolicy';
+import { WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS } from '../../config/wallDisplayMonitorPrivacyModel';
 import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
 import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
 import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
@@ -118,6 +130,14 @@ function mergeSettings(base = {}, patch = {}) {
       },
     },
     alertRules: { ...(base.alertRules || {}), ...(patch.alertRules || {}) },
+    allowedRolesByScreenMode: {
+      ...(base.allowedRolesByScreenMode || {}),
+      ...(patch.allowedRolesByScreenMode || {}),
+    },
+    screenModeKpiVisibility: {
+      ...(base.screenModeKpiVisibility || {}),
+      ...(patch.screenModeKpiVisibility || {}),
+    },
     centralControl: {
       ...DEFAULT_CENTRAL_CONTROL_SETTINGS,
       ...(base.centralControl || {}),
@@ -569,6 +589,64 @@ export default function EmergencySettings() {
     );
   };
 
+  const screenModeSettings = useMemo(
+    () => normalizeCareDroidScreenModeSettings(draft),
+    [draft],
+  );
+
+  const configurableScreenModes = useMemo(
+    () => listConfigurableScreenModes(draft),
+    [draft],
+  );
+
+  const toggleEnabledScreenMode = (screenModeId, enabled) => {
+    const enabledModes = new Set(draft.enabledScreenModes || []);
+    if (enabled) enabledModes.add(screenModeId);
+    else enabledModes.delete(screenModeId);
+    updateDraft({ enabledScreenModes: [...enabledModes] });
+  };
+
+  const toggleAllowedRole = (screenModeId, roleId, enabled) => {
+    const normalized = normalizeCareDroidScreenModeSettings(draft);
+    const roles = new Set(normalized.allowedRolesByScreenMode[screenModeId] || []);
+    if (enabled) roles.add(roleId);
+    else roles.delete(roleId);
+    updateDraft({
+      allowedRolesByScreenMode: {
+        ...normalized.allowedRolesByScreenMode,
+        [screenModeId]: [...roles],
+      },
+    });
+  };
+
+  const toggleScreenModeKpi = (screenModeId, kpiId, enabled) => {
+    const normalized = normalizeCareDroidScreenModeSettings(draft);
+    const available = EMERGENCY_SCREEN_KPI_POLICY[screenModeId] || [];
+    const current = new Set(
+      normalized.screenModeKpiVisibility[screenModeId]?.length
+        ? normalized.screenModeKpiVisibility[screenModeId]
+        : available,
+    );
+    if (enabled) current.add(kpiId);
+    else current.delete(kpiId);
+    updateDraft({
+      screenModeKpiVisibility: {
+        ...normalized.screenModeKpiVisibility,
+        [screenModeId]: available.filter((id) => current.has(id)),
+      },
+    });
+  };
+
+  const resetScreenModeRoles = (screenModeId) => {
+    const defaults = buildDefaultAllowedRolesByScreenMode();
+    updateDraft({
+      allowedRolesByScreenMode: {
+        ...normalizeCareDroidScreenModeSettings(draft).allowedRolesByScreenMode,
+        [screenModeId]: [...(defaults[screenModeId] || [])],
+      },
+    });
+  };
+
   const updateAlertRule = (rule, patch) => {
     setDraft((current) =>
       mergeSettings(current, {
@@ -732,12 +810,6 @@ export default function EmergencySettings() {
             onClick={() =>
               saveGroup('central', {
                 centralControl: draft.centralControl,
-                defaultScreenMode: draft.defaultScreenMode,
-                enabledScreenModes: draft.enabledScreenModes,
-                readOnlyDisplayMode: draft.readOnlyDisplayMode,
-                commandCenterMode: draft.commandCenterMode,
-                wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
-                wallDisplayMonitorPrivacy: draft.wallDisplayMonitorPrivacy,
               })
             }
           >
@@ -852,43 +924,6 @@ export default function EmergencySettings() {
             }
           />
         </div>
-        <DeviceContextPanel className="emergency-settings__device-context" />
-        <div className="emergency-settings__grid">
-          <SettingsField
-            label="Default screen mode"
-            value={draft.defaultScreenMode}
-            options={listScreenModesForSettings().map((mode) => [mode.id, mode.label])}
-            onChange={(value) => updateDraft({ defaultScreenMode: value })}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Command center mode"
-            value={draft.commandCenterMode}
-            onChange={(value) => updateDraft({ commandCenterMode: value })}
-          />
-          <SettingsField
-            type="checkbox"
-            label="Read-only display mode"
-            value={draft.readOnlyDisplayMode}
-            onChange={(value) => updateDraft({ readOnlyDisplayMode: value })}
-          />
-          <SettingsField
-            type="number"
-            label="Wall display refresh interval (ms)"
-            value={draft.wallDisplayRefreshInterval}
-            onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
-          />
-          <SettingsField
-            label="Hallway monitor privacy"
-            value={draft.wallDisplayMonitorPrivacy || 'operational'}
-            options={[
-              ['operational', 'Operational — full aggregate detail'],
-              ['restricted', 'Restricted — hide timing and arrival detail'],
-              ['minimal', 'Minimal — bucketed waits, highest privacy'],
-            ]}
-            onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
-          />
-        </div>
         <div className="emergency-settings__rules" aria-label="Central node governed rule groups">
           {draft.centralControl.governedRuleGroups.map((ruleGroup) => (
             <article key={ruleGroup}>
@@ -905,6 +940,140 @@ export default function EmergencySettings() {
             </article>
           ))}
         </div>
+        <DeviceContextPanel className="emergency-settings__device-context" />
+      </Section>
+
+      <Section
+        id="screen-modes"
+        title="Screen Modes"
+        subtitle="Tenant defaults for CareDroid screen modes, hallway displays, role access, privacy tiers, refresh cadence, and KPI visibility."
+        action={
+          <button
+            type="button"
+            disabled={savingGroup === 'screen-modes'}
+            onClick={() =>
+              saveGroup('screen-modes', {
+                defaultScreenMode: draft.defaultScreenMode,
+                enabledScreenModes: draft.enabledScreenModes,
+                allowedRolesByScreenMode: draft.allowedRolesByScreenMode,
+                publicDisplayPrivacy: draft.publicDisplayPrivacy || 'standard',
+                wallDisplayMonitorPrivacy: draft.wallDisplayMonitorPrivacy,
+                wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
+                screenModeKpiVisibility: draft.screenModeKpiVisibility,
+                readOnlyDisplayMode: draft.readOnlyDisplayMode,
+                commandCenterMode: draft.commandCenterMode,
+              })
+            }
+          >
+            Save Screen Modes
+          </button>
+        }
+      >
+        <div className="emergency-settings__grid">
+          <SettingsField
+            label="Default screen mode"
+            value={screenModeSettings.defaultScreenMode}
+            options={listScreenModesForSettings()
+              .filter((mode) => screenModeSettings.enabledScreenModes.includes(mode.id))
+              .map((mode) => [mode.id, mode.label])}
+            onChange={(value) => updateDraft({ defaultScreenMode: value })}
+          />
+          <SettingsField
+            type="number"
+            label="Wall display auto-refresh interval (ms)"
+            value={screenModeSettings.wallDisplayRefreshInterval}
+            onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
+          />
+          <SettingsField
+            label="Public display privacy level"
+            value={draft.publicDisplayPrivacy || 'standard'}
+            options={PUBLIC_DISPLAY_PRIVACY_OPTIONS.map((option) => [
+              option.id,
+              `${option.label} — ${option.description}`,
+            ])}
+            onChange={(value) => updateDraft({ publicDisplayPrivacy: value })}
+          />
+          <SettingsField
+            label="Read-only whiteboard privacy level"
+            value={draft.wallDisplayMonitorPrivacy || 'operational'}
+            options={WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS.map((option) => [
+              option.id,
+              `${option.label} — ${option.description}`,
+            ])}
+            onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Command center mode"
+            value={draft.commandCenterMode}
+            onChange={(value) => updateDraft({ commandCenterMode: value })}
+          />
+          <SettingsField
+            type="checkbox"
+            label="Read-only display mode"
+            value={draft.readOnlyDisplayMode}
+            onChange={(value) => updateDraft({ readOnlyDisplayMode: value })}
+          />
+        </div>
+        <div className="emergency-settings__rules" aria-label="Enabled screen modes">
+          {listScreenModesForSettings().map((mode) => (
+            <article key={mode.id}>
+              <SettingsField
+                type="checkbox"
+                label={mode.label}
+                value={screenModeSettings.enabledScreenModes.includes(mode.id)}
+                onChange={(enabled) => toggleEnabledScreenMode(mode.id, enabled)}
+              />
+              <small>{mode.id}</small>
+            </article>
+          ))}
+        </div>
+        {configurableScreenModes.map((screenMode) => {
+          const availableKpis = EMERGENCY_SCREEN_KPI_POLICY[screenMode.id] || [];
+          const enabledKpis = new Set(screenMode.kpiIds);
+          const enabledRoles = new Set(screenMode.allowedRoles);
+          return (
+            <div key={screenMode.id} className="emergency-settings__screen-mode-card">
+              <header>
+                <strong>{screenMode.label}</strong>
+                <button type="button" onClick={() => resetScreenModeRoles(screenMode.id)}>
+                  Reset allowed roles
+                </button>
+              </header>
+              <div className="emergency-settings__rules" aria-label={`${screenMode.label} allowed roles`}>
+                {SCREEN_MODE_ROLE_OPTIONS.map((role) => (
+                  <article key={`${screenMode.id}-${role.id}`}>
+                    <SettingsField
+                      type="checkbox"
+                      label={role.label}
+                      value={enabledRoles.has(role.id)}
+                      onChange={(enabled) => toggleAllowedRole(screenMode.id, role.id, enabled)}
+                    />
+                    <small>Allowed role</small>
+                  </article>
+                ))}
+              </div>
+              {availableKpis.length ? (
+                <div
+                  className="emergency-settings__rules"
+                  aria-label={`${screenMode.label} KPI visibility`}
+                >
+                  {availableKpis.map((kpiId) => (
+                    <article key={`${screenMode.id}-${kpiId}`}>
+                      <SettingsField
+                        type="checkbox"
+                        label={EMERGENCY_SCREEN_KPI_LABELS[kpiId] || kpiId}
+                        value={enabledKpis.has(kpiId)}
+                        onChange={(enabled) => toggleScreenModeKpi(screenMode.id, kpiId, enabled)}
+                      />
+                      <small>KPI visibility</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
       </Section>
 
       <Section

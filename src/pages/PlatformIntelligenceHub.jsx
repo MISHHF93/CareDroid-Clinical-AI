@@ -13,6 +13,8 @@ import { useOrganizationContext } from '../contexts/OrganizationContext';
 import { useTenantContext } from '../contexts/TenantContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildPlatformIntelligenceAssessment } from '../config/platformIntelligenceModel';
+import { filterTrackMindIntelligenceModules } from '../config/trackMindModuleAccess';
+import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
 import './PlatformIntelligenceHub.css';
 
 function statusClass(status) {
@@ -62,6 +64,7 @@ function ModuleDetail({ module }) {
 }
 
 export default function PlatformIntelligenceHub() {
+  const trackMind = useTrackMindRolePermissions();
   const { tenantContext } = useTenantContext();
   const { organization: identityOrganization, platformContext } = useUserIdentity();
   const organizationContext = useOrganizationContext();
@@ -87,16 +90,21 @@ export default function PlatformIntelligenceHub() {
     [organization, organizationName],
   );
 
-  const radarData = assessment.modules.map((module) => ({
+  const visibleModules = useMemo(
+    () => filterTrackMindIntelligenceModules(assessment.modules, trackMind.can),
+    [assessment.modules, trackMind.can],
+  );
+
+  const radarData = visibleModules.map((module) => ({
     domain: module.label.split(' ').slice(0, 2).join(' '),
     score: module.assessment.score,
     fullMark: 100,
   }));
 
   const selectedModule =
-    assessment.modules.find((module) => module.id === selectedModuleId) || assessment.modules[0];
+    visibleModules.find((module) => module.id === selectedModuleId) || visibleModules[0];
 
-  const convergence = assessment.modules.find((m) => m.id === 'platform_convergence');
+  const convergence = visibleModules.find((m) => m.id === 'platform_convergence');
 
   return (
     <div className="pi-hub">
@@ -177,7 +185,7 @@ export default function PlatformIntelligenceHub() {
           </ResponsiveContainer>
         </div>
         <div className="pi-module-grid" aria-label="Platform intelligence modules">
-          {assessment.modules.map((module) => (
+          {visibleModules.map((module) => (
             <button
               key={module.id}
               type="button"

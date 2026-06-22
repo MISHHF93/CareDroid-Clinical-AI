@@ -220,6 +220,7 @@ const KnowledgeBasePage = lazy(() => import('./pages/KnowledgeBasePage'));
 const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
 const EnterpriseReadinessPage = lazy(() => import('./pages/EnterpriseReadinessPage'));
 const TrackMindMaturityDashboard = lazy(() => import('./pages/TrackMindMaturityDashboard'));
+const TrackMindRoleWorkspace = lazy(() => import('./pages/TrackMindRoleWorkspace'));
 const CustomerSuccessPlatformPage = lazy(() => import('./pages/CustomerSuccessPlatformPage'));
 const EnterpriseOperatingPlatformHub = lazy(() => import('./pages/EnterpriseOperatingPlatformHub'));
 const PlatformIntelligenceHub = lazy(() => import('./pages/PlatformIntelligenceHub'));
@@ -271,6 +272,7 @@ import {
 } from './config/routes.config';
 import { resolveRegistryId } from './data/clinicalCatalogWiring';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
+import TrackMindRouteGuard from './components/TrackMindRouteGuard';
 import { getEmergencyRoleHomeRoute, EMERGENCY_ROLE_IDS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from './config/emergencyRolePermissions';
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from './config/receptionFirstUx.config';
 
@@ -1020,27 +1022,43 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.trackMindWorkspace}
+          element={
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindWorkspace}>
+              <LazyRoute label="Loading TrackMind workspace...">
+                <TrackMindRoleWorkspace />
+              </LazyRoute>
+            </TrackMindRouteGuard>
+          }
+        />
+        <Route
           path={CANONICAL_ROUTES.trackMindMaturity}
           element={
-            <LazyRoute label="Loading TrackMind maturity...">
-              <TrackMindMaturityDashboard />
-            </LazyRoute>
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.trackMindMaturity}>
+              <LazyRoute label="Loading TrackMind maturity...">
+                <TrackMindMaturityDashboard />
+              </LazyRoute>
+            </TrackMindRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.enterprisePlatform}
           element={
-            <LazyRoute label="Loading enterprise platform...">
-              <EnterpriseOperatingPlatformHub />
-            </LazyRoute>
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.enterprisePlatform}>
+              <LazyRoute label="Loading enterprise platform...">
+                <EnterpriseOperatingPlatformHub />
+              </LazyRoute>
+            </TrackMindRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.platformIntelligence}
           element={
-            <LazyRoute label="Loading platform intelligence...">
-              <PlatformIntelligenceHub />
-            </LazyRoute>
+            <TrackMindRouteGuard path={CANONICAL_ROUTES.platformIntelligence}>
+              <LazyRoute label="Loading platform intelligence...">
+                <PlatformIntelligenceHub />
+              </LazyRoute>
+            </TrackMindRouteGuard>
           }
         />
         <Route

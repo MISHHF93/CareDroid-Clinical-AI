@@ -13,6 +13,8 @@ import { useOrganizationContext } from '../contexts/OrganizationContext';
 import { useTenantContext } from '../contexts/TenantContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildEnterpriseOperatingPlatformAssessment } from '../config/enterpriseOperatingPlatformModel';
+import { TRACKMIND_PERMISSION_KEYS } from '../config/trackMindPermissionRegistry';
+import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
 import './EnterpriseOperatingPlatformHub.css';
 
 function statusClass(status) {
@@ -64,7 +66,14 @@ function ModuleDetail({ module }) {
   );
 }
 
+const EXECUTIVE_ENTERPRISE_MODULE_IDS = new Set([
+  'strategy_planning',
+  'portfolio_management',
+  'executive_governance',
+]);
+
 export default function EnterpriseOperatingPlatformHub() {
+  const trackMind = useTrackMindRolePermissions();
   const { tenantContext } = useTenantContext();
   const { organization: identityOrganization, platformContext } = useUserIdentity();
   const organizationContext = useOrganizationContext();
@@ -97,15 +106,28 @@ export default function EnterpriseOperatingPlatformHub() {
     [organization, organizationName],
   );
 
-  const radarData = assessment.modules.map((module) => ({
+  const visibleModules = useMemo(() => {
+    const K = TRACKMIND_PERMISSION_KEYS;
+    return assessment.modules.filter((module) => {
+      if (EXECUTIVE_ENTERPRISE_MODULE_IDS.has(module.id)) {
+        return trackMind.can(K.executiveDashboardView) || trackMind.can(K.enterpriseView);
+      }
+      if (module.id === 'governance_esg' || module.id === 'enterprise_governance') {
+        return trackMind.can(K.complianceEvidenceAttach) || trackMind.can(K.enterpriseView);
+      }
+      return trackMind.can(K.enterpriseView);
+    });
+  }, [assessment.modules, trackMind]);
+
+  const radarData = visibleModules.map((module) => ({
     domain: module.label.split(' ').slice(0, 2).join(' '),
     score: module.assessment.score,
     fullMark: 100,
   }));
 
   const selectedModule =
-    assessment.modules.find((module) => module.id === selectedModuleId) ||
-    assessment.modules[0];
+    visibleModules.find((module) => module.id === selectedModuleId) ||
+    visibleModules[0];
 
   return (
     <div className="eop-hub">
@@ -175,7 +197,7 @@ export default function EnterpriseOperatingPlatformHub() {
         </div>
 
         <div className="eop-module-grid" aria-label="Enterprise platform modules">
-          {assessment.modules.map((module) => (
+          {visibleModules.map((module) => (
             <button
               key={module.id}
               type="button"

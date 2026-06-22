@@ -5,6 +5,7 @@ import OperationalStrip from '../emergency/OperationalStrip';
 import { selectReceptionOperationalStripMetrics } from './receptionQueueModel';
 
 function metricTone(metric) {
+  if (metric.id === 'crowd-level') return metric.tone || 'neutral';
   if (metric.id === 'ems-inbound' && metric.value > 0) return 'info';
   if (metric.id === 'queue-size' && metric.value >= 8) return 'warning';
   if (metric.id === 'awaiting-triage' && metric.value >= 6) return 'warning';
@@ -22,6 +23,7 @@ export default function ReceptionOperationalStrip({
   patients = [],
   emsInbound = 0,
   emsArrivals = [],
+  capacity = null,
   onMetricSelect,
   shiftSummaryPath = null,
   stripMetricIds = null,
@@ -33,12 +35,13 @@ export default function ReceptionOperationalStrip({
       metricIds: stripMetricIds,
       settings,
       emsArrivals,
+      capacity,
     });
     return normalizeOperationalStripMetrics(
       selected.map((metric) => ({ ...metric, tone: metricTone(metric) })),
       { onMetricSelect },
     );
-  }, [patients, emsInbound, emsArrivals, stripMetricIds, settings, onMetricSelect]);
+  }, [patients, emsInbound, emsArrivals, capacity, stripMetricIds, settings, onMetricSelect]);
 
   return (
     <OperationalStrip

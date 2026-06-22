@@ -143,8 +143,10 @@ export default function SmartIntake({
   const [documentCaptured, setDocumentCaptured] = useState(false);
   const [aiVerificationHint, setAiVerificationHint] = useState('');
   const [aiHintLoading, setAiHintLoading] = useState(false);
-  const canVerifyIntake = emergencyRole.can(EMERGENCY_ACTIONS.verifyIntake);
-  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
+  const verifyIntakePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.verifyIntake);
+  const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
+  const canVerifyIntake = verifyIntakePresentation.enabled;
+  const canCreatePatient = createPatientPresentation.enabled;
 
   const boardPatient = useMemo(
     () => (contextPatientId ? patients.find((candidate) => candidate.id === contextPatientId) || null : null),
@@ -681,7 +683,7 @@ export default function SmartIntake({
           {statusMessage}
         </div>
       ) : null}
-      {canVerifyIntake ? (
+      {verifyIntakePresentation.visible ? (
         <div className="smart-intake__ai-hint" data-testid="smart-intake-ai-hint">
           <button type="button" onClick={() => void requestVerificationHint()} disabled={aiHintLoading}>
             {aiHintLoading

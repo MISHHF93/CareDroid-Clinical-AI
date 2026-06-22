@@ -1,12 +1,14 @@
 import { PatientFlag, PatientState } from '../../types/emergency';
-import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
 import { PHYSICIAN_SCREEN_WIDGETS } from '../../config/physicianScreenModel';
-import { buildWaitingRoomSafetyBoard } from './waitingRoomSafetyBoardModel';
 import { summarizeReferralAwareness } from './referralAwarenessModel';
+import { selectProviderWaitVisibilityMetrics } from '../../services/providerWaitVisibilityModel';
+import { resolvePhysicianStripMetricIds } from '../../config/emergencyScreenKpiPolicy';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 
 /** Operational strip surfaces aligned to PHYSICIAN_SCREEN widgets. */
 export const PHYSICIAN_WORKFLOW_SURFACES = Object.freeze([
+  PHYSICIAN_SCREEN_WIDGETS.providerWaitBreaches,
   PHYSICIAN_SCREEN_WIDGETS.assignedPatients,
   PHYSICIAN_SCREEN_WIDGETS.providerWaitingQueue,
   PHYSICIAN_SCREEN_WIDGETS.resultsPending,
@@ -148,20 +150,33 @@ export function selectPhysicianOperationalStrip({
   physicianStaffId = null,
   settings = {},
   visibleSurfaces = null,
+  stripMetricIds = null,
   now = new Date(),
 } = {}) {
-  const waitingBoard = buildWaitingRoomSafetyBoard(patients, {
+  const policyMetricIds =
+    stripMetricIds || resolvePhysicianStripMetricIds(CARE_DROID_SCREEN_MODES.physician) || [];
+  const providerWaitMetrics = selectProviderWaitVisibilityMetrics(patients, {
     settings,
     now,
-  });
-  const providerWaiting = waitingBoard.summary.awaitingProvider ?? 0;
+    surface: 'physician',
+  }).map((metric) => ({
+    id: metric.id,
+    label: metric.label,
+    hint: metric.hint,
+    value: metric.value,
+    surface: PHYSICIAN_SCREEN_WIDGETS.providerWaitBreaches,
+    tone: metric.tone || 'neutral',
+    whiteboardAction: 'filter-waiting',
+    routeKey: 'provider-wait',
+  }));
+
   const assignedCount = countAssignedPatients(patients, physicianStaffId);
   const resultsPending = countResultsPendingPatients(patients);
   const referralSummary = summarizeReferralAwareness(referrals);
   const referralsPending = referralSummary.buckets.pending ?? 0;
   const dispositionBoarders = patients.filter(isBoardingForDisposition).length;
 
-  const metrics = [
+  const clinicalMetrics = [
     {
       id: 'assigned',
       label: physicianStaffId ? 'My patients' : 'Relevant',
@@ -171,16 +186,6 @@ export function selectPhysicianOperationalStrip({
       tone: assignedCount >= 6 ? 'warning' : assignedCount ? 'info' : 'neutral',
       whiteboardAction: 'filter-assigned',
       routeKey: 'assigned',
-    },
-    {
-      id: 'provider-wait',
-      label: 'Provider wait',
-      hint: 'Awaiting physician assessment',
-      value: providerWaiting,
-      surface: PHYSICIAN_SCREEN_WIDGETS.providerWaitingQueue,
-      tone: providerWaiting >= 3 ? 'critical' : providerWaiting ? 'warning' : 'neutral',
-      whiteboardAction: 'filter-waiting',
-      routeKey: 'provider-wait',
     },
     {
       id: 'results',
@@ -213,6 +218,14 @@ export function selectPhysicianOperationalStrip({
       routeKey: 'boarding',
     },
   ];
+
+  let filteredProviderMetrics = providerWaitMetrics;
+  if (policyMetricIds.length) {
+    const allowed = new Set(policyMetricIds);
+    filteredProviderMetrics = providerWaitMetrics.filter((metric) => allowed.has(metric.id));
+  }
+
+  const metrics = [...filteredProviderMetrics, ...clinicalMetrics];
 
   if (!visibleSurfaces?.length) return metrics;
   const allowed = new Set(visibleSurfaces);

@@ -31,6 +31,11 @@ export const RECEPTION_SCREEN_WIDGETS = Object.freeze({
   arrivalBanner: 'arrival-banner',
   prepareChooser: 'prepare-chooser',
   operationalStrip: 'operational-strip',
+  triageBreach: 'triage-breach',
+  waitingRoomSafetyEscalation: 'waiting-room-safety-escalation',
+  processEducation: 'process-education',
+  communicationStatus: 'communication-status',
+  patientAnswers: 'patient-answers',
 });
 
 export const RECEPTION_SCREEN_ACTIONS = Object.freeze({

@@ -206,6 +206,22 @@
   margin-top: 12px;
 }
 
+.reception-workspace__process-education {
+  margin-top: 4px;
+}
+
+.reception-workspace__status-messaging {
+  margin-top: 4px;
+}
+
+.reception-workspace__communication-status {
+  margin-top: 4px;
+}
+
+.reception-workspace__patient-answers {
+  margin-top: 4px;
+}
+
 .reception-workspace--desk-slim .reception-operational-strip {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

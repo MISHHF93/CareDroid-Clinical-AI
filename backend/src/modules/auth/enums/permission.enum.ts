@@ -78,6 +78,21 @@ export enum Permission {
   VIEW_OBSERVABILITY = 'VIEW_OBSERVABILITY',
   MANAGE_INCIDENTS = 'MANAGE_INCIDENTS',
 
+  // TrackMind Nexus / Racetrack Operations
+  VIEW_TRACKMIND = 'VIEW_TRACKMIND',
+  VIEW_TRACKMIND_MATURITY = 'VIEW_TRACKMIND_MATURITY',
+  VIEW_TRACKMIND_ENTERPRISE = 'VIEW_TRACKMIND_ENTERPRISE',
+  VIEW_TRACKMIND_INTELLIGENCE = 'VIEW_TRACKMIND_INTELLIGENCE',
+  MANAGE_RACEDAY_OPERATIONS = 'MANAGE_RACEDAY_OPERATIONS',
+  MANAGE_STEWARDING = 'MANAGE_STEWARDING',
+  MANAGE_EQUINE_WELFARE = 'MANAGE_EQUINE_WELFARE',
+  VIEW_VETERINARY_RECORDS = 'VIEW_VETERINARY_RECORDS',
+  WRITE_VETERINARY_RECORDS = 'WRITE_VETERINARY_RECORDS',
+  MANAGE_SECURITY_OPERATIONS = 'MANAGE_SECURITY_OPERATIONS',
+  EXPORT_TRACKMIND_AUDIT = 'EXPORT_TRACKMIND_AUDIT',
+  MANAGE_TRACKMIND_APPROVALS = 'MANAGE_TRACKMIND_APPROVALS',
+  MANAGE_PLATFORM_TENANTS = 'MANAGE_PLATFORM_TENANTS',
+
   // Emergency & Safety
   TRIGGER_EMERGENCY_PROTOCOL = 'TRIGGER_EMERGENCY_PROTOCOL', // Initiate emergency response
   OVERRIDE_SAFETY_CHECKS = 'OVERRIDE_SAFETY_CHECKS', // Override warnings (senior physicians only)
@@ -389,6 +404,72 @@ export const PermissionMetadata: Record<
   [Permission.MANAGE_INCIDENTS]: {
     description: 'Create, update, and resolve operations incidents',
     category: 'Operations',
+    riskLevel: 'critical',
+  },
+
+  [Permission.VIEW_TRACKMIND]: {
+    description: 'Access TrackMind Nexus role workspaces',
+    category: 'TrackMind',
+    riskLevel: 'low',
+  },
+  [Permission.VIEW_TRACKMIND_MATURITY]: {
+    description: 'View TrackMind maturity assessments',
+    category: 'TrackMind',
+    riskLevel: 'low',
+  },
+  [Permission.VIEW_TRACKMIND_ENTERPRISE]: {
+    description: 'View enterprise operating platform modules',
+    category: 'TrackMind',
+    riskLevel: 'medium',
+  },
+  [Permission.VIEW_TRACKMIND_INTELLIGENCE]: {
+    description: 'View platform intelligence modules',
+    category: 'TrackMind',
+    riskLevel: 'medium',
+  },
+  [Permission.MANAGE_RACEDAY_OPERATIONS]: {
+    description: 'Manage race-day operational status and incident command',
+    category: 'TrackMind',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_STEWARDING]: {
+    description: 'Review steward incidents and create governed decisions',
+    category: 'TrackMind',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_EQUINE_WELFARE]: {
+    description: 'Create and review equine welfare observations',
+    category: 'TrackMind',
+    riskLevel: 'high',
+  },
+  [Permission.VIEW_VETERINARY_RECORDS]: {
+    description: 'View privacy-scoped veterinary records',
+    category: 'TrackMind',
+    riskLevel: 'critical',
+  },
+  [Permission.WRITE_VETERINARY_RECORDS]: {
+    description: 'Create or update veterinary records',
+    category: 'TrackMind',
+    riskLevel: 'critical',
+  },
+  [Permission.MANAGE_SECURITY_OPERATIONS]: {
+    description: 'Manage racetrack security incidents and restricted zones',
+    category: 'TrackMind',
+    riskLevel: 'high',
+  },
+  [Permission.EXPORT_TRACKMIND_AUDIT]: {
+    description: 'Export TrackMind audit and compliance evidence',
+    category: 'TrackMind',
+    riskLevel: 'critical',
+  },
+  [Permission.MANAGE_TRACKMIND_APPROVALS]: {
+    description: 'Review and decide governed TrackMind approvals',
+    category: 'TrackMind',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_PLATFORM_TENANTS]: {
+    description: 'Manage platform tenants and module entitlements',
+    category: 'TrackMind',
     riskLevel: 'critical',
   },
 

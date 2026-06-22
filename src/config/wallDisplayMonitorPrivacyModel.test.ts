@@ -48,6 +48,15 @@ describe('wallDisplayMonitorPrivacyModel', () => {
     expect(normalizeWallDisplayMonitorPrivacy('restricted')).toBe(
       WALL_DISPLAY_MONITOR_PRIVACY.restricted,
     );
+    expect(normalizeWallDisplayMonitorPrivacy('semi-private-hallway')).toBe(
+      WALL_DISPLAY_MONITOR_PRIVACY.restricted,
+    );
+    expect(normalizeWallDisplayMonitorPrivacy('staff-private')).toBe(
+      WALL_DISPLAY_MONITOR_PRIVACY.operational,
+    );
+    expect(normalizeWallDisplayMonitorPrivacy('public-safe-aggregate')).toBe(
+      WALL_DISPLAY_MONITOR_PRIVACY.minimal,
+    );
     expect(normalizeWallDisplayMonitorPrivacy('unknown')).toBe(
       WALL_DISPLAY_MONITOR_PRIVACY.operational,
     );
@@ -62,6 +71,7 @@ describe('wallDisplayMonitorPrivacyModel', () => {
     expect(snapshot.metrics.find((metric) => metric.id === 'ems-inbound')?.detail).toContain(
       'no unit identifiers',
     );
+    expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')?.value).toBe('1–2 hr');
     expect(snapshot.summaryLine).not.toContain('Next arrival');
   });
 

@@ -5,6 +5,8 @@ import QuickIntake from '../../components/QuickIntake';
 import ArrivalDashboard from '../../components/reception/ArrivalDashboard';
 import ReceptionOperationalStrip from '../../components/reception/ReceptionOperationalStrip';
 import TriageOperationalStrip from '../../components/triage/TriageOperationalStrip';
+import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
+import WaitingRoomSafetyEscalationStrip from '../../components/waiting-room/WaitingRoomSafetyEscalationStrip';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
 import DuplicatePatientBanner from '../../components/reception/DuplicatePatientBanner';
 import ReceptionSearchHint from '../../components/reception/ReceptionSearchHint';
@@ -41,6 +43,9 @@ import HighRiskComplaintAttentionStrip from '../../components/waiting-room/HighR
 import ReceptionThroughputAttentionCluster from '../../components/reception/ReceptionThroughputAttentionCluster';
 import OperationalPresentationFrame from '../../components/emergency/OperationalPresentationFrame';
 import WaitingRoomStatusMessagingStrip from '../../components/patient-experience/WaitingRoomStatusMessagingStrip';
+import WaitingRoomProcessEducation from '../../components/patient-experience/WaitingRoomProcessEducation';
+import PatientCommunicationStatusPanel from '../../components/waiting-room/PatientCommunicationStatusPanel';
+import ReceptionPatientAnswersPanel from '../../components/reception/ReceptionPatientAnswersPanel';
 import ArrivalControlBadge from '../../components/reception/ArrivalControlBadge';
 import WhatHappensNextBadge from '../../components/guidance/WhatHappensNextBadge';
 import { PatientState } from '../../types/emergency';
@@ -264,6 +269,11 @@ export default function ReceptionWorkspace() {
     selectPatient(patientId);
   };
 
+  const focusedPatientId =
+    expandedPretriagePatientId || contextPatientId || queuePatientId || arrivedPatientId || null;
+
+  const showPatientAnswersDesk = reception.showWidget('patient-answers') && !triage.isTriageScreen;
+
   useEffect(() => {
     if (!contextPatientId) return;
     handlePatientSelect(contextPatientId);
@@ -399,6 +409,27 @@ export default function ReceptionWorkspace() {
               resolveTriageStripMetricIds(CARE_DROID_SCREEN_MODES.triage)
             }
           />
+          {triage.showTriageBreach ? (
+            <TriageBreachStrip
+              patients={patients}
+              settings={emergencySettings}
+              onSelectPatient={handlePatientSelect}
+              className="reception-workspace__triage-breach"
+            />
+          ) : null}
+          {triage.showWaitingRoomSafetyEscalation ? (
+            <WaitingRoomSafetyEscalationStrip
+              patients={patients}
+              workflowLogs={workflowLogs}
+              staff={staff}
+              alerts={alerts}
+              communicationOverdueMinutes={
+                Number(emergencySettings?.thresholds?.communicationOverdueMinutes ?? 30) || 30
+              }
+              onSelectPatient={handlePatientSelect}
+              className="reception-workspace__safety-escalation"
+            />
+          ) : null}
           <ReceptionEscalationAttentionStrip
             alerts={alerts}
             roleId={emergencyRole.role}
@@ -410,6 +441,7 @@ export default function ReceptionWorkspace() {
       <ReceptionOperationalStrip
         patients={patients}
         emsInbound={emsInbound}
+        capacity={capacity}
         settings={emergencySettings}
         emsArrivals={emsArrivals}
         onMetricSelect={handleMetricSelect}
@@ -426,13 +458,48 @@ export default function ReceptionWorkspace() {
       />
       ) : null}
 
-      {reception.showWidget('operational-strip') && !triage.isTriageScreen ? (
+      {showPatientAnswersDesk ? (
+        <ReceptionPatientAnswersPanel
+          patients={patients}
+          capacity={capacity}
+          referrals={referrals}
+          staff={staff}
+          workflowLogs={workflowLogs}
+          settings={emergencySettings}
+          focusedPatientId={focusedPatientId}
+          onSelectPatient={handlePatientSelect}
+          className="reception-workspace__patient-answers"
+        />
+      ) : null}
+
+      {reception.showWidget('process-education') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
+        <WaitingRoomProcessEducation
+          audience="staff"
+          variant="compact"
+          className="reception-workspace__process-education"
+        />
+      ) : null}
+
+      {reception.showWidget('operational-strip') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
         <WaitingRoomStatusMessagingStrip
           patients={patients}
           referrals={referrals}
           capacity={capacity}
           audience="staff"
           className="reception-workspace__status-messaging"
+        />
+      ) : null}
+
+      {reception.showWidget('communication-status') || triage.showWidget('communication-status') ? (
+        <PatientCommunicationStatusPanel
+          patients={patients}
+          workflowLogs={workflowLogs}
+          staff={staff}
+          referrals={referrals}
+          settings={emergencySettings}
+          onSelectPatient={handlePatientSelect}
+          compact={deskUi.slim}
+          className="reception-workspace__communication-status"
         />
       ) : null}
 
@@ -483,6 +550,7 @@ export default function ReceptionWorkspace() {
             onSelectPatient={handlePatientSelect}
             className="reception-workspace__high-risk-complaint-strip"
           />
+          {(reception.showWidget('triage-breach') || reception.showWidget('operational-strip')) ? (
           <ReceptionThroughputAttentionCluster
             patients={patients}
             emsArrivals={emsArrivals}
@@ -491,10 +559,13 @@ export default function ReceptionWorkspace() {
             rooms={store.rooms}
             workflowLogs={workflowLogs}
             emergencySettings={emergencySettings}
+            alerts={alerts}
+            showSafetyEscalation={reception.showWidget('waiting-room-safety-escalation')}
             onSelectPatient={handlePatientSelect}
             onSelectEmsArrival={(arrival) => handleConvertEmsArrival(arrival)}
             className="reception-workspace__throughput-cluster"
           />
+          ) : null}
         </>
       ) : null}
 

@@ -17,12 +17,17 @@ export const CHARGE_NURSE_SCREEN_WIDGETS = Object.freeze({
   queueHealth: 'queue-health',
   reassessmentsDue: 'reassessments-due',
   providerWaitBreaches: 'provider-wait-breaches',
+  emsOffloadAggregate: 'ems-offload-aggregate',
   emsInbound: 'ems-inbound',
   offloadDelays: 'offload-delays',
   boarders: 'boarders',
   referralsPending: 'referrals-pending',
   capacityStatus: 'capacity-status',
+  crowdLevel: 'crowd-level',
+  triageBreach: 'triage-breach',
+  waitingRoomSafetyEscalation: 'waiting-room-safety-escalation',
   operationalStrip: 'operational-strip',
+  communicationStatus: 'communication-status',
   alerts: 'alerts',
   shiftHandoff: 'shift-handoff',
 });
@@ -68,11 +73,14 @@ export type ChargeNurseScreenCapabilities = {
   showQueueHealth: boolean;
   showReassessmentsDue: boolean;
   showProviderWaitBreaches: boolean;
+  showEmsOffloadAggregate: boolean;
   showEmsInbound: boolean;
   showOffloadDelays: boolean;
   showBoarders: boolean;
   showReferralsPending: boolean;
   showCapacityStatus: boolean;
+  showTriageBreach: boolean;
+  showWaitingRoomSafetyEscalation: boolean;
   showOperationalStrip: boolean;
   canMovePatient: boolean;
   canManageCapacity: boolean;
@@ -126,17 +134,27 @@ export function resolveChargeNurseScreenCapabilities(
   const showQueueHealth = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.queueHealth);
   const showReassessmentsDue = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.reassessmentsDue);
   const showProviderWaitBreaches = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.providerWaitBreaches);
+  const showEmsOffloadAggregate = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.emsOffloadAggregate);
   const showEmsInbound = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.emsInbound);
   const showOffloadDelays = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.offloadDelays);
   const showBoarders = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.boarders);
   const showReferralsPending = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.referralsPending);
   const showCapacityStatus = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.capacityStatus);
+  const showTriageBreach = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.triageBreach);
+  const showWaitingRoomSafetyEscalation = showWidget(
+    CHARGE_NURSE_SCREEN_WIDGETS.waitingRoomSafetyEscalation,
+  );
   const showOperationalStrip = showWidget(CHARGE_NURSE_SCREEN_WIDGETS.operationalStrip);
 
   const visibleOperationalSurfaces = [
+    showTriageBreach ? CHARGE_NURSE_SCREEN_WIDGETS.triageBreach : null,
     showQueueHealth ? CHARGE_NURSE_SCREEN_WIDGETS.queueHealth : null,
     showReassessmentsDue ? CHARGE_NURSE_SCREEN_WIDGETS.reassessmentsDue : null,
     showProviderWaitBreaches ? CHARGE_NURSE_SCREEN_WIDGETS.providerWaitBreaches : null,
+    showWaitingRoomSafetyEscalation
+      ? CHARGE_NURSE_SCREEN_WIDGETS.waitingRoomSafetyEscalation
+      : null,
+    showEmsOffloadAggregate ? CHARGE_NURSE_SCREEN_WIDGETS.emsOffloadAggregate : null,
     showEmsInbound ? CHARGE_NURSE_SCREEN_WIDGETS.emsInbound : null,
     showOffloadDelays ? CHARGE_NURSE_SCREEN_WIDGETS.offloadDelays : null,
     showBoarders ? CHARGE_NURSE_SCREEN_WIDGETS.boarders : null,
@@ -159,11 +177,14 @@ export function resolveChargeNurseScreenCapabilities(
     showQueueHealth,
     showReassessmentsDue,
     showProviderWaitBreaches,
+    showEmsOffloadAggregate,
     showEmsInbound,
     showOffloadDelays,
     showBoarders,
     showReferralsPending,
     showCapacityStatus,
+    showTriageBreach,
+    showWaitingRoomSafetyEscalation,
     showOperationalStrip,
     canMovePatient: canPerform(CHARGE_NURSE_SCREEN_ACTIONS.movePatient),
     canManageCapacity: canPerform(CHARGE_NURSE_SCREEN_ACTIONS.manageCapacity),

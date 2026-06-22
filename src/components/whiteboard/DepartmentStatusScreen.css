@@ -145,6 +145,107 @@
   font-size: clamp(32px, 5vw, 52px);
 }
 
+.department-status-screen--kiosk {
+  min-height: 100dvh;
+  min-height: 100vh;
+  padding: clamp(20px, 3vw, 40px) clamp(24px, 4vw, 56px) clamp(28px, 4vw, 48px);
+  border-bottom: none;
+  box-sizing: border-box;
+  align-content: start;
+  gap: clamp(18px, 2.5vw, 28px);
+}
+
+.department-status-screen--kiosk .department-status-screen__eyebrow {
+  font-size: clamp(12px, 1.4vw, 16px);
+}
+
+.department-status-screen--kiosk .department-status-screen__header h2 {
+  font-size: clamp(32px, 5vw, 56px);
+}
+
+.department-status-screen--kiosk .department-status-screen__subtitle {
+  font-size: clamp(14px, 1.8vw, 20px);
+  max-width: 56rem;
+}
+
+.department-status-screen--kiosk .department-status-screen__summary {
+  font-size: clamp(17px, 2.2vw, 26px);
+}
+
+.department-status-screen--kiosk .department-status-screen__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.department-status-screen--kiosk .department-status-screen__tile {
+  min-height: clamp(140px, 17vh, 210px);
+  padding: clamp(18px, 2.4vw, 28px);
+}
+
+.department-status-screen--kiosk .department-status-screen__value {
+  font-size: clamp(36px, 6vw, 64px);
+}
+
+.department-status-screen--kiosk .department-status-screen__label {
+  font-size: clamp(15px, 2vw, 22px);
+}
+
+.department-status-screen--kiosk .department-status-screen__detail {
+  font-size: clamp(13px, 1.5vw, 17px);
+}
+
+.department-status-screen--kiosk .department-status-screen__live-clock {
+  font-size: clamp(24px, 3.5vw, 40px);
+}
+
+.department-status-screen__kiosk-note {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #60a5fa;
+  font-weight: 800;
+}
+
+.department-status-screen__footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.department-status-screen__footer p {
+  margin: 0;
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.emergency-app-shell--read-only-whiteboard-kiosk .ed-skip-link {
+  position: absolute;
+  left: -9999px;
+}
+
+.emergency-app-shell--read-only-whiteboard-kiosk .app-shell-main-content {
+  padding-bottom: 0;
+  overflow: auto;
+}
+
+.emergency-whiteboard-page--read-only-whiteboard-kiosk {
+  min-height: 100%;
+}
+
+html.read-only-whiteboard-kiosk-active,
+html.read-only-whiteboard-kiosk-active body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.read-only-whiteboard-kiosk-active
+  .emergency-app-shell--read-only-whiteboard-kiosk
+  .app-shell-main-content {
+  overflow: auto;
+  padding-bottom: 0;
+}
+
 @media (max-width: 899px) {
   .department-status-screen--wall .department-status-screen__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

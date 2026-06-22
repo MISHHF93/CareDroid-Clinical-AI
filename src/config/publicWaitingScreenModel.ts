@@ -16,6 +16,7 @@ export const PUBLIC_WAITING_SCREEN_WIDGETS = Object.freeze({
   careProcessStages: 'care-process-stages',
   patientGuidance: 'patient-guidance',
   symptomEscalation: 'symptom-escalation',
+  emsCrowdingImpact: 'ems-crowding-impact',
 });
 
 const WIDGET_ALIASES: Record<string, string> = {
@@ -32,6 +33,7 @@ export type PublicWaitingScreenCapabilitiesInput = {
 
 export type PublicWaitingScreenCapabilities = {
   isPublicWaitingScreen: boolean;
+  isKioskMode: boolean;
   screenMode: CareDroidScreenMode;
   role: string;
   roleLabel: string;
@@ -45,6 +47,7 @@ export type PublicWaitingScreenCapabilities = {
   showCareProcessStages: boolean;
   showPatientGuidance: boolean;
   showSymptomEscalation: boolean;
+  showEmsCrowdingImpact: boolean;
   visibleOperationalSurfaces: string[];
 };
 
@@ -78,6 +81,7 @@ export function resolvePublicWaitingScreenCapabilities(
   const showCareProcessStages = showWidget(PUBLIC_WAITING_SCREEN_WIDGETS.careProcessStages);
   const showPatientGuidance = showWidget(PUBLIC_WAITING_SCREEN_WIDGETS.patientGuidance);
   const showSymptomEscalation = showWidget(PUBLIC_WAITING_SCREEN_WIDGETS.symptomEscalation);
+  const showEmsCrowdingImpact = showWidget(PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact);
 
   const visibleOperationalSurfaces = [
     showWaitRange ? PUBLIC_WAITING_SCREEN_WIDGETS.waitRange : null,
@@ -86,10 +90,12 @@ export function resolvePublicWaitingScreenCapabilities(
     showCareProcessStages ? PUBLIC_WAITING_SCREEN_WIDGETS.careProcessStages : null,
     showPatientGuidance ? PUBLIC_WAITING_SCREEN_WIDGETS.patientGuidance : null,
     showSymptomEscalation ? PUBLIC_WAITING_SCREEN_WIDGETS.symptomEscalation : null,
+    showEmsCrowdingImpact ? PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact : null,
   ].filter((surface): surface is string => Boolean(surface));
 
   return {
     isPublicWaitingScreen,
+    isKioskMode: isPublicWaitingScreen,
     screenMode: input.screenMode,
     role: input.role || '',
     roleLabel: input.roleLabel || 'Public display',
@@ -103,6 +109,7 @@ export function resolvePublicWaitingScreenCapabilities(
     showCareProcessStages,
     showPatientGuidance,
     showSymptomEscalation,
+    showEmsCrowdingImpact,
     visibleOperationalSurfaces,
   };
 }

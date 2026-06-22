@@ -18,13 +18,7 @@ import {
   getDefaultScreenModeForRole,
   getPersonaLabelForRole,
 } from '../config/emergencyRoleScreenMatrix';
-import {
-  presentEmergencyRoleAction,
-  resolveEmergencyRoleActionState,
-  isEmergencyActionEnabled,
-  isEmergencyActionReadOnly,
-  isEmergencyActionVisible,
-} from '../config/emergencyRoleActionMatrix';
+import { presentEmergencyPermission } from '../config/emergencyActionPresentationModel';
 import { resolveRoleLandingRoute } from '../config/emergencyRoleNavigationModel';
 import useEmergencyDeviceContext from './useEmergencyDeviceContext';
 import useRouteScreenMode from './useRouteScreenMode';
@@ -113,36 +107,30 @@ export function useEmergencyRolePermissions() {
       canMutateSurface: (context = {}) =>
         canMutateEmergencySurface(role, { ...permissionContext, ...context }),
       presentAction: (actionOrPermission, context = {}) =>
-        presentEmergencyRoleAction(role, actionOrPermission, permissionsOverrides, {
+        presentEmergencyPermission(role, actionOrPermission, permissionsOverrides, {
           ...permissionContext,
           ...context,
         }),
       actionState: (actionOrPermission, context = {}) =>
-        resolveEmergencyRoleActionState(role, actionOrPermission, permissionsOverrides, {
+        presentEmergencyPermission(role, actionOrPermission, permissionsOverrides, {
           ...permissionContext,
           ...context,
-        }),
+        }).state,
       actionVisible: (actionOrPermission, context = {}) =>
-        isEmergencyActionVisible(
-          resolveEmergencyRoleActionState(role, actionOrPermission, permissionsOverrides, {
-            ...permissionContext,
-            ...context,
-          }),
-        ),
+        presentEmergencyPermission(role, actionOrPermission, permissionsOverrides, {
+          ...permissionContext,
+          ...context,
+        }).visible,
       actionEnabled: (actionOrPermission, context = {}) =>
-        isEmergencyActionEnabled(
-          resolveEmergencyRoleActionState(role, actionOrPermission, permissionsOverrides, {
-            ...permissionContext,
-            ...context,
-          }),
-        ),
+        presentEmergencyPermission(role, actionOrPermission, permissionsOverrides, {
+          ...permissionContext,
+          ...context,
+        }).enabled,
       actionReadOnly: (actionOrPermission, context = {}) =>
-        isEmergencyActionReadOnly(
-          resolveEmergencyRoleActionState(role, actionOrPermission, permissionsOverrides, {
-            ...permissionContext,
-            ...context,
-          }),
-        ),
+        presentEmergencyPermission(role, actionOrPermission, permissionsOverrides, {
+          ...permissionContext,
+          ...context,
+        }).readOnly,
       switchDemoRole: (nextRole) => {
         const normalizedRole = normalizeEmergencyRole(nextRole);
         setUser({

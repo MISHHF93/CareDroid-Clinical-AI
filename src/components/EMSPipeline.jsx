@@ -294,16 +294,21 @@ export default function EMSPipeline() {
   const incomingSectionRef = useRef(null);
   const receivingSectionRef = useRef(null);
   const offloadSectionRef = useRef(null);
+  const prepareBayPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.prepareEmsBay);
+  const convertPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
   const canPrepareBay =
-    emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay) &&
+    prepareBayPresentation.visible &&
+    prepareBayPresentation.enabled &&
     (!ems.isEmsScreen || ems.canPrepareEmsBay);
   const canConvert =
-    emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival) &&
+    convertPresentation.visible &&
+    convertPresentation.enabled &&
     (!ems.isEmsScreen || ems.canConvertArrival);
-  const canCompleteHandoff =
-    emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.completeEmsHandoff) &&
-    (!ems.isEmsScreen || ems.canCompleteHandoff);
   const handoffPresentation = emergencyRole.presentAction(EMERGENCY_ROLE_ACTIONS.completeEmsHandoff);
+  const canCompleteHandoff =
+    handoffPresentation.visible &&
+    handoffPresentation.enabled &&
+    (!ems.isEmsScreen || ems.canCompleteHandoff);
   const showInboundSection = !ems.isEmsScreen || ems.showInboundAmbulances;
   const showReceivingSection = !ems.isEmsScreen || ems.showReceivingArea;
   const showOffloadSection = !ems.isEmsScreen || ems.showOffloadTimers;

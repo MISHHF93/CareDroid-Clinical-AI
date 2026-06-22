@@ -168,8 +168,10 @@ export default function EMSCriticalBroadcast() {
   const isCollapsed = Boolean(collapsedArrivalIds[arrival.id]);
   const isChecklistExpanded = !isPrepComplete && !isCollapsed;
   const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
-  const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
-  const canConvert = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
+  const prepareBayPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.prepareEmsBay);
+  const convertPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
+  const canPrepareBay = prepareBayPresentation.visible && prepareBayPresentation.enabled;
+  const canConvert = convertPresentation.visible && convertPresentation.enabled;
 
   const toggleItem = (item, checked) => {
     if (!canPrepareBay) return;

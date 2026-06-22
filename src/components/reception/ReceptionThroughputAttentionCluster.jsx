@@ -2,6 +2,7 @@ import React from 'react';
 import TriageBreachStrip from '../triage/TriageBreachStrip';
 import LwbsRiskStrip from '../waiting-room/LwbsRiskStrip';
 import DeteriorationWatchStrip from '../waiting-room/DeteriorationWatchStrip';
+import WaitingRoomSafetyEscalationStrip from '../waiting-room/WaitingRoomSafetyEscalationStrip';
 import QueueReasonAttentionStrip from '../queues/QueueReasonAttentionStrip';
 import EmsOffloadAttentionStrip from '../ems/EmsOffloadAttentionStrip';
 import './ReceptionThroughputAttentionCluster.css';
@@ -18,6 +19,8 @@ export default function ReceptionThroughputAttentionCluster({
   rooms = [],
   workflowLogs = [],
   emergencySettings = null,
+  alerts = [],
+  showSafetyEscalation = true,
   onSelectPatient,
   onSelectEmsArrival,
   className = '',
@@ -61,6 +64,19 @@ export default function ReceptionThroughputAttentionCluster({
           onSelectPatient={onSelectPatient}
           className="reception-throughput-cluster__strip"
         />
+        {showSafetyEscalation ? (
+          <WaitingRoomSafetyEscalationStrip
+            patients={patients}
+            workflowLogs={workflowLogs}
+            staff={staff}
+            alerts={alerts}
+            communicationOverdueMinutes={
+              Number(emergencySettings?.thresholds?.communicationOverdueMinutes ?? 30) || 30
+            }
+            onSelectPatient={onSelectPatient}
+            className="reception-throughput-cluster__strip"
+          />
+        ) : null}
         <QueueReasonAttentionStrip
           patients={patients}
           referrals={referrals}

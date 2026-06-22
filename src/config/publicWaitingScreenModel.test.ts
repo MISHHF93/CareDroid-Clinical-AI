@@ -21,12 +21,14 @@ describe('publicWaitingScreenModel', () => {
     });
 
     expect(waiting.isPublicWaitingScreen).toBe(true);
+    expect(waiting.isKioskMode).toBe(true);
     expect(waiting.showWaitRange).toBe(true);
     expect(waiting.showCrowdLevel).toBe(true);
     expect(waiting.showTriageWait).toBe(true);
     expect(waiting.showCareProcessStages).toBe(true);
     expect(waiting.showPatientGuidance).toBe(true);
     expect(waiting.showSymptomEscalation).toBe(true);
+    expect(waiting.showEmsCrowdingImpact).toBe(true);
     expect(waiting.visibleOperationalSurfaces).toEqual([
       PUBLIC_WAITING_SCREEN_WIDGETS.waitRange,
       PUBLIC_WAITING_SCREEN_WIDGETS.crowdLevel,
@@ -34,6 +36,7 @@ describe('publicWaitingScreenModel', () => {
       PUBLIC_WAITING_SCREEN_WIDGETS.careProcessStages,
       PUBLIC_WAITING_SCREEN_WIDGETS.patientGuidance,
       PUBLIC_WAITING_SCREEN_WIDGETS.symptomEscalation,
+      PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact,
     ]);
     expect(waiting.defaultFocus).toBe(PUBLIC_WAITING_SCREEN_WIDGETS.waitRange);
     expect(waiting.defaultLandingRoute).toContain('display=waiting-room');

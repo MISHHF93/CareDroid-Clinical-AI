@@ -74,29 +74,42 @@ describe('commandCenterThroughputModel', () => {
 
     expect(snapshot.hourlyArrivals).toHaveLength(2);
     expect(snapshot.peakHourLabel).toContain('09:00');
-    expect(snapshot.metrics.find((metric) => metric.id === 'waiting-room-occupancy')?.value).toBe('2 / 24');
+    expect(snapshot.trendIndicators.length).toBeGreaterThan(0);
+    expect(snapshot.metrics.find((metric) => metric.id === 'provider-awaiting')).toBeTruthy();
+    expect(snapshot.metrics.find((metric) => metric.id === 'provider-breached')).toBeTruthy();
+    expect(snapshot.metrics.find((metric) => metric.id === 'waiting-count')?.value).toBe(2);
+    expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')).toBeTruthy();
+    expect(snapshot.metrics.find((metric) => metric.id === 'capacity-score')?.value).toBe('82 · Orange');
+    expect(snapshot.metrics.find((metric) => metric.id === 'crowd-level')).toBeTruthy();
     expect(snapshot.metrics.find((metric) => metric.id === 'referrals-backlog')?.value).toBe(1);
     expect(snapshot.crowdingForecast.available).toBe(true);
-    expect(snapshot.crowdingForecast.label).toBe('Amber');
+    expect(snapshot.crowdLevel.staffLabel).toBeTruthy();
+    expect(snapshot.crowdingForecast.label).toBe(snapshot.crowdLevel.staffLabel);
+    expect(snapshot.crowdingForecast.detail).toContain('BRAG peak Amber');
     expect(snapshot.systemHealth.label).toBe('Data fresh');
     expect(snapshot.summaryLine).toContain('waiting');
   });
 
   it('falls back when crowding forecast is unavailable', () => {
+    const now = new Date('2026-06-20T12:00:00.000Z');
     const snapshot = buildCommandCenterThroughputSnapshot({
-      patients: [buildPatient()],
+      now,
+      patients: [buildPatient({ arrivalTime: now.toISOString(), triageTime: now.toISOString() })],
       capacity: {
         score: 40,
         band: 'Green',
-        updatedAt: new Date().toISOString(),
+        updatedAt: now.toISOString(),
         totalPatients: 1,
         occupiedRooms: 8,
         boardingCount: 0,
         reassessmentDue: 0,
+        waitingCount: 1,
+        averageWaitMinutes: 10,
       },
     });
 
     expect(snapshot.crowdingForecast.available).toBe(true);
-    expect(snapshot.crowdingForecast.label).toContain('Green');
+    expect(snapshot.crowdLevel.id).toBe('LOW');
+    expect(snapshot.crowdingForecast.label).toBe('LOW');
   });
 });

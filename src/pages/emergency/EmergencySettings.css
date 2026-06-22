@@ -536,3 +536,20 @@
     transform: none;
   }
 }
+
+.emergency-settings__screen-mode-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 12px;
+  background: var(--color-card, #172033);
+}
+
+.emergency-settings__screen-mode-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}

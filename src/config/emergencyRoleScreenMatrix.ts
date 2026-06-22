@@ -16,6 +16,7 @@ import {
   resolveDeviceContextScreenMode,
   type EmergencyDeviceContextId,
 } from './emergencyDeviceContextModel';
+import { coerceScreenModeForRole } from './emergencyScreenModeAccessModel';
 
 /** Stable ED role ids — kept local to avoid circular imports with emergencyRolePermissions.js */
 export const EMERGENCY_ROLE_ID = Object.freeze({
@@ -27,6 +28,7 @@ export const EMERGENCY_ROLE_ID = Object.freeze({
   registrationClerk: 'registration_clerk',
   emsUser: 'ems_user',
   readOnlyViewer: 'read_only_viewer',
+  publicDisplay: 'public_display',
 });
 
 export type EmergencyRoleId = (typeof EMERGENCY_ROLE_ID)[keyof typeof EMERGENCY_ROLE_ID];
@@ -55,6 +57,7 @@ export const DEFAULT_SCREEN_MODE_BY_ROLE: Record<EmergencyRoleId, CareDroidScree
     [EMERGENCY_ROLE_ID.edManager]: CARE_DROID_SCREEN_MODES.commandCenter,
     [EMERGENCY_ROLE_ID.admin]: CARE_DROID_SCREEN_MODES.admin,
     [EMERGENCY_ROLE_ID.readOnlyViewer]: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
+    [EMERGENCY_ROLE_ID.publicDisplay]: CARE_DROID_SCREEN_MODES.publicWaiting,
   });
 
 export const ED_PERSONA_TO_ROLE: Record<keyof typeof ED_PERSONA_LABELS, EmergencyRoleId> =
@@ -98,6 +101,11 @@ export function isPublicDisplayPersona(role: string | null | undefined): boolean
 export type EmergencyScreenSettings = {
   defaultScreenMode?: string;
   enabledScreenModes?: string[];
+  allowedRolesByScreenMode?: Partial<Record<string, string[]>>;
+  publicDisplayPrivacy?: string | null;
+  wallDisplayMonitorPrivacy?: string | null;
+  wallDisplayRefreshInterval?: number;
+  screenModeKpiVisibility?: Partial<Record<string, readonly string[]>>;
   readOnlyDisplayMode?: boolean;
   commandCenterMode?: boolean;
 };
@@ -236,44 +244,57 @@ export function resolveEmergencyScreenMode(input: ResolveEmergencyScreenModeInpu
   const settings = input.emergencySettings || {};
   const enabledModes = settings.enabledScreenModes?.length
     ? settings.enabledScreenModes
-    : CARE_DROID_SCREEN_MODE_OPTIONS;
+        .map((entry) => normalizeCareDroidScreenMode(entry))
+        .filter((entry): entry is CareDroidScreenMode => Boolean(entry))
+    : [...CARE_DROID_SCREEN_MODE_OPTIONS];
+  const role = input.role || EMERGENCY_ROLE_ID.physician;
+  const roleAccessSettings = {
+    allowedRolesByScreenMode: settings.allowedRolesByScreenMode,
+    enabledScreenModes: enabledModes,
+    defaultScreenMode: normalizeCareDroidScreenMode(settings.defaultScreenMode) || undefined,
+  };
+
+  const finalize = (
+    mode: CareDroidScreenMode,
+    options: { skipRoleCoercion?: boolean } = {},
+  ): CareDroidScreenMode => {
+    const enabled = coerceEnabledScreenMode(mode, enabledModes);
+    if (options.skipRoleCoercion) return enabled;
+    return coerceScreenModeForRole(enabled, role, roleAccessSettings);
+  };
 
   if (input.screenModeOverride && isValidScreenMode(input.screenModeOverride)) {
-    return coerceEnabledScreenMode(
-      normalizeCareDroidScreenMode(input.screenModeOverride)!,
-      enabledModes,
-    );
+    return finalize(normalizeCareDroidScreenMode(input.screenModeOverride)!);
   }
 
   const displayMode = resolveDisplayParamScreenMode(input.displayParam);
   if (displayMode) {
-    return coerceEnabledScreenMode(displayMode, enabledModes);
+    return finalize(displayMode, { skipRoleCoercion: true });
   }
 
   const deviceContextMode = resolveDeviceContextScreenMode(input.deviceContextId, settings);
   if (deviceContextMode) {
-    return deviceContextMode;
+    return finalize(deviceContextMode, { skipRoleCoercion: true });
   }
 
   if (isPublicDisplayPersona(input.role)) {
-    return coerceEnabledScreenMode(CARE_DROID_SCREEN_MODES.publicWaiting, enabledModes);
+    return finalize(CARE_DROID_SCREEN_MODES.publicWaiting);
   }
 
   if (settings.readOnlyDisplayMode || input.readOnly) {
-    return coerceEnabledScreenMode(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, enabledModes);
+    return finalize(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, { skipRoleCoercion: true });
   }
 
   const pathname = input.pathname || '';
-  const role = input.role || EMERGENCY_ROLE_ID.physician;
   const routeMode = pathname
     ? resolveRouteScreenMode(pathname, role, settings, input.queueParam)
     : null;
 
   if (routeMode) {
-    return coerceEnabledScreenMode(routeMode, enabledModes);
+    return finalize(routeMode);
   }
 
-  return coerceEnabledScreenMode(getDefaultScreenModeForRole(role), enabledModes);
+  return finalize(getDefaultScreenModeForRole(role));
 }
 
 export function isPublicDisplayScreenMode(screenMode: CareDroidScreenMode): boolean {

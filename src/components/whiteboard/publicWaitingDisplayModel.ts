@@ -10,17 +10,43 @@ import {
   PUBLIC_WAITING_ESCALATION_MESSAGE,
   type WaitingRoomStatusMessagingSnapshot,
 } from '../../services/waitingRoomStatusMessaging';
+import { buildCrowdLevelSnapshot, type CrowdLevelTone } from '../../engine/crowdLevelEngine';
+import {
+  buildWaitingRoomProcessEducationSnapshot,
+  type WaitingRoomProcessEducationSnapshot,
+} from '../../services/waitingRoomProcessEducation';
+import {
+  PUBLIC_WAIT_URGENCY_DISCLAIMER,
+  buildSafeWaitRangeMessage,
+} from '../../engine/safeWaitRangeMessaging';
+import {
+  buildPublicEmsCrowdingImpact,
+  type PublicEmsCrowdingImpact,
+} from '../../services/emsOffloadVisibilityModel';
+import {
+  assertDisplayPayloadIsPhiSafe,
+  collectDisplayPhiTokens,
+} from '../../config/displayPhiRedaction';
+import type { EMSArrival } from '../../types/emergency';
+
+export {
+  PUBLIC_WAIT_URGENCY_DISCLAIMER,
+  formatPublicWaitDuration,
+  formatPublicWaitRange,
+} from '../../engine/safeWaitRangeMessaging';
 
 export { PUBLIC_WAITING_ESCALATION_MESSAGE } from '../../services/waitingRoomStatusMessaging';
 
 export const PUBLIC_WAITING_GUIDANCE_MESSAGES = Object.freeze([
   'Please remain in the waiting area until you are called.',
   'Wait times vary — patients with the most urgent needs are seen first.',
+  'This screen shows general department information only, not your personal care status.',
+  'If your symptoms worsen, tell staff immediately or ask for help at the desk.',
   'You may be asked to move to a different chair or room for care.',
   'Ask staff if you need help with restrooms, water, or comfort items.',
 ]);
 
-export type PublicWaitingTone = 'stable' | 'info' | 'watch' | 'warning' | 'critical';
+export type PublicWaitingTone = CrowdLevelTone;
 
 export type PublicWaitingCrowdLevel = {
   label: string;
@@ -35,13 +61,16 @@ export type PublicWaitingCareStage = {
 };
 
 export type PublicWaitingDisplaySnapshot = {
-  waitRange: { label: string; value: string; detail: string };
+  waitRange: { label: string; value: string; detail: string; disclaimer: string };
   crowdLevel: PublicWaitingCrowdLevel;
-  triageWait: { label: string; value: string; detail: string; available: boolean };
+  triageWait: { label: string; value: string; detail: string; available: boolean; disclaimer: string };
   careStages: PublicWaitingCareStage[];
+  processEducation: WaitingRoomProcessEducationSnapshot;
   statusMessaging: WaitingRoomStatusMessagingSnapshot;
   guidanceMessages: readonly string[];
   escalationMessage: string;
+  waitDisclaimer: string;
+  emsCrowdingImpact: PublicEmsCrowdingImpact;
   summaryLine: string;
   updatedAt: string | null;
 };
@@ -53,52 +82,28 @@ function minutesSince(timestamp: string | null | undefined, now: Date): number {
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatPublicWaitDuration(minutes: number): string {
-  if (!Number.isFinite(minutes) || minutes <= 0) return '—';
-  if (minutes < 60) return `${minutes} min`;
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return remainder ? `${hours} hr ${remainder} min` : `${hours} hr`;
-}
-
-export function formatPublicWaitRange(avgMinutes: number, longestMinutes: number): string {
-  if (!avgMinutes && !longestMinutes) return 'Updating';
-  const avg = avgMinutes || longestMinutes;
-  const longest = longestMinutes || avgMinutes;
-  if (longest <= avg + 5) return `About ${formatPublicWaitDuration(avg)}`;
-  return `${formatPublicWaitDuration(avg)} – ${formatPublicWaitDuration(longest)}`;
-}
-
 export function derivePublicCrowdLevel(
   waitingCount: number,
   capacityBand?: string,
 ): PublicWaitingCrowdLevel {
-  const band = capacityBand || 'Green';
-  if (band === 'Red' || waitingCount >= 20) {
-    return {
-      label: 'Very busy',
-      tone: 'critical',
-      detail: 'The department is under high demand right now.',
-    };
-  }
-  if (band === 'Orange' || waitingCount >= 12) {
-    return {
-      label: 'Busy',
-      tone: 'warning',
-      detail: 'More patients than usual are waiting.',
-    };
-  }
-  if (band === 'Yellow' || waitingCount >= 6) {
-    return {
-      label: 'Moderate',
-      tone: 'watch',
-      detail: 'Typical waiting-room activity.',
-    };
-  }
+  const crowd = buildCrowdLevelSnapshot({
+    audience: 'public',
+    patients: [],
+    capacity: {
+      waitingCount,
+      band: (capacityBand as CapacitySnapshot['band']) || 'Green',
+      score: 0,
+      updatedAt: new Date().toISOString(),
+      totalPatients: waitingCount,
+      occupiedRooms: 0,
+      boardingCount: 0,
+      reassessmentDue: 0,
+    },
+  });
   return {
-    label: 'Calm',
-    tone: 'stable',
-    detail: 'Lower-than-usual waiting room activity.',
+    label: crowd.label,
+    tone: crowd.tone,
+    detail: crowd.detail,
   };
 }
 
@@ -122,6 +127,9 @@ export function buildPublicWaitingDisplaySnapshot(
     patients?: Patient[];
     capacity?: CapacitySnapshot;
     referrals?: Referral[];
+    emsArrivals?: EMSArrival[];
+    showEmsCrowdingImpact?: boolean;
+    offloadTargetMinutes?: number;
     now?: Date;
     updatedAt?: string | null;
   } = {},
@@ -152,13 +160,28 @@ export function buildPublicWaitingDisplaySnapshot(
       0,
     );
 
+  const clinicianWait = buildSafeWaitRangeMessage({
+    avgMinutes: avgWait,
+    longestMinutes: longestWait,
+  });
   const waitRange = {
-    label: 'Estimated average wait range',
-    value: formatPublicWaitRange(avgWait, longestWait),
-    detail: 'Typical wait to see a clinician — varies by patient needs',
+    label: 'Estimated wait range',
+    value: clinicianWait.value,
+    detail: clinicianWait.detail,
+    disclaimer: clinicianWait.disclaimer,
   };
 
-  const crowdLevel = derivePublicCrowdLevel(waitingCount, capacity?.band);
+  const crowdSnapshot = buildCrowdLevelSnapshot({
+    audience: 'public',
+    patients,
+    capacity,
+    now,
+  });
+  const crowdLevel = {
+    label: crowdSnapshot.label,
+    tone: crowdSnapshot.tone,
+    detail: crowdSnapshot.detail,
+  };
 
   const arrivalControl = buildArrivalControlSummary(patients);
   const triagePendingCount = Math.max(
@@ -183,26 +206,49 @@ export function buildPublicWaitingDisplaySnapshot(
     count: line.count,
   }));
 
+  const processEducation = buildWaitingRoomProcessEducationSnapshot('patient');
+
+  const emsCrowdingImpact = buildPublicEmsCrowdingImpact(input.emsArrivals || [], {
+    enabled: input.showEmsCrowdingImpact !== false,
+    patients,
+    now,
+    offloadTargetMinutes: input.offloadTargetMinutes ?? 15,
+  });
+
+  const triageWaitMessage = triageWaitAvailable
+    ? buildSafeWaitRangeMessage({ minutes: avgTriageWait! })
+    : null;
+
   const summaryLine = triageWaitAvailable
-    ? `${crowdLevel.label} waiting room · ${waitRange.value} estimated clinician wait`
+    ? `${crowdLevel.label} waiting room · typical clinician wait ${waitRange.value}`
     : `${crowdLevel.label} waiting room · care teams are actively moving patients forward`;
 
   return {
     waitRange,
     crowdLevel,
     triageWait: {
-      label: 'Average wait to triage',
-      value: triageWaitAvailable ? formatPublicWaitDuration(avgTriageWait!) : 'Not available',
-      detail: triageWaitAvailable
-        ? 'Typical time until triage nurse assessment'
-        : 'No triage queue estimate at this time',
+      label: 'Estimated wait to triage',
+      value: triageWaitMessage?.value ?? 'Not available',
+      detail: triageWaitMessage?.detail ?? 'No triage queue estimate at this time',
+      disclaimer: triageWaitMessage?.disclaimer ?? PUBLIC_WAIT_URGENCY_DISCLAIMER,
       available: triageWaitAvailable,
     },
     careStages,
+    processEducation,
     statusMessaging,
     guidanceMessages: PUBLIC_WAITING_GUIDANCE_MESSAGES,
     escalationMessage: statusMessaging.escalationMessage,
+    waitDisclaimer: PUBLIC_WAIT_URGENCY_DISCLAIMER,
+    emsCrowdingImpact,
     summaryLine,
     updatedAt: input.updatedAt ?? capacity?.updatedAt ?? null,
   };
+}
+
+/** Validates that a public waiting display snapshot contains no patient PHI. */
+export function assertPublicWaitingDisplaySnapshotIsPhiSafe(
+  snapshot: PublicWaitingDisplaySnapshot,
+  sourcePatients: Patient[] = [],
+): boolean {
+  return assertDisplayPayloadIsPhiSafe(snapshot, collectDisplayPhiTokens(sourcePatients));
 }

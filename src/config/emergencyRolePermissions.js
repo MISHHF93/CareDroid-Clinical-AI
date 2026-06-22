@@ -40,6 +40,7 @@ export const EMERGENCY_ROLE_IDS = Object.freeze({
   registrationClerk: 'registration_clerk',
   emsUser: 'ems_user',
   readOnlyViewer: 'read_only_viewer',
+  publicDisplay: 'public_display',
 });
 
 export const EMERGENCY_ROLE_LABELS = Object.freeze({
@@ -50,7 +51,8 @@ export const EMERGENCY_ROLE_LABELS = Object.freeze({
   [EMERGENCY_ROLE_IDS.physician]: 'Physician',
   [EMERGENCY_ROLE_IDS.registrationClerk]: 'Registration Clerk',
   [EMERGENCY_ROLE_IDS.emsUser]: 'EMS User',
-  [EMERGENCY_ROLE_IDS.readOnlyViewer]: 'Read-Only Viewer',
+  [EMERGENCY_ROLE_IDS.readOnlyViewer]: 'Read-Only Display',
+  [EMERGENCY_ROLE_IDS.publicDisplay]: 'Public Display',
 });
 
 export const EMERGENCY_ACTIONS = Object.freeze({
@@ -333,26 +335,18 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.readOnlyViewer,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.readOnlyViewer],
-    description: 'Observer role with Emergency OS visibility and no mutating actions.',
-    routes: [
-      ROUTES.reception,
-      ROUTES.whiteboard,
-      ROUTES.patients,
-      ROUTES.ems,
-      ROUTES.intake,
-      ROUTES.queues,
-      ROUTES.reassessment,
-      ROUTES.capacity,
-      ROUTES.boarding,
-      ROUTES.referrals,
-      ROUTES.copilot,
-      ROUTES.tools,
-      ROUTES.platform,
-      ROUTES.integrations,
-      ROUTES.cosmos,
-      ROUTES.analytics,
-    ],
-    actions: [EMERGENCY_ACTIONS.viewAnalytics],
+    description: 'Read-only hallway and departmental wall displays with no mutating actions.',
+    routes: [ROUTES.whiteboard, ROUTES.analytics],
+    actions: [EMERGENCY_ACTIONS.viewAnalytics, EMERGENCY_ACTIONS.displayWhiteboardReadonly],
+    defaultRoute: ROUTES.whiteboard,
+    readOnly: true,
+  }),
+  [EMERGENCY_ROLE_IDS.publicDisplay]: Object.freeze({
+    id: EMERGENCY_ROLE_IDS.publicDisplay,
+    label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.publicDisplay],
+    description: 'Public waiting-room display — aggregate status only, no staff actions.',
+    routes: [ROUTES.whiteboard],
+    actions: [EMERGENCY_ACTIONS.displayPublicWaitboard, EMERGENCY_ACTIONS.displayPublicPublish],
     defaultRoute: ROUTES.whiteboard,
     readOnly: true,
   }),
@@ -404,8 +398,12 @@ const ROLE_ALIASES = Object.freeze({
   'read-only viewer': EMERGENCY_ROLE_IDS.readOnlyViewer,
   read_only_viewer: EMERGENCY_ROLE_IDS.readOnlyViewer,
   readonly: EMERGENCY_ROLE_IDS.readOnlyViewer,
-  'public display': EMERGENCY_ROLE_IDS.readOnlyViewer,
-  'waiting room display': EMERGENCY_ROLE_IDS.readOnlyViewer,
+  'read-only display': EMERGENCY_ROLE_IDS.readOnlyViewer,
+  'read only display': EMERGENCY_ROLE_IDS.readOnlyViewer,
+  'public display': EMERGENCY_ROLE_IDS.publicDisplay,
+  'waiting room display': EMERGENCY_ROLE_IDS.publicDisplay,
+  'public waiting display': EMERGENCY_ROLE_IDS.publicDisplay,
+  public_display: EMERGENCY_ROLE_IDS.publicDisplay,
 });
 
 export function normalizeEmergencyRole(role) {

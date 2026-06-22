@@ -18,6 +18,8 @@ describe('triageWorkflowModel', () => {
 
     expect(byId['triage-pending'].value).toBeGreaterThanOrEqual(1);
     expect(byId['longest-untriaged-wait'].value).not.toBe('—');
+    expect(byId['triage-breach-approaching']).toBeTruthy();
+    expect(byId['triage-breached']).toBeTruthy();
     expect(byId['rapid-review-flags'].value).toBeGreaterThanOrEqual(0);
   });
 

@@ -114,6 +114,117 @@
   gap: 12px;
 }
 
+.command-center-throughput--performance {
+  min-height: 100%;
+  padding: clamp(18px, 2.5vw, 28px) clamp(20px, 3vw, 32px) clamp(24px, 3vw, 36px);
+  gap: clamp(16px, 2vw, 24px);
+}
+
+.command-center-throughput--performance .command-center-throughput__header h2 {
+  font-size: clamp(26px, 3.5vw, 38px);
+}
+
+.command-center-throughput--performance .command-center-throughput__summary {
+  font-size: clamp(15px, 1.8vw, 18px);
+}
+
+.command-center-throughput--performance .command-center-throughput__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.command-center-throughput--performance .command-center-throughput__value {
+  font-size: clamp(28px, 4vw, 44px);
+}
+
+.command-center-throughput__tile-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.command-center-throughput__metric-trend {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.command-center-throughput__metric-trend[data-direction='up'] {
+  color: #fbbf24;
+}
+
+.command-center-throughput__metric-trend[data-direction='down'] {
+  color: #34d399;
+}
+
+.command-center-throughput__trends {
+  display: grid;
+  gap: 12px;
+}
+
+.command-center-throughput__trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.command-center-throughput__trend-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #0b1220;
+}
+
+.command-center-throughput__trend-direction {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+  color: #93c5fd;
+}
+
+.command-center-throughput__trend-card[data-tone='warning'] .command-center-throughput__trend-direction,
+.command-center-throughput__trend-card[data-tone='critical'] .command-center-throughput__trend-direction {
+  color: #fbbf24;
+}
+
+.command-center-throughput__trend-card[data-tone='stable'] .command-center-throughput__trend-direction {
+  color: #34d399;
+}
+
+.command-center-throughput__trend-value {
+  display: block;
+  font-size: 20px;
+  color: #f8fafc;
+}
+
+.command-center-throughput__trend-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.command-center-throughput__trend-detail {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+@media (max-width: 899px) {
+  .command-center-throughput--performance .command-center-throughput__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .command-center-throughput__tile {
   display: grid;
   gap: 6px;

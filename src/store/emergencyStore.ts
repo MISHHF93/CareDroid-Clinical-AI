@@ -2242,6 +2242,9 @@ type EmergencyOsSettings = {
   commandCenterMode: boolean;
   wallDisplayRefreshInterval: number;
   wallDisplayMonitorPrivacy: 'operational' | 'restricted' | 'minimal';
+  publicDisplayPrivacy: 'standard' | 'minimal';
+  allowedRolesByScreenMode: Partial<Record<string, string[]>>;
+  screenModeKpiVisibility: Partial<Record<string, string[]>>;
   enabledModules: Array<{ id: string; label: string; enabled: boolean }>;
   aiSettings: Record<string, string | boolean>;
   integrationSettings: Record<string, string | boolean>;
@@ -2513,6 +2516,9 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
   commandCenterMode: true,
   wallDisplayRefreshInterval: 30000,
   wallDisplayMonitorPrivacy: 'operational',
+  publicDisplayPrivacy: 'standard',
+  allowedRolesByScreenMode: {},
+  screenModeKpiVisibility: {},
   enabledModules: DEFAULT_EMERGENCY_MODULES.map((module) => ({ ...module })),
   aiSettings: {
     enabled: true,

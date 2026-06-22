@@ -22,6 +22,7 @@ describe('readOnlyWhiteboardScreenModel', () => {
     });
 
     expect(readOnly.isReadOnlyWhiteboardScreen).toBe(true);
+    expect(readOnly.isKioskMode).toBe(true);
     expect(readOnly.showWaitingCount).toBe(true);
     expect(readOnly.showLongestWait).toBe(true);
     expect(readOnly.showTriagePending).toBe(true);

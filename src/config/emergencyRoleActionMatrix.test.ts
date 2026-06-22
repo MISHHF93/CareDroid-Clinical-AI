@@ -124,6 +124,21 @@ describe('emergencyRoleActionMatrix', () => {
   it('keeps public display role read-only for publish and hides mutations', () => {
     expect(
       resolveEmergencyRoleActionState(
+        EMERGENCY_ROLE_ID.publicDisplay,
+        EMERGENCY_ROLE_ACTIONS.publicDisplayPublish,
+      ),
+    ).toBe('readonly');
+    expect(
+      resolveEmergencyRoleActionState(
+        EMERGENCY_ROLE_ID.publicDisplay,
+        EMERGENCY_ROLE_ACTIONS.patientCreate,
+      ),
+    ).toBe('hidden');
+  });
+
+  it('keeps read-only display role read-only for publish and hides mutations', () => {
+    expect(
+      resolveEmergencyRoleActionState(
         EMERGENCY_ROLE_ID.readOnlyViewer,
         EMERGENCY_ROLE_ACTIONS.publicDisplayPublish,
       ),

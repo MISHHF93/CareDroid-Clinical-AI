@@ -254,12 +254,22 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'trackmind-workspace',
+    label: 'TrackMind Workspace',
+    mobileLabel: 'Workspace',
+    path: CANONICAL_ROUTES.trackMindWorkspace,
+    matchPaths: [CANONICAL_ROUTES.trackMindWorkspace],
+    showInMobile: true,
+    trackMindPermission: 'trackmind.workspace.view',
+  },
+  {
     id: 'trackmind-maturity',
     label: 'TrackMind Maturity',
     mobileLabel: 'TrackMind',
     path: CANONICAL_ROUTES.trackMindMaturity,
     matchPaths: [CANONICAL_ROUTES.trackMindMaturity],
     showInMobile: false,
+    trackMindPermission: 'trackmind.maturity.view',
   },
   {
     id: 'enterprise-platform',
@@ -268,6 +278,7 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     path: CANONICAL_ROUTES.enterprisePlatform,
     matchPaths: [CANONICAL_ROUTES.enterprisePlatform],
     showInMobile: false,
+    trackMindPermission: 'trackmind.enterprise.view',
   },
   {
     id: 'platform-intelligence',
@@ -276,6 +287,7 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     path: CANONICAL_ROUTES.platformIntelligence,
     matchPaths: [CANONICAL_ROUTES.platformIntelligence],
     showInMobile: false,
+    trackMindPermission: 'trackmind.intelligence.view',
   },
   {
     id: 'customer-success',

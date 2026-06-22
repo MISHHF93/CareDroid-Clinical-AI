@@ -322,12 +322,13 @@ export default function WaitingRoomSafetyBoard({
                       <StatusBadge
                         label={row.queueReasonPrimaryLabel}
                         tone={
-                          row.queueReasonPrimaryId === 'reassessment-pending'
-                            ? 'critical'
-                            : row.queueReasonPrimaryId === 'verification-incomplete' ||
-                                row.queueReasonPrimaryId === 'registration-incomplete' ||
-                                row.queueReasonPrimaryId === 'triage-pending'
-                              ? 'warning'
+                          row.queueReasonPrimaryId === 'verification-incomplete' ||
+                          row.queueReasonPrimaryId === 'triage-pending' ||
+                          row.queueReasonPrimaryId === 'provider-pending'
+                            ? 'warning'
+                            : row.queueReasonPrimaryId === 'discharge-paperwork-pending' ||
+                                row.queueReasonPrimaryId === 'admission-bed-pending'
+                              ? 'info'
                               : 'info'
                         }
                         title={[

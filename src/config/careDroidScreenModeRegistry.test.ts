@@ -77,7 +77,8 @@ describe('careDroidScreenModeRegistry', () => {
     const commandCenter = getScreenModeDefinition(CARE_DROID_SCREEN_MODES.commandCenter)!;
     expect(commandCenter.defaultFocus).toBe('arrivals-by-hour');
     expect(isScreenWidgetVisible(commandCenter.id, 'arrivals-by-hour')).toBe(true);
-    expect(isScreenWidgetVisible(commandCenter.id, 'waiting-room-occupancy')).toBe(true);
+    expect(isScreenWidgetVisible(commandCenter.id, 'waiting-count')).toBe(true);
+    expect(isScreenWidgetVisible(commandCenter.id, 'longest-wait')).toBe(true);
     expect(isScreenWidgetVisible(commandCenter.id, 'avg-wait-triage')).toBe(true);
     expect(isScreenWidgetVisible(commandCenter.id, 'avg-wait-provider')).toBe(true);
     expect(isScreenWidgetVisible(commandCenter.id, 'ems-offload-delays')).toBe(true);

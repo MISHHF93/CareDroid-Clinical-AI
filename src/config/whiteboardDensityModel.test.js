@@ -89,8 +89,22 @@ describe('whiteboardDensityModel', () => {
 
     expect(density.surfaces.publicWaitingScreen.visible).toBe(true);
     expect(density.surfaces.departmentStatusScreen.visible).toBe(false);
+    expect(density.surfaces.heroTitle.visible).toBe(false);
     expect(density.surfaces.patientGrid.visible).toBe(false);
     expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
+  });
+
+  it('hides staff hero on read-only whiteboard kiosk display', () => {
+    const density = evaluateWhiteboardDensity({
+      displayMode: true,
+      publicWaitingDisplay: false,
+      waitingPatients: 12,
+      totalPatients: 20,
+    });
+
+    expect(density.surfaces.departmentStatusScreen.visible).toBe(true);
+    expect(density.surfaces.heroTitle.visible).toBe(false);
+    expect(density.surfaces.patientGrid.visible).toBe(false);
   });
 
   it('uses command center throughput instead of patient grid for COMMAND_CENTER_SCREEN', () => {
@@ -155,5 +169,73 @@ describe('whiteboardDensityModel', () => {
     expect(report.progressiveDisclosure).toContain('command-layer');
     expect(report.stressScenario.hiddenUnderLoad).toBeGreaterThan(0);
     expect(report.mitigations.length).toBeGreaterThan(0);
+  });
+
+  it('keeps charge nurse operational surfaces visible under load via density profile', () => {
+    const density = evaluateWhiteboardDensity({
+      waitingPatients: 40,
+      emsArrivals: 5,
+      reassessmentsDue: 10,
+      referralsPending: 8,
+      totalPatients: 63,
+      densityProfile: {
+        whiteboard: {
+          preferOperationalStrips: true,
+          showMissionControl: true,
+          showQueueIntelligence: true,
+          showSecondaryStats: true,
+          showWaitingRoomSafety: true,
+          showAttentionStrips: true,
+          maxVisibleCards: 48,
+          gridMinCardWidth: 250,
+          gridGap: 10,
+        },
+      },
+      signals: {
+        emsAttention: true,
+        reassessAttention: true,
+        referralAttention: true,
+        chargeNurseStrip: true,
+        waitingRoomSafety: true,
+      },
+    });
+
+    expect(density.surfaces.missionControl.visible).toBe(true);
+    expect(density.surfaces.chargeNurseStrip.visible).toBe(true);
+    expect(density.surfaces.patientGrid.maxVisibleCards).toBe(48);
+  });
+
+  it('suppresses physician clutter surfaces via patient-clinical density profile', () => {
+    const density = evaluateWhiteboardDensity({
+      waitingPatients: 12,
+      emsArrivals: 1,
+      reassessmentsDue: 2,
+      referralsPending: 1,
+      totalPatients: 20,
+      densityProfile: {
+        whiteboard: {
+          preferOperationalStrips: false,
+          showMissionControl: false,
+          showQueueIntelligence: false,
+          showSecondaryStats: false,
+          showWaitingRoomSafety: false,
+          showAttentionStrips: false,
+          maxVisibleCards: 36,
+          gridMinCardWidth: 300,
+          gridGap: 14,
+        },
+      },
+      signals: {
+        emsAttention: true,
+        reassessAttention: true,
+        chargeNurseStrip: true,
+        waitingRoomSafety: true,
+      },
+    });
+
+    expect(density.surfaces.missionControl.visible).toBe(false);
+    expect(density.surfaces.queueIntelligence.visible).toBe(false);
+    expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
+    expect(density.surfaces.patientGrid.maxVisibleCards).toBe(36);
   });
 });

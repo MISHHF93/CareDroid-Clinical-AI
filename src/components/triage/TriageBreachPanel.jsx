@@ -1,14 +1,22 @@
 import React, { useMemo } from 'react';
-import { summarizeTriageBreachBoard } from '../../services/triageBreachTimer';
+import {
+  buildTriageBreachVisibilitySnapshot,
+  hasTriageBreachVisibilityActivity,
+} from '../../services/triageBreachVisibilityModel';
 import './TriageBreachBadge.css';
 
 export default function TriageBreachPanel({ patients = [], settings = null, className = '' }) {
-  const summary = useMemo(
-    () => summarizeTriageBreachBoard(patients, { settings: settings || undefined }),
+  const visibility = useMemo(
+    () =>
+      buildTriageBreachVisibilitySnapshot(patients, {
+        settings: settings ? { emergencySettings: settings } : undefined,
+      }),
     [patients, settings],
   );
 
-  if (!summary.awaitingTriageCount) return null;
+  if (!hasTriageBreachVisibilityActivity(visibility)) return null;
+
+  const { summary } = visibility;
 
   return (
     <section
@@ -19,25 +27,35 @@ export default function TriageBreachPanel({ patients = [], settings = null, clas
         <p className="triage-breach-panel__eyebrow">Arrival to triage</p>
         <h3>Triage breach timer</h3>
         <p className="triage-breach-panel__subtitle">
-          Target {summary.targetMinutes}m · breach risk from {summary.warningMinutes}m
+          Target {summary.targetMinutes}m · approaching from {summary.warningMinutes}m
         </p>
       </header>
       <div className="triage-breach-panel__grid">
         <div className="triage-breach-panel__metric" data-tone="neutral">
-          <strong>{summary.awaitingTriageCount}</strong>
+          <strong>{visibility.awaitingTriageCount}</strong>
           <span>Awaiting triage</span>
         </div>
+        <div
+          className="triage-breach-panel__metric"
+          data-tone={visibility.breachedCount ? 'critical' : 'neutral'}
+        >
+          <strong>{visibility.longestUntriagedWaitLabel}</strong>
+          <span>Longest untriaged wait</span>
+        </div>
         <div className="triage-breach-panel__metric" data-tone="watch">
-          <strong>{summary.breachRiskCount}</strong>
-          <span>Breach risk</span>
+          <strong>{visibility.approachingBreachCount}</strong>
+          <span>Approaching breach</span>
         </div>
         <div className="triage-breach-panel__metric" data-tone="critical">
-          <strong>{summary.breachedCount}</strong>
+          <strong>{visibility.breachedCount}</strong>
           <span>Breached</span>
         </div>
-        <div className="triage-breach-panel__metric" data-tone={summary.breachedCount ? 'critical' : 'neutral'}>
-          <strong>{summary.longestElapsedLabel}</strong>
-          <span>Longest elapsed</span>
+        <div
+          className="triage-breach-panel__metric"
+          data-tone={visibility.rapidReviewFlags ? 'watch' : 'neutral'}
+        >
+          <strong>{visibility.rapidReviewFlags}</strong>
+          <span>Rapid-review flags</span>
         </div>
       </div>
     </section>
