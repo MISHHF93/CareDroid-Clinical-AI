@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
-import type { Patient, ArrivalMode, PatientFlag, QuickSafetyFlag, HighRiskComplaintFlagId } from '../../types/emergency';
+import { PatientFlag, type Patient, type ArrivalMode, type QuickSafetyFlag, type HighRiskComplaintFlagId } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';

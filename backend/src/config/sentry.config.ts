@@ -13,9 +13,11 @@ export const initSentry = (): void => {
   const release = config.deployment.version || 'unknown';
 
   if (!dsn) {
-    console.warn(
-      'SENTRY_DSN not configured. Error tracking disabled. Set SENTRY_DSN environment variable to enable.',
-    );
+    if (environment === 'production') {
+      console.warn(
+        'SENTRY_DSN not configured. Error tracking disabled. Set SENTRY_DSN environment variable to enable.',
+      );
+    }
     return;
   }
 

@@ -28,10 +28,14 @@ export class FirebaseService implements OnModuleInit {
       const credentialsPath = firebaseConfig?.credentialsPath;
 
       if (!serviceAccount && !credentialsPath) {
-        this.logger.warn(
+        const message =
           'Firebase credentials not configured. Push notifications will fail. ' +
-            'Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.',
-        );
+          'Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.';
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(message);
+        } else {
+          this.logger.warn(message);
+        }
         return;
       }
 

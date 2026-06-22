@@ -6,7 +6,21 @@ import { fileURLToPath } from 'node:url';
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = resolve(rootDir, 'backend');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const useShell = process.platform === 'win32';
+
+const spawnDevProcess = (entry) => {
+  const options = {
+    cwd: entry.cwd,
+    env: entry.env,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true,
+  };
+
+  if (process.platform === 'win32') {
+    return spawn('cmd.exe', ['/d', '/s', '/c', `${entry.command} ${entry.args.join(' ')}`], options);
+  }
+
+  return spawn(entry.command, entry.args, options);
+};
 const rawArgs = process.argv.slice(2);
 const args = new Set(rawArgs);
 
@@ -160,13 +174,7 @@ console.log('');
 for (const entry of commands) {
   let child;
   try {
-    child = spawn(entry.command, entry.args, {
-      cwd: entry.cwd,
-      env: entry.env,
-      shell: useShell,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true,
-    });
+    child = spawnDevProcess(entry);
   } catch (error) {
     console.error(
       `[${entry.name}] failed to spawn ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`,

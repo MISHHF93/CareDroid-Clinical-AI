@@ -16,7 +16,12 @@ export class CacheService implements OnModuleInit {
   private async connect() {
     try {
       if (process.env.REDIS_ENABLED === 'false' || process.env.REDIS_ENABLED === '0') {
-        this.logger.warn('Redis disabled (REDIS_ENABLED=false). Cache service disabled.');
+        const message = 'Redis disabled (REDIS_ENABLED=false). Cache service disabled.';
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(message);
+        } else {
+          this.logger.warn(message);
+        }
         return;
       }
 

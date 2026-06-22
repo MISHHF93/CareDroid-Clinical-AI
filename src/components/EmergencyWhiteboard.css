@@ -739,10 +739,6 @@
   filter: brightness(1.08);
 }
 
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
 .emergency-whiteboard-page__mission-card,
 .emergency-whiteboard-page__arrival-card {
   border-color: var(--component-inner-surface-border) !important;

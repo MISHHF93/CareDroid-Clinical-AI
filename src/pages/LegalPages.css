@@ -95,7 +95,7 @@
 
 .legal-content code {
   background: var(--bg-primary, #0a0b0d);
-  padding: 0.2rem:4rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;

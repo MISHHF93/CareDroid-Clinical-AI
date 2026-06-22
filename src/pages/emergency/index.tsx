@@ -20,6 +20,7 @@ import {
   prefersReceptionForPatientCreate,
 } from '../../config/emergencyRolePermissions';
 import { isReceptionFirstUxEnabled } from '../../config/receptionFirstUx.config';
+import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import useTriageScreen from '../../hooks/useTriageScreen';

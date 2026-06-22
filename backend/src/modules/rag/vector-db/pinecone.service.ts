@@ -55,9 +55,13 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       const apiKey = pineconeConfig.apiKey;
 
       if (!apiKey) {
-        this.logger.warn(
-          'PINECONE_API_KEY is not configured. Vector database functionality will be disabled.',
-        );
+        const message =
+          'PINECONE_API_KEY is not configured. Vector database functionality will be disabled.';
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(message);
+        } else {
+          this.logger.warn(message);
+        }
         return; // Optional for development
       }
 

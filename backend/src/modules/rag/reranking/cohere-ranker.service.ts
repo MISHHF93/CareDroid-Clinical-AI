@@ -23,6 +23,8 @@ export class CohereRankerService {
 
     if (this.enabled) {
       this.logger.log(`Local reranking enabled with model: ${this.model}`);
+    } else if (process.env.NODE_ENV === 'development') {
+      this.logger.log('Reranking disabled. Set RERANK_ENABLED=true to enable local reranking.');
     } else {
       this.logger.warn('Reranking disabled. Set RERANK_ENABLED=true to enable local reranking.');
     }

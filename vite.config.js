@@ -1,7 +1,52 @@
-import { defineConfig, loadEnv } from 'vite';
+import { createLogger, defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
+
+const PROXY_REFUSED_LOG_INTERVAL_MS = 60_000;
+
+const createThrottledDevLogger = (proxyTarget) => {
+  const logger = createLogger();
+  const warn = logger.warn.bind(logger);
+  let lastProxyRefusedLogAt = 0;
+
+  logger.warn = (msg, options) => {
+    const text = typeof msg === 'string' ? msg : String(msg);
+    if (text.includes('http proxy error')) {
+      const now = Date.now();
+      if (now - lastProxyRefusedLogAt < PROXY_REFUSED_LOG_INTERVAL_MS) return;
+      lastProxyRefusedLogAt = now;
+      warn(
+        `API proxy could not reach ${proxyTarget} (ECONNREFUSED). ` +
+          'Start the backend with `npm run dev:api` or use `npm run dev:fullstack` for frontend + API.',
+        options,
+      );
+      return;
+    }
+    warn(msg, options);
+  };
+
+  return logger;
+};
+
+const backendHealthPlugin = (proxyTarget) => ({
+  name: 'care-backend-health',
+  configureServer(server) {
+    server.httpServer?.once('listening', () => {
+      void fetch(`${proxyTarget}/health`)
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        })
+        .catch(() => {
+          server.config.logger.warn(
+            `\nCareDroid API is not reachable at ${proxyTarget}.\n` +
+              '  Full stack: npm run dev:fullstack\n' +
+              '  API only:   npm run dev:api\n',
+          );
+        });
+    });
+  },
+});
 
 const readGitValue = (command, fallback = 'unknown') => {
   try {
@@ -80,7 +125,10 @@ export default defineConfig(({ mode }) => {
   const buildInfo = buildInfoFor(mode, env);
 
   return {
-    plugins: [react()],
+    customLogger: mode === 'development' ? createThrottledDevLogger(proxyTarget) : undefined,
+    plugins: [react(), mode === 'development' ? backendHealthPlugin(proxyTarget) : null].filter(
+      Boolean,
+    ),
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), './src'),
@@ -221,9 +269,8 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]',
         },
       },
-      // The calculator hub is an intentionally lazy-loaded clinical route with many form
-      // implementations. Keep Vercel warnings focused on unexpected chunk growth.
-      chunkSizeWarningLimit: 950,
+      // data-navigation (~1.2MB) is an intentional platform registry bundle; raise limit to match.
+      chunkSizeWarningLimit: 1300,
     },
     // Optimize dependencies
     optimizeDeps: {
