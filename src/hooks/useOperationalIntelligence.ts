@@ -28,6 +28,8 @@ function unwrapEnvelopeData<T>(envelope: unknown): T | null {
 export function useOperationalIntelligence(options: UseOperationalIntelligenceOptions = {}) {
   const centralNode = useCareDroidCentralNode(options);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const patients = useEmergencyStore((state) => state.patients);
+  const referrals = useEmergencyStore((state) => state.referrals);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const [backendSnapshot, setBackendSnapshot] = useState<OperationalIntelligenceSnapshot | null>(null);
   const [refreshError, setRefreshError] = useState('');
@@ -47,10 +49,12 @@ export function useOperationalIntelligence(options: UseOperationalIntelligenceOp
         centralSnapshot: centralNode.snapshot,
         settings: oiSettings,
         tenantId: emergencySettings.tenantName,
+        patients,
+        referrals,
         workflowLogs,
         backendSnapshot,
       }),
-    [backendSnapshot, centralNode.snapshot, emergencySettings.tenantName, oiSettings, workflowLogs],
+    [backendSnapshot, centralNode.snapshot, emergencySettings.tenantName, oiSettings, patients, referrals, workflowLogs],
   );
 
   const refresh = useCallback(async () => {

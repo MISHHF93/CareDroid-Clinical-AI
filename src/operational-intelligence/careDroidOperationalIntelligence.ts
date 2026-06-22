@@ -1,4 +1,5 @@
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+import type { Patient, Referral } from '../types/emergency';
 import { summarizeWhatHappensNextBoard } from '../services/whatHappensNextGuidance';
 import {
   BLOCKED_AUTONOMOUS_ACTIONS,
@@ -32,6 +33,8 @@ type BuildOperationalIntelligenceOptions = {
   centralSnapshot: CareDroidCentralNodeSnapshot;
   settings?: Partial<OperationalIntelligenceSettings>;
   tenantId?: string;
+  patients?: Patient[];
+  referrals?: Referral[];
   workflowLogs?: Array<{
     id: string;
     type: string;
@@ -57,6 +60,8 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
   centralSnapshot,
   settings,
   tenantId = 'CareDroid Emergency Department',
+  patients = [],
+  referrals = [],
   workflowLogs = [],
   backendSnapshot = null,
 }: BuildOperationalIntelligenceOptions): OperationalIntelligenceSnapshot {
@@ -438,11 +443,11 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
       activeAlerts: centralSnapshot.currentDepartmentStatus.activeAlerts,
       dataFreshnessStatus,
       humanReviewRequired: true,
-      whatHappensNextReassessmentDue: summarizeWhatHappensNextBoard(source.patients, {
-        referrals: source.referrals,
+      whatHappensNextReassessmentDue: summarizeWhatHappensNextBoard(patients, {
+        referrals,
       })['reassessment-due'],
-      whatHappensNextTriageNeeded: summarizeWhatHappensNextBoard(source.patients, {
-        referrals: source.referrals,
+      whatHappensNextTriageNeeded: summarizeWhatHappensNextBoard(patients, {
+        referrals,
       })['triage-needed'],
     },
   };
