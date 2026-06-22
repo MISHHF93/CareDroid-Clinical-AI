@@ -1,7 +1,8 @@
-import { buildApiUrl } from './apiClient';
+import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const DEFAULT_RECONNECT_MS = 10_000;
+const DEFAULT_SSE_PATH = '/api/emergency/realtime/stream';
 
 function envValue(name) {
   return import.meta.env?.[name] || '';
@@ -9,10 +10,18 @@ function envValue(name) {
 
 function realtimeConfig() {
   return {
-    ssePath: envValue('VITE_ED_REALTIME_SSE_PATH'),
+    ssePath: envValue('VITE_ED_REALTIME_SSE_PATH') || DEFAULT_SSE_PATH,
     wsPath: envValue('VITE_ED_REALTIME_WS_PATH'),
     pollIntervalMs: Number(envValue('VITE_ED_REALTIME_POLL_MS')) || DEFAULT_POLL_INTERVAL_MS,
   };
+}
+
+function buildAuthenticatedSsePath(path) {
+  const token = getStoredAccessToken();
+  const basePath = path.startsWith('/api/') ? path : `/api/${path.replace(/^\//, '')}`;
+  if (!token) return buildStreamUrl(basePath);
+  const separator = basePath.includes('?') ? '&' : '?';
+  return buildStreamUrl(`${basePath}${separator}token=${encodeURIComponent(token)}`);
 }
 
 function parseRealtimeMessage(raw) {
@@ -63,7 +72,7 @@ function createPollingLoop({ intervalMs, onPoll, onStatus }) {
 }
 
 function openEventSource({ path, onEvent, onStatus, scheduleReconnect }) {
-  const source = new EventSource(buildApiUrl(path));
+  const source = new EventSource(buildAuthenticatedSsePath(path));
 
   source.onopen = () => {
     onStatus?.({
@@ -76,7 +85,17 @@ function openEventSource({ path, onEvent, onStatus, scheduleReconnect }) {
 
   source.onmessage = (message) => {
     const event = normalizeRealtimeEvent(parseRealtimeMessage(message.data));
-    if (event) onEvent?.(event);
+    if (!event) return;
+    if (event.type === 'heartbeat') return;
+    if (event.type === 'connected') {
+      onStatus?.({
+        status: 'connected',
+        mode: event.payload?.mode || 'sse',
+        message: 'Real-time connected.',
+        updatedAt: new Date().toISOString(),
+      });
+    }
+    onEvent?.(event);
   };
 
   source.onerror = () => {
@@ -162,7 +181,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll } = {}) {
     onStatus?.({
       status: 'reconnecting',
       mode: 'polling',
-      message: 'No Emergency OS real-time endpoint configured; using 30-second polling.',
+      message: 'Emergency OS realtime unavailable; polling every 30 seconds.',
       updatedAt: new Date().toISOString(),
     });
   };

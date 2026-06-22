@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import {
   calculateEmergencyOsCapacity,
   type EmergencyOsCapacityThresholds,
@@ -8,6 +8,7 @@ import {
   EXTERNAL_DATA_REVIEW_DISCLAIMER,
   HUMAN_REVIEW_DISCLAIMER,
 } from '../../../../lib/ai/safetyPolicy';
+import { EmergencyRealtimeService } from './emergency-realtime.service';
 import {
   emergencyAlertsFixture,
   emergencyPatientsFixture,
@@ -520,6 +521,10 @@ type WorkflowActionInput = Omit<
 export class WorkflowActionLogService {
   private readonly logs: WorkflowActionLog[] = [];
 
+  constructor(
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+  ) {}
+
   record(input: WorkflowActionInput): WorkflowActionLog {
     const timestamp = input.timestamp || new Date().toISOString();
     const log: WorkflowActionLog = {
@@ -547,6 +552,7 @@ export class WorkflowActionLogService {
       metadata: input.metadata || {},
     };
     this.logs.unshift(log);
+    this.realtimeService?.publish({ type: 'workflow_log_created', payload: clone(log) });
     return clone(log);
   }
 
@@ -573,7 +579,29 @@ export class EmergencyPatientService {
   private readonly alerts: EmergencyAlert[] = clone(emergencyAlertsFixture);
   private lastCapacityScore: number | undefined;
 
-  constructor(private readonly workflowLogService: WorkflowActionLogService) {}
+  constructor(
+    private readonly workflowLogService: WorkflowActionLogService,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+  ) {}
+
+  private isEmsPatient(patient: EmergencyPatient): boolean {
+    return (
+      patient.flags.includes('EMSArrival') ||
+      /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint)
+    );
+  }
+
+  private publishPatientBoardRealtime(
+    type: string,
+    payload: unknown,
+    patient?: EmergencyPatient,
+  ): void {
+    this.realtimeService?.publish({ type, payload });
+    this.realtimeService?.publishBoardMutations();
+    if (patient && this.isEmsPatient(patient)) {
+      this.realtimeService?.publishEmsUpdate();
+    }
+  }
 
   listPatients(): EmergencyPatient[] {
     return clone(this.patients);
@@ -642,7 +670,9 @@ export class EmergencyPatientService {
         priority,
       },
     });
-    return clone(patient);
+    const created = clone(patient);
+    this.publishPatientBoardRealtime('patient_created', created, created);
+    return created;
   }
 
   movePatientToState(
@@ -707,7 +737,16 @@ export class EmergencyPatientService {
       });
     }
 
-    return clone(this.patients[index]);
+    const updated = clone(this.patients[index]);
+    this.publishPatientBoardRealtime(
+      'journey_state_changed',
+      {
+        patient: updated,
+        journeyEvent: event,
+      },
+      updated,
+    );
+    return updated;
   }
 
   patchPatient(
@@ -785,6 +824,8 @@ export class EmergencyPatientService {
           band,
         },
       });
+      this.realtimeService?.publish({ type: 'capacity_updated', payload: snapshot });
+      this.realtimeService?.publishBoardMutations();
     }
     this.lastCapacityScore = score;
     return snapshot;

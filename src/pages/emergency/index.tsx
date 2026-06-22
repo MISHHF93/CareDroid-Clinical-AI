@@ -711,7 +711,7 @@ export default function EmergencyWhiteboard() {
   const hiddenBoardCount = Math.max(0, visiblePatients.length - boardPatients.length);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setClockTick(Date.now()), 30000);
+    const timer = window.setInterval(() => setClockTick(Date.now()), 15_000);
     return () => window.clearInterval(timer);
   }, []);
 

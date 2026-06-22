@@ -111,6 +111,44 @@ describe('Emergency OS store shim', () => {
     expect(next.websocket.lastEventAt).toEqual(expect.any(String));
   });
 
+  it('routes whiteboard_snapshot events through canonical patient state', () => {
+    const store = useEmergencyStore.getState();
+    const generatedAt = '2026-06-14T06:32:00.000Z';
+    const patient = {
+      ...store.patients[0],
+      id: 'whiteboard-realtime-patient',
+      mrn: 'WB-RT-1',
+      firstName: 'Board',
+      lastName: 'Realtime',
+      timeline: [],
+    };
+
+    store.dispatchWebSocketEvent({
+      type: 'whiteboard_snapshot',
+      payload: {
+        data: {
+          generatedAt,
+          patients: [patient],
+          alerts: [],
+          rooms: store.rooms,
+          staff: store.staff,
+          capacity: {
+            ...store.capacity,
+            score: store.capacity.score + 2,
+            updatedAt: generatedAt,
+          },
+        },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.patients.find((candidate) => candidate.id === patient.id)).toEqual(
+      expect.objectContaining({ mrn: 'WB-RT-1' }),
+    );
+    expect(next.capacity.score).toBe(store.capacity.score + 2);
+    expect(next.websocket.lastEventAt).toEqual(expect.any(String));
+  });
+
   it('hydrates single-record realtime patient, referral, and settings events', () => {
     const store = useEmergencyStore.getState();
     const patient = {

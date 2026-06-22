@@ -198,12 +198,21 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const patientLookupInputRef = useRef<HTMLInputElement>(null);
   const isReceptionRoute = location.pathname === CANONICAL_ROUTES.emergencyReception;
   const operationalIntelligence = useOperationalIntelligence({
-    realtime: true,
+    realtime: false,
     screenMode: routeScreenMode,
   });
+  const websocket = useEmergencyStore((store) => store.websocket);
+  const [syncPulse, setSyncPulse] = useState(false);
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const refreshError = operationalIntelligence.refreshError;
+
+  useEffect(() => {
+    if (!websocket.lastEventAt) return undefined;
+    setSyncPulse(true);
+    const timer = window.setTimeout(() => setSyncPulse(false), 1200);
+    return () => window.clearTimeout(timer);
+  }, [websocket.lastEventAt]);
   const alerts = useEmergencyStore((store) => store.alerts);
   const patients = useEmergencyStore((store) => store.patients);
   const referrals = useEmergencyStore((store) => store.referrals);
@@ -266,17 +275,21 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     () => filterOperationalMetrics(operationalSummary.metrics, 'alerts'),
     [operationalSummary.metrics],
   );
-  const syncMode = centralSnapshot.sync.mode || 'polling';
-  const syncAge = formatSyncAge(centralSnapshot.sync.lastSyncedAt);
-  const syncLabel = centralSnapshot.sync.stale
+  const syncMode = websocket.mode || centralSnapshot.sync.mode || 'polling';
+  const syncAge = formatSyncAge(websocket.lastEventAt || centralSnapshot.sync.lastSyncedAt);
+  const syncStale =
+    websocket.status === 'connected'
+      ? false
+      : centralSnapshot.sync.stale || websocket.status === 'reconnecting';
+  const syncLabel = syncStale
     ? `${syncMode.toUpperCase()} stale`
     : `${syncMode.toUpperCase()} ${syncAge}`;
   const syncTitle = [
-    `Status: ${centralSnapshot.sync.status}`,
+    `Status: ${websocket.status || centralSnapshot.sync.status}`,
     `Mode: ${syncMode}`,
     `Last update: ${syncAge}`,
     `Source: ${centralSnapshot.sync.source}`,
-    centralSnapshot.sync.message,
+    websocket.message || centralSnapshot.sync.message,
   ]
     .filter(Boolean)
     .join('. ');
@@ -953,7 +966,11 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             >
               ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
             </span>
-            <span data-tone={centralSnapshot.sync.stale ? 'warning' : 'success'} title={syncTitle}>
+            <span
+              className={syncPulse ? 'emergency-os-header__sync-pill--pulse' : ''}
+              data-tone={syncStale ? 'warning' : 'success'}
+              title={syncTitle}
+            >
               {syncLabel}
             </span>
             {intelligenceSnapshot.enabled ? (

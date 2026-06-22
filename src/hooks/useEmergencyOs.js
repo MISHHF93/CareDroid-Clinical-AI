@@ -343,13 +343,19 @@ export const useReceptionSnapshot = () => useEmergencyModule(fetchReceptionSnaps
 
 export function useReceptionSnapshotPolling(intervalMs = 15000) {
   const snapshot = useReceptionSnapshot();
+  const websocketStatus = useEmergencyStore((state) => state.websocket?.status);
+  const websocketMode = useEmergencyStore((state) => state.websocket?.mode);
+  const realtimeActive =
+    websocketStatus === 'connected' &&
+    (websocketMode === 'sse' || websocketMode === 'websocket');
+
   useEffect(() => {
-    if (!intervalMs) return undefined;
+    if (!intervalMs || realtimeActive) return undefined;
     const timer = window.setInterval(() => {
       void snapshot.refresh();
     }, intervalMs);
     return () => window.clearInterval(timer);
-  }, [intervalMs, snapshot.refresh]);
+  }, [intervalMs, realtimeActive, snapshot.refresh]);
   return snapshot;
 }
 export const useSmartIntake = () => useEmergencyModule(fetchSmartIntake);

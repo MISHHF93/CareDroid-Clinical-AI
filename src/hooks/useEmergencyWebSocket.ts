@@ -11,6 +11,7 @@ export type UseEmergencyWebSocketOptions = {
 export function useEmergencyWebSocket(options: UseEmergencyWebSocketOptions = {}) {
   const enabled = options.enabled ?? true;
   const loading = useEmergencyStore((state) => state.loading);
+  const dispatchWebSocketEvent = useEmergencyStore((state) => state.dispatchWebSocketEvent);
 
   useEffect(() => {
     if (!enabled || typeof WebSocket === 'undefined') return undefined;
@@ -22,7 +23,7 @@ export function useEmergencyWebSocket(options: UseEmergencyWebSocketOptions = {}
       socket.addEventListener('message', (event) => {
         try {
           const payload = JSON.parse(event.data);
-          useEmergencyStore.getState().dispatchWebSocketEvent(payload);
+          dispatchWebSocketEvent(payload);
         } catch {
           // Ignore malformed realtime events; polling/store state remains authoritative.
         }
@@ -32,7 +33,7 @@ export function useEmergencyWebSocket(options: UseEmergencyWebSocketOptions = {}
     }
 
     return () => socket?.close();
-  }, [enabled, options.protocols, options.url]);
+  }, [dispatchWebSocketEvent, enabled, options.protocols, options.url]);
 
   return { connected: enabled && !loading };
 }

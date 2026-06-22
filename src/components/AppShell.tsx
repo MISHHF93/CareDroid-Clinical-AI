@@ -4,9 +4,11 @@ import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import ErrorBoundary from './ErrorBoundary';
-import { useEmergencyStore } from '../store/emergencyStore';
+import { useEmergencyStore, type EmergencyWebSocketStatus } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
+import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
+import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
@@ -200,9 +202,42 @@ export function AppShell({ children }: AppShellProps) {
 
     let cancelled = false;
     let stopSimulation: (() => void) | undefined;
+    let stopRealtime: (() => void) | undefined;
 
     void useEmergencyStore.getState().initializeFromBackend();
     useEmergencyStore.getState().updateAlerts();
+
+    stopRealtime = startEmergencyRealtime({
+      onEvent: (event: { type?: string; payload?: unknown }) => {
+        useEmergencyStore.getState().dispatchWebSocketEvent(event);
+      },
+      onStatus: (status: Partial<EmergencyWebSocketStatus>) => {
+        useEmergencyStore.getState().setWebSocketStatus(status);
+      },
+      onPoll: async () => {
+        const store = useEmergencyStore.getState();
+        await store.refreshAllData();
+        try {
+          const envelope = await fetchCareDroidCentralNodeSnapshot();
+          store.dispatchWebSocketEvent({ type: 'central_node_snapshot', payload: envelope });
+          store.setWebSocketStatus({
+            status: 'connected',
+            mode: 'polling',
+            lastEventAt: new Date().toISOString(),
+            message: 'Emergency OS snapshot refreshed via polling fallback.',
+          });
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : 'Unable to refresh central node snapshot.';
+          store.setWebSocketStatus({
+            status: 'reconnecting',
+            mode: 'polling',
+            message,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      },
+    });
 
     const reassessmentInterval = screenCapabilities.showReassessmentEngine
       ? startReassessmentEngine()
@@ -228,6 +263,7 @@ export function AppShell({ children }: AppShellProps) {
 
     return () => {
       cancelled = true;
+      stopRealtime?.();
       if (reassessmentInterval !== undefined) window.clearInterval(reassessmentInterval);
       if (capacityInterval !== undefined) window.clearInterval(capacityInterval);
       window.clearInterval(alertsInterval);

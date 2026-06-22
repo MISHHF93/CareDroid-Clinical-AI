@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
 import { ChatModule } from '../chat/chat.module';
 import { EmergencyOsController } from './emergency-os.controller';
+import { EmergencyRealtimeController } from './emergency-realtime.controller';
+import { EmergencyRealtimeService } from './emergency-realtime.service';
+import { JwtQueryAuthGuard } from './guards/jwt-query-auth.guard';
 import {
   AICallInterrogationController,
   ERPulseHandoverController,
@@ -48,9 +52,30 @@ import {
 } from './emergency-os.services';
 
 @Module({
-  imports: [ConfigModule, AuthModule, AuditModule, ChatModule],
+  imports: [
+    ConfigModule,
+    AuthModule,
+    AuditModule,
+    ChatModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const config = configService.get<{ secret?: string; accessTokenExpiry?: string; issuer?: string; audience?: string }>('jwt');
+        return {
+          secret: config?.secret,
+          signOptions: {
+            expiresIn: config?.accessTokenExpiry,
+            issuer: config?.issuer,
+            audience: config?.audience,
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [
     EmergencyOsController,
+    EmergencyRealtimeController,
     ERPulseHandoverController,
     FederatedEMSController,
     LMECSController,
@@ -58,6 +83,8 @@ import {
     OrganizationalDigitalTwinController,
   ],
   providers: [
+    EmergencyRealtimeService,
+    JwtQueryAuthGuard,
     EmergencyWhiteboardService,
     WorkflowActionLogService,
     EmergencyPatientService,

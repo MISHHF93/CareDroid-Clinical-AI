@@ -12,6 +12,11 @@ const mocks = vi.hoisted(() => ({
   startReassessmentEngine: vi.fn(() => 111),
   startSimulation: vi.fn(() => [333]),
   stopSimulation: vi.fn(),
+  startEmergencyRealtime: vi.fn(() => vi.fn()),
+}));
+
+vi.mock('../services/emergencyRealtimeService', () => ({
+  default: mocks.startEmergencyRealtime,
 }));
 
 vi.mock('../engine/capacityEngine', () => ({
@@ -101,6 +106,7 @@ describe('AppShell R12 startup wiring', () => {
     );
 
     expect(initializeFromBackend).toHaveBeenCalledTimes(1);
+    expect(mocks.startEmergencyRealtime).toHaveBeenCalledTimes(1);
     expect(startReassessmentEngine).toHaveBeenCalledTimes(1);
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);
 
@@ -111,5 +117,6 @@ describe('AppShell R12 startup wiring', () => {
     expect(clearIntervalSpy).toHaveBeenCalledWith(111);
     expect(clearIntervalSpy).toHaveBeenCalledWith(222);
     expect(stopSimulation).toHaveBeenCalledTimes(1);
+    expect(mocks.startEmergencyRealtime.mock.results[0]?.value).toEqual(expect.any(Function));
   });
 });
