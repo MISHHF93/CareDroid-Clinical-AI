@@ -12,6 +12,7 @@ export const RECEPTION_DESK_UI = Object.freeze({
     'arrivals-today',
     'awaiting-verification',
     'awaiting-triage',
+    'queue-size',
     'ems-inbound',
   ]),
   surfaces: Object.freeze({
@@ -30,6 +31,8 @@ export const RECEPTION_DESK_UI = Object.freeze({
     'queueTabBadges',
     'shiftStripLink',
   ]),
+  /** Pin quick intake inline on the reception desk — no modal open step. */
+  inlineQuickIntakeForSlim: true,
 });
 
 export function isReceptionDeskUiEnabled() {

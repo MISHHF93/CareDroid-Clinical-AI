@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   buildCareDroidCentralNodeSnapshot,
   type CareDroidScreenMode,
 } from '../central-node/careDroidCentralNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';
+import useRouteScreenMode from './useRouteScreenMode';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
 import { startEmergencyRealtime } from '../services/emergencyRealtimeService';
 
@@ -14,6 +16,8 @@ type UseCareDroidCentralNodeOptions = {
 };
 
 export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions = {}) {
+  const location = useLocation();
+  const routeScreenMode = useRouteScreenMode();
   const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
@@ -22,6 +26,8 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
   const emsUnits = useEmergencyStore((state) => state.emsUnits);
   const referrals = useEmergencyStore((state) => state.referrals);
+  const staff = useEmergencyStore((state) => state.staff);
+  const rooms = useEmergencyStore((state) => state.rooms);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const websocket = useEmergencyStore((state) => state.websocket);
@@ -45,6 +51,8 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
       emsIncomingPatients,
       emsUnits,
       referrals,
+      staff,
+      rooms,
       workflowLogs,
       emergencySettings,
       websocket,
@@ -70,6 +78,8 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
       loading,
       patients,
       referrals,
+      staff,
+      rooms,
       selectedPatientId,
       websocket,
       whiteboardSearchQuery,
@@ -89,12 +99,13 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
           can: emergencyRole.can,
         },
         {
-          screenMode: options.screenMode,
+          screenMode: options.screenMode || routeScreenMode,
           source: backendSnapshot ? 'backend-snapshot' : 'store',
           backendSnapshot,
+          pathname: location.pathname,
         },
       ),
-    [backendSnapshot, emergencyRole, options.screenMode, source],
+    [backendSnapshot, emergencyRole, location.pathname, options.screenMode, routeScreenMode, source],
   );
 
   const refresh = useCallback(async (): Promise<unknown | null> => {

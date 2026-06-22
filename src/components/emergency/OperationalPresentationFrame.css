@@ -1,0 +1,61 @@
+.operational-presentation-frame {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.operational-presentation-frame--density-wall {
+  gap: 1rem;
+}
+
+.operational-presentation-frame--density-compact {
+  gap: 0.55rem;
+}
+
+.operational-presentation-frame__header {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.operational-presentation-frame__eyebrow {
+  margin: 0;
+  color: var(--status-info, #93c5fd);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.operational-presentation-frame[data-operational-emphasis='reassuring'] .operational-presentation-frame__eyebrow {
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.operational-presentation-frame[data-operational-emphasis='speed'] .operational-presentation-frame__eyebrow {
+  color: #fde68a;
+}
+
+.operational-presentation-frame[data-operational-emphasis='assessment'] .operational-presentation-frame__eyebrow {
+  color: #fca5a5;
+}
+
+.operational-presentation-frame[data-operational-emphasis='patient'] .operational-presentation-frame__eyebrow {
+  color: #c4b5fd;
+}
+
+.operational-presentation-frame__title {
+  margin: 0;
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 1.5rem;
+  line-height: 1.08;
+}
+
+.operational-presentation-frame__subtitle {
+  margin: 0;
+  max-width: 920px;
+  color: var(--color-text-secondary, #cbd5e1);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.operational-presentation-frame--density-wall .operational-presentation-frame__title {
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+}

@@ -1,416 +1,516 @@
-import type { Patient, PatientState, PatientFlag, Priority, Encounter } from '../types/emergency';
-import { PatientState as PatientStateEnum, PatientFlag as PatientFlagEnum, Priority as PriorityEnum } from '../types/emergency';
-import type { useEmergencyStore } from '../store/emergencyStore';
-import { WHITEBOARD_QUEUE_FILTER, enterTriageQueue } from './queueAssignment';
-import { ensureEncounterAfterIntake, type IntakeEncounterSource } from './intakeEncounter';
+import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
+import {
+  PatientFlag,
+  PatientState,
+  type ArrivalControlSnapshot,
+  type ArrivalMode,
+  type Patient,
+  type QueueDestination,
+  type QuickSafetyFlag,
+  type RegistrationStatus,
+} from '../types/emergency';
+import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
+import { getArrivalReasonFromPatient } from './intakeEncounterChain';
+import {
+  buildHighRiskComplaintPatch,
+  collectHighRiskComplaintLabels,
+  deriveHighRiskComplaintQueueDestination,
+  patientNeedsRapidReview,
+} from './highRiskComplaintFlags';
 
-/**
- * Arrival mode enumeration – supports all primary patient entry paths.
- * Maps to operational context and triage priority hints.
- */
-export const ArrivalMode = Object.freeze({
-  WalkIn: 'walk-in',
-  EMS: 'ems',
-  Referral: 'referral',
-  Police: 'police',
-  Transfer: 'transfer',
-  Kiosk: 'kiosk',
-  Telehealth: 'telehealth',
-  Unknown: 'unknown',
-} as const);
+export const ARRIVAL_MODES: readonly ArrivalMode[] = [
+  'walk-in',
+  'EMS',
+  'referral',
+  'police',
+  'transfer',
+] as const;
 
-export type ArrivalModeType = (typeof ArrivalMode)[keyof typeof ArrivalMode];
+export const QUICK_SAFETY_FLAG_TYPES: readonly QuickSafetyFlag[] = [
+  PatientFlag.HighRisk,
+  PatientFlag.StrokeCode,
+  PatientFlag.SepsisAlert,
+  PatientFlag.PsychAlert,
+  PatientFlag.Isolation,
+  PatientFlag.DeterioratingNeuro,
+] as const;
 
-/**
- * Quick safety flags evaluated at arrival – informs immediate triage and resource allocation.
- */
-export const QuickSafetyFlag = Object.freeze({
-  Altered: 'altered-consciousness',
-  Chest: 'chest-pain',
-  Respiratory: 'respiratory-distress',
-  Trauma: 'trauma',
-  Neuro: 'neuro-deficit',
-  Sepsis: 'sepsis-risk',
-  Allergy: 'allergy-alert',
-  Isolation: 'isolation-required',
-  Violence: 'violence-risk',
-} as const);
+const QUICK_SAFETY_FLAG_SET = new Set<string>(QUICK_SAFETY_FLAG_TYPES);
 
-export type QuickSafetyFlagType = (typeof QuickSafetyFlag)[keyof typeof QuickSafetyFlag];
+export type ArrivalControlSummary = {
+  recentArrivals: number;
+  awaitingRegistration: number;
+  triagePending: number;
+  rapidReview: number;
+  inWaitingRoom: number;
+  byMode: Record<ArrivalMode, number>;
+  snapshots: ArrivalControlSnapshot[];
+};
 
-/**
- * Arrival registration status – tracks identity and verification progress.
- */
-export enum RegistrationStatus {
-  Unknown = 'unknown',
-  PartialIdentity = 'partial-identity',
-  IdentityVerified = 'identity-verified',
-  IdentityPending = 'identity-pending',
-}
+export type ArrivalControlStore = {
+  patients: Patient[];
+  updatePatient: (patientId: string, patch: Partial<Patient>) => void;
+  dispatchWebSocketEvent?: (event: {
+    type: string;
+    payload: Record<string, unknown>;
+  }) => void;
+  recordWorkflowAction?: (input: {
+    type: string;
+    summary: string;
+    patientId?: string;
+    source?: string;
+    metadata?: Record<string, unknown>;
+  }) => void;
+};
 
-/**
- * Triage pending status – indicates when triage nurse assessment is ready or needed.
- */
-export enum TriagePendingStatus {
-  AwaitingTriage = 'awaiting-triage',
-  TriageInProgress = 'triage-in-progress',
-  TriageComplete = 'triage-complete',
-}
-
-/**
- * Core arrival context – captured at first contact.
- * Normalizes all arrival entry points into unified control flow.
- */
-export interface ArrivalContext {
-  // Arrival metadata
-  arrivalTimestamp: string; // ISO 8601
-  arrivalMode: ArrivalModeType;
-  firstContactTimestamp: string; // ISO 8601
-
-  // Patient identification
-  presentingComplaint: string;
-  complaintCategory?: string;
-
-  // Safety and triage hints
-  quickSafetyFlags: QuickSafetyFlagType[];
-  estimatedPriority?: Priority | string;
-
-  // Registration state
-  registrationStatus: RegistrationStatus;
-  identityVerified?: boolean;
-
-  // Triage readiness
-  triagePendingStatus: TriagePendingStatus;
-
-  // Operational routing
-  queueDestination: string; // 'triage' | 'waiting' | 'assessment' etc.
-
-  // Source tracking
-  intakeSource?: IntakeEncounterSource;
-  sessionId?: string;
+export type RegisterArrivalControlOptions = {
+  source?: string;
+  route?: boolean;
+  destination?: QueueDestination;
+  recordFirstContact?: boolean;
   actorName?: string;
-
-  // Additional metadata
-  notes?: string;
-  emsArrivalId?: string;
-  referralId?: string;
-}
-
-/**
- * Arrival arrival state – the minimal operational snapshot for a new arrival.
- * Synchronized across triage queue, waiting room, whiteboard, and dashboard.
- */
-export interface ArrivalSnapshot {
-  patientId: string;
-  arrivalContext: ArrivalContext;
-  patientState: PatientState;
-  encounterId: string | null;
-  createdEncounter: boolean;
-  queueAssignment: string;
-  triageAssistGeneratedAt?: string;
-  handoffSyncPending: boolean;
-  operationallyVisible: boolean;
-}
-
-export type ArrivalControlStore = Pick<
-  ReturnType<typeof useEmergencyStore.getState>,
-  | 'patients'
-  | 'addPatient'
-  | 'updatePatient'
-  | 'selectPatient'
-  | 'movePatientToState'
-  | 'recordWorkflowAction'
-  | 'emergencySettings'
-  | 'dispatchWebSocketEvent'
->;
-
-/**
- * Map arrival mode to encounter source for downstream tracking.
- */
-const ARRIVAL_MODE_TO_ENCOUNTER_SOURCE: Record<ArrivalModeType, IntakeEncounterSource> = {
-  [ArrivalMode.WalkIn]: 'walk-in',
-  [ArrivalMode.EMS]: 'ems',
-  [ArrivalMode.Referral]: 'referral',
-  [ArrivalMode.Police]: 'walk-in',
-  [ArrivalMode.Transfer]: 'transfer',
-  [ArrivalMode.Kiosk]: 'walk-in',
-  [ArrivalMode.Telehealth]: 'walk-in',
-  [ArrivalMode.Unknown]: 'walk-in',
 };
 
-/**
- * Map quick safety flags to Emergency OS patient flags for visibility and alerts.
- */
-const SAFETY_FLAG_TO_PATIENT_FLAG: Record<QuickSafetyFlagType, PatientFlag | null> = {
-  [QuickSafetyFlag.Altered]: PatientFlagEnum.DeteriorationRisk,
-  [QuickSafetyFlag.Chest]: null, // Handled in complaint routing
-  [QuickSafetyFlag.Respiratory]: PatientFlagEnum.DeteriorationRisk,
-  [QuickSafetyFlag.Trauma]: null, // Handled in complaint routing
-  [QuickSafetyFlag.Neuro]: PatientFlagEnum.DeterioratingNeuro,
-  [QuickSafetyFlag.Sepsis]: PatientFlagEnum.SepsisAlert,
-  [QuickSafetyFlag.Allergy]: null, // Handled in allergies array
-  [QuickSafetyFlag.Isolation]: PatientFlagEnum.Isolation,
-  [QuickSafetyFlag.Violence]: null, // Handled via alert system
+/** Adapts emergency store slices to the arrival control layer contract. */
+export function toArrivalControlStore(
+  store: ArrivalControlStore & {
+    recordWorkflowAction?: ArrivalControlStore['recordWorkflowAction'];
+  },
+): ArrivalControlStore {
+  return {
+    patients: store.patients,
+    updatePatient: store.updatePatient.bind(store),
+    dispatchWebSocketEvent: store.dispatchWebSocketEvent?.bind(store),
+    recordWorkflowAction: store.recordWorkflowAction?.bind(store),
+  };
+}
+
+function hasFlag(patient: Patient, flag: PatientFlag): boolean {
+  return (patient.flags || []).some((entry) =>
+    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+  );
+}
+
+function extractQuickSafetyFlags(patient: Patient): QuickSafetyFlag[] {
+  const stored = patient.quickSafetyFlags?.filter((flag): flag is QuickSafetyFlag =>
+    QUICK_SAFETY_FLAG_SET.has(flag),
+  );
+  if (stored?.length) return stored;
+
+  return (patient.flags || [])
+    .map((entry) => (typeof entry === 'string' ? entry : entry?.type))
+    .filter((flag): flag is QuickSafetyFlag => Boolean(flag && QUICK_SAFETY_FLAG_SET.has(flag)));
+}
+
+export function normalizeArrivalMode(
+  input?: string | null,
+  patient?: Patient | null,
+): ArrivalMode {
+  if (patient && (hasFlag(patient, PatientFlag.EMSArrival) || patient.source === 'EMS')) {
+    return 'EMS';
+  }
+
+  const normalized = String(input || patient?.arrivalMode || patient?.source || '')
+    .trim()
+    .toLowerCase();
+
+  if (normalized === 'ems') return 'EMS';
+  if (normalized === 'referral') return 'referral';
+  if (normalized === 'police') return 'police';
+  if (normalized === 'transfer') return 'transfer';
+  if (normalized === 'walk-in' || normalized === 'walkin') return 'walk-in';
+
+  if (patient?.source === 'Referral') return 'referral';
+  if (patient?.source === 'Transfer') return 'transfer';
+
+  return 'walk-in';
+}
+
+export function deriveRegistrationStatus(patient: Patient): RegistrationStatus {
+  if (patient.registrationStatus) return patient.registrationStatus;
+  if (hasFlag(patient, PatientFlag.IdentityPending)) return 'provisional';
+  if (patient.state === PatientState.Arrival) return 'pending';
+  if (patient.state === PatientState.Registration) return 'in-progress';
+  return 'complete';
+}
+
+export function deriveTriagePending(patient: Patient): boolean {
+  if (typeof patient.triagePending === 'boolean') return patient.triagePending;
+  return patient.state === PatientState.Triage;
+}
+
+export function deriveQueueDestination(patient: Patient): QueueDestination {
+  if (patient.queueDestination) return patient.queueDestination;
+
+  const rapidReview = deriveHighRiskComplaintQueueDestination(patient);
+  if (rapidReview) return rapidReview;
+
+  if (patient.state === PatientState.Waiting) return 'waiting-room';
+  if (patient.state === PatientState.Triage) return 'triage-queue';
+  if (isEmsRegistrationPatient(patient)) return 'ems-registration';
+  if (patient.state === PatientState.Registration || patient.state === PatientState.Arrival) {
+    return 'verification';
+  }
+  return 'whiteboard';
+}
+
+export function buildArrivalControlSnapshot(patient: Patient): ArrivalControlSnapshot {
+  return {
+    patientId: patient.id,
+    arrivalTimestamp: patient.arrivalTime,
+    arrivalMode: normalizeArrivalMode(patient.arrivalMode, patient),
+    presentingComplaint: getArrivalReasonFromPatient(patient),
+    quickSafetyFlags: extractQuickSafetyFlags(patient),
+    highRiskComplaintFlags: patient.highRiskComplaintFlags || [],
+    registrationStatus: deriveRegistrationStatus(patient),
+    triagePending: deriveTriagePending(patient),
+    firstContactTimestamp: patient.firstContactAt ?? null,
+    queueDestination: deriveQueueDestination(patient),
+  };
+}
+
+export type BuildArrivalControlFieldsOptions = {
+  arrivalMode?: ArrivalMode | string;
+  presentingComplaint?: string;
+  quickSafetyFlags?: QuickSafetyFlag[];
+  state?: PatientState;
+  flags?: PatientFlag[];
+  arrivalTime?: string;
+  queueDestination?: QueueDestination;
+  firstContactAt?: string | null;
 };
 
-/**
- * Resolve priority from quick safety flags and complaint category.
- * Rapid triage estimation at arrival.
- */
-export function estimateArrivalPriority(
-  safetyFlags: QuickSafetyFlagType[],
-  complaintCategory?: string,
-): Priority {
-  // Critical flags override all
-  if (
-    safetyFlags.includes(QuickSafetyFlag.Altered) ||
-    safetyFlags.includes(QuickSafetyFlag.Chest) ||
-    safetyFlags.includes(QuickSafetyFlag.Respiratory)
-  ) {
-    return PriorityEnum.P2;
-  }
+export function buildArrivalControlFields(
+  options: BuildArrivalControlFieldsOptions = {},
+): Partial<Patient> {
+  const arrivalMode = normalizeArrivalMode(options.arrivalMode);
+  const flags = options.flags || [];
+  const quickSafetyFlags = Array.from(
+    new Set([
+      ...(options.quickSafetyFlags || []),
+      ...flags.filter((flag): flag is QuickSafetyFlag => QUICK_SAFETY_FLAG_SET.has(flag)),
+    ]),
+  );
+  const state = options.state || PatientState.Registration;
+  const registrationStatus: RegistrationStatus =
+    hasFlag({ flags } as Patient, PatientFlag.IdentityPending)
+      ? 'provisional'
+      : state === PatientState.Arrival
+        ? 'pending'
+        : state === PatientState.Registration
+          ? 'in-progress'
+          : 'complete';
 
-  // Urgent flags
-  if (safetyFlags.includes(QuickSafetyFlag.Trauma)) {
-    return PriorityEnum.P2;
-  }
+  const queueDestination =
+    options.queueDestination ||
+    (state === PatientState.Triage
+      ? 'triage-queue'
+      : state === PatientState.Waiting
+        ? 'waiting-room'
+        : arrivalMode === 'EMS'
+          ? 'ems-registration'
+          : 'verification');
 
-  if (
-    safetyFlags.includes(QuickSafetyFlag.Neuro) ||
-    safetyFlags.includes(QuickSafetyFlag.Sepsis)
-  ) {
-    return PriorityEnum.P3;
-  }
-
-  // Category-based estimation
-  const urgent = ['chest pain', 'trauma', 'stroke', 'sepsis', 'mental health crisis'];
-  if (complaintCategory && urgent.some((c) => complaintCategory.toLowerCase().includes(c))) {
-    return PriorityEnum.P3;
-  }
-
-  return PriorityEnum.P4;
+  return {
+    arrivalMode,
+    registrationStatus,
+    triagePending: state === PatientState.Triage,
+    queueDestination,
+    quickSafetyFlags,
+    firstContactAt: options.firstContactAt ?? null,
+  };
 }
 
-/**
- * Create or update arrival flags on patient based on safety flags.
- */
-function applyArrivalSafetyFlags(
-  patient: Patient,
-  safetyFlags: QuickSafetyFlagType[],
-): PatientFlag[] {
-  const flags = [...(patient.flags || [])];
-  const uniqueFlags = new Set(flags.filter((f) => typeof f === 'string'));
-
-  for (const safetyFlag of safetyFlags) {
-    const patientFlag = SAFETY_FLAG_TO_PATIENT_FLAG[safetyFlag];
-    if (patientFlag) {
-      uniqueFlags.add(patientFlag);
-    }
-  }
-
-  return Array.from(uniqueFlags);
-}
-
-/**
- * Register arrival context on patient journey.
- * Core operation: capture all arrival-specific metadata.
- */
-export function registerArrival(
+export function stampArrivalControlLayer(
   store: ArrivalControlStore,
   patientId: string,
-  context: ArrivalContext,
-): {
-  ok: boolean;
-  reason?: string;
-  patient?: Patient;
-} {
-  const patient = store.patients.find((p) => p.id === patientId);
-  if (!patient) {
-    return { ok: false, reason: 'patient_not_found' };
-  }
+  patch: Partial<Patient> & BuildArrivalControlFieldsOptions,
+): ArrivalControlSnapshot | null {
+  const patient = store.patients.find((entry) => entry.id === patientId);
+  if (!patient) return null;
 
-  const updatedFlags = applyArrivalSafetyFlags(patient, context.quickSafetyFlags);
-  const priority = context.estimatedPriority || estimateArrivalPriority(context.quickSafetyFlags, context.complaintCategory);
+  const controlFields = buildArrivalControlFields({
+    arrivalMode: patch.arrivalMode ?? patient.arrivalMode,
+    presentingComplaint: patch.presentingComplaint ?? patch.chiefComplaint ?? patient.chiefComplaint,
+    quickSafetyFlags: patch.quickSafetyFlags,
+    state: patch.state ?? patient.state,
+    flags: patch.flags ?? patient.flags,
+    queueDestination: patch.queueDestination,
+    firstContactAt: patch.firstContactAt ?? patient.firstContactAt,
+  });
 
   store.updatePatient(patientId, {
-    arrivalTime: context.arrivalTimestamp,
-    chiefComplaint: context.presentingComplaint,
-    complaint: context.presentingComplaint,
-    complaintCategory: context.complaintCategory || 'Other',
-    priority,
-    flags: updatedFlags,
-    source: context.arrivalMode === ArrivalMode.EMS ? 'EMS' : 'WalkIn',
+    ...patch,
+    ...controlFields,
+    ...(patch.chiefComplaint ? { chiefComplaint: patch.chiefComplaint } : {}),
+    ...(patch.complaint ? { complaint: patch.complaint } : {}),
   });
 
-  store.recordWorkflowAction({
-    type: 'patient_created',
-    title: 'Patient arrival registered',
-    summary: `Arrival registered: ${context.arrivalMode} | ${context.presentingComplaint} | Safety flags: ${context.quickSafetyFlags.join(', ') || 'None'}`,
-    patientId,
-    source: 'arrival-control-layer',
-    severity: context.quickSafetyFlags.length > 0 ? 'Warning' : 'Info',
-    metadata: {
-      arrivalMode: context.arrivalMode,
-      presentingComplaint: context.presentingComplaint,
-      quickSafetyFlags: context.quickSafetyFlags,
-      estimatedPriority: priority,
-      registrationStatus: context.registrationStatus,
-      triagePendingStatus: context.triagePendingStatus,
-    },
-  });
-
-  return { ok: true, patient: store.patients.find((p) => p.id === patientId) };
+  const updated = { ...patient, ...patch, ...controlFields };
+  return buildArrivalControlSnapshot(updated);
 }
 
-/**
- * Complete arrival-to-triage handoff.
- * Canonical operation: move patient from arrival through verification into triage queue.
- */
-export function completeArrivalToTriageHandoff(
+export function recordFirstContact(
   store: ArrivalControlStore,
   patientId: string,
-  context: ArrivalContext,
-  options: {
-    actorName?: string;
-    sessionId?: string;
-  } = {},
-): ArrivalSnapshot {
-  const patient = store.patients.find((p) => p.id === patientId);
+  options: { actorName?: string; source?: string; note?: string } = {},
+): void {
+  const patient = store.patients.find((entry) => entry.id === patientId);
+  if (!patient || patient.firstContactAt) return;
 
-  if (!patient) {
-    return {
-      patientId,
-      arrivalContext: context,
-      patientState: PatientStateEnum.Arrival,
-      encounterId: null,
-      createdEncounter: false,
-      queueAssignment: WHITEBOARD_QUEUE_FILTER.triage,
-      handoffSyncPending: false,
-      operationallyVisible: false,
-    };
+  const timestamp = new Date().toISOString();
+  store.updatePatient(patientId, {
+    firstContactAt: timestamp,
+    registrationStatus:
+      patient.state === PatientState.Registration ? 'in-progress' : patient.registrationStatus,
+  });
+
+  store.recordWorkflowAction?.({
+    type: 'journey_state_changed',
+    summary: options.note || 'First staff contact recorded at arrival.',
+    patientId,
+    source: options.source || 'arrival-control',
+    metadata: {
+      firstContactAt: timestamp,
+      actorName: options.actorName,
+    },
+  });
+}
+
+export function routeArrivalToDestination(
+  store: ArrivalControlStore,
+  patientId: string,
+  destination: QueueDestination,
+  options: { source?: string; actorName?: string } = {},
+): ArrivalControlSnapshot | null {
+  const patient = store.patients.find((entry) => entry.id === patientId);
+  if (!patient) return null;
+
+  const patch: Partial<Patient> = { queueDestination: destination };
+
+  if (destination === 'triage-queue') {
+    patch.state = PatientState.Triage;
+    patch.triagePending = true;
+    patch.registrationStatus = 'complete';
+  } else if (destination === 'rapid-review') {
+    patch.state = PatientState.Triage;
+    patch.triagePending = true;
+    patch.registrationStatus = 'complete';
+    patch.queueDestination = 'rapid-review';
+  } else if (destination === 'waiting-room') {
+    patch.state = PatientState.Waiting;
+    patch.triagePending = false;
+    patch.registrationStatus = 'complete';
+  } else if (destination === 'verification') {
+    patch.state = PatientState.Registration;
+    patch.triagePending = false;
+    patch.registrationStatus = 'in-progress';
+  } else if (destination === 'ems-registration') {
+    patch.state = PatientState.Registration;
+    patch.triagePending = false;
+    patch.registrationStatus = 'in-progress';
   }
 
-  // Register arrival metadata
-  registerArrival(store, patientId, context);
-
-  // Assign to triage queue
-  const queueResult = enterTriageQueue(store, {
-    patientId,
-    source: context.intakeSource || ARRIVAL_MODE_TO_ENCOUNTER_SOURCE[context.arrivalMode],
-    actorName: options.actorName,
-    actorId: 'arrival-control',
-    note: `Arrival to triage: ${context.arrivalMode} | ${context.presentingComplaint}`,
-    recordWorkflow: true,
+  const snapshot = stampArrivalControlLayer(store, patientId, patch);
+  syncArrivalOperationalSurfaces(store, patientId, {
+    destination,
+    source: options.source,
+    snapshot,
   });
 
-  // Create encounter
-  const encounterResult = ensureEncounterAfterIntake(store, {
-    patientId,
-    source: ARRIVAL_MODE_TO_ENCOUNTER_SOURCE[context.arrivalMode],
-    sessionId: options.sessionId,
-    actorName: options.actorName,
-    queue: queueResult.queue || WHITEBOARD_QUEUE_FILTER.triage,
-  });
+  return snapshot;
+}
 
-  // Sync operational surfaces
+export function syncArrivalOperationalSurfaces(
+  store: ArrivalControlStore,
+  patientId: string,
+  options: {
+    destination?: QueueDestination;
+    source?: string;
+    snapshot?: ArrivalControlSnapshot | null;
+  } = {},
+): void {
+  const patient = store.patients.find((entry) => entry.id === patientId);
+  if (!patient) return;
+
+  const snapshot = options.snapshot || buildArrivalControlSnapshot(patient);
+  const destination = options.destination || snapshot.queueDestination;
+
   store.dispatchWebSocketEvent?.({
-    type: 'arrival_handoff_complete',
+    type: 'arrival_control_sync',
     payload: {
       patientId,
-      arrivalMode: context.arrivalMode,
-      presentingComplaint: context.presentingComplaint,
-      quickSafetyFlags: context.quickSafetyFlags,
-      encounterId: encounterResult.encounterId,
-      queue: queueResult.queue || WHITEBOARD_QUEUE_FILTER.triage,
-      surfaces: ['triage-queue', 'whiteboard', 'operational-snapshot'],
+      destination,
+      source: options.source || 'arrival-control',
+      snapshot,
+      surfaces: ['triage-queue', 'waiting-room', 'whiteboard', 'operational-snapshot'],
       generatedAt: new Date().toISOString(),
     },
   });
-
-  return {
-    patientId,
-    arrivalContext: context,
-    patientState: patient.state || PatientStateEnum.Triage,
-    encounterId: encounterResult.encounterId,
-    createdEncounter: encounterResult.created,
-    queueAssignment: queueResult.queue || WHITEBOARD_QUEUE_FILTER.triage,
-    handoffSyncPending: false,
-    operationallyVisible: true,
-  };
 }
 
 /**
- * Snapshot current arrival state for operational surface display.
- * Used by triage queue, waiting room, whiteboard, and dashboard.
+ * Canonical post-persist hook: stamp control fields, route high-risk arrivals,
+ * and sync triage queue, waiting room, whiteboard, and operational snapshot surfaces.
  */
-export function getArrivalSnapshot(
+export function registerArrivalControl(
   store: ArrivalControlStore,
   patientId: string,
-  context: ArrivalContext,
-): ArrivalSnapshot {
-  const patient = store.patients.find((p) => p.id === patientId);
+  options: RegisterArrivalControlOptions = {},
+): ArrivalControlSnapshot | null {
+  const snapshot = registerNewArrival(store, patientId, {
+    source: options.source,
+    route: options.route,
+  });
+
+  if (!snapshot) return null;
+
+  if (options.recordFirstContact) {
+    recordFirstContact(store, patientId, {
+      actorName: options.actorName,
+      source: options.source || 'arrival-control',
+    });
+  }
+
+  if (options.destination && options.destination !== snapshot.queueDestination) {
+    return routeArrivalToDestination(store, patientId, options.destination, {
+      source: options.source,
+      actorName: options.actorName,
+    });
+  }
+
+  return snapshot;
+}
+
+/** @deprecated Use registerArrivalControl */
+export function registerNewArrival(
+  store: ArrivalControlStore,
+  patientId: string,
+  options: { source?: string; route?: boolean } = {},
+): ArrivalControlSnapshot | null {
+  const patient = store.patients.find((entry) => entry.id === patientId);
+  if (!patient) return null;
+
+  const complaintPatch = buildHighRiskComplaintPatch(patient);
+  if (Object.keys(complaintPatch).length) {
+    store.updatePatient(patientId, complaintPatch);
+  }
+
+  let workingPatient: Patient = {
+    ...patient,
+    ...complaintPatch,
+  };
+
+  let snapshot: ArrivalControlSnapshot | null = null;
+  if (patientNeedsRapidReview(workingPatient) && options.route !== false) {
+    snapshot = routeArrivalToDestination(store, patientId, 'rapid-review', {
+      source: options.source || 'high-risk-complaint-flags',
+    });
+    if (snapshot) {
+      workingPatient = {
+        ...workingPatient,
+        state: PatientState.Triage,
+        triagePending: true,
+        queueDestination: 'rapid-review',
+        registrationStatus: 'complete',
+      };
+    }
+  }
+
+  if (!snapshot) {
+    snapshot = stampArrivalControlLayer(store, patientId, {
+      arrivalMode: workingPatient.arrivalMode,
+      state: workingPatient.state,
+      flags: workingPatient.flags,
+      queueDestination: workingPatient.queueDestination,
+      triagePending: workingPatient.triagePending,
+    });
+  }
+
+  syncArrivalOperationalSurfaces(store, patientId, {
+    source: options.source || 'arrival-register',
+    snapshot,
+  });
+
+  if (complaintPatch.highRiskComplaintFlags?.length) {
+    store.recordWorkflowAction?.({
+      type: 'high_risk_complaint_flagged',
+      summary: `High-risk complaint flags: ${collectHighRiskComplaintLabels(workingPatient).join(', ')}. Rapid review queue — staff triage required.`,
+      patientId,
+      source: options.source || 'high-risk-complaint-flags',
+      metadata: {
+        flagIds: complaintPatch.highRiskComplaintFlags.map((record) => record.id),
+        advisoryOnly: true,
+      },
+    });
+  }
+
+  return snapshot;
+}
+
+export function buildArrivalControlSummary(
+  patients: Patient[] = [],
+  { recentMinutes = 30 }: { recentMinutes?: number } = {},
+): ArrivalControlSummary {
+  const active = patients.filter(
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+  );
+  const snapshots = active.map(buildArrivalControlSnapshot);
+  const cutoff = Date.now() - recentMinutes * 60_000;
+
+  const byMode = ARRIVAL_MODES.reduce(
+    (accumulator, mode) => {
+      accumulator[mode] = snapshots.filter((entry) => entry.arrivalMode === mode).length;
+      return accumulator;
+    },
+    {} as Record<ArrivalMode, number>,
+  );
 
   return {
-    patientId,
-    arrivalContext: context,
-    patientState: patient?.state || PatientStateEnum.Arrival,
-    encounterId:
-      patient?.timeline?.find((e) => e.type === 'EncounterCreated')?.metadata?.encounterId || null,
-    createdEncounter: patient?.timeline?.some((e) => e.type === 'EncounterCreated') || false,
-    queueAssignment: patient?.state === PatientStateEnum.Triage ? WHITEBOARD_QUEUE_FILTER.triage : 'arrival',
-    triageAssistGeneratedAt: patient?.triageAssistGeneratedAt,
-    handoffSyncPending: patient?.handoffSyncPending || false,
-    operationallyVisible: Boolean(patient),
+    recentArrivals: snapshots.filter(
+      (entry) => new Date(entry.arrivalTimestamp).getTime() >= cutoff,
+    ).length,
+    awaitingRegistration: snapshots.filter(
+      (entry) =>
+        entry.registrationStatus === 'pending' || entry.registrationStatus === 'in-progress',
+    ).length,
+    triagePending: snapshots.filter((entry) => entry.triagePending).length,
+    rapidReview: snapshots.filter((entry) => entry.queueDestination === 'rapid-review').length,
+    inWaitingRoom: snapshots.filter((entry) => entry.queueDestination === 'waiting-room').length,
+    byMode,
+    snapshots,
   };
 }
 
-/**
- * Resolve queue destination from arrival context and business rules.
- */
-export function resolveQueueDestination(context: ArrivalContext): string {
-  // High-priority safety flags → immediate triage
-  if (
-    context.quickSafetyFlags.includes(QuickSafetyFlag.Altered) ||
-    context.quickSafetyFlags.includes(QuickSafetyFlag.Chest) ||
-    context.quickSafetyFlags.includes(QuickSafetyFlag.Respiratory) ||
-    context.quickSafetyFlags.includes(QuickSafetyFlag.Trauma)
-  ) {
+export function queueDestinationToWhiteboardFilter(
+  destination: QueueDestination,
+): string | null {
+  if (destination === 'triage-queue' || destination === 'rapid-review') {
     return WHITEBOARD_QUEUE_FILTER.triage;
   }
-
-  // EMS arrivals → triage queue
-  if (context.arrivalMode === ArrivalMode.EMS) {
-    return WHITEBOARD_QUEUE_FILTER.triage;
-  }
-
-  // Referrals → triage queue
-  if (context.arrivalMode === ArrivalMode.Referral) {
-    return WHITEBOARD_QUEUE_FILTER.triage;
-  }
-
-  // Default: triage
-  return WHITEBOARD_QUEUE_FILTER.triage;
+  if (destination === 'waiting-room') return WHITEBOARD_QUEUE_FILTER.waiting;
+  if (destination === 'ems-registration') return WHITEBOARD_QUEUE_FILTER.ems;
+  return null;
 }
 
-/**
- * Validate arrival context completeness.
- * Ensures required fields are present before registration.
- */
-export function validateArrivalContext(context: Partial<ArrivalContext>): {
-  valid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-
-  if (!context.arrivalTimestamp) errors.push('arrivalTimestamp is required');
-  if (!context.arrivalMode) errors.push('arrivalMode is required');
-  if (!context.firstContactTimestamp) errors.push('firstContactTimestamp is required');
-  if (!context.presentingComplaint) errors.push('presentingComplaint is required');
-  if (context.registrationStatus === undefined) errors.push('registrationStatus is required');
-  if (context.triagePendingStatus === undefined) errors.push('triagePendingStatus is required');
-
-  return {
-    valid: errors.length === 0,
-    errors,
+export function arrivalModeLabel(mode: ArrivalMode): string {
+  const labels: Record<ArrivalMode, string> = {
+    'walk-in': 'Walk-in',
+    EMS: 'EMS',
+    referral: 'Referral',
+    police: 'Police',
+    transfer: 'Transfer',
   };
+  return labels[mode] || mode;
+}
+
+export function registrationStatusLabel(status: RegistrationStatus): string {
+  const labels: Record<RegistrationStatus, string> = {
+    pending: 'Pending',
+    'in-progress': 'Registering',
+    complete: 'Registered',
+    provisional: 'Provisional',
+  };
+  return labels[status] || status;
 }

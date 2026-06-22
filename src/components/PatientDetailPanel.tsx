@@ -30,6 +30,10 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
 import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatientState } from '../services/queueAssignment';
+import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
+import QueueReasonBadge from './queues/QueueReasonBadge';
+import DeteriorationWatchBadge from './waiting-room/DeteriorationWatchBadge';
+import WhatHappensNextPanel from './guidance/WhatHappensNextPanel';
 import { buildPatientTimeline } from '../utils/patientTimeline';
 import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
 import { findMatchingChecklists, type Checklist } from '../config/criticalChecklists';
@@ -40,8 +44,16 @@ import WhoNextPanel from './WhoNextPanel';
 import ErrorBoundary from './ErrorBoundary';
 import AiTriageAssistPanel from './reception/AiTriageAssistPanel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
+import WaitingRoomCommunicationPanel from './waiting-room/WaitingRoomCommunicationPanel';
+import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicationBadge';
+import {
+  createWaitingRoomCommunicationLogInput,
+  type WaitingRoomCommunicationKind,
+} from '../services/waitingRoomCommunicationLog';
 import DataQualityRiskPanel from './dataQuality/DataQualityRiskPanel';
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
+import ReassessmentTimerPanel from './reassessment/ReassessmentTimerPanel';
+import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -560,6 +572,8 @@ export default function PatientDetailPanel() {
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
   const alerts = useEmergencyStore((state) => state.alerts);
+  const referrals = useEmergencyStore((state) => state.referrals);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
@@ -571,6 +585,10 @@ export default function PatientDetailPanel() {
   const addVitals = useEmergencyStore((state) => state.addVitals);
   const addNote = useEmergencyStore((state) => state.addNote);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
+  const recordWorkflowAction = useEmergencyStore((state) => state.recordWorkflowAction);
+  const recordWaitingRoomCommunication = useEmergencyStore(
+    (state) => state.recordWaitingRoomCommunication,
+  );
   const [showVitalsForm, setShowVitalsForm] = useState(false);
   const [vitalsForm, setVitalsForm] = useState<VitalsForm>(emptyVitalsForm);
   const [flagToAdd, setFlagToAdd] = useState<PatientFlag>(PatientFlag.ReassessmentDue);
@@ -869,6 +887,14 @@ export default function PatientDetailPanel() {
       patientId: selectedPatient.id,
       source: 'patient-detail-panel',
     });
+    recordWorkflowAction(
+      createWaitingRoomCommunicationLogInput({
+        kind: 'concern-escalated',
+        patientId: selectedPatient.id,
+        summary: `${selectedPatient.firstName} ${selectedPatient.lastName} escalated for urgent review.`,
+        severity: 'Critical',
+      }),
+    );
     addFlag(selectedPatient.id, PatientFlag.HighRisk);
     setActionMode(null);
   };
@@ -941,6 +967,15 @@ export default function PatientDetailPanel() {
               {selectedPatient.firstName} {selectedPatient.lastName}
             </h2>
             <div style={{ marginTop: 4, color: '#9CA3AF', fontSize: 12 }}>{selectedPatient.mrn}</div>
+            {selectedPatient.state === PatientState.Waiting || selectedPatient.state === PatientState.Triage ? (
+              <div style={{ marginTop: 8 }}>
+                <WaitingRoomCommunicationBadge
+                  patient={selectedPatient}
+                  workflowLogs={patientWorkflowLogs}
+                  staff={staff}
+                />
+              </div>
+            ) : null}
           </div>
           <button
             type="button"
@@ -964,7 +999,28 @@ export default function PatientDetailPanel() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
           <Badge color="#9CA3AF">{selectedPatient.state}</Badge>
+          <PatientExperienceStatusBadge
+            patient={selectedPatient}
+            referrals={referrals}
+            showStaffDetail
+          />
+          <QueueReasonBadge
+            patient={selectedPatient}
+            referrals={referrals}
+            staff={staff}
+            showAll
+          />
+          <DeteriorationWatchBadge
+            patient={selectedPatient}
+            emsArrivals={emsArrivals}
+          />
         </div>
+
+        <WhatHappensNextPanel
+          patient={selectedPatient}
+          referrals={referrals}
+          staff={staff}
+        />
 
         {selectedPatient.state === PatientState.Triage ? (
           <div style={{ marginTop: 12 }}>
@@ -1067,6 +1123,18 @@ export default function PatientDetailPanel() {
         </div>
       </section>
 
+      {selectedPatient.state === PatientState.Waiting ? (
+        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+          <ReassessmentTimerPanel
+            timer={selectReassessmentTimerForPatient(selectedPatient)}
+            onOpenReassessment={(patientId) => {
+              selectPatient(patientId);
+              document.dispatchEvent(new Event('open-reassessment-drawer'));
+            }}
+          />
+        </section>
+      ) : null}
+
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }} aria-labelledby="patient-timeline-heading">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
           <div>
@@ -1137,6 +1205,24 @@ export default function PatientDetailPanel() {
           />
         </section>
       ) : null}
+
+      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+        <WaitingRoomCommunicationPanel
+          patient={selectedPatient}
+          workflowLogs={patientWorkflowLogs}
+          staff={staff}
+          limit={10}
+          readOnly={!canWriteNote}
+          onRecordCommunication={async ({ kind, summary }: { kind: WaitingRoomCommunicationKind; summary: string }) => {
+            recordWaitingRoomCommunication({
+              kind,
+              patientId: selectedPatient.id,
+              summary,
+              actorStaffId,
+            });
+          }}
+        />
+      </section>
 
       <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
         <OperationalHistoryPanel

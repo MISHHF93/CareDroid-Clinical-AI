@@ -49,6 +49,12 @@
   font-weight: 700;
 }
 
+.recent-arrivals__primary {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
 .recent-arrivals__empty {
   margin: 0;
   font-size: 13px;

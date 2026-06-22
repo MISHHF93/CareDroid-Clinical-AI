@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PatientFlag, type Note, type Patient, type Room } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
+import { collectReassessmentAttentionPatients } from '../services/reassessmentAttentionPatients';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
 import './ReassessmentDrawer.css';
 
@@ -12,6 +13,7 @@ export const REASSESSMENT_ATTENTION_FLAGS = [
   PatientFlag.SepsisAlert,
   PatientFlag.HighRisk,
   PatientFlag.ReassessmentDue,
+  PatientFlag.ScoreReassessmentRecommended,
 ] as const;
 
 export type ReassessmentAttentionFlag = (typeof REASSESSMENT_ATTENTION_FLAGS)[number];
@@ -58,6 +60,12 @@ const FLAG_COPY: Record<
     icon: 'R',
     tone: 'yellow',
     rowClass: 'reassessment-due',
+  },
+  [PatientFlag.ScoreReassessmentRecommended]: {
+    label: 'Score reassessment recommended',
+    icon: 'S',
+    tone: 'yellow',
+    rowClass: 'score-reassessment',
   },
 };
 
@@ -134,7 +142,7 @@ export function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 export function filterFlaggedReassessmentPatients(patients: Patient[]): Patient[] {
-  return patients.filter(isPatientFlaggedForReassessment);
+  return collectReassessmentAttentionPatients(patients);
 }
 
 export function getMostSevereReassessmentFlag(patient: Patient): ReassessmentAttentionFlag | null {

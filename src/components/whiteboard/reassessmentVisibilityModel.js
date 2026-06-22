@@ -1,7 +1,32 @@
 import { PatientFlag, PatientState } from '../../types/emergency';
+import { buildWaitingPatientReassessmentTimers } from '../../engine/reassessmentTimerEngine';
 
 /** Existing reassessment surfaces in the product (drawer, header badge, cards, palette, etc.). */
 export const REASSESSMENT_WORKFLOW_ARTIFACTS = Object.freeze([
+  Object.freeze({
+    id: 'notification-center',
+    label: 'Header notification center',
+    surfaces: ['Header'],
+    mechanism: 'reassessment-timer-alerts',
+  }),
+  Object.freeze({
+    id: 'waiting-room-safety-board',
+    label: 'Waiting room safety board',
+    surfaces: ['WaitingRoomSafetyBoard', 'ReassessmentTimerStrip'],
+    mechanism: 'timer-snapshot',
+  }),
+  Object.freeze({
+    id: 'patient-detail',
+    label: 'Patient detail reassessment panel',
+    surfaces: ['PatientDetailPanel', 'ReassessmentTimerPanel'],
+    mechanism: 'timer-snapshot',
+  }),
+  Object.freeze({
+    id: 'whiteboard-card',
+    label: 'Whiteboard patient card timer strip',
+    surfaces: ['PatientCard', 'ReassessmentTimerStrip'],
+    mechanism: 'timer-snapshot',
+  }),
   Object.freeze({
     id: 'drawer',
     label: 'Reassessment drawer',
@@ -130,6 +155,21 @@ export function buildReassessmentAttentionStripMetrics(patients = []) {
         surface: 'reassessments',
         tone: 'critical',
         whiteboardAction: 'filter-reassess',
+      }),
+    );
+  }
+
+  const overdueTimers = buildWaitingPatientReassessmentTimers(patients).filter((timer) => timer.isOverdue);
+  if (overdueTimers.length > 0) {
+    metrics.unshift(
+      Object.freeze({
+        id: 'reassessment-timer-overdue',
+        label: 'Reassessment timers overdue',
+        hint: 'Waiting-room patients past reassessment due time',
+        value: overdueTimers.length,
+        surface: 'reassessments',
+        tone: 'critical',
+        whiteboardAction: 'open-reassessment',
       }),
     );
   }

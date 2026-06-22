@@ -7,7 +7,7 @@ import { resolveWhiteboardDisplayProfile } from './useWhiteboardDisplayMode';
 describe('resolveWhiteboardDisplayProfile', () => {
   it('enables display-mode behavior for read-only screen modes', () => {
     const profile = resolveWhiteboardDisplayProfile({
-      screenMode: CARE_DROID_SCREEN_MODES.readOnly,
+      screenMode: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
       wallDisplayRefreshInterval: 30000,
       displayQueryReadOnly: false,
     });
@@ -16,6 +16,7 @@ describe('resolveWhiteboardDisplayProfile', () => {
     expect(profile.canMutate).toBe(false);
     expect(profile.autoRefresh).toBe(true);
     expect(profile.operationalAwarenessOnly).toBe(true);
+    expect(profile.isReadOnlyWhiteboardDisplay).toBe(true);
     expect(profile.refreshIntervalMs).toBe(30000);
   });
 
@@ -44,7 +45,7 @@ describe('resolveWhiteboardDisplayProfile', () => {
 
   it('clamps refresh interval to a safe minimum', () => {
     const profile = resolveWhiteboardDisplayProfile({
-      screenMode: CARE_DROID_SCREEN_MODES.readOnly,
+      screenMode: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
       wallDisplayRefreshInterval: 5000,
       displayQueryReadOnly: false,
     });

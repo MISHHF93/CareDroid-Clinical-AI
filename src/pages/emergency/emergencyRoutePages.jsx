@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import {
@@ -28,6 +29,8 @@ import {
   findUpgradeSignal,
   displayPatientName,
 } from './emergencyRouteShared';
+import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
+import QueueReasonBadge from '../../components/queues/QueueReasonBadge';
 
 
 export function PatientsRoute() {
@@ -219,10 +222,13 @@ export function PatientsRoute() {
 export function QueueRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
+  const staff = useEmergencyStore((state) => state.staff);
   const referrals = useEmergencyStore((state) => state.referrals);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const setFitToWaitClassification = useEmergencyStore((state) => state.setFitToWaitClassification);
   const queues = useEmergencyQueues();
   const requestedQueueFilter =
     searchParams.get('queue') || searchParams.get('filter') || searchParams.get('queueFilter') || '';
@@ -368,6 +374,27 @@ export function QueueRoute() {
           },
         ]}
       />
+      {(activeFilterKey === 'waiting' || !activeFilterKey) && (
+        <WaitingRoomSafetyBoard
+          patients={patients}
+          staff={staff}
+          referrals={referrals}
+          workflowLogs={workflowLogs}
+          activeQueueFilter={effectiveQueueFilter}
+          variant="focused"
+          onSelectPatient={(patientId) => {
+            selectPatient(patientId);
+            document.dispatchEvent(new Event('open-reassessment-drawer'));
+          }}
+          onOpenReassessment={(patientId) => {
+            selectPatient(patientId);
+            document.dispatchEvent(new Event('open-reassessment-drawer'));
+          }}
+          onClassifyFitToWait={(patientId, classificationId) => {
+            setFitToWaitClassification(patientId, classificationId, { staffName: 'Staff' });
+          }}
+        />
+      )}
       {effectiveQueueFilter ? (
         <div
           role="status"
@@ -447,23 +474,39 @@ export function QueueRoute() {
                 >
                   {patientsInQueue.length ? (
                     patientsInQueue.slice(0, 3).map((patient) => (
-                      <button
+                      <span
                         key={patient.id}
-                        type="button"
-                        onClick={() => selectPatient(patient.id)}
                         style={{
-                          border: '1px solid var(--color-border-subtle, #1F2937)',
-                          borderRadius: 999,
-                          background: 'var(--color-elevated, #0B1120)',
-                          color: 'var(--color-text-primary, #F9FAFB)',
-                          cursor: 'pointer',
-                          fontSize: 12,
-                          fontWeight: 800,
-                          padding: '4px 8px',
+                          display: 'inline-flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: 4,
                         }}
                       >
-                        {displayPatientName(patient)}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => selectPatient(patient.id)}
+                          style={{
+                            border: '1px solid var(--color-border-subtle, #1F2937)',
+                            borderRadius: 999,
+                            background: 'var(--color-elevated, #0B1120)',
+                            color: 'var(--color-text-primary, #F9FAFB)',
+                            cursor: 'pointer',
+                            fontSize: 12,
+                            fontWeight: 800,
+                            padding: '4px 8px',
+                          }}
+                        >
+                          {displayPatientName(patient)}
+                        </button>
+                        <QueueReasonBadge
+                          patient={patient}
+                          referrals={referrals}
+                          staff={staff}
+                          compact
+                          showAll
+                        />
+                      </span>
                     ))
                   ) : (
                     'Queue clear'

@@ -42,7 +42,12 @@ import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
 import DoorToDoctorIntelligenceService from './doorToDoctorIntelligenceService';
 import EdAutomationMarketplace from './edAutomationMarketplace';
 import EmsPreArrivalPipelineService from './emsPreArrivalPipelineService';
-import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
+import {
+  getCanonicalEmsOffloadThroughputDashboard,
+  getCanonicalQueueReasonThroughputDashboard,
+  getCanonicalReassessmentThroughputDashboard,
+  getCanonicalWaitingRoomThroughputDashboard,
+} from './canonicalThroughputPipelineAdapters';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
@@ -57,9 +62,7 @@ import EmergencyWhiteboardService from './emergencyWhiteboardService';
 import EmergencyOperatingSystemService from './emergencyOperatingSystemService';
 import EmergencyPatientPathService from './emergencyPatientPathService';
 import QueueIntelligenceService from './queueIntelligenceService';
-import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
-import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
 
 const PIPELINE_STAGES = Object.freeze([
   'Source',
@@ -198,13 +201,23 @@ export const WorkspaceDataPipelineService = {
     const doorToDoctorIntelligence =
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? DoorToDoctorIntelligenceService.getDashboard() : null;
     const waitingRoomIntelligence =
-      model.workspace.id === EMERGENCY_WORKSPACE_ID ? WaitingRoomIntelligenceService.getWaitingRoomDashboard() : null;
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? getCanonicalWaitingRoomThroughputDashboard()
+        : null;
     const reassessmentAutomation =
-      model.workspace.id === EMERGENCY_WORKSPACE_ID ? ReassessmentAutomationService.getDashboard() : null;
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? getCanonicalReassessmentThroughputDashboard()
+        : null;
     const emsPreArrival =
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmsPreArrivalPipelineService.getPreArrivalDashboard() : null;
     const emsOffload =
-      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmsOffloadCommandCenterService.getDashboard() : null;
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? getCanonicalEmsOffloadThroughputDashboard()
+        : null;
+    const queueReasonThroughput =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? getCanonicalQueueReasonThroughputDashboard()
+        : null;
     const capacityIntelligence =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
@@ -268,6 +281,7 @@ export const WorkspaceDataPipelineService = {
               doorToDoctorIntelligence,
               waitingRoomIntelligence,
               reassessmentAutomation,
+              queueReasonThroughput,
               emsPreArrival,
               emsOffload,
               capacityIntelligence,

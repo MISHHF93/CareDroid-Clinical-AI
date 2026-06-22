@@ -278,6 +278,57 @@ export interface CriticalChecklistRecord {
   savedToPatientAt?: ISODateString;
 }
 
+/** Identity verification state captured at ambulance handoff. */
+export type AmbulanceHandoffIdentityStatus =
+  | 'unknown'
+  | 'provisional'
+  | 'verified'
+  | 'mismatch';
+
+/** Where the patient was moved after EMS handoff. */
+export type AmbulanceHandoffDestination =
+  | 'pending'
+  | 'waiting'
+  | 'room'
+  | 'monitored-chair'
+  | 'hallway'
+  | 'offload-area';
+
+export type AmbulanceHandoffCriticalFlagSource =
+  | 'ems-severity'
+  | 'patient-flag'
+  | 'high-risk-complaint'
+  | 'critical-checklist'
+  | 'staff';
+
+export interface AmbulanceHandoffCriticalFlag {
+  id: string;
+  label: string;
+  source: AmbulanceHandoffCriticalFlagSource;
+}
+
+/** Structured ambulance handoff checklist — derived from EMS/intake data with staff confirmations. */
+export interface AmbulanceHandoffChecklist {
+  arrivalId: EntityId;
+  patientId?: EntityId;
+  identityStatus: AmbulanceHandoffIdentityStatus;
+  complaintSummary: string;
+  vitalsReceived: boolean;
+  vitalsSnapshot?: Vitals;
+  medicationsEnRoute: string[];
+  criticalFlags: AmbulanceHandoffCriticalFlag[];
+  handoffSummary?: string;
+  handoffAccepted: boolean;
+  handoffAcceptedAt?: ISODateString;
+  handoffAcceptedByStaffId?: EntityId;
+  handoffAcceptedByStaffName?: string;
+  patientDestination: AmbulanceHandoffDestination;
+  destinationLabel?: string;
+  destinationRoomId?: EntityId;
+  handoffNotes?: string;
+  updatedAt: ISODateString;
+}
+
 export interface EMSArrival {
   id: EntityId;
   patientId?: EntityId;
@@ -295,6 +346,7 @@ export interface EMSArrival {
   estimatedArrivalTime: ISODateString;
   notes: string;
   arrivedAt?: ISODateString;
+  handoffStartedAt?: ISODateString;
   handoffCompletedAt?: ISODateString;
   status: EMSArrivalStatus;
   preparedRoomId?: EntityId;
@@ -302,9 +354,71 @@ export interface EMSArrival {
   priority: Priority;
   handoffSummary?: string;
   criticalChecklist?: CriticalChecklistRecord;
+  /** Explicit medications documented by EMS crew (optional feed field). */
+  medicationsEnRoute?: string[];
+  /** Structured handoff checklist — synced to linked patient.emsArrival when present. */
+  ambulanceHandoffChecklist?: AmbulanceHandoffChecklist;
 }
 
 export type EMSCase = EMSArrival;
+
+/** Canonical arrival channel for reception / triage routing. */
+export type ArrivalMode = 'walk-in' | 'EMS' | 'referral' | 'police' | 'transfer';
+
+/** Registration progress through the arrival pipeline. */
+export type RegistrationStatus = 'pending' | 'in-progress' | 'complete' | 'provisional';
+
+/** Operational queue destination after arrival capture. */
+export type QueueDestination =
+  | 'triage-queue'
+  | 'rapid-review'
+  | 'waiting-room'
+  | 'verification'
+  | 'ems-registration'
+  | 'whiteboard';
+
+/** High-risk complaint fast flag — staff alert only; does not assign CTAS. */
+export type HighRiskComplaintFlagId =
+  | 'chest-pain'
+  | 'shortness-of-breath'
+  | 'stroke-symptoms'
+  | 'syncope'
+  | 'altered-mental-status'
+  | 'severe-abdominal-pain'
+  | 'severe-bleeding'
+  | 'sepsis-concern'
+  | 'anaphylaxis-concern'
+  | 'pregnancy-emergency';
+
+export interface HighRiskComplaintFlagRecord {
+  id: HighRiskComplaintFlagId;
+  label: string;
+  detectedAt: ISODateString;
+  source: 'complaint-text' | 'complaint-category' | 'staff-selected';
+}
+
+/** Quick safety flags captured at arrival (subset of PatientFlag). */
+export type QuickSafetyFlag =
+  | PatientFlag.HighRisk
+  | PatientFlag.StrokeCode
+  | PatientFlag.SepsisAlert
+  | PatientFlag.PsychAlert
+  | PatientFlag.Isolation
+  | PatientFlag.DeterioratingNeuro;
+
+/** Unified arrival-to-triage control snapshot for reception and operational surfaces. */
+export interface ArrivalControlSnapshot {
+  patientId: string;
+  arrivalTimestamp: ISODateString;
+  arrivalMode: ArrivalMode;
+  presentingComplaint: string;
+  quickSafetyFlags: QuickSafetyFlag[];
+  highRiskComplaintFlags: HighRiskComplaintFlagRecord[];
+  registrationStatus: RegistrationStatus;
+  triagePending: boolean;
+  firstContactTimestamp: ISODateString | null;
+  queueDestination: QueueDestination;
+}
 
 export interface Patient {
   id: EntityId;
@@ -347,6 +461,65 @@ export interface Patient {
   phn?: string;
   triageAssist?: TriageAssistEnvelope | null;
   triageAssistGeneratedAt?: ISODateString | null;
+  /** Arrival-to-triage control layer — optional on legacy records; derived when absent. */
+  arrivalMode?: ArrivalMode;
+  registrationStatus?: RegistrationStatus;
+  triagePending?: boolean;
+  firstContactAt?: ISODateString | null;
+  queueDestination?: QueueDestination;
+  quickSafetyFlags?: QuickSafetyFlag[];
+  /** Reception / waiting-room fast flags — advisory only, no auto-triage. */
+  highRiskComplaintFlags?: HighRiskComplaintFlagRecord[];
+  /** Staff-confirmed fit-to-sit / fit-to-wait seating pathway — never auto-assigned. */
+  fitToWaitClassification?: FitToWaitClassificationRecord | null;
+}
+
+/** Fit-to-sit / fit-to-wait seating classification — human review required. */
+export type FitToWaitClassificationId =
+  | 'fit-to-sit'
+  | 'monitored-chair'
+  | 'stretcher-needed'
+  | 'immediate-room-needed'
+  | 'reassessment-required';
+
+export interface FitToWaitClassificationRecord {
+  id: FitToWaitClassificationId;
+  label: string;
+  classifiedAt: ISODateString;
+  classifiedByStaffId?: EntityId;
+  classifiedByStaffName?: string;
+  notes?: string;
+  /** Always true — classifications require explicit staff action. */
+  staffConfirmed: true;
+}
+
+/** Patient-facing experience status — derived from journey/queue state for staff visibility. */
+export type PatientExperienceStatusId =
+  | 'registered'
+  | 'waiting-for-triage'
+  | 'waiting-for-clinician'
+  | 'tests-in-progress'
+  | 'waiting-for-results'
+  | 'waiting-for-specialist-review'
+  | 'preparing-discharge'
+  | 'awaiting-admission-bed';
+
+export type PatientExperienceTone = 'neutral' | 'info' | 'watch' | 'stable';
+
+export interface PatientExperienceStatusSnapshot {
+  id: PatientExperienceStatusId;
+  label: string;
+  shortLabel: string;
+  tone: PatientExperienceTone;
+  internalState: PatientState;
+  queueDestination?: QueueDestination;
+  staffDetail: string;
+}
+
+/** PHI-safe status view for public or wall displays — no identifiers or clinical detail. */
+export interface PublicPatientExperienceStatusView {
+  id: PatientExperienceStatusId;
+  label: string;
 }
 
 export type StaffRole =

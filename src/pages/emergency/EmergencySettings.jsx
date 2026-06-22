@@ -28,10 +28,12 @@ import {
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
+import { listScreenModesForSettings } from '../../config/careDroidScreenModes';
 import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
 import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
 import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
 import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
+import DeviceContextPanel from '../../components/emergency/DeviceContextPanel';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
@@ -735,6 +737,7 @@ export default function EmergencySettings() {
                 readOnlyDisplayMode: draft.readOnlyDisplayMode,
                 commandCenterMode: draft.commandCenterMode,
                 wallDisplayRefreshInterval: draft.wallDisplayRefreshInterval,
+                wallDisplayMonitorPrivacy: draft.wallDisplayMonitorPrivacy,
               })
             }
           >
@@ -848,20 +851,13 @@ export default function EmergencySettings() {
               })
             }
           />
+        </div>
+        <DeviceContextPanel className="emergency-settings__device-context" />
+        <div className="emergency-settings__grid">
           <SettingsField
             label="Default screen mode"
             value={draft.defaultScreenMode}
-            options={[
-              ['TRIAGE_SCREEN', 'Triage screen'],
-              ['REGISTRATION_SCREEN', 'Registration screen'],
-              ['CHARGE_NURSE_SCREEN', 'Charge nurse screen'],
-              ['PHYSICIAN_SCREEN', 'Physician screen'],
-              ['EMS_SCREEN', 'EMS screen'],
-              ['WAITING_ROOM_DISPLAY', 'Waiting room display'],
-              ['COMMAND_CENTER_DISPLAY', 'Command center display'],
-              ['ADMIN_SCREEN', 'Admin screen'],
-              ['READ_ONLY_DISPLAY', 'Read-only display'],
-            ]}
+            options={listScreenModesForSettings().map((mode) => [mode.id, mode.label])}
             onChange={(value) => updateDraft({ defaultScreenMode: value })}
           />
           <SettingsField
@@ -881,6 +877,16 @@ export default function EmergencySettings() {
             label="Wall display refresh interval (ms)"
             value={draft.wallDisplayRefreshInterval}
             onChange={(value) => updateDraft({ wallDisplayRefreshInterval: Number(value) })}
+          />
+          <SettingsField
+            label="Hallway monitor privacy"
+            value={draft.wallDisplayMonitorPrivacy || 'operational'}
+            options={[
+              ['operational', 'Operational — full aggregate detail'],
+              ['restricted', 'Restricted — hide timing and arrival detail'],
+              ['minimal', 'Minimal — bucketed waits, highest privacy'],
+            ]}
+            onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
           />
         </div>
         <div className="emergency-settings__rules" aria-label="Central node governed rule groups">

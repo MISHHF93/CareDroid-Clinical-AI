@@ -3,6 +3,13 @@ import { filterPatientsBySearch } from '../../utils/patientSearch';
 import { RECEPTION_COPY } from './receptionCopy';
 import { summarizeDataQualityRisks } from '../../config/dataQualityModel';
 import { auditReceptionQueues, summarizeQueueAudit } from '../../config/queueAuditModel';
+import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
+import { buildEmsOffloadTrackerSummary } from '../../services/emsOffloadTracker';
+import { summarizeTriageBreachBoard } from '../../services/triageBreachTimer';
+import {
+  patientNeedsRapidReview,
+  sortPatientsForRapidReview,
+} from '../../services/highRiskComplaintFlags';
 
 export const RECENT_ARRIVAL_MINUTES = 30;
 export const RECEPTION_QUEUE_PREVIEW_LIMIT = 8;
@@ -44,14 +51,16 @@ export function selectReceptionQueues(patients = [], { limit = RECEPTION_QUEUE_P
       patient.state === PatientState.Registration && !isEmsRegistrationPatient(patient),
   );
   const pretriageAll = patients.filter((patient) => patient.state === PatientState.Triage);
+  const rapidReviewAll = patients.filter((patient) => patientNeedsRapidReview(patient));
   const recentAll = patients.filter(
     (patient) => minutesSince(patient.arrivalTime) <= RECENT_ARRIVAL_MINUTES,
   );
 
   const ems = [...emsAll].sort(sortByArrivalDesc).slice(0, limit);
   const verification = [...verificationAll].sort(sortByArrivalDesc).slice(0, limit);
-  const pretriage = [...pretriageAll].sort(sortByArrivalDesc).slice(0, limit);
-  const recentArrivals = [...recentAll].sort(sortByArrivalDesc).slice(0, limit);
+  const pretriage = sortPatientsForRapidReview(pretriageAll).slice(0, limit);
+  const rapidReview = sortPatientsForRapidReview(rapidReviewAll).slice(0, limit);
+  const recentArrivals = sortPatientsForRapidReview(recentAll).slice(0, limit);
 
   const awaitingVerification = patients.filter(
     (patient) => patient.state === PatientState.Registration,
@@ -64,11 +73,13 @@ export function selectReceptionQueues(patients = [], { limit = RECEPTION_QUEUE_P
     ems,
     verification,
     pretriage,
+    rapidReview,
     recentArrivals,
     counts: {
       ems: emsAll.length,
       verification: verificationAll.length,
       pretriage: pretriageAll.length,
+      rapidReview: rapidReviewAll.length,
       recentArrivals: recentAll.length,
       awaitingVerification,
       awaitingTriage,
@@ -104,7 +115,7 @@ export const RECEPTION_STRIP_TO_OPERATIONAL_KEY = Object.freeze({
 export function selectReceptionOperationalStripMetrics(
   patients = [],
   emsInbound = 0,
-  { metricIds = null } = {},
+  { metricIds = null, settings = null, emsArrivals = [] } = {},
 ) {
   const { counts } = selectReceptionQueues(patients);
   const today = localDateKey();
@@ -113,6 +124,16 @@ export function selectReceptionOperationalStripMetrics(
   ).length;
   const dataQualitySummary = summarizeDataQualityRisks(patients);
   const receptionAudit = summarizeQueueAudit(auditReceptionQueues(patients, { emsInbound }));
+  const arrivalControl = buildArrivalControlSummary(patients);
+  const triageBreachSummary = summarizeTriageBreachBoard(patients, {
+    settings: settings || undefined,
+  });
+  const offloadSummary = buildEmsOffloadTrackerSummary(emsArrivals, {
+    patients,
+    offloadTargetMinutes:
+      Number(settings?.thresholds?.emsOffloadTargetMinutes ?? settings?.emsThresholds?.offloadTargetMinutes) ||
+      15,
+  });
 
   return [
     {
@@ -130,7 +151,13 @@ export function selectReceptionOperationalStripMetrics(
     {
       id: 'awaiting-triage',
       label: RECEPTION_COPY.metrics.awaitingTriage,
-      value: counts.awaitingTriage,
+      value: arrivalControl.triagePending || counts.awaitingTriage,
+      queueTab: 'pretriage',
+    },
+    {
+      id: 'rapid-review',
+      label: RECEPTION_COPY.metrics.rapidReview,
+      value: arrivalControl.rapidReview || counts.rapidReview,
       queueTab: 'pretriage',
     },
     {
@@ -165,6 +192,36 @@ export function selectReceptionOperationalStripMetrics(
       label: RECEPTION_COPY.metrics.longestWait,
       value: receptionAudit.longestWaitLabel,
       queueTab: 'pretriage',
+    },
+    {
+      id: 'triage-breach-risk',
+      label: RECEPTION_COPY.metrics.triageBreachRisk,
+      value: triageBreachSummary.breachRiskCount,
+      queueTab: 'pretriage',
+      hint: `Target ${triageBreachSummary.targetMinutes}m`,
+    },
+    {
+      id: 'triage-breached',
+      label: RECEPTION_COPY.metrics.triageBreached,
+      value: triageBreachSummary.breachedCount,
+      queueTab: 'pretriage',
+      hint: `Longest ${triageBreachSummary.longestElapsedLabel}`,
+    },
+    {
+      id: 'door-to-triage',
+      label: RECEPTION_COPY.metrics.doorToTriage,
+      value: triageBreachSummary.longestElapsedLabel,
+      queueTab: 'pretriage',
+      hint: `Target ${triageBreachSummary.targetMinutes}m · ${triageBreachSummary.awaitingTriageCount} awaiting`,
+    },
+    {
+      id: 'offload-delays',
+      label: RECEPTION_COPY.metrics.offloadDelays,
+      value: offloadSummary.delayedCount,
+      queueTab: 'ems',
+      hint: offloadSummary.longestOffloadMinutes
+        ? `Longest ${offloadSummary.longestOffloadMinutes}m`
+        : undefined,
     },
   ].filter((metric) => !metricIds?.length || metricIds.includes(metric.id));
 }

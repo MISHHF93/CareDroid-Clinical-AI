@@ -27,6 +27,7 @@ import {
 import { RECEPTION_FIRST_UX, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { navigateToEmergencySurface } from '../services/navigateToEmergencySurface';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import type { EmergencyRoleActionPresentation } from '../config/emergencyRoleActionMatrix';
 import type { Patient } from '../types/emergency';
 import { getPatientDisplayName, rankPatientsBySearch, scorePatientSearch } from '../utils/patientSearch';
 import {
@@ -64,6 +65,7 @@ export interface Command {
 type EmergencyCommandPermissions = {
   role: string;
   can: (action: string) => boolean;
+  presentAction: (action: string) => EmergencyRoleActionPresentation;
   canAccessRoute: (path: string) => boolean;
   nearestRoute: (path: string) => string;
 };
@@ -96,6 +98,8 @@ type PatientResult = {
 
 type CommandResult = Command & {
   type: 'command';
+  disabled?: boolean;
+  readOnly?: boolean;
 };
 
 type OperationalEntityResult = {
@@ -387,6 +391,16 @@ function createEmergencyRouteCommands(
   });
 }
 
+export function resolveCommandActionPresentation(
+  command: Pick<CommandWithVisibility, 'requiredAction'>,
+  emergencyRole: EmergencyCommandPermissions,
+) {
+  if (!command.requiredAction) {
+    return { visible: true, enabled: true, readOnly: false, state: 'allowed' as const };
+  }
+  return emergencyRole.presentAction(command.requiredAction);
+}
+
 export function isCommandVisibleForEmergencyRole(
   command: Pick<CommandWithVisibility, 'id' | 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
   emergencyRole: EmergencyCommandPermissions,
@@ -395,9 +409,28 @@ export function isCommandVisibleForEmergencyRole(
   if (command.id === 'open-intake' && shouldHideStandaloneIntakeNav(emergencyRole.role)) {
     return false;
   }
-  if (command.requiredAction && !emergencyRole.can(command.requiredAction)) return false;
+  if (command.requiredAction && !resolveCommandActionPresentation(command, emergencyRole).visible) {
+    return false;
+  }
   if (command.requiredRoute && !emergencyRole.canAccessRoute(command.requiredRoute)) return false;
   return true;
+}
+
+function applyRoleActionMatrixToCommands(
+  commands: CommandWithVisibility[],
+  emergencyRole: EmergencyCommandPermissions,
+): Array<CommandWithVisibility & { disabled?: boolean; readOnly?: boolean }> {
+  return commands
+    .filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole))
+    .map((command) => {
+      if (!command.requiredAction) return command;
+      const presentation = emergencyRole.presentAction(command.requiredAction);
+      return {
+        ...command,
+        disabled: !presentation.enabled,
+        readOnly: presentation.readOnly,
+      };
+    });
 }
 
 function createHighValueCommands(
@@ -481,6 +514,7 @@ function createHighValueCommands(
       shortcut: 'R',
       group: quickGroup,
       keywords: ['reassessment', 'reassess', 'due', 'safety', 'review', 'flag'],
+      requiredAction: EMERGENCY_ACTIONS.completeReassessment,
       requiredRoute: CANONICAL_ROUTES.emergencyReassessment,
       action: () => {
         dispatchDocumentEvent('open-reassessment-drawer');
@@ -563,7 +597,7 @@ function createCommands(
       : []),
   ];
 
-  return commands.filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole));
+  return applyRoleActionMatrixToCommands(commands, emergencyRole);
 }
 
 export function buildCommandResults(
@@ -669,6 +703,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
 
   const executeResult = (result: PaletteResult | undefined) => {
     if (!result) return;
+    if (result.type === 'command' && result.disabled) return;
 
     result.action();
     if (result.type === 'command') {
@@ -740,11 +775,14 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                     type="button"
                     role="option"
                     aria-selected={active}
+                    aria-disabled={result.type === 'command' && result.disabled ? true : undefined}
+                    disabled={result.type === 'command' && result.disabled}
                     onMouseEnter={() => setSelectedIndex(index)}
                     onClick={() => executeResult(result)}
                     style={{
                       ...styles.resultItem,
                       ...(active ? styles.resultItemActive : null),
+                      ...(result.type === 'command' && result.disabled ? styles.resultItemDisabled : null),
                     }}
                   >
                     <span
@@ -884,6 +922,10 @@ const styles: Record<string, CSSProperties> = {
   },
   resultItemActive: {
     background: '#1C2333',
+  },
+  resultItemDisabled: {
+    opacity: 0.45,
+    cursor: 'not-allowed',
   },
   commandIcon: {
     display: 'inline-flex',

@@ -1,0 +1,133 @@
+.triage-breach-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.triage-breach-badge--compact {
+  font-size: 0.68rem;
+  padding: 0.1rem 0.45rem;
+}
+
+.triage-breach-badge--neutral {
+  background: rgba(148, 163, 184, 0.18);
+  color: #cbd5e1;
+}
+
+.triage-breach-badge--info {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+}
+
+.triage-breach-badge--watch {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+}
+
+.triage-breach-badge--critical {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+}
+
+.triage-breach-panel,
+.triage-breach-strip {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.triage-breach-panel__header h3,
+.triage-breach-strip__header h3 {
+  margin: 0.15rem 0 0;
+  font-size: 0.95rem;
+}
+
+.triage-breach-panel__eyebrow,
+.triage-breach-strip__eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.triage-breach-panel__subtitle,
+.triage-breach-strip__subtitle {
+  margin: 0.25rem 0 0;
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.triage-breach-panel__grid,
+.triage-breach-strip__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.triage-breach-panel__metric,
+.triage-breach-strip__count {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 5.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+}
+
+.triage-breach-panel__metric strong,
+.triage-breach-strip__count strong {
+  font-size: 1rem;
+}
+
+.triage-breach-panel__metric span,
+.triage-breach-strip__count span {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.triage-breach-panel__metric[data-tone='critical'],
+.triage-breach-strip__count[data-tone='critical'] {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.triage-breach-panel__metric[data-tone='watch'],
+.triage-breach-strip__count[data-tone='watch'] {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.triage-breach-strip__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.triage-breach-strip__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.35);
+  color: #f9fafb;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 6px 10px;
+}
+
+.triage-breach-strip__item:disabled {
+  cursor: default;
+}

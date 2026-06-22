@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildReassessmentAttentionStripMetrics } from './reassessmentVisibilityModel';
-import './ChargeNurseOperationalStrip.css';
 
 export default function ReassessmentAttentionStrip({
   patients = [],
@@ -16,7 +15,7 @@ export default function ReassessmentAttentionStrip({
     <ChargeNurseOperationalStrip
       metrics={metrics}
       eyebrow="Reassess now"
-      className="charge-nurse-operational-strip--reassessment"
+      accent="reassessment"
       onMetricSelect={onMetricSelect}
       readOnly={readOnly}
       emptyLabel={clearCopy.label}

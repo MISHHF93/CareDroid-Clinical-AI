@@ -26,7 +26,7 @@ export const RECEPTION_PIPELINE_STAGES = Object.freeze([
   Object.freeze({
     id: RECEPTION_PIPELINE_STAGE.REGISTER,
     label: 'Register',
-    querySignals: Object.freeze(['express', 'intake', 'quickCreate']),
+    querySignals: Object.freeze(['express', 'intake', 'quickCreate', 'quickIntake']),
   }),
   Object.freeze({
     id: RECEPTION_PIPELINE_STAGE.VERIFY,
@@ -270,7 +270,12 @@ export function resolvePipelineStageFromSearchParams(searchParams = {}) {
   if (searchParams.get?.('intake') === '1' || searchParams.intake === '1') {
     return RECEPTION_PIPELINE_STAGE.REGISTER;
   }
-  if (searchParams.get?.('quickCreate') === '1' || searchParams.quickCreate === '1') {
+  if (
+    searchParams.get?.('quickCreate') === '1' ||
+    searchParams.quickCreate === '1' ||
+    searchParams.get?.('quickIntake') === '1' ||
+    searchParams.quickIntake === '1'
+  ) {
     return RECEPTION_PIPELINE_STAGE.REGISTER;
   }
   if (queue === 'verification') return RECEPTION_PIPELINE_STAGE.VERIFY;

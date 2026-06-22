@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../../types/emergency';
 import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
+import { CHARGE_NURSE_SCREEN_WIDGETS } from '../../config/chargeNurseScreenModel';
 import {
   CHARGE_NURSE_WORKFLOW_SURFACES,
   selectChargeNurseOperationalStrip,
@@ -28,13 +29,16 @@ const basePatient = {
 };
 
 describe('chargeNurseWorkflowModel', () => {
-  it('defines the five charge nurse workflow surfaces', () => {
+  it('defines charge nurse workflow surfaces aligned to screen widgets', () => {
     expect(CHARGE_NURSE_WORKFLOW_SURFACES).toEqual([
-      'queues',
-      'reassessments',
-      'ems',
-      'capacity',
-      'boarding',
+      CHARGE_NURSE_SCREEN_WIDGETS.queueHealth,
+      CHARGE_NURSE_SCREEN_WIDGETS.reassessmentsDue,
+      CHARGE_NURSE_SCREEN_WIDGETS.providerWaitBreaches,
+      CHARGE_NURSE_SCREEN_WIDGETS.emsInbound,
+      CHARGE_NURSE_SCREEN_WIDGETS.offloadDelays,
+      CHARGE_NURSE_SCREEN_WIDGETS.boarders,
+      CHARGE_NURSE_SCREEN_WIDGETS.referralsPending,
+      CHARGE_NURSE_SCREEN_WIDGETS.capacityStatus,
     ]);
   });
 
@@ -75,18 +79,52 @@ describe('chargeNurseWorkflowModel', () => {
       centralSnapshot: {
         queueHealth: [{ breached: true }, { breached: false }],
         reassessmentStatus: { due: 4 },
-        emsPressure: { inbound: 2 },
+        emsPressure: { inbound: 2, delayedOffload: 1 },
         capacityStatus: { score: 78, band: 'Orange' },
         boardingStatus: { boarders: 3, risk: 'strained' },
+        referralStatus: { pending: 2 },
       },
       activeEmsArrivals: 1,
+      referrals: [{ id: 'r-1', status: 'Pending' }],
     });
 
-    expect(metrics.map((metric) => metric.surface)).toEqual(CHARGE_NURSE_WORKFLOW_SURFACES);
+    expect(metrics.some((metric) => metric.id === 'waiting-count')).toBe(true);
+    expect(metrics.map((metric) => metric.surface)).toEqual([
+      CHARGE_NURSE_SCREEN_WIDGETS.queueHealth,
+      ...CHARGE_NURSE_WORKFLOW_SURFACES,
+    ]);
+    expect(metrics.find((metric) => metric.id === 'waiting-count')?.value).toBe(1);
     expect(metrics.find((metric) => metric.id === 'queues')?.value).toBe(1);
     expect(metrics.find((metric) => metric.id === 'reassessments')?.value).toBe(4);
     expect(metrics.find((metric) => metric.id === 'ems')?.value).toBe(3);
+    expect(metrics.find((metric) => metric.id === 'offload')?.value).toBe(1);
     expect(metrics.find((metric) => metric.id === 'capacity')?.value).toBe('78 Orange');
     expect(metrics.find((metric) => metric.id === 'boarding')?.value).toBe(3);
+    expect(metrics.find((metric) => metric.id === 'referrals')?.value).toBe(2);
+  });
+
+  it('filters strip metrics to visible charge nurse surfaces', () => {
+    const metrics = selectChargeNurseOperationalStrip({
+      patients: [basePatient],
+      visibleSurfaces: [
+        CHARGE_NURSE_SCREEN_WIDGETS.queueHealth,
+        CHARGE_NURSE_SCREEN_WIDGETS.emsInbound,
+      ],
+    });
+
+    expect(metrics.map((metric) => metric.id)).toEqual(['waiting-count', 'queues', 'ems']);
+  });
+
+  it('filters strip metrics to KPI policy metric ids', () => {
+    const metrics = selectChargeNurseOperationalStrip({
+      patients: [basePatient],
+      kpiMetricIds: ['waiting-count', 'reassessments', 'offload'],
+      centralSnapshot: {
+        reassessmentStatus: { due: 2 },
+        emsPressure: { delayedOffload: 1 },
+      },
+    });
+
+    expect(metrics.map((metric) => metric.id)).toEqual(['waiting-count', 'reassessments', 'offload']);
   });
 });

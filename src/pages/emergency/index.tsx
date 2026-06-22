@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } from '../../types/emergency';
+import { PatientFlag, PatientState, Priority, type EMSArrival, type FitToWaitClassificationId, type Patient } from '../../types/emergency';
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
@@ -22,6 +22,12 @@ import {
 import { isReceptionFirstUxEnabled } from '../../config/receptionFirstUx.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import useTriageScreen from '../../hooks/useTriageScreen';
+import useChargeNurseScreen from '../../hooks/useChargeNurseScreen';
+import usePhysicianScreen from '../../hooks/usePhysicianScreen';
+import usePublicWaitingScreen from '../../hooks/usePublicWaitingScreen';
+import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen';
+import useCommandCenterScreen from '../../hooks/useCommandCenterScreen';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
 import WhoNextPanel from '../../components/WhoNextPanel';
@@ -35,12 +41,42 @@ import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import CapacityCrisisMode from '../../components/CapacityCrisisMode';
 import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
 import ChargeNurseOperationalStrip from '../../components/whiteboard/ChargeNurseOperationalStrip';
+import PhysicianOperationalStrip from '../../components/whiteboard/PhysicianOperationalStrip';
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
 import WhiteboardOpsDetailStrip from '../../components/whiteboard/WhiteboardOpsDetailStrip';
 import { evaluateWhiteboardDensity } from '../../config/whiteboardDensityModel';
 import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
+import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
+import PatientExperienceStatusStrip from '../../components/patient-experience/PatientExperienceStatusStrip';
+import WhatHappensNextStrip from '../../components/guidance/WhatHappensNextStrip';
+import LwbsRiskStrip from '../../components/waiting-room/LwbsRiskStrip';
+import DeteriorationWatchStrip from '../../components/waiting-room/DeteriorationWatchStrip';
+import HighRiskComplaintAttentionStrip from '../../components/waiting-room/HighRiskComplaintAttentionStrip';
+import FitToWaitAttentionStrip from '../../components/waiting-room/FitToWaitAttentionStrip';
+import QueueReasonAttentionStrip from '../../components/queues/QueueReasonAttentionStrip';
+import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
+import ProviderWaitBreachStrip from '../../components/provider-wait/ProviderWaitBreachStrip';
+import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
+import DepartmentStatusScreen from '../../components/whiteboard/DepartmentStatusScreen';
+import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
+import CommandCenterThroughputScreen from '../../components/whiteboard/CommandCenterThroughputScreen';
+import { buildDepartmentStatusSnapshot, filterDepartmentStatusSnapshot } from '../../components/whiteboard/departmentStatusScreenModel';
+import { buildPublicWaitingDisplaySnapshot } from '../../components/whiteboard/publicWaitingDisplayModel';
+import { buildCommandCenterThroughputSnapshot, filterCommandCenterThroughputSnapshot } from '../../components/whiteboard/commandCenterThroughputModel';
+import {
+  resolveChargeNurseStripMetricIds,
+  resolveCommandCenterMetricIds,
+  resolveCommandCenterWidgetVisibility,
+  resolvePublicWaitingKpiWidgets,
+} from '../../config/emergencyScreenKpiPolicy';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import useOperationalPresentation from '../../hooks/useOperationalPresentation';
+import { applyWallDisplayMonitorPrivacy } from '../../config/wallDisplayMonitorPrivacyModel';
+import { READ_ONLY_WHITEBOARD_METRIC_IDS } from '../../config/readOnlyWhiteboardScreenModel';
 import ReferralAttentionStrip from '../../components/whiteboard/ReferralAttentionStrip';
 import EmsAttentionStrip from '../../components/whiteboard/EmsAttentionStrip';
+import EmsOffloadTrackerPanel from '../../components/ems/EmsOffloadTrackerPanel';
+import EmsOffloadAttentionStrip from '../../components/ems/EmsOffloadAttentionStrip';
 import { shouldShowChargeNurseOperationalStrip } from '../../components/whiteboard/chargeNurseWorkflowModel';
 import { shouldShowShiftHandoffStrip } from '../../components/whiteboard/shiftHandoffSnapshotModel';
 import { buildOperationalHandoffDomains } from '../../components/whiteboard/operationalHandoffSummaryModel';
@@ -58,9 +94,10 @@ import {
   summarizeEmsAwareness,
 } from '../../components/whiteboard/emsAwarenessModel';
 import { formatEta as formatEmsEta } from '../../utils/emsArrivalDisplay';
-import { resolvePatientCardWorkflowProfile } from '../../components/whiteboard/physicianWorkflowModel';
+import { resolvePatientCardWorkflowProfile, shouldShowPhysicianOperationalStrip } from '../../components/whiteboard/physicianWorkflowModel';
+import { resolvePhysicianStaffId } from '../../utils/whoNext';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
-import { completeIntakeHandoff } from '../../services/receptionHandoff';
+import { completeIntakeHandoff, refreshIntakeHandoffSurfaces } from '../../services/receptionHandoff';
 import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
 import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
 import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/whiteboardOperationalLoadModel';
@@ -302,23 +339,50 @@ function MissionButton({
 export default function EmergencyWhiteboard() {
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
+  const triage = useTriageScreen();
+  const charge = useChargeNurseScreen();
+  const physician = usePhysicianScreen();
+  const publicWaiting = usePublicWaitingScreen();
+  const readOnlyWhiteboard = useReadOnlyWhiteboardScreen();
+  const commandCenter = useCommandCenterScreen();
   const storePatients = useEmergencyStore((state) => state.patients);
   const storeCapacity = useEmergencyStore((state) => state.capacity);
   const storeLoading = useEmergencyStore((state) => state.loading);
   const rooms = useEmergencyStore((state) => state.rooms);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
+  const alerts = useEmergencyStore((state) => state.alerts);
   const emsIncomingPatients = useEmergencyStore((state) => state.emsIncomingPatients);
+  const staff = useEmergencyStore((state) => state.staff);
+  const activeShift = useEmergencyStore((state) => state.activeShift);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
+  const setFitToWaitClassification = useEmergencyStore((state) => state.setFitToWaitClassification);
   const centralControlSettings = useEmergencyStore(
     (state) => state.emergencySettings.centralControl,
   );
+  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const boardingMetrics = useEmergencyStore((state) => state.boardingMetrics);
+  const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
+  const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
   const display = useWhiteboardDisplayMode();
+  const presentationScreenMode = display.isWaitingRoomDisplay
+    ? CARE_DROID_SCREEN_MODES.publicWaiting
+    : display.isDisplayMode
+      ? CARE_DROID_SCREEN_MODES.readOnlyWhiteboard
+      : commandCenter.isCommandCenterScreen
+        ? CARE_DROID_SCREEN_MODES.commandCenter
+        : physician.isPhysicianScreen
+          ? CARE_DROID_SCREEN_MODES.physician
+          : charge.isChargeNurseScreen
+            ? CARE_DROID_SCREEN_MODES.chargeNurse
+            : undefined;
+  const presentation = useOperationalPresentation(presentationScreenMode);
   const routeScreenMode = display.screenMode;
   const whiteboard = useEmergencyWhiteboard();
   const upgradePatientFlow = useUpgradeHarnessPatientFlow();
@@ -341,9 +405,11 @@ export default function EmergencyWhiteboard() {
   const vvtSignal = findUpgradeSignal(upgradeFlowSignals, 'virtual_visit_track');
   const wearableAlertCount = wearableSignal?.data?.alerts?.length || 0;
   const virtualVisitCandidateCount = vvtSignal?.data?.candidates?.length || 0;
+  const bragSignal = findUpgradeSignal(upgradeFlowSignals, 'brag_forecast_10h');
   const capacity = whiteboardPayload?.capacity || storeCapacity;
   const [activeFilter, setActiveFilter] = useState<FilterId>('All');
   const [showIntake, setShowIntake] = useState(false);
+  const [emsOffloadPanelOpen, setEmsOffloadPanelOpen] = useState(false);
   const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [toast, setToast] = useState('');
   const [clockTick, setClockTick] = useState(() => Date.now());
@@ -351,7 +417,8 @@ export default function EmergencyWhiteboard() {
   const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
   const canConvertEmsArrival = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
   const canManageReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
-  const canReviewTriage = emergencyRole.can(EMERGENCY_ACTIONS.triage);
+  const canReviewTriage = triage.canAssignAcuity;
+  const canClassifyFitToWait = triage.canClassifyFitToWait;
   const centralControl = useMemo(
     () =>
       getCentralControlPolicy({
@@ -365,7 +432,10 @@ export default function EmergencyWhiteboard() {
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const isRegistrationClerk = emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk;
-  const canMutateWhiteboard = display.canMutate && !emergencyRole.readOnly;
+  const canMutateWhiteboard = emergencyRole.canMutateSurface({
+    readOnlyDisplayMode: display.isDisplayMode,
+    displayParam: emergencyRole.permissionContext.displayParam,
+  });
   const commandLayerMetrics = useMemo(
     () => filterOperationalMetrics(centralSnapshot.operationalSummary.metrics, 'whiteboard'),
     [centralSnapshot.operationalSummary.metrics],
@@ -374,16 +444,31 @@ export default function EmergencyWhiteboard() {
   const canUseCentralIntake =
     canMutateWhiteboard &&
     !isRegistrationClerk &&
+    !(physician.isPhysicianScreen && physician.hideCentralIntake) &&
     (canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly));
+  const physicianStaffId = useMemo(
+    () => resolvePhysicianStaffId({ staff, activeShift }),
+    [activeShift, staff],
+  );
   const isInitialLoading = (storeLoading || whiteboard.loading) && patients.length === 0;
   const activeEmsArrivals = useMemo(
     () => emsArrivals.filter((arrival) => !['Complete', 'Cancelled'].includes(arrival.status)),
     [emsArrivals],
   );
-  const emsAwareness = useMemo(
-    () => summarizeEmsAwareness(emsArrivals, clockTick),
-    [clockTick, emsArrivals],
-  );
+  const emsAwareness = useMemo(() => {
+    const offloadTargetMinutes =
+      Number(
+        useEmergencyStore.getState().emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
+          useEmergencyStore.getState().emergencySettings?.emsThresholds?.offloadTargetMinutes ??
+          15,
+      ) || 15;
+    return summarizeEmsAwareness(emsArrivals, clockTick, {
+      patients,
+      staff,
+      rooms,
+      offloadTargetMinutes,
+    });
+  }, [clockTick, emsArrivals, patients, rooms, staff]);
   const showEmsAttentionStrip = shouldShowEmsAttentionStrip({
     displayMode: display.isDisplayMode,
     summary: emsAwareness,
@@ -420,6 +505,155 @@ export default function EmergencyWhiteboard() {
       reassessmentDue,
     };
   }, [capacity.reassessmentDue, capacity.reassessmentDueCount, patients, reassessmentAttentionCount]);
+
+  const departmentStatusSnapshot = useMemo(
+    () =>
+      buildDepartmentStatusSnapshot({
+        patients,
+        capacity,
+        emsArrivals,
+        referrals,
+        staff,
+        rooms,
+        emergencySettings,
+        now: new Date(clockTick),
+        updatedAt: capacity.updatedAt || whiteboardGeneratedAt,
+        offloadTargetMinutes:
+          Number(
+            emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
+              emergencySettings?.emsThresholds?.offloadTargetMinutes ??
+              15,
+          ) || 15,
+      }),
+    [
+      capacity,
+      clockTick,
+      emsArrivals,
+      emergencySettings,
+      patients,
+      referrals,
+      rooms,
+      staff,
+      whiteboardGeneratedAt,
+    ],
+  );
+
+  const readOnlyDepartmentMetricIds = useMemo(
+    () =>
+      readOnlyWhiteboard.visibleMetricIds.length > 0
+        ? readOnlyWhiteboard.visibleMetricIds
+        : READ_ONLY_WHITEBOARD_METRIC_IDS,
+    [readOnlyWhiteboard.visibleMetricIds],
+  );
+
+  const publicWaitingSnapshot = useMemo(
+    () =>
+      buildPublicWaitingDisplaySnapshot({
+        patients,
+        capacity,
+        referrals,
+        updatedAt: capacity.updatedAt || whiteboardGeneratedAt,
+      }),
+    [capacity, patients, referrals, whiteboardGeneratedAt],
+  );
+
+  const readOnlyDepartmentSnapshot = useMemo(() => {
+    const filtered = filterDepartmentStatusSnapshot(
+      departmentStatusSnapshot,
+      readOnlyDepartmentMetricIds,
+    );
+    return applyWallDisplayMonitorPrivacy(
+      filtered,
+      emergencySettings.wallDisplayMonitorPrivacy,
+    );
+  }, [
+    departmentStatusSnapshot,
+    emergencySettings.wallDisplayMonitorPrivacy,
+    readOnlyDepartmentMetricIds,
+  ]);
+
+  const commandCenterSnapshot = useMemo(
+    () =>
+      buildCommandCenterThroughputSnapshot({
+        patients,
+        capacity,
+        referrals,
+        emsArrivals,
+        staff,
+        rooms,
+        boardingMetrics,
+        emergencySettings,
+        centralSnapshot,
+        intelligenceSnapshot,
+        hourlyArrivals:
+          (emergencyAnalytics.data?.operationalCommand?.hourlyArrivals as
+            | Array<{ hour: string; count: number }>
+            | undefined) || [],
+        analyticsSource: emergencyAnalytics.source,
+        bragPeakBand: bragSignal?.data?.peakBand || null,
+        bragDetail: bragSignal?.data?.forecast?.slice(-1)?.[0]?.humanReviewTrigger || null,
+        updatedAt: capacity.updatedAt || whiteboardGeneratedAt,
+        offloadTargetMinutes:
+          Number(
+            emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
+              emergencySettings?.emsThresholds?.offloadTargetMinutes ??
+              15,
+          ) || 15,
+      }),
+    [
+      boardingMetrics,
+      bragSignal?.data,
+      capacity,
+      centralSnapshot,
+      emsArrivals,
+      emergencyAnalytics.data?.operationalCommand?.hourlyArrivals,
+      emergencyAnalytics.source,
+      emergencySettings,
+      intelligenceSnapshot,
+      patients,
+      referrals,
+      rooms,
+      staff,
+      whiteboardGeneratedAt,
+    ],
+  );
+
+  const commandCenterKpiMetricIds = useMemo(
+    () =>
+      commandCenter.isCommandCenterScreen
+        ? resolveCommandCenterMetricIds(CARE_DROID_SCREEN_MODES.commandCenter)
+        : null,
+    [commandCenter.isCommandCenterScreen],
+  );
+
+  const filteredCommandCenterSnapshot = useMemo(() => {
+    if (!commandCenterKpiMetricIds?.length) return commandCenterSnapshot;
+    return filterCommandCenterThroughputSnapshot(commandCenterSnapshot, commandCenterKpiMetricIds);
+  }, [commandCenterKpiMetricIds, commandCenterSnapshot]);
+
+  const commandCenterKpiWidgets = useMemo(
+    () =>
+      commandCenter.isCommandCenterScreen
+        ? resolveCommandCenterWidgetVisibility(CARE_DROID_SCREEN_MODES.commandCenter)
+        : null,
+    [commandCenter.isCommandCenterScreen],
+  );
+
+  const publicWaitingKpiWidgets = useMemo(
+    () =>
+      publicWaiting.isPublicWaitingScreen
+        ? resolvePublicWaitingKpiWidgets(CARE_DROID_SCREEN_MODES.publicWaiting)
+        : null,
+    [publicWaiting.isPublicWaitingScreen],
+  );
+
+  const chargeNurseKpiMetricIds = useMemo(
+    () =>
+      charge.isChargeNurseScreen
+        ? resolveChargeNurseStripMetricIds(CARE_DROID_SCREEN_MODES.chargeNurse)
+        : null,
+    [charge.isChargeNurseScreen],
+  );
 
   const operationalLoad = useMemo(
     () =>
@@ -520,6 +754,11 @@ export default function EmergencyWhiteboard() {
   }, [canUseCentralIntake, emergencyRole.role, navigate]);
 
   useEffect(() => {
+    if (!commandCenter.isCommandCenterScreen) return;
+    void loadEmergencyAnalytics({ force: true });
+  }, [commandCenter.isCommandCenterScreen, loadEmergencyAnalytics]);
+
+  useEffect(() => {
     const clearFilters = () => {
       setActiveFilter('All');
       setQueueFilter(null);
@@ -551,12 +790,93 @@ export default function EmergencyWhiteboard() {
 
   const showChargeNurseStrip = useMemo(
     () =>
+      !(physician.isPhysicianScreen && physician.hideChargeNurseStrip) &&
+      (!charge.isChargeNurseScreen || charge.showOperationalStrip) &&
       shouldShowChargeNurseOperationalStrip({
         screenMode: routeScreenMode,
         roleId: emergencyRole.role,
         displayMode: display.isDisplayMode,
-      }) && !showShiftHandoffStrip,
-    [display.isDisplayMode, emergencyRole.role, routeScreenMode, showShiftHandoffStrip],
+      }) &&
+      !showShiftHandoffStrip,
+    [
+      charge.isChargeNurseScreen,
+      charge.showOperationalStrip,
+      display.isDisplayMode,
+      emergencyRole.role,
+      physician.hideChargeNurseStrip,
+      physician.isPhysicianScreen,
+      routeScreenMode,
+      showShiftHandoffStrip,
+    ],
+  );
+
+  const showPhysicianStrip = useMemo(
+    () =>
+      (!physician.isPhysicianScreen || physician.showOperationalStrip) &&
+      shouldShowPhysicianOperationalStrip({
+        screenMode: routeScreenMode,
+        roleId: emergencyRole.role,
+        displayMode: display.isDisplayMode,
+      }) &&
+      !showShiftHandoffStrip,
+    [
+      display.isDisplayMode,
+      emergencyRole.role,
+      physician.isPhysicianScreen,
+      physician.showOperationalStrip,
+      routeScreenMode,
+      showShiftHandoffStrip,
+    ],
+  );
+
+  const chargeNurseSurfaceSignals = useMemo(
+    () => ({
+      emsAttention: charge.isChargeNurseScreen
+        ? charge.showEmsInbound && showEmsAttentionStrip
+        : physician.isPhysicianScreen
+          ? false
+          : showEmsAttentionStrip,
+      reassessAttention: charge.isChargeNurseScreen
+        ? charge.showReassessmentsDue && showReassessmentAttentionStrip
+        : physician.isPhysicianScreen
+          ? physician.showReassessment && showReassessmentAttentionStrip
+          : showReassessmentAttentionStrip,
+      referralAttention: charge.isChargeNurseScreen
+        ? charge.showReferralsPending && showReferralAttentionStrip
+        : physician.isPhysicianScreen
+          ? physician.showReferralsPending && showReferralAttentionStrip
+          : showReferralAttentionStrip,
+      waitingRoomSafety: charge.isChargeNurseScreen
+        ? charge.showWaitingRoomBoard && stats.waiting > 0
+        : triage.isTriageScreen
+          ? triage.showWaitingRoomSafetyBoard && stats.waiting > 0
+          : physician.isPhysicianScreen
+            ? physician.showProviderWaitingQueue && stats.waiting > 0
+            : stats.waiting > 0,
+      inboundEmsBanner: charge.isChargeNurseScreen
+        ? charge.showEmsInbound && Boolean(emsAwareness.inboundArrivals.length)
+        : physician.isPhysicianScreen
+          ? false
+          : Boolean(emsAwareness.inboundArrivals.length),
+    }),
+    [
+      charge.isChargeNurseScreen,
+      charge.showEmsInbound,
+      charge.showReassessmentsDue,
+      charge.showReferralsPending,
+      charge.showWaitingRoomBoard,
+      triage.isTriageScreen,
+      triage.showWaitingRoomSafetyBoard,
+      emsAwareness.inboundArrivals.length,
+      physician.isPhysicianScreen,
+      physician.showProviderWaitingQueue,
+      physician.showReassessment,
+      physician.showReferralsPending,
+      showEmsAttentionStrip,
+      showReassessmentAttentionStrip,
+      showReferralAttentionStrip,
+      stats.waiting,
+    ],
   );
 
   const whiteboardDensity = useMemo(
@@ -564,27 +884,33 @@ export default function EmergencyWhiteboard() {
       evaluateWhiteboardDensity({
         operationalLoad,
         displayMode: display.isDisplayMode,
+        publicWaitingDisplay: display.isWaitingRoomDisplay,
+        commandCenterScreen: commandCenter.isCommandCenterScreen,
         showShiftHandoffStrip,
         prioritizeAwareness,
         signals: {
-          emsAttention: showEmsAttentionStrip,
-          reassessAttention: showReassessmentAttentionStrip,
-          referralAttention: showReferralAttentionStrip,
+          emsAttention: chargeNurseSurfaceSignals.emsAttention,
+          reassessAttention: chargeNurseSurfaceSignals.reassessAttention,
+          referralAttention: chargeNurseSurfaceSignals.referralAttention,
           chargeNurseStrip: showChargeNurseStrip,
-          inboundEmsBanner: Boolean(emsAwareness.inboundArrivals.length),
+          waitingRoomSafety: chargeNurseSurfaceSignals.waitingRoomSafety,
+          inboundEmsBanner: chargeNurseSurfaceSignals.inboundEmsBanner,
           opsDetailCount: 3,
         },
       }),
     [
       display.isDisplayMode,
-      emsAwareness.inboundArrivals.length,
+      display.isWaitingRoomDisplay,
+      commandCenter.isCommandCenterScreen,
       operationalLoad,
       prioritizeAwareness,
       showChargeNurseStrip,
-      showEmsAttentionStrip,
-      showReassessmentAttentionStrip,
-      showReferralAttentionStrip,
       showShiftHandoffStrip,
+      chargeNurseSurfaceSignals.emsAttention,
+      chargeNurseSurfaceSignals.inboundEmsBanner,
+      chargeNurseSurfaceSignals.reassessAttention,
+      chargeNurseSurfaceSignals.referralAttention,
+      chargeNurseSurfaceSignals.waitingRoomSafety,
     ],
   );
 
@@ -592,11 +918,12 @@ export default function EmergencyWhiteboard() {
     () =>
       resolvePatientCardWorkflowProfile({
         roleId: emergencyRole.role,
+        screenMode: routeScreenMode,
         displayMode: display.isDisplayMode,
         canMutateWhiteboard,
         isRegistrationClerk,
       }),
-    [canMutateWhiteboard, display.isDisplayMode, emergencyRole.role, isRegistrationClerk],
+    [canMutateWhiteboard, display.isDisplayMode, emergencyRole.role, isRegistrationClerk, routeScreenMode],
   );
 
   const openIntake = useCallback(() => {
@@ -658,9 +985,8 @@ export default function EmergencyWhiteboard() {
       if (metric.whiteboardAction === 'focus-ems-offload') {
         setActiveFilter('EMS');
         setQueueFilter(null);
-        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
-          openRoute(CANONICAL_ROUTES.emergencyEms);
-        }
+        setEmsOffloadPanelOpen(true);
+        return;
       }
     },
     [display.isDisplayMode, emergencyRole, openRoute, setQueueFilter],
@@ -683,6 +1009,31 @@ export default function EmergencyWhiteboard() {
     setQueueFilter(null);
     openReassessmentTasks(patientId);
   }, [openReassessmentTasks, setQueueFilter]);
+
+  const handleWaitingRoomSafetySelect = useCallback(
+    (patientId: string) => {
+      if (display.isDisplayMode) return;
+      selectPatient(patientId);
+      setActiveFilter('Waiting');
+      setQueueFilter(null);
+    },
+    [display.isDisplayMode, selectPatient, setQueueFilter],
+  );
+
+  const handleClassifyFitToWait = useCallback(
+    (patientId: string, classificationId: string) => {
+      if (display.isDisplayMode || !canMutateWhiteboard) return;
+      setFitToWaitClassification(patientId, classificationId as FitToWaitClassificationId, {
+        staffName: emergencyRole.roleLabel,
+      });
+    },
+    [
+      canMutateWhiteboard,
+      display.isDisplayMode,
+      emergencyRole.roleLabel,
+      setFitToWaitClassification,
+    ],
+  );
 
   const handleOperationalMetricClick = useCallback(
     (metricKey: EmergencyOperationalMetricKey) => {
@@ -781,9 +1132,7 @@ export default function EmergencyWhiteboard() {
       if (metric.whiteboardAction === 'focus-ems-offload') {
         setActiveFilter('EMS');
         setQueueFilter(null);
-        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
-          openRoute(CANONICAL_ROUTES.emergencyEms);
-        }
+        setEmsOffloadPanelOpen(true);
         return;
       }
 
@@ -822,6 +1171,18 @@ export default function EmergencyWhiteboard() {
 
       if (metric.whiteboardAction === 'filter-boarding') {
         setActiveFilter('Boarding');
+        setQueueFilter(null);
+        return;
+      }
+
+      if (metric.whiteboardAction === 'filter-assigned') {
+        setActiveFilter('Assessment');
+        setQueueFilter(null);
+        return;
+      }
+
+      if (metric.whiteboardAction === 'filter-results') {
+        setActiveFilter('Assessment');
         setQueueFilter(null);
       }
     },
@@ -872,16 +1233,17 @@ export default function EmergencyWhiteboard() {
 
   const handlePatientAdded = useCallback(
     (patient: Patient) => {
-      completeIntakeHandoff(useEmergencyStore.getState(), {
+      const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
         patientId: patient.id,
         source: 'whiteboard-central-intake',
       });
-      setToast(`${patient.firstName} ${patient.lastName} added to whiteboard`);
+      refreshIntakeHandoffSurfaces(useEmergencyStore.getState());
+      setToast(`${patient.firstName} ${patient.lastName} added to triage queue`);
       window.setTimeout(() => setToast(''), 2400);
-      setActiveFilter('All');
+      setQueueFilter(handoff.queue || 'Triage');
       whiteboard.refresh();
     },
-    [whiteboard.refresh],
+    [whiteboard.refresh, setQueueFilter],
   );
 
   return (
@@ -889,11 +1251,30 @@ export default function EmergencyWhiteboard() {
       className={[
         'emergency-whiteboard-page',
         prioritizeAwareness ? 'emergency-whiteboard-page--awareness' : '',
+        whiteboardDensity.surfaces.departmentStatusScreen.visible
+          ? 'emergency-whiteboard-page--department-wall'
+          : '',
       ]
         .filter(Boolean)
         .join(' ')}
       style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
     >
+      {whiteboardDensity.surfaces.departmentStatusScreen.visible ? (
+        <DepartmentStatusScreen
+          snapshot={readOnlyDepartmentSnapshot}
+          title={display.label}
+          refreshIntervalMs={display.refreshIntervalMs}
+          layout="wall"
+          liveClock={clockTick}
+          privacyLabel={
+            emergencySettings.wallDisplayMonitorPrivacy !== 'operational'
+              ? `${emergencySettings.wallDisplayMonitorPrivacy} monitor privacy`
+              : undefined
+          }
+        />
+      ) : null}
+      {!whiteboardDensity.surfaces.departmentStatusScreen.visible ? (
+      <>
       <div
         className="emergency-whiteboard-page__hero"
         style={{
@@ -915,13 +1296,13 @@ export default function EmergencyWhiteboard() {
               textTransform: 'uppercase',
             }}
           >
-            {EMERGENCY_OS_BRANDING.platformLine}
+            {presentation.pageEyebrow}
           </span>
           <h1 style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 24, lineHeight: 1.08, margin: '3px 0 0' }}>
-            {EMERGENCY_OS_BRANDING.commandCenterName}
+            {presentation.pageTitle}
           </h1>
           <p style={{ color: 'var(--color-text-secondary, #CBD5E1)', margin: '4px 0 0', maxWidth: 920, fontSize: 13 }}>
-            {EMERGENCY_OS_BRANDING.commandCenterSummary}
+            {presentation.pageSubtitle}
           </p>
         </div>
         {whiteboardDensity.surfaces.heroDetail.visible ? (
@@ -999,7 +1380,8 @@ export default function EmergencyWhiteboard() {
           readOnly={display.isDisplayMode}
         />
       ) : null}
-      {whiteboardDensity.surfaces.opsDetail.visible ? (
+      {whiteboardDensity.surfaces.opsDetail.visible &&
+      !(physician.isPhysicianScreen && physician.hideOpsDetail) ? (
         <WhiteboardOpsDetailStrip defaultExpanded={whiteboardDensity.surfaces.opsDetail.defaultExpanded} />
       ) : null}
       {display.isDisplayMode ? (
@@ -1019,10 +1401,18 @@ export default function EmergencyWhiteboard() {
         >
           <div style={{ display: 'grid', gap: 2 }}>
             <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>
-              {display.label} · operational awareness only
+              {display.isWaitingRoomDisplay
+                ? `${display.label} · public information only`
+                : display.isReadOnlyWhiteboardDisplay
+                  ? `${display.label} · hallway operations`
+                  : `${display.label} · operational awareness only`}
             </strong>
             <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12 }}>
-              Read-only wall display · auto-refresh every {Math.round(display.refreshIntervalMs / 1000)}s · no editing actions
+              {display.isWaitingRoomDisplay
+                ? `Patient waiting-area display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no names or clinical details`
+                : display.isReadOnlyWhiteboardDisplay
+                  ? `Read-only operations wall · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · ${emergencySettings.wallDisplayMonitorPrivacy} monitor privacy`
+                  : `Read-only wall display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no editing actions`}
             </span>
           </div>
           <span style={{ color: 'var(--color-text-secondary, #CBD5E1)', fontSize: 12, fontWeight: 750 }}>
@@ -1030,7 +1420,89 @@ export default function EmergencyWhiteboard() {
           </span>
         </section>
       ) : null}
-      {whiteboardDensity.surfaces.commandLayer.visible ? (
+      {whiteboardDensity.surfaces.publicWaitingScreen.visible ? (
+        <PublicWaitingDisplay
+          snapshot={publicWaitingSnapshot}
+          title={display.label}
+          refreshIntervalMs={display.refreshIntervalMs}
+          showWaitRange={
+            publicWaiting.showWaitRange &&
+            (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('wait-range'))
+          }
+          showCrowdLevel={
+            publicWaiting.showCrowdLevel &&
+            (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('crowd-level'))
+          }
+          showTriageWait={
+            publicWaiting.showTriageWait &&
+            (!publicWaitingKpiWidgets || publicWaitingKpiWidgets.includes('triage-wait'))
+          }
+          showCareProcessStages={
+            publicWaiting.showCareProcessStages &&
+            (!publicWaitingKpiWidgets ||
+              publicWaitingKpiWidgets.includes('care-process-stages'))
+          }
+          showPatientGuidance={
+            publicWaiting.showPatientGuidance &&
+            (!publicWaitingKpiWidgets ||
+              publicWaitingKpiWidgets.includes('patient-guidance'))
+          }
+          showSymptomEscalation={publicWaiting.showSymptomEscalation}
+        />
+      ) : null}
+      {whiteboardDensity.surfaces.commandCenterThroughput.visible ? (
+        <CommandCenterThroughputScreen
+          snapshot={filteredCommandCenterSnapshot}
+          title="Command center throughput"
+          refreshIntervalMs={Math.max(
+            15000,
+            Number(emergencySettings.wallDisplayRefreshInterval) || 30000,
+          )}
+          showArrivalsByHour={
+            commandCenter.showArrivalsByHour &&
+            (commandCenterKpiWidgets?.['arrivals-by-hour'] ?? true)
+          }
+          showWaitingRoomOccupancy={
+            commandCenter.showWaitingRoomOccupancy &&
+            (commandCenterKpiWidgets?.['waiting-room-occupancy'] ?? true)
+          }
+          showAvgWaitTriage={
+            commandCenter.showAvgWaitTriage &&
+            (commandCenterKpiWidgets?.['avg-wait-triage'] ?? true)
+          }
+          showAvgWaitProvider={
+            commandCenter.showAvgWaitProvider &&
+            (commandCenterKpiWidgets?.['avg-wait-provider'] ?? true)
+          }
+          showEmsOffloadDelays={
+            commandCenter.showEmsOffloadDelays &&
+            (commandCenterKpiWidgets?.['ems-offload-delays'] ?? true)
+          }
+          showBoardingDuration={
+            commandCenter.showBoardingDuration &&
+            (commandCenterKpiWidgets?.['boarding-duration'] ?? true)
+          }
+          showReferralsBacklog={
+            commandCenter.showReferralsBacklog &&
+            (commandCenterKpiWidgets?.['referrals-backlog'] ?? true)
+          }
+          showLwbsRisk={
+            commandCenter.showLwbsRisk &&
+            (commandCenterKpiWidgets?.['lwbs-risk'] ?? true)
+          }
+          showCrowdingForecast={
+            commandCenter.showCrowdingForecast &&
+            (commandCenterKpiWidgets?.['crowding-forecast'] ?? true)
+          }
+          showSystemHealth={
+            commandCenter.showSystemHealth &&
+            (commandCenterKpiWidgets?.['system-health'] ?? true)
+          }
+        />
+      ) : null}
+      {whiteboardDensity.surfaces.commandLayer.visible &&
+      !(physician.isPhysicianScreen && physician.hideCommandLayer) &&
+      !commandCenter.hideCommandLayer ? (
       <section
         aria-label="Operational command layer metrics"
         style={{
@@ -1130,6 +1602,7 @@ export default function EmergencyWhiteboard() {
         </div>
       </section>
       ) : null}
+      {whiteboardDensity.surfaces.primaryStats.visible ? (
       <div
         className="emergency-whiteboard-page__stats"
         style={{
@@ -1284,14 +1757,67 @@ export default function EmergencyWhiteboard() {
         </>
         ) : null}
       </div>
+      ) : null}
 
       {whiteboardDensity.surfaces.emsAttention.visible ? (
         <EmsAttentionStrip
           emsArrivals={emsArrivals}
+          patients={patients}
+          staff={staff}
+          rooms={rooms}
+          offloadTargetMinutes={
+            Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
+          }
           now={clockTick}
           onMetricSelect={handleEmsAttentionSelect}
           readOnly={display.isDisplayMode}
         />
+      ) : null}
+
+      {emsAwareness.offloadRows?.length &&
+      !display.isDisplayMode &&
+      !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
+      (!charge.isChargeNurseScreen || charge.showOffloadDelays) ? (
+        <EmsOffloadAttentionStrip
+          emsArrivals={emsArrivals}
+          patients={patients}
+          staff={staff}
+          rooms={rooms}
+          offloadTargetMinutes={
+            Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
+          }
+          onSelectPatient={(patientId) => {
+            selectPatient(patientId);
+            setActiveFilter('EMS');
+            setQueueFilter(null);
+          }}
+          onSelectArrival={() => {
+            setActiveFilter('EMS');
+            setQueueFilter(null);
+            setEmsOffloadPanelOpen(true);
+          }}
+          onOpenTracker={() => setEmsOffloadPanelOpen(true)}
+        />
+      ) : null}
+
+      {emsAwareness.offloadRows?.length &&
+      !display.isDisplayMode &&
+      !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
+      (!charge.isChargeNurseScreen || charge.showOffloadDelays) &&
+      (emsOffloadPanelOpen || (emsAwareness.delayedOffloadCount ?? 0) > 0) ? (
+        <div style={{ padding: '0 16px 12px' }}>
+          <EmsOffloadTrackerPanel
+            emsArrivals={emsArrivals}
+            patients={patients}
+            staff={staff}
+            rooms={rooms}
+            compact
+            onSelectPatient={(patientId) => {
+              selectPatient(patientId);
+              setActiveFilter('EMS');
+            }}
+          />
+        </div>
       ) : null}
 
       {whiteboardDensity.surfaces.emsInboundBanner.visible ? (
@@ -1369,12 +1895,107 @@ export default function EmergencyWhiteboard() {
           patients={patients}
           centralSnapshot={centralSnapshot}
           activeEmsArrivals={activeEmsArrivals.length}
+          referrals={referrals}
+          emsArrivals={emsArrivals}
+          settings={emergencySettings}
+          kpiMetricIds={chargeNurseKpiMetricIds}
+          visibleSurfaces={
+            chargeNurseKpiMetricIds ? null : charge.isChargeNurseScreen ? charge.visibleOperationalSurfaces : null
+          }
           onMetricSelect={handleOperationalStripMetricSelect}
           readOnly={display.isDisplayMode}
         />
       ) : null}
 
-      {whiteboardDensity.surfaces.missionControl.visible ? (
+      {showPhysicianStrip ? (
+        <PhysicianOperationalStrip
+          patients={patients}
+          referrals={referrals}
+          physicianStaffId={physicianStaffId}
+          settings={emergencySettings}
+          visibleSurfaces={physician.isPhysicianScreen ? physician.visibleOperationalSurfaces : null}
+          onMetricSelect={handleOperationalStripMetricSelect}
+          readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {whiteboardDensity.surfaces.waitingRoomSafety.visible ? (
+        <>
+          {!display.isDisplayMode && !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
+            <>
+              <PatientExperienceStatusStrip
+                patients={patients}
+                referrals={referrals}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <WhatHappensNextStrip patients={patients} referrals={referrals} staff={staff} />
+              <LwbsRiskStrip
+                patients={patients}
+                workflowLogs={workflowLogs}
+                staff={staff}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <HighRiskComplaintAttentionStrip
+                patients={patients}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <FitToWaitAttentionStrip
+                patients={patients}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <QueueReasonAttentionStrip
+                patients={patients}
+                referrals={referrals}
+                staff={staff}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <DeteriorationWatchStrip
+                patients={patients}
+                emsArrivals={emsArrivals}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              <TriageBreachStrip
+                patients={patients}
+                settings={emergencySettings}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+              {(!charge.isChargeNurseScreen || charge.showProviderWaitBreaches) ? (
+                <ProviderWaitBreachStrip
+                  patients={patients}
+                  settings={emergencySettings}
+                  onSelectPatient={handleWaitingRoomSafetySelect}
+                />
+              ) : null}
+              <ReceptionEscalationAttentionStrip
+                alerts={alerts}
+                roleId={emergencyRole.role}
+                onSelectPatient={handleWaitingRoomSafetySelect}
+              />
+            </>
+          ) : null}
+          <WaitingRoomSafetyBoard
+            patients={patients}
+            staff={staff}
+            referrals={referrals}
+            emsArrivals={emsArrivals}
+            workflowLogs={workflowLogs}
+            settings={emergencySettings}
+            activeQueueFilter={activeQueueFilter}
+            displayMode={display.isDisplayMode}
+            readOnly={display.isDisplayMode || !canClassifyFitToWait}
+            variant={
+              charge.isChargeNurseScreen || triage.isTriageScreen ? 'focused' : 'full'
+            }
+            onSelectPatient={handleWaitingRoomSafetySelect}
+            onOpenReassessment={focusReassessmentOnBoard}
+            onClassifyFitToWait={handleClassifyFitToWait}
+          />
+        </>
+      ) : null}
+
+      {whiteboardDensity.surfaces.missionControl.visible &&
+      !(physician.isPhysicianScreen && physician.hideMissionControlAdmin) &&
+      !commandCenter.hideMissionControl ? (
       <section
         className="emergency-whiteboard-page__mission"
         aria-labelledby="whiteboard-mission-control-title"
@@ -1713,6 +2334,7 @@ export default function EmergencyWhiteboard() {
         </section>
       ) : null}
 
+      {whiteboardDensity.surfaces.filters.visible ? (
       <div
         className="emergency-whiteboard-page__controls"
         style={{
@@ -1833,6 +2455,7 @@ export default function EmergencyWhiteboard() {
           </button>
         )}
       </div>
+      ) : null}
 
       {showIntake &&
       canUseCentralIntake &&
@@ -1840,7 +2463,8 @@ export default function EmergencyWhiteboard() {
         <QuickIntake onClose={closeIntake} onAdded={handlePatientAdded} />
       ) : null}
 
-      {whiteboardDensity.surfaces.queueIntelligence.visible ? (
+      {whiteboardDensity.surfaces.queueIntelligence.visible &&
+      !(physician.isPhysicianScreen && physician.hideQueueIntelligence) ? (
       <section
         className="emergency-whiteboard-page__queue-intelligence"
         aria-label="Whiteboard queue intelligence"
@@ -1852,7 +2476,7 @@ export default function EmergencyWhiteboard() {
       </section>
       ) : null}
 
-      {activeQueueFilter ? (
+      {activeQueueFilter && whiteboardDensity.surfaces.patientGrid.visible ? (
         <div
           role="status"
           style={{
@@ -1919,13 +2543,13 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : null}
 
-      {!whiteboard.loading && activeQueueFilter === 'Triage' && canReviewTriage && selectedPatientId ? (
+      {whiteboardDensity.surfaces.patientGrid.visible && !whiteboard.loading && activeQueueFilter === 'Triage' && canReviewTriage && selectedPatientId ? (
         <div style={{ padding: '0 14px', marginTop: 12 }}>
           <AiTriageAssistPanelForPatientId patientId={selectedPatientId} />
         </div>
       ) : null}
 
-      {hiddenBoardCount > 0 ? (
+      {whiteboardDensity.surfaces.patientGrid.visible && hiddenBoardCount > 0 ? (
         <div
           role="status"
           className="emergency-whiteboard-page__board-limit"
@@ -1957,7 +2581,7 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : null}
 
-      {whiteboard.loading && boardPatients.length === 0 ? (
+      {whiteboardDensity.surfaces.patientGrid.visible && whiteboard.loading && boardPatients.length === 0 ? (
         <div
           className="emergency-whiteboard-page__grid emergency-whiteboard-page__grid--loading"
           style={{ padding: 14 }}
@@ -1975,7 +2599,7 @@ export default function EmergencyWhiteboard() {
           />
           <SkeletonLoader variant="whiteboard" />
         </div>
-      ) : boardPatients.length > 0 ? (
+      ) : whiteboardDensity.surfaces.patientGrid.visible && boardPatients.length > 0 ? (
         <>
         <div
           className="emergency-whiteboard-page__grid"
@@ -1996,7 +2620,7 @@ export default function EmergencyWhiteboard() {
           ))}
         </div>
         </>
-      ) : (
+      ) : whiteboardDensity.surfaces.patientGrid.visible ? (
         <div
           className="ed-whiteboard__empty"
           style={{
@@ -2060,8 +2684,12 @@ export default function EmergencyWhiteboard() {
             }
           />
         </div>
-      )}
-      {!display.isDisplayMode ? <WhoNextPanel mode="floating" /> : null}
+      ) : null}
+      {!display.isDisplayMode && (!physician.isPhysicianScreen || physician.showAssignedPatients) ? (
+        <WhoNextPanel mode="floating" />
+      ) : null}
+      </>
+      ) : null}
     </section>
   );
 }

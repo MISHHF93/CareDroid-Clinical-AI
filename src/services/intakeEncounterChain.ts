@@ -1,5 +1,6 @@
 import type { JourneyEvent, Patient } from '../types/emergency';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
+import { buildArrivalControlSnapshot } from './arrivalControlLayer';
 
 export type IntakeEncounterChain = {
   patientId: string;
@@ -8,6 +9,7 @@ export type IntakeEncounterChain = {
   complaintCategory: string;
   queue: string;
   connected: boolean;
+  arrivalControl?: import('../types/emergency').ArrivalControlSnapshot;
 };
 
 export function getArrivalReasonFromPatient(patient?: Patient | null): string {
@@ -120,5 +122,6 @@ export function readIntakeEncounterChain(
         linkedQueue &&
         encounterEvent?.metadata?.patientId === patient.id,
     ),
+    arrivalControl: patient ? buildArrivalControlSnapshot(patient) : undefined,
   };
 }

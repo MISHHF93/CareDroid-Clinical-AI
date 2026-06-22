@@ -47,6 +47,20 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     surfaces: ['Header', 'QueueIntelligencePanel'],
   }),
   Object.freeze({
+    id: 'lwbs-risk-advisory',
+    domain: 'Patient',
+    source: 'lwbs-risk-advisory',
+    defaultTier: 'high',
+    surfaces: ['Header', 'WaitingRoomSafetyBoard', 'PatientCard'],
+  }),
+  Object.freeze({
+    id: 'deterioration-watch-advisory',
+    domain: 'Patient',
+    source: 'deterioration-watch-advisory',
+    defaultTier: 'high',
+    surfaces: ['Header', 'WaitingRoomSafetyBoard', 'PatientCard'],
+  }),
+  Object.freeze({
     id: 'long-wait-critical',
     domain: 'Patient',
     source: 'alert-long-wait-critical',
@@ -138,6 +152,13 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     source: 'alert-escalation',
     defaultTier: 'critical',
     surfaces: ['Header', 'PatientCard'],
+  }),
+  Object.freeze({
+    id: 'reception-escalation',
+    domain: 'Queue',
+    source: 'reception-escalation-workflow',
+    defaultTier: 'critical',
+    surfaces: ['Header', 'ReceptionWorkspace', 'ChargeNurseOperationalStrip', 'ReceptionEscalationStrip'],
   }),
   Object.freeze({
     id: 'operational-intelligence',

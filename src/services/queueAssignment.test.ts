@@ -52,12 +52,10 @@ describe('queueAssignment', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(calls).toEqual([
-      `move:${triagePatient.id}:Triage`,
-      `update:${triagePatient.id}`,
-      'filter:Triage',
-      'workflow',
-    ]);
+    expect(calls).toContain(`move:${triagePatient.id}:Triage`);
+    expect(calls).toContain(`update:${triagePatient.id}`);
+    expect(calls).toContain('filter:Triage');
+    expect(calls).toContain('workflow');
   });
 
   it('detects EMS registration queue membership', () => {

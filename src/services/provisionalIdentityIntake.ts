@@ -6,6 +6,7 @@ import {
 } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
 import { completeIntakeHandoff } from './receptionHandoff';
+import { buildArrivalControlFields, registerArrivalControl } from './arrivalControlLayer';
 
 export type ProvisionalIdentityKind = 'unknown' | 'temporary' | 'identity-pending';
 
@@ -80,6 +81,16 @@ function createTemporaryMrn(prefix: string): string {
   return `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
+function normalizeProvisionalArrivalMode(
+  source: Patient['source'],
+  kind: ProvisionalIdentityKind,
+): import('../types/emergency').ArrivalMode {
+  if (source === 'EMS' || kind === 'temporary') return 'EMS';
+  if (source === 'Referral') return 'referral';
+  if (source === 'Transfer') return 'transfer';
+  return 'walk-in';
+}
+
 export function buildProvisionalPatient(
   kind: ProvisionalIdentityKind,
   overrides: Partial<Patient> = {},
@@ -132,6 +143,16 @@ export function buildProvisionalPatient(
       },
     ],
     source: overrides.source || profile.source,
+    ...buildArrivalControlFields({
+      arrivalMode: normalizeProvisionalArrivalMode(profile.source, kind),
+      state: overrides.state || PatientState.Triage,
+      presentingComplaint: overrides.chiefComplaint || profile.complaint,
+      flags,
+      quickSafetyFlags: flags.filter((flag) =>
+        ['HighRisk', 'StrokeCode', 'SepsisAlert', 'PsychAlert', 'Isolation', 'DeterioratingNeuro'].includes(flag),
+      ) as import('../types/emergency').QuickSafetyFlag[],
+      queueDestination: 'triage-queue',
+    }),
   };
 
   return {
@@ -153,6 +174,11 @@ export function completeProvisionalIntake(
   const profile = PROVISIONAL_IDENTITY_PROFILES[kind];
   const patient = buildProvisionalPatient(kind, options.patientOverrides);
   store.addPatient(patient);
+
+  registerArrivalControl(store, patient.id, {
+    source: 'provisional-intake',
+    destination: 'triage-queue',
+  });
 
   const handoff = completeIntakeHandoff(store, {
     patientId: patient.id,

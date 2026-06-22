@@ -1,0 +1,71 @@
+.waiting-room-communication-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.waiting-room-communication-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.waiting-room-communication-panel__header h3 {
+  margin: 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.waiting-room-communication-panel__header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.waiting-room-communication-panel__recency {
+  margin: 0;
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.waiting-room-communication-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.waiting-room-communication-panel__item {
+  background: #0b1120;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.waiting-room-communication-panel__item strong {
+  display: block;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+.waiting-room-communication-panel__item p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.waiting-room-communication-panel__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.waiting-room-communication-panel__empty {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}

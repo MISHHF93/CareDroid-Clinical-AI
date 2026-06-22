@@ -1,0 +1,197 @@
+.amb-handoff-checklist {
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.35));
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  background: var(--surface-elevated, rgba(15, 23, 42, 0.55));
+  margin-top: 0.65rem;
+}
+
+.amb-handoff-checklist--compact {
+  padding: 0.65rem 0.75rem;
+}
+
+.amb-handoff-checklist__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.amb-handoff-checklist__header h4 {
+  margin: 0 0 0.15rem;
+  font-size: 0.92rem;
+}
+
+.amb-handoff-checklist__header p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.amb-handoff-checklist__status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--warning, #f59e0b);
+  white-space: nowrap;
+}
+
+.amb-handoff-checklist__status--done {
+  color: var(--success, #22c55e);
+}
+
+.amb-handoff-checklist__progress {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  margin-bottom: 0.65rem;
+  overflow: hidden;
+}
+
+.amb-handoff-checklist__progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #22c55e);
+  transition: width 0.2s ease;
+}
+
+.amb-handoff-checklist__steps {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.amb-handoff-checklist__steps li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.76rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.15);
+}
+
+.amb-handoff-checklist__steps li[data-status='complete'] span {
+  color: #86efac;
+}
+
+.amb-handoff-checklist__steps li[data-status='warning'] span {
+  color: #fcd34d;
+}
+
+.amb-handoff-checklist__steps li[data-status='pending'] span {
+  color: #94a3b8;
+}
+
+.amb-handoff-checklist__steps small {
+  color: var(--text-muted, #94a3b8);
+  text-align: right;
+}
+
+.amb-handoff-checklist__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem 1rem;
+  margin: 0;
+}
+
+.amb-handoff-checklist__grid dt {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 0.2rem;
+}
+
+.amb-handoff-checklist__grid dd {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.amb-handoff-checklist__grid select,
+.amb-handoff-checklist__inline-form input,
+.amb-handoff-checklist__notes textarea {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.35));
+  background: var(--surface, rgba(2, 6, 23, 0.35));
+  color: inherit;
+  padding: 0.35rem 0.45rem;
+  font: inherit;
+}
+
+.amb-handoff-checklist__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.amb-handoff-checklist__vitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.amb-handoff-checklist__meds {
+  margin: 0 0 0.45rem;
+  padding-left: 1rem;
+}
+
+.amb-handoff-checklist__inline-form {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.amb-handoff-checklist__inline-form button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.35rem 0.55rem;
+  background: var(--accent, #2563eb);
+  color: #fff;
+  cursor: pointer;
+}
+
+.amb-handoff-checklist__inline-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.amb-handoff-checklist__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.amb-handoff-checklist__flag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fecaca;
+}
+
+.amb-handoff-checklist__muted {
+  margin: 0;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.78rem;
+}
+
+.amb-handoff-checklist__summary,
+.amb-handoff-checklist__notes {
+  margin-top: 0.65rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.amb-handoff-checklist__notes {
+  display: grid;
+  gap: 0.35rem;
+}

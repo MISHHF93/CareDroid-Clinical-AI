@@ -1,9 +1,35 @@
 import { CANONICAL_ROUTES } from './routes.config';
 import {
+  canAccessEmergencyRoutePermission,
+  canPerformEmergencyMutation,
+  EMERGENCY_PERMISSION_KEYS,
+  hasEmergencyPermission,
+  isPublicDisplayContext,
+  isReadOnlyOperationalContext,
+  listPermissionsForRole,
+  resolveEmergencyPermissionKey,
+} from './emergencyPermissionRegistry';
+import {
   getPlatformHomeRoute,
   isReceptionFirstUxEnabled,
   RECEPTION_FIRST_UX,
 } from './receptionFirstUx.config';
+import { CARE_DROID_SCREEN_MODES, normalizeCareDroidScreenMode } from './careDroidScreenModes';
+import { getTriagePendingQueuePath } from './triageScreenModel';
+import { isPhysicianScreenMode } from './physicianScreenModel';
+import { presentEmergencyRoleAction } from './emergencyRoleActionMatrix';
+import { resolveRoleLandingRoute } from './emergencyRoleNavigationModel';
+
+export {
+  EMERGENCY_PERMISSION_KEYS,
+  resolveEmergencyPermissionKey,
+  hasEmergencyPermission,
+  canPerformEmergencyMutation,
+  canAccessEmergencyRoutePermission,
+  isPublicDisplayContext,
+  isReadOnlyOperationalContext,
+  listPermissionsForRole,
+} from './emergencyPermissionRegistry';
 
 export const EMERGENCY_ROLE_IDS = Object.freeze({
   admin: 'admin',
@@ -28,33 +54,42 @@ export const EMERGENCY_ROLE_LABELS = Object.freeze({
 });
 
 export const EMERGENCY_ACTIONS = Object.freeze({
-  createPatient: 'patient.create',
-  verifyIntake: 'intake.verify',
-  triage: 'triage.manage',
-  transitionPatient: 'patient.transition',
-  writeVitals: 'vitals.write',
-  writeNote: 'notes.write',
-  manageFlags: 'flags.manage',
-  assignStaff: 'patient.assignStaff',
-  assignRoom: 'patient.assignRoom',
-  escalatePatient: 'patient.escalate',
-  dischargePatient: 'patient.discharge',
-  prepareEmsBay: 'ems.prepareBay',
-  convertEmsArrival: 'ems.convertArrival',
-  completeEmsHandoff: 'ems.completeHandoff',
-  manageReferral: 'referrals.manage',
-  manageTransfer: 'transfers.manage',
-  manageCapacity: 'capacity.manage',
-  manageBoarding: 'boarding.manage',
-  reassignWorkload: 'workload.reassign',
-  useCopilot: 'copilot.use',
-  viewAnalytics: 'analytics.view',
-  runSimulation: 'simulation.run',
+  createPatient: EMERGENCY_PERMISSION_KEYS.patientCreate,
+  editPatientDemographics: EMERGENCY_PERMISSION_KEYS.patientDemographicsEdit,
+  createEncounter: EMERGENCY_PERMISSION_KEYS.encounterCreate,
+  verifyIntake: EMERGENCY_PERMISSION_KEYS.intakeVerify,
+  triage: EMERGENCY_PERMISSION_KEYS.triageAssignAcuity,
+  transitionPatient: EMERGENCY_PERMISSION_KEYS.queueMove,
+  queueMove: EMERGENCY_PERMISSION_KEYS.queueMove,
+  completeReassessment: EMERGENCY_PERMISSION_KEYS.reassessmentComplete,
+  writeVitals: EMERGENCY_PERMISSION_KEYS.vitalsWrite,
+  writeNote: EMERGENCY_PERMISSION_KEYS.notesWrite,
+  manageFlags: EMERGENCY_PERMISSION_KEYS.flagsManage,
+  assignStaff: EMERGENCY_PERMISSION_KEYS.patientAssignStaff,
+  assignRoom: EMERGENCY_PERMISSION_KEYS.patientAssignRoom,
+  escalatePatient: EMERGENCY_PERMISSION_KEYS.patientEscalate,
+  receptionEscalate: EMERGENCY_PERMISSION_KEYS.receptionEscalate,
+  dischargePatient: EMERGENCY_PERMISSION_KEYS.patientDischarge,
+  prepareEmsBay: EMERGENCY_PERMISSION_KEYS.emsPrepareBay,
+  convertEmsArrival: EMERGENCY_PERMISSION_KEYS.emsConvertArrival,
+  completeEmsHandoff: EMERGENCY_PERMISSION_KEYS.emsHandoffComplete,
+  manageReferral: EMERGENCY_PERMISSION_KEYS.referralCreate,
+  manageTransfer: EMERGENCY_PERMISSION_KEYS.transferManage,
+  manageCapacity: EMERGENCY_PERMISSION_KEYS.capacityManage,
+  manageBoarding: EMERGENCY_PERMISSION_KEYS.boardingManage,
+  reassignWorkload: EMERGENCY_PERMISSION_KEYS.workloadReassign,
+  useCopilot: EMERGENCY_PERMISSION_KEYS.copilotUse,
+  viewAnalytics: EMERGENCY_PERMISSION_KEYS.analyticsView,
+  runSimulation: EMERGENCY_PERMISSION_KEYS.simulationRun,
+  manageSettings: EMERGENCY_PERMISSION_KEYS.settingsManage,
+  displayPublicWaitboard: EMERGENCY_PERMISSION_KEYS.displayPublicWaitboard,
+  displayPublicPublish: EMERGENCY_PERMISSION_KEYS.displayPublicPublish,
+  completeDisposition: EMERGENCY_PERMISSION_KEYS.patientDischarge,
+  displayWhiteboardReadonly: EMERGENCY_PERMISSION_KEYS.displayWhiteboardReadonly,
   // Future module
   manageFederatedLearning: 'federated.manage',
   // Future module
   runDigitalTwin: 'digitalTwin.run',
-  manageSettings: 'settings.manage',
   // Future module
   viewAiGovernance: 'aiGovernance.view',
 });
@@ -88,7 +123,7 @@ const ROUTES = Object.freeze({
   aiGovernance: CANONICAL_ROUTES.emergencyAiGovernance,
   // Future module
   aiGovernanceGlobal: CANONICAL_ROUTES.aiGovernance,
-  integrations: CANONICAL_ROUTES.integrationHub,
+  integrationHub: CANONICAL_ROUTES.integrationHub,
   cosmos: CANONICAL_ROUTES.cosmosViewer,
   settings: CANONICAL_ROUTES.emergencySettings,
 });
@@ -277,6 +312,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.verifyIntake,
       EMERGENCY_ACTIONS.convertEmsArrival,
+      EMERGENCY_ACTIONS.receptionEscalate,
     ],
     defaultRoute: ROUTES.reception,
   }),
@@ -325,13 +361,19 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
 const ROLE_ALIASES = Object.freeze({
   admin: EMERGENCY_ROLE_IDS.admin,
   administrator: EMERGENCY_ROLE_IDS.admin,
+  'site admin': EMERGENCY_ROLE_IDS.admin,
+  site_admin: EMERGENCY_ROLE_IDS.admin,
   'ed manager': EMERGENCY_ROLE_IDS.edManager,
   ed_manager: EMERGENCY_ROLE_IDS.edManager,
   edmanager: EMERGENCY_ROLE_IDS.edManager,
   manager: EMERGENCY_ROLE_IDS.edManager,
+  director: EMERGENCY_ROLE_IDS.edManager,
+  'department manager': EMERGENCY_ROLE_IDS.edManager,
   charge: EMERGENCY_ROLE_IDS.chargeNurse,
   'charge nurse': EMERGENCY_ROLE_IDS.chargeNurse,
   charge_nurse: EMERGENCY_ROLE_IDS.chargeNurse,
+  'flow nurse': EMERGENCY_ROLE_IDS.chargeNurse,
+  flow_nurse: EMERGENCY_ROLE_IDS.chargeNurse,
   nurse: EMERGENCY_ROLE_IDS.chargeNurse,
   'triage nurse': EMERGENCY_ROLE_IDS.triageNurse,
   triage_nurse: EMERGENCY_ROLE_IDS.triageNurse,
@@ -339,20 +381,31 @@ const ROLE_ALIASES = Object.freeze({
   physician: EMERGENCY_ROLE_IDS.physician,
   doctor: EMERGENCY_ROLE_IDS.physician,
   md: EMERGENCY_ROLE_IDS.physician,
+  np: EMERGENCY_ROLE_IDS.physician,
+  pa: EMERGENCY_ROLE_IDS.physician,
+  'nurse practitioner': EMERGENCY_ROLE_IDS.physician,
+  'physician assistant': EMERGENCY_ROLE_IDS.physician,
   'registration clerk': EMERGENCY_ROLE_IDS.registrationClerk,
   registration_clerk: EMERGENCY_ROLE_IDS.registrationClerk,
   clerk: EMERGENCY_ROLE_IDS.registrationClerk,
   registrar: EMERGENCY_ROLE_IDS.registrationClerk,
+  'ed clerk': EMERGENCY_ROLE_IDS.registrationClerk,
+  ed_clerk: EMERGENCY_ROLE_IDS.registrationClerk,
+  receptionist: EMERGENCY_ROLE_IDS.registrationClerk,
   ems: EMERGENCY_ROLE_IDS.emsUser,
   'ems user': EMERGENCY_ROLE_IDS.emsUser,
   ems_user: EMERGENCY_ROLE_IDS.emsUser,
   paramedic: EMERGENCY_ROLE_IDS.emsUser,
+  'ems handoff': EMERGENCY_ROLE_IDS.emsUser,
+  'ems handoff nurse': EMERGENCY_ROLE_IDS.emsUser,
   viewer: EMERGENCY_ROLE_IDS.readOnlyViewer,
   'read only': EMERGENCY_ROLE_IDS.readOnlyViewer,
   'read only viewer': EMERGENCY_ROLE_IDS.readOnlyViewer,
   'read-only viewer': EMERGENCY_ROLE_IDS.readOnlyViewer,
   read_only_viewer: EMERGENCY_ROLE_IDS.readOnlyViewer,
   readonly: EMERGENCY_ROLE_IDS.readOnlyViewer,
+  'public display': EMERGENCY_ROLE_IDS.readOnlyViewer,
+  'waiting room display': EMERGENCY_ROLE_IDS.readOnlyViewer,
 });
 
 export function normalizeEmergencyRole(role) {
@@ -416,19 +469,53 @@ export function isEmergencyReadOnlyRole(role) {
   return Boolean(getEmergencyRoleDefinition(role)?.readOnly);
 }
 
-export function hasEmergencyActionPermission(role, action, permissionsOverrides = {}) {
-  const definition = getEmergencyRoleDefinition(role);
-  if (!definition || !action) return false;
-  const roleKey = definition.id;
-  const extra =
-    permissionsOverrides?.[roleKey] ||
-    permissionsOverrides?.[role] ||
-    permissionsOverrides?.[normalizeEmergencyRole(role)];
-  if (Array.isArray(extra) && extra.length) {
-    const merged = new Set([...definition.actions, ...extra]);
-    return merged.has(action);
-  }
-  return definition.actions.includes(action);
+export function buildEmergencyPermissionContext(role, context = {}) {
+  const normalizedRole = normalizeEmergencyRole(role);
+  return {
+    roleReadOnly: isEmergencyReadOnlyRole(normalizedRole),
+    ...context,
+  };
+}
+
+export function hasEmergencyActionPermission(
+  role,
+  action,
+  permissionsOverrides = {},
+  context = {},
+) {
+  if (!action) return false;
+  const normalizedRole = normalizeEmergencyRole(role);
+  return hasEmergencyPermission(
+    normalizedRole,
+    action,
+    permissionsOverrides,
+    buildEmergencyPermissionContext(normalizedRole, context),
+  );
+}
+
+export function canPerformEmergencyAction(
+  role,
+  action,
+  permissionsOverrides = {},
+  context = {},
+) {
+  if (!action) return false;
+  const normalizedRole = normalizeEmergencyRole(role);
+  return canPerformEmergencyMutation(
+    normalizedRole,
+    action,
+    permissionsOverrides,
+    buildEmergencyPermissionContext(normalizedRole, context),
+  );
+}
+
+export function canMutateEmergencySurface(role, context = {}) {
+  const normalizedRole = normalizeEmergencyRole(role);
+  const permissionContext = buildEmergencyPermissionContext(normalizedRole, context);
+  if (permissionContext.roleReadOnly) return false;
+  if (isPublicDisplayContext(permissionContext)) return false;
+  if (isReadOnlyOperationalContext(permissionContext)) return false;
+  return true;
 }
 
 export function canAccessEmergencyRoute(role, path) {
@@ -447,16 +534,12 @@ export function getNearestEmergencyRoute(role, preferredPath) {
   return getEmergencyRoleHomeRoute(role);
 }
 
-export function getEmergencyRoleHomeRoute(role) {
-  if (isReceptionFirstUxEnabled()) {
-    const definition = getEmergencyRoleDefinition(role);
-    if (definition && canAccessEmergencyRoute(role, RECEPTION_FIRST_UX.platformHomeRoute)) {
-      return RECEPTION_FIRST_UX.platformHomeRoute;
-    }
-  }
-  const definition = getEmergencyRoleDefinition(role);
-  if (!definition) return CANONICAL_ROUTES.emergencyReception;
-  return definition.defaultRoute || definition.routes[0] || CANONICAL_ROUTES.emergencyReception;
+export function getEmergencyRoleHomeRoute(role, emergencySettings = {}) {
+  return resolveRoleLandingRoute({
+    role,
+    emergencySettings,
+    readOnly: isEmergencyReadOnlyRole(role),
+  });
 }
 
 /** Fastest reception create — express registration modal on reception workspace. */
@@ -500,9 +583,31 @@ export function isRegistrationClerkRole(role) {
   return normalizeEmergencyRole(role) === EMERGENCY_ROLE_IDS.registrationClerk;
 }
 
-export function prefersReceptionForPatientCreate(role) {
+export function isReceptionScreenMode(screenMode) {
+  return normalizeCareDroidScreenMode(screenMode) === CARE_DROID_SCREEN_MODES.reception;
+}
+
+export function isTriageScreenMode(screenMode) {
+  return normalizeCareDroidScreenMode(screenMode) === CARE_DROID_SCREEN_MODES.triage;
+}
+
+export function getTriagePrimaryLandingPath(role, patientId) {
+  if (
+    normalizeEmergencyRole(role) === EMERGENCY_ROLE_IDS.triageNurse ||
+    isTriageScreenMode(role)
+  ) {
+    return getTriagePendingQueuePath(patientId);
+  }
+  return getEmergencyRoleHomeRoute(role);
+}
+
+export function prefersReceptionForPatientCreate(role, screenMode) {
   const normalizedRole = normalizeEmergencyRole(role);
   if (normalizedRole === EMERGENCY_ROLE_IDS.emsUser) return false;
+  if (screenMode && isPhysicianScreenMode(screenMode)) return false;
+  if (screenMode && isReceptionScreenMode(screenMode)) {
+    return hasEmergencyActionPermission(role, EMERGENCY_ACTIONS.createPatient);
+  }
   if (
     isReceptionFirstUxEnabled() &&
     RECEPTION_FIRST_UX.routeAllIntakeThroughReception &&
@@ -513,7 +618,9 @@ export function prefersReceptionForPatientCreate(role) {
   return hasEmergencyActionPermission(role, EMERGENCY_ACTIONS.createPatient);
 }
 
-export function prefersReceptionForPatientSearch(role) {
+export function prefersReceptionForPatientSearch(role, screenMode) {
+  if (screenMode && isPhysicianScreenMode(screenMode)) return false;
+  if (screenMode && isReceptionScreenMode(screenMode)) return true;
   if (
     isReceptionFirstUxEnabled() &&
     RECEPTION_FIRST_UX.routePatientSearchThroughReception &&
@@ -547,11 +654,37 @@ export function getVisibleEmergencyNavigationItems(role, items) {
   });
 }
 
-export function canExecuteEmergencyCommand(role, command) {
+export function canExecuteEmergencyCommand(role, command, context = {}, permissionsOverrides = {}) {
   if (!command) return false;
-  if (command.requiredAction && !hasEmergencyActionPermission(role, command.requiredAction))
-    return false;
+  if (command.requiredAction) {
+    const presentation = presentEmergencyRoleAction(
+      role,
+      command.requiredAction,
+      permissionsOverrides,
+      context,
+    );
+    if (!presentation.visible || !presentation.enabled) return false;
+  }
   const commandPath = command.path || command.build?.('')?.path;
   if (commandPath && !canAccessEmergencyRoute(role, commandPath)) return false;
   return true;
 }
+
+export {
+  EMERGENCY_ROLE_ACTIONS,
+  EMERGENCY_ROLE_ACTION_MATRIX,
+  EMERGENCY_ROLE_ACTION_PERMISSION,
+  presentEmergencyRoleAction,
+  resolveEmergencyRoleActionState,
+  resolveRoleActionId,
+  isEmergencyActionVisible,
+  isEmergencyActionEnabled,
+  isEmergencyActionReadOnly,
+} from './emergencyRoleActionMatrix';
+
+export {
+  isPublicDisplayPersona,
+  resolveRoleLandingRoute,
+  resolveRoleLandingScreenMode,
+  resolveRoleHomeNavItemId,
+} from './emergencyRoleNavigationModel';

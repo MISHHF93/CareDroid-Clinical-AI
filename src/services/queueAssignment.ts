@@ -8,6 +8,7 @@ import { PatientFlag, PatientState, type Patient } from '../types/emergency';
 import { useEmergencyStore, type useEmergencyStore as UseEmergencyStoreType } from '../store/emergencyStore';
 import QueueIntelligenceService from './queueIntelligenceService';
 import { getPatientDisplayName } from '../utils/patientSearch';
+import { recordFirstContact, stampArrivalControlLayer } from './arrivalControlLayer';
 
 /** Trace registry: how patients enter, leave, and what triggers movement. */
 export const QUEUE_MOVEMENT_REGISTRY = Object.freeze({
@@ -387,6 +388,18 @@ export function enterTriageQueue(
     });
   }
 
+  recordFirstContact(store, options.patientId, {
+    actorName: options.actorName,
+    source: options.source || 'queue-assignment',
+    note: 'First contact recorded on triage queue entry.',
+  });
+
+  stampArrivalControlLayer(store, options.patientId, {
+    triagePending: true,
+    registrationStatus: 'complete',
+    queueDestination: 'triage-queue',
+  });
+
   const syncFilter =
     options.syncWhiteboardFilter !== false &&
     isAutoAssignTriageQueueEnabled(store.emergencySettings);
@@ -468,6 +481,12 @@ export function enterWaitingQueue(
   if (syncFilter) {
     store.setQueueFilter(WHITEBOARD_QUEUE_FILTER.waiting);
   }
+
+  stampArrivalControlLayer(store, options.patientId, {
+    triagePending: false,
+    registrationStatus: 'complete',
+    queueDestination: 'waiting-room',
+  });
 
   store.recordWorkflowAction({
     type: 'journey_state_changed',

@@ -28,9 +28,10 @@ export const RECEPTION_INTAKE_URL_KEYS = [
  *
  * | Param              | Panel / behavior                          |
  * |--------------------|-------------------------------------------|
- * | express=1          | Express registration modal                |
+ * | express=1          | Reception quick intake modal              |
+ * | quickIntake=1      | Reception quick intake modal              |
  * | intake=1           | Smart intake overlay                      |
- * | quickCreate=1      | QuickIntake modal                         |
+ * | quickCreate=1      | Reception quick intake modal              |
  * | queue=ems          | Work queues — EMS tab                     |
  * | queue=verification | Work queues — identity verification tab   |
  * | queue=pretriage    | Work queues — pre-triage / handoff tab    |
@@ -40,9 +41,10 @@ export const RECEPTION_INTAKE_URL_KEYS = [
  * | patient            | Expanded pretriage queue row              |
  */
 export const RECEPTION_PIPELINE_URL_CONTRACT = Object.freeze({
-  express: 'Express registration',
+  express: 'Reception quick intake',
+  quickIntake: 'Reception quick intake',
   intake: 'Smart intake overlay',
-  quickCreate: 'QuickIntake modal',
+  quickCreate: 'Reception quick intake',
   'queue=ems': 'EMS work queue tab',
   'queue=verification': 'Identity verification queue tab',
   'queue=pretriage': 'Pre-triage / handoff queue tab',
@@ -88,6 +90,11 @@ export function convertEmsArrivalForReception(arrivalId, options = {}) {
     patientId,
     emsArrivalId: arrivalId,
     actorName: options.actorName,
+  });
+
+  after.registerArrivalControl?.(patientId, {
+    source: 'ems-convert',
+    destination: 'ems-registration',
   });
 
   const receptionVerifyPath = getReceptionEmbeddedIntakePath({

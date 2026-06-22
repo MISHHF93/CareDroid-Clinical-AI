@@ -23,6 +23,7 @@ import {
   groupOperationalAlertsByMetric,
 } from '../../config/operationalMetricsModel';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { summarizeTriageBreachAnalytics } from '../../services/triageBreachTimer';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -92,7 +93,9 @@ export default function EmergencyAnalytics() {
   const emergencyRole = useEmergencyRolePermissions();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_DISPLAY' });
+  const patients = useEmergencyStore((state) => state.patients);
+  const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const centralFreshness = formatCentralFreshness(centralSnapshot);
@@ -142,6 +145,10 @@ export default function EmergencyAnalytics() {
   const federatedSignal = findUpgradeSignal(upgradeSignals, 'federated_learning_harness');
   const auditSignal = findUpgradeSignal(upgradeSignals, 'immutable_audit_abstraction');
   const blockedActions = upgradeHarness.data?.data?.blockedAutonomousActions || [];
+  const triageBreachAnalytics = useMemo(
+    () => summarizeTriageBreachAnalytics(patients, { settings: emergencySettings }),
+    [patients, emergencySettings],
+  );
 
   useEffect(() => {
     void loadEmergencyAnalytics({ force: true });
@@ -243,6 +250,14 @@ export default function EmergencyAnalytics() {
             <strong>{centralSnapshot.reassessmentStatus.due}</strong>
             <small className="emergency-analytics__source">
               {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human reviewed
+            </small>
+          </ChartCard>
+          <ChartCard title="Triage breach timer" subtitle="Arrival to triage against site target">
+            <strong>{triageBreachAnalytics.summary.breachedCount}</strong>
+            <small className="emergency-analytics__source">
+              {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
+              {triageBreachAnalytics.summary.targetMinutes}m · longest{' '}
+              {triageBreachAnalytics.summary.longestElapsedLabel}
             </small>
           </ChartCard>
           <ChartCard title="Alerts" subtitle="Active alert/escalation context">

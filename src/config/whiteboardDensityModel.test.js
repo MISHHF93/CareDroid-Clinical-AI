@@ -56,6 +56,60 @@ describe('whiteboardDensityModel', () => {
     expect(density.hiddenUnderLoad).toBeGreaterThanOrEqual(4);
   });
 
+  it('uses department status screen instead of patient grid in display mode', () => {
+    const density = evaluateWhiteboardDensity({
+      displayMode: true,
+      waitingPatients: 12,
+      emsArrivals: 2,
+      reassessmentsDue: 3,
+      referralsPending: 2,
+      totalPatients: 20,
+    });
+
+    expect(density.surfaces.departmentStatusScreen.visible).toBe(true);
+    expect(density.surfaces.heroTitle.visible).toBe(false);
+    expect(density.surfaces.publicWaitingScreen.visible).toBe(false);
+    expect(density.surfaces.patientGrid.visible).toBe(false);
+    expect(density.surfaces.filters.visible).toBe(false);
+    expect(density.surfaces.primaryStats.visible).toBe(false);
+    expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
+    expect(density.surfaces.missionControl.visible).toBe(false);
+  });
+
+  it('uses public waiting screen instead of department status for waiting-room display', () => {
+    const density = evaluateWhiteboardDensity({
+      displayMode: true,
+      publicWaitingDisplay: true,
+      waitingPatients: 12,
+      emsArrivals: 2,
+      reassessmentsDue: 3,
+      referralsPending: 2,
+      totalPatients: 20,
+    });
+
+    expect(density.surfaces.publicWaitingScreen.visible).toBe(true);
+    expect(density.surfaces.departmentStatusScreen.visible).toBe(false);
+    expect(density.surfaces.patientGrid.visible).toBe(false);
+    expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
+  });
+
+  it('uses command center throughput instead of patient grid for COMMAND_CENTER_SCREEN', () => {
+    const density = evaluateWhiteboardDensity({
+      commandCenterScreen: true,
+      waitingPatients: 12,
+      emsArrivals: 2,
+      reassessmentsDue: 3,
+      referralsPending: 2,
+      totalPatients: 20,
+    });
+
+    expect(density.surfaces.commandCenterThroughput.visible).toBe(true);
+    expect(density.surfaces.patientGrid.visible).toBe(false);
+    expect(density.surfaces.missionControl.visible).toBe(false);
+    expect(density.surfaces.commandLayer.visible).toBe(false);
+    expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
+  });
+
   it('defers audit strips to progressive ops detail', () => {
     const density = evaluateWhiteboardDensity({
       waitingPatients: 6,

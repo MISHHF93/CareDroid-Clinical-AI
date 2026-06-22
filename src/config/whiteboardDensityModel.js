@@ -91,6 +91,12 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     rationale: 'Role-specific queue summary — suppressed under pressure.',
   }),
   Object.freeze({
+    id: 'waiting-room-safety',
+    label: 'Waiting room safety board',
+    tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
+    rationale: 'Post-triage waiting patients with vitals, reassessment, and provider/test status.',
+  }),
+  Object.freeze({
     id: 'mission-control',
     label: 'Mission control panels',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
@@ -120,12 +126,32 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     rationale: 'Core work surface — cap count under waiting-wall load.',
   }),
+  Object.freeze({
+    id: 'department-status-screen',
+    label: 'Department status screen',
+    tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    rationale: 'Read-only wall display — aggregate metrics without PHI.',
+  }),
+  Object.freeze({
+    id: 'public-waiting-screen',
+    label: 'Public waiting display',
+    tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    rationale: 'Patient waiting-area wall — PHI-safe operational guidance only.',
+  }),
+  Object.freeze({
+    id: 'command-center-throughput',
+    label: 'Command center throughput',
+    tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    rationale: 'Manager/director throughput dashboard — arrivals, waits, boarding, forecast.',
+  }),
 ]);
 
 /**
  * @param {object} context
  * @param {object} [context.operationalLoad]
  * @param {boolean} [context.displayMode]
+ * @param {boolean} [context.publicWaitingDisplay]
+ * @param {boolean} [context.commandCenterScreen]
  * @param {boolean} [context.showShiftHandoffStrip]
  * @param {boolean} [context.prioritizeAwareness]
  * @param {boolean} [context.showCapacityCrisis]
@@ -134,6 +160,7 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
  * @param {boolean} [context.signals.reassessAttention]
  * @param {boolean} [context.signals.referralAttention]
  * @param {boolean} [context.signals.chargeNurseStrip]
+ * @param {boolean} [context.signals.waitingRoomSafety]
  * @param {boolean} [context.signals.inboundEmsBanner]
  * @param {number} [context.signals.opsDetailCount]
  */
@@ -149,42 +176,65 @@ export function evaluateWhiteboardDensity(context = {}) {
     });
 
   const displayMode = Boolean(context.displayMode);
+  const publicWaitingDisplay = Boolean(context.publicWaitingDisplay);
+  const commandCenterScreen = Boolean(context.commandCenterScreen);
+  const wallKioskDisplay = displayMode;
   const showShiftHandoffStrip = Boolean(context.showShiftHandoffStrip);
   const prioritizeAwareness =
     Boolean(context.prioritizeAwareness) || operationalLoad.prioritizeAwareness;
   const signals = context.signals || {};
   const opsDetailCount = Number(signals.opsDetailCount) || 0;
   const duplicateDomainChrome = showShiftHandoffStrip || prioritizeAwareness;
+  const departmentScreen = wallKioskDisplay && !publicWaitingDisplay;
 
   const surfaces = Object.freeze({
-    heroTitle: Object.freeze({ visible: true, tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE }),
+    heroTitle: Object.freeze({
+      visible: !departmentScreen,
+      tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    }),
     heroDetail: Object.freeze({
-      visible: !prioritizeAwareness && !operationalLoad.hideHeroDetail,
+      visible: !wallKioskDisplay && !prioritizeAwareness && !operationalLoad.hideHeroDetail,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     capacityCrisis: Object.freeze({
-      visible: Boolean(context.showCapacityCrisis),
+      visible: Boolean(context.showCapacityCrisis) && !departmentScreen,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     shiftHandoff: Object.freeze({
-      visible: showShiftHandoffStrip,
+      visible: showShiftHandoffStrip && !wallKioskDisplay,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     awarenessBanner: Object.freeze({
       visible: prioritizeAwareness && !displayMode,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
+    departmentStatusScreen: Object.freeze({
+      visible: departmentScreen,
+      tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    }),
+    publicWaitingScreen: Object.freeze({
+      visible: publicWaitingDisplay,
+      tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    }),
+    commandCenterThroughput: Object.freeze({
+      visible: commandCenterScreen,
+      tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
+    }),
     primaryStats: Object.freeze({
-      visible: true,
+      visible: !wallKioskDisplay,
       compact: prioritizeAwareness,
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),
     secondaryStats: Object.freeze({
-      visible: !prioritizeAwareness,
+      visible: !wallKioskDisplay && !prioritizeAwareness,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     commandLayer: Object.freeze({
-      visible: !prioritizeAwareness && !operationalLoad.hideCommandLayer,
+      visible:
+        !wallKioskDisplay &&
+        !commandCenterScreen &&
+        !prioritizeAwareness &&
+        !operationalLoad.hideCommandLayer,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     emsAttention: Object.freeze({
@@ -224,27 +274,41 @@ export function evaluateWhiteboardDensity(context = {}) {
         Boolean(signals.chargeNurseStrip) &&
         !operationalLoad.hideChargeNurseStrip &&
         !showShiftHandoffStrip &&
-        !displayMode,
+        !displayMode &&
+        !commandCenterScreen,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
+    waitingRoomSafety: Object.freeze({
+      visible:
+        !wallKioskDisplay &&
+        !commandCenterScreen &&
+        Boolean(signals.waitingRoomSafety) &&
+        !operationalLoad.hideMissionControl,
+      tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
+    }),
     missionControl: Object.freeze({
-      visible: !prioritizeAwareness && !operationalLoad.hideMissionControl,
+      visible:
+        !wallKioskDisplay && !commandCenterScreen && !prioritizeAwareness && !operationalLoad.hideMissionControl,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     queueIntelligence: Object.freeze({
-      visible: !prioritizeAwareness && !operationalLoad.collapseQueueIntelligence,
+      visible:
+        !wallKioskDisplay &&
+        !commandCenterScreen &&
+        !prioritizeAwareness &&
+        !operationalLoad.collapseQueueIntelligence,
       defaultCollapsed: operationalLoad.collapseQueueIntelligence,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     opsDetail: Object.freeze({
-      visible: !displayMode && !showShiftHandoffStrip,
+      visible: !wallKioskDisplay && !commandCenterScreen && !showShiftHandoffStrip,
       defaultExpanded: !prioritizeAwareness,
       signalCount: opsDetailCount,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
-    filters: Object.freeze({ visible: true, tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE }),
+    filters: Object.freeze({ visible: !wallKioskDisplay, tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE }),
     patientGrid: Object.freeze({
-      visible: true,
+      visible: !wallKioskDisplay && !commandCenterScreen,
       maxVisibleCards: operationalLoad.maxVisibleCards,
       tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     }),

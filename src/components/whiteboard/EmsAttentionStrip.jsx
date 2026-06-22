@@ -2,18 +2,26 @@ import React, { useMemo } from 'react';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildEmsAttentionStripMetrics, summarizeEmsAwareness } from './emsAwarenessModel';
-import './ChargeNurseOperationalStrip.css';
 
 export default function EmsAttentionStrip({
   emsArrivals = [],
+  patients = [],
+  staff = [],
+  rooms = [],
+  offloadTargetMinutes = 15,
   now = Date.now(),
   onMetricSelect,
   readOnly = false,
 }) {
   const metrics = useMemo(() => {
-    const summary = summarizeEmsAwareness(emsArrivals, now);
+    const summary = summarizeEmsAwareness(emsArrivals, now, {
+      patients,
+      staff,
+      rooms,
+      offloadTargetMinutes,
+    });
     return buildEmsAttentionStripMetrics(summary);
-  }, [emsArrivals, now]);
+  }, [emsArrivals, now, offloadTargetMinutes, patients, rooms, staff]);
 
   const clearCopy = EMPTY_STATE_COPY.strips.emsClear;
 
@@ -21,7 +29,7 @@ export default function EmsAttentionStrip({
     <ChargeNurseOperationalStrip
       metrics={metrics}
       eyebrow="EMS inbound"
-      className="charge-nurse-operational-strip--ems"
+      accent="ems"
       onMetricSelect={onMetricSelect}
       readOnly={readOnly}
       emptyLabel={clearCopy.label}

@@ -5,6 +5,7 @@ import {
   minutesRemaining,
 } from '../../utils/emsArrivalDisplay';
 import { calculateEMSPressureScore } from '../EMSPressureScore';
+import { buildEmsOffloadTrackerSummary } from '../../services/emsOffloadTracker';
 
 /** Existing EMS surfaces in the product. */
 export const EMS_WORKFLOW_ARTIFACTS = Object.freeze([
@@ -71,7 +72,7 @@ export function isHighRiskEmsArrival(arrival) {
   );
 }
 
-export function summarizeEmsAwareness(emsArrivals = [], now = Date.now()) {
+export function summarizeEmsAwareness(emsArrivals = [], now = Date.now(), context = {}) {
   const active = activeEmsArrivals(emsArrivals);
   const inbound = active
     .filter((arrival) => isInboundEmsArrival(arrival, now))
@@ -79,6 +80,13 @@ export function summarizeEmsAwareness(emsArrivals = [], now = Date.now()) {
   const soonest = inbound[0] || null;
   const soonestMinutes = soonest ? minutesRemaining(soonest, now) : null;
   const pressure = calculateEMSPressureScore(emsArrivals, new Date(now));
+  const offloadTracker = buildEmsOffloadTrackerSummary(emsArrivals, {
+    patients: context.patients || [],
+    staff: context.staff || [],
+    rooms: context.rooms || [],
+    now,
+    offloadTargetMinutes: context.offloadTargetMinutes,
+  });
   const riskArrivals = active.filter(isHighRiskEmsArrival);
   const awaitingOffload = active.filter((arrival) => getArrivalOffloadMinutes(arrival, now) !== null);
 
@@ -94,12 +102,15 @@ export function summarizeEmsAwareness(emsArrivals = [], now = Date.now()) {
     riskCount: riskArrivals.length,
     riskArrivals: Object.freeze([...riskArrivals]),
     inboundArrivals: Object.freeze([...inbound]),
-    awaitingHandoff: pressure.awaitingHandoff,
-    offloadMinutes: pressure.averageOffloadMinutes,
+    awaitingHandoff: offloadTracker.awaitingOffloadCount || pressure.awaitingHandoff,
+    offloadMinutes: offloadTracker.averageOffloadMinutes || pressure.averageOffloadMinutes,
+    longestOffloadMinutes: offloadTracker.longestOffloadMinutes,
+    delayedOffloadCount: offloadTracker.delayedCount,
+    offloadRows: Object.freeze([...offloadTracker.rows]),
     awaitingOffload: Object.freeze([...awaitingOffload]),
     pressureScore: pressure.score,
     pressureBand: pressure.band.id,
-    totalSignals: active.length + pressure.awaitingHandoff,
+    totalSignals: active.length + (offloadTracker.awaitingOffloadCount || pressure.awaitingHandoff),
   });
 }
 
@@ -156,15 +167,23 @@ export function buildEmsAttentionStripMetrics(summary) {
     );
   }
 
-  if (summary.awaitingHandoff > 0 || summary.offloadMinutes > 0) {
+  if (summary.awaitingHandoff > 0 || summary.offloadMinutes > 0 || summary.delayedOffloadCount > 0) {
     metrics.push(
       Object.freeze({
         id: 'ems-offload',
         label: 'Offload',
         hint: `${summary.awaitingHandoff} unit${summary.awaitingHandoff === 1 ? '' : 's'} awaiting handoff`,
-        value: summary.offloadMinutes > 0 ? `${summary.offloadMinutes}m` : summary.awaitingHandoff,
+        value:
+          summary.offloadMinutes > 0
+            ? `${summary.offloadMinutes}m`
+            : summary.awaitingHandoff,
         surface: 'ems',
-        tone: summary.offloadMinutes >= 15 ? 'critical' : summary.offloadMinutes >= 10 ? 'warning' : 'info',
+        tone:
+          summary.delayedOffloadCount > 0 || summary.offloadMinutes >= 15
+            ? 'critical'
+            : summary.offloadMinutes >= 10
+              ? 'warning'
+              : 'info',
         whiteboardAction: 'focus-ems-offload',
       }),
     );

@@ -2,16 +2,30 @@ import { useMemo } from 'react';
 import {
   CARE_DROID_SCREEN_MODE_CONFIG,
   CARE_DROID_SCREEN_MODES,
+  canEditInScreenMode,
+  getScreenModeDefaultLandingRoute,
+  getScreenModePhiVisibility,
+  isScreenActionAvailable,
+  isScreenWidgetVisible,
   type CareDroidScreenMode,
-} from '../central-node/careDroidCentralNode';
+  type ScreenModePhiVisibility,
+} from '../config/careDroidScreenModes';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import useRouteScreenMode from './useRouteScreenMode';
+import {
+  isPublicDisplayScreenMode,
+  shouldUseMinimalAppChrome,
+} from '../config/emergencyRoleScreenMatrix';
 
 export type ScreenModeCapabilities = {
   screenMode: CareDroidScreenMode;
   label: string;
   visibleWidgets: readonly string[];
   availableActions: readonly string[];
+  canEdit: boolean;
+  phiVisibility: ScreenModePhiVisibility;
+  defaultLandingRoute: string;
+  defaultFocus: string;
   showCentralNodeBadge: boolean;
   showOperationalStrip: boolean;
   showReassessAction: boolean;
@@ -21,7 +35,15 @@ export type ScreenModeCapabilities = {
   headerDensity: 'comfortable' | 'compact' | 'wall';
   productLabel: string;
   alertVisibility: 'all' | 'critical' | 'operational' | 'redacted';
+  isReceptionScreen: boolean;
+  isTriageScreen: boolean;
+  /** @deprecated Use isReceptionScreen */
   isRegistrationScreen: boolean;
+  isPublicDisplay: boolean;
+  isWallKiosk: boolean;
+  useMinimalAppChrome: boolean;
+  isWidgetVisible: (widgetId: string) => boolean;
+  isActionAvailable: (actionId: string) => boolean;
 };
 
 const CLINICAL_COMMAND_MODES = new Set<CareDroidScreenMode>([
@@ -36,25 +58,39 @@ export function resolveScreenModeCapabilities(
   screenMode: CareDroidScreenMode,
 ): ScreenModeCapabilities {
   const config = CARE_DROID_SCREEN_MODE_CONFIG[screenMode];
-  const isRegistrationScreen = screenMode === CARE_DROID_SCREEN_MODES.registration;
+  const isReceptionScreen = screenMode === CARE_DROID_SCREEN_MODES.reception;
+  const isTriageScreen = screenMode === CARE_DROID_SCREEN_MODES.triage;
+  const isPublicDisplay = isPublicDisplayScreenMode(screenMode);
+  const isWallKiosk = shouldUseMinimalAppChrome(screenMode);
 
   return {
     screenMode,
     label: config.label,
     visibleWidgets: config.visibleWidgets,
     availableActions: config.availableActions,
-    showCentralNodeBadge: !isRegistrationScreen,
-    showOperationalStrip: !isRegistrationScreen,
-    showReassessAction: CLINICAL_COMMAND_MODES.has(screenMode),
-    showEmsCriticalOverlay: !isRegistrationScreen,
-    showCapacityEngine: !isRegistrationScreen,
-    showReassessmentEngine: !isRegistrationScreen,
+    canEdit: canEditInScreenMode(screenMode),
+    phiVisibility: getScreenModePhiVisibility(screenMode),
+    defaultLandingRoute: getScreenModeDefaultLandingRoute(screenMode),
+    defaultFocus: config.defaultFocus,
+    showCentralNodeBadge: !isReceptionScreen && !isWallKiosk,
+    showOperationalStrip: !isReceptionScreen && !isWallKiosk,
+    showReassessAction: (CLINICAL_COMMAND_MODES.has(screenMode) || isTriageScreen) && !isWallKiosk,
+    showEmsCriticalOverlay: !isReceptionScreen && !isWallKiosk,
+    showCapacityEngine: !isReceptionScreen && !isWallKiosk,
+    showReassessmentEngine: !isReceptionScreen && !isWallKiosk,
     headerDensity: config.density,
-    productLabel: isRegistrationScreen
+    productLabel: isReceptionScreen
       ? EMERGENCY_OS_BRANDING.receptionName
       : EMERGENCY_OS_BRANDING.productName,
     alertVisibility: config.alertVisibility,
-    isRegistrationScreen,
+    isReceptionScreen,
+    isTriageScreen,
+    isRegistrationScreen: isReceptionScreen,
+    isPublicDisplay,
+    isWallKiosk,
+    useMinimalAppChrome: isWallKiosk,
+    isWidgetVisible: (widgetId) => isScreenWidgetVisible(screenMode, widgetId),
+    isActionAvailable: (actionId) => isScreenActionAvailable(screenMode, actionId),
   };
 }
 

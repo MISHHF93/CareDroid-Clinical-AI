@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
 import { selectReceptionQueues } from './receptionQueueModel';
+import ArrivalControlSummaryStrip from './ArrivalControlSummaryStrip';
 import EmsPreArrivalPanel from './EmsPreArrivalPanel';
 import RecentArrivalsPanel from './RecentArrivalsPanel';
 import ReceptionWorkQueues from './ReceptionWorkQueues';
 import DataQualityRiskPanel from '../dataQuality/DataQualityRiskPanel';
 import QueueOperationalPanel from '../queues/QueueOperationalPanel';
+import TriageBreachPanel from '../triage/TriageBreachPanel';
 import { buildQueueAuditSnapshot } from '../../services/queueAuditDiscovery';
 import { QUEUE_AUDIT_DOMAIN } from '../../config/queueAuditModel';
 import { RECEPTION_COPY } from './receptionCopy';
@@ -35,6 +37,8 @@ export default function ArrivalDashboard({
   onVerifyPatient,
   onCaptureComplaint,
   onReviewDuplicate,
+  settings = null,
+  onQueueMetricSelect,
 }) {
   const deskUi = useReceptionDeskUi();
   const queues = useMemo(() => selectReceptionQueues(patients), [patients]);
@@ -51,11 +55,18 @@ export default function ArrivalDashboard({
         {RECEPTION_COPY.queues.sectionTitle}
       </h2>
 
+      <ArrivalControlSummaryStrip
+        patients={patients}
+        onMetricSelect={onQueueMetricSelect}
+        className="arrival-dashboard__control-summary"
+      />
+
       <div className="arrival-dashboard__feeds">
         <RecentArrivalsPanel
           patients={queues.recentArrivals}
           onSelectPatient={onSelectPatient}
           onRegisterWalkIn={onRegisterWalkIn}
+          settings={settings}
         />
         <EmsPreArrivalPanel
           arrivals={emsArrivals}
@@ -69,8 +80,11 @@ export default function ArrivalDashboard({
         />
       </div>
 
+      <TriageBreachPanel patients={patients} settings={settings} className="arrival-dashboard__triage-breach" />
+
       <ReceptionWorkQueues
         patients={patients}
+        settings={settings}
         activeTab={activeQueueTab}
         dataQualitySnapshot={dataQualitySnapshot}
         queueAuditSnapshot={queueAuditSnapshot}

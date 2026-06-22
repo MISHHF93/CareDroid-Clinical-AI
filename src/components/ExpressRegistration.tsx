@@ -14,6 +14,8 @@ import {
 
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { RECEPTION_COPY } from './reception/receptionCopy';
+import { buildArrivalControlFields, registerNewArrival } from '../services/arrivalControlLayer';
+import { buildHighRiskComplaintPatch } from '../services/highRiskComplaintFlags';
 
 type ExpressRegistrationProps = {
   onClose: () => void;
@@ -164,6 +166,17 @@ export default function ExpressRegistration({
       healthCardNumber: healthCard.trim() || undefined,
       healthCard: healthCard.trim() || undefined,
       source: 'WalkIn',
+      ...buildArrivalControlFields({
+        arrivalMode: 'walk-in',
+        state: PatientState.Registration,
+        presentingComplaint: arrivalReason.trim(),
+      }),
+      ...buildHighRiskComplaintPatch({
+        chiefComplaint: arrivalReason.trim(),
+        complaintCategory: 'Other',
+        state: PatientState.Registration,
+        triagePending: true,
+      }),
     };
 
     setSubmitting(true);
@@ -173,11 +186,28 @@ export default function ExpressRegistration({
       const response = await createSmartIntakePatient(patient);
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
+      registerNewArrival(
+        { patients: [...patients, persistedPatient], updatePatient: useEmergencyStore.getState().updatePatient, dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent },
+        persistedPatient.id,
+        { source: 'express-register' },
+      );
       onAdded(persistedPatient);
       onClose();
     } catch (error) {
+      addPatient(patient);
+      registerNewArrival(
+        {
+          patients: [...patients, patient],
+          updatePatient: useEmergencyStore.getState().updatePatient,
+          dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
+        },
+        patient.id,
+        { source: 'express-register' },
+      );
+      onAdded(patient);
+      onClose();
       setSubmitError(
-        `${formatApiRecoveryMessage(error, 'registration form')} ${ERROR_RECOVERY_COPY.intakeForm}`,
+        `${formatApiRecoveryMessage(error, 'registration form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
       );
     } finally {
       setSubmitting(false);

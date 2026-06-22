@@ -188,31 +188,29 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.waitingRoomIntelligence).toEqual(
       expect.objectContaining({
-        healthScore: expect.any(Number),
-        riskState: expect.stringMatching(/Normal|Busy|Critical/),
-        reassessmentIntelligence: expect.objectContaining({
-          engineId: 'reassessment-intelligence',
-          preventionGoal: expect.stringMatching(/Prevent forgotten patients/i),
-          alerts: expect.arrayContaining([
-            expect.objectContaining({ label: 'Needs Reassessment' }),
-          ]),
+        id: 'waiting-room-throughput',
+        source: 'waitingRoomSafetyBoardModel',
+        metrics: expect.objectContaining({
+          lwbsElevated: expect.any(Number),
+          deteriorationWatch: expect.any(Number),
+          triageBreached: expect.any(Number),
+          triageAtRisk: expect.any(Number),
         }),
-        reassessmentQueue: expect.objectContaining({
-          label: 'Reassessment Queue',
-          count: expect.any(Number),
-          thresholds: expect.arrayContaining([
-            'waiting duration',
-            'risk score changes',
-            'abnormal vitals',
-            'reassessment intervals',
-          ]),
-          alerts: expect.arrayContaining([
-            expect.objectContaining({ label: 'Needs Reassessment' }),
-          ]),
-        }),
-      })
+        advisoryOnly: true,
+      }),
     );
-    expect(data.emergency.reassessmentAutomation.queue.items.length).toBeGreaterThan(0);
+    expect(data.emergency.reassessmentAutomation).toEqual(
+      expect.objectContaining({
+        id: 'reassessment-throughput',
+        source: 'reassessmentTimerEngine',
+        metrics: expect.objectContaining({
+          overdueTimers: expect.any(Number),
+          dueSoonTimers: expect.any(Number),
+          activeTimers: expect.any(Number),
+        }),
+        advisoryOnly: true,
+      }),
+    );
     expect(data.emergency.emsPreArrival).toEqual(
       expect.objectContaining({
         pipelineId: 'ems-handoff-pipeline',
@@ -261,18 +259,15 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.emsOffload).toEqual(
       expect.objectContaining({
+        id: 'ems-offload-throughput',
+        source: 'emsOffloadTracker',
         metrics: expect.objectContaining({
-          incomingAmbulances: expect.any(Number),
-          waitingHandoffs: expect.any(Number),
-          longestOffloadDelay: expect.any(Number),
+          inboundCount: expect.any(Number),
+          awaitingHandoff: expect.any(Number),
+          delayedOffloadCount: expect.any(Number),
         }),
-        handoffs: expect.arrayContaining([
-          expect.objectContaining({
-            status: expect.any(String),
-            offloadDelayMinutes: expect.any(Number),
-          }),
-        ]),
-      })
+        advisoryOnly: true,
+      }),
     );
     expect(data.emergency.capacityIntelligence).toEqual(
       expect.objectContaining({

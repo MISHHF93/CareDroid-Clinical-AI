@@ -9,11 +9,7 @@ import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
-import {
-  getPlatformHomeRoute,
-  isReceptionFirstUxEnabled,
-  RECEPTION_FIRST_UX,
-} from '../config/receptionFirstUx.config';
+import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
@@ -145,6 +141,11 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
+  const isEmergencyBoardRoute =
+    location.pathname === CANONICAL_ROUTES.emergencyWhiteboard ||
+    location.pathname === '/emergency';
+  const useWallKioskChrome =
+    screenCapabilities.useMinimalAppChrome && isEmergencyBoardRoute;
   const startupStartedRef = useRef(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
@@ -286,11 +287,9 @@ export function AppShell({ children }: AppShellProps) {
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
         e.preventDefault();
         navigate(
-          isReceptionFirstUxEnabled()
-            ? getPlatformHomeRoute()
-            : emergencyRole.defaultRoute ||
-                emergencyRole.allowedRoutes[0] ||
-                CANONICAL_ROUTES.emergencyReception,
+          emergencyRole.landingRoute ||
+            emergencyRole.defaultRoute ||
+            CANONICAL_ROUTES.emergencyReception,
         );
         return;
       }
@@ -334,7 +333,7 @@ export function AppShell({ children }: AppShellProps) {
         e.key === 'n' &&
         !e.metaKey &&
         !e.ctrlKey &&
-        emergencyRole.can(EMERGENCY_ACTIONS.createPatient)
+        emergencyRole.actionEnabled(EMERGENCY_ACTIONS.createPatient)
       ) {
         e.preventDefault();
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
@@ -415,7 +414,7 @@ export function AppShell({ children }: AppShellProps) {
   const handleCommandExecute = (action: CommandAction) => {
     switch (action.type) {
       case 'OPEN_INTAKE':
-        if (!emergencyRole.can(EMERGENCY_ACTIONS.createPatient)) break;
+        if (!emergencyRole.actionEnabled(EMERGENCY_ACTIONS.createPatient)) break;
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
           navigate(getReceptionPrimaryCreatePath(emergencyRole.role));
           break;
@@ -441,7 +440,7 @@ export function AppShell({ children }: AppShellProps) {
         else navigate(CANONICAL_ROUTES.emergencyPatients);
         break;
       case 'OPEN_REFERRAL': {
-        if (!emergencyRole.can(EMERGENCY_ACTIONS.manageReferral)) break;
+        if (!emergencyRole.actionEnabled(EMERGENCY_ACTIONS.manageReferral)) break;
         const params = new URLSearchParams();
         if (action.patientId) params.set('patientId', action.patientId);
         if (action.value) params.set('patientSearch', action.value);
@@ -505,9 +504,25 @@ export function AppShell({ children }: AppShellProps) {
       <a className="ed-skip-link" href="#main-content">
         Skip to main content
       </a>
-      <Sidebar navigationItems={visibleNavigationItems} />
+      {useWallKioskChrome ? null : <Sidebar navigationItems={visibleNavigationItems} />}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
+        {useWallKioskChrome ? (
+          <header
+            className="emergency-wall-kiosk-header"
+            style={{
+              padding: '12px 20px',
+              borderBottom: '1px solid rgba(148,163,184,0.2)',
+              background: 'var(--color-background, #0B1220)',
+            }}
+          >
+            <strong>{screenCapabilities.label}</strong>
+            <span style={{ marginLeft: 12, opacity: 0.72, fontSize: 13 }}>
+              {EMERGENCY_OS_BRANDING.safetyLine}
+            </span>
+          </header>
+        ) : (
+          <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
+        )}
         <main
           id="main-content"
           className="app-shell-main-content"
@@ -537,7 +552,7 @@ export function AppShell({ children }: AppShellProps) {
           </ErrorBoundary>
         </main>
       </div>
-      {!screenCapabilities.isRegistrationScreen ? (
+      {!screenCapabilities.isRegistrationScreen && !useWallKioskChrome ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>
           <PatientDetailPanel />
@@ -545,6 +560,7 @@ export function AppShell({ children }: AppShellProps) {
       </ErrorBoundary>
       ) : null}
       {canUseCopilot &&
+      !useWallKioskChrome &&
       !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
       (!isTabletViewport || copilotOpen) ? (
         <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
@@ -558,7 +574,7 @@ export function AppShell({ children }: AppShellProps) {
           {screenCapabilities.showEmsCriticalOverlay ? <EMSCriticalBroadcast /> : null}
         </Suspense>
       </ErrorBoundary>
-      {showReassessmentDrawer && screenCapabilities.showReassessAction ? (
+      {showReassessmentDrawer && screenCapabilities.showReassessAction && !useWallKioskChrome ? (
         <ErrorBoundary fallbackText="Reassessment drawer encountered an error.">
           <Suspense fallback={null}>
             <ReassessmentDrawer
@@ -569,7 +585,7 @@ export function AppShell({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      {showPalette ? (
+      {showPalette && !useWallKioskChrome ? (
         <ErrorBoundary fallbackText="Command palette encountered an error.">
           <Suspense fallback={null}>
             <CommandPalette

@@ -1,0 +1,44 @@
+.reception-throughput-cluster {
+  display: grid;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-surface, #111827);
+}
+
+.reception-throughput-cluster__header h2 {
+  margin: 4px 0 0;
+  font-size: 16px;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.reception-throughput-cluster__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--status-info, #93c5fd);
+  font-weight: 800;
+}
+
+.reception-throughput-cluster__subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted, #9ca3af);
+  max-width: 920px;
+}
+
+.reception-throughput-cluster__grid {
+  display: grid;
+  gap: 10px;
+}
+
+.reception-throughput-cluster__strip {
+  margin: 0;
+}
+
+@media (min-width: 1100px) {
+  .reception-throughput-cluster__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

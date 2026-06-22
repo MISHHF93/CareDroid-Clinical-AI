@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import useTriageScreen from '../../hooks/useTriageScreen';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { enterWaitingQueue } from '../../services/queueAssignment';
 import { buildClientTriageAssist } from '../../services/triageAssist';
@@ -18,10 +18,11 @@ export default function AiTriageAssistPanel({
   onDismissed,
   onAccepted,
 }) {
+  const triage = useTriageScreen();
   const emergencyRole = useEmergencyRolePermissions();
   const store = useEmergencyStore();
   const patients = useEmergencyStore((state) => state.patients);
-  const canReviewTriage = emergencyRole.can(EMERGENCY_ACTIONS.triage);
+  const canReviewTriage = triage.showAiTriageAssist;
 
   const resolvedAssist = useMemo(() => {
     if (!patient || patient.state !== PatientState.Triage || !canReviewTriage) return null;

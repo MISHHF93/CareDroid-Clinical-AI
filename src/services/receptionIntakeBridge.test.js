@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
+vi.mock('./queueAssignment', () => ({
+  enterEmsRegistrationQueue: vi.fn(() => ({ ok: true, queue: 'ems' })),
+}));
+
+const registerArrivalControl = vi.fn();
+
 vi.mock('../store/emergencyStore', () => {
   let patients = [];
   let emsArrivals = [
@@ -46,14 +52,11 @@ vi.mock('../store/emergencyStore', () => {
             },
           ];
         },
+        registerArrivalControl,
       }),
     },
   };
 });
-
-vi.mock('./queueAssignment', () => ({
-  enterEmsRegistrationQueue: vi.fn(() => ({ ok: true, queue: 'ems' })),
-}));
 
 import { convertEmsArrivalForReception } from './receptionIntakeBridge';
 
@@ -66,5 +69,9 @@ describe('receptionIntakeBridge', () => {
     expect(result.receptionVerifyPath).toContain('step=verify');
     expect(result.receptionVerifyPath).toContain('patientId=patient-ems-1');
     expect(result.receptionVerifyPath).toContain('emsArrivalId=ems-1');
+    expect(registerArrivalControl).toHaveBeenCalledWith('patient-ems-1', {
+      source: 'ems-convert',
+      destination: 'ems-registration',
+    });
   });
 });

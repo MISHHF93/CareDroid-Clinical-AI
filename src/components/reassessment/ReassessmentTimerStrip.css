@@ -1,0 +1,41 @@
+.reassessment-timer-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reassessment-timer-strip__pill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 52px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+  background: #0b1120;
+}
+
+.reassessment-timer-strip__pill small {
+  color: #9ca3af;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.reassessment-timer-strip__pill strong {
+  color: #f9fafb;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.reassessment-timer-strip__pill[data-tone='warning'] {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.reassessment-timer-strip__pill[data-tone='critical'] {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+}

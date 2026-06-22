@@ -1,0 +1,213 @@
+import { describe, expect, it } from 'vitest';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
+import {
+  AMBULANCE_HANDOFF_CHECKLIST_FIELDS,
+  AMBULANCE_HANDOFF_DESTINATION_LABELS,
+  buildAmbulanceHandoffChecklistSteps,
+  buildAmbulanceHandoffChecklist,
+  buildPatientPatchFromHandoffChecklist,
+  deriveAmbulanceHandoffDestination,
+  mergeAmbulanceHandoffChecklistPatch,
+  normalizeAmbulanceHandoffChecklist,
+  parseMedicationsEnRoute,
+  resolveAmbulanceHandoffChecklist,
+  syncAmbulanceHandoffChecklistSurfaces,
+} from './ambulanceHandoffChecklist';
+
+const baseArrival = {
+  id: 'ems-handoff-1',
+  unitId: 'Medic 4',
+  unitName: 'Medic 4',
+  crewNames: ['C. Park'],
+  patientAge: 62,
+  patientSex: 'M' as const,
+  chiefComplaint: 'Chest pain',
+  prearrivalComplaint: 'Chest pain radiating to jaw',
+  eta: 0,
+  severity: 'Critical' as const,
+  dispatchTime: '2026-06-20T11:30:00.000Z',
+  estimatedArrivalTime: '2026-06-20T11:45:00.000Z',
+  notes: 'Crew gave aspirin 325mg and nitro x1 en route.',
+  handoffSummary: 'STEMI concern. 12-lead transmitted.',
+  status: 'Handoff' as const,
+  priority: Priority.P1,
+  patientId: 'patient-ems-1',
+  arrivedAt: '2026-06-20T11:45:00.000Z',
+  vitals: { hr: 98, sbp: 142, dbp: 88, spo2: 94 },
+  criticalChecklist: {
+    type: 'stemi' as const,
+    title: 'STEMI Preparation Checklist',
+    triggeredAt: '2026-06-20T11:40:00.000Z',
+    completions: [],
+  },
+};
+
+describe('ambulanceHandoffChecklist', () => {
+  it('derives complaint, vitals, medications, and critical flags from EMS data', () => {
+    const checklist = buildAmbulanceHandoffChecklist(baseArrival);
+
+    expect(checklist.complaintSummary).toBe('Chest pain');
+    expect(checklist.vitalsReceived).toBe(true);
+    expect(checklist.medicationsEnRoute).toEqual(
+      expect.arrayContaining(['Aspirin', 'Nitroglycerin']),
+    );
+    expect(checklist.criticalFlags.some((flag) => flag.id === 'ems-critical')).toBe(true);
+    expect(checklist.criticalFlags.some((flag) => flag.label === 'Chest pain')).toBe(true);
+    expect(checklist.criticalFlags.some((flag) => flag.source === 'critical-checklist')).toBe(true);
+  });
+
+  it('parses explicit medications and administered phrases', () => {
+    expect(parseMedicationsEnRoute(['Morphine 4mg'], 'Administered ondansetron for nausea')).toEqual(
+      expect.arrayContaining(['Morphine 4mg', 'Ondansetron']),
+    );
+  });
+
+  it('derives patient destination from room, waiting state, and location hints', () => {
+    expect(
+      deriveAmbulanceHandoffDestination(baseArrival, null, [
+        { id: 'resus-1', name: 'Resus 1', type: 'Resus' },
+      ]),
+    ).toMatchObject({
+      patientDestination: 'offload-area',
+    });
+
+    expect(
+      deriveAmbulanceHandoffDestination(
+        { ...baseArrival, preparedRoomId: 'resus-1' },
+        {
+          id: 'patient-ems-1',
+          roomId: 'resus-1',
+          state: PatientState.Assessment,
+        } as never,
+        [{ id: 'resus-1', name: 'Resus 1', type: 'Resus' }],
+      ),
+    ).toMatchObject({
+      patientDestination: 'room',
+      destinationLabel: 'Resus 1',
+    });
+
+    expect(
+      deriveAmbulanceHandoffDestination(baseArrival, {
+        state: PatientState.Waiting,
+        location: 'Waiting room chair 3',
+      } as never),
+    ).toMatchObject({
+      patientDestination: 'monitored-chair',
+    });
+  });
+
+  it('merges staff overrides while preserving derived EMS fields', () => {
+    const derived = buildAmbulanceHandoffChecklist(baseArrival);
+    const merged = resolveAmbulanceHandoffChecklist(
+      {
+        ...baseArrival,
+        ambulanceHandoffChecklist: mergeAmbulanceHandoffChecklistPatch(derived, {
+          identityStatus: 'verified',
+          patientDestination: 'room',
+          destinationLabel: 'Resus 2',
+          handoffAccepted: true,
+          handoffAcceptedByStaffName: 'Dr. Lee',
+        }),
+      },
+      {
+        patient: {
+          id: 'patient-ems-1',
+          firstName: 'Sam',
+          lastName: 'Rivera',
+          registrationStatus: 'complete',
+          flags: [PatientFlag.EMSArrival],
+        } as never,
+      },
+    );
+
+    expect(merged.identityStatus).toBe('verified');
+    expect(merged.handoffAccepted).toBe(true);
+    expect(merged.handoffAcceptedByStaffName).toBe('Dr. Lee');
+    expect(merged.destinationLabel).toBe('Resus 2');
+    expect(merged.vitalsReceived).toBe(true);
+    expect(merged.complaintSummary).toBe('Chest pain');
+  });
+
+  it('exposes destination labels for all supported destinations', () => {
+    expect(AMBULANCE_HANDOFF_DESTINATION_LABELS.waiting).toMatch(/waiting/i);
+    expect(AMBULANCE_HANDOFF_DESTINATION_LABELS['monitored-chair']).toMatch(/chair/i);
+    expect(AMBULANCE_HANDOFF_DESTINATION_LABELS['offload-area']).toMatch(/offload/i);
+    expect(AMBULANCE_HANDOFF_DESTINATION_LABELS.hallway).toMatch(/hallway/i);
+    expect(AMBULANCE_HANDOFF_DESTINATION_LABELS.room).toMatch(/room/i);
+  });
+
+  it('defines structured checklist fields for all required handoff steps', () => {
+    expect(AMBULANCE_HANDOFF_CHECKLIST_FIELDS.map((field) => field.id)).toEqual([
+      'identity-status',
+      'complaint-summary',
+      'vitals-received',
+      'medications-en-route',
+      'critical-flags',
+      'handoff-accepted',
+      'patient-destination',
+    ]);
+  });
+
+  it('builds structured step status from resolved checklist', () => {
+    const checklist = buildAmbulanceHandoffChecklist(baseArrival);
+    const steps = buildAmbulanceHandoffChecklistSteps(checklist);
+
+    expect(steps.find((step) => step.id === 'vitals-received')?.status).toBe('complete');
+    expect(steps.find((step) => step.id === 'handoff-accepted')?.status).toBe('pending');
+    expect(steps.find((step) => step.id === 'critical-flags')?.status).toBe('warning');
+  });
+
+  it('normalizes legacy checklist payloads', () => {
+    const normalized = normalizeAmbulanceHandoffChecklist(
+      {
+        identityStatus: 'verified',
+        complaintSummary: 'Stroke symptoms',
+        vitalsReceived: true,
+        handoffAccepted: true,
+        patientDestination: 'room',
+        destinationLabel: 'Resus 1',
+      },
+      'ems-handoff-legacy',
+    );
+
+    expect(normalized?.arrivalId).toBe('ems-handoff-legacy');
+    expect(normalized?.patientDestination).toBe('room');
+    expect(normalized?.handoffAccepted).toBe(true);
+  });
+
+  it('maps confirmed destination to patient location and waiting state', () => {
+    const patch = buildPatientPatchFromHandoffChecklist({
+      arrivalId: 'ems-handoff-1',
+      identityStatus: 'verified',
+      complaintSummary: 'Chest pain',
+      vitalsReceived: true,
+      medicationsEnRoute: [],
+      criticalFlags: [],
+      handoffAccepted: true,
+      patientDestination: 'waiting',
+      destinationLabel: 'Waiting room',
+      updatedAt: '2026-06-20T12:00:00.000Z',
+    });
+
+    expect(patch.state).toBe(PatientState.Waiting);
+    expect(patch.location).toBe('Waiting room');
+  });
+
+  it('syncs structured checklist to operational surfaces', () => {
+    const payloads: Record<string, unknown>[] = [];
+    const checklist = buildAmbulanceHandoffChecklist(baseArrival);
+
+    syncAmbulanceHandoffChecklistSurfaces(
+      {
+        emsArrivals: [baseArrival],
+        dispatchWebSocketEvent: (event) => payloads.push(event.payload),
+      },
+      baseArrival.id,
+      checklist,
+      { source: 'test' },
+    );
+
+    expect(payloads[0]?.surfaces).toContain('ems-pipeline');
+    expect(payloads[0]?.steps).toHaveLength(AMBULANCE_HANDOFF_CHECKLIST_FIELDS.length);
+  });
+});

@@ -7,6 +7,7 @@ export const OPERATIONAL_AUDIT_DOMAIN = Object.freeze({
   QUEUE: 'queue',
   REASSESSMENT: 'reassessment',
   REFERRAL: 'referral',
+  COMMUNICATION: 'communication',
 });
 
 export const OPERATIONAL_AUDIT_DOMAIN_LABELS = Object.freeze({
@@ -14,6 +15,7 @@ export const OPERATIONAL_AUDIT_DOMAIN_LABELS = Object.freeze({
   queue: 'Queue changes',
   reassessment: 'Reassessments',
   referral: 'Referrals',
+  communication: 'Staff communication',
 });
 
 const PATIENT_ACTION_TYPES = new Set([
@@ -38,8 +40,17 @@ const QUEUE_SOURCES = new Set([
   'reception.handoff',
 ]);
 
+const COMMUNICATION_SOURCES = new Set(['waiting-room-communication']);
+
 function metadataValue(log, key) {
   return log?.metadata?.[key];
+}
+
+export function isCommunicationWorkflowLog(log) {
+  if (!log) return false;
+  if (COMMUNICATION_SOURCES.has(log.source)) return true;
+  if (log.metadata?.communicationKind) return true;
+  return false;
 }
 
 export function isQueueWorkflowLog(log) {
@@ -55,6 +66,7 @@ export function isQueueWorkflowLog(log) {
 
 export function classifyWorkflowLog(log) {
   if (!log?.type) return null;
+  if (isCommunicationWorkflowLog(log)) return OPERATIONAL_AUDIT_DOMAIN.COMMUNICATION;
   if (PATIENT_ACTION_TYPES.has(log.type)) return OPERATIONAL_AUDIT_DOMAIN.PATIENT;
   if (REASSESSMENT_TYPES.has(log.type)) return OPERATIONAL_AUDIT_DOMAIN.REASSESSMENT;
   if (REFERRAL_TYPES.has(log.type)) return OPERATIONAL_AUDIT_DOMAIN.REFERRAL;

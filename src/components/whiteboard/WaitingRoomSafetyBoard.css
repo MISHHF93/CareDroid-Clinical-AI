@@ -1,0 +1,207 @@
+.waiting-room-safety-board {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 14px;
+  background: var(--color-card, #172033);
+}
+
+.waiting-room-safety-board__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.waiting-room-safety-board__eyebrow {
+  margin: 0;
+  color: var(--status-info, #93c5fd);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.waiting-room-safety-board__header h2 {
+  margin: 4px 0 0;
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 16px;
+}
+
+.waiting-room-safety-board__subtitle {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+}
+
+.waiting-room-safety-board__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.waiting-room-safety-board__summary span {
+  display: grid;
+  gap: 2px;
+  min-width: 72px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 10px;
+  background: var(--color-elevated, #0b1120);
+  text-align: center;
+}
+
+.waiting-room-safety-board__summary strong {
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.waiting-room-safety-board__summary small {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.waiting-room-safety-board__summary span[data-tone='critical'] {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.waiting-room-safety-board__summary span[data-tone='warning'] {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.waiting-room-safety-board--focused .waiting-room-safety-board__table {
+  min-width: 960px;
+}
+
+.waiting-room-safety-board--focused .waiting-room-safety-board__complaint {
+  max-width: 220px;
+}
+
+.waiting-room-safety-board__table-wrap {
+  overflow-x: auto;
+}
+
+.waiting-room-safety-board__table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.waiting-room-safety-board__table th,
+.waiting-room-safety-board__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.waiting-room-safety-board__table thead th {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.waiting-room-safety-board__table tbody tr[data-safety-tone='critical'] {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.waiting-room-safety-board__table tbody tr[data-safety-tone='watch'] {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.waiting-room-safety-board__patient {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary, #f9fafb);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.waiting-room-safety-board__patient:disabled {
+  cursor: default;
+}
+
+.waiting-room-safety-board__complaint {
+  max-width: 220px;
+}
+
+.waiting-room-safety-board__badge,
+.waiting-room-safety-board__flag,
+.waiting-room-safety-board__overdue-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.waiting-room-safety-board__badge {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.waiting-room-safety-board__badge[data-tone='warning'] {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+.waiting-room-safety-board__badge[data-tone='critical'] {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+}
+
+.waiting-room-safety-board__badge[data-tone='info'] {
+  background: rgba(37, 99, 235, 0.16);
+  color: #93c5fd;
+}
+
+.waiting-room-safety-board__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.waiting-room-safety-board__flag {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
+}
+
+.waiting-room-safety-board__overdue-badge {
+  border: 0;
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+  cursor: pointer;
+}
+
+.waiting-room-safety-board__overdue-badge:disabled {
+  cursor: default;
+}
+
+.waiting-room-safety-board__reassess-cell {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.waiting-room-safety-board__muted {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+}
+
+.waiting-room-safety-board__empty {
+  margin: 0;
+}

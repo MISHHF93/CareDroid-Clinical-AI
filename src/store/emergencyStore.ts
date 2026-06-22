@@ -8,6 +8,8 @@ import {
   CriticalChecklistRecord,
   EmsUnit,
   EMSArrival,
+  AmbulanceHandoffChecklist,
+  FitToWaitClassificationId,
   EmergencyFeatureFlags,
   JourneyEvent,
   Note,
@@ -27,6 +29,21 @@ import {
   WorkflowActionType,
 } from '../types/emergency';
 import { resolveCriticalChecklistConfig } from '../config/criticalChecklists';
+import {
+  mergeAmbulanceHandoffChecklistPatch,
+  resolveAmbulanceHandoffChecklist,
+  buildPatientPatchFromHandoffChecklist,
+  syncAmbulanceHandoffChecklistSurfaces,
+} from '../services/ambulanceHandoffChecklist';
+import {
+  buildFitToWaitClassificationPatch,
+  canClassifyFitToWait,
+  fitToWaitClassificationLabel,
+  syncFitToWaitOperationalSurfaces,
+} from '../services/fitToWaitPathway';
+import {
+  syncPatientExperienceOperationalSurfaces,
+} from '../services/patientExperienceStatus';
 import {
   ED_SCENARIO_DEMO_MODES,
   buildSrcEmergencyScenarioState,
@@ -54,6 +71,7 @@ import {
   fetchEmergencyWorkflowLogs,
   fetchReassessmentQueue,
   fetchReferrals,
+  createSmartIntakePatient,
 } from '../services/emergencyOsApi';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
@@ -78,6 +96,34 @@ import {
 } from './emergencyOperationalSync';
 import { calculateCapacity } from '../engine/capacityEngine';
 import { normalizeAlert } from '../engine/alertEngineDerived';
+import {
+  buildArrivalControlFields,
+  registerArrivalControl as registerArrivalControlLayer,
+  toArrivalControlStore,
+  type RegisterArrivalControlOptions,
+} from '../services/arrivalControlLayer';
+import {
+  applyHighRiskComplaintFlags as applyHighRiskComplaintFlagsLayer,
+  type ApplyHighRiskComplaintFlagsOptions,
+  type HighRiskComplaintFlagRecord,
+} from '../services/highRiskComplaintFlags';
+import {
+  normalizeEmsArrivalOffloadPatch,
+  syncEmsOffloadOperationalSurfaces,
+} from '../services/emsOffloadTracker';
+import {
+  createWaitingRoomCommunicationLogInput,
+  isDelayInformedNoteText,
+  recordWaitingRoomCommunication as recordWaitingRoomCommunicationEvent,
+  type WaitingRoomCommunicationKind,
+} from '../services/waitingRoomCommunicationLog';
+import {
+  buildReceptionEscalationSubmission,
+  broadcastReceptionEscalation,
+  syncReceptionEscalationOperationalSurfaces,
+  type ReceptionEscalationInput,
+  type ReceptionEscalationRecord,
+} from '../services/receptionEscalationWorkflow';
 
 export function tMinus(mins: number): string {
   return new Date(Date.now() - mins * 60000).toISOString();
@@ -2005,6 +2051,18 @@ function emsArrivalToPatient(arrival: EMSArrival, timestamp = nowIso()): Patient
     emsUnitId: arrival.unitId,
     emsArrival: arrival,
     criticalChecklist: savedChecklist,
+    ...buildArrivalControlFields({
+      arrivalMode: 'EMS',
+      state: PatientState.Registration,
+      presentingComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint,
+      flags: [
+        PatientFlag.EMSArrival,
+        ...(arrival.priority === Priority.P1 || arrival.priority === Priority.P2
+          ? [PatientFlag.HighRisk]
+          : []),
+      ],
+      queueDestination: 'ems-registration',
+    }),
   };
 
   patient.timeline = [
@@ -2183,6 +2241,7 @@ type EmergencyOsSettings = {
   readOnlyDisplayMode: boolean;
   commandCenterMode: boolean;
   wallDisplayRefreshInterval: number;
+  wallDisplayMonitorPrivacy: 'operational' | 'restricted' | 'minimal';
   enabledModules: Array<{ id: string; label: string; enabled: boolean }>;
   aiSettings: Record<string, string | boolean>;
   integrationSettings: Record<string, string | boolean>;
@@ -2254,12 +2313,25 @@ interface EmergencyStoreState {
   lastPulseView: number | null;
 
   addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
+  registerArrivalControl: (
+    patientId: string,
+    options?: RegisterArrivalControlOptions,
+  ) => import('../types/emergency').ArrivalControlSnapshot | null;
+  applyHighRiskComplaintFlags: (
+    patientId: string,
+    options?: ApplyHighRiskComplaintFlagsOptions,
+  ) => HighRiskComplaintFlagRecord[];
   setThreshold: (key: EmergencyThresholdKey, value: number) => void;
   resetThresholds: () => void;
   saveEmergencySettings: (patch: Partial<EmergencyOsSettings>) => void;
   setPatients: (patients: Patient[]) => void;
   removePatient: (patientId: string) => void;
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
+  setFitToWaitClassification: (
+    patientId: string,
+    classificationId: FitToWaitClassificationId,
+    actor?: { staffId?: string; staffName?: string; notes?: string },
+  ) => void;
   movePatientToState: (
     patientId: string,
     to: PatientState,
@@ -2295,6 +2367,7 @@ interface EmergencyStoreState {
   snoozeReassessmentReminder: (patientId: string, reminderId: string, minutes?: number) => void;
   escalatePatient: (patientId: string, input: EscalationInput) => void;
   cancelEscalation: (patientId: string, input: EscalationInput) => void;
+  submitReceptionEscalation: (input: ReceptionEscalationInput) => ReceptionEscalationRecord | null;
   acknowledgeVitalsAlert: (patientId: string, alertId: string, acknowledgedBy: string) => void;
   updateCapacity: () => void;
   updateAlerts: () => void;
@@ -2326,6 +2399,11 @@ interface EmergencyStoreState {
   addEMSArrival: (arrival: EMSArrival) => void;
   prepareEMSBay: (arrivalId: string) => void;
   updateEMSArrival: (arrivalId: string, patch: Partial<EMSArrival>) => void;
+  updateAmbulanceHandoffChecklist: (
+    arrivalId: string,
+    patch: Partial<AmbulanceHandoffChecklist>,
+    actor?: { staffId?: string; staffName?: string },
+  ) => void;
   checkCriticalEMSChecklistItem: (
     arrivalId: string,
     input: {
@@ -2364,6 +2442,15 @@ interface EmergencyStoreState {
   ) => void;
   loadEmergencyAnalytics: (options?: { force?: boolean }) => Promise<EmergencyAnalyticsState>;
   recordWorkflowAction: (input: WorkflowActionInput) => WorkflowActionLog;
+  recordWaitingRoomCommunication: (input: {
+    kind: WaitingRoomCommunicationKind;
+    patientId: string;
+    summary?: string;
+    actorStaffId?: string;
+    actorName?: string;
+    severity?: WorkflowActionLog['severity'];
+    timestamp?: string;
+  }) => WorkflowActionLog | null;
   requestAdditionalStaff: (
     input?: Partial<Omit<StaffingRequest, 'id' | 'requestedAt' | 'status'>>,
   ) => StaffingRequest;
@@ -2413,18 +2500,19 @@ const DEFAULT_EMERGENCY_SETTINGS: EmergencyOsSettings = {
   defaultScreenMode: 'CHARGE_NURSE_SCREEN',
   enabledScreenModes: [
     'TRIAGE_SCREEN',
-    'REGISTRATION_SCREEN',
+    'RECEPTION_SCREEN',
     'CHARGE_NURSE_SCREEN',
     'PHYSICIAN_SCREEN',
     'EMS_SCREEN',
-    'WAITING_ROOM_DISPLAY',
-    'COMMAND_CENTER_DISPLAY',
+    'PUBLIC_WAITING_DISPLAY',
+    'COMMAND_CENTER_SCREEN',
     'ADMIN_SCREEN',
-    'READ_ONLY_DISPLAY',
+    'READ_ONLY_WHITEBOARD',
   ],
   readOnlyDisplayMode: false,
   commandCenterMode: true,
   wallDisplayRefreshInterval: 30000,
+  wallDisplayMonitorPrivacy: 'operational',
   enabledModules: DEFAULT_EMERGENCY_MODULES.map((module) => ({ ...module })),
   aiSettings: {
     enabled: true,
@@ -2699,7 +2787,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       },
     ],
 
-    addPatient: (patient) =>
+    addPatient: (patient, options) => {
       set((state) => {
         const patientWithTimeline: Patient = {
           ...patient,
@@ -2769,7 +2857,31 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               : null,
           ]),
         };
-      }),
+      });
+
+      if (options?.syncToBackend) {
+        void createSmartIntakePatient(patient).catch(() => undefined);
+      }
+    },
+
+    registerArrivalControl: (patientId, options = {}) => {
+      const state = get();
+      return registerArrivalControlLayer(toArrivalControlStore(state), patientId, options);
+    },
+
+    applyHighRiskComplaintFlags: (patientId, options = {}) => {
+      const state = get();
+      return applyHighRiskComplaintFlagsLayer(
+        {
+          patients: state.patients,
+          updatePatient: state.updatePatient,
+          recordWorkflowAction: state.recordWorkflowAction,
+          dispatchWebSocketEvent: state.dispatchWebSocketEvent,
+        },
+        patientId,
+        options,
+      );
+    },
 
     setThreshold: (key, value) =>
       set((state) => {
@@ -2859,7 +2971,85 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) =>
+    setFitToWaitClassification: (patientId, classificationId, actor) => {
+      set((state) => {
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        if (!patient || !canClassifyFitToWait(patient)) return {};
+
+        const timestamp = nowIso();
+        const patch = buildFitToWaitClassificationPatch(classificationId, actor, {
+          notes: actor?.notes,
+          timestamp,
+        });
+        const nextPatient: Patient = {
+          ...patient,
+          ...patch,
+          timeline: [
+            ...(patient.timeline || []),
+            createPatientTimelineEvent(
+              patient,
+              'StateChange',
+              `Fit-to-wait classified: ${fitToWaitClassificationLabel(classificationId)}.`,
+              {
+                timestamp,
+                metadata: {
+                  fitToWaitClassificationId: classificationId,
+                  classifiedByStaffId: actor?.staffId || null,
+                  classifiedByStaffName: actor?.staffName || null,
+                  staffConfirmed: true,
+                },
+              },
+            ),
+          ],
+        };
+
+        const patients = state.patients.map((candidate) =>
+          candidate.id === patientId ? nextPatient : candidate,
+        );
+
+        return {
+          patients,
+          capacity: buildCapacitySnapshot(patients, state.rooms),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'fit_to_wait_classified',
+              title: 'Fit-to-wait classification',
+              summary: `${patient.firstName} ${patient.lastName}: ${fitToWaitClassificationLabel(classificationId)}.`,
+              patientId,
+              timestamp,
+              source: 'waiting-room-board',
+              severity:
+                classificationId === 'immediate-room-needed'
+                  ? 'Critical'
+                  : classificationId === 'reassessment-required'
+                    ? 'Warning'
+                    : 'Info',
+              metadata: {
+                classificationId,
+                classifiedByStaffName: actor?.staffName || null,
+              },
+            },
+          ]),
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'setFitToWaitClassification',
+            patientId,
+            staffId: actor?.staffId || patient.assignedStaffId || 'system',
+            details: { classificationId },
+          }),
+        };
+      });
+
+      const nextState = get();
+      syncFitToWaitOperationalSurfaces(
+        {
+          patients: nextState.patients,
+          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
+        },
+        { patientId, source: 'waiting-room-board' },
+      );
+    },
+
+    movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) => {
       set((state) => {
         const options =
           typeof staffIdOrOptions === 'string'
@@ -2958,7 +3148,18 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               : null,
           ]),
         };
-      }),
+      });
+
+      const nextState = get();
+      syncPatientExperienceOperationalSurfaces(
+        {
+          patients: nextState.patients,
+          referrals: nextState.referrals,
+          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
+        },
+        { patientId, source: 'patient-journey-engine' },
+      );
+    },
 
     dischargePatient: (patientId, options = {}) =>
       set((state) => {
@@ -3243,6 +3444,18 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                   metadata: { flag: normalizedFlag },
                 }
               : null,
+            normalizedFlag === PatientFlag.HighRisk ||
+            normalizedFlag === PatientFlag.DeteriorationRisk ||
+            normalizedFlag === PatientFlag.SepsisAlert ||
+            normalizedFlag === PatientFlag.StrokeCode ||
+            normalizedFlag === PatientFlag.DeterioratingNeuro
+              ? createWaitingRoomCommunicationLogInput({
+                  kind: 'concern-escalated',
+                  patientId,
+                  summary: `Concern escalated — ${normalizedFlag} flagged for review.`,
+                  severity: 'Critical',
+                })
+              : null,
           ]),
         };
       }),
@@ -3387,6 +3600,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                 hr: vitals.hr ?? null,
                 spo2: vitals.spo2 ?? null,
                 news2: news2.total,
+                communicationKind: 'vitals-repeated',
               },
             },
           ]),
@@ -3394,45 +3608,59 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }),
 
     addNote: (patientId, note, staffId) =>
-      set((state) => ({
-        patients: state.patients.map((patient) =>
-          patient.id === patientId
+      set((state) => {
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        const resolvedStaffId = staffId || patient?.assignedStaffId || 'system';
+        const normalizedNote =
+          typeof note === 'string'
             ? {
-                ...patient,
-                notes: [
-                  ...patient.notes,
-                  typeof note === 'string'
-                    ? {
-                        id: createId('note'),
-                        patientId,
-                        text: note,
-                        body: note,
-                        authorId: staffId || patient.assignedStaffId || 'system',
-                        authorStaffId: staffId || patient.assignedStaffId || 'system',
-                        type: 'Score',
-                        timestamp: new Date().toISOString(),
-                        createdAt: new Date().toISOString(),
-                      }
-                    : {
-                        ...note,
-                        id: note.id || createId('note'),
-                        patientId,
-                        timestamp: note.timestamp || note.createdAt || new Date().toISOString(),
-                      },
-                ],
+                id: createId('note'),
+                patientId,
+                text: note,
+                body: note,
+                authorId: resolvedStaffId,
+                authorStaffId: resolvedStaffId,
+                type: 'Score' as const,
+                timestamp: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
               }
-            : patient,
-        ),
-        auditLog: appendAuditLog(state.auditLog, {
-          action: 'addNote',
-          patientId,
-          staffId:
-            staffId ||
-            state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
-            'system',
-          details: { noteType: typeof note === 'string' ? 'text' : note.type || 'note' },
-        }),
-      })),
+            : {
+                ...note,
+                id: note.id || createId('note'),
+                patientId,
+                timestamp: note.timestamp || note.createdAt || new Date().toISOString(),
+              };
+        const noteText = normalizedNote.text || normalizedNote.body || '';
+        const communicationKind = isDelayInformedNoteText(noteText)
+          ? 'delay-informed'
+          : 'patient-updated';
+
+        return {
+          patients: state.patients.map((candidate) =>
+            candidate.id === patientId
+              ? {
+                  ...candidate,
+                  notes: [...candidate.notes, normalizedNote],
+                }
+              : candidate,
+          ),
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'addNote',
+            patientId,
+            staffId: resolvedStaffId,
+            details: { noteType: typeof note === 'string' ? 'text' : note.type || 'note' },
+          }),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            createWaitingRoomCommunicationLogInput({
+              kind: communicationKind,
+              patientId,
+              summary: noteText || 'Patient communication recorded.',
+              actorStaffId: resolvedStaffId,
+              timestamp: normalizedNote.timestamp,
+            }),
+          ]),
+        };
+      }),
 
     scheduleReassessmentReminder: (patientId, reminder) => {
       const nextReminder: ReassessmentReminder = {
@@ -3548,6 +3776,30 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     cancelEscalation: (patientId, input) =>
       set((state) => buildCancelEscalationPatch(state, patientId, input) || state),
+
+    submitReceptionEscalation: (input) => {
+      const state = get();
+      const submission = buildReceptionEscalationSubmission(input, {
+        patients: state.patients,
+        staff: state.staff,
+      });
+      if (!submission) return null;
+
+      const nextAlerts = mergeEmergencyAlerts([submission.alert], state.alerts);
+
+      set((current) => ({
+        patients: submission.patients,
+        alerts: nextAlerts,
+        workflowLogs: appendWorkflowLogs(current.workflowLogs, [
+          submission.workflowLog,
+          submission.communicationLog,
+        ]),
+      }));
+
+      broadcastReceptionEscalation(submission.alert);
+      syncReceptionEscalationOperationalSurfaces(nextAlerts);
+      return submission.record;
+    },
 
     acknowledgeVitalsAlert: (patientId, alertId, acknowledgedBy) =>
       set((state) => buildAcknowledgeVitalsAlertPatch(state, patientId, alertId, acknowledgedBy)),
@@ -4009,6 +4261,64 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         }));
         return;
       }
+      if (type === 'intake_handoff_complete') {
+        const data = asRecord(payload);
+        const patientId = stringFrom(data.patientId);
+        const queue = stringFrom(data.queue) || 'Triage';
+        get().setQueueFilter(queue);
+        if (patientId) {
+          get().selectPatient(patientId);
+        }
+        get().updateCapacity();
+        get().updateAlerts();
+        set((state) => ({
+          workflowLogs: mergeWorkflowLogs(
+            [
+              normalizeWorkflowLog({
+                ...data,
+                type: 'integration_event_received',
+                title: 'Intake handoff complete',
+                summary: `Patient synced to triage queue, whiteboard, and operational snapshot.`,
+                source: 'intake-handoff-realtime',
+                patientId,
+              }),
+            ],
+            state.workflowLogs,
+          ),
+        }));
+        return;
+      }
+      if (type === 'arrival_control_sync') {
+        const data = asRecord(payload);
+        const patientId = stringFrom(data.patientId);
+        const destination = stringFrom(data.destination);
+        if (patientId) {
+          get().selectPatient(patientId);
+        }
+        if (destination === 'triage-queue') {
+          get().setQueueFilter('Triage');
+        } else if (destination === 'waiting-room') {
+          get().setQueueFilter('Waiting');
+        }
+        get().updateCapacity();
+        get().updateAlerts();
+        set((state) => ({
+          workflowLogs: mergeWorkflowLogs(
+            [
+              normalizeWorkflowLog({
+                ...data,
+                type: 'integration_event_received',
+                title: 'Arrival control sync',
+                summary: `Arrival routed to ${destination || 'operational surfaces'}.`,
+                source: 'arrival-control-realtime',
+                patientId,
+              }),
+            ],
+            state.workflowLogs,
+          ),
+        }));
+        return;
+      }
       if (['referral_updated', 'referrals_updated'].includes(type)) {
         const referrals = extractReferrals(payload);
         if (referrals.length) {
@@ -4214,12 +4524,114 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    updateEMSArrival: (arrivalId, patch) =>
-      set((state) => ({
-        emsArrivals: state.emsArrivals.map((arrival) =>
-          arrival.id === arrivalId ? { ...arrival, ...patch } : arrival,
+    updateEMSArrival: (arrivalId, patch) => {
+      const state = get();
+      const arrival = state.emsArrivals.find((candidate) => candidate.id === arrivalId);
+      if (!arrival) return;
+
+      const normalizedPatch = normalizeEmsArrivalOffloadPatch(arrival, patch);
+      set((current) => {
+        const nextArrivals = current.emsArrivals.map((entry) =>
+          entry.id === arrivalId ? { ...entry, ...normalizedPatch } : entry,
+        );
+        const linked = nextArrivals.find((entry) => entry.id === arrivalId);
+        if (!linked?.patientId) {
+          return { emsArrivals: nextArrivals };
+        }
+        return {
+          emsArrivals: nextArrivals,
+          patients: current.patients.map((patient) =>
+            patient.id === linked.patientId && patient.emsArrival
+              ? {
+                  ...patient,
+                  emsArrival: { ...patient.emsArrival, ...normalizedPatch },
+                }
+              : patient,
+          ),
+        };
+      });
+
+      const nextState = get();
+      syncEmsOffloadOperationalSurfaces(
+        {
+          emsArrivals: nextState.emsArrivals,
+          patients: nextState.patients,
+          staff: nextState.staff,
+          rooms: nextState.rooms,
+          emergencySettings: nextState.emergencySettings,
+          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
+        },
+        { arrivalId, source: 'ems-pipeline' },
+      );
+    },
+
+    updateAmbulanceHandoffChecklist: (arrivalId, patch, actor) => {
+      const state = get();
+      const arrival = state.emsArrivals.find((candidate) => candidate.id === arrivalId);
+      if (!arrival) return;
+
+      const patient = arrival.patientId
+        ? state.patients.find((candidate) => candidate.id === arrival.patientId)
+        : undefined;
+      const current = resolveAmbulanceHandoffChecklist(arrival, {
+        patient,
+        rooms: state.rooms,
+      });
+      const checklist = mergeAmbulanceHandoffChecklistPatch(current, patch, actor);
+      const nextArrival: EMSArrival = {
+        ...arrival,
+        ambulanceHandoffChecklist: checklist,
+        handoffCompletedAt:
+          patch.handoffAccepted === true
+            ? checklist.handoffAcceptedAt || arrival.handoffCompletedAt
+            : patch.handoffAccepted === false
+              ? undefined
+              : arrival.handoffCompletedAt,
+        status:
+          patch.handoffAccepted === true && arrival.status !== 'Cancelled'
+            ? 'Complete'
+            : arrival.status,
+      };
+      const patientHandoffPatch =
+        patient &&
+        (patch.patientDestination ||
+          patch.destinationLabel ||
+          patch.destinationRoomId ||
+          patch.handoffAccepted)
+          ? buildPatientPatchFromHandoffChecklist(checklist)
+          : {};
+
+      set({
+        emsArrivals: state.emsArrivals.map((candidate) =>
+          candidate.id === arrivalId ? nextArrival : candidate,
         ),
-      })),
+        patients: patient
+          ? state.patients.map((candidate) =>
+              candidate.id === patient.id
+                ? {
+                    ...candidate,
+                    ...patientHandoffPatch,
+                    emsArrival: candidate.emsArrival
+                      ? {
+                          ...candidate.emsArrival,
+                          ambulanceHandoffChecklist: checklist,
+                          handoffCompletedAt: nextArrival.handoffCompletedAt,
+                          status: nextArrival.status,
+                        }
+                      : candidate.emsArrival,
+                  }
+                : candidate,
+            )
+          : state.patients,
+      });
+
+      syncAmbulanceHandoffChecklistSurfaces(
+        { emsArrivals: get().emsArrivals, dispatchWebSocketEvent: get().dispatchWebSocketEvent },
+        arrivalId,
+        checklist,
+        { source: 'ems-handoff-checklist' },
+      );
+    },
 
     checkCriticalEMSChecklistItem: (arrivalId, input) =>
       set((state) => ({
@@ -4286,8 +4698,26 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           status: 'Handoff' as const,
           patientId: patient.id,
           arrivedAt: arrival.arrivedAt || timestamp,
+          handoffStartedAt: arrival.handoffStartedAt || timestamp,
+          ambulanceHandoffChecklist: resolveAmbulanceHandoffChecklist(
+            {
+              ...arrival,
+              status: 'Handoff',
+              patientId: patient.id,
+              arrivedAt: arrival.arrivedAt || timestamp,
+              handoffStartedAt: arrival.handoffStartedAt || timestamp,
+            },
+            { patient, rooms: state.rooms, timestamp },
+          ),
         };
-        const patients = [patient, ...state.patients.filter((candidate) => candidate.id !== patient.id)];
+        const patientWithChecklist = {
+          ...patient,
+          emsArrival: convertedArrival,
+        };
+        const patients = [
+          patientWithChecklist,
+          ...state.patients.filter((candidate) => candidate.id !== patient.id),
+        ];
         const rooms = state.rooms.map((room) =>
           room.id === patient.roomId
             ? {
@@ -4511,6 +4941,17 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
       }));
       return log;
+    },
+
+    recordWaitingRoomCommunication: (input) => {
+      const state = get();
+      return recordWaitingRoomCommunicationEvent(
+        {
+          patients: state.patients,
+          recordWorkflowAction: (logInput) => get().recordWorkflowAction(logInput),
+        },
+        input,
+      );
     },
 
     requestAdditionalStaff: (input = {}) => {

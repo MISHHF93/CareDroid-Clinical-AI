@@ -1,0 +1,155 @@
+.reassessment-timer-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 12px;
+  background: var(--color-elevated, #0b1120);
+}
+
+.reassessment-timer-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.reassessment-timer-panel__eyebrow {
+  margin: 0;
+  color: var(--status-info, #93c5fd);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reassessment-timer-panel__header h3 {
+  margin: 4px 0 0;
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 15px;
+}
+
+.reassessment-timer-panel__status {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: right;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.reassessment-timer-panel__status strong {
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 13px;
+}
+
+.reassessment-timer-panel__status span {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 11px;
+}
+
+.reassessment-timer-panel__status[data-tone='watch'] {
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.reassessment-timer-panel__status[data-tone='critical'] {
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.reassessment-timer-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.reassessment-timer-panel--compact .reassessment-timer-panel__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reassessment-timer-panel__cell {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.reassessment-timer-panel__cell span {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.reassessment-timer-panel__cell strong {
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 13px;
+}
+
+.reassessment-timer-panel__cell[data-tone='warning'] strong {
+  color: #fcd34d;
+}
+
+.reassessment-timer-panel__cell[data-tone='critical'] strong {
+  color: #fca5a5;
+}
+
+.reassessment-timer-panel__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.reassessment-timer-panel__meta dt {
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.reassessment-timer-panel__meta dd {
+  margin: 0;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.reassessment-timer-panel__action {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reassessment-timer-panel__action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reassessment-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.reassessment-timer-badge[data-tone='watch'] {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+.reassessment-timer-badge[data-tone='critical'] {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+}

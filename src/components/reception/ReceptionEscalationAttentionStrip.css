@@ -1,0 +1,72 @@
+.reception-escalation-attention-strip {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #b45309;
+  border-radius: 12px;
+  background: rgba(69, 26, 3, 0.35);
+}
+
+.reception-escalation-attention-strip__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fdba74;
+}
+
+.reception-escalation-attention-strip__header h3 {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #fff7ed;
+}
+
+.reception-escalation-attention-strip__subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #fdba74;
+}
+
+.reception-escalation-attention-strip__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.reception-escalation-attention-strip__item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #7c2d12;
+  border-radius: 10px;
+  background: #111827;
+  color: #f9fafb;
+  cursor: pointer;
+  padding: 10px 12px;
+}
+
+.reception-escalation-attention-strip__item[data-severity='Critical'] {
+  border-color: #dc2626;
+}
+
+.reception-escalation-attention-strip__item:disabled {
+  cursor: default;
+}
+
+.reception-escalation-attention-strip__title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reception-escalation-attention-strip__message {
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.reception-escalation-attention-strip__meta {
+  font-size: 11px;
+  color: #9ca3af;
+}

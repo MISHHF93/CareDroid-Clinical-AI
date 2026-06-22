@@ -1,0 +1,91 @@
+.device-context-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.device-context-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.device-context-panel__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.device-context-panel__header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.device-context-panel__subtitle,
+.device-context-panel__detail {
+  margin: 8px 0 0;
+  color: rgba(203, 213, 225, 0.88);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.device-context-panel__badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.device-context-panel__badge[data-kiosk] {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+}
+
+.device-context-panel__field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.device-context-panel__field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.8);
+  color: inherit;
+}
+
+.device-context-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 12px;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.device-context-panel__clear {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #93c5fd;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.device-context-panel--compact {
+  padding: 12px;
+}
+
+.device-context-panel--compact .device-context-panel__subtitle {
+  display: none;
+}

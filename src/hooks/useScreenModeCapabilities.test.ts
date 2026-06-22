@@ -4,7 +4,7 @@ import { resolveScreenModeCapabilities } from './useScreenModeCapabilities';
 
 describe('useScreenModeCapabilities', () => {
   it('hides command-layer chrome on registration screen', () => {
-    const capabilities = resolveScreenModeCapabilities(CARE_DROID_SCREEN_MODES.registration);
+    const capabilities = resolveScreenModeCapabilities(CARE_DROID_SCREEN_MODES.reception);
 
     expect(capabilities.isRegistrationScreen).toBe(true);
     expect(capabilities.showCentralNodeBadge).toBe(false);

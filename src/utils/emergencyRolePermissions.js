@@ -1,3 +1,12 @@
+/**
+ * Legacy MD/RN/PA/Tech permission helpers — delegate to canonical Emergency OS registry.
+ */
+import {
+  hasEmergencyActionPermission,
+  resolveEmergencyRoleId,
+} from '../config/emergencyRolePermissions';
+import { EMERGENCY_PERMISSION_KEYS } from '../config/emergencyPermissionRegistry';
+
 const ROLE_ALIASES = Object.freeze({
   physician: 'MD',
   doctor: 'MD',
@@ -17,6 +26,18 @@ const ROLE_ALIASES = Object.freeze({
   clerk: 'Tech',
   admin: 'Admin',
   administrator: 'Admin',
+});
+
+const LEGACY_ACTION_TO_PERMISSION = Object.freeze({
+  canUpdateVitals: EMERGENCY_PERMISSION_KEYS.vitalsWrite,
+  canManageFlags: EMERGENCY_PERMISSION_KEYS.flagsManage,
+  canAddNotes: EMERGENCY_PERMISSION_KEYS.notesWrite,
+  canAssignRoom: EMERGENCY_PERMISSION_KEYS.patientAssignRoom,
+  canAssignStaff: EMERGENCY_PERMISSION_KEYS.patientAssignStaff,
+  canDischarge: EMERGENCY_PERMISSION_KEYS.patientDischarge,
+  canTransfer: EMERGENCY_PERMISSION_KEYS.transferManage,
+  canUseOrders: EMERGENCY_PERMISSION_KEYS.notesWrite,
+  canManageShift: EMERGENCY_PERMISSION_KEYS.workloadReassign,
 });
 
 const PERMISSIONS_BY_ROLE = Object.freeze({
@@ -99,7 +120,9 @@ export function emergencyPermissionsForUser(user) {
 }
 
 export function canUseEmergencyAction(user, action) {
-  return Boolean(emergencyPermissionsForUser(user)[action]);
+  const permission = LEGACY_ACTION_TO_PERMISSION[action] || action;
+  const role = resolveEmergencyRoleId(user);
+  return hasEmergencyActionPermission(role, permission);
 }
 
 export { PERMISSIONS_BY_ROLE };

@@ -1,4 +1,5 @@
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+import { summarizeWhatHappensNextBoard } from '../services/whatHappensNextGuidance';
 import {
   BLOCKED_AUTONOMOUS_ACTIONS,
   CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER,
@@ -437,6 +438,12 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
       activeAlerts: centralSnapshot.currentDepartmentStatus.activeAlerts,
       dataFreshnessStatus,
       humanReviewRequired: true,
+      whatHappensNextReassessmentDue: summarizeWhatHappensNextBoard(source.patients, {
+        referrals: source.referrals,
+      })['reassessment-due'],
+      whatHappensNextTriageNeeded: summarizeWhatHappensNextBoard(source.patients, {
+        referrals: source.referrals,
+      })['triage-needed'],
     },
   };
 }

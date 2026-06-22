@@ -1,0 +1,43 @@
+.arrival-control-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.arrival-control-badge span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.arrival-control-badge__mode {
+  background: rgba(37, 99, 235, 0.16);
+  color: #93c5fd;
+}
+
+.arrival-control-badge__status {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+
+.arrival-control-badge__triage {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+.arrival-control-badge__safety {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
+}
+
+.arrival-control-badge--compact span {
+  min-height: 20px;
+  padding: 0 6px;
+  font-size: 10px;
+}

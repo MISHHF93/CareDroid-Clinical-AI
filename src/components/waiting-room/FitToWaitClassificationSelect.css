@@ -1,0 +1,37 @@
+.fit-to-wait-select {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fit-to-wait-select--compact {
+  gap: 0.25rem;
+}
+
+.fit-to-wait-select__label {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fit-to-wait-select select {
+  width: 100%;
+  min-width: 10rem;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(2, 6, 23, 0.35);
+  color: inherit;
+  padding: 0.3rem 0.45rem;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.fit-to-wait-select__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

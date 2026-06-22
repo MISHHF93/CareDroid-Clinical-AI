@@ -1,6 +1,7 @@
 import { useEmergencyStore } from '../store/emergencyStore';
 import { dispatchAlert } from './alertEngine';
 import { longWaitStatus } from '../utils/longWaitRescue';
+import { evaluateReassessmentDueFlag } from './reassessmentTimerEngine';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 
 export const REASSESSMENT_FLAG_TYPES = [
@@ -47,15 +48,24 @@ function patientName(patient: Patient): string {
   return `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
 }
 
-function reassessmentThresholdForPriority(priority: Priority, thresholds: ReturnType<typeof useEmergencyStore.getState>['thresholds']): number {
-  const priorityThresholds = {
-    [Priority.P1]: thresholds.reassessP1Min,
-    [Priority.P2]: thresholds.reassessP2Min,
-    [Priority.P3]: thresholds.reassessP3Min,
-    [Priority.P4]: thresholds.reassessP4Min,
-    [Priority.P5]: thresholds.reassessP5Min,
-  };
-  return priorityThresholds[priority] ?? thresholds.reassessP3Min;
+function syncReassessmentDueFlag(
+  patient: Patient,
+  now: Date,
+  thresholds: ReturnType<typeof useEmergencyStore.getState>['thresholds'],
+  addFlag: (patientId: string, flag: PatientFlag) => void,
+  removeFlag: (patientId: string, flag: PatientFlag) => void,
+): void {
+  const hasFlag = (flag: PatientFlag) => patient.flags.includes(flag);
+  const { shouldFlag } = evaluateReassessmentDueFlag(patient, { now, thresholds: { thresholds } });
+
+  if (patient.state === PatientState.Waiting && shouldFlag && !hasFlag(PatientFlag.ReassessmentDue)) {
+    addFlag(patient.id, PatientFlag.ReassessmentDue);
+    return;
+  }
+
+  if (patient.state !== PatientState.Waiting && hasFlag(PatientFlag.ReassessmentDue)) {
+    removeFlag(patient.id, PatientFlag.ReassessmentDue);
+  }
 }
 
 function dispatchLongWaitAlert(
@@ -89,8 +99,6 @@ export function startReassessmentEngine() {
     const now = new Date();
 
     patients.forEach(patient => {
-      const arrivalMins =
-        (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
       const latestVitals = patient.vitals[patient.vitals.length - 1];
       const hasFlag = (f: PatientFlag) =>
         patient.flags.includes(f);
@@ -143,21 +151,7 @@ export function startReassessmentEngine() {
         }
       }
 
-      if (patient.state === PatientState.Waiting && arrivalMins > thresholds.waitTimeWarningMin
-          && !hasFlag(PatientFlag.ReassessmentDue)) {
-        addFlag(patient.id, PatientFlag.ReassessmentDue);
-      }
-
-      if (latestVitals) {
-        const vitalRecordedAt = new Date(latestVitals.recordedAt || patient.arrivalTime).getTime();
-        const vitalAgeMins = Number.isFinite(vitalRecordedAt)
-          ? (now.getTime() - vitalRecordedAt) / 60000
-          : arrivalMins;
-        const priorityThresholdMins = reassessmentThresholdForPriority(patient.priority, thresholds);
-        if (vitalAgeMins > priorityThresholdMins && !hasFlag(PatientFlag.ReassessmentDue)) {
-          addFlag(patient.id, PatientFlag.ReassessmentDue);
-        }
-      }
+      syncReassessmentDueFlag(patient, now, thresholds, addFlag, removeFlag);
 
       // Rule 2: P1/P2 not in Assessment+
       if ([Priority.P1, Priority.P2].includes(patient.priority)
@@ -198,10 +192,6 @@ export function runEmergencyReassessment(now = new Date()): void {
     useEmergencyStore.getState();
 
   patients.forEach((patient) => {
-    const arrivalMins = (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
-    const latestVitals = Array.isArray(patient.vitals)
-      ? patient.vitals[patient.vitals.length - 1]
-      : patient.vitals;
     const hasFlag = (f: PatientFlag) => patient.flags.includes(f);
 
     if (patient.state === PatientState.Waiting) {
@@ -224,24 +214,7 @@ export function runEmergencyReassessment(now = new Date()): void {
       }
     }
 
-    if (
-      patient.state === PatientState.Waiting &&
-      arrivalMins > thresholds.waitTimeWarningMin &&
-      !hasFlag(PatientFlag.ReassessmentDue)
-    ) {
-      addFlag(patient.id, PatientFlag.ReassessmentDue);
-    }
-
-    if (latestVitals) {
-      const vitalRecordedAt = new Date(latestVitals.recordedAt || patient.arrivalTime).getTime();
-      const vitalAgeMins = Number.isFinite(vitalRecordedAt)
-        ? (now.getTime() - vitalRecordedAt) / 60000
-        : arrivalMins;
-      const priorityThresholdMins = reassessmentThresholdForPriority(patient.priority, thresholds);
-      if (vitalAgeMins > priorityThresholdMins && !hasFlag(PatientFlag.ReassessmentDue)) {
-        addFlag(patient.id, PatientFlag.ReassessmentDue);
-      }
-    }
+    syncReassessmentDueFlag(patient, now, thresholds, addFlag, removeFlag);
 
     if (
       [Priority.P1, Priority.P2].includes(patient.priority) &&

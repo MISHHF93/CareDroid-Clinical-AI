@@ -25,7 +25,9 @@ describe('Reception-first experience wiring', () => {
     expect(receptionSource).toContain('RECEPTION_COPY');
     expect(receptionSource).toContain('registerWalkIn');
     expect(receptionSource).toContain('checkIdentity');
-    expect(receptionSource).toContain('isRegistrationClerkRole');
+    expect(receptionSource).toContain('useReceptionScreen');
+    expect(receptionSource).toContain('reception.showWidget');
+    expect(receptionSource).toContain('canOpenSmartIntake');
     expect(receptionSource).not.toContain('buildPostHandoffNavigationPaths');
   });
 

@@ -1,0 +1,120 @@
+.ems-offload-tracker {
+  --ems-offload-border: #1f2937;
+  --ems-offload-muted: #9ca3af;
+}
+
+.ems-offload-tracker {
+  display: grid;
+  gap: 12px;
+}
+
+.ems-offload-tracker__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ems-offload-tracker__header h2,
+.ems-offload-tracker__header h3 {
+  margin: 0;
+}
+
+.ems-offload-tracker__header p {
+  margin: 4px 0 0;
+  color: var(--ems-offload-muted);
+  font-size: 12px;
+}
+
+.ems-offload-tracker__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ems-offload-tracker__summary span {
+  border: 1px solid var(--ems-offload-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ems-offload-tracker__summary span[data-tone='critical'] {
+  border-color: #ef4444;
+  color: #fecaca;
+  background: #7f1d1d33;
+}
+
+.ems-offload-tracker__summary span[data-tone='watch'] {
+  border-color: #f59e0b;
+  color: #fde68a;
+  background: #78350f33;
+}
+
+.ems-offload-tracker__table-wrap {
+  overflow: auto;
+  border: 1px solid var(--ems-offload-border);
+  border-radius: 12px;
+}
+
+.ems-offload-tracker__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ems-offload-tracker__table th,
+.ems-offload-tracker__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ems-offload-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ems-offload-tracker__table th {
+  color: var(--ems-offload-muted);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ems-offload-tracker__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ems-offload-tracker__table tr[data-tone='critical'] {
+  background: #7f1d1d18;
+}
+
+.ems-offload-tracker__table tr[data-tone='watch'] {
+  background: #78350f12;
+}
+
+.ems-offload-tracker__unit strong {
+  display: block;
+}
+
+.ems-offload-tracker__unit small {
+  color: var(--ems-offload-muted);
+}
+
+.ems-offload-tracker__empty {
+  margin: 0;
+  color: var(--ems-offload-muted);
+  font-size: 13px;
+}
+
+.ems-offload-tracker--compact .ems-offload-tracker__table th:nth-child(n + 5),
+.ems-offload-tracker--compact .ems-offload-tracker__table td:nth-child(n + 5) {
+  display: none;
+}
+
+.ems-offload-tracker__action {
+  border: 0;
+  background: transparent;
+  color: #93c5fd;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0;
+}

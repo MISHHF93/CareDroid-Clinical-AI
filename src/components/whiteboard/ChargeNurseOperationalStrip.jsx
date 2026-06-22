@@ -1,71 +1,65 @@
 import React, { useMemo } from 'react';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import { normalizeOperationalStripMetrics } from '../../config/emergencyOperationalPresentationModel';
+import OperationalStrip from '../emergency/OperationalStrip';
 import { selectChargeNurseOperationalStrip } from './chargeNurseWorkflowModel';
-import './ChargeNurseOperationalStrip.css';
 
 export default function ChargeNurseOperationalStrip({
   patients = [],
   centralSnapshot = null,
   activeEmsArrivals = 0,
+  referrals = [],
+  emsArrivals = [],
+  settings = {},
+  visibleSurfaces = null,
+  kpiMetricIds = null,
   onMetricSelect,
   readOnly = false,
   metrics: metricsOverride = null,
-  eyebrow = 'Charge command',
+  eyebrow = null,
   className = '',
-  emptyLabel = 'All clear',
-  emptyHint = 'No operational signals need attention right now.',
+  emptyLabel = null,
+  emptyHint = null,
+  accent = 'default',
 }) {
-  const metrics = useMemo(
-    () =>
+  const metrics = useMemo(() => {
+    const selected =
       metricsOverride ??
       selectChargeNurseOperationalStrip({
         patients,
         centralSnapshot,
         activeEmsArrivals,
-      }),
-    [activeEmsArrivals, centralSnapshot, metricsOverride, patients],
-  );
-
-  if (!metrics.length) {
-    return (
-      <nav
-        className={['charge-nurse-operational-strip', 'charge-nurse-operational-strip--clear', className]
-          .filter(Boolean)
-          .join(' ')}
-        aria-label={eyebrow}
-      >
-        <span className="charge-nurse-operational-strip__eyebrow">{eyebrow}</span>
-        <span
-          className="charge-nurse-operational-strip__metric charge-nurse-operational-strip__metric--clear"
-          data-tone="stable"
-          title={emptyHint}
-        >
-          <strong>{emptyLabel}</strong>
-          <span>{emptyHint}</span>
-        </span>
-      </nav>
-    );
-  }
+        referrals,
+        emsArrivals,
+        settings,
+        visibleSurfaces,
+        kpiMetricIds,
+      });
+    return normalizeOperationalStripMetrics(selected, { onMetricSelect });
+  }, [
+    activeEmsArrivals,
+    centralSnapshot,
+    emsArrivals,
+    metricsOverride,
+    onMetricSelect,
+    patients,
+    referrals,
+    settings,
+    visibleSurfaces,
+    kpiMetricIds,
+  ]);
 
   return (
-    <nav
-      className={['charge-nurse-operational-strip', className].filter(Boolean).join(' ')}
-      aria-label={eyebrow}
-    >
-      <span className="charge-nurse-operational-strip__eyebrow">{eyebrow}</span>
-      {metrics.map((metric) => (
-        <button
-          key={metric.id}
-          type="button"
-          className="charge-nurse-operational-strip__metric"
-          data-tone={metric.tone}
-          onClick={() => onMetricSelect?.(metric)}
-          disabled={readOnly || !onMetricSelect}
-          title={`${metric.label}: ${metric.value}. ${metric.hint}`}
-        >
-          <strong>{metric.value}</strong>
-          <span>{metric.label}</span>
-        </button>
-      ))}
-    </nav>
+    <OperationalStrip
+      screenMode={CARE_DROID_SCREEN_MODES.chargeNurse}
+      metrics={metrics}
+      eyebrow={eyebrow}
+      emptyLabel={emptyLabel}
+      emptyHint={emptyHint}
+      accent={accent}
+      onMetricSelect={onMetricSelect}
+      readOnly={readOnly}
+      className={className}
+    />
   );
 }

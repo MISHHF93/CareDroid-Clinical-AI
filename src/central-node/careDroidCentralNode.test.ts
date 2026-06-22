@@ -261,7 +261,7 @@ describe('CareDroidCentralNode contract', () => {
         readOnly: true,
         allowedRoutes: ['/emergency/whiteboard'],
       },
-      { screenMode: CARE_DROID_SCREEN_MODES.waitingRoom },
+      { screenMode: CARE_DROID_SCREEN_MODES.publicWaiting },
     );
     const serialized = JSON.stringify(snapshot);
 
@@ -275,5 +275,29 @@ describe('CareDroidCentralNode contract', () => {
       title: 'Operational alert',
       message: 'Sensitive clinical details hidden for public display.',
     });
+  });
+
+  it('redacts identifiers for read-only whiteboard minimal monitor privacy', () => {
+    const snapshot = buildCareDroidCentralNodeSnapshot(
+      {
+        ...source(),
+        emergencySettings: {
+          ...source().emergencySettings,
+          wallDisplayMonitorPrivacy: 'minimal',
+        },
+      },
+      {
+        role: 'read_only_viewer',
+        roleLabel: 'Read-Only Viewer',
+        readOnly: true,
+        allowedRoutes: ['/emergency/whiteboard'],
+      },
+      { screenMode: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard },
+    );
+    const serialized = JSON.stringify(snapshot);
+
+    expect(snapshot.screenContext.sensitiveDataRedacted).toBe(true);
+    expect(serialized).not.toContain('Avery');
+    expect(serialized).not.toContain('Chest pain');
   });
 });

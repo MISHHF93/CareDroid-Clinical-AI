@@ -1,14 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
-import { EMERGENCY_ACTIONS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from '../config/emergencyRolePermissions';
+import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_ACTIONS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from '../config/emergencyRolePermissions';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useEmsScreen from '../hooks/useEmsScreen';
 import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
+import EmsOffloadTrackerPanel from './ems/EmsOffloadTrackerPanel';
+import EmsOffloadAttentionStrip from './ems/EmsOffloadAttentionStrip';
+import EmsOperationalStrip from './ems/EmsOperationalStrip';
+import { shouldShowEmsOperationalStrip } from './ems/emsWorkflowModel';
+import AmbulanceHandoffChecklistPanel from './ems/AmbulanceHandoffChecklistPanel';
+import AmbulanceHandoffChecklistBadge from './ems/AmbulanceHandoffChecklistBadge';
 import './EMSPipeline.css';
 
 function minutesRemaining(arrival, now) {
@@ -99,20 +106,35 @@ function EMSArrivalRow({
   arrival,
   now,
   rooms,
+  patients,
   onPrepareBay,
   onConvert,
   onCompleteHandoff,
   onOpenPatient,
+  onUpdateHandoffChecklist,
   offloadTargetMinutes,
   canPrepareBay,
   canConvert,
   canCompleteHandoff,
+  showHandoffChecklistPanel = true,
+  showEncounterConversion = true,
+  showEtaDisplay = true,
+  actorName,
 }) {
   const remaining = minutesRemaining(arrival, now);
   const tone = etaTone(remaining, arrival.status);
   const isIncoming = arrival.status === 'Inbound' && remaining > 0;
   const offload = offloadMinutes(arrival, now);
   const offloadBreach = Number.isFinite(offload) && offload > offloadTargetMinutes;
+  const linkedPatient = arrival.patientId
+    ? patients.find((patient) => patient.id === arrival.patientId)
+    : null;
+  const showHandoffChecklist =
+    showHandoffChecklistPanel &&
+    (!isIncoming ||
+      arrival.status === 'Arrived' ||
+      arrival.status === 'Handoff' ||
+      Boolean(arrival.patientId));
 
   return (
     <article className={`ems-pipeline__row ems-pipeline__row--${tone}`}>
@@ -129,6 +151,14 @@ function EMSArrivalRow({
           >
             {arrival.severity}
           </span>
+          {showHandoffChecklist ? (
+            <AmbulanceHandoffChecklistBadge
+              arrival={arrival}
+              patient={linkedPatient}
+              rooms={rooms}
+              compact
+            />
+          ) : null}
         </div>
         <span>{arrival.mechanismOfInjury || arrival.notes}</span>
       </div>
@@ -137,8 +167,14 @@ function EMSArrivalRow({
         className={`ems-pipeline__eta ems-pipeline__eta--${tone}`}
         dateTime={arrival.estimatedArrivalTime}
       >
-        <Clock3 size={14} aria-hidden />
-        {formatEta(remaining, arrival.status)}
+        {showEtaDisplay ? (
+          <>
+            <Clock3 size={14} aria-hidden />
+            {formatEta(remaining, arrival.status)}
+          </>
+        ) : (
+          <span aria-hidden>—</span>
+        )}
       </time>
 
       <div className="ems-pipeline__vitals" aria-label="EMS vitals">
@@ -176,7 +212,7 @@ function EMSArrivalRow({
             Prepare Bay
           </button>
         )}
-        {!isIncoming && !arrival.patientId ? (
+        {!isIncoming && !arrival.patientId && showEncounterConversion ? (
           <button
             type="button"
             className="ems-pipeline__handoff"
@@ -221,6 +257,17 @@ function EMSArrivalRow({
           <span className="ems-pipeline__prepared">Handoff complete</span>
         ) : null}
       </div>
+
+      {showHandoffChecklist ? (
+        <AmbulanceHandoffChecklistPanel
+          arrival={arrival}
+          patient={linkedPatient}
+          rooms={rooms}
+          actorName={actorName}
+          canEdit={canCompleteHandoff}
+          onUpdate={onUpdateHandoffChecklist}
+        />
+      ) : null}
     </article>
   );
 }
@@ -228,19 +275,51 @@ function EMSArrivalRow({
 export default function EMSPipeline() {
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
+  const ems = useEmsScreen();
   const emsModule = useEMSIntake();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const patients = useEmergencyStore((state) => state.patients);
+  const staff = useEmergencyStore((state) => state.staff);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const rooms = useEmergencyStore((state) => state.rooms);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
+  const updateAmbulanceHandoffChecklist = useEmergencyStore(
+    (state) => state.updateAmbulanceHandoffChecklist,
+  );
   const [now, setNow] = useState(() => new Date());
   const [fleetSnapshot, setFleetSnapshot] = useState({ status: 'loading', units: [], message: '' });
   const [diversionStatus, setDiversionStatus] = useState({ status: 'idle', data: null, message: '' });
-  const canPrepareBay = emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay);
-  const canConvert = emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival);
-  const canCompleteHandoff = emergencyRole.can(EMERGENCY_ACTIONS.completeEmsHandoff);
+  const incomingSectionRef = useRef(null);
+  const receivingSectionRef = useRef(null);
+  const offloadSectionRef = useRef(null);
+  const canPrepareBay =
+    emergencyRole.can(EMERGENCY_ACTIONS.prepareEmsBay) &&
+    (!ems.isEmsScreen || ems.canPrepareEmsBay);
+  const canConvert =
+    emergencyRole.can(EMERGENCY_ACTIONS.convertEmsArrival) &&
+    (!ems.isEmsScreen || ems.canConvertArrival);
+  const canCompleteHandoff =
+    emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.completeEmsHandoff) &&
+    (!ems.isEmsScreen || ems.canCompleteHandoff);
+  const handoffPresentation = emergencyRole.presentAction(EMERGENCY_ROLE_ACTIONS.completeEmsHandoff);
+  const showInboundSection = !ems.isEmsScreen || ems.showInboundAmbulances;
+  const showReceivingSection = !ems.isEmsScreen || ems.showReceivingArea;
+  const showOffloadSection = !ems.isEmsScreen || ems.showOffloadTimers;
+  const showPressureWidget = !ems.isEmsScreen || ems.showEmsPressure;
+  const showHandoffChecklistWidget = !ems.isEmsScreen || ems.showHandoffChecklist;
+  const showEncounterConversionWidget = !ems.isEmsScreen || ems.showEncounterConversion;
+  const showEtaWidget = !ems.isEmsScreen || ems.showEtaDisplay;
+  const showOperationalStrip = useMemo(
+    () =>
+      (!ems.isEmsScreen || ems.showOperationalStrip) &&
+      shouldShowEmsOperationalStrip({
+        screenMode: ems.screenMode,
+        roleId: emergencyRole.role,
+      }),
+    [ems.isEmsScreen, ems.screenMode, ems.showOperationalStrip, emergencyRole.role],
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -354,15 +433,40 @@ export default function EMSPipeline() {
   const emsSource = sourceLabel(emsModule.data?.source);
   const emsFreshness = formatFreshness(emsModule.data?.generatedAt);
   const completeHandoff = (arrivalId) => {
+    const timestamp = new Date().toISOString();
+    const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+    updateAmbulanceHandoffChecklist(
+      arrivalId,
+      { handoffAccepted: true, handoffAcceptedAt: timestamp },
+      { staffName: emergencyRole.roleLabel },
+    );
     updateEMSArrival(arrivalId, {
       status: 'Complete',
-      handoffCompletedAt: new Date().toISOString(),
+      handoffCompletedAt: timestamp,
+      handoffStartedAt: arrival?.handoffStartedAt || arrival?.arrivedAt || timestamp,
     });
+  };
+  const handleHandoffChecklistUpdate = (arrivalId, patch, actor) => {
+    updateAmbulanceHandoffChecklist(arrivalId, patch, actor);
   };
   const openPatient = (patientId) => {
     if (!patientId) return;
     selectPatient(patientId);
     navigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
+  };
+
+  const handleEmsStripMetricSelect = (metric) => {
+    if (metric.whiteboardAction === 'focus-inbound' && incomingSectionRef.current) {
+      incomingSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (metric.whiteboardAction === 'focus-receiving-area' && receivingSectionRef.current) {
+      receivingSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (metric.whiteboardAction === 'open-offload-tracker' && offloadSectionRef.current) {
+      offloadSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
@@ -377,15 +481,29 @@ export default function EMSPipeline() {
           </p>
         </div>
         <div className="ems-pipeline__header-actions">
-          <span
-            className={`ems-pipeline__offload-kpi${offloadBreachCount ? ' ems-pipeline__offload-kpi--breach' : ''}`}
-            title={`${offloadBreachCount} crews over ${offloadTargetMinutes} minutes`}
-          >
-            Avg offload {avgOffload}m
-          </span>
-          <EMSPressureScore />
+          {showOffloadSection ? (
+            <span
+              className={`ems-pipeline__offload-kpi${offloadBreachCount ? ' ems-pipeline__offload-kpi--breach' : ''}`}
+              title={`${offloadBreachCount} crews over ${offloadTargetMinutes} minutes`}
+            >
+              Avg offload {avgOffload}m
+            </span>
+          ) : null}
+          {showPressureWidget ? <EMSPressureScore /> : null}
         </div>
       </header>
+
+      {showOperationalStrip ? (
+        <EmsOperationalStrip
+          emsArrivals={emsArrivals}
+          patients={patients}
+          staff={staff}
+          rooms={rooms}
+          offloadTargetMinutes={offloadTargetMinutes}
+          visibleSurfaces={ems.isEmsScreen ? ems.visibleOperationalSurfaces : null}
+          onMetricSelect={handleEmsStripMetricSelect}
+        />
+      ) : null}
 
       {emsModule.loading && !emsArrivals.length ? (
         <p className="ems-pipeline__empty" role="status">Loading Emergency OS EMS intake...</p>
@@ -396,104 +514,167 @@ export default function EMSPipeline() {
         </p>
       ) : null}
 
+      {showOffloadSection ? (
+        <>
+          <EmsOffloadAttentionStrip
+            emsArrivals={emsArrivals}
+            patients={patients}
+            staff={staff}
+            rooms={rooms}
+            offloadTargetMinutes={offloadTargetMinutes}
+            onSelectPatient={openPatient}
+            onSelectArrival={(arrivalId, patientId) => {
+              if (patientId) {
+                openPatient(patientId);
+                return;
+              }
+              const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+              if (arrival?.patientId) openPatient(arrival.patientId);
+            }}
+            onOpenTracker={() => {
+              if (offloadSectionRef.current) {
+                offloadSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            className="ems-pipeline__offload-attention"
+          />
+          <div ref={offloadSectionRef}>
+            <EmsOffloadTrackerPanel
+            emsArrivals={emsArrivals}
+            patients={patients}
+            staff={staff}
+            rooms={rooms}
+            offloadTargetMinutes={offloadTargetMinutes}
+            onSelectPatient={openPatient}
+            onSelectArrival={(arrivalId, patientId) => {
+              if (patientId) {
+                openPatient(patientId);
+                return;
+              }
+              const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+              if (arrival?.patientId) openPatient(arrival.patientId);
+            }}
+          />
+        </div>
+        </>
+      ) : null}
+
       <div className="ems-pipeline__sections">
-        <section className="ems-pipeline__section">
-          <div className="ems-pipeline__section-heading">
-            <Ambulance size={17} aria-hidden />
-            <h2>EMS Unit Visibility</h2>
-            <span>{fleetSnapshot.units.length}</span>
-          </div>
-          <p className="ems-pipeline__source">
-            {fleetSnapshot.message || 'Live EMS feed status is pending.'}
-          </p>
-          {diversionStatus.status === 'ready' && diversionStatus.data ? (
-            <div className="ems-pipeline__diversion">
-              <strong>Diversion Status</strong>
-              <span role="status" aria-label="Diversion status">
-                {diversionStatus.data.active ? 'Active diversion' : 'No diversion'}
-              </span>
-            </div>
-          ) : null}
-          <div className="ems-pipeline__unit-grid">
-            {fleetSnapshot.status === 'loading' ? (
-              <p className="ems-pipeline__empty" role="status">Loading department data...</p>
-            ) : fleetSnapshot.status === 'error' ? (
-              <p className="ems-pipeline__empty" role="alert">
-                {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
+        {showInboundSection ? (
+          <>
+            <section className="ems-pipeline__section">
+              <div className="ems-pipeline__section-heading">
+                <Ambulance size={17} aria-hidden />
+                <h2>EMS Unit Visibility</h2>
+                <span>{fleetSnapshot.units.length}</span>
+              </div>
+              <p className="ems-pipeline__source">
+                {fleetSnapshot.message || 'Live EMS feed status is pending.'}
               </p>
-            ) : fleetSnapshot.units.length ? (
-              fleetSnapshot.units.slice(0, 6).map((unit) => (
-                <article key={unit.id}>
-                  <strong>{unit.callSign}</strong>
-                  <span>{unit.status}</span>
-                  <small>{unit.lastKnownLocation}</small>
-                </article>
-              ))
-            ) : (
-              <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
-            )}
-          </div>
-        </section>
+              {diversionStatus.status === 'ready' && diversionStatus.data ? (
+                <div className="ems-pipeline__diversion">
+                  <strong>Diversion Status</strong>
+                  <span role="status" aria-label="Diversion status">
+                    {diversionStatus.data.active ? 'Active diversion' : 'No diversion'}
+                  </span>
+                </div>
+              ) : null}
+              <div className="ems-pipeline__unit-grid">
+                {fleetSnapshot.status === 'loading' ? (
+                  <p className="ems-pipeline__empty" role="status">Loading department data...</p>
+                ) : fleetSnapshot.status === 'error' ? (
+                  <p className="ems-pipeline__empty" role="alert">
+                    {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
+                  </p>
+                ) : fleetSnapshot.units.length ? (
+                  fleetSnapshot.units.slice(0, 6).map((unit) => (
+                    <article key={unit.id}>
+                      <strong>{unit.callSign}</strong>
+                      <span>{unit.status}</span>
+                      <small>{unit.lastKnownLocation}</small>
+                    </article>
+                  ))
+                ) : (
+                  <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
+                )}
+              </div>
+            </section>
 
-        <section className="ems-pipeline__section">
-          <div className="ems-pipeline__section-heading">
-            <Ambulance size={17} aria-hidden />
-            <h2>Incoming</h2>
-            <span>{incoming.length}</span>
-          </div>
-          <div className="ems-pipeline__list">
-            {incoming.length ? (
-              incoming.map((arrival) => (
-                <EMSArrivalRow
-                  key={arrival.id}
-                  arrival={arrival}
-                  now={now}
-                  rooms={rooms}
-                  onPrepareBay={prepareEMSBay}
-                  onConvert={handleConvertEmsArrival}
-                  onCompleteHandoff={completeHandoff}
-                  onOpenPatient={openPatient}
-                  offloadTargetMinutes={offloadTargetMinutes}
-                  canPrepareBay={canPrepareBay}
-                  canConvert={canConvert}
-                  canCompleteHandoff={canCompleteHandoff}
-                />
-              ))
-            ) : (
-              <p className="ems-pipeline__empty">No inbound EMS units in the active Emergency OS state.</p>
-            )}
-          </div>
-        </section>
+            <section className="ems-pipeline__section" ref={incomingSectionRef}>
+              <div className="ems-pipeline__section-heading">
+                <Ambulance size={17} aria-hidden />
+                <h2>Incoming</h2>
+                <span>{incoming.length}</span>
+              </div>
+              <div className="ems-pipeline__list">
+                {incoming.length ? (
+                  incoming.map((arrival) => (
+                    <EMSArrivalRow
+                      key={arrival.id}
+                      arrival={arrival}
+                      now={now}
+                      rooms={rooms}
+                      patients={patients}
+                      onPrepareBay={prepareEMSBay}
+                      onConvert={handleConvertEmsArrival}
+                      onCompleteHandoff={completeHandoff}
+                      onOpenPatient={openPatient}
+                      onUpdateHandoffChecklist={handleHandoffChecklistUpdate}
+                      offloadTargetMinutes={offloadTargetMinutes}
+                      canPrepareBay={canPrepareBay}
+                      canConvert={canConvert}
+                      canCompleteHandoff={canCompleteHandoff}
+                      showHandoffChecklistPanel={showHandoffChecklistWidget}
+                      showEncounterConversion={showEncounterConversionWidget}
+                      showEtaDisplay={showEtaWidget}
+                      actorName={emergencyRole.roleLabel}
+                    />
+                  ))
+                ) : (
+                  <p className="ems-pipeline__empty">No inbound EMS units in the active Emergency OS state.</p>
+                )}
+              </div>
+            </section>
+          </>
+        ) : null}
 
-        <section className="ems-pipeline__section">
-          <div className="ems-pipeline__section-heading">
-            <Bed size={17} aria-hidden />
-            <h2>Awaiting Handoff</h2>
-            <span>{awaitingHandoff.length}</span>
-          </div>
-          <div className="ems-pipeline__list">
-            {awaitingHandoff.length ? (
-              awaitingHandoff.map((arrival) => (
-                <EMSArrivalRow
-                  key={arrival.id}
-                  arrival={arrival}
-                  now={now}
-                  rooms={rooms}
-                  onPrepareBay={prepareEMSBay}
-                  onConvert={handleConvertEmsArrival}
-                  onCompleteHandoff={completeHandoff}
-                  onOpenPatient={openPatient}
-                  offloadTargetMinutes={offloadTargetMinutes}
-                  canPrepareBay={canPrepareBay}
-                  canConvert={canConvert}
-                  canCompleteHandoff={canCompleteHandoff}
-                />
-              ))
-            ) : (
-              <p className="ems-pipeline__empty">No crews waiting for handoff.</p>
-            )}
-          </div>
-        </section>
+        {showReceivingSection ? (
+          <section className="ems-pipeline__section" ref={receivingSectionRef}>
+            <div className="ems-pipeline__section-heading">
+              <Bed size={17} aria-hidden />
+              <h2>Awaiting Handoff</h2>
+              <span>{awaitingHandoff.length}</span>
+            </div>
+            <div className="ems-pipeline__list">
+              {awaitingHandoff.length ? (
+                awaitingHandoff.map((arrival) => (
+                  <EMSArrivalRow
+                    key={arrival.id}
+                    arrival={arrival}
+                    now={now}
+                    rooms={rooms}
+                    patients={patients}
+                    onPrepareBay={prepareEMSBay}
+                    onConvert={handleConvertEmsArrival}
+                    onCompleteHandoff={completeHandoff}
+                    onOpenPatient={openPatient}
+                    onUpdateHandoffChecklist={handleHandoffChecklistUpdate}
+                    offloadTargetMinutes={offloadTargetMinutes}
+                    canPrepareBay={canPrepareBay}
+                    canConvert={canConvert}
+                    canCompleteHandoff={canCompleteHandoff}
+                    showHandoffChecklistPanel={showHandoffChecklistWidget}
+                    showEncounterConversion={showEncounterConversionWidget}
+                    showEtaDisplay={showEtaWidget}
+                    actorName={emergencyRole.roleLabel}
+                  />
+                ))
+              ) : (
+                <p className="ems-pipeline__empty">No crews waiting for handoff.</p>
+              )}
+            </div>
+          </section>
+        ) : null}
       </div>
     </section>
   );

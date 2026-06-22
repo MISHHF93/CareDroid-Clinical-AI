@@ -176,4 +176,36 @@ describe('Emergency OS store shim', () => {
       ]),
     );
   });
+
+  it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
+    const store = useEmergencyStore.getState();
+    const patientId = store.patients[0]?.id;
+    expect(patientId).toBeTruthy();
+
+    store.setQueueFilter(null);
+    store.selectPatient(null);
+
+    store.dispatchWebSocketEvent({
+      type: 'intake_handoff_complete',
+      payload: {
+        patientId,
+        encounterId: 'encounter-ws-test',
+        queue: 'Triage',
+        surfaces: ['triage-queue', 'whiteboard', 'operational-snapshot'],
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.activeQueueFilter).toBe('Triage');
+    expect(next.selectedPatientId).toBe(patientId);
+    expect(next.websocket.lastEventAt).toBeTruthy();
+    expect(next.workflowLogs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'integration_event_received',
+          patientId,
+        }),
+      ]),
+    );
+  });
 });

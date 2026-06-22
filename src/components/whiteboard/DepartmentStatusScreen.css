@@ -1,0 +1,158 @@
+.department-status-screen {
+  display: grid;
+  gap: 16px;
+  padding: 20px 24px 28px;
+  border-bottom: 1px solid #1f2937;
+  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+}
+
+.department-status-screen__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.department-status-screen__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #60a5fa;
+}
+
+.department-status-screen__header h2 {
+  margin: 4px 0 0;
+  font-size: clamp(24px, 3vw, 34px);
+  color: #f8fafc;
+}
+
+.department-status-screen__subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.department-status-screen__meta {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: #cbd5e1;
+  text-align: right;
+}
+
+.department-status-screen__summary {
+  margin: 0;
+  font-size: 14px;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.department-status-screen__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.department-status-screen__tile {
+  display: grid;
+  gap: 6px;
+  min-height: 120px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #334155;
+  background: #111827;
+}
+
+.department-status-screen__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1;
+  color: #f8fafc;
+}
+
+.department-status-screen__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.department-status-screen__detail {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.department-status-screen__tile[data-tone='stable'] {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.department-status-screen__tile[data-tone='info'] {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.department-status-screen__tile[data-tone='watch'] {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.department-status-screen__tile[data-tone='warning'] {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.department-status-screen__tile[data-tone='critical'] {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.department-status-screen__live-clock {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.04em;
+}
+
+.department-status-screen--wall {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(20px, 3vw, 40px) clamp(24px, 4vw, 48px) clamp(28px, 4vw, 48px);
+  border-bottom: none;
+  box-sizing: border-box;
+}
+
+.department-status-screen--wall .department-status-screen__header h2 {
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.department-status-screen--wall .department-status-screen__summary {
+  font-size: clamp(15px, 2vw, 18px);
+}
+
+.department-status-screen--wall .department-status-screen__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  flex: 1;
+}
+
+.department-status-screen--wall .department-status-screen__tile {
+  min-height: clamp(130px, 16vh, 190px);
+  padding: clamp(16px, 2vw, 22px);
+}
+
+.department-status-screen--wall .department-status-screen__value {
+  font-size: clamp(32px, 5vw, 52px);
+}
+
+@media (max-width: 899px) {
+  .department-status-screen--wall .department-status-screen__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .department-status-screen__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

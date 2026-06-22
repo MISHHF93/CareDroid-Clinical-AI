@@ -1,0 +1,84 @@
+.patient-experience-strip {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  margin-bottom: 0.75rem;
+}
+
+.patient-experience-strip__header h3 {
+  margin: 0.15rem 0;
+  font-size: 0.95rem;
+}
+
+.patient-experience-strip__eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.patient-experience-strip__subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.patient-experience-strip__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.patient-experience-strip__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.35);
+  font-size: 0.78rem;
+}
+
+.patient-experience-strip__count strong {
+  font-size: 0.95rem;
+}
+
+.patient-experience-strip__sample {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.patient-experience-strip__sample:disabled {
+  cursor: default;
+}
+
+.patient-experience-strip__advisories {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.patient-experience-strip__advisory {
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.patient-experience-strip__advisory[data-tone='warning'] {
+  border-left: 3px solid #f59e0b;
+}
+
+.patient-experience-strip__advisory[data-tone='critical'] {
+  border-left: 3px solid #ef4444;
+}

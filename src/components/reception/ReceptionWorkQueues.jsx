@@ -1,17 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PatientState } from '../../types/emergency';
-import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
-import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import useTriageScreen from '../../hooks/useTriageScreen';
+import useReceptionScreen from '../../hooks/useReceptionScreen';
 import OperationalEmptyState, { OperationalEmptyAction } from '../ui/OperationalEmptyState';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import { RECEPTION_COPY } from './receptionCopy';
 import AiTriageAssistPanel from './AiTriageAssistPanel';
 import { patientLabel, selectReceptionQueues } from './receptionQueueModel';
+import ArrivalControlBadge from './ArrivalControlBadge';
+import HighRiskComplaintFlagBadge from './HighRiskComplaintFlagBadge';
 import { QueueAuditBadge } from '../queues/QueueOperationalPanel';
 import DataQualityRiskBadge from '../dataQuality/DataQualityRiskBadge';
 import { buildQueueAuditSnapshot } from '../../services/queueAuditDiscovery';
 import { getPatientDataQualityRisks } from '../../services/dataQualityDiscovery';
 import { QUEUE_AUDIT_DOMAIN } from '../../config/queueAuditModel';
+import { useEmergencyStore } from '../../store/emergencyStore';
+import QueueReasonBadge from '../queues/QueueReasonBadge';
+import TriageBreachBadge from '../triage/TriageBreachBadge';
+import WhatHappensNextBadge from '../guidance/WhatHappensNextBadge';
+import DeteriorationWatchBadge from '../waiting-room/DeteriorationWatchBadge';
+import FitToWaitBadge from '../waiting-room/FitToWaitBadge';
+import PatientExperienceStatusBadge from '../patient-experience/PatientExperienceStatusBadge';
+import ReassessmentTimerBadge from '../reassessment/ReassessmentTimerBadge';
 import './ReceptionWorkQueues.css';
 
 export const RECEPTION_QUEUE_TABS = [
@@ -33,10 +43,15 @@ export default function ReceptionWorkQueues({
   onRegisterWalkIn,
   onOpenEms,
   showTabBadges = true,
+  settings = null,
 }) {
   const [activeTab, setActiveTab] = useState(activeTabProp);
-  const emergencyRole = useEmergencyRolePermissions();
-  const canReviewTriage = emergencyRole.can(EMERGENCY_ACTIONS.triage);
+  const reception = useReceptionScreen();
+  const triage = useTriageScreen();
+  const canReviewTriage = triage.showClinicalTriageAssist;
+  const staff = useEmergencyStore((state) => state.staff);
+  const referrals = useEmergencyStore((state) => state.referrals);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
 
   useEffect(() => {
     setActiveTab(activeTabProp);
@@ -61,6 +76,7 @@ export default function ReceptionWorkQueues({
     ems: queues.counts.ems,
     verification: queues.counts.verification,
     pretriage: queues.counts.pretriage,
+    rapidReview: queues.counts.rapidReview,
   };
 
   const activePatients = queues[activeTab] || [];
@@ -100,6 +116,11 @@ export default function ReceptionWorkQueues({
           >
             {tab.label}
             <span className="reception-work-queues__count">{counts[tab.id]}</span>
+            {tab.id === 'pretriage' && counts.rapidReview > 0 ? (
+              <span className="reception-work-queues__rapid-review" title="Rapid review needed">
+                {counts.rapidReview} rapid
+              </span>
+            ) : null}
             {showTabBadges && queueRowByTab[tab.id] ? (
               <QueueAuditBadge row={queueRowByTab[tab.id]} limit={1} />
             ) : null}
@@ -134,11 +155,40 @@ export default function ReceptionWorkQueues({
                     }
                   }}
                 >
-                  <span>
-                    {patientLabel(patient)}
-                    {showTabBadges && qualityRisks.length ? (
-                      <DataQualityRiskBadge risks={qualityRisks} limit={2} />
-                    ) : null}
+                  <span className="reception-work-queues__primary">
+                    <span>
+                      {patientLabel(patient)}
+                      {showTabBadges && qualityRisks.length ? (
+                        <DataQualityRiskBadge risks={qualityRisks} limit={2} />
+                      ) : null}
+                      <HighRiskComplaintFlagBadge patient={patient} compact />
+                      <PatientExperienceStatusBadge
+                        patient={patient}
+                        referrals={referrals}
+                        compact
+                        showStaffDetail
+                      />
+                      <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} compact showAll />
+                      <WhatHappensNextBadge
+                        patient={patient}
+                        referrals={referrals}
+                        staff={staff}
+                        compact
+                      />
+                      <TriageBreachBadge patient={patient} settings={settings} compact showElapsed />
+                      {activeTab === 'pretriage' ? (
+                        <>
+                          <DeteriorationWatchBadge
+                            patient={patient}
+                            emsArrivals={emsArrivals}
+                            compact
+                          />
+                          <FitToWaitBadge patient={patient} compact />
+                          <ReassessmentTimerBadge patient={patient} thresholds={settings?.thresholds} />
+                        </>
+                      ) : null}
+                    </span>
+                    <ArrivalControlBadge patient={patient} compact />
                   </span>
                   <span>
                     {activeTab === 'ems'

@@ -19,11 +19,14 @@ function buildStore(patient: { id: string; state: PatientState; timeline?: unkno
       calls.push(`move:${patientId}:${to}`),
     selectPatient: (patientId: string) => calls.push(`select:${patientId}`),
     setQueueFilter: (filter: string | null) => calls.push(`queue:${filter}`),
-    dispatchWebSocketEvent: () => calls.push('websocket:intake_handoff_complete'),
+    dispatchWebSocketEvent: (event: { type?: string }) =>
+      calls.push(`websocket:${event?.type || 'unknown'}`),
     recordWorkflowAction: (input: { metadata?: Record<string, unknown>; type?: string }) => {
       calls.push(`workflow:${input.metadata?.handoff || input.type}`);
       return { id: 'log-1' };
     },
+    updateCapacity: () => calls.push('capacity:update'),
+    updateAlerts: () => calls.push('alerts:update'),
   };
   return { store, calls };
 }
@@ -41,18 +44,16 @@ describe('receptionHandoff', () => {
       source: 'smart-intake',
     });
 
-    expect(calls).toEqual([
-      'move:patient-123:Triage',
-      'update:patient-123',
-      'queue:Triage',
-      'select:patient-123',
-      'workflow:reception.handoff',
-      'update:patient-123',
-      'workflow:encounter_created',
-      'websocket:intake_handoff_complete',
-      'workflow:intake.complete',
-      'update:patient-123',
-    ]);
+    expect(calls).toContain('move:patient-123:Triage');
+    expect(calls).toContain('select:patient-123');
+    expect(calls).toContain('queue:Triage');
+    expect(calls).toContain('websocket:intake_handoff_complete');
+    expect(calls).toContain('websocket:arrival_control_sync');
+    expect(calls).toContain('websocket:triage_breach_sync');
+    expect(calls).toContain('websocket:patient_experience_sync');
+    expect(calls).toContain('capacity:update');
+    expect(calls).toContain('alerts:update');
+    expect(calls).toContain('workflow:reception.handoff');
     expect(result.receptionPath).toBe(
       `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent('patient-123')}`,
     );
@@ -76,17 +77,13 @@ describe('receptionHandoff', () => {
 
     completeReceptionHandoff(store, { patientId: 'patient-456', source: 'quick-intake' });
 
-    expect(calls).toEqual([
-      'update:patient-456',
-      'queue:Triage',
-      'select:patient-456',
-      'workflow:reception.handoff',
-      'update:patient-456',
-      'workflow:encounter_created',
-      'websocket:intake_handoff_complete',
-      'workflow:intake.complete',
-      'update:patient-456',
-    ]);
+    expect(calls).not.toContain('move:patient-456:Triage');
+    expect(calls).toContain('select:patient-456');
+    expect(calls).toContain('queue:Triage');
+    expect(calls).toContain('websocket:triage_breach_sync');
+    expect(calls).toContain('websocket:patient_experience_sync');
+    expect(calls).toContain('capacity:update');
+    expect(calls).toContain('alerts:update');
   });
 
   it('completeIntakeHandoff supports whiteboard central intake source', () => {

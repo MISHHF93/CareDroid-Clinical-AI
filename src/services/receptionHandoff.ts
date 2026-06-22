@@ -1,8 +1,16 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { getTriagePendingQueuePath } from '../config/triageScreenModel';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { postReceptionHandoff } from './emergencyOsApi';
 import { ensureEncounterAfterIntake, type IntakeEncounterSource } from './intakeEncounter';
 import { getArrivalReasonFromPatient } from './intakeEncounterChain';
+import {
+  recordFirstContact,
+  stampArrivalControlLayer,
+  syncArrivalOperationalSurfaces,
+} from './arrivalControlLayer';
+import { syncPatientExperienceOperationalSurfaces } from './patientExperienceStatus';
+import { syncTriageBreachOperationalSurfaces } from './triageBreachTimer';
 import { enterTriageQueue, WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { buildClientTriageAssist, refreshTriageAssistFromBackend } from './triageAssist';
 import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
@@ -19,11 +27,14 @@ export type IntakeHandoffStore = Pick<
   | 'emergencySettings'
   | 'updatePatient'
   | 'dispatchWebSocketEvent'
+  | 'updateCapacity'
+  | 'updateAlerts'
 >;
 
 export type IntakeHandoffSource =
   | 'quick-intake'
   | 'express-register'
+  | 'reception-quick-intake'
   | 'smart-intake'
   | 'reception'
   | 'ems-convert'
@@ -38,6 +49,7 @@ export type ReceptionHandoffSource = IntakeHandoffSource;
 const HANDOFF_ENCOUNTER_SOURCE: Record<IntakeHandoffSource, IntakeEncounterSource> = {
   'quick-intake': 'walk-in',
   'express-register': 'walk-in',
+  'reception-quick-intake': 'walk-in',
   'smart-intake': 'smart-intake',
   reception: 'walk-in',
   'ems-convert': 'ems',
@@ -50,6 +62,7 @@ const HANDOFF_ENCOUNTER_SOURCE: Record<IntakeHandoffSource, IntakeEncounterSourc
 const HANDOFF_WORKFLOW_SOURCE: Record<IntakeHandoffSource, string> = {
   'quick-intake': 'quick-intake',
   'express-register': 'express-register',
+  'reception-quick-intake': 'reception-quick-intake',
   'smart-intake': 'smart-intake',
   reception: 'reception-workspace',
   'ems-convert': 'ems-pipeline',
@@ -84,6 +97,18 @@ export type ReceptionHandoffOptions = IntakeHandoffOptions;
 /** @deprecated Use IntakeHandoffResult */
 export type ReceptionHandoffResult = IntakeHandoffResult;
 
+/** Refresh reception, whiteboard, and operational snapshot consumers after intake handoff. */
+export function refreshIntakeHandoffSurfaces(
+  store: Pick<
+    ReturnType<typeof useEmergencyStore.getState>,
+    'updateCapacity' | 'updateAlerts' | 'initializeFromBackend'
+  >,
+) {
+  store.updateCapacity?.();
+  store.updateAlerts?.();
+  void store.initializeFromBackend?.();
+}
+
 function buildWhiteboardPath(patientId: string, encounterId: string | null): string {
   const params = new URLSearchParams({ patient: patientId });
   if (encounterId) params.set('encounter', encounterId);
@@ -98,7 +123,7 @@ export function buildPostHandoffNavigationPaths(
   return {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,
     whiteboardPath: buildWhiteboardPath(patientId, encounterId),
-    queuesPath: `${CANONICAL_ROUTES.emergencyReception}?queue=${encodeURIComponent('pretriage')}&patient=${encodeURIComponent(patientId)}`,
+    queuesPath: getTriagePendingQueuePath(patientId),
   };
 }
 
@@ -144,6 +169,31 @@ function syncOperationalSurfaces(
       surfaces: ['triage-queue', 'whiteboard', 'operational-snapshot'],
     },
   });
+
+  syncArrivalOperationalSurfaces(store, options.patientId, {
+    destination: 'triage-queue',
+    source: options.source,
+  });
+
+  syncTriageBreachOperationalSurfaces(
+    {
+      patients: store.patients,
+      settings: store.emergencySettings,
+      dispatchWebSocketEvent: store.dispatchWebSocketEvent,
+    },
+    { patientId: options.patientId, source: options.source },
+  );
+
+  syncPatientExperienceOperationalSurfaces(
+    {
+      patients: store.patients,
+      dispatchWebSocketEvent: store.dispatchWebSocketEvent,
+    },
+    { patientId: options.patientId, source: options.source },
+  );
+
+  store.updateCapacity?.();
+  store.updateAlerts?.();
 }
 
 /**
@@ -161,7 +211,7 @@ export function completeIntakeHandoff(
     return {
       receptionPath: CANONICAL_ROUTES.emergencyReception,
       whiteboardPath: CANONICAL_ROUTES.emergencyWhiteboard,
-      queuesPath: `${CANONICAL_ROUTES.emergencyReception}?queue=pretriage`,
+      queuesPath: getTriagePendingQueuePath(),
       encounterId: null,
       createdEncounter: false,
       queue: WHITEBOARD_QUEUE_FILTER.triage,
@@ -179,6 +229,18 @@ export function completeIntakeHandoff(
     actorId: 'intake-handoff',
     note: `Intake handoff to triage queue (${source}) — ${arrivalReason}.`,
     recordWorkflow: false,
+  });
+
+  recordFirstContact(store, patientId, {
+    actorName,
+    source: 'intake-handoff',
+    note: `First contact at intake handoff (${source}).`,
+  });
+
+  stampArrivalControlLayer(store, patientId, {
+    triagePending: true,
+    registrationStatus: 'complete',
+    queueDestination: 'triage-queue',
   });
 
   store.selectPatient(patientId);
@@ -280,7 +342,7 @@ export function completeIntakeHandoff(
   return {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,
     whiteboardPath: buildWhiteboardPath(patientId, encounterResult.encounterId),
-    queuesPath: `${CANONICAL_ROUTES.emergencyReception}?queue=${encodeURIComponent('pretriage')}&patient=${encodeURIComponent(patientId)}`,
+    queuesPath: getTriagePendingQueuePath(patientId),
     encounterId: encounterResult.encounterId,
     createdEncounter: encounterResult.created,
     queue,

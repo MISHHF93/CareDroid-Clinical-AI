@@ -1,0 +1,43 @@
+.arrival-control-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.arrival-control-summary__metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 108px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  background: #111827;
+  color: #f9fafb;
+  cursor: pointer;
+  text-align: left;
+}
+
+.arrival-control-summary__metric:disabled {
+  cursor: default;
+  opacity: 0.92;
+}
+
+.arrival-control-summary__metric:not(:disabled):hover {
+  border-color: #374151;
+  background: #1a2233;
+}
+
+.arrival-control-summary__label {
+  font-size: 11px;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+.arrival-control-summary__value {
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1;
+}

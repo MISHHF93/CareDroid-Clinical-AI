@@ -10,6 +10,8 @@ import {
 } from './CommandPalette';
 import { COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS, COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS } from '../config/commandPaletteHighValueModel';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import { presentEmergencyRoleAction } from '../config/emergencyRoleActionMatrix';
+import { EMERGENCY_ROLE_ID } from '../config/emergencyRoleScreenMatrix';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_ROUTE_COMMANDS, EMERGENCY_OS_TOOL_COMMANDS } from '../config/commandPalette.config';
 import { PatientState, Priority, type Patient } from '../types/emergency';
@@ -161,7 +163,10 @@ describe('CommandPalette helpers', () => {
 
   it('hides command actions that the active Emergency OS role cannot perform', () => {
     const readOnlyRole = {
+      role: EMERGENCY_ROLE_ID.readOnlyViewer,
       can: (action: string) => action === EMERGENCY_ACTIONS.viewAnalytics,
+      presentAction: (action: string) =>
+        presentEmergencyRoleAction(EMERGENCY_ROLE_ID.readOnlyViewer, action),
       canAccessRoute: (path: string) => path !== CANONICAL_ROUTES.emergencySettings,
       nearestRoute: () => CANONICAL_ROUTES.emergencyWhiteboard,
     };

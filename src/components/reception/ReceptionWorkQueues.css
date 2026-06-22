@@ -56,6 +56,17 @@
   text-align: center;
 }
 
+.reception-work-queues__rapid-review {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.18);
+  color: #fecaca;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .reception-work-queues__list {
   display: grid;
   gap: 8px;
@@ -83,6 +94,12 @@
   color: var(--color-text-secondary, #9ca3af);
   font-size: 12px;
   font-weight: 700;
+}
+
+.reception-work-queues__primary {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
 }
 
 .reception-work-queues__empty {

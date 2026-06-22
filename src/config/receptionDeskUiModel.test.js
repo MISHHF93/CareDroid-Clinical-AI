@@ -25,7 +25,7 @@ describe('receptionDeskUiModel', () => {
     });
     expect(desk.slim).toBe(false);
     expect(desk.show(RECEPTION_DESK_UI.surfaces.queueAuditPanel)).toBe(true);
-    expect(desk.stripMetricIds).toBeNull();
+    expect(desk.stripMetricIds).toEqual(RECEPTION_DESK_UI.coreStripMetricIds);
   });
 
   it('filters strip metrics to core clerk counts', () => {

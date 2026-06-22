@@ -14,6 +14,11 @@ import {
   type PatientDuplicateCandidate,
 } from '../utils/patientDuplicateDetection';
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
+import { buildArrivalControlFields, registerNewArrival } from '../services/arrivalControlLayer';
+import {
+  buildHighRiskComplaintPatch,
+  detectHighRiskComplaintFlags,
+} from '../services/highRiskComplaintFlags';
 
 type QuickIntakeVariant = 'whiteboard' | 'reception';
 
@@ -238,6 +243,14 @@ export default function QuickIntake({
     : complaintCategory
       ? SUGGESTED_PROTOCOLS[complaintCategory] || []
       : [];
+  const detectedComplaintFlags = useMemo(
+    () =>
+      detectHighRiskComplaintFlags({
+        complaint,
+        complaintCategory,
+      }),
+    [complaint, complaintCategory],
+  );
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -286,6 +299,16 @@ export default function QuickIntake({
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
       : [];
+    const safetyFlags =
+      priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [];
+    const complaintPatch = buildHighRiskComplaintPatch(
+      {
+        chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
+        complaintCategory: complaintCategory || 'Other',
+        state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
+        triagePending: isReceptionIntake ? true : undefined,
+      },
+    );
     const patient: Patient = {
       id: createId('patient'),
       mrn,
@@ -301,7 +324,18 @@ export default function QuickIntake({
       state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
       priority,
       vitals: completeVitals,
-      flags: priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [],
+      flags: safetyFlags,
+      ...complaintPatch,
+      ...buildArrivalControlFields({
+        arrivalMode: 'walk-in',
+        state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
+        presentingComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
+        quickSafetyFlags: safetyFlags,
+        flags: safetyFlags,
+        queueDestination:
+          complaintPatch.queueDestination ||
+          (isReceptionIntake ? 'verification' : 'triage-queue'),
+      }),
       notes: [
         {
           id: createId('central-input-note'),
@@ -327,11 +361,32 @@ export default function QuickIntake({
       const response = await createSmartIntakePatient(patient);
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
+      registerNewArrival(
+        {
+          patients: useEmergencyStore.getState().patients,
+          updatePatient: useEmergencyStore.getState().updatePatient,
+          dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
+        },
+        persistedPatient.id,
+        { source: isReceptionIntake ? 'quick-intake-reception' : 'quick-intake-whiteboard' },
+      );
       onAdded(persistedPatient);
       onClose();
     } catch (error) {
+      addPatient(patient);
+      registerNewArrival(
+        {
+          patients: useEmergencyStore.getState().patients,
+          updatePatient: useEmergencyStore.getState().updatePatient,
+          dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
+        },
+        patient.id,
+        { source: isReceptionIntake ? 'quick-intake-reception' : 'quick-intake-whiteboard' },
+      );
+      onAdded(patient);
+      onClose();
       setSubmitError(
-        `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.intakeForm}`,
+        `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
       );
     } finally {
       setSubmitting(false);
@@ -602,6 +657,41 @@ export default function QuickIntake({
                     </span>
                   ))}
                 </div>
+              </div>
+            ) : null}
+            {detectedComplaintFlags.length ? (
+              <div
+                style={{
+                  borderRadius: 10,
+                  border: '1px solid #DC2626',
+                  background: '#7F1D1D22',
+                  padding: 10,
+                }}
+              >
+                <div style={{ color: '#FCA5A5', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+                  High-risk complaint flags — staff alert only
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {detectedComplaintFlags.map((flag) => (
+                    <span
+                      key={flag.id}
+                      style={{
+                        borderRadius: 999,
+                        background: '#991B1B33',
+                        border: '1px solid #EF4444',
+                        color: '#FEE2E2',
+                        padding: '5px 8px',
+                        fontSize: 12,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {flag.label}
+                    </span>
+                  ))}
+                </div>
+                <p style={{ color: '#FCA5A5', fontSize: 11, margin: '8px 0 0' }}>
+                  Sends to rapid review queue. Does not assign triage level.
+                </p>
               </div>
             ) : null}
           </section>

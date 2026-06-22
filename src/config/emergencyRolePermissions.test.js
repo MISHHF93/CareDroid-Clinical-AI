@@ -24,6 +24,7 @@ import {
   normalizeEmergencyRole,
   resolveEmergencyRoleId,
 } from './emergencyRolePermissions';
+import { getDefaultScreenModeForRole } from './emergencyRoleScreenMatrix';
 
 describe('Emergency OS role-based views', () => {
   it('merges tenant permission overrides into action checks', () => {
@@ -71,6 +72,16 @@ describe('Emergency OS role-based views', () => {
     ]);
     expect(normalizeEmergencyRole('Read-Only Viewer')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
     expect(normalizeEmergencyRole('paramedic')).toBe(EMERGENCY_ROLE_IDS.emsUser);
+    expect(normalizeEmergencyRole('np')).toBe(EMERGENCY_ROLE_IDS.physician);
+    expect(normalizeEmergencyRole('flow nurse')).toBe(EMERGENCY_ROLE_IDS.chargeNurse);
+    expect(normalizeEmergencyRole('receptionist')).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
+  });
+
+  it('exposes default screen modes from the role-screen matrix', () => {
+    expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.triageNurse)).toBe('TRIAGE_SCREEN');
+    expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
+      'RECEPTION_SCREEN',
+    );
   });
 
   it('filters Emergency OS navigation by role', () => {
@@ -131,8 +142,16 @@ describe('Emergency OS role-based views', () => {
     expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
       CANONICAL_ROUTES.emergencyReception,
     );
+    expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.triageNurse)).toContain('queue=pretriage');
     expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.chargeNurse)).toBe(
-      CANONICAL_ROUTES.emergencyReception,
+      CANONICAL_ROUTES.emergencyWhiteboard,
+    );
+    expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.physician)).toBe(
+      CANONICAL_ROUTES.emergencyWhiteboard,
+    );
+    expect(getEmergencyRoleHomeRoute('public display')).toContain('display=waiting-room');
+    expect(getEmergencyRoleHomeRoute(EMERGENCY_ROLE_IDS.readOnlyViewer)).toContain(
+      'display=readonly',
     );
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(true);
     expect(prefersReceptionForPatientCreate(EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
@@ -183,9 +202,6 @@ describe('Emergency OS role-based views', () => {
       hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
     ).toBe(false);
     expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.physician).defaultRoute).toBe(
-      CANONICAL_ROUTES.emergencyReception,
-    );
-    expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.registrationClerk).defaultRoute).toBe(
       CANONICAL_ROUTES.emergencyReception,
     );
   });

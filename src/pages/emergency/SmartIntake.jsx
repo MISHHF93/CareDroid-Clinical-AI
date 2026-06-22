@@ -102,6 +102,7 @@ export default function SmartIntake({
   const [searchParams] = useSearchParams();
   const store = useEmergencyStore();
   const addPatient = useEmergencyStore((state) => state.addPatient);
+  const registerArrivalControl = useEmergencyStore((state) => state.registerArrivalControl);
   const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
   const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
@@ -444,6 +445,8 @@ export default function SmartIntake({
       },
       { syncToBackend: false },
     );
+    applyIntakeArrivalContext(store, patient.id, resolveIntakeArrivalReason());
+    registerArrivalControl(patient.id, { source: 'smart-intake' });
     selectPatient(patient.id);
     finishIntakeNavigation(patient.id);
     return patient;
@@ -462,6 +465,8 @@ export default function SmartIntake({
       capacity: whiteboard.capacity || capacity,
     });
     if (patient?.id) {
+      applyIntakeArrivalContext(store, patient.id, resolveIntakeArrivalReason());
+      registerArrivalControl(patient.id, { source: 'smart-intake' });
       selectPatient(patient.id);
       finishIntakeNavigation(patient.id);
     }
@@ -481,13 +486,18 @@ export default function SmartIntake({
       const result = await backendAction();
       localCompletion?.(result);
       setStatusMessage(
-        `${actionLabel} confirmed for session ${result.sessionId || sessionId}. Identity audit trail updated for human review.`,
+        `${actionLabel} confirmed for session ${result?.sessionId || sessionId}. Identity audit trail updated for human review.`,
       );
       setActiveStepTracked(SMART_INTAKE_DEMO.steps.length - 1, 'finalize-complete');
     } catch (error) {
-      setErrorMessage(formatApiRecoveryMessage(error, 'intake confirmation'));
-      setStatusMessage(`${actionLabel} not confirmed — review the error and retry.`);
-      return;
+      if (localCompletion) {
+        localCompletion(null);
+        setStatusMessage(`${actionLabel} saved locally. ${ERROR_RECOVERY_COPY.handoffPending}`);
+        setActiveStepTracked(SMART_INTAKE_DEMO.steps.length - 1, 'finalize-local-fallback');
+      } else {
+        setErrorMessage(formatApiRecoveryMessage(error, 'intake confirmation'));
+        setStatusMessage(`${actionLabel} not confirmed — review the error and retry.`);
+      }
     } finally {
       setPendingAction('');
     }

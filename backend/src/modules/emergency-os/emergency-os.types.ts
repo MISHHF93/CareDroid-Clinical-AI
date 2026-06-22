@@ -119,6 +119,18 @@ export interface EmergencyPatient {
   timeline: JourneyEvent[];
   triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope | null;
   triageAssistGeneratedAt?: string | null;
+  arrivalMode?: 'walk-in' | 'EMS' | 'referral' | 'police' | 'transfer';
+  registrationStatus?: 'pending' | 'in-progress' | 'complete' | 'provisional';
+  triagePending?: boolean;
+  firstContactAt?: string | null;
+  queueDestination?: 'triage-queue' | 'rapid-review' | 'waiting-room' | 'verification' | 'ems-registration' | 'whiteboard';
+  quickSafetyFlags?: string[];
+  highRiskComplaintFlags?: Array<{
+    id: string;
+    label: string;
+    detectedAt: string;
+    source: 'complaint-text' | 'complaint-category' | 'staff-selected';
+  }>;
 }
 
 export interface EmergencyRoom {

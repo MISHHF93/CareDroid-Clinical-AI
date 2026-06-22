@@ -1,4 +1,8 @@
 import type { Patient } from '../types/emergency';
+import {
+  formatPrivacySafePatientName,
+  type EmergencyDisplayPrivacyPolicy,
+} from '../config/emergencyDisplayPrivacyPolicy';
 
 export const MIN_PATIENT_NAME_SEARCH_LENGTH = 2;
 export const DEFAULT_PATIENT_SEARCH_LIMIT = 8;
@@ -71,8 +75,12 @@ export function parseDobQuery(query: string): string | null {
 }
 
 export function getPatientDisplayName(
-  patient: Pick<PatientSearchSource, 'firstName' | 'lastName' | 'name' | 'mrn'>,
+  patient: Pick<PatientSearchSource, 'id' | 'firstName' | 'lastName' | 'name' | 'mrn'>,
+  privacyPolicy?: EmergencyDisplayPrivacyPolicy,
 ): string {
+  if (privacyPolicy) {
+    return formatPrivacySafePatientName(patient, privacyPolicy);
+  }
   return (
     `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.mrn
   );

@@ -396,9 +396,9 @@ function EmergencyDefaultRedirect() {
   return (
     <Navigate
       to={
+        emergencyRole.landingRoute ||
         emergencyRole.defaultRoute ||
         getPlatformHomeRoute() ||
-        emergencyRole.allowedRoutes[0] ||
         CANONICAL_ROUTES.emergencyReception
       }
       replace

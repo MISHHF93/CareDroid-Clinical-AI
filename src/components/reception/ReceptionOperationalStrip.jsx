@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import { normalizeOperationalStripMetrics } from '../../config/emergencyOperationalPresentationModel';
+import OperationalStrip from '../emergency/OperationalStrip';
 import { selectReceptionOperationalStripMetrics } from './receptionQueueModel';
-import './ReceptionOperationalStrip.css';
 
 function metricTone(metric) {
   if (metric.id === 'ems-inbound' && metric.value > 0) return 'info';
@@ -10,52 +11,42 @@ function metricTone(metric) {
   if (metric.id === 'awaiting-verification' && metric.value >= 5) return 'warning';
   if (metric.id === 'data-quality-risks' && metric.value > 0) return 'warning';
   if (metric.id === 'queue-overdue' && metric.value > 0) return 'warning';
-  if (metric.id === 'longest-wait' && String(metric.value).includes('h')) return 'warning';
+  if (metric.id === 'triage-breached' && metric.value > 0) return 'critical';
+  if (metric.id === 'triage-breach-risk' && metric.value > 0) return 'warning';
+  if (metric.id === 'offload-delays' && metric.value > 0) return 'warning';
+  if (metric.id === 'door-to-triage' && String(metric.value).includes('h')) return 'warning';
   return 'neutral';
 }
 
 export default function ReceptionOperationalStrip({
   patients = [],
   emsInbound = 0,
+  emsArrivals = [],
   onMetricSelect,
   shiftSummaryPath = null,
   stripMetricIds = null,
   showShiftLink = true,
+  settings = null,
 }) {
-  const metrics = useMemo(
-    () => selectReceptionOperationalStripMetrics(patients, emsInbound, { metricIds: stripMetricIds }),
-    [patients, emsInbound, stripMetricIds],
-  );
+  const metrics = useMemo(() => {
+    const selected = selectReceptionOperationalStripMetrics(patients, emsInbound, {
+      metricIds: stripMetricIds,
+      settings,
+      emsArrivals,
+    });
+    return normalizeOperationalStripMetrics(
+      selected.map((metric) => ({ ...metric, tone: metricTone(metric) })),
+      { onMetricSelect },
+    );
+  }, [patients, emsInbound, emsArrivals, stripMetricIds, settings, onMetricSelect]);
 
   return (
-    <nav className="reception-operational-strip" aria-label="Reception operational metrics">
-      {metrics.map((metric) => {
-        const interactive = Boolean(metric.queueTab && onMetricSelect);
-        return (
-          <button
-            key={metric.id}
-            type="button"
-            className="reception-operational-strip__metric"
-            data-tone={metricTone(metric)}
-            onClick={() => interactive && onMetricSelect(metric)}
-            disabled={!interactive}
-            title={[metric.label, metric.hint].filter(Boolean).join(' · ')}
-          >
-            <strong>{metric.value}</strong>
-            <span>{metric.label}</span>
-          </button>
-        );
-      })}
-      {shiftSummaryPath && showShiftLink ? (
-        <Link
-          to={shiftSummaryPath}
-          className="reception-operational-strip__metric reception-operational-strip__metric--link"
-          title="Open shift summary"
-        >
-          <strong>Shift</strong>
-          <span>Today&apos;s handoff</span>
-        </Link>
-      ) : null}
-    </nav>
+    <OperationalStrip
+      screenMode={CARE_DROID_SCREEN_MODES.reception}
+      metrics={metrics}
+      onMetricSelect={onMetricSelect}
+      shiftSummaryPath={shiftSummaryPath}
+      showShiftLink={showShiftLink}
+    />
   );
 }

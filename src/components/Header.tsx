@@ -10,6 +10,7 @@ import {
   groupOperationalAlertsByMetric,
   resolveOperationalAlertRoute,
 } from '../config/operationalMetricsModel';
+import { filterOperationalMetricsByScreenMode } from '../config/emergencyScreenKpiPolicy';
 import {
   getAlertClassificationTier,
   sortAlertsByClassification,
@@ -28,6 +29,24 @@ import {
 import { RECEPTION_COPY } from './reception/receptionCopy';
 import { getCentralControlPolicy } from '../config/centralControl.config';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
+import {
+  buildReassessmentTimerAlerts,
+  buildReassessmentNotificationCenterSnapshot,
+} from '../engine/reassessmentTimerEngine';
+import { buildHighRiskComplaintAlerts } from '../services/highRiskComplaintFlags';
+import { buildLwbsRiskAdvisoryAlerts } from '../services/lwbsRiskLayer';
+import { buildDeteriorationWatchAlerts } from '../services/waitingRoomDeteriorationWatch';
+import { buildTriageBreachAlerts } from '../services/triageBreachTimer';
+import { buildProviderWaitBreachAlerts } from '../services/providerWaitBreachTimer';
+import {
+  escalationAlertTargets,
+  isClinicalEscalationRecipientRole,
+} from '../services/receptionEscalationWorkflow';
+import { toast } from 'sonner';
+import {
+  buildEmsOffloadAlerts,
+  buildEmsOffloadTrackerSummary,
+} from '../services/emsOffloadTracker';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
@@ -189,7 +208,11 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const patients = useEmergencyStore((store) => store.patients);
   const referrals = useEmergencyStore((store) => store.referrals);
   const emsArrivals = useEmergencyStore((store) => store.emsArrivals);
+  const staff = useEmergencyStore((store) => store.staff);
+  const workflowLogs = useEmergencyStore((store) => store.workflowLogs);
+  const rooms = useEmergencyStore((store) => store.rooms);
   const queues = useEmergencyStore((store) => store.queues);
+  const thresholds = useEmergencyStore((store) => store.thresholds);
   const selectedPatientId = useEmergencyStore((store) => store.selectedPatientId);
   const loading = useEmergencyStore((store) => store.loading);
   const integrationEvents = useEmergencyStore((store) => store.integrationEvents);
@@ -216,9 +239,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     () => new Set(),
   );
   const canManageWorkload = emergencyRole.can(EMERGENCY_ACTIONS.reassignWorkload);
-  const canCreatePatient = emergencyRole.can(EMERGENCY_ACTIONS.createPatient);
-  const canCreateReferral = emergencyRole.can(EMERGENCY_ACTIONS.manageReferral);
-  const canDischarge = emergencyRole.can(EMERGENCY_ACTIONS.dischargePatient);
+  const createPatientAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
+  const createReferralAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageReferral);
+  const dispositionAction = emergencyRole.presentAction(EMERGENCY_ACTIONS.completeDisposition);
+  const canCreatePatient = createPatientAction.enabled;
+  const canCreateReferral = createReferralAction.enabled;
+  const canDischarge = dispositionAction.enabled;
   const canOpenPatients = emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPatients);
   const centralControl = useMemo(
     () =>
@@ -232,10 +258,10 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const operationalSummary = centralSnapshot.operationalSummary;
-  const headerOperationalMetrics = useMemo(
-    () => filterOperationalMetrics(operationalSummary.metrics, 'header'),
-    [operationalSummary.metrics],
-  );
+  const headerOperationalMetrics = useMemo(() => {
+    const surfaceMetrics = filterOperationalMetrics(operationalSummary.metrics, 'header');
+    return filterOperationalMetricsByScreenMode(surfaceMetrics, routeScreenMode);
+  }, [operationalSummary.metrics, routeScreenMode]);
   const alertsSurfaceMetrics = useMemo(
     () => filterOperationalMetrics(operationalSummary.metrics, 'alerts'),
     [operationalSummary.metrics],
@@ -259,6 +285,55 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     [patients],
   );
   const storeAlertIds = useMemo(() => new Set(alerts.map((alert) => alert.id)), [alerts]);
+  const reassessmentTimerAlerts = useMemo(
+    () =>
+      buildReassessmentNotificationCenterSnapshot(patients, { thresholds }).alerts,
+    [patients, thresholds],
+  );
+  const highRiskComplaintAlerts = useMemo(
+    () => buildHighRiskComplaintAlerts(patients),
+    [patients],
+  );
+  const lwbsRiskAdvisoryAlerts = useMemo(
+    () =>
+      buildLwbsRiskAdvisoryAlerts(
+        patients,
+        {
+          waitingPatientCount: patients.filter((patient) => patient.state === 'Waiting').length,
+          workflowLogs,
+          staff,
+        },
+      ),
+    [patients, staff, workflowLogs],
+  );
+  const deteriorationWatchAlerts = useMemo(
+    () => buildDeteriorationWatchAlerts(patients, { emsArrivals }),
+    [patients, emsArrivals],
+  );
+  const triageBreachAlerts = useMemo(
+    () =>
+      buildTriageBreachAlerts(patients, {
+        settings: { emergencySettings: thresholds },
+      }),
+    [patients, thresholds],
+  );
+  const providerWaitBreachAlerts = useMemo(
+    () =>
+      buildProviderWaitBreachAlerts(patients, {
+        settings: { emergencySettings: thresholds },
+      }),
+    [patients, thresholds],
+  );
+  const emsOffloadAlerts = useMemo(() => {
+    const summary = buildEmsOffloadTrackerSummary(emsArrivals, {
+      patients,
+      staff,
+      rooms,
+      offloadTargetMinutes:
+        Number(thresholds?.emsOffloadTargetMinutes ?? thresholds?.emsOffloadTargetMin ?? 15) || 15,
+    });
+    return buildEmsOffloadAlerts(summary);
+  }, [emsArrivals, patients, rooms, staff, thresholds]);
   const supplementalAlerts = useMemo<Alert[]>(() => {
     const generatedAt = centralSnapshot.generatedAt || new Date().toISOString();
     const notices: Alert[] = [];
@@ -344,6 +419,13 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     const byId = new Map<string, Alert>();
     for (const alert of [
       ...supplementalAlerts,
+      ...reassessmentTimerAlerts,
+      ...highRiskComplaintAlerts,
+      ...lwbsRiskAdvisoryAlerts,
+      ...deteriorationWatchAlerts,
+      ...triageBreachAlerts,
+      ...providerWaitBreachAlerts,
+      ...emsOffloadAlerts,
       ...intelligenceAlerts,
       ...centralSnapshot.operationalAlerts,
       ...alerts,
@@ -363,6 +445,13 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     localAcknowledgedAlertIds,
     localDismissedAlertIds,
     localReadAlertIds,
+    reassessmentTimerAlerts,
+    highRiskComplaintAlerts,
+    lwbsRiskAdvisoryAlerts,
+    deteriorationWatchAlerts,
+    triageBreachAlerts,
+    providerWaitBreachAlerts,
+    emsOffloadAlerts,
     supplementalAlerts,
   ]);
 
@@ -474,7 +563,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const openCentralIntake = () => {
     if (!canSubmitCentralIntake) return;
-    if (isReceptionRoute || prefersReceptionForPatientCreate(emergencyRole.role)) {
+    if (isReceptionRoute || prefersReceptionForPatientCreate(emergencyRole.role, screenCapabilities.screenMode)) {
       if (isReceptionRoute) {
         document.dispatchEvent(new Event('open-reception-intake'));
         return;
@@ -499,7 +588,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const openPatientLookupRoute = () => {
     const query = patientLookupQuery.trim();
     if (!canOpenPatients && !isReceptionRoute) return;
-    if (isReceptionRoute || prefersReceptionForPatientSearch(emergencyRole.role)) {
+    if (isReceptionRoute || prefersReceptionForPatientSearch(emergencyRole.role, screenCapabilities.screenMode)) {
       const nextParams = new URLSearchParams(searchParams);
       if (query) nextParams.set('q', query);
       else nextParams.delete('q');
@@ -526,7 +615,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const selectLookupPatient = (patientId: string) => {
     selectPatient(patientId);
-    if (prefersReceptionForPatientSearch(emergencyRole.role)) {
+    if (prefersReceptionForPatientSearch(emergencyRole.role, screenCapabilities.screenMode)) {
       navigateEmergencyRoute(
         `${CANONICAL_ROUTES.emergencyReception}?patientId=${encodeURIComponent(patientId)}`,
       );
@@ -731,6 +820,33 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     return () => document.removeEventListener('close-all-panels', closePanels);
   }, []);
 
+  useEffect(() => {
+    const handleReceptionEscalation = (event: Event) => {
+      if (!isClinicalEscalationRecipientRole(emergencyRole.role)) return;
+      const alert = (event as CustomEvent<{ alert?: Alert }>).detail?.alert;
+      if (!alert) return;
+
+      const targets = escalationAlertTargets(alert);
+      if (emergencyRole.role === 'triage_nurse' && !targets.includes('triage')) return;
+      if (emergencyRole.role === 'charge_nurse' && !targets.includes('charge')) return;
+
+      toast.error(alert.title, {
+        description: alert.message,
+        duration: alert.severity === 'Critical' ? Infinity : 12000,
+        action: alert.patientId
+          ? {
+              label: 'View patient',
+              onClick: () => selectPatient(alert.patientId || null),
+            }
+          : undefined,
+      });
+    };
+
+    document.addEventListener('reception-escalation-raised', handleReceptionEscalation);
+    return () =>
+      document.removeEventListener('reception-escalation-raised', handleReceptionEscalation);
+  }, [emergencyRole.role, selectPatient]);
+
   return (
     <header
       className="emergency-os-header"
@@ -904,6 +1020,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
             {!screenCapabilities.isRegistrationScreen ? (
             <>
+            {createReferralAction.visible ? (
             <button
               type="button"
               className="emergency-os-header__action"
@@ -913,12 +1030,15 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               title={
                 canCreateReferral
                   ? 'Create referral or consult request'
-                  : `${emergencyRole.roleLabel} cannot create referrals`
+                  : createReferralAction.readOnly
+                    ? 'Referral workflow is read-only for this role'
+                    : `${emergencyRole.roleLabel} cannot create referrals`
               }
             >
               Referral
             </button>
-            {!PILOT_CUSTOMER_MODE.enabled ? (
+            ) : null}
+            {!PILOT_CUSTOMER_MODE.enabled && dispositionAction.visible ? (
               <button
                 type="button"
                 className="emergency-os-header__action"
@@ -930,7 +1050,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                     ? selectedPatientId
                       ? 'Open discharge confirmation for the selected patient'
                       : 'Select a patient before discharge'
-                    : `${emergencyRole.roleLabel} cannot discharge patients`
+                    : dispositionAction.readOnly
+                      ? 'Disposition is read-only for this role'
+                      : `${emergencyRole.roleLabel} cannot discharge patients`
                 }
               >
                 Discharge

@@ -23,6 +23,10 @@ import {
   selectReassessmentQueue,
   useEmergencyStore,
 } from '../store/emergencyStore';
+import {
+  formatWhatHappensNextForCopilot,
+  resolveWhatHappensNext,
+} from '../services/whatHappensNextGuidance';
 import { buildEMSPressureCopilotContext, calculateEMSPressureScore } from './EMSPressureScore';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import {
@@ -61,8 +65,9 @@ function patientLocation(patient, rooms) {
   return patient.location || rooms.find((room) => room.id === patient.roomId)?.name || 'Unassigned';
 }
 
-function buildCopilotPatient(patient, rooms, staff) {
+function buildCopilotPatient(patient, rooms, staff, referrals = []) {
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
+  const nextStep = resolveWhatHappensNext(patient, { referrals, staff });
   return {
     ...patient,
     name: patientDisplayName(patient),
@@ -70,6 +75,8 @@ function buildCopilotPatient(patient, rooms, staff) {
     complaint: patient.complaint || patient.chiefComplaint,
     assignedTo: assignedStaff ? staffDisplayName(assignedStaff) : patient.assignedTo || null,
     vitalsUpdatedAt: patient.vitalsUpdatedAt || patient.vitals?.recordedAt,
+    whatHappensNext: nextStep?.label || null,
+    whatHappensNextGuidance: nextStep?.guidance || null,
   };
 }
 
@@ -325,6 +332,8 @@ function buildRequestedEdCopilotSystemPrompt({
     longWaitAttention || null,
     longestWaitBroadcast ? `⏱ ${longestWaitBroadcast}` : null,
     ...enabledToolLines,
+    '',
+    formatWhatHappensNextForCopilot(activePatients, { referrals }),
     '',
     'Patients:',
     formatBriefPatientList(activePatients),
@@ -664,9 +673,9 @@ const ChatInterface = ({
   const patients = useMemo(
     () =>
       emergencyPatients.map((patient) =>
-        buildCopilotPatient(patient, emergencyRooms, emergencyStaff)
+        buildCopilotPatient(patient, emergencyRooms, emergencyStaff, emergencyReferrals)
       ),
-    [emergencyPatients, emergencyRooms, emergencyStaff]
+    [emergencyPatients, emergencyReferrals, emergencyRooms, emergencyStaff]
   );
   const capacitySnapshot = emergencyCapacity;
   const setWhiteboardFilter = useCallback(

@@ -1,0 +1,41 @@
+.waiting-room-communication-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.waiting-room-communication-badge--compact {
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+.waiting-room-communication-badge--fresh {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+}
+
+.waiting-room-communication-badge--watch {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+.waiting-room-communication-badge--warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fcd34d;
+}
+
+.waiting-room-communication-badge--critical {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}

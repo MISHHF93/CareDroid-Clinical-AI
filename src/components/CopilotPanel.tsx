@@ -21,6 +21,7 @@ import {
   buildCopilotRecommendationSnapshot,
   resolveCopilotQuickActionFromSnapshot,
 } from '../services/copilotRecommendationDiscovery';
+import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuidance';
 
 type CopilotMessage = {
   id: string;
@@ -216,6 +217,7 @@ function buildDepartmentPrompt({
   attachments,
   selectedPatient,
   copilotRecommendations,
+  referrals,
 }: {
   patients: Patient[];
   alerts: Alert[];
@@ -226,6 +228,7 @@ function buildDepartmentPrompt({
   attachments?: CopilotAttachment[];
   selectedPatient?: Patient | null;
   copilotRecommendations: ReturnType<typeof buildCopilotRecommendationSnapshot>['recommendations'];
+  referrals?: ReturnType<typeof useEmergencyStore.getState>['referrals'];
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -255,6 +258,11 @@ function buildDepartmentPrompt({
     `Reassessment queue count: ${centralSnapshot.reassessmentStatus.due}; overdue ${centralSnapshot.reassessmentStatus.overdue}`,
     `Active operational alerts: ${activeAlerts.length}`,
     longWaitAttention || null,
+    '',
+    formatWhatHappensNextForCopilot(patients, {
+      referrals,
+      selectedPatientId: selectedPatient?.id || null,
+    }),
     '',
     'Active high risk patients:',
     highRiskPatients.length ? highRiskPatients.map((patient) => `- ${summarizePatient(patient)}`).join('\n') : '- None',
@@ -646,6 +654,7 @@ export function CopilotPanel() {
       attachments: submittedAttachments,
       selectedPatient,
       copilotRecommendations,
+      referrals,
     });
     const quickActionResolution = resolveCopilotQuickActionFromSnapshot(promptText, {
       centralSnapshot,
