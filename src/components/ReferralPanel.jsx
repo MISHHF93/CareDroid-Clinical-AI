@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useReferrals } from '../hooks/useEmergencyOs';
 import {
@@ -299,7 +301,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
 
 export default function ReferralPanel() {
   const emergencyRole = useEmergencyRolePermissions();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [searchParams] = useSearchParams();
   const referralsModule = useReferrals();
   const referrals = useEmergencyStore((state) => state.referrals);
@@ -514,7 +516,7 @@ export default function ReferralPanel() {
     }
 
     selectPatient(patientId);
-    navigate('/emergency/patients');
+    profileNavigate(CANONICAL_ROUTES.emergencyPatients);
   };
 
   return (

@@ -1,4 +1,5 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../../contexts/UserContext';
@@ -18,7 +19,7 @@ export default function ToolNotFound({
   showCatalogLink = true,
 }) {
   const location = useLocation();
-  const navigate = useNavigate();
+  const { profileNavigate, rawNavigate } = useProfileNavigate();
   const { hasPermission } = useUser();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
@@ -60,7 +61,7 @@ export default function ToolNotFound({
             className="tool-not-found-btn tool-not-found-btn--primary"
             onClick={() =>
               applyRegistryToolLaunch(resolvedId, {
-                navigate,
+                navigate: rawNavigate,
                 addMessage,
                 selectTool,
                 setActiveTool,
@@ -75,7 +76,7 @@ export default function ToolNotFound({
           <button
             type="button"
             className="tool-not-found-btn tool-not-found-btn--primary"
-            onClick={() => navigate(suggestedPath)}
+            onClick={() => profileNavigate(suggestedPath)}
           >
             Open suggested tool
           </button>

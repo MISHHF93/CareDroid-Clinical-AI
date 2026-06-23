@@ -150,7 +150,7 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     id: 'persist-session',
     order: 11,
     title: 'Persist identity',
-    summary: 'Sign in to save profile; demo remains local-first for ED mutations.',
+    summary: 'Start at the platform hub — explore the demo or open admin. Profile saves stay local during the build phase.',
     laneId: 'persist',
     route: CANONICAL_ROUTES.auth,
     backendCapabilities: ['operationalProfile'],

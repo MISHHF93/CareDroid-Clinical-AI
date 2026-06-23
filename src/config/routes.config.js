@@ -160,10 +160,10 @@ export const CANONICAL_ROUTES = Object.freeze({
 });
 
 export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
-  { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/', type: 'redirect', to: '/emergency/reception' },
   { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
   { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
-  { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
   { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
   { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
@@ -180,7 +180,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
   { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
   { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
-  { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '*', type: 'redirect', to: '/emergency/reception' },
 ]);
 
 export const EMERGENCY_OS_TARGET_ROUTES = Object.freeze(
@@ -382,10 +382,10 @@ export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
 export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
     id: 'auth',
-    path: CANONICAL_ROUTES.auth,
+    path: CANONICAL_ROUTES.platformStart,
     layout: 'auth',
     auth: 'publicOnly',
-    status: 'active',
+    status: 'redirect',
     aliases: AUTH_PATH_ALIASES,
     navGroup: 'auth',
   }),
@@ -1252,7 +1252,7 @@ function aliasesForRoute(id) {
 }
 
 export const ROUTE_ALIAS_GROUPS = Object.freeze({
-  auth: Object.freeze({ target: CANONICAL_ROUTES.auth, aliases: aliasesForRoute('auth') }),
+  auth: Object.freeze({ target: CANONICAL_ROUTES.platformStart, aliases: aliasesForRoute('auth') }),
   dashboard: Object.freeze({
     target: CANONICAL_ROUTES.emergencyWhiteboard,
     aliases: aliasesForRoute('dashboard'),

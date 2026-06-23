@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import StateSourceNotice from '../components/StateSourceNotice';
-import { CANONICAL_ROUTES } from '../config/routes.config';
-import { SURVEILLANCE_NEXUS_ROUTES } from '../config/surveillanceNexusModel';
+import StateSourceNotice from '../../components/StateSourceNotice';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { SURVEILLANCE_NEXUS_ROUTES } from '../../config/surveillanceNexusModel';
 import {
   fetchSurveillanceNexusSnapshot,
   formatSurveillanceTime,
   statusTone,
-} from '../services/surveillanceIoTService';
-import type { SurveillanceNexusSnapshot } from '../types/surveillanceIoT';
-import './SurveillanceNexusDashboard.css';
+} from '../../services/surveillanceIoTService';
+import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../../config/userProfileCompiler';
+import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 
 const REFRESH_MS = 60_000;
 
 export default function SurveillanceNexusDashboard() {
+  const { saasRole } = useEffectiveUserProfile();
+  const compiled = useMemo(
+    () => compileUserProfile({ saasRole }),
+    [saasRole],
+  );
   const [snapshot, setSnapshot] = useState<SurveillanceNexusSnapshot | null>(null);
   const [capability, setCapability] = useState('loading');
   const [activeTab, setActiveTab] = useState('overview');
@@ -37,6 +42,15 @@ export default function SurveillanceNexusDashboard() {
     () => (snapshot?.alerts || []).filter((alert) => alert.status === 'open'),
     [snapshot?.alerts],
   );
+
+  if (!isRouteAllowedInCompiledProfile(CANONICAL_ROUTES.surveillanceNexus, compiled)) {
+    return (
+      <div className="surv-nexus surv-nexus--loading" role="status">
+        Surveillance Nexus is not available for your profile. Contact your administrator for hospital-operations or
+        TrackMind entitlements.
+      </div>
+    );
+  }
 
   if (loading && !snapshot) {
     return <div className="surv-nexus surv-nexus--loading">Loading surveillance nexus…</div>;

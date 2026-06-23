@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
@@ -407,7 +407,7 @@ function CategoryBadge({ category }) {
 }
 
 const ClinicalToolCatalog = () => {
-  const navigate = useNavigate();
+  const { profileNavigate, rawNavigate } = useProfileNavigate();
   const { setActiveTool, addMessage, selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const [search, setSearch] = useState('');
@@ -605,14 +605,14 @@ const ClinicalToolCatalog = () => {
     sortedDiscovered.length === 0;
 
   const handleOpenPath = (path) => {
-    if (path) navigate(path);
+    if (path) profileNavigate(path);
   };
 
   const launchCatalogItem = (id) => {
     const launch = resolveCatalogLaunch(id);
     const resolvedNavigationPath = resolveNavigationPathForLaunch(launch);
     applyRegistryToolLaunch(id, {
-      navigate,
+      navigate: rawNavigate,
       addMessage,
       selectTool,
       setActiveTool,
@@ -637,7 +637,7 @@ const ClinicalToolCatalog = () => {
     }
     if (chatSeed) {
       addMessage(chatSeed, 'user');
-      navigate('/assistant');
+      profileNavigate('/assistant');
     }
   };
 
@@ -661,7 +661,7 @@ const ClinicalToolCatalog = () => {
 
   return (
     <div className="clinical-tool-catalog">
-      <button type="button" className="catalog-back-link" onClick={() => navigate('/tools')}>
+      <button type="button" className="catalog-back-link" onClick={() => profileNavigate('/tools')}>
         <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
         Back to All Tools
       </button>

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   DashboardGrid,
   DashboardSection,
@@ -10,12 +10,19 @@ import {
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import {
   buildWorkspaceAssistantPrompt,
   getWorkspaceExperienceProfile,
 } from '../data/workspaceExperience';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import {
+  filterOperationAreas,
+  resolveOperationsResonanceDescription,
+  resolveOperationsResonanceTitle,
+} from '../config/operationsProfileModel';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getWorkspaceIcon } from '../navigation/iconRegistry';
 import './OperatingWorkspace.css';
@@ -183,7 +190,8 @@ function getWorkspaceOperationAreas(workspaceId) {
 }
 
 export default function Operations() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
+  const { saasRole } = useEffectiveUserProfile();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const { activeWorkspace, activeWorkspaceId } = useWorkspace();
@@ -208,18 +216,41 @@ export default function Operations() {
     [activeWorkspace?.icon, activeWorkspace?.workspaceProfile?.icon]
   );
 
+  const visiblePrimaryAreas = useMemo(
+    () => filterOperationAreas(saasRole, workspaceOperationAreas),
+    [saasRole, workspaceOperationAreas],
+  );
+  const visibleDrilldowns = useMemo(
+    () => filterOperationAreas(saasRole, workspaceDrilldowns),
+    [saasRole, workspaceDrilldowns],
+  );
+  const visibleIntelligence = useMemo(
+    () => filterOperationAreas(saasRole, OPERATION_INTELLIGENCE),
+    [saasRole],
+  );
+  const visibleContinuations = useMemo(
+    () => filterOperationAreas(saasRole, OPERATION_CONTINUATIONS),
+    [saasRole],
+  );
+  const operationsTitle = useMemo(() => resolveOperationsResonanceTitle(saasRole), [saasRole]);
+  const operationsDescription = useMemo(
+    () => resolveOperationsResonanceDescription(saasRole),
+    [saasRole],
+  );
+
   const launchArea = (area) => {
     if (!area.toolId) {
-      navigate(area.path);
+      profileNavigate(area.path);
       return;
     }
 
     applyRegistryToolLaunch(area.toolId, {
-      navigate,
+      navigate: profileNavigate,
       addMessage,
       selectTool,
       setActiveTool,
       recordToolAccess,
+      context: { saasRole },
     });
   };
 
@@ -231,7 +262,7 @@ export default function Operations() {
       ),
       'user'
     );
-    navigate(CANONICAL_ROUTES.assistant);
+    profileNavigate(CANONICAL_ROUTES.assistant);
   };
 
   return (
@@ -240,9 +271,9 @@ export default function Operations() {
       contentClassName="cd-page-stack cd-page-stack--compact operating-workspace__content"
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
-      eyebrow={workspaceExperience.operatingLabel}
+      eyebrow={operationsTitle}
       title={`${workspaceExperience.shortLabel} Operations`}
-      description={`${workspaceExperience.modeSummary} Operational routes, tools, alerts, maps, and recommendations now follow the active workspace.`}
+      description={operationsDescription || workspaceExperience.modeSummary}
       actions={
         <button
           type="button"
@@ -277,7 +308,7 @@ export default function Operations() {
           description="These are the first operational actions for the active workspace. Other maps, telemetry, and fleet views stay available as drill-downs."
       >
         <DashboardGrid className="operating-card-grid">
-          {workspaceOperationAreas.map((area) => (
+          {visiblePrimaryAreas.map((area) => (
             <button
               key={area.title}
               type="button"
@@ -303,7 +334,7 @@ export default function Operations() {
         description={`Lower-level routes stay reachable without competing with ${workspaceExperience.shortLabel} priorities.`}
       >
         <DashboardGrid className="operating-drilldown-list">
-          {workspaceDrilldowns.map((area) => (
+          {visibleDrilldowns.map((area) => (
             <button
               key={area.title}
               type="button"
@@ -330,7 +361,7 @@ export default function Operations() {
         description="Analysis routes from the operations sidebar stay discoverable from the hub."
       >
         <DashboardGrid className="operating-drilldown-list">
-          {OPERATION_INTELLIGENCE.slice(0, 2).map((area) => (
+          {visibleIntelligence.slice(0, 2).map((area) => (
             <button
               key={area.title}
               type="button"
@@ -357,7 +388,7 @@ export default function Operations() {
         description="Continue into workspace-aware workflows, result review, recommendations, or Assistant."
       >
         <DashboardGrid className="operating-drilldown-list">
-          {OPERATION_CONTINUATIONS.map((action) => (
+          {visibleContinuations.map((action) => (
             <Link
               key={action.title}
               className="operating-drilldown"

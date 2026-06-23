@@ -20,6 +20,7 @@ import {
 } from '../config/commandPaletteHighValueModel';
 import { RECEPTION_COPY } from './reception/receptionCopy';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../config/userProfileCompiler';
 import {
   EMERGENCY_OS_ROUTE_COMMANDS,
   EMERGENCY_OS_TOOL_COMMANDS,
@@ -27,6 +28,9 @@ import {
 import { RECEPTION_FIRST_UX, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { navigateToEmergencySurface } from '../services/navigateToEmergencySurface';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import type { EmergencyRoleActionPresentation } from '../config/emergencyRoleActionMatrix';
 import type { Patient } from '../types/emergency';
 import { getPatientDisplayName, rankPatientsBySearch, scorePatientSearch } from '../utils/patientSearch';
@@ -213,12 +217,16 @@ export function searchOperationalEntitiesForPalette(
     emsArrivals = [],
     queues = [],
     query = '',
+    emergencyRole,
+    saasRole,
   }: {
     patients?: Patient[];
     referrals?: import('../types/emergency').Referral[];
     emsArrivals?: import('../types/emergency').EMSArrival[];
     queues?: import('../types/emergency').QueueSummary[];
     query?: string;
+    emergencyRole?: EmergencyCommandPermissions;
+    saasRole?: string;
   },
 ): OperationalEntityResult[] {
   const groupLabel: Record<Exclude<OperationalSearchEntityType, 'patient'>, OperationalEntityResult['group']> = {
@@ -243,19 +251,28 @@ export function searchOperationalEntitiesForPalette(
       action: () => {
         if (hit.patientId) useEmergencyStore.getState().selectPatient(hit.patientId);
         if (hit.entityType === 'encounter' && hit.patientId) {
-          navigate(buildEncounterSearchPath(hit.patientId, hit.encounterId));
+          navigateProfileAware(navigate, buildEncounterSearchPath(hit.patientId, hit.encounterId), {
+            emergencyRole,
+            saasRole,
+          });
           return;
         }
         if (hit.entityType === 'referral' && hit.referralId) {
-          navigate(buildReferralSearchPath(hit.referralId, hit.patientId));
+          navigateProfileAware(navigate, buildReferralSearchPath(hit.referralId, hit.patientId), {
+            emergencyRole,
+            saasRole,
+          });
           return;
         }
         if (hit.entityType === 'ems' && hit.emsArrivalId) {
-          navigate(buildEmsCasePath(hit.emsArrivalId));
+          navigateProfileAware(navigate, buildEmsCasePath(hit.emsArrivalId), { emergencyRole, saasRole });
           return;
         }
         if (hit.entityType === 'queue') {
-          navigate(buildQueueItemPath(hit.queueType || 'Waiting', hit.patientId));
+          navigateProfileAware(navigate, buildQueueItemPath(hit.queueType || 'Waiting', hit.patientId), {
+            emergencyRole,
+            saasRole,
+          });
         }
       },
     }));
@@ -346,13 +363,9 @@ function navigateWithRoleGuard(
   navigate: ReturnType<typeof useNavigate>,
   path: string,
   emergencyRole: EmergencyCommandPermissions,
+  saasRole?: string,
 ): void {
-  const permissionPath = routePermissionPath(path);
-  navigate(
-    emergencyRole.canAccessRoute(permissionPath)
-      ? path
-      : emergencyRole.nearestRoute(permissionPath),
-  );
+  navigateProfileAware(navigate, path, { emergencyRole, saasRole });
 }
 
 function dispatchDocumentEvent(name: string): void {
@@ -363,6 +376,7 @@ function createEmergencyRouteCommands(
   navigate: ReturnType<typeof useNavigate>,
   emergencyRole: EmergencyCommandPermissions,
   commands: readonly RouteCommandConfig[] = EMERGENCY_OS_ROUTE_COMMANDS,
+  saasRole?: string,
 ): CommandWithVisibility[] {
   const visibleCommands = commands.filter(
     (command) => !COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has(command.id),
@@ -381,10 +395,10 @@ function createEmergencyRouteCommands(
       action: () => {
         if (action.type === 'OPEN_ROUTE' && action.path) {
           if (command.navItemId) {
-            navigateToEmergencySurface(navigate, command.navItemId, { emergencyRole });
+            navigateToEmergencySurface(navigate, command.navItemId, { emergencyRole, saasRole });
             return;
           }
-          navigateWithRoleGuard(navigate, action.path, emergencyRole);
+          navigateWithRoleGuard(navigate, action.path, emergencyRole, saasRole);
         }
       },
     };
@@ -404,6 +418,7 @@ export function resolveCommandActionPresentation(
 export function isCommandVisibleForEmergencyRole(
   command: Pick<CommandWithVisibility, 'id' | 'requiredAction' | 'requiredRoute' | 'hiddenInPilotMode'>,
   emergencyRole: EmergencyCommandPermissions,
+  saasRole?: string,
 ): boolean {
   if (command.hiddenInPilotMode && PILOT_CUSTOMER_MODE.enabled) return false;
   if (command.id === 'open-intake' && shouldHideStandaloneIntakeNav(emergencyRole.role)) {
@@ -413,15 +428,20 @@ export function isCommandVisibleForEmergencyRole(
     return false;
   }
   if (command.requiredRoute && !emergencyRole.canAccessRoute(command.requiredRoute)) return false;
+  if (command.requiredRoute && saasRole) {
+    const profile = resolveUserProfileFromSaasRole(saasRole);
+    if (!isRouteAllowedForProfile(profile, command.requiredRoute)) return false;
+  }
   return true;
 }
 
 function applyRoleActionMatrixToCommands(
   commands: CommandWithVisibility[],
   emergencyRole: EmergencyCommandPermissions,
+  saasRole?: string,
 ): Array<CommandWithVisibility & { disabled?: boolean; readOnly?: boolean }> {
   return commands
-    .filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole))
+    .filter((command) => isCommandVisibleForEmergencyRole(command, emergencyRole, saasRole))
     .map((command) => {
       if (!command.requiredAction) return command;
       const presentation = emergencyRole.presentAction(command.requiredAction);
@@ -436,6 +456,7 @@ function applyRoleActionMatrixToCommands(
 function createHighValueCommands(
   navigate: ReturnType<typeof useNavigate>,
   emergencyRole: EmergencyCommandPermissions,
+  saasRole?: string,
 ): CommandWithVisibility[] {
   const quickGroup = COMMAND_PALETTE_QUICK_ACTIONS_GROUP as CommandGroup;
 
@@ -455,10 +476,10 @@ function createHighValueCommands(
         : CANONICAL_ROUTES.emergencyWhiteboard,
       action: () => {
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigateWithRoleGuard(navigate, getReceptionPrimaryCreatePath(emergencyRole.role), emergencyRole);
+          navigateWithRoleGuard(navigate, getReceptionPrimaryCreatePath(emergencyRole.role), emergencyRole, saasRole);
           return;
         }
-        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole);
+        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole);
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
     },
@@ -480,10 +501,10 @@ function createHighValueCommands(
             dispatchDocumentEvent('open-reception-intake');
             return;
           }
-          navigateWithRoleGuard(navigate, getReceptionEmbeddedIntakePath(), emergencyRole);
+          navigateWithRoleGuard(navigate, getReceptionEmbeddedIntakePath(), emergencyRole, saasRole);
           return;
         }
-        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole);
+        navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole);
         window.setTimeout(() => dispatchDocumentEvent('open-intake'), 0);
       },
     },
@@ -495,7 +516,7 @@ function createHighValueCommands(
       group: quickGroup,
       keywords: ['whiteboard', 'board', 'patient flow', 'operational screen', 'charge nurse'],
       requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole),
+      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyWhiteboard, emergencyRole, saasRole),
     },
     {
       id: 'open-ems',
@@ -505,7 +526,7 @@ function createHighValueCommands(
       group: quickGroup,
       keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline', 'inbound'],
       requiredRoute: CANONICAL_ROUTES.emergencyEms,
-      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms, emergencyRole),
+      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyEms, emergencyRole, saasRole),
     },
     {
       id: 'open-reassessment',
@@ -529,7 +550,7 @@ function createHighValueCommands(
       requiredAction: EMERGENCY_ACTIONS.manageReferral,
       requiredRoute: CANONICAL_ROUTES.emergencyReferrals,
       action: () =>
-        navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`, emergencyRole),
+        navigateWithRoleGuard(navigate, `${CANONICAL_ROUTES.emergencyReferrals}?new=1`, emergencyRole, saasRole),
     },
   ];
 }
@@ -539,11 +560,20 @@ function createCommands(
   toggleCopilot: () => void,
   emergencyRole: EmergencyCommandPermissions,
   selectedPatientId: string | null,
+  saasRole?: string,
 ): Command[] {
+  const compiled = saasRole ? compileUserProfile({ saasRole }) : null;
   const commands: CommandWithVisibility[] = [
-    ...createHighValueCommands(navigate, emergencyRole),
-    ...createEmergencyRouteCommands(navigate, emergencyRole),
-    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_TOOL_COMMANDS).map((command) => ({
+    ...createHighValueCommands(navigate, emergencyRole, saasRole),
+    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_ROUTE_COMMANDS, saasRole),
+    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_TOOL_COMMANDS, saasRole)
+      .filter(
+        (command) =>
+          !compiled ||
+          !command.requiredRoute ||
+          isRouteAllowedInCompiledProfile(command.requiredRoute, compiled),
+      )
+      .map((command) => ({
       ...command,
       group: 'Clinical' as const,
       description: command.description?.replace(' in the active Emergency OS shell.', ' in Medical Tools.'),
@@ -568,6 +598,7 @@ function createCommands(
             ? CANONICAL_ROUTES.emergencyReception
             : CANONICAL_ROUTES.emergencyPatients,
           emergencyRole,
+          saasRole,
         ),
     },
     {
@@ -597,7 +628,7 @@ function createCommands(
       : []),
   ];
 
-  return applyRoleActionMatrixToCommands(commands, emergencyRole);
+  return applyRoleActionMatrixToCommands(commands, emergencyRole, saasRole);
 }
 
 export function buildCommandResults(
@@ -653,6 +684,7 @@ function patientInitials(label: string): string {
 export default function CommandPalette({ open, onClose, onExecute }: CommandPaletteProps) {
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
+  const { saasRole } = useEffectiveUserProfile();
   const patients = useEmergencyStore((state) => state.patients);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -666,8 +698,8 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const [results, setResults] = useState<PaletteResult[]>([]);
 
   const commands = useMemo(
-    () => createCommands(navigate, toggleCopilot, emergencyRole, selectedPatientId),
-    [emergencyRole, navigate, selectedPatientId, toggleCopilot],
+    () => createCommands(navigate, toggleCopilot, emergencyRole, selectedPatientId, saasRole),
+    [emergencyRole, navigate, saasRole, selectedPatientId, toggleCopilot],
   );
 
   const computedResults = useMemo(() => {
@@ -678,12 +710,14 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
       emsArrivals,
       queues,
       query,
+      emergencyRole,
+      saasRole,
     });
     const commandResults = buildCommandResults(commands, query, recentCommandIds);
     return normalizeSearch(query)
       ? [...patientResults, ...operationalResults, ...commandResults]
       : commandResults;
-  }, [commands, emsArrivals, navigate, patients, queues, query, recentCommandIds, referrals]);
+  }, [commands, emsArrivals, emergencyRole, navigate, patients, queues, query, recentCommandIds, referrals, saasRole]);
 
   useEffect(() => {
     setResults(computedResults);

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUser } from '../contexts/UserContext';
@@ -148,7 +149,7 @@ function openSearchResult(item, navigate, launchTool) {
 }
 
 export function WorkspacesIndexPage() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   return (
     <PageShell
       eyebrow="Workspace Architecture"
@@ -161,7 +162,7 @@ export function WorkspacesIndexPage() {
           const Icon = getWorkspaceIcon(workspace.icon);
           const summary = workspaceFilterSummary(workspace.id);
           return (
-            <button key={workspace.id} type="button" className="platform-workspace-card" onClick={() => navigate(workspace.path)}>
+            <button key={workspace.id} type="button" className="platform-workspace-card" onClick={() => profileNavigate(workspace.path)}>
               <NavIcon icon={Icon} size={28} aria-hidden />
               <strong>{workspace.label}</strong>
               <span>{workspace.description}</span>
@@ -177,7 +178,7 @@ export function WorkspacesIndexPage() {
 }
 
 export function SearchResultsPage() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { recordToolAccess } = useToolPreferences();
   const { user } = useUser();
   const { workspaceState, platformContext, account } = useUserIdentity();
@@ -203,7 +204,7 @@ export function SearchResultsPage() {
     [query, results]
   );
   const launchTool = (tool) =>
-    applyRegistryToolLaunch(tool.id, { navigate, recordToolAccess, replace: false });
+    applyRegistryToolLaunch(tool.id, { navigate: profileNavigate, recordToolAccess, replace: false });
 
   return (
     <PageShell eyebrow="Search Everything" title="Global Search" description="Search assets, tools, calculators, workflows, simulations, protocols, AI agents, operations, workspaces, dashboards, maps, notifications, devices, rooms, and fleet assets.">
@@ -223,7 +224,7 @@ export function SearchResultsPage() {
       />
       <section className="platform-result-grid" aria-label="Search results">
         {visibleResults.map((item) => (
-          <ResultCard key={item.id} item={item} onOpen={(result) => openSearchResult(result, navigate, launchTool)} />
+          <ResultCard key={item.id} item={item} onOpen={(result) => openSearchResult(result, profileNavigate, launchTool)} />
         ))}
       </section>
       {results.length > visibleResults.length ? (
@@ -492,7 +493,7 @@ export function DigitalTwinPage() {
 }
 
 export function WorkflowBuilderPage() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [searchParams] = useSearchParams();
   const requestedWorkflowId = searchParams.get('workflow');
   const initialWorkflowId = PLATFORM_WORKFLOWS.some((item) => item.id === requestedWorkflowId)
@@ -513,8 +514,8 @@ export function WorkflowBuilderPage() {
     }
   }, [requestedWorkflowId]);
   const launchBlock = (block) => {
-    if (block.path) navigate(block.path);
-    if (block.toolId) applyRegistryToolLaunch(block.toolId, { navigate, replace: false });
+    if (block.path) profileNavigate(block.path);
+    if (block.toolId) applyRegistryToolLaunch(block.toolId, { navigate: profileNavigate, replace: false });
   };
   const completeWorkflow = () => {
     recordWorkflowCompletion({

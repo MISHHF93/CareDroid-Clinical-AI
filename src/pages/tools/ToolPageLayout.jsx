@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { buildSharedSessionUrl, createSharedSession } from '../../utils/sharedSessions';
@@ -63,7 +63,7 @@ const ToolPageLayout = ({
   embedded = false,
   onCloseEmbedded,
 }) => {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const [showShareModal, setShowShareModal] = useState(false);
@@ -167,7 +167,7 @@ const ToolPageLayout = ({
           <span>Close panel</span>
         </button>
       ) : (
-        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
+        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => profileNavigate('/tools')}>
           <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
           <span>Tools</span>
         </button>
@@ -187,14 +187,14 @@ const ToolPageLayout = ({
     >
       {!embedded && (
         <div className="tool-breadcrumb">
-          <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
+          <button type="button" onClick={() => profileNavigate('/dashboard')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
               <span>Whiteboard</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
-          <button type="button" onClick={() => navigate('/tools')} className="breadcrumb-link">
+          <button type="button" onClick={() => profileNavigate('/tools')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
               <span>Tools</span>
@@ -326,7 +326,7 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/assistant');
+                profileNavigate('/assistant');
               }}
             >
               <span className="btn-icon" aria-hidden>
@@ -339,7 +339,7 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/assistant');
+                profileNavigate('/assistant');
               }}
             >
               <span className="btn-icon" aria-hidden>

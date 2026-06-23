@@ -14,6 +14,10 @@ import { getUserFacingToolRegistryProjection, TOOL_EXECUTOR_STATUS } from './too
 import { resolveEntitlementDecision } from '../services/entitlementService';
 import { ENTITLEMENT_ACCESS_STATES } from '../config/entitlements.config';
 import { resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
+import {
+  isStrictPackEnforcementForRole,
+  toolMatchesProfilePackPolicy,
+} from '../config/profilePackTaxonomy';
 
 export const ASSET_ACCESS_STATES = Object.freeze({
   ALLOWED: 'allowed',
@@ -48,7 +52,14 @@ export const ASSET_ACCESS_LABELS = Object.freeze({
 });
 
 const ADMIN_ONLY_TOOLS = new Set(['audit-logs', 'system-config', 'team-management']);
-const ADMIN_ROLES = new Set(['admin', 'owner']);
+const ADMIN_SAAS_ROLES = new Set([
+  'platform-admin',
+  'hospital-administrator',
+  'compliance-officer',
+  'executive-leadership',
+  'auditor-regulator',
+  'racetrack-admin',
+]);
 
 function normalizePermission(permission) {
   return String(permission || '').trim();
@@ -92,11 +103,12 @@ function hasCatalogToolRestriction(tool = {}, userRole = 'student') {
   const restricted = new Set(profile.toolPolicy?.restrictedToolIds || []);
   const assetId = tool.id || tool.canonicalInventoryId;
   if (restricted.has(assetId)) return false;
-  const allowedPacks = profile.toolPolicy?.allowedPacks || [];
-  if (!allowedPacks.length) return true;
-  const packId = tool.packId || tool.assetPackId || tool.category;
-  if (!packId) return true;
-  return allowedPacks.some((pack) => String(packId).includes(pack) || pack === 'core-platform');
+  const strict = isStrictPackEnforcementForRole(userRole);
+  return toolMatchesProfilePackPolicy(
+    { id: assetId, packId: tool.packId, assetPackId: tool.assetPackId, category: tool.category },
+    userRole,
+    { strict },
+  );
 }
 
 function hasAllowedRoleAccess(tool = {}, userRole = 'student') {
@@ -107,7 +119,18 @@ function hasAllowedRoleAccess(tool = {}, userRole = 'student') {
   return allowedRoles.map((role) => String(role).toLowerCase()).includes(normalizedRole);
 }
 
+function resolveSaasRoleFromContext(context = {}, fallback = 'student') {
+  return (
+    context?.roleProfile?.id ||
+    context?.membership?.roleProfileId ||
+    context?.saasRole ||
+    context?.user?.roleProfileId ||
+    fallback
+  );
+}
+
 export function resolveAssetAccessState(tool, context = getPlatformEntitlementContext(), userRole = 'student') {
+  const saasRole = resolveSaasRoleFromContext(context, userRole);
   const assetId = tool.id || tool.canonicalInventoryId;
   const hasOrganization = Boolean(context?.organization?.id);
   const strictEntitlements = isStrictSaasEntitlementsEnabled(context);
@@ -121,7 +144,7 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['user-hidden'] };
   }
 
-  const entitlementDecision = resolveEntitlementDecision(tool, context, userRole);
+  const entitlementDecision = resolveEntitlementDecision(tool, context, saasRole);
   if (!entitlementDecision.isLaunchable) {
     return {
       accessState: mapEntitlementState(entitlementDecision.accessState || entitlementDecision.state),
@@ -130,7 +153,7 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     };
   }
 
-  if (hasOrganization && !hasAllowedRoleAccess(tool, userRole)) {
+  if (hasOrganization && !hasAllowedRoleAccess(tool, saasRole)) {
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['role-hidden'] };
   }
 
@@ -139,7 +162,7 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
   }
 
   if (ADMIN_ONLY_TOOLS.has(assetId)) {
-    if (!ADMIN_ROLES.has(userRole)) {
+    if (!ADMIN_SAAS_ROLES.has(saasRole)) {
       return { accessState: ASSET_ACCESS_STATES.ADMIN_ONLY, reasons: ['admin-only'] };
     }
   }
@@ -258,7 +281,7 @@ function mapEntitlementState(state) {
   return Object.values(ASSET_ACCESS_STATES).includes(state) ? state : ASSET_ACCESS_STATES.ALLOWED;
 }
 
-function isLaunchableAccessState(state) {
+export function isLaunchableAccessState(state) {
   return [
     ASSET_ACCESS_STATES.ALLOWED,
     ASSET_ACCESS_STATES.BETA,

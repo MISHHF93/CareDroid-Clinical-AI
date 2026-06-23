@@ -110,7 +110,7 @@ export const DEMO_JOURNEY_STEPS: readonly DemoJourneyStep[] = Object.freeze([
     id: 'entry',
     letter: 'A',
     title: 'Choose your entry path',
-    summary: 'Start at the platform hub — sign in, explore demo, or open admin.',
+    summary: 'Start at the platform hub — explore the demo or open admin.',
     route: CANONICAL_ROUTES.platformStart,
   },
   {
@@ -177,9 +177,9 @@ export const DEMO_JOURNEY_STEPS: readonly DemoJourneyStep[] = Object.freeze([
   {
     id: 'persist',
     letter: 'K',
-    title: 'Sign in to save your profile',
-    summary: 'Demo data resets on refresh — sign in to persist preferences and assigned role.',
-    route: CANONICAL_ROUTES.auth,
+    title: 'Review profile preferences',
+    summary: 'Open profile settings to adjust demo role, tools, and workspace preferences.',
+    route: CANONICAL_ROUTES.profile,
   },
 ]);
 

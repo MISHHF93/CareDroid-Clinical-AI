@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
@@ -29,7 +29,7 @@ export default function FleetPageChrome({
   mainId = 'fleet-page-main',
   children,
 }) {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
 
   return (
     <>
@@ -57,7 +57,7 @@ export default function FleetPageChrome({
           <button
             type="button"
             className="fleet-back-btn"
-            onClick={() => navigate('/operations')}
+            onClick={() => profileNavigate('/operations')}
             aria-label="Back to operations"
           >
             <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />

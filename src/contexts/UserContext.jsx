@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
-import { deriveAuthMode, hydrateAuthenticatedSession, isRealAuthToken } from '../auth/authSession';
+import { deriveAuthMode } from '../auth/authSession';
 import {
   buildOpenAccessDemoUser,
   hydrateStoredDemoUser,
@@ -34,7 +34,7 @@ const readStoredUser = () => {
     if (parsed?.id === OPEN_ACCESS_USER_ID || parsed?.authMode === 'open-access') {
       return hydrateStoredDemoUser(parsed);
     }
-    return parsed;
+    return hydrateStoredDemoUser(parsed);
   } catch {
     localStorage.removeItem(USER_PROFILE_KEY);
     return null;
@@ -252,87 +252,29 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }) => {
   const [user, setUserState] = useState(() => readStoredUser() || OPEN_ACCESS_USER);
-  const [authToken, setAuthTokenState] = useState(() => readStoredToken() || OPEN_ACCESS_TOKEN);
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessionHydrated, setSessionHydrated] = useState(false);
+  const [authToken, setAuthTokenState] = useState(() => OPEN_ACCESS_TOKEN);
+  const [isLoading] = useState(false);
 
-  useEffect(() => {
-    if (sessionHydrated || !isRealAuthToken(authToken)) {
-      if (!isRealAuthToken(authToken)) setSessionHydrated(true);
-      return undefined;
-    }
-
-    let cancelled = false;
-    (async () => {
-      setIsLoading(true);
-      try {
-        const hydrated = await hydrateAuthenticatedSession(authToken);
-        if (cancelled || !hydrated.user) return;
-
-        const profile = hydrated.profile || {};
-        const saasProfile = profile.saasProfile || profile.effectiveProfile || {};
-        const emergencyRoleId =
-          profile.accessSummary?.emergencyRole ||
-          saasProfile.emergencyRoleId ||
-          hydrated.user.profile?.roleProfileId;
-        const saasRole = saasProfile.saasRole || saasProfile.role || hydrated.user.role;
-
-        setUserState({
-          ...hydrated.user,
-          authMode: 'authenticated',
-          role: emergencyRoleId || saasRole || hydrated.user.role,
-          profile: {
-            ...(hydrated.user.profile || {}),
-            ...profile,
-            roleProfileId: emergencyRoleId || saasRole || hydrated.user.profile?.roleProfileId,
-          },
-        });
-      } catch (err) {
-        logger.warn('Session hydration failed; using stored user profile', { err });
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          setSessionHydrated(true);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authToken, sessionHydrated]);
-
-  // Public product mode opens directly, but still seeds a local session so platform providers hydrate.
+  // Open-access build phase: always seed a local demo session for platform providers.
   useEffect(() => {
     persistSession(user, authToken);
     logger.info('Open access platform session initialized');
   }, [authToken, user]);
 
   const setUser = (newUser) => {
-    const nextUser = newUser
-      ? { ...newUser, authMode: newUser.authMode || 'authenticated' }
-      : OPEN_ACCESS_USER;
-    setUserState(nextUser);
-    setIsLoading(false);
-    persistSession(nextUser, authToken);
+    const nextUser = newUser ? hydrateStoredDemoUser(newUser) : OPEN_ACCESS_USER;
+    setUserState({ ...nextUser, authMode: 'open-access' });
+    persistSession({ ...nextUser, authMode: 'open-access' }, OPEN_ACCESS_TOKEN);
   };
 
-  const setAuthToken = (token) => {
-    const nextToken = token || OPEN_ACCESS_TOKEN;
-    setAuthTokenState(nextToken);
-    setIsLoading(false);
-    const nextUser =
-      isRealAuthToken(nextToken) && user?.id === OPEN_ACCESS_USER.id
-        ? { ...user, authMode: 'authenticated' }
-        : user;
-    if (nextUser !== user) setUserState(nextUser);
-    persistSession(nextUser, nextToken);
+  const setAuthToken = () => {
+    setAuthTokenState(OPEN_ACCESS_TOKEN);
+    persistSession(user, OPEN_ACCESS_TOKEN);
   };
 
   const signOut = () => {
     setUserState(OPEN_ACCESS_USER);
     setAuthTokenState(OPEN_ACCESS_TOKEN);
-    setIsLoading(false);
     persistSession(OPEN_ACCESS_USER, OPEN_ACCESS_TOKEN);
   };
 
@@ -365,7 +307,7 @@ export const UserProvider = ({ children }) => {
 
   const isAuthenticated = Boolean(user && authToken);
   const authMode = deriveAuthMode(user, authToken);
-  const isRealSession = authMode === 'authenticated' && isRealAuthToken(authToken);
+  const isRealSession = false;
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'platform-access' ||

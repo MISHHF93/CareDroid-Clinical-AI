@@ -38,6 +38,7 @@ import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePe
 import { isReceptionPipelinePath } from '../config/emergencyPipelineModel';
 import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { isAdminSaasRole } from '../config/platformEntryModel';
+import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import './Sidebar.css';
@@ -179,7 +180,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             isEmergencyCore: false,
           },
         ];
-    if (isAdminSaasRole(saasRole) && !withAccount.some((item) => item.id === 'admin-console')) {
+    if (
+      isAdminSaasRole(saasRole) &&
+      isRouteAllowedForProfile(resolveUserProfileFromSaasRole(saasRole), CANONICAL_ROUTES.adminOperations) &&
+      !withAccount.some((item) => item.id === 'admin-console')
+    ) {
       return [
         ...withAccount,
         {

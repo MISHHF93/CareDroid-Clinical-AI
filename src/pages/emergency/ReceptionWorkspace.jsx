@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import ReceptionQuickIntake, { focusReceptionQuickIntake } from '../../components/reception/ReceptionQuickIntake';
 import QuickIntake from '../../components/QuickIntake';
 import ArrivalDashboard from '../../components/reception/ArrivalDashboard';
@@ -68,7 +69,7 @@ import ReceptionPipelineShell from './ReceptionPipelineShell';
 import './ReceptionWorkspace.css';
 
 export default function ReceptionWorkspace() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
   const reception = useReceptionScreen();
@@ -172,9 +173,9 @@ export default function ReceptionWorkspace() {
       setShowQuickIntake(false);
       setSmartIntakeSession(null);
       const handoff = completeProvisionalIntake(store, kind);
-      navigate(handoff.receptionPath);
+      profileNavigate(handoff.receptionPath);
     },
-    [navigate, store],
+    [profileNavigate, store],
   );
 
   const openVerificationFromDuplicate = useCallback(
@@ -191,9 +192,9 @@ export default function ReceptionWorkspace() {
       refreshIntakeHandoffSurfaces(store);
       void refreshReceptionSnapshot();
       setSmartIntakeSession(null);
-      navigate(handoff.receptionPath);
+      profileNavigate(handoff.receptionPath);
     },
-    [navigate, refreshReceptionSnapshot, store],
+    [profileNavigate, refreshReceptionSnapshot, store],
   );
 
   useEffect(() => {
@@ -306,7 +307,7 @@ export default function ReceptionWorkspace() {
     if (!useInlineQuickIntake) {
       setShowReceptionQuickIntake(false);
     }
-    navigate(handoff.receptionPath);
+    profileNavigate(handoff.receptionPath);
   };
 
   const handleQuickIntakeAdded = (patient) => {
@@ -320,7 +321,7 @@ export default function ReceptionWorkspace() {
     refreshIntakeHandoffSurfaces(store);
     void refreshReceptionSnapshot();
     setShowQuickIntake(false);
-    navigate(handoff.receptionPath);
+    profileNavigate(handoff.receptionPath);
   };
 
   const handlePrepareEmsRegistration = (arrival) => {

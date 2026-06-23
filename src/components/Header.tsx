@@ -49,6 +49,8 @@ import {
   buildEmsOffloadTrackerSummary,
 } from '../services/emsOffloadTracker';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
@@ -195,6 +197,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
+  const { saasRole } = useEffectiveUserProfile();
   const routeScreenMode = useRouteScreenMode();
   const screenCapabilities = useScreenModeCapabilities();
   const patientLookupInputRef = useRef<HTMLInputElement>(null);
@@ -562,14 +565,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   const navigateEmergencyRoute = useCallback(
     (path: string) => {
-      const permissionPath = routePermissionPath(path);
-      navigate(
-        emergencyRole.canAccessRoute(permissionPath)
-          ? path
-          : emergencyRole.nearestRoute(permissionPath),
-      );
+      navigateProfileAware(navigate, path, { emergencyRole, saasRole });
     },
-    [emergencyRole, navigate],
+    [emergencyRole, navigate, saasRole],
   );
 
   const openSmartIntakeFromSearch = (options: { step?: string; patientId?: string } = {}) => {

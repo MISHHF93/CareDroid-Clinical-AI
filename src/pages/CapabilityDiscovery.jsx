@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { buildCapabilityDiscovery } from '../data/capabilityDiscoveryEngine';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import './CapabilityDiscovery.css';
@@ -11,6 +12,7 @@ import './CapabilityDiscovery.css';
 export default function CapabilityDiscovery() {
   const { user } = useUser();
   const { account, preferences, activeWorkspace } = useUserIdentity();
+  const { saasRole } = useEffectiveUserProfile();
   const toolPreferences = useToolPreferences();
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
   const profile = useMemo(
@@ -28,10 +30,11 @@ export default function CapabilityDiscovery() {
     () =>
       buildCapabilityDiscovery({
         profile,
+        saasRole,
         tools,
         recentToolIds: toolPreferences.recentTools,
       }),
-    [profile, tools, toolPreferences.recentTools]
+    [profile, saasRole, tools, toolPreferences.recentTools]
   );
 
   return (

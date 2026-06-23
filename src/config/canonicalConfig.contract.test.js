@@ -35,7 +35,7 @@ describe('canonical configuration contract', () => {
 
     expect(CANONICAL_ROUTES.auth).toBe('/auth');
     expect(AUTH_CONFIG.canonicalRoute).toBe(CANONICAL_ROUTES.auth);
-    expect(getRouteAliasTarget('/signin')).toBe('/auth');
+    expect(getRouteAliasTarget('/signin')).toBe(CANONICAL_ROUTES.platformStart);
     expect(getRouteAliasTarget('/chat')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/catalog')).toBe('/emergency/tools');

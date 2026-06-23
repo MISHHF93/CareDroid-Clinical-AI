@@ -10,6 +10,8 @@ import {
   prefersReceptionForPatientCreate,
 } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { staffDisplayName } from '../utils/staffManagement';
 import './EMSCriticalBroadcast.css';
@@ -134,6 +136,7 @@ export default function EMSCriticalBroadcast() {
   const navigate = useNavigate();
   const { user } = useUser();
   const emergencyRole = useEmergencyRolePermissions();
+  const { saasRole } = useEffectiveUserProfile();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const rooms = useEmergencyStore((state) => state.rooms);
   const staff = useEmergencyStore((state) => state.staff);
@@ -214,13 +217,15 @@ export default function EMSCriticalBroadcast() {
     });
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigate(
+      navigateProfileAware(
+        navigate,
         result.receptionVerifyPath ||
           getReceptionEmbeddedIntakePath({
             step: 'verify',
             patientId: result.patientId,
             emsArrivalId: arrival.id,
           }),
+        { emergencyRole, saasRole },
       );
     }
   };

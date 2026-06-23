@@ -12,10 +12,20 @@ import {
 import { listEdWorkflowAzSteps } from '../../config/edWorkflowIntegrationModel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { getEmergencyRoleHomeRoute } from '../../config/emergencyRolePermissions';
+import { getPlatformEntitlementContext } from '../../data/assetEntitlements';
 
 export default function EdStaffWorkflowAdmin() {
-  const [rolePreviewId, setRolePreviewId] = useState('emergency-physician');
-  const catalogRoleOptions = useMemo(() => listUserProfileCatalogOptions(), []);
+  const [rolePreviewId, setRolePreviewId] = useState('registration-clerk');
+  const entitlementContext = useMemo(() => getPlatformEntitlementContext() || {}, []);
+  const catalogRoleOptions = useMemo(
+    () =>
+      listUserProfileCatalogOptions({
+        organizationType:
+          entitlementContext?.organization?.organizationType || 'hospital',
+        entitledPackIds: entitlementContext?.entitledPackIds || [],
+      }),
+    [entitlementContext],
+  );
   const rolePreviewSummary = useMemo(
     () => buildUserProfileAccessSummary(rolePreviewId),
     [rolePreviewId],

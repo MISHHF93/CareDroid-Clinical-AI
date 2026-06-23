@@ -23,6 +23,8 @@ import {
 } from '../services/copilotRecommendationDiscovery';
 import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuidance';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 
 type CopilotMessage = {
   id: string;
@@ -393,7 +395,8 @@ export function CopilotPanel() {
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'PHYSICIAN_SCREEN' });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
-  const { profileCopy } = useEffectiveUserProfile();
+  const { profileCopy, saasRole } = useEffectiveUserProfile();
+  const emergencyRole = useEmergencyRolePermissions();
   const welcomeMessage = useMemo(
     () =>
       `${EMERGENCY_OS_BRANDING.copilotName} online. ${profileCopy.copilotIntro} Use quick actions or tap a recommendation card. ${HUMAN_REVIEW_DISCLAIMER}`,
@@ -460,7 +463,7 @@ export function CopilotPanel() {
 
   const openRecommendation = (route?: string) => {
     if (!route) return;
-    navigate(route);
+    navigateProfileAware(navigate, route, { emergencyRole, saasRole });
   };
 
   useEffect(() => {

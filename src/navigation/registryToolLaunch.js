@@ -15,6 +15,7 @@ import {
   ASSET_ACCESS_STATES,
   resolveAssetAccessState,
 } from '../data/assetAccess';
+import { isToolAllowedForCompiledProfile } from '../config/userProfileCompiler';
 import {
   getCalculatorRouteBySlug,
   isKnownToolAreaPath,
@@ -27,6 +28,7 @@ import {
   getPlatformEntitlementContext,
 } from '../data/assetEntitlements';
 import { trackRoleAssetUsage, trackRoleWorkflowLaunch } from '../services/roleIntelligenceTelemetry';
+import { navigateProfileAware } from './profileRouteLaunch';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -242,21 +244,36 @@ export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEnt
   const inventoryRecord = resolveToolInventoryRecord(registryId) || resolveToolInventoryRecord(toolId);
   const tool = inventoryRecord || { id: registryId, canonicalInventoryId: registryId };
   const userRole =
-    context?.user?.role || context?.account?.role || context?.membership?.role || context?.role || 'student';
+    context?.roleProfile?.id ||
+    context?.membership?.roleProfileId ||
+    context?.saasRole ||
+    context?.user?.role ||
+    context?.account?.role ||
+    context?.membership?.role ||
+    context?.role ||
+    'student';
   const access = resolveAssetAccessState(
     { ...tool, id: registryId, canonicalInventoryId: tool.canonicalInventoryId || registryId },
     context,
     userRole
   );
+  const compilerAllowed = isToolAllowedForCompiledProfile(
+    registryId,
+    tool,
+    userRole,
+    context,
+  );
   return {
     ...access,
     registryId,
-    allowed: [
-      ASSET_ACCESS_STATES.ALLOWED,
-      ASSET_ACCESS_STATES.BETA,
-      ASSET_ACCESS_STATES.EXPERIMENTAL,
-      ASSET_ACCESS_STATES.DEMO_ONLY,
-    ].includes(access.accessState),
+    allowed:
+      compilerAllowed &&
+      [
+        ASSET_ACCESS_STATES.ALLOWED,
+        ASSET_ACCESS_STATES.BETA,
+        ASSET_ACCESS_STATES.EXPERIMENTAL,
+        ASSET_ACCESS_STATES.DEMO_ONLY,
+      ].includes(access.accessState),
   };
 }
 
@@ -309,9 +326,18 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     addMessage?.(plan.launch.chatSeed, 'user');
   }
 
-  navigate(
+  const saasRole =
+    handlers.context?.roleProfile?.id ||
+    handlers.context?.membership?.roleProfileId ||
+    handlers.context?.saasRole ||
+    handlers.entitlementContext?.roleProfile?.id ||
+    handlers.entitlementContext?.membership?.roleProfileId ||
+    handlers.entitlementContext?.saasRole;
+
+  navigateProfileAware(
+    navigate,
     { pathname: plan.pathname, search: plan.search || '' },
-    { replace, state }
+    { replace, state, saasRole, context: handlers.context || handlers.entitlementContext },
   );
 
   return plan;

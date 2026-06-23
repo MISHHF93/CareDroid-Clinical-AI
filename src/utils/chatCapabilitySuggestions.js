@@ -7,6 +7,7 @@ import {
 } from '../data/clinicalToolIdContract';
 import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { buildProfileToolGraph, getProfileAssistantRecommendations } from '../data/profileToolSegmentation';
+import { compileUserProfile } from '../config/userProfileCompiler';
 import { getCareDroidDidYouKnowSuggestions } from '../data/capabilityDiscoveryEngine';
 import { buildSearchFirstResults } from '../data/searchFirstDiscovery';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
@@ -158,6 +159,7 @@ function getContextAwareLauncherSuggestions({
   input,
   tools,
   profileContext,
+  saasRole = null,
   workspaceContext,
   recentToolIds = [],
 }) {
@@ -165,7 +167,12 @@ function getContextAwareLauncherSuggestions({
   const matchedIntents = CONTEXT_AWARE_LAUNCHER_INTENTS.filter((intent) => textMatches(input, intent.terms));
   if (!matchedIntents.length) return [];
 
-  const profileGraph = profileContext ? buildProfileToolGraph({ tools, profile: profileContext }) : null;
+  const compiled = saasRole ? compileUserProfile({ saasRole, tools }) : null;
+  const effectiveTools = compiled?.tools.visible?.length ? compiled.tools.visible : tools;
+  const effectiveProfile = compiled?.segmentationProfile || profileContext;
+  const profileGraph = effectiveProfile
+    ? buildProfileToolGraph({ tools: effectiveTools, profile: effectiveProfile })
+    : null;
   return matchedIntents.flatMap((intent) => {
     const toolSuggestions = intent.toolIds
       .map((toolId, index) => {
@@ -377,6 +384,7 @@ export function getChatCapabilitySuggestions({
   routes = BACKEND_HTTP_ROUTES,
   hasPermission = () => true,
   profileContext = null,
+  saasRole = null,
   tools = getUserFacingToolRegistryProjection(),
   workspaceContext = null,
   recentToolIds = [],
@@ -384,11 +392,15 @@ export function getChatCapabilitySuggestions({
   includePlatformCatalog = false,
 } = {}) {
   const suggestions = [];
+  const compiled = saasRole ? compileUserProfile({ saasRole, tools }) : null;
+  const effectiveTools = compiled?.tools.visible?.length ? compiled.tools.visible : tools;
+  const effectiveProfile = compiled?.segmentationProfile || profileContext;
 
   getContextAwareLauncherSuggestions({
     input,
-    tools,
-    profileContext,
+    tools: effectiveTools,
+    profileContext: effectiveProfile,
+    saasRole,
     workspaceContext,
     recentToolIds,
   }).forEach((suggestion) => {
@@ -530,19 +542,20 @@ export function getChatCapabilitySuggestions({
     });
   });
 
-  if (profileContext) {
-    getProfileAssistantRecommendations(profileContext, tools, 4).forEach((item, index) => {
+  if (effectiveProfile) {
+    getProfileAssistantRecommendations(effectiveProfile, effectiveTools, 4).forEach((item, index) => {
       suggestions.push({
         ...item,
         icon: getToolIcon(item.toolId),
         defaultRank: 72 + index,
-        keywords: [item.label, item.toolId, profileContext.role, profileContext.specialty],
+        keywords: [item.label, item.toolId, effectiveProfile.role, effectiveProfile.specialty],
       });
     });
 
     getCareDroidDidYouKnowSuggestions({
-      profile: profileContext,
-      tools,
+      profile: effectiveProfile,
+      saasRole,
+      tools: effectiveTools,
       recentToolIds,
       limit: 3,
     }).forEach((item, index) => {

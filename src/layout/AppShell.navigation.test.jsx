@@ -20,6 +20,7 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
     selectPatient: vi.fn(),
     initializeFromBackend: vi.fn().mockResolvedValue(undefined),
     updateAlerts: vi.fn(),
+    setWebSocketStatus: vi.fn(),
     emergencySettings: {
       defaultScreenMode: 'clinical',
       readOnlyDisplayMode: false,
@@ -37,13 +38,18 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+const emergencyRoleMock = vi.hoisted(() => {
+  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.js');
+  return withEmergencyRoleMock({ role: 'physician', nearestRoute: () => '/emergency/whiteboard' });
+});
+
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
-  useEmergencyRolePermissions: () => ({
-    role: 'physician',
-    can: () => true,
-    canAccessRoute: () => true,
-    nearestRoute: () => '/emergency/whiteboard',
-  }),
+  useEmergencyRolePermissions: () => emergencyRoleMock,
+  default: () => emergencyRoleMock,
+}));
+
+vi.mock('../components/account/DemoPersonaPanel', () => ({
+  default: () => null,
 }));
 
 vi.mock('../store/emergencyStore', () => {
@@ -59,6 +65,10 @@ vi.mock('../engine/reassessmentEngine', () => ({
 
 vi.mock('../engine/capacityEngine', () => ({
   startCapacityEngine: () => 0,
+}));
+
+vi.mock('../services/emergencyRealtimeService', () => ({
+  default: () => () => {},
 }));
 
 vi.mock('../components/Sidebar', () => ({
@@ -193,7 +203,7 @@ describe('AppShell navigation surfaces', () => {
         }),
       );
     });
-    expect(navigateMock).toHaveBeenLastCalledWith(
+    expect(navigateMock.mock.lastCall?.[0]).toBe(
       '/emergency/tools?source=chat&filter=clinical-tools&q=drug-check',
     );
 
@@ -204,7 +214,7 @@ describe('AppShell navigation surfaces', () => {
         }),
       );
     });
-    expect(navigateMock).toHaveBeenLastCalledWith(
+    expect(navigateMock.mock.lastCall?.[0]).toBe(
       '/emergency/tools?source=calculators&filter=calculator&q=heart-score&open=heart-score&patientId=patient-123',
     );
   });

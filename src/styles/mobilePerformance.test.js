@@ -38,7 +38,7 @@ describe('mobile performance — routing & bundles', () => {
     expect(app).not.toMatch(/pages\/Dashboard/);
     expect(appShell).toContain('<CopilotPanel />');
     expect(app).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
-    expect(app).toContain('element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}');
+    expect(app).toContain('EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot}');
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
@@ -65,13 +65,9 @@ describe('mobile performance — CLS & images', () => {
     expect(css).toContain('touch-action: manipulation');
   });
 
-  it('images use lazy decode and dimensions', () => {
+  it('images use lazy loading where avatars are rendered', () => {
     const workloadPanel = read('src/components/WorkloadBalancePanel.jsx');
     expect(workloadPanel).toContain('loading="lazy"');
-    const tfa = read('src/pages/TwoFactorSetup.jsx');
-    expect(tfa).toMatch(/width=\{280\}/);
-    expect(tfa).toMatch(/height=\{280\}/);
-    expect(tfa).toContain('decoding="async"');
   });
 });
 

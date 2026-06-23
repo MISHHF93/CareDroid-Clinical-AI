@@ -5,6 +5,7 @@ import { UserProfile } from '../users/entities/user-profile.entity';
 import { UserPreferencesService } from '../user-profile/user-preferences.service';
 import { AssetRegistryService } from './asset-registry.service';
 import { LEGACY_TOOL_ID_ALIASES } from './data/platform-asset-seed.data';
+import { resolveSaasProfileAllowedPacks } from '../user-profile/saas-profile-rbac.config';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
@@ -161,6 +162,16 @@ export class PlatformAssetsService {
         where: { id: params.roleProfileId },
       });
       profile?.hiddenAssetIds?.forEach((id) => entitled.delete(id));
+
+      const allowedPacks = resolveSaasProfileAllowedPacks(params.roleProfileId);
+      if (allowedPacks.length && entitled.size && strictEntitlements && hasOrganizationScope) {
+        const packs = await this.packRepository.find({ where: { id: In(allowedPacks) } });
+        const allowedAssetIds = new Set<string>();
+        packs.forEach((pack) => pack.assetIds?.forEach((id) => allowedAssetIds.add(id)));
+        for (const id of [...entitled]) {
+          if (!allowedAssetIds.has(id)) entitled.delete(id);
+        }
+      }
     }
 
     if (!entitled.size && !(strictEntitlements && hasOrganizationScope)) {

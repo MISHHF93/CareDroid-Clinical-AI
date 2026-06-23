@@ -789,6 +789,44 @@ function sourceStatusFor({ catalogVisible, sidebarVisible, component, route }) {
   return 'active';
 }
 
+const REGISTRY_PACK_ID = Object.freeze({
+  calculators: 'core-platform',
+  'heart-score': 'emergency-clinical',
+  qsofa: 'emergency-clinical',
+  nihss: 'emergency-clinical',
+  perc: 'emergency-clinical',
+  protocols: 'emergency-clinical',
+  'differential-ai': 'emergency-clinical',
+  'drug-check': 'pharmacy',
+  'lab-interp': 'laboratory',
+  'medical-iot-dashboard': 'medical-iot',
+  'fleet-command': 'fleet',
+  'route-optimizer': 'fleet',
+  'predictive-maintenance': 'fleet',
+  'dispatch-ai': 'fleet',
+  'simulation-suite': 'education',
+  'simulation-outcomes': 'education',
+  'audit-logs': 'governance',
+  'system-config': 'platform-admin',
+  'team-management': 'platform-admin',
+});
+
+function resolveRegistryPackId(registryId, category) {
+  if (REGISTRY_PACK_ID[registryId]) return REGISTRY_PACK_ID[registryId];
+  const normalizedCategory = normalizeCategory(category || '').toLowerCase();
+  if (normalizedCategory.includes('fleet')) return 'fleet';
+  if (normalizedCategory.includes('cardio')) return 'cardiology';
+  if (normalizedCategory.includes('pharm')) return 'pharmacy';
+  if (normalizedCategory.includes('lab')) return 'laboratory';
+  if (normalizedCategory.includes('simulation') || normalizedCategory.includes('education')) return 'education';
+  if (normalizedCategory.includes('governance') || normalizedCategory.includes('audit')) return 'governance';
+  if (normalizedCategory.includes('iot') || normalizedCategory.includes('device')) return 'medical-iot';
+  if (normalizedCategory.includes('emergency') || normalizedCategory.includes('critical')) {
+    return 'emergency-clinical';
+  }
+  return 'core-platform';
+}
+
 function buildRecordFromRegistry(registryId, patternByToolId) {
   const registryEntry = toolRegistryById[registryId] || null;
   const platformCapability = PLATFORM_SYSTEM_CAPABILITY_BY_ID[registryId] || null;
@@ -873,11 +911,15 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
     category: normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category),
     tier,
   });
+  const category = normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category);
+  const packId = resolveRegistryPackId(registryId, category);
 
   return {
     id: registryId,
     label: registryEntry?.name || primaryNlu?.toolName || pattern?.toolName || registryId,
-    category: normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category),
+    category,
+    packId,
+    assetPackId: packId,
     tier,
     status,
     lifecycleState,
@@ -1194,6 +1236,7 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
   const projection = getUserFacingToolInventory(records).map((record) => {
     const legacy = record.legacy || {};
     const category = legacy.category || record.presentationCategory;
+    const packId = record.packId || record.assetPackId || resolveRegistryPackId(record.id, category);
     return enrichToolWithSegmentation({
       ...legacy,
       id: record.id,
@@ -1203,6 +1246,8 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
       description: record.description || legacy.description || 'Clinical decision support tool',
       shortcut: legacy.shortcut || null,
       category,
+      packId,
+      assetPackId: packId,
       features: legacy.features || [],
       useCases: legacy.useCases || [],
       panelTool:

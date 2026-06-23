@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 import {
@@ -19,7 +19,7 @@ const TOOL_CONFIG = {
 };
 
 export default function CalculatorRecommender({ embedded = false, onCloseEmbedded } = {}) {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [chiefComplaint, setChiefComplaint] = useState('');
   const [symptoms, setSymptoms] = useState('');
   const [clinicalKeywords, setClinicalKeywords] = useState('');
@@ -176,7 +176,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
                     <button
                       type="button"
                       className="diagnosis-primary-btn"
-                      onClick={() => navigate(tool.navigationPath || tool.route || '/tools/calculators')}
+                      onClick={() => profileNavigate(tool.navigationPath || tool.route || '/tools/calculators')}
                     >
                       Open {tool.label}
                     </button>

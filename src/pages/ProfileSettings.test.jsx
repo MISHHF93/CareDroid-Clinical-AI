@@ -48,9 +48,6 @@ vi.mock('../contexts/UserIdentityContext', () => ({
   }),
 }));
 
-vi.mock('../components/TwoFactorSettings', () => ({
-  default: () => <section aria-label="two factor settings">Two-factor settings</section>,
-}));
 
 function renderProfileSettings() {
   return render(

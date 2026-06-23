@@ -1,12 +1,6 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import {
-  resolvePlatformLanding,
-} from '../config/platformEntryModel';
-import { apiFetchJson } from '../services/apiClient';
-import appConfig from '../config/appConfig';
-
-const OPEN_ACCESS_USER_ID = 'open-access-user';
-const DEV_BYPASS_TOKEN = appConfig.dev?.bearerToken || 'dev-bypass-token';
+import { resolveClinicalHomeRoute } from '../config/platformEntryModel';
+import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
 
 export type HydratedSession = {
   user: Record<string, unknown> | null;
@@ -21,101 +15,64 @@ export function sanitizeReturnUrl(returnUrl?: string | null): string {
   return raw;
 }
 
+/** Auth UI removed — legacy callers land on the platform entry hub. */
 export function buildAuthUrl({
-  mode = 'login',
   returnUrl,
-  inviteToken,
 }: {
   mode?: 'login' | 'signup';
   returnUrl?: string;
   inviteToken?: string;
 } = {}): string {
-  const params = new URLSearchParams();
-  if (mode === 'signup') params.set('mode', 'signup');
   const safe = sanitizeReturnUrl(returnUrl);
-  if (safe !== '/') params.set('returnUrl', safe);
-  if (inviteToken) params.set('invite', inviteToken);
-  const qs = params.toString();
-  return qs ? `${CANONICAL_ROUTES.auth}?${qs}` : CANONICAL_ROUTES.auth;
+  return safe !== '/' ? safe : CANONICAL_ROUTES.platformStart;
 }
 
-export async function fetchAuthenticatedUser(token: string) {
-  const { response, data } = await apiFetchJson('/api/auth/me', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) return null;
-  return data as Record<string, unknown>;
+export async function fetchAuthenticatedUser(_token: string) {
+  return null;
 }
 
-export async function fetchOperationalProfile(token: string) {
-  const { response, data } = await apiFetchJson('/api/profile/me', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) return null;
-  return data as Record<string, unknown>;
+export async function fetchOperationalProfile(_token: string) {
+  return null;
 }
 
-export async function hydrateAuthenticatedSession(token: string): Promise<HydratedSession> {
-  const [user, profile] = await Promise.all([
-    fetchAuthenticatedUser(token),
-    fetchOperationalProfile(token),
-  ]);
-  return { user, profile };
+export async function hydrateAuthenticatedSession(_token: string): Promise<HydratedSession> {
+  return { user: null, profile: null };
 }
 
 export function resolvePostAuthDestination({
+  returnUrl,
   user,
   profile,
-  returnUrl,
 }: {
   user?: Record<string, unknown> | null;
   profile?: Record<string, unknown> | null;
   returnUrl?: string | null;
-}): string {
-  const saasProfile =
-    (profile?.saasProfile as Record<string, unknown> | undefined) ||
-    (profile?.effectiveProfile as Record<string, unknown> | undefined);
-  const onboardingStatus = saasProfile?.onboardingStatus ?? profile?.onboardingStatus ?? 'complete';
-  if (onboardingStatus !== 'complete') {
-    return CANONICAL_ROUTES.welcome;
-  }
-
+} = {}): string {
   const safeReturn = sanitizeReturnUrl(returnUrl);
   if (safeReturn !== '/') return safeReturn;
 
+  const saasProfile =
+    (profile?.saasProfile as Record<string, unknown> | undefined) ||
+    (profile?.effectiveProfile as Record<string, unknown> | undefined);
   const role =
     (user?.role as string | undefined) ||
     ((user?.profile as Record<string, unknown> | undefined)?.roleProfileId as string | undefined) ||
     (saasProfile?.saasRole as string | undefined);
 
-  return resolvePlatformLanding({
-    authMode: 'authenticated',
-    saasRole: role,
-    onboardingStatus: String(onboardingStatus),
-    returnUrl: safeReturn !== '/' ? safeReturn : null,
-  });
+  return resolveClinicalHomeRoute(role) || resolveDemoDefaultLandingRoute();
 }
 
-export function isRealAuthToken(token: string | null | undefined): boolean {
-  if (!token) return false;
-  return token !== DEV_BYPASS_TOKEN;
+export function isRealAuthToken(_token: string | null | undefined): boolean {
+  return false;
 }
 
-export function isOpenAccessUser(user: Record<string, unknown> | null | undefined): boolean {
-  if (!user) return true;
-  return (
-    user.id === OPEN_ACCESS_USER_ID ||
-    user.authMode === 'open-access' ||
-    user.authMode === 'platform-access'
-  );
+export function isOpenAccessUser(_user: Record<string, unknown> | null | undefined): boolean {
+  return true;
 }
 
 export function deriveAuthMode(
-  user: Record<string, unknown> | null | undefined,
-  token: string | null | undefined,
-): 'open-access' | 'authenticated' {
-  if (isOpenAccessUser(user) || !isRealAuthToken(token)) {
-    return 'open-access';
-  }
-  return 'authenticated';
+  _user: Record<string, unknown> | null | undefined,
+  _token: string | null | undefined,
+): 'open-access' {
+  return 'open-access';
 }

@@ -2,38 +2,38 @@ import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES } from './routes.config';
 import {
   isAdminSaasRole,
+  resolveAdminHomeRoute,
+  resolveClinicalHomeRoute,
   resolvePlatformLanding,
 } from './platformEntryModel';
 
 describe('platformEntryModel', () => {
-  it('sends open-access users to the platform entry hub', () => {
-    expect(
-      resolvePlatformLanding({ authMode: 'open-access', saasRole: 'student' }),
-    ).toBe(CANONICAL_ROUTES.platformStart);
+  it('sends students to their clinical home in open-access mode', () => {
+    expect(resolvePlatformLanding({ saasRole: 'student' })).toBe(
+      resolveClinicalHomeRoute('student'),
+    );
   });
 
-  it('sends admins to the admin console after sign-in', () => {
+  it('sends admins to the admin console', () => {
     expect(
       resolvePlatformLanding({
-        authMode: 'authenticated',
         saasRole: 'hospital-administrator',
-        onboardingStatus: 'complete',
       }),
     ).toBe(CANONICAL_ROUTES.adminOperations);
   });
 
-  it('sends incomplete onboarding to welcome', () => {
+  it('honors safe return URLs', () => {
     expect(
       resolvePlatformLanding({
-        authMode: 'authenticated',
-        saasRole: 'nurse',
-        onboardingStatus: 'pending',
+        saasRole: 'student',
+        returnUrl: '/profile',
       }),
-    ).toBe(CANONICAL_ROUTES.welcome);
+    ).toBe('/profile');
   });
 
-  it('detects admin SaaS roles', () => {
+  it('identifies admin SaaS roles', () => {
     expect(isAdminSaasRole('hospital-administrator')).toBe(true);
-    expect(isAdminSaasRole('nurse')).toBe(false);
+    expect(isAdminSaasRole('student')).toBe(false);
+    expect(resolveAdminHomeRoute()).toBe(`${CANONICAL_ROUTES.adminOperations}/tenant`);
   });
 });

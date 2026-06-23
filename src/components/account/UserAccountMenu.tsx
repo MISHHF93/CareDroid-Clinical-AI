@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
-import { buildAuthUrl } from '../../auth/authSession';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
 import { DEMO_PERSONA, isDemoPersonaUser } from '../../config/demoPersonaModel';
@@ -23,12 +22,11 @@ function getInitials(name: string): string {
 }
 
 export default function UserAccountMenu() {
-  const { user, signOut, isRealSession } = useUser();
-  const { account, refreshIdentity } = useUserIdentity();
+  const { user } = useUser();
+  const { account } = useUserIdentity();
   const { accessSummary, profileCopy } = useEffectiveUserProfile();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const displayName = useMemo(
@@ -36,8 +34,8 @@ export default function UserAccountMenu() {
       account?.displayName ||
       user?.fullName ||
       user?.name ||
-      (isRealSession ? 'Signed-in user' : 'Demo mode'),
-    [account?.displayName, isRealSession, user?.fullName, user?.name],
+      DEMO_PERSONA.displayName,
+    [account?.displayName, user?.fullName, user?.name],
   );
 
   const avatarUrl = account?.avatarUrl || user?.avatarUrl || '';
@@ -45,15 +43,13 @@ export default function UserAccountMenu() {
     profileCopy?.personaTitle ||
     accessSummary?.saasRole?.replace(/-/g, ' ') ||
     user?.role ||
-    'open access';
+    'demo mode';
   const workspaceMeta = profileCopy?.workspaceEyebrow;
   const demoMeta = useMemo(() => {
-    if (isRealSession || !isDemoPersonaUser(user)) return null;
+    if (!isDemoPersonaUser(user)) return null;
     return `${DEMO_PERSONA.title} · ${DEMO_PERSONA.department}`;
-  }, [isRealSession, user]);
-  const accountMeta = isRealSession
-    ? workspaceMeta || roleLabel
-    : demoMeta || workspaceMeta || 'Demo mode';
+  }, [user]);
+  const accountMeta = demoMeta || workspaceMeta || 'Demo mode';
   const showAdminLink = isAdminSaasRole(accessSummary?.saasRole || user?.role);
 
   useEffect(() => {
@@ -69,14 +65,6 @@ export default function UserAccountMenu() {
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
-
-  const handleSignOut = () => {
-    signOut();
-    refreshIdentity();
-    setOpen(false);
-  };
-
-  const signInHref = buildAuthUrl({ returnUrl: location.pathname + location.search });
 
   return (
     <div className="account-menu" ref={rootRef}>
@@ -110,12 +98,10 @@ export default function UserAccountMenu() {
             <Link className="account-menu__item" to={CANONICAL_ROUTES.profile} role="menuitem">
               Profile overview
             </Link>
-            {isRealSession ? (
-              <Link className="account-menu__item" to="/profile/security" role="menuitem">
-                Security
-              </Link>
-            ) : null}
-            {showAdminLink || !isRealSession ? (
+            <Link className="account-menu__item" to={CANONICAL_ROUTES.platformStart} role="menuitem">
+              Entry hub
+            </Link>
+            {showAdminLink ? (
               <Link
                 className="account-menu__item"
                 to={CANONICAL_ROUTES.adminOperations}
@@ -124,28 +110,6 @@ export default function UserAccountMenu() {
                 Admin console
               </Link>
             ) : null}
-          </div>
-
-          <div className="account-menu__section">
-            {isRealSession ? (
-              <button
-                type="button"
-                className="account-menu__item account-menu__item--danger"
-                role="menuitem"
-                onClick={handleSignOut}
-              >
-                Sign out
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="account-menu__item"
-                role="menuitem"
-                onClick={() => navigate(signInHref)}
-              >
-                Sign in
-              </button>
-            )}
           </div>
         </div>
       ) : null}

@@ -21,8 +21,7 @@ const srcRoot = dirname(__dirname);
 const appSource = readFileSync(join(srcRoot, 'App.jsx'), 'utf8');
 const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
 const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.jsx'), 'utf8');
-const authSource = readFileSync(join(srcRoot, 'pages/Auth.jsx'), 'utf8');
-const devAuthSource = readFileSync(join(srcRoot, 'auth/devAuthBypass.js'), 'utf8');
+const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.jsx'), 'utf8');
 const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.js'), 'utf8');
 const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.js'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
@@ -99,24 +98,17 @@ function routeSurfaceDeclares(route) {
 }
 
 describe('full platform consolidation contract', () => {
-  it('redirects retired roots to Emergency OS and keeps auth open-access configuration intact', () => {
+  it('redirects retired roots to Emergency OS and keeps open-access configuration intact', () => {
     for (const snippet of REQUIRED_LEGACY_REDIRECT_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
-    expect(routeConfigSource).toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
-
-    expect(authSource).toContain('Enter Platform');
-    expect(authSource).toContain('directSignInSection');
+    expect(platformEntrySource).toContain('Start ED 18 demo');
+    expect(platformEntrySource).not.toContain('Continue to sign in');
     expect(userContextSource).toContain('OPEN_ACCESS_USER');
     expect(userContextSource).toContain("authMode: 'open-access'");
     expect(appSource).not.toContain('<TenantRequired>');
-    expect(appShellSource).toContain('isDevAuthBypass');
+    expect(appSource).toContain('function AuthPathsRedirect()');
     expect(appShellSource).toContain('ed-os-banner');
-    expect(devAuthSource).toContain('AUTH_CONFIG.demo.exposed');
-    expect(authConfigSource).toContain('ENV_CONFIG.demoMode');
-    expect(authConfigSource).toContain('showDemoAuth');
-    expect(appConfigSource).toContain('VITE_DEMO_MODE');
-    expect(appConfigSource).toContain('VITE_SHOW_DEMO_AUTH');
   });
 
   it('declares the Emergency OS route surface once', () => {
@@ -126,9 +118,8 @@ describe('full platform consolidation contract', () => {
 
     expect(appSource).toContain('path="/emergency" element={<EmergencyDefaultRedirect />}');
     expect(appSource).toContain('path="/emergency/*"');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.fleetCommand}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.marketplace}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.aiGovernance}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.fleetCommand}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.aiGovernance}');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 

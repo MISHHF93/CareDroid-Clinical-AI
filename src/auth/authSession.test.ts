@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import appConfig from '../config/appConfig';
 import {
   buildAuthUrl,
   deriveAuthMode,
@@ -8,6 +7,7 @@ import {
   resolvePostAuthDestination,
   sanitizeReturnUrl,
 } from './authSession';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 describe('authSession', () => {
   it('sanitizes unsafe return URLs', () => {
@@ -17,24 +17,19 @@ describe('authSession', () => {
     expect(sanitizeReturnUrl('')).toBe('/');
   });
 
-  it('builds auth URLs with mode, returnUrl, and invite token', () => {
-    expect(buildAuthUrl()).toBe('/auth');
-    expect(buildAuthUrl({ mode: 'signup' })).toBe('/auth?mode=signup');
-    expect(buildAuthUrl({ returnUrl: '/profile' })).toBe('/auth?returnUrl=%2Fprofile');
-    expect(buildAuthUrl({ inviteToken: 'abc-123' })).toBe('/auth?invite=abc-123');
+  it('routes legacy auth URL builders to platform entry or safe return paths', () => {
+    expect(buildAuthUrl()).toBe(CANONICAL_ROUTES.platformStart);
+    expect(buildAuthUrl({ returnUrl: '/profile' })).toBe('/profile');
   });
 
-  it('routes incomplete onboarding to welcome', () => {
+  it('resolves post-auth destinations to clinical home or safe return URL', () => {
     expect(
       resolvePostAuthDestination({
         user: { role: 'physician' },
         profile: { saasProfile: { onboardingStatus: 'pending' } },
         returnUrl: '/',
       }),
-    ).toBe('/welcome');
-  });
-
-  it('uses safe return URL when onboarding is complete', () => {
+    ).not.toBe('/welcome');
     expect(
       resolvePostAuthDestination({
         user: { role: 'physician' },
@@ -44,14 +39,12 @@ describe('authSession', () => {
     ).toBe('/profile');
   });
 
-  it('derives auth mode for open access vs authenticated sessions', () => {
-    const bypassToken = appConfig.dev?.bearerToken || 'dev-bypass-token';
-    expect(isRealAuthToken(bypassToken)).toBe(false);
-    expect(isRealAuthToken('eyJhbGciOiJIUzI1NiJ9.token')).toBe(true);
+  it('always treats sessions as open-access during the build phase', () => {
+    expect(isRealAuthToken('eyJhbGciOiJIUzI1NiJ9.token')).toBe(false);
     expect(isOpenAccessUser({ id: 'open-access-user' })).toBe(true);
     expect(
       deriveAuthMode({ id: 'user-1', authMode: 'authenticated' }, 'real-jwt-token'),
-    ).toBe('authenticated');
-    expect(deriveAuthMode({ id: 'open-access-user' }, bypassToken)).toBe('open-access');
+    ).toBe('open-access');
+    expect(deriveAuthMode({ id: 'open-access-user' }, 'dev-bypass-token')).toBe('open-access');
   });
 });

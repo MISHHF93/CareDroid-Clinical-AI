@@ -60,6 +60,15 @@ const EMERGENCY_MEDICINE_ASSET_IDS = [
   'hospital-map',
 ];
 
+const RECEPTION_DESK_ASSET_IDS = [
+  'calculators',
+  'calculators-hub',
+  'drug-check',
+  'lab-interp',
+  'protocols',
+  'analytics',
+];
+
 const LABORATORY_INTELLIGENCE_ASSET_IDS = [
   'lab-interp',
   'laboratory',
@@ -426,6 +435,61 @@ const RAW_SEED_ASSET_PACKS = [
     ],
   },
   {
+    id: 'reception-desk',
+    name: 'Reception Desk Pack',
+    slug: 'reception-desk',
+    description:
+      'Front-desk registration, identity verification, patient search, intake, pulse, and shift utilities.',
+    organizationTypes: [
+      OrganizationType.HOSPITAL,
+      OrganizationType.CLINIC,
+      OrganizationType.EMS,
+      OrganizationType.LONG_TERM_CARE,
+      OrganizationType.TELEHEALTH,
+    ],
+    assetIds: RECEPTION_DESK_ASSET_IDS,
+    requiredDependencies: ['core-platform'],
+    defaultModules: ['reception', 'intake', 'patients', 'pulse', 'shift'],
+    pricingTier: PricingTier.CORE,
+    targetRoles: ['registration clerk', 'receptionist', 'front desk'],
+  },
+  {
+    id: 'emergency-clinical',
+    name: 'Emergency Clinical Pack',
+    slug: 'emergency-clinical',
+    description: 'ED whiteboard, triage, copilot, reassessment, and clinical mutation surfaces.',
+    organizationTypes: [
+      OrganizationType.HOSPITAL,
+      OrganizationType.EMS,
+      OrganizationType.HEALTH_SYSTEM,
+      OrganizationType.ACADEMIC_MEDICAL_CENTER,
+    ],
+    assetIds: EMERGENCY_MEDICINE_ASSET_IDS,
+    requiredDependencies: ['core-platform', 'reception-desk'],
+    defaultModules: ['dashboard', 'whiteboard', 'triage', 'copilot'],
+    pricingTier: PricingTier.ENTERPRISE,
+    targetRoles: ['emergency physician', 'nurse', 'charge nurse'],
+  },
+  {
+    id: 'trackmind',
+    name: 'TrackMind Operations Pack',
+    slug: 'trackmind',
+    description: 'Race-day operations, surveillance nexus, stewarding, and equine welfare surfaces.',
+    organizationTypes: [OrganizationType.HEALTH_SYSTEM, OrganizationType.RACETRACK],
+    assetIds: [
+      'analytics',
+      'incident-command-center',
+      'hospital-operations-command',
+      'fleet-dashboard',
+      'hospital-map',
+      'telemetry-monitoring',
+    ],
+    requiredDependencies: ['core-platform'],
+    defaultModules: ['trackmind', 'surveillance', 'operations'],
+    pricingTier: PricingTier.ENTERPRISE,
+    targetRoles: ['steward', 'racetrack admin', 'operations manager'],
+  },
+  {
     id: 'emergency-medicine',
     name: 'Emergency Medicine Pack',
     slug: 'emergency-medicine',
@@ -671,6 +735,7 @@ export const SEED_ASSET_PACKS = RAW_SEED_ASSET_PACKS.map((pack) => {
 export const DEFAULT_PACKS_BY_ORGANIZATION_TYPE: Record<OrganizationType, string[]> = {
   [OrganizationType.HOSPITAL]: [
     'core-platform',
+    'reception-desk',
     'emergency-medicine',
     'laboratory-intelligence',
     'hospital-operations',
@@ -696,9 +761,19 @@ export const DEFAULT_PACKS_BY_ORGANIZATION_TYPE: Record<OrganizationType, string
   [OrganizationType.HOME_CARE]: ['core-platform', 'fleet-logistics'],
   [OrganizationType.TELEHEALTH]: ['core-platform', 'laboratory-intelligence'],
   [OrganizationType.UNIVERSITY]: ['core-platform', 'research-education'],
+  [OrganizationType.RACETRACK]: ['core-platform', 'trackmind'],
 };
 
 export const SEED_ROLE_PROFILES = [
+  {
+    id: 'registration-clerk',
+    label: 'Receptionist / Registration Clerk',
+    intendedRoles: ['registration clerk', 'receptionist'],
+    specialties: ['front desk', 'emergency medicine'],
+    preferredAssetIds: ['calculators', 'protocols', 'analytics'],
+    defaultDashboard: 'reception',
+    defaultAiAgentId: 'agent-clinical',
+  },
   {
     id: 'emergency-physician',
     label: 'Emergency Physician',

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
@@ -273,7 +273,7 @@ function EMSArrivalRow({
 }
 
 export default function EMSPipeline() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const ems = useEmsScreen();
   const emsModule = useEMSIntake();
@@ -402,7 +402,7 @@ export default function EMSPipeline() {
     const result = convertEmsArrivalForReception(arrivalId, { actorName: emergencyRole.roleLabel });
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigate(
+      profileNavigate(
         result.receptionVerifyPath ||
           getReceptionEmbeddedIntakePath({
             step: 'verify',
@@ -457,7 +457,7 @@ export default function EMSPipeline() {
   const openPatient = (patientId) => {
     if (!patientId) return;
     selectPatient(patientId);
-    navigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
+    profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
   };
 
   const handleEmsStripMetricSelect = (metric) => {

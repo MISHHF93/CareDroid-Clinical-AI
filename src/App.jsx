@@ -37,8 +37,7 @@ const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazy(() => import('./pages/tools/ClinicalToolCatalog'));
 const PlatformNavigationPage = lazy(() => import('./pages/PlatformNavigationPage'));
 const CapabilityDiscovery = lazy(() => import('./pages/CapabilityDiscovery'));
-const Auth = lazy(() => import('./pages/Auth'));
-const Welcome = lazy(() => import('./pages/Welcome'));
+const PlatformEntryHub = lazy(() => import('./pages/PlatformEntryHub'));
 const ExecutiveCommandCenter = lazy(() => import('./pages/ExecutiveCommandCenter'));
 const AiCommandCenterDashboard = lazy(() => import('./pages/AiCommandCenterDashboard'));
 const DigitalTwinIntelligence = lazy(() => import('./pages/DigitalTwinIntelligence'));
@@ -248,8 +247,6 @@ const ProfilePreferences = lazy(() => import('./pages/profile/ProfilePreferences
 const ProfileSecurity = lazy(() => import('./pages/profile/ProfileSecurity'));
 const ProfileToolPreferences = lazy(() => import('./pages/profile/ProfileToolPreferences'));
 const ProfileWorkspaces = lazy(() => import('./pages/profile/ProfileWorkspaces'));
-const TwoFactorSetup = lazy(() => import('./pages/TwoFactorSetup'));
-const BiometricSetup = lazy(() => import('./pages/BiometricSetup'));
 const DependencyMap = lazy(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazy(() => import('./pages/DependencyGraph'));
 const DataLineageExplorer = lazy(() => import('./pages/DataLineageExplorer'));
@@ -268,13 +265,6 @@ const SimulationOutcomes = lazy(() => import('./pages/SimulationOutcomes'));
 const Competencies = lazy(() => import('./pages/Competencies'));
 const Credentials = lazy(() => import('./pages/Credentials'));
 const Artifacts = lazy(() => import('./pages/Artifacts'));
-const AuthCallback = lazy(() => import('./pages/AuthCallback'));
-const AuthForgotPassword = lazy(() => import('./pages/auth/AuthForgotPassword'));
-const AuthResetPassword = lazy(() => import('./pages/auth/AuthResetPassword'));
-const AuthVerifyEmail = lazy(() => import('./pages/auth/AuthVerifyEmail'));
-const AuthMagicLink = lazy(() => import('./pages/auth/AuthMagicLink'));
-const AuthInviteAccept = lazy(() => import('./pages/auth/AuthInviteAccept'));
-const PlatformEntryHub = lazy(() => import('./pages/PlatformEntryHub'));
 const AdminOperationsShell = lazy(() => import('./components/admin/AdminOperationsShell'));
 const AdminOperationsHome = lazy(() => import('./pages/admin/AdminOperationsHome'));
 const EdStaffWorkflowAdmin = lazy(() => import('./pages/admin/EdStaffWorkflowAdmin'));
@@ -292,16 +282,11 @@ import {
 import { resolveRegistryId } from './data/clinicalCatalogWiring';
 import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions';
 import TrackMindRouteGuard from './components/TrackMindRouteGuard';
+import ProfileRouteGuard from './components/ProfileRouteGuard';
 import { getEmergencyRoleHomeRoute, EMERGENCY_ROLE_IDS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from './config/emergencyRolePermissions';
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from './config/receptionFirstUx.config';
 import { resolvePlatformLanding } from './config/platformEntryModel';
-import {
-  hydrateAuthenticatedSession,
-  resolvePostAuthDestination,
-  sanitizeReturnUrl,
-} from './auth/authSession';
-import { AuthApi } from './services/authApi';
-import { toast } from 'sonner';
+import { resolveDemoDefaultLandingRoute } from './config/demoPersonaModel';
 
 
 import {
@@ -327,57 +312,8 @@ function LazyRoute({ children, label }) {
   return <Suspense fallback={<RouteLoadingFallback label={label} />}>{children}</Suspense>;
 }
 
-function AuthRoute() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { setAuthToken, setUser, isRealSession } = useUser();
-  const returnUrl = sanitizeReturnUrl(searchParams.get('returnUrl'));
-  const inviteToken = searchParams.get('invite') || '';
-
-  useEffect(() => {
-    if (isRealSession) {
-      toast.info('Already signed in', { description: 'Redirecting to your workspace.' });
-      navigate(returnUrl !== '/' ? returnUrl : getPlatformHomeRoute(), { replace: true });
-    }
-  }, [isRealSession, navigate, returnUrl]);
-
-  const completeAuthSuccess = async (accessToken, user, profileOverride = null) => {
-    if (accessToken) setAuthToken(accessToken);
-    const hydrated = profileOverride
-      ? { user: user || null, profile: profileOverride }
-      : await hydrateAuthenticatedSession(accessToken);
-    const nextUser = hydrated.user || user;
-    if (nextUser) {
-      setUser({ ...nextUser, authMode: 'authenticated' });
-    } else if (user) {
-      setUser({ ...user, authMode: 'authenticated' });
-    }
-
-    if (inviteToken && accessToken) {
-      await AuthApi.acceptWorkspaceInvitation(inviteToken, accessToken);
-    }
-
-    const destination = resolvePostAuthDestination({
-      user: nextUser || user,
-      profile: hydrated.profile,
-      returnUrl,
-    });
-    navigate(destination, { replace: true });
-  };
-
-  const handleAuthSuccess = (accessToken, user) => {
-    completeAuthSuccess(accessToken, user);
-  };
-
-  if (isRealSession) {
-    return <RouteLoadingFallback label="Redirecting..." />;
-  }
-
-  return (
-    <LazyRoute label="Loading sign-in...">
-      <Auth onAuthSuccess={handleAuthSuccess} />
-    </LazyRoute>
-  );
+function AuthPathsRedirect() {
+  return <Navigate to={resolveDemoDefaultLandingRoute()} replace />;
 }
 
 function EmergencyAccessDenied({ requestedPath }) {
@@ -456,32 +392,20 @@ function EmergencyRouteGuard({ path, children }) {
 }
 
 function EmergencyDefaultRedirect() {
-  const { authMode } = useUser();
   const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
 
-  const destination = resolvePlatformLanding({
-    authMode,
-    saasRole: saasProfile?.role || saasProfile?.saasRole,
-    onboardingStatus: saasProfile?.onboardingStatus,
-  });
+  const destination =
+    resolvePlatformLanding({
+      saasRole: saasProfile?.role || saasProfile?.saasRole,
+    }) ||
+    emergencyRole.landingRoute ||
+    emergencyRole.defaultRoute ||
+    resolveDemoDefaultLandingRoute() ||
+    getPlatformHomeRoute() ||
+    CANONICAL_ROUTES.emergencyReception;
 
-  if (destination === CANONICAL_ROUTES.platformStart) {
-    return <Navigate to={destination} replace />;
-  }
-
-  return (
-    <Navigate
-      to={
-        destination ||
-        emergencyRole.landingRoute ||
-        emergencyRole.defaultRoute ||
-        getPlatformHomeRoute() ||
-        CANONICAL_ROUTES.emergencyReception
-      }
-      replace
-    />
-  );
+  return <Navigate to={destination} replace />;
 }
 
 function EmergencyIntakeEntry() {
@@ -763,7 +687,9 @@ function EmergencyAliasRedirect({ to }) {
 function RootLayout() {
   return (
     <AppShell>
-      <Outlet />
+      <ProfileRouteGuard>
+        <Outlet />
+      </ProfileRouteGuard>
     </AppShell>
   );
 }
@@ -772,77 +698,27 @@ export function AppRoutes() {
   const signInAliases = AUTH_PATH_ALIASES.filter(
     (path) => !AUTH_SIGNUP_PATH_ALIASES.includes(path),
   );
+  const legacyAuthPaths = [
+    CANONICAL_ROUTES.auth,
+    CANONICAL_ROUTES.authCallback,
+    CANONICAL_ROUTES.authForgotPassword,
+    CANONICAL_ROUTES.resetPassword,
+    CANONICAL_ROUTES.verifyEmail,
+    CANONICAL_ROUTES.authMagicLink,
+    CANONICAL_ROUTES.authInvite,
+    CANONICAL_ROUTES.welcome,
+    '/two-factor-setup',
+    '/biometric-setup',
+    ...signInAliases,
+    ...AUTH_SIGNUP_PATH_ALIASES,
+  ];
 
   return (
     <Routes>
       <Route path="/" element={<EmergencyDefaultRedirect />} />
-      <Route path={CANONICAL_ROUTES.auth} element={<AuthRoute />} />
-      {signInAliases.map((path) => (
-        <Route key={`auth-signin-${path}`} path={path} element={<AuthRoute />} />
+      {legacyAuthPaths.map((path) => (
+        <Route key={`legacy-auth-${path}`} path={path} element={<AuthPathsRedirect />} />
       ))}
-      {AUTH_SIGNUP_PATH_ALIASES.map((path) => (
-        <Route
-          key={`auth-signup-${path}`}
-          path={path}
-          element={<Navigate to={`${CANONICAL_ROUTES.auth}?mode=signup`} replace />}
-        />
-      ))}
-      <Route
-        path={CANONICAL_ROUTES.authCallback}
-        element={
-          <LazyRoute label="Completing sign-in...">
-            <AuthCallback />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.authForgotPassword}
-        element={
-          <LazyRoute label="Loading...">
-            <AuthForgotPassword />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.resetPassword}
-        element={
-          <LazyRoute label="Loading...">
-            <AuthResetPassword />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.verifyEmail}
-        element={
-          <LazyRoute label="Loading...">
-            <AuthVerifyEmail />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.authMagicLink}
-        element={
-          <LazyRoute label="Signing in...">
-            <AuthMagicLink />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.authInvite}
-        element={
-          <LazyRoute label="Loading invite...">
-            <AuthInviteAccept />
-          </LazyRoute>
-        }
-      />
-      <Route
-        path={CANONICAL_ROUTES.welcome}
-        element={
-          <LazyRoute label="Loading welcome...">
-            <Welcome />
-          </LazyRoute>
-        }
-      />
       <Route
         path="/shared/tools/:shareId"
         element={
@@ -1308,22 +1184,6 @@ export function AppRoutes() {
           element={
             <LazyRoute label="Loading profile workspaces...">
               <ProfileWorkspaces />
-            </LazyRoute>
-          }
-        />
-        <Route
-          path="/two-factor-setup"
-          element={
-            <LazyRoute label="Loading two-factor setup...">
-              <TwoFactorSetup />
-            </LazyRoute>
-          }
-        />
-        <Route
-          path="/biometric-setup"
-          element={
-            <LazyRoute label="Loading biometric setup...">
-              <BiometricSetup />
             </LazyRoute>
           }
         />

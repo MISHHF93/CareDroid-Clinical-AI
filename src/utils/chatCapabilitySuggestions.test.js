@@ -256,4 +256,17 @@ describe('chat capability suggestions', () => {
       expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'Respiratory Workspace'])
     );
   });
+
+  it('filters profile-aware suggestions through the SaaS compiler for registration-clerk', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'chest pain',
+      hasPermission: allowAll,
+      saasRole: 'registration-clerk',
+      tools: getUserFacingToolRegistryProjection(),
+    });
+
+    const toolIds = suggestions.map((suggestion) => suggestion.toolId).filter(Boolean);
+    expect(toolIds).not.toContain('protocols');
+    expect(toolIds).not.toContain('acs-workflow-assistant');
+  });
 });

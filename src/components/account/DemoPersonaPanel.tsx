@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
+import useEmergencyRolePermissions from '../../hooks/useEmergencyRolePermissions';
 import { useUser } from '../../contexts/UserContext';
-import { buildAuthUrl } from '../../auth/authSession';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
   DEMO_JOURNEY_STEPS,
@@ -10,7 +11,6 @@ import {
   listCuratedDemoRoleViews,
   resolveDemoRoleLandingRoute,
 } from '../../config/demoPersonaModel';
-import useEmergencyRolePermissions from '../../hooks/useEmergencyRolePermissions';
 import './DemoPersonaPanel.css';
 
 const DISMISS_KEY = 'caredroid_demo_persona_dismissed';
@@ -18,8 +18,7 @@ const DISMISS_KEY = 'caredroid_demo_persona_dismissed';
 export default function DemoPersonaPanel() {
   const { authMode } = useUser();
   const { role, switchDemoRole } = useEmergencyRolePermissions();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [dismissed, setDismissed] = useState(
     () => typeof sessionStorage !== 'undefined' && sessionStorage.getItem(DISMISS_KEY) === '1',
   );
@@ -27,14 +26,11 @@ export default function DemoPersonaPanel() {
 
   if (authMode !== 'open-access' || dismissed) return null;
 
-  const signInHref = buildAuthUrl({
-    returnUrl: `${location.pathname}${location.search}`,
-  });
   const roleViews = listCuratedDemoRoleViews();
 
   const handleRoleSwitch = (emergencyRoleId: string) => {
     switchDemoRole(emergencyRoleId);
-    navigate(resolveDemoRoleLandingRoute(emergencyRoleId));
+    profileNavigate(resolveDemoRoleLandingRoute(emergencyRoleId));
   };
 
   const runJourneyStep = (step: (typeof DEMO_JOURNEY_STEPS)[number]) => {
@@ -43,7 +39,7 @@ export default function DemoPersonaPanel() {
       return;
     }
     if (step.route) {
-      navigate(step.route);
+      profileNavigate(step.route);
     }
   };
 
@@ -58,9 +54,6 @@ export default function DemoPersonaPanel() {
         <div className="demo-persona-panel__actions">
           <Link className="demo-persona-panel__link" to={CANONICAL_ROUTES.platformStart}>
             Entry hub
-          </Link>
-          <Link className="demo-persona-panel__link" to={signInHref}>
-            Sign in
           </Link>
           <button
             type="button"

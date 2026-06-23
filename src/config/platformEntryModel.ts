@@ -14,7 +14,7 @@ export const ADMIN_SAAS_ROLES = Object.freeze([
 ]);
 
 export const ED_WORKFLOW_LANES = Object.freeze([
-  { id: 'reception', label: 'Reception & registration', saasRoles: ['nurse'], emergencyRoles: ['registration_clerk'] },
+  { id: 'reception', label: 'Reception & registration', saasRoles: ['registration-clerk'], emergencyRoles: ['registration_clerk'] },
   { id: 'triage', label: 'Triage & acuity', saasRoles: ['nurse'], emergencyRoles: ['triage_nurse'] },
   { id: 'waiting', label: 'Waiting room & reassessment', saasRoles: ['nurse'], emergencyRoles: ['charge_nurse'] },
   { id: 'provider', label: 'Provider & disposition', saasRoles: ['emergency-physician'], emergencyRoles: ['physician'] },
@@ -46,11 +46,9 @@ export type PlatformLandingInput = {
 };
 
 export function resolvePlatformLanding({
-  authMode = 'open-access',
   saasRole,
-  onboardingStatus,
   returnUrl,
-}: PlatformLandingInput): string {
+}: PlatformLandingInput = {}): string {
   const safeReturn = String(returnUrl || '').trim();
   if (
     safeReturn &&
@@ -60,14 +58,6 @@ export function resolvePlatformLanding({
     !safeReturn.startsWith('/auth')
   ) {
     return safeReturn;
-  }
-
-  if (authMode === 'open-access') {
-    return CANONICAL_ROUTES.platformStart;
-  }
-
-  if (onboardingStatus && onboardingStatus !== 'complete') {
-    return CANONICAL_ROUTES.welcome;
   }
 
   if (isAdminSaasRole(saasRole)) {

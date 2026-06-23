@@ -493,6 +493,13 @@ export const TRACKMIND_ROUTE_PERMISSION_MAP: Record<string, string | null> = Obj
   [CANONICAL_ROUTES.executive]: K.executiveDashboardView,
   [CANONICAL_ROUTES.billing]: K.financeReportView,
   [CANONICAL_ROUTES.regulatory]: K.complianceReportExport,
+  [CANONICAL_ROUTES.surveillanceNexus]: K.surveillanceNexusView,
+  [CANONICAL_ROUTES.hospitalMap]: K.surveillanceNexusView,
+  [CANONICAL_ROUTES.medicalIot]: K.surveillanceIotManage,
+  [CANONICAL_ROUTES.devices]: K.surveillanceIotManage,
+  [CANONICAL_ROUTES.fleetCommand]: K.analyticsView,
+  [CANONICAL_ROUTES.fleetMap]: K.analyticsView,
+  [CANONICAL_ROUTES.adminOperations]: K.tenantAdminView,
 });
 
 export type TrackMindPermissionContext = {

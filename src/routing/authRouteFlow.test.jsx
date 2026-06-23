@@ -8,15 +8,11 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
 describe('auth canonical flow wiring', () => {
-  it('mounts the auth page and keeps auth aliases out of legacy Emergency redirects', () => {
-    expect(appSource).toContain('function AuthRoute()');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
-    expect(appSource).toContain('AUTH_PATH_ALIASES');
-    expect(appSource).toContain('AUTH_SIGNUP_PATH_ALIASES');
-    expect(appSource).toContain('key={`auth-signin-${path}`}');
-    expect(appSource).toContain('key={`auth-signup-${path}`}');
+  it('redirects legacy auth paths instead of mounting sign-in pages', () => {
+    expect(appSource).toContain('function AuthPathsRedirect()');
+    expect(appSource).toContain('legacyAuthPaths');
+    expect(appSource).not.toContain('function AuthRoute()');
     expect(routeConfigSource).not.toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
-    expect(appSource).not.toContain('function AuthPathRedirect()');
   });
 
   it('keeps Emergency OS routes inside the AppShell while UserProvider supplies platform access', () => {

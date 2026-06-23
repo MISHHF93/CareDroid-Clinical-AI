@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { Checkbox } from '../../components/forms/Checkbox';
 import { recordConsentPreferences } from '../../services/complianceApi';
 import { getStoredAccessToken } from '../../services/apiClient';
@@ -14,7 +15,7 @@ import logger from '../../utils/logger';
  * Tracks consent in audit log
  */
 export const ConsentFlow = ({ onComplete }) => {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [consents, setConsents] = useState({
     hipaa: false,
     privacy: false,
@@ -82,7 +83,7 @@ export const ConsentFlow = ({ onComplete }) => {
       if (onComplete) {
         onComplete();
       } else {
-        navigate('/');
+        profileNavigate('/');
       }
     } catch (error) {
       logger.error('Consent submission error', { error });
@@ -257,7 +258,7 @@ export const ConsentFlow = ({ onComplete }) => {
             <button
               type="button"
               className="btn-consent-secondary"
-              onClick={() => navigate('/auth')}
+              onClick={() => profileNavigate(CANONICAL_ROUTES.platformStart)}
               disabled={isSubmitting}
             >
               Cancel

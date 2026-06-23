@@ -38,6 +38,18 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'shift',
 ]);
 
+/** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
+export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
+  Object.freeze({
+    'registration-clerk': Object.freeze(['reception', 'patients', 'pulse', 'shift']),
+    student: Object.freeze(['tools', 'platform', 'pulse']),
+    steward: Object.freeze(['platform']),
+    'racetrack-admin': Object.freeze(['platform']),
+    'race-day-operations-manager': Object.freeze(['platform']),
+    'equine-welfare-officer': Object.freeze(['platform']),
+    veterinarian: Object.freeze(['platform', 'tools']),
+  });
+
 export const PILOT_CUSTOMER_MODE = Object.freeze({
   enabled: true,
   label: 'Pilot Customer Mode',
@@ -292,6 +304,7 @@ export function getVisibleNavigationForSaasRole(
         (allowedRoutes.has(item.route) || item.roles.includes(emergencyRole)) &&
         !hiddenForRole.has(item.id),
     ),
+    profile.saasRole,
   );
 
   return sortNavigationItemsForRole(visibleItems, emergencyRole);
@@ -324,14 +337,22 @@ export const NAVIGATION_ITEMS = Object.freeze(
   ),
 ) satisfies readonly NavigationItem[];
 
-export function isPilotCustomerVisibleNavItemId(id: string): boolean {
-  return !PILOT_CUSTOMER_MODE.enabled || PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS.includes(id);
+export function isPilotCustomerVisibleNavItemId(id: string, saasRole?: string | null): boolean {
+  if (!PILOT_CUSTOMER_MODE.enabled) return true;
+  const scoped = saasRole ? PROFILE_SCOPED_PILOT_NAV_IDS[normalizeSaasRoleForNav(saasRole)] : null;
+  if (scoped?.length) return scoped.includes(id);
+  return PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS.includes(id);
+}
+
+function normalizeSaasRoleForNav(role: string): string {
+  return String(role || '').trim();
 }
 
 export function getPilotCustomerNavigationItems(
   items: readonly NavigationItem[] = NAVIGATION_ITEMS,
+  saasRole?: string | null,
 ): readonly NavigationItem[] {
-  return items.filter((item) => isPilotCustomerVisibleNavItemId(item.id));
+  return items.filter((item) => isPilotCustomerVisibleNavItemId(item.id, saasRole));
 }
 
 export function getVisibleNavigation(

@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsObject,
   IsOptional,
@@ -87,4 +88,8 @@ export class OrganizationOnboardingDto {
   @IsOptional()
   @IsObject()
   branding?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsBoolean()
+  pilotStrictSaasEntitlements?: boolean;
 }

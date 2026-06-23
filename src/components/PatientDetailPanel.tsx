@@ -69,6 +69,19 @@ const priorityColors: Record<Priority, string> = {
   [Priority.P5]: '#6B7280',
 };
 
+const patientStateOrder: PatientState[] = [
+  PatientState.Arrival,
+  PatientState.Registration,
+  PatientState.Triage,
+  PatientState.Waiting,
+  PatientState.Assessment,
+  PatientState.Orders,
+  PatientState.Results,
+  PatientState.Disposition,
+  PatientState.Admission,
+  PatientState.Discharge,
+];
+
 const emptyVitalsForm = {
   hr: '',
   sbp: '',
@@ -201,6 +214,24 @@ function hasPatientFlagValue(patient: Patient, flag: PatientFlag | string): bool
 
 function hasStrokeCodeFlag(patient: Patient): boolean {
   return patient.flags.some((flag) => /stroke\s*code|strokecode|stroke_code/i.test(String(flag)));
+}
+
+function formatPatientFlag(flag: unknown): string {
+  if (typeof flag === 'string') return flag;
+  if (flag && typeof flag === 'object' && 'type' in flag) {
+    const record = flag as { type?: string; reason?: string };
+    return record.reason ? `${record.type}: ${record.reason}` : String(record.type ?? 'Flag');
+  }
+  return String(flag ?? 'Flag');
+}
+
+function patientFlagKey(flag: unknown): string {
+  if (typeof flag === 'string') return flag;
+  if (flag && typeof flag === 'object') {
+    const record = flag as { type?: string; detectedAt?: string };
+    return `${record.type ?? 'flag'}-${record.detectedAt ?? JSON.stringify(flag)}`;
+  }
+  return String(flag);
 }
 
 function findUpgradeSignal(signals: UpgradeHarnessSignal[], capability: string): UpgradeHarnessSignal | null {
@@ -1362,7 +1393,7 @@ export default function PatientDetailPanel() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {selectedPatient.flags.map((flag) => (
             <span
-              key={flag}
+              key={patientFlagKey(flag)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1374,14 +1405,14 @@ export default function PatientDetailPanel() {
                 fontSize: 12,
               }}
             >
-              {flag}
+              {formatPatientFlag(flag)}
               <button
                 type="button"
                 onClick={() => {
                   if (canManageFlags) removeFlag(selectedPatient.id, flag);
                 }}
                 disabled={!canManageFlags}
-                aria-label={`Remove ${flag}`}
+                aria-label={`Remove ${formatPatientFlag(flag)}`}
                 style={{ border: 0, background: 'transparent', color: '#9CA3AF', cursor: canManageFlags ? 'pointer' : 'not-allowed', opacity: canManageFlags ? 1 : 0.45 }}
               >
                 x

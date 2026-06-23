@@ -119,6 +119,14 @@ export const SURVEILLANCE_ROLE_PERMISSION_GRANTS: Readonly<Record<string, readon
       SURVEILLANCE_PERMISSION_KEYS.auditExport,
       SURVEILLANCE_PERMISSION_KEYS.kpiView,
     ]),
+    organization_admin: Object.freeze([
+      SURVEILLANCE_PERMISSION_KEYS.nexusView,
+      SURVEILLANCE_PERMISSION_KEYS.cameraRegistryView,
+      SURVEILLANCE_PERMISSION_KEYS.iotRegistryView,
+      SURVEILLANCE_PERMISSION_KEYS.zoneMapView,
+      SURVEILLANCE_PERMISSION_KEYS.healthView,
+      SURVEILLANCE_PERMISSION_KEYS.kpiView,
+    ]),
     security_manager: Object.freeze([
       SURVEILLANCE_PERMISSION_KEYS.nexusView,
       SURVEILLANCE_PERMISSION_KEYS.cameraRegistryView,
@@ -150,6 +158,12 @@ export const SURVEILLANCE_ROLE_PERMISSION_GRANTS: Readonly<Record<string, readon
       SURVEILLANCE_PERMISSION_KEYS.healthView,
       SURVEILLANCE_PERMISSION_KEYS.kpiView,
     ]),
+    racetrack_admin: Object.freeze([
+      SURVEILLANCE_PERMISSION_KEYS.nexusView,
+      SURVEILLANCE_PERMISSION_KEYS.cameraRegistryView,
+      SURVEILLANCE_PERMISSION_KEYS.healthView,
+      SURVEILLANCE_PERMISSION_KEYS.kpiView,
+    ]),
     hospital_administrator: Object.freeze([
       SURVEILLANCE_PERMISSION_KEYS.nexusView,
       SURVEILLANCE_PERMISSION_KEYS.cameraRegistryView,
@@ -163,11 +177,32 @@ export const SURVEILLANCE_ROLE_PERMISSION_GRANTS: Readonly<Record<string, readon
       SURVEILLANCE_PERMISSION_KEYS.iotRegistryView,
       SURVEILLANCE_PERMISSION_KEYS.healthView,
     ]),
+    fleet_operator: Object.freeze([
+      SURVEILLANCE_PERMISSION_KEYS.nexusView,
+      SURVEILLANCE_PERMISSION_KEYS.zoneMapView,
+      SURVEILLANCE_PERMISSION_KEYS.healthView,
+    ]),
   });
 
+const SAAS_TO_SURVEILLANCE_ROLE: Readonly<Record<string, string>> = Object.freeze({
+  'platform-admin': 'platform_super_admin',
+  'hospital-administrator': 'hospital_administrator',
+  'biomedical-engineer': 'biomedical_engineer',
+  'fleet-operator': 'fleet_operator',
+  'racetrack-admin': 'racetrack_admin',
+  'race-day-operations-manager': 'race_day_operations_manager',
+  steward: 'steward',
+  'equine-welfare-officer': 'equine_welfare_officer',
+  veterinarian: 'veterinarian',
+  'executive-leadership': 'executive_leadership',
+  'compliance-officer': 'compliance_officer',
+});
+
 export function resolveSurveillancePermissionsForRole(role: string | null | undefined): readonly string[] {
-  const key = String(role || 'generic_staff').replace(/-/g, '_');
-  return SURVEILLANCE_ROLE_PERMISSION_GRANTS[key] || [SURVEILLANCE_PERMISSION_KEYS.nexusView];
+  const raw = String(role || 'generic_staff').trim();
+  const normalized = raw.replace(/-/g, '_');
+  const mapped = SAAS_TO_SURVEILLANCE_ROLE[raw] || SAAS_TO_SURVEILLANCE_ROLE[normalized.replace(/_/g, '-')] || normalized;
+  return SURVEILLANCE_ROLE_PERMISSION_GRANTS[mapped] || [];
 }
 
 export function canAccessSurveillanceRoute(

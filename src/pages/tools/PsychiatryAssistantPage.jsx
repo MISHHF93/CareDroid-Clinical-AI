@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import ToolPageLayout from './ToolPageLayout';
 import ToolNotFound from './ToolNotFound';
 import { useConversation } from '../../contexts/ConversationContext';
@@ -60,7 +61,7 @@ const PSYCHIATRY_WORKFLOW_DETAIL = Object.freeze({
 
 export default function PsychiatryAssistantPage() {
   const { toolId } = useParams();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const normalizedToolId = String(toolId || '').toLowerCase();
   const tool = toolRegistryById[normalizedToolId];
@@ -83,7 +84,7 @@ export default function PsychiatryAssistantPage() {
     selectTool?.(tool.id);
     setActiveTool?.(tool.id);
     if (launch.chatSeed) addMessage?.(launch.chatSeed, 'user');
-    navigate('/assistant');
+    profileNavigate('/assistant');
   };
 
   return (

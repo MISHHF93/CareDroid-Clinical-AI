@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type FitToWaitClassificationId, type Patient } from '../../types/emergency';
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
@@ -27,6 +27,7 @@ import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import useTriageScreen from '../../hooks/useTriageScreen';
 import useChargeNurseScreen from '../../hooks/useChargeNurseScreen';
+import useReceptionScreen from '../../hooks/useReceptionScreen';
 import usePhysicianScreen from '../../hooks/usePhysicianScreen';
 import usePublicWaitingScreen from '../../hooks/usePublicWaitingScreen';
 import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen';
@@ -345,10 +346,11 @@ function MissionButton({
 }
 
 export default function EmergencyWhiteboard() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const triage = useTriageScreen();
   const charge = useChargeNurseScreen();
+  const reception = useReceptionScreen();
   const physician = usePhysicianScreen();
   const publicWaiting = usePublicWaitingScreen();
   const readOnlyWhiteboard = useReadOnlyWhiteboardScreen();
@@ -822,7 +824,7 @@ export default function EmergencyWhiteboard() {
     if (!canUseCentralIntake) return undefined;
     const openIntake = () => {
       if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-        navigate(getReceptionQuickCreatePath());
+        profileNavigate(getReceptionQuickCreatePath());
         return;
       }
       if (canUseCentralIntake) setShowIntake(true);
@@ -834,7 +836,7 @@ export default function EmergencyWhiteboard() {
       document.removeEventListener('open-intake', openIntake);
       document.removeEventListener('close-all-panels', closePanels);
     };
-  }, [canUseCentralIntake, emergencyRole.role, navigate]);
+  }, [canUseCentralIntake, emergencyRole.role, profileNavigate]);
 
   useEffect(() => {
     const clearFilters = () => {
@@ -1010,20 +1012,20 @@ export default function EmergencyWhiteboard() {
 
   const openIntake = useCallback(() => {
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigate(getReceptionQuickCreatePath());
+      profileNavigate(getReceptionQuickCreatePath());
       return;
     }
     if (canUseCentralIntake) setShowIntake(true);
-  }, [canUseCentralIntake, emergencyRole.role, navigate]);
+  }, [canUseCentralIntake, emergencyRole.role, profileNavigate]);
 
   const openRoute = useCallback((path: string) => {
     const permissionPath = routePermissionPath(path);
-    navigate(
+    profileNavigate(
       emergencyRole.canAccessRoute(permissionPath)
         ? path
         : emergencyRole.nearestRoute(permissionPath),
     );
-  }, [emergencyRole, navigate]);
+  }, [emergencyRole, profileNavigate]);
 
   const openReferralWorkflow = useCallback((patientId?: string, status?: string) => {
     if (!patientId && !status && !canManageReferral) return;
@@ -1034,8 +1036,8 @@ export default function EmergencyWhiteboard() {
     }
     if (status) params.set('status', status.toLowerCase());
     const query = params.toString();
-    navigate(query ? `${CANONICAL_ROUTES.emergencyReferrals}?${query}` : CANONICAL_ROUTES.emergencyReferrals);
-  }, [canManageReferral, navigate]);
+    profileNavigate(query ? `${CANONICAL_ROUTES.emergencyReferrals}?${query}` : CANONICAL_ROUTES.emergencyReferrals);
+  }, [canManageReferral, profileNavigate]);
 
   const handleReferralAttentionSelect = useCallback(
     (metric: { whiteboardAction?: string }) => {
@@ -1278,7 +1280,7 @@ export default function EmergencyWhiteboard() {
     });
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigate(
+      profileNavigate(
         result.receptionVerifyPath ||
           getReceptionEmbeddedIntakePath({
             step: 'verify',
@@ -1296,7 +1298,7 @@ export default function EmergencyWhiteboard() {
     canConvertEmsArrival,
     emergencyRole.role,
     emergencyRole.roleLabel,
-    navigate,
+    profileNavigate,
     whiteboard.refresh,
   ]);
 
@@ -3066,7 +3068,7 @@ export default function EmergencyWhiteboard() {
                     secondary
                     onClick={() => {
                       if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-                        navigate(getReceptionQuickCreatePath());
+                        profileNavigate(getReceptionQuickCreatePath());
                         return;
                       }
                       document.dispatchEvent(new Event('open-intake'));

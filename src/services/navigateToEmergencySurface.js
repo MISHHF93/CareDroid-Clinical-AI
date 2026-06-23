@@ -8,6 +8,7 @@ import {
 } from '../config/emergencyRolePermissions';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 
 const FRONT_DOOR_REDIRECT_ROLES = new Set([
   'registration_clerk',
@@ -89,19 +90,20 @@ export function navigateToEmergencySurface(navigate, surfaceId, options = {}) {
     resetReceptionQuery: options.resetReceptionQuery,
   });
 
-  if (emergencyRole?.canAccessRoute) {
-    const navItem = navItemForSurface(surfaceId);
-    const permissionPath = navItem?.path || path;
-    navigate(
-      emergencyRole.canAccessRoute(permissionPath)
-        ? path
-        : emergencyRole.nearestRoute(permissionPath),
-    );
-    return path;
-  }
+  const navItem = navItemForSurface(surfaceId);
+  const permissionPath = navItem?.path || path;
 
-  navigate(path);
-  return path;
+  navigateProfileAware(navigate, path, {
+    emergencyRole,
+    saasRole: options.saasRole,
+    context: options.context,
+  });
+
+  return emergencyRole?.canAccessRoute
+    ? emergencyRole.canAccessRoute(permissionPath)
+      ? path
+      : emergencyRole.nearestRoute(permissionPath)
+    : path;
 }
 
 export function getEmergencySurfaceTitle(surfaceId) {

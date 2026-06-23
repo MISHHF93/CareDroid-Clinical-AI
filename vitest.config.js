@@ -25,6 +25,8 @@ export default defineConfig({
       /** Archived future-module review code is not part of the active Emergency OS test surface. */
       '**/features/future-modules/_review/**',
       'src/pages/WorkspaceHome.test.jsx',
+      /** Jest integration harness (`npm run test:integration`); requires express/supertest not in Vitest graph. */
+      'tests/integration/**',
     ],
     /**
      * Default `maxWorkers: 1` avoids Vitest 4 worker startup timeouts on some Windows setups.

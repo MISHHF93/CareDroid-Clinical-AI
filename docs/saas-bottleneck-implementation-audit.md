@@ -1,6 +1,6 @@
 # SaaS Bottleneck Implementation Audit
 
-Generated: 2026-06-12T21:14:44.094Z
+Generated: 2026-06-23T02:49:13.243Z
 
 ## Purpose
 
@@ -8,19 +8,19 @@ This scanner checks whether the implementation matches the architecture plan in 
 
 ## Summary
 
-- Score: **96 / 100**
-- Passing checks: **11 / 12**
+- Score: **79 / 100**
+- Passing checks: **9 / 12**
 - Partial checks: **1**
-- Failing checks: **0**
+- Failing checks: **2**
 
 ## Checks
 
 | Phase | Check | Status | Evidence | Next step |
 | --- | --- | --- | --- | --- |
 | Phase 0 | SaaS bottleneck architecture plan exists | **PASS** | `docs/saas-bottleneck-architecture-plan.md` | Keep this focused plan linked from future implementation tickets. |
-| Phase 1 | Seeded platform assets are fully packaged | **PASS** | 68/68 seeded assets compliant; 0 violations | Fix seeded asset pack/specialty/role/org mappings before expanding strict rollout. |
+| Phase 1 | Seeded platform assets are fully packaged | **FAIL** | 68/69 seeded assets compliant; 1 violations | Fix seeded asset pack/specialty/role/org mappings before expanding strict rollout. |
 | Phase 1 | All user-facing inventory tools are platform assets | **PARTIAL** | 245 frontend-mounted registry tools await backend seed rows; 0 lack mounted projection | Promote high-value mounted projection rows into backend `platform_assets` when they need entitlement enforcement, billing, or marketplace ownership. |
-| Phase 2 | Backend strict SaaS entitlement mode is implemented | **PASS** | `PlatformAssetsService.resolveEntitledAssetIds` supports strict organization behavior | Keep fallback behavior feature-flagged and disabled for strict org tenants. |
+| Phase 2 | Backend strict SaaS entitlement mode is implemented | **FAIL** | `PlatformAssetsService.resolveEntitledAssetIds` supports strict organization behavior | Keep fallback behavior feature-flagged and disabled for strict org tenants. |
 | Phase 2 | Onboarding workspaces are backend authoritative and org-linked | **PASS** | `WorkspacesService.createWorkspace` accepts organization scope; onboarding sends supported workspace type and enabled tool IDs | Migrate remaining localStorage workspace filters behind compatibility mode. |
 | Phase 2 | Organization-scoped platform reads enforce membership | **PASS** | `platform-assets.controller.ts` checks organization membership for entitlements, analytics, and digital twin reads | Extend the same assertion pattern to new organization-scoped endpoints. |
 | Phase 3 | Asset lifecycle changes require platform admin role | **PASS** | `PATCH /platform/assets/:assetId/lifecycle` checks `UserRole.ADMIN` | Add audit logging when lifecycle state changes. |
@@ -38,12 +38,12 @@ This scanner checks whether the implementation matches the architecture plan in 
 
 ### Phase 1
 
-- **PASS:** Seeded platform assets are fully packaged
+- **FAIL:** Seeded platform assets are fully packaged
 - **PARTIAL:** All user-facing inventory tools are platform assets
 
 ### Phase 2
 
-- **PASS:** Backend strict SaaS entitlement mode is implemented
+- **FAIL:** Backend strict SaaS entitlement mode is implemented
 - **PASS:** Onboarding workspaces are backend authoritative and org-linked
 - **PASS:** Organization-scoped platform reads enforce membership
 

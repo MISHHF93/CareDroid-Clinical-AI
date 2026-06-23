@@ -68,6 +68,8 @@ export class OrganizationOnboardingService {
           integrationsRequested: dto.integrationSlugs || [],
           complianceMode,
           branding,
+          pilotStrictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
+          strictSaasEntitlements: dto.pilotStrictSaasEntitlements === true,
         },
       }),
     );

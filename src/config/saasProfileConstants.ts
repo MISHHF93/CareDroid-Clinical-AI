@@ -6,6 +6,7 @@ export const SAAS_USER_ROLES = Object.freeze([
   'emergency-physician',
   'icu-physician',
   'cardiologist',
+  'registration-clerk',
   'nurse',
   'pharmacist',
   'lab-technician',
@@ -24,6 +25,18 @@ export const SAAS_USER_ROLES = Object.freeze([
   'veterinarian',
   'executive-leadership',
   'auditor-regulator',
+] as const);
+
+export const SAAS_ORGANIZATION_TYPES = Object.freeze([
+  'hospital',
+  'clinic',
+  'EMS',
+  'university',
+  'research-center',
+  'long-term-care',
+  'telehealth',
+  'government',
+  'racetrack',
 ] as const);
 
 export type SaasUserRole = (typeof SAAS_USER_ROLES)[number];
@@ -55,6 +68,7 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
   ],
   'icu-physician': ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'VIEW_ICU'],
   cardiologist: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'VIEW_CARDIOLOGY'],
+  'registration-clerk': ['VIEW_DASHBOARD', 'VIEW_EMERGENCY_RECEPTION'],
   nurse: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'VIEW_PATIENT_CARE'],
   pharmacist: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'VIEW_PHARMACY'],
   'lab-technician': ['VIEW_DASHBOARD', 'VIEW_TOOLS', 'VIEW_LABORATORY'],
@@ -138,6 +152,14 @@ export function normalizeSaasRole(role?: string | null): SaasUserRole {
   if (role === 'physician') return 'emergency-physician';
   if (role === 'admin') return 'hospital-administrator';
   if (role === 'nurse') return 'nurse';
+  if (
+    role === 'registration_clerk' ||
+    role === 'registration-clerk' ||
+    role === 'receptionist' ||
+    role === 'clerk'
+  ) {
+    return 'registration-clerk';
+  }
   if (role === 'platform_super_admin' || role === 'platform-admin') return 'platform-admin';
   if (role === 'organization_admin' || role === 'racetrack_admin') return 'racetrack-admin';
   if (role === 'race_day_operations_manager') return 'race-day-operations-manager';

@@ -1,4 +1,6 @@
 import { buildProfileToolGraph, buildUserToolProfile } from './profileToolSegmentation';
+import { applySaasResonanceToToolProfile, resolveSaasToolResonance } from '../config/saasProfileToolResonance';
+import { compileUserProfile } from '../config/userProfileCompiler';
 
 export const ROLE_INTELLIGENCE_SIGNALS = Object.freeze({
   ASSET_USAGE: 'role_asset_usage',
@@ -209,6 +211,14 @@ export function buildRoleIntelligenceProfile({
   platformContext,
   activity,
 } = {}) {
+  const saasRoleId = roleProfile?.id || platformContext?.roleProfile?.id || platformContext?.saasRole;
+  const saasResonance = saasRoleId ? resolveSaasToolResonance(saasRoleId) : null;
+  const compiledProfile = saasRoleId
+    ? compileUserProfile({
+        saasRole: saasRoleId,
+        entitlementContext: platformContext,
+      })
+    : null;
   const baseProfile =
     profile ||
     buildUserToolProfile({
@@ -220,19 +230,24 @@ export function buildRoleIntelligenceProfile({
       toolPreferences,
       permissions,
     });
-  const role = normalizeRole(roleProfile?.label || roleProfile?.id || baseProfile.role);
+  const mergedProfile = saasRoleId ? applySaasResonanceToToolProfile(baseProfile, saasRoleId) : baseProfile;
+  const role = normalizeRole(mergedProfile.role || roleProfile?.label || roleProfile?.id || baseProfile.role);
   const workspaceId =
     activeWorkspace?.id ||
     workspaceState?.activeWorkspaceId ||
-    baseProfile.workspace ||
+    mergedProfile.workspace ||
     platformContext?.workspace?.activeWorkspaceId ||
     'all';
 
   return {
-    ...baseProfile,
+    ...mergedProfile,
     role,
-    roleLabel: getRoleDisplayName(role),
-    roleProfileId: roleProfile?.id,
+    roleLabel: saasResonance?.profileCopy.personaTitle || getRoleDisplayName(role),
+    roleProfileId: roleProfile?.id || saasRoleId,
+    saasRole: saasRoleId || mergedProfile.saasRole,
+    toolsTitle: saasResonance?.toolsTitle,
+    toolsSubtitle: saasResonance?.toolsSubtitle,
+    operationsEyebrow: saasResonance?.operationsEyebrow,
     workspace: workspaceId,
     workspaceId,
     workspaceLabel: activeWorkspace?.name || platformContext?.workspace?.activeWorkspaceId || workspaceId,
@@ -240,6 +255,7 @@ export function buildRoleIntelligenceProfile({
     entitledPackIds: platformContext?.entitledPackIds || [],
     defaultAiAgentId: platformContext?.defaultAiAgentId,
     behaviorSignals: buildRoleBehaviorSignals({ activity, toolPreferences, preferences }),
+    compiledProfile,
   };
 }
 

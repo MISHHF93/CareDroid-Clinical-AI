@@ -158,6 +158,17 @@ function implementationChecks() {
     'narrows entitled assets by workspace scope',
   ]);
 
+  const profileCompiler =
+    has('src/config/userProfileCompiler.ts', 'compileUserProfile') &&
+    has('src/config/profilePackTaxonomy.ts', 'isStrictPackEnforcementForRole') &&
+    has('src/hooks/useCompiledUserProfile.ts', 'useCompiledUserProfile') &&
+    has('src/data/toolInventory.js', 'REGISTRY_PACK_ID');
+
+  const catalogSegregationComplete =
+    has('src/config/user-profile-catalog.data.json', '"assignableOrganizationTypes"') &&
+    has('src/config/user-profile-catalog.data.json', '"requiredEntitlementPacks"') &&
+    has('src/config/user-profile-catalog.data.json', '"heart-score"');
+
   return [
     check(
       'plan-doc',
@@ -246,6 +257,22 @@ function implementationChecks() {
       statusFromBoolean(roleSegmentation),
       '`RoleProfile` stores preferred/hidden assets and defaults; platform context returns role profile/default agent',
       'Make role profile authoritative across every recommendation and dashboard surface.',
+    ),
+    check(
+      'profile-compiler',
+      'User profile compiler unifies routes, tools, and launch policy',
+      'Phase 4',
+      statusFromBoolean(profileCompiler),
+      '`userProfileCompiler.ts`, `profilePackTaxonomy.ts`, `useCompiledUserProfile`, and registry pack metadata in `toolInventory.js`',
+      'Route remaining direct launch bypasses through `compileUserProfile` / `isToolAllowedForCompiledProfile`.',
+    ),
+    check(
+      'catalog-segregation',
+      'SaaS catalog has explicit segregation and curated required tools',
+      'Phase 4',
+      statusFromBoolean(catalogSegregationComplete),
+      '`user-profile-catalog.data.json` includes assignable org types, entitlement packs, and profile-specific required tools',
+      'Keep backend `saas-profile-rbac.config.ts` pack IDs aligned with frontend taxonomy.',
     ),
     check(
       'tests',

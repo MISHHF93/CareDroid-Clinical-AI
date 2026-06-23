@@ -10,8 +10,8 @@ export default function HelpCenter() {
       title: 'Getting Started',
       items: [
         {
-          q: 'How do I sign up for CareDroid?',
-          a: 'Click "Create Account" on the login page and follow the registration steps. You\'ll need to verify your email and set up a secure password.'
+          q: 'How do I get started with CareDroid?',
+          a: 'Open the platform entry hub or land directly in the ED demo. Use the demo persona panel to switch between reception, triage, physician, EMS, and admin views without signing in.'
         },
         {
           q: 'What is careDroid AI?',
@@ -79,7 +79,7 @@ export default function HelpCenter() {
       items: [
         {
           q: 'I forgot my password',
-          a: 'Click "Forgot Password" on the login page. You\'ll receive a secure reset link via email.'
+          a: 'Use profile settings to review your demo identity. Password reset flows are disabled during the build phase.'
         },
         {
           q: 'The app is loading slowly',

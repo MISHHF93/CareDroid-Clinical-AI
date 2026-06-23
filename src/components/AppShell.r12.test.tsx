@@ -32,14 +32,18 @@ vi.mock('../engine/simulation', () => ({
   stopSimulation: mocks.stopSimulation,
 }));
 
+const emergencyRoleMock = vi.hoisted(() => {
+  const { PERMISSIVE_EMERGENCY_ROLE_MOCK } = require('../test/permissiveEmergencyRoleMock.js');
+  return PERMISSIVE_EMERGENCY_ROLE_MOCK;
+});
+
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
-  useEmergencyRolePermissions: () => ({
-    role: 'charge-nurse',
-    roleLabel: 'Charge Nurse',
-    can: () => true,
-    canAccessRoute: () => true,
-    nearestRoute: (path: string) => path,
-  }),
+  useEmergencyRolePermissions: () => emergencyRoleMock,
+  default: () => emergencyRoleMock,
+}));
+
+vi.mock('./account/DemoPersonaPanel', () => ({
+  default: () => null,
 }));
 
 vi.mock('./Sidebar', () => ({

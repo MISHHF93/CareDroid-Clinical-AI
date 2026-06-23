@@ -113,7 +113,7 @@ const ProfileSettings = ({ authToken }) => {
   const handleSave = async (event) => {
     event.preventDefault();
     if (!effectiveAuthToken) {
-      setStatus({ type: 'error', message: 'Sign in to update your profile.' });
+      setStatus({ type: 'error', message: 'Profile API unavailable — changes stay local in demo mode.' });
       return;
     }
     if (!payload.displayName) {
@@ -169,7 +169,7 @@ const ProfileSettings = ({ authToken }) => {
         >
           {!effectiveAuthToken && (
             <div className="api-state-banner api-state-banner--warning" role="status">
-              Sign in to save profile changes to the backend.
+              Profile changes save locally during the build phase when the backend profile API is offline.
             </div>
           )}
           {status.message && (

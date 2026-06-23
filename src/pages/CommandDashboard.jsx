@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Permission, useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
@@ -29,6 +29,7 @@ import {
   applyRegistryToolLaunch,
 } from '../navigation/registryToolLaunch';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import './CommandDashboard.css';
@@ -333,7 +334,7 @@ function isAlertNotification(notification) {
 }
 
 export default function CommandDashboard() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
   const {
@@ -480,7 +481,7 @@ export default function CommandDashboard() {
   const showStatusPanel = systemConfig.loading || systemConfig.configDegraded || Boolean(systemConfig.error);
   const launchTool = (tool) => {
     applyRegistryToolLaunch(tool.id, {
-      navigate,
+      navigate: profileNavigate,
       addMessage,
       selectTool,
       setActiveTool,
@@ -492,7 +493,7 @@ export default function CommandDashboard() {
 
   const launchPrompt = (prompt) => {
     addMessage(buildWorkspaceAssistantPrompt(prompt, workspaceExperience), 'user');
-    navigate(CANONICAL_ROUTES.assistant);
+    profileNavigate(CANONICAL_ROUTES.assistant);
   };
 
   const handleSubmit = (event) => {
@@ -504,7 +505,7 @@ export default function CommandDashboard() {
 
   const handlePromptAction = (action) => {
     if (action.route) {
-      navigate(action.route);
+      profileNavigate(action.route);
       return;
     }
     if (action.toolId) {

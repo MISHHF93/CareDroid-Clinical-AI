@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   IconAlertTriangle,
   IconAmbulance,
@@ -14,6 +13,7 @@ import {
   useEmergencyStore,
 } from '../../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../../config/routes.config';
+import useProfileNavigate from '../../../hooks/useProfileNavigate';
 import {
   PatientFlag,
   PatientState,
@@ -387,7 +387,7 @@ function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string
 }
 
 export default function DepartmentPulse() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
   const staff = useEmergencyStore((state) => state.staff);
@@ -553,7 +553,7 @@ export default function DepartmentPulse() {
               key={tile.label}
               type="button"
               className={`emergency-pulse__stat emergency-pulse__stat--${tile.tone}`}
-              onClick={() => navigate(tile.route)}
+              onClick={() => profileNavigate(tile.route)}
             >
               <Icon size={24} aria-hidden="true" />
               <span>{tile.label}</span>

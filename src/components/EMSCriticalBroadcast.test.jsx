@@ -6,10 +6,20 @@ import EMSCriticalBroadcast from './EMSCriticalBroadcast';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { Priority } from '../types/emergency';
 
-vi.mock('../hooks/useEmergencyRolePermissions', () => ({
-  useEmergencyRolePermissions: () => ({
-    can: () => true,
+const emergencyRoleMock = vi.hoisted(() => ({
+  role: 'charge_nurse',
+  can: () => true,
+  presentAction: () => ({
+    state: 'A',
+    visible: true,
+    enabled: true,
+    readOnly: false,
+    permission: null,
   }),
+}));
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => emergencyRoleMock,
 }));
 
 const originalState = useEmergencyStore.getState();

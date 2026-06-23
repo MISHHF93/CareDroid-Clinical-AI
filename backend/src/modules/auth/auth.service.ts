@@ -338,6 +338,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
+      roleProfileId: user.profile?.roleProfileId || null,
       tokenUse: 'access',
     };
 

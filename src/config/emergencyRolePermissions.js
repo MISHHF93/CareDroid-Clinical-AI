@@ -149,6 +149,7 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.shift,
   ROUTES.analytics,
   ROUTES.integrations,
+  ROUTES.integrationHub,
   ROUTES.cosmos,
   ROUTES.settings,
 ]);

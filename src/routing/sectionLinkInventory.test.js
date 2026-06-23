@@ -27,7 +27,7 @@ const visibleLinkInventory = [
 
 const canonicalRoutes = new Set([
   '/',
-  '/auth',
+  '/start',
   '/dashboard',
   '/assistant',
   '/app',
@@ -36,8 +36,7 @@ const canonicalRoutes = new Set([
 
 const userFacingLinkFiles = [
   'layout/AppShell.jsx',
-  'pages/Auth.jsx',
-  'pages/AuthCallback.jsx',
+  'pages/PlatformEntryHub.jsx',
   'pages/Profile.jsx',
   'pages/ProfileSettings.jsx',
   'pages/Settings.jsx',

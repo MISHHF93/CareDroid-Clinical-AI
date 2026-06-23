@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
@@ -52,13 +52,13 @@ const PATIENT_ACTIONS = Object.freeze([
 ]);
 
 export default function Patients() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
 
   const launchAction = (action) => {
     if (!action.toolId) {
-      navigate(action.path);
+      profileNavigate(action.path);
       return;
     }
 
@@ -84,7 +84,7 @@ export default function Patients() {
             Start from the active patient, then bring summaries, timelines, notes, and order workflows into Assistant.
           </p>
         </div>
-        <button type="button" className="operating-primary-action" onClick={() => navigate('/assistant')}>
+        <button type="button" className="operating-primary-action" onClick={() => profileNavigate('/assistant')}>
           Ask Assistant
         </button>
       </section>

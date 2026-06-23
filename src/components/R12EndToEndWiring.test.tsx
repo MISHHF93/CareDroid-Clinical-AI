@@ -31,16 +31,14 @@ vi.mock('sonner', () => ({
   toast: mocks.toast,
 }));
 
+const emergencyRoleMock = vi.hoisted(() => {
+  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.js');
+  return withEmergencyRoleMock({ switchDemoRole: vi.fn() });
+});
+
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
-  useEmergencyRolePermissions: () => ({
-    role: 'charge-nurse',
-    roleLabel: 'Charge Nurse',
-    demoRoles: [{ id: 'charge-nurse', label: 'Charge Nurse' }],
-    switchDemoRole: vi.fn(),
-    can: () => true,
-    canAccessRoute: () => true,
-    nearestRoute: (path: string) => path,
-  }),
+  useEmergencyRolePermissions: () => emergencyRoleMock,
+  default: () => emergencyRoleMock,
 }));
 
 vi.mock('../hooks/usePatientTimelineContext', () => ({
@@ -292,7 +290,11 @@ describe('R12 critical vitals and flag reactivity', () => {
     const patient = makePatient();
     useEmergencyStore.setState({ ...originalState, patients: [patient] }, true);
 
-    render(<PatientCard patient={patient} />);
+    render(
+      <MemoryRouter>
+        <PatientCard patient={patient} />
+      </MemoryRouter>,
+    );
 
     expect(screen.queryByLabelText(PatientFlag.DeteriorationRisk)).toBeNull();
 

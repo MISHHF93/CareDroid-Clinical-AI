@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { FileScan } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { EMERGENCY_ACTIONS, prefersReceptionForPatientCreate } from '../../config/emergencyRolePermissions';
@@ -98,7 +99,7 @@ export default function SmartIntake({
   onHandoffComplete,
 }) {
   const emergencyRole = useEmergencyRolePermissions();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [searchParams] = useSearchParams();
   const store = useEmergencyStore();
   const addPatient = useEmergencyStore((state) => state.addPatient);
@@ -216,7 +217,7 @@ export default function SmartIntake({
   useEffect(() => {
     if (embedded || fromReception) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigate(
+      profileNavigate(
         getReceptionEmbeddedIntakePath({
           step: searchParams.get('step') || undefined,
           mode: searchParams.get('mode') || undefined,
@@ -226,12 +227,12 @@ export default function SmartIntake({
         { replace: true },
       );
     }
-  }, [embedded, emergencyRole.role, fromReception, navigate, searchParams]);
+  }, [embedded, emergencyRole.role, fromReception, profileNavigate, searchParams]);
 
   useEffect(() => {
     if (embedded || !fromReception) return;
     if (searchParams.get('from') !== 'reception') return;
-    navigate(
+    profileNavigate(
       getReceptionEmbeddedIntakePath({
         step: searchParams.get('step') || undefined,
         mode: searchParams.get('mode') || undefined,
@@ -240,7 +241,7 @@ export default function SmartIntake({
       }),
       { replace: true },
     );
-  }, [embedded, fromReception, navigate, searchParams]);
+  }, [embedded, fromReception, profileNavigate, searchParams]);
 
   useEffect(() => {
     if (!contextPatientId) return;
@@ -330,10 +331,10 @@ export default function SmartIntake({
         onHandoffComplete(handoff);
         return;
       }
-      navigate(handoff.receptionPath);
+      profileNavigate(handoff.receptionPath);
       return;
     }
-    navigate(handoff.whiteboardPath);
+    profileNavigate(handoff.whiteboardPath);
   };
 
   const verificationComplete = useMemo(
@@ -668,7 +669,7 @@ export default function SmartIntake({
             {RECEPTION_COPY.identityCheck.close}
           </button>
         ) : fromReception ? (
-          <button type="button" onClick={() => navigate(CANONICAL_ROUTES.emergencyReception)}>
+          <button type="button" onClick={() => profileNavigate(CANONICAL_ROUTES.emergencyReception)}>
             {RECEPTION_COPY.identityCheck.backToReception}
           </button>
         ) : null}

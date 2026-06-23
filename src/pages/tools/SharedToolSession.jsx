@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { getSharedSession } from '../../utils/sharedSessions';
 import { toolRegistryById } from '../../data/toolRegistry';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -8,7 +9,7 @@ import './SharedToolSession.css';
 
 const SharedToolSession = () => {
   const { shareId } = useParams();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const session = getSharedSession(shareId);
   const tool = session?.toolId ? toolRegistryById[session.toolId] : null;
 
@@ -18,7 +19,7 @@ const SharedToolSession = () => {
         <div className="shared-session-card">
           <h1>Session Not Found</h1>
           <p>This shared session link is invalid or has expired.</p>
-          <button onClick={() => navigate('/tools')}>Browse Tools</button>
+          <button onClick={() => profileNavigate('/tools')}>Browse Tools</button>
         </div>
       </div>
     );
@@ -50,9 +51,9 @@ const SharedToolSession = () => {
           </pre>
         )}
         <div className="shared-actions">
-          <button onClick={() => navigate('/dashboard')}>Open Dashboard</button>
+          <button onClick={() => profileNavigate('/dashboard')}>Open Dashboard</button>
           {tool && (
-            <button onClick={() => navigate(tool.path)}>Open Tool</button>
+            <button onClick={() => profileNavigate(tool.path)}>Open Tool</button>
           )}
         </div>
       </div>

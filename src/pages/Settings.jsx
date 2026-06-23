@@ -104,7 +104,7 @@ const Settings = () => {
         setBillingLoading(false);
         setBillingStatus({
           type: 'idle',
-          message: 'Sign in to view subscription billing.',
+          message: 'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
         });
         return;
       }
@@ -193,7 +193,7 @@ const Settings = () => {
     if (authLoading) return undefined;
     if (!canLoadBilling) {
       setTenantIsolationAudit(null);
-      setTenantIsolationStatus('Sign in as a tenant administrator to view the isolation audit.');
+      setTenantIsolationStatus('Open admin console as a tenant administrator to view the isolation audit.');
       return undefined;
     }
 
@@ -644,12 +644,13 @@ const Settings = () => {
                   the customer portal from protected subscription routes.
                 </p>
               </div>
-              <span className="settings-billing-card__badge">Auth required</span>
+              <span className="settings-billing-card__badge">Demo mode</span>
             </div>
 
             {!canLoadBilling ? (
               <div className="settings-billing-empty">
-                Sign in to view current plan/status, checkout, and customer portal actions.
+                Billing data loads when the backend subscription API is available. During the build
+                phase, plan and checkout actions may stay disabled.
               </div>
             ) : (
               <>

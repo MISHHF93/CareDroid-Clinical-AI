@@ -6,6 +6,7 @@ import {
   PILOT_CUSTOMER_MODE,
   getPilotCustomerNavigationItems,
   getVisibleNavigation,
+  getVisibleNavigationForSaasRole,
   resolveFeatureGate,
 } from './unified-navigation.config';
 
@@ -205,23 +206,7 @@ describe('unified navigation config', () => {
     expect(adminLabels.sort()).toEqual(expectedAdminLabels.sort());
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
-    expect(readOnlyLabels).toEqual([
-      'Whiteboard',
-      'Reception',
-      'Patients',
-      'Queues',
-      'Reassess',
-      'Capacity',
-      'Boarding',
-      'Referrals',
-      'Copilot',
-      'Medical Tools',
-      'Analytics',
-      'Integrations',
-      'Cosmos',
-      'Platform',
-      'EMS',
-    ]);
+    expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics']);
     expect(readOnlyLabels).toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
   });
@@ -241,6 +226,13 @@ describe('unified navigation config', () => {
     expect(clerkNavIds).not.toContain('queues');
     expect(clerkNavIds).not.toContain('tools');
     expect(clerkNavIds).not.toContain('platform');
+  });
+
+  it('scopes reception clerk pilot nav to front-desk utilities', () => {
+    const clerkNavIds = getVisibleNavigationForSaasRole('registration-clerk').map((item) => item.id);
+    expect(clerkNavIds).toEqual(expect.arrayContaining(['reception', 'patients', 'pulse', 'shift']));
+    expect(clerkNavIds).not.toContain('whiteboard');
+    expect(clerkNavIds).not.toContain('copilot');
   });
 
   it('shows integrations alongside settings for admin users', () => {

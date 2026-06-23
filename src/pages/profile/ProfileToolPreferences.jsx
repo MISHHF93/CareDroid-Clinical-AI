@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
+import { compileUserProfile } from '../../config/userProfileCompiler';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -67,7 +68,19 @@ export default function ProfileToolPreferences() {
   const filteredWorkspaces = workspaces.filter(
     (workspace) => !allowedWorkspaceIds.size || allowedWorkspaceIds.has(workspace.id),
   );
-  const graph = useMemo(() => buildProfileToolGraph({ tools, profile }), [profile, tools]);
+  const { saasRole } = useEffectiveUserProfile();
+  const compiledProfile = useMemo(
+    () => compileUserProfile({ saasRole, tools }),
+    [saasRole, tools],
+  );
+  const graph = useMemo(
+    () => ({
+      ...buildProfileToolGraph({ tools: compiledProfile.tools.visible, profile: compiledProfile.segmentationProfile }),
+      visibleTools: compiledProfile.tools.visible,
+      recommendedTools: compiledProfile.tools.recommended,
+    }),
+    [compiledProfile],
+  );
   const pinnedToolSet = useMemo(() => new Set(pinned), [pinned]);
   const hiddenToolSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
 

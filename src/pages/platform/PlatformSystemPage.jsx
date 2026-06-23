@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import {
   PLATFORM_SYSTEM_CAPABILITIES,
@@ -42,7 +43,7 @@ function demoPayloadFor(capability, patientId) {
 
 export default function PlatformSystemPage({ pack }) {
   const location = useLocation();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { patientId = 'demo-patient' } = useParams();
   const capability = getPlatformSystemCapabilityByPath(location.pathname);
   const hubPack = pack || inferHubPack(location.pathname) || capability?.pack;
@@ -108,7 +109,7 @@ export default function PlatformSystemPage({ pack }) {
           <p>{subtitle}</p>
         </div>
         <div className="platform-system-hero__actions">
-          <button type="button" onClick={() => navigate('/tools')}>
+          <button type="button" onClick={() => profileNavigate('/tools')}>
             View tool library
           </button>
           {capability ? (

@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
+import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../../config/userProfileCatalog';
 import './AdminOperationsShell.css';
 
 const ADMIN_NAV = Object.freeze([
@@ -17,6 +18,8 @@ export default function AdminOperationsShell() {
   const location = useLocation();
   const { saasRole, accessSummary } = useEffectiveUserProfile();
   const isAdmin = isAdminSaasRole(saasRole);
+  const profile = resolveUserProfileFromSaasRole(saasRole);
+  const visibleNav = ADMIN_NAV.filter((item) => isRouteAllowedForProfile(profile, item.path));
 
   return (
     <div className="admin-ops-shell">
@@ -25,7 +28,7 @@ export default function AdminOperationsShell() {
         <h1 className="admin-ops-shell__title">Emergency department operations console</h1>
         <p className="admin-ops-shell__subtitle">
           Assign canonical roles, preview workflow access, invite staff, and configure tenant policies.
-          {isAdmin ? null : ' You are viewing admin tools in demo mode — sign in with an administrator account to persist changes.'}
+          {isAdmin ? null : ' You are viewing admin tools in demo mode — changes stay local during the build phase.'}
         </p>
         {accessSummary ? (
           <p className="admin-ops-shell__subtitle" style={{ marginTop: 8 }}>
@@ -35,7 +38,7 @@ export default function AdminOperationsShell() {
       </header>
 
       <nav className="admin-ops-shell__nav" aria-label="Admin sections">
-        {ADMIN_NAV.map((item) => {
+        {visibleNav.map((item) => {
           const active =
             location.pathname === item.path ||
             (item.path !== CANONICAL_ROUTES.adminOperations &&

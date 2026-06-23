@@ -7,6 +7,7 @@ import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { compileUserProfile } from '../../config/userProfileCompiler';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import {
   buildProfileToolGraph,
@@ -32,6 +33,8 @@ import {
 import { getWorkspaceExperienceProfile } from '../../data/workspaceExperience';
 import { FEATURE_FLAGS } from '../../config/featureFlags.config';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
+import { navigateProfileAware } from '../../navigation/profileRouteLaunch';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import {
@@ -558,6 +561,7 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
 
 const ToolsOverview = () => {
   const navigate = useNavigate();
+  const emergencyRole = useEmergencyRolePermissions();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
@@ -654,6 +658,8 @@ const ToolsOverview = () => {
       workspaceState,
       visibleAssetIds,
       saasProfile,
+      roleProfile,
+      saasRole: roleProfile?.id || saasProfile?.role,
     }),
     [
       account,
@@ -690,10 +696,31 @@ const ToolsOverview = () => {
     });
   }, [accessContext, accessRole, hiddenTools, platformContext, preferences?.toolPreferences, saasProfile?.hiddenAssets]);
 
-  const tools = useMemo(
-    () => filterVisibleTools(allToolsWithAccess),
-    [allToolsWithAccess]
+  const compiledProfile = useMemo(
+    () =>
+      compileUserProfile({
+        saasRole: roleProfile?.id || saasProfile?.role || 'student',
+        orgContext: {
+          organizationType: platformContext?.organization?.type || 'hospital',
+          entitledPackIds: platformContext?.entitledPackIds || [],
+        },
+        entitlementContext: accessContext,
+        tools: allToolsWithAccess,
+      }),
+    [
+      accessContext,
+      allToolsWithAccess,
+      platformContext?.entitledPackIds,
+      platformContext?.organization?.type,
+      roleProfile?.id,
+      saasProfile?.role,
+    ],
   );
+
+  const tools = useMemo(() => {
+    const visibleIds = new Set(compiledProfile.tools.visible.map((tool) => tool.id));
+    return filterVisibleTools(allToolsWithAccess).filter((tool) => visibleIds.has(tool.id));
+  }, [allToolsWithAccess, compiledProfile.tools.visible]);
 
   const toolById = useMemo(
     () => Object.fromEntries(allToolsWithAccess.map((tool) => [tool.id, tool])),
@@ -764,8 +791,19 @@ const ToolsOverview = () => {
     ]
   );
   const profileToolGraph = useMemo(
-    () => buildProfileToolGraph({ tools, profile }),
-    [profile, tools]
+    () => ({
+      ...buildProfileToolGraph({ tools, profile: compiledProfile.segmentationProfile }),
+      visibleTools: compiledProfile.tools.visible,
+      recommendedTools: compiledProfile.tools.recommended,
+      restrictedTools: compiledProfile.tools.restricted,
+      counts: {
+        ...buildProfileToolGraph({ tools, profile: compiledProfile.segmentationProfile }).counts,
+        visible: compiledProfile.tools.visible.length,
+        recommended: compiledProfile.tools.recommended.length,
+        restricted: compiledProfile.tools.restricted.length,
+      },
+    }),
+    [compiledProfile, tools],
   );
   const roleAssetRecommendations = useMemo(() => {
     if (workspaceRecommendations.length) {
@@ -942,6 +980,7 @@ const ToolsOverview = () => {
       setActiveTool,
       recordToolAccess,
       roleIntelligenceProfile,
+      context: accessContext,
     });
   };
 
@@ -960,7 +999,11 @@ const ToolsOverview = () => {
         `Help me use ${tool.name} as clinical decision support only. Ask for any context needed before recommending next steps.`,
       'user'
     );
-    navigate(CANONICAL_ROUTES.emergencyCopilot);
+    navigateProfileAware(navigate, CANONICAL_ROUTES.emergencyCopilot, {
+      emergencyRole,
+      saasRole: roleProfile?.id || saasProfile?.role,
+      context: accessContext,
+    });
   };
 
   const orderedTools = useMemo(() => {
@@ -999,10 +1042,10 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            {workspaceExperience.toolsTitle}
+            {roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle}
           </h1>
           <p className="header-subtitle">
-            {workspaceExperience.toolsSubtitle}
+            {roleIntelligenceProfile.toolsSubtitle || workspaceExperience.toolsSubtitle}
           </p>
           <div className="tools-workspace-os" aria-label="Active workspace operating mode">
             <strong>{workspaceExperience.operatingLabel}</strong>
@@ -1151,7 +1194,13 @@ const ToolsOverview = () => {
           <button
             type="button"
             className="tools-recent-card"
-            onClick={() => navigate(`${CANONICAL_ROUTES.emergencyTools}?source=workflows&filter=ai-workflows`)}
+            onClick={() =>
+              navigateProfileAware(
+                navigate,
+                `${CANONICAL_ROUTES.emergencyTools}?source=workflows&filter=ai-workflows`,
+                { emergencyRole, saasRole: roleProfile?.id || saasProfile?.role, context: accessContext },
+              )
+            }
           >
             <span className="tools-recent-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
@@ -1165,7 +1214,13 @@ const ToolsOverview = () => {
           <button
             type="button"
             className="tools-recent-card"
-            onClick={() => navigate(`${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`)}
+            onClick={() =>
+              navigateProfileAware(
+                navigate,
+                `${CANONICAL_ROUTES.emergencyTools}?source=recommendations&filter=recommended`,
+                { emergencyRole, saasRole: roleProfile?.id || saasProfile?.role, context: accessContext },
+              )
+            }
           >
             <span className="tools-recent-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.sparkles} size={22} />

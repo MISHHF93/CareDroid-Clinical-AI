@@ -11,6 +11,12 @@ import {
 } from './emergencyRolePermissions';
 import { listTrackMindRoutesForRole } from './trackMindRolePermissions';
 import { ROLE_PERMISSION_PRESETS, normalizeSaasRole, SAAS_USER_ROLES } from './saasProfileConstants';
+import { getPlatformHomeRoute } from './receptionFirstUx.config';
+import {
+  isProfileAssignableForOrganization,
+  resolveProfileSegregationDefaults,
+  type ProfileSegregationContext,
+} from './userProfileSegregation';
 
 export type UserProfileDomain =
   | 'clinical'
@@ -37,7 +43,10 @@ export type UserProfileCatalogEntry = Readonly<{
   defaultScreenMode: string | null;
   toolPolicy: UserProfileToolPolicy;
   requiredToolIds: string[];
+  restrictedToolIds?: string[];
   profileBenefits: string;
+  assignableOrganizationTypes?: string[];
+  requiredEntitlementPacks?: string[];
 }>;
 
 export type ResolvedUserProfile = UserProfileCatalogEntry &
@@ -59,38 +68,101 @@ export type UserProfileAccessSummary = Readonly<{
   profileBenefits: string;
 }>;
 
-const BASE_PROFILE_ROUTES = Object.freeze([
-  CANONICAL_ROUTES.dashboard,
-  CANONICAL_ROUTES.profile,
-  CANONICAL_ROUTES.profileSettings,
-  CANONICAL_ROUTES.profileToolPreferences,
-  '/profile/preferences',
-  '/profile/security',
-  '/profile/activity',
-  '/profile/workspaces',
-  CANONICAL_ROUTES.assistant,
-]);
+function resolveProfileHomeRoute(entry: UserProfileCatalogEntry): string {
+  if (entry.emergencyRoleId) {
+    const definition = getEmergencyRoleDefinition(entry.emergencyRoleId);
+    return definition?.defaultRoute || getPlatformHomeRoute();
+  }
+  if (entry.trackMindRoleId) {
+    return CANONICAL_ROUTES.trackMindWorkspace;
+  }
+  return getPlatformHomeRoute();
+}
+
+function getBaseProfileRoutes(entry?: UserProfileCatalogEntry): string[] {
+  return [
+    entry ? resolveProfileHomeRoute(entry) : getPlatformHomeRoute(),
+    CANONICAL_ROUTES.profile,
+    CANONICAL_ROUTES.profileSettings,
+    CANONICAL_ROUTES.profileToolPreferences,
+    '/profile/preferences',
+    '/profile/security',
+    '/profile/activity',
+    '/profile/workspaces',
+  ];
+}
 
 const PERMISSION_ROUTE_MAP: Record<string, string[]> = Object.freeze({
+  USE_ASSISTANT: [CANONICAL_ROUTES.assistant, CANONICAL_ROUTES.emergencyCopilot],
   VIEW_TOOLS: [CANONICAL_ROUTES.tools, CANONICAL_ROUTES.emergencyTools],
   VIEW_EMERGENCY: [CANONICAL_ROUTES.emergencyWhiteboard],
-  VIEW_OPERATIONS: [CANONICAL_ROUTES.operations],
-  VIEW_FLEET: [CANONICAL_ROUTES.fleetCommand],
-  VIEW_GOVERNANCE: [CANONICAL_ROUTES.governanceRegistry],
-  VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit],
+  VIEW_EMERGENCY_RECEPTION: [
+    CANONICAL_ROUTES.emergencyReception,
+    CANONICAL_ROUTES.emergencyPatients,
+    CANONICAL_ROUTES.emergencyIntake,
+    CANONICAL_ROUTES.emergencyPulse,
+    CANONICAL_ROUTES.emergencyShift,
+  ],
+  VIEW_OPERATIONS: [CANONICAL_ROUTES.operations, CANONICAL_ROUTES.integrationHub],
+  VIEW_FLEET: [CANONICAL_ROUTES.fleetCommand, CANONICAL_ROUTES.fleetMap],
+  VIEW_MEDICAL_IOT: [CANONICAL_ROUTES.medicalIot, CANONICAL_ROUTES.devices],
+  VIEW_DEVICES: [CANONICAL_ROUTES.devices, CANONICAL_ROUTES.hospitalMap],
+  VIEW_GOVERNANCE: [CANONICAL_ROUTES.governanceRegistry, CANONICAL_ROUTES.aiGovernance],
+  VIEW_AUDIT_LOGS: [CANONICAL_ROUTES.audit, CANONICAL_ROUTES.automationAudit],
   VIEW_ANALYTICS: [CANONICAL_ROUTES.emergencyAnalytics, CANONICAL_ROUTES.executive],
+  VIEW_SURVEILLANCE: [CANONICAL_ROUTES.surveillanceNexus],
   VIEW_TRACKMIND: [CANONICAL_ROUTES.trackMindWorkspace],
   VIEW_TRACKMIND_MATURITY: [CANONICAL_ROUTES.trackMindMaturity],
   VIEW_TRACKMIND_ENTERPRISE: [CANONICAL_ROUTES.enterprisePlatform],
   VIEW_TRACKMIND_INTELLIGENCE: [CANONICAL_ROUTES.platformIntelligence],
+  VIEW_ICU: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.emergencyPulse],
+  VIEW_CARDIOLOGY: [CANONICAL_ROUTES.emergencyWhiteboard, CANONICAL_ROUTES.tools],
+  VIEW_PATIENT_CARE: [
+    CANONICAL_ROUTES.emergencyReception,
+    CANONICAL_ROUTES.emergencyWhiteboard,
+    CANONICAL_ROUTES.emergencyPatients,
+  ],
+  VIEW_PHARMACY: [CANONICAL_ROUTES.tools, '/pharmacy'],
+  VIEW_LABORATORY: [CANONICAL_ROUTES.laboratory, CANONICAL_ROUTES.tools],
+  VIEW_RESEARCH: [CANONICAL_ROUTES.research, CANONICAL_ROUTES.tools],
+  VIEW_EDUCATION: ['/education', CANONICAL_ROUTES.simulation, CANONICAL_ROUTES.tools],
+  VIEW_SIMULATION: [CANONICAL_ROUTES.emergencySimulation, CANONICAL_ROUTES.simulation],
+  MANAGE_STEWARDING: [CANONICAL_ROUTES.trackMindWorkspace, CANONICAL_ROUTES.governanceRegistry],
+  MANAGE_RACEDAY_OPERATIONS: [CANONICAL_ROUTES.trackMindWorkspace, CANONICAL_ROUTES.operations],
+  MANAGE_PLATFORM_TENANTS: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
   MANAGE_ORGANIZATION: [CANONICAL_ROUTES.tenantAdmin, CANONICAL_ROUTES.adminOperations],
   CONFIGURE_SYSTEM: [CANONICAL_ROUTES.platformAdmin],
 });
 
+function enrichCatalogEntry(entry: UserProfileCatalogEntry): UserProfileCatalogEntry {
+  const defaults = resolveProfileSegregationDefaults(entry.saasRole);
+  const mergedRestricted = [
+    ...new Set([
+      ...(entry.toolPolicy?.restrictedToolIds || []),
+      ...(entry.restrictedToolIds || []),
+    ]),
+  ];
+  return Object.freeze({
+    ...entry,
+    toolPolicy: Object.freeze({
+      allowedPacks: [...(entry.toolPolicy?.allowedPacks || ['core-platform'])],
+      restrictedToolIds: mergedRestricted,
+    }),
+    assignableOrganizationTypes:
+      entry.assignableOrganizationTypes?.length
+        ? entry.assignableOrganizationTypes
+        : defaults.assignableOrganizationTypes,
+    requiredEntitlementPacks:
+      entry.requiredEntitlementPacks?.length
+        ? entry.requiredEntitlementPacks
+        : defaults.requiredEntitlementPacks,
+  });
+}
+
 const CATALOG_BY_ROLE = Object.freeze(
   (catalogData as UserProfileCatalogEntry[]).reduce(
     (map, entry) => {
-      map.set(entry.saasRole, entry);
+      map.set(entry.saasRole, enrichCatalogEntry(entry));
       return map;
     },
     new Map<string, UserProfileCatalogEntry>(),
@@ -98,7 +170,7 @@ const CATALOG_BY_ROLE = Object.freeze(
 );
 
 export const USER_PROFILE_CATALOG: readonly UserProfileCatalogEntry[] = Object.freeze(
-  catalogData as UserProfileCatalogEntry[],
+  (catalogData as UserProfileCatalogEntry[]).map(enrichCatalogEntry),
 );
 
 export function resolveUserProfileFromSaasRole(
@@ -120,7 +192,7 @@ export function buildNavigationRoutes(
   permissionPresets: string[] = ROLE_PERMISSION_PRESETS[entry.saasRole as keyof typeof ROLE_PERMISSION_PRESETS] ||
     ROLE_PERMISSION_PRESETS.student,
 ): string[] {
-  const routes = new Set<string>(BASE_PROFILE_ROUTES);
+  const routes = new Set<string>(getBaseProfileRoutes(entry));
 
   if (entry.emergencyRoleId) {
     const definition = getEmergencyRoleDefinition(entry.emergencyRoleId);
@@ -137,6 +209,14 @@ export function buildNavigationRoutes(
 
   if (entry.navigationGroups.includes('fleet')) {
     routes.add(CANONICAL_ROUTES.fleetCommand);
+  }
+  if (entry.navigationGroups.includes('admin')) {
+    routes.add(CANONICAL_ROUTES.adminOperations);
+  }
+  if (entry.navigationGroups.includes('devices') || entry.navigationGroups.includes('operations')) {
+    if (permissionPresets.includes('VIEW_MEDICAL_IOT') || permissionPresets.includes('VIEW_DEVICES')) {
+      routes.add(CANONICAL_ROUTES.surveillanceNexus);
+    }
   }
 
   return [...routes].sort();
@@ -220,13 +300,15 @@ export function buildUserProfileAccessSummary(
   });
 }
 
-export function listUserProfileCatalogOptions() {
-  return USER_PROFILE_CATALOG.map((entry) => ({
-    id: entry.saasRole,
-    label: entry.label,
-    domain: entry.domain,
-    hierarchyLevel: entry.hierarchyLevel,
-  }));
+export function listUserProfileCatalogOptions(context: ProfileSegregationContext = {}) {
+  return USER_PROFILE_CATALOG.filter((entry) => isProfileAssignableForOrganization(entry, context)).map(
+    (entry) => ({
+      id: entry.saasRole,
+      label: entry.label,
+      domain: entry.domain,
+      hierarchyLevel: entry.hierarchyLevel,
+    }),
+  );
 }
 
 export function validateHiddenAssetsWithinProfile(
@@ -268,4 +350,5 @@ export function isPublicDisplaySaasRole(role: string | null | undefined): boolea
   return PUBLIC_DISPLAY_SAAS_ROLES.includes(normalizeSaasRole(role));
 }
 
+export { isProfileAssignableForOrganization, resolveProfileSegregationDefaults };
 export { CARE_DROID_SCREEN_MODES };

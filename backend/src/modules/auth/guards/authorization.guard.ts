@@ -7,6 +7,7 @@ import {
   IS_PUBLIC_KEY,
 } from '../decorators/permissions.decorator';
 import { hasPermissionWithHierarchy, hasAnyPermission } from '../config/role-permissions.config';
+import { hasSaasProfilePermission } from '../../user-profile/saas-profile-rbac.config';
 import { UserRole } from '../../users/entities/user.entity';
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
@@ -69,6 +70,11 @@ export class AuthorizationGuard implements CanActivate {
 
     const userRole: UserRole = user.role;
     const userId: string = user.id;
+    const roleProfileId: string | null = user.profile?.roleProfileId || null;
+
+    const hasRolePermission = (permission: Permission) =>
+      hasPermissionWithHierarchy(userRole, permission) ||
+      hasSaasProfilePermission(roleProfileId, permission);
 
     // Get route information for audit logging
     const handler = context.getHandler();
@@ -83,15 +89,13 @@ export class AuthorizationGuard implements CanActivate {
     // Check if user has required permissions (ALL logic)
     if (requiredPermissions && requiredPermissions.length > 0) {
       checkedPermissions = requiredPermissions;
-      hasAccess = requiredPermissions.every((permission) =>
-        hasPermissionWithHierarchy(userRole, permission),
-      );
+      hasAccess = requiredPermissions.every((permission) => hasRolePermission(permission));
     }
 
     // Check if user has any of the permissions (OR logic)
     if (anyPermissions && anyPermissions.length > 0) {
       checkedPermissions = anyPermissions;
-      hasAccess = hasAnyPermission(userRole, anyPermissions);
+      hasAccess = anyPermissions.some((permission) => hasRolePermission(permission));
     }
 
     // Log permission check to audit trail
@@ -103,6 +107,7 @@ export class AuthorizationGuard implements CanActivate {
         method,
         url,
         role: userRole,
+        roleProfileId,
         requiredPermissions: checkedPermissions,
         granted: hasAccess,
         timestamp: new Date().toISOString(),

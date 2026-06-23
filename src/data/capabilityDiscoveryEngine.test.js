@@ -67,4 +67,19 @@ describe('capabilityDiscoveryEngine', () => {
     expect(suggestions[0].label).toMatch(/^Did you know CareDroid can also/);
     expect(suggestions[0].source).toContain('capability-discovery:');
   });
+
+  it('filters discovery tools through the profile compiler when saasRole is set', () => {
+    const tools = getUserFacingToolRegistryProjection();
+    const clerkDiscovery = buildCapabilityDiscovery({
+      saasRole: 'registration-clerk',
+      tools,
+      recentToolIds: [],
+    });
+    const recommendedIds = clerkDiscovery.sections
+      .find((section) => section.id === DISCOVERY_SECTION_IDS.RECOMMENDED_TOOLS)
+      ?.items.map((item) => item.id);
+
+    expect(recommendedIds).not.toContain('protocols');
+    expect(recommendedIds).not.toContain('simulation-suite');
+  });
 });

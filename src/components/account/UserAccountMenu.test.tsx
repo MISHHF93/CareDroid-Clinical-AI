@@ -11,22 +11,19 @@ vi.mock('../../contexts/UserContext', () => ({
 vi.mock('../../contexts/UserIdentityContext', () => ({
   useUserIdentity: vi.fn(() => ({
     account: null,
-    refreshIdentity: vi.fn(),
   })),
 }));
 
 vi.mock('../../hooks/useEffectiveUserProfile', () => ({
-  default: vi.fn(() => ({ accessSummary: null })),
+  default: vi.fn(() => ({ accessSummary: null, profileCopy: null })),
 }));
 
 import { useUser } from '../../contexts/UserContext';
 
 describe('UserAccountMenu', () => {
-  it('shows demo mode sign-in action for open-access sessions', async () => {
+  it('shows profile and entry hub links for demo sessions', async () => {
     vi.mocked(useUser).mockReturnValue({
       user: { id: 'open-access-user', name: 'Demo User' },
-      signOut: vi.fn(),
-      isRealSession: false,
     });
 
     render(
@@ -36,23 +33,9 @@ describe('UserAccountMenu', () => {
     );
 
     await userEvent.click(screen.getByRole('button'));
-    expect(screen.getByRole('menuitem', { name: 'Sign in' })).toBeInTheDocument();
-  });
-
-  it('shows sign out for authenticated sessions', async () => {
-    vi.mocked(useUser).mockReturnValue({
-      user: { id: 'user-1', name: 'Dr. Patel', role: 'physician' },
-      signOut: vi.fn(),
-      isRealSession: true,
-    });
-
-    render(
-      <MemoryRouter>
-        <UserAccountMenu />
-      </MemoryRouter>,
-    );
-
-    await userEvent.click(screen.getByRole('button'));
-    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Profile overview' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Entry hub' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Sign in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 });

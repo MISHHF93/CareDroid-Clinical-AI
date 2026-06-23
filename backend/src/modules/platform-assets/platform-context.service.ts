@@ -14,6 +14,7 @@ import { PlatformAssetsService } from './platform-assets.service';
 import { User } from '../users/entities/user.entity';
 import { EntitlementService } from './entitlement.service';
 import { normalizeLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
+import { resolveSaasProfileAllowedPacks } from '../user-profile/saas-profile-rbac.config';
 
 @Injectable()
 export class PlatformContextService {
@@ -109,6 +110,10 @@ export class PlatformContextService {
       (agent) => accessDecisions[agent.id]?.isLaunchable && entitledAssetIds.includes(agent.id),
     );
 
+    const pilotStrict =
+      settings.pilotStrictSaasEntitlements === true ||
+      settings.strictSaasEntitlements === true;
+
     return {
       organization: organization
         ? {
@@ -144,7 +149,12 @@ export class PlatformContextService {
             roleProfileId: membership.roleProfileId,
           }
         : null,
-      roleProfile,
+      roleProfile: roleProfile
+        ? {
+            ...roleProfile,
+            allowedPacks: resolveSaasProfileAllowedPacks(profile?.roleProfileId),
+          }
+        : null,
       entitledPackIds,
       entitledAssetIds,
       assetAccessDecisions: accessDecisions,
@@ -154,7 +164,8 @@ export class PlatformContextService {
       defaultAiAgentId: roleProfile?.defaultAiAgentId || entitledAgents[0]?.id || 'agent-clinical',
       workspace: workspaceState,
       legacyToolAliases: enabledToolIds,
-      strictSaasEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+      strictSaasEntitlements:
+        pilotStrict || this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
     };
   }
 

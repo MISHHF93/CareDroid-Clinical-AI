@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
@@ -11,7 +11,7 @@ function receptionMetricRoute(tab) {
 
 /** @deprecated Prefer ArrivalDashboard — kept for legacy imports and alignment scans. */
 export default function ArrivalMetricsPanel({ patients: patientsProp }) {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const storePatients = useEmergencyStore((state) => state.patients);
   const emsInbound = useEmergencyStore(selectEmsInboundCount);
@@ -36,7 +36,7 @@ export default function ArrivalMetricsPanel({ patients: patientsProp }) {
             disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
             onClick={() => {
               if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)) {
-                navigate(route);
+                profileNavigate(route);
               }
             }}
           >

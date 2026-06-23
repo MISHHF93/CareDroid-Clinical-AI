@@ -72,6 +72,7 @@ export enum OrganizationType {
   HOME_CARE = 'home_care',
   TELEHEALTH = 'telehealth',
   UNIVERSITY = 'university',
+  RACETRACK = 'racetrack',
 }
 
 export enum EntitlementStatus {

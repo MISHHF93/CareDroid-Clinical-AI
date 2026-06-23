@@ -186,6 +186,11 @@ export const SAAS_ROLE_FUNCTION_IDS: Readonly<Record<SaasUserRole, readonly Prof
     ],
     'icu-physician': ['provider-rounds', 'clinical-tools', 'copilot-capture', 'reassessment'],
     cardiologist: ['provider-rounds', 'clinical-tools', 'copilot-capture', 'disposition'],
+    'registration-clerk': [
+      'register-patient',
+      'verify-identity',
+      'ems-handoff',
+    ],
     nurse: [
       'register-patient',
       'verify-identity',
@@ -295,6 +300,13 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
     workspaceDescription: 'Cardiac complaints, emergency handoffs, and specialty calculators.',
     profileShellSubtitle: 'Cardiology profile with emergency workspace access.',
     copilotIntro: 'Assist with cardiac risk scores and protocol selection.',
+  },
+  'registration-clerk': {
+    personaTitle: ED_PERSONA_LABELS.registrationClerk,
+    workspaceEyebrow: 'Front desk',
+    workspaceDescription: 'Registration, identity verification, patient search, and EMS conversion.',
+    profileShellSubtitle: 'Receptionist profile — front-desk workflows without clinical mutation surfaces.',
+    copilotIntro: 'Assist with registration steps and duplicate-patient checks.',
   },
   nurse: {
     personaTitle: ED_PERSONA_LABELS.triageNurse,

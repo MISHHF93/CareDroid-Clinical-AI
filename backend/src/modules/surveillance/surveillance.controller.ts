@@ -10,9 +10,9 @@ import type { SurveillanceNexusSnapshot, SurveillanceRequestLike } from './surve
 
 const SURVEILLANCE_VIEW_PERMISSIONS = [
   Permission.VIEW_SURVEILLANCE,
-  Permission.VIEW_ANALYTICS,
-  Permission.CONFIGURE_SYSTEM,
   Permission.MANAGE_SECURITY_OPERATIONS,
+  Permission.VIEW_OPERATIONS,
+  Permission.MANAGE_SURVEILLANCE_REGISTRY,
 ];
 
 function envelope<T>(data: T, message: string) {

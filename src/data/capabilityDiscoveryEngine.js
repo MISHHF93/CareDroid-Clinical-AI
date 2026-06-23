@@ -6,6 +6,7 @@ import {
   buildProfileToolGraph,
   getProfileAssistantRecommendations,
 } from './profileToolSegmentation';
+import { compileUserProfile } from '../config/userProfileCompiler';
 
 export const DISCOVERY_SECTION_IDS = Object.freeze({
   NEW_TOOLS: 'new-tools',
@@ -153,14 +154,18 @@ function buildProtocolItems(profile, limit = 8) {
 
 export function buildCapabilityDiscovery({
   profile = DEFAULT_DISCOVERY_PROFILE,
+  saasRole = null,
   tools = getUserFacingToolRegistryProjection(),
   recentToolIds = [],
 } = {}) {
-  const graph = buildProfileToolGraph({ tools, profile });
-  const recommendedFromProfile = getProfileAssistantRecommendations(profile, tools, 8)
+  const compiled = saasRole ? compileUserProfile({ saasRole, tools }) : null;
+  const effectiveTools = compiled?.tools.visible?.length ? compiled.tools.visible : tools;
+  const effectiveProfile = compiled?.segmentationProfile || profile;
+  const graph = buildProfileToolGraph({ tools: effectiveTools, profile: effectiveProfile });
+  const recommendedFromProfile = getProfileAssistantRecommendations(effectiveProfile, effectiveTools, 8)
     .map((item) => findTool(graph.visibleTools, item.toolId))
     .filter(Boolean)
-    .map((tool) => normalizeTool(tool, `${profile.role} profile match`));
+    .map((tool) => normalizeTool(tool, `${effectiveProfile.role || profile.role} profile match`));
 
   const workflowTools = graph.visibleTools
     .filter(isWorkflowTool)
@@ -190,7 +195,7 @@ export function buildCapabilityDiscovery({
       DISCOVERY_SECTION_IDS.SIMULATIONS,
       'Simulations',
       'Training scenarios matched to your clinical or operational profile.',
-      buildSimulationItems(profile)
+      buildSimulationItems(effectiveProfile)
     ),
     makeSection(
       DISCOVERY_SECTION_IDS.WORKFLOWS,
@@ -202,12 +207,13 @@ export function buildCapabilityDiscovery({
       DISCOVERY_SECTION_IDS.PROTOCOLS,
       'Protocols',
       'Clinical pathways with linked calculators, simulations, and explanation support.',
-      buildProtocolItems(profile)
+      buildProtocolItems(effectiveProfile)
     ),
   ];
 
   return {
-    profile,
+    profile: effectiveProfile,
+    saasRole: compiled?.saasRole || null,
     sections,
     summary: {
       totalItems: sections.reduce((total, section) => total + section.items.length, 0),
@@ -222,11 +228,12 @@ export function buildCapabilityDiscovery({
 
 export function getCareDroidDidYouKnowSuggestions({
   profile = DEFAULT_DISCOVERY_PROFILE,
+  saasRole = null,
   tools = getUserFacingToolRegistryProjection(),
   recentToolIds = [],
   limit = 3,
 } = {}) {
-  const discovery = buildCapabilityDiscovery({ profile, tools, recentToolIds });
+  const discovery = buildCapabilityDiscovery({ profile, saasRole, tools, recentToolIds });
   return discovery.sections
     .flatMap((section) =>
       section.items.map((item) => ({

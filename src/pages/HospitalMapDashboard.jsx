@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import useProfileNavigate from '../hooks/useProfileNavigate';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import ContextInsightCard from '../components/ContextInsightCard';
@@ -429,7 +430,7 @@ function DeviceFleetTable({ devices, onSelectDevice }) {
 }
 
 export default function HospitalMapDashboard() {
-  const navigate = useNavigate();
+  const { profileNavigate, rawNavigate } = useProfileNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const [state, setState] = useState({ loading: true, error: '', snapshot: null, message: '' });
@@ -521,12 +522,12 @@ export default function HospitalMapDashboard() {
       'Show hospital map device alerts, offline devices, stale telemetry, low battery devices, and maintenance overdue items. Monitoring support only; do not replace bedside alarms.',
       'user'
     );
-    navigate('/assistant');
+    profileNavigate('/assistant');
   };
 
   const launchMedicalIot = () => {
     applyRegistryToolLaunch('medical-iot-dashboard', {
-      navigate,
+      navigate: rawNavigate,
       addMessage,
       selectTool,
       setActiveTool,

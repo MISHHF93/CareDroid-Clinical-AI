@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
 import {
@@ -465,7 +466,7 @@ export function ProductsIndexPage() {
 export function ProductDetailPage() {
   const { slug } = useParams();
   const { organization } = useUserIdentity();
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState('');
 
@@ -760,7 +761,7 @@ export function SpecialtiesIndexPage() {
 export function SpecialtyDetailPage() {
   const { slug } = useParams();
   const [specialty, setSpecialty] = useState(null);
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
 
   useEffect(() => {
     if (!slug) return;
@@ -771,11 +772,11 @@ export function SpecialtyDetailPage() {
 
   const launchAsset = (asset) => {
     if (asset?.route) {
-      navigate(asset.route);
+      profileNavigate(asset.route);
       return;
     }
     const plan = getRegistryToolNavigation(asset.id);
-    if (plan?.pathname) navigate(`${plan.pathname}${plan.search || ''}`);
+    if (plan?.pathname) profileNavigate(`${plan.pathname}${plan.search || ''}`);
   };
 
   return (
@@ -834,7 +835,7 @@ export function CarePathwaysIndexPage() {
 export function CarePathwayDetailPage() {
   const { slug } = useParams();
   const [pathway, setPathway] = useState(null);
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
 
   useEffect(() => {
     if (!slug) return;
@@ -845,11 +846,11 @@ export function CarePathwayDetailPage() {
 
   const openAsset = (asset) => {
     if (asset?.route) {
-      navigate(asset.route);
+      profileNavigate(asset.route);
       return;
     }
     const plan = getRegistryToolNavigation(asset?.id);
-    if (plan?.pathname) navigate(`${plan.pathname}${plan.search || ''}`);
+    if (plan?.pathname) profileNavigate(`${plan.pathname}${plan.search || ''}`);
   };
 
   return (
@@ -2095,6 +2096,7 @@ function buildPresetFromRegistry(organizationType, overrides = {}) {
     subscriptionPlan: overrides.subscriptionPlan || 'professional',
     defaultWorkspace: profile.defaultWorkspace,
     workspaceSetups,
+    pilotStrictSaasEntitlements: overrides.pilotStrictSaasEntitlements === true,
   };
 }
 
@@ -2102,10 +2104,11 @@ const TENANT_PRESETS = {
   hospital: buildPresetFromRegistry('hospital', {
     specialties: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations'],
     departments: ['Emergency', 'ICU', 'Cardiology', 'Laboratory', 'Operations', 'Administration'],
-    packIds: ['core-platform', 'emergency-medicine', 'laboratory-intelligence', 'hospital-operations'],
+    packIds: ['core-platform', 'reception-desk', 'emergency-medicine', 'laboratory-intelligence', 'hospital-operations'],
     integrationSlugs: ['fhir-patient', 'hl7-adt', 'laboratory-interface', 'identity-sso'],
     complianceMode: 'hipaa',
-    defaultRoleProfileId: 'emergency-physician',
+    defaultRoleProfileId: 'registration-clerk',
+    pilotStrictSaasEntitlements: true,
   }),
   clinic: buildPresetFromRegistry('clinic', {
     specialties: ['cardiology', 'laboratory', 'operations'],
@@ -2149,7 +2152,7 @@ const TENANT_PRESETS = {
 };
 
 export function OrganizationOnboardingPage() {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { refreshPlatformContext } = useUserIdentity();
   const [step, setStep] = useState(0);
   const [packs, setPacks] = useState([]);
@@ -2212,6 +2215,7 @@ export function OrganizationOnboardingPage() {
       workspaceSetups: preset.workspaceSetups,
       defaultWorkspace: preset.defaultWorkspace,
       complianceMode: preset.complianceMode,
+      pilotStrictSaasEntitlements: preset.pilotStrictSaasEntitlements === true,
     }));
   };
 
@@ -2313,6 +2317,9 @@ export function OrganizationOnboardingPage() {
         defaultWorkspace: clientProfile.defaultWorkspace,
         branding,
         complianceMode: form.complianceMode,
+        pilotStrictSaasEntitlements:
+          TENANT_PRESETS[form.organizationType]?.pilotStrictSaasEntitlements === true ||
+          form.organizationType === 'hospital',
       });
       saveLocalClientProfile({
         ...clientProfile,
@@ -2665,10 +2672,10 @@ export function OrganizationOnboardingPage() {
         }
         actions={
           <>
-            <Button variant="primary" onClick={() => navigate('/dashboard')}>
+            <Button variant="primary" onClick={() => profileNavigate('/dashboard')}>
               Open dashboard
             </Button>
-            <Button variant="secondary" onClick={() => navigate('/organization')}>
+            <Button variant="secondary" onClick={() => profileNavigate('/organization')}>
               Open organization
             </Button>
           </>

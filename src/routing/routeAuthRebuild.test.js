@@ -17,13 +17,10 @@ const nonEdRedirectPaths = new Set(
 );
 
 describe('canonical route/auth architecture', () => {
-  it('mounts auth routes without reintroducing tenant-required wrappers', () => {
-    expect(appSource).toContain('function AuthRoute()');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.auth}');
-    expect(appSource).toContain('AUTH_PATH_ALIASES');
-    expect(appSource).toContain('AUTH_SIGNUP_PATH_ALIASES');
-    expect(appSource).toContain('key={`auth-signin-${path}`}');
-    expect(appSource).not.toContain('function AuthPathRedirect()');
+  it('redirects legacy auth paths into the demo landing flow', () => {
+    expect(appSource).toContain('function AuthPathsRedirect()');
+    expect(appSource).toContain('legacyAuthPaths');
+    expect(appSource).not.toContain('function AuthRoute()');
     expect(appSource).not.toContain('<TenantRequired>');
     expect(redirectsByPath['/auth']).toBeUndefined();
   });
@@ -45,22 +42,11 @@ describe('canonical route/auth architecture', () => {
     }
   });
 
-  it('normalizes legacy tools and product aliases into Emergency OS redirects', () => {
+  it('keeps fleet and operations routes wired in App.jsx', () => {
     expect(appSource).toContain('path="/tools/*"');
-    for (const path of [
-      '/fleet',
-      '/fleet/*',
-      '/hospital-map',
-      '/medical-iot',
-      '/devices',
-      '/operations',
-      '/operations/*',
-    ]) {
-      expect(
-        redirectsByPath[path] ||
-          (nonEdRedirectPaths.has(path) ? CANONICAL_ROUTES.emergencyWhiteboard : undefined),
-      ).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
-    }
+    expect(appSource).toContain('CANONICAL_ROUTES.fleetCommand');
+    expect(appSource).toContain('path="/fleet" element={<Navigate to={CANONICAL_ROUTES.fleetCommand}');
+    expect(appSource).toContain('CANONICAL_ROUTES.hospitalMap');
   });
 
   it('ensures unknown protected routes redirect to the Emergency Whiteboard', () => {

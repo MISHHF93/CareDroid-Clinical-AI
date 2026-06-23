@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
@@ -251,7 +252,7 @@ function CalculatorSelectCard({ calc, isActive, onSelect }) {
 }
 
 const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = null } = {}) => {
-  const navigate = useNavigate();
+  const { profileNavigate } = useProfileNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const { recordActivity } = useUserIdentity();
@@ -280,9 +281,9 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
         addMessage(launch.chatSeed, 'user');
       }
       const navPath = launch.chatSeed ? '/assistant' : resolveNavigationPathForLaunch(launch);
-      navigate(navPath || '/assistant');
+      profileNavigate(navPath || '/assistant');
     },
-    [addMessage, navigate, recordActivity, recordToolAccess, selectTool, setActiveTool]
+    [addMessage, profileNavigate, recordActivity, recordToolAccess, selectTool, setActiveTool]
   );
 
   const toolConfig = {
@@ -338,7 +339,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
         return;
       }
       if (plan.mode === 'calculator-route') {
-        navigate({ pathname: plan.pathname, search: plan.search || '' });
+        profileNavigate({ pathname: plan.pathname, search: plan.search || '' });
         return;
       }
     }
@@ -346,7 +347,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
     setSelectedCalculator(null);
     setSharedResult(null);
     setUnknownSlug(slug);
-  }, [initialCalculatorId, calcFromUrl, handleChatAssistedLaunch, navigate]);
+  }, [initialCalculatorId, calcFromUrl, handleChatAssistedLaunch, profileNavigate]);
 
   return (
     <ToolPageLayout
@@ -458,7 +459,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                   },
                 });
                 if (calc.route) {
-                  navigate(calc.route);
+                  profileNavigate(calc.route);
                 }
               }}
             />

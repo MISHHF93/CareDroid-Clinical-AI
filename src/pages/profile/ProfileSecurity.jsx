@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
-import TwoFactorSettings from '../../components/TwoFactorSettings';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../../hooks/useProfileShellProps';
-import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
@@ -17,13 +15,12 @@ function formatDate(value) {
 
 export default function ProfileSecurity() {
   const { accessSummary, profileCopy } = useProfileShellProps();
-  const { authToken } = useUser();
   const { account, security } = useUserIdentity();
 
   return (
     <ProfileSettingsShell
       title="Security"
-      subtitle="Email verification, multi-factor authentication, and biometric setup."
+      subtitle="Demo-mode identity summary. Account sign-in flows are disabled during the build phase."
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >
@@ -32,38 +29,36 @@ export default function ProfileSecurity() {
           <div className="profile-identity-grid">
             <div className="profile-identity-card">
               <h3>Email</h3>
-              <p>{account?.email || 'Unknown email'}</p>
-              <strong>{security?.emailVerified ? 'Verified' : 'Verification pending'}</strong>
+              <p>{account?.email || 'Demo profile email'}</p>
+              <strong>{security?.emailVerified ? 'Verified' : 'Demo mode'}</strong>
             </div>
             <div className="profile-identity-card">
               <h3>Role</h3>
               <p>{security?.role || account?.role || 'Not assigned'}</p>
-              <strong>Admin-managed SaaS role</strong>
+              <strong>Demo SaaS role</strong>
             </div>
             <div className="profile-identity-card">
-              <h3>Multi-factor</h3>
-              <p>{security?.mfaEnabled ? 'Enabled' : 'Not enabled'}</p>
-              <Link to="/two-factor-setup">Manage 2FA setup</Link>
+              <h3>Session</h3>
+              <p>Open-access build preview</p>
+              <strong>No sign-in required</strong>
             </div>
             <div className="profile-identity-card">
-              <h3>Last login</h3>
+              <h3>Last activity</h3>
               <p>{formatDate(security?.lastLoginAt)}</p>
-              <Link to="/biometric-setup">Biometric setup</Link>
+              <Link to="/profile/settings">Identity settings</Link>
             </div>
           </div>
         </Card>
 
-        <TwoFactorSettings authToken={authToken} />
-
         <Card>
-          <h2 style={{ marginTop: 0 }}>Protected routes</h2>
+          <h2 style={{ marginTop: 0 }}>Profile routes</h2>
           <p className="profile-identity-muted">
-            Security-sensitive setup flows stay on dedicated routes for clearer audit trails.
+            Use profile settings to adjust demo identity, tools, and workspace preferences.
           </p>
           <div className="profile-identity-list">
-            <Link to="/two-factor-setup">Two-factor enrollment</Link>
-            <Link to="/biometric-setup">Biometric enrollment</Link>
             <Link to="/profile/settings">Identity settings</Link>
+            <Link to="/profile/preferences">Preferences</Link>
+            <Link to="/profile/tool-preferences">Tool preferences</Link>
           </div>
         </Card>
       </div>

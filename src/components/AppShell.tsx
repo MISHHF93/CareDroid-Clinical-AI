@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
@@ -24,6 +24,7 @@ import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
+import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import DemoPersonaPanel from './account/DemoPersonaPanel';
 import './CopilotPanel.css';
 import {
@@ -188,6 +189,11 @@ export function AppShell({ children }: AppShellProps) {
   const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
   const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
   const { saasRole, profileCopy } = useEffectiveUserProfile();
+  const profileNavigate = useCallback(
+    (to: Parameters<typeof navigate>[0], options?: { replace?: boolean; state?: unknown }) =>
+      navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
+    [emergencyRole, navigate, saasRole],
+  );
   const visibleNavigationItems = useMemo(
     () => getVisibleNavigation(emergencyRole.role, { saasRole }),
     [emergencyRole.role, saasRole],
@@ -341,7 +347,7 @@ export function AppShell({ children }: AppShellProps) {
 
       if (e.shiftKey && e.key.toLowerCase() === 'h') {
         e.preventDefault();
-        navigate(
+        profileNavigate(
           emergencyRole.landingRoute ||
             emergencyRole.defaultRoute ||
             CANONICAL_ROUTES.emergencyReception,
@@ -392,17 +398,17 @@ export function AppShell({ children }: AppShellProps) {
       ) {
         e.preventDefault();
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigate(getReceptionPrimaryCreatePath(emergencyRole.role));
+          profileNavigate(getReceptionPrimaryCreatePath(emergencyRole.role));
           return;
         }
-        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard);
         window.setTimeout(() => document.dispatchEvent(new Event('open-intake')), 0);
       }
     };
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [canUseCopilot, emergencyRole, location.pathname, navigate, screenCapabilities.showReassessAction]);
+  }, [canUseCopilot, emergencyRole, location.pathname, profileNavigate, screenCapabilities.showReassessAction]);
 
   useEffect(() => {
     const openPalette = () => setShowPalette(true);
@@ -434,7 +440,7 @@ export function AppShell({ children }: AppShellProps) {
         filter: detail.filter || 'all',
         q: detail.query,
       });
-      navigate(
+      profileNavigate(
         emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
           ? targetPath
           : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
@@ -451,7 +457,7 @@ export function AppShell({ children }: AppShellProps) {
         open: detail.calculatorId,
         patientId: detail.patientId || undefined,
       });
-      navigate(
+      profileNavigate(
         emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
           ? targetPath
           : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
@@ -464,35 +470,30 @@ export function AppShell({ children }: AppShellProps) {
       window.removeEventListener('ed:open-tools', openTools);
       window.removeEventListener('ed:open-calculator', openCalculator);
     };
-  }, [emergencyRole, navigate]);
+  }, [emergencyRole, profileNavigate]);
 
   const handleCommandExecute = (action: CommandAction) => {
     switch (action.type) {
       case 'OPEN_INTAKE':
         if (!emergencyRole.actionEnabled(EMERGENCY_ACTIONS.createPatient)) break;
         if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-          navigate(getReceptionPrimaryCreatePath(emergencyRole.role));
+          profileNavigate(getReceptionPrimaryCreatePath(emergencyRole.role));
           break;
         }
-        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard);
         document.dispatchEvent(new Event('open-intake'));
         break;
       case 'OPEN_ROUTE':
         if (action.path) {
-          const permissionPath = routePermissionPath(action.path);
-          navigate(
-            emergencyRole.canAccessRoute(permissionPath)
-              ? action.path
-              : emergencyRole.nearestRoute(permissionPath),
-          );
+          profileNavigate(action.path);
         }
         break;
       case 'VIEW_PATIENT':
       case 'FIND_PATIENT':
         if (action.patientId) selectPatient(action.patientId);
         else if (action.value)
-          navigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
-        else navigate(CANONICAL_ROUTES.emergencyPatients);
+          profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?q=${encodeURIComponent(action.value)}`);
+        else profileNavigate(CANONICAL_ROUTES.emergencyPatients);
         break;
       case 'OPEN_REFERRAL': {
         if (!emergencyRole.actionEnabled(EMERGENCY_ACTIONS.manageReferral)) break;
@@ -500,11 +501,11 @@ export function AppShell({ children }: AppShellProps) {
         if (action.patientId) params.set('patientId', action.patientId);
         if (action.value) params.set('patientSearch', action.value);
         params.set('new', '1');
-        navigate(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
+        profileNavigate(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
         break;
       }
       case 'OPEN_PEDIATRIC_DRUGS':
-        navigate(
+        profileNavigate(
           buildEmergencyToolsPath({
             source: 'calculators',
             filter: 'calculator',
@@ -523,12 +524,12 @@ export function AppShell({ children }: AppShellProps) {
           params.set('open', action.calculatorId);
         }
         if (action.patientId) params.set('patientId', action.patientId);
-        navigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
+        profileNavigate(`${CANONICAL_ROUTES.emergencyTools}?${params.toString()}`);
         break;
       }
       case 'OPEN_CAPACITY':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) break;
-        navigate(CANONICAL_ROUTES.emergencyCapacity);
+        profileNavigate(CANONICAL_ROUTES.emergencyCapacity);
         break;
       case 'OPEN_REASSESSMENT_QUEUE':
         if (!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReassessment)) break;
@@ -536,7 +537,7 @@ export function AppShell({ children }: AppShellProps) {
         break;
       case 'CLEAR_FILTERS':
         document.dispatchEvent(new Event('clear-whiteboard-filters'));
-        navigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard);
         break;
       default:
         break;
