@@ -1,0 +1,91 @@
+.platform-entry {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.platform-entry__hero {
+  margin-bottom: 28px;
+}
+
+.platform-entry__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
+.platform-entry__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.platform-entry__subtitle {
+  margin: 10px 0 0;
+  color: var(--muted-text);
+  line-height: 1.5;
+  max-width: 640px;
+}
+
+.platform-entry__sync {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--muted-text);
+  max-width: 640px;
+}
+
+.platform-entry__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.platform-entry__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.1));
+  background: var(--panel-bg, rgba(255, 255, 255, 0.03));
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.platform-entry__card:hover {
+  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 40%, transparent);
+  transform: translateY(-1px);
+}
+
+.platform-entry__card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.platform-entry__card p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted-text);
+  flex: 1;
+}
+
+.platform-entry__cta {
+  font-weight: 600;
+  color: var(--app-accent, #00ff88);
+}
+
+.platform-entry__flow {
+  margin-top: 28px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed var(--app-panel-border);
+}
+
+.platform-entry__flow ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--muted-text);
+  font-size: 0.875rem;
+}

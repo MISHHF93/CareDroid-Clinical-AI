@@ -19,6 +19,15 @@
   color: var(--color-text-secondary, #9ca3af);
 }
 
+.reception-work-queues__online-summary {
+  margin: 4px 0 0;
+}
+
+.reception-work-queues__item span:last-child {
+  min-width: 5.5rem;
+  text-align: right;
+}
+
 .reception-work-queues__tabs {
   display: flex;
   flex-wrap: wrap;

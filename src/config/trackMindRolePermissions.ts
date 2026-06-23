@@ -19,6 +19,7 @@ import {
   TRACKMIND_ROUTE_PERMISSION_MAP,
   type TrackMindPermissionContext,
 } from './trackMindPermissionRegistry';
+import { resolveEffectiveTrackMindRole as resolveCatalogTrackMindRole } from './userProfileCatalog';
 import { resolveTrackMindRoleLandingRoute } from './trackMindRoleNavigationModel';
 import { getTrackMindWorkspaceDefinition } from './trackMindWorkspaceModel';
 
@@ -44,9 +45,12 @@ const TRACKMIND_PROTECTED_ROUTES = Object.freeze(
 );
 
 export function resolveTrackMindRoleId(
-  user: { trackMindRole?: string; role?: string; profile?: { trackMindRole?: string; role?: string } } | null | undefined,
+  user: { trackMindRole?: string; role?: string; profile?: { trackMindRole?: string; roleProfileId?: string; role?: string }; roleProfileId?: string } | null | undefined,
   settings?: { trackMindRole?: string; roleOverrides?: Record<string, string> } | null,
 ): TrackMindRoleId {
+  const catalogRole = resolveCatalogTrackMindRole(user, settings || {});
+  if (catalogRole) return normalizeTrackMindRoleId(catalogRole);
+
   const override = settings?.trackMindRole || settings?.roleOverrides?.trackMind;
   if (override) return normalizeTrackMindRoleId(override);
   const fromUser =

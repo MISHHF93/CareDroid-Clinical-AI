@@ -649,3 +649,25 @@
     animation: none !important;
   }
 }
+
+.ed-copilot-launch {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  border: 1px solid color-mix(in srgb, var(--status-info, #06b6d4) 40%, transparent);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--color-surface, #111827) 92%, #020617);
+  color: var(--color-text-primary, #f9fafb);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.35);
+}
+
+.ed-copilot-launch:hover,
+.ed-copilot-launch:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info, #06b6d4) 70%, transparent);
+  transform: translateY(-1px);
+}

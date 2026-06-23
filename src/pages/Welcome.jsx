@@ -3,19 +3,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { resolvePostAuthDestination } from '../auth/authSession';
+import { useUser } from '../contexts/UserContext';
 
 const steps = [
   {
-    title: 'Choose your role',
-    description: 'Help us tailor CareDroid to your workflow.',
-    options: ['Receptionist / Registration Clerk', 'Physician', 'Nurse', 'Pharmacist', 'Student'],
-  },
-  {
+    id: 'workflow',
     title: 'Set your focus',
-    description: 'Pick the clinical areas you use most.',
+    description: 'Pick the clinical areas you use most. This does not change your assigned role.',
     options: ['Emergency', 'ICU', 'Primary Care', 'Cardiology'],
   },
   {
+    id: 'safety',
     title: 'Safety & compliance',
     description: 'Always verify medical information before action.',
     options: ['I understand and agree'],
@@ -25,17 +25,45 @@ const steps = [
 const Welcome = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [selection, setSelection] = useState({});
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
-  const { success } = useNotificationActions();
+  const { success, error } = useNotificationActions();
+  const { updateProfile, savePreferences } = useUserIdentity();
+  const { user } = useUser();
   const step = steps[stepIndex];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (stepIndex < steps.length - 1) {
       setStepIndex(stepIndex + 1);
       return;
     }
+
+    setSaving(true);
+    const focusArea = selection[0] || 'Emergency';
+
+    const profileResult = await updateProfile({
+      onboardingStatus: 'complete',
+      clinicalInterests: [focusArea],
+    });
+    await savePreferences({
+      defaultDashboard: focusArea.toLowerCase().includes('emergency') ? 'command' : 'workspace',
+    });
+    setSaving(false);
+
+    if (!profileResult?.ok) {
+      error('Could not save onboarding', profileResult?.message || 'Try again from profile settings.');
+      return;
+    }
+
     success('Welcome complete', 'Profile preferences saved.');
-    navigate('/');
+    navigate(
+      resolvePostAuthDestination({
+        user,
+        profile: profileResult.data,
+        returnUrl: '/',
+      }),
+      { replace: true },
+    );
   };
 
   return (
@@ -84,17 +112,18 @@ const Welcome = () => {
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
           <Button
             onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}
-            disabled={stepIndex === 0}
+            disabled={stepIndex === 0 || saving}
             variant="secondary"
             style={{ flex: 1 }}
           >
             Back
           </Button>
-          <Button onClick={handleNext} variant="primary" style={{ flex: 1 }}>
+          <Button onClick={handleNext} variant="primary" style={{ flex: 1 }} loading={saving}>
             {stepIndex === steps.length - 1 ? 'Finish' : 'Next'}
           </Button>
         </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
+          Your SaaS role remains admin-assigned.{' '}
           <Link to="/onboarding" style={{ color: '#00FF88', textDecoration: 'none' }}>
             Set up a hospital organization →
           </Link>

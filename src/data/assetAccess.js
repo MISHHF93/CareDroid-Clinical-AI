@@ -13,6 +13,7 @@ import {
 import { getUserFacingToolRegistryProjection, TOOL_EXECUTOR_STATUS } from './toolInventory';
 import { resolveEntitlementDecision } from '../services/entitlementService';
 import { ENTITLEMENT_ACCESS_STATES } from '../config/entitlements.config';
+import { resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
 
 export const ASSET_ACCESS_STATES = Object.freeze({
   ALLOWED: 'allowed',
@@ -86,7 +87,20 @@ function hasPermissionPolicyAccess(tool, context) {
   return permissions.every((permission) => effectivePermissions.has(permission));
 }
 
+function hasCatalogToolRestriction(tool = {}, userRole = 'student') {
+  const profile = resolveUserProfileFromSaasRole(userRole);
+  const restricted = new Set(profile.toolPolicy?.restrictedToolIds || []);
+  const assetId = tool.id || tool.canonicalInventoryId;
+  if (restricted.has(assetId)) return false;
+  const allowedPacks = profile.toolPolicy?.allowedPacks || [];
+  if (!allowedPacks.length) return true;
+  const packId = tool.packId || tool.assetPackId || tool.category;
+  if (!packId) return true;
+  return allowedPacks.some((pack) => String(packId).includes(pack) || pack === 'core-platform');
+}
+
 function hasAllowedRoleAccess(tool = {}, userRole = 'student') {
+  if (!hasCatalogToolRestriction(tool, userRole)) return false;
   const allowedRoles = tool.permissionPolicy?.allowedRoles || tool.allowedRoles || [];
   if (!Array.isArray(allowedRoles) || !allowedRoles.length || !userRole) return true;
   const normalizedRole = String(userRole).toLowerCase();

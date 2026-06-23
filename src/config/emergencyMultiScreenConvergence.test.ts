@@ -192,4 +192,15 @@ describe('emergencyMultiScreenConvergence', () => {
     expect(whiteboardSource).toContain('OperationalStrip');
     expect(whiteboardSource).not.toContain('EmergencyWhiteboardApp');
   });
+
+  it('maps catalog default screen modes for emergency personas', async () => {
+    const { resolveUserProfileFromSaasRole, isSaasRoleCatalogComplete } = await import(
+      './userProfileCatalog'
+    );
+    expect(isSaasRoleCatalogComplete()).toBe(true);
+    expect(resolveUserProfileFromSaasRole('nurse').defaultScreenMode).toBe('triage');
+    expect(resolveUserProfileFromSaasRole('hospital-administrator').defaultScreenMode).toBe(
+      'command-center',
+    );
+  });
 });

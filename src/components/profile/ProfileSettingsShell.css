@@ -1,0 +1,87 @@
+.profile-settings-shell {
+  display: grid;
+  gap: 20px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.profile-settings-shell__header {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-settings-shell__eyebrow {
+  margin: 0;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-settings-shell__header h1 {
+  margin: 0;
+  color: var(--color-text-primary, #f8fafc);
+  font-size: 28px;
+}
+
+.profile-settings-shell__subtitle {
+  margin: 0;
+  color: var(--color-text-secondary, #cbd5e1);
+  max-width: 720px;
+}
+
+.profile-settings-shell__access {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-subtle, #334155);
+  background: var(--color-card, #172033);
+  color: var(--color-text-secondary, #cbd5e1);
+  font-size: 13px;
+}
+
+.profile-settings-shell__access strong {
+  color: var(--color-text-primary, #f8fafc);
+  font-size: 14px;
+}
+
+.profile-settings-shell__functions {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.profile-settings-shell__functions li {
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+.profile-settings-shell__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-settings-shell__nav a {
+  border: 1px solid var(--color-border-subtle, #334155);
+  border-radius: 999px;
+  color: var(--color-text-secondary, #cbd5e1);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.profile-settings-shell__nav a.is-active {
+  border-color: color-mix(in srgb, var(--status-info, #3b82f6) 50%, transparent);
+  background: color-mix(in srgb, var(--status-info, #3b82f6) 16%, transparent);
+  color: var(--color-text-primary, #f8fafc);
+}
+
+.profile-settings-shell__content {
+  display: grid;
+  gap: 16px;
+}

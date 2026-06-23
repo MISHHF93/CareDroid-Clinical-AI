@@ -1,40 +1,91 @@
-# SaaS User Profile And Workspace Profiling Report
+# Unified User Profile Catalog
 
-## SaaS Profile Model
+## Overview
 
-CareDroid now exposes a normalized `saasProfile` from `/api/profile/me` alongside the existing account, professional, preferences, workspace, activity, security, and audit sections. The profile includes `userId`, `organizationId`, `organizationType`, `displayName`, `email`, `role`, `specialty`, `department`, `defaultWorkspace`, `allowedWorkspaces`, `permissions`, `subscriptionEntitlements`, `enabledAssetPacks`, `pinnedAssets`, `hiddenAssets`, `recentAssets`, `preferredAIStyle`, `themePreference`, `compactMode`, and `onboardingStatus`.
+CareDroid uses one **canonical SaaS role** per user (admin-assigned via `roleProfileId`) to drive Emergency OS, TrackMind, navigation, clinical tools, and workspace access. User personalization is limited to pins, hidden tools (within allowed bounds), theme, and AI preferences.
 
-The backend preserves existing storage: `UserProfile` stores organization and role profile identifiers, `ProfessionalProfile` stores specialty and department details, and `UserPreference` JSON stores workspace defaults, pins, hidden assets, recents, entitlements, packs, AI style, theme, compact mode, and onboarding state.
+## Catalog schema
 
-## Workspace Profile Model
+Each entry in `src/config/user-profile-catalog.data.json` includes:
 
-Workspace taxonomy covers Emergency, ICU, Cardiology, Laboratory, Pharmacy, Operations, Fleet, Medical IoT, Education, Research, Governance, and Admin. Each workspace settings payload includes a `workspaceProfile` with `workspaceId`, `name`, `description`, `allowedRoles`, `intendedDepartments`, `defaultAssets`, `recommendedAssetPacks`, `defaultDashboardWidgets`, `recommendedAIAgents`, `visibleNavigationGroups`, `restrictedAssets`, and `defaultFilters`.
+| Field | Purpose |
+|-------|---------|
+| `saasRole` | Canonical role id (`emergency-physician`, `student`, …) |
+| `label` | Display label for profile and admin UI |
+| `domain` | `clinical`, `operations`, `education`, `governance`, `trackmind`, `platform` |
+| `hierarchyLevel` | 1 (student) – 6 (platform admin) |
+| `emergencyRoleId` | Emergency OS role or `null` |
+| `trackMindRoleId` | TrackMind persona or `null` |
+| `allowedWorkspaces` | Workspace ids the role may use |
+| `navigationGroups` | High-level product areas |
+| `defaultScreenMode` | Emergency screen mode when applicable |
+| `toolPolicy` | `allowedPacks`, `restrictedToolIds` |
+| `requiredToolIds` | Tools that cannot be hidden by users |
+| `profileBenefits` | Human-readable access summary for profile hub |
 
-## Roles And Organizations
+## API
 
-Canonical roles include emergency physician, ICU physician, cardiologist, nurse, pharmacist, lab technician, biomedical engineer, fleet operator, hospital administrator, researcher, educator, student, compliance officer, and platform admin. Organization types include hospital, clinic, EMS, university, research center, long-term care, telehealth, and government.
+`GET /api/profile/me` returns:
 
-## Permission And Asset Filtering
+- `saasProfile` — persisted preferences and entitlements
+- `effectiveProfile` — resolved catalog entry + permission presets
+- `accessSummary` — `{ navigationRoutes, allowedWorkspaces, emergencyRole, trackMindRole, … }`
 
-Effective access now returns legacy `accessState` plus SaaS `effectiveAccessState`: visible, recommended, pinned, hidden, restricted, locked, demo-only, or unsupported. Ordering follows pinned assets, workspace recommendations, role recommendations, recent assets, then all permitted assets. Hidden assets remain restorable through profile tool preferences. Locked assets remain visible only in the locked view with access explanations.
+`PATCH /api/profile/me` rejects user-initiated `role`, `permissions`, and `allowedWorkspaces` changes unless the caller has `MANAGE_ROLES` or `MANAGE_USERS`. Hidden assets are validated against `requiredToolIds`.
 
-## Personalization
+## Admin workflow
 
-`/dashboard` renders the active organization, workspace, role, recommended assets, pinned and recent asset counts, enabled asset packs, workspace widgets, notifications, and recommended AI agents. `/tools` uses the SaaS filter model: Recommended for Me, My Workspace, My Department, My Role, My Asset Packs, All Permitted, Locked, Hidden, Recent, and Favorites.
+1. Org admin assigns canonical role via membership / `roleProfileId` in Tenant Administration Center.
+2. Use **Role access preview** to see routes, workspaces, Emergency/TrackMind mapping, and benefits before assignment.
+3. Org-level `emergencyRoleMapping` remains as an override layer atop catalog defaults.
 
-## Assistant Context
+## Runtime wiring
 
-Assistant requests carry organization, workspace, role, specialty, department, allowed assets, enabled packs, recent assets, pinned assets, and permissions. Backend chat sanitizes this context, marks it as client-supplied, and uses it only as contextual metadata. Contextual suggestions now cover emergency chest pain, fleet active units, and biomedical/offline device prompts.
+- `resolveEmergencyRoleId` — catalog first, then org mapping
+- `resolveTrackMindRoleId` — catalog first, then user overrides
+- `getVisibleNavigation(role, { saasRole })` — filters sidebar from catalog routes
+- `assetAccess.js` — respects catalog `toolPolicy`
+- `useEffectiveUserProfile` — frontend hook for profile hub and AppShell
 
-## Tenant Isolation
+## Auth and account UX
 
-Workspace membership checks continue to gate workspace reads and switches. Platform asset context resolves organization entitlements server-side. Workspace switch and profile update audit events include tenant identifiers when available. Memory fabric context is tenant scoped and filters organization/workspace memory before returning recommendations.
+CareDroid keeps **open-access demo mode** as the default session while offering optional sign-in:
 
-## Tests Added
+| Session | Behavior |
+|---------|----------|
+| Open access | `OPEN_ACCESS_USER` + dev token; demo strip + “Sign in” in account menu |
+| Authenticated | Real JWT from login/OAuth/magic link; profile hydration via `/api/auth/me` + `/api/profile/me` |
 
-Focused frontend tests were updated for SaaS tool filters and assistant payload context. Existing memory fabric tests already cover tenant-scoped memory filtering and audit metadata.
+### Auth routes
 
-## Remaining Risks
+| Route | Purpose |
+|-------|---------|
+| `/auth` | Sign in / create account (open + institution invite CTA) |
+| `/auth/forgot-password` | Request reset email |
+| `/reset-password?token=` | Complete password reset |
+| `/verify-email?token=` | Email verification |
+| `/auth/magic-link?token=` | Magic link sign-in |
+| `/auth/invite?token=` | Workspace invitation accept flow |
+| `/auth-callback` | OAuth token hydration |
+| `/welcome` | Post-sign-up onboarding (`onboardingStatus`) |
 
-Some organization administration flows still need deeper admin assignment UX for roles, workspace grants, asset pack assignments, and permissions. Backend SaaS profile fields currently reuse JSON preference storage; a future migration can promote high-volume fields to first-class columns if reporting or indexing needs grow.
+### Profile page map
 
+All `/profile/*` routes use `ProfileSettingsShell` with access summary:
+
+- **Overview** — `/profile`
+- **Identity** — `/profile/settings` (clinical fields only)
+- **Preferences** — `/profile/preferences` (theme, density, AI, notifications)
+- **Tools** — `/profile/tool-preferences`
+- **Workspaces** — `/profile/workspaces`
+- **Security** — `/profile/security` (2FA, biometric links)
+- **Activity** — `/profile/activity`
+
+Global account chrome: header `UserAccountMenu` (avatar, profile, sign in/out) and sidebar **Account** link.
+
+## Tests
+
+- `src/config/userProfileCatalog.test.ts`
+- `src/config/userProfileIsolation.test.ts`
+- `src/auth/authSession.test.ts`
+- `src/components/account/UserAccountMenu.test.tsx`

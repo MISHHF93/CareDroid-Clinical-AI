@@ -1,5 +1,6 @@
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
+import { buildDevPlatformDemoUser } from '../config/demoPersonaModel';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
@@ -17,17 +18,7 @@ export const withDevSessionMarker = (user) => ({
   devAuthLabel: DEV_AUTH_LABEL,
 });
 
-export const buildDevDemoUser = () =>
-  withDevSessionMarker({
-    id: 'platform-access-user',
-    email: 'access@caredroid.local',
-    name: 'CareDroid Clinician',
-    role: 'physician',
-    fullName: 'CareDroid Clinician',
-    isEmailVerified: true,
-    twoFactorEnabled: false,
-    createdAt: new Date().toISOString(),
-  });
+export const buildDevDemoUser = () => withDevSessionMarker(buildDevPlatformDemoUser());
 
 export function createLocalPlatformAccessSession() {
   const user = buildDevDemoUser();

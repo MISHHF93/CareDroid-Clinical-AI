@@ -1,11 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
+import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
+import useProfileShellProps from '../../hooks/useProfileShellProps';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { isFutureWorkspace } from '../../config/workspace.config';
 import './ProfileIdentityPages.css';
 
 export default function ProfileWorkspaces() {
+  const { accessSummary, profileCopy } = useProfileShellProps();
   const {
     activeWorkspace,
     workspaces,
@@ -31,13 +35,13 @@ export default function ProfileWorkspaces() {
   };
 
   return (
-    <section className="profile-identity-page">
+    <ProfileSettingsShell
+      title="Workspaces"
+      subtitle="Switch active workspace and set your default clinical workspace."
+      accessSummary={accessSummary}
+      profileCopy={profileCopy}
+    >
       <div className="profile-identity-page__inner">
-        <header className="profile-identity-page__header">
-          <h1>Manage Workspaces</h1>
-          <p>Use one control to change the active workspace and set workspace defaults.</p>
-        </header>
-
         <Card>
           <h2 style={{ marginTop: 0 }}>Change Workspace</h2>
           <div className="profile-identity-row">
@@ -105,7 +109,10 @@ export default function ProfileWorkspaces() {
             ))}
           </div>
         </Card>
+        <p className="profile-identity-muted">
+          <Link to="/profile/preferences">Adjust display preferences</Link>
+        </p>
       </div>
-    </section>
+    </ProfileSettingsShell>
   );
 }

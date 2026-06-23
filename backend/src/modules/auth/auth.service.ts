@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   ForbiddenException,
+  Optional,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +22,7 @@ import {
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +39,17 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
     private readonly twoFactorService: TwoFactorService,
+    @Optional() private readonly emailService?: EmailService,
   ) {}
+
+  private getFrontendBaseUrl(): string {
+    const serverConfig = this.configService.get<any>('server') || {};
+    const raw =
+      serverConfig.frontendUrl ||
+      this.configService.get<string>('FRONTEND_URL') ||
+      'http://localhost:8000';
+    return raw.replace(/\/$/, '');
+  }
 
   private normalizeEmail(email: string): string {
     return String(email || '').trim().toLowerCase();
@@ -454,6 +466,23 @@ export class AuthService {
       return { status: 'sent' };
     }
 
+    const config = this.configService.get<any>('jwt');
+    const magicToken = this.jwtService.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        tokenUse: 'magic-link',
+      },
+      {
+        expiresIn: '15m',
+        secret: config.secret,
+      },
+    );
+
+    if (this.emailService) {
+      await this.emailService.sendMagicLinkEmail(user.email, magicToken, this.getFrontendBaseUrl());
+    }
+
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.LOGIN,
@@ -463,6 +492,121 @@ export class AuthService {
     });
 
     return { status: 'sent' };
+  }
+
+  async verifyMagicLink(token: string, ipAddress: string, userAgent: string) {
+    const magicToken = String(token || '').trim();
+    if (!magicToken) {
+      throw new BadRequestException('Magic link token is required');
+    }
+
+    try {
+      const config = this.configService.get<any>('jwt');
+      const payload = this.jwtService.verify(magicToken, { secret: config.secret });
+      if (payload?.tokenUse !== 'magic-link' || !payload?.sub) {
+        throw new UnauthorizedException('Invalid magic link');
+      }
+
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+        relations: ['profile', 'subscription', 'twoFactor'],
+      });
+
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException('Invalid magic link');
+      }
+
+      user.lastLoginAt = new Date();
+      user.lastLoginIp = ipAddress;
+      await this.userRepository.save(user);
+
+      await this.auditService.log({
+        userId: user.id,
+        action: AuditAction.LOGIN,
+        resource: 'auth:magic-link',
+        ipAddress,
+        userAgent,
+      });
+
+      if (user.twoFactor?.enabled) {
+        return {
+          requiresTwoFactor: true,
+          userId: user.id,
+          twoFactorChallenge: this.generateTwoFactorChallenge(user, ipAddress, userAgent),
+        };
+      }
+
+      const tokens = await this.generateTokens(user);
+      return {
+        ...tokens,
+        user: this.sanitizeUser(user),
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Invalid or expired magic link');
+    }
+  }
+
+  async forgotPassword(email: string) {
+    const normalizedEmail = this.normalizeEmail(email);
+    if (!normalizedEmail) {
+      throw new BadRequestException('Email is required');
+    }
+
+    const user = await this.userRepository.findOne({ where: { email: normalizedEmail } });
+    if (!user) {
+      return { status: 'sent' };
+    }
+
+    const passwordResetToken = randomBytes(32).toString('hex');
+    user.passwordResetToken = passwordResetToken;
+    user.passwordResetExpiry = new Date(Date.now() + 30 * 60 * 1000);
+    await this.userRepository.save(user);
+
+    if (this.emailService) {
+      await this.emailService.sendPasswordResetEmail(
+        user.email,
+        passwordResetToken,
+        this.getFrontendBaseUrl(),
+      );
+    }
+
+    return { status: 'sent' };
+  }
+
+  async resetPassword(token: string, password: string) {
+    const resetToken = String(token || '').trim();
+    if (!/^[a-f0-9]{64}$/i.test(resetToken)) {
+      throw new BadRequestException('Invalid reset token');
+    }
+    if (!password || password.length < 8) {
+      throw new BadRequestException('Password must be at least 8 characters');
+    }
+
+    const user = await this.userRepository.findOne({ where: { passwordResetToken: resetToken } });
+    if (!user || !user.passwordResetExpiry) {
+      throw new BadRequestException('Invalid reset token');
+    }
+    if (new Date() > user.passwordResetExpiry) {
+      throw new BadRequestException('Reset token expired');
+    }
+
+    user.passwordHash = await bcrypt.hash(password, 12);
+    user.passwordResetToken = null;
+    user.passwordResetExpiry = null;
+    await this.userRepository.save(user);
+
+    await this.auditService.log({
+      userId: user.id,
+      action: AuditAction.PASSWORD_CHANGE,
+      resource: 'auth',
+      ipAddress: '0.0.0.0',
+      userAgent: 'system',
+    });
+
+    return { success: true };
   }
 
   private generateTwoFactorChallenge(user: User, ipAddress: string, userAgent: string) {

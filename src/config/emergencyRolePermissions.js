@@ -18,6 +18,7 @@ import { CARE_DROID_SCREEN_MODES, normalizeCareDroidScreenMode } from './careDro
 import { getTriagePendingQueuePath } from './triageScreenModel';
 import { isPhysicianScreenMode } from './physicianScreenModel';
 import { presentEmergencyRoleAction } from './emergencyRoleActionMatrix';
+import { resolveEffectiveEmergencyRole } from './userProfileCatalog';
 import { resolveRoleLandingRoute } from './emergencyRoleNavigationModel';
 
 export {
@@ -352,6 +353,8 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
   }),
 });
 
+const roleDefinitionLandingCache = new Map();
+
 const ROLE_ALIASES = Object.freeze({
   admin: EMERGENCY_ROLE_IDS.admin,
   administrator: EMERGENCY_ROLE_IDS.admin,
@@ -419,7 +422,7 @@ export function normalizeEmergencyRole(role) {
 }
 
 /**
- * Map platform membership roleProfileId to an Emergency OS role via org settings.
+ * Map platform membership roleProfileId to an Emergency OS role via catalog + org settings.
  * @param {object} [user]
  * @param {object} [emergencyOsSettings]
  */
@@ -432,8 +435,18 @@ export function resolveEmergencyRoleId(user, emergencyOsSettings = {}) {
     return normalizeEmergencyRole(mapping[explicitProfileId]);
   }
 
+  try {
+    const catalogRole = resolveEffectiveEmergencyRole(user, emergencyOsSettings);
+    if (catalogRole) return catalogRole;
+  } catch {
+    // catalog unavailable in some test contexts
+  }
+
   if (user?.role) {
-    return normalizeEmergencyRole(user.role);
+    const normalizedUserRole = normalizeEmergencyRole(user.role);
+    if (Object.values(EMERGENCY_ROLE_IDS).includes(normalizedUserRole)) {
+      return normalizedUserRole;
+    }
   }
 
   const fallbackProfileId = explicitProfileId || rolesConfig.defaultRoleProfileId;
@@ -452,7 +465,22 @@ export function resolveEmergencyRoleId(user, emergencyOsSettings = {}) {
 }
 
 export function getEmergencyRoleDefinition(role) {
-  return EMERGENCY_ROLE_DEFINITIONS[normalizeEmergencyRole(role)];
+  const normalizedRole = normalizeEmergencyRole(role);
+  const base = EMERGENCY_ROLE_DEFINITIONS[normalizedRole];
+  if (!base) return undefined;
+  if (!roleDefinitionLandingCache.has(normalizedRole)) {
+    roleDefinitionLandingCache.set(
+      normalizedRole,
+      Object.freeze({
+        ...base,
+        defaultRoute: resolveRoleLandingRoute({
+          role: normalizedRole,
+          readOnly: Boolean(base.readOnly),
+        }),
+      }),
+    );
+  }
+  return roleDefinitionLandingCache.get(normalizedRole);
 }
 
 export function getEmergencyDemoRoles() {

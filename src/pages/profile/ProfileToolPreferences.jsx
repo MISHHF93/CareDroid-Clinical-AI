@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
+import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
+import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
@@ -7,9 +9,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 import {
   buildProfileToolGraph,
   buildUserToolProfile,
-  ORGANIZATION_TYPES,
   PROFILE_DEPARTMENTS,
-  PROFILE_ROLES,
   PROFILE_SPECIALTIES,
   PROFILE_TRAINING_LEVELS,
 } from '../../data/profileToolSegmentation';
@@ -28,7 +28,9 @@ export default function ProfileToolPreferences() {
     resetToolRecommendations,
   } = toolPreferences;
   const { user } = useUser();
-  const { account, preferences, activeWorkspace, workspaceState, updateProfile, saasProfile } = useUserIdentity();
+  const { account, preferences, activeWorkspace, workspaceState, updateProfile, saasProfile, accessSummary } =
+    useUserIdentity();
+  const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
   const [status, setStatus] = useState('');
@@ -59,6 +61,11 @@ export default function ProfileToolPreferences() {
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
     ]
+  );
+  const resolvedAccessSummary = accessSummary || hookAccessSummary;
+  const allowedWorkspaceIds = new Set(resolvedAccessSummary?.allowedWorkspaces || []);
+  const filteredWorkspaces = workspaces.filter(
+    (workspace) => !allowedWorkspaceIds.size || allowedWorkspaceIds.has(workspace.id),
   );
   const graph = useMemo(() => buildProfileToolGraph({ tools, profile }), [profile, tools]);
   const pinnedToolSet = useMemo(() => new Set(pinned), [pinned]);
@@ -113,25 +120,18 @@ export default function ProfileToolPreferences() {
   }, [graph.tools, graph.visibleTools, hiddenTools]);
 
   return (
-    <section className="profile-identity-page">
-      <div className="profile-identity-page__inner">
-        <header className="profile-identity-page__header">
-          <h1>Tool Preferences</h1>
-          <p>Personalize which tools are recommended, pinned, hidden, grouped, and prioritized for your profile.</p>
-        </header>
-
+    <ProfileSettingsShell
+      title="Tool preferences"
+      subtitle="Pin or hide tools within your assigned role. Role and workspace access are managed by your administrator."
+      accessSummary={resolvedAccessSummary}
+      profileCopy={profileCopy}
+    >
         <Card>
           <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
             <div className="profile-identity-muted">
-              Backend SaaS role: {saasProfile?.role || profile.role} · default workspace:{' '}
+              Assigned role: {saasProfile?.role || profile.role} (admin-managed) · default workspace:{' '}
               {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
             </div>
-            <label>
-              Role
-              <select value={profileSettings.role || profile.role} onChange={(event) => updateSetting('role', event.target.value)}>
-                {PROFILE_ROLES.map((role) => <option key={role} value={role}>{role}</option>)}
-              </select>
-            </label>
             <label>
               Specialty
               <select value={profileSettings.specialty || profile.specialty} onChange={(event) => updateSetting('specialty', event.target.value)}>
@@ -147,7 +147,7 @@ export default function ProfileToolPreferences() {
             <label>
               Default workspace
               <select value={profileSettings.defaultWorkspace || activeWorkspaceId} onChange={(event) => updateSetting('defaultWorkspace', event.target.value)}>
-                {workspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
+                {filteredWorkspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
               </select>
             </label>
             <label>
@@ -158,9 +158,7 @@ export default function ProfileToolPreferences() {
             </label>
             <label>
               Organization type
-              <select value={profileSettings.organizationType || profile.organizationType} onChange={(event) => updateSetting('organizationType', event.target.value)}>
-                {ORGANIZATION_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-              </select>
+              <input value={saasProfile?.organizationType || profile.organizationType || 'hospital'} readOnly />
             </label>
             <label>
               <span>
@@ -216,7 +214,6 @@ export default function ProfileToolPreferences() {
             ))}
           </div>
         </section>
-      </div>
-    </section>
+    </ProfileSettingsShell>
   );
 }

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import {
   BrowserRouter,
   Link,
@@ -18,7 +18,7 @@ import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { OrganizationContextProvider } from './contexts/OrganizationContext';
 import { WhiteLabelProvider } from './contexts/WhiteLabelContext';
-import { UserIdentityProvider } from './contexts/UserIdentityContext';
+import { UserIdentityProvider, useUserIdentity } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
 import { TenantContextProvider } from './contexts/TenantContext';
@@ -259,6 +259,15 @@ const Competencies = lazy(() => import('./pages/Competencies'));
 const Credentials = lazy(() => import('./pages/Credentials'));
 const Artifacts = lazy(() => import('./pages/Artifacts'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const AuthForgotPassword = lazy(() => import('./pages/auth/AuthForgotPassword'));
+const AuthResetPassword = lazy(() => import('./pages/auth/AuthResetPassword'));
+const AuthVerifyEmail = lazy(() => import('./pages/auth/AuthVerifyEmail'));
+const AuthMagicLink = lazy(() => import('./pages/auth/AuthMagicLink'));
+const AuthInviteAccept = lazy(() => import('./pages/auth/AuthInviteAccept'));
+const PlatformEntryHub = lazy(() => import('./pages/PlatformEntryHub'));
+const AdminOperationsShell = lazy(() => import('./components/admin/AdminOperationsShell'));
+const AdminOperationsHome = lazy(() => import('./pages/admin/AdminOperationsHome'));
+const EdStaffWorkflowAdmin = lazy(() => import('./pages/admin/EdStaffWorkflowAdmin'));
 const SharedToolSession = lazy(() => import('./pages/tools/SharedToolSession'));
 const EmergencyDepartmentPulse = lazy(() => import('./pages/emergency/pulse'));
 const EmergencyShiftSummary = lazy(() => import('./pages/emergency/shift'));
@@ -275,6 +284,14 @@ import { useEmergencyRolePermissions } from './hooks/useEmergencyRolePermissions
 import TrackMindRouteGuard from './components/TrackMindRouteGuard';
 import { getEmergencyRoleHomeRoute, EMERGENCY_ROLE_IDS, getReceptionEmbeddedIntakePath, prefersReceptionForPatientCreate } from './config/emergencyRolePermissions';
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from './config/receptionFirstUx.config';
+import { resolvePlatformLanding } from './config/platformEntryModel';
+import {
+  hydrateAuthenticatedSession,
+  resolvePostAuthDestination,
+  sanitizeReturnUrl,
+} from './auth/authSession';
+import { AuthApi } from './services/authApi';
+import { toast } from 'sonner';
 
 
 import {
@@ -302,14 +319,49 @@ function LazyRoute({ children, label }) {
 
 function AuthRoute() {
   const navigate = useNavigate();
-  const { setAuthToken, setUser } = useUser();
+  const [searchParams] = useSearchParams();
+  const { setAuthToken, setUser, isRealSession } = useUser();
+  const returnUrl = sanitizeReturnUrl(searchParams.get('returnUrl'));
+  const inviteToken = searchParams.get('invite') || '';
+
+  useEffect(() => {
+    if (isRealSession) {
+      toast.info('Already signed in', { description: 'Redirecting to your workspace.' });
+      navigate(returnUrl !== '/' ? returnUrl : getPlatformHomeRoute(), { replace: true });
+    }
+  }, [isRealSession, navigate, returnUrl]);
+
+  const completeAuthSuccess = async (accessToken, user, profileOverride = null) => {
+    if (accessToken) setAuthToken(accessToken);
+    const hydrated = profileOverride
+      ? { user: user || null, profile: profileOverride }
+      : await hydrateAuthenticatedSession(accessToken);
+    const nextUser = hydrated.user || user;
+    if (nextUser) {
+      setUser({ ...nextUser, authMode: 'authenticated' });
+    } else if (user) {
+      setUser({ ...user, authMode: 'authenticated' });
+    }
+
+    if (inviteToken && accessToken) {
+      await AuthApi.acceptWorkspaceInvitation(inviteToken, accessToken);
+    }
+
+    const destination = resolvePostAuthDestination({
+      user: nextUser || user,
+      profile: hydrated.profile,
+      returnUrl,
+    });
+    navigate(destination, { replace: true });
+  };
 
   const handleAuthSuccess = (accessToken, user) => {
-    if (user) setUser(user);
-    if (accessToken) setAuthToken(accessToken);
-    const role = user?.role || user?.profile?.roleProfileId;
-    navigate(getEmergencyRoleHomeRoute(role), { replace: true });
+    completeAuthSuccess(accessToken, user);
   };
+
+  if (isRealSession) {
+    return <RouteLoadingFallback label="Redirecting..." />;
+  }
 
   return (
     <LazyRoute label="Loading sign-in...">
@@ -394,10 +446,24 @@ function EmergencyRouteGuard({ path, children }) {
 }
 
 function EmergencyDefaultRedirect() {
+  const { authMode } = useUser();
+  const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
+
+  const destination = resolvePlatformLanding({
+    authMode,
+    saasRole: saasProfile?.role || saasProfile?.saasRole,
+    onboardingStatus: saasProfile?.onboardingStatus,
+  });
+
+  if (destination === CANONICAL_ROUTES.platformStart) {
+    return <Navigate to={destination} replace />;
+  }
+
   return (
     <Navigate
       to={
+        destination ||
         emergencyRole.landingRoute ||
         emergencyRole.defaultRoute ||
         getPlatformHomeRoute() ||
@@ -720,6 +786,46 @@ export function AppRoutes() {
         }
       />
       <Route
+        path={CANONICAL_ROUTES.authForgotPassword}
+        element={
+          <LazyRoute label="Loading...">
+            <AuthForgotPassword />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path={CANONICAL_ROUTES.resetPassword}
+        element={
+          <LazyRoute label="Loading...">
+            <AuthResetPassword />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path={CANONICAL_ROUTES.verifyEmail}
+        element={
+          <LazyRoute label="Loading...">
+            <AuthVerifyEmail />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path={CANONICAL_ROUTES.authMagicLink}
+        element={
+          <LazyRoute label="Signing in...">
+            <AuthMagicLink />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path={CANONICAL_ROUTES.authInvite}
+        element={
+          <LazyRoute label="Loading invite...">
+            <AuthInviteAccept />
+          </LazyRoute>
+        }
+      />
+      <Route
         path={CANONICAL_ROUTES.welcome}
         element={
           <LazyRoute label="Loading welcome...">
@@ -736,6 +842,59 @@ export function AppRoutes() {
         }
       />
       <Route element={<RootLayout />}>
+        <Route
+          path={CANONICAL_ROUTES.platformStart}
+          element={
+            <LazyRoute label="Loading platform entry...">
+              <PlatformEntryHub />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.adminOperations}
+          element={
+            <LazyRoute label="Loading admin console...">
+              <AdminOperationsShell />
+            </LazyRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <LazyRoute label="Loading admin overview...">
+                <AdminOperationsHome />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="staff-workflows"
+            element={
+              <LazyRoute label="Loading ED workflows...">
+                <EdStaffWorkflowAdmin />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="team"
+            element={
+              <LazyRoute label="Loading team...">
+                <TeamManagement />
+              </LazyRoute>
+            }
+          />
+          <Route
+            path="tenant"
+            element={
+              <LazyRoute label="Loading tenant admin...">
+                <TenantAdministrationCenter />
+              </LazyRoute>
+            }
+          />
+        </Route>
+        <Route
+          path={CANONICAL_ROUTES.tenantAdmin}
+          element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />}
+        />
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
         <Route
           path={CANONICAL_ROUTES.emergencyWhiteboard}
@@ -1066,14 +1225,6 @@ export function AppRoutes() {
           element={
             <LazyRoute label="Loading platform admin...">
               <PlatformAdminPage />
-            </LazyRoute>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.tenantAdmin}
-          element={
-            <LazyRoute label="Loading tenant admin...">
-              <TenantAdministrationCenter />
             </LazyRoute>
           }
         />

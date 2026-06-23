@@ -9,6 +9,7 @@ import { WorkspaceInvitation } from './entities/workspace-invitation.entity';
 import { WorkspaceMembership } from './entities/workspace-membership.entity';
 import { Workspace } from './entities/workspace.entity';
 import { WorkspacesController } from './workspaces.controller';
+import { WorkspaceInvitationsController } from './workspace-invitations.controller';
 import { WorkspaceContextService } from './workspace-context.service';
 import { WorkspacesService } from './workspaces.service';
 
@@ -25,7 +26,7 @@ import { WorkspacesService } from './workspaces.service';
     PermissionsModule,
     forwardRef(() => PlatformAssetsModule),
   ],
-  controllers: [WorkspacesController],
+  controllers: [WorkspacesController, WorkspaceInvitationsController],
   providers: [WorkspacesService, WorkspaceContextService],
   exports: [WorkspacesService, WorkspaceContextService],
 })

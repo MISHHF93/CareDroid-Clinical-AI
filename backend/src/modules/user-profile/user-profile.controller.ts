@@ -1,6 +1,9 @@
 import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Permission } from '../auth/enums/permission.enum';
+import { hasPermission } from '../auth/config/role-permissions.config';
+import { UserRole } from '../users/entities/user.entity';
 import { UpdateOperationalProfileDto } from './dto/update-operational-profile.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UserProfileService } from './user-profile.service';
@@ -21,11 +24,16 @@ export class UserProfileController {
   @Patch('me')
   @ApiOperation({ summary: 'Update current-user operational profile' })
   async update(@Req() req: any, @Body() dto: UpdateOperationalProfileDto) {
+    const canAssignRole =
+      req.user?.role === UserRole.ADMIN ||
+      hasPermission(req.user?.role, Permission.MANAGE_ROLES) ||
+      hasPermission(req.user?.role, Permission.MANAGE_USERS);
     return this.userProfileService.updateOperationalProfile(
       req.user.id,
       dto,
       req.ip,
       req.headers['user-agent'],
+      { canAssignRole },
     );
   }
 

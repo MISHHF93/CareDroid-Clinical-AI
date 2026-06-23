@@ -75,7 +75,7 @@ describe('feature flag UI coverage', () => {
     expect(settingsSource).toContain('<FeatureGate feature="audit_log">');
     expect(appShellSource).toContain('startReassessmentEngine()');
     expect(appShellSource).toContain('startCapacityEngine()');
-    expect(appShellSource).toContain('!isTabletViewport || copilotOpen');
+    expect(appShellSource).toContain('copilotOpen ?');
     expect(appShellSource).toContain('<CopilotPanel />');
     expect(chatSource).toContain('copilotToolActionsEnabled && actionSuggestion');
     expect(chatSource).toContain('enabledFeatures: enabledCopilotFeatures');

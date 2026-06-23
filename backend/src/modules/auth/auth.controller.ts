@@ -175,6 +175,28 @@ export class AuthController {
     return this.authService.requestMagicLink(body.email);
   }
 
+  @Get('magic-link/verify')
+  @ApiOperation({ summary: 'Verify magic login link token' })
+  async verifyMagicLink(@Query('token') token: string, @Req() req: Request) {
+    const ipAddress = req.ip || '0.0.0.0';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    return this.authService.verifyMagicLink(token, ipAddress, userAgent);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request password reset email' })
+  async forgotPassword(@Body() body: MagicLinkRequestDto) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password with token from email' })
+  async resetPassword(@Body() body: { token: string; password: string }) {
+    return this.authService.resetPassword(body.token, body.password);
+  }
+
   @Get('oidc')
   @ApiOperation({ summary: 'OIDC SSO entry (placeholder)' })
   async oidcLogin() {

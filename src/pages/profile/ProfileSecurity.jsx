@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
+import TwoFactorSettings from '../../components/TwoFactorSettings';
+import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
+import useProfileShellProps from '../../hooks/useProfileShellProps';
+import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
@@ -12,16 +16,18 @@ function formatDate(value) {
 }
 
 export default function ProfileSecurity() {
+  const { accessSummary, profileCopy } = useProfileShellProps();
+  const { authToken } = useUser();
   const { account, security } = useUserIdentity();
 
   return (
-    <section className="profile-identity-page">
+    <ProfileSettingsShell
+      title="Security"
+      subtitle="Email verification, multi-factor authentication, and biometric setup."
+      accessSummary={accessSummary}
+      profileCopy={profileCopy}
+    >
       <div className="profile-identity-page__inner">
-        <header className="profile-identity-page__header">
-          <h1>Profile Security</h1>
-          <p>Review account verification, role, MFA, biometric setup, and protected security routes.</p>
-        </header>
-
         <Card>
           <div className="profile-identity-grid">
             <div className="profile-identity-card">
@@ -32,12 +38,12 @@ export default function ProfileSecurity() {
             <div className="profile-identity-card">
               <h3>Role</h3>
               <p>{security?.role || account?.role || 'Not assigned'}</p>
-              <strong>Workspace permissions refine route access</strong>
+              <strong>Admin-managed SaaS role</strong>
             </div>
             <div className="profile-identity-card">
               <h3>Multi-factor</h3>
               <p>{security?.mfaEnabled ? 'Enabled' : 'Not enabled'}</p>
-              <Link to="/two-factor-setup">Manage 2FA</Link>
+              <Link to="/two-factor-setup">Manage 2FA setup</Link>
             </div>
             <div className="profile-identity-card">
               <h3>Last login</h3>
@@ -47,15 +53,20 @@ export default function ProfileSecurity() {
           </div>
         </Card>
 
+        <TwoFactorSettings authToken={authToken} />
+
         <Card>
-          <h2 style={{ marginTop: 0 }}>Protected Areas</h2>
-          <div className="profile-identity-actions">
-            <Link to="/audit">Audit logs</Link>
-            <Link to="/settings">Privacy and billing settings</Link>
-            <Link to="/notifications">Notification security alerts</Link>
+          <h2 style={{ marginTop: 0 }}>Protected routes</h2>
+          <p className="profile-identity-muted">
+            Security-sensitive setup flows stay on dedicated routes for clearer audit trails.
+          </p>
+          <div className="profile-identity-list">
+            <Link to="/two-factor-setup">Two-factor enrollment</Link>
+            <Link to="/biometric-setup">Biometric enrollment</Link>
+            <Link to="/profile/settings">Identity settings</Link>
           </div>
         </Card>
       </div>
-    </section>
+    </ProfileSettingsShell>
   );
 }

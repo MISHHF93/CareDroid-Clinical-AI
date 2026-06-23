@@ -10,6 +10,7 @@ import { readLocalClientProfile } from '../config/workspace.config';
 import { fetchMemoryFabricContext, LOCAL_MEMORY_FABRIC_CONTEXT } from '../services/memoryApi';
 import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import logger from '../utils/logger';
+import { enrichDemoIdentityFallback } from '../config/demoPersonaModel';
 
 const BACKEND_TO_LOCAL_WORKSPACE = {
   personal: 'emergency',
@@ -58,6 +59,8 @@ const UserIdentityContext = createContext({
   security: null,
   audit: null,
   saasProfile: DEFAULT_SAAS_PROFILE,
+  effectiveProfile: null,
+  accessSummary: null,
   isLoading: false,
   error: '',
   refreshIdentity: () => {},
@@ -128,7 +131,7 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
     compactMode: false,
   };
 
-  return {
+  return enrichDemoIdentityFallback(user, {
     userId: user?.id || '',
     saasProfile,
     account: {
@@ -211,7 +214,7 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
       lastLoginAt: user?.lastLoginAt,
     },
     audit: { recentEvents: [] },
-  };
+  });
 }
 
 function normalizeSaasProfile(profile, workspaceState) {
@@ -502,6 +505,8 @@ export const UserIdentityProvider = ({ children }) => {
       security: profile?.security || null,
       audit: profile?.audit || null,
       saasProfile,
+      effectiveProfile: profile?.effectiveProfile || null,
+      accessSummary: profile?.accessSummary || null,
       isLoading,
       error,
       refreshIdentity,

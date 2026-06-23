@@ -4,34 +4,56 @@ import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useUser } from '../contexts/UserContext';
+import { AuthApi } from '../services/authApi';
+import {
+  hydrateAuthenticatedSession,
+  resolvePostAuthDestination,
+  sanitizeReturnUrl,
+} from '../auth/authSession';
 
 /**
- * OAuth completes with ?token=... on this route (backend redirects to FRONTEND_URL/auth-callback).
+ * OAuth completes with #token=... on this route (backend redirects to FRONTEND_URL/auth-callback).
  * Manual paste remains for troubleshooting.
  */
 const AuthCallback = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { setAuthToken } = useUser();
+  const { setAuthToken, setUser } = useUser();
   const { info } = useNotificationActions();
   const fragmentParams = new URLSearchParams(
     typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '',
   );
   const initialToken = fragmentParams.get('token') || params.get('token') || '';
-  const nextPath = fragmentParams.get('next') || params.get('next') || '/';
+  const nextPath = fragmentParams.get('next') || params.get('next') || params.get('returnUrl') || '/';
+  const inviteToken = params.get('invite') || '';
   const [token, setToken] = useState(initialToken);
   const autoHandled = useRef(false);
-  const safeNextPath = nextPath.startsWith('/') && !nextPath.startsWith('//') && !nextPath.startsWith('/auth')
-    ? nextPath
-    : '/';
+  const safeNextPath = sanitizeReturnUrl(nextPath);
 
   useEffect(() => {
     const fromUrl = initialToken;
     if (!fromUrl || autoHandled.current) return;
     autoHandled.current = true;
-    setAuthToken(fromUrl);
-    navigate(safeNextPath, { replace: true });
-  }, [initialToken, setAuthToken, navigate, safeNextPath]);
+
+    (async () => {
+      setAuthToken(fromUrl);
+      const hydrated = await hydrateAuthenticatedSession(fromUrl);
+      if (hydrated.user) {
+        setUser({ ...hydrated.user, authMode: 'authenticated' });
+      }
+      if (inviteToken) {
+        await AuthApi.acceptWorkspaceInvitation(inviteToken, fromUrl);
+      }
+      navigate(
+        resolvePostAuthDestination({
+          user: hydrated.user,
+          profile: hydrated.profile,
+          returnUrl: safeNextPath,
+        }),
+        { replace: true },
+      );
+    })();
+  }, [initialToken, setAuthToken, setUser, navigate, safeNextPath, inviteToken]);
 
   const handleSave = () => {
     const trimmed = token.trim();
@@ -49,7 +71,7 @@ const AuthCallback = () => {
         <Card style={{ width: '100%', maxWidth: '480px' }}>
           <h2 style={{ marginTop: 0 }}>Completing sign-in…</h2>
           <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-            You will be redirected to the Command Dashboard.
+            Loading your profile and routing to your workspace.
           </p>
         </Card>
       </div>
@@ -79,13 +101,9 @@ const AuthCallback = () => {
             marginTop: '12px',
           }}
         />
-        <Button onClick={handleSave} style={{ marginTop: '14px' }}>
-          Save token
-        </Button>
-        <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/assistant" style={{ color: '#00FF88', textDecoration: 'none' }}>
-            ← Back to Assistant
-          </Link>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+          <Button onClick={handleSave}>Continue</Button>
+          <Link to="/auth">Back to sign in</Link>
         </div>
       </Card>
     </div>

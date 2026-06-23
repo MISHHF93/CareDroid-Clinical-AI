@@ -20,9 +20,12 @@ import {
   prefersReceptionForPatientCreate,
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
+import DemoPersonaPanel from './account/DemoPersonaPanel';
+import './CopilotPanel.css';
 import {
   resolveScreenDensityProfile,
   screenDensityShellClassName,
@@ -169,11 +172,6 @@ export function AppShell({ children }: AppShellProps) {
   const startupStartedRef = useRef(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
-  const [isTabletViewport, setIsTabletViewport] = useState(() =>
-    typeof window === 'undefined' || typeof window.matchMedia !== 'function'
-      ? false
-      : window.matchMedia('(max-width: 1024px)').matches,
-  );
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window === 'undefined' || typeof window.matchMedia !== 'function'
       ? false
@@ -181,6 +179,7 @@ export function AppShell({ children }: AppShellProps) {
   );
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
+  const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const patients = useEmergencyStore((state) => state.patients);
   const reassessmentCount = useMemo(
     () => patients.filter(isPatientFlaggedForReassessment).length,
@@ -188,9 +187,10 @@ export function AppShell({ children }: AppShellProps) {
   );
   const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
   const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
+  const { saasRole, profileCopy } = useEffectiveUserProfile();
   const visibleNavigationItems = useMemo(
-    () => getVisibleNavigation(emergencyRole.role),
-    [emergencyRole.role],
+    () => getVisibleNavigation(emergencyRole.role, { saasRole }),
+    [emergencyRole.role, saasRole],
   );
   const currentPage = useMemo(() => {
     const surface = getEmergencySurface(location.pathname);
@@ -210,10 +210,10 @@ export function AppShell({ children }: AppShellProps) {
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
         (activeItem
-          ? `Open ${activeItem.label} in Emergency OS.`
-          : EMERGENCY_OS_BRANDING.safetyLine),
+          ? profileCopy.workspaceDescription || `Open ${activeItem.label} in Emergency OS.`
+          : profileCopy.workspaceDescription || EMERGENCY_OS_BRANDING.safetyLine),
     };
-  }, [location.pathname, visibleNavigationItems]);
+  }, [location.pathname, profileCopy.workspaceDescription, visibleNavigationItems]);
 
   useEffect(() => {
     if (startupStartedRef.current) return undefined;
@@ -294,18 +294,14 @@ export function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return undefined;
 
-    const tabletQuery = window.matchMedia('(max-width: 1024px)');
     const mobileQuery = window.matchMedia('(max-width: 768px)');
     const syncViewportState = () => {
-      setIsTabletViewport(tabletQuery.matches);
       setIsMobileViewport(mobileQuery.matches);
     };
 
     syncViewportState();
-    tabletQuery.addEventListener('change', syncViewportState);
     mobileQuery.addEventListener('change', syncViewportState);
     return () => {
-      tabletQuery.removeEventListener('change', syncViewportState);
       mobileQuery.removeEventListener('change', syncViewportState);
     };
   }, []);
@@ -333,6 +329,10 @@ export function AppShell({ children }: AppShellProps) {
       if (inInput) return;
 
       if (e.key === 'Escape') {
+        if (store.copilotOpen) {
+          store.setCopilotOpen(false);
+          return;
+        }
         store.selectPatient(null);
         setShowReassessmentDrawer(false);
         document.dispatchEvent(new Event('close-all-panels'));
@@ -585,6 +585,7 @@ export function AppShell({ children }: AppShellProps) {
         ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
           <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         )}
+        <DemoPersonaPanel />
         <main
           id="main-content"
           className="app-shell-main-content"
@@ -625,12 +626,26 @@ export function AppShell({ children }: AppShellProps) {
       {canUseCopilot &&
       !useKioskShell &&
       !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
-      (!isTabletViewport || copilotOpen) ? (
+      copilotOpen ? (
         <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
           <Suspense fallback={null}>
             <CopilotPanel />
           </Suspense>
         </ErrorBoundary>
+      ) : null}
+      {canUseCopilot &&
+      !useKioskShell &&
+      !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
+      !copilotOpen ? (
+        <button
+          type="button"
+          className="ed-copilot-launch"
+          onClick={toggleCopilot}
+          aria-label={`Open ${EMERGENCY_OS_BRANDING.copilotName}`}
+          title={`Open ${EMERGENCY_OS_BRANDING.copilotName} (C)`}
+        >
+          {EMERGENCY_OS_BRANDING.copilotName}
+        </button>
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>

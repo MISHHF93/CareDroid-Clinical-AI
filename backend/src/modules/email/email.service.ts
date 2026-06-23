@@ -143,6 +143,25 @@ export class EmailService {
     });
   }
 
+  async sendMagicLinkEmail(email: string, token: string, baseUrl?: string): Promise<boolean> {
+    const resolvedBaseUrl = baseUrl || this.getFrontendBaseUrl();
+    const magicLink = `${resolvedBaseUrl}/auth/magic-link?token=${encodeURIComponent(token)}`;
+    const html = `
+      <h2>Sign in to CareDroid</h2>
+      <p>Click the link below to sign in:</p>
+      <a href="${magicLink}">Sign in</a>
+      <p>Or copy this link: ${magicLink}</p>
+      <p>This link expires in 15 minutes.</p>
+    `;
+
+    return this.sendEmail({
+      to: email,
+      subject: 'Your CareDroid sign-in link',
+      html,
+      text: `Sign in: ${magicLink}`,
+    });
+  }
+
   async sendWelcomeEmail(email: string, name: string): Promise<boolean> {
     const html = `
       <h2>Welcome to CareDroid!</h2>

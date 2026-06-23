@@ -2382,6 +2382,7 @@ interface EmergencyStoreState {
   setLastPulseView: (timestamp: number) => void;
   setLoading: (loading: boolean) => void;
   toggleCopilot: () => void;
+  setCopilotOpen: (open: boolean) => void;
   clearError: () => void;
   initializeFromBackend: () => Promise<EmergencyDashboardRefreshResult>;
   refreshAllData: () => Promise<EmergencyDashboardRefreshResult>;
@@ -3851,6 +3852,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     setLoading: (loading) => set((state) => ({ loading, ui: { ...state.ui, loading } })),
 
     toggleCopilot: () => set((state) => ({ copilotOpen: !state.copilotOpen })),
+
+    setCopilotOpen: (open) => set({ copilotOpen: Boolean(open) }),
 
     clearError: () => set((state) => ({ ui: { ...state.ui, error: null } })),
 

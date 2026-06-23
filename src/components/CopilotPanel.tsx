@@ -22,6 +22,7 @@ import {
   resolveCopilotQuickActionFromSnapshot,
 } from '../services/copilotRecommendationDiscovery';
 import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuidance';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 
 type CopilotMessage = {
   id: string;
@@ -385,21 +386,35 @@ export function CopilotPanel() {
   const capacity = useEmergencyStore((store) => store.capacity);
   const alerts = useEmergencyStore((store) => store.alerts);
   const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
-  const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
+  const setCopilotOpen = useEmergencyStore((store) => store.setCopilotOpen);
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
   const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'PHYSICIAN_SCREEN' });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
+  const { profileCopy } = useEffectiveUserProfile();
+  const welcomeMessage = useMemo(
+    () =>
+      `${EMERGENCY_OS_BRANDING.copilotName} online. ${profileCopy.copilotIntro} Use quick actions or tap a recommendation card. ${HUMAN_REVIEW_DISCLAIMER}`,
+    [profileCopy.copilotIntro],
+  );
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: 'copilot-welcome',
       role: 'copilot',
-      content: `${EMERGENCY_OS_BRANDING.copilotName} online. Priority: queue → capacity → boarding → reassessment. Use quick actions or tap a recommendation card. ${HUMAN_REVIEW_DISCLAIMER}`,
+      content: welcomeMessage,
       timestamp: new Date(),
     },
   ]);
+  useEffect(() => {
+    setMessages((current) => {
+      if (current.length === 1 && current[0]?.id === 'copilot-welcome') {
+        return [{ ...current[0], content: welcomeMessage }];
+      }
+      return current;
+    });
+  }, [welcomeMessage]);
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<CopilotAttachment[]>([]);
   const [composerStatus, setComposerStatus] = useState('');
@@ -820,7 +835,7 @@ export function CopilotPanel() {
         </div>
         <button
           type="button"
-          onClick={toggleCopilot}
+          onClick={() => setCopilotOpen(false)}
           aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
           className="ed-copilot-panel__close"
         >

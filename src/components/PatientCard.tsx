@@ -17,6 +17,8 @@ import PatientExperienceStatusBadge from './patient-experience/PatientExperience
 import WhatHappensNextBadge from './guidance/WhatHappensNextBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
 import { isInQueueFlow } from '../services/queueReasonVisibility';
+import { resolvePatientQueueTiming } from '../services/patientQueueTimingModel';
+import PatientQueueTimingBadge from './queues/PatientQueueTimingBadge';
 import LwbsRiskBadge from './waiting-room/LwbsRiskBadge';
 import DeteriorationWatchBadge from './waiting-room/DeteriorationWatchBadge';
 import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicationBadge';
@@ -361,6 +363,10 @@ function PatientCard({
       patient.state === PatientState.Waiting ? selectReassessmentTimerForPatient(patient) : null,
     [patient],
   );
+  const queueTiming = useMemo(
+    () => resolvePatientQueueTiming(patient, { settings: emergencySettings }),
+    [emergencySettings, patient],
+  );
   const cardStyle = {
     '--patient-priority-color': priorityColors[patient.priority],
   } as CSSProperties;
@@ -582,8 +588,19 @@ function PatientCard({
       {cardDensity.showMetaGrid ? (
       <div className="patient-card__meta-grid">
         <div className="patient-card__meta-item">
-          <span>Wait</span>
-          <strong style={{ color: waitStatusColor }}>{minutesWaiting}m</strong>
+          <span>{queueTiming?.isOnline ? 'Queue' : 'Wait'}</span>
+          <strong style={{ color: waitStatusColor }}>
+            {queueTiming ? (
+              <>
+                {queueTiming.elapsedLabel}
+                <small style={{ display: 'block', fontSize: '0.72em', opacity: 0.9 }}>
+                  {queueTiming.remainingLabel}
+                </small>
+              </>
+            ) : (
+              `${minutesWaiting}m`
+            )}
+          </strong>
         </div>
         {privacyPolicy.showRoomAssignment ? (
           <div className="patient-card__meta-item">
@@ -598,6 +615,12 @@ function PatientCard({
           </div>
         ) : null}
       </div>
+      ) : null}
+
+      {queueTiming?.isOnline ? (
+        <div className="patient-card__queue-timing" aria-label="Queue timing">
+          <PatientQueueTimingBadge patient={patient} settings={emergencySettings} showScenario />
+        </div>
       ) : null}
 
       {cardDensity.showVitalsGrid && privacyPolicy.showVitals ? (

@@ -73,6 +73,7 @@ import {
   type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
+import UserAccountMenu from './account/UserAccountMenu';
 import './ReassessmentDrawer.css';
 import './Header.css';
 
@@ -1196,6 +1197,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               </span>
             ) : null}
           </button>
+
+          <UserAccountMenu />
 
           {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen && workloadPresentation.visible ? (
             <button

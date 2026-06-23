@@ -18,7 +18,10 @@ import {
   saveLocalClientProfile,
 } from '../../config/workspace.config';
 import { buildOrganizationIntelligenceProfile } from '../../data/organizationIntelligenceProfile';
-import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
+import {
+  buildUserProfileAccessSummary,
+  listUserProfileCatalogOptions,
+} from '../../config/userProfileCatalog';
 import {
   buildRoleIntelligenceProfile,
   getRoleIntelligencePackRecommendations,
@@ -414,9 +417,9 @@ export function OrganizationSettings() {
               {profile.label}
             </option>
           ))}
-          {PROFILE_ROLES.map((role) => (
-            <option key={role} value={`${role.replace(/\s+/g, '-')}`}>
-              {role} (legacy label)
+          {listUserProfileCatalogOptions().map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.label} (catalog)
             </option>
           ))}
         </select>
@@ -1588,6 +1591,12 @@ export function TenantAdministrationCenter() {
     permissionsJson: '{}',
   });
   const [status, setStatus] = useState('');
+  const [rolePreviewId, setRolePreviewId] = useState('hospital-administrator');
+  const catalogRoleOptions = useMemo(() => listUserProfileCatalogOptions(), []);
+  const rolePreviewSummary = useMemo(
+    () => buildUserProfileAccessSummary(rolePreviewId),
+    [rolePreviewId],
+  );
 
   const load = useCallback(async () => {
     if (!organization?.id) return;
@@ -1944,6 +1953,32 @@ export function TenantAdministrationCenter() {
             onChange={(e) => setForm((f) => ({ ...f, departmentsText: e.target.value }))}
             rows={6}
           />
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
+          <h2>Role access preview</h2>
+          <p className="org-pack-meta">
+            Preview navigation routes, workspaces, and benefits before assigning a canonical SaaS role.
+          </p>
+          <label>
+            Canonical role
+            <select value={rolePreviewId} onChange={(event) => setRolePreviewId(event.target.value)}>
+              {catalogRoleOptions.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p>{rolePreviewSummary.profileBenefits}</p>
+          <ul className="org-pack-meta">
+            <li>{rolePreviewSummary.navigationRoutes.length} navigation routes</li>
+            <li>{rolePreviewSummary.allowedWorkspaces.join(', ')}</li>
+            <li>
+              Emergency: {rolePreviewSummary.emergencyRole || 'none'} · TrackMind:{' '}
+              {rolePreviewSummary.trackMindRole || 'none'}
+            </li>
+          </ul>
         </Card>
 
         <Card className="org-card org-admin-wide-card">

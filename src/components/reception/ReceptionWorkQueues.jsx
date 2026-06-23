@@ -22,6 +22,8 @@ import DeteriorationWatchBadge from '../waiting-room/DeteriorationWatchBadge';
 import FitToWaitBadge from '../waiting-room/FitToWaitBadge';
 import PatientExperienceStatusBadge from '../patient-experience/PatientExperienceStatusBadge';
 import ReassessmentTimerBadge from '../reassessment/ReassessmentTimerBadge';
+import PatientQueueTimingBadge from '../queues/PatientQueueTimingBadge';
+import { buildQueueTimingSummary } from '../../services/patientQueueTimingModel';
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import './ReceptionWorkQueues.css';
 
@@ -83,6 +85,10 @@ export default function ReceptionWorkQueues({
   };
 
   const activePatients = queues[activeTab] || [];
+  const queueTimingSummary = useMemo(
+    () => buildQueueTimingSummary(patients, { settings }),
+    [patients, settings],
+  );
   const emptyCopy = RECEPTION_COPY.queues.empty;
   const queueGuidanceKey = { ems: 'queueEms', verification: 'queueVerification', pretriage: 'queuePretriage' }[
     activeTab
@@ -98,6 +104,15 @@ export default function ReceptionWorkQueues({
     <section className="reception-work-queues" aria-labelledby="reception-work-queues-title">
       <header className="reception-work-queues__header">
         <h2 id="reception-work-queues-title">{RECEPTION_COPY.queues.listsTitle}</h2>
+        <p className="reception-work-queues__online-summary" role="status">
+          {queueTimingSummary.onlineCount} patient{queueTimingSummary.onlineCount === 1 ? '' : 's'} online
+          {queueTimingSummary.dueSoonCount
+            ? ` · ${queueTimingSummary.dueSoonCount} due soon`
+            : ''}
+          {queueTimingSummary.breachedCount
+            ? ` · ${queueTimingSummary.breachedCount} overdue`
+            : ''}
+        </p>
       </header>
 
       <div className="reception-work-queues__tabs" role="tablist" aria-label="Patient waiting lists">
@@ -207,11 +222,12 @@ export default function ReceptionWorkQueues({
                     <ArrivalControlBadge patient={patient} compact />
                   </span>
                   <span>
-                    {activeTab === 'ems'
-                      ? patient.emsUnitId || RECEPTION_COPY.queues.rowActionEms
-                      : activeTab === 'verification'
-                        ? RECEPTION_COPY.queues.rowActionVerify
-                        : patient.priority || PatientState.Triage}
+                    <PatientQueueTimingBadge
+                      patient={patient}
+                      settings={settings}
+                      layout="row"
+                      showOnlineDot
+                    />
                   </span>
                 </button>
                 {activeTab === 'pretriage' &&

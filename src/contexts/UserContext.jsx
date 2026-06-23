@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
+import { deriveAuthMode, hydrateAuthenticatedSession, isRealAuthToken } from '../auth/authSession';
+import {
+  buildOpenAccessDemoUser,
+  hydrateStoredDemoUser,
+  OPEN_ACCESS_USER_ID,
+} from '../config/demoPersonaModel';
 import logger from '../utils/logger';
 
 /**
@@ -15,16 +21,7 @@ const LEGACY_AUTH_TOKEN_KEY = AUTH_CONFIG.legacyTokenStorageKey;
 const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 const OPEN_ACCESS_TOKEN = appConfig.dev.bearerToken || 'dev-bypass-token';
 
-const OPEN_ACCESS_USER = Object.freeze({
-  id: 'open-access-user',
-  email: 'open-access@caredroid.local',
-  name: 'CareDroid Reception',
-  fullName: 'CareDroid Reception',
-  role: 'registration_clerk',
-  authMode: 'open-access',
-  isEmailVerified: true,
-  twoFactorEnabled: false,
-});
+const OPEN_ACCESS_USER = buildOpenAccessDemoUser();
 
 const canUseStorage = () => typeof localStorage !== 'undefined';
 
@@ -33,7 +30,11 @@ const readStoredUser = () => {
   const raw = localStorage.getItem(USER_PROFILE_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (parsed?.id === OPEN_ACCESS_USER_ID || parsed?.authMode === 'open-access') {
+      return hydrateStoredDemoUser(parsed);
+    }
+    return parsed;
   } catch {
     localStorage.removeItem(USER_PROFILE_KEY);
     return null;
@@ -229,6 +230,8 @@ const UserContext = createContext({
   user: null,
   authToken: '',
   isAuthenticated: false,
+  isRealSession: false,
+  authMode: 'open-access',
   isDevAuthBypass: false,
   isLoading: true,
   hasPermission: () => false,
@@ -251,6 +254,53 @@ export const UserProvider = ({ children }) => {
   const [user, setUserState] = useState(() => readStoredUser() || OPEN_ACCESS_USER);
   const [authToken, setAuthTokenState] = useState(() => readStoredToken() || OPEN_ACCESS_TOKEN);
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionHydrated, setSessionHydrated] = useState(false);
+
+  useEffect(() => {
+    if (sessionHydrated || !isRealAuthToken(authToken)) {
+      if (!isRealAuthToken(authToken)) setSessionHydrated(true);
+      return undefined;
+    }
+
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+      try {
+        const hydrated = await hydrateAuthenticatedSession(authToken);
+        if (cancelled || !hydrated.user) return;
+
+        const profile = hydrated.profile || {};
+        const saasProfile = profile.saasProfile || profile.effectiveProfile || {};
+        const emergencyRoleId =
+          profile.accessSummary?.emergencyRole ||
+          saasProfile.emergencyRoleId ||
+          hydrated.user.profile?.roleProfileId;
+        const saasRole = saasProfile.saasRole || saasProfile.role || hydrated.user.role;
+
+        setUserState({
+          ...hydrated.user,
+          authMode: 'authenticated',
+          role: emergencyRoleId || saasRole || hydrated.user.role,
+          profile: {
+            ...(hydrated.user.profile || {}),
+            ...profile,
+            roleProfileId: emergencyRoleId || saasRole || hydrated.user.profile?.roleProfileId,
+          },
+        });
+      } catch (err) {
+        logger.warn('Session hydration failed; using stored user profile', { err });
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+          setSessionHydrated(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authToken, sessionHydrated]);
 
   // Public product mode opens directly, but still seeds a local session so platform providers hydrate.
   useEffect(() => {
@@ -259,7 +309,9 @@ export const UserProvider = ({ children }) => {
   }, [authToken, user]);
 
   const setUser = (newUser) => {
-    const nextUser = newUser || OPEN_ACCESS_USER;
+    const nextUser = newUser
+      ? { ...newUser, authMode: newUser.authMode || 'authenticated' }
+      : OPEN_ACCESS_USER;
     setUserState(nextUser);
     setIsLoading(false);
     persistSession(nextUser, authToken);
@@ -269,7 +321,12 @@ export const UserProvider = ({ children }) => {
     const nextToken = token || OPEN_ACCESS_TOKEN;
     setAuthTokenState(nextToken);
     setIsLoading(false);
-    persistSession(user, nextToken);
+    const nextUser =
+      isRealAuthToken(nextToken) && user?.id === OPEN_ACCESS_USER.id
+        ? { ...user, authMode: 'authenticated' }
+        : user;
+    if (nextUser !== user) setUserState(nextUser);
+    persistSession(nextUser, nextToken);
   };
 
   const signOut = () => {
@@ -307,6 +364,8 @@ export const UserProvider = ({ children }) => {
   };
 
   const isAuthenticated = Boolean(user && authToken);
+  const authMode = deriveAuthMode(user, authToken);
+  const isRealSession = authMode === 'authenticated' && isRealAuthToken(authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'platform-access' ||
@@ -331,6 +390,8 @@ export const UserProvider = ({ children }) => {
     user,
     authToken,
     isAuthenticated,
+    isRealSession,
+    authMode,
     isDevAuthBypass,
     isLoading,
     hasPermission,

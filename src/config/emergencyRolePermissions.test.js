@@ -205,7 +205,7 @@ describe('Emergency OS role-based views', () => {
       hasEmergencyActionPermission(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
     ).toBe(false);
     expect(getEmergencyRoleDefinition(EMERGENCY_ROLE_IDS.physician).defaultRoute).toBe(
-      CANONICAL_ROUTES.emergencyReception,
+      CANONICAL_ROUTES.emergencyWhiteboard,
     );
   });
 

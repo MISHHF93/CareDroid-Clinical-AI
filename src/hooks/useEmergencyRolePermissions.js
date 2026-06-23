@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import {
   canAccessEmergencyRoute,
   canMutateEmergencySurface,
@@ -19,6 +20,7 @@ import {
   getPersonaLabelForRole,
 } from '../config/emergencyRoleScreenMatrix';
 import { presentEmergencyPermission } from '../config/emergencyActionPresentationModel';
+import { applyDemoRoleView, isDemoPersonaUser } from '../config/demoPersonaModel';
 import { resolveRoleLandingRoute } from '../config/emergencyRoleNavigationModel';
 import useEmergencyDeviceContext from './useEmergencyDeviceContext';
 import useRouteScreenMode from './useRouteScreenMode';
@@ -26,6 +28,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 
 export function useEmergencyRolePermissions() {
   const { user, setUser } = useUser();
+  const { operationalProfile } = useUserIdentity();
   const [searchParams] = useSearchParams();
   const screenMode = useRouteScreenMode();
   const deviceContext = useEmergencyDeviceContext();
@@ -37,9 +40,32 @@ export function useEmergencyRolePermissions() {
       {},
     [emergencySettings],
   );
+  const roleSubject = useMemo(() => {
+    if (isDemoPersonaUser(user)) return user;
+
+    const effective = operationalProfile?.effectiveProfile;
+    const access = operationalProfile?.accessSummary;
+    if (!effective && !access) return user;
+
+    const emergencyRoleId =
+      access?.emergencyRole ||
+      effective?.emergencyRoleId ||
+      user?.profile?.roleProfileId;
+    const saasRole = effective?.saasRole || access?.saasRole;
+
+    return {
+      ...user,
+      role: emergencyRoleId || user?.role,
+      profile: {
+        ...(user?.profile || {}),
+        roleProfileId: emergencyRoleId || saasRole || user?.profile?.roleProfileId,
+      },
+    };
+  }, [operationalProfile?.accessSummary, operationalProfile?.effectiveProfile, user]);
+
   const role = useMemo(
-    () => resolveEmergencyRoleId(user, emergencySettings),
-    [user, emergencySettings],
+    () => resolveEmergencyRoleId(roleSubject, emergencySettings),
+    [roleSubject, emergencySettings],
   );
   const roleDefinition = getEmergencyRoleDefinition(role);
   const permissionContext = useMemo(
@@ -54,7 +80,7 @@ export function useEmergencyRolePermissions() {
   const landingRoute = useMemo(
     () =>
       resolveRoleLandingRoute({
-        role: user?.role || user?.profile?.roleProfileId || role,
+        role: roleSubject?.role || roleSubject?.profile?.roleProfileId || role,
         emergencySettings,
         displayParam: searchParams.get('display'),
         readOnly: isEmergencyReadOnlyRole(role),
@@ -66,7 +92,8 @@ export function useEmergencyRolePermissions() {
       role,
       searchParams,
       user?.profile?.roleProfileId,
-      user?.role,
+      roleSubject?.profile?.roleProfileId,
+      roleSubject?.role,
     ],
   );
 
@@ -133,17 +160,20 @@ export function useEmergencyRolePermissions() {
         }).readOnly,
       switchDemoRole: (nextRole) => {
         const normalizedRole = normalizeEmergencyRole(nextRole);
-        setUser({
-          ...user,
-          role: normalizedRole,
-          profile: {
-            ...(user?.profile || {}),
-            roleProfileId: normalizedRole,
-          },
-        });
+        const nextUser = isDemoPersonaUser(user)
+          ? applyDemoRoleView(user, normalizedRole)
+          : {
+              ...user,
+              role: normalizedRole,
+              profile: {
+                ...(user?.profile || {}),
+                roleProfileId: normalizedRole,
+              },
+            };
+        setUser(nextUser);
       },
     }),
-    [deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, setUser, user],
+    [deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, roleSubject, setUser, user],
   );
 }
 

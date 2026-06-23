@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
+import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
+import useProfileShellProps from '../../hooks/useProfileShellProps';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
 export default function ProfilePreferences() {
+  const { accessSummary, profileCopy } = useProfileShellProps();
   const { preferences, aiPersonalization, savePreferences, isLoading } = useUserIdentity();
   const [form, setForm] = useState({
     theme: 'system',
@@ -68,13 +71,13 @@ export default function ProfilePreferences() {
   };
 
   return (
-    <section className="profile-identity-page">
+    <ProfileSettingsShell
+      title="Preferences"
+      subtitle="Theme, density, AI style, citations, and notification preferences."
+      accessSummary={accessSummary}
+      profileCopy={profileCopy}
+    >
       <div className="profile-identity-page__inner">
-        <header className="profile-identity-page__header">
-          <h1>Profile Preferences</h1>
-          <p>Personalize dashboards, theme, accessibility mode, calculators, notifications, and AI behavior.</p>
-        </header>
-
         <Card>
           <form className="profile-identity-form" onSubmit={handleSubmit}>
             <label>
@@ -187,6 +190,6 @@ export default function ProfilePreferences() {
           </div>
         </section>
       </div>
-    </section>
+    </ProfileSettingsShell>
   );
 }

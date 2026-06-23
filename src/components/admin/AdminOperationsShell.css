@@ -1,0 +1,124 @@
+.admin-ops-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.admin-ops-shell__header {
+  margin-bottom: 20px;
+}
+
+.admin-ops-shell__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
+.admin-ops-shell__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.admin-ops-shell__subtitle {
+  margin: 8px 0 0;
+  color: var(--muted-text);
+  max-width: 720px;
+}
+
+.admin-ops-shell__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.08));
+}
+
+.admin-ops-shell__nav a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--muted-text);
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.admin-ops-shell__nav a:hover {
+  color: var(--text-color);
+  border-color: var(--app-panel-border);
+}
+
+.admin-ops-shell__nav a.is-active {
+  color: var(--text-color);
+  background: color-mix(in srgb, var(--app-accent, #00ff88) 12%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 30%, transparent);
+}
+
+.admin-ops-shell__content {
+  min-height: 320px;
+}
+
+.admin-ops-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.admin-ops-card {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--app-panel-border);
+  background: var(--panel-bg, rgba(255, 255, 255, 0.03));
+}
+
+.admin-ops-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.admin-ops-card p,
+.admin-ops-card li {
+  color: var(--muted-text);
+  font-size: 0.875rem;
+}
+
+.admin-ops-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-ops-table th,
+.admin-ops-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--app-panel-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-ops-table th {
+  color: var(--muted-text);
+  font-weight: 600;
+}
+
+.admin-ops-lanes {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-ops-lane {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--app-panel-border);
+}
+
+@media (max-width: 720px) {
+  .admin-ops-lane {
+    grid-template-columns: 1fr;
+  }
+}

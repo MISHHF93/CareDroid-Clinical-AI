@@ -17,6 +17,11 @@ import {
   normalizeSaasRole,
   uniqueStrings,
 } from './saas-profile.constants';
+import {
+  buildUserProfileAccessSummary,
+  resolveUserProfileFromSaasRole,
+  validateHiddenAssetsWithinProfile,
+} from './user-profile-catalog';
 import { UserPreferencesService } from './user-preferences.service';
 import { WorkspaceService } from './workspace.service';
 
@@ -44,11 +49,17 @@ export class UserProfileService {
     const activity = await this.activityService.getSummary(userId);
     const aiPersonalization = await this.personalizationService.getForUser(userId);
     const auditLogs = await this.auditService.findByUser(userId, 5);
+    const profile = user.profile || ({} as UserProfile);
+    const saasRole = normalizeSaasRole(
+      profile.roleProfileId || preferences?.toolPreferences?.saasProfile?.role || user.role,
+    );
 
     return {
       userId: user.id,
       account: this.buildAccount(user, professional),
       saasProfile: this.buildSaasProfile(user, professional, preferences, workspace, activity),
+      effectiveProfile: resolveUserProfileFromSaasRole(saasRole),
+      accessSummary: buildUserProfileAccessSummary(saasRole),
       professional: this.serializeProfessional(user, professional),
       preferences,
       aiPersonalization,
@@ -77,12 +88,35 @@ export class UserProfileService {
     dto: UpdateOperationalProfileDto,
     ipAddress = '0.0.0.0',
     userAgent = 'system',
+    options: { canAssignRole?: boolean } = {},
   ) {
     if (!dto || Object.keys(dto).length === 0) {
       throw new BadRequestException('No profile fields were provided.');
     }
+    if (
+      dto.role !== undefined &&
+      !options.canAssignRole
+    ) {
+      throw new BadRequestException(
+        'Role assignment is managed by your organization administrator.',
+      );
+    }
+    if (dto.permissions !== undefined && !options.canAssignRole) {
+      throw new BadRequestException(
+        'Permission changes are managed by your organization administrator.',
+      );
+    }
+    if (dto.allowedWorkspaces !== undefined && !options.canAssignRole) {
+      throw new BadRequestException(
+        'Workspace access is managed by your organization administrator.',
+      );
+    }
     const user = await this.loadUser(userId);
     const profile = await this.getOrCreateUserProfile(user);
+    const currentRole = normalizeSaasRole(profile.roleProfileId || user.role);
+    if (dto.hiddenAssets !== undefined) {
+      dto.hiddenAssets = validateHiddenAssetsWithinProfile(currentRole, dto.hiddenAssets);
+    }
     const professional = await this.getOrCreateProfessional(userId);
 
     const profileUpdates: Partial<UserProfile> = {};
@@ -264,6 +298,7 @@ export class UserProfileService {
     const aiPreferences = preferences?.aiAssistantPreferences || {};
     const subscriptionMetadata = user.subscription?.metadata || {};
     const role = normalizeSaasRole(profile.roleProfileId || saasPreferences.role || user.role);
+    const catalogEntry = resolveUserProfileFromSaasRole(role);
     const permissionPreset = ROLE_PERMISSION_PRESETS[role] || DEFAULT_SAAS_PROFILE.permissions;
     const subscriptionEntitlements = uniqueStrings([
       ...(saasPreferences.subscriptionEntitlements || []),
@@ -299,10 +334,10 @@ export class UserProfileService {
       workspace?.activeWorkspace?.id ||
       DEFAULT_SAAS_PROFILE.defaultWorkspace;
     const allowedWorkspaces = uniqueStrings([
+      ...(catalogEntry?.allowedWorkspaces || []),
       ...(saasPreferences.allowedWorkspaces || []),
       ...(workspace?.workspaces || []).map((item: any) => item.id),
       defaultWorkspace,
-      ...DEFAULT_SAAS_PROFILE.allowedWorkspaces,
     ]);
 
     return {

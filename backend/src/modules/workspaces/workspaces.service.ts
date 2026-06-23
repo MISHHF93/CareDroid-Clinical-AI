@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -202,6 +202,85 @@ export class WorkspacesService {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     return this.invitationRepository.save(invitation);
+  }
+
+  async previewInvitation(token: string) {
+    const invitation = await this.invitationRepository.findOne({
+      where: { id: token },
+    });
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found.');
+    }
+    if (invitation.status !== WorkspaceInvitationStatus.PENDING) {
+      throw new NotFoundException('Invitation is no longer valid.');
+    }
+    if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+      invitation.status = WorkspaceInvitationStatus.EXPIRED;
+      await this.invitationRepository.save(invitation);
+      throw new NotFoundException('Invitation has expired.');
+    }
+
+    const workspace = await this.workspaceRepository.findOne({
+      where: { id: invitation.workspaceId },
+    });
+
+    return {
+      invitationId: invitation.id,
+      email: invitation.email,
+      role: invitation.role,
+      workspaceName: workspace?.name || 'Workspace',
+      workspace: workspace ? this.serializeWorkspace(workspace) : null,
+      expiresAt: invitation.expiresAt,
+    };
+  }
+
+  async acceptInvitation(user: User, token: string) {
+    const invitation = await this.invitationRepository.findOne({
+      where: { id: token },
+    });
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found.');
+    }
+    if (invitation.status !== WorkspaceInvitationStatus.PENDING) {
+      throw new BadRequestException('Invitation is no longer valid.');
+    }
+    if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+      invitation.status = WorkspaceInvitationStatus.EXPIRED;
+      await this.invitationRepository.save(invitation);
+      throw new BadRequestException('Invitation has expired.');
+    }
+
+    const normalizedUserEmail = String(user.email || '').toLowerCase().trim();
+    if (invitation.email !== normalizedUserEmail) {
+      throw new ForbiddenException('This invitation was sent to a different email address.');
+    }
+
+    const workspace = await this.workspaceRepository.findOne({
+      where: { id: invitation.workspaceId },
+    });
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found.');
+    }
+
+    const membershipRole =
+      Object.values(WorkspaceMembershipRole).find((role) => role === invitation.role) ||
+      WorkspaceMembershipRole.VIEWER;
+
+    const existing = await this.membershipRepository.findOne({
+      where: { userId: user.id, workspaceId: invitation.workspaceId },
+    });
+    if (!existing) {
+      await this.createMembership(user, workspace, membershipRole);
+    } else if (existing.status !== WorkspaceMembershipStatus.ACTIVE) {
+      existing.status = WorkspaceMembershipStatus.ACTIVE;
+      existing.role = membershipRole;
+      await this.membershipRepository.save(existing);
+    }
+
+    invitation.status = WorkspaceInvitationStatus.ACCEPTED;
+    await this.invitationRepository.save(invitation);
+
+    return this.getActiveWorkspaceState(user);
   }
 
   async updateTools(user: User, workspaceId: string, enabledToolIds: string[]) {

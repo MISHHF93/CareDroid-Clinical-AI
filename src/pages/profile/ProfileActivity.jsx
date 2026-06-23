@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
+import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
+import useProfileShellProps from '../../hooks/useProfileShellProps';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
@@ -35,16 +37,17 @@ function ActivityList({ title, items = [] }) {
 }
 
 export default function ProfileActivity() {
+  const { accessSummary, profileCopy } = useProfileShellProps();
   const { activity, audit } = useUserIdentity();
 
   return (
-    <section className="profile-identity-page">
+    <ProfileSettingsShell
+      title="Activity"
+      subtitle="Safe recent activity across tools, calculators, AI, fleet, and Medical IoT."
+      accessSummary={accessSummary}
+      profileCopy={profileCopy}
+    >
       <div className="profile-identity-page__inner">
-        <header className="profile-identity-page__header">
-          <h1>Profile Activity</h1>
-          <p>Safe recent activity across tools, calculators, AI, fleet, and Medical IoT. PHI stays out of this summary.</p>
-        </header>
-
         <div className="profile-identity-grid">
           <ActivityList title="Recent tools" items={activity?.recentTools || []} />
           <ActivityList title="Recent calculators" items={activity?.recentCalculators || []} />
@@ -71,6 +74,6 @@ export default function ProfileActivity() {
           </div>
         </Card>
       </div>
-    </section>
+    </ProfileSettingsShell>
   );
 }

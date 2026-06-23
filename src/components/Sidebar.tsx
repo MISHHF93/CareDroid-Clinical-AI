@@ -22,12 +22,14 @@ import {
   IconSettings,
   IconShieldCheck,
   IconStethoscope,
+  IconUserCircle,
   IconUsers,
   type Icon,
 } from '@tabler/icons-react';
 import { PatientFlag, type Alert } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyStore } from '../store/emergencyStore';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import {
   getVisibleNavigation,
   type NavigationItem,
@@ -35,6 +37,7 @@ import {
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import { isReceptionPipelinePath } from '../config/emergencyPipelineModel';
 import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
+import { isAdminSaasRole } from '../config/platformEntryModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import './Sidebar.css';
@@ -89,6 +92,7 @@ const ICONS: Record<string, Icon> = {
   'wearable-monitor': IconReport,
   settings: IconSettings,
   'emergency-settings': IconSettings,
+  account: IconUserCircle,
   platform: IconApps,
   activity: IconActivity,
   clock: IconClock,
@@ -151,18 +155,45 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
     [patients],
   );
+  const { saasRole } = useEffectiveUserProfile();
   const visibleNav: readonly SidebarNavItem[] = useMemo(
-    () => navigationItems || getVisibleNavigation(emergencyRole.role),
-    [emergencyRole.role, navigationItems],
+    () => navigationItems || getVisibleNavigation(emergencyRole.role, { saasRole }),
+    [emergencyRole.role, navigationItems, saasRole],
   );
   const desktopPrimaryNav = useMemo(
     () => visibleNav.filter((item) => item.isEmergencyCore !== false),
     [visibleNav],
   );
-  const desktopUtilityNav = useMemo(
-    () => visibleNav.filter((item) => item.isEmergencyCore === false),
-    [visibleNav],
-  );
+  const desktopUtilityNav = useMemo(() => {
+    const utility = visibleNav.filter((item) => item.isEmergencyCore === false);
+    const withAccount = utility.some((item) => item.id === 'account')
+      ? utility
+      : [
+          ...utility,
+          {
+            id: 'account',
+            label: 'Account',
+            icon: 'account',
+            path: CANONICAL_ROUTES.profile,
+            route: CANONICAL_ROUTES.profile,
+            isEmergencyCore: false,
+          },
+        ];
+    if (isAdminSaasRole(saasRole) && !withAccount.some((item) => item.id === 'admin-console')) {
+      return [
+        ...withAccount,
+        {
+          id: 'admin-console',
+          label: 'Admin',
+          icon: 'settings',
+          path: CANONICAL_ROUTES.adminOperations,
+          route: CANONICAL_ROUTES.adminOperations,
+          isEmergencyCore: false,
+        },
+      ];
+    }
+    return withAccount;
+  }, [saasRole, visibleNav]);
   const mobilePrimaryIds = useMemo(() => {
     if (isReceptionFirstUxEnabled()) {
       return visibleNav

@@ -24,6 +24,24 @@
   color: var(--muted-text);
 }
 
+.auth-panel__hint {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-text);
+}
+
+.auth-form__row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 4px;
+}
+
+.auth-oauth-btn--link {
+  text-decoration: none;
+  justify-content: center;
+}
+
 /* Sign in / Create account toggle */
 .auth-segment {
   display: flex;

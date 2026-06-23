@@ -11,6 +11,8 @@ import {
   getHiddenNavItemIdsForRole,
   sortNavigationItemsForRole,
 } from './emergencyNavPolicy.js';
+import { SAAS_USER_ROLES } from './saasProfileConstants';
+import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
@@ -260,9 +262,39 @@ function navigationItem(item: NavigationItem): NavigationItem {
 }
 
 function rolesForRoute(path: string): readonly string[] {
-  return Object.freeze(
+  const emergencyRoles = Object.freeze(
     ALL_ROLES.filter((role) => getEmergencyRoleDefinition(role).routes.includes(path)),
   );
+  const saasRoles = Object.freeze(
+    SAAS_USER_ROLES.filter((role) => {
+      const profile = resolveUserProfileFromSaasRole(role);
+      return profile.navigationRoutes.includes(path);
+    }),
+  );
+  return Object.freeze([...new Set([...emergencyRoles, ...saasRoles])]);
+}
+
+export function getVisibleNavigationForSaasRole(
+  saasRole: string | null | undefined,
+): readonly NavigationItem[] {
+  const profile = resolveUserProfileFromSaasRole(saasRole);
+  const allowedRoutes = new Set(profile.navigationRoutes);
+  const emergencyRole = profile.emergencyRoleId
+    ? normalizeEmergencyRole(profile.emergencyRoleId)
+    : normalizeEmergencyRole(saasRole);
+  const hiddenForRole = getHiddenNavItemIdsForRole(emergencyRole, {
+    hideStandaloneIntake: shouldHideStandaloneIntakeNav(emergencyRole),
+  });
+
+  const visibleItems = getPilotCustomerNavigationItems(
+    NAVIGATION_ITEMS.filter(
+      (item) =>
+        (allowedRoutes.has(item.route) || item.roles.includes(emergencyRole)) &&
+        !hiddenForRole.has(item.id),
+    ),
+  );
+
+  return sortNavigationItemsForRole(visibleItems, emergencyRole);
 }
 
 export const NAVIGATION_ITEMS = Object.freeze(
@@ -304,7 +336,11 @@ export function getPilotCustomerNavigationItems(
 
 export function getVisibleNavigation(
   userRole: string | null | undefined,
+  options: { saasRole?: string | null } = {},
 ): readonly NavigationItem[] {
+  if (options.saasRole && (SAAS_USER_ROLES as readonly string[]).includes(options.saasRole)) {
+    return getVisibleNavigationForSaasRole(options.saasRole);
+  }
   const normalizedRole = normalizeEmergencyRole(userRole);
   const hiddenForRole = getHiddenNavItemIdsForRole(normalizedRole, {
     hideStandaloneIntake: shouldHideStandaloneIntakeNav(normalizedRole),

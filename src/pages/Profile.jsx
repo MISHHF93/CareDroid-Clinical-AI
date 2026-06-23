@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
+import ProfileSettingsShell from '../components/profile/ProfileSettingsShell';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
@@ -41,7 +43,9 @@ function formatDate(value) {
 
 const Profile = () => {
   const { user, hasPermission } = useUser();
-  const { account, preferences, activity, activeWorkspace } = useUserIdentity();
+  const { account, preferences, activity, activeWorkspace, accessSummary, saasProfile } = useUserIdentity();
+  const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();
+  const resolvedAccessSummary = accessSummary || hookAccessSummary;
   const { favorites, pinned, recentTools } = useToolPreferences();
   const [activityState, setActivityState] = useState({
     loading: true,
@@ -151,6 +155,23 @@ const Profile = () => {
   }, [canViewPhiAccess]);
 
   return (
+    <ProfileSettingsShell
+      title="Profile overview"
+      subtitle={profileCopy.profileShellSubtitle}
+      accessSummary={resolvedAccessSummary}
+      profileCopy={profileCopy}
+    >
+    {saasProfile?.onboardingStatus && saasProfile.onboardingStatus !== 'complete' ? (
+      <Card style={{ marginBottom: 16, padding: 16 }}>
+        <strong>Finish setting up your profile</strong>
+        <p style={{ margin: '8px 0', color: 'var(--muted-text)', fontSize: 14 }}>
+          Complete the welcome wizard to personalize focus areas and safety preferences.
+        </p>
+        <Link to="/welcome" style={{ color: '#00FF88' }}>
+          Continue onboarding →
+        </Link>
+      </Card>
+    ) : null}
     <section className="profile-page">
       <Card style={{ width: '100%', maxWidth: '820px' }}>
         <h2 style={{ marginTop: 0 }}>Profile</h2>
@@ -389,6 +410,7 @@ const Profile = () => {
         </div>
       </Card>
     </section>
+    </ProfileSettingsShell>
   );
 };
 

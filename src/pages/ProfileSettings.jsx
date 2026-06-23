@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
-import TwoFactorSettings from '../components/TwoFactorSettings';
+import ProfileSettingsShell from '../components/profile/ProfileSettingsShell';
+import useProfileShellProps from '../hooks/useProfileShellProps';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import {
   ActionRow,
   DashboardSection,
-  PageShell,
 } from '../components/ui/CareDroidPrimitives';
 import './ProfileSettings.css';
 
@@ -21,29 +21,14 @@ const ProfileSettings = ({ authToken }) => {
   const [country, setCountry] = useState('');
   const [timezone, setTimezone] = useState('');
   const [status, setStatus] = useState({ type: 'idle', message: '' });
-  const [preferenceStatus, setPreferenceStatus] = useState('');
   const [saving, setSaving] = useState(false);
-  const [prefForm, setPrefForm] = useState({
-    theme: 'system',
-    responseStyle: 'concise',
-    citationLevel: 'standard',
-    safetyTone: 'standard',
-    defaultWorkspace: 'emergency',
-    density: 'standard',
-    pushEnabled: true,
-    emailEnabled: true,
-    securityAlerts: true,
-  });
+  const { accessSummary, profileCopy } = useProfileShellProps();
   const { user, authToken: contextAuthToken, setUser } = useUser();
   const {
     account,
     professional,
-    preferences,
     updateProfile,
-    savePreferences,
     isLoading: identityLoading,
-    workspaces,
-    saasProfile,
   } = useUserIdentity();
   const { success, error } = useNotificationActions();
   const effectiveAuthToken = authToken || contextAuthToken;
@@ -100,23 +85,6 @@ const ProfileSettings = ({ authToken }) => {
     currentProfile.specialty,
     currentProfile.timezone,
   ]);
-
-  useEffect(() => {
-    setPrefForm({
-      theme: preferences?.theme || 'system',
-      responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
-      citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
-      safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
-      defaultWorkspace: saasProfile?.defaultWorkspace || 'emergency',
-      density:
-        saasProfile?.density ||
-        preferences?.density ||
-        (saasProfile?.compactMode ?? preferences?.compactMode ? 'compact' : 'standard'),
-      pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
-      emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
-      securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
-    });
-  }, [preferences, saasProfile?.compactMode, saasProfile?.defaultWorkspace, saasProfile?.density]);
 
   const payload = useMemo(
     () => ({
@@ -187,48 +155,12 @@ const ProfileSettings = ({ authToken }) => {
     success('Profile saved', 'Clinical profile updated.');
   };
 
-  const updatePreferenceField = (field, value) => {
-    setPrefForm((current) => ({ ...current, [field]: value }));
-    setPreferenceStatus('');
-  };
-
-  const handleSavePreferences = async (event) => {
-    event.preventDefault();
-    const result = await savePreferences({
-      theme: prefForm.theme,
-      density: prefForm.density,
-      compactMode: prefForm.density === 'compact',
-      aiAssistantPreferences: {
-        responseStyle: prefForm.responseStyle,
-        citationLevel: prefForm.citationLevel,
-        safetyTone: prefForm.safetyTone,
-      },
-      notificationSettings: {
-        ...(preferences?.notificationSettings || {}),
-        pushEnabled: prefForm.pushEnabled,
-        emailEnabled: prefForm.emailEnabled,
-        securityAlerts: prefForm.securityAlerts,
-      },
-    });
-    if (result.ok) {
-      await updateProfile({
-        defaultWorkspace: prefForm.defaultWorkspace,
-        preferredAIStyle: prefForm.responseStyle,
-        themePreference: prefForm.theme,
-        density: prefForm.density,
-        compactMode: prefForm.density === 'compact',
-      });
-    }
-    setPreferenceStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
-  };
-
   return (
-    <PageShell
-      className="profile-settings-page"
-      contentClassName="cd-page-stack cd-page-stack--compact profile-settings-stack"
-      title="Profile Settings"
-      titleId="profile-settings-title"
-      description="Update your backend-backed clinical profile and institutional details."
+    <ProfileSettingsShell
+      title="Identity"
+      subtitle="Clinical profile and institutional details. Your role is assigned by an administrator."
+      accessSummary={accessSummary}
+      profileCopy={profileCopy}
     >
         <DashboardSection
           className="profile-settings-section"
@@ -318,128 +250,7 @@ const ProfileSettings = ({ authToken }) => {
             </Link>
           </ActionRow>
         </DashboardSection>
-
-        <DashboardSection
-          className="profile-settings-section"
-          title="AI, Notification, and Theme Preferences"
-          description="Tune the assistant response style, notification channels, security alerts, and app theme."
-        >
-          <form
-            id="profile-preferences-form"
-            onSubmit={handleSavePreferences}
-            style={{ display: 'grid', gap: '12px', marginTop: '18px' }}
-          >
-            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-              Default workspace
-              <select
-                value={prefForm.defaultWorkspace}
-                onChange={(event) => updatePreferenceField('defaultWorkspace', event.target.value)}
-              >
-                {(workspaces || []).map((workspace) => (
-                  <option key={workspace.id} value={workspace.type || workspace.workspaceKey || workspace.id}>
-                    {workspace.branding?.displayName || workspace.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-              Theme
-              <select
-                value={prefForm.theme}
-                onChange={(event) => updatePreferenceField('theme', event.target.value)}
-              >
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-              Density
-              <select
-                value={prefForm.density}
-                onChange={(event) => updatePreferenceField('density', event.target.value)}
-              >
-                <option value="standard">Standard density</option>
-                <option value="compact">Compact density</option>
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-              AI response style
-              <select
-                value={prefForm.responseStyle}
-                onChange={(event) => updatePreferenceField('responseStyle', event.target.value)}
-              >
-                <option value="concise">Concise</option>
-                <option value="stepwise">Stepwise</option>
-                <option value="evidence_first">Evidence first</option>
-                <option value="teaching">Teaching</option>
-              </select>
-            </label>
-            <div className="profile-settings-grid">
-              <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-                Citation level
-                <select
-                  value={prefForm.citationLevel}
-                  onChange={(event) => updatePreferenceField('citationLevel', event.target.value)}
-                >
-                  <option value="minimal">Minimal</option>
-                  <option value="standard">Standard</option>
-                  <option value="full">Full</option>
-                </select>
-              </label>
-              <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
-                Safety tone
-                <select
-                  value={prefForm.safetyTone}
-                  onChange={(event) => updatePreferenceField('safetyTone', event.target.value)}
-                >
-                  <option value="standard">Standard</option>
-                  <option value="strict">Strict</option>
-                </select>
-              </label>
-            </div>
-            <div className="card-subtle" style={{ display: 'grid', gap: '10px', padding: '12px 16px' }}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={prefForm.pushEnabled}
-                  onChange={(event) => updatePreferenceField('pushEnabled', event.target.checked)}
-                />{' '}
-                Push notifications
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={prefForm.emailEnabled}
-                  onChange={(event) => updatePreferenceField('emailEnabled', event.target.checked)}
-                />{' '}
-                Email notifications
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={prefForm.securityAlerts}
-                  onChange={(event) => updatePreferenceField('securityAlerts', event.target.checked)}
-                />{' '}
-                Security alerts
-              </label>
-            </div>
-          </form>
-          <ActionRow className="profile-settings-actions">
-            <Button type="submit" form="profile-preferences-form" disabled={identityLoading}>
-              Save preferences
-            </Button>
-            {preferenceStatus ? (
-              <span style={{ color: 'var(--muted-text)', alignSelf: 'center', fontSize: '14px' }}>
-                {preferenceStatus}
-              </span>
-            ) : null}
-          </ActionRow>
-        </DashboardSection>
-
-        {/* Two-Factor Authentication Settings */}
-        <TwoFactorSettings authToken={authToken} />
-    </PageShell>
+    </ProfileSettingsShell>
   );
 };
 
