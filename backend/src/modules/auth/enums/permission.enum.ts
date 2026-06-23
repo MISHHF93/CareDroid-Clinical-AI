@@ -93,6 +93,10 @@ export enum Permission {
   MANAGE_TRACKMIND_APPROVALS = 'MANAGE_TRACKMIND_APPROVALS',
   MANAGE_PLATFORM_TENANTS = 'MANAGE_PLATFORM_TENANTS',
 
+  // Surveillance & IoT Nexus
+  VIEW_SURVEILLANCE = 'VIEW_SURVEILLANCE',
+  MANAGE_SURVEILLANCE_REGISTRY = 'MANAGE_SURVEILLANCE_REGISTRY',
+
   // Emergency & Safety
   TRIGGER_EMERGENCY_PROTOCOL = 'TRIGGER_EMERGENCY_PROTOCOL', // Initiate emergency response
   OVERRIDE_SAFETY_CHECKS = 'OVERRIDE_SAFETY_CHECKS', // Override warnings (senior physicians only)
@@ -471,6 +475,16 @@ export const PermissionMetadata: Record<
     description: 'Manage platform tenants and module entitlements',
     category: 'TrackMind',
     riskLevel: 'critical',
+  },
+  [Permission.VIEW_SURVEILLANCE]: {
+    description: 'View surveillance and IoT nexus dashboards, health, and alerts',
+    category: 'Surveillance',
+    riskLevel: 'medium',
+  },
+  [Permission.MANAGE_SURVEILLANCE_REGISTRY]: {
+    description: 'Manage camera and IoT device registry entries',
+    category: 'Surveillance',
+    riskLevel: 'high',
   },
 
   // Emergency & Safety

@@ -1,0 +1,167 @@
+.surv-nexus {
+  padding: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  color: var(--text-primary, #e8edf5);
+}
+
+.surv-nexus--loading {
+  padding: 48px;
+  text-align: center;
+}
+
+.surv-nexus__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.surv-nexus__eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-text, #8b98ab);
+}
+
+.surv-nexus__lead {
+  margin: 8px 0 0;
+  color: var(--muted-text, #8b98ab);
+  max-width: 720px;
+}
+
+.surv-nexus__kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.surv-nexus__kpi {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.surv-nexus__kpi-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-text, #8b98ab);
+  margin-bottom: 4px;
+}
+
+.surv-nexus__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.surv-nexus__tabs button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.surv-nexus__tabs button.is-active {
+  border-color: #00ff88;
+  color: #00ff88;
+}
+
+.surv-nexus__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 20px;
+}
+
+.surv-nexus__main section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.surv-nexus__muted {
+  color: var(--muted-text, #8b98ab);
+  font-size: 13px;
+}
+
+.surv-nexus__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.surv-nexus__card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.surv-nexus__card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.surv-nexus__badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.surv-nexus__badge--good { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+.surv-nexus__badge--warning { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+.surv-nexus__badge--critical { background: rgba(255, 82, 82, 0.15); color: #ff5252; }
+.surv-nexus__badge--neutral { background: rgba(255, 255, 255, 0.08); color: #b0bac8; }
+
+.surv-nexus__table-wrap { overflow-x: auto; }
+.surv-nexus__table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.surv-nexus__table th, .surv-nexus__table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
+.surv-nexus__sub { display: block; font-size: 12px; color: var(--muted-text, #8b98ab); }
+
+.surv-nexus__health-list, .surv-nexus__alert-list, .surv-nexus__rule-list, .surv-nexus__incident-list, .surv-nexus__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.surv-nexus__health, .surv-nexus__alert, .surv-nexus__incident {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.surv-nexus__rail {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.surv-nexus__links li {
+  margin-bottom: 10px;
+}
+
+.surv-nexus__links a {
+  color: #00ff88;
+  text-decoration: none;
+}
+
+.surv-nexus__domain, .surv-nexus__code {
+  font-size: 11px;
+  color: var(--muted-text, #8b98ab);
+}
+
+@media (max-width: 900px) {
+  .surv-nexus__grid { grid-template-columns: 1fr; }
+  .surv-nexus__header { flex-direction: column; }
+}

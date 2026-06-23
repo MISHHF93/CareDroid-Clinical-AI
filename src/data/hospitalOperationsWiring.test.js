@@ -37,21 +37,22 @@ describe('Hospital operations wiring', () => {
     expect(CANONICAL_TOOL_GROUPS.hospitalOperations).toEqual(HOSPITAL_OPERATIONS_REGISTRY_IDS);
   });
 
-  it('keeps Hospital Map launch inventory while active App redirects retired operations routes', () => {
+  it('mounts hospital operations routes in App and removes legacy whiteboard redirects', () => {
     expect(TOOL_LAUNCH_PATHS.hospitalMap).toBe('/hospital-map');
     expect(TOOL_LAUNCH_PATHS.deviceFleet).toBe('/devices');
-    expect(appSource).not.toContain("path: '/hospital-map'");
-    expect(appSource).not.toContain("path: '/devices'");
-    expect(appSource).not.toContain('HospitalMapDashboard');
-    expect(appSource).not.toContain('DeviceFleetManagement');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.hospitalMap}');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.devices}');
+    expect(appSource).toContain('HospitalMapDashboard');
+    expect(appSource).toContain('DeviceFleetManagement');
+    expect(appSource).toContain('SurveillanceNexusDashboard');
 
     const redirectsByPath = Object.fromEntries(
       LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to])
     );
-    expect(redirectsByPath['/hospital-map']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
-    expect(redirectsByPath['/devices']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
-    expect(redirectsByPath['/medical-iot']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
-    expect(redirectsByPath['/operations/*']).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
+    expect(redirectsByPath['/hospital-map']).toBeUndefined();
+    expect(redirectsByPath['/devices']).toBeUndefined();
+    expect(redirectsByPath['/medical-iot']).toBeUndefined();
+    expect(redirectsByPath['/operations/*']).toBeUndefined();
   });
 
   it('keeps registry rows and catalog launches aligned', () => {

@@ -117,6 +117,12 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   deviceAlerting: BACKEND_CAPABILITY_STATUS.DEMO,
   deviceFleet: BACKEND_CAPABILITY_STATUS.DEMO,
   deviceMaintenance: BACKEND_CAPABILITY_STATUS.DISABLED,
+  surveillanceNexus: BACKEND_CAPABILITY_STATUS.DEMO,
+  surveillanceCameras: BACKEND_CAPABILITY_STATUS.DEMO,
+  surveillanceIotRegistry: BACKEND_CAPABILITY_STATUS.DEMO,
+  surveillanceZones: BACKEND_CAPABILITY_STATUS.DEMO,
+  surveillanceHealth: BACKEND_CAPABILITY_STATUS.DEMO,
+  surveillanceAlerts: BACKEND_CAPABILITY_STATUS.DEMO,
 });
 
 export const BACKEND_API_CAPABILITIES = Object.freeze(

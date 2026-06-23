@@ -98,3 +98,21 @@ export const HOSPITAL_OPERATIONS_ASSISTANT_CONTRACTS: readonly HospitalOperation
       requiredHumanApproval: true,
     },
   ] as const;
+
+export interface SurveillanceNexusPackContract {
+  toolId: 'surveillance-nexus' | 'camera-registry' | 'iot-device-registry';
+  launchPath: '/surveillance/nexus' | '/hospital-map' | '/medical-iot' | '/devices';
+  telemetrySourceMustBeLabeled: true;
+  welfareSafeZonesRequired: true;
+  incidentLinkageRequired: true;
+  autonomousActionAllowed: false;
+}
+
+export const SURVEILLANCE_NEXUS_PACK_CONTRACT: SurveillanceNexusPackContract = Object.freeze({
+  toolId: 'surveillance-nexus',
+  launchPath: '/surveillance/nexus',
+  telemetrySourceMustBeLabeled: true,
+  welfareSafeZonesRequired: true,
+  incidentLinkageRequired: true,
+  autonomousActionAllowed: false,
+});

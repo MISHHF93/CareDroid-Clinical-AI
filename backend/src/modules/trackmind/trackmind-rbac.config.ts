@@ -41,6 +41,8 @@ export const TRACKMIND_ROLE_API_PERMISSIONS: Record<TrackMindBackendRoleId, Perm
     Permission.VIEW_VETERINARY_RECORDS,
     Permission.VIEW_ANALYTICS,
     Permission.VIEW_OBSERVABILITY,
+    Permission.VIEW_SURVEILLANCE,
+    Permission.MANAGE_SURVEILLANCE_REGISTRY,
   ],
   [TRACKMIND_BACKEND_ROLE_ID.organizationAdmin]: [
     Permission.VIEW_TRACKMIND,
@@ -70,6 +72,7 @@ export const TRACKMIND_ROLE_API_PERMISSIONS: Record<TrackMindBackendRoleId, Perm
     Permission.MANAGE_RACEDAY_OPERATIONS,
     Permission.MANAGE_TRACKMIND_APPROVALS,
     Permission.MANAGE_INCIDENTS,
+    Permission.VIEW_SURVEILLANCE,
   ],
   [TRACKMIND_BACKEND_ROLE_ID.steward]: [
     Permission.VIEW_TRACKMIND,
@@ -92,6 +95,7 @@ export const TRACKMIND_ROLE_API_PERMISSIONS: Record<TrackMindBackendRoleId, Perm
     Permission.VIEW_TRACKMIND_MATURITY,
     Permission.MANAGE_EQUINE_WELFARE,
     Permission.VIEW_VETERINARY_RECORDS,
+    Permission.VIEW_SURVEILLANCE,
   ],
   [TRACKMIND_BACKEND_ROLE_ID.veterinarian]: [
     Permission.VIEW_TRACKMIND,
@@ -110,11 +114,14 @@ export const TRACKMIND_ROLE_API_PERMISSIONS: Record<TrackMindBackendRoleId, Perm
     Permission.MANAGE_SECURITY_OPERATIONS,
     Permission.EXPORT_TRACKMIND_AUDIT,
     Permission.MANAGE_TRACKMIND_APPROVALS,
+    Permission.VIEW_SURVEILLANCE,
+    Permission.MANAGE_SURVEILLANCE_REGISTRY,
   ],
   [TRACKMIND_BACKEND_ROLE_ID.facilitiesManager]: [
     Permission.VIEW_TRACKMIND,
     Permission.VIEW_TRACKMIND_MATURITY,
     Permission.MANAGE_RACEDAY_OPERATIONS,
+    Permission.VIEW_SURVEILLANCE,
   ],
   [TRACKMIND_BACKEND_ROLE_ID.complianceOfficer]: [
     Permission.VIEW_TRACKMIND,

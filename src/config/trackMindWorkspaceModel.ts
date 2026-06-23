@@ -187,10 +187,11 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<TrackMindRoleId, TrackMindW
       kpiPermissionKeys: [K.kpiSecurityView],
       quickActions: [
         { id: 'incident', label: 'Security incident', permission: K.securityIncidentManage },
+        { id: 'surveillance', label: 'Surveillance nexus', permission: K.surveillanceNexusView, route: CANONICAL_ROUTES.surveillanceNexus },
         { id: 'export', label: 'Security audit export', permission: K.securityAuditExport, route: CANONICAL_ROUTES.audit },
         { id: 'alerts', label: 'Alert center', permission: K.intelligenceView, route: CANONICAL_ROUTES.security },
       ],
-      relatedRoutes: [CANONICAL_ROUTES.security, CANONICAL_ROUTES.audit],
+      relatedRoutes: [CANONICAL_ROUTES.surveillanceNexus, CANONICAL_ROUTES.security, CANONICAL_ROUTES.audit],
     }),
     [R.facilitiesManager]: Object.freeze({
       ...WORKSPACE_BASE,
@@ -202,9 +203,10 @@ export const TRACKMIND_WORKSPACE_DEFINITIONS: Record<TrackMindRoleId, TrackMindW
       quickActions: [
         { id: 'inspect', label: 'Create inspection', permission: K.facilitiesInspectionCreate },
         { id: 'maintain', label: 'Maintenance task', permission: K.facilitiesMaintenanceManage },
+        { id: 'surveillance', label: 'Zone & IoT map', permission: K.surveillanceNexusView, route: CANONICAL_ROUTES.surveillanceNexus },
         { id: 'maturity', label: 'Facilities maturity', permission: K.maturityView, route: CANONICAL_ROUTES.trackMindMaturity },
       ],
-      relatedRoutes: [CANONICAL_ROUTES.trackMindMaturity],
+      relatedRoutes: [CANONICAL_ROUTES.surveillanceNexus, CANONICAL_ROUTES.trackMindMaturity],
     }),
     [R.complianceOfficer]: Object.freeze({
       ...WORKSPACE_BASE,

@@ -84,6 +84,30 @@
   font-size: 0.875rem;
 }
 
+.admin-ops-status-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.admin-ops-status-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.admin-ops-status-list strong {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #00ff88;
+}
+
+.admin-ops-inline-link {
+  margin-left: auto;
+  font-size: 12px;
+}
+
 .admin-ops-table {
   width: 100%;
   border-collapse: collapse;

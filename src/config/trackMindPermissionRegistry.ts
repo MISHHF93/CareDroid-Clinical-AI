@@ -99,6 +99,13 @@ export const TRACKMIND_PERMISSION_KEYS = Object.freeze({
   notificationOperational: 'notification.operational.receive',
   notificationApproval: 'notification.approval.receive',
   notificationExecutive: 'notification.executive.receive',
+  surveillanceNexusView: 'surveillance.nexus.view',
+  surveillanceCameraManage: 'surveillance.camera.manage',
+  surveillanceIotManage: 'surveillance.iot.manage',
+  surveillanceHealthView: 'surveillance.health.view',
+  surveillanceRuleManage: 'surveillance.rule.manage',
+  surveillanceIncidentLink: 'surveillance.incident.link',
+  kpiSurveillanceView: 'kpi.surveillance.view',
 } as const);
 
 const K = TRACKMIND_PERMISSION_KEYS;
@@ -160,6 +167,13 @@ export const TRACKMIND_PERMISSION_REGISTRY: readonly TrackMindPermissionDefiniti
     { key: K.notificationOperational, category: 'action', label: 'Operational notifications', description: 'Receive operational alert notifications.', sensitivity: S.operational, scope: 'racetrack' },
     { key: K.notificationApproval, category: 'action', label: 'Approval notifications', description: 'Receive approval queue notifications.', sensitivity: S.operational, scope: 'racetrack' },
     { key: K.notificationExecutive, category: 'action', label: 'Executive notifications', description: 'Receive executive summary notifications.', sensitivity: S.federation, scope: 'organization' },
+    { key: K.surveillanceNexusView, category: 'route', label: 'Surveillance nexus', description: 'View surveillance and IoT nexus dashboards.', sensitivity: S.security, scope: 'racetrack' },
+    { key: K.surveillanceCameraManage, category: 'admin', label: 'Camera registry', description: 'Manage CCTV camera registry entries.', sensitivity: S.security, scope: 'racetrack', blockedForReadOnlyRole: true },
+    { key: K.surveillanceIotManage, category: 'admin', label: 'IoT registry', description: 'Manage surveillance IoT device registry.', sensitivity: S.operational, scope: 'racetrack', blockedForReadOnlyRole: true },
+    { key: K.surveillanceHealthView, category: 'kpi', label: 'Surveillance health', description: 'View surveillance platform health metrics.', sensitivity: S.operational, scope: 'racetrack' },
+    { key: K.surveillanceRuleManage, category: 'action', label: 'Alert rules', description: 'Manage surveillance alert rules.', sensitivity: S.security, scope: 'racetrack', blockedForReadOnlyRole: true },
+    { key: K.surveillanceIncidentLink, category: 'action', label: 'Incident linkage', description: 'Link surveillance events to security and race-day incidents.', sensitivity: S.security, scope: 'racetrack' },
+    { key: K.kpiSurveillanceView, category: 'kpi', label: 'Surveillance KPIs', description: 'Camera, IoT, and zone coverage KPIs.', sensitivity: S.security, scope: 'racetrack' },
   ]);
 
 const PERMISSION_BY_KEY = new Map(
@@ -210,6 +224,12 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.financeReportView,
       K.complianceReportExport,
       K.securityAuditExport,
+      K.surveillanceNexusView,
+      K.surveillanceCameraManage,
+      K.surveillanceIotManage,
+      K.surveillanceHealthView,
+      K.surveillanceRuleManage,
+      K.kpiSurveillanceView,
     ]),
     [R.organizationAdmin]: Object.freeze([
       ...ALL_VIEW,
@@ -268,6 +288,10 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.notificationOperational,
       K.notificationApproval,
       K.analyticsView,
+      K.surveillanceNexusView,
+      K.surveillanceHealthView,
+      K.surveillanceIncidentLink,
+      K.kpiSurveillanceView,
     ]),
     [R.steward]: Object.freeze([
       K.workspaceView,
@@ -309,6 +333,9 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.kpiWelfareView,
       K.kpiRaceDayView,
       K.notificationOperational,
+      K.surveillanceNexusView,
+      K.surveillanceHealthView,
+      K.kpiSurveillanceView,
     ]),
     [R.veterinarian]: Object.freeze([
       K.workspaceView,
@@ -319,6 +346,9 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.approvalRequest,
       K.kpiWelfareView,
       K.notificationOperational,
+      K.surveillanceNexusView,
+      K.surveillanceHealthView,
+      K.kpiSurveillanceView,
     ]),
     [R.trainerLiaison]: Object.freeze([
       K.workspaceView,
@@ -337,6 +367,12 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.approvalRequest,
       K.approvalReview,
       K.kpiSecurityView,
+      K.surveillanceNexusView,
+      K.surveillanceCameraManage,
+      K.surveillanceHealthView,
+      K.surveillanceRuleManage,
+      K.surveillanceIncidentLink,
+      K.kpiSurveillanceView,
       K.notificationOperational,
     ]),
     [R.facilitiesManager]: Object.freeze([
@@ -348,6 +384,9 @@ export const TRACKMIND_ROLE_PERMISSION_GRANTS: Record<TrackMindRoleId, readonly 
       K.approvalRequest,
       K.kpiFacilitiesView,
       K.kpiRaceDayView,
+      K.surveillanceNexusView,
+      K.surveillanceHealthView,
+      K.kpiSurveillanceView,
       K.notificationOperational,
     ]),
     [R.complianceOfficer]: Object.freeze([

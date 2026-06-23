@@ -26,6 +26,10 @@ export const TRACKMIND_ENTITY = Object.freeze({
   approvalRequest: 'approval_request',
   auditPacket: 'audit_packet',
   tenantConfig: 'tenant_config',
+  surveillanceCamera: 'surveillance_camera',
+  surveillanceIotDevice: 'surveillance_iot_device',
+  surveillanceZone: 'surveillance_zone',
+  surveillanceAlertRule: 'surveillance_alert_rule',
 } as const);
 
 export type TrackMindEntityId = (typeof TRACKMIND_ENTITY)[keyof typeof TRACKMIND_ENTITY];
@@ -148,6 +152,38 @@ export const TRACKMIND_ENTITY_CAPABILITY_MATRIX: Record<TrackMindEntityId, Entit
       export: [R.auditorRegulator, R.platformSuperAdmin],
       admin: [R.platformSuperAdmin],
     }),
+    [TRACKMIND_ENTITY.surveillanceCamera]: Object.freeze({
+      view: [R.securityManager, R.raceDayOperationsManager, R.facilitiesManager, R.platformSuperAdmin, R.auditorRegulator],
+      create: [R.securityManager, R.platformSuperAdmin],
+      edit: [R.securityManager, R.platformSuperAdmin],
+      approve: [R.securityManager, R.racetrackAdmin],
+      export: [R.securityManager, R.auditorRegulator],
+      admin: [R.platformSuperAdmin],
+    }),
+    [TRACKMIND_ENTITY.surveillanceIotDevice]: Object.freeze({
+      view: [R.securityManager, R.facilitiesManager, R.raceDayOperationsManager, R.platformSuperAdmin],
+      create: [R.facilitiesManager, R.securityManager, R.platformSuperAdmin],
+      edit: [R.facilitiesManager, R.securityManager],
+      approve: [R.facilitiesManager, R.racetrackAdmin],
+      export: [R.auditorRegulator],
+      admin: [R.platformSuperAdmin],
+    }),
+    [TRACKMIND_ENTITY.surveillanceZone]: Object.freeze({
+      view: [R.securityManager, R.facilitiesManager, R.equineWelfareOfficer, R.raceDayOperationsManager],
+      create: [R.facilitiesManager, R.platformSuperAdmin],
+      edit: [R.facilitiesManager, R.securityManager],
+      approve: [R.racetrackAdmin],
+      export: [R.auditorRegulator],
+      admin: [R.platformSuperAdmin],
+    }),
+    [TRACKMIND_ENTITY.surveillanceAlertRule]: Object.freeze({
+      view: [R.securityManager, R.raceDayOperationsManager, R.complianceOfficer],
+      create: [R.securityManager],
+      edit: [R.securityManager],
+      approve: [R.securityManager, R.complianceOfficer, R.racetrackAdmin],
+      export: [R.auditorRegulator],
+      admin: [R.platformSuperAdmin],
+    }),
   });
 
 export const TRACKMIND_ENTITY_PERMISSION_HINT: Partial<Record<TrackMindEntityId, string>> =
@@ -166,6 +202,10 @@ export const TRACKMIND_ENTITY_PERMISSION_HINT: Partial<Record<TrackMindEntityId,
     [TRACKMIND_ENTITY.approvalRequest]: K.approvalRequest,
     [TRACKMIND_ENTITY.auditPacket]: K.auditExport,
     [TRACKMIND_ENTITY.tenantConfig]: K.racetrackConfigManage,
+    [TRACKMIND_ENTITY.surveillanceCamera]: K.surveillanceCameraManage,
+    [TRACKMIND_ENTITY.surveillanceIotDevice]: K.surveillanceIotManage,
+    [TRACKMIND_ENTITY.surveillanceZone]: K.surveillanceHealthView,
+    [TRACKMIND_ENTITY.surveillanceAlertRule]: K.surveillanceRuleManage,
   });
 
 export function canAccessTrackMindEntityCapability(

@@ -42,6 +42,16 @@ const Welcome = lazy(() => import('./pages/Welcome'));
 const ExecutiveCommandCenter = lazy(() => import('./pages/ExecutiveCommandCenter'));
 const AiCommandCenterDashboard = lazy(() => import('./pages/AiCommandCenterDashboard'));
 const DigitalTwinIntelligence = lazy(() => import('./pages/DigitalTwinIntelligence'));
+const HospitalMapDashboard = lazy(() => import('./pages/HospitalMapDashboard'));
+const MedicalIotDashboard = lazy(() => import('./pages/MedicalIotDashboard'));
+const DeviceFleetManagement = lazy(() => import('./pages/DeviceFleetManagement'));
+const LiveTrackingMap = lazy(() => import('./pages/LiveTrackingMap'));
+const DigitalOperationsCenter = lazy(() => import('./pages/DigitalOperationsCenter'));
+const FleetDashboard = lazy(() => import('./pages/fleet/FleetDashboard'));
+const FleetLiveMap = lazy(() => import('./pages/fleet/FleetLiveMap'));
+const RouteOptimizer = lazy(() => import('./pages/fleet/RouteOptimizer'));
+const PredictiveMaintenance = lazy(() => import('./pages/fleet/PredictiveMaintenance'));
+const SurveillanceNexusDashboard = lazy(() => import('./pages/surveillance/SurveillanceNexusDashboard'));
 const SuccessCenterPage = lazy(() => import('./pages/success-center/SuccessCenterPage'));
 const LaboratoryDashboard = lazy(() => import('./pages/LaboratoryDashboard'));
 const SimulationScenarioPlayer = lazy(() => import('./pages/SimulationScenarioPlayer'));
@@ -1574,6 +1584,88 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={CANONICAL_ROUTES.surveillanceNexus}
+          element={
+            <LazyRoute label="Loading surveillance nexus...">
+              <SurveillanceNexusDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route path="/surveillance" element={<Navigate to={CANONICAL_ROUTES.surveillanceNexus} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.hospitalMap}
+          element={
+            <LazyRoute label="Loading hospital map...">
+              <HospitalMapDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.medicalIot}
+          element={
+            <LazyRoute label="Loading medical IoT...">
+              <MedicalIotDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.devices}
+          element={
+            <LazyRoute label="Loading device fleet...">
+              <DeviceFleetManagement />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.liveMap}
+          element={
+            <LazyRoute label="Loading live map...">
+              <LiveTrackingMap />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.operations}
+          element={
+            <LazyRoute label="Loading operations center...">
+              <DigitalOperationsCenter />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.fleetCommand}
+          element={
+            <LazyRoute label="Loading fleet command...">
+              <FleetDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.fleetMap}
+          element={
+            <LazyRoute label="Loading fleet map...">
+              <FleetLiveMap />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/fleet/route-optimizer"
+          element={
+            <LazyRoute label="Loading route optimizer...">
+              <RouteOptimizer />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="/fleet/predictive-maintenance"
+          element={
+            <LazyRoute label="Loading predictive maintenance...">
+              <PredictiveMaintenance />
+            </LazyRoute>
+          }
+        />
+        <Route path="/fleet" element={<Navigate to={CANONICAL_ROUTES.fleetCommand} replace />} />
+        <Route
           path={CANONICAL_ROUTES.workflows}
           element={
             <LazyRoute label="Loading workflows...">
@@ -1910,20 +2002,12 @@ export function AppRoutes() {
       <Route path="/clinical-tools" element={<ToolsRedirect />} />
       <Route path="/lab" element={<ToolsRedirect />} />
       <Route path="/medical-simulation" element={<ToolsRedirect />} />
-      <Route path="/hospital-map" element={<ToolsRedirect />} />
-      <Route path="/medical-iot" element={<ToolsRedirect />} />
-      <Route path="/devices" element={<ToolsRedirect />} />
-      <Route path="/live-map" element={<ToolsRedirect />} />
-      <Route path="/maps" element={<ToolsRedirect />} />
-      <Route path="/tracking" element={<ToolsRedirect />} />
-      <Route path="/live-tracking" element={<ToolsRedirect />} />
-      <Route path="/operations" element={<ToolsRedirect />} />
-      <Route path="/operations/*" element={<ToolsRedirect />} />
-      <Route path="/operations-center" element={<ToolsRedirect />} />
-      <Route path="/fleet" element={<ToolsRedirect />} />
-      <Route path="/fleet/*" element={<ToolsRedirect />} />
-      <Route path="/vehicle" element={<ToolsRedirect />} />
-      <Route path="/vehicle/*" element={<ToolsRedirect />} />
+      <Route path="/maps" element={<Navigate to={CANONICAL_ROUTES.liveMap} replace />} />
+      <Route path="/tracking" element={<Navigate to={CANONICAL_ROUTES.liveMap} replace />} />
+      <Route path="/live-tracking" element={<Navigate to={CANONICAL_ROUTES.liveMap} replace />} />
+      <Route path="/operations-center" element={<Navigate to={CANONICAL_ROUTES.operations} replace />} />
+      <Route path="/vehicle" element={<Navigate to={CANONICAL_ROUTES.fleetCommand} replace />} />
+      <Route path="/vehicle/*" element={<Navigate to={CANONICAL_ROUTES.fleetCommand} replace />} />
       <Route path="/pharmacy" element={<ToolsRedirect />} />
       <Route path="/pharmacy/*" element={<ToolsRedirect />} />
       <Route path="/radiology" element={<ToolsRedirect />} />

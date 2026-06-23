@@ -37,4 +37,13 @@ describe('trackmind-rbac.config', () => {
       ),
     ).toBe(false);
   });
+
+  it('grants surveillance view to security manager', () => {
+    expect(
+      trackMindRoleHasApiPermission(
+        TRACKMIND_BACKEND_ROLE_ID.securityManager,
+        Permission.VIEW_SURVEILLANCE,
+      ),
+    ).toBe(true);
+  });
 });

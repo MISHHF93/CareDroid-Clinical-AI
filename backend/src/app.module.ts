@@ -71,6 +71,7 @@ import { ObservabilityModule } from './modules/observability/observability.modul
 import { HospitalMapModule } from './modules/hospital-map';
 import { TelemetryModule } from './modules/telemetry';
 import { FleetModule } from './modules/fleet';
+import { SurveillanceModule } from './modules/surveillance';
 import { WorkspaceIntelligenceModule } from './modules/workspace-intelligence/workspace-intelligence.module';
 import { SimulationModule } from './modules/simulation';
 import { PlatformAssetsModule } from './modules/platform-assets/platform-assets.module';
@@ -215,6 +216,7 @@ function resolveDatabaseClient() {
     HospitalMapModule,
     TelemetryModule,
     FleetModule,
+    SurveillanceModule,
     WorkspaceIntelligenceModule,
     SimulationModule,
     ClinicalAlertsModule,
