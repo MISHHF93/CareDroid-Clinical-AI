@@ -12,11 +12,14 @@ import {
 } from '../config/demoPersonaModel';
 import { listEdWorkflowAzSteps } from '../config/edWorkflowIntegrationModel';
 import useEdWorkflowIntegration from '../hooks/useEdWorkflowIntegration';
+import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import ProfileRoleSwitcher from '../components/account/ProfileRoleSwitcher';
 import './PlatformEntryHub.css';
 
 export default function PlatformEntryHub() {
   const { saasProfile } = useUserIdentity();
+  const showProfileSwitcher = useProfileSwitcherVisibility();
   const edContext = useEdWorkflowIntegration();
   const workflowSteps = listEdWorkflowAzSteps();
   const clinicalHome = resolveClinicalHomeRoute(saasProfile?.role);
@@ -39,6 +42,20 @@ export default function PlatformEntryHub() {
           {edContext.backendSync.persistenceMode.replace('-', ' ')}
         </p>
       </header>
+
+      {showProfileSwitcher ? (
+        <section className="platform-entry__profiles" aria-label="Switch workflow profile">
+          <div className="platform-entry__profiles-copy">
+            <h2 className="platform-entry__profiles-title">Switch profile before entering ED</h2>
+            <p>
+              Pick the lane you want to walk — command, charge, provider, triage, reception, EMS, or
+              display views. CareDroid keeps Dr. George&apos;s identity while permissions and surfaces
+              change.
+            </p>
+          </div>
+          <ProfileRoleSwitcher variant="chips" />
+        </section>
+      ) : null}
 
       <div className="platform-entry__grid">
         <Link className="platform-entry__card" to={demoHome}>

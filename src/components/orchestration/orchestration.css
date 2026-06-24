@@ -1,0 +1,135 @@
+.patient-orchestration {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.patient-orchestration__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.patient-orchestration__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(37, 99, 235, 0.12);
+  color: #dbeafe;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.patient-orchestration__chip:hover {
+  background: rgba(37, 99, 235, 0.22);
+}
+
+.patient-orchestration__chip--primary {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+}
+
+.patient-orchestration__chip--completed {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.patient-orchestration__chip--preview {
+  border-style: dashed;
+}
+
+.patient-orchestration__more {
+  border: none;
+  background: transparent;
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.patient-orchestration__meta {
+  font-size: 10px;
+  color: #9ca3af;
+  line-height: 1.35;
+}
+
+.patient-orchestration__strip {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.patient-orchestration__strip-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.patient-orchestration__disclaimer {
+  margin: 6px 0 0;
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.patient-orchestration--scores {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.patient-orchestration__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.patient-orchestration__header strong {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.patient-orchestration__chip small {
+  opacity: 0.75;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.patient-orchestration__chip--red {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+}
+
+.patient-orchestration__chip--yellow {
+  border-color: rgba(251, 191, 36, 0.45);
+  background: rgba(120, 53, 15, 0.35);
+  color: #fde68a;
+}
+
+.patient-orchestration__chip--green {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(20, 83, 45, 0.35);
+  color: #bbf7d0;
+}
+
+.patient-orchestration__chip--neutral {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(51, 65, 85, 0.35);
+  color: #e2e8f0;
+}

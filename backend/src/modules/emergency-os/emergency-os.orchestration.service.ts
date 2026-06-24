@@ -4,15 +4,19 @@ import { getAIPrompt } from '../../../../lib/ai/promptRegistry';
 import { appendRequiredDisclaimer } from '../../../../lib/ai/safetyPolicy';
 import {
   buildOperationalContextFromCounts,
+  buildPatientCardOrchestrationContext,
   buildTriageAssistEnvelope,
   mergeLlmTriageEnrichment,
   patientInputFromEmergencyRecord,
+  type EmergencyRoleId,
+  type PatientCardOrchestrationContext,
   type TriageAssistEnvelope,
 } from '../../../../lib/patient-orchestration';
 import { ChatService } from '../chat/chat.service';
 import {
   EmergencyPatientService,
   EmergencySettingsService,
+  ReferralService,
 } from './emergency-os.services';
 import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 import type { EmergencyPatient } from './emergency-os.types';
@@ -31,11 +35,32 @@ export class PatientOrchestrationService {
 
   constructor(
     private readonly patientService: EmergencyPatientService,
+    private readonly referralService: ReferralService,
     private readonly settingsService: EmergencySettingsService,
     private readonly operationalIntelligenceService: OperationalIntelligenceService,
     private readonly configService: ConfigService,
     @Optional() private readonly chatService?: ChatService,
   ) {}
+
+  buildPatientOrchestration(
+    patientId: string,
+    role: EmergencyRoleId = 'physician',
+  ): PatientCardOrchestrationContext {
+    const patient = this.patientService
+      .listPatients()
+      .find((candidate) => candidate.id === patientId);
+    if (!patient) {
+      throw new Error(`Emergency patient ${patientId} not found`);
+    }
+
+    const referrals = this.referralService.getReferrals().data.referrals || [];
+    return buildPatientCardOrchestrationContext({
+      patient: patient as unknown as import('../../../../src/types/emergency').Patient,
+      role,
+      referrals: referrals as unknown as import('../../../../src/types/emergency').Referral[],
+      sourceState: 'demo',
+    });
+  }
 
   async buildTriageAssist(
     patientId: string,

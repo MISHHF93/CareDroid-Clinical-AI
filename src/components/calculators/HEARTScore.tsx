@@ -134,6 +134,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
     if (!patient) return;
     const saved = saveCalculatorResult({
       patientId: patient.id,
+      scoreId: 'heart-score',
       scoreName: 'HEART Score',
       total,
       max: 10,

@@ -369,6 +369,7 @@ export default function PediatricDrugCalculator({ open, patient = null, onClose 
     if (!canSave) return;
     const saved = saveCalculatorResult({
       patientId: patient.id,
+      scoreId: 'pediatric-dose-safety-checker',
       scoreName: 'Pediatric Drug Calculator',
       total: rows.length,
       max: rows.length,

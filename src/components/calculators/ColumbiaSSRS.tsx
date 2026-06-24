@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { dispatchAlert } from '../../engine/alertEngine';
+import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag } from '../../types/emergency';
 
@@ -213,16 +214,29 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
 
   const saveAndAlert = () => {
     if (!patientId || !patient) return;
-    const store = useEmergencyStore.getState();
-    const staffId = getStaffId(patient);
-    const timestamp = new Date().toISOString();
     const q6Answer = answers.q6 ? answers.q6.toUpperCase() : 'NOT ANSWERED';
+    const yesCount = [...IDEATION, BEHAVIOR]
+      .map((item) => answers[item.id])
+      .filter((answer) => answer === 'yes').length;
 
-    store.addNote(
+    const saved = saveCalculatorResult({
       patientId,
-      `Columbia SSR Scale: ${risk} RISK.\nIdeation: ${ideationSummary(answers)}.\nBehavior past 3 months: ${q6Answer}.\nAssessed by: ${staffId} at ${timestamp}`,
-      staffId,
-    );
+      scoreId: 'columbia-suicide-severity-workflow',
+      scoreName: 'Columbia SSR Scale',
+      total: yesCount,
+      max: 6,
+      band: `${risk} risk`,
+      recommendation: `Ideation: ${ideationSummary(answers)}. Behavior past 3 months: ${q6Answer}.`,
+      fields: {
+        answers,
+        risk,
+        ideationSummary: ideationSummary(answers),
+        behaviorPast3Months: q6Answer,
+      },
+      staffId: getStaffId(patient),
+      critical: risk === 'HIGH',
+    });
+    if (!saved) return;
     setSavedMessage('Columbia SSR Scale saved to patient.');
     setConfirmingSave(false);
     onClose();

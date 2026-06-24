@@ -119,6 +119,32 @@
   justify-content: flex-end;
 }
 
+.clinical-calculator-hub__saved-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.clinical-calculator-hub__saved-scores span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary, #3b82f6) 10%, var(--app-surface));
+  color: var(--app-text-secondary);
+  padding: 6px 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.clinical-calculator-hub__saved-scores small {
+  font-size: 0.68rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
 .clinical-calculator-hub__vitals span,
 .clinical-calculator-card__meta span {
   display: inline-flex;

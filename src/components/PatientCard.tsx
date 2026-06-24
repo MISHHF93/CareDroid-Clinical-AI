@@ -37,6 +37,8 @@ import {
   formatPrivacySafePatientName,
   type EmergencyDisplayPrivacyPolicy,
 } from '../config/emergencyDisplayPrivacyPolicy';
+import PatientCardToolChips from './orchestration/PatientCardToolChips';
+import { getRecentSavedScores } from '../utils/clinicalScoreEvents';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -224,23 +226,14 @@ function staffInitials(name?: string): string {
     .toUpperCase();
 }
 
-function noteContent(note: Patient['notes'][number]): string {
-  return `${note.text || ''} ${note.body || ''} ${JSON.stringify(note.metadata || {})}`;
-}
-
-function scoreBadges(patient: Patient): string[] {
-  const scores = new Set<string>();
-  patient.notes.forEach((note) => {
-    const content = noteContent(note);
-    ['HEART', 'qSOFA', 'NEWS2', 'NIHSS', 'GCS', 'Wells', 'PERC'].forEach((scoreName) => {
-      if (new RegExp(`\\b${scoreName}\\b`, 'i').test(content)) {
-        scores.add(scoreName);
-      }
-    });
-    const scoreLabel = note.metadata?.scoreLabel || note.metadata?.scoreId;
-    if (scoreLabel) scores.add(String(scoreLabel).slice(0, 14));
-  });
-  return [...scores].slice(0, 3);
+function scoreBadges(patient: Patient): Array<{ key: string; label: string; tone: string }> {
+  return getRecentSavedScores(patient)
+    .slice(0, 3)
+    .map((score) => ({
+      key: `${score.toolId || score.shortLabel}-${score.timestamp}`,
+      label: `${score.shortLabel} ${score.result ?? '--'}`,
+      tone: score.tone,
+    }));
 }
 
 function abnormalVitalsSummary({
@@ -650,7 +643,13 @@ function PatientCard({
       {cardDensity.showScores && scores.length ? (
         <div className="patient-card__scores" aria-label="Saved score badges">
           {scores.map((score) => (
-            <span key={score}>{score}</span>
+            <span
+              key={score.key}
+              className={`patient-card__score patient-card__score--${score.tone}`}
+              title={score.label}
+            >
+              {score.label}
+            </span>
           ))}
         </div>
       ) : null}
@@ -675,6 +674,8 @@ function PatientCard({
           );
         })}
       </div>
+
+      <PatientCardToolChips patient={patient} readOnlyDisplay={readOnlyDisplay} />
 
       <button
         type="button"

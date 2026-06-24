@@ -126,6 +126,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
     if (!patient) return;
     const saved = saveCalculatorResult({
       patientId: patient.id,
+      scoreId: 'qsofa',
       scoreName: 'qSOFA',
       total,
       max: 3,

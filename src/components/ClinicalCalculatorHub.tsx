@@ -7,6 +7,9 @@ import { buildBuiltinHubCalculatorCards, getHubChatAssistedTools } from '../data
 import { useEmergencyStore } from '../store/emergencyStore';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import type { Patient, Vitals } from '../types/emergency';
+import { formatScoreAge, getRecentSavedScores } from '../utils/clinicalScoreEvents';
+import usePatientOrchestration from '../hooks/usePatientOrchestration';
+import { buildCalculatorCopilotSeed } from '../services/patientAiContext';
 import ErrorBoundary from './ErrorBoundary';
 import CIWAAr from './calculators/CIWAAr';
 import ColumbiaSSRS from './calculators/ColumbiaSSRS';
@@ -374,6 +377,7 @@ export default function ClinicalCalculatorHub() {
   const patient =
     patients.find((candidate) => candidate.id === queryPatientId) ||
     patients.find((candidate) => candidate.id === selectedPatientId);
+  const patientOrchestration = usePatientOrchestration(patient);
 
   useEffect(() => {
     if (queryCalculatorId) setActiveCalculatorId(queryCalculatorId);
@@ -381,6 +385,10 @@ export default function ClinicalCalculatorHub() {
   }, [queryCalculatorId]);
 
   const activeCalculator = CALCULATORS.find((calculator) => calculator.id === activeCalculatorId);
+  const recentSavedScores = useMemo(
+    () => (patient ? getRecentSavedScores(patient) : []),
+    [patient],
+  );
   const filteredCalculators = useMemo(() => {
     const query = search.trim().toLowerCase();
     return CALCULATORS.filter((calculator) => {
@@ -406,13 +414,20 @@ export default function ClinicalCalculatorHub() {
     const registryId = launch.registryId || calculator.id;
     chooseTool?.(registryId);
     activateTool?.(registryId);
-    seedMessage?.(
+    const seed =
       launch.chatSeed ||
-        `Help me use ${calculator.name} as clinical decision support only. Ask for any missing context before suggesting next steps.`,
-      'user',
-    );
+      buildCalculatorCopilotSeed(patient, calculator.name, patientOrchestration);
+    if (patient?.id) {
+      window.dispatchEvent(
+        new CustomEvent('ed:copilot-prefill', {
+          detail: { patientId: patient.id, message: seed },
+        }),
+      );
+    } else {
+      seedMessage?.(seed, 'user');
+    }
     navigate(CANONICAL_ROUTES.emergencyCopilot);
-  }, [activateTool, chooseTool, navigate, seedMessage]);
+  }, [activateTool, chooseTool, navigate, patient, patientOrchestration, seedMessage]);
 
   const closeCalculator = useCallback(() => {
     const params = new URLSearchParams(searchParams);
@@ -479,6 +494,16 @@ export default function ClinicalCalculatorHub() {
                 </span>
               ))}
             </div>
+            {recentSavedScores.length ? (
+              <div className="clinical-calculator-hub__saved-scores" aria-label="Recent saved scores">
+                {recentSavedScores.map((score) => (
+                  <span key={`${score.toolId || score.shortLabel}-${score.timestamp}`}>
+                    {score.shortLabel} <strong>{score.result ?? '--'}</strong>
+                    <small>{formatScoreAge(score.timestamp)}</small>
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </>
         ) : (
           <div>

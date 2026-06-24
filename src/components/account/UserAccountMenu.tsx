@@ -7,6 +7,8 @@ import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
 import { DEMO_PERSONA, isDemoPersonaUser } from '../../config/demoPersonaModel';
+import useProfileSwitcherVisibility from '../../hooks/useProfileSwitcherVisibility';
+import ProfileRoleSwitcher from './ProfileRoleSwitcher';
 import './UserAccountMenu.css';
 
 function getInitials(name: string): string {
@@ -51,6 +53,7 @@ export default function UserAccountMenu() {
   }, [user]);
   const accountMeta = demoMeta || workspaceMeta || 'Demo mode';
   const showAdminLink = isAdminSaasRole(accessSummary?.saasRole || user?.role);
+  const showProfileSwitcher = useProfileSwitcherVisibility();
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -93,6 +96,13 @@ export default function UserAccountMenu() {
               <span className="account-menu__role-chip">{roleLabel}</span>
             </div>
           </div>
+
+          {showProfileSwitcher ? (
+            <div className="account-menu__section account-menu__section--profiles">
+              <div className="account-menu__section-title">Switch workflow profile</div>
+              <ProfileRoleSwitcher variant="menu" onSwitch={() => setOpen(false)} />
+            </div>
+          ) : null}
 
           <div className="account-menu__section">
             <Link className="account-menu__item" to={CANONICAL_ROUTES.profile} role="menuitem">

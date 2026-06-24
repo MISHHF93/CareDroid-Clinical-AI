@@ -1788,7 +1788,9 @@ export class ChatService {
     edContext: Record<string, any>,
     requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<string> {
-    const systemPrompt = buildSystemPrompt(edContext as any, 'COPILOT_CHAT');
+    const frontendPrompt =
+      typeof edContext?.systemPrompt === 'string' ? edContext.systemPrompt.trim() : '';
+    const systemPrompt = frontendPrompt || buildSystemPrompt(edContext as any, 'COPILOT_CHAT');
     const messages: Message[] =
       requestMessages
         ?.filter((item) => item?.role === 'user' || item?.role === 'assistant')

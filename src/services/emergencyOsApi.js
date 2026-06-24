@@ -21,6 +21,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   receptionSnapshot: '/api/emergency/reception/snapshot',
   receptionHandoff: '/api/emergency/reception/handoff',
   triageAssist: '/api/emergency/triage/assist',
+  patientOrchestration: '/api/emergency/patients',
   intake: '/api/emergency/intake',
   smartIntakeVerticalSlice: '/api/emergency/intake/vertical-slice',
   queues: '/api/emergency/queues',
@@ -168,6 +169,12 @@ export const postTriageAssist = (payload) =>
     method: 'POST',
     body: JSON.stringify(payload),
   });
+export const fetchPatientOrchestration = (patientId, role = 'physician') => {
+  const params = new URLSearchParams({ role: String(role || 'physician') });
+  return requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.patientOrchestration}/${encodeURIComponent(patientId)}/orchestration?${params.toString()}`,
+  );
+};
 export const fetchSmartIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake);
 export const fetchEmergencyQueues = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.queues);
 export const fetchReassessmentQueue = () =>

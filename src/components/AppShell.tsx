@@ -9,6 +9,7 @@ import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
 import startEmergencyRealtime from '../services/emergencyRealtimeService';
+import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
@@ -233,6 +234,7 @@ export function AppShell({ children }: AppShellProps) {
     let stopSimulation: (() => void) | undefined;
     let stopRealtime: (() => void) | undefined;
 
+    bootstrapAiPlatformIntegrations();
     void useEmergencyStore.getState().initializeFromBackend();
     useEmergencyStore.getState().updateAlerts();
 
@@ -468,13 +470,21 @@ export function AppShell({ children }: AppShellProps) {
       );
     };
 
+    const openPatientDetail = (event: Event) => {
+      const detail = (event as CustomEvent<{ patientId?: string }>).detail || {};
+      if (!detail.patientId) return;
+      selectPatient(detail.patientId);
+    };
+
     window.addEventListener('ed:open-tools', openTools);
     window.addEventListener('ed:open-calculator', openCalculator);
+    window.addEventListener('ed:open-patient-detail', openPatientDetail);
     return () => {
       window.removeEventListener('ed:open-tools', openTools);
       window.removeEventListener('ed:open-calculator', openCalculator);
+      window.removeEventListener('ed:open-patient-detail', openPatientDetail);
     };
-  }, [emergencyRole, profileNavigate]);
+  }, [emergencyRole, profileNavigate, selectPatient]);
 
   const handleCommandExecute = (action: CommandAction) => {
     switch (action.type) {

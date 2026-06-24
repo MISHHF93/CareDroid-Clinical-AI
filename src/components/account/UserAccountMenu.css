@@ -117,6 +117,19 @@
   background: color-mix(in srgb, var(--app-accent) 16%, transparent);
 }
 
+.account-menu__section--profiles {
+  padding: 4px 6px 6px;
+}
+
+.account-menu__section-title {
+  padding: 4px 6px 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
 @media (max-width: 720px) {
   .account-menu__label {
     display: none;

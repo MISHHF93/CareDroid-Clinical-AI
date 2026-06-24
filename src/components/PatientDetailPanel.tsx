@@ -55,6 +55,8 @@ import DataQualityRiskPanel from './dataQuality/DataQualityRiskPanel';
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import ReassessmentTimerPanel from './reassessment/ReassessmentTimerPanel';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
+import RecommendedToolsStrip from './orchestration/RecommendedToolsStrip';
+import SavedClinicalScoresStrip from './orchestration/SavedClinicalScoresStrip';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -1063,6 +1065,14 @@ export default function PatientDetailPanel() {
           referrals={referrals}
           staff={staff}
         />
+
+        <div style={{ marginTop: 12 }}>
+          <SavedClinicalScoresStrip patient={selectedPatient} />
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <RecommendedToolsStrip patient={selectedPatient} />
+        </div>
 
         {selectedPatient.state === PatientState.Triage ? (
           <div style={{ marginTop: 12 }}>

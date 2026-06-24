@@ -27,6 +27,7 @@ import {
   Vitals,
   WorkflowActionLog,
   WorkflowActionType,
+  ClinicalScoreSaveInput,
 } from '../types/emergency';
 import { resolveCriticalChecklistConfig } from '../config/criticalChecklists';
 import {
@@ -1828,6 +1829,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   copilot_used: 'Copilot used',
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
+  clinical_score_saved: 'Clinical score saved',
 };
 
 type WorkflowActionInput = Omit<
@@ -2358,6 +2360,7 @@ interface EmergencyStoreState {
   removeFlag: (patientId: string, flag: PatientFlag) => void;
   addVitals: (patientId: string, vitals: Vitals) => void;
   addNote: (patientId: string, note: Note | string, staffId?: string) => void;
+  saveClinicalScore: (input: ClinicalScoreSaveInput) => boolean;
   scheduleReassessmentReminder: (
     patientId: string,
     reminder: Omit<ReassessmentReminder, 'id' | 'patientId' | 'status'>,
@@ -3668,6 +3671,107 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           ]),
         };
       }),
+
+    saveClinicalScore: (input) => {
+      const state = get();
+      const patient = state.patients.find((candidate) => candidate.id === input.patientId);
+      if (!patient) return false;
+
+      const staffId =
+        input.staffId || patient.assignedStaffId || state.activeShift.chargeStaffId || state.staff[0]?.id || 'system';
+      const timestamp = new Date().toISOString();
+      const maxSuffix = input.max !== undefined && input.max !== null && input.max !== '' ? `/${input.max}` : '';
+      const noteText = `${input.scoreLabel}: ${input.scoreTotal}${maxSuffix} — ${input.band}`;
+      const noteBody = input.recommendation ? `${noteText}. ${input.recommendation}` : noteText;
+
+      const note: Note = {
+        id: createId('note'),
+        patientId: input.patientId,
+        text: noteText,
+        body: noteBody,
+        authorId: staffId,
+        authorStaffId: staffId,
+        type: 'Score',
+        timestamp,
+        createdAt: timestamp,
+        metadata: {
+          scoreId: input.scoreId,
+          calculatorId: input.scoreId,
+          scoreLabel: input.scoreLabel,
+          scoreName: input.scoreLabel,
+          scoreTotal: String(input.scoreTotal),
+          max: input.max !== undefined && input.max !== null ? String(input.max) : undefined,
+          band: input.band,
+          recommendation: input.recommendation,
+          fieldsJson: input.fields ? JSON.stringify(input.fields) : undefined,
+        },
+      };
+
+      const timelineEvent = createPatientTimelineEvent(
+        patient,
+        'ClinicalScoreSaved',
+        `Saved ${input.scoreLabel}: ${input.scoreTotal} (${input.band}).`,
+        {
+          timestamp,
+          staffId,
+          actorStaffId: staffId,
+          note: noteText,
+          metadata: {
+            scoreId: input.scoreId,
+            calculatorId: input.scoreId,
+            scoreLabel: input.scoreLabel,
+            scoreTotal: String(input.scoreTotal),
+            result: String(input.scoreTotal),
+            band: input.band,
+            recommendation: input.recommendation,
+            staffId,
+          },
+        },
+      );
+
+      set((current) => ({
+        patients: current.patients.map((candidate) =>
+          candidate.id === input.patientId
+            ? {
+                ...candidate,
+                notes: [...candidate.notes, note],
+                timeline: [...candidate.timeline, timelineEvent],
+              }
+            : candidate,
+        ),
+        auditLog: appendAuditLog(current.auditLog, {
+          action: 'saveClinicalScore',
+          patientId: input.patientId,
+          staffId,
+          details: {
+            scoreId: input.scoreId,
+            scoreLabel: input.scoreLabel,
+            scoreTotal: String(input.scoreTotal),
+            band: input.band,
+          },
+        }),
+        workflowLogs: appendWorkflowLogs(current.workflowLogs, [
+          {
+            type: 'clinical_score_saved',
+            title: 'Clinical score saved',
+            summary: noteText,
+            patientId: input.patientId,
+            actorStaffId: staffId,
+            source: 'clinical-calculator-hub',
+            severity: input.critical ? 'Warning' : 'Info',
+            metadata: {
+              scoreId: input.scoreId,
+              scoreLabel: input.scoreLabel,
+              scoreTotal: String(input.scoreTotal),
+              band: input.band,
+              journeyEventId: timelineEvent.id,
+            },
+          },
+        ]),
+      }));
+
+      return true;
+    },
 
     scheduleReassessmentReminder: (patientId, reminder) => {
       const nextReminder: ReassessmentReminder = {

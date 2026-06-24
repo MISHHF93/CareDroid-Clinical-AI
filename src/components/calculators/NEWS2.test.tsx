@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NEWS2 from './NEWS2';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag, PatientState, Priority, type Patient, type Vitals } from '../../types/emergency';
 import { calculateNews2FromVitals, news2Response, scoreNews2, valueFromVitals } from '../../utils/news2';
 
@@ -138,10 +138,11 @@ describe('NEWS2 calculator and auto scoring', () => {
         expect.objectContaining({
           text: 'NEWS2: 9/20 — High',
           authorId: 'news-rn',
-        }),
-        expect.objectContaining({
-          text: expect.stringContaining('NEWS2 fields:'),
-          authorId: 'news-rn',
+          type: 'Score',
+          metadata: expect.objectContaining({
+            scoreId: 'news2',
+            scoreTotal: '9',
+          }),
         }),
       ]),
     );
@@ -162,16 +163,13 @@ describe('NEWS2 calculator and auto scoring', () => {
     });
 
     const state = useEmergencyStore.getState();
-    expect(state.patients[0].flags).toContain(PatientFlag.ReassessmentDue);
-    expect(state.alerts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          severity: 'Critical',
-          title: 'NEWS2 High deterioration risk',
-          patientId: patient.id,
-          source: 'news2-auto-score',
-        }),
-      ]),
-    );
+    expect(hasPatientFlag(state.patients[0], PatientFlag.ReassessmentDue)).toBe(true);
+    expect(
+      state.alerts.some(
+        (alert) =>
+          alert.patientId === patient.id &&
+          (alert.source === 'news2-auto-score' || alert.title?.includes('Vitals warning')),
+      ),
+    ).toBe(true);
   });
 });

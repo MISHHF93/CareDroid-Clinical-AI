@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { dispatchAlert } from '../../engine/alertEngine';
+import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import type { Note, Patient } from '../../types/emergency';
 
@@ -254,10 +255,19 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
 
   const saveToPatient = () => {
     if (!patientId || !patient) return;
-    const store = useEmergencyStore.getState();
-    const staffId = patient.assignedStaffId || store.activeShift.chargeStaffId || store.staff[0]?.id || 'system';
-    store.addNote(patientId, `CIWA-Ar: ${total}/67 - ${protocol.band}. ${protocol.recommendation}`, staffId);
-    store.addNote(patientId, `CIWA-Ar fields: ${JSON.stringify(scores)}`, staffId);
+    const saved = saveCalculatorResult({
+      patientId,
+      scoreId: 'ciwa-ar',
+      scoreName: 'CIWA-Ar',
+      total,
+      max: 67,
+      band: protocol.band,
+      recommendation: protocol.recommendation,
+      fields: scores,
+      staffId: patient.assignedStaffId || undefined,
+      critical: protocol.band.toLowerCase().includes('severe'),
+    });
+    if (!saved) return;
     setSavedMessage('CIWA-Ar score saved to patient.');
     onClose();
   };

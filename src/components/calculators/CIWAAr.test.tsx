@@ -110,12 +110,13 @@ describe('CIWAAr calculator', () => {
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          text: expect.stringContaining('CIWA-Ar: 27/67 - Severe.'),
+          text: expect.stringContaining('CIWA-Ar: 27/67 — Severe'),
           authorId: 'withdrawal-rn',
-        }),
-        expect.objectContaining({
-          text: expect.stringContaining('CIWA-Ar fields:'),
-          authorId: 'withdrawal-rn',
+          type: 'Score',
+          metadata: expect.objectContaining({
+            scoreId: 'ciwa-ar',
+            scoreTotal: '27',
+          }),
         }),
       ]),
     );

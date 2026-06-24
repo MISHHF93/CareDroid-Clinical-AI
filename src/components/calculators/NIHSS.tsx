@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { dispatchAlert } from '../../engine/alertEngine';
+import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 
 type NIHSSProps = {
@@ -233,37 +233,25 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
 
   const saveToPatient = () => {
     if (!patient) return;
-    const store = useEmergencyStore.getState();
-    const staffId = patient.assignedStaffId || store.activeShift.chargeStaffId || store.staff[0]?.id || 'system';
     const lkwFormatted = formatLkw(lastKnownWell);
-    const noteText = `NIHSS: ${total}/42 — ${severity.label}. LKW: ${lkwFormatted}`;
-    const detailText = `NIHSS fields: ${JSON.stringify({
-      scores,
-      lastKnownWell,
-      lastKnownWellFormatted: lkwFormatted,
-      timeSinceLastKnownWell: lkwElapsed.label,
-    })}`;
-
-    store.addNote(patient.id, noteText, staffId);
-    store.addNote(patient.id, detailText, staffId);
-
-    if (total >= 5) {
-      dispatchAlert({
-        severity: 'Warning',
-        title: `Significant NIHSS — ${patientName(patient)}`,
-        message: `Score ${total}/42 — ${severity.label}`,
-        patientId: patient.id,
-        source: 'clinical-calculator-hub',
-        metadata: {
-          calculator: 'NIHSS',
-          total: String(total),
-          max: '42',
-          band: severity.label,
-          lastKnownWell: lkwFormatted,
-        },
-      });
-    }
-
+    const saved = saveCalculatorResult({
+      patientId: patient.id,
+      scoreId: 'nihss',
+      scoreName: 'NIHSS',
+      total,
+      max: 42,
+      band: severity.label,
+      recommendation: `LKW: ${lkwFormatted} (${lkwElapsed.label})`,
+      fields: {
+        scores,
+        lastKnownWell,
+        lastKnownWellFormatted: lkwFormatted,
+        timeSinceLastKnownWell: lkwElapsed.label,
+      },
+      staffId: patient.assignedStaffId || undefined,
+      critical: total >= 5,
+    });
+    if (!saved) return;
     setSavedMessage('NIHSS score saved to patient.');
     onClose();
   };

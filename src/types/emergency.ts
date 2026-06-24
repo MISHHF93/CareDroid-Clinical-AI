@@ -666,7 +666,21 @@ export type WorkflowActionType =
   | 'referral_status_changed'
   | 'copilot_used'
   | 'provincial_data_viewed'
-  | 'integration_event_received';
+  | 'integration_event_received'
+  | 'clinical_score_saved';
+
+export interface ClinicalScoreSaveInput {
+  patientId: string;
+  scoreId: string;
+  scoreLabel: string;
+  scoreTotal: number | string;
+  max?: number | string;
+  band: string;
+  recommendation?: string;
+  fields?: Record<string, unknown>;
+  staffId?: string;
+  critical?: boolean;
+}
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
 export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';

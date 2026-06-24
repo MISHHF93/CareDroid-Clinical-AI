@@ -266,6 +266,7 @@ export default function ClinicalScoreCalculator({
     onSaveScore?.(score);
     saveCalculatorResult({
       patientId: patient?.id,
+      scoreId: calculatorId,
       scoreName: label,
       total,
       max: maxTotalForCalculator(calculatorId),

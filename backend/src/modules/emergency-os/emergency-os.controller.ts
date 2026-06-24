@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { TenantContext } from '../tenant-context/tenant-context.decorator';
 import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -129,6 +129,40 @@ export class EmergencyOsController {
   @Get('patients/:patientId/workflow-logs')
   getPatientWorkflowLogs(@Param('patientId') patientId: string) {
     return this.workflowActionLogService.getEnvelope(patientId);
+  }
+
+  @Get('patients/:patientId/orchestration')
+  getPatientOrchestration(
+    @Param('patientId') patientId: string,
+    @Query('role') roleQuery?: string,
+  ) {
+    const allowedRoles = new Set([
+      'registration_clerk',
+      'triage_nurse',
+      'physician',
+      'charge_nurse',
+      'ed_manager',
+      'ems_user',
+      'admin',
+    ]);
+    const role = (
+      allowedRoles.has(String(roleQuery || ''))
+        ? roleQuery
+        : 'physician'
+    ) as import('../../../../lib/patient-orchestration').EmergencyRoleId;
+    const orchestration = this.orchestrationService.buildPatientOrchestration(patientId, role);
+    return {
+      module: 'Patient Card Orchestration',
+      generatedAt: orchestration.generatedAt,
+      source: 'backend-fixture',
+      status: 'active',
+      data: {
+        ok: true,
+        patientId,
+        orchestration,
+      },
+      remainingGaps: [],
+    };
   }
 
   @Get('ems')

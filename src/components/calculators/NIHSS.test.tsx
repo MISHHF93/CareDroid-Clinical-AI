@@ -79,22 +79,28 @@ describe('NIHSS calculator', () => {
     expect(savedPatient?.notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          text: expect.stringContaining('NIHSS: 7/42 — Moderate stroke. LKW:'),
+          text: expect.stringContaining('NIHSS: 7/42 — Moderate stroke'),
           authorId: 'stroke-rn',
-        }),
-        expect.objectContaining({
-          text: expect.stringContaining('NIHSS fields:'),
-          authorId: 'stroke-rn',
+          type: 'Score',
+          metadata: expect.objectContaining({
+            scoreId: 'nihss',
+            scoreTotal: '7',
+            band: 'Moderate stroke',
+          }),
         }),
       ]),
     );
+    expect(
+      savedPatient?.timeline.some((event) => event.type === 'ClinicalScoreSaved'),
+    ).toBe(true);
     expect(useEmergencyStore.getState().alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           severity: 'Warning',
-          title: 'Significant NIHSS — Sam Rivera',
-          message: 'Score 7/42 — Moderate stroke',
+          title: 'NIHSS — Moderate stroke risk',
+          message: 'Sam Rivera scored 7/42',
           patientId: patient.id,
+          source: 'clinical-calculator-hub',
         }),
       ]),
     );

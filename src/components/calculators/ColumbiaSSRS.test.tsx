@@ -107,8 +107,13 @@ describe('ColumbiaSSRS calculator', () => {
     expect(useEmergencyStore.getState().patients[0].notes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          text: expect.stringContaining('Columbia SSR Scale: MODERATE RISK.'),
+          text: expect.stringContaining('Columbia SSR Scale: 2/6 — MODERATE risk'),
           authorId: 'psych-rn',
+          type: 'Score',
+          metadata: expect.objectContaining({
+            scoreId: 'columbia-suicide-severity-workflow',
+            band: 'MODERATE risk',
+          }),
         }),
       ]),
     );

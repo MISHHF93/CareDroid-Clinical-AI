@@ -76,6 +76,8 @@ import {
 } from '../services/unifiedOperationalSearch';
 import StaffWorkloadPanel from './StaffWorkloadPanel';
 import UserAccountMenu from './account/UserAccountMenu';
+import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
+import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
 import './ReassessmentDrawer.css';
 import './Header.css';
 
@@ -272,36 +274,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   );
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
-
-  // Dev helper: always-visible quick profile switcher so you don't have to hunt for it.
-  const isLocalDev = typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  const DevRoleQuickSwitch = isLocalDev ? (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 12, fontSize: 12 }}>
-      <span style={{ opacity: 0.6 }}>Profile:</span>
-      <select
-        value={emergencyRole.role}
-        onChange={(e) => {
-          // use the same switch mechanism
-          const { switchDemoRole } = emergencyRole as any;
-          if (switchDemoRole) switchDemoRole(e.target.value);
-          // navigate to main surface for that profile
-          navigate('/emergency/whiteboard', { replace: true });
-        }}
-        style={{ fontSize: 12, padding: '2px 6px' }}
-      >
-        {[
-          { id: 'ed-manager', label: 'Command' },
-          { id: 'charge-nurse', label: 'Charge' },
-          { id: 'physician', label: 'Physician' },
-          { id: 'triage-nurse', label: 'Triage' },
-          { id: 'registration-clerk', label: 'Reception' },
-        ].map((r) => (
-          <option key={r.id} value={r.id}>{r.label}</option>
-        ))}
-      </select>
-    </div>
-  ) : null;
+  const showProfileSwitcher = useProfileSwitcherVisibility();
   const operationalSummary = centralSnapshot.operationalSummary;
   const headerOperationalMetrics = useMemo(() => {
     const surfaceMetrics = filterOperationalMetrics(operationalSummary.metrics, 'header');
@@ -1225,6 +1198,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               </span>
             ) : null}
           </button>
+
+          {showProfileSwitcher ? <ProfileRoleSwitcher variant="compact" /> : null}
 
           <UserAccountMenu />
 

@@ -25,6 +25,13 @@ import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuid
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+import usePatientOrchestration from '../hooks/usePatientOrchestration';
+import {
+  formatPatientOrchestrationForCopilot,
+  formatPatientToolRecommendationsForCopilot,
+} from '../../lib/patient-orchestration';
+import { launchOrchestrationRecommendation } from '../services/orchestrationToolLaunch';
+import { buildCopilotPatientArtifactContext } from '../services/patientAiContext';
 
 type CopilotMessage = {
   id: string;
@@ -221,6 +228,8 @@ function buildDepartmentPrompt({
   selectedPatient,
   copilotRecommendations,
   referrals,
+  patientOrchestrationPrompt,
+  patientToolRecommendationsPrompt,
 }: {
   patients: Patient[];
   alerts: Alert[];
@@ -232,6 +241,8 @@ function buildDepartmentPrompt({
   selectedPatient?: Patient | null;
   copilotRecommendations: ReturnType<typeof buildCopilotRecommendationSnapshot>['recommendations'];
   referrals?: ReturnType<typeof useEmergencyStore.getState>['referrals'];
+  patientOrchestrationPrompt?: string;
+  patientToolRecommendationsPrompt?: string;
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -294,6 +305,8 @@ function buildDepartmentPrompt({
           `- ${selectedPatient.triageAssist.disclaimers?.[0] || HUMAN_REVIEW_DISCLAIMER}`,
         ].join('\n')
       : null,
+    patientOrchestrationPrompt || null,
+    patientToolRecommendationsPrompt || null,
   ].filter((line): line is string => Boolean(line)).join('\n');
 }
 
@@ -389,6 +402,7 @@ export function CopilotPanel() {
   const alerts = useEmergencyStore((store) => store.alerts);
   const emergencySettings = useEmergencyStore((store) => store.emergencySettings);
   const setCopilotOpen = useEmergencyStore((store) => store.setCopilotOpen);
+  const selectPatient = useEmergencyStore((store) => store.selectPatient);
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
   const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
@@ -449,6 +463,15 @@ export function CopilotPanel() {
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
     [patients, selectedPatientId],
   );
+  const patientOrchestration = usePatientOrchestration(selectedPatient);
+  const patientOrchestrationPrompt = useMemo(
+    () => formatPatientOrchestrationForCopilot(patientOrchestration),
+    [patientOrchestration],
+  );
+  const patientToolRecommendationsPrompt = useMemo(
+    () => formatPatientToolRecommendationsForCopilot(patientOrchestration),
+    [patientOrchestration],
+  );
   const copilotSnapshot = useMemo(
     () =>
       buildCopilotRecommendationSnapshot({
@@ -468,14 +491,18 @@ export function CopilotPanel() {
 
   useEffect(() => {
     const handlePrefill = (event: Event) => {
-      const detail = (event as CustomEvent<{ message?: string }>).detail;
+      const detail = (event as CustomEvent<{ message?: string; patientId?: string }>).detail;
+      if (detail?.patientId) {
+        selectPatient(detail.patientId);
+        setCopilotOpen(true);
+      }
       if (detail?.message) {
         setInput(detail.message);
       }
     };
     window.addEventListener('ed:copilot-prefill', handlePrefill);
     return () => window.removeEventListener('ed:copilot-prefill', handlePrefill);
-  }, []);
+  }, [selectPatient, setCopilotOpen]);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
   const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
   const activeOperationalAlerts = useMemo(
@@ -673,6 +700,8 @@ export function CopilotPanel() {
       selectedPatient,
       copilotRecommendations,
       referrals,
+      patientOrchestrationPrompt,
+      patientToolRecommendationsPrompt,
     });
     const quickActionResolution = resolveCopilotQuickActionFromSnapshot(promptText, {
       centralSnapshot,
@@ -737,15 +766,32 @@ export function CopilotPanel() {
         })),
         { role: 'user' as const, content: promptText },
       ];
+      const patientArtifactContext = buildCopilotPatientArtifactContext(
+        selectedPatient,
+        patientOrchestration,
+      );
+
       const response = await callAI({
         requestType: 'COPILOT_CHAT',
         systemPrompt,
         message: promptText,
         messages: requestMessages,
+        patientId: selectedPatient?.id,
         context: {
+          aiRequest: {
+            requestType: 'COPILOT_CHAT',
+            patientId: selectedPatient?.id,
+            patientContext: patientOrchestrationPrompt,
+            complaint: selectedPatient?.chiefComplaint || selectedPatient?.complaint,
+            patientVitals: patientArtifactContext?.vitals,
+          },
           edCopilot: {
             patientCount: activePatients.length,
             highRiskCount,
+            selectedPatientId: selectedPatient?.id || null,
+            patientArtifactContext,
+            patientOrchestrationPrompt,
+            patientToolRecommendationsPrompt,
             capacityBand: capacity.band,
             capacityScore: capacity.score,
             emsPressure: centralSnapshot.emsPressure,
@@ -861,6 +907,22 @@ export function CopilotPanel() {
               : `Backend safety policy: ${backendSafetyRule}`}
           </div>
         ) : null}
+        {selectedPatient && patientOrchestration ? (
+          <section
+            aria-label="Selected patient case tools"
+            className="ed-copilot-panel__awareness"
+          >
+            <strong>
+              Case tools · {selectedPatient.firstName} {selectedPatient.lastName}
+            </strong>
+            <p className="ed-copilot-panel__recommendations-empty">
+              Stage: {patientOrchestration.operationalStage}
+              {patientOrchestration.complaintRoute
+                ? ` · ${patientOrchestration.complaintRoute.complaint}`
+                : ''}
+            </p>
+          </section>
+        ) : null}
         <section
           aria-label="Copilot operational awareness"
           className="ed-copilot-panel__awareness"
@@ -963,18 +1025,36 @@ export function CopilotPanel() {
       </div>
 
       <div className="ed-copilot-panel__tool-actions" role="toolbar" aria-label="Open Copilot tools">
-        {TOOL_ACTIONS.map((action) => (
-          <button
-            key={action.id}
-            type="button"
-            onClick={() => openToolAction(action)}
-            disabled={loading}
-            data-copilot-tool-action={action.id}
-            aria-label={`Open ${action.label}`}
-          >
-            {action.label}
-          </button>
-        ))}
+        {selectedPatient && patientOrchestration?.prioritizedRecommendations.length
+          ? patientOrchestration.prioritizedRecommendations.map((recommendation) => (
+              <button
+                key={recommendation.id}
+                type="button"
+                onClick={() =>
+                  launchOrchestrationRecommendation({
+                    patientId: selectedPatient.id,
+                    recommendation,
+                  })
+                }
+                disabled={loading || recommendation.completed}
+                data-copilot-tool-action={recommendation.toolId}
+                aria-label={`Open ${recommendation.label} for selected patient`}
+              >
+                {recommendation.label}
+              </button>
+            ))
+          : TOOL_ACTIONS.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                onClick={() => openToolAction(action)}
+                disabled={loading}
+                data-copilot-tool-action={action.id}
+                aria-label={`Open ${action.label}`}
+              >
+                {action.label}
+              </button>
+            ))}
       </div>
 
       <div

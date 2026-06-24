@@ -621,6 +621,24 @@
   color: var(--color-primary);
 }
 
+.patient-card__score--red {
+  background: color-mix(in srgb, var(--status-danger) 16%, var(--color-card));
+  border-color: color-mix(in srgb, var(--status-danger) 42%, var(--color-border-default));
+  color: var(--status-danger);
+}
+
+.patient-card__score--yellow {
+  background: color-mix(in srgb, var(--status-warning) 16%, var(--color-card));
+  border-color: color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default));
+  color: var(--status-warning);
+}
+
+.patient-card__score--green {
+  background: color-mix(in srgb, var(--status-success, #22c55e) 14%, var(--color-card));
+  border-color: color-mix(in srgb, var(--status-success, #22c55e) 38%, var(--color-border-default));
+  color: var(--status-success, #22c55e);
+}
+
 .patient-card__timeline-button {
   align-items: center;
   align-self: end;

@@ -141,6 +141,7 @@ export default function LegacyCalculatorWrapper({ calculator, patientId, onClose
     if (!patient || !canSave) return;
     const saved = saveCalculatorResult({
       patientId: patient.id,
+      scoreId: calculator.id,
       scoreName: calculator.name,
       total,
       max: MAX_SCORE_BY_ID[calculator.id] ?? 'n/a',

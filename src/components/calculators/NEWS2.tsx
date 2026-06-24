@@ -105,6 +105,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
     if (!patient) return;
     const saved = saveCalculatorResult({
       patientId: patient.id,
+      scoreId: 'news2',
       scoreName: 'NEWS2',
       total: score.total,
       max: 20,
