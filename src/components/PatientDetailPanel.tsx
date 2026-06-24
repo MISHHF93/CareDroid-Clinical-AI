@@ -57,6 +57,7 @@ import ReassessmentTimerPanel from './reassessment/ReassessmentTimerPanel';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
 import RecommendedToolsStrip from './orchestration/RecommendedToolsStrip';
 import SavedClinicalScoresStrip from './orchestration/SavedClinicalScoresStrip';
+import PatientCardCopilot from './copilot/PatientCardCopilot';
 import './PatientDetailPanel.css';
 
 const HEARTScore = lazy(() => import('./calculators/HEARTScore'));
@@ -1073,6 +1074,8 @@ export default function PatientDetailPanel() {
         <div style={{ marginTop: 12 }}>
           <RecommendedToolsStrip patient={selectedPatient} />
         </div>
+
+        <PatientCardCopilot patient={selectedPatient} />
 
         {selectedPatient.state === PatientState.Triage ? (
           <div style={{ marginTop: 12 }}>

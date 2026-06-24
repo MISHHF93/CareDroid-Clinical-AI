@@ -646,9 +646,11 @@ export const isEmergencySimulationAvailable = (): boolean => {
     ?.NODE_ENV;
   const viteEnv = import.meta.env;
   if (viteEnv.MODE === 'test') return false;
+  const isSimulationMode = viteEnv.VITE_SIMULATION_MODE === 'true';
   const isDemoMode = viteEnv.VITE_DEMO_MODE === 'true';
-  if (nodeEnv) return nodeEnv !== 'production' || isDemoMode;
-  return !viteEnv.PROD || isDemoMode;
+  if (!isSimulationMode && !isDemoMode) return false;
+  if (nodeEnv) return nodeEnv !== 'production' || isDemoMode || isSimulationMode;
+  return !viteEnv.PROD || isDemoMode || isSimulationMode;
 };
 
 const emitSimulationStatus = (running: boolean): void => {
@@ -740,8 +742,6 @@ export const initializeEmergencySimulation = (): void => {
   startEmergencySimulation();
 };
 
-if (typeof window !== 'undefined' && isEmergencySimulationAvailable()) {
-  window.setTimeout(initializeEmergencySimulation, 0);
-}
+// Simulation auto-start is owned by AppShell when platform simulation mode is active.
 
 export type { SimulationEngine };

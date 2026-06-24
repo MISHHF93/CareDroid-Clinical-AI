@@ -1,5 +1,6 @@
 import PatientCard from '../../components/PatientCard';
 import { PatientFlag, PatientState } from '../../types/emergency';
+import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 
 export const emergencyRouteStyles = {
   page: {
@@ -192,38 +193,7 @@ export function PatientGrid({ patients, emptyMessage }) {
 }
 
 function dataFreshness(generatedAt) {
-  if (!generatedAt) {
-    return {
-      label: 'latest local state',
-      stale: false,
-    };
-  }
-
-  const timestamp = new Date(generatedAt).getTime();
-  if (!Number.isFinite(timestamp)) {
-    return {
-      label: 'latest local state',
-      stale: false,
-    };
-  }
-
-  const elapsedMinutes = Math.max(0, Math.round((Date.now() - timestamp) / 60000));
-  const timeLabel = new Date(timestamp).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  if (elapsedMinutes < 1) {
-    return {
-      label: `updated now at ${timeLabel}`,
-      stale: false,
-    };
-  }
-
-  return {
-    label: `updated ${elapsedMinutes < 60 ? `${elapsedMinutes}m ago` : `${Math.round(elapsedMinutes / 60)}h ago`} at ${timeLabel}`,
-    stale: elapsedMinutes >= 5,
-  };
+  return resolveEdDataFreshness(generatedAt);
 }
 
 export function ApiStateBanner({
@@ -285,12 +255,7 @@ export function DataSourceNote({ moduleState }) {
   const generatedAt = moduleState.data?.generatedAt;
   const source = moduleState.data?.source;
   const freshness = dataFreshness(generatedAt);
-  const sourceLabel =
-    !source || /fallback|demo|fixture|first-customer/i.test(source)
-      ? 'walkthrough/local dataset - no live hospital integration'
-      : source === 'backend'
-        ? 'live CareDroid feed'
-        : source;
+  const sourceLabel = resolveEdSourceLabel(source);
   return (
     <div
       role="status"

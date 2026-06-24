@@ -1,9 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EmergencySettings, { auditLogToCsv } from './EmergencySettings';
 import {
   fetchEmergencyOsSettings,
+  fetchOrganizationEmergencyOsSettings,
   saveEmergencyOsSettings,
+  saveOrganizationEmergencyOsSettings,
 } from '../../services/emergencySettingsApi';
 import {
   fetchEmergencyAiGovernanceCompliance,
@@ -138,7 +141,9 @@ vi.mock('../../store/emergencyStore', () => ({
 
 vi.mock('../../services/emergencySettingsApi', () => ({
   fetchEmergencyOsSettings: vi.fn(),
+  fetchOrganizationEmergencyOsSettings: vi.fn(),
   saveEmergencyOsSettings: vi.fn(),
+  saveOrganizationEmergencyOsSettings: vi.fn(),
 }));
 
 vi.mock('../../services/emergencyOsApi', () => ({
@@ -153,7 +158,27 @@ vi.mock('../../services/emergencyOsApi', () => ({
 describe('EmergencySettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    fetchOrganizationEmergencyOsSettings.mockResolvedValue({ ok: false, data: null });
     fetchEmergencyOsSettings.mockResolvedValue({ ok: true, data: { data: mockSettings } });
+    saveOrganizationEmergencyOsSettings.mockImplementation((patch) =>
+      Promise.resolve({
+        ok: true,
+        data: {
+          data: {
+            ...mockSettings,
+            ...patch,
+            capacityThresholds: {
+              ...mockSettings.capacityThresholds,
+              ...patch.capacityThresholds,
+            },
+            thresholds: {
+              ...mockSettings.thresholds,
+              ...patch.thresholds,
+            },
+          },
+        },
+      }),
+    );
     fetchEmergencyWorkflowLogs.mockResolvedValue({
       data: {
         logs: [
@@ -259,7 +284,11 @@ describe('EmergencySettings', () => {
   });
 
   it('renders the complete required settings surface', async () => {
-    render(<EmergencySettings />);
+    render(
+      <MemoryRouter>
+        <EmergencySettings />
+      </MemoryRouter>,
+    );
 
     expect(
       await screen.findByRole('heading', { name: 'CareDroid Settings' }),
@@ -287,22 +316,30 @@ describe('EmergencySettings', () => {
   });
 
   it('renders fetched workflow action audit logs', async () => {
-    render(<EmergencySettings />);
+    render(
+      <MemoryRouter>
+        <EmergencySettings />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('Workflow Action Audit')).toBeInTheDocument();
-    expect(await screen.findByText('Created patient Audit Render.')).toBeInTheDocument();
+    expect((await screen.findAllByText('Created patient Audit Render.')).length).toBeGreaterThan(0);
     expect(screen.getByText(/Workflow audit loaded/i)).toBeInTheDocument();
   });
 
   it('saves capacity thresholds through the settings API and local store', async () => {
-    render(<EmergencySettings />);
+    render(
+      <MemoryRouter>
+        <EmergencySettings />
+      </MemoryRouter>,
+    );
 
     await screen.findByRole('heading', { name: 'CareDroid Settings' });
     fireEvent.change(screen.getByLabelText('Capacity orange %'), { target: { value: '76' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save Capacity' }));
 
     await waitFor(() => {
-      expect(saveEmergencyOsSettings).toHaveBeenCalledWith(
+      expect(saveOrganizationEmergencyOsSettings).toHaveBeenCalledWith(
         expect.objectContaining({
           capacityThresholds: expect.objectContaining({ warningPercent: 76 }),
           thresholds: expect.objectContaining({ waitWarningMinutes: 45, waitCriticalMinutes: 60 }),
@@ -311,7 +348,8 @@ describe('EmergencySettings', () => {
     });
     expect(saveEmergencySettings).toHaveBeenCalledWith(
       expect.objectContaining({
-        thresholds: expect.objectContaining({ capacityWarningPercent: 76 }),
+        capacityThresholds: expect.objectContaining({ warningPercent: 76 }),
+        thresholds: expect.objectContaining({ capacityOrangePercent: 76 }),
       }),
     );
   });

@@ -41,6 +41,7 @@ import {
   updateRealTimeSimulationState,
   validateEmergencyAiGovernancePrompts,
 } from '../services/emergencyOsApi';
+import { ensurePatientArrivalBlock } from '../services/patientArrivalBackendSync';
 
 function latestVitals(patient = {}) {
   if (Array.isArray(patient.vitals)) return patient.vitals.at(-1) || {};
@@ -53,12 +54,19 @@ function asArray(value) {
 }
 
 function normalizePatientRecord(patient = {}) {
-  return {
+  const withArrival = ensurePatientArrivalBlock({
     ...patient,
     flags: Array.isArray(patient.flags) ? patient.flags : [],
     vitals: asArray(patient.vitals),
     notes: Array.isArray(patient.notes) ? patient.notes : [],
     timeline: Array.isArray(patient.timeline) ? patient.timeline : [],
+  });
+  return {
+    ...withArrival,
+    flags: Array.isArray(withArrival.flags) ? withArrival.flags : [],
+    vitals: asArray(withArrival.vitals),
+    notes: Array.isArray(withArrival.notes) ? withArrival.notes : [],
+    timeline: Array.isArray(withArrival.timeline) ? withArrival.timeline : [],
   };
 }
 

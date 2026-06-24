@@ -9,7 +9,7 @@ export default function ReceptionSmartIntakeOverlay({ session, onClose, onHandof
   return (
     <div className="reception-smart-intake-overlay" role="dialog" aria-modal="true" aria-label={RECEPTION_COPY.identityCheck.overlayLabel}>
       <SmartIntake
-        key={`${session.step || 'capture'}-${session.patientId || 'new'}-${session.mode || 'standard'}`}
+        key={`${session.step || 'capture'}-${session.patientId || 'new'}-${session.mode || 'standard'}-${session.artifactId || 'any'}`}
         embedded
         intakeOptions={session}
         onClose={onClose}

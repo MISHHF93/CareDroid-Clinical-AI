@@ -133,8 +133,22 @@ export function resolvePatientExperienceStatus(
   context: PatientExperienceContext = {},
 ): PatientExperienceStatusSnapshot {
   const referrals = context.referrals || [];
-  const queueDestination = deriveQueueDestination(patient);
-  const triagePending = deriveTriagePending(patient);
+  const queueDestination =
+    patient.arrival?.queueDestination ?? deriveQueueDestination(patient);
+  const triagePending =
+    typeof patient.arrival?.triagePending === 'boolean'
+      ? patient.arrival.triagePending
+      : deriveTriagePending(patient);
+
+  if (patient.arrival?.waitingRoomStatus) {
+    return buildSnapshot(
+      patient.arrival.waitingRoomStatus,
+      patient,
+      `Arrival status · ${patient.arrival.waitingRoomStatus}`,
+      queueDestination,
+    );
+  }
+
   const referral = activeReferralForPatient(patient, referrals);
 
   if (
@@ -258,8 +272,10 @@ export function summarizePatientExperienceStatuses(
   ) as Record<PatientExperienceStatusId, number>;
 
   patients.forEach((patient) => {
-    const status = resolvePatientExperienceStatus(patient, context);
-    counts[status.id] += 1;
+    const statusId =
+      patient.arrival?.waitingRoomStatus ??
+      resolvePatientExperienceStatus(patient, context).id;
+    counts[statusId] += 1;
   });
 
   return counts;

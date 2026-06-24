@@ -20,6 +20,12 @@ describe('provisionalIdentityIntake', () => {
     expect(temporary.flags).toContain(PatientFlag.IdentityPending);
     expect(pending.flags).toContain(PatientFlag.IdentityPending);
     expect(unknown.state).toBe(PatientState.Triage);
+    expect(unknown.arrival).toMatchObject({
+      arrivalMode: 'walk-in',
+      waitingRoomStatus: 'waiting-for-triage',
+      registrationStatus: 'provisional',
+    });
+    expect(temporary.arrival?.arrivalMode).toBe('EMS');
   });
 
   it('completes non-blocking intake with triage handoff', () => {

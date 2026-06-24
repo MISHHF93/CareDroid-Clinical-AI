@@ -97,6 +97,61 @@ export interface EmergencyEncounter {
   timelineEventIds: string[];
 }
 
+export type ArrivalMode =
+  | 'walk-in'
+  | 'EMS'
+  | 'referral'
+  | 'self-check-in'
+  | 'police'
+  | 'transfer';
+
+export type TriageAcuityStatus = 'unassigned' | 'suggested' | 'confirmed';
+export type TriageAcuitySystem = 'CTAS' | 'ESI' | 'PRIORITY';
+
+export interface TriageAcuity {
+  code: string;
+  system: TriageAcuitySystem;
+  level: 1 | 2 | 3 | 4 | 5;
+  status: TriageAcuityStatus;
+  assignedAt?: string | null;
+  assignedByStaffId?: string | null;
+  suggestedAt?: string | null;
+  suggestionSource?: 'rules' | 'triage-assist' | 'self-arrival' | 'staff';
+}
+
+export type WaitingRoomStatus =
+  | 'registered'
+  | 'waiting-for-triage'
+  | 'waiting-for-clinician'
+  | 'tests-in-progress'
+  | 'waiting-for-results'
+  | 'waiting-for-specialist-review'
+  | 'preparing-discharge'
+  | 'awaiting-admission-bed';
+
+export type RegistrationStatus = 'pending' | 'in-progress' | 'complete' | 'provisional';
+
+export type QueueDestination =
+  | 'triage-queue'
+  | 'rapid-review'
+  | 'waiting-room'
+  | 'verification'
+  | 'ems-registration'
+  | 'whiteboard';
+
+/** Canonical normalized arrival record for reception → whiteboard handoff. */
+export interface PatientArrivalRecord {
+  arrivalMode: ArrivalMode;
+  arrivalTimestamp: string;
+  chiefComplaint: string;
+  triageAcuity: TriageAcuity;
+  waitingRoomStatus: WaitingRoomStatus;
+  registrationStatus: RegistrationStatus;
+  queueDestination: QueueDestination;
+  triagePending: boolean;
+  firstContactAt?: string | null;
+}
+
 export interface EmergencyPatient {
   id: string;
   mrn: string;
@@ -105,6 +160,7 @@ export interface EmergencyPatient {
   dob: string;
   age: number;
   sex: 'M' | 'F' | 'Other';
+  /** @deprecated Prefer `patient.arrival.arrivalTimestamp`. Retained for API compatibility. */
   arrivalTime: string;
   triageTime?: string;
   chiefComplaint: string;
@@ -119,11 +175,14 @@ export interface EmergencyPatient {
   timeline: JourneyEvent[];
   triageAssist?: import('../../../../lib/patient-orchestration').TriageAssistEnvelope | null;
   triageAssistGeneratedAt?: string | null;
-  arrivalMode?: 'walk-in' | 'EMS' | 'referral' | 'police' | 'transfer';
-  registrationStatus?: 'pending' | 'in-progress' | 'complete' | 'provisional';
+  /** @deprecated Prefer `patient.arrival.arrivalMode`. */
+  arrivalMode?: ArrivalMode;
+  registrationStatus?: RegistrationStatus;
   triagePending?: boolean;
   firstContactAt?: string | null;
-  queueDestination?: 'triage-queue' | 'rapid-review' | 'waiting-room' | 'verification' | 'ems-registration' | 'whiteboard';
+  queueDestination?: QueueDestination;
+  /** Normalized arrival block — preferred source for whiteboard and reception surfaces. */
+  arrival?: PatientArrivalRecord;
   quickSafetyFlags?: string[];
   highRiskComplaintFlags?: Array<{
     id: string;

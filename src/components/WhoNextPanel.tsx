@@ -3,6 +3,7 @@ import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import OperationalEmptyState from './ui/OperationalEmptyState';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { Patient, PatientFlag, PatientState, Priority, Room } from '../types/emergency';
+import { hasPatientFlag, patientFlags } from '../utils/patientVitals';
 
 export const CURRENT_STAFF_ID = 'current-staff';
 export const WHO_NEXT_REFRESH_MS = 30_000;
@@ -78,10 +79,10 @@ export function scorePatient(patient: Patient, now: number): number {
   const waitMins = waitMinutes(patient, now);
   score += priorityScore[patient.priority] || 0;
   if (waitMins > 45) score += 20 + (waitMins - 45) * 0.5;
-  if (patient.flags.includes(PatientFlag.ReassessmentDue)) score += 25;
-  if (patient.flags.includes(PatientFlag.DeteriorationRisk)) score += 35;
-  if (patient.flags.includes(PatientFlag.HighRisk)) score += 30;
-  if (patient.flags.includes(PatientFlag.SepsisAlert)) score += 40;
+  if (hasPatientFlag(patient, PatientFlag.ReassessmentDue)) score += 25;
+  if (hasPatientFlag(patient, PatientFlag.DeteriorationRisk)) score += 35;
+  if (hasPatientFlag(patient, PatientFlag.HighRisk)) score += 30;
+  if (hasPatientFlag(patient, PatientFlag.SepsisAlert)) score += 40;
   if (!hasRunProtocolScores(patient, now)) score += 15;
   return score;
 }
@@ -98,16 +99,16 @@ export function getReasonFactors(patient: Patient, now: number): ReasonFactor[] 
       weight: 20 + (waitMins - 45) * 0.5,
     });
   }
-  if (patient.flags.includes(PatientFlag.ReassessmentDue)) {
+  if (hasPatientFlag(patient, PatientFlag.ReassessmentDue)) {
     factors.push({ label: 'Reassessment due', weight: 25 });
   }
-  if (patient.flags.includes(PatientFlag.DeteriorationRisk)) {
+  if (hasPatientFlag(patient, PatientFlag.DeteriorationRisk)) {
     factors.push({ label: 'Deterioration risk', weight: 35 });
   }
-  if (patient.flags.includes(PatientFlag.HighRisk)) {
+  if (hasPatientFlag(patient, PatientFlag.HighRisk)) {
     factors.push({ label: 'High risk', weight: 30 });
   }
-  if (patient.flags.includes(PatientFlag.SepsisAlert)) {
+  if (hasPatientFlag(patient, PatientFlag.SepsisAlert)) {
     factors.push({ label: 'Sepsis alert', weight: 40 });
   }
   if (!hasRunProtocolScores(patient, now)) {
@@ -120,10 +121,10 @@ export function getReasonFactors(patient: Patient, now: number): ReasonFactor[] 
 export function hasSnoozeBreakingDeterioration(patient: Patient, snooze: SnoozedPatient, now: number): boolean {
   const flagsAtSnooze = new Set(snooze.flagsAtSnooze);
   const hasNewCriticalFlag = CRITICAL_SNOOZE_FLAGS.some(
-    (flag) => patient.flags.includes(flag) && !flagsAtSnooze.has(flag),
+    (flag) => hasPatientFlag(patient, flag) && !flagsAtSnooze.has(flag),
   );
   const scoreIncrease = scorePatient(patient, now) - snooze.scoreAtSnooze;
-  const hasCriticalFlag = CRITICAL_SNOOZE_FLAGS.some((flag) => patient.flags.includes(flag));
+  const hasCriticalFlag = CRITICAL_SNOOZE_FLAGS.some((flag) => hasPatientFlag(patient, flag));
 
   return hasNewCriticalFlag || (hasCriticalFlag && scoreIncrease >= WHO_NEXT_MATERIAL_SCORE_INCREASE);
 }
@@ -282,7 +283,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
         patientId: patient.id,
         snoozedAt: now,
         scoreAtSnooze: score,
-        flagsAtSnooze: [...patient.flags],
+        flagsAtSnooze: [...patientFlags(patient)],
       },
     ]);
   };
@@ -293,7 +294,9 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
     document.dispatchEvent(new Event('open-reassessment-drawer'));
   };
 
-  const recommendationNeedsReassessment = recommendation?.patient.flags.includes(PatientFlag.ReassessmentDue);
+  const recommendationNeedsReassessment = recommendation
+    ? hasPatientFlag(recommendation.patient, PatientFlag.ReassessmentDue)
+    : false;
 
   return (
     <aside style={containerStyle} aria-label="See next patient recommendation">

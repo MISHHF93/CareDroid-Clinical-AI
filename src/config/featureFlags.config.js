@@ -12,6 +12,7 @@ export const FEATURE_FLAGS = Object.freeze({
   enableBiometricAuth: appConfig.features.enableBiometricAuth,
   enableDevAuthBypass: appConfig.features.enableDevAuthBypass,
   enableDemoMode: appConfig.features.enableDemoMode,
+  enableSimulationMode: appConfig.features.enableSimulationMode,
   allowLocalDemoAuth: appConfig.features.allowLocalDemoAuth,
   showDemoAuth: appConfig.features.showDemoAuth,
   hideDivisionMode: appConfig.features.hideDivisionMode,

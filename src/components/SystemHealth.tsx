@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '../services/apiClient';
+import { probeBackendReachability } from '../services/backendReachability';
 
 type OverallStatus = 'healthy' | 'degraded' | 'unhealthy';
 type ComponentStatus = OverallStatus | 'not-configured';
@@ -108,7 +110,28 @@ export function SystemHealth() {
       else setLoading((current) => current && !health);
 
       try {
-        const response = await fetch('/health', {
+        const reachable = await probeBackendReachability({ force: manual });
+        if (!reachable) {
+          setHealth({
+            status: 'unhealthy',
+            timestamp: new Date().toISOString(),
+            responseTimeMs: 0,
+            components: {
+              api: {
+                status: 'unhealthy',
+                responseTimeMs: 0,
+                checkedAt: new Date().toISOString(),
+                configured: true,
+                critical: true,
+                error: 'API offline — start with npm run dev:api or npm run dev:fullstack',
+              },
+            },
+          });
+          setError('CareDroid API is not running locally.');
+          return;
+        }
+
+        const response = await apiFetch('/health', {
           headers: { accept: 'application/json' },
         });
         const payload = (await response.json()) as SystemHealthResponse;

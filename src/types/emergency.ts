@@ -307,6 +307,68 @@ export interface AmbulanceHandoffCriticalFlag {
   source: AmbulanceHandoffCriticalFlagSource;
 }
 
+/** Structured pre-arrival notification frameworks (MIST / SBAR). */
+export type PreArrivalNotificationFramework = 'mist' | 'sbar';
+
+export interface MISTNotification {
+  mechanism: string;
+  injuries: string;
+  signs: string;
+  treatments: string;
+}
+
+export interface SBARNotification {
+  situation: string;
+  background: string;
+  assessment: string;
+  recommendation: string;
+}
+
+export interface PreArrivalNotification {
+  framework: PreArrivalNotificationFramework;
+  mist?: MISTNotification;
+  sbar?: SBARNotification;
+  submittedAt?: ISODateString;
+  submittedBy?: string;
+  source?: 'ems-crew' | 'call-in' | 'integration' | 'staff';
+}
+
+export type ResourceActivationType =
+  | 'stemi'
+  | 'stroke-alert'
+  | 'trauma-level-1'
+  | 'trauma-level-2'
+  | 'sepsis-bundle'
+  | 'ob-emergency'
+  | 'respiratory-failure';
+
+export interface ResourceActivationRecommendation {
+  type: ResourceActivationType;
+  label: string;
+  priority: 'immediate' | 'urgent' | 'standard';
+  rationale: string[];
+  confidence: number;
+}
+
+/** Shared clinical checkpoint confirming receiving clinician understood prehospital handoff. */
+export interface HandoffCloseRecord {
+  receivingClinicianId?: EntityId;
+  receivingClinicianName: string;
+  informationUnderstood: boolean;
+  questionsClarified: boolean;
+  closedAt?: ISODateString;
+  closedByStaffName?: string;
+  notes?: string;
+}
+
+export interface PatientCareRecordFeed {
+  source: 'ems-epcr' | 'fhir' | 'hl7' | 'manual';
+  receivedAt: ISODateString;
+  summary?: string;
+  vitals?: Vitals;
+  medications?: string[];
+}
+
 /** Structured ambulance handoff checklist — derived from EMS/intake data with staff confirmations. */
 export interface AmbulanceHandoffChecklist {
   arrivalId: EntityId;
@@ -358,12 +420,66 @@ export interface EMSArrival {
   medicationsEnRoute?: string[];
   /** Structured handoff checklist — synced to linked patient.emsArrival when present. */
   ambulanceHandoffChecklist?: AmbulanceHandoffChecklist;
+  /** MIST/SBAR structured pre-arrival notification from EMS or call-in. */
+  preArrivalNotification?: PreArrivalNotification;
+  /** Recommended resource activations derived from clinical data. */
+  resourceActivations?: ResourceActivationRecommendation[];
+  /** Structured handoff close — receiving clinician confirmation. */
+  handoffClose?: HandoffCloseRecord;
+  /** Real-time electronic patient care records from EMS. */
+  epcrFeed?: PatientCareRecordFeed[];
 }
 
 export type EMSCase = EMSArrival;
 
 /** Canonical arrival channel for reception / triage routing. */
-export type ArrivalMode = 'walk-in' | 'EMS' | 'referral' | 'police' | 'transfer';
+export type ArrivalMode =
+  | 'walk-in'
+  | 'EMS'
+  | 'referral'
+  | 'self-check-in'
+  | 'police'
+  | 'transfer';
+
+/** Staff-confirmed or suggested triage acuity lifecycle. */
+export type TriageAcuityStatus = 'unassigned' | 'suggested' | 'confirmed';
+
+export type TriageAcuitySystem = 'CTAS' | 'ESI' | 'PRIORITY';
+
+export interface TriageAcuity {
+  code: string;
+  system: TriageAcuitySystem;
+  level: 1 | 2 | 3 | 4 | 5;
+  status: TriageAcuityStatus;
+  assignedAt?: ISODateString | null;
+  assignedByStaffId?: EntityId | null;
+  suggestedAt?: ISODateString | null;
+  suggestionSource?: 'rules' | 'triage-assist' | 'self-arrival' | 'staff';
+}
+
+/** Patient-facing waiting room process status — mirrors PatientExperienceStatusId. */
+export type WaitingRoomStatus =
+  | 'registered'
+  | 'waiting-for-triage'
+  | 'waiting-for-clinician'
+  | 'tests-in-progress'
+  | 'waiting-for-results'
+  | 'waiting-for-specialist-review'
+  | 'preparing-discharge'
+  | 'awaiting-admission-bed';
+
+/** Canonical normalized arrival record for Reception & Arrival → Whiteboard handoff. */
+export interface PatientArrivalRecord {
+  arrivalMode: ArrivalMode;
+  arrivalTimestamp: ISODateString;
+  chiefComplaint: string;
+  triageAcuity: TriageAcuity;
+  waitingRoomStatus: WaitingRoomStatus;
+  registrationStatus: RegistrationStatus;
+  queueDestination: QueueDestination;
+  triagePending: boolean;
+  firstContactAt?: ISODateString | null;
+}
 
 /** Registration progress through the arrival pipeline. */
 export type RegistrationStatus = 'pending' | 'in-progress' | 'complete' | 'provisional';
@@ -430,10 +546,12 @@ export interface Patient {
   age: number;
   sex: Sex;
   location?: string;
+  /** @deprecated Prefer `patient.arrival.arrivalTimestamp`. Retained for API compatibility. */
   arrivalTime: ISODateString;
   triageTime?: ISODateString | null;
   lastAssessedTime?: ISODateString | null;
   chiefComplaint: string;
+  /** @deprecated Prefer `patient.arrival.chiefComplaint`. */
   complaint?: string;
   complaintCategory: string;
   state: PatientState;
@@ -450,6 +568,7 @@ export interface Patient {
   referral?: Referral;
   reassessmentReminders?: ReassessmentReminder[];
   vitalsAlerts?: VitalsAlert[];
+  /** @deprecated Prefer `patient.arrival.arrivalMode`. */
   source?: 'EMS' | 'WalkIn' | 'Transfer' | 'Referral' | string;
   emsUnitId?: EntityId;
   emsArrival?: EMSArrival;
@@ -461,7 +580,7 @@ export interface Patient {
   phn?: string;
   triageAssist?: TriageAssistEnvelope | null;
   triageAssistGeneratedAt?: ISODateString | null;
-  /** Arrival-to-triage control layer — optional on legacy records; derived when absent. */
+  /** @deprecated Prefer `patient.arrival.arrivalMode`. */
   arrivalMode?: ArrivalMode;
   registrationStatus?: RegistrationStatus;
   triagePending?: boolean;
@@ -472,6 +591,12 @@ export interface Patient {
   highRiskComplaintFlags?: HighRiskComplaintFlagRecord[];
   /** Staff-confirmed fit-to-sit / fit-to-wait seating pathway — never auto-assigned. */
   fitToWaitClassification?: FitToWaitClassificationRecord | null;
+  /** Normalized arrival block — preferred source for whiteboard and reception surfaces. */
+  arrival?: PatientArrivalRecord;
+  /** Live automated whiteboard timers and derived display state. */
+  whiteboardAutomation?: WhiteboardAutomationSnapshot;
+  /** Assigned attending / physician for role-based whiteboard automation. */
+  assignedPhysicianId?: EntityId | null;
 }
 
 /** Fit-to-sit / fit-to-wait seating classification — human review required. */
@@ -520,6 +645,33 @@ export interface PatientExperienceStatusSnapshot {
 export interface PublicPatientExperienceStatusView {
   id: PatientExperienceStatusId;
   label: string;
+}
+
+/** Automated whiteboard tracking events — live timers and role-triggered state signals. */
+export type WhiteboardAutomationEventId =
+  | 'mse-due'
+  | 'nurse-review-required'
+  | 'results-review-required'
+  | 'critical-labs'
+  | 'awaiting-disposition';
+
+export type WhiteboardAutomationTone = 'critical' | 'warning' | 'info' | 'flow';
+
+export interface WhiteboardAutomationTimer {
+  id: WhiteboardAutomationEventId;
+  label: string;
+  dueAt: ISODateString;
+  triggeredAt?: ISODateString;
+  source: string;
+  tone: WhiteboardAutomationTone;
+  overdueMinutes?: number;
+  remainingMinutes?: number;
+}
+
+export interface WhiteboardAutomationSnapshot {
+  events: WhiteboardAutomationTimer[];
+  displayState?: string;
+  updatedAt: ISODateString;
 }
 
 export type StaffRole =

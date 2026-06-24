@@ -10,6 +10,10 @@ import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCent
 import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
+import {
+  PATIENT_STATUS_SUMMARY_PROMPT,
+  SAFETY_BOUNDED_ASSISTANT_LABEL,
+} from '../config/copilotSafety.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import OperationalEmptyState, { OperationalEmptyAction } from './ui/OperationalEmptyState';
@@ -871,7 +875,7 @@ export function CopilotPanel() {
         <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
         <div className="ed-copilot-panel__identity">
           <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
-          <strong>Human review required</strong>
+          <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
         </div>
         <div className="ed-copilot-panel__status-strip" aria-label="Copilot context snapshot">
           {[activePatients.length, capacity.band, reassessmentCount].map((value, index) => (
@@ -1012,6 +1016,16 @@ export function CopilotPanel() {
       </div>
 
       <div className="ed-copilot-panel__quick-actions">
+        {selectedPatient ? (
+          <button
+            type="button"
+            onClick={() => sendQuickAction(PATIENT_STATUS_SUMMARY_PROMPT)}
+            disabled={loading}
+            data-copilot-quick-action="patient-status-summary"
+          >
+            {PATIENT_STATUS_SUMMARY_PROMPT}
+          </button>
+        ) : null}
         {quickActions.map((action) => (
           <button
             key={action}

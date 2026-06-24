@@ -1,11 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import useTriageScreen from '../../hooks/useTriageScreen';
+import useReceptionScreen from '../../hooks/useReceptionScreen';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
-import { enterWaitingQueue } from '../../services/queueAssignment';
 import { buildClientTriageAssist } from '../../services/triageAssist';
+import {
+  acceptTriageAssistSuggestion,
+  dismissTriageAssistSuggestion,
+  isTriageAssistPendingReview,
+  streamingLaneLabel,
+} from '../../services/triageAssistSignOff';
+import { CARE_STREAMING_LANES } from '../../config/edOperationalStandards';
+import { priorityToEsiLabel } from '../../config/edOperationalStandards';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientState, Priority } from '../../types/emergency';
+import { Priority } from '../../types/emergency';
 import './AiTriageAssistPanel.css';
+
+const PRIORITY_OPTIONS = [Priority.P1, Priority.P2, Priority.P3, Priority.P4, Priority.P5];
 
 function priorityLabel(priority) {
   return priority || Priority.P3;
@@ -17,73 +27,49 @@ export default function AiTriageAssistPanel({
   onEdit,
   onDismissed,
   onAccepted,
+  allowWaitingReview = true,
 }) {
   const triage = useTriageScreen();
+  const reception = useReceptionScreen();
   const emergencyRole = useEmergencyRolePermissions();
   const store = useEmergencyStore();
   const patients = useEmergencyStore((state) => state.patients);
-  const canReviewTriage = triage.showAiTriageAssist;
+  const canReviewTriage = triage.showAiTriageAssist || reception.showClinicalTriageAssist;
+
+  const [overridePriority, setOverridePriority] = useState('');
+  const [overrideLane, setOverrideLane] = useState('');
 
   const resolvedAssist = useMemo(() => {
-    if (!patient || patient.state !== PatientState.Triage || !canReviewTriage) return null;
-    if (patient.triageAssist && !patient.triageAssist.dismissedAt) return patient.triageAssist;
+    if (!patient || !canReviewTriage) return null;
+    if (!isTriageAssistPendingReview(patient) && !allowWaitingReview) return null;
+    if (patient.triageAssist && !patient.triageAssist.dismissedAt && !patient.triageAssist.acceptedAt) {
+      return patient.triageAssist;
+    }
+    if (!isTriageAssistPendingReview(patient)) return null;
     return buildClientTriageAssist(patient, patients);
-  }, [canReviewTriage, patient, patients]);
+  }, [allowWaitingReview, canReviewTriage, patient, patients]);
 
-  const visible = Boolean(resolvedAssist && !resolvedAssist.dismissedAt);
+  const visible = Boolean(resolvedAssist && isTriageAssistPendingReview(patient));
 
-  if (!visible || !resolvedAssist) return null;
+  if (!visible || !resolvedAssist || !patient) return null;
 
   const assist = resolvedAssist;
+  const lane = overrideLane || assist.suggestedQueue;
+  const priority = overridePriority || assist.suggestedPriority;
 
   const handleAccept = () => {
-    store.updatePatient(patient.id, {
-      priority: assist.suggestedPriority,
-      triageAssist: {
-        ...assist,
-        acceptedAt: new Date().toISOString(),
+    const result = acceptTriageAssistSuggestion(store, patient, assist, {
+      actorName: emergencyRole.roleLabel,
+      override: {
+        priority: overridePriority || undefined,
+        streamingLane: overrideLane || undefined,
       },
     });
-    const result = enterWaitingQueue(store, {
-      patientId: patient.id,
-      actorName: emergencyRole.roleLabel,
-      note: `Triage assist accepted (${assist.suggestedPriority}) — moved to waiting queue.`,
-    });
-    store.recordWorkflowAction({
-      type: 'journey_state_changed',
-      summary: `AI triage suggestion accepted for ${patient.firstName} ${patient.lastName}.`,
-      patientId: patient.id,
-      actorName: emergencyRole.roleLabel,
-      source: 'ai-triage-assist',
-      metadata: {
-        suggestedPriority: assist.suggestedPriority,
-        suggestedQueue: assist.suggestedQueue,
-        ruleTriggered: assist.ruleTriggered,
-        accepted: true,
-        queueResult: result.ok ? 'waiting' : result.reason,
-      },
-    });
-    onAccepted?.(patient.id, assist);
+    onAccepted?.(patient.id, result.accepted);
   };
 
   const handleDismiss = () => {
-    store.updatePatient(patient.id, {
-      triageAssist: {
-        ...assist,
-        dismissedAt: new Date().toISOString(),
-      },
-    });
-    store.recordWorkflowAction({
-      type: 'integration_event_received',
-      summary: `AI triage suggestion dismissed for ${patient.firstName} ${patient.lastName}.`,
-      patientId: patient.id,
-      actorName: emergencyRole.roleLabel,
-      source: 'ai-triage-assist',
-      metadata: {
-        dismissed: true,
-        suggestedPriority: assist.suggestedPriority,
-      },
-    });
+    dismissTriageAssistSuggestion(store, patient, assist, emergencyRole.roleLabel);
     onDismissed?.(patient.id);
   };
 
@@ -107,6 +93,9 @@ export default function AiTriageAssistPanel({
     );
   };
 
+  const sourceLabel =
+    patient.source === 'Self-arrival' ? 'Self-arrival check-in' : assist.source || 'Rules engine';
+
   return (
     <section
       className={[
@@ -115,18 +104,44 @@ export default function AiTriageAssistPanel({
       ]
         .filter(Boolean)
         .join(' ')}
-      aria-label="AI triage assist suggestion"
+      aria-label="Triage assist nurse sign-off"
       data-testid="ai-triage-assist-panel"
     >
       <header className="ai-triage-assist__header">
         <div>
-          <p className="ai-triage-assist__eyebrow">AI triage assist</p>
+          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off · {sourceLabel}</p>
           <h3 className="ai-triage-assist__title">
-            Suggested {priorityLabel(assist.suggestedPriority)} · {assist.suggestedQueue}
+            Suggested {priorityLabel(priority)} · {streamingLaneLabel(String(lane))}
           </h3>
+          <p className="ai-triage-assist__esi">{priorityToEsiLabel(priority)}</p>
         </div>
         <span className="ai-triage-assist__confidence">{assist.confidence} confidence</span>
       </header>
+
+      <div className="ai-triage-assist__overrides">
+        <label>
+          Confirm or override priority
+          <select value={overridePriority} onChange={(event) => setOverridePriority(event.target.value)}>
+            <option value="">Use suggestion ({assist.suggestedPriority})</option>
+            {PRIORITY_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Confirm or override streaming lane
+          <select value={overrideLane} onChange={(event) => setOverrideLane(event.target.value)}>
+            <option value="">Use suggestion ({streamingLaneLabel(String(assist.suggestedQueue))})</option>
+            {CARE_STREAMING_LANES.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <ul className="ai-triage-assist__rationale">
         {assist.rationale.map((line) => (
@@ -141,12 +156,12 @@ export default function AiTriageAssistPanel({
       ) : null}
 
       <p className="ai-triage-assist__disclaimer">
-        {assist.disclaimers?.[0] || 'Human review required. Staff must confirm before clinical actions.'}
+        {assist.disclaimers?.[0] || 'Human review required. Nurse must confirm acuity and streaming before clinical actions.'}
       </p>
 
       <div className="ai-triage-assist__actions">
         <button type="button" className="ai-triage-assist__action ai-triage-assist__action--primary" onClick={handleAccept}>
-          Accept suggestion
+          Accept &amp; send to queue
         </button>
         <button type="button" className="ai-triage-assist__action" onClick={handleEdit}>
           Edit manually
@@ -166,6 +181,6 @@ export function AiTriageAssistPanelForPatientId({ patientId, ...props }) {
   const patient = useEmergencyStore((state) =>
     state.patients.find((entry) => entry.id === patientId),
   );
-  if (!patient || patient.state !== PatientState.Triage) return null;
+  if (!patient || !isTriageAssistPendingReview(patient)) return null;
   return <AiTriageAssistPanel patient={patient} {...props} />;
 }

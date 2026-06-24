@@ -36,6 +36,8 @@ export const CANONICAL_ROUTES = Object.freeze({
   emergencySmartIntake: '/emergency/intake',
   emergencyIntake: '/emergency/intake',
   emergencyReception: '/emergency/reception',
+  emergencySelfArrival: '/emergency/self-arrival',
+  emergencyPatientRoom: '/emergency/patient-room',
   emergencyQueues: '/emergency/queues',
   emergencyReassessment: '/emergency/reassessment',
   emergencyOperations: '/emergency/queues',

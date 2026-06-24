@@ -1,0 +1,68 @@
+.simulation-mode-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.18), rgba(251, 191, 36, 0.08));
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.simulation-mode-banner__content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.simulation-mode-banner__badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(245, 158, 11, 0.22);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fcd34d;
+}
+
+.simulation-mode-banner__summary {
+  color: #fef3c7;
+}
+
+.simulation-mode-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.simulation-mode-banner__link {
+  border: 0;
+  background: transparent;
+  color: #fde68a;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.simulation-mode-banner__panel {
+  width: 100%;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.simulation-mode-banner--stacked {
+  flex-direction: column;
+  align-items: stretch;
+}

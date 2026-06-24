@@ -1,0 +1,67 @@
+.handoff-close {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border: 1px dashed var(--color-border, #cbd5e1);
+  background: #fff;
+}
+
+.handoff-close--done {
+  border-style: solid;
+  border-color: rgba(22, 163, 74, 0.35);
+  background: rgba(240, 253, 244, 0.8);
+}
+
+.handoff-close header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.handoff-close header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.handoff-close header span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #5b6472);
+}
+
+.handoff-close > p {
+  margin: 0.25rem 0 0.55rem;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary, #5b6472);
+}
+
+.handoff-close__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.74rem;
+  margin-bottom: 0.45rem;
+}
+
+.handoff-close__field input,
+.handoff-close__field textarea {
+  border: 1px solid var(--color-border, #d8dee8);
+  border-radius: 6px;
+  padding: 0.35rem 0.45rem;
+  font: inherit;
+}
+
+.handoff-close__check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  margin-bottom: 0.35rem;
+}
+
+.handoff-close__notes {
+  margin: 0.35rem 0 0;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary, #5b6472);
+}

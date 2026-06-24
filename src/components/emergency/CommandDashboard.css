@@ -1,0 +1,230 @@
+.command-dashboard {
+  display: grid;
+  gap: 18px;
+  padding: 20px 24px 28px;
+  border-bottom: 1px solid #1f2937;
+  background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+}
+
+.command-dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.command-dashboard__eyebrow {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.command-dashboard__header h2 {
+  margin: 4px 0 0;
+  color: #f8fafc;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.command-dashboard__subtitle {
+  margin: 6px 0 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.command-dashboard__meta {
+  display: grid;
+  gap: 4px;
+  color: #cbd5e1;
+  font-size: 12px;
+  text-align: right;
+}
+
+.command-dashboard__bottleneck {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, #f59e0b 34%, #1f2937);
+  border-radius: 12px;
+  background: color-mix(in srgb, #f59e0b 10%, #111827);
+  color: #fde68a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.command-dashboard__metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.command-dashboard__metric {
+  border: 1px solid #334155;
+  border-radius: 14px;
+  background: #0f172a;
+  display: grid;
+  gap: 6px;
+  min-height: 132px;
+  padding: 14px;
+}
+
+.command-dashboard__metric--green {
+  border-color: color-mix(in srgb, #22c55e 42%, #334155);
+  box-shadow: inset 3px 0 0 #22c55e;
+}
+
+.command-dashboard__metric--amber {
+  border-color: color-mix(in srgb, #f59e0b 42%, #334155);
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+.command-dashboard__metric--red {
+  border-color: color-mix(in srgb, #ef4444 42%, #334155);
+  box-shadow: inset 3px 0 0 #ef4444;
+}
+
+.command-dashboard__metric-head,
+.command-dashboard__zone-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.command-dashboard__metric-label,
+.command-dashboard__zone-head span:first-child {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.command-dashboard__rag {
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  text-transform: uppercase;
+}
+
+.command-dashboard__rag--green {
+  background: color-mix(in srgb, #22c55e 18%, transparent);
+  color: #86efac;
+}
+
+.command-dashboard__rag--amber {
+  background: color-mix(in srgb, #f59e0b 18%, transparent);
+  color: #fcd34d;
+}
+
+.command-dashboard__rag--red {
+  background: color-mix(in srgb, #ef4444 18%, transparent);
+  color: #fca5a5;
+}
+
+.command-dashboard__metric-value {
+  color: #f8fafc;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.command-dashboard__metric-detail,
+.command-dashboard__empty {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.command-dashboard__metric-threshold,
+.command-dashboard__zone small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.command-dashboard__zones-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.command-dashboard__zones-heading {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.command-dashboard__zones-heading h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 15px;
+}
+
+.command-dashboard__zones-heading span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.command-dashboard__zones {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.command-dashboard__zone {
+  border: 1px solid #334155;
+  border-radius: 12px;
+  background: #0f172a;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.command-dashboard__zone--green {
+  border-color: color-mix(in srgb, #22c55e 34%, #334155);
+}
+
+.command-dashboard__zone--amber {
+  border-color: color-mix(in srgb, #f59e0b 34%, #334155);
+}
+
+.command-dashboard__zone--red {
+  border-color: color-mix(in srgb, #ef4444 34%, #334155);
+}
+
+.command-dashboard__zone strong {
+  color: #f8fafc;
+  font-size: 18px;
+}
+
+.command-dashboard__zone-bar {
+  background: #1e293b;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.command-dashboard__zone-bar span {
+  background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 4px;
+}
+
+@media (max-width: 768px) {
+  .command-dashboard {
+    padding: 16px;
+  }
+
+  .command-dashboard__meta {
+    text-align: left;
+  }
+}

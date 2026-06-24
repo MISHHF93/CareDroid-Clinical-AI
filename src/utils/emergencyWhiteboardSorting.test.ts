@@ -41,6 +41,44 @@ describe('sortWhiteboardPatients', () => {
     ]);
   });
 
+  it('sorts by normalized arrival acuity level when arrival block is present', () => {
+    const p2 = patient({
+      id: 'p2-arrival',
+      state: PatientState.Assessment,
+      priority: Priority.P4,
+      arrival: {
+        arrivalMode: 'walk-in',
+        arrivalTimestamp: isoMinutesAgo(5),
+        chiefComplaint: 'Pain',
+        triageAcuity: { code: Priority.P2, system: 'PRIORITY', level: 2, status: 'confirmed' },
+        waitingRoomStatus: 'waiting-for-clinician',
+        registrationStatus: 'complete',
+        queueDestination: 'waiting-room',
+        triagePending: false,
+      },
+    });
+    const p4 = patient({
+      id: 'p4-arrival',
+      state: PatientState.Assessment,
+      priority: Priority.P2,
+      arrival: {
+        arrivalMode: 'walk-in',
+        arrivalTimestamp: isoMinutesAgo(5),
+        chiefComplaint: 'Pain',
+        triageAcuity: { code: Priority.P4, system: 'PRIORITY', level: 4, status: 'confirmed' },
+        waitingRoomStatus: 'waiting-for-clinician',
+        registrationStatus: 'complete',
+        queueDestination: 'waiting-room',
+        triagePending: false,
+      },
+    });
+
+    expect([p4, p2].sort((a, b) => sortWhiteboardPatients(a, b, now)).map((entry) => entry.id)).toEqual([
+      'p2-arrival',
+      'p4-arrival',
+    ]);
+  });
+
   it('keeps priority ordering for non-waiting comparisons', () => {
     const p1Assessment = patient({ id: 'p1-assessment', state: PatientState.Assessment, priority: Priority.P1 });
     const p4Waiting = patient({ id: 'p4-waiting', priority: Priority.P4, arrivalTime: isoMinutesAgo(90) });

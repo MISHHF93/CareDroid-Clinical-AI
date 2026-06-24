@@ -1,0 +1,101 @@
+.command-center-surge {
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
+  border: 1px solid var(--color-border, #d8dee8);
+}
+
+.command-center-surge--elevated {
+  background: rgba(254, 243, 199, 0.35);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+.command-center-surge--surge {
+  background: rgba(254, 226, 226, 0.35);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.command-center-surge--crisis {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.55);
+}
+
+.command-center-surge header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.command-center-surge header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary, #5b6472);
+}
+
+.command-center-surge__bottleneck {
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.command-center-surge__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.command-center-surge__metrics article {
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--color-border, #d8dee8);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.72rem;
+}
+
+.command-center-surge__metrics strong {
+  font-size: 1rem;
+}
+
+.command-center-surge__metric--critical {
+  border-color: rgba(220, 38, 38, 0.45);
+}
+
+.command-center-surge__metric--warning {
+  border-color: rgba(217, 119, 6, 0.45);
+}
+
+.command-center-surge__zones {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.command-center-surge__zones li {
+  background: #fff;
+  border: 1px solid var(--color-border, #d8dee8);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.72rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.command-center-surge__zone--critical {
+  border-color: rgba(220, 38, 38, 0.45);
+}
+
+.command-center-surge__zone--warning {
+  border-color: rgba(217, 119, 6, 0.45);
+}
+
+@media (max-width: 900px) {
+  .command-center-surge__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

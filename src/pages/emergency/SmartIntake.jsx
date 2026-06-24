@@ -47,14 +47,18 @@ import {
   recordSmartIntakeTransition,
   startSmartIntakeTelemetry,
 } from '../../utils/smartIntakeTelemetry';
+import { captureIntakeArtifact } from '../../services/intakeArtifactCapture';
+import { mergeExtractedFieldRows } from '../../utils/intakeArtifactFields';
+import {
+  getIntakeArtifact,
+  listReceptionArtifacts,
+  resolveArtifactId,
+} from '../../config/intakeArtifactRegistry';
 
 const STEP_INDEX_BY_QUERY = VERIFICATION_STEP_QUERY_INDEX;
 
-function extractedFieldValue(fieldName, fallback = '') {
-  return (
-    SMART_INTAKE_DEMO.extractedFields.find((field) => field.field === fieldName)?.extracted ||
-    fallback
-  );
+function extractedFieldValue(fieldName, fields = [], fallback = '') {
+  return fields.find((field) => field.field === fieldName)?.extracted || fallback;
 }
 
 function ageFromDob(dob) {
@@ -67,21 +71,21 @@ function ageFromDob(dob) {
   return Math.max(0, age);
 }
 
-function buildSmartIntakePatient(sessionId, label = 'Smart Intake patient') {
+function buildSmartIntakePatient(sessionId, label = 'Smart Intake patient', fields = []) {
   const now = new Date().toISOString();
-  const dob = extractedFieldValue('dateOfBirth', '');
+  const dob = extractedFieldValue('dateOfBirth', fields, '');
   const firstName =
-    label === 'Unknown Patient' ? 'Unknown' : extractedFieldValue('firstName', 'Smart');
+    label === 'Unknown Patient' ? 'Unknown' : extractedFieldValue('firstName', fields, 'Smart');
   const lastName =
-    label === 'Unknown Patient' ? 'Patient' : extractedFieldValue('lastName', 'Intake');
+    label === 'Unknown Patient' ? 'Patient' : extractedFieldValue('lastName', fields, 'Intake');
   return buildSmartIntakeVerticalSlicePatient({
     patientId: `smart-intake-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    mrn: extractedFieldValue('healthCardNumber', `SI-${Date.now()}`),
+    mrn: extractedFieldValue('healthCardNumber', fields, `SI-${Date.now()}`),
     identity: {
       firstName,
       lastName,
       dob,
-      sex: extractedFieldValue('sex', 'Unspecified'),
+      sex: extractedFieldValue('sex', fields, 'Unspecified'),
     },
     age: ageFromDob(dob),
     sessionId,
@@ -121,6 +125,7 @@ export default function SmartIntake({
   const intakeStep = intakeParam('step');
   const intakeEmsArrivalId = intakeParam('emsArrivalId');
   const intakeAutostart = intakeParam('autostart');
+  const intakeArtifactId = intakeParam('artifactId');
 
   const [activeStep, setActiveStep] = useState(() => verificationStepFromQuery(intakeStep));
   const [selectedCandidateId, setSelectedCandidateId] = useState(
@@ -138,10 +143,22 @@ export default function SmartIntake({
   const [matchError, setMatchError] = useState('');
   const [ocrUploadStatus, setOcrUploadStatus] = useState('');
   const [isUploadingDocument, setIsUploadingDocument] = useState(false);
+  const [extractedFields, setExtractedFields] = useState(() => [...SMART_INTAKE_DEMO.extractedFields]);
   const [fieldDecisions, setFieldDecisions] = useState(() =>
     buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields),
   );
   const [documentCaptured, setDocumentCaptured] = useState(false);
+  const [capturePreviewDataUrl, setCapturePreviewDataUrl] = useState('');
+  const [supplementalCaptureText, setSupplementalCaptureText] = useState('');
+  const [identityAuditLog, setIdentityAuditLog] = useState(() => [...SMART_INTAKE_DEMO.auditLog]);
+  const [selectedArtifactId, setSelectedArtifactId] = useState(() =>
+    resolveArtifactId(intakeArtifactId),
+  );
+  const captureArtifactOptions = useMemo(() => listReceptionArtifacts(), []);
+  const selectedArtifact = useMemo(
+    () => getIntakeArtifact(selectedArtifactId),
+    [selectedArtifactId],
+  );
   const [aiVerificationHint, setAiVerificationHint] = useState('');
   const [aiHintLoading, setAiHintLoading] = useState(false);
   const verifyIntakePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.verifyIntake);
@@ -172,15 +189,15 @@ export default function SmartIntake({
 
   const intakeDemographics = useMemo(
     () => ({
-      firstName: extractedFieldValue('firstName'),
-      lastName: extractedFieldValue('lastName'),
-      dateOfBirth: extractedFieldValue('dateOfBirth'),
-      sex: extractedFieldValue('sex'),
-      phone: extractedFieldValue('phone'),
-      healthCardNumber: extractedFieldValue('healthCardNumber'),
-      address: extractedFieldValue('address'),
+      firstName: extractedFieldValue('firstName', extractedFields),
+      lastName: extractedFieldValue('lastName', extractedFields),
+      dateOfBirth: extractedFieldValue('dateOfBirth', extractedFields),
+      sex: extractedFieldValue('sex', extractedFields),
+      phone: extractedFieldValue('phone', extractedFields),
+      healthCardNumber: extractedFieldValue('healthCardNumber', extractedFields),
+      address: extractedFieldValue('address', extractedFields),
     }),
-    [],
+    [extractedFields],
   );
 
   const matchCandidates = useMemo(() => {
@@ -249,7 +266,27 @@ export default function SmartIntake({
     const boardPatient = patients.find((candidate) => candidate.id === contextPatientId);
     if (boardPatient) {
       setSelectedCandidateId(contextPatientId);
-      setFieldDecisions(buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields, boardPatient));
+      setExtractedFields((current) => {
+        const nextFields = current.map((field) => ({
+          ...field,
+          existing:
+            field.field === 'firstName'
+              ? boardPatient.firstName || field.existing
+              : field.field === 'lastName'
+                ? boardPatient.lastName || field.existing
+                : field.field === 'dateOfBirth'
+                  ? boardPatient.dob || field.existing
+                  : field.field === 'sex'
+                    ? boardPatient.sex || field.existing
+                    : field.field === 'phone'
+                      ? boardPatient.phone || field.existing
+                      : field.field === 'healthCardNumber'
+                        ? boardPatient.healthCardNumber || boardPatient.mrn || field.existing
+                        : field.existing,
+        }));
+        setFieldDecisions(buildAutoApprovedFieldDecisions(nextFields, boardPatient));
+        return nextFields;
+      });
       setStatusMessage(
         `Verifying ${[boardPatient.firstName, boardPatient.lastName].filter(Boolean).join(' ') || boardPatient.mrn || 'selected patient'} from reception queue.`,
       );
@@ -310,6 +347,11 @@ export default function SmartIntake({
       setActiveStepTracked(STEP_INDEX_BY_QUERY[intakeStep], 'query-step');
     }
   }, [intakeStep]);
+
+  useEffect(() => {
+    if (!intakeArtifactId) return;
+    setSelectedArtifactId(resolveArtifactId(intakeArtifactId));
+  }, [intakeArtifactId]);
 
   const resolveSessionStartStep = () =>
     resolveSmartIntakeStartStep({
@@ -399,32 +441,31 @@ export default function SmartIntake({
     setIsUploadingDocument(true);
     setOcrUploadStatus('');
     try {
-      const reader = new FileReader();
-      const dataUrl = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
+      const captured = await captureIntakeArtifact({
+        file,
+        artifactId: selectedArtifactId,
+        sessionId,
+        staff: emergencyRole.roleLabel,
+        supplementalText: supplementalCaptureText,
+        boardPatient,
+        seedFields: extractedFields,
       });
-      if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
-        await SmartIntakeApi.uploadDocument(
-          sessionId,
-          {
-            filename: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            content: dataUrl,
-          },
-          emergencyRole.roleLabel,
-        );
-        setOcrUploadStatus(`Document "${file.name}" uploaded for OCR extraction.`);
-        setDocumentCaptured(true);
-        setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload');
-      } else {
-        setOcrUploadStatus(
-          `Document "${file.name}" captured locally. Continue with safeguarded review fields.`,
-        );
-        setDocumentCaptured(true);
-        setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload-local');
+
+      setCapturePreviewDataUrl(captured.dataUrl);
+      const nextFields = mergeExtractedFieldRows(extractedFields, captured.extractedFields);
+      setExtractedFields(nextFields);
+      setFieldDecisions(buildAutoApprovedFieldDecisions(nextFields, boardPatient));
+      setOcrUploadStatus(captured.auditNote);
+      setIdentityAuditLog((current) => [
+        ...current,
+        `${captured.artifactLabel} uploaded: ${captured.filename}`,
+        captured.auditNote,
+      ]);
+      if (captured.artifactId !== selectedArtifactId) {
+        setSelectedArtifactId(captured.artifactId);
       }
+      setDocumentCaptured(true);
+      setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload');
     } catch {
       setOcrUploadStatus('Document upload failed. Continue with manual field verification.');
     } finally {
@@ -435,7 +476,7 @@ export default function SmartIntake({
 
   const addSmartIntakePatientToWhiteboard = (label) => {
     if (!canCreatePatient) return null;
-    const patient = buildSmartIntakePatient(sessionId, label);
+    const patient = buildSmartIntakePatient(sessionId, label, extractedFields);
     const timeline = (Array.isArray(patient.timeline) ? patient.timeline : []).map((event) => ({
       ...event,
       patientId: patient.id,
@@ -507,11 +548,11 @@ export default function SmartIntake({
   };
 
   const resolveIntakeArrivalReason = () => {
-    const complaint = extractedFieldValue('chiefComplaint', '');
+    const complaint = extractedFieldValue('chiefComplaint', extractedFields, '');
     if (complaint.trim()) {
       return { arrivalReason: complaint.trim(), complaintCategory: 'Other' };
     }
-    const built = buildSmartIntakePatient(sessionId, 'Smart Intake patient');
+    const built = buildSmartIntakePatient(sessionId, 'Smart Intake patient', extractedFields);
     return {
       arrivalReason: built.chiefComplaint,
       complaintCategory: built.complaintCategory,
@@ -527,8 +568,13 @@ export default function SmartIntake({
   };
 
   const bulkApprovableCount = useMemo(
-    () => countBulkApprovableFields(SMART_INTAKE_DEMO.extractedFields, fieldDecisions),
-    [fieldDecisions],
+    () => countBulkApprovableFields(extractedFields, fieldDecisions),
+    [extractedFields, fieldDecisions],
+  );
+
+  const extractedCapturePreview = useMemo(
+    () => extractedFields.filter((field) => String(field.extracted || '').trim()).slice(0, 8),
+    [extractedFields],
   );
 
   const approveMatchingFields = () => {
@@ -536,7 +582,7 @@ export default function SmartIntake({
     recordSmartIntakeClick('approve-matching-fields', { count: bulkApprovableCount });
     setFieldDecisions((current) => {
       const next = { ...current };
-      SMART_INTAKE_DEMO.extractedFields.forEach((field) => {
+      extractedFields.forEach((field) => {
         const extracted = String(field.extracted || '').trim();
         const existing = String(field.existing || '').trim();
         if (
@@ -584,7 +630,7 @@ export default function SmartIntake({
     setAiHintLoading(true);
     setErrorMessage('');
     try {
-      const missingFields = SMART_INTAKE_DEMO.extractedFields
+      const missingFields = extractedFields
         .filter((field) => field.status !== 'verified')
         .map((field) => field.field)
         .join(', ');
@@ -719,7 +765,7 @@ export default function SmartIntake({
           }
           setActiveStepTracked(stepIndex, 'step-nav');
         }}
-        extractedFields={SMART_INTAKE_DEMO.extractedFields}
+        extractedFields={extractedFields}
         fieldDecisions={fieldDecisions}
         canVerifyIntake={canVerifyIntake}
         canCreatePatient={canCreatePatient}
@@ -740,11 +786,19 @@ export default function SmartIntake({
         ocrUploadStatus={ocrUploadStatus}
         isUploadingDocument={isUploadingDocument}
         onDocumentUpload={(event) => void handleDocumentUpload(event)}
+        capturePreviewDataUrl={capturePreviewDataUrl}
+        supplementalCaptureText={supplementalCaptureText}
+        onSupplementalCaptureTextChange={setSupplementalCaptureText}
+        extractedCapturePreview={extractedCapturePreview}
+        captureArtifactOptions={captureArtifactOptions}
+        selectedCaptureArtifactId={selectedArtifactId}
+        onCaptureArtifactChange={setSelectedArtifactId}
+        selectedCaptureArtifactLabel={selectedArtifact.label}
         verificationComplete={verificationComplete}
         selectedCandidateOnBoard={selectedCandidateOnBoard}
         pendingAction={pendingAction}
         warnings={SMART_INTAKE_DEMO.warnings}
-        auditLog={SMART_INTAKE_DEMO.auditLog}
+        auditLog={identityAuditLog}
         highlightProvisional={Boolean(provisionalKindFromIntakeMode(intakeMode))}
         steps={fromReception || embedded ? RECEPTION_COPY.identityCheck.steps : undefined}
         displaySteps={fromReception || embedded ? SMART_INTAKE_STREAMLINED_STEPS : null}
@@ -786,7 +840,7 @@ export default function SmartIntake({
           )
         }
         onCreatePatient={() => {
-          const patient = buildSmartIntakePatient(sessionId, 'Smart Intake patient');
+          const patient = buildSmartIntakePatient(sessionId, 'Smart Intake patient', extractedFields);
           completeFinalAction(
             'Create-and-triage intake',
             () =>

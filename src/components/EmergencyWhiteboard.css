@@ -813,6 +813,20 @@
     var(--app-elevation-card);
 }
 
+.emergency-whiteboard-page__patient-list {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.emergency-whiteboard-page__patient-list .patient-card--row {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--patient-priority-color) 8%, transparent),
+    var(--app-elevation-card);
+}
+
 @media (max-width: 1180px) {
   .ed-whiteboard__body {
     grid-template-columns: 188px minmax(0, 1fr);

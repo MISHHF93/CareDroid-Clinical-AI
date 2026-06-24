@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { selectReceptionQueues } from './receptionQueueModel';
 import ArrivalControlSummaryStrip from './ArrivalControlSummaryStrip';
 import EmsPreArrivalPanel from './EmsPreArrivalPanel';
+import PreArrivalForm from '../ems/PreArrivalForm';
 import RecentArrivalsPanel from './RecentArrivalsPanel';
 import ReceptionWorkQueues from './ReceptionWorkQueues';
 import DataQualityRiskPanel from '../dataQuality/DataQualityRiskPanel';
@@ -27,6 +28,10 @@ export default function ArrivalDashboard({
   onPrepareRegistration,
   onConvertArrival,
   onRefreshEms,
+  onPreArrivalSubmitted,
+  canSubmitPreArrival = false,
+  preArrivalStore = null,
+  preArrivalActorName = 'Reception',
   expandedPatientId = null,
   onExpandPatient,
   onRegisterWalkIn,
@@ -60,6 +65,17 @@ export default function ArrivalDashboard({
         onMetricSelect={onQueueMetricSelect}
         className="arrival-dashboard__control-summary"
       />
+
+      {preArrivalStore ? (
+        <PreArrivalForm
+          store={preArrivalStore}
+          canSubmit={canSubmitPreArrival}
+          actorName={preArrivalActorName}
+          notificationSource="call-in"
+          onSubmitted={onPreArrivalSubmitted}
+          className="arrival-dashboard__pre-arrival-form"
+        />
+      ) : null}
 
       <div className="arrival-dashboard__feeds">
         <RecentArrivalsPanel

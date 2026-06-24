@@ -14,6 +14,10 @@
   font-weight: 800;
 }
 
+.arrival-dashboard__pre-arrival-form {
+  margin: 0;
+}
+
 .arrival-dashboard__feeds {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);

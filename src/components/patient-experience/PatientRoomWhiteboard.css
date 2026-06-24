@@ -1,0 +1,70 @@
+.patient-room-whiteboard {
+  min-height: 100%;
+  padding: 1.25rem 1.5rem 2rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  color: #0f172a;
+}
+
+.patient-room-whiteboard__header span {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #475569;
+}
+
+.patient-room-whiteboard__header h1 {
+  margin: 0.2rem 0 0;
+  font-size: 1.6rem;
+}
+
+.patient-room-whiteboard__header p {
+  margin: 0.35rem 0 1rem;
+  font-size: 1.05rem;
+  color: #334155;
+}
+
+.patient-room-whiteboard__status,
+.patient-room-whiteboard__team,
+.patient-room-whiteboard__next,
+.patient-room-whiteboard__discharge {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.patient-room-whiteboard h2 {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.patient-room-whiteboard__status-label {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.patient-room-whiteboard__wait {
+  margin: 0.35rem 0 0;
+  color: #475569;
+}
+
+.patient-room-whiteboard ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.patient-room-whiteboard li {
+  margin-bottom: 0.3rem;
+  line-height: 1.45;
+}
+
+.patient-room-whiteboard__footer {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: #64748b;
+}

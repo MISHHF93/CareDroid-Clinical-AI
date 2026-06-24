@@ -1,4 +1,5 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { serializePatientForBackendApi } from './patientArrivalBackendSync';
 
 /**
  * Canonical CareDroid frontend facade.
@@ -299,13 +300,13 @@ export const evaluateHybridDigitalTwinScenario = (payload = {}) =>
 export const createEmergencyPatient = (patient) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients, {
     method: 'POST',
-    body: JSON.stringify(patient),
+    body: JSON.stringify(serializePatientForBackendApi(patient)),
   });
 
 export const createSmartIntakePatient = (patient) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake, {
     method: 'POST',
-    body: JSON.stringify(patient),
+    body: JSON.stringify(serializePatientForBackendApi(patient)),
   });
 
 export const runSmartIntakeVerticalSlice = (payload = {}) =>

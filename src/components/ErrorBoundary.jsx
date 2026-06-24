@@ -86,6 +86,24 @@ class ErrorBoundary extends Component {
           this.props.fallback || (
             <div role="alert" style={{ padding: 16, color: '#FCA5A5' }}>
               <p style={{ margin: '0 0 12px' }}>{this.props.fallbackText}</p>
+              {this.state.error && (
+                <details
+                  style={{
+                    marginBottom: '12px',
+                    textAlign: 'left',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    color: 'var(--text-color, #E5E7EB)',
+                  }}
+                >
+                  <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>Error Details</summary>
+                  <pre style={{ fontSize: '12px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                    {this.state.error.toString()}
+                    {this.state.errorInfo && this.state.errorInfo.componentStack}
+                  </pre>
+                </details>
+              )}
               <button type="button" onClick={this.handleReload}>
                 Reload
               </button>

@@ -32,7 +32,8 @@ describe('Emergency Whiteboard navigation wiring', () => {
     expect(whiteboardSource).toContain('matchesWhiteboardQueueFilter(patient, activeQueueFilter, pendingReferralPatientIds)');
     expect(whiteboardSource).toContain('useWhiteboardDisplayMode');
     expect(whiteboardSource).toContain('operational awareness only');
-    expect(whiteboardSource).toContain('boardPatients.map((patient)');
+    expect(whiteboardSource).toContain('<WhiteboardView');
+    expect(whiteboardSource).toContain('patients={boardPatients}');
     expect(whiteboardSource).toContain('<WhoNextPanel');
   });
 

@@ -19,8 +19,8 @@ import type {
   WorkflowActionRecommendation,
 } from './orchestrationTypes';
 
-import { ClinicalIntentRouter } from '../../src/data/clinicalIntentRouter.js';
-import { formatScoresForCopilot } from '../../src/utils/clinicalScoreEvents';
+import { ClinicalIntentRouter } from './clinicalIntentRouterBackend';
+import { formatScoresForCopilot } from './clinicalScoreEventsBackend';
 
 function waitMinutes(arrivalTime: string): number {
   const arrivedAt = new Date(arrivalTime).getTime();

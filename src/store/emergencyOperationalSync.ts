@@ -19,6 +19,7 @@ import {
   LONG_WAIT_PHASE_RANK,
 } from '../utils/longWaitRescue';
 import { evaluateVitalsAlerts } from '../utils/vitalsAlertPipeline';
+import { applyWhiteboardAutomationToPatients } from '../services/whiteboardAutomationEngine';
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -289,7 +290,10 @@ export function buildUpdateAlertsPatch(state: {
   alerts: Alert[];
 }): Partial<OperationalStateSlice> {
   const now = new Date();
-  const patients = ensureLongWaitRescueFlags(ensureReminderReassessmentFlags(state.patients, now), now);
+  const patients = applyWhiteboardAutomationToPatients(
+    ensureLongWaitRescueFlags(ensureReminderReassessmentFlags(state.patients, now), now),
+    now,
+  );
   const capacity = calculateCapacity();
   const normalizedQueues = (state.queues || []).map((queue) => {
     const record = queue as Record<string, unknown>;

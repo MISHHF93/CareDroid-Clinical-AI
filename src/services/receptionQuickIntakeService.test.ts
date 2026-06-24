@@ -44,6 +44,11 @@ describe('receptionQuickIntakeService', () => {
     expect(patient.queueDestination).toBe('rapid-review');
     expect(patient.notes).toHaveLength(1);
     expect(patient.highRiskComplaintFlags?.map((flag) => flag.id)).toContain('chest-pain');
+    expect(patient.arrival).toMatchObject({
+      arrivalMode: 'walk-in',
+      chiefComplaint: 'Chest pain',
+      waitingRoomStatus: 'registered',
+    });
   });
 
   it('reuses an existing chart and stamps EMS arrival mode', () => {
@@ -81,6 +86,7 @@ describe('receptionQuickIntakeService', () => {
     expect(patient.id).toBe('patient-9');
     expect(patient.flags).toContain(PatientFlag.EMSArrival);
     expect(patient.arrivalMode).toBe('EMS');
+    expect(patient.arrival?.arrivalMode).toBe('EMS');
     expect(patient.chiefComplaint).toBe('Shortness of breath');
     expect(patient.arrivalTime).toBe('2026-06-20T12:00:00.000Z');
   });

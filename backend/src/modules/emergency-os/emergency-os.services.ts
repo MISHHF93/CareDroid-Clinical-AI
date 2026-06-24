@@ -35,6 +35,7 @@ import type {
   WorkflowActionLog,
   WorkflowActionType,
 } from './emergency-os.types';
+import { ensurePatientArrivalBlock } from './patient-arrival.sync';
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
@@ -621,40 +622,51 @@ export class EmergencyPatientService {
 
   createPatient(input: Partial<EmergencyPatient>): EmergencyPatient {
     const now = new Date().toISOString();
-    const state = input.state || 'Triage';
-    const priority = input.priority || 'P3';
+    const normalized = ensurePatientArrivalBlock(input);
+    const state = normalized.state || 'Triage';
+    const priority = normalized.priority || 'P3';
     const patient: EmergencyPatient = {
-      id: input.id || createId('patient'),
-      mrn: input.mrn || `ED-${Math.floor(100000 + Math.random() * 900000)}`,
-      firstName: input.firstName || 'Unknown',
-      lastName: input.lastName || 'Patient',
-      dob: input.dob || now.slice(0, 10),
-      age: Number.isFinite(input.age) ? Number(input.age) : 0,
-      sex: input.sex || 'Other',
-      arrivalTime: input.arrivalTime || now,
-      triageTime: input.triageTime ?? (state === 'Triage' ? now : undefined),
-      chiefComplaint: input.chiefComplaint || 'Unspecified complaint',
-      complaintCategory: input.complaintCategory || 'Other',
+      id: normalized.id || createId('patient'),
+      mrn: normalized.mrn || `ED-${Math.floor(100000 + Math.random() * 900000)}`,
+      firstName: normalized.firstName || 'Unknown',
+      lastName: normalized.lastName || 'Patient',
+      dob: normalized.dob || now.slice(0, 10),
+      age: Number.isFinite(normalized.age) ? Number(normalized.age) : 0,
+      sex: normalized.sex || 'Other',
+      arrivalTime: normalized.arrivalTime || now,
+      triageTime: normalized.triageTime ?? (state === 'Triage' ? now : undefined),
+      chiefComplaint: normalized.chiefComplaint || 'Unspecified complaint',
+      complaintCategory: normalized.complaintCategory || 'Other',
       state,
       priority,
-      vitals: (Array.isArray(input.vitals)
-        ? input.vitals
-        : input.vitals
-          ? [input.vitals as unknown as EmergencyVitals]
+      vitals: (Array.isArray(normalized.vitals)
+        ? normalized.vitals
+        : normalized.vitals
+          ? [normalized.vitals as unknown as EmergencyVitals]
           : []) as EmergencyVitals[],
-      flags: input.flags || (priority === 'P1' || priority === 'P2' ? ['HighRisk'] : []),
-      assignedStaffId: input.assignedStaffId,
-      roomId: input.roomId,
-      notes: input.notes || [],
-      timeline: input.timeline || [
+      flags: normalized.flags || (priority === 'P1' || priority === 'P2' ? ['HighRisk'] : []),
+      assignedStaffId: normalized.assignedStaffId,
+      roomId: normalized.roomId,
+      notes: normalized.notes || [],
+      timeline: normalized.timeline || [
         {
           id: createId('journey'),
-          to: input.state || 'Triage',
+          to: state,
           timestamp: now,
           staffId: 'intake',
           note: 'Created through Smart Intake.',
         },
       ],
+      arrivalMode: normalized.arrivalMode,
+      registrationStatus: normalized.registrationStatus,
+      triagePending: normalized.triagePending,
+      firstContactAt: normalized.firstContactAt,
+      queueDestination: normalized.queueDestination,
+      arrival: normalized.arrival,
+      triageAssist: normalized.triageAssist,
+      triageAssistGeneratedAt: normalized.triageAssistGeneratedAt,
+      quickSafetyFlags: normalized.quickSafetyFlags,
+      highRiskComplaintFlags: normalized.highRiskComplaintFlags,
     };
     this.patients.push(patient);
     this.workflowLogService.record({

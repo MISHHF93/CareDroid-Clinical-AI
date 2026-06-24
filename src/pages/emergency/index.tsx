@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type FitToWaitClassificationId, type Patient } from '../../types/emergency';
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
@@ -32,7 +33,7 @@ import usePhysicianScreen from '../../hooks/usePhysicianScreen';
 import usePublicWaitingScreen from '../../hooks/usePublicWaitingScreen';
 import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen';
 import useCommandCenterScreen from '../../hooks/useCommandCenterScreen';
-import PatientCard from '../../components/PatientCard';
+
 import QuickIntake from '../../components/QuickIntake';
 import WhoNextPanel from '../../components/WhoNextPanel.tsx';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
@@ -68,9 +69,12 @@ import PatientCommunicationStatusPanel from '../../components/waiting-room/Patie
 import DepartmentStatusScreen from '../../components/whiteboard/DepartmentStatusScreen';
 import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
 import CommandCenterThroughputScreen from '../../components/whiteboard/CommandCenterThroughputScreen';
+import OperationalCommandDashboard from '../../components/emergency/CommandDashboard';
+import { buildOperationalCommandDashboardSnapshot } from '../../services/operationalCommandDashboardModel';
 import { buildDepartmentStatusSnapshot, filterDepartmentStatusSnapshot } from '../../components/whiteboard/departmentStatusScreenModel';
 import { buildPublicWaitingDisplaySnapshot } from '../../components/whiteboard/publicWaitingDisplayModel';
 import { buildCommandCenterThroughputSnapshot, filterCommandCenterThroughputSnapshot } from '../../components/whiteboard/commandCenterThroughputModel';
+import { buildCommandCenterSurgeSnapshot } from '../../services/commandCenterSurgeModel';
 import {
   resolveChargeNurseStripMetricIds,
   resolveCommandCenterMetricIds,
@@ -106,11 +110,15 @@ import { formatEta as formatEmsEta } from '../../utils/emsArrivalDisplay';
 import { resolvePatientCardWorkflowProfile, shouldShowPhysicianOperationalStrip } from '../../components/whiteboard/physicianWorkflowModel';
 import { resolvePhysicianStaffId } from '../../utils/whoNext';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
+import WhiteboardView from '../../components/whiteboard/WhiteboardView';
 import { completeIntakeHandoff, refreshIntakeHandoffSurfaces } from '../../services/receptionHandoff';
 import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
 import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
 import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/whiteboardOperationalLoadModel';
 import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import DiagnosticSafetyDashboard from '../../components/copilot/DiagnosticSafetyDashboard';
+import { normalizeWhiteboardPatient } from '../../utils/patientVitals';
 import '../../components/EmergencyWhiteboard.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
@@ -346,6 +354,7 @@ function MissionButton({
 }
 
 export default function EmergencyWhiteboard() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const triage = useTriageScreen();
@@ -380,6 +389,8 @@ export default function EmergencyWhiteboard() {
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const display = useWhiteboardDisplayMode();
   const presentationScreenMode = display.isWaitingRoomDisplay
     ? CARE_DROID_SCREEN_MODES.publicWaiting
@@ -405,9 +416,14 @@ export default function EmergencyWhiteboard() {
   )?.generatedAt;
   const patients = useMemo(() => {
     const payloadPatients = whiteboardPayload?.patients;
-    if (!payloadPatients?.length) return storePatients;
+    if (!payloadPatients?.length) return storePatients.map(normalizeWhiteboardPatient);
     const payloadIds = new Set(payloadPatients.map((patient) => patient.id));
-    return [...payloadPatients, ...storePatients.filter((patient) => !payloadIds.has(patient.id))];
+    return [
+      ...payloadPatients.map(normalizeWhiteboardPatient),
+      ...storePatients
+        .filter((patient) => !payloadIds.has(patient.id))
+        .map(normalizeWhiteboardPatient),
+    ];
   }, [storePatients, whiteboardPayload?.patients]);
   const upgradeFlowSignals = (
     upgradePatientFlow.data as { data?: { signals?: UpgradeHarnessSignal[] } } | null
@@ -683,6 +699,37 @@ export default function EmergencyWhiteboard() {
     return filterCommandCenterThroughputSnapshot(commandCenterSnapshot, commandCenterKpiMetricIds);
   }, [commandCenterKpiMetricIds, commandCenterSnapshot]);
 
+  const commandCenterSurgeSnapshot = useMemo(() => {
+    const offloadMetric = commandCenterSnapshot.metrics.find(
+      (metric) => metric.id === 'ems-offload-delays',
+    );
+    return buildCommandCenterSurgeSnapshot({
+      patients,
+      rooms,
+      capacity,
+      emsArrivals,
+      offloadDelayCount: Number(offloadMetric?.value || 0),
+      offloadTargetMinutes:
+        Number(
+          emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
+            emergencySettings?.emsThresholds?.offloadTargetMinutes ??
+            15,
+        ) || 15,
+    });
+  }, [capacity, commandCenterSnapshot.metrics, emsArrivals, emergencySettings, patients, rooms]);
+
+  const operationalCommandDashboardSnapshot = useMemo(
+    () =>
+      buildOperationalCommandDashboardSnapshot({
+        patients,
+        rooms,
+        capacity,
+        boardingMetrics,
+        now: new Date(clockTick),
+      }),
+    [boardingMetrics, capacity, clockTick, patients, rooms],
+  );
+
   const stablePublicWaitingSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
   const stableReadOnlyDepartmentSnapshot = useStableDisplaySnapshot(readOnlyDepartmentSnapshot);
   const stableCommandCenterSnapshot = useStableDisplaySnapshot(filteredCommandCenterSnapshot);
@@ -813,6 +860,26 @@ export default function EmergencyWhiteboard() {
     const timer = window.setInterval(() => setClockTick(Date.now()), 15_000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const patientId = searchParams.get('patient');
+    if (!patientId) return undefined;
+
+    const patient = patients.find((entry) => entry.id === patientId);
+    if (!patient) return undefined;
+
+    selectPatient(patientId);
+    if (patient.state === PatientState.Triage) {
+      setQueueFilter('Triage');
+      setActiveFilter('All');
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('patient');
+    setSearchParams(nextParams, { replace: true });
+
+    return undefined;
+  }, [patients, searchParams, selectPatient, setQueueFilter, setSearchParams]);
 
   useEffect(() => {
     if (operationalLoad.collapseQueueIntelligence) {
@@ -1413,9 +1480,21 @@ export default function EmergencyWhiteboard() {
         aria-label="Command center operational performance"
         style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
       >
+        <OperationalCommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          boardingMetrics={boardingMetrics}
+          snapshot={operationalCommandDashboardSnapshot}
+          title={presentation.pageTitle}
+          subtitle={presentation.pageSubtitle}
+        />
         <CommandCenterThroughputScreen
           performanceMode
           snapshot={stableCommandCenterSnapshot}
+          surgeSnapshot={commandCenterSurgeSnapshot}
           title={presentation.pageTitle}
           refreshIntervalMs={display.refreshIntervalMs}
           refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
@@ -1587,6 +1666,13 @@ export default function EmergencyWhiteboard() {
           <p style={{ color: 'var(--color-text-secondary, #CBD5E1)', margin: '4px 0 0', maxWidth: 920, fontSize: 13 }}>
             {presentation.pageSubtitle}
           </p>
+          <EdDataSourceBanner
+            envelope={whiteboard.data as { source?: string; generatedAt?: string } | null}
+            loading={whiteboard.loading}
+            error={whiteboard.error}
+            activeScenarioId={activeScenarioId}
+            backendAvailable={backendAvailable}
+          />
         </div>
         {whiteboardDensity.surfaces.heroDetail.visible ? (
         <div
@@ -1742,6 +1828,7 @@ export default function EmergencyWhiteboard() {
       {whiteboardDensity.surfaces.commandCenterThroughput.visible ? (
         <CommandCenterThroughputScreen
           snapshot={stableCommandCenterSnapshot}
+          surgeSnapshot={commandCenterSurgeSnapshot}
           title="Command center throughput"
           refreshIntervalMs={display.refreshIntervalMs}
           refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
@@ -2237,6 +2324,20 @@ export default function EmergencyWhiteboard() {
           patients={patients}
           onMetricSelect={handleReassessmentAttentionSelect}
           readOnly={display.isDisplayMode}
+        />
+      ) : null}
+
+      {charge.isChargeNurseScreen && whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
+        <OperationalCommandDashboard
+          patients={patients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          capacity={capacity}
+          boardingMetrics={boardingMetrics}
+          snapshot={operationalCommandDashboardSnapshot}
+          title="Charge nurse command dashboard"
+          subtitle="Live whiteboard metrics for department flow and bed pressure"
         />
       ) : null}
 
@@ -2998,24 +3099,24 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : whiteboardDensity.surfaces.patientGrid.visible && boardPatients.length > 0 ? (
         <>
-        <div
-          className="emergency-whiteboard-page__grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${screenDensity.whiteboard.gridMinCardWidth}px), 1fr))`,
-            gap: screenDensity.whiteboard.gridGap,
-            padding: screenDensity.whiteboard.gridGap + 4,
-          }}
-        >
-          {boardPatients.map((patient) => (
-            <PatientCard
-              key={patient.id}
-              patient={patient}
-              workflowProfile={patientCardWorkflowProfile}
-              readOnlyDisplay={display.isDisplayMode}
+        {physician.isPhysicianScreen && !display.isDisplayMode ? (
+          <div style={{ padding: '12px 14px 0' }}>
+            <DiagnosticSafetyDashboard
+              patients={patients}
+              onSelectPatient={(patientId) => selectPatient(patientId)}
             />
-          ))}
-        </div>
+          </div>
+        ) : null}
+        <WhiteboardView
+          patients={boardPatients}
+          rooms={rooms}
+          staff={staff}
+          activeShift={activeShift}
+          workflowProfile={patientCardWorkflowProfile}
+          readOnlyDisplay={display.isDisplayMode}
+          layout="row"
+          gridPadding={screenDensity.whiteboard.gridGap + 4}
+        />
         </>
       ) : whiteboardDensity.surfaces.patientGrid.visible ? (
         <div

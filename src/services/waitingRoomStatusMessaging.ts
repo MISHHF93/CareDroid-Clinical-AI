@@ -180,13 +180,24 @@ export function resolveWaitingRoomStatusMessage(
   return audience === 'staff' ? definition.staffMessage : definition.patientMessage;
 }
 
+export function resolvePatientWaitingRoomStatusId(
+  patient: Patient,
+  context: PatientExperienceContext = {},
+): WaitingRoomStatusMessageId {
+  if (patient.arrival?.waitingRoomStatus) {
+    return mapExperienceStatusToWaitingRoomMessageId(patient.arrival.waitingRoomStatus);
+  }
+
+  const experience = resolvePatientExperienceStatus(patient, context);
+  return mapExperienceStatusToWaitingRoomMessageId(experience.id);
+}
+
 export function resolvePatientWaitingRoomMessage(
   patient: Patient,
   context: PatientExperienceContext = {},
   audience: 'patient' | 'staff' = 'patient',
 ): string | null {
-  const experience = resolvePatientExperienceStatus(patient, context);
-  const messageId = mapExperienceStatusToWaitingRoomMessageId(experience.id);
+  const messageId = resolvePatientWaitingRoomStatusId(patient, context);
   return resolveWaitingRoomStatusMessage(messageId, audience);
 }
 

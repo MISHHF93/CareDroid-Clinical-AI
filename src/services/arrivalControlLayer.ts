@@ -1,4 +1,3 @@
-import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
 import {
   PatientFlag,
   PatientState,
@@ -12,16 +11,37 @@ import {
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { getArrivalReasonFromPatient } from './intakeEncounterChain';
 import {
+  deriveQueueDestination,
+  deriveRegistrationStatus,
+  deriveTriagePending,
+  normalizeArrivalMode,
+} from './arrivalDerivations';
+import { arrivalRecordToControlSnapshot } from './patientArrivalModel';
+import {
   buildHighRiskComplaintPatch,
   collectHighRiskComplaintLabels,
-  deriveHighRiskComplaintQueueDestination,
   patientNeedsRapidReview,
 } from './highRiskComplaintFlags';
+
+export {
+  deriveQueueDestination,
+  deriveRegistrationStatus,
+  deriveTriagePending,
+  normalizeArrivalMode,
+} from './arrivalDerivations';
+export {
+  assertPatientArrivalContract,
+  ensurePatientArrivalBlock,
+  hydratePatientFromBackendApi,
+  patientArrivalContractViolations,
+  serializePatientForBackendApi,
+} from './patientArrivalBackendSync';
 
 export const ARRIVAL_MODES: readonly ArrivalMode[] = [
   'walk-in',
   'EMS',
   'referral',
+  'self-check-in',
   'police',
   'transfer',
 ] as const;
@@ -85,11 +105,24 @@ export function toArrivalControlStore(
   };
 }
 
+type PatientFlagEntry = PatientFlag | string | { type?: PatientFlag };
+
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
-  return (patient.flags || []).some((entry) =>
+  return ((patient.flags || []) as PatientFlagEntry[]).some((entry) =>
     typeof entry === 'string' ? entry === flag : entry?.type === flag,
   );
 }
+
+export {
+  buildPatientArrivalRecord,
+  mergePatientWithArrival,
+  normalizePatientArrival,
+  stampPatientArrivalAtHandoff,
+  syncPatientFromArrival,
+  priorityToTriageAcuity,
+  triageAcuityToPriority,
+  deriveWaitingRoomStatus,
+} from './patientArrivalModel';
 
 function extractQuickSafetyFlags(patient: Patient): QuickSafetyFlag[] {
   const stored = patient.quickSafetyFlags?.filter((flag): flag is QuickSafetyFlag =>
@@ -97,76 +130,13 @@ function extractQuickSafetyFlags(patient: Patient): QuickSafetyFlag[] {
   );
   if (stored?.length) return stored;
 
-  return (patient.flags || [])
+  return ((patient.flags || []) as PatientFlagEntry[])
     .map((entry) => (typeof entry === 'string' ? entry : entry?.type))
     .filter((flag): flag is QuickSafetyFlag => Boolean(flag && QUICK_SAFETY_FLAG_SET.has(flag)));
 }
 
-export function normalizeArrivalMode(
-  input?: string | null,
-  patient?: Patient | null,
-): ArrivalMode {
-  if (patient && (hasFlag(patient, PatientFlag.EMSArrival) || patient.source === 'EMS')) {
-    return 'EMS';
-  }
-
-  const normalized = String(input || patient?.arrivalMode || patient?.source || '')
-    .trim()
-    .toLowerCase();
-
-  if (normalized === 'ems') return 'EMS';
-  if (normalized === 'referral') return 'referral';
-  if (normalized === 'police') return 'police';
-  if (normalized === 'transfer') return 'transfer';
-  if (normalized === 'walk-in' || normalized === 'walkin') return 'walk-in';
-
-  if (patient?.source === 'Referral') return 'referral';
-  if (patient?.source === 'Transfer') return 'transfer';
-
-  return 'walk-in';
-}
-
-export function deriveRegistrationStatus(patient: Patient): RegistrationStatus {
-  if (patient.registrationStatus) return patient.registrationStatus;
-  if (hasFlag(patient, PatientFlag.IdentityPending)) return 'provisional';
-  if (patient.state === PatientState.Arrival) return 'pending';
-  if (patient.state === PatientState.Registration) return 'in-progress';
-  return 'complete';
-}
-
-export function deriveTriagePending(patient: Patient): boolean {
-  if (typeof patient.triagePending === 'boolean') return patient.triagePending;
-  return patient.state === PatientState.Triage;
-}
-
-export function deriveQueueDestination(patient: Patient): QueueDestination {
-  if (patient.queueDestination) return patient.queueDestination;
-
-  const rapidReview = deriveHighRiskComplaintQueueDestination(patient);
-  if (rapidReview) return rapidReview;
-
-  if (patient.state === PatientState.Waiting) return 'waiting-room';
-  if (patient.state === PatientState.Triage) return 'triage-queue';
-  if (isEmsRegistrationPatient(patient)) return 'ems-registration';
-  if (patient.state === PatientState.Registration || patient.state === PatientState.Arrival) {
-    return 'verification';
-  }
-  return 'whiteboard';
-}
-
 export function buildArrivalControlSnapshot(patient: Patient): ArrivalControlSnapshot {
-  return {
-    patientId: patient.id,
-    arrivalTimestamp: patient.arrivalTime,
-    arrivalMode: normalizeArrivalMode(patient.arrivalMode, patient),
-    presentingComplaint: getArrivalReasonFromPatient(patient),
-    quickSafetyFlags: extractQuickSafetyFlags(patient),
-    highRiskComplaintFlags: patient.highRiskComplaintFlags || [],
-    registrationStatus: deriveRegistrationStatus(patient),
-    triagePending: deriveTriagePending(patient),
-    firstContactTimestamp: patient.firstContactAt ?? null,
-    queueDestination: deriveQueueDestination(patient),
-  };
+  return arrivalRecordToControlSnapshot(patient);
 }
 
 export type BuildArrivalControlFieldsOptions = {
@@ -499,6 +469,7 @@ export function arrivalModeLabel(mode: ArrivalMode): string {
     'walk-in': 'Walk-in',
     EMS: 'EMS',
     referral: 'Referral',
+    'self-check-in': 'Self check-in',
     police: 'Police',
     transfer: 'Transfer',
   };

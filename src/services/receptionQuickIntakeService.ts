@@ -8,8 +8,8 @@ import {
   type QuickSafetyFlag,
   type HighRiskComplaintFlagId,
 } from '../types/emergency';
-import { buildArrivalControlFields } from './arrivalControlLayer';
 import { buildHighRiskComplaintPatch } from './highRiskComplaintFlags';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 import { createSmartIntakePatient } from './emergencyOsApi';
 
 export type ReceptionQuickIntakeInput = {
@@ -54,13 +54,6 @@ function createMrn(): string {
   return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-function arrivalModeToSource(mode: ArrivalMode): Patient['source'] {
-  if (mode === 'EMS') return 'EMS';
-  if (mode === 'referral') return 'Referral';
-  if (mode === 'transfer') return 'Transfer';
-  return 'WalkIn';
-}
-
 function buildIntakeNote(body: string, authorId: string): Note {
   const now = new Date().toISOString();
   return {
@@ -99,42 +92,54 @@ export function buildReceptionQuickIntakePatient(
     notes.push(buildIntakeNote(input.quickNotes, actorId));
   }
 
-  const base: Partial<Patient> = {
-    firstName,
-    lastName,
-    dob,
-    age,
-    sex: input.existingPatient?.sex || 'Other',
-    arrivalTime: now,
-    triageTime: undefined,
-    chiefComplaint: complaint,
-    complaint,
-    complaintCategory: input.existingPatient?.complaintCategory || 'Other',
-    state: PatientState.Registration,
-    priority: input.existingPatient?.priority || Priority.P3,
-    vitals: input.existingPatient?.vitals || [],
-    flags,
-    notes,
-    timeline: input.existingPatient?.timeline || [],
-    phone: phone || input.existingPatient?.phone,
-    healthCardNumber: healthCard || input.existingPatient?.healthCardNumber,
-    healthCard: healthCard || input.existingPatient?.healthCard,
-    source: arrivalModeToSource(input.arrivalMode),
-    ...buildArrivalControlFields({
-      arrivalMode: input.arrivalMode,
+  const complaintPatch = buildHighRiskComplaintPatch(
+    {
+      chiefComplaint: complaint,
+      complaintCategory: input.existingPatient?.complaintCategory || 'Other',
       state: PatientState.Registration,
-      presentingComplaint: complaint,
+    },
+    { selectedFlagIds: input.selectedComplaintFlags },
+  );
+
+  const arrival = buildPatientArrivalRecord({
+    arrivalMode: input.arrivalMode,
+    arrivalTimestamp: now,
+    chiefComplaint: complaint,
+    state: PatientState.Registration,
+    triageAcuity: {
+      code: input.existingPatient?.priority || Priority.P3,
+      status: 'unassigned',
+    },
+    queueDestination: complaintPatch.queueDestination,
+    triagePending: complaintPatch.triagePending ?? false,
+    waitingRoomStatus: 'registered',
+  });
+
+  const synced = syncPatientFromArrival(
+    {
+      firstName,
+      lastName,
+      dob,
+      age,
+      sex: input.existingPatient?.sex || 'Other',
+      state: PatientState.Registration,
+      triageTime: undefined,
+      complaintCategory: input.existingPatient?.complaintCategory || 'Other',
+      vitals: input.existingPatient?.vitals || [],
       flags,
+      notes,
+      timeline: input.existingPatient?.timeline || [],
+      phone: phone || input.existingPatient?.phone,
+      healthCardNumber: healthCard || input.existingPatient?.healthCardNumber,
+      healthCard: healthCard || input.existingPatient?.healthCard,
       quickSafetyFlags: input.quickSafetyFlags,
-    }),
-    ...buildHighRiskComplaintPatch(
-      {
-        chiefComplaint: complaint,
-        complaintCategory: input.existingPatient?.complaintCategory || 'Other',
-        state: PatientState.Registration,
-      },
-      { selectedFlagIds: input.selectedComplaintFlags },
-    ),
+    },
+    arrival,
+  );
+
+  const base: Partial<Patient> = {
+    ...synced,
+    ...complaintPatch,
   };
 
   if (input.existingPatient) {
@@ -143,7 +148,7 @@ export function buildReceptionQuickIntakePatient(
       ...base,
       id: input.existingPatient.id,
       mrn: input.existingPatient.mrn,
-    };
+    } as Patient;
   }
 
   return {

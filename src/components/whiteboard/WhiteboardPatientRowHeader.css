@@ -1,0 +1,69 @@
+.whiteboard-patient-row-header {
+  --patient-row-columns: 52px minmax(132px, 1.15fr) 80px 112px minmax(148px, 2.2fr) 88px 96px 84px;
+  align-items: center;
+  background: color-mix(in srgb, var(--color-floating-surface, #111827) 88%, transparent);
+  border: 1px solid var(--color-border-subtle, #374151);
+  border-radius: 12px 12px 0 0;
+  color: var(--color-text-muted, #9ca3af);
+  display: grid;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 8px;
+  grid-template-columns: var(--patient-row-columns);
+  letter-spacing: 0.06em;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.whiteboard-patient-row-header__cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whiteboard-patient-row-header__cell--complaint {
+  padding-left: 2px;
+}
+
+.whiteboard-patient-row-header__sort {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  gap: 4px;
+  justify-content: flex-start;
+  letter-spacing: inherit;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  text-transform: inherit;
+}
+
+.whiteboard-patient-row-header__sort:hover,
+.whiteboard-patient-row-header__sort:focus-visible {
+  color: var(--color-text-primary, #f9fafb);
+  outline: none;
+}
+
+.whiteboard-patient-row-header__sort--active {
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.whiteboard-patient-row-header__sort-indicator {
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+@media (max-width: 1024px) {
+  .whiteboard-patient-row-header {
+    display: none;
+  }
+}

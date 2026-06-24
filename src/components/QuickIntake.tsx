@@ -14,7 +14,8 @@ import {
   type PatientDuplicateCandidate,
 } from '../utils/patientDuplicateDetection';
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
-import { buildArrivalControlFields, registerNewArrival } from '../services/arrivalControlLayer';
+import { registerNewArrival } from '../services/arrivalControlLayer';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 import {
   buildHighRiskComplaintPatch,
   detectHighRiskComplaintFlags,
@@ -311,50 +312,60 @@ export default function QuickIntake({
         triagePending: isReceptionIntake ? true : undefined,
       },
     );
-    const patient: Patient = {
-      id: createId('patient'),
-      mrn,
-      firstName: firstName.trim() || 'Unknown',
-      lastName: lastName.trim() || 'Patient',
-      dob: dob || new Date().toISOString().slice(0, 10),
-      age,
-      sex,
-      arrivalTime: now,
-      triageTime: isReceptionIntake ? undefined : now,
-      chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
-      complaintCategory: complaintCategory || 'Other',
-      state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
-      priority,
-      vitals: completeVitals,
-      flags: safetyFlags,
-      ...complaintPatch,
-      ...buildArrivalControlFields({
-        arrivalMode: 'walk-in',
-        state: isReceptionIntake ? PatientState.Registration : PatientState.Triage,
-        presentingComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
-        quickSafetyFlags: safetyFlags,
+    const complaintText = complaint.trim() || complaintCategory || 'Unspecified complaint';
+    const intakeState = isReceptionIntake ? PatientState.Registration : PatientState.Triage;
+    const arrival = buildPatientArrivalRecord({
+      arrivalMode: 'walk-in',
+      arrivalTimestamp: now,
+      chiefComplaint: complaintText,
+      state: intakeState,
+      triageAcuity: {
+        code: priority,
+        status: isReceptionIntake ? 'unassigned' : 'confirmed',
+        assignedAt: isReceptionIntake ? null : now,
+      },
+      queueDestination:
+        complaintPatch.queueDestination ||
+        (isReceptionIntake ? 'verification' : 'triage-queue'),
+      triagePending: isReceptionIntake ? (complaintPatch.triagePending ?? true) : true,
+      waitingRoomStatus: isReceptionIntake ? 'registered' : 'waiting-for-triage',
+    });
+
+    const patient = syncPatientFromArrival(
+      {
+        id: createId('patient'),
+        mrn,
+        firstName: firstName.trim() || 'Unknown',
+        lastName: lastName.trim() || 'Patient',
+        dob: dob || new Date().toISOString().slice(0, 10),
+        age,
+        sex,
+        state: intakeState,
+        triageTime: isReceptionIntake ? undefined : now,
+        complaintCategory: complaintCategory || 'Other',
+        vitals: completeVitals,
         flags: safetyFlags,
-        queueDestination:
-          complaintPatch.queueDestination ||
-          (isReceptionIntake ? 'verification' : 'triage-queue'),
-      }),
-      notes: [
-        {
-          id: createId('central-input-note'),
-          type: 'System',
-          body: `${centralControl.inputProfile.label} submitted unified intake input to ${centralControl.label}. Escalation path: ${centralControl.inputProfile.escalationPath}.`,
-          authorId: emergencyRole.role,
-          createdAt: now,
-          metadata: {
-            centralNodeId: centralControl.nodeId,
-            inputMode: centralControl.userInputMode,
-            inputRole: emergencyRole.role,
-            escalationPath: centralControl.inputProfile.escalationPath,
+        quickSafetyFlags: safetyFlags,
+        ...complaintPatch,
+        notes: [
+          {
+            id: createId('central-input-note'),
+            type: 'System',
+            body: `${centralControl.inputProfile.label} submitted unified intake input to ${centralControl.label}. Escalation path: ${centralControl.inputProfile.escalationPath}.`,
+            authorId: emergencyRole.role,
+            createdAt: now,
+            metadata: {
+              centralNodeId: centralControl.nodeId,
+              inputMode: centralControl.userInputMode,
+              inputRole: emergencyRole.role,
+              escalationPath: centralControl.inputProfile.escalationPath,
+            },
           },
-        },
-      ],
-      timeline: [],
-    };
+        ],
+        timeline: [],
+      },
+      arrival,
+    ) as Patient;
 
     setSubmitting(true);
     setSubmitError('');

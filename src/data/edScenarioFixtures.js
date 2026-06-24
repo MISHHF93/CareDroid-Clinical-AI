@@ -75,11 +75,11 @@ export const DEFAULT_ED_SCENARIO_ID = 'normal-day';
 const SCENARIO_BY_ID = new Map(ED_SCENARIO_DEMO_MODES.map((scenario) => [scenario.id, scenario]));
 
 const STAFF = Object.freeze([
-  { id: 's1', name: 'Dr. Priya Nair', role: 'MD', active: true },
-  { id: 's2', name: 'Maya Thompson', role: 'RN', active: true },
-  { id: 's3', name: 'Owen Clarke', role: 'Charge', active: true },
-  { id: 's4', name: 'Leo Fraser', role: 'RN', active: true },
-  { id: 's5', name: 'Dr. Hana Patel', role: 'MD', active: true },
+  { id: 's1', name: 'Dr. Priya Nair', role: 'MD', roleLabel: 'Attending Physician', status: 'OnShift', active: true },
+  { id: 's2', name: 'Maya Thompson', role: 'TriageNurse', roleLabel: 'Triage Nurse', status: 'OnShift', active: true },
+  { id: 's3', name: 'Owen Clarke', role: 'Charge', roleLabel: 'Charge Nurse', status: 'OnShift', active: true },
+  { id: 's4', name: 'Leo Fraser', role: 'RN', roleLabel: 'Staff Nurse', status: 'OnShift', active: true },
+  { id: 's5', name: 'Dr. Hana Patel', role: 'MD', roleLabel: 'Attending Physician', status: 'OnShift', active: true },
 ]);
 
 function clone(value) {

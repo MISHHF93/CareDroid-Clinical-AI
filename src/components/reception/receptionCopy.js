@@ -38,6 +38,11 @@ export const RECEPTION_COPY = Object.freeze({
     unknown: 'Patient unknown',
     unknownHint: 'Send to triage nurse while identity is still being sorted out',
   },
+  artifactPicker: {
+    eyebrow: 'Document capture',
+    title: 'What are you capturing?',
+    description: 'Choose the document type so CareDroid extracts the right fields for staff review.',
+  },
   queues: {
     sectionTitle: 'Arrivals & waiting lists',
     listsTitle: "Today's lists",

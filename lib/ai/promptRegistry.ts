@@ -3,6 +3,7 @@ import { HUMAN_REVIEW_DISCLAIMER } from './safetyPolicy';
 
 export type AIPromptId =
   | 'ed-copilot'
+  | 'patient-status-summarizer'
   | 'smart-intake-assistant'
   | 'triage-assistant'
   | 'clinical-workflow-launcher'
@@ -26,6 +27,14 @@ export const AI_PROMPT_REGISTRY: Record<AIPromptId, AIPromptDefinition> = Object
     requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
     prompt:
       'You are the CareDroid Copilot — an embedded workflow assistant inside the CareDroid emergency department platform. Answer operational questions using the prioritized recommendation list in context. Lead with queue, capacity, boarding, and reassessment actions that include counts, queue names, and routes. Be concise, cite live board data, and never give generic advice like "monitor closely" or "review when possible". Never make autonomous clinical decisions, prescribe, or decide disposition.',
+  },
+  'patient-status-summarizer': {
+    id: 'patient-status-summarizer',
+    requestType: 'CLINICAL_SUMMARY',
+    productRole: 'Case-aware Copilot = summarizes selected patient context for staff review',
+    requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
+    prompt:
+      "Summarize the selected patient's current status using only the provided demographics, chief complaint, vitals, flags, recent notes, and pathway context. Lead with acuity, location/state, outstanding risks, and what staff should verify next. Never diagnose, prescribe, or recommend disposition autonomously.",
   },
   'smart-intake-assistant': {
     id: 'smart-intake-assistant',

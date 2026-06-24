@@ -16,6 +16,12 @@ import EmsOperationalStrip from './ems/EmsOperationalStrip';
 import { shouldShowEmsOperationalStrip } from './ems/emsWorkflowModel';
 import AmbulanceHandoffChecklistPanel from './ems/AmbulanceHandoffChecklistPanel';
 import AmbulanceHandoffChecklistBadge from './ems/AmbulanceHandoffChecklistBadge';
+import PreArrivalNotificationForm from './ems/PreArrivalNotificationForm';
+import PreArrivalForm from './ems/PreArrivalForm';
+import ResourceActivationStrip from './ems/ResourceActivationStrip';
+import HandoffClosePanel from './ems/HandoffClosePanel';
+import { resolveAmbulanceHandoffChecklist } from '../services/ambulanceHandoffChecklist';
+import { syncResourceActivationsForArrival } from '../services/resourceActivation';
 import './EMSPipeline.css';
 
 function minutesRemaining(arrival, now) {
@@ -112,6 +118,8 @@ function EMSArrivalRow({
   onCompleteHandoff,
   onOpenPatient,
   onUpdateHandoffChecklist,
+  onUpdatePreArrivalNotification,
+  onUpdateHandoffClose,
   offloadTargetMinutes,
   canPrepareBay,
   canConvert,
@@ -129,6 +137,10 @@ function EMSArrivalRow({
   const linkedPatient = arrival.patientId
     ? patients.find((patient) => patient.id === arrival.patientId)
     : null;
+  const handoffChecklist = resolveAmbulanceHandoffChecklist(arrival, {
+    patient: linkedPatient,
+    rooms,
+  });
   const showHandoffChecklist =
     showHandoffChecklistPanel &&
     (!isIncoming ||
@@ -258,6 +270,18 @@ function EMSArrivalRow({
         ) : null}
       </div>
 
+      {isIncoming || arrival.status === 'Inbound' ? (
+        <>
+          <ResourceActivationStrip arrival={arrival} patient={linkedPatient} />
+          <PreArrivalNotificationForm
+            notification={arrival.preArrivalNotification}
+            actorName={actorName}
+            canEdit={canCompleteHandoff}
+            onUpdate={(notification) => onUpdatePreArrivalNotification?.(arrival.id, notification)}
+          />
+        </>
+      ) : null}
+
       {showHandoffChecklist ? (
         <AmbulanceHandoffChecklistPanel
           arrival={arrival}
@@ -266,6 +290,17 @@ function EMSArrivalRow({
           actorName={actorName}
           canEdit={canCompleteHandoff}
           onUpdate={onUpdateHandoffChecklist}
+        />
+      ) : null}
+
+      {showHandoffChecklist ? (
+        <HandoffClosePanel
+          arrival={arrival}
+          checklist={handoffChecklist}
+          handoffClose={arrival.handoffClose}
+          actorName={actorName}
+          canEdit={canCompleteHandoff}
+          onUpdate={(record) => onUpdateHandoffClose?.(arrival.id, record)}
         />
       ) : null}
     </article>
@@ -285,6 +320,7 @@ export default function EMSPipeline() {
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
+  const addEMSArrival = useEmergencyStore((state) => state.addEMSArrival);
   const updateAmbulanceHandoffChecklist = useEmergencyStore(
     (state) => state.updateAmbulanceHandoffChecklist,
   );
@@ -316,6 +352,13 @@ export default function EMSPipeline() {
   const showHandoffChecklistWidget = !ems.isEmsScreen || ems.showHandoffChecklist;
   const showEncounterConversionWidget = !ems.isEmsScreen || ems.showEncounterConversion;
   const showEtaWidget = !ems.isEmsScreen || ems.showEtaDisplay;
+  const preArrivalStore = useMemo(
+    () => ({
+      addEMSArrival,
+    }),
+    [addEMSArrival],
+  );
+  const canSubmitPreArrival = canCompleteHandoff || canConvert || canPrepareBay;
   const showOperationalStrip = useMemo(
     () =>
       (!ems.isEmsScreen || ems.showOperationalStrip) &&
@@ -453,6 +496,24 @@ export default function EMSPipeline() {
   };
   const handleHandoffChecklistUpdate = (arrivalId, patch, actor) => {
     updateAmbulanceHandoffChecklist(arrivalId, patch, actor);
+  };
+  const handlePreArrivalNotificationUpdate = (arrivalId, notification) => {
+    const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+    if (!arrival) return;
+    const linkedPatient = arrival.patientId
+      ? patients.find((patient) => patient.id === arrival.patientId)
+      : null;
+    const synced = syncResourceActivationsForArrival(
+      { ...arrival, preArrivalNotification: notification },
+      linkedPatient,
+    );
+    updateEMSArrival(arrivalId, {
+      preArrivalNotification: notification,
+      resourceActivations: synced.resourceActivations,
+    });
+  };
+  const handleHandoffCloseUpdate = (arrivalId, handoffClose) => {
+    updateEMSArrival(arrivalId, { handoffClose });
   };
   const openPatient = (patientId) => {
     if (!patientId) return;
@@ -606,6 +667,18 @@ export default function EMSPipeline() {
             </section>
 
             <section className="ems-pipeline__section" ref={incomingSectionRef}>
+              <PreArrivalForm
+                store={preArrivalStore}
+                canSubmit={canSubmitPreArrival}
+                actorName={emergencyRole.roleLabel}
+                notificationSource="ems-crew"
+                onSubmitted={(result) => {
+                  if (result?.patient?.id) {
+                    openPatient(result.patient.id);
+                  }
+                }}
+                className="ems-pipeline__pre-arrival-form"
+              />
               <div className="ems-pipeline__section-heading">
                 <Ambulance size={17} aria-hidden />
                 <h2>Incoming</h2>
@@ -625,6 +698,8 @@ export default function EMSPipeline() {
                       onCompleteHandoff={completeHandoff}
                       onOpenPatient={openPatient}
                       onUpdateHandoffChecklist={handleHandoffChecklistUpdate}
+                      onUpdatePreArrivalNotification={handlePreArrivalNotificationUpdate}
+                      onUpdateHandoffClose={handleHandoffCloseUpdate}
                       offloadTargetMinutes={offloadTargetMinutes}
                       canPrepareBay={canPrepareBay}
                       canConvert={canConvert}
@@ -664,6 +739,8 @@ export default function EMSPipeline() {
                     onCompleteHandoff={completeHandoff}
                     onOpenPatient={openPatient}
                     onUpdateHandoffChecklist={handleHandoffChecklistUpdate}
+                    onUpdatePreArrivalNotification={handlePreArrivalNotificationUpdate}
+                    onUpdateHandoffClose={handleHandoffCloseUpdate}
                     offloadTargetMinutes={offloadTargetMinutes}
                     canPrepareBay={canPrepareBay}
                     canConvert={canConvert}

@@ -4,6 +4,8 @@ import { registerNewArrival } from './arrivalControlLayer';
 import { readIntakeEncounterChain } from './intakeEncounterChain';
 import { completeReceptionHandoff } from './receptionHandoff';
 import { buildReceptionQuickIntakePatient } from './receptionQuickIntakeService';
+import { buildSelfCheckinPatient, createEmptySelfCheckinForm } from './selfCheckinService';
+import { completeSelfCheckinWhiteboardHandoff } from './selfCheckinWhiteboardHandoff';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 
 function buildHandoffStore(initialPatients: Patient[] = []) {
@@ -16,6 +18,9 @@ function buildHandoffStore(initialPatients: Patient[] = []) {
     patients,
     emergencySettings: {
       intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true },
+    },
+    addPatient: (patient: Patient) => {
+      patients.push(patient);
     },
     updatePatient: (patientId: string, patch: Partial<Patient>) => {
       const index = patients.findIndex((entry) => entry.id === patientId);
@@ -85,5 +90,33 @@ describe('reception to whiteboard handoff chain', () => {
     expect(handoff.whiteboardPath).toContain(`patient=${encodeURIComponent(patient.id)}`);
     expect(handoff.whiteboardPath).toContain('encounter=');
     expect(handoff.queuesPath).toContain('queue=pretriage');
+  });
+
+  it('connects self-check-in through arrival control to the whiteboard triage queue', () => {
+    const result = buildSelfCheckinPatient(
+      {
+        ...createEmptySelfCheckinForm(),
+        firstName: 'Alex',
+        lastName: 'Kim',
+        complaint: 'Chest pain',
+        noKnownAllergies: true,
+      },
+      { now: '2026-06-24T10:00:00.000Z', patientId: 'self-arrival-handoff-1' },
+    );
+
+    const { store, patients, websocketEvents, getSelectedPatientId, getQueueFilter } =
+      buildHandoffStore();
+
+    const handoff = completeSelfCheckinWhiteboardHandoff(store as never, result);
+
+    const updated = patients.find((entry) => entry.id === 'self-arrival-handoff-1');
+    expect(updated).toBeTruthy();
+    expect(updated?.state).toBe(PatientState.Triage);
+    expect(updated?.arrival?.waitingRoomStatus).toBe('waiting-for-triage');
+    expect(getSelectedPatientId()).toBe('self-arrival-handoff-1');
+    expect(getQueueFilter()).toBe(WHITEBOARD_QUEUE_FILTER.triage);
+    expect(handoff.whiteboardPath).toContain('patient=self-arrival-handoff-1');
+    expect(websocketEvents.some((event) => event.type === 'intake_handoff_complete')).toBe(true);
+    expect(websocketEvents.some((event) => event.type === 'arrival_control_sync')).toBe(true);
   });
 });

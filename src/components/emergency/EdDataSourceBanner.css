@@ -1,0 +1,31 @@
+.ed-data-source {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #6b7280);
+  line-height: 1.4;
+}
+
+.ed-data-source--compact {
+  font-size: 0.68rem;
+}
+
+.ed-data-source--loading {
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.ed-data-source--stale {
+  color: var(--status-warning, #f59e0b);
+}
+
+.ed-data-source__label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ed-data-source__warn {
+  font-weight: 600;
+}
+
+.ed-data-source__sep {
+  opacity: 0.65;
+}

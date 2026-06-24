@@ -3,6 +3,12 @@ import appConfig from '../config/appConfig';
 import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/api.config';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { getTenantHeaders } from './tenantContextStore';
+import {
+  isBackendKnownOffline,
+  isLikelyNetworkError,
+  markBackendReachable,
+  markBackendUnreachable,
+} from './backendReachability';
 
 // In development, use empty string to let Vite proxy handle routing.
 // VITE_API_URL is treated as an origin only; request paths own the /api prefix.
@@ -116,7 +122,7 @@ const shouldShortCircuitProtectedApi = (path, headers) => {
 // Dev-only: for many paths that hit disabled services, return graceful empty responses
 // instead of letting the request fail and spam the console / error UI.
 const DEV_GRACEFUL_EMPTY_PATHS = [
-  /\/emergency\/(whiteboard|capacity|queues|reassessment|referrals|ems|analytics)/,
+  /\/emergency\/(whiteboard|capacity|queues|reassessment|referrals|ems|analytics|central-node|workflow)/,
   /\/profile\/me/,
   /\/tools\/available/,
   /\/ai\//,
@@ -124,13 +130,56 @@ const DEV_GRACEFUL_EMPTY_PATHS = [
   /\/operational-intelligence/,
   /\/central-node/,
   /\/realtime\//,
+  /\/interoperability/,
+  /\/governance/,
+  /\/config\//,
+  /\/boarding/,
+  /\/auth\//,
 ];
+
+function buildDevOfflineJsonBody(path) {
+  const p = normalizeApiPath(path);
+  if (/\/whiteboard|\/patients|\/reassessment/.test(p)) {
+    return { patients: [], staff: [], rooms: [], alerts: [], workflowLogs: [], status: 'dev-offline' };
+  }
+  if (/\/ems/.test(p)) {
+    return { arrivals: [], units: [], patients: [], status: 'dev-offline' };
+  }
+  if (/\/referrals/.test(p)) {
+    return { referrals: [], items: [], status: 'dev-offline' };
+  }
+  if (/\/queues/.test(p)) {
+    return { queues: [], items: [], status: 'dev-offline' };
+  }
+  if (/\/workflow/.test(p)) {
+    return { logs: [], workflowLogs: [], status: 'dev-offline' };
+  }
+  return { data: null, items: [], patients: [], results: [], logs: [], status: 'dev-offline' };
+}
 
 function getDevGracefulResponse(path) {
   if (!isDev) return null;
   const p = normalizeApiPath(path);
   if (DEV_GRACEFUL_EMPTY_PATHS.some((re) => re.test(p))) {
-    return new Response(JSON.stringify({ data: [], items: [], results: [], status: 'dev-mocked' }), {
+    return new Response(JSON.stringify(buildDevOfflineJsonBody(path)), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return null;
+}
+
+function getDevOfflineResponse(path) {
+  if (!isDev) return null;
+  const p = normalizeApiPath(path);
+  if (p === '/health') {
+    return new Response(JSON.stringify({ status: 'offline', mode: 'local-dev' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (p.startsWith('/api/')) {
+    return new Response(JSON.stringify(buildDevOfflineJsonBody(path)), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -228,14 +277,34 @@ export const apiFetch = async (path, options = {}) => {
     return devGraceful;
   }
 
+  if (isDev && isBackendKnownOffline()) {
+    const offline = getDevOfflineResponse(path);
+    if (offline) return offline;
+  }
+
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);
 
   try {
-    return await fetch(buildApiUrl(path), {
+    const response = await fetch(buildApiUrl(path), {
       ...fetchOptions,
       headers: mergedHeaders,
       signal,
     });
+    if (response.ok) {
+      markBackendReachable();
+    }
+    return response;
+  } catch (error) {
+    const isTimeoutOrAbort =
+      error?.name === 'TimeoutError' ||
+      error?.name === 'AbortError' ||
+      error?.message?.includes('timed out');
+    if (!isTimeoutOrAbort && isLikelyNetworkError(error)) {
+      markBackendUnreachable();
+      const offline = getDevOfflineResponse(path);
+      if (offline) return offline;
+    }
+    throw error;
   } finally {
     cleanup();
   }
@@ -322,6 +391,9 @@ export function getApiErrorMessage(error, response) {
     if (response.status === 404) return 'The requested API endpoint was not found.';
     if (response.status >= 500) return 'The server is unavailable. Try again later.';
     return `Request failed (${response.status}${response.statusText ? ` ${response.statusText}` : ''}).`;
+  }
+  if (isLikelyNetworkError(error)) {
+    return 'Unable to reach the API. Start the backend with `npm run dev:api` or `npm run dev:fullstack`.';
   }
   if (error?.message) return error.message;
   return 'Unable to reach the API. Ensure the backend is running or check VITE_API_URL.';

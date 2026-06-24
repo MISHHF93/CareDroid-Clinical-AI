@@ -1,0 +1,79 @@
+.digital-door-sign {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 2px solid #1e293b;
+  background: #0f172a;
+  color: #f8fafc;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.digital-door-sign header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.digital-door-sign__room {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.digital-door-sign__name {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.digital-door-sign__mrn {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.digital-door-sign__team span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.digital-door-sign__team p {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+}
+
+.digital-door-sign__flags,
+.digital-door-sign__reminders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.digital-door-sign__flags li,
+.digital-door-sign__reminders li {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 252, 0.2);
+}
+
+.digital-door-sign__flag--critical {
+  background: rgba(220, 38, 38, 0.35);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.digital-door-sign__flag--warning {
+  background: rgba(217, 119, 6, 0.35);
+  border-color: rgba(251, 191, 36, 0.6);
+}
+
+.digital-door-sign__flag--info {
+  background: rgba(37, 99, 235, 0.3);
+}

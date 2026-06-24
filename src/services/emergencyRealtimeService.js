@@ -1,4 +1,5 @@
 import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
+import { probeBackendReachability } from './backendReachability';
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const MIN_RECONNECT_MS = 10_000;
@@ -27,12 +28,7 @@ function buildAuthenticatedSsePath(path) {
 }
 
 async function isBackendReachable() {
-  try {
-    const response = await fetch('/health', { cache: 'no-store' });
-    return response.ok;
-  } catch {
-    return false;
-  }
+  return probeBackendReachability();
 }
 
 function parseRealtimeMessage(raw) {
@@ -205,18 +201,19 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll } = {}) {
     if (stopped) return;
     stopCurrentConnections();
 
+    const reachable = await isBackendReachable();
+    if (!reachable) {
+      onStatus?.({
+        status: 'reconnecting',
+        mode: 'polling',
+        message: 'API offline — using local CareDroid state until backend is available.',
+        updatedAt: new Date().toISOString(),
+      });
+      scheduleReconnect();
+      return;
+    }
+
     if (sseSuspended) {
-      const reachable = await isBackendReachable();
-      if (!reachable) {
-        onStatus?.({
-          status: 'reconnecting',
-          mode: 'polling',
-          message: 'API offline - polling until backend is available.',
-          updatedAt: new Date().toISOString(),
-        });
-        scheduleReconnect();
-        return;
-      }
       resetReconnectState();
     }
 

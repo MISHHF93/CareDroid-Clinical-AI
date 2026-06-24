@@ -604,6 +604,7 @@ export function getReceptionEmbeddedIntakePath(options = {}) {
   if (options.mode) params.set('mode', options.mode);
   if (options.patientId) params.set('patientId', options.patientId);
   if (options.emsArrivalId) params.set('emsArrivalId', options.emsArrivalId);
+  if (options.artifactId) params.set('artifactId', options.artifactId);
   return `${CANONICAL_ROUTES.emergencyReception}?${params.toString()}`;
 }
 

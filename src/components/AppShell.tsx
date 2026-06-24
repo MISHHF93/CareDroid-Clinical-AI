@@ -8,6 +8,7 @@ import { useEmergencyStore, type EmergencyWebSocketStatus } from '../store/emerg
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
+import { probeBackendReachability } from '../services/backendReachability';
 import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
 import { CANONICAL_ROUTES } from '../config/routes.config';
@@ -27,12 +28,16 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import DemoPersonaPanel from './account/DemoPersonaPanel';
+import SimulationModeBanner from './simulation/SimulationModeBanner';
+import { useSimulationMode } from '../contexts/SimulationModeContext';
+import { isSimulationModeActive } from '../services/simulationModeService';
 import './CopilotPanel.css';
 import {
   resolveScreenDensityProfile,
   screenDensityShellClassName,
 } from '../config/screenDensityModeModel';
 import { PatientFlag, type Patient } from '../types/emergency';
+import { patientFlags } from '../utils/patientVitals';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
 const CopilotPanel = lazy(() =>
@@ -58,7 +63,7 @@ function getPatientFlagType(flag: unknown): string | null {
 }
 
 function isPatientFlaggedForReassessment(patient: Patient): boolean {
-  return patient.flags.some((flag) => {
+  return patientFlags(patient).some((flag) => {
     const flagType = getPatientFlagType(flag);
     return flagType ? REASSESSMENT_FLAGS.has(flagType) : false;
   });
@@ -172,6 +177,7 @@ export function AppShell({ children }: AppShellProps) {
     !isReadOnlyWhiteboardKiosk;
   const useKioskShell = useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk;
   const startupStartedRef = useRef(false);
+  const previousSimulationModeRef = useRef<boolean | null>(null);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
@@ -183,6 +189,7 @@ export function AppShell({ children }: AppShellProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const patients = useEmergencyStore((state) => state.patients);
+  const { active: simulationModeActive } = useSimulationMode();
 
   // Dev simplification flag — used to cut down initial UI noise and side panels.
   const isDev = typeof window !== 'undefined' &&
@@ -235,8 +242,11 @@ export function AppShell({ children }: AppShellProps) {
     let stopRealtime: (() => void) | undefined;
 
     bootstrapAiPlatformIntegrations();
-    void useEmergencyStore.getState().initializeFromBackend();
-    useEmergencyStore.getState().updateAlerts();
+    void (async () => {
+      await probeBackendReachability({ force: true });
+      await useEmergencyStore.getState().initializeFromBackend();
+      useEmergencyStore.getState().updateAlerts();
+    })();
 
     stopRealtime = startEmergencyRealtime({
       onEvent: (event: { type?: string; payload?: unknown }) => {
@@ -246,6 +256,7 @@ export function AppShell({ children }: AppShellProps) {
         useEmergencyStore.getState().setWebSocketStatus(status);
       },
       onPoll: async () => {
+        if (isSimulationModeActive()) return;
         const store = useEmergencyStore.getState();
         await store.refreshAllData();
         try {
@@ -281,10 +292,7 @@ export function AppShell({ children }: AppShellProps) {
       30_000,
     );
 
-    const isDevelopment = Boolean(
-      (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV,
-    );
-    if (isDevelopment) {
+    if (simulationModeActive) {
       void import('../engine/simulation').then((simulation) => {
         if (cancelled) return;
         simulation.startSimulation();
@@ -301,7 +309,19 @@ export function AppShell({ children }: AppShellProps) {
       stopSimulation?.();
       startupStartedRef.current = false;
     };
-  }, [screenCapabilities.showCapacityEngine, screenCapabilities.showReassessmentEngine]);
+  }, [
+    screenCapabilities.showCapacityEngine,
+    screenCapabilities.showReassessmentEngine,
+    simulationModeActive,
+  ]);
+
+  useEffect(() => {
+    if (previousSimulationModeRef.current === simulationModeActive) return;
+    const isInitialMount = previousSimulationModeRef.current === null;
+    previousSimulationModeRef.current = simulationModeActive;
+    if (isInitialMount) return;
+    void useEmergencyStore.getState().initializeFromBackend();
+  }, [simulationModeActive]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return undefined;
@@ -600,6 +620,7 @@ export function AppShell({ children }: AppShellProps) {
         ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
           <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         )}
+        <SimulationModeBanner />
         <DemoPersonaPanel />
         {isDev && (
           <div style={{ padding: '4px 12px', background: '#1f2937', fontSize: 11, color: '#93c5fd', display: 'flex', alignItems: 'center', gap: 8 }}>

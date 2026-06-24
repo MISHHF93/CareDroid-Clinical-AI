@@ -14,8 +14,9 @@ import {
 
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { RECEPTION_COPY } from './reception/receptionCopy';
-import { buildArrivalControlFields, registerNewArrival } from '../services/arrivalControlLayer';
+import { registerNewArrival } from '../services/arrivalControlLayer';
 import { buildHighRiskComplaintPatch } from '../services/highRiskComplaintFlags';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 
 type ExpressRegistrationProps = {
   onClose: () => void;
@@ -145,40 +146,46 @@ export default function ExpressRegistration({
 
     const now = new Date().toISOString();
     const resolvedMrn = healthCard.trim() || createMrn();
-    const patient: Patient = {
-      id: createId('patient'),
-      mrn: resolvedMrn,
-      firstName: firstName.trim() || 'Unknown',
-      lastName: lastName.trim() || 'Patient',
-      dob: dob || new Date().toISOString().slice(0, 10),
-      age: dob ? age : 0,
-      sex: 'Other',
-      arrivalTime: now,
-      triageTime: undefined,
-      chiefComplaint: arrivalReason.trim(),
+    const complaintText = arrivalReason.trim();
+    const complaintPatch = buildHighRiskComplaintPatch({
+      chiefComplaint: complaintText,
       complaintCategory: 'Other',
       state: PatientState.Registration,
-      priority: Priority.P3,
-      vitals: [],
-      flags: [],
-      notes: [],
-      timeline: [],
-      phone: phone.trim() || undefined,
-      healthCardNumber: healthCard.trim() || undefined,
-      healthCard: healthCard.trim() || undefined,
-      source: 'WalkIn',
-      ...buildArrivalControlFields({
-        arrivalMode: 'walk-in',
+      triagePending: true,
+    });
+    const arrival = buildPatientArrivalRecord({
+      arrivalMode: 'walk-in',
+      arrivalTimestamp: now,
+      chiefComplaint: complaintText,
+      state: PatientState.Registration,
+      triageAcuity: { code: Priority.P3, status: 'unassigned' },
+      queueDestination: complaintPatch.queueDestination,
+      triagePending: complaintPatch.triagePending ?? true,
+      waitingRoomStatus: 'registered',
+    });
+    const patient = syncPatientFromArrival(
+      {
+        id: createId('patient'),
+        mrn: resolvedMrn,
+        firstName: firstName.trim() || 'Unknown',
+        lastName: lastName.trim() || 'Patient',
+        dob: dob || new Date().toISOString().slice(0, 10),
+        age: dob ? age : 0,
+        sex: 'Other',
         state: PatientState.Registration,
-        presentingComplaint: arrivalReason.trim(),
-      }),
-      ...buildHighRiskComplaintPatch({
-        chiefComplaint: arrivalReason.trim(),
+        triageTime: undefined,
         complaintCategory: 'Other',
-        state: PatientState.Registration,
-        triagePending: true,
-      }),
-    };
+        vitals: [],
+        flags: [],
+        notes: [],
+        timeline: [],
+        phone: phone.trim() || undefined,
+        healthCardNumber: healthCard.trim() || undefined,
+        healthCard: healthCard.trim() || undefined,
+        ...complaintPatch,
+      },
+      arrival,
+    ) as Patient;
 
     setSubmitting(true);
     setSubmitError('');

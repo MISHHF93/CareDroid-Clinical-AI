@@ -5,6 +5,7 @@ import { resolveOperationalPresentation } from '../../config/emergencyOperationa
 import OperationalPresentationFrame from '../emergency/OperationalPresentationFrame';
 import DisplayRefreshStatusBar from '../emergency/DisplayRefreshStatusBar';
 import { sortCommandCenterMetrics } from './commandCenterThroughputModel';
+import CommandCenterSurgePanel from './CommandCenterSurgePanel';
 import './CommandCenterThroughputScreen.css';
 
 function trendGlyph(direction) {
@@ -15,6 +16,7 @@ function trendGlyph(direction) {
 
 export default function CommandCenterThroughputScreen({
   snapshot,
+  surgeSnapshot = null,
   title = 'Command center',
   refreshIntervalMs = 30000,
   refreshStatus = null,
@@ -128,6 +130,8 @@ export default function CommandCenterThroughputScreen({
           />
         </div>
       </header>
+
+      {surgeSnapshot ? <CommandCenterSurgePanel snapshot={surgeSnapshot} /> : null}
 
       <p className="command-center-throughput__summary" role="status">
         {resolvedSnapshot.summaryLine}

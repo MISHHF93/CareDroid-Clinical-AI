@@ -39,11 +39,15 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
 }
 
 describe('arrivalControlLayer', () => {
-  it('normalizes arrival modes including police and EMS', () => {
+  it('normalizes arrival modes including police, EMS, and self check-in', () => {
     expect(normalizeArrivalMode('walkin')).toBe('walk-in');
     expect(normalizeArrivalMode('EMS')).toBe('EMS');
     expect(normalizeArrivalMode('police')).toBe('police');
     expect(normalizeArrivalMode('transfer')).toBe('transfer');
+    expect(normalizeArrivalMode('self-arrival')).toBe('self-check-in');
+    expect(normalizeArrivalMode(null, buildPatient({ source: 'Self-arrival' }))).toBe(
+      'self-check-in',
+    );
     expect(normalizeArrivalMode(null, buildPatient({ flags: [PatientFlag.EMSArrival] }))).toBe(
       'EMS',
     );

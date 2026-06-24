@@ -23,6 +23,7 @@ import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
 import { TenantContextProvider } from './contexts/TenantContext';
 import OfflineProvider from './contexts/OfflineProvider';
+import { SimulationModeProvider } from './contexts/SimulationModeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AppShell } from './components/AppShell';
 const lazyNamed = (loader, exportName) =>
@@ -30,6 +31,8 @@ const lazyNamed = (loader, exportName) =>
 const EmergencyWhiteboard = lazy(() => import('./components/EmergencyWhiteboard'));
 const SmartIntake = lazy(() => import('./pages/emergency/SmartIntake'));
 const ReceptionWorkspace = lazy(() => import('./pages/emergency/ReceptionWorkspace'));
+const SelfArrivalCheckIn = lazy(() => import('./pages/emergency/SelfArrivalCheckIn'));
+const PatientRoomDisplay = lazy(() => import('./pages/emergency/PatientRoomDisplay'));
 const EmergencyAnalytics = lazy(() => import('./pages/emergency/EmergencyAnalytics'));
 const EmergencySettings = lazy(() => import('./pages/emergency/EmergencySettings'));
 const EMSPipeline = lazy(() => import('./components/EMSPipeline'));
@@ -831,6 +834,22 @@ export function AppRoutes() {
                 <ReceptionWorkspace />
               </LazyRoute>
             </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencySelfArrival}
+          element={
+            <LazyRoute label="Loading self check-in...">
+              <SelfArrivalCheckIn />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyPatientRoom}
+          element={
+            <LazyRoute label="Loading patient room display...">
+              <PatientRoomDisplay />
+            </LazyRoute>
           }
         />
         <Route
@@ -1940,9 +1959,11 @@ export default function App() {
                           <ConversationProvider>
                             <SystemConfigProvider>
                               <OfflineProvider>
-                                <BrowserRouter>
-                                  <AppRoutes />
-                                </BrowserRouter>
+                                <SimulationModeProvider>
+                                  <BrowserRouter>
+                                    <AppRoutes />
+                                  </BrowserRouter>
+                                </SimulationModeProvider>
                               </OfflineProvider>
                             </SystemConfigProvider>
                           </ConversationProvider>

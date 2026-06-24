@@ -313,6 +313,15 @@ describe('unified navigation config', () => {
     expect(whiteboard?.suiteLabel).toBe('Emergency Whiteboard Suite');
   });
 
+  it('assigns suite metadata to every pilot core nav item', () => {
+    for (const navId of PILOT_CORE_NAV_ITEM_IDS) {
+      const item = NAVIGATION_ITEMS.find((entry) => entry.id === navId);
+      expect(item, `missing nav item: ${navId}`).toBeDefined();
+      expect(item?.suiteId, `${navId} missing suiteId`).toBeTruthy();
+      expect(item?.suiteLabel, `${navId} missing suiteLabel`).toBeTruthy();
+    }
+  });
+
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
     expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics']);

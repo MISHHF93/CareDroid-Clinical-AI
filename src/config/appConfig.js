@@ -87,6 +87,13 @@ const appConfig = {
     /** Production-safe demo flag for hosted demos. */
     enableDemoMode: toBoolean(getEnvValue('VITE_DEMO_MODE', 'false')),
     /**
+     * Platform-wide simulation / training mode. When enabled, staff can opt in via UI toggle
+     * to swap live data sources for mock scenario generators (no real patient data).
+     */
+    enableSimulationMode: toBoolean(
+      getEnvValue('VITE_SIMULATION_MODE', isProductionBuild() ? 'false' : 'true')
+    ),
+    /**
      * Browser-only fallback demo sessions are local-dev only by default.
      * Hosted demos should use the backend /api/auth/dev-session endpoint.
      */

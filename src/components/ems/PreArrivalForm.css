@@ -1,0 +1,203 @@
+.pre-arrival-intake {
+  border: 1px solid var(--color-border, #d8dee8);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pre-arrival-intake__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.pre-arrival-intake__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-secondary, #0f766e);
+}
+
+.pre-arrival-intake__header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.pre-arrival-intake__header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #5b6472);
+}
+
+.pre-arrival-intake__completion {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-accent, #2563eb);
+  white-space: nowrap;
+}
+
+.pre-arrival-intake__dispatch {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.pre-arrival-intake__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.74rem;
+}
+
+.pre-arrival-intake__field span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.pre-arrival-intake__field input,
+.pre-arrival-intake__field select,
+.pre-arrival-intake__field textarea {
+  border: 1px solid var(--color-border, #d8dee8);
+  border-radius: 8px;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  background: #fff;
+}
+
+.pre-arrival-intake__field textarea {
+  resize: vertical;
+  min-height: 2.6rem;
+}
+
+.pre-arrival-intake__eta-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pre-arrival-intake__eta-presets button {
+  border: 1px solid var(--color-border, #d8dee8);
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pre-arrival-intake__eta-presets button.is-active {
+  background: var(--color-accent, #2563eb);
+  border-color: var(--color-accent, #2563eb);
+  color: #fff;
+}
+
+.pre-arrival-intake__framework {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.pre-arrival-intake__framework button {
+  border: 1px solid var(--color-border, #d8dee8);
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pre-arrival-intake__framework button.is-active {
+  background: var(--color-secondary, #0f766e);
+  border-color: var(--color-secondary, #0f766e);
+  color: #fff;
+}
+
+.pre-arrival-intake__framework-label {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary, #5b6472);
+}
+
+.pre-arrival-intake__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.pre-arrival-intake__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.pre-arrival-intake__status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary, #5b6472);
+  max-width: 28rem;
+}
+
+.pre-arrival-intake__posted {
+  color: var(--color-secondary, #0f766e);
+  font-weight: 600;
+}
+
+.pre-arrival-intake__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--color-accent, #2563eb);
+  color: #fff;
+}
+
+.pre-arrival-intake__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pre-arrival-intake__error {
+  color: #b42318;
+  font-size: 0.72rem;
+}
+
+.pre-arrival-intake__error--banner {
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+}
+
+@media (max-width: 960px) {
+  .pre-arrival-intake__dispatch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .pre-arrival-intake__dispatch,
+  .pre-arrival-intake__grid {
+    grid-template-columns: 1fr;
+  }
+}

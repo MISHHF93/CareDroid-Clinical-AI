@@ -3,6 +3,7 @@ import { dispatchAlert } from './alertEngine';
 import { longWaitStatus } from '../utils/longWaitRescue';
 import { evaluateReassessmentDueFlag } from './reassessmentTimerEngine';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
+import { hasPatientFlag } from '../utils/patientVitals';
 
 export const REASSESSMENT_FLAG_TYPES = [
   PatientFlag.DeteriorationRisk,
@@ -55,7 +56,7 @@ function syncReassessmentDueFlag(
   addFlag: (patientId: string, flag: PatientFlag) => void,
   removeFlag: (patientId: string, flag: PatientFlag) => void,
 ): void {
-  const hasFlag = (flag: PatientFlag) => patient.flags.includes(flag);
+  const hasFlag = (flag: PatientFlag) => hasPatientFlag(patient, flag);
   const { shouldFlag } = evaluateReassessmentDueFlag(patient, { now, thresholds: { thresholds } });
 
   if (patient.state === PatientState.Waiting && shouldFlag && !hasFlag(PatientFlag.ReassessmentDue)) {
@@ -99,9 +100,9 @@ export function startReassessmentEngine() {
     const now = new Date();
 
     patients.forEach(patient => {
-      const latestVitals = patient.vitals[patient.vitals.length - 1];
-      const hasFlag = (f: PatientFlag) =>
-        patient.flags.includes(f);
+      const vitalsList = Array.isArray(patient.vitals) ? patient.vitals : [];
+      const latestVitals = vitalsList.at(-1);
+      const hasFlag = (f: PatientFlag) => hasPatientFlag(patient, f);
 
       // Rule 1: Long wait rescue in Waiting state
       if (patient.state === PatientState.Waiting) {
@@ -169,8 +170,16 @@ export function startReassessmentEngine() {
             latestVitals.hr < 50)) ||
           (latestVitals.sbp !== undefined && (latestVitals.sbp < 90 ||
             latestVitals.sbp > 180));
-        if (isDeteriorating && !hasFlag(detFlag)) {
-          addFlag(patient.id, detFlag);
+        if (isDeteriorating) {
+          if (!hasFlag(detFlag)) {
+            addFlag(patient.id, detFlag);
+          }
+          if (!hasFlag(PatientFlag.ReassessmentDue)) {
+            addFlag(patient.id, PatientFlag.ReassessmentDue);
+          }
+          if (!hasFlag(PatientFlag.ScoreReassessmentRecommended)) {
+            addFlag(patient.id, PatientFlag.ScoreReassessmentRecommended);
+          }
         }
       }
 
@@ -192,7 +201,7 @@ export function runEmergencyReassessment(now = new Date()): void {
     useEmergencyStore.getState();
 
   patients.forEach((patient) => {
-    const hasFlag = (f: PatientFlag) => patient.flags.includes(f);
+    const hasFlag = (f: PatientFlag) => hasPatientFlag(patient, f);
 
     if (patient.state === PatientState.Waiting) {
       const status = longWaitStatus(patient, now, emergencySettings);

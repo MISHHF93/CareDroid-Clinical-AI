@@ -469,7 +469,12 @@ export default function FeatureManagement() {
         </section>
       ) : null}
 
-      {persistenceMode === 'local' ? (
+      {persistenceMode === 'simulation' ? (
+        <section className="feature-toggle-panel__fallback-banner" role="status">
+          Simulation mode is active. Feature settings use mock training data and are not written to
+          live patient systems.
+        </section>
+      ) : persistenceMode === 'local' ? (
         <section className="feature-toggle-panel__fallback-banner" role="status">
           Feature settings backend is unavailable. Changes are saved locally on this device only.
         </section>

@@ -78,6 +78,7 @@ import StaffWorkloadPanel from './StaffWorkloadPanel';
 import UserAccountMenu from './account/UserAccountMenu';
 import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
 import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
+import SimulationModeToggle from './simulation/SimulationModeToggle';
 import './ReassessmentDrawer.css';
 import './Header.css';
 
@@ -1200,6 +1201,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           </button>
 
           {showProfileSwitcher ? <ProfileRoleSwitcher variant="compact" /> : null}
+
+          <SimulationModeToggle />
 
           <UserAccountMenu />
 

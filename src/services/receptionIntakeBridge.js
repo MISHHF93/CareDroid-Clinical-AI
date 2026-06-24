@@ -11,6 +11,7 @@ export function buildReceptionIntakeSession(options = {}) {
     patientId: options.patientId || null,
     mode: options.mode || null,
     emsArrivalId: options.emsArrivalId || null,
+    artifactId: options.artifactId || null,
   };
 }
 
@@ -21,6 +22,7 @@ export const RECEPTION_INTAKE_URL_KEYS = [
   'patientId',
   'mode',
   'emsArrivalId',
+  'artifactId',
 ];
 
 /**

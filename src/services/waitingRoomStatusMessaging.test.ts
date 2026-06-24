@@ -50,6 +50,28 @@ describe('waitingRoomStatusMessaging', () => {
     );
   });
 
+  it('prefers stored arrival waiting room status when present', () => {
+    const message = resolvePatientWaitingRoomMessage(
+      buildPatient({
+        state: PatientState.Waiting,
+        arrival: {
+          arrivalMode: 'self-check-in',
+          arrivalTimestamp: '2026-06-20T08:00:00.000Z',
+          chiefComplaint: 'Sore throat',
+          triageAcuity: { code: 'P4', system: 'PRIORITY', level: 4, status: 'suggested' },
+          waitingRoomStatus: 'waiting-for-triage',
+          registrationStatus: 'complete',
+          queueDestination: 'triage-queue',
+          triagePending: true,
+        },
+      }),
+      {},
+      'patient',
+    );
+
+    expect(message).toBe('Waiting for triage');
+  });
+
   it('maps individual patients to safe status messages without PHI', () => {
     const message = resolvePatientWaitingRoomMessage(
       buildPatient({ state: PatientState.Triage }),

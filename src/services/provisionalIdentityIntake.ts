@@ -6,7 +6,8 @@ import {
 } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
 import { completeIntakeHandoff } from './receptionHandoff';
-import { buildArrivalControlFields, registerArrivalControl } from './arrivalControlLayer';
+import { registerArrivalControl } from './arrivalControlLayer';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 
 export type ProvisionalIdentityKind = 'unknown' | 'temporary' | 'identity-pending';
 
@@ -102,64 +103,77 @@ export function buildProvisionalPatient(
     new Set([PatientFlag.IdentityPending, ...profile.extraFlags, ...(overrides.flags || [])]),
   );
 
-  const base = {
-    id,
-    mrn: overrides.mrn || createTemporaryMrn(profile.mrnPrefix),
-    firstName: overrides.firstName || profile.firstName,
-    lastName: overrides.lastName || profile.lastName,
-    dob: overrides.dob || '',
-    age: overrides.age ?? 0,
-    sex: overrides.sex || 'Unspecified',
-    arrivalTime: overrides.arrivalTime || now,
-    triageTime: overrides.triageTime || now,
-    chiefComplaint: overrides.chiefComplaint || profile.complaint,
-    complaintCategory: overrides.complaintCategory || profile.complaintCategory,
-    state: overrides.state || PatientState.Triage,
-    priority: overrides.priority || profile.priority,
-    vitals: overrides.vitals || [],
-    flags,
-    notes: overrides.notes || [
-      {
-        id: `note-${id}-provisional`,
-        type: 'System',
-        body: profile.timelineNote,
-        authorId: 'provisional-intake',
-        createdAt: now,
-      },
-    ],
-    timeline: overrides.timeline || [
-      {
-        id: `evt-${id}-provisional-intake`,
-        patientId: id,
-        type: 'Intake',
-        timestamp: now,
-        to: PatientState.Triage,
-        summary: profile.timelineNote,
-        metadata: {
-          provisionalIdentityKind: kind,
-          identityStatus: 'pending',
-          identityBlocking: false,
-        },
-      },
-    ],
-    source: overrides.source || profile.source,
-    ...buildArrivalControlFields({
-      arrivalMode: normalizeProvisionalArrivalMode(profile.source, kind),
-      state: overrides.state || PatientState.Triage,
-      presentingComplaint: overrides.chiefComplaint || profile.complaint,
+  const state = overrides.state || PatientState.Triage;
+  const chiefComplaint = overrides.chiefComplaint || profile.complaint;
+  const arrivalMode = normalizeProvisionalArrivalMode(profile.source, kind);
+  const quickSafetyFlags = flags.filter((flag) =>
+    ['HighRisk', 'StrokeCode', 'SepsisAlert', 'PsychAlert', 'Isolation', 'DeterioratingNeuro'].includes(flag),
+  ) as import('../types/emergency').QuickSafetyFlag[];
+
+  const arrival = buildPatientArrivalRecord({
+    arrivalMode,
+    arrivalTimestamp: overrides.arrivalTime || now,
+    chiefComplaint,
+    state,
+    triageAcuity: {
+      code: overrides.priority || profile.priority,
+      status: 'suggested',
+    },
+    queueDestination: 'triage-queue',
+    triagePending: true,
+    waitingRoomStatus: 'waiting-for-triage',
+    registrationStatus: 'provisional',
+  });
+
+  const base = syncPatientFromArrival(
+    {
+      id,
+      mrn: overrides.mrn || createTemporaryMrn(profile.mrnPrefix),
+      firstName: overrides.firstName || profile.firstName,
+      lastName: overrides.lastName || profile.lastName,
+      dob: overrides.dob || '',
+      age: overrides.age ?? 0,
+      sex: overrides.sex || 'Unspecified',
+      state,
+      triageTime: overrides.triageTime || now,
+      complaintCategory: overrides.complaintCategory || profile.complaintCategory,
+      vitals: overrides.vitals || [],
       flags,
-      quickSafetyFlags: flags.filter((flag) =>
-        ['HighRisk', 'StrokeCode', 'SepsisAlert', 'PsychAlert', 'Isolation', 'DeterioratingNeuro'].includes(flag),
-      ) as import('../types/emergency').QuickSafetyFlag[],
-      queueDestination: 'triage-queue',
-    }),
-  };
+      quickSafetyFlags,
+      notes: overrides.notes || [
+        {
+          id: `note-${id}-provisional`,
+          type: 'System',
+          body: profile.timelineNote,
+          authorId: 'provisional-intake',
+          createdAt: now,
+        },
+      ],
+      timeline: overrides.timeline || [
+        {
+          id: `evt-${id}-provisional-intake`,
+          patientId: id,
+          type: 'Intake',
+          timestamp: now,
+          to: PatientState.Triage,
+          summary: profile.timelineNote,
+          metadata: {
+            provisionalIdentityKind: kind,
+            identityStatus: 'pending',
+            identityBlocking: false,
+          },
+        },
+      ],
+      source: overrides.source || profile.source,
+    },
+    arrival,
+  );
 
   return {
     ...base,
     ...overrides,
     flags: overrides.flags ? flags : base.flags,
-  };
+  } as Patient;
 }
 
 export function completeProvisionalIntake(

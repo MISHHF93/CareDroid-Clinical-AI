@@ -1,0 +1,23 @@
+.patient-room-display {
+  min-height: 100%;
+  background: #eef4ff;
+}
+
+.patient-room-display--door-sign {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: #0f172a;
+}
+
+.patient-room-display__door-sign {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+.patient-room-display--empty {
+  padding: 2rem;
+}

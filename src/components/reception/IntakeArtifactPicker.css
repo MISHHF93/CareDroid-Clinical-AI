@@ -1,0 +1,96 @@
+.intake-artifact-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 6, 23, 0.72);
+}
+
+.intake-artifact-picker__panel {
+  width: min(720px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: auto;
+  border-radius: 16px;
+  border: 1px solid var(--color-border-subtle, #374151);
+  background: var(--color-surface, #111827);
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.intake-artifact-picker__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.intake-artifact-picker__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.intake-artifact-picker__header h2 {
+  margin: 4px 0;
+  font-size: 20px;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.intake-artifact-picker__header p {
+  margin: 0;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+}
+
+.intake-artifact-picker__close {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #9ca3af);
+  cursor: pointer;
+}
+
+.intake-artifact-picker__groups {
+  display: grid;
+  gap: 14px;
+}
+
+.intake-artifact-picker__group h3 {
+  margin: 0 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.intake-artifact-picker__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.intake-artifact-picker__option {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-subtle, #374151);
+  background: var(--color-elevated, #0b1120);
+  color: var(--color-text-primary, #f9fafb);
+  cursor: pointer;
+}
+
+.intake-artifact-picker__option strong {
+  font-size: 14px;
+}
+
+.intake-artifact-picker__option small {
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 11px;
+  line-height: 1.35;
+}

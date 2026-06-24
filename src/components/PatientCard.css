@@ -387,6 +387,13 @@
   font-weight: 700;
 }
 
+.patient-card__arrival-mode {
+  display: inline-block;
+  letter-spacing: 0.04em;
+  margin-left: 0.35rem;
+  text-transform: uppercase;
+}
+
 .patient-card__demographics {
   align-items: center;
   justify-self: start;
@@ -810,4 +817,186 @@
 
 .emergency-app-shell--density-wall .patient-card {
   display: none;
+}
+
+/* Row layout — one patient per row, columnar whiteboard scanning */
+.patient-card--row {
+  --patient-row-columns: 52px minmax(132px, 1.15fr) 80px 112px minmax(148px, 2.2fr) 88px 96px 84px;
+  align-items: center;
+  animation: none;
+  border-left-width: 5px !important;
+  border-radius: 0 !important;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: var(--patient-row-columns);
+  min-height: 0 !important;
+  padding: 10px 12px !important;
+}
+
+.patient-card--row:hover,
+.patient-card--row:focus-visible,
+.patient-card--row.patient-card--keyboard-selected,
+.patient-card--row.patient-card--highlighted {
+  transform: none;
+  z-index: 1;
+}
+
+.patient-card--row .patient-card__row-cell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.patient-card--row .patient-card__row-cell--triage {
+  align-items: center;
+  gap: 1px;
+  justify-items: center;
+}
+
+.patient-card--row .patient-card__row-triage-code {
+  background: var(--patient-priority-color);
+  border-radius: 8px;
+  color: var(--app-on-solid, #fff);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 36px;
+  padding: 5px 6px;
+  text-align: center;
+}
+
+.patient-card--row .patient-card__row-triage-label {
+  color: var(--color-text-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.patient-card--row .patient-card__row-cell--identity strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 850;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-card--row .patient-card__row-cell--identity span {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.patient-card--row .patient-card__row-cell--demographics {
+  align-items: start;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.patient-card--row .patient-card__row-cell--demographics span + span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.patient-card--row .patient-card__row-cell--arrival,
+.patient-card--row .patient-card__row-cell--wait,
+.patient-card--row .patient-card__row-cell--reassess {
+  align-items: center;
+  font-size: 11px;
+  font-weight: 750;
+  gap: 6px;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.patient-card--row .patient-card__row-cell--arrival svg,
+.patient-card--row .patient-card__row-cell--wait svg,
+.patient-card--row .patient-card__row-cell--reassess svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.patient-card--row .patient-card__row-cell--complaint {
+  background: color-mix(in srgb, var(--color-floating-surface) 70%, transparent);
+  border: 1px solid var(--component-inner-surface-border);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 750;
+  overflow: hidden;
+  padding: 7px 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-card--row .patient-card__row-cell--reassess-due {
+  color: var(--status-warning);
+  font-weight: 900;
+}
+
+.patient-card--row .patient-card__row-cell--state {
+  justify-items: end;
+}
+
+.patient-card--row .patient-card__state-pill {
+  font-size: 10px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.patient-card--row.patient-card--reassessment-due {
+  animation: patient-card-reassessment-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite;
+}
+
+.emergency-whiteboard-page__patient-list .patient-card--row + .patient-card--row {
+  border-top: 0;
+}
+
+.emergency-whiteboard-page__patient-list .patient-card--row:first-of-type {
+  border-radius: 0 !important;
+}
+
+.emergency-whiteboard-page__patient-list .patient-card--row:last-of-type {
+  border-radius: 0 0 12px 12px !important;
+}
+
+@media (max-width: 1024px) {
+  .patient-card--row {
+    --patient-row-columns: 44px minmax(0, 1fr) 72px;
+    grid-template-areas:
+      'triage identity identity'
+      'complaint complaint complaint'
+      'arrival wait reassess';
+    row-gap: 6px;
+  }
+
+  .patient-card--row .patient-card__row-cell--triage {
+    grid-area: triage;
+  }
+
+  .patient-card--row .patient-card__row-cell--identity {
+    grid-area: identity;
+  }
+
+  .patient-card--row .patient-card__row-cell--demographics,
+  .patient-card--row .patient-card__row-cell--state {
+    display: none;
+  }
+
+  .patient-card--row .patient-card__row-cell--complaint {
+    grid-area: complaint;
+  }
+
+  .patient-card--row .patient-card__row-cell--arrival {
+    grid-area: arrival;
+  }
+
+  .patient-card--row .patient-card__row-cell--wait {
+    grid-area: wait;
+  }
+
+  .patient-card--row .patient-card__row-cell--reassess {
+    grid-area: reassess;
+  }
 }

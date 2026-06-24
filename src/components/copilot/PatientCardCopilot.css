@@ -1,0 +1,188 @@
+.patient-card-copilot {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.88));
+  overflow: hidden;
+}
+
+.patient-card-copilot__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.patient-card-copilot__title-block {
+  display: grid;
+  gap: 4px;
+}
+
+.patient-card-copilot__title {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.patient-card-copilot__safety-badge {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 3px 8px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.patient-card-copilot__toggle {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.patient-card-copilot__body {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 0;
+  min-height: 220px;
+}
+
+.patient-card-copilot__sidebar {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 10px;
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.patient-card-copilot__sidebar h4 {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.patient-card-copilot__quick-action,
+.patient-card-copilot__tool-action {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.patient-card-copilot__tool-action {
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.patient-card-copilot__tool-action small {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.patient-card-copilot__chat {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 220px;
+}
+
+.patient-card-copilot__messages {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 10px 12px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.patient-card-copilot__message {
+  display: grid;
+  gap: 2px;
+  max-width: 92%;
+}
+
+.patient-card-copilot__message[data-role='staff'] {
+  justify-self: end;
+}
+
+.patient-card-copilot__bubble {
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.patient-card-copilot__message[data-role='staff'] .patient-card-copilot__bubble {
+  background: rgba(59, 130, 246, 0.2);
+  color: #dbeafe;
+}
+
+.patient-card-copilot__message[data-role='copilot'] .patient-card-copilot__bubble {
+  background: rgba(30, 41, 59, 0.9);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.patient-card-copilot__composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.patient-card-copilot__composer input {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.patient-card-copilot__composer button {
+  border: 0;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .patient-card-copilot__body {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-card-copilot__sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  }
+}

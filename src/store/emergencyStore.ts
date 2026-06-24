@@ -51,6 +51,7 @@ import {
   getInitialEdScenarioId,
   persistEdScenarioId,
 } from '../data/edScenarioFixtures';
+import { isSimulationModeActive } from '../services/simulationModeService';
 import {
   FEATURE_REGISTRY,
   FEATURE_REGISTRY_BY_ID,
@@ -74,6 +75,7 @@ import {
   fetchReferrals,
   createSmartIntakePatient,
 } from '../services/emergencyOsApi';
+import { apiFetch } from '../services/apiClient';
 import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
   DEFAULT_EMERGENCY_ALERT_RULES,
@@ -95,14 +97,24 @@ import {
   buildUpdateAlertsPatch,
   type EscalationInput,
 } from './emergencyOperationalSync';
+import {
+  buildLabResultPostedPatch,
+  buildPhysicianDiagnosisPatch,
+  type LabResultPostedInput,
+  type PhysicianDiagnosisInput,
+} from '../services/whiteboardAutomationEngine';
 import { calculateCapacity } from '../engine/capacityEngine';
 import { normalizeAlert } from '../engine/alertEngineDerived';
 import {
-  buildArrivalControlFields,
   registerArrivalControl as registerArrivalControlLayer,
   toArrivalControlStore,
   type RegisterArrivalControlOptions,
 } from '../services/arrivalControlLayer';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
+import {
+  ensurePatientArrivalBlock,
+  hydratePatientFromBackendApi,
+} from '../services/patientArrivalBackendSync';
 import {
   applyHighRiskComplaintFlags as applyHighRiskComplaintFlagsLayer,
   type ApplyHighRiskComplaintFlagsOptions,
@@ -627,7 +639,7 @@ const DEFAULT_FEATURES: EmergencyFeatureFlags = {
 
 type FeatureFlags = Record<string, boolean>;
 type FeatureOverrides = Record<string, boolean>;
-type FeaturePersistenceMode = 'backend' | 'local';
+type FeaturePersistenceMode = 'backend' | 'local' | 'simulation';
 
 export type EmergencyThresholds = {
   waitTimeWarningMin: number;
@@ -2014,58 +2026,58 @@ function emsArrivalToPatient(arrival: EMSArrival, timestamp = nowIso()): Patient
       ]
     : [];
 
-  const patient: Patient = {
-    id: patientId,
-    mrn: `EMS-${arrival.id.toUpperCase()}`,
-    firstName: 'EMS',
-    lastName: `Patient ${arrival.patientAge}`,
-    dob: new Date(timestamp).toISOString().slice(0, 10),
-    age: arrival.patientAge,
-    sex: arrival.patientSex,
-    arrivalTime: timestamp,
-    triageTime: null,
-    lastAssessedTime: null,
-    chiefComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint,
-    complaint: arrival.prearrivalComplaint,
-    complaintCategory: 'EMS',
+  const complaint = arrival.chiefComplaint || arrival.prearrivalComplaint || 'EMS arrival';
+  const flags = [
+    PatientFlag.EMSArrival,
+    ...(arrival.priority === Priority.P1 || arrival.priority === Priority.P2
+      ? [PatientFlag.HighRisk]
+      : []),
+  ];
+  const arrivalRecord = buildPatientArrivalRecord({
+    arrivalMode: 'EMS',
+    arrivalTimestamp: arrival.arrivedAt || timestamp,
+    chiefComplaint: complaint,
     state: PatientState.Registration,
-    priority: arrival.priority,
-    vitals,
-    flags: [
-      PatientFlag.EMSArrival,
-      ...(arrival.priority === Priority.P1 || arrival.priority === Priority.P2
-        ? [PatientFlag.HighRisk]
-        : []),
-    ],
-    assignedStaffId: null,
-    roomId: arrival.preparedRoomId,
-    notes: [
-      {
-        id: createId('ems-note'),
-        type: 'System',
-        body: `${arrival.unitName} handoff created from EMS pipeline. ${arrival.notes || ''}`.trim(),
-        authorId: 'ems',
-        createdAt: timestamp,
-      },
-    ],
-    timeline: [],
-    source: 'EMS',
-    emsUnitId: arrival.unitId,
-    emsArrival: arrival,
-    criticalChecklist: savedChecklist,
-    ...buildArrivalControlFields({
-      arrivalMode: 'EMS',
+    triageAcuity: { code: arrival.priority, status: 'unassigned' },
+    queueDestination: 'ems-registration',
+    waitingRoomStatus: 'registered',
+    registrationStatus: 'in-progress',
+  });
+
+  const patient = syncPatientFromArrival(
+    {
+      id: patientId,
+      mrn: `EMS-${arrival.id.toUpperCase()}`,
+      firstName: 'EMS',
+      lastName: `Patient ${arrival.patientAge}`,
+      dob: new Date(timestamp).toISOString().slice(0, 10),
+      age: arrival.patientAge,
+      sex: arrival.patientSex,
       state: PatientState.Registration,
-      presentingComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint,
-      flags: [
-        PatientFlag.EMSArrival,
-        ...(arrival.priority === Priority.P1 || arrival.priority === Priority.P2
-          ? [PatientFlag.HighRisk]
-          : []),
+      triageTime: null,
+      lastAssessedTime: null,
+      complaint: arrival.prearrivalComplaint,
+      complaintCategory: 'EMS',
+      vitals,
+      flags,
+      assignedStaffId: null,
+      roomId: arrival.preparedRoomId,
+      notes: [
+        {
+          id: createId('ems-note'),
+          type: 'System',
+          body: `${arrival.unitName} handoff created from EMS pipeline. ${arrival.notes || ''}`.trim(),
+          authorId: 'ems',
+          createdAt: timestamp,
+        },
       ],
-      queueDestination: 'ems-registration',
-    }),
-  };
+      timeline: [],
+      emsUnitId: arrival.unitId,
+      emsArrival: arrival,
+      criticalChecklist: savedChecklist,
+    },
+    arrivalRecord,
+  ) as Patient;
 
   patient.timeline = [
     createPatientTimelineEvent(patient, 'Arrival', `EMS arrival from ${arrival.unitName}.`, {
@@ -2332,6 +2344,8 @@ interface EmergencyStoreState {
   setPatients: (patients: Patient[]) => void;
   removePatient: (patientId: string) => void;
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
+  recordPhysicianDiagnosis: (patientId: string, input: PhysicianDiagnosisInput) => void;
+  recordLabResultPosted: (patientId: string, input?: LabResultPostedInput) => void;
   setFitToWaitClassification: (
     patientId: string,
     classificationId: FitToWaitClassificationId,
@@ -2798,29 +2812,32 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     ],
 
     addPatient: (patient, options) => {
-      set((state) => {
-        const patientWithTimeline: Patient = {
-          ...patient,
-          timeline: patient.timeline.length
-            ? patient.timeline
-            : [
-                createPatientTimelineEvent(
-                  patient,
-                  'Intake',
-                  `Created patient ${patient.firstName} ${patient.lastName}.`,
-                  {
-                    to: patient.state,
-                    timestamp: patient.arrivalTime,
-                    staffId: patient.assignedStaffId || 'intake',
-                    metadata: {
-                      mrn: patient.mrn,
-                      priority: patient.priority,
-                      complaintCategory: patient.complaintCategory,
-                    },
+      const normalizedPatient = ensurePatientArrivalBlock(patient);
+      const patientWithTimeline: Patient = {
+        ...normalizedPatient,
+        timeline: normalizedPatient.timeline.length
+          ? normalizedPatient.timeline
+          : [
+              createPatientTimelineEvent(
+                normalizedPatient,
+                'Intake',
+                `Created patient ${normalizedPatient.firstName} ${normalizedPatient.lastName}.`,
+                {
+                  to: normalizedPatient.state,
+                  timestamp: normalizedPatient.arrivalTime,
+                  staffId: normalizedPatient.assignedStaffId || 'intake',
+                  metadata: {
+                    mrn: normalizedPatient.mrn,
+                    priority: normalizedPatient.priority,
+                    complaintCategory: normalizedPatient.complaintCategory,
+                    arrivalMode: normalizedPatient.arrival?.arrivalMode,
                   },
-                ),
-              ],
-        };
+                },
+              ),
+            ],
+      };
+
+      set((state) => {
         const patients = [...state.patients, patientWithTimeline];
         const capacity = buildCapacitySnapshot(patients, state.rooms);
         return {
@@ -2870,7 +2887,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       if (options?.syncToBackend) {
-        void createSmartIntakePatient(patient).catch(() => undefined);
+        void createSmartIntakePatient(patientWithTimeline).catch(() => undefined);
       }
     },
 
@@ -2977,6 +2994,66 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
               'system',
             details: { fields: Object.keys(patch) },
+          }),
+        };
+      }),
+
+    recordPhysicianDiagnosis: (patientId, input) =>
+      set((state) => {
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        if (!patient) return {};
+
+        const nextPatient = buildPhysicianDiagnosisPatch(patient, input);
+        if (!nextPatient) return {};
+
+        const patients = state.patients.map((candidate) =>
+          candidate.id === patientId ? nextPatient : candidate,
+        );
+        const capacity = buildCapacitySnapshot(patients, state.rooms);
+
+        return {
+          patients,
+          capacity,
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'recordPhysicianDiagnosis',
+            patientId,
+            staffId: input.physicianId || patient.assignedPhysicianId || 'system',
+            details: { diagnosis: input.diagnosis },
+          }),
+          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+            {
+              type: 'whiteboard_automation',
+              title: 'Diagnosis recorded',
+              summary: `${input.diagnosis} — whiteboard advanced to awaiting disposition.`,
+              patientId,
+              source: 'physician-diagnosis',
+            },
+          ]),
+        };
+      }),
+
+    recordLabResultPosted: (patientId, input = {}) =>
+      set((state) => {
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        if (!patient) return {};
+
+        const nextPatient = buildLabResultPostedPatch(patient, input);
+        const patients = state.patients.map((candidate) =>
+          candidate.id === patientId ? nextPatient : candidate,
+        );
+        const capacity = buildCapacitySnapshot(patients, state.rooms);
+
+        return {
+          patients,
+          capacity,
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'recordLabResultPosted',
+            patientId,
+            staffId: input.actorId || patient.assignedStaffId || 'system',
+            details: {
+              critical: Boolean(input.critical),
+              analyte: input.analyte || null,
+            },
           }),
         };
       }),
@@ -3966,6 +4043,22 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       await get().initializeFlags();
 
+      if (isSimulationModeActive()) {
+        const scenarioId = getInitialEdScenarioId();
+        get().setActiveScenario(scenarioId);
+        set((state) => ({
+          backendAvailable: false,
+          persistenceMode: 'simulation',
+          loading: false,
+          ui: {
+            ...state.ui,
+            loading: false,
+            error: null,
+          },
+        }));
+        return { errors: {} };
+      }
+
       try {
         const result = await get().refreshAllData();
         const whiteboardData = asRecord(unwrapData(result.whiteboard));
@@ -4062,6 +4155,20 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     },
 
     refreshAllData: async () => {
+      if (isSimulationModeActive()) {
+        set((state) => ({
+          loading: false,
+          backendAvailable: false,
+          persistenceMode: 'simulation',
+          ui: {
+            ...state.ui,
+            loading: false,
+            error: null,
+          },
+        }));
+        return { errors: {} };
+      }
+
       set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
       const loadDataset = async (
         label: string,
@@ -4149,7 +4256,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     activateSurge: async (payload = {}) => {
       set((state) => ({ ui: { ...state.ui, error: null } }));
       try {
-        const response = await fetch('/api/emergency/surge/activate', {
+        const response = await apiFetch('/api/emergency/surge/activate', {
           method: 'POST',
           headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -4188,7 +4295,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       if (!cleanQuery) throw new Error('Copilot query is required.');
       set((state) => ({ ui: { ...state.ui, error: null } }));
       try {
-        const response = await fetch('/api/emergency/copilot/query', {
+        const response = await apiFetch('/api/emergency/copilot/query', {
           method: 'POST',
           headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -4942,7 +5049,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       writeLocalFeatureSnapshot(nextState);
 
       const result =
-        state.persistenceMode === 'local'
+        state.persistenceMode === 'local' || state.persistenceMode === 'simulation'
           ? { ok: true, localFallback: true, message: '' }
           : await persistFeatureOverride(featureId, enabled, metadata.changedBy).catch(
               (error: unknown) => ({
@@ -4971,7 +5078,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set({ lastSynced });
       writeLocalFeatureSnapshot({ ...nextState, lastSynced });
 
-      if (state.persistenceMode === 'local') {
+      if (state.persistenceMode === 'local' || state.persistenceMode === 'simulation') {
         auditFeatureToggle(featureId, enabled, {
           tier: state.tier,
           backendPersisted: false,
@@ -5333,11 +5440,13 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set((state) => {
         const patients = payload.patients
           ? [
-              ...payload.patients,
-              ...state.patients.filter(
-                (patient) =>
-                  !payload.patients!.some((payloadPatient) => payloadPatient.id === patient.id),
-              ),
+              ...payload.patients.map(hydratePatientFromBackendApi),
+              ...state.patients
+                .filter(
+                  (patient) =>
+                    !payload.patients!.some((payloadPatient) => payloadPatient.id === patient.id),
+                )
+                .map(hydratePatientFromBackendApi),
             ]
           : state.patients;
         const rooms = payload.rooms || state.rooms;

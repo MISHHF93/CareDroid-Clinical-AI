@@ -1,4 +1,5 @@
 import { PatientState, Priority } from '../types/emergency';
+import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 
 export const SMART_INTAKE_VERTICAL_SLICE_FIXTURE = Object.freeze({
   staffId: 'staff-smart-intake-rn',
@@ -105,27 +106,8 @@ export function buildSmartIntakeVerticalSlicePatient({
   const override = Boolean(triageSuggestion.override);
   const encounterId = `encounter-${id}`;
 
-  return {
-    id,
-    mrn,
-    firstName,
-    lastName,
-    dob: identity.dob || '',
-    age,
-    sex: identity.sex || 'Unspecified',
-    arrivalTime: timestamp,
-    triageTime: timestamp,
-    lastAssessedTime: Object.values(vitals).some((value) => String(value ?? '').trim()) ? timestamp : null,
-    chiefComplaint: complaintText.trim() || complaintCategory,
-    complaint: complaintText.trim() || complaintCategory,
-    complaintCategory,
-    state: PatientState.Triage,
-    priority: selectedPriority,
-    vitals: normalizedVitals,
-    assignedStaffId: null,
-    roomId: null,
-    flags,
-    timeline: [
+  const resolvedComplaint = complaintText.trim() || complaintCategory;
+  const timeline = [
       {
         id: `evt-${id}-arrival`,
         patientId: id,
@@ -186,7 +168,47 @@ export function buildSmartIntakeVerticalSlicePatient({
             },
           ]
         : []),
-    ],
-    notes: [],
-  };
+  ];
+
+  const arrival = buildPatientArrivalRecord({
+    arrivalMode: 'walk-in',
+    arrivalTimestamp: timestamp,
+    chiefComplaint: resolvedComplaint,
+    state: PatientState.Triage,
+    triageAcuity: {
+      code: selectedPriority,
+      status: override ? 'confirmed' : 'suggested',
+      assignedAt: override ? timestamp : null,
+      suggestedAt: timestamp,
+      suggestionSource: 'triage-assist',
+    },
+    queueDestination: 'triage-queue',
+    triagePending: true,
+    waitingRoomStatus: 'waiting-for-triage',
+    registrationStatus: 'complete',
+  });
+
+  return syncPatientFromArrival(
+    {
+      id,
+      mrn,
+      firstName,
+      lastName,
+      dob: identity.dob || '',
+      age,
+      sex: identity.sex || 'Unspecified',
+      state: PatientState.Triage,
+      triageTime: timestamp,
+      lastAssessedTime: Object.values(vitals).some((value) => String(value ?? '').trim()) ? timestamp : null,
+      complaintCategory,
+      vitals: normalizedVitals,
+      assignedStaffId: null,
+      roomId: null,
+      flags,
+      timeline,
+      notes: [],
+      source,
+    },
+    arrival,
+  );
 }

@@ -1,0 +1,61 @@
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import PatientRoomWhiteboard from '../../components/patient-experience/PatientRoomWhiteboard';
+import DigitalDoorSign from '../../components/whiteboard/DigitalDoorSign';
+import { useEmergencyStore } from '../../store/emergencyStore';
+import './PatientRoomDisplay.css';
+
+export default function PatientRoomDisplay() {
+  const [searchParams] = useSearchParams();
+  const patientId = searchParams.get('patientId') || '';
+  const roomId = searchParams.get('roomId') || '';
+  const mode = searchParams.get('mode') || 'whiteboard';
+
+  const patients = useEmergencyStore((state) => state.patients);
+  const staff = useEmergencyStore((state) => state.staff);
+  const rooms = useEmergencyStore((state) => state.rooms);
+
+  const patient = useMemo(
+    () => patients.find((entry) => entry.id === patientId) || null,
+    [patientId, patients],
+  );
+  const room = useMemo(() => {
+    if (roomId) return rooms.find((entry) => entry.id === roomId);
+    if (patient?.roomId) return rooms.find((entry) => entry.id === patient.roomId);
+    return rooms[0];
+  }, [patient?.roomId, roomId, rooms]);
+
+  if (!patient && mode !== 'door-sign') {
+    return (
+      <section className="patient-room-display patient-room-display--empty" role="status">
+        <h1>Patient room display</h1>
+        <p>Select a patient with <code>?patientId=</code> to show the in-room whiteboard.</p>
+      </section>
+    );
+  }
+
+  if (mode === 'door-sign' && room) {
+    const roomPatient =
+      patient ||
+      patients.find(
+        (entry) => entry.roomId === room.id || entry.id === room.patientId || entry.id === room.currentPatientId,
+      ) ||
+      null;
+    return (
+      <section className="patient-room-display patient-room-display--door-sign">
+        <DigitalDoorSign room={room} patient={roomPatient} staff={staff} />
+      </section>
+    );
+  }
+
+  return (
+    <section className="patient-room-display">
+      {room ? (
+        <div className="patient-room-display__door-sign">
+          <DigitalDoorSign room={room} patient={patient} staff={staff} />
+        </div>
+      ) : null}
+      {patient ? <PatientRoomWhiteboard patient={patient} staff={staff} /> : null}
+    </section>
+  );
+}

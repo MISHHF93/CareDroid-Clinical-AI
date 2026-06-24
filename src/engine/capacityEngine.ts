@@ -11,6 +11,8 @@ import {
   type Room,
 } from '../types/emergency';
 import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
+import { hasPatientFlag as patientHasFlag } from '../utils/patientVitals';
+
 
 type CrisisBand = 'Orange' | 'Red';
 type TimestampSource = 'timeline' | 'lastAssessedTime' | 'arrivalTime' | 'unknown';
@@ -79,8 +81,8 @@ export function calculateCapacity(): CapacitySnapshot {
     ![PatientState.Discharge].includes(p.state)).length;
   const boarding = patients.filter(p =>
     p.state === PatientState.Admission).length;
-  const reassessmentDue = patients.filter(p =>
-    p.flags.includes(PatientFlag.ReassessmentDue)).length;
+  const reassessmentDue = patients.filter((p) =>
+    hasPatientFlag(p, PatientFlag.ReassessmentDue)).length;
   const occupied = rooms.filter(r =>
     r.status === 'Occupied').length;
   const maxRooms = rooms.length || 15;
@@ -295,11 +297,7 @@ function isBoardingPatient(patient: Patient): boolean {
 }
 
 function hasPatientFlag(patient: Patient, flag: PatientFlag): boolean {
-  const flags = patient.flags as Array<PatientFlag | string | { type?: PatientFlag | string }>;
-  return flags.some((candidate) => {
-    const value = typeof candidate === 'object' ? candidate.type : candidate;
-    return value === flag;
-  });
+  return patientHasFlag(patient, flag);
 }
 
 function latestStateTimestamp(patient: Patient, state: PatientState): { value: string; source: TimestampSource } {

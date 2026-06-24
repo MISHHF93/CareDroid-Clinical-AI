@@ -24,6 +24,14 @@ export default function PatientVerificationExperience({
   ocrUploadStatus = '',
   isUploadingDocument = false,
   onDocumentUpload,
+  capturePreviewDataUrl = '',
+  supplementalCaptureText = '',
+  onSupplementalCaptureTextChange,
+  extractedCapturePreview = [],
+  captureArtifactOptions = [],
+  selectedCaptureArtifactId = '',
+  onCaptureArtifactChange,
+  selectedCaptureArtifactLabel = '',
   verificationComplete = false,
   selectedCandidateOnBoard = false,
   pendingAction = '',
@@ -70,6 +78,14 @@ export default function PatientVerificationExperience({
           isUploading={isUploadingDocument}
           uploadStatus={ocrUploadStatus}
           onDocumentUpload={onDocumentUpload}
+          previewDataUrl={capturePreviewDataUrl}
+          supplementalText={supplementalCaptureText}
+          onSupplementalTextChange={onSupplementalCaptureTextChange}
+          extractedPreview={extractedCapturePreview}
+          artifactOptions={captureArtifactOptions}
+          selectedArtifactId={selectedCaptureArtifactId}
+          onArtifactChange={onCaptureArtifactChange}
+          selectedArtifactLabel={selectedCaptureArtifactLabel}
         />
       );
     }

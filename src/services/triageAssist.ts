@@ -60,7 +60,11 @@ export function isTriageAssistVisible(
   canReviewTriage: boolean,
 ): boolean {
   if (!patient || !canReviewTriage) return false;
-  if (patient.state !== PatientState.Triage) return false;
-  if (!patient.triageAssist || patient.triageAssist.dismissedAt) return false;
-  return true;
+  if (!patient.triageAssist || patient.triageAssist.dismissedAt || patient.triageAssist.acceptedAt) {
+    return false;
+  }
+  if (patient.state === PatientState.Triage) return true;
+  if (patient.triagePending) return true;
+  if (patient.source === 'Self-arrival') return true;
+  return false;
 }

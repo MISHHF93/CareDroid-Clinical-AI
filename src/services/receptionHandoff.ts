@@ -13,6 +13,7 @@ import { syncPatientExperienceOperationalSurfaces } from './patientExperienceSta
 import { syncTriageBreachOperationalSurfaces } from './triageBreachTimer';
 import { enterTriageQueue, WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { buildClientTriageAssist, refreshTriageAssistFromBackend } from './triageAssist';
+import { stampPatientArrivalAtHandoff } from './patientArrivalModel';
 import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
 import { PatientState } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
@@ -36,6 +37,7 @@ export type IntakeHandoffSource =
   | 'express-register'
   | 'reception-quick-intake'
   | 'smart-intake'
+  | 'self-check-in'
   | 'reception'
   | 'ems-convert'
   | 'prepare-patient'
@@ -51,6 +53,7 @@ const HANDOFF_ENCOUNTER_SOURCE: Record<IntakeHandoffSource, IntakeEncounterSourc
   'express-register': 'walk-in',
   'reception-quick-intake': 'walk-in',
   'smart-intake': 'smart-intake',
+  'self-check-in': 'self-check-in',
   reception: 'walk-in',
   'ems-convert': 'ems',
   'prepare-patient': 'smart-intake',
@@ -64,6 +67,7 @@ const HANDOFF_WORKFLOW_SOURCE: Record<IntakeHandoffSource, string> = {
   'express-register': 'express-register',
   'reception-quick-intake': 'reception-quick-intake',
   'smart-intake': 'smart-intake',
+  'self-check-in': 'self-arrival-check-in',
   reception: 'reception-workspace',
   'ems-convert': 'ems-pipeline',
   'prepare-patient': 'smart-intake',
@@ -242,6 +246,11 @@ export function completeIntakeHandoff(
     registrationStatus: 'complete',
     queueDestination: 'triage-queue',
   });
+
+  const patientAfterStamp = store.patients.find((entry) => entry.id === patientId);
+  if (patientAfterStamp) {
+    store.updatePatient(patientId, stampPatientArrivalAtHandoff(patientAfterStamp));
+  }
 
   store.selectPatient(patientId);
   store.recordWorkflowAction({

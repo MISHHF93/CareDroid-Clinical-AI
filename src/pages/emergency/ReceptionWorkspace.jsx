@@ -9,6 +9,7 @@ import TriageOperationalStrip from '../../components/triage/TriageOperationalStr
 import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
 import WaitingRoomSafetyEscalationStrip from '../../components/waiting-room/WaitingRoomSafetyEscalationStrip';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
+import IntakeArtifactPicker from '../../components/reception/IntakeArtifactPicker';
 import DuplicatePatientBanner from '../../components/reception/DuplicatePatientBanner';
 import ReceptionSearchHint from '../../components/reception/ReceptionSearchHint';
 import {
@@ -35,6 +36,8 @@ import {
   convertEmsArrivalForReception,
   RECEPTION_INTAKE_URL_KEYS,
 } from '../../services/receptionIntakeBridge';
+import { registerEmsPreArrivalPlaceholder } from '../../services/preArrivalWorkflow';
+import { useIntegrationPreArrivalSync } from '../../hooks/useIntegrationPreArrivalSync';
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import ReceptionEscalationPanel from '../../components/reception/ReceptionEscalationPanel';
 import ReceptionEscalationStrip from '../../components/reception/ReceptionEscalationStrip';
@@ -43,6 +46,7 @@ import ReceptionEscalationAttentionStrip from '../../components/reception/Recept
 import HighRiskComplaintAttentionStrip from '../../components/waiting-room/HighRiskComplaintAttentionStrip';
 import ReceptionThroughputAttentionCluster from '../../components/reception/ReceptionThroughputAttentionCluster';
 import OperationalPresentationFrame from '../../components/emergency/OperationalPresentationFrame';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import WaitingRoomStatusMessagingStrip from '../../components/patient-experience/WaitingRoomStatusMessagingStrip';
 import WaitingRoomProcessEducation from '../../components/patient-experience/WaitingRoomProcessEducation';
 import PatientCommunicationStatusPanel from '../../components/waiting-room/PatientCommunicationStatusPanel';
@@ -75,8 +79,14 @@ export default function ReceptionWorkspace() {
   const reception = useReceptionScreen();
   const triage = useTriageScreen();
   const deskUi = useReceptionDeskUi();
-  const { loading: receptionLoading, error: receptionError, refresh: refreshReceptionSnapshot } =
-    useReceptionSnapshotPolling(15000);
+  const {
+    data: receptionSnapshot,
+    loading: receptionLoading,
+    error: receptionError,
+    refresh: refreshReceptionSnapshot,
+  } = useReceptionSnapshotPolling(15000);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const [handoffSyncWarning, setHandoffSyncWarning] = useState('');
   const patients = useEmergencyStore((state) => state.patients);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
@@ -107,6 +117,7 @@ export default function ReceptionWorkspace() {
   const [showEscalationPanel, setShowEscalationPanel] = useState(false);
   const [escalationReasonId, setEscalationReasonId] = useState(null);
   const [smartIntakeSession, setSmartIntakeSession] = useState(null);
+  const [showArtifactPicker, setShowArtifactPicker] = useState(false);
 
   const canEscalateToNurse = reception.canEscalateToNurse;
   const canCreatePatient = reception.canCreatePatient;
@@ -122,6 +133,7 @@ export default function ReceptionWorkspace() {
   const canVerifyIntake = reception.canVerifyIdentity;
   const canConvertEmsArrival = reception.canConvertEmsArrival;
   const canOpenSmartIntake = reception.canOpenSmartIntake;
+  useIntegrationPreArrivalSync(canVerifyIntake);
 
   const emsInbound = useEmergencyStore(selectEmsInboundCount);
 
@@ -152,15 +164,22 @@ export default function ReceptionWorkspace() {
   );
 
   const openSmartIntake = useCallback((step, patientId, extraParams = {}) => {
+    setShowArtifactPicker(false);
     setSmartIntakeSession(
       buildReceptionIntakeSession({
         step,
         patientId,
         mode: extraParams.mode,
         emsArrivalId: extraParams.emsArrivalId,
+        artifactId: extraParams.artifactId,
       }),
     );
   }, []);
+
+  const openArtifactCapture = useCallback(() => {
+    if (!canOpenSmartIntake) return;
+    setShowArtifactPicker(true);
+  }, [canOpenSmartIntake]);
 
   const closeSmartIntake = useCallback(() => {
     setSmartIntakeSession(null);
@@ -228,6 +247,7 @@ export default function ReceptionWorkspace() {
           patientId: searchParams.get('patientId') || null,
           mode: searchParams.get('mode') || null,
           emsArrivalId: searchParams.get('emsArrivalId') || null,
+          artifactId: searchParams.get('artifactId') || null,
         }),
       );
       const nextParams = new URLSearchParams(searchParams);
@@ -325,10 +345,26 @@ export default function ReceptionWorkspace() {
   };
 
   const handlePrepareEmsRegistration = (arrival) => {
-    openSmartIntake('capture', arrival.patientId, {
+    const placeholder = registerEmsPreArrivalPlaceholder(arrival.id);
+    openSmartIntake('capture', placeholder.patientId || arrival.patientId, {
       emsArrivalId: arrival.id,
       mode: 'ems-prearrival',
     });
+  };
+
+  const preArrivalStore = useMemo(
+    () => ({
+      addEMSArrival: store.addEMSArrival,
+    }),
+    [store.addEMSArrival],
+  );
+
+  const handlePreArrivalSubmitted = (result) => {
+    refreshIntakeHandoffSurfaces(store);
+    void refreshReceptionSnapshot();
+    if (result?.patient?.id) {
+      selectPatient(result.patient.id);
+    }
   };
 
   const handleConvertEmsArrival = (arrival) => {
@@ -397,6 +433,14 @@ export default function ReceptionWorkspace() {
             ? RECEPTION_COPY.workspace.deskDescription
             : RECEPTION_COPY.workspace.description}
         </p>
+        <EdDataSourceBanner
+          className="reception-workspace__data-source"
+          envelope={receptionSnapshot}
+          loading={receptionLoading}
+          error={receptionError}
+          activeScenarioId={activeScenarioId}
+          backendAvailable={backendAvailable}
+        />
       </header>
 
       {triage.isTriageScreen ? (
@@ -619,7 +663,7 @@ export default function ReceptionWorkspace() {
             <button
               type="button"
               className="reception-workspace__action"
-              onClick={() => canOpenSmartIntake && openSmartIntake()}
+              onClick={openArtifactCapture}
               disabled={!canOpenSmartIntake}
             >
               {RECEPTION_COPY.workspace.checkIdentity}
@@ -657,7 +701,7 @@ export default function ReceptionWorkspace() {
           <button
             type="button"
             className="reception-workspace__action"
-            onClick={() => canOpenSmartIntake && openSmartIntake()}
+            onClick={openArtifactCapture}
             disabled={!canOpenSmartIntake}
           >
             {RECEPTION_COPY.workspace.checkIdentity}
@@ -716,6 +760,10 @@ export default function ReceptionWorkspace() {
         onPrepareRegistration={handlePrepareEmsRegistration}
         onConvertArrival={handleConvertEmsArrival}
         onRefreshEms={() => void refreshReceptionSnapshot()}
+        preArrivalStore={preArrivalStore}
+        canSubmitPreArrival={canVerifyIntake || canCreatePatient}
+        preArrivalActorName={emergencyRole.roleLabel || 'Reception'}
+        onPreArrivalSubmitted={handlePreArrivalSubmitted}
         emsFeedError={receptionError}
         expandedPatientId={expandedPretriagePatientId}
         onExpandPatient={setExpandedPretriagePatientId}
@@ -796,6 +844,13 @@ export default function ReceptionWorkspace() {
         </div>
       ) : null}
 
+      {showArtifactPicker ? (
+        <IntakeArtifactPicker
+          onClose={() => setShowArtifactPicker(false)}
+          onSelectArtifact={(artifactId) => openSmartIntake('ocr', null, { artifactId })}
+        />
+      ) : null}
+
       {reception.showWidget('prepare-chooser') && showPrepareChooser ? (
         <PreparePatientChooser
           onClose={() => setShowPrepareChooser(false)}
@@ -805,7 +860,7 @@ export default function ReceptionWorkspace() {
           }}
           onScan={() => {
             setShowPrepareChooser(false);
-            openSmartIntake('ocr');
+            openSmartIntake('ocr', null, { artifactId: 'health_card' });
           }}
           onSmartIntake={() => {
             setShowPrepareChooser(false);

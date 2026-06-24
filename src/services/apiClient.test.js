@@ -94,10 +94,32 @@ describe('getApiErrorMessage', () => {
   });
 });
 
+describe('apiFetch offline fallback', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    localStorage.clear();
+  });
+
+  it('returns graceful JSON when the backend is unreachable in development', async () => {
+    vi.stubGlobal('location', { hostname: 'localhost' });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+
+    const response = await apiFetch('/api/emergency/whiteboard');
+    expect(response.ok).toBe(true);
+    const payload = await response.json();
+    expect(payload.status).toBe('dev-offline');
+  });
+});
+
 describe('apiFetch timeout', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     localStorage.clear();
+  });
+
+  beforeEach(async () => {
+    const { resetBackendReachabilityCache } = await import('./backendReachability');
+    resetBackendReachabilityCache();
   });
 
   it('aborts when the request exceeds timeoutMs', async () => {
@@ -112,7 +134,7 @@ describe('apiFetch timeout', () => {
       ),
     );
 
-    await expect(apiFetch('/api/config/system', { timeoutMs: 50 })).rejects.toMatchObject({
+    await expect(apiFetch('/api/tenant/runtime-settings', { timeoutMs: 50 })).rejects.toMatchObject({
       name: 'TimeoutError',
     });
   });

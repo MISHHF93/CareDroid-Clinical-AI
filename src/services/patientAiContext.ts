@@ -1,11 +1,7 @@
 import type { PatientCardOrchestrationContext } from '../../lib/patient-orchestration';
-import type { Patient, Vitals } from '../types/emergency';
+import type { Patient } from '../types/emergency';
 import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
-
-function latestVitals(patient?: Patient): Vitals | undefined {
-  if (!patient) return undefined;
-  return Array.isArray(patient.vitals) ? patient.vitals.at(-1) : patient.vitals;
-}
+import { latestPatientVitals } from '../utils/patientVitals';
 
 export function buildCopilotPatientArtifactContext(
   patient: Patient | null | undefined,
@@ -13,14 +9,28 @@ export function buildCopilotPatientArtifactContext(
 ): Record<string, unknown> | null {
   if (!patient) return null;
 
-  const vitals = latestVitals(patient);
+  const vitals = latestPatientVitals(patient);
   const savedScores = formatScoresForCopilot(patient);
+  const recentNotes = (patient.notes || [])
+    .slice(-5)
+    .map((note) => ({
+      id: note.id,
+      content: note.text || note.body || '',
+      createdAt: note.createdAt,
+      authorStaffId: note.authorStaffId,
+    }));
 
   return {
     patientId: patient.id,
     mrn: patient.mrn,
     name: `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn,
+    demographics: {
+      age: patient.age ?? null,
+      sex: patient.sex ?? null,
+      dob: patient.dob ?? null,
+    },
     chiefComplaint: patient.chiefComplaint || patient.complaint || null,
+    recentNotes,
     state: patient.state,
     priority: patient.priority,
     flags: patient.flags || [],
@@ -64,7 +74,7 @@ export function buildCalculatorCopilotSeed(
     return `Help me use ${calculatorName} as clinical decision support only. Ask for any missing context before suggesting next steps.`;
   }
 
-  const vitals = latestVitals(patient);
+  const vitals = latestPatientVitals(patient);
   const savedScores = formatScoresForCopilot(patient);
   const complaint = patient.chiefComplaint || patient.complaint;
   const missingScores = orchestration?.scoresMissing?.length
