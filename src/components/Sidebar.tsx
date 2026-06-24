@@ -97,6 +97,14 @@ const ICONS: Record<string, Icon> = {
   platform: IconApps,
   activity: IconActivity,
   clock: IconClock,
+  // Additional for full nav
+  fleet: IconAmbulance,
+  surveillance: IconActivity,
+  simulation: IconListDetails,
+  laboratory: IconStethoscope,
+  knowledge: IconChartBar,
+  'ai-center': IconRobot,
+  admin: IconSettings,
 };
 
 function matchesNavigationPath(pathname: string, path: string): boolean {

@@ -36,6 +36,15 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'platform',
   'pulse',
   'shift',
+  // Full nav normalization: include additional core surfaces
+  'fleet',
+  'surveillance',
+  'simulation',
+  'laboratory',
+  'knowledge',
+  'audit',
+  'ai-center',
+  'admin',
 ]);
 
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
@@ -228,6 +237,63 @@ export const NAV_ITEMS = Object.freeze([
     route: CANONICAL_ROUTES.emergencyShift,
     featureGate: null,
   },
+  // Additional pages brought in for full navigation normalization
+  {
+    id: 'fleet',
+    label: 'Fleet',
+    icon: 'ambulance',
+    route: CANONICAL_ROUTES.fleetCommand,
+    featureGate: null,
+  },
+  {
+    id: 'surveillance',
+    label: 'Surveillance',
+    icon: 'activity',
+    route: CANONICAL_ROUTES.surveillanceNexus,
+    featureGate: null,
+  },
+  {
+    id: 'simulation',
+    label: 'Simulation',
+    icon: 'list-check',
+    route: CANONICAL_ROUTES.simulation,
+    featureGate: null,
+  },
+  {
+    id: 'laboratory',
+    label: 'Laboratory',
+    icon: 'stethoscope',
+    route: CANONICAL_ROUTES.laboratory,
+    featureGate: null,
+  },
+  {
+    id: 'knowledge',
+    label: 'Knowledge Graph',
+    icon: 'chart-bar',
+    route: CANONICAL_ROUTES.knowledgeGraph,
+    featureGate: null,
+  },
+  {
+    id: 'audit',
+    label: 'Audit',
+    icon: 'report',
+    route: CANONICAL_ROUTES.audit,
+    featureGate: null,
+  },
+  {
+    id: 'ai-center',
+    label: 'AI Center',
+    icon: 'robot',
+    route: CANONICAL_ROUTES.aiCommandCenter,
+    featureGate: null,
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: 'settings',
+    route: CANONICAL_ROUTES.adminOperations,
+    featureGate: null,
+  },
 ] satisfies readonly NavItem[]);
 
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
@@ -252,6 +318,14 @@ const NAV_FEATURE_IDS = Object.freeze({
   platform: 'platform_navigation',
   pulse: 'department_pulse',
   shift: 'shift_summary',
+  fleet: 'fleet_management',
+  surveillance: 'surveillance_nexus',
+  simulation: 'simulation_academy',
+  laboratory: 'laboratory',
+  knowledge: 'knowledge_graph',
+  audit: 'audit',
+  'ai-center': 'ai_command_center',
+  admin: 'admin_console',
 } as const);
 
 export const FEATURE_GATE_ALIASES = Object.freeze({

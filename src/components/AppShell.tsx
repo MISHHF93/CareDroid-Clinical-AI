@@ -182,6 +182,10 @@ export function AppShell({ children }: AppShellProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const patients = useEmergencyStore((state) => state.patients);
+
+  // Dev simplification flag — used to cut down initial UI noise and side panels.
+  const isDev = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta.env.DEV);
   const reassessmentCount = useMemo(
     () => patients.filter(isPatientFlaggedForReassessment).length,
     [patients],
@@ -587,6 +591,11 @@ export function AppShell({ children }: AppShellProps) {
           <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
         )}
         <DemoPersonaPanel />
+        {isDev && (
+          <div style={{ padding: '4px 12px', background: '#1f2937', fontSize: 11, color: '#93c5fd', display: 'flex', alignItems: 'center', gap: 8 }}>
+            DEV — Use the Profile bar above to switch user profilings/roles. Main surface defaults to the Whiteboard.
+          </div>
+        )}
         <main
           id="main-content"
           className="app-shell-main-content"
@@ -617,7 +626,7 @@ export function AppShell({ children }: AppShellProps) {
           </ErrorBoundary>
         </main>
       </div>
-      {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
+      {!screenCapabilities.isRegistrationScreen && !useKioskShell && !(isDev as boolean) ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>
           <PatientDetailPanel />

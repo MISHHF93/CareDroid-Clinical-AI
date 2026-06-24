@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-06-12 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-06-24 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 |--------|------:|
 | Audit sections | 11 |
 | Duplicate findings documented | 35 |
-| CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | 27 |
+| CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | 28 |
 | POST executor ids (frontend) | drug-interactions, lab-interpreter, sofa-calculator |
 | REGISTRY_ID_TO_ORCHESTRATOR_TOOL entries | 3 |
 
@@ -31,9 +31,9 @@ Identify competing sources of truth that cause drift, double registration, or am
 |--------|------------------|---------------------|
 | Routes | `src/config/routes.config.js` | App.jsx (paths only), TOOL_LAUNCH_PATHS |
 | Router mount | `src/App.jsx` | — |
-| Layouts | `src/layout/AppShell.jsx` | Page-level shells |
-| AppShell rail | `src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` | Inline nav arrays |
-| Navigation | `src/config/navigation.config.js` | `primaryNavigation.js` (shim only) |
+| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.jsx`, page-level shells |
+| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |
+| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |
 | Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |
 | Tool ids / NLU | `src/data/clinicalToolIdContract.js` | Random string ids in components |
 | NLU catalog | `src/data/clinicalIntentToolCatalog.js` | Duplicate registry rows |
@@ -68,22 +68,26 @@ Identify competing sources of truth that cause drift, double registration, or am
 
 ## Layouts
 
-**Canonical:** `src/layout/AppShell.jsx` (shared app chrome)
+**Canonical:** `src/components/AppShell.tsx` (active Emergency OS app chrome)
+
+**Secondary (allowed):** `src/layout/AppShell.jsx` (legacy/manual-review shell helper, not runtime-mounted)
 
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Shell variants | AppShell.jsx | Resolved — AppShell owns route chrome. | done | Canonical shell: AppShell; use shared CareDroid primitives inside pages for content width only. |
+| Shell variants | src/components/AppShell.tsx; src/layout/AppShell.jsx | Legacy shell is not mounted but retained for tests/manual migration review. | legacy | Canonical shell: src/components/AppShell.tsx; do not wire src/layout/AppShell.jsx back into runtime. |
 | Ops demo layout class | .ops-demo-page on simulation/lab/3D pages | Parallel layout CSS systems | merge | Migrate ops-demo pages to shared design tokens and CareDroid primitives. |
 
 ## Sidebars
 
-**Canonical:** `src/layout/AppShell.jsx` + `APP_SHELL_NAV_ITEMS` from navigation.config.js
+**Canonical:** `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` from unified-navigation.config.ts
+
+**Secondary (allowed):** `src/config/navigation.config.js` compatibility projections
 
 
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
-| Sidebar nav item sources | APP_SHELL_NAV_ITEMS; PRIMARY_SIDEBAR_NAV_ITEMS; QUICK_COMMAND_DESTINATION_ITEMS | Route surfaces can drift if they bypass navigation.config.js | done | Canonical AppShell rail: APP_SHELL_NAV_ITEMS; other navigation projections must derive from navigation.config.js. |
+| Sidebar nav item sources | APP_SHELL_NAV_ITEMS; PRIMARY_SIDEBAR_NAV_ITEMS; QUICK_COMMAND_DESTINATION_ITEMS | Route surfaces can drift if they bypass unified-navigation.config.ts | done | Canonical AppShell rail: NAVIGATION_ITEMS; compatibility projections must derive from unified-navigation.config.ts. |
 | Tool list in sidebar | sidebarToolPresentation.js; historical getSidebarToolRegistryProjection in tests | Tests may reference removed sidebar tool partition API | legacy | Canonical tool sidebar data: getUserFacingToolRegistryProjection + sidebarToolPresentation. |
 
 ## Navigation
@@ -206,6 +210,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 | medical3dViewer | /3d-viewer |
 | artifacts | /artifacts |
 | aiEvaluation | /ai-evaluation |
+| aiCommandCenter | /ai-command-center |
 | aiGovernance | /ai-governance |
 | aiSecurity | /security |
 | liveTrackingMap | /live-map |
@@ -214,36 +219,6 @@ Identify competing sources of truth that cause drift, double registration, or am
 | deviceFleet | /devices |
 | fleetCommand | /fleet/command |
 | fleetMap | /fleet/map |
-
-## App.jsx paths not listed in CANONICAL_ROUTES (sample)
-
-- `/`
-- `/auth/callback`
-- `/emergency`
-- `/emergency/pulse`
-- `/emergency/shift`
-- `/ai-command-center`
-- `/analytics`
-- `/costs`
-- `/memory`
-- `/training`
-- `/fleet/predictive-maintenance`
-- `/fleet/route-optimizer`
-- `/profile/activity`
-- `/profile/preferences`
-- `/profile/workspaces`
-- `/profile/security`
-- `/profile-settings`
-- `/organization/settings`
-- `/notification-preferences`
-- `/two-factor-setup`
-- `/biometric-setup`
-- `/consent`
-- `/consent-history`
-- `/team`
-- `*`
-
-_Many are dynamic tool routes, org/commercial pages, or profile subpaths — extend CANONICAL_ROUTES or document as extensions._
 
 ## Action legend
 

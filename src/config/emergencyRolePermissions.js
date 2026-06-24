@@ -129,6 +129,13 @@ const ROUTES = Object.freeze({
   integrationHub: CANONICAL_ROUTES.integrationHub,
   cosmos: CANONICAL_ROUTES.cosmosViewer,
   settings: CANONICAL_ROUTES.emergencySettings,
+  fleet: CANONICAL_ROUTES.fleetCommand,
+  surveillance: CANONICAL_ROUTES.surveillanceNexus,
+  laboratory: CANONICAL_ROUTES.laboratory,
+  knowledgeGraph: CANONICAL_ROUTES.knowledgeGraph,
+  audit: CANONICAL_ROUTES.audit,
+  aiCommandCenter: CANONICAL_ROUTES.aiCommandCenter,
+  adminOperations: CANONICAL_ROUTES.adminOperations,
 });
 
 const ALL_ROUTES = Object.freeze([
@@ -152,6 +159,14 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.integrationHub,
   ROUTES.cosmos,
   ROUTES.settings,
+  ROUTES.fleet,
+  ROUTES.surveillance,
+  ROUTES.simulation,
+  ROUTES.laboratory,
+  ROUTES.knowledgeGraph,
+  ROUTES.audit,
+  ROUTES.aiCommandCenter,
+  ROUTES.adminOperations,
 ]);
 const FUTURE_MODULE_ACTIONS = Object.freeze([
   EMERGENCY_ACTIONS.manageFederatedLearning,
@@ -191,6 +206,14 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.platform,
   ROUTES.shift,
   ROUTES.analytics,
+  ROUTES.fleet,
+  ROUTES.surveillance,
+  ROUTES.simulation,
+  ROUTES.laboratory,
+  ROUTES.knowledgeGraph,
+  ROUTES.audit,
+  ROUTES.aiCommandCenter,
+  ROUTES.adminOperations,
 ]);
 
 export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({

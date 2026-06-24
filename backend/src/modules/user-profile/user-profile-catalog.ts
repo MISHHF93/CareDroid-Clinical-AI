@@ -1,4 +1,4 @@
-import catalogData from '../../../../src/config/user-profile-catalog.data.json';
+import catalogDataRaw from '../../../../src/config/user-profile-catalog.data.json';
 import {
   DEFAULT_SAAS_PROFILE,
   normalizeSaasRole,
@@ -21,6 +21,8 @@ export type UserProfileCatalogEntry = Readonly<{
   requiredToolIds: string[];
   profileBenefits: string;
 }>;
+
+const catalogData: any = (catalogDataRaw as any)?.default ?? catalogDataRaw;
 
 const CATALOG_BY_ROLE = new Map<string, UserProfileCatalogEntry>(
   (catalogData as UserProfileCatalogEntry[]).map((entry) => [entry.saasRole, entry]),

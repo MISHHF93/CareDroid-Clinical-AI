@@ -395,6 +395,15 @@ function EmergencyDefaultRedirect() {
   const { saasProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
 
+  // In development/demo, default straight to the core Emergency Whiteboard for the selected persona.
+  // This reduces the "huge app" feeling and makes role switching + main surface the clear entry point.
+  const isDev = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta.env.DEV);
+
+  if (isDev) {
+    return <Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />;
+  }
+
   const destination =
     resolvePlatformLanding({
       saasRole: saasProfile?.role || saasProfile?.saasRole,

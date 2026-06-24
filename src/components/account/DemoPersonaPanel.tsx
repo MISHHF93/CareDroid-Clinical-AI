@@ -19,12 +19,20 @@ export default function DemoPersonaPanel() {
   const { authMode } = useUser();
   const { role, switchDemoRole } = useEmergencyRolePermissions();
   const { profileNavigate } = useProfileNavigate();
-  const [dismissed, setDismissed] = useState(
-    () => typeof sessionStorage !== 'undefined' && sessionStorage.getItem(DISMISS_KEY) === '1',
-  );
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof sessionStorage === 'undefined') return false;
+    // In dev, never auto-dismiss the persona switcher — we want it always visible for easy role changes.
+    const isDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    if (isDev) return false;
+    return sessionStorage.getItem(DISMISS_KEY) === '1';
+  });
   const [journeyOpen, setJourneyOpen] = useState(false);
 
-  if (authMode !== 'open-access' || dismissed) return null;
+  const isDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || (import.meta as any)?.env?.DEV);
+
+  // In dev, always show the role switcher — this is the primary way to experience different user profilings.
+  const forceShowInDev = isDev;
+  if (!forceShowInDev && (authMode !== 'open-access' || dismissed)) return null;
 
   const roleViews = listCuratedDemoRoleViews();
 
@@ -47,7 +55,7 @@ export default function DemoPersonaPanel() {
     <section className="demo-persona-panel" aria-label="Demo persona">
       <div className="demo-persona-panel__bar">
         <div className="demo-persona-panel__identity">
-          <p className="demo-persona-panel__eyebrow">Demo mode · Emergency Department 18</p>
+          <p className="demo-persona-panel__eyebrow">DEV MODE — Click to switch user profiling / role</p>
           <p className="demo-persona-panel__title">{getDemoPersonaHeadline()}</p>
           <p className="demo-persona-panel__subtitle">{DEMO_PERSONA.tagline}</p>
         </div>
@@ -68,7 +76,8 @@ export default function DemoPersonaPanel() {
         </div>
       </div>
 
-      <div className="demo-persona-panel__roles" role="group" aria-label="Switch ED role view">
+      <div className="demo-persona-panel__roles" role="group" aria-label="Switch user profile / ED role view">
+        <span style={{ fontSize: '0.75rem', opacity: 0.7, marginRight: 8 }}>Switch Profile:</span>
         {roleViews.map((view) => {
           const active = view.emergencyRoleId === role;
           return (

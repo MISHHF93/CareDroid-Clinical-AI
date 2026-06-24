@@ -85,6 +85,10 @@ export const PHYSICIAN_NAV_ORDER = Object.freeze([
   'tools',
   'analytics',
   'platform',
+  'fleet',
+  'simulation',
+  'knowledge',
+  'ai-center',
 ]);
 
 function hasPatientFlag(patient, flagType) {

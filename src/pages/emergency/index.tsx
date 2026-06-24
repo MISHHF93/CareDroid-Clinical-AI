@@ -34,7 +34,7 @@ import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen
 import useCommandCenterScreen from '../../hooks/useCommandCenterScreen';
 import PatientCard from '../../components/PatientCard';
 import QuickIntake from '../../components/QuickIntake';
-import WhoNextPanel from '../../components/WhoNextPanel';
+import WhoNextPanel from '../../components/WhoNextPanel.tsx';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import OperationalEmptyState, {
   OperationalEmptyAction,

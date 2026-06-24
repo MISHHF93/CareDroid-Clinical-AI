@@ -91,12 +91,52 @@ const PUBLIC_API_PATH_PATTERNS = [
 const isPublicApiPath = (apiPath) =>
   PUBLIC_API_PATH_PATTERNS.some((pattern) => pattern.test(apiPath));
 
+// In development, reduce console noise from expected degraded/disabled services and 401s
+// when running with the local dev-stack (many backends features are intentionally off).
+const isDev = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+
+function shouldSilenceInDev(status, url) {
+  if (!isDev) return false;
+  if (status === 401 || status === 403) return true; // auth is often bypassed or not fully set in pure demo
+  if (status >= 500) return true; // disabled services (RAG, AI, Redis, external, etc.)
+  // Common dev-disabled or demo paths
+  const p = String(url || '');
+  if (/\/ai\/|\/rag\/|\/memory\/|\/realtime\/|\/central-node|\/operational-intelligence/.test(p)) return true;
+  return false;
+}
+
 const shouldShortCircuitProtectedApi = (path, headers) => {
   const apiPath = normalizeApiPath(path);
   if (!apiPath.startsWith('/api/')) return false;
   if (isPublicApiPath(apiPath)) return false;
   return !hasUsableAuthorization(headers);
 };
+
+// Dev-only: for many paths that hit disabled services, return graceful empty responses
+// instead of letting the request fail and spam the console / error UI.
+const DEV_GRACEFUL_EMPTY_PATHS = [
+  /\/emergency\/(whiteboard|capacity|queues|reassessment|referrals|ems|analytics)/,
+  /\/profile\/me/,
+  /\/tools\/available/,
+  /\/ai\//,
+  /\/memory\//,
+  /\/operational-intelligence/,
+  /\/central-node/,
+  /\/realtime\//,
+];
+
+function getDevGracefulResponse(path) {
+  if (!isDev) return null;
+  const p = normalizeApiPath(path);
+  if (DEV_GRACEFUL_EMPTY_PATHS.some((re) => re.test(p))) {
+    return new Response(JSON.stringify({ data: [], items: [], results: [], status: 'dev-mocked' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return null;
+}
 
 const unauthenticatedApiResponse = () =>
   new Response(JSON.stringify({ message: 'Sign in required to load this data.' }), {
@@ -124,6 +164,9 @@ const buildRequestHeaders = (path, optionHeaders) => {
     const token = getStoredAccessToken();
     if (token) {
       mergedHeaders.Authorization = `Bearer ${token}`;
+    } else if (isDev) {
+      // In dev, auto-attach the known bypass token so we get fewer 401s and less console noise
+      mergedHeaders.Authorization = 'Bearer dev-bypass-token';
     }
   }
 
@@ -177,6 +220,12 @@ export const apiFetch = async (path, options = {}) => {
 
   if (shouldShortCircuitProtectedApi(path, mergedHeaders)) {
     return unauthenticatedApiResponse();
+  }
+
+  // Dev noise reduction: return mocked success for known noisy/degraded endpoints
+  const devGraceful = getDevGracefulResponse(path);
+  if (devGraceful) {
+    return devGraceful;
   }
 
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);

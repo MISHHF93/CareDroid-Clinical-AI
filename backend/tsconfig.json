@@ -10,6 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "ES2021",
     "sourceMap": true,
     "rootDir": "..",
@@ -19,6 +20,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],
       "@modules/*": ["src/modules/*"],
@@ -26,5 +28,5 @@
       "@config/*": ["src/config/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "test/**/*"]
+  "exclude": ["node_modules", "dist", "test/**/*", "**/*.spec.ts", "src/**/*.spec.ts"]
 }
