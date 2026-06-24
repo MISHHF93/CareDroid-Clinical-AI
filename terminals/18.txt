@@ -1,0 +1,14 @@
+---
+pid: 28676
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI; npm run dev:fullstack"
+started_at: 2026-06-24T11:52:35.730Z
+running_for_ms: 5515001  
+---
+npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system. For 
+more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:52
++ Set-Location C:\Users\borah\CareDroid-Clinical-AI; npm run dev:fullst ...
++                                                    ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess

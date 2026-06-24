@@ -1,0 +1,395 @@
+---
+pid: 21220
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node scripts/dev-stack.mjs\""
+started_at: 2026-06-24T13:35:54.632Z
+running_for_ms: 22349998 
+---
+Starting CareDroid local stack...
+Frontend: http://localhost:8000
+Backend:  http://localhost:3000
+Health:   http://localhost:3000/health
+
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 start:dev
+[api] > npm run build && npm run start:prod
+[api] 
+[web] 
+[web] > caredroid-clinical-ai@1.0.0 dev
+[web] > vite --strictPort
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 prebuild
+[api] > rimraf dist
+[api] 
+[web] 
+[web]   VITE v7.3.5  ready in 388 ms
+[web] 
+[web]   ➜  Local:   http://localhost:8000/
+[web]   ➜  Network: http://192.168.2.220:8000/
+[web] 
+[web] CareDroid API is not reachable at http://localhost:3000.
+[web]   Full stack: npm run dev:fullstack
+[web]   API only:   npm run dev:api
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 build
+[api] > nest build
+[api] 
+[api] Found 55 error(s).
+[api] ../engine/journeyEngine.ts:209:7 - error TS2345: Argument of type '{ flags: PatientFlag[]; timelineEvent: JourneyEvent; }' is not assignable to parameter of type '{ staffId?: string; note?: string; }'.
+[api] 
+[api]   Object literal may only specify known properties, and 'flags' does not exist in type '{ staffId?: string; note?: string; }'.
+[api] 
+[api] 209       flags: nextFlags,
+[api]           ~~~~~
+[api] ../engine/journeyEngine.ts:214:7 - error TS2345: Argument of type '{ flags: PatientFlag[]; timelineEvent: JourneyEvent; }' is not assignable to parameter of type 'string | { staffId?: string; note?: string; timelineEvent?: JourneyEvent; }'.
+[api]   Object literal may only specify known properties, and 'flags' does not exist in type '{ staffId?: string; note?: string; timelineEvent?: JourneyEvent; }'.
+[api] 
+[api] 214       flags: nextFlags,
+[api]           ~~~~~
+[api] ../src/components/whiteboard/waitingRoomSafetyBoardModel.ts:202:61 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 202     typeof flag === 'string' ? (flag as PatientFlag) : flag.type,
+[api]                                                                 ~~~~
+[api] ../src/engine/alertEngineDerived.ts:49:58 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 49     const value = typeof flag === 'string' ? flag : flag.type;
+[api]                                                             ~~~~
+[api] ../src/engine/anticipatedAdmissionScore.ts:39:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 39     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                            ~~~~
+[api] ../src/services/emsOffloadTracker.ts:113:74 - error TS2719: Type 'RoomLike[]' is not assignable to type 'RoomLike[]'. Two different types with this name exist, but they are unrelated.
+[api]   Property 'type' is missing in type 'RoomLike' but required in type 'RoomLike'.
+[api] 
+[api] 113   const checklist = resolveAmbulanceHandoffChecklist(arrival, { patient, rooms });
+[api]                                                                              ~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:762:3
+[api]     762   type: RoomType;
+[api]           ~~~~
+[api]     'type' is declared here.
+[api]   ../src/services/ambulanceHandoffChecklist.ts:420:5
+[api]     420     rooms?: RoomLike[];
+[api]             ~~~~~
+[api]     The expected type comes from property 'rooms' which is declared here on type '{ patient?: Patient; rooms?: RoomLike[]; timestamp?: string; }'
+[api] ../src/services/highRiskComplaintFlags.ts:355:3 - error TS2322: Type '{ id: string; type: string; severity: string; title: string; message: string; patientId: string; createdAt: string; dismissed: boolean; source: string; actionType: string; metadata: { flagIds: HighRiskComplaintFlagId[]; labels: string[]; needsRapidReview: boolean; advisoryOnly: boolean; }; }[]' is not assignable to type 'Alert[]'.
+[api]   Type '{ id: string; type: string; severity: string; title: string; message: string; patientId: string; createdAt: string; dismissed: boolean; source: string; actionType: string; metadata: { flagIds: HighRiskComplaintFlagId[]; labels: string[]; needsRapidReview: boolean; advisoryOnly: boolean; }; }' is not assignable to type 'Alert'.
+[api]     Types of property 'severity' are incompatible.
+[api]       Type 'string' is not assignable to type 'AlertSeverity'.
+[api] 
+[api] 355   return patients
+[api]       ~~~~~~
+[api] ../src/services/lwbsRiskLayer.ts:88:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 88     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                            ~~~~
+[api] ../src/services/lwbsRiskLayer.ts:133:19 - error TS2367: This comparison appears to be unintentional because the types 'ReassessmentReminderStatus' and '"overdue"' have no overlap.
+[api] 
+[api] 133     (reminder) => reminder.status === 'overdue' || reminder.status === 'missed',
+[api]                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ../src/services/lwbsRiskLayer.ts:133:52 - error TS2367: This comparison appears to be unintentional because the types 'ReassessmentReminderStatus' and '"missed"' have no overlap.
+[api] 
+[api] 133     (reminder) => reminder.status === 'overdue' || reminder.status === 'missed',
+[api]                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ../src/services/lwbsRiskLayer.ts:339:3 - error TS2322: Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }[]' is not assignable to type 'Alert[]'.
+[api]   Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }' is not assignable to type 'Alert'.
+[api]     Types of property 'metadata' are incompatible.
+[api]       Type '{ advisoryOnly: true; lwbsRiskScore: number; lwbsRiskLevel: LwbsRiskLevel; factors: LwbsRiskFactorId[]; }' is not assignable to type 'Record<string, string | number | boolean>'.
+[api]         Property 'factors' is incompatible with index signature.
+[api]           Type 'LwbsRiskFactorId[]' is not assignable to type 'string | number | boolean'.
+[api] 
+[api] 339   return waitingPatients
+[api]       ~~~~~~
+[api] ../src/services/patientDocumentArtifactModel.ts:687:41 - error TS2339: Property 'destination' does not exist on type 'Referral'.
+[api] 
+[api] 687           destination: patient.referral.destination,
+[api]                                             ~~~~~~~~~~~
+[api] ../src/services/patientExperienceStatus.ts:85:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 85     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                            ~~~~
+[api] ../src/services/providerWaitBreachTimer.ts:219:7 - error TS2367: This comparison appears to be unintentional because the types 'PatientState.Waiting' and 'PatientState.Discharge' have no overlap.
+[api] 
+[api] 219   if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) {
+[api]           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ../src/services/providerWaitBreachTimer.ts:219:51 - error TS2367: This comparison appears to be unintentional because the types 'PatientState.Waiting' and 'PatientState.Deceased' have no overlap.
+[api] 
+[api] 219   if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) {
+[api]                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ../src/services/queueAssignment.ts:176:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 176     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                             ~~~~
+[api] ../src/services/queueAssignment.ts:391:22 - error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+[api]   Types of property 'recordWorkflowAction' are incompatible.
+[api]     Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }) => void'.
+[api]       Types of parameters 'input' and 'input' are incompatible.
+[api]         Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'WorkflowActionInput'.
+[api]           Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "status" | "timestamp" | "title" | "severity" | "source" | "metadata">'.
+[api] 
+[api] 391   recordFirstContact(store, options.patientId, {
+[api]                          ~~~~~
+[api] ../src/services/queueAssignment.ts:397:28 - error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+[api] 
+[api] 397   stampArrivalControlLayer(store, options.patientId, {
+[api]                                ~~~~~
+[api] ../src/services/queueAssignment.ts:485:28 - error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+[api] 
+[api] 485   stampArrivalControlLayer(store, options.patientId, {
+[api]                                ~~~~~
+[api] ../src/services/queueReasonVisibility.ts:140:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 140     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                             ~~~~
+[api] ../src/services/receptionEscalationWorkflow.ts:238:81 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 238     (patient.flags || []).map((flag) => (typeof flag === 'string' ? flag : flag.type)),
+[api]                                                                                     ~~~~
+[api] ../src/services/receptionEscalationWorkflow.ts:248:7 - error TS2322: Type 'JourneyEvent | { id: string; type: "ReceptionEscalation"; timestamp: string; to: PatientState; summary: string; note: ReceptionEscalationReasonId; metadata: { ...; }; }' is not assignable to type 'JourneyEvent'.
+[api]   Type '{ id: string; type: "ReceptionEscalation"; timestamp: string; to: PatientState; summary: string; note: ReceptionEscalationReasonId; metadata: { ...; }; }' is not assignable to type 'JourneyEvent'.
+[api]     Types of property 'type' are incompatible.
+[api]       Type '"ReceptionEscalation"' is not assignable to type 'JourneyEventType'.
+[api] 
+[api] 248       ...(patient.timeline || []),
+[api]           ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ../src/services/receptionEscalationWorkflow.ts:251:9 - error TS2322: Type '"ReceptionEscalation"' is not assignable to type 'JourneyEventType'.
+[api] 
+[api] 251         type: 'ReceptionEscalation',
+[api]             ~~~~
+[api] 
+[api]   ../src/types/emergency.ts:157:3
+[api]     157   type?: JourneyEventType;
+[api]           ~~~~
+[api]     The expected type comes from property 'type' which is declared here on type 'JourneyEvent'
+[api] ../src/services/waitingRoomDeteriorationWatch.ts:346:3 - error TS2322: Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }[]' is not assignable to type 'Alert[]'.
+[api]   Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }' is not assignable to type 'Alert'.
+[api]     Types of property 'metadata' are incompatible.
+[api]       Type '{ advisoryOnly: true; deteriorationWatchLevel: DeteriorationWatchLevel; factors: DeteriorationWatchFactorId[]; }' is not assignable to type 'Record<string, string | number | boolean>'.
+[api]         Property 'factors' is incompatible with index signature.
+[api]           Type 'DeteriorationWatchFactorId[]' is not assignable to type 'string | number | boolean'.
+[api] 
+[api] 346   return patients
+[api]       ~~~~~~
+[api] ../src/services/whatHappensNextGuidance.ts:140:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 140     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                             ~~~~
+[api] ../src/services/whiteboardAutomationEngine.ts:50:16 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 50     if (entry?.type === flag) return entry.detectedAt || null;
+[api]                   ~~~~
+[api] ../src/services/whiteboardAutomationEngine.ts:50:44 - error TS2339: Property 'detectedAt' does not exist on type 'never'.
+[api] 
+[api] 50     if (entry?.type === flag) return entry.detectedAt || null;
+[api]                                               ~~~~~~~~~~
+[api] ../src/services/whiteboardAutomationEngine.ts:57:57 - error TS2339: Property 'type' does not exist on type 'never'.
+[api] 
+[api] 57     typeof entry === 'string' ? entry === flag : entry?.type === flag,
+[api]                                                            ~~~~
+[api] ../src/store/emergencyOperationalSync.ts:80:5 - error TS2322: Type 'VitalValue' is not assignable to type 'number'.
+[api]   Type 'string' is not assignable to type 'number'.
+[api] 
+[api] 80     sbp: vitals.sbp ?? vitals.bpSystolic,
+[api]        ~~~
+[api] 
+[api]   ../src/types/emergency.ts:100:3
+[api]     100   sbp?: number;
+[api]           ~~~
+[api]     The expected type comes from property 'sbp' which is declared here on type 'Vitals'
+[api] ../src/store/emergencyOperationalSync.ts:81:5 - error TS2322: Type 'VitalValue' is not assignable to type 'number'.
+[api]   Type 'string' is not assignable to type 'number'.
+[api] 
+[api] 81     dbp: vitals.dbp ?? vitals.bpDiastolic,
+[api]        ~~~
+[api] 
+[api]   ../src/types/emergency.ts:101:3
+[api]     101   dbp?: number;
+[api]           ~~~
+[api]     The expected type comes from property 'dbp' which is declared here on type 'Vitals'
+[api] ../src/store/emergencyOperationalSync.ts:101:3 - error TS2322: Type '{ id: string; patientId: string; type: JourneyEventType; timestamp: string; from?: PatientState; to?: PatientState; fromState?: PatientState; ... 7 more ...; metadata?: Record<...>; }' is not assignable to type 'JourneyEvent'.
+[api]   Property 'to' is optional in type '{ id: string; patientId: string; type: JourneyEventType; timestamp: string; from?: PatientState; to?: PatientState; fromState?: PatientState; ... 7 more ...; metadata?: Record<...>; }' but required in type 'JourneyEvent'.
+[api] 
+[api] 101   return {
+[api]       ~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:165:3 - error TS2322: Type '{ flags: (PatientFlag | PatientFlagRecord)[]; timeline: JourneyEvent[]; id: string; mrn: string; firstName: string; lastName: string; name?: string; ... 45 more ...; documentSources?: PatientDocumentSource[]; }[]' is not assignable to type 'Patient[]'.
+[api]   Type '{ flags: (PatientFlag | PatientFlagRecord)[]; timeline: JourneyEvent[]; id: string; mrn: string; firstName: string; lastName: string; name?: string; ... 45 more ...; documentSources?: PatientDocumentSource[]; }' is not assignable to type 'Patient'.
+[api]     Types of property 'flags' are incompatible.
+[api]       Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+[api]         Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+[api]           Type 'PatientFlagRecord' is not assignable to type 'PatientFlag'.
+[api] 
+[api] 165   return changed ? nextPatients : patients;
+[api]       ~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:202:54 - error TS2339: Property 'reason' does not exist on type 'never'.
+[api] 
+[api] 202             (typeof flag === 'string' ? false : flag.reason === expected.reason) &&
+[api]                                                          ~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:203:53 - error TS2339: Property 'severity' does not exist on type 'never'.
+[api] 
+[api] 203             (typeof flag === 'string' ? true : flag.severity === expected.severity),
+[api]                                                         ~~~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:214:3 - error TS2322: Type '{ flags: (PatientFlag | PatientFlagRecord)[]; id: string; mrn: string; firstName: string; lastName: string; name?: string; dob: string; age: number; sex: Sex; ... 43 more ...; documentSources?: PatientDocumentSource[]; }[]' is not assignable to type 'Patient[]'.
+[api]   Type '{ flags: (PatientFlag | PatientFlagRecord)[]; id: string; mrn: string; firstName: string; lastName: string; name?: string; dob: string; age: number; sex: Sex; ... 43 more ...; documentSources?: PatientDocumentSource[]; }' is not assignable to type 'Patient'.
+[api]     Types of property 'flags' are incompatible.
+[api]       Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+[api] 
+[api] 214   return changed ? nextPatients : patients;
+[api]       ~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:254:50 - error TS2339: Property 'reason' does not exist on type 'never'.
+[api] 
+[api] 254           typeof flag === 'string' ? flag : flag.reason || getPatientFlagType(flag),
+[api]                                                      ~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:259:37 - error TS2339: Property 'detectedAt' does not exist on type 'never'.
+[api] 
+[api] 259             : reassessmentFlags[0]?.detectedAt) || new Date().toISOString(),
+[api]                                         ~~~~~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:302:7 - error TS2322: Type 'string' is not assignable to type 'QueueType'.
+[api] 
+[api] 302       type: String(record.type || record.label || 'Queue'),
+[api]           ~~~~
+[api] 
+[api]   ../src/types/emergency.ts:920:3
+[api]     920   type: QueueType;
+[api]           ~~~~
+[api]     The expected type comes from property 'type' which is declared here on type 'Queue'
+[api] ../src/store/emergencyOperationalSync.ts:309:68 - error TS2339: Property 'health' does not exist on type 'Queue'.
+[api] 
+[api] 309       health: (record.health as import('../types/emergency').Queue['health']) || 'green',
+[api]                                                                        ~~~~~~~~
+[api] ../src/store/emergencyOperationalSync.ts:319:7 - error TS2322: Type '{ id: string; type: string; name: string; patientIds: string[]; targetWaitMinutes: number; averageWaitMinutes: number; longestWaitMinutes: number; count: number; health: any; updatedAt: string; }[]' is not assignable to type 'Queue[]'.
+[api]   Property 'criticalCount' is missing in type '{ id: string; type: string; name: string; patientIds: string[]; targetWaitMinutes: number; averageWaitMinutes: number; longestWaitMinutes: number; count: number; health: any; updatedAt: string; }' but required in type 'Queue'.
+[api] 
+[api] 319       queues: normalizedQueues,
+[api]           ~~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:926:3
+[api]     926   criticalCount: number;
+[api]           ~~~~~~~~~~~~~
+[api]     'criticalCount' is declared here.
+[api]   ../src/engine/alertEngineDerived.ts:20:3
+[api]     20   queues: Queue[];
+[api]          ~~~~~~
+[api]     The expected type comes from property 'queues' which is declared here on type 'AlertEngineInputs'
+[api] ../src/store/emergencyOperationalSync.ts:376:5 - error TS2345: Argument of type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' is not assignable to parameter of type 'AlertDispatchInput'.
+[api]   Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' but required in type 'Omit<Alert, "id" | "type" | "severity" | "createdAt">'.
+[api] 
+[api] 376     {
+[api]         ~
+[api] 377       id: `alert-escalation-${patient.id}`,
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ... 
+[api] 384       actionType: 'VIEW_PATIENT',
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] 385     },
+[api]     ~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:890:3
+[api]     890   dismissed: boolean;
+[api]           ~~~~~~~~~
+[api]     'dismissed' is declared here.
+[api] ../src/store/emergencyOperationalSync.ts:391:5 - error TS2322: Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+[api]   Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+[api] 
+[api] 391     flags: [
+[api]         ~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:566:3
+[api]     566   flags: PatientFlag[];
+[api]           ~~~~~
+[api]     The expected type comes from property 'flags' which is declared here on type 'Patient'
+[api] ../src/store/emergencyOperationalSync.ts:521:9 - error TS2345: Argument of type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: undefined; }' is not assignable to parameter of type 'AlertDispatchInput'.
+[api]   Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: undefined; }' but required in type 'Omit<Alert, "id" | "type" | "severity" | "createdAt">'.
+[api] 
+[api] 7m521         {
+[api]             ~
+[api] 522           id: `alert-vitals-critical-${alert.id}`,
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ... 
+[api] 530           autoDismissAfter: undefined,
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] 531         },
+[api]     ~~~~~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:890:3
+[api]     890   dismissed: boolean;
+[api]           ~~~~~~~~~
+[api]     'dismissed' is declared here.
+[api] ../src/store/emergencyOperationalSync.ts:537:9 - error TS2345: Argument of type '{ id: string; type: string; severity: "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: number; }' is not assignable to parameter of type 'AlertDispatchInput'.
+[api]   Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: number; }' but required in type 'Omit<Alert, "id" | "type" | "severity" | "createdAt">'.
+[api] 
+[api] 537         {
+[api]             ~
+[api] 538           id: `alert-vitals-warning-${alert.id}`,
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] ... 
+[api] 546           autoDismissAfter: 30,
+[api]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[api] 547         },
+[api]     ~~~~~~~~~
+[api] 
+[api]   ../src/types/emergency.ts:890:3
+[api]     890   dismissed: boolean;
+[api]           ~~~~~~~~~
+[api]     'dismissed' is declared here.
+[api] ../src/store/emergencyOperationalSync.ts:553:62 - error TS2345: Argument of type '(current: Patient) => { vitals: Vitals[]; vitalsUpdatedAt: string; lastAssessedTime: string; flags: (PatientFlag | PatientFlagRecord)[]; ... 48 more ...; documentSources?: PatientDocumentSource[]; }' is not assignable to parameter of type '(patient: Patient) => Patient'.
+[api]   Call signature return types '{ vitals: Vitals[]; vitalsUpdatedAt: string; lastAssessedTime: string; flags: (PatientFlag | PatientFlagRecord)[]; vitalsAlerts: VitalsAlert[]; ... 47 more ...; documentSources?: PatientDocumentSource[]; }' and 'Patient' are incompatible.
+[api]     The types of 'flags' are incompatible between these types.
+[api]       Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+[api] 
+[api] 553   const patients = updatePatients(state.patients, patientId, (current) => {
+[api]                                                                  ~~~~~~~~~~~~~~
+[api] ../src/store/emergencyStore.ts:1621:12 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+[api] 
+[api] 1621   Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+[api]                 ~~~~~~~~~~~
+[api] ../src/store/emergencyStore.ts:2638:84 - error TS2698: Spread types may only be created from object types.
+[api] 
+[api] 2638     Object.entries(DEFAULT_EMERGENCY_ALERT_RULES).map(([rule, config]) => [rule, { ...config }]),
+[api]                                                                                         ~~~~~~~~~
+[api] ../src/store/emergencyStore.ts:2918:64 - error TS2345: Argument of type 'EmergencyStoreState' is not assignable to parameter of type 'ArrivalControlStore & { recordWorkflowAction?: (input: { type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }) => void; }'.
+[api]   Type 'EmergencyStoreState' is not assignable to type 'ArrivalControlStore'.
+[api]     Types of property 'recordWorkflowAction' are incompatible.
+[api]       Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }) => void'.
+[api]         Types of parameters 'input' and 'input' are incompatible.
+[api]           Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'WorkflowActionInput'.
+[api]             Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "status" | "timestamp" | "title" | "severity" | "source" | "metadata">'.
+[api]               Types of property 'type' are incompatible.
+[api]                 Type 'string' is not assignable to type 'WorkflowActionType'.
+[api] 
+[api] 2918       return registerArrivalControlLayer(toArrivalControlStore(state), patientId, options);
+[api]                                                                     ~~~~~
+[api] ../src/store/emergencyStore.ts:2927:11 - error TS2322: Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }) => void'.
+[api]   Types of parameters 'input' and 'input' are incompatible.
+[api]     Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'WorkflowActionInput'.
+[api]       Type '{ type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown>; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "status" | "timestamp" | "title" | "severity" | "source" | "metadata">'.
+[api]         Types of property 'type' are incompatible.
+[api]           Type 'string' is not assignable to type 'WorkflowActionType'.
+[api] 
+[api] 2927           recordWorkflowAction: state.recordWorkflowAction,
+[api]                ~~~~~~~~~~~~~~~~~~~~
+[api] 
+[api]   ../src/services/highRiskComplaintFlags.ts:448:3
+[api]     448   recordWorkflowAction?: (input: {
+[api]           ~~~~~~~~~~~~~~~~~~~~
+[api]     The expected type comes from property 'recordWorkflowAction' which is declared here on type 'HighRiskComplaintFlagStore'
+[api] ../src/store/emergencyStore.ts:3125:15 - error TS2322: Type '"whiteboard_automation"' is not assignable to type 'WorkflowActionType'.
+[api] 
+[api] 3125               type: 'whiteboard_automation',
+[api]                    ~~~~
+[api] 
+[api]   ../src/types/emergency.ts:850:3
+[api]     850   type: WorkflowActionType;
+[api]           ~~~~
+[api]     The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+[api] ../src/store/emergencyStore.ts:3202:15 - error TS2322: Type '"fit_to_wait_classified"' is not assignable to type 'WorkflowActionType'.
+[api] 
+[api] 3202               type: 'fit_to_wait_classified',
+[api]                    ~~~~
+[api] 
+[api]   ../src/types/emergency.ts:850:3
+[api]     850   type: WorkflowActionType;
+[api]           ~~~~
+[api]     The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+[api] ../src/store/emergencyStore.ts:5378:30 - error TS2345: Argument of type '{ id: string; type: string; severity: "Info" | "Warning"; title: string; message: string; patientId: string; actionLabel: string; ac

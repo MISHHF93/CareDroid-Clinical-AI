@@ -1,0 +1,169 @@
+---
+pid: 29220
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run dev\""
+started_at: 2026-06-24T18:07:30.278Z
+running_for_ms: 6055000  
+---
+
+> caredroid-clinical-ai@1.0.0 dev
+> vite --strictPort
+
+
+  VITE v7.3.5  ready in 721 ms
+
+  ➜  Local:   http://localhost:8000/
+  ➜  Network: http://192.168.2.220:8000/
+2:10:39 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+2:10:39 PM [vite] (client) hmr update /src/App.jsx
+2:10:39 PM [vite] vite.config.js changed, restarting server...
+2:10:39 PM [vite] (client) hmr update /src/App.jsx
+2:10:40 PM [vite] (client) hmr update /src/App.jsx
+2:10:40 PM [vite] vite.config.js changed, restarting server...
+2:10:40 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+2:10:40 PM [vite] server restarted.
+2:17:45 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.tsx
+2:17:45 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.tsx
+2:17:45 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/PatientSearchResults.tsx, /src/components/Header.tsx, /src/pages/emergency/index.tsx, /src/components/reception/AiTriageAssistPanel.jsx, /src/components/orchestration/PatientCardToolChips.tsx, /src/components/CopilotPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/DiagnosticSafetyDashboard.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.tsx
+2:19:42 PM [vite] (client) hmr update /src/components/copilot/DiagnosticSafetyDashboard.tsx
+2:19:42 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\copilot\DiagnosticSafetyDashboard.tsx: Unexpected token, expected "jsxTagEnd" (113:13)
+
+  111 |         ))}
+  112 |       </div>
+> 113 |     </section
+      |              ^
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/components/copilot/DiagnosticSafetyDashboard.tsx:113:13
+  111 |          ))}
+  112 |        </div>
+  113 |      </section
+      |               ^
+2:19:42 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\copilot\DiagnosticSafetyDashboard.tsx: Unexpected token, expected "jsxTagEnd" (113:13)
+
+  111 |         ))}
+  112 |       </div>
+> 113 |     </section
+      |              ^
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/components/copilot/DiagnosticSafetyDashboard.tsx:113:13
+  111 |          ))}
+  112 |        </div>
+  113 |      </section
+      |               ^
+      at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+      at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+      at TypeScriptParserMixin.unexpected (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6636:16)
+      at TypeScriptParserMixin.expect (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6916:12)
+      at TypeScriptParserMixin.jsxParseClosingElementAt (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4692:10)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4707:37)
+      at TypeScriptParserMixin.jsxParseElement (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4761:17)
+      at TypeScriptParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4771:19)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11098:23)
+      at TypeScriptParserMixin.parseUpdate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11083:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11063:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9854:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10916:61)
+      at TypeScriptParserMixin.parseExprOps (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10921:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10898:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10848:21)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9792:39
+      at TypeScriptParserMixin.tryParse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6924:20)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9792:18)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:39
+      at TypeScriptParserMixin.allowInAnd (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12443:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12510:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11692:28)
+      at TypeScriptParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11348:23)
+      at TypeScriptParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4776:20)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11098:23)
+      at TypeScriptParserMixin.parseUpdate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11083:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11063:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9854:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10916:61)
+      at TypeScriptParserMixin.parseExprOps (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10921:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10898:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10848:21)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9803:20)
+      at TypeScriptParserMixin.parseExpressionBase (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10801:23)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10797:39
+      at TypeScriptParserMixin.allowInAnd (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12438:16)
+      at TypeScriptParserMixin.parseExpression (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10797:17)
+      at TypeScriptParserMixin.parseReturnStatement (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13159:28)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12815:21)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+      at TypeScriptParserMixin.parseStatementListItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12764:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:61)
+      at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+      at TypeScriptParserMixin.parseBlock (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13314:10)
+      at TypeScriptParserMixin.parseFunctionBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12117:24)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12103:10)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9189:18)
+2:19:42 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\copilot\DiagnosticSafetyDashboard.tsx: Unexpected token, expected "jsxTagEnd" (113:13)
+
+  111 |         ))}
+  112 |       </div>
+> 113 |     </section
+      |              ^
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/components/copilot/DiagnosticSafetyDashboard.tsx:113:13
+  111 |          ))}
+  112 |        </div>
+  113 |      </section
+      |               ^
+2:19:42 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\copilot\DiagnosticSafetyDashboard.tsx: Unexpected token, expected "jsxTagEnd" (113:13)
+
+  111 |         ))}
+  112 |       </div>
+> 113 |     </section
+      |              ^
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/components/copilot/DiagnosticSafetyDashboard.tsx:113:13
+  111 |          ))}
+  112 |        </div>
+  113 |      </section
+      |               ^
+2:19:47 PM [vite] (client) hmr update /src/components/PatientSearchResults.tsx, /src/components/Header.tsx, /src/pages/emergency/index.tsx, /src/components/reception/AiTriageAssistPanel.jsx, /src/components/orchestration/PatientCardToolChips.tsx, /src/components/CopilotPanel.tsx
+2:19:47 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:19:47 PM [vite] (client) hmr update /src/components/orchestration/PatientCardToolChips.tsx, /src/components/CopilotPanel.tsx
+2:19:47 PM [vite] (client) hmr update /src/components/PatientSearchResults.tsx, /src/components/Header.tsx, /src/pages/emergency/index.tsx, /src/components/reception/AiTriageAssistPanel.jsx, /src/components/orchestration/PatientCardToolChips.tsx, /src/components/CopilotPanel.tsx
+2:19:47 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:19:48 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:19:48 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:19:54 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:19:54 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:31:44 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:31:44 PM [vite] (client) hmr update /src/components/CopilotPanel.css
+2:31:44 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:31:58 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+2:37:03 PM [vite] (client) hmr update /src/pages/emergency/index.tsx, /src/components/native-ai/DriftMonitoringPanel.tsx
+2:37:03 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+2:37:03 PM [vite] (client) hmr update /src/pages/emergency/index.tsx, /src/components/native-ai/DriftMonitoringPanel.tsx
+2:37:03 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+2:37:12 PM [vite] (client) hmr update /src/components/native-ai/ClinicalAcuityLeaderboard.tsx
+2:37:12 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.css
+2:37:12 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.tsx
+2:37:12 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+2:37:12 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.css
+2:37:17 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.tsx
+2:37:17 PM [vite] (client) hmr update /src/components/AppShell.tsx
+2:37:17 PM [vite] (client) hmr update /src/contexts/TenantContext.jsx
+2:37:17 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.tsx
+2:37:17 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.tsx
+2:37:17 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.tsx
+2:37:17 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.tsx
+2:37:25 PM [vite] (client) page reload src/services/apiClient.js
+2:37:25 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+2:37:25 PM [vite] (client) hmr update /src/components/native-ai/DriftMonitoringPanel.css
+2:37:25 PM [vite] (client) page reload src/services/apiClient.js
+2:37:29 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.tsx
+2:37:29 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.tsx

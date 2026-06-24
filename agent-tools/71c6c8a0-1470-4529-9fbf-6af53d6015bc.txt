@@ -1,0 +1,1177 @@
+engine/journeyEngine.ts(209,7): error TS2353: Object literal may only specify known properties, and 'flags' does not exist in type '{ staffId?: string | undefined; note?: string | undefined; }'.
+engine/journeyEngine.ts(214,7): error TS2353: Object literal may only specify known properties, and 'flags' does not exist in type '{ staffId?: string | undefined; note?: string | undefined; timelineEvent?: JourneyEvent | undefined; }'.
+lib/patient-orchestration/clinicalScoreEventsBackend.ts(7,55): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+lib/patient-orchestration/recommendTools.ts(46,3): error TS2322: Type '(string | undefined)[]' is not assignable to type 'string[]'.
+  Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/central-node/careDroidCentralNode.test.ts(34,3): error TS2322: Type '{ staff?: Staff[] | undefined; emergencySettings: EmergencyOsSettings; alerts: Alert[]; capacity: CapacitySnapshot; ... 14 more ...; workflowLogs: WorkflowActionLog[]; }' is not assignable to type 'CareDroidCentralNodeSource'.
+  Types of property 'staff' are incompatible.
+    Type 'Staff[] | undefined' is not assignable to type 'Staff[]'.
+      Type 'undefined' is not assignable to type 'Staff[]'.
+src/components/account/UserAccountMenu.test.tsx(45,7): error TS2322: Type '{ id: string; name: string; }' is not assignable to type 'null'.
+src/components/account/UserAccountMenu.test.tsx(63,7): error TS2322: Type '{ id: string; name: string; }' is not assignable to type 'null'.
+src/components/account/UserAccountMenu.test.tsx(80,7): error TS2322: Type '{ id: string; name: string; }' is not assignable to type 'null'.
+src/components/account/UserAccountMenu.tsx(36,16): error TS2339: Property 'displayName' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(37,13): error TS2339: Property 'fullName' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(38,13): error TS2339: Property 'name' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(40,15): error TS2339: Property 'displayName' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(40,34): error TS2339: Property 'fullName' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(40,50): error TS2339: Property 'name' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(43,30): error TS2339: Property 'avatarUrl' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(43,49): error TS2339: Property 'avatarUrl' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(47,11): error TS2339: Property 'role' does not exist on type 'never'.
+src/components/account/UserAccountMenu.tsx(55,74): error TS2339: Property 'role' does not exist on type 'never'.
+src/components/AppShell.tsx(190,106): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/components/AppShell.tsx(200,38): error TS2345: Argument of type 'number' is not assignable to parameter of type 'To'.
+src/components/AppShell.tsx(361,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(411,27): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(414,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(498,27): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(501,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(506,27): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(513,27): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(514,30): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(522,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(527,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(545,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(550,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/AppShell.tsx(558,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/components/calculators/calculatorSave.test.ts(9,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob: LocalDateString; age: number; sex: Sex; ... 40 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'complaintCategory' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/CommandPalette.test.tsx(176,9): error TS2345: Argument of type '{ requiredAction: "patient.create"; requiredRoute: "/emergency/whiteboard"; }' is not assignable to parameter of type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+  Property 'id' is missing in type '{ requiredAction: "patient.create"; requiredRoute: "/emergency/whiteboard"; }' but required in type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+src/components/CommandPalette.test.tsx(185,9): error TS2345: Argument of type '{ requiredRoute: "/emergency/patients"; }' is not assignable to parameter of type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+  Property 'id' is missing in type '{ requiredRoute: "/emergency/patients"; }' but required in type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+src/components/CommandPalette.test.tsx(193,9): error TS2345: Argument of type '{ requiredRoute: "/emergency/settings"; }' is not assignable to parameter of type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+  Property 'id' is missing in type '{ requiredRoute: "/emergency/settings"; }' but required in type 'Pick<CommandWithVisibility, "id" | "requiredAction" | "requiredRoute" | "hiddenInPilotMode">'.
+src/components/CommandPalette.tsx(209,29): error TS2345: Argument of type 'PatientLookupFields' is not assignable to parameter of type 'PatientSearchSource'.
+  Type 'PatientLookupFields' is missing the following properties from type 'Pick<Patient, "id" | "state" | "name" | "chiefComplaint" | "priority" | "mrn" | "firstName" | "lastName" | "dob" | "complaint" | "complaintCategory">': id, dob
+src/components/CommandPalette.tsx(254,32): error TS2345: Argument of type '(path: string) => void' is not assignable to parameter of type 'NavigateFunction'.
+  Types of parameters 'path' and 'to' are incompatible.
+    Type 'To' is not assignable to type 'string'.
+      Type 'Partial<Path>' is not assignable to type 'string'.
+src/components/CommandPalette.tsx(261,32): error TS2345: Argument of type '(path: string) => void' is not assignable to parameter of type 'NavigateFunction'.
+  Types of parameters 'path' and 'to' are incompatible.
+    Type 'To' is not assignable to type 'string'.
+      Type 'Partial<Path>' is not assignable to type 'string'.
+src/components/CommandPalette.tsx(268,32): error TS2345: Argument of type '(path: string) => void' is not assignable to parameter of type 'NavigateFunction'.
+  Types of parameters 'path' and 'to' are incompatible.
+    Type 'To' is not assignable to type 'string'.
+      Type 'Partial<Path>' is not assignable to type 'string'.
+src/components/CommandPalette.tsx(272,32): error TS2345: Argument of type '(path: string) => void' is not assignable to parameter of type 'NavigateFunction'.
+  Types of parameters 'path' and 'to' are incompatible.
+    Type 'To' is not assignable to type 'string'.
+      Type 'Partial<Path>' is not assignable to type 'string'.
+src/components/CommandPalette.tsx(397,23): error TS2339: Property 'navItemId' does not exist on type 'RouteCommandConfig'.
+src/components/CommandPalette.tsx(398,58): error TS2339: Property 'navItemId' does not exist on type 'RouteCommandConfig'.
+src/components/CommandPalette.tsx(423,36): error TS2304: Cannot find name 'PILOT_CUSTOMER_MODE'.
+src/components/CommandPalette.tsx(864,15): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/components/CopilotPanel.tsx(261,43): error TS2345: Argument of type 'readonly any[]' is not assignable to parameter of type 'any[]'.
+  The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
+src/components/CopilotPanel.tsx(998,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/components/CopilotPanel.tsx(999,13): error TS2322: Type 'Element[]' is not assignable to type 'null | undefined'.
+src/components/ExpressRegistration.tsx(300,15): error TS2322: Type 'PatientDuplicateCandidate[]' is not assignable to type 'never[]'.
+  Type 'PatientDuplicateCandidate' is not assignable to type 'never'.
+src/components/ExpressRegistration.tsx(306,31): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/ExpressRegistration.tsx(307,36): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/Header.tsx(312,63): error TS2559: Type 'EmergencyThresholds' has no properties in common with type 'ReassessmentTimerThresholdsInput'.
+src/components/Header.tsx(342,30): error TS2339: Property 'communicationOverdueMinutes' does not exist on type 'EmergencyThresholds'.
+src/components/Header.tsx(366,28): error TS2551: Property 'emsOffloadTargetMinutes' does not exist on type 'EmergencyThresholds'. Did you mean 'emsOffloadTargetMin'?
+src/components/Header.tsx(819,45): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/components/PatientCard.tsx(533,59): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientCard.tsx(536,51): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientCard.tsx(536,73): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientCard.tsx(539,12): error TS2739: Type '{ patient: Patient; waitingPatientCount: number; compact: true; }' is missing the following properties from type '{ patient: any; waitingPatientCount: any; congestionThreshold: any; now: any; compact?: boolean | undefined; showScore?: boolean | undefined; }': congestionThreshold, now
+src/components/PatientCard.tsx(546,54): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/components/PatientCard.tsx(551,13): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/components/PatientCard.tsx(552,13): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientCard.tsx(557,12): error TS2739: Type '{ patient: Patient; settings: EmergencyOsSettings; compact: true; showElapsed: true; }' is missing the following properties from type '{ patient: any; settings: any; targetMinutes: any; warningMinutes: any; now: any; compact?: boolean | undefined; showElapsed?: boolean | undefined; }': targetMinutes, warningMinutes, now
+src/components/PatientCard.tsx(586,47): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientCard.tsx(586,69): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientCard.tsx(649,54): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/components/PatientDetailPanel.tsx(44,26): error TS5097: An import path can only end with a '.tsx' extension when 'allowImportingTsExtensions' is enabled.
+src/components/PatientDetailPanel.tsx(1016,19): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1017,19): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1046,13): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1052,15): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1053,15): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1059,13): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1065,11): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1066,11): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1079,14): error TS2739: Type '{ patient: Patient; }' is missing the following properties from type '{ patient: any; compact?: boolean | undefined; onEdit: any; onDismissed: any; onAccepted: any; allowWaitingReview?: boolean | undefined; }': onEdit, onDismissed, onAccepted
+src/components/PatientDetailPanel.tsx(1184,34): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/PatientDetailPanel.tsx(1266,11): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1267,11): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1283,11): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/components/PatientDetailPanel.tsx(1284,11): error TS2322: Type 'string' is not assignable to type 'null | undefined'.
+src/components/PatientSearchResults.tsx(179,11): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/components/PatientSearchResults.tsx(180,11): error TS2322: Type 'Element' is not assignable to type 'null | undefined'.
+src/components/profile/ProfileSettingsShell.tsx(17,3): error TS7031: Binding element 'title' implicitly has an 'any' type.
+src/components/profile/ProfileSettingsShell.tsx(18,3): error TS7031: Binding element 'subtitle' implicitly has an 'any' type.
+src/components/profile/ProfileSettingsShell.tsx(19,3): error TS7031: Binding element 'children' implicitly has an 'any' type.
+src/components/profile/ProfileSettingsShell.tsx(24,53): error TS2339: Property 'profileShellSubtitle' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(31,27): error TS2339: Property 'workspaceEyebrow' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(40,35): error TS2339: Property 'personaTitle' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(40,65): error TS2339: Property 'profileBenefits' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(41,34): error TS2339: Property 'profileBenefits' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(43,36): error TS2339: Property 'saasRole' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(44,30): error TS2339: Property 'emergencyRole' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(45,43): error TS2339: Property 'emergencyRole' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(47,32): error TS2339: Property 'navigationRoutes' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(48,30): error TS2339: Property 'allowedWorkspaces' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(50,27): error TS2339: Property 'primaryFunctions' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(52,30): error TS2339: Property 'primaryFunctions' does not exist on type 'never'.
+src/components/profile/ProfileSettingsShell.tsx(52,52): error TS7006: Parameter 'fn' implicitly has an 'any' type.
+src/components/QuickIntake.tsx(335,9): error TS2322: Type 'PatientFlag[]' is not assignable to type 'QuickSafetyFlag[]'.
+  Type 'PatientFlag' is not assignable to type 'QuickSafetyFlag'.
+src/components/QuickIntake.tsx(547,17): error TS2322: Type 'PatientDuplicateCandidate[]' is not assignable to type 'never[]'.
+  Type 'PatientDuplicateCandidate' is not assignable to type 'never'.
+src/components/QuickIntake.tsx(553,33): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/QuickIntake.tsx(554,38): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/ReassessmentDrawer.tsx(432,9): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/components/reception/ReceptionQuickIntake.tsx(366,13): error TS2322: Type 'PatientDuplicateCandidate[]' is not assignable to type 'never[]'.
+  Type 'PatientDuplicateCandidate' is not assignable to type 'never'.
+src/components/reception/ReceptionQuickIntake.tsx(372,29): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/reception/ReceptionQuickIntake.tsx(373,34): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/components/reception/ReceptionQuickIntake.tsx(532,13): error TS2322: Type 'HighRiskComplaintFlagId[]' is not assignable to type 'never[]'.
+  Type 'HighRiskComplaintFlagId' is not assignable to type 'never'.
+    Type '"chest-pain"' is not assignable to type 'never'.
+src/components/whiteboard/commandCenterThroughputModel.test.ts(6,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/whiteboard/commandCenterThroughputModel.ts(402,37): error TS2367: This comparison appears to be unintentional because the types '"healthy" | "fallback" | "unavailable" | undefined' and '"critical"' have no overlap.
+src/components/whiteboard/commandCenterThroughputModel.ts(403,12): error TS2367: This comparison appears to be unintentional because the types '"healthy" | "fallback" | "unavailable" | undefined' and '"watch"' have no overlap.
+src/components/whiteboard/commandCenterThroughputModel.ts(825,9): error TS18048: 'longestBoarding' is possibly 'undefined'.
+src/components/whiteboard/commandCenterThroughputModel.ts(827,13): error TS18048: 'longestBoarding' is possibly 'undefined'.
+src/components/whiteboard/departmentStatusScreenModel.test.ts(12,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/whiteboard/departmentStatusScreenModel.test.ts(49,7): error TS2739: Type '{ score: number; band: "Orange"; updatedAt: string; boardingCount: number; longestWaitMinutes: number; }' is missing the following properties from type 'CapacitySnapshot': totalPatients, occupiedRooms, reassessmentDue
+src/components/whiteboard/departmentStatusScreenModel.test.ts(58,9): error TS2740: Type '{ id: string; unitId: string; status: "Inbound"; severity: "High"; eta: number; dispatchTime: string; estimatedArrivalTime: string; }' is missing the following properties from type 'EMSArrival': unitName, crewNames, patientAge, patientSex, and 4 more.
+src/components/whiteboard/departmentStatusScreenModel.test.ts(104,7): error TS2739: Type '{ score: number; band: "Yellow"; updatedAt: string; boardingCount: number; }' is missing the following properties from type 'CapacitySnapshot': totalPatients, occupiedRooms, reassessmentDue
+src/components/whiteboard/departmentStatusScreenModel.test.ts(129,7): error TS2739: Type '{ score: number; band: "Orange"; updatedAt: string; boardingCount: number; }' is missing the following properties from type 'CapacitySnapshot': totalPatients, occupiedRooms, reassessmentDue
+src/components/whiteboard/departmentStatusScreenModel.test.ts(140,9): error TS2740: Type '{ id: string; unitId: string; status: "Inbound"; severity: "High"; eta: number; dispatchTime: string; estimatedArrivalTime: string; }' is missing the following properties from type 'EMSArrival': unitName, crewNames, patientAge, patientSex, and 4 more.
+src/components/whiteboard/publicWaitingDisplayModel.test.ts(14,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/whiteboard/waitingRoomSafetyBoardModel.ts(202,61): error TS2339: Property 'type' does not exist on type 'never'.
+src/components/WhoNextPanel.tsx(402,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/config/chargeNurseScreenModel.ts(163,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"triage-breach" | "waiting-room-safety-escalation" | "queue-health" | "reassessments-due" | "provider-wait-breaches" | "ems-offload-aggregate" | "ems-inbound" | "offload-delays" | "boarders" | "referrals-pending" | "capacity-status" | null'.
+src/config/chargeNurseScreenModel.ts(196,5): error TS2322: Type '("triage-breach" | "waiting-room-safety-escalation" | "queue-health" | "reassessments-due" | "provider-wait-breaches" | "ems-offload-aggregate" | "ems-inbound" | "offload-delays" | "boarders" | "referrals-pending" | "capacity-status" | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/commandCenterScreenModel.test.ts(13,34): error TS2339: Property 'analyticsView' does not exist on type 'Readonly<{ createPatient: "patient.create"; editPatientDemographics: "patient.demographics.edit"; createEncounter: "encounter.create"; verifyIntake: "intake.verify"; triage: "triage.assign_acuity"; ... 29 more ...; viewAiGovernance: "aiGovernance.view"; }>'.
+src/config/commandCenterScreenModel.test.ts(14,34): error TS2339: Property 'copilotUse' does not exist on type 'Readonly<{ createPatient: "patient.create"; editPatientDemographics: "patient.demographics.edit"; createEncounter: "encounter.create"; verifyIntake: "intake.verify"; triage: "triage.assign_acuity"; ... 29 more ...; viewAiGovernance: "aiGovernance.view"; }>'.
+src/config/commandCenterScreenModel.ts(209,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"ems-inbound" | "triage-awaiting" | "longest-untriaged-wait" | "triage-approaching-breach" | "triage-breached" | "rapid-review-flags" | "provider-awaiting" | "longest-provider-wait" | ... 18 more ... | null'.
+src/config/commandCenterScreenModel.ts(256,5): error TS2322: Type '("ems-inbound" | "triage-awaiting" | "longest-untriaged-wait" | "triage-approaching-breach" | "triage-breached" | "rapid-review-flags" | "provider-awaiting" | "longest-provider-wait" | ... 18 more ... | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/displayPhiRedaction.test.ts(18,7): error TS2739: Type '{ id: string; mrn: string; firstName: string; lastName: string; healthCardNumber: string; state: PatientState.Waiting; priority: Priority.P3; arrivalTime: string; chiefComplaint: string; flags: never[]; notes: { ...; }[]; timeline: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory, vitals
+src/config/displayPhiRedaction.ts(64,34): error TS2339: Property 'authorName' does not exist on type 'Note'.
+src/config/displayPhiRedaction.ts(71,34): error TS2339: Property 'actorName' does not exist on type 'JourneyEvent'.
+src/config/emergencyActionPresentationModel.ts(257,3): error TS2322: Type '{ state: EmergencyRoleActionState; visible: boolean; enabled: boolean; readOnly: boolean; permission: string | null; id: string; label: string; surface: string; destructive?: boolean | undefined; clinical?: boolean | undefined; }[]' is not assignable to type '(EmergencyUiActionSurface & Readonly<{ state: EmergencyRoleActionState; visible: boolean; enabled: boolean; readOnly: boolean; permission: string | null; }>)[]'.
+  Type '{ state: EmergencyRoleActionState; visible: boolean; enabled: boolean; readOnly: boolean; permission: string | null; id: string; label: string; surface: string; destructive?: boolean; clinical?: boolean; }' is not assignable to type 'EmergencyUiActionSurface & Readonly<{ state: EmergencyRoleActionState; visible: boolean; enabled: boolean; readOnly: boolean; permission: string | null; }>'.
+    Type '{ state: EmergencyRoleActionState; visible: boolean; enabled: boolean; readOnly: boolean; permission: string | null; id: string; label: string; surface: string; destructive?: boolean; clinical?: boolean; }' is not assignable to type 'EmergencyUiActionSurface'.
+      Types of property 'permission' are incompatible.
+        Type 'string | null' is not assignable to type 'string'.
+          Type 'null' is not assignable to type 'string'.
+src/config/emergencyRoleActionMatrix.ts(73,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(75,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(76,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(77,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(78,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(79,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(80,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(81,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(82,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleActionMatrix.ts(83,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/config/emergencyRoleScreenMatrix.ts(192,57): error TS2345: Argument of type 'EmergencyRoleId' is not assignable to parameter of type '"physician" | "admin" | "charge_nurse" | "triage_nurse"'.
+  Type '"ed_manager"' is not assignable to type '"physician" | "admin" | "charge_nurse" | "triage_nurse"'.
+src/config/emergencyScreenKpiPolicy.test.ts(205,43): error TS2322: Type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }[]' is not assignable to type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 8 more.
+src/config/emergencyScreenKpiPolicy.test.ts(227,7): error TS2322: Type '{ id: string; state: PatientState; arrivalTime: string; }[]' is not assignable to type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/config/emergencyScreenKpiPolicy.test.ts(257,7): error TS2322: Type '{ id: string; state: PatientState; arrivalTime: string; triageTime: string; }[]' is not assignable to type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/config/emergencyScreenKpiPolicy.test.ts(258,7): error TS2322: Type '{ score: number; band: string; updatedAt: string; totalPatients: number; occupiedRooms: number; boardingCount: number; reassessmentDue: number; waitingCount: number; averageWaitMinutes: number; longestWaitMinutes: number; }' is not assignable to type 'CapacitySnapshot'.
+  Types of property 'band' are incompatible.
+    Type 'string' is not assignable to type 'CapacityBand'.
+src/config/emergencyScreenKpiPolicy.test.ts(269,7): error TS2322: Type '{ id: string; state: PatientState; arrivalTime: string; triageTime: string; }[]' is not assignable to type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/config/emergencyScreenKpiPolicy.test.ts(270,7): error TS2322: Type '{ score: number; band: string; updatedAt: string; totalPatients: number; occupiedRooms: number; boardingCount: number; reassessmentDue: number; waitingCount: number; averageWaitMinutes: number; longestWaitMinutes: number; }' is not assignable to type 'CapacitySnapshot'.
+  Types of property 'band' are incompatible.
+    Type 'string' is not assignable to type 'CapacityBand'.
+src/config/emergencyScreenKpiPolicy.ts(304,14): error TS2322: Type 'Readonly<{ 'waiting-count': "waiting-count"; 'awaiting-clinician': "provider-awaiting"; 'longest-provider-wait': "longest-provider-wait"; 'average-provider-wait': "provider-wait-breached"; 'provider-wait-approaching': "provider-wait-breached"; ... 4 more ...; 'offload-delays': "offload-delays"; }>' is not assignable to type 'Readonly<Partial<Record<EmergencyScreenKpiId, DepartmentStatusMetricId>>>'.
+  Types of property '"longest-provider-wait"' are incompatible.
+    Type '"longest-provider-wait"' is not assignable to type 'DepartmentStatusMetricId | undefined'.
+src/config/emergencyScreenKpiPolicy.ts(415,14): error TS2322: Type 'Readonly<{ 'triage-pending': readonly string[]; 'longest-untriaged-wait': readonly string[]; 'triage-breach-approaching': readonly string[]; 'triage-breached': readonly string[]; 'rapid-review-flags': readonly string[]; 'awaiting-clinician': readonly string[]; 'longest-provider-wait': readonly string[]; ... 8 more ....' is not assignable to type 'Readonly<Partial<Record<EmergencyScreenKpiId, readonly CommandCenterMetricId[]>>>'.
+  Types of property '"longest-untriaged-wait"' are incompatible.
+    Type 'readonly string[]' is not assignable to type 'readonly CommandCenterMetricId[]'.
+      Type 'string' is not assignable to type 'CommandCenterMetricId'.
+src/config/emergencyScreenKpiPolicy.ts(618,3): error TS2322: Type 'readonly string[] | null' is not assignable to type 'string[] | null'.
+  The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/config/emergencyScreenKpiPolicy.ts(810,5): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/config/emergencyScreenKpiPolicy.ts(811,5): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/config/emergencyScreenKpiPolicy.ts(814,5): error TS2322: Type 'CapacitySnapshot | undefined' is not assignable to type 'null | undefined'.
+  Type 'CapacitySnapshot' is not assignable to type 'null | undefined'.
+src/config/emergencyScreenKpiPolicy.ts(1009,24): error TS2339: Property 'emsArrivals' does not exist on type '{ patients?: Patient[] | undefined; capacity?: CapacitySnapshot | undefined; referrals?: Referral[] | undefined; now?: Date | undefined; }'.
+src/config/emergencyScreenKpiPolicy.ts(1069,33): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Date'.
+src/config/emsScreenModel.ts(123,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"inbound-ambulances" | "eta-display" | "offload-timers" | "receiving-area" | "ems-pressure" | null'.
+src/config/emsScreenModel.ts(149,5): error TS2322: Type '("inbound-ambulances" | "eta-display" | "offload-timers" | "receiving-area" | "ems-pressure" | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/physicianScreenModel.ts(183,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"provider-wait-breaches" | "referrals-pending" | "assigned-patients" | "provider-waiting-queue" | "results-pending" | "disposition-boarders" | null'.
+src/config/physicianScreenModel.ts(225,5): error TS2322: Type '("provider-wait-breaches" | "referrals-pending" | "assigned-patients" | "provider-waiting-queue" | "results-pending" | "disposition-boarders" | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/publicWaitingScreenModel.ts(94,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"crowd-level" | "wait-range" | "triage-wait" | "care-process-stages" | "patient-guidance" | "symptom-escalation" | "ems-crowding-impact" | null'.
+src/config/publicWaitingScreenModel.ts(113,5): error TS2322: Type '("crowd-level" | "wait-range" | "triage-wait" | "care-process-stages" | "patient-guidance" | "symptom-escalation" | "ems-crowding-impact" | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/readOnlyWhiteboardScreenModel.ts(130,34): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"reassessments-due" | "ems-inbound" | "offload-delays" | "boarders" | "referrals-pending" | "capacity-status" | "waiting-count" | "longest-wait" | "triage-pending" | null'.
+src/config/readOnlyWhiteboardScreenModel.ts(151,5): error TS2322: Type '("reassessments-due" | "ems-inbound" | "offload-delays" | "boarders" | "referrals-pending" | "capacity-status" | "waiting-count" | "longest-wait" | "triage-pending" | null)[]' is not assignable to type 'string[]'.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+src/config/triageScreenModel.ts(162,5): error TS2353: Object literal may only specify known properties, and 'showWaitingRoomSafetyEscalation' does not exist in type 'TriageScreenCapabilities'.
+src/config/userProfileCatalog.ts(145,3): error TS2322: Type 'Readonly<{ toolPolicy: Readonly<{ allowedPacks: string[]; restrictedToolIds: string[]; }>; assignableOrganizationTypes: readonly string[] | undefined; requiredEntitlementPacks: readonly string[] | undefined; ... 11 more ...; profileBenefits: string; }>' is not assignable to type 'Readonly<{ saasRole: string; label: string; domain: UserProfileDomain; hierarchyLevel: number; emergencyRoleId: string | null; trackMindRoleId: string | null; allowedWorkspaces: string[]; ... 7 more ...; requiredEntitlementPacks?: string[] | undefined; }>'.
+  Types of property 'assignableOrganizationTypes' are incompatible.
+    Type 'readonly string[] | undefined' is not assignable to type 'string[] | undefined'.
+      The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/config/userProfileCompiler.ts(85,5): error TS2353: Object literal may only specify known properties, and 'preferences' does not exist in type '{ toolPreferences?: {} | undefined; }'.
+src/config/userProfileCompiler.ts(85,80): error TS2339: Property 'preferences' does not exist on type '{ toolPreferences?: {} | undefined; } | undefined'.
+src/config/userProfileCompiler.ts(86,91): error TS2339: Property 'activeWorkspace' does not exist on type '{ toolPreferences?: {} | undefined; } | undefined'.
+src/config/userProfileCompiler.ts(126,39): error TS7006: Parameter 'tool' implicitly has an 'any' type.
+src/config/userProfileCompiler.ts(143,8): error TS7006: Parameter 'tool' implicitly has an 'any' type.
+src/config/userProfileCompiler.ts(155,16): error TS2345: Argument of type 'string' is not assignable to parameter of type '"allowed" | "beta" | "experimental" | "demo-only"'.
+src/config/userProfileCompiler.ts(224,14): error TS2345: Argument of type 'string' is not assignable to parameter of type '"allowed" | "beta" | "experimental" | "demo-only"'.
+src/config/userProfileCopyModel.ts(305,37): error TS2339: Property 'registrationClerk' does not exist on type 'Readonly<{ receptionClerk: "Receptionist / ED Clerk"; triageNurse: "Triage Nurse"; chargeNurse: "Charge Nurse / Flow Nurse"; physician: "ED Physician / NP / PA"; emsHandoff: "EMS Handoff Nurse"; departmentManager: "Department Manager / Director"; siteAdmin: "Site Admin"; publicWaiting: "Public Waiting Display"; read...'.
+src/engine/alertEngineDerived.ts(49,58): error TS2339: Property 'type' does not exist on type 'never'.
+src/engine/alertEngineDerived.ts(246,34): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/engine/crowdLevelEngine.test.ts(10,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/engine/crowdLevelEngine.ts(147,45): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(148,49): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(149,48): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(150,48): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(156,46): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(157,51): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(158,51): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/crowdLevelEngine.ts(159,29): error TS2322: Type 'CrowdLevelId' is not assignable to type '"LOW"'.
+  Type '"MODERATE"' is not assignable to type '"LOW"'.
+src/engine/patientJourneyPrediction.test.ts(13,18): error TS2741: Property 'recordedAt' is missing in type '{ hr: number; spo2: number; }' but required in type 'Vitals'.
+src/engine/reassessmentTimerEngine.ts(294,6): error TS7006: Parameter 'left' implicitly has an 'any' type.
+src/engine/reassessmentTimerEngine.ts(294,12): error TS7006: Parameter 'right' implicitly has an 'any' type.
+src/hooks/useEffectiveUserProfile.ts(26,46): error TS2339: Property 'effectiveProfile' does not exist on type 'never'.
+src/hooks/useEffectiveUserProfile.ts(27,44): error TS2339: Property 'accessSummary' does not exist on type 'never'.
+src/hooks/useEffectiveUserProfile.ts(51,27): error TS2339: Property 'accessSummary' does not exist on type 'never'.
+src/hooks/useEffectiveUserProfile.ts(51,62): error TS2339: Property 'effectiveProfile' does not exist on type 'never'.
+src/hooks/useEmergencyScreenKpis.ts(76,59): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(77,83): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(78,77): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(79,87): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(80,85): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(82,80): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(83,81): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useEmergencyScreenKpis.ts(86,9): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/hooks/useProfileSwitcherVisibility.test.ts(14,7): error TS2322: Type '{ id: string; }' is not assignable to type 'null'.
+src/hooks/useProfileSwitcherVisibility.test.ts(24,7): error TS2322: Type '{ id: string; name: string; }' is not assignable to type 'null'.
+src/hooks/useProfileSwitcherVisibility.test.ts(34,7): error TS2322: Type '{ id: string; name: string; }' is not assignable to type 'null'.
+src/hooks/useRouteScreenMode.ts(20,34): error TS2345: Argument of type 'null' is not assignable to parameter of type 'object | undefined'.
+src/hooks/useTrackMindRolePermissions.ts(86,17): error TS2554: Expected 0 arguments, but got 1.
+src/hooks/useTrackMindRolePermissions.ts(86,19): error TS2698: Spread types may only be created from object types.
+src/operational-intelligence/careDroidOperationalIntelligence.test.ts(53,7): error TS2345: Argument of type '{ readonly patients: readonly []; readonly capacity: { readonly score: 72; readonly band: "Orange"; readonly totalPatients: 0; readonly occupiedRooms: 0; readonly boardingCount: 0; readonly reassessmentDue: 0; readonly updatedAt: string; }; ... 14 more ...; readonly backendAvailable: true; }' is not assignable to parameter of type 'CareDroidCentralNodeSource'.
+  Type '{ readonly patients: readonly []; readonly capacity: { readonly score: 72; readonly band: "Orange"; readonly totalPatients: 0; readonly occupiedRooms: 0; readonly boardingCount: 0; readonly reassessmentDue: 0; readonly updatedAt: string; }; ... 14 more ...; readonly backendAvailable: true; }' is missing the following properties from type 'CareDroidCentralNodeSource': staff, rooms
+src/pages/emergency/index.tsx(37,26): error TS5097: An import path can only end with a '.tsx' extension when 'allowImportingTsExtensions' is enabled.
+src/pages/emergency/index.tsx(473,37): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(497,5): error TS2353: Object literal may only specify known properties, and 'summary' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(636,41): error TS2339: Property 'peakBand' does not exist on type '{ alerts?: unknown[] | undefined; candidates?: unknown[] | undefined; }'.
+src/pages/emergency/index.tsx(637,39): error TS2339: Property 'forecast' does not exist on type '{ alerts?: unknown[] | undefined; candidates?: unknown[] | undefined; }'.
+src/pages/emergency/index.tsx(679,13): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/pages/emergency/index.tsx(752,13): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/pages/emergency/index.tsx(763,13): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/pages/emergency/index.tsx(774,13): error TS2345: Argument of type '{ screenModeKpiVisibility: Partial<Record<string, string[]>>; publicDisplayPrivacy: "standard" | "minimal"; }' is not assignable to parameter of type 'ScreenModeKpiSettingsInput'.
+  Types of property 'screenModeKpiVisibility' are incompatible.
+    Type 'Partial<Record<string, string[]>>' is not assignable to type 'Partial<Record<string, readonly EmergencyScreenKpiId[]>>'.
+      'string' index signatures are incompatible.
+        Type 'string[] | undefined' is not assignable to type 'readonly EmergencyScreenKpiId[] | undefined'.
+          Type 'string[]' is not assignable to type 'readonly EmergencyScreenKpiId[]'.
+            Type 'string' is not assignable to type 'EmergencyScreenKpiId'.
+src/pages/emergency/index.tsx(876,9): error TS2353: Object literal may only specify known properties, and 'roleId' does not exist in type '{ displayMode?: boolean | undefined; isRegistrationClerk?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(886,9): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(887,9): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(888,9): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(889,9): error TS2322: Type 'number' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(899,9): error TS2353: Object literal may only specify known properties, and 'screenMode' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(920,9): error TS2353: Object literal may only specify known properties, and 'screenMode' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(1027,9): error TS2353: Object literal may only specify known properties, and 'roleId' does not exist in type '{ displayMode?: boolean | undefined; canMutateWhiteboard?: boolean | undefined; isRegistrationClerk?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(1368,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1369,11): error TS2322: Type 'number' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1419,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1442,11): error TS2322: Type 'CommandCenterSurgeSnapshot' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1445,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1573,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1692,11): error TS4104: The type 'readonly (Readonly<{ id: "patient"; label: "Patient"; headline: string; metrics: readonly (Readonly<{ id: "patient-waiting"; label: "Waiting"; hint: "Patients in the waiting room queue"; value: number; tone: "neutral" | "warning" | "success"; whiteboardAction: "filter-waiting"; }> | Readonly<...> | Readonly<...>)[];...' is 'readonly' and cannot be assigned to the mutable type 'never[]'.
+src/pages/emergency/index.tsx(1742,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1776,11): error TS2322: Type 'CommandCenterSurgeSnapshot' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1779,11): error TS2322: Type 'DisplayRefreshStatus | null' is not assignable to type 'null | undefined'.
+  Type 'DisplayRefreshStatus' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(1905,15): error TS2353: Object literal may only specify known properties, and 'canAccessRoute' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/pages/emergency/index.tsx(1905,32): error TS7006: Parameter 'path' implicitly has an 'any' type.
+src/pages/emergency/index.tsx(2131,11): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2132,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2133,11): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2134,11): error TS2322: Type 'Room[]' is not assignable to type 'never[]'.
+  Type 'Room' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2148,11): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2149,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2150,11): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2151,11): error TS2322: Type 'Room[]' is not assignable to type 'never[]'.
+  Type 'Room' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2164,11): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2165,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2166,11): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2167,11): error TS2322: Type 'Room[]' is not assignable to type 'never[]'.
+  Type 'Room' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2171,29): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/pages/emergency/index.tsx(2192,13): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2193,13): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2194,13): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2195,13): error TS2322: Type 'Room[]' is not assignable to type 'never[]'.
+  Type 'Room' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2197,31): error TS7006: Parameter 'patientId' implicitly has an 'any' type.
+src/pages/emergency/index.tsx(2261,11): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2269,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2277,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2278,11): error TS2322: Type 'CareDroidCentralNodeSnapshot' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2280,11): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2281,11): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2282,11): error TS2322: Type 'CapacitySnapshot' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2284,11): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2285,11): error TS2322: Type 'Alert[]' is not assignable to type 'never[]'.
+  Type 'Alert' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2286,11): error TS2322: Type 'string[] | null' is not assignable to type 'null | undefined'.
+  Type 'string[]' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2287,11): error TS2322: Type 'string[] | null' is not assignable to type 'null | undefined'.
+  Type 'string[]' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2297,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2298,11): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2301,11): error TS2322: Type 'string[] | null' is not assignable to type 'null | undefined'.
+  Type 'string[]' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2309,11): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2310,11): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2321,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2322,17): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2325,37): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2325,57): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2325,79): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2327,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2328,17): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2329,17): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2333,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2337,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2341,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2342,17): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2343,17): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2347,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2348,17): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2353,51): error TS2339: Property 'showWaitingRoomSafetyEscalation' does not exist on type 'TriageScreenCapabilities'.
+src/pages/emergency/index.tsx(2355,19): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2356,19): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2357,19): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2358,19): error TS2322: Type 'Alert[]' is not assignable to type 'never[]'.
+  Type 'Alert' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2368,17): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2369,17): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2375,19): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2376,19): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2381,17): error TS2322: Type 'Alert[]' is not assignable to type 'never[]'.
+  Type 'Alert' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2390,15): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2391,15): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2392,15): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2393,15): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2394,15): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2400,13): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2401,13): error TS2322: Type 'Staff[]' is not assignable to type 'never[]'.
+  Type 'Staff' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2402,13): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2403,13): error TS2322: Type 'EMSArrival[]' is not assignable to type 'never[]'.
+  Type 'EMSArrival' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2404,13): error TS2322: Type 'WorkflowActionLog[]' is not assignable to type 'never[]'.
+  Type 'WorkflowActionLog' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(2405,13): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2406,13): error TS2322: Type 'string | null' is not assignable to type 'null | undefined'.
+  Type 'string' is not assignable to type 'null | undefined'.
+src/pages/emergency/index.tsx(2629,80): error TS2339: Property 'patientId' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2631,28): error TS2339: Property 'status' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2633,32): error TS2339: Property 'status' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2638,35): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2640,66): error TS2339: Property 'patientId' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2654,72): error TS2339: Property 'patientId' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2656,33): error TS2339: Property 'targetDepartment' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2656,62): error TS2339: Property 'service' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2656,98): error TS2339: Property 'reason' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2656,117): error TS2339: Property 'summary' does not exist on type 'never'.
+src/pages/emergency/index.tsx(2718,63): error TS18047: 'focus' is possibly 'null'.
+src/pages/emergency/index.tsx(2718,78): error TS18047: 'focus' is possibly 'null'.
+src/pages/emergency/index.tsx(3027,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(3081,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
+  Type 'string' is not assignable to type 'never'.
+src/pages/emergency/index.tsx(3086,13): error TS2322: Type 'Element' is not assignable to type 'null | undefined'.
+src/pages/emergency/SelfArrivalCheckIn.tsx(80,9): error TS2353: Object literal may only specify known properties, and 'registrationStatus' does not exist in type 'BuildArrivalControlFieldsOptions'.
+src/pages/emergency/SelfArrivalCheckIn.tsx(87,28): error TS2345: Argument of type 'EmergencyStoreState' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(22,44): error TS2304: Cannot find name 'SurveillanceNexusSnapshot'.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(42,44): error TS7006: Parameter 'alert' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(73,11): error TS2322: Type '{ sourceLabel: any; demo: any; generatedAt: any; }' is not assignable to type 'IntrinsicAttributes & { title?: string | undefined; states?: never[] | undefined; details: any; className?: string | undefined; }'.
+  Property 'sourceLabel' does not exist on type 'IntrinsicAttributes & { title?: string | undefined; states?: never[] | undefined; details: any; className?: string | undefined; }'.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(80,41): error TS7006: Parameter 'kpi' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(118,42): error TS7006: Parameter 'metric' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(144,40): error TS7006: Parameter 'camera' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(170,39): error TS7006: Parameter 'device' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(191,34): error TS7006: Parameter 'zone' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(216,42): error TS7006: Parameter 'metric' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(232,35): error TS7006: Parameter 'alert' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(242,39): error TS7006: Parameter 'rule' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(258,42): error TS7006: Parameter 'incident' implicitly has an 'any' type.
+src/pages/surveillance/SurveillanceNexusDashboard.tsx(275,49): error TS7006: Parameter 'contract' implicitly has an 'any' type.
+src/services/aiPlatformBootstrap.test.ts(11,32): error TS2345: Argument of type '(state: EmergencyStoreState) => { patients: { id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; ... 4 more ...; timeline: never[]; }[]; ... 113 more ...; hydrateFromApi: (payload: Partial<...>) => void; }' is not assignable to parameter of type 'EmergencyStoreState | Partial<EmergencyStoreState> | ((state: EmergencyStoreState) => EmergencyStoreState | Partial<...>)'.
+  Type '(state: EmergencyStoreState) => { patients: { id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; ... 4 more ...; timeline: never[]; }[]; ... 113 more ...; hydrateFromApi: (payload: Partial<...>) => void; }' is not assignable to type '(state: EmergencyStoreState) => EmergencyStoreState | Partial<EmergencyStoreState>'.
+    Type '{ patients: { id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; priority: Priority.P3; vitals: never[]; flags: never[]; notes: never[]; timeline: never[]; }[]; ... 113 more ...; hydrateFromApi: (payload: Partial<{ patients: Patient[...' is not assignable to type 'EmergencyStoreState | Partial<EmergencyStoreState>'.
+      Type '{ patients: { id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; priority: Priority.P3; vitals: never[]; flags: never[]; notes: never[]; timeline: never[]; }[]; ... 113 more ...; hydrateFromApi: (payload: Partial<{ patients: Patient[...' is not assignable to type 'Partial<EmergencyStoreState>'.
+        Types of property 'patients' are incompatible.
+          Type '{ id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; priority: Priority.P3; vitals: never[]; flags: never[]; notes: never[]; timeline: never[]; }[]' is not assignable to type 'Patient[]'.
+            Type '{ id: string; mrn: string; firstName: string; lastName: string; arrivalTime: string; chiefComplaint: string; state: PatientState.Triage; priority: Priority.P3; vitals: never[]; flags: never[]; notes: never[]; timeline: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory
+src/services/ambulanceHandoffChecklist.test.ts(47,54): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(67,41): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(76,9): error TS2345: Argument of type '{ preparedRoomId: string; id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; ... 10 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(90,41): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(100,52): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(102,7): error TS2345: Argument of type '{ ambulanceHandoffChecklist: AmbulanceHandoffChecklist; id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; ... 13 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(152,54): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(198,54): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/ambulanceHandoffChecklist.test.ts(202,23): error TS2322: Type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M"; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: "Critical"; dispatchTime: string; ... 8 more ...; criticalChecklist: { ...; }; }' is not assignable to type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/arrivalControlLayer.ts(103,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/arrivalControlLayer.ts(123,65): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/arrivalDerivations.ts(14,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/arrivalToTriageControlLayer.test.ts(85,46): error TS2345: Argument of type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string, patch: Partial<Patient>) => void; ... 4 more ...; recordWorkflowAction: () => { ...; }; }' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string, patch: Partial<Patient>) => void; ... 4 more ...; recordWorkflowAction: () => { ...; }; }' is missing the following properties from type 'IntakeHandoffStore': updateCapacity, updateAlerts
+src/services/arrivalToTriageControlLayer.test.ts(115,17): error TS2352: Conversion of type '{ score: number; band: "Green"; occupiedBeds: number; totalBeds: number; waitingCount: number; boardingCount: number; }' to type 'CapacitySnapshot' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ score: number; band: "Green"; occupiedBeds: number; totalBeds: number; waitingCount: number; boardingCount: number; }' is missing the following properties from type 'CapacitySnapshot': totalPatients, occupiedRooms, reassessmentDue, updatedAt
+src/services/careDroidToolLaunch.test.ts(22,9): error TS2322: Type '"calculator"' is not assignable to type 'OrchestrationToolCategory'.
+src/services/careDroidToolLaunch.test.ts(44,9): error TS2322: Type '"copilot"' is not assignable to type 'OrchestrationToolCategory'.
+src/services/commandCenterSurgeModel.ts(87,5): error TS2365: Operator '>=' cannot be applied to types 'string | number' and 'number'.
+src/services/commandCenterSurgeModel.ts(89,9): error TS2365: Operator '>=' cannot be applied to types 'string | number' and 'number'.
+src/services/commandCenterSurgeModel.ts(91,11): error TS2365: Operator '>=' cannot be applied to types 'string | number' and 'number'.
+src/services/copilotRecommendationDiscovery.ts(39,40): error TS2345: Argument of type 'readonly any[]' is not assignable to parameter of type 'any[]'.
+  The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'any[]'.
+src/services/dataQualityDiscovery.ts(36,18): error TS7006: Parameter 'risk' implicitly has an 'any' type.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(131,7): error TS2322: Type 'string[]' is not assignable to type 'null | undefined'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(137,7): error TS2353: Object literal may only specify known properties, and 'encounterId' does not exist in type 'Partial<Patient>'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(145,7): error TS2322: Type 'string[]' is not assignable to type 'null | undefined'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(157,7): error TS2353: Object literal may only specify known properties, and 'assignedProviderId' does not exist in type 'Partial<Patient>'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(164,18): error TS2322: Type 'Patient' is not assignable to type 'never'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(164,27): error TS2322: Type 'Patient' is not assignable to type 'never'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(166,7): error TS2322: Type 'string[] | null' is not assignable to type 'null | undefined'.
+  Type 'string[]' is not assignable to type 'null | undefined'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(172,9): error TS2353: Object literal may only specify known properties, and 'screenMode' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(179,18): error TS2322: Type 'Patient' is not assignable to type 'never'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(180,7): error TS2322: Type 'string' is not assignable to type 'null | undefined'.
+src/services/emergencyMultiRoleWorkflowValidation.test.ts(186,9): error TS2353: Object literal may only specify known properties, and 'screenMode' does not exist in type '{ displayMode?: boolean | undefined; }'.
+src/services/emsOffloadTracker.test.ts(89,51): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'RoomLike'.
+src/services/emsOffloadTracker.test.ts(154,7): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: never[]; patientAge: number; patientSex: string; chiefComplaint: string; prearrivalComplaint: string; eta: number; severity: string; dispatchTime: string; estimatedArrivalTime: string; notes: string; status: "Inbound"; priority: Priority; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'patientSex' are incompatible.
+    Type 'string' is not assignable to type 'Sex'.
+src/services/emsOffloadTracker.test.ts(177,13): error TS2322: Type '"Medium"' is not assignable to type 'EMSSeverity'.
+src/services/emsOffloadTracker.ts(113,74): error TS2719: Type 'RoomLike[]' is not assignable to type 'RoomLike[]'. Two different types with this name exist, but they are unrelated.
+  Property 'type' is missing in type 'RoomLike' but required in type 'RoomLike'.
+src/services/emsOffloadVisibilityModel.test.ts(30,57): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; estimatedArrivalTime: string; chiefComplaint: string; patientId: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 5 more.
+src/services/emsOffloadVisibilityModel.test.ts(30,73): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; arrivedAt: string; chiefComplaint: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 6 more.
+src/services/emsOffloadVisibilityModel.test.ts(38,56): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; estimatedArrivalTime: string; chiefComplaint: string; patientId: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 5 more.
+src/services/emsOffloadVisibilityModel.test.ts(38,72): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; arrivedAt: string; chiefComplaint: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 6 more.
+src/services/emsOffloadVisibilityModel.test.ts(52,50): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; estimatedArrivalTime: string; chiefComplaint: string; patientId: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 5 more.
+src/services/emsOffloadVisibilityModel.test.ts(52,66): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; arrivedAt: string; chiefComplaint: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 6 more.
+src/services/emsOffloadVisibilityModel.test.ts(63,50): error TS2740: Type '{ id: string; unitId: string; unitName: string; status: string; estimatedArrivalTime: string; chiefComplaint: string; patientId: string; }' is missing the following properties from type 'EMSArrival': crewNames, patientAge, patientSex, eta, and 5 more.
+src/services/highRiskComplaintFlags.ts(355,3): error TS2322: Type '{ id: string; type: string; severity: string; title: string; message: string; patientId: string; createdAt: string; dismissed: boolean; source: string; actionType: string; metadata: { flagIds: HighRiskComplaintFlagId[]; labels: string[]; needsRapidReview: boolean; advisoryOnly: boolean; }; }[]' is not assignable to type 'Alert[]'.
+  Type '{ id: string; type: string; severity: string; title: string; message: string; patientId: string; createdAt: string; dismissed: boolean; source: string; actionType: string; metadata: { flagIds: HighRiskComplaintFlagId[]; labels: string[]; needsRapidReview: boolean; advisoryOnly: boolean; }; }' is not assignable to type 'Alert'.
+    Types of property 'severity' are incompatible.
+      Type 'string' is not assignable to type 'AlertSeverity'.
+src/services/intakeArtifactCapture.ts(135,35): error TS2345: Argument of type '{ requestType: "INTAKE_SUGGESTION"; systemPrompt: string; message: string; context: { smartIntake: { verificationOnly: boolean; artifactExtraction: boolean; artifactId: IntakeArtifactId; }; }; }' is not assignable to parameter of type 'AIRequest'.
+  Property 'messages' is missing in type '{ requestType: "INTAKE_SUGGESTION"; systemPrompt: string; message: string; context: { smartIntake: { verificationOnly: boolean; artifactExtraction: boolean; artifactId: IntakeArtifactId; }; }; }' but required in type 'AIRequest'.
+src/services/intakeEncounter.test.ts(61,47): error TS2345: Argument of type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string, patch: Partial<Patient>) => void; recordWorkflowAction: (input: { type: string; }) => { ...; }; }' is not assignable to parameter of type 'IntakeEncounterStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/intakeEncounter.test.ts(98,47): error TS2345: Argument of type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoCreateEncounter: boolean; }; }; updatePatient: () => undefined; recordWorkflowAction: () => { id: string; }; }' is not assignable to parameter of type 'IntakeEncounterStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/intakeEncounterChain.test.ts(82,78): error TS2345: Argument of type 'string' is not assignable to parameter of type '"Triage"'.
+src/services/integrationPreArrivalConsumer.ts(23,56): error TS2339: Property 'status' does not exist on type '{}'.
+src/services/integrationPreArrivalConsumer.ts(25,66): error TS2339: Property 'preArrival' does not exist on type '{}'.
+src/services/integrationPreArrivalConsumer.ts(131,7): error TS2353: Object literal may only specify known properties, and 'registrationStatus' does not exist in type 'BuildArrivalControlFieldsOptions'.
+src/services/integrationPreArrivalConsumer.ts(172,7): error TS2322: Type '{} | null' is not assignable to type 'string | number | boolean | null | undefined'.
+  Type '{}' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/lwbsRiskLayer.test.ts(37,23): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(43,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(69,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(73,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(93,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(94,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(117,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(118,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(134,8): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(143,20): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; complaintCategory: string; chiefComplaint: string; flags: never[]; timeline: { ...; }[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, vitals, notes
+src/services/lwbsRiskLayer.test.ts(152,12): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type '{}'.
+  Property '0' does not exist on type '{}'.
+src/services/lwbsRiskLayer.ts(88,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/lwbsRiskLayer.ts(133,19): error TS2367: This comparison appears to be unintentional because the types 'ReassessmentReminderStatus' and '"overdue"' have no overlap.
+src/services/lwbsRiskLayer.ts(133,52): error TS2367: This comparison appears to be unintentional because the types 'ReassessmentReminderStatus' and '"missed"' have no overlap.
+src/services/lwbsRiskLayer.ts(339,3): error TS2322: Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }[]' is not assignable to type 'Alert[]'.
+  Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }' is not assignable to type 'Alert'.
+    Types of property 'metadata' are incompatible.
+      Type '{ advisoryOnly: true; lwbsRiskScore: number; lwbsRiskLevel: LwbsRiskLevel; factors: LwbsRiskFactorId[]; }' is not assignable to type 'Record<string, string | number | boolean | null | undefined>'.
+        Property 'factors' is incompatible with index signature.
+          Type 'LwbsRiskFactorId[]' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/patientArrivalModel.ts(52,65): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/patientArrivalModel.ts(58,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/patientCommunicationStatus.test.ts(38,7): error TS2741: Property 'to' is missing in type '{ id: string; type: "ReassessmentReminderCompleted"; timestamp: string; summary: string; }' but required in type 'JourneyEvent'.
+src/services/patientCommunicationStatus.test.ts(66,7): error TS2322: Type '(Omit<WorkflowActionLog, "id" | "status" | "timestamp"> & { timestamp?: string | undefined; })[]' is not assignable to type 'WorkflowActionLog[]'.
+  Type 'Omit<WorkflowActionLog, "id" | "status" | "timestamp"> & { timestamp?: string | undefined; }' is missing the following properties from type 'WorkflowActionLog': id, status
+src/services/patientCommunicationStatus.test.ts(105,11): error TS2739: Type 'Omit<WorkflowActionLog, "id" | "status" | "timestamp"> & { timestamp?: string | undefined; }' is missing the following properties from type 'WorkflowActionLog': id, status
+src/services/patientExperienceStatus.ts(85,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/patientQueueTimingModel.ts(53,16): error TS2339: Property 'Treatment' does not exist on type 'typeof PatientState'.
+src/services/patientSearchActions.test.ts(54,34): error TS2345: Argument of type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to parameter of type 'Patient'.
+  Types of property 'priority' are incompatible.
+    Type '"P3"' is not assignable to type 'Priority'.
+src/services/preArrivalNotification.test.ts(30,65): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "Male"; chiefComplaint: string; mechanismOfInjury: string; vitals: { hr: number; sbp: number; dbp: number; spo2: number; }; ... 7 more ...; priority: Priority; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/preArrivalNotification.test.ts(38,65): error TS2345: Argument of type '{ id: string; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "Male"; chiefComplaint: string; mechanismOfInjury: string; vitals: { hr: number; sbp: number; dbp: number; spo2: number; }; ... 7 more ...; priority: Priority; }' is not assignable to parameter of type 'EMSArrival'.
+  Types of property 'vitals' are incompatible.
+    Property 'recordedAt' is missing in type '{ hr: number; sbp: number; dbp: number; spo2: number; }' but required in type 'Vitals'.
+src/services/preArrivalWorkflow.ts(62,7): error TS2353: Object literal may only specify known properties, and 'registrationStatus' does not exist in type 'BuildArrivalControlFieldsOptions'.
+src/services/providerWaitBreachTimer.test.ts(55,53): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(59,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(63,50): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(72,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(92,51): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(93,52): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(99,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(114,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(115,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(116,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(134,9): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(143,64): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.test.ts(152,20): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/providerWaitBreachTimer.ts(219,7): error TS2367: This comparison appears to be unintentional because the types 'PatientState.Waiting' and 'PatientState.Discharge' have no overlap.
+src/services/providerWaitBreachTimer.ts(219,51): error TS2367: This comparison appears to be unintentional because the types 'PatientState.Waiting' and 'PatientState.Deceased' have no overlap.
+src/services/providerWaitVisibilityModel.test.ts(26,58): error TS2345: Argument of type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/services/providerWaitVisibilityModel.test.ts(37,66): error TS2345: Argument of type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/services/providerWaitVisibilityModel.test.ts(38,64): error TS2345: Argument of type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; priority: Priority; triageTime: string; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 9 more.
+src/services/provisionalIdentityIntake.ts(178,26): error TS2345: Argument of type 'ProvisionalIntakeStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/provisionalIdentityIntake.ts(183,41): error TS2345: Argument of type 'ProvisionalIntakeStore' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Type 'ProvisionalIntakeStore' is missing the following properties from type 'IntakeHandoffStore': updateCapacity, updateAlerts
+src/services/queueAssignment.test.ts(49,37): error TS2345: Argument of type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; }; }; movePatientToState: (patientId: string, to: PatientState) => number; updatePatient: (patientId: string) => number; setQueueFilter: (filter: string | null) => number; selectPatient: () => undefined; recordWorkflowActio...' is not assignable to parameter of type 'QueueAssignmentStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoAssignTriageQueue: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/queueAssignment.test.ts(87,46): error TS2345: Argument of type '{ patients: { flags: PatientFlag[]; id: EntityId; mrn: string; firstName: string; lastName: string; name?: string; dob: LocalDateString; ... 41 more ...; arrival?: PatientArrivalRecord; }[]; ... 5 more ...; recordWorkflowAction: Mock<...>; }' is not assignable to parameter of type 'QueueAssignmentStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{}' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 22 more.
+src/services/queueAssignment.test.ts(127,37): error TS2345: Argument of type '{ patients: { state: PatientState; id: EntityId; mrn: string; firstName: string; lastName: string; name?: string; dob: LocalDateString; ... 41 more ...; arrival?: PatientArrivalRecord; }[]; ... 5 more ...; recordWorkflowAction: Mock<...>; }' is not assignable to parameter of type 'QueueAssignmentStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{}' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 22 more.
+src/services/queueAssignment.ts(176,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/queueAssignment.ts(391,22): error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/queueAssignment.ts(397,28): error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/queueAssignment.ts(485,28): error TS2345: Argument of type 'QueueAssignmentStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/queueAuditDiscovery.ts(25,5): error TS2322: Type 'Patient[]' is not assignable to type 'never[]'.
+  Type 'Patient' is not assignable to type 'never'.
+src/services/queueAuditDiscovery.ts(27,5): error TS2322: Type 'Referral[]' is not assignable to type 'never[]'.
+  Type 'Referral' is not assignable to type 'never'.
+src/services/queueReasonVisibility.test.ts(57,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(70,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(86,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(97,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(112,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(128,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(143,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(159,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(165,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(177,49): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(189,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(202,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(226,39): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(227,33): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(234,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(235,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(252,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(267,7): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.test.ts(268,7): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; lastAssessedTime: string; flags: never[]; timeline: never[]; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 3 more.
+src/services/queueReasonVisibility.ts(140,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/reassessmentAttentionPatients.test.ts(38,60): error TS2345: Argument of type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; flags: never[]; vitals: never[]; notes: never[]; timeline: never[]; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; flags: never[]; vitals: never[]; notes: never[]; timeline: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, complaintCategory
+src/services/receptionEscalationWorkflow.test.ts(58,9): error TS2740: Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; chiefComplaint: string; flags: never[]; timeline: never[]; notes: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, arrivalTime, and 2 more.
+src/services/receptionEscalationWorkflow.test.ts(77,20): error TS2740: Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; chiefComplaint: string; flags: never[]; timeline: never[]; notes: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, arrivalTime, and 2 more.
+src/services/receptionEscalationWorkflow.ts(238,81): error TS2339: Property 'type' does not exist on type 'never'.
+src/services/receptionEscalationWorkflow.ts(248,7): error TS2322: Type 'JourneyEvent | { id: string; type: "ReceptionEscalation"; timestamp: string; to: PatientState; summary: string; note: ReceptionEscalationReasonId; metadata: { ...; }; }' is not assignable to type 'JourneyEvent'.
+  Type '{ id: string; type: "ReceptionEscalation"; timestamp: string; to: PatientState; summary: string; note: ReceptionEscalationReasonId; metadata: { ...; }; }' is not assignable to type 'JourneyEvent'.
+    Types of property 'type' are incompatible.
+      Type '"ReceptionEscalation"' is not assignable to type 'JourneyEventType | undefined'.
+src/services/receptionEscalationWorkflow.ts(251,9): error TS2322: Type '"ReceptionEscalation"' is not assignable to type 'JourneyEventType | undefined'.
+src/services/receptionHandoff.test.ts(42,45): error TS2345: Argument of type '{ patients: { id: string; state: PatientState; timeline?: unknown[]; }[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string) => number; ... 6 more ...; updateAlerts: () => number; }' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/receptionHandoff.test.ts(78,30): error TS2345: Argument of type '{ patients: { id: string; state: PatientState; timeline?: unknown[]; }[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string) => number; ... 6 more ...; updateAlerts: () => number; }' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/receptionHandoff.test.ts(96,42): error TS2345: Argument of type '{ patients: { id: string; state: PatientState; timeline?: unknown[]; }[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string) => number; ... 6 more ...; updateAlerts: () => number; }' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/receptionHandoff.ts(169,7): error TS2322: Type 'string[]' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/receptionHandoff.ts(173,34): error TS2345: Argument of type 'IntakeHandoffStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/receptionHandoff.ts(234,22): error TS2345: Argument of type 'IntakeHandoffStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/receptionHandoff.ts(240,28): error TS2345: Argument of type 'IntakeHandoffStore' is not assignable to parameter of type 'ArrivalControlStore'.
+  Types of property 'recordWorkflowAction' are incompatible.
+    Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+      Types of parameters 'input' and 'input' are incompatible.
+        Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+            Types of property 'type' are incompatible.
+              Type 'string' is not assignable to type 'WorkflowActionType'.
+src/services/receptionHandoff.ts(306,13): error TS2353: Object literal may only specify known properties, and 'handoffSyncPending' does not exist in type 'Partial<Patient>'.
+src/services/receptionHandoff.ts(313,11): error TS2353: Object literal may only specify known properties, and 'handoffSyncPending' does not exist in type 'Partial<Patient>'.
+src/services/receptionHandoff.ts(332,9): error TS2353: Object literal may only specify known properties, and 'handoffSyncPending' does not exist in type 'Partial<Patient>'.
+src/services/receptionPatientAnswersModel.test.ts(9,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/receptionPatientAnswersModel.ts(114,38): error TS2339: Property 'Treatment' does not exist on type 'typeof PatientState'.
+src/services/receptionToWhiteboardHandoff.test.ts(65,46): error TS2345: Argument of type '{ patients: Patient[]; emergencySettings: { intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }; updatePatient: (patientId: string, patch: Partial<Patient>) => void; ... 6 more ...; updateAlerts: () => undefined; }' is not assignable to parameter of type 'IntakeHandoffStore'.
+  Types of property 'emergencySettings' are incompatible.
+    Type '{ intakeSettings: { autoAssignTriageQueue: boolean; autoCreateEncounter: boolean; }; }' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 21 more.
+src/services/receptionToWhiteboardHandoff.test.ts(72,74): error TS2345: Argument of type 'string' is not assignable to parameter of type '"Triage"'.
+src/services/triageBreachTimer.test.ts(46,47): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(52,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(63,47): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(76,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(77,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(78,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(96,9): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(107,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(108,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(125,58): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(136,20): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(150,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(151,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachTimer.test.ts(152,9): error TS2740: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triagePending: boolean; }' is missing the following properties from type 'Patient': dob, age, sex, chiefComplaint, and 5 more.
+src/services/triageBreachVisibilityModel.test.ts(26,58): error TS2345: Argument of type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 8 more.
+src/services/triageBreachVisibilityModel.test.ts(37,63): error TS2345: Argument of type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 8 more.
+src/services/triageBreachVisibilityModel.test.ts(38,66): error TS2345: Argument of type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }[]' is not assignable to parameter of type 'Patient[]'.
+  Type '{ id: string; state: PatientState; arrivalTime: string; flags: PatientFlag[]; }' is missing the following properties from type 'Patient': mrn, firstName, lastName, dob, and 8 more.
+src/services/unifiedOperationalSearch.test.ts(82,44): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(87,53): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(90,52): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(93,47): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(96,49): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(101,44): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(102,41): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(103,41): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(104,41): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/unifiedOperationalSearch.test.ts(105,41): error TS2345: Argument of type '{ query: string; patients: { id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; ... 5 more ...; timeline: { ...; }[]; }[]; referrals: { ...; }[]; emsArrivals: { ...; }[]; queues: { ...; }[]; }' is not assignable to parameter of type '{ query?: string | undefined; patients?: Patient[] | undefined; referrals?: Referral[] | undefined; emsArrivals?: EMSArrival[] | undefined; queues?: QueueSummary[] | undefined; }'.
+  Types of property 'patients' are incompatible.
+    Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }[]' is not assignable to type 'Patient[]'.
+      Type '{ id: string; mrn: string; firstName: string; lastName: string; dob: string; age: number; sex: "F"; arrivalTime: string; chiefComplaint: string; complaintCategory: string; state: PatientState; ... 4 more ...; timeline: { ...; }[]; }' is not assignable to type 'Patient'.
+        Types of property 'timeline' are incompatible.
+          Type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }[]' is not assignable to type 'JourneyEvent[]'.
+            Property 'to' is missing in type '{ id: string; patientId: string; type: string; timestamp: string; summary: string; metadata: { encounterId: string; }; }' but required in type 'JourneyEvent'.
+src/services/waitingRoomCommunicationLog.test.ts(20,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob: LocalDateString; age: number; sex: Sex; ... 40 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'complaintCategory' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/waitingRoomDeteriorationWatch.test.ts(47,33): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(54,48): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(93,7): error TS2345: Argument of type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(115,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(116,9): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(139,55): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(145,64): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(154,20): error TS2739: Type '{ id: string; firstName: string; lastName: string; mrn: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; ... 6 more ...; reassessmentReminders: never[]; }' is missing the following properties from type 'Patient': dob, age, sex, notes
+src/services/waitingRoomDeteriorationWatch.test.ts(163,12): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type '{}'.
+  Property '0' does not exist on type '{}'.
+src/services/waitingRoomDeteriorationWatch.ts(346,3): error TS2322: Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }[]' is not assignable to type 'Alert[]'.
+  Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }' is not assignable to type 'Alert'.
+    Types of property 'metadata' are incompatible.
+      Type '{ advisoryOnly: true; deteriorationWatchLevel: DeteriorationWatchLevel; factors: DeteriorationWatchFactorId[]; }' is not assignable to type 'Record<string, string | number | boolean | null | undefined>'.
+        Property 'factors' is incompatible with index signature.
+          Type 'DeteriorationWatchFactorId[]' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/waitingRoomSafetyBoard.ts(179,36): error TS2339: Property 'recordedAt' does not exist on type 'Vitals | Vitals[]'.
+  Property 'recordedAt' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(196,30): error TS2339: Property 'presentingComplaint' does not exist on type 'Patient'.
+src/services/waitingRoomSafetyBoard.ts(225,60): error TS2339: Property 'presentingComplaint' does not exist on type 'Patient'.
+src/services/waitingRoomSafetyBoard.ts(228,5): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/services/waitingRoomSafetyBoard.ts(236,28): error TS2339: Property 'hr' does not exist on type 'Vitals | Vitals[]'.
+  Property 'hr' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(236,47): error TS2339: Property 'heartRate' does not exist on type 'Vitals | Vitals[]'.
+  Property 'heartRate' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(237,29): error TS2339: Property 'sbp' does not exist on type 'Vitals | Vitals[]'.
+  Property 'sbp' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(237,49): error TS2339: Property 'bpSystolic' does not exist on type 'Vitals | Vitals[]'.
+  Property 'bpSystolic' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(238,29): error TS2339: Property 'dbp' does not exist on type 'Vitals | Vitals[]'.
+  Property 'dbp' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(238,49): error TS2339: Property 'bpDiastolic' does not exist on type 'Vitals | Vitals[]'.
+  Property 'bpDiastolic' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(239,30): error TS2339: Property 'spo2' does not exist on type 'Vitals | Vitals[]'.
+  Property 'spo2' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(239,51): error TS2339: Property 'oxygenSaturation' does not exist on type 'Vitals | Vitals[]'.
+  Property 'oxygenSaturation' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(240,30): error TS2339: Property 'temp' does not exist on type 'Vitals | Vitals[]'.
+  Property 'temp' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(240,51): error TS2339: Property 'temperature' does not exist on type 'Vitals | Vitals[]'.
+  Property 'temperature' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(241,28): error TS2339: Property 'rr' does not exist on type 'Vitals | Vitals[]'.
+  Property 'rr' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(241,47): error TS2339: Property 'respiratoryRate' does not exist on type 'Vitals | Vitals[]'.
+  Property 'respiratoryRate' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyBoard.ts(259,5): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/services/waitingRoomSafetyBoard.ts(261,27): error TS2367: This comparison appears to be unintentional because the types 'PatientState.Waiting' and 'PatientState.Results' have no overlap.
+src/services/waitingRoomSafetyEscalationVisibilityModel.test.ts(33,65): error TS2345: Argument of type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; highRiskComplaintFlags: { ...; }[]; flags: PatientFlag[]; vitals: { ...; }[]; reassessmentReminders: { ...; }[]; }' is not assignable to parameter of type 'Patient'.
+  Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; highRiskComplaintFlags: { ...; }[]; flags: PatientFlag[]; vitals: { ...; }[]; reassessmentReminders: { ...; }[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory, and 2 more.
+src/services/waitingRoomSafetyEscalationVisibilityModel.test.ts(50,64): error TS2740: Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; highRiskComplaintFlags: { ...; }[]; flags: PatientFlag[]; vitals: { ...; }[]; reassessmentReminders: { ...; }[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory, and 2 more.
+src/services/waitingRoomSafetyEscalationVisibilityModel.test.ts(55,63): error TS2740: Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; highRiskComplaintFlags: { ...; }[]; flags: PatientFlag[]; vitals: { ...; }[]; reassessmentReminders: { ...; }[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory, and 2 more.
+src/services/waitingRoomSafetyEscalationVisibilityModel.test.ts(64,60): error TS2740: Type '{ id: string; mrn: string; firstName: string; lastName: string; state: PatientState; priority: Priority; arrivalTime: string; triageTime: string; chiefComplaint: string; highRiskComplaintFlags: { ...; }[]; flags: PatientFlag[]; vitals: { ...; }[]; reassessmentReminders: { ...; }[]; }' is missing the following properties from type 'Patient': dob, age, sex, complaintCategory, and 2 more.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(112,21): error TS2339: Property 'hr' does not exist on type 'Vitals | Vitals[]'.
+  Property 'hr' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(112,34): error TS2339: Property 'heartRate' does not exist on type 'Vitals | Vitals[]'.
+  Property 'heartRate' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(113,22): error TS2339: Property 'sbp' does not exist on type 'Vitals | Vitals[]'.
+  Property 'sbp' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(113,36): error TS2339: Property 'bpSystolic' does not exist on type 'Vitals | Vitals[]'.
+  Property 'bpSystolic' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(114,23): error TS2339: Property 'spo2' does not exist on type 'Vitals | Vitals[]'.
+  Property 'spo2' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(114,38): error TS2339: Property 'oxygenSaturation' does not exist on type 'Vitals | Vitals[]'.
+  Property 'oxygenSaturation' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(115,21): error TS2339: Property 'rr' does not exist on type 'Vitals | Vitals[]'.
+  Property 'rr' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(115,34): error TS2339: Property 'respiratoryRate' does not exist on type 'Vitals | Vitals[]'.
+  Property 'respiratoryRate' does not exist on type 'Vitals[]'.
+src/services/waitingRoomSafetyEscalationVisibilityModel.ts(400,3): error TS2322: Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }[]' is not assignable to type 'Alert[]'.
+  Type '{ id: string; type: "OperationalIntelligence"; severity: "Warning" | "Critical"; title: string; message: string; patientId: string; createdAt: string; dismissed: false; source: string; actionType: string; actionLabel: string; metadata: { ...; }; }' is not assignable to type 'Alert'.
+    Types of property 'metadata' are incompatible.
+      Type '{ triggers: WaitingRoomSafetyEscalationTriggerId[]; advisoryOnly: true; }' is not assignable to type 'Record<string, string | number | boolean | null | undefined>'.
+        Property 'triggers' is incompatible with index signature.
+          Type 'WaitingRoomSafetyEscalationTriggerId[]' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/waitingRoomStatusMessaging.test.ts(12,3): error TS2322: Type '{ id: EntityId; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob?: string | undefined; age?: number | undefined; sex?: Sex | undefined; location?: string | undefined; ... 39 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to type 'Patient'.
+  Types of property 'dob' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/waitingRoomStatusMessaging.test.ts(70,73): error TS2739: Type '{ type: "OrderPlaced"; }' is missing the following properties from type 'JourneyEvent': id, timestamp, to
+src/services/whatHappensNextGuidance.ts(140,57): error TS2339: Property 'type' does not exist on type 'never'.
+src/store/emergencyOperationalSync.ts(79,5): error TS2322: Type 'VitalValue | undefined' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+src/store/emergencyOperationalSync.ts(80,5): error TS2322: Type 'VitalValue | undefined' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+src/store/emergencyOperationalSync.ts(100,3): error TS2322: Type '{ id: EntityId; patientId: EntityId; type: JourneyEventType; timestamp: ISODateString; ... 10 more ...; metadata?: Record<string, string | number | boolean | null | undefined> | undefined; }' is not assignable to type 'JourneyEvent'.
+  Types of property 'to' are incompatible.
+    Type 'PatientState | undefined' is not assignable to type 'PatientState'.
+      Type 'undefined' is not assignable to type 'PatientState'.
+src/store/emergencyOperationalSync.ts(164,20): error TS2322: Type '{ flags: (PatientFlag | PatientFlagRecord)[]; timeline: JourneyEvent[]; id: string; mrn: string; firstName: string; lastName: string; name?: string | undefined; ... 41 more ...; arrival?: PatientArrivalRecord | undefined; }[]' is not assignable to type 'Patient[]'.
+  Type '{ flags: (PatientFlag | PatientFlagRecord)[]; timeline: JourneyEvent[]; id: EntityId; mrn: string; firstName: string; ... 43 more ...; arrival?: PatientArrivalRecord; }' is not assignable to type 'Patient'.
+    Types of property 'flags' are incompatible.
+      Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+        Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+          Type 'PatientFlagRecord' is not assignable to type 'PatientFlag'.
+src/store/emergencyOperationalSync.ts(201,54): error TS2339: Property 'reason' does not exist on type 'never'.
+src/store/emergencyOperationalSync.ts(202,53): error TS2339: Property 'severity' does not exist on type 'never'.
+src/store/emergencyOperationalSync.ts(213,20): error TS2322: Type '{ flags: (PatientFlag | PatientFlagRecord)[]; id: string; mrn: string; firstName: string; lastName: string; name?: string | undefined; dob: string; age: number; ... 40 more ...; arrival?: PatientArrivalRecord | undefined; }[]' is not assignable to type 'Patient[]'.
+  Type '{ flags: (PatientFlag | PatientFlagRecord)[]; id: EntityId; mrn: string; firstName: string; lastName: string; name?: string; dob: LocalDateString; ... 41 more ...; arrival?: PatientArrivalRecord; }' is not assignable to type 'Patient'.
+    Types of property 'flags' are incompatible.
+      Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+        Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+          Type 'PatientFlagRecord' is not assignable to type 'PatientFlag'.
+src/store/emergencyOperationalSync.ts(253,50): error TS2339: Property 'reason' does not exist on type 'never'.
+src/store/emergencyOperationalSync.ts(258,37): error TS2339: Property 'detectedAt' does not exist on type 'never'.
+src/store/emergencyOperationalSync.ts(268,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ none: number; warning: number; critical: number; lwbs: number; }'.
+  No index signature with a parameter of type 'string' was found on type '{ none: number; warning: number; critical: number; lwbs: number; }'.
+src/store/emergencyOperationalSync.ts(268,59): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ none: number; warning: number; critical: number; lwbs: number; }'.
+  No index signature with a parameter of type 'string' was found on type '{ none: number; warning: number; critical: number; lwbs: number; }'.
+src/store/emergencyOperationalSync.ts(298,7): error TS2322: Type 'string' is not assignable to type 'QueueType'.
+src/store/emergencyOperationalSync.ts(305,68): error TS2339: Property 'health' does not exist on type 'Queue'.
+src/store/emergencyOperationalSync.ts(315,7): error TS2322: Type '{ id: string; type: string; name: string; patientIds: string[]; targetWaitMinutes: number; averageWaitMinutes: number; longestWaitMinutes: number; count: number; health: any; updatedAt: string; }[]' is not assignable to type 'Queue[]'.
+  Property 'criticalCount' is missing in type '{ id: string; type: string; name: string; patientIds: string[]; targetWaitMinutes: number; averageWaitMinutes: number; longestWaitMinutes: number; count: number; health: any; updatedAt: string; }' but required in type 'Queue'.
+src/store/emergencyOperationalSync.ts(372,5): error TS2345: Argument of type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' is not assignable to parameter of type 'AlertDispatchInput'.
+  Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' but required in type 'Omit<Alert, "id" | "createdAt" | "type" | "severity">'.
+src/store/emergencyOperationalSync.ts(387,5): error TS2322: Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+  Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+    Type 'PatientFlagRecord' is not assignable to type 'PatientFlag'.
+src/store/emergencyOperationalSync.ts(517,9): error TS2345: Argument of type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: undefined; }' is not assignable to parameter of type 'AlertDispatchInput'.
+  Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Critical"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: undefined; }' but required in type 'Omit<Alert, "id" | "createdAt" | "type" | "severity">'.
+src/store/emergencyOperationalSync.ts(533,9): error TS2345: Argument of type '{ id: string; type: string; severity: "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: number; }' is not assignable to parameter of type 'AlertDispatchInput'.
+  Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; autoDismissAfter: number; }' but required in type 'Omit<Alert, "id" | "createdAt" | "type" | "severity">'.
+src/store/emergencyOperationalSync.ts(549,62): error TS2345: Argument of type '(current: Patient) => { vitals: Vitals[]; vitalsUpdatedAt: string; lastAssessedTime: string; flags: (PatientFlag | PatientFlagRecord)[]; ... 44 more ...; arrival?: PatientArrivalRecord | undefined; }' is not assignable to parameter of type '(patient: Patient) => Patient'.
+  Call signature return types '{ vitals: Vitals[]; vitalsUpdatedAt: string; lastAssessedTime: string; flags: (PatientFlag | PatientFlagRecord)[]; vitalsAlerts: VitalsAlert[]; ... 43 more ...; arrival?: PatientArrivalRecord | undefined; }' and 'Patient' are incompatible.
+    The types of 'flags' are incompatible between these types.
+      Type '(PatientFlag | PatientFlagRecord)[]' is not assignable to type 'PatientFlag[]'.
+        Type 'PatientFlag | PatientFlagRecord' is not assignable to type 'PatientFlag'.
+          Type 'PatientFlagRecord' is not assignable to type 'PatientFlag'.
+src/store/emergencyStore.ts(2880,64): error TS2345: Argument of type 'EmergencyStoreState' is not assignable to parameter of type 'ArrivalControlStore & { recordWorkflowAction?: ((input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<...> | undefined; }) => void) | undefined; }'.
+  Type 'EmergencyStoreState' is not assignable to type 'ArrivalControlStore'.
+    Types of property 'recordWorkflowAction' are incompatible.
+      Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+        Types of parameters 'input' and 'input' are incompatible.
+          Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+            Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+              Types of property 'type' are incompatible.
+                Type 'string' is not assignable to type 'WorkflowActionType'.
+src/store/emergencyStore.ts(2889,11): error TS2322: Type '(input: WorkflowActionInput) => WorkflowActionLog' is not assignable to type '(input: { type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }) => void'.
+  Types of parameters 'input' and 'input' are incompatible.
+    Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'WorkflowActionInput'.
+      Type '{ type: string; summary: string; patientId?: string | undefined; source?: string | undefined; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Omit<WorkflowActionLog, "id" | "title" | "status" | "severity" | "timestamp" | "metadata" | "source">'.
+        Types of property 'type' are incompatible.
+          Type 'string' is not assignable to type 'WorkflowActionType'.
+src/store/emergencyStore.ts(3026,15): error TS2322: Type '"fit_to_wait_classified"' is not assignable to type 'WorkflowActionType'.
+src/store/emergencyStore.ts(3343,15): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/store/emergencyStore.ts(3872,15): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/store/emergencyStore.ts(5172,30): error TS2345: Argument of type '{ id: string; type: string; severity: "Info" | "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' is not assignable to parameter of type 'AlertDispatchInput'.
+  Property 'dismissed' is missing in type '{ id: string; type: string; severity: "Info" | "Warning"; title: string; message: string; patientId: string; actionLabel: string; actionType: string; }' but required in type 'Omit<Alert, "id" | "createdAt" | "type" | "severity">'.
+src/store/emergencyStore.ts(5395,17): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/utils/digitalDoorSignModel.ts(66,22): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/utils/digitalDoorSignModel.ts(67,30): error TS2339: Property 'assignedPhysicianId' does not exist on type 'Patient'.
+src/utils/patientRoomWhiteboardModel.ts(30,15): error TS2339: Property 'assignedPhysicianId' does not exist on type 'Patient'.
+src/utils/patientRoomWhiteboardModel.ts(31,66): error TS2339: Property 'assignedPhysicianId' does not exist on type 'Patient'.

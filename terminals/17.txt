@@ -1,0 +1,13 @@
+---
+pid: 11932
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node node_modules/vite/bin/vite.js --port 8000 --strictPort"
+started_at: 2026-06-24T11:26:54.366Z
+running_for_ms: 7055014  
+---
+error when starting dev server:
+Error: Port 8000 is already in use
+    at Server.onError$1 (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vite/dist/node/chunks/config.js:15006:28)
+    at Server.emit (node:events:509:28)
+    at emitErrorNT (node:net:2044:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)

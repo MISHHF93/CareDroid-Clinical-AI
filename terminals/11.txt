@@ -1,0 +1,79 @@
+---
+pid: 13808
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI ; node scripts/dev-stack.mjs"
+started_at: 2026-06-24T06:02:35.790Z
+running_for_ms: 1385006  
+---
+Starting CareDroid local stack...
+Frontend: http://localhost:8000
+Backend:  http://localhost:3000
+Health:   http://localhost:3000/health
+
+[web] 
+[web] > caredroid-clinical-ai@1.0.0 dev
+[web] > vite --strictPort
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 start:dev
+[api] > npm run build && npm run start:prod
+[api] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 prebuild
+[api] > rimraf dist
+[api] 
+[web] 
+[web]   VITE v7.3.5  ready in 505 ms
+[web] 
+[web] 
+[web]   ➜  Local:   http://localhost:8000/
+[web]   ➜  Network: http://192.168.2.220:8000/
+[web] CareDroid API is not reachable at http://localhost:3000.
+[web]   Full stack: npm run dev:fullstack
+[web]   API only:   npm run dev:api
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 build
+[api] > nest build
+[api] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 start:prod
+[api] > node dist/backend/src/main.js
+[api] 
+[api] node:internal/modules/cjs/loader:1503
+[api]   throw err;
+[api]   ^
+[api] 
+[api] Error: Cannot find module '../../src/data/clinicalIntentRouter.js'
+[api] Require stack:
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\lib\patient-orchestration\recommendTools.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\lib\patient-orchestration\index.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\backend\src\modules\emergency-os\emergency-os.orchestration.service.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\backend\src\modules\emergency-os\emergency-os.controller.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\backend\src\modules\emergency-os\emergency-os.module.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\backend\src\app.module.js
+[api] - C:\Users\borah\CareDroid-Clinical-AI\backend\dist\backend\src\main.js
+[api]     at Module._resolveFilename (node:internal/modules/cjs/loader:1500:15)
+[api]     at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+[api]     at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+[api]     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1116:12)
+[api]     at Module._load (node:internal/modules/cjs/loader:1285:25)
+[api]     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+[api]     at Module.require (node:internal/modules/cjs/loader:1600:12)
+[api]     at require (node:internal/modules/helpers:153:16)
+[api]     at Object.<anonymous> (C:\Users\borah\CareDroid-Clinical-AI\backend\dist\lib\patient-orchestration\recommendTools.js:10:35)
+[api]     at Module._compile (node:internal/modules/cjs/loader:1854:14) {
+[api]   code: 'MODULE_NOT_FOUND',
+[api]   requireStack: [
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\lib\\patient-orchestration\\recommendTools.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\lib\\patient-orchestration\\index.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\backend\\src\\modules\\emergency-os\\emergency-os.orchestration.service.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\backend\\src\\modules\\emergency-os\\emergency-os.controller.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\backend\\src\\modules\\emergency-os\\emergency-os.module.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\backend\\src\\app.module.js',
+[api]     'C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\dist\\backend\\src\\main.js'
+[api]   ]
+[api] }
+[api] 
+[api] Node.js v24.16.0
+[api] exited with code 1

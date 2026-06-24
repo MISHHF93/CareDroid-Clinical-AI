@@ -1,0 +1,16 @@
+---
+pid: 23460
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run dev\""
+started_at: 2026-06-24T06:09:00.012Z
+running_for_ms: 1005007  
+---
+
+> caredroid-clinical-ai@1.0.0 dev
+> vite --strictPort
+
+
+  VITE v7.3.5  ready in 494 ms
+
+  ➜  Local:   http://localhost:8000/
+  ➜  Network: http://192.168.2.220:8000/

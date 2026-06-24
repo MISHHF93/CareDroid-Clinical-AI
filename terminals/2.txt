@@ -1,0 +1,7 @@
+---
+pid: 37464
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npx vitest run src/test/routePagesSmoke.test.jsx src/routing/canonicalRouteTree.behavior.test.jsx src/components/EmergencyWhiteboard.storeReactivity.test.jsx 2>&1\" | findstr /i \"FAIL pass fail Tests Test Files\""
+started_at: 2026-06-24T03:16:10.160Z
+running_for_ms: 11065007 
+---

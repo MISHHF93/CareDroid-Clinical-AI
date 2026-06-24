@@ -1,0 +1,2055 @@
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ReferenceError: resolveUserProfileFromSaasRole is not defined
+    at resolveOperationsResonanceTitle (C:/Users/borah/CareDroid-Clinical-AI/src/config/operationsProfileModel.ts:35:19)
+    at C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:41
+    at mountMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16406:19)
+    at Object.useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16851:16)
+    at useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react\cjs\react.development.js:1650:21)
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:27)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+stderr | src/test/routePagesSmoke.test.jsx > Route pages smoke — non-empty render > 'operations' at '/operations' renders primary content
+The above error occurred in the <Operations> component:
+
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:189:65)
+    at RenderedRoute (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:535:7)
+    at Routes (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1269:7)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.js:12:41)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+ReferenceError: resolveUserProfileFromSaasRole is not defined
+    at resolveOperationsResonanceTitle (C:/Users/borah/CareDroid-Clinical-AI/src/config/operationsProfileModel.ts:35:19)
+    at C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:41
+    at mountMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16406:19)
+    at Object.useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16851:16)
+    at useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react\cjs\react.development.js:1650:21)
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:27)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+ReferenceError: resolveUserProfileFromSaasRole is not defined
+    at resolveOperationsResonanceTitle (C:/Users/borah/CareDroid-Clinical-AI/src/config/operationsProfileModel.ts:35:19)
+    at C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:41
+    at mountMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16406:19)
+    at Object.useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16851:16)
+    at useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react\cjs\react.development.js:1650:21)
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:27)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+stderr | src/test/routePagesSmoke.test.jsx > Route pages smoke — compact viewport (no crash) > 'operations' survives compact viewport mock
+The above error occurred in the <Operations> component:
+
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:189:65)
+    at RenderedRoute (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:535:7)
+    at Routes (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1269:7)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.js:12:41)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+ReferenceError: resolveUserProfileFromSaasRole is not defined
+    at resolveOperationsResonanceTitle (C:/Users/borah/CareDroid-Clinical-AI/src/config/operationsProfileModel.ts:35:19)
+    at C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:41
+    at mountMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16406:19)
+    at Object.useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:16851:16)
+    at useMemo (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react\cjs\react.development.js:1650:21)
+    at Operations (C:/Users/borah/CareDroid-Clinical-AI/src/pages/Operations.jsx:235:27)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+ ❯ src/test/routePagesSmoke.test.jsx (180 tests | 17 failed) 38980ms
+     ✓ 'dashboard' at '/dashboard' renders primary content  498ms
+     ✓ 'executive' at '/executive' renders primary content 167ms
+     ✓ 'discover' at '/discover' renders primary content 132ms
+     ✓ 'workflows' at '/workflows' renders primary content 98ms
+     × 'operations' at '/operations' renders primary content 198ms
+     × 'tools-overview' at '/tools' renders primary content 1132ms
+     ✓ 'protocols' at '/protocols' renders primary content 134ms
+     ✓ 'research' at '/research' renders primary content 90ms
+     ✓ 'documentation' at '/documentation' renders primary content 83ms
+     ✓ 'knowledge-graph' at '/knowledge-graph' renders primary content 94ms
+     ✓ 'predictive-analytics' at '/predictive-analytics' renders primary content 98ms
+     ✓ 'clinical-decision-support' at '/clinical-decision-support' renders primary content 88ms
+     ✓ 'competencies' at '/competencies' renders primary content 84ms
+     ✓ 'credentials' at '/credentials' renders primary content 76ms
+     ✓ 'simulation' at '/simulation' renders primary content 82ms
+     ✓ 'simulation-scenario' at '/simulation/sepsis-deterioration' renders primary content 95ms
+     ✓ 'simulation-outcomes' at '/simulation/outcomes' renders primary content 85ms
+     ✓ 'laboratory' at '/laboratory' renders primary content 87ms
+     ✓ '3d-viewer' at '/3d-viewer' renders primary content 92ms
+     ✓ 'live-map' at '/live-map' renders primary content 86ms
+     ✓ 'hospital-map' at '/hospital-map' renders primary content 110ms
+     ✓ 'medical-iot' at '/medical-iot' renders primary content 113ms
+     ✓ 'devices' at '/devices' renders primary content 100ms
+     ✓ 'clinical-alerts' at '/clinical/alerts' renders primary content 78ms
+     ✓ 'tools-catalog' at '/tools/catalog' renders primary content  773ms
+     × 'calculators-library-filter' at '/tools/calculators' renders primary content 1731ms
+     ✓ 'ambient-scribe' at '/tools/ambient-scribe' renders primary content 92ms
+     ✓ 'calculator-recommender-ai' at '/tools/calculator-recommender' renders primary content 123ms
+     ✓ 'guideline-rag' at '/tools/guideline-rag' renders primary content 110ms
+     ✓ 'differential-ai' at '/tools/differential-ai' renders primary content 104ms
+     ✓ 'timeline-ai' at '/tools/timeline-ai' renders primary content 113ms
+     ✓ 'patient-summary-ai' at '/tools/patient-summary-ai' renders primary content 93ms
+     ✓ 'order-set-ai' at '/tools/order-set-ai' renders primary content 110ms
+     ✓ 'ai-explainability' at '/tools/ai-explainability' renders primary content 109ms
+     ✓ 'clinical-audit' at '/tools/clinical-audit' renders primary content 101ms
+     ✓ 'artifacts' at '/artifacts' renders primary content  416ms
+     ✓ 'memory' at '/memory' renders primary content 100ms
+     ✓ 'training' at '/training' renders primary content 95ms
+     ✓ 'analytics' at '/analytics' renders primary content 110ms
+     ✓ 'knowledge-hub' at '/knowledge-hub' renders primary content 108ms
+     ✓ 'workflow-mining' at '/workflow-mining' renders primary content 94ms
+     ✓ 'workspace-dependency-graph' at '/workspace-dependency-graph' renders primary content 86ms
+     ✓ 'organization-intelligence' at '/organization-intelligence' renders primary content 83ms
+     ✓ 'department-intelligence' at '/department-intelligence' renders primary content 89ms
+     ✓ 'product-intelligence' at '/product-intelligence' renders primary content 86ms
+     ✓ 'expansion-opportunities' at '/expansion-opportunities' renders primary content 120ms
+     ✓ 'maturity-assessment' at '/maturity-assessment' renders primary content 104ms
+     ✓ 'feature-flags' at '/feature-flags' renders primary content 99ms
+     ✓ 'plugins' at '/plugins' renders primary content 77ms
+     ✓ 'dependency-map' at '/dependency-map' renders primary content 133ms
+     ✓ 'dependency-graph' at '/dependency-graph' renders primary content 61ms
+     ✓ 'data-lineage' at '/data-lineage' renders primary content 87ms
+     ✓ 'self-diagnostics' at '/self-diagnostics' renders primary content 139ms
+     ✓ 'costs' at '/costs' renders primary content 105ms
+     ✓ 'ai-evaluation' at '/ai-evaluation' renders primary content 104ms
+     ✓ 'ai-command-center' at '/ai-command-center' renders primary content 97ms
+     ✓ 'business-brain' at '/business-brain' renders primary content 100ms
+     ✓ 'integrations-platform' at '/integrations' renders primary content 84ms
+     ✓ 'workflow-builder-ai' at '/tools/workflow-builder-ai' renders primary content 74ms
+     ✓ 'patient-workspace-platform' at '/patients/demo-patient/workspace' renders primary content 73ms
+     ✓ 'soap-builder' at '/tools/soap-builder' renders primary content 75ms
+     ✓ 'ai-governance-center' at '/ai-governance' renders primary content 87ms
+     ✓ 'llm-security-dashboard' at '/security' renders primary content 76ms
+     ✓ 'regulatory-enterprise' at '/regulatory' renders primary content 120ms
+     ✓ 'equity-monitoring-enterprise' at '/equity' renders primary content 118ms
+     ✓ 'human-review-enterprise' at '/human-review' renders primary content 112ms
+     ✓ 'privacy-enterprise' at '/privacy' renders primary content 209ms
+     ✓ 'system-health-enterprise' at '/system-health' renders primary content 135ms
+     ✓ 'saas-health-enterprise' at '/saas-health' renders primary content 83ms
+     ✓ 'governance-registry-enterprise' at '/governance-registry' renders primary content 73ms
+     ✓ 'governance-platform' at '/governance' renders primary content 89ms
+     ✓ 'governance-clinical' at '/governance/clinical' renders primary content 91ms
+     ✓ 'ai-security-platform' at '/governance/ai-security' renders primary content 96ms
+     ✓ 'regulatory-classification' at '/governance/regulatory' renders primary content 83ms
+     ✓ 'validation-sandbox' at '/governance/validation' renders primary content 79ms
+     ✓ 'human-review-queue' at '/review' renders primary content 75ms
+     ✓ 'audit-trail-spine' at '/audit' renders primary content 79ms
+     ✓ 'deployment-observability' at '/operations/observability' renders primary content 92ms
+     ✓ 'fleet-live-map' at '/fleet/map' renders primary content 123ms
+     ✓ 'fleet-command' at '/fleet/command' renders primary content  863ms
+     ✓ 'fleet-route-optimizer' at '/fleet/route-optimizer' renders primary content 114ms
+     ✓ 'fleet-predictive-maintenance' at '/fleet/predictive-maintenance' renders primary content 104ms
+     × major pages render non-empty content in light mode 1208ms
+     × major pages render non-empty content in dark mode 1194ms
+     ✓ 'dashboard' survives compact viewport mock 114ms
+     ✓ 'executive' survives compact viewport mock 93ms
+     ✓ 'discover' survives compact viewport mock 112ms
+     ✓ 'workflows' survives compact viewport mock 93ms
+     × 'operations' survives compact viewport mock 178ms
+     × 'tools-overview' survives compact viewport mock 1074ms
+     ✓ 'protocols' survives compact viewport mock 108ms
+     ✓ 'research' survives compact viewport mock 63ms
+     ✓ 'documentation' survives compact viewport mock 81ms
+     ✓ 'knowledge-graph' survives compact viewport mock 86ms
+     ✓ 'predictive-analytics' survives compact viewport mock 84ms
+     ✓ 'clinical-decision-support' survives compact viewport mock 94ms
+     ✓ 'competencies' survives compact viewport mock 92ms
+     ✓ 'credentials' survives compact viewport mock 92ms
+     ✓ 'simulation' survives compact viewport mock 89ms
+     ✓ 'simulation-scenario' survives compact viewport mock 74ms
+     ✓ 'simulation-outcomes' survives compact viewport mock 73ms
+     ✓ 'laboratory' survives compact viewport mock 73ms
+     ✓ '3d-viewer' survives compact viewport mock 77ms
+     ✓ 'live-map' survives compact viewport mock 94ms
+     ✓ 'hospital-map' survives compact viewport mock 108ms
+     ✓ 'medical-iot' survives compact viewport mock 97ms
+     ✓ 'devices' survives compact viewport mock 93ms
+     ✓ 'clinical-alerts' survives compact viewport mock 76ms
+     ✓ 'tools-catalog' survives compact viewport mock  732ms
+     × 'calculators-library-filter' survives compact viewport mock 1775ms
+     ✓ 'ambient-scribe' survives compact viewport mock 97ms
+     ✓ 'calculator-recommender-ai' survives compact viewport mock 95ms
+     ✓ 'guideline-rag' survives compact viewport mock 90ms
+     ✓ 'differential-ai' survives compact viewport mock 92ms
+     ✓ 'timeline-ai' survives compact viewport mock 110ms
+     ✓ 'patient-summary-ai' survives compact viewport mock 106ms
+     ✓ 'order-set-ai' survives compact viewport mock 100ms
+     ✓ 'ai-explainability' survives compact viewport mock 89ms
+     ✓ 'clinical-audit' survives compact viewport mock 90ms
+     ✓ 'artifacts' survives compact viewport mock  416ms
+     ✓ 'memory' survives compact viewport mock 92ms
+     ✓ 'training' survives compact viewport mock 92ms
+     ✓ 'analytics' survives compact viewport mock 88ms
+     ✓ 'knowledge-hub' survives compact viewport mock 95ms
+     ✓ 'workflow-mining' survives compact viewport mock 83ms
+     ✓ 'workspace-dependency-graph' survives compact viewport mock 100ms
+     ✓ 'organization-intelligence' survives compact viewport mock 69ms
+     ✓ 'department-intelligence' survives compact viewport mock 100ms
+     ✓ 'product-intelligence' survives compact viewport mock 96ms
+     ✓ 'expansion-opportunities' survives compact viewport mock 90ms
+     ✓ 'maturity-assessment' survives compact viewport mock 82ms
+     ✓ 'feature-flags' survives compact viewport mock 103ms
+     ✓ 'plugins' survives compact viewport mock 78ms
+     ✓ 'dependency-map' survives compact viewport mock 110ms
+     ✓ 'dependency-graph' survives compact viewport mock 75ms
+     ✓ 'data-lineage' survives compact viewport mock 80ms
+     ✓ 'self-diagnostics' survives compact viewport mock 126ms
+     ✓ 'costs' survives compact viewport mock 105ms
+     ✓ 'ai-evaluation' survives compact viewport mock 94ms
+     ✓ 'ai-command-center' survives compact viewport mock 84ms
+     ✓ 'business-brain' survives compact viewport mock 116ms
+     ✓ 'integrations-platform' survives compact viewport mock 97ms
+     ✓ 'workflow-builder-ai' survives compact viewport mock 92ms
+     ✓ 'patient-workspace-platform' survives compact viewport mock 87ms
+     ✓ 'soap-builder' survives compact viewport mock 86ms
+     ✓ 'ai-governance-center' survives compact viewport mock 99ms
+     ✓ 'llm-security-dashboard' survives compact viewport mock 82ms
+     ✓ 'regulatory-enterprise' survives compact viewport mock 71ms
+     ✓ 'equity-monitoring-enterprise' survives compact viewport mock 70ms
+     ✓ 'human-review-enterprise' survives compact viewport mock 84ms
+     ✓ 'privacy-enterprise' survives compact viewport mock 86ms
+     ✓ 'system-health-enterprise' survives compact viewport mock 101ms
+     ✓ 'saas-health-enterprise' survives compact viewport mock 91ms
+     ✓ 'governance-registry-enterprise' survives compact viewport mock 97ms
+     ✓ 'governance-platform' survives compact viewport mock 103ms
+     ✓ 'governance-clinical' survives compact viewport mock 102ms
+     ✓ 'ai-security-platform' survives compact viewport mock 78ms
+     ✓ 'regulatory-classification' survives compact viewport mock 78ms
+     ✓ 'validation-sandbox' survives compact viewport mock 64ms
+     ✓ 'human-review-queue' survives compact viewport mock 68ms
+     ✓ 'audit-trail-spine' survives compact viewport mock 75ms
+     ✓ 'deployment-observability' survives compact viewport mock 83ms
+     ✓ 'fleet-live-map' survives compact viewport mock 110ms
+     ✓ 'fleet-command' survives compact viewport mock  829ms
+     ✓ 'fleet-route-optimizer' survives compact viewport mock 127ms
+     ✓ 'fleet-predictive-maintenance' survives compact viewport mock 124ms
+     × renders core UX surfaces without empty content at 320px 1198ms
+     × renders core UX surfaces without empty content at 360px 1177ms
+     × renders core UX surfaces without empty content at 390px 1189ms
+     × renders core UX surfaces without empty content at 412px 1196ms
+     × renders core UX surfaces without empty content at 430px 1193ms
+     × renders core UX surfaces without empty content at 768px 1175ms
+     × renders core UX surfaces without empty content at 1024px 1185ms
+     × renders core UX surfaces without empty content at 1280px 1186ms
+     × renders core UX surfaces without empty content at 1440px 1167ms
+     ✓ 'qsofa' renders scrollable calculator content 188ms
+     ✓ 'news2' renders scrollable calculator content 180ms
+     ✓ 'has-bled' renders scrollable calculator content 173ms
+     ✓ 'phq9' renders scrollable calculator content 171ms
+     ✓ 'ascvd-risk' renders scrollable calculator content 184ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — non-empty render > 'operations' at '/operations' renders primary content
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — compact viewport (no crash) > 'operations' survives compact viewport mock
+ReferenceError: resolveUserProfileFromSaasRole is not defined
+ ❯ resolveOperationsResonanceTitle src/config/operationsProfileModel.ts:35:19
+     33|
+     34| export function resolveOperationsResonanceTitle(saasRole: string): str…
+     35|   const profile = resolveUserProfileFromSaasRole(saasRole);
+       |                   ^
+     36|   if (profile.domain === 'trackmind') return 'TrackMind operations';
+     37|   if (profile.domain === 'operations') return 'Hospital & fleet operat…
+ ❯ src/pages/Operations.jsx:235:41
+ ❯ mountMemo node_modules/react-dom/cjs/react-dom.development.js:16406:19
+ ❯ Object.useMemo node_modules/react-dom/cjs/react-dom.development.js:16851:16
+ ❯ useMemo node_modules/react/cjs/react.development.js:1650:21
+ ❯ Operations src/pages/Operations.jsx:235:27
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom.development.js:15486:18
+ ❯ mountIndeterminateComponent node_modules/react-dom/cjs/react-dom.development.js:20103:13
+ ❯ beginWork node_modules/react-dom/cjs/react-dom.development.js:21626:16
+ ❯ beginWork$1 node_modules/react-dom/cjs/react-dom.development.js:27465:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — non-empty render > 'tools-overview' at '/tools' renders primary content
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — non-empty render > 'calculators-library-filter' at '/tools/calculators' renders primary content
+TestingLibraryElementError: Unable to find role="heading" and name `/emergency os console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all tools"
+          ...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all tools"
+          ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.jsx:854:29
+    852|         });
+    853|       } else {
+    854|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    855|       }
+    856|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — light and dark theme render > major pages render non-empty content in light mode
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — light and dark theme render > major pages render non-empty content in dark mode
+TestingLibraryElementError: Unable to find role="heading" and name `/emergency os console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.jsx:891:26
+    889|         } else {
+    890|           expect(
+    891|             await screen.findByRole('heading', { level: 1, name: route…
+       |                          ^
+    892|           ).toBeInTheDocument();
+    893|         }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — compact viewport (no crash) > 'tools-overview' survives compact viewport mock
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — compact viewport (no crash) > 'calculators-library-filter' survives compact viewport mock
+TestingLibraryElementError: Unable to find role="heading" and name `/emergency os console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all tools"
+          ...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all tools"
+          ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.jsx:928:29
+    926|         });
+    927|       } else {
+    928|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    929|       }
+    930|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 320px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 360px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 390px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 412px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 768px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 1440px
+TestingLibraryElementError: Unable to find role="heading" and name `/emergency os console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.jsx:964:26
+    962|         } else {
+    963|           expect(
+    964|             await screen.findByRole('heading', { level: 1, name: route…
+       |                          ^
+    965|           ).toBeInTheDocument();
+    966|         }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 430px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 1024px
+ FAIL  src/test/routePagesSmoke.test.jsx > Route pages smoke — requested responsive matrix > renders core UX surfaces without empty content at 1280px
+TestingLibraryElementError: Unable to find role="heading" and name `/emergency os console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <div
+      class="tools-overview"
+    >
+      <div
+        class="tools-overview-header"
+      >
+        <div
+          class="header-content"
+        >
+          <h1>
+            <span
+              aria-hidden="true"
+              class="tools-overview-title-icon"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench nav-icon-svg"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                style="width: 28px; height: 28px;"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                />
+              </svg>
+            </span>
+             
+            CareDroid Console
+          </h1>
+          <p
+            class="header-subtitle"
+          >
+            Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.
+          </p>
+          <div
+            aria-label="Active workspace operating mode"
+            class="tools-workspace-os"
+          >
+            <strong>
+              CareDroid
+            </strong>
+            <span>
+              CareDroid mode is active.
+            </span>
+          </div>
+          <div
+            aria-label="Profile tool graph summary"
+            class="tools-profile-summary"
+          >
+            <span>
+              Hospitalist
+            </span>
+            <span>
+              Emergency
+            </span>
+            <span>
+              hospital medicine
+            </span>
+            <span>
+              24
+               recommended
+            </span>
+            <span>
+              88
+               restricted
+            </span>
+          </div>
+          <section
+            aria-label="Technical and medical execution modes"
+            class="tools-execution-legend"
+          >
+            <div>
+              <strong>
+                How tools run
+              </strong>
+              <p>
+                Each mode connects the technical path to the medical safety boundary.
+              </p>
+            </div>
+            <div
+              class="tools-execution-legend__items"
+            >
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--local"
+                >
+                  Runs in this browser
+                </span>
+                <span>
+                  Deterministic forms and calculators run locally with human review.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--server"
+                >
+                  Uses server validation
+                </span>
+                <span>
+                  Forms can submit to registered backend executor APIs when available.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--chat"
+                >
+                  Copilot-guided, human-reviewed
+                </span>
+                <span>
+                  Seeds a guarded Copilot workflow; clinicians confirm context and next steps.
+                </span>
+              </div>
+              <div
+                class="tools-execution-legend__item"
+              >
+                <span
+                  class="tools-execution-badge tools-execution-badge--platform"
+                >
+                  Platform service
+                </span>
+                <span>
+                  Uses a platform or clinical-intelligence API rather than a tool executor.
+                </span>
+              </div>
+            </div>
+          </section>
+          <div
+            class="tools-workspace"
+          >
+            <label
+              for="workspaceSelect"
+            >
+              Workspace
+            </label>
+            <select
+              id="workspaceSelect"
+            />
+          </div>
+          <div
+            aria-label="Search and filter all tools"
+            class="tools-discovery-controls"
+            role="search"
+          >
+            <label
+              class="tools-search-field"
+            >
+              <span>
+                Search tools
+              </span>
+              <input
+                aria-label="Search all to...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.jsx:964:26
+    962|         } else {
+    963|           expect(
+    964|             await screen.findByRole('heading', { level: 1, name: route…
+       |                          ^
+    965|           ).toBeInTheDocument();
+    966|         }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  17 failed | 163 passed (180)
+   Start at  23:15:13
+   Duration  45.64s (transform 3.13s, setup 178ms, import 5.49s, tests 38.98s, environment 853ms)
+

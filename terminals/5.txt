@@ -1,0 +1,739 @@
+---
+pid: 36700
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run dev:fullstack\""
+started_at: 2026-06-24T03:40:03.556Z
+running_for_ms: 9930000  
+---
+
+> caredroid-clinical-ai@1.0.0 dev:fullstack
+> node scripts/dev-stack.mjs
+
+Starting CareDroid local stack...
+Frontend: http://localhost:8000
+Backend:  http://localhost:3000
+Health:   http://localhost:3000/health
+
+[web] 
+[web] > caredroid-clinical-ai@1.0.0 dev
+[web] > vite --strictPort
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 start:dev
+[api] > npm run build && npm run start:prod
+[api] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 prebuild
+[api] > rimraf dist
+[api] 
+[web] 
+[web] 
+[web]   VITE v7.3.5  ready in 568 ms
+[web] 
+[web]   ➜  Local:   http://localhost:8000/
+[web]   ➜  Network: http://192.168.2.220:8000/
+[web] CareDroid API is not reachable at http://localhost:3000.
+[web]   Full stack: npm run dev:fullstack
+[web]   API only:   npm run dev:api
+[web] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 build
+[api] > nest build
+[api] 
+[api] 
+[api] > caredroid-clinical-ai-backend@1.0.0 start:prod
+[api] > node dist/backend/src/main.js
+[api] 
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [NestFactory] Starting Nest application...
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +144ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PassportModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PermissionsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] WorkspaceIntelligenceModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] MedicalControlPlaneModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ThrottlerModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ConfigHostModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] MoERouterModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] MetricsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] DiscoveryModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ConfigModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ConfigModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ScheduleModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [CohereRankerService] Reranking disabled. Set RERANK_ENABLED=true to enable local reranking.
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [EncryptionService] ✅ Encryption service initialized with aes-256-gcm
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [EmailService] ✅ Email service initialized with SMTP server: smtp.sendgrid.net:587
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AppModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] LoggerModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EmailModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] CacheModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EvaluationModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] JwtModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] JwtModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [RAGService] RAG configured: topK=5, minScore=0.7, chunkSize=512, overlap=50
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] SimulationModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] CostOptimizerModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] RAGModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TrainingModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmCoreModule dependencies initialized +166ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EncryptionModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EmergencyEscalationModule dependencies initialized +5ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AIGatewayModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] LiveTrackingModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] UserPreferencesModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ClinicalAlertsModule dependencies initialized +2ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] SurveillanceModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] RegulatoryModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PlatformSystemsModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] GovernanceModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] LlmSecurityModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EquityModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] IntentClassifierModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [ToolOrchestratorService] Registered tool: sofa-calculator (SOFA Score Calculator)
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [ToolOrchestratorService] Registered tool: drug-interactions (Drug Interaction Checker)
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [ToolOrchestratorService] Registered tool: lab-interpreter (Lab Results Interpreter)
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [ToolOrchestratorService] Initialized tool registry with 3 tools
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AuditModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AutomationAuditModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ClinicalModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ArtifactsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PersonalizationModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] UserActivityModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AnalyticsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TenantContextModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] NotificationModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] HospitalMapModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] UsersModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TwoFactorModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ComplianceModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PlatformGovernanceModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] SubscriptionsModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] FleetModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] TelemetryModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] InteroperabilityModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] HumanReviewModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PrivacyCenterModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EhrAuditModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ObservabilityModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ClinicalIntelligenceModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AiModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] WorkspacesModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ToolOrchestratorModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] AuthModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] MemoryModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] UserProfileModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] PlatformAssetsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] OrganizationsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ToolCallingModule dependencies initialized +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ProductCatalogModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] EmergencyOsModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:38 PM     LOG [InstanceLoader] ChatModule dependencies initialized +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AppController {/api}: +94ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/health, GET} route +2ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/config/system, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] MetricsController {/api/metrics}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/metrics, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AuthController {/api/auth}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/register, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/login, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/dev-session, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/verify-2fa, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/verify-email, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/google, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/identity-providers, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/google/callback, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/linkedin, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/linkedin/callback, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/magic-link, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/magic-link/verify, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/forgot-password, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/reset-password, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/oidc, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/saml, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/me, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] BiometricController {/api/auth/biometric}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/enroll, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/verify, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/config, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/stats, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/disable/:deviceId, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/delete/:deviceId, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/auth/biometric/available, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] UsersController {/api/users}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/users/profile, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/users/profile, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AuditController {/api/audit}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/sync, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/my-logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/phi-access, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/verify-integrity, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/statistics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] TwoFactorController {/api/two-factor}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/two-factor/generate, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/two-factor/enable, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/two-factor/disable, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/two-factor/verify, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/two-factor/status, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] SubscriptionsController {/api/subscriptions}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/plans, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/config, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/create-checkout, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/portal, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/current, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/lifecycle, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/entitlements/resolve, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/upgrade, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/downgrade, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/trial/convert, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/billing, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/usage, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/usage/metering, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/usage/events, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/subscriptions/webhook, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AIController {/api/ai}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai/query, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai/structured, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai/usage, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai/organizations/:organizationId/usage, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai/remaining-queries, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] OrganizationsController {/api/organizations}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/current, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/current/engine, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/onboarding, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/engine, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/tenant-admin, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/tenant-admin, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/feature-flags, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/feature-flags, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/settings, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] SettingsFeaturesController {/api/settings/features}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/settings/features, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/settings/features, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] WhiteLabelController {/api/white-label}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/white-label/:tenantId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] PlatformAssetsController {/api/platform}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/context, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/me/role-profile, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/users/me/assets, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/users/me/recommendations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/users/me/pinned-assets, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/users/me/hidden-assets, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/assets/:assetId, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/assets, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/governance-registry, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/departments, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/departments/:departmentId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/service-lines, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/service-lines/:serviceLineId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/packs, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/marketplace/packs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/marketplace/packs/:packId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/packs/:packId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/role-profiles, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/role-profiles/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/organizations/:organizationId/entitlements, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/organizations/:organizationId/packs/:packId/install, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/organizations/:organizationId/packs/:packId/remove, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/assets/:assetId/lifecycle, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/digital-twin, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/organizations/:organizationId/analytics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform/organizations/:organizationId/customer-success, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AutomationAuditController {/api/automation-audit}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/automation-audit, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/automation-audit, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] FleetController {/api/fleet}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/fleet/vehicles/live, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/fleet/routes/active, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/fleet/alerts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/fleet/snapshot, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] WorkspacesController {/api/workspaces}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/active, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/context, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId/context, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId/members, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId/invitations, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId/tools, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/:workspaceId/tools, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] WorkspaceInvitationsController {/api/workspaces/invitations}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/invitations/:token, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/workspaces/invitations/:token/accept, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] PlatformGovernanceController {/api/platform-governance}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/gate/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/security/events, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/review/items, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/review/items, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/review/items/:itemId/decision, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/consent/:patientId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/consent/:patientId/:scope, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/privacy/:patientId/:requestType, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/source-provenance/:sourceId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/synthetic/fhir, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/synthetic/hl7, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/validation/scenarios, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/validation/scenarios, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-governance/observability, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] DrugController {/api/drugs}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs/categories, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs/:id, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/drugs/:id, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ProtocolController {/api/protocols}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols/categories, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols/:id, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/protocols/:id, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ComplianceController {/api/compliance}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/compliance/export, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/compliance/delete-account, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/compliance/consent, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/compliance/consent, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ChatController {/api/chat}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/chat/message-3d, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/chat/intent-classify, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/chat/message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/chat/suggest-action, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/chat/analyze-vitals, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EmergencyAIController {/api}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/copilot/message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/intake/ai/message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/referrals/ai/message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/analytics/ai/message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ToolOrchestratorController {/api/tools}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/available, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/statistics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/catalog/executors, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/:id/validate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/:id/execute, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/execute, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tools/results, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ToolCallingController {/api/tool-calling}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tool-calling/execute, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tool-calling/catalog, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tool-calling/resolve, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tool-calling/logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] HospitalMapController {/api/hospital-map}: +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/hospital-map/floors, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/hospital-map/rooms, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/hospital-map/devices, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/hospital-map/devices/:deviceId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/hospital-map/search, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] PlatformSystemsController {/api}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/staff, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/rooms, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/shift, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ems, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/referrals, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/referrals, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-systems/capabilities/:capabilityId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/platform-systems/packs/:pack, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/fhir/connections, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/fhir/connections, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/fhir/:connectionId/test, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/fhir/:connectionId/sync, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/hl7/interfaces, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/hl7/interfaces/:interfaceId/test-message, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/hl7/messages/quarantine, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations/hl7/messages/:messageId/replay-preview, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/source-provenance/:sourceId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/import/ehr, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/import/labs, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/import/medications, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/import/observations, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/workspace, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/source-data, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/timeline, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/events, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/risk-scores, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/risk-scores, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/care-plan, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/calculator-recommender/suggest, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/workflow-builder/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/reasoning/analyze, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/why-engine/explain, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/audit-trail/summarize, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/clinical-event-ai/draft, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/soap/draft, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/dictation/transcribe, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/discharge-summary/draft, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/referral/draft, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/prior-auth/draft, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/:documentId/approve, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/documentation/:documentId/export, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/readiness, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/policies, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/policies, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/policies/:policyId, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/policies/:policyId/approve, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/release-gates, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/release-gates/:gateId/decision, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/safety-findings, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical/safety-findings/:findingId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai/policies, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai/policies/:policyId, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/rules, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/rules/:ruleId, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/model-access, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/model-access/:policyId, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/incidents, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/ai-security/incidents/:incidentId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/model-usage/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/model-usage/events, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/costs/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/costs/budgets/:budgetId, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical-safety/findings, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/clinical-safety/findings/:findingId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/consent/:patientId, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/consent/:patientId, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/consent/:patientId/revoke, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/access-log, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/patient/:patientId/access-log, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/export, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/delete-request, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/requests, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/requests/:requestId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/capabilities, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/capabilities/:capabilityId, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/capabilities/:capabilityId/classification, PUT} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/capabilities/:capabilityId/approve, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/evidence/:capabilityId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/regulatory/evidence/:capabilityId/artifacts, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/metrics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/cohorts, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/cohorts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/findings, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/findings/:findingId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/equity/reports, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/scenarios, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/scenarios, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/synthetic-patients, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/runs, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/runs/:runId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/runs/:runId/approve, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/governance/validation/release-gates/:capabilityId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items/:itemId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items/:itemId/assign, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items/:itemId/decision, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/review/items/:itemId/comments, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/patients/:patientId/review-items, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/events, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/events/:eventId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/runs/:runId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/patients/:patientId/access, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/integrity/status, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/integrity/verify, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/audit/export, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/service-health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/observability/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/observability/ai-runs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/observability/orchestrator, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/observability/integrations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/deployments/current, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/incidents, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/operations/incidents/:incidentId/review, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] TelemetryController {/api}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/devices/live, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/telemetry/live, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/alerts/devices, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/medical-iot/snapshot, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] CostOptimizerController {/api/cost-optimizer}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/cost-optimizer/route, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/cost-optimizer/dashboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] MemoryController {/api/memory}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/dashboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/short, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/short, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/long, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/long, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/clinical, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/clinical, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/fabric/context, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/memory/fabric/signals, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ArtifactsController {/api/artifacts}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts/graph, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts/:id/versions, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/artifacts/:id, PATCH} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] PersonalizationController {/api/personalization}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/personalization/me, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/personalization/me, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/personalization/me/recommendations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/personalization/me/saved-prompts, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/personalization/me/saved-prompts/:promptId, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] UserActivityController {/api/activity}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/activity, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/activity/me, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/activity/me/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/activity/workspaces/:workspaceId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EvaluationController {/api/evaluation}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/evaluation/dashboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/evaluation/metrics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/evaluation/runs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/evaluation/runs, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ClinicalIntelligenceController {/api/clinical-intelligence}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/ambient-scribe/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/guideline-rag/query, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/differential-ai/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/timeline-ai/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/patient-summary-ai/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/order-set-ai/generate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/ai-explainability/trace, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical-intelligence/clinical-audit/execution-logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AnalyticsController {/api}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/analytics/events, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/analytics/metrics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/crashes, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/health, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] NotificationController {/api/notifications}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/devices/register, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/devices, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/devices/:token, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/preferences, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/preferences, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/preferences/toggle-all, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/unread/count, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/:id/read, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/read-all, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/:id, DELETE} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/notifications/test, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] TrainingController {/api/training}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/pipeline, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/dashboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/runs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/runs, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/runs/:runId/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/training/moe-plan, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] GovernanceController {/api/ai-governance}: +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ai-governance/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AIGovernanceV1Controller {/api/v1/governance}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/v1/governance/registry, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/v1/governance/safety-rules, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/v1/governance/compliance, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/v1/governance/violations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/v1/governance/validate-prompts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EmergencyAIGovernanceController {/api/emergency/governance}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/governance/registry, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/governance/safety-rules, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/governance/compliance, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/governance/violations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/governance/validate-prompts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] LlmSecurityController {/api/security}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/security/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/security/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] InteroperabilityController {/api/interoperability}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/interoperability/summary, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/interoperability/events, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/interoperability/events, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/interoperability/events/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] RegulatoryController {/api/regulatory}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/regulatory/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EquityController {/api/equity}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/equity/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] HumanReviewController {/api/human-review}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/human-review/items, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/human-review/items/:itemId/decision, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] PrivacyCenterController {/api/privacy}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/summary, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/privacy/requests, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EhrAuditController {/api/ehr-audit}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ehr-audit/summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ObservabilityController {/api/system-health}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/system-health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] SaasHealthController {/api/saas-health}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/saas-health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] UserProfileController {/api/profile}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/preferences, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/preferences, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/activity, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/workspaces, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/workspaces/active, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/profile/me/security, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] SurveillanceController {/api/surveillance}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/nexus/snapshot, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/cameras/registry, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/iot/registry, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/zones, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/alerts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/incidents, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/surveillance/integrations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] SimulationController {/api/simulation}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/scenarios, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/scenarios/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/runs, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/runs/:id/steps, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/runs/:id/complete, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/outcomes, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/simulation/recommendations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ClinicalAlertsController {/api/clinical/alerts}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical/alerts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical/alerts/:alertId/acknowledge, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/clinical/alerts/:alertId/dismiss, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ProductCatalogController {/api}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products/pack-map, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products/builder, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products/:slug, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products/:slug/builder, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/asset-packs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/products/:slug/assets, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/commercial-plans, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/commercial-plans/:id, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/specialties, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/specialties/:slug, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/specialties/:slug/assets, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/care-pathways, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/care-pathways/:slug, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/agents, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integrations-marketplace, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/integration-readiness, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/solution-builder/recommendations, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/solution-builder/apply, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/dependency-graph, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/maturity-assessments/questionnaire, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/maturity-assessments, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/outcomes, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/value-tracking, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/configuration, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/commercial-plan, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/organizations/:organizationId/integrations/request, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] TenantContextController {/api/tenant}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tenant/context, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/tenant/isolation-audit, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EmergencyOsController {/api/emergency}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/whiteboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/central-node/snapshot, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/operational-intelligence/snapshot, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/operational-intelligence/model-health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/operational-intelligence/alerts, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/operational-intelligence/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/patients, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/patients, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/journey, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/workflow-logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/implementation-readiness, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/patients/:patientId/workflow-logs, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/ems, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/reception/snapshot, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/reception/handoff, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/triage/assist, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/intake, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/intake, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/intake/vertical-slice, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/queues, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/reassessment, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/capacity, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/boarding, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/referrals, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/referrals, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/provincial-health, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/integrations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/copilot, GET} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/copilot/query, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/analytics, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/capacity, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/patient-flow, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/patient-flow/:patientId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/clinical-intelligence, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/clinical-intelligence/:patientId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/upgrade-harness/audit-summary, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/settings, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/settings, PATCH} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/simulation/update-live, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/simulation/evaluate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/simulation/compare, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/simulation/recommendations, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/federated-learning/register, POST} route +3ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/federated-learning/update, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/federated-learning/aggregate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/federated-learning/global-model/:hospitalId, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/federated-learning/dashboard, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/initialize, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/simulate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/state, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/scenario, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] EmergencyRealtimeController {/api/emergency/realtime}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/realtime/stream, GET} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] ERPulseHandoverController {/api/handover}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/handover/er-pulse, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] FederatedEMSController {/api/ems/federated}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ems/federated/112-call, POST} route +1ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] LMECSController {/api/federated/lmecs}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/federated/lmecs/select, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/federated/lmecs/predict, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] AICallInterrogationController {/api/ems}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ems/ai-call-interrogation, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/ems/ai-call-interrogation/ecg, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RoutesResolver] OrganizationalDigitalTwinController {/api/emergency/digital-twin/organizational}: +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/organizational/synchronize, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [RouterExplorer] Mapped {/api/emergency/digital-twin/organizational/simulate, POST} route +0ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [PlatformAssetsSeedService] Repaired 7 stale platform asset registry rows
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [CacheService] Redis disabled (REDIS_ENABLED=false). Cache service disabled.
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [PineconeService] PINECONE_API_KEY is not configured. Vector database functionality will be disabled.
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [FirebaseService] Firebase credentials not configured. Push notifications will fail. Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [NestApplication] Nest application successfully started +18ms
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] CareDroid Backend running on: http://localhost:3000
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Swagger docs available at: http://localhost:3000/api/docs
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Prometheus metrics at: http://localhost:3000/api/metrics
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Environment: development
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] TLS 1.3: ENFORCED (only TLS 1.3+ allowed)
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Monitoring Stack when docker-compose is running:
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Grafana dashboards: http://localhost:3001
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Prometheus: http://localhost:9090
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Kibana logs: http://localhost:5601
+[api] [Nest] 28216  - 06/23/2026, 11:40:39 PM     LOG [Bootstrap] Sentry errors: http://localhost:9000
