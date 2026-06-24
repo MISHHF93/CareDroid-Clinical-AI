@@ -14,8 +14,8 @@ export default function HelpCenter() {
           a: 'Open the platform entry hub or land directly in the ED demo. Use the demo persona panel to switch between reception, triage, physician, EMS, and admin views without signing in.'
         },
         {
-          q: 'What is careDroid AI?',
-          a: 'CareDroid is a clinical AI assistant that provides evidence-based medical guidance, drug interaction checks, lab value interpretations, and clinical protocols to healthcare professionals.'
+          q: 'What is CareDroid?',
+          a: 'CareDroid is a reception-first emergency department operating platform. The whiteboard, patient cards, role-based suites, and case-aware Copilot give ED teams shared operational awareness from arrival through disposition.'
         },
         {
           q: 'Is my data secure?',
@@ -24,19 +24,19 @@ export default function HelpCenter() {
       ]
     },
     {
-      title: 'Using Clinical Tools',
+      title: 'ED Operations',
       items: [
         {
-          q: 'How do I check drug interactions?',
-          a: 'Use the Drug Checker tool in the toolbar. Enter medication names or generic names, and the AI will analyze interactions and contraindications.'
+          q: 'How do I open the emergency whiteboard?',
+          a: 'Land on /emergency/whiteboard or use the Whiteboard item in the sidebar. Reception prepares patient cards first; triage, charge, and bedside teams consume the shared board state.'
         },
         {
-          q: 'Can I get lab value interpretations?',
-          a: 'Yes, use the Lab Interpreter tool. Enter lab test names and values, and get clinical interpretation with reference ranges.'
+          q: 'How does CareDroid Copilot work?',
+          a: 'Open Copilot from the header or patient detail drawer. Copilot is case-aware decision support — it surfaces routing, evidence, and workflow prompts without making autonomous clinical decisions.'
         },
         {
-          q: 'Where can I find clinical protocols?',
-          a: 'Access the Protocols tool to view evidence-based clinical guidelines and treatment protocols organized by specialty.'
+          q: 'Where do I manage referrals and boarding?',
+          a: 'Use Referrals (/emergency/referrals) for specialty coordination and Boarding (/emergency/boarding) for inpatient bed pressure. Both surfaces tie back to the whiteboard patient card.'
         }
       ]
     },

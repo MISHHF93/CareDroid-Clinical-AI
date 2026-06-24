@@ -3,7 +3,7 @@ import { normalizeApiPath } from '../config/api.config';
 
 const mockAppConfig = vi.hoisted(() => ({
   app: {
-    name: 'CareDroid-Clinical-AI',
+    name: 'CareDroid',
     version: 'test',
     environment: 'test',
   },

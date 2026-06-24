@@ -163,7 +163,7 @@ export function buildDocumentationExport({
   return {
     filename: `${safeTitle || noteType.id}-${action.id}.txt`,
     content: [
-      'CareDroid Clinical Documentation Assistant Export',
+      'CareDroid Documentation Assistant Export',
       `Note type: ${noteType.label}`,
       `AI action: ${action.label}`,
       'Status: Draft only - clinician review required before chart use',

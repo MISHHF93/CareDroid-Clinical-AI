@@ -77,7 +77,7 @@ describe('WorkspaceHome', () => {
   it('renders workspace context, routes, and recommended tools', () => {
     renderWorkspace();
 
-    expect(screen.getByRole('heading', { name: /^Emergency OS$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^CareDroid$/i })).toBeInTheDocument();
     expect(screen.getByText(/AI-assisted patient flow for small emergency departments/i)).toBeInTheDocument();
     expect(screen.queryByText(/emergency department operating environment/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/ED flow model/i)).not.toBeInTheDocument();
@@ -147,13 +147,13 @@ describe('WorkspaceHome', () => {
 
     expect(screen.getByRole('heading', { name: /emergency intake command center/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Smart Arrival$/i })).toBeInTheDocument();
-    expect(screen.getByText(/embedded Emergency OS capability, not a separate intake app/i)).toBeInTheDocument();
+    expect(screen.getByText(/embedded CareDroid capability, not a separate intake app/i)).toBeInTheDocument();
     expect(screen.getByText(/Capture ID document/i)).toBeInTheDocument();
     expect(screen.getByText(/Medication list ingestion/i)).toBeInTheDocument();
     expect(screen.getByText(/Allergy extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/Patient Snapshot contains:/i)).toBeInTheDocument();
     expect(screen.getByText(/patient confirmation or staff confirmation is required before finalizing/i)).toBeInTheDocument();
-    expect(screen.getByText(/patient arrives inside Emergency OS already summarized/i)).toBeInTheDocument();
+    expect(screen.getByText(/patient arrives inside CareDroid already summarized/i)).toBeInTheDocument();
     expect(screen.getByText(/registration completion score/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /create intake patient/i })).toBeInTheDocument();
     expect(screen.getByText(/Only confirmed values are promoted/i)).toBeInTheDocument();
@@ -177,7 +177,7 @@ describe('WorkspaceHome', () => {
     const patientContextRoute = renderWorkspace('/workspace/emergency/patient-context');
 
     expect(screen.getByRole('heading', { name: /^Patient Snapshot$/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /patient arrives summarized in emergency os/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /patient arrives summarized in caredroid/i })).toBeInTheDocument();
     expect(screen.getByText(/Demographics: Jordan Lee/i)).toBeInTheDocument();
     expect(screen.getByText(/Arrival complaint: Chest Pain/i)).toBeInTheDocument();
     expect(screen.getByText(/Referral reason: ED assessment recommended/i)).toBeInTheDocument();
@@ -203,7 +203,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/no autonomous triage decision/i)).toBeInTheDocument();
     expect(screen.getByText(/triage staff · measured/i)).toBeInTheDocument();
     expect(screen.getByText(/Unresolved: allergy confirmation incomplete/i)).toBeInTheDocument();
-    expect(screen.getByText(/all intake automations update emergency os/i)).toBeInTheDocument();
+    expect(screen.getByText(/all intake automations update caredroid/i)).toBeInTheDocument();
     expect(screen.getByText(/Consent and Verification/i)).toBeInTheDocument();
     expect(screen.getByText(/Intake Analytics:/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /markdown plans linked to implementation/i })).toBeInTheDocument();
@@ -571,7 +571,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
-  it('renders the commercial Patients surface at the primary Emergency OS route', () => {
+  it('renders the commercial Patients surface at the primary CareDroid route', () => {
     renderWorkspace('/workspace/emergency/patients');
 
     expect(screen.getByRole('heading', { name: /Patient Journey Engine/i })).toBeInTheDocument();
@@ -825,10 +825,10 @@ describe('WorkspaceHome', () => {
   it('renders the ED onboarding walkthrough and launches walkthrough targets', () => {
     renderWorkspace('/workspace/emergency/onboarding');
 
-    expect(screen.getByRole('heading', { name: /emergency os onboarding/i })).toBeInTheDocument();
-    expect(screen.getByText(/understand Emergency OS in 10 minutes/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /caredroid onboarding/i })).toBeInTheDocument();
+    expect(screen.getByText(/understand CareDroid in 10 minutes/i)).toBeInTheDocument();
     [
-      /Emergency OS overview/i,
+      /CareDroid overview/i,
       /Calculators/i,
       /Protocols/i,
       /AI Copilot/i,
@@ -838,7 +838,7 @@ describe('WorkspaceHome', () => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
     expect(screen.getByRole('heading', { name: /run the first hospital demo/i })).toBeInTheDocument();
-    expect(screen.getByText(/Open Emergency OS/i)).toBeInTheDocument();
+    expect(screen.getByText(/Open CareDroid/i)).toBeInTheDocument();
     expect(screen.getByText(/Close with analytics/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /open analytics/i }));
@@ -903,7 +903,7 @@ describe('WorkspaceHome', () => {
     expect(screen.getByRole('heading', { name: /first customer deployment blueprint/i })).toBeInTheDocument();
     expect(screen.getAllByText(/minimal operational risk/i).length).toBeGreaterThan(0);
     [
-      /Standalone Emergency OS/i,
+      /Standalone CareDroid/i,
       /Protocol Library/i,
       /AI Copilot/i,
       /Analytics/i,
@@ -913,7 +913,7 @@ describe('WorkspaceHome', () => {
     });
     expect(screen.getByText(/No integrations required/i)).toBeInTheDocument();
     expect(screen.getByText(/No live writeback/i)).toBeInTheDocument();
-    expect(screen.getByText(/Minimum sellable Emergency OS/i)).toBeInTheDocument();
+    expect(screen.getByText(/Minimum sellable CareDroid/i)).toBeInTheDocument();
     expect(screen.getByText(/Patient Journey Engine, Queue Intelligence, ED Copilot, Referral Intelligence, EMS Intelligence, Analytics/i)).toBeInTheDocument();
     expect(screen.getByText(/30-day pilot plan/i)).toBeInTheDocument();
     expect(screen.getByText(/60-day rollout plan/i)).toBeInTheDocument();
@@ -921,10 +921,10 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/without requiring a full hospital-wide deployment/i)).toBeInTheDocument();
   });
 
-  it('renders the Emergency OS implementation summary write-up in the application', () => {
+  it('renders the CareDroid implementation summary write-up in the application', () => {
     renderWorkspace('/workspace/emergency/implementation');
 
-    expect(screen.getByRole('heading', { name: /emergency os mvp implementation summary/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /caredroid mvp implementation summary/i })).toBeInTheDocument();
     expect(screen.getByText(/docs\/emergency-os-mvp-implementation-summary\.md/i)).toBeInTheDocument();
     expect(screen.getByText(/Every ED OS plan has an application surface/i)).toBeInTheDocument();
     expect(screen.getByText(/Door-to-Doctor Intelligence/i)).toBeInTheDocument();

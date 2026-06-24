@@ -303,7 +303,7 @@ export default function PlatformNavigationPage() {
           <span className="platform-navigation-eyebrow">Platform Navigation</span>
           <h1 id="platform-navigation-title">CareDroid App Map</h1>
           <p>
-            Use this hub to move between the Emergency OS and the broader platform surfaces that
+            Use this hub to move between the CareDroid and the broader platform surfaces that
             are registered in the app route inventory.
           </p>
         </div>

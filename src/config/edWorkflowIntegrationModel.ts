@@ -223,7 +223,7 @@ export function summarizeBackendFrontendSync(): BackendFrontendSyncSummary {
     persistenceMode: emergencyWriteWired ? 'hybrid' : 'demo-fixture',
     notes: Object.freeze([
       'Profile and workspace APIs are production-backed.',
-      'Emergency OS reads use /api/emergency/* demo envelopes until persistence ships.',
+      'CareDroid reads use /api/emergency/* demo envelopes until persistence ships.',
       'Critical handoffs (reception, triage assist) POST to real backend routes.',
       'Whiteboard mutations remain local-first in Zustand until PATCH endpoints land.',
     ]),

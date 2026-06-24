@@ -4,7 +4,7 @@ import EmergencyOperatingSystemService, {
 } from './emergencyOperatingSystemService';
 
 describe('EmergencyOperatingSystemService', () => {
-  it('unifies Emergency OS into one operating system payload', () => {
+  it('unifies CareDroid into one operating system payload', () => {
     const operatingSystem = getEmergencyOperatingSystem();
 
     expect(operatingSystem).toEqual(

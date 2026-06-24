@@ -98,7 +98,7 @@ function routeSurfaceDeclares(route) {
 }
 
 describe('full platform consolidation contract', () => {
-  it('redirects retired roots to Emergency OS and keeps open-access configuration intact', () => {
+  it('redirects retired roots to CareDroid and keeps open-access configuration intact', () => {
     for (const snippet of REQUIRED_LEGACY_REDIRECT_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
@@ -111,7 +111,7 @@ describe('full platform consolidation contract', () => {
     expect(appShellSource).toContain('ed-os-banner');
   });
 
-  it('declares the Emergency OS route surface once', () => {
+  it('declares the CareDroid route surface once', () => {
     for (const route of REQUIRED_ROUTES) {
       expect(routeSurfaceDeclares(route), route).toBe(true);
     }

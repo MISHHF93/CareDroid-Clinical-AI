@@ -609,6 +609,7 @@ export function BoardingRoute() {
     <EmergencyRoutePage
       eyebrow="Flow"
       title="Boarding"
+      maturity="demo"
       description="Patients waiting for an inpatient bed and the boarding pressure affecting department flow."
     >
       <ApiStateBanner moduleState={boarding} />

@@ -221,7 +221,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.admin,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.admin],
     description:
-      'Full Emergency OS administration, settings, governance, and clinical operations access.',
+      'Full CareDroid administration, settings, governance, and clinical operations access.',
     routes: ALL_ROUTES,
     actions: ALL_ACTIONS,
     defaultRoute: ROUTES.reception,
@@ -446,7 +446,7 @@ export function normalizeEmergencyRole(role) {
 }
 
 /**
- * Map platform membership roleProfileId to an Emergency OS role via catalog + org settings.
+ * Map platform membership roleProfileId to an CareDroid role via catalog + org settings.
  * @param {object} [user]
  * @param {object} [emergencyOsSettings]
  */

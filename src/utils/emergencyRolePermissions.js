@@ -1,5 +1,5 @@
 /**
- * Legacy MD/RN/PA/Tech permission helpers — delegate to canonical Emergency OS registry.
+ * Legacy MD/RN/PA/Tech permission helpers — delegate to canonical CareDroid registry.
  */
 import {
   hasEmergencyActionPermission,

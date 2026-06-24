@@ -239,7 +239,7 @@ export class NotificationController {
       userId: req.user.id,
       type: NotificationType.GENERAL,
       title: 'Test Notification',
-      body: 'This is a test notification from CareDroid-Clinical-AI',
+      body: 'This is a test notification from CareDroid',
       priority: 'normal',
     });
 

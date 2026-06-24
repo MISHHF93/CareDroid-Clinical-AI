@@ -173,14 +173,14 @@ export class PlatformSystemsController {
 
   @Get('patients')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get Emergency OS patients for the active tenant workspace' })
+  @ApiOperation({ summary: 'Get CareDroid patients for the active tenant workspace' })
   getEmergencyPatients() {
     return this.emergencyPatients;
   }
 
   @Get('patients/:patientId')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get one Emergency OS patient by id' })
+  @ApiOperation({ summary: 'Get one CareDroid patient by id' })
   getEmergencyPatient(@Param('patientId') patientId: string) {
     const patient = this.emergencyPatients.find((candidate) => candidate.id === patientId);
     if (!patient) {
@@ -191,7 +191,7 @@ export class PlatformSystemsController {
 
   @Post('patients')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  @ApiOperation({ summary: 'Create an Emergency OS intake patient' })
+  @ApiOperation({ summary: 'Create an CareDroid intake patient' })
   createEmergencyPatient(@Body() body: Record<string, any>) {
     if (!body?.chiefComplaint && !body?.complaint) {
       throw new BadRequestException('chiefComplaint or complaint is required');
@@ -233,7 +233,7 @@ export class PlatformSystemsController {
           patientId,
           type: 'Arrival',
           timestamp: now,
-          summary: 'Created through Emergency OS intake API.',
+          summary: 'Created through CareDroid intake API.',
         },
       ],
       notes: body.notes || [],
@@ -244,7 +244,7 @@ export class PlatformSystemsController {
 
   @Patch('patients/:patientId')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  @ApiOperation({ summary: 'Patch an Emergency OS patient' })
+  @ApiOperation({ summary: 'Patch an CareDroid patient' })
   updateEmergencyPatient(@Param('patientId') patientId: string, @Body() body: Record<string, any>) {
     let updatedPatient: Record<string, any> | null = null;
     this.emergencyPatients = this.emergencyPatients.map((patient) => {
@@ -260,28 +260,28 @@ export class PlatformSystemsController {
 
   @Get('staff')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get Emergency OS staff roster' })
+  @ApiOperation({ summary: 'Get CareDroid staff roster' })
   getEmergencyStaff() {
     return this.emergencyStaff;
   }
 
   @Get('rooms')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get Emergency OS room grid' })
+  @ApiOperation({ summary: 'Get CareDroid room grid' })
   getEmergencyRooms() {
     return this.emergencyRooms;
   }
 
   @Get('shift')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get active Emergency OS shift' })
+  @ApiOperation({ summary: 'Get active CareDroid shift' })
   getEmergencyShift() {
     return this.emergencyShift;
   }
 
   @Get('ems')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get Emergency OS EMS unit and arrival state' })
+  @ApiOperation({ summary: 'Get CareDroid EMS unit and arrival state' })
   getEmergencyEms() {
     return {
       units: this.emergencyEmsUnits,
@@ -291,14 +291,14 @@ export class PlatformSystemsController {
 
   @Get('referrals')
   @Permissions(Permission.READ_PHI)
-  @ApiOperation({ summary: 'Get Emergency OS referrals' })
+  @ApiOperation({ summary: 'Get CareDroid referrals' })
   getEmergencyReferrals() {
     return this.emergencyReferrals;
   }
 
   @Post('referrals')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  @ApiOperation({ summary: 'Create an Emergency OS referral' })
+  @ApiOperation({ summary: 'Create an CareDroid referral' })
   createEmergencyReferral(@Body() body: Record<string, any>) {
     if (!body?.patientId) {
       throw new BadRequestException('patientId is required');
@@ -313,7 +313,7 @@ export class PlatformSystemsController {
       requestingStaffId: body.requestingStaffId || 'staff-priya-nair',
       targetDepartment: body.targetDepartment || 'Other',
       urgency: body.urgency || 'Routine',
-      reason: body.reason || 'Referral requested from Emergency OS.',
+      reason: body.reason || 'Referral requested from CareDroid.',
       clinicalSummary: body.clinicalSummary || body.reason || 'Clinical summary pending.',
       status: body.status || 'Sent',
       requestedAt: body.requestedAt || now,

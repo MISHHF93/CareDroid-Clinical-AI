@@ -72,7 +72,7 @@ describe('mounted SaaS asset inventory projection', () => {
     );
   });
 
-  it('keeps quick command destinations scoped to the active Emergency OS route surface', () => {
+  it('keeps quick command destinations scoped to the active CareDroid route surface', () => {
     const mountedNav = buildNavigationMountProjection();
     const commandPaths = new Set(QUICK_COMMAND_DESTINATION_ITEMS.map((item) => item.path));
 

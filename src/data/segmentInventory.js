@@ -709,7 +709,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     bridges: bridge({
       userReach: 'Operations, Settings, or direct routes.',
       assistant: 'Clinical audit is separate under /tools; platform audit has no Assistant handoff.',
-      tools: 'Clinical AI audit is in /tools; platform audit is not.',
+      tools: 'CareDroid tool audit is in /tools; platform audit is not.',
       backend: 'Audit and compliance controllers.',
       result: 'Tables, integrity status, downloads, and consent state.',
       safeFailure: 'Error states and compliance API failure messages.',

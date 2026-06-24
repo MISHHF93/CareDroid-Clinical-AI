@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 
 describe('workspace subpage routes', () => {
-  it('keeps workspace aliases on the Emergency OS redirect contract', () => {
+  it('keeps workspace aliases on the CareDroid redirect contract', () => {
     expect(WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS).toMatchObject({
       whiteboard: '/emergency/whiteboard',
       patients: '/emergency/patients',
@@ -31,7 +31,7 @@ describe('workspace subpage routes', () => {
     expect(appSource).not.toContain('function WorkspaceRouteRedirect');
   });
 
-  it('keeps automation analytics unmounted from the active Emergency OS app', () => {
+  it('keeps automation analytics unmounted from the active CareDroid app', () => {
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.automationAnalytics}');
     expect(appSource).not.toContain("path=\"/automation-analytics\"");
     expect(appSource).toContain('<Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');

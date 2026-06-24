@@ -166,7 +166,7 @@ export class EmailService {
     const html = `
       <h2>Welcome to CareDroid!</h2>
       <p>Hello ${name},</p>
-      <p>Thank you for registering with CareDroid Clinical Companion.</p>
+      <p>Thank you for registering with CareDroid.</p>
       <p>Your account is now active and you can start exploring our clinical tools.</p>
     `;
 

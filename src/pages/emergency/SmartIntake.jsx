@@ -634,7 +634,7 @@ export default function SmartIntake({
             </>
           ) : (
             <>
-              <span>Emergency OS</span>
+              <span>CareDroid</span>
               <h1 id="smart-intake-title">Patient Verification</h1>
               <p>
                 One workflow for identity, OCR, duplicate detection, and manual review before

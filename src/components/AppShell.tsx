@@ -98,7 +98,7 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyCapacity]: 'Capacity score, rooms, boarders, and pressure inputs.',
   [CANONICAL_ROUTES.emergencyBoarding]: 'Admission boarders and boarding escalation status.',
   [CANONICAL_ROUTES.emergencyReferrals]: 'Referral and transfer queue status.',
-  [CANONICAL_ROUTES.emergencyCopilot]: 'Safe Emergency OS Copilot context and actions.',
+  [CANONICAL_ROUTES.emergencyCopilot]: 'Safe CareDroid Copilot context and actions.',
   [CANONICAL_ROUTES.emergencyTools]:
     'Clinical calculators, tool launchers, and role-aware medical utilities.',
   [CANONICAL_ROUTES.emergencyAnalytics]: 'Operational KPIs and local analytics fallback.',
@@ -220,7 +220,7 @@ export function AppShell({ children }: AppShellProps) {
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
         (activeItem
-          ? profileCopy.workspaceDescription || `Open ${activeItem.label} in Emergency OS.`
+          ? profileCopy.workspaceDescription || `Open ${activeItem.label} in CareDroid.`
           : profileCopy.workspaceDescription || EMERGENCY_OS_BRANDING.safetyLine),
     };
   }, [location.pathname, profileCopy.workspaceDescription, visibleNavigationItems]);
@@ -253,7 +253,7 @@ export function AppShell({ children }: AppShellProps) {
             status: 'connected',
             mode: 'polling',
             lastEventAt: new Date().toISOString(),
-            message: 'Emergency OS snapshot refreshed via polling fallback.',
+            message: 'CareDroid snapshot refreshed via polling fallback.',
           });
         } catch (error) {
           const message =
@@ -613,7 +613,11 @@ export function AppShell({ children }: AppShellProps) {
             paddingBottom: isMobileViewport ? 'calc(60px + env(safe-area-inset-bottom, 0px))' : 0,
           }}
         >
-          <ErrorBoundary fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}>
+          <ErrorBoundary
+            key={location.pathname}
+            resetKey={location.pathname}
+            fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
+          >
             <Suspense
               fallback={
                 <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
@@ -637,7 +641,11 @@ export function AppShell({ children }: AppShellProps) {
       !useKioskShell &&
       !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
       copilotOpen ? (
-        <ErrorBoundary fallbackText="CopilotPanel encountered an error. Refresh to reload.">
+        <ErrorBoundary
+          key={`copilot-${copilotOpen ? 'open' : 'closed'}-${location.pathname}`}
+          resetKey={`${copilotOpen}-${location.pathname}`}
+          fallbackText="CopilotPanel encountered an error. Refresh to reload."
+        >
           <Suspense fallback={null}>
             <CopilotPanel />
           </Suspense>

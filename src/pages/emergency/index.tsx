@@ -1591,7 +1591,7 @@ export default function EmergencyWhiteboard() {
         {whiteboardDensity.surfaces.heroDetail.visible ? (
         <div
           className="emergency-whiteboard-page__status"
-          aria-label="AIIOS command center status"
+          aria-label="CareDroid command center status"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -2087,7 +2087,7 @@ export default function EmergencyWhiteboard() {
           value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
           label="Data Freshness"
           tone="info"
-          title="Last Emergency OS capacity or whiteboard update"
+          title="Last CareDroid capacity or whiteboard update"
         />
         </>
         ) : null}

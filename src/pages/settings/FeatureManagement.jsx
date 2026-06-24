@@ -14,6 +14,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../../../lib/features/featureRegistry';
+import { getSuiteById } from '../../../lib/features/suiteRegistry';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { FEATURE_TOGGLE_BACKEND_QUEUE } from '../../data/featureToggleBackendQueue';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
@@ -443,7 +444,7 @@ export default function FeatureManagement() {
     <section className="feature-toggle-panel" aria-label="Feature management">
       <header className="feature-toggle-panel__header">
         <div>
-          <span className="feature-toggle-panel__eyebrow">Emergency OS</span>
+          <span className="feature-toggle-panel__eyebrow">CareDroid</span>
           <h1>Feature Management</h1>
           <p>Surface backend functions, enable modules, and manage rollout dependencies.</p>
         </div>
@@ -462,7 +463,7 @@ export default function FeatureManagement() {
         <section className="feature-toggle-panel__plan-banner" role="status">
           <div>
             <strong>Professional features are disabled on your plan</strong>
-            <p>Upgrade to enable professional and enterprise Emergency OS modules across devices.</p>
+            <p>Upgrade to enable professional and enterprise CareDroid modules across devices.</p>
           </div>
           <a href="/billing">Upgrade plan</a>
         </section>
@@ -657,6 +658,14 @@ export default function FeatureManagement() {
                         <div className="feature-toggle-panel__row-main">
                           <div className="feature-toggle-panel__row-title">
                             <strong>{feature.label}</strong>
+                            {feature.suiteId ? (
+                              <span
+                                className="feature-toggle-panel__suite-badge"
+                                title={getSuiteById(feature.suiteId)?.description || feature.suiteId}
+                              >
+                                {getSuiteById(feature.suiteId)?.label || feature.suiteId}
+                              </span>
+                            ) : null}
                             {feature.status === 'beta' ? <span>Beta</span> : null}
                             {feature.status === 'preview' ? <span>Preview</span> : null}
                             {feature.status === 'deprecated' ? (

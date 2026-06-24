@@ -27,7 +27,7 @@ export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
   Object.freeze({
     id: 'arrival',
     label: 'Arrival',
-    description: 'Patient enters the Emergency OS arrival state with EMS context attached.',
+    description: 'Patient enters the CareDroid arrival state with EMS context attached.',
   }),
 ]);
 

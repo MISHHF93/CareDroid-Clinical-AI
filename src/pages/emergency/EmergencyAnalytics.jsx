@@ -24,6 +24,7 @@ import {
 } from '../../config/operationalMetricsModel';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { summarizeTriageBreachAnalytics } from '../../services/triageBreachTimer';
+import { MaturityChip } from './emergencyRouteShared';
 import './EmergencyAnalytics.css';
 
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -159,7 +160,10 @@ export default function EmergencyAnalytics() {
       <header className="emergency-analytics__header">
         <div>
           <span>Operational Command</span>
-          <h1>Emergency Analytics</h1>
+          <div className="emergency-analytics__title-row">
+            <h1>Emergency Analytics</h1>
+            <MaturityChip maturity="demo" />
+          </div>
           <p>
             Current shift, arrival, wait-time, and complaint-mix signals for ED leadership review.
           </p>
@@ -173,7 +177,7 @@ export default function EmergencyAnalytics() {
 
       {emergencyAnalytics.status === 'loading' ? (
         <p className="emergency-analytics__state" role="status">
-          Loading Emergency OS analytics...
+          Loading CareDroid analytics...
         </p>
       ) : null}
       {statusMessage ? (
@@ -183,7 +187,7 @@ export default function EmergencyAnalytics() {
       ) : null}
       {emergencyAnalytics.status !== 'loading' && !hasOperationalData ? (
         <p className="emergency-analytics__state emergency-analytics__state--empty">
-          Operational analytics will populate when Emergency OS has active patient flow data for this department. Do not present empty charts as connected hospital analytics.
+          Operational analytics will populate when CareDroid has active patient flow data for this department. Do not present empty charts as connected hospital analytics.
         </p>
       ) : null}
 
@@ -287,7 +291,7 @@ export default function EmergencyAnalytics() {
       <div className="emergency-analytics__grid" aria-label="Operational hidden artifact links">
         <ChartCard title="Department Pulse" subtitle="Live command view">
           <strong>Queues, staff, EMS, alerts</strong>
-          <small>Compact charge-nurse view surfaced from the Emergency OS store.</small>
+          <small>Compact charge-nurse view surfaced from the CareDroid store.</small>
           {emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyPulse) ? (
             <Link className="emergency-analytics__link" to={CANONICAL_ROUTES.emergencyPulse}>
               Open Department Pulse
@@ -310,7 +314,7 @@ export default function EmergencyAnalytics() {
       </div>
 
       {upgradeHarness.data?.data ? (
-        <div className="emergency-analytics__grid" aria-label="Advanced Emergency OS upgrade harness analytics">
+        <div className="emergency-analytics__grid" aria-label="Advanced CareDroid upgrade harness analytics">
           <ChartCard title="Upgrade Harness" subtitle="Pilot readiness">
             <strong>
               {upgradeHarness.data.data.pilotReadiness.reviewRequired}/

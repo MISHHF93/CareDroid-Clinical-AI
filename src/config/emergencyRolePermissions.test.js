@@ -26,7 +26,7 @@ import {
 } from './emergencyRolePermissions';
 import { getDefaultScreenModeForRole } from './emergencyRoleScreenMatrix';
 
-describe('Emergency OS role-based views', () => {
+describe('CareDroid role-based views', () => {
   it('merges tenant permission overrides into action checks', () => {
     expect(
       hasEmergencyActionPermission(
@@ -37,7 +37,7 @@ describe('Emergency OS role-based views', () => {
     ).toBe(true);
   });
 
-  it('maps platform roleProfileId to Emergency OS role via org settings', () => {
+  it('maps platform roleProfileId to CareDroid role via org settings', () => {
     const emergencyOs = {
       roles: {
         defaultRoleProfileId: 'physician',
@@ -87,7 +87,7 @@ describe('Emergency OS role-based views', () => {
     );
   });
 
-  it('filters Emergency OS navigation by role', () => {
+  it('filters CareDroid navigation by role', () => {
     const clerkNavIds = getVisibleNavigation(EMERGENCY_ROLE_IDS.registrationClerk).map(
       (item) => item.id,
     );

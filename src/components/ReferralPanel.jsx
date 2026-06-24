@@ -15,6 +15,7 @@ import {
 import { summarizeReferralAwareness } from './whiteboard/referralAwarenessModel';
 import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
+import { MaturityChip } from '../pages/emergency/emergencyRouteShared';
 import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
@@ -471,7 +472,7 @@ export default function ReferralPanel() {
         }
         setBackendStatus(
           result.ok
-            ? 'Referral saved to Emergency OS.'
+            ? 'Referral saved to CareDroid.'
             : 'Referral saved for this shift. Live sync is pending.'
         );
       })
@@ -497,7 +498,7 @@ export default function ReferralPanel() {
         .then((result) => {
           setBackendStatus(
             result.ok
-              ? 'Transfer workflow synced to Emergency OS.'
+              ? 'Transfer workflow synced to CareDroid.'
               : 'Transfer updated for this shift. Live sync is pending.'
           );
         })
@@ -524,7 +525,10 @@ export default function ReferralPanel() {
       <header className="referral-panel__header">
         <div>
           <span>Referral Intelligence</span>
-          <h1 id="referral-panel-title">Referrals</h1>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+            <h1 id="referral-panel-title">Referrals</h1>
+            <MaturityChip maturity="demo" />
+          </div>
           <p>
             Specialty requests, transfer workflows, and delay signals. Source: {referralSource};{' '}
             {referralFreshness}.
@@ -578,7 +582,7 @@ export default function ReferralPanel() {
 
       {referralsModule.loading && !referrals.length ? (
         <p className="referral-panel__backend-status" role="status">
-          Loading Emergency OS referrals...
+          Loading CareDroid referrals...
         </p>
       ) : null}
       {referralsModule.error ? (
@@ -587,7 +591,7 @@ export default function ReferralPanel() {
         </p>
       ) : null}
       <p className="referral-panel__backend-status" role="status">
-        Source: {referralSource}; {referralFreshness}. Referral rows are local Emergency OS workflow records unless a backend confirmation is shown.
+        Source: {referralSource}; {referralFreshness}. Referral rows are local CareDroid workflow records unless a backend confirmation is shown.
       </p>
 
       <div className="referral-panel__metrics" aria-label="Referral metrics">
@@ -776,7 +780,7 @@ export default function ReferralPanel() {
 
       <div className="referral-panel__groups">
         {!referrals.length ? (
-          <p className="referral-group__empty">No active referrals in the current Emergency OS workflow state.</p>
+          <p className="referral-group__empty">No active referrals in the current CareDroid workflow state.</p>
         ) : statusFilter && awareness.grouped[statusFilter]?.length ? (
           <section className="referral-group" aria-labelledby={`referrals-filter-${statusFilter}`}>
             <div className="referral-group__heading">

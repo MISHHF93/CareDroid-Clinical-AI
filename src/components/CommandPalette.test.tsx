@@ -107,7 +107,7 @@ describe('CommandPalette helpers', () => {
     expect(readRecentCommandIds(storage)).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
   });
 
-  it('registers route and calculator commands against canonical Emergency OS paths', () => {
+  it('registers route and calculator commands against canonical CareDroid paths', () => {
     const routePathsById = Object.fromEntries(
       EMERGENCY_OS_ROUTE_COMMANDS.map((entry) => [entry.id, entry.build().path]),
     );
@@ -161,7 +161,7 @@ describe('CommandPalette helpers', () => {
     expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-reassessment')).toBe(true);
   });
 
-  it('hides command actions that the active Emergency OS role cannot perform', () => {
+  it('hides command actions that the active CareDroid role cannot perform', () => {
     const readOnlyRole = {
       role: EMERGENCY_ROLE_ID.readOnlyViewer,
       can: (action: string) => action === EMERGENCY_ACTIONS.viewAnalytics,

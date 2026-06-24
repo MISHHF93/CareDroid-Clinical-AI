@@ -5,7 +5,7 @@ import {
   calculateEmergencyOsCapacity,
 } from './logic';
 
-describe('Emergency OS shared logic', () => {
+describe('CareDroid shared logic', () => {
   it('calculates one transparent capacity pressure score with units and factors', () => {
     const result = calculateEmergencyOsCapacity({
       totalPatients: 24,

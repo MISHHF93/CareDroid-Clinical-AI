@@ -463,7 +463,7 @@ function presentationCategory(value) {
   if (category === 'fleet') return 'Fleet';
   if (category === 'iot') return 'IoT';
   if (category === 'hospital-operations') return 'Hospital Operations';
-  if (category === 'clinical ai') return 'Clinical AI';
+  if (category === 'clinical ai') return 'CareDroid';
   if (category === 'documentation') return 'Documentation';
   if (category === 'governance') return 'Governance';
   if (category === 'interoperability') return 'Interoperability';

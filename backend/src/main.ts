@@ -41,7 +41,7 @@ async function registerEmergencyMongooseRuntime(
   const mongoUri = config.database.mongodbUri;
   if (!mongoUri) {
     logger.warn(
-      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose Emergency OS routes.',
+      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose CareDroid routes.',
     );
     return;
   }
@@ -55,15 +55,15 @@ async function registerEmergencyMongooseRuntime(
   const initialization = await initializeAllServices();
   if (initialization.totals.failed > 0) {
     logger.warn(
-      `Emergency OS service registry initialized with ${initialization.totals.failed} failed service(s).`,
+      `CareDroid service registry initialized with ${initialization.totals.failed} failed service(s).`,
     );
   } else {
     logger.log(
-      `Emergency OS service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
+      `CareDroid service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
     );
   }
   logger.log(
-    `Mongoose Emergency OS routes mounted under /api/* (${mountedRoutes.length} route groups; legacy aliases under /api/emergency/*)`,
+    `Mongoose CareDroid routes mounted under /api/* (${mountedRoutes.length} route groups; legacy aliases under /api/emergency/*)`,
   );
 }
 

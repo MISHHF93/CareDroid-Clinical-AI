@@ -35,7 +35,7 @@ describe('emergencyPermissionRegistry', () => {
     );
   });
 
-  it('exposes canonical permission keys requested for Emergency OS', () => {
+  it('exposes canonical permission keys requested for CareDroid', () => {
     expect(EMERGENCY_PERMISSION_KEYS.patientCreate).toBe('patient.create');
     expect(EMERGENCY_PERMISSION_KEYS.patientDemographicsEdit).toBe('patient.demographics.edit');
     expect(EMERGENCY_PERMISSION_KEYS.encounterCreate).toBe('encounter.create');
@@ -135,7 +135,7 @@ describe('emergencyPermissionRegistry', () => {
     ).toBe(true);
   });
 
-  it('defines grants for every Emergency OS role', () => {
+  it('defines grants for every CareDroid role', () => {
     for (const roleId of Object.values(EMERGENCY_ROLE_ID)) {
       expect(ROLE_PERMISSION_GRANTS[roleId]?.length).toBeGreaterThan(0);
     }

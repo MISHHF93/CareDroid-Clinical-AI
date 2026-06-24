@@ -209,7 +209,7 @@
   --app-elevation-subtle: var(--app-shadow-1);
   --app-elevation-floating: var(--app-shadow-2);
 
-  /* Emergency OS component variants */
+  /* CareDroid component variants */
   --component-card-bg: var(--app-surface-2, var(--app-surface));
   --component-card-border: var(--app-border-subtle, var(--app-border));
   --component-card-radius: var(--app-radius-lg);

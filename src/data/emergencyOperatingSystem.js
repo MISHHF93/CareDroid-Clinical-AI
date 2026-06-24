@@ -633,7 +633,7 @@ export const EMERGENCY_DEMO_DATA_LABELS = Object.freeze({
 
 export const EMERGENCY_DEMO_TENANT = Object.freeze({
   tenantId: 'emergency-demo-tenant',
-  tenantName: 'Emergency OS Demo Hospital',
+  tenantName: 'CareDroid Demo Hospital',
   workspaceId: EMERGENCY_WORKSPACE_ID,
   workspaceRoute: '/workspace/emergency/demo',
   mode: 'demo',
@@ -794,7 +794,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
 export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
   route: '/workspace/emergency/roi',
   title: 'ED ROI Estimator',
-  goal: 'Estimate Emergency OS value for sales discovery, onboarding, and pilot planning.',
+  goal: 'Estimate CareDroid value for sales discovery, onboarding, and pilot planning.',
   inputFields: Object.freeze([
     Object.freeze({
       id: 'annualEdVolume',
@@ -837,7 +837,7 @@ export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
     Object.freeze({
       id: 'workflowEfficiency',
       label: 'Workflow efficiency',
-      helper: 'Estimated efficiency lift from moving repeated ED work into Emergency OS.',
+      helper: 'Estimated efficiency lift from moving repeated ED work into CareDroid.',
     }),
     Object.freeze({
       id: 'adoptionPotential',
@@ -852,9 +852,9 @@ export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
 export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
   route: '/workspace/emergency/deployment',
   title: 'First Customer Deployment Blueprint',
-  goal: 'Deploy Emergency OS for the first ED customer with minimal operational risk.',
+  goal: 'Deploy CareDroid for the first ED customer with minimal operational risk.',
   principle:
-    'Start with standalone Emergency OS, keep every clinical output human-reviewed, and add integrations only after the buyer sees value.',
+    'Start with standalone CareDroid, keep every clinical output human-reviewed, and add integrations only after the buyer sees value.',
   minimumSellableCapabilities: Object.freeze([
     'Patient Journey Engine',
     'Queue Intelligence',
@@ -890,13 +890,13 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
     Object.freeze({
       id: 'phase-1-standalone-emergency-workspace',
       phase: 'Phase 1',
-      title: 'Standalone Emergency OS',
+      title: 'Standalone CareDroid',
       description:
         'Demonstrate the Emergency Whiteboard, triage flow, calculators, sample patients, sample alerts, onboarding, ROI estimator, and safety messaging with demo/local data.',
       operationalRisk: 'Minimal',
       integrationRequirement: 'No integrations required',
       acceptance:
-        'Prospect can experience Emergency OS without EHR writeback, order placement, disposition automation, or live patient identity dependency.',
+        'Prospect can experience CareDroid without EHR writeback, order placement, disposition automation, or live patient identity dependency.',
     }),
     Object.freeze({
       id: 'phase-2-protocol-library',
@@ -927,7 +927,7 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
       description:
         'Track assessments completed, calculators used, protocol retrievals, workflow launches, AI requests, and simulation completion.',
       operationalRisk: 'Minimal',
-      integrationRequirement: 'Demo/local or Emergency OS event data',
+      integrationRequirement: 'Demo/local or CareDroid event data',
       acceptance:
         'Analytics demonstrate adoption, workflow efficiency, and ROI potential without claiming autonomous clinical quality outcomes.',
     }),
@@ -944,12 +944,12 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
     }),
   ]),
   acceptance:
-    'Emergency OS can be demonstrated, piloted, and sold without requiring a full hospital-wide deployment.',
+    'CareDroid can be demonstrated, piloted, and sold without requiring a full hospital-wide deployment.',
 });
 
 export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
   route: '/workspace/emergency/implementation',
-  title: 'Emergency OS MVP Implementation Summary',
+  title: 'CareDroid MVP Implementation Summary',
   purpose:
     'Document and display what has been implemented for the ED OS MVP, what markdown plan each capability satisfies, and which live integrations remain intentionally out of scope.',
   sourceDocument: 'docs/emergency-os-mvp-implementation-summary.md',
@@ -1033,7 +1033,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
       capability: 'First Customer Path',
       route: '/workspace/emergency/deployment',
       service: 'EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT',
-      acceptance: 'Emergency OS can be piloted by an Emergency Department without requiring hospital-wide deployment.',
+      acceptance: 'CareDroid can be piloted by an Emergency Department without requiring hospital-wide deployment.',
       status: 'implemented',
     }),
   ]),
@@ -1399,22 +1399,22 @@ export const EMERGENCY_FLOW_INTELLIGENCE_PLATFORM = Object.freeze({
   aiModel: EMERGENCY_FLOW_AI_MODEL,
   saasPackagingModel: EMERGENCY_FLOW_SAAS_PACKAGING_MODEL,
   acceptance:
-    'Emergency OS becomes a sellable Emergency Flow Intelligence solution rather than a collection of calculators.',
+    'CareDroid becomes a sellable Emergency Flow Intelligence solution rather than a collection of calculators.',
 });
 
 export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
   route: '/workspace/emergency/onboarding',
-  title: 'Emergency OS Onboarding',
-  goal: 'Help a new hospital understand Emergency OS in 10 minutes.',
+  title: 'CareDroid Onboarding',
+  goal: 'Help a new hospital understand CareDroid in 10 minutes.',
   audience: 'ED directors, triage nurses, clinical informatics leads, operations leaders, and implementation teams.',
   sections: Object.freeze([
     Object.freeze({
       id: 'overview',
-      label: 'Emergency OS overview',
+      label: 'CareDroid overview',
       duration: '1 minute',
       summary:
-        'Orient the hospital to the Emergency Whiteboard, patient journey, human-review boundary, and Emergency OS subpages.',
-      outcome: 'The team understands that Emergency OS is an operating environment, not a loose set of tools.',
+        'Orient the hospital to the Emergency Whiteboard, patient journey, human-review boundary, and CareDroid subpages.',
+      outcome: 'The team understands that CareDroid is an operating environment, not a loose set of tools.',
       targetRoute: '/emergency/whiteboard',
     }),
     Object.freeze({
@@ -1450,7 +1450,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       duration: '2 minutes',
       summary:
         'Launch triage review, protocol guidance, automation queues, patient follow-up, and simulation practice from the Emergency Whiteboard.',
-      outcome: 'The team sees how Emergency OS turns guidance into coordinated next steps.',
+      outcome: 'The team sees how CareDroid turns guidance into coordinated next steps.',
       targetRoute: '/workspace/emergency/automations',
     }),
     Object.freeze({
@@ -1466,7 +1466,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
   walkthrough: Object.freeze([
     Object.freeze({
       minute: '0-1',
-      title: 'Open Emergency OS',
+      title: 'Open CareDroid',
       instruction: 'Start at the Emergency Whiteboard and explain the ED journey, operating queues, and human-review posture.',
       targetRoute: '/emergency/whiteboard',
     }),
@@ -1502,7 +1502,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
     }),
   ]),
   takeaway:
-    'A hospital should leave onboarding knowing what Emergency OS does first, how clinicians stay in control, and how adoption is measured.',
+    'A hospital should leave onboarding knowing what CareDroid does first, how clinicians stay in control, and how adoption is measured.',
 });
 
 export const ED_READINESS_CLASSIFICATIONS = Object.freeze({
@@ -2275,7 +2275,7 @@ function uniqueCalculators(calculators = []) {
 export function buildEmergencyCopilotGuidance(input = {}) {
   const complaint = String(input.complaint || '').trim();
   const vitals = String(input.vitals || input.vitalsSummary || '').trim();
-  const workspaceContext = String(input.workspaceContext || 'Emergency OS').trim();
+  const workspaceContext = String(input.workspaceContext || 'CareDroid').trim();
   const surfacedCalculators = uniqueCalculators(input.surfacedCalculators || input.selectedCalculators || []);
   const routedComplaint = routeEmergencyChiefComplaint(complaint);
   const recommendedTools = uniqueCalculators([

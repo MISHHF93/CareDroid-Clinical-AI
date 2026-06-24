@@ -1,5 +1,5 @@
 /**
- * Backend governance adapter for the canonical Emergency OS AI configuration.
+ * Backend governance adapter for the canonical CareDroid AI configuration.
  * The source of truth lives in `lib/ai/config.ts` and `lib/ai/promptRegistry.ts`.
  */
 
@@ -83,7 +83,7 @@ export const PromptTemplateRegistry: Readonly<Record<string, AIPromptTemplate>> 
         template: `${definition.prompt}\n\n${definition.requiredDisclaimer}`,
         variables: [],
         validationRules: [
-          'Must stay within Emergency OS allowed AI scope',
+          'Must stay within CareDroid allowed AI scope',
           'Must require human review',
           'Must not diagnose, prescribe, disposition, auto-triage, auto-import, or auto-link identity',
         ],

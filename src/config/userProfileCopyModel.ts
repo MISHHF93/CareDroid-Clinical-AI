@@ -484,7 +484,7 @@ const EMERGENCY_PROFILE_COPY_BASE: Readonly<
   [EMERGENCY_ROLE_IDS.admin]: {
     personaTitle: ED_PERSONA_LABELS.siteAdmin,
     workspaceEyebrow: 'ED administration',
-    workspaceDescription: 'Settings, governance, and full Emergency OS administration.',
+    workspaceDescription: 'Settings, governance, and full CareDroid administration.',
     profileShellSubtitle: 'Site admin — settings, roles, and governance.',
     copilotIntro: 'Assist with configuration and policy-aligned changes.',
   },

@@ -44,7 +44,7 @@ function blocker(id, severity, domain, summary, resolution = '') {
 
 /** @type {ReadonlyArray} */
 export const PRODUCTION_RISK_CATALOG = Object.freeze([
-  risk('R001', 'critical', 'security', 'Emergency OS API lacks JWT authentication', 'Add AuthGuard to EmergencyOsController'),
+  risk('R001', 'critical', 'security', 'CareDroid API lacks JWT authentication', 'Add AuthGuard to EmergencyOsController'),
   risk('R002', 'critical', 'security', 'EmergencySettingsService singleton shared across tenants', 'Scope settings by organizationId'),
   risk('R003', 'critical', 'pilot', 'Vercel frontend-only deploy serves /api as index.html', 'Set VITE_API_URL to Nest backend'),
   risk('R004', 'critical', 'security', 'TenantIsolationGuard passes unauthenticated requests', 'Require auth before tenant scope or fail closed'),

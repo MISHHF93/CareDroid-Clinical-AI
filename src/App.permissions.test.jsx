@@ -33,8 +33,8 @@ const RETIRED_PLATFORM_PATHS = [
   '/fleet/command',
 ];
 
-describe('App Emergency OS route contract', () => {
-  it('mounts the active Emergency OS pages through the single AppShell route tree', () => {
+describe('App CareDroid route contract', () => {
+  it('mounts the active CareDroid pages through the single AppShell route tree', () => {
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
 
@@ -46,7 +46,7 @@ describe('App Emergency OS route contract', () => {
     expect(appSource).not.toContain(`path="${path}" element={<`);
   });
 
-  it('redirects retired product roots and platform surfaces into Emergency OS', () => {
+  it('redirects retired product roots and platform surfaces into CareDroid', () => {
     const redirectsByPath = Object.fromEntries(
       LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to]),
     );

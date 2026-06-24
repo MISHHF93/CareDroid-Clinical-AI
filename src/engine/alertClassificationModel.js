@@ -1,5 +1,5 @@
 /**
- * Four-tier operational alert taxonomy for Emergency OS.
+ * Four-tier operational alert taxonomy for CareDroid.
  * Maps canonical Alert records (Info | Warning | Critical) into clinician-facing tiers.
  */
 

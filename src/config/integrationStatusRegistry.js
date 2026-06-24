@@ -70,7 +70,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
   {
     id: 'fhir-ed-consumer',
     category: INTEGRATION_CATEGORY.FHIR,
-    label: 'Emergency OS FHIR consumer',
+    label: 'CareDroid FHIR consumer',
     status: INTEGRATION_STATUS.PLACEHOLDER,
     capability: 'emergencySmartIntake',
     surfaces: ['SmartIntake'],

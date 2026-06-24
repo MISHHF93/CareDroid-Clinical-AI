@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('First Customer Demo Mode root store activation', () => {
-  it('loads the 100-patient/day demo into the richer Emergency OS store', () => {
+  it('loads the 100-patient/day demo into the richer CareDroid store', () => {
     useEmergencyStore.getState().setActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
 
     const state = useEmergencyStore.getState();

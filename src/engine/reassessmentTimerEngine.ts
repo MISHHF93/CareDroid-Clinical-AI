@@ -66,7 +66,7 @@ export const DEFAULT_REASSESSMENT_TIMER_THRESHOLDS: Required<ReassessmentTimerTh
   reassessP5Min: 120,
 };
 
-/** Canonical Emergency OS surfaces that consume reassessment timer snapshots. */
+/** Canonical CareDroid surfaces that consume reassessment timer snapshots. */
 export const REASSESSMENT_TIMER_SURFACES = Object.freeze([
   'waiting-room-safety-board',
   'whiteboard-patient-card',

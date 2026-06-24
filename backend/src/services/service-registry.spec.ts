@@ -35,7 +35,7 @@ const expectedServiceNames = [
   'consentService',
 ];
 
-describe('Emergency OS service registry', () => {
+describe('CareDroid service registry', () => {
   it('exports every required singleton name', () => {
     expect(Object.keys(emergencyOsServiceRegistry).sort()).toEqual(expectedServiceNames.sort());
     expect(REQUIRED_SERVICE_NAMES.sort()).toEqual(expectedServiceNames.sort());

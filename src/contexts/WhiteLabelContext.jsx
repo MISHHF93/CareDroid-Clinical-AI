@@ -9,7 +9,7 @@ import {
 import logger from '../utils/logger';
 
 const DEFAULT_BRANDING = Object.freeze({
-  displayName: 'CareDroid Clinical AI',
+  displayName: 'CareDroid',
   logoUrl: '',
   faviconUrl: '',
   primaryColor: '',
@@ -130,9 +130,7 @@ export function WhiteLabelProvider({ children }) {
       branding.loginBackgroundImageUrl ? `url(${JSON.stringify(branding.loginBackgroundImageUrl)})` : '',
     );
     root.dataset.whiteLabelTheme = branding.theme || 'system';
-    document.title = branding.displayName
-      ? `${branding.displayName} | Clinical AI`
-      : 'CareDroid Clinical AI';
+    document.title = branding.displayName || 'CareDroid';
     applyFavicon(branding.faviconUrl);
   }, [value]);
 

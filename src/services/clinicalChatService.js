@@ -37,7 +37,7 @@ export async function sendClinicalChatMessage({
   tenantId = 'default-tenant',
   patientId,
   encounterId,
-  purpose = 'Emergency OS operational support',
+  purpose = 'CareDroid operational support',
   sourceModule = 'ed-copilot',
 }) {
   const headers = { 'Content-Type': 'application/json' };

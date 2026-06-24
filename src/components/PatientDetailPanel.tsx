@@ -1194,7 +1194,7 @@ export default function PatientDetailPanel() {
 
         {timelineContextState.loading ? (
           <div role="status" className="patient-timeline-status patient-timeline-status--loading">
-            Loading timeline enrichment from Emergency OS modules...
+            Loading timeline enrichment from CareDroid modules...
           </div>
         ) : null}
 

@@ -140,7 +140,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         emergencyWorkspaceFeed: expect.objectContaining({
           route: '/workspace/emergency',
           separateIntakeAppCreated: false,
-          arrivalState: expect.stringMatching(/inside Emergency OS already summarized/i),
+          arrivalState: expect.stringMatching(/inside CareDroid already summarized/i),
         }),
       })
     );
@@ -168,7 +168,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         'Document review workspace',
         'Identity resolution review',
         'Medication and allergy capture review',
-        'Smart Arrival summary in Emergency OS',
+        'Smart Arrival summary in CareDroid',
         'Emergency command center and Patient Journey Engine views',
       ])
     );

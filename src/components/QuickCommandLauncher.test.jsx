@@ -275,7 +275,7 @@ describe('QuickCommandLauncher', () => {
     });
   });
 
-  it('searches and launches Emergency OS discovery entries', () => {
+  it('searches and launches CareDroid discovery entries', () => {
     renderQuickCommand({ defaultOpen: true });
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {

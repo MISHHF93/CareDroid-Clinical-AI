@@ -7,7 +7,7 @@ import { normalizeApiPath } from '../config/api.config';
 
 const mockAppConfig = vi.hoisted(() => ({
   app: {
-    name: 'CareDroid-Clinical-AI',
+    name: 'CareDroid',
     version: 'test',
     environment: 'test',
   },
@@ -129,7 +129,7 @@ describe('apiFetch auth header', () => {
     );
   });
 
-  it('lets public Emergency OS API routes reach fetch without a token', async () => {
+  it('lets public CareDroid API routes reach fetch without a token', async () => {
     localStorage.clear();
 
     await apiFetch('/api/emergency/whiteboard');

@@ -51,13 +51,54 @@ export const emergencyRouteStyles = {
   },
 };
 
-export function EmergencyRoutePage({ eyebrow, title, description, children, actions }) {
+const MATURITY_CHIP_STYLES = {
+  demo: { border: '1px solid rgba(245, 158, 11, 0.45)', background: 'rgba(245, 158, 11, 0.12)', color: '#FCD34D' },
+  preview: { border: '1px solid rgba(96, 165, 250, 0.45)', background: 'rgba(96, 165, 250, 0.12)', color: '#93C5FD' },
+  planned: { border: '1px solid rgba(156, 163, 175, 0.45)', background: 'rgba(156, 163, 175, 0.12)', color: '#D1D5DB' },
+};
+
+const MATURITY_CHIP_LABELS = {
+  demo: 'Demo',
+  preview: 'Preview',
+  planned: 'Planned',
+};
+
+export function MaturityChip({ maturity }) {
+  if (!maturity || maturity === 'live' || !MATURITY_CHIP_LABELS[maturity]) return null;
+
+  const chipStyle = MATURITY_CHIP_STYLES[maturity];
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        borderRadius: 999,
+        fontSize: 11,
+        fontWeight: 900,
+        letterSpacing: '0.06em',
+        lineHeight: 1,
+        padding: '5px 10px',
+        textTransform: 'uppercase',
+        ...chipStyle,
+      }}
+      aria-label={`${MATURITY_CHIP_LABELS[maturity]} surface`}
+    >
+      {MATURITY_CHIP_LABELS[maturity]}
+    </span>
+  );
+}
+
+export function EmergencyRoutePage({ eyebrow, title, description, children, actions, maturity }) {
   return (
     <section style={emergencyRouteStyles.page}>
       <header style={emergencyRouteStyles.hero}>
         <div>
           {eyebrow ? <span style={emergencyRouteStyles.eyebrow}>{eyebrow}</span> : null}
-          <h1 style={emergencyRouteStyles.title}>{title}</h1>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+            <h1 style={{ ...emergencyRouteStyles.title, margin: 'var(--space-1, 4px) 0 0' }}>{title}</h1>
+            <MaturityChip maturity={maturity} />
+          </div>
           {description ? <p style={emergencyRouteStyles.description}>{description}</p> : null}
         </div>
         {actions ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{actions}</div> : null}
@@ -187,7 +228,7 @@ function dataFreshness(generatedAt) {
 
 export function ApiStateBanner({
   moduleState,
-  fallbackText = 'Showing the last local Emergency OS state. Verify against the current department record before operational decisions.',
+  fallbackText = 'Showing the last local CareDroid state. Verify against the current department record before operational decisions.',
 }) {
   if (moduleState.loading && !moduleState.data) {
     return (
@@ -248,7 +289,7 @@ export function DataSourceNote({ moduleState }) {
     !source || /fallback|demo|fixture|first-customer/i.test(source)
       ? 'walkthrough/local dataset - no live hospital integration'
       : source === 'backend'
-        ? 'live Emergency OS feed'
+        ? 'live CareDroid feed'
         : source;
   return (
     <div

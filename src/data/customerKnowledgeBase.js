@@ -113,7 +113,7 @@ export const CUSTOMER_KNOWLEDGE_BASE_ARTICLES = Object.freeze([
     title: 'Choose The Right AI Agent',
     summary: 'Match AI agents to clinical, operations, lab, fleet, education, or research tasks.',
     content:
-      'CareDroid agents are scoped by entitlement, role profile, and workspace. Clinical AI supports reasoning and documentation. Operations AI supports throughput and incidents. Laboratory AI helps with labs. Fleet AI supports EMS and routing. Education AI supports simulation. Research AI supports evidence review.',
+      'CareDroid agents are scoped by entitlement, role profile, and workspace. The CareDroid Copilot supports reasoning and documentation. Operations agents support throughput and incidents. Laboratory agents help with labs. Fleet agents support EMS and routing. Education agents support simulation. Research agents support evidence review.',
     steps: [
       'Open Assistant.',
       'Use the active workspace context.',

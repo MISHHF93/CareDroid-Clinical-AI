@@ -183,7 +183,7 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     navId: 'clinical_calculator_hub',
     screenshotSlug: '14-medical-tools',
     movementStages: ['Triage', 'Assessment', 'Results', 'Disposition'],
-    notes: 'Role-aware Emergency OS tools console mounted in the active AppShell.',
+    notes: 'Role-aware CareDroid tools console mounted in the active AppShell.',
   }),
   page({
     id: 'department-pulse',

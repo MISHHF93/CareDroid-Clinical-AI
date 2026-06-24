@@ -24,7 +24,7 @@ describe('emergencyGovernanceApi', () => {
     });
   });
 
-  it('uses the canonical Emergency OS AI governance API routes', async () => {
+  it('uses the canonical CareDroid AI governance API routes', async () => {
     await fetchAIGovernanceRegistry();
     await fetchAIGovernanceSafetyRules();
     await fetchEmergencyGovernanceCompliance(14);

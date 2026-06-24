@@ -126,7 +126,7 @@ function formatAlertTime(timestamp?: string): string {
 }
 
 function describeAlertSource(alert: Alert): string {
-  const source = alert.source || alert.type || 'Emergency OS';
+  const source = alert.source || alert.type || 'CareDroid';
   return String(source)
     .replace(/[-_]/g, ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -446,7 +446,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         title: isProvincial ? 'Provincial data event' : 'Integration event received',
         message: isWarning
           ? 'Integration signal needs review before relying on downstream data.'
-          : 'Integration signal captured in the Emergency OS event stream.',
+          : 'Integration signal captured in the CareDroid event stream.',
         createdAt: latestIntegrationEvent.receivedAt,
         dismissed: false,
         source: isProvincial ? 'provincial-data' : 'integration-events',
@@ -906,7 +906,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
   return (
     <header
-      className="emergency-os-header"
+      className="caredroid-header"
       style={{
         height: screenCapabilities.showOperationalStrip ? 92 : 48,
         width: '100%',
@@ -920,7 +920,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       }}
     >
       <div
-        className="emergency-os-header__topbar"
+        className="caredroid-header__topbar"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -931,14 +931,14 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <span
-            className="emergency-os-header__wordmark"
+            className="caredroid-header__wordmark"
             title={EMERGENCY_OS_BRANDING.platformLine}
             style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
           >
             {screenCapabilities.productLabel}
           </span>
           {!screenCapabilities.isRegistrationScreen ? (
-            <span className="emergency-os-header__aiios-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
+            <span className="caredroid-header__copilot-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
           ) : null}
           <Clock />
         </div>
@@ -953,8 +953,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           }}
         >
           <div
-            className="emergency-os-header__page-title"
-            aria-label="Current Emergency OS page"
+            className="caredroid-header__page-title"
+            aria-label="Current CareDroid page"
             style={{ display: 'grid', minWidth: 0, justifyItems: 'center' }}
           >
             {screenCapabilities.isRegistrationScreen ? (
@@ -968,7 +968,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           </div>
           {screenCapabilities.showCentralNodeBadge && !PILOT_CUSTOMER_MODE.enabled ? (
             <span
-              className="emergency-os-header__central-node"
+              className="caredroid-header__central-node"
               title={`${centralControl.statusLabel}. ${centralControl.dashboardControlLabel}. ${centralControl.inputProfile.label}. ${centralControl.contributorMode ? 'Users submit inputs only.' : 'This role can operate central controls.'}`}
             >
               {centralControl.label}: {centralControl.contributorMode ? 'Input only' : 'Controller'}{' '}
@@ -977,7 +977,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           ) : null}
           {screenCapabilities.showOperationalStrip ? (
           <div
-            className="emergency-os-header__central-status"
+            className="caredroid-header__central-status"
             aria-label="CareDroid central node live status"
           >
             <span
@@ -1011,7 +1011,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
             </span>
             <span
-              className={syncPulse ? 'emergency-os-header__sync-pill--pulse' : ''}
+              className={syncPulse ? 'caredroid-header__sync-pill--pulse' : ''}
               data-tone={syncStale ? 'warning' : 'success'}
               title={syncTitle}
             >
@@ -1019,7 +1019,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             </span>
             {intelligenceSnapshot.enabled ? (
               <span
-                className="emergency-os-header__aiios-pill"
+                className="caredroid-header__copilot-pill"
                 data-tone={
                   intelligenceSnapshot.dataFreshness.status === 'stale'
                     ? 'warning'
@@ -1041,12 +1041,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
-            className="emergency-os-header__primary-actions"
-            aria-label="Emergency OS primary actions"
+            className="caredroid-header__primary-actions"
+            aria-label="CareDroid primary actions"
           >
             <button
               type="button"
-              className="emergency-os-header__action emergency-os-header__action--primary"
+              className="caredroid-header__action caredroid-header__action--primary"
               onClick={openCentralIntake}
               disabled={!canSubmitCentralIntake}
               aria-label={
@@ -1071,7 +1071,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             {screenCapabilities.showReassessAction ? (
             <button
               type="button"
-              className="emergency-os-header__action"
+              className="caredroid-header__action"
               onClick={() => document.dispatchEvent(new Event('open-reassessment-drawer'))}
               aria-label="Open reassessment queue"
               title="Open reassessment queue"
@@ -1084,7 +1084,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             {createReferralAction.visible ? (
             <button
               type="button"
-              className="emergency-os-header__action"
+              className="caredroid-header__action"
               onClick={openReferralWorkflow}
               disabled={!canCreateReferral}
               aria-label="Create referral"
@@ -1102,7 +1102,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             {!PILOT_CUSTOMER_MODE.enabled && dispositionAction.visible ? (
               <button
                 type="button"
-                className="emergency-os-header__action"
+                className="caredroid-header__action"
                 onClick={openSelectedPatientDischarge}
                 disabled={!canDischarge || !selectedPatientId}
                 aria-label="Discharge selected patient"
@@ -1123,7 +1123,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
           </div>
 
-          <div className={`emergency-os-header__lookup${isReceptionRoute ? ' emergency-os-header__lookup--primary' : ''}`}>
+          <div className={`caredroid-header__lookup${isReceptionRoute ? ' caredroid-header__lookup--primary' : ''}`}>
             <IconSearch size={15} stroke={2} aria-hidden />
             <input
               ref={patientLookupInputRef}
@@ -1152,7 +1152,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               }}
             />
             {patientLookupOpen && patientLookupQuery.trim() ? (
-              <div className="emergency-os-header__lookup-results">
+              <div className="caredroid-header__lookup-results">
                 <PatientSearchResults
                   query={patientLookupQuery}
                   results={patientLookupResults}
@@ -1211,7 +1211,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
           <button
             type="button"
-            className="emergency-os-header__icon-button emergency-os-header__notification-trigger"
+            className="caredroid-header__icon-button caredroid-header__notification-trigger"
             onClick={() => setAlertDrawerOpen((open) => !open)}
             aria-label={`Notification Center${unreadAlertCount ? `: ${unreadAlertCount} unread` : ''}`}
             aria-haspopup="dialog"
@@ -1220,7 +1220,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           >
             <IconBell size={18} stroke={2} aria-hidden />
             {unreadAlertCount > 0 ? (
-              <span className="emergency-os-header__notification-badge">
+              <span className="caredroid-header__notification-badge">
                 {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
               </span>
             ) : null}
@@ -1271,7 +1271,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
       {screenCapabilities.showOperationalStrip ? (
       <nav
-        className="emergency-os-header__operational-strip"
+        className="caredroid-header__operational-strip"
         aria-label="Operational command context"
       >
         {headerOperationalMetrics.map((metric) => {
@@ -1281,7 +1281,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             <button
               key={metric.key}
               type="button"
-              className="emergency-os-header__operational-metric"
+              className="caredroid-header__operational-metric"
               data-tone={metric.tone || 'neutral'}
               onClick={() => {
                 if (canOpenRoute) navigateEmergencyRoute(route);
@@ -1377,7 +1377,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               className="emergency-os-notification-center__state emergency-os-notification-center__state--error"
               role="alert"
             >
-              Notification data is using local Emergency OS state. {refreshError}
+              Notification data is using local CareDroid state. {refreshError}
             </div>
           ) : visibleNotificationAlerts.length > 0 ? (
             <div className="emergency-os-notification-center__list" role="list">
@@ -1456,7 +1456,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             </div>
           ) : (
             <div className="emergency-os-notification-center__state">
-              No active Emergency OS notifications. Capacity, EMS, reassessment, boarding, referral,
+              No active CareDroid notifications. Capacity, EMS, reassessment, boarding, referral,
               sync, AI safety, and integration streams are clear.
             </div>
           )}

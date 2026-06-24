@@ -1,7 +1,7 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 /**
- * Canonical Emergency OS frontend facade.
+ * Canonical CareDroid frontend facade.
  *
  * Active pages should prefer the Nest `/api/emergency/*` endpoints listed in
  * ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS. The review-only groups remain exported

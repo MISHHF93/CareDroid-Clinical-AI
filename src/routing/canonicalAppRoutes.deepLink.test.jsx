@@ -77,7 +77,7 @@ describe('canonical App routes deep links', () => {
       screen.getByRole('complementary', { name: /emergency navigation/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByRole('banner').some((banner) => banner.textContent?.includes('Emergency OS')),
+      screen.getAllByRole('banner').some((banner) => banner.textContent?.includes('CareDroid')),
     ).toBe(true);
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByTestId('location')).toHaveTextContent('/emergency/ems');
@@ -92,7 +92,7 @@ describe('canonical App routes deep links', () => {
     );
   }, 20_000);
 
-  it('redirects the retired assistant alias to Emergency OS Copilot', async () => {
+  it('redirects the retired assistant alias to CareDroid Copilot', async () => {
     render(<AppRouteHarness initialPath="/assistant?agent=agent-emergency" />);
 
     await waitFor(() =>

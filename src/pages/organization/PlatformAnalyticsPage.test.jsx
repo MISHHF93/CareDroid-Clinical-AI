@@ -100,7 +100,7 @@ const analytics = {
     packUsage: [{ id: 'core-platform', label: 'Core Platform', count: 11 }],
     roleUsage: [{ id: 'clinician', label: 'clinician', count: 12 }],
     workspaceUsage: [{ id: 'emergency', label: 'emergency', count: 12 }],
-    aiUsage: [{ id: 'agent-clinical', label: 'Clinical AI', count: 3 }],
+    aiUsage: [{ id: 'agent-clinical', label: 'CareDroid', count: 3 }],
     searchQueries: [{ id: 'search', label: 'search', count: 4 }],
     simulationCompletion: [{ id: 'simulation-suite', label: 'Simulation Suite', count: 1 }],
     dashboardEngagement: [{ id: 'dashboard', label: 'Command Center', count: 2 }],
@@ -130,7 +130,7 @@ describe('PlatformAnalyticsPage', () => {
     expect(screen.getAllByText('NEWS2').length).toBeGreaterThan(0);
     expect(screen.getByText('Unused Tool')).toBeInTheDocument();
     expect(screen.getByText('Merge into qSOFA')).toBeInTheDocument();
-    expect(screen.getByText('Clinical AI')).toBeInTheDocument();
+    expect(screen.getByText('CareDroid')).toBeInTheDocument();
     expect(screen.getByText('Simulation Suite')).toBeInTheDocument();
     expect(screen.getByText('Command Center')).toBeInTheDocument();
   });

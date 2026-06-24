@@ -13,7 +13,7 @@ export const TermsOfService = () => {
         <h1>Terms of Service</h1>
         <p className="legal-meta">Last Updated: January 31, 2026</p>
         <p className="legal-intro">
-          These Terms of Service ("Terms") govern your access to and use of CareDroid Clinical AI 
+          These Terms of Service ("Terms") govern your access to and use of CareDroid 
           ("CareDroid", "Service", "Platform"). Please read these Terms carefully before using 
           the Service.
         </p>

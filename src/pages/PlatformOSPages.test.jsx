@@ -83,7 +83,7 @@ describe('PlatformOSPages', () => {
     expect(screen.getByRole('button', { name: /open boarding/i })).toBeInTheDocument();
   });
 
-  it('supports Emergency OS search-first discovery', () => {
+  it('supports CareDroid search-first discovery', () => {
     renderPage(<SearchResultsPage />, '/search');
     const input = screen.getByPlaceholderText(/search everything/i);
 

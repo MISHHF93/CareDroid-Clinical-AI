@@ -279,7 +279,7 @@ function useEmergencyModule(fetcher, scenarioModule) {
       }
       return normalizedEnvelope;
     } catch (loadError) {
-      const message = loadError?.message || 'Unable to load Emergency OS data.';
+      const message = loadError?.message || 'Unable to load CareDroid data.';
       setError(message);
       return null;
     } finally {
@@ -315,7 +315,7 @@ function useEmergencyModule(fetcher, scenarioModule) {
       })
       .catch((loadError) => {
         if (!cancelled) {
-          setError(loadError?.message || 'Unable to load Emergency OS data.');
+          setError(loadError?.message || 'Unable to load CareDroid data.');
         }
       })
       .finally(() => {
@@ -414,7 +414,7 @@ function useEmergencyModuleActions(fetcher, actions) {
               await moduleState.refresh();
               return result;
             } catch (error) {
-              const message = error?.message || 'Emergency OS action failed.';
+              const message = error?.message || 'CareDroid action failed.';
               setActionError(message);
               return null;
             } finally {

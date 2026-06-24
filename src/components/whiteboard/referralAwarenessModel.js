@@ -127,7 +127,7 @@ export function buildReferralAttentionStripMetrics(referrals = []) {
     Object.freeze({
       id: 'referral-delayed',
       label: 'Delayed',
-      hint: 'Referrals flagged delayed in Emergency OS workflow state',
+      hint: 'Referrals flagged delayed in CareDroid workflow state',
       value: summary.buckets.delayed,
       surface: 'referrals',
       tone: summary.buckets.delayed ? 'critical' : 'info',

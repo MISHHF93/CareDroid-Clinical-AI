@@ -325,12 +325,12 @@ const INTAKE_AUTOMATION_MODULES = Object.freeze([
     moduleId: 'smart-arrival',
     title: 'Smart Arrival',
     description:
-      'Arrival-time ID capture, OCR, document ingestion, medication/allergy extraction, confirmation, and Patient Snapshot handoff inside Emergency OS.',
+      'Arrival-time ID capture, OCR, document ingestion, medication/allergy extraction, confirmation, and Patient Snapshot handoff inside CareDroid.',
     tierAvailability: Object.freeze({ core: 'Included', pro: 'Included', enterprise: 'Included' }),
     route: '/workspace/emergency/intake',
     journeyStages: Object.freeze(['arrival', 'registration', 'triage']),
     reviewControls: Object.freeze([...BASE_REVIEW_CONTROLS, 'patient or staff confirmation before finalizing']),
-    usageMetric: 'summarized arrivals in Emergency OS',
+    usageMetric: 'summarized arrivals in CareDroid',
   }),
   Object.freeze({
     moduleId: 'smart-intake',
@@ -815,8 +815,8 @@ function buildSmartArrival({ documentRecords = [], patientSnapshot = buildPatien
     capabilityId: 'smart-arrival',
     title: 'Smart Arrival',
     route: '/workspace/emergency/intake',
-    operatingModel: 'embedded Emergency OS capability, not a separate intake app',
-    arrivalTrigger: 'Patient arrives inside Emergency OS and is summarized before handoff.',
+    operatingModel: 'embedded CareDroid capability, not a separate intake app',
+    arrivalTrigger: 'Patient arrives inside CareDroid and is summarized before handoff.',
     capturePipeline: SMART_ARRIVAL_CAPTURE_STEPS,
     documentInputs: Object.freeze([
       'ID document',
@@ -882,7 +882,7 @@ function buildSmartArrival({ documentRecords = [], patientSnapshot = buildPatien
         'triage',
         'whiteboard',
       ]),
-      arrivalState: 'patient arrives inside Emergency OS already summarized',
+      arrivalState: 'patient arrives inside CareDroid already summarized',
       separateIntakeAppCreated: false,
       payloads: Object.freeze(['Patient Snapshot', 'Pre-Triage Queue entry', 'Patient Journey update']),
     }),
@@ -1178,7 +1178,7 @@ function buildMarketplace() {
       { from: 'Pro', to: 'Enterprise', unlocks: Object.freeze(['advanced Identity Resolution', 'Voice Intake', 'Multi-Language Intake']) },
     ]),
     configurationRules: Object.freeze(['role-based enablement', 'governance policy controls', 'review controls cannot be disabled for extracted clinical or identity data']),
-    packagingStatement: 'Intake is packaged as a sellable Emergency OS product category.',
+    packagingStatement: 'Intake is packaged as a sellable CareDroid product category.',
   });
 }
 
@@ -1368,7 +1368,7 @@ export const EmergencyIntakeOperatingSystemService = Object.freeze({
         { surface: 'Document review workspace', route: '/workspace/emergency/intake', artifact: 'documentIntelligence' },
         { surface: 'Identity resolution review', route: '/workspace/emergency/patient-context', artifact: 'identityResolution' },
         { surface: 'Medication and allergy capture review', route: '/workspace/emergency/patient-context', artifact: 'medicationSummary + allergyRiskCapture' },
-        { surface: 'Smart Arrival summary in Emergency OS', route: '/workspace/emergency', artifact: 'smartArrival' },
+        { surface: 'Smart Arrival summary in CareDroid', route: '/workspace/emergency', artifact: 'smartArrival' },
         { surface: 'Emergency command center and Patient Journey Engine views', route: '/workspace/emergency', artifact: 'emergencyOsIntegration' },
       ]),
       safetyStatement:

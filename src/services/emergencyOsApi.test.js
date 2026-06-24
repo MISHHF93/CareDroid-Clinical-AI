@@ -58,14 +58,14 @@ const {
   validateEmergencyAiGovernancePrompts,
 } = await import('./emergencyOsApi');
 
-describe('emergencyOsApi advanced Emergency OS capabilities', () => {
+describe('emergencyOsApi advanced CareDroid capabilities', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     parseApiResponse.mockResolvedValue({ status: 'ok' });
     apiFetch.mockResolvedValue({ ok: true });
   });
 
-  it('marks active Emergency OS page endpoints separately from review-only capabilities', () => {
+  it('marks active CareDroid page endpoints separately from review-only capabilities', () => {
     expect(ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual([
       'centralNodeSnapshot',
       'whiteboard',
@@ -107,7 +107,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('calls the active Emergency OS module endpoints through the canonical facade', async () => {
+  it('calls the active CareDroid module endpoints through the canonical facade', async () => {
     const activeFetchers = [
       [fetchCareDroidCentralNodeSnapshot, '/api/emergency/central-node/snapshot'],
       [fetchEmergencyWhiteboard, '/api/emergency/whiteboard'],
@@ -247,7 +247,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('fetches Emergency OS workflow audit logs', async () => {
+  it('fetches CareDroid workflow audit logs', async () => {
     await fetchEmergencyWorkflowLogs();
 
     expect(apiFetch).toHaveBeenCalledWith(
@@ -256,7 +256,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('fetches patient-scoped Emergency OS workflow audit logs', async () => {
+  it('fetches patient-scoped CareDroid workflow audit logs', async () => {
     await fetchPatientWorkflowLogs('patient 1');
 
     expect(apiFetch).toHaveBeenCalledWith(
@@ -274,7 +274,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('fetches the canonical Advanced Emergency OS upgrade harness endpoints', async () => {
+  it('fetches the canonical Advanced CareDroid upgrade harness endpoints', async () => {
     await fetchAdvancedEmergencyOsUpgradeHarness();
     await fetchUpgradeHarnessCapacity();
     await fetchUpgradeHarnessPatientFlow('patient 1');
@@ -308,7 +308,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('fetches the canonical Emergency OS AI governance endpoints', async () => {
+  it('fetches the canonical CareDroid AI governance endpoints', async () => {
     await fetchEmergencyAiGovernanceRegistry();
     await fetchEmergencyAiGovernanceSafetyRules();
     await fetchEmergencyAiGovernanceCompliance(14);
@@ -342,7 +342,7 @@ describe('emergencyOsApi advanced Emergency OS capabilities', () => {
     );
   });
 
-  it('updates Emergency OS settings through the canonical facade', async () => {
+  it('updates CareDroid settings through the canonical facade', async () => {
     await updateEmergencySettings({ tenantName: 'North Command ED' });
 
     expect(apiFetch).toHaveBeenCalledWith(

@@ -55,7 +55,7 @@ describe('canonical protected AppShell source-level route contract', () => {
     expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
   });
 
-  it('keeps non-canonical profile routes off the mounted Emergency OS shell', () => {
+  it('keeps non-canonical profile routes off the mounted CareDroid shell', () => {
     expect(appSource).not.toContain('path="/profile"');
     expect(appSource).not.toContain('path="/profile/*"');
     expect(appSource).not.toContain("path: '/profile/settings'");

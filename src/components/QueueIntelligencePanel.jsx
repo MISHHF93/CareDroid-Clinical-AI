@@ -216,7 +216,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
             </div>
           ))}
           {!emergencyAnalytics.data?.queuePerformance?.length ? (
-            <small>No backend queue analytics returned yet. Queue rows are derived from the active Emergency OS state.</small>
+            <small>No backend queue analytics returned yet. Queue rows are derived from the active CareDroid state.</small>
           ) : null}
         </section>
       ) : null}

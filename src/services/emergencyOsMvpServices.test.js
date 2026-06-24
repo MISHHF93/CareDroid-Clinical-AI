@@ -9,7 +9,7 @@ import EmergencySimulationScenariosService from './emergencySimulationScenariosS
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
 
-describe('Emergency OS MVP services', () => {
+describe('CareDroid MVP services', () => {
   it('builds throughput, waiting room, reassessment, EMS, resource, escalation, KPI, simulation, and demo contracts', () => {
     const throughput = DoorToDoctorIntelligenceService.getDashboard();
     const waitingRoom = WaitingRoomIntelligenceService.getWaitingRoomDashboard();

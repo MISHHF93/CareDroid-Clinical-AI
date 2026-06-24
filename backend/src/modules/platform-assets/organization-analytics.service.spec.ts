@@ -178,7 +178,7 @@ describe('OrganizationAnalyticsService', () => {
       },
       {
         id: 'agent-clinical',
-        title: 'Clinical AI',
+        title: 'CareDroid',
         assetType: PlatformAssetType.AI_AGENT,
         category: 'AI Agent',
         route: '/assistant',

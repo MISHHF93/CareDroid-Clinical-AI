@@ -122,7 +122,7 @@ export class EmergencyOsUpgradeHarnessService {
 
     this.recordHarnessAudit('aggregate', 'Advanced upgrade harness aggregate generated.');
 
-    return envelope('Advanced Emergency OS Upgrade Harness', {
+    return envelope('Advanced CareDroid Upgrade Harness', {
       harnessId: 'advanced-emergency-os-upgrade-harness',
       mode: 'deterministic-pilot-harness',
       apiBase: '/api/emergency',
@@ -151,7 +151,7 @@ export class EmergencyOsUpgradeHarnessService {
   getCapacityAndForecasting() {
     const generatedAt = new Date().toISOString();
     this.recordHarnessAudit('capacity', 'Capacity and 10-hour forecasting harness generated.');
-    return envelope('Advanced Emergency OS Capacity Upgrade Harness', {
+    return envelope('Advanced CareDroid Capacity Upgrade Harness', {
       signals: this.buildCapacityAndForecastingSignals(generatedAt),
     });
   }
@@ -159,7 +159,7 @@ export class EmergencyOsUpgradeHarnessService {
   getPatientFlow(patientId?: string) {
     const generatedAt = new Date().toISOString();
     this.recordHarnessAudit('patient-flow', 'Patient flow upgrade harness generated.', patientId);
-    return envelope('Advanced Emergency OS Patient Flow Upgrade Harness', {
+    return envelope('Advanced CareDroid Patient Flow Upgrade Harness', {
       patientId: patientId || null,
       signals: this.buildPatientFlowSignals(generatedAt, patientId),
     });
@@ -172,7 +172,7 @@ export class EmergencyOsUpgradeHarnessService {
       'Clinical intelligence upgrade harness generated.',
       patientId,
     );
-    return envelope('Advanced Emergency OS Clinical Intelligence Upgrade Harness', {
+    return envelope('Advanced CareDroid Clinical Intelligence Upgrade Harness', {
       patientId: patientId || null,
       signals: this.buildClinicalDecisionSupportSignals(generatedAt, patientId),
     });
@@ -186,7 +186,7 @@ export class EmergencyOsUpgradeHarnessService {
       ...this.buildClinicalDecisionSupportSignals(generatedAt),
     ];
     this.recordHarnessAudit('audit-summary', 'Immutable audit abstraction summary generated.');
-    return envelope('Advanced Emergency OS Upgrade Audit Summary', {
+    return envelope('Advanced CareDroid Upgrade Audit Summary', {
       signals: this.buildGovernanceSignals(generatedAt, signals),
       workflowLogs: this.workflowLogService.listLogs().slice(0, 10),
     });
@@ -605,7 +605,7 @@ export class EmergencyOsUpgradeHarnessService {
       provider: `deterministic-${capability}-provider`,
       sourceSystems: ['EmergencyPatientService', 'CapacitySnapshot', 'WorkflowActionLogService'],
       inputSignals,
-      evidenceWindow: 'current in-memory Emergency OS fixture state',
+      evidenceWindow: 'current in-memory CareDroid fixture state',
       limitations,
     };
     const safety: UpgradeHarnessSafety = {

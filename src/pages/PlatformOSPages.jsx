@@ -82,7 +82,7 @@ function FilterBar({
       <FormField label={searchLabel}>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={searchPlaceholder} />
       </FormField>
-      <FormField label="Emergency OS">
+      <FormField label="CareDroid">
         <select value={workspaceId} onChange={(event) => setWorkspaceId(event.target.value)}>
           <option value="all">All workspaces</option>
           {CARE_WORKSPACES.map((workspace) => (
@@ -155,7 +155,7 @@ export function WorkspacesIndexPage() {
       eyebrow="Workspace Architecture"
       title="Workspaces"
       description="Clinical operating-system workspaces filter tools, calculators, dashboards, AI suggestions, maps, notifications, and workflows."
-      actions={<Link className="platform-primary-link" to="/workspace/emergency">Open Emergency OS</Link>}
+      actions={<Link className="platform-primary-link" to="/workspace/emergency">Open CareDroid</Link>}
     >
       <section className="platform-workspace-grid">
         {CARE_WORKSPACES.map((workspace) => {
@@ -288,7 +288,7 @@ export function HealthcareKnowledgeHubPage() {
         </label>
         <KnowledgeFacetSelect label="Specialty" value={specialty} onChange={setSpecialty} options={hub.facets.specialties} />
         <KnowledgeFacetSelect label="Role" value={role} onChange={setRole} options={hub.facets.roles} />
-        <KnowledgeFacetSelect label="Emergency OS" value={workspace} onChange={setWorkspace} options={hub.facets.workspaces} />
+        <KnowledgeFacetSelect label="CareDroid" value={workspace} onChange={setWorkspace} options={hub.facets.workspaces} />
         <KnowledgeFacetSelect label="Department" value={department} onChange={setDepartment} options={hub.facets.departments} />
       </section>
 

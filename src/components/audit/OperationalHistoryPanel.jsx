@@ -28,7 +28,7 @@ export default function OperationalHistoryPanel({
   logs = [],
   patientId = null,
   title = 'Operational history',
-  description = 'Recent workflow actions from the Emergency OS audit log.',
+  description = 'Recent workflow actions from the CareDroid audit log.',
   domains = Object.values(OPERATIONAL_AUDIT_DOMAIN),
   limit = 8,
   compact = false,

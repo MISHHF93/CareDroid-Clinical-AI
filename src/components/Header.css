@@ -1,13 +1,13 @@
-.emergency-os-header button,
-.emergency-os-header select {
+.caredroid-header button,
+.caredroid-header select {
   -webkit-tap-highlight-color: transparent;
 }
 
-.emergency-os-header__topbar {
+.caredroid-header__topbar {
   min-width: 0;
 }
 
-.emergency-os-header__central-node {
+.caredroid-header__central-node {
   border: 1px solid rgba(96, 165, 250, 0.35);
   border-radius: 999px;
   background: rgba(37, 99, 235, 0.14);
@@ -19,7 +19,7 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__central-status {
+.caredroid-header__central-status {
   display: flex;
   min-width: 0;
   align-items: center;
@@ -27,7 +27,7 @@
   overflow: hidden;
 }
 
-.emergency-os-header__central-status span {
+.caredroid-header__central-status span {
   border: 1px solid rgba(31, 41, 55, 0.9);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.8);
@@ -41,22 +41,22 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__central-status span[data-tone='success'] {
+.caredroid-header__central-status span[data-tone='success'] {
   border-color: rgba(16, 185, 129, 0.34);
   color: #a7f3d0;
 }
 
-.emergency-os-header__central-status span[data-tone='warning'] {
+.caredroid-header__central-status span[data-tone='warning'] {
   border-color: rgba(245, 158, 11, 0.38);
   color: #fde68a;
 }
 
-.emergency-os-header__central-status span[data-tone='critical'] {
+.caredroid-header__central-status span[data-tone='critical'] {
   border-color: rgba(239, 68, 68, 0.42);
   color: #fca5a5;
 }
 
-.emergency-os-header__sync-pill--pulse {
+.caredroid-header__sync-pill--pulse {
   animation: emergency-os-sync-pulse 1.2s ease-out;
 }
 
@@ -72,7 +72,7 @@
   }
 }
 
-.emergency-os-header__page-title strong {
+.caredroid-header__page-title strong {
   max-width: min(24vw, 260px);
   overflow: hidden;
   color: #f9fafb;
@@ -83,7 +83,7 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__page-title span {
+.caredroid-header__page-title span {
   max-width: min(28vw, 360px);
   overflow: hidden;
   color: #9ca3af;
@@ -93,7 +93,7 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__aiios-pill {
+.caredroid-header__copilot-pill {
   border: 1px solid rgba(16, 185, 129, 0.4);
   border-radius: 999px;
   background: rgba(16, 185, 129, 0.12);
@@ -104,13 +104,13 @@
   padding: 4px 7px;
 }
 
-.emergency-os-header__primary-actions {
+.caredroid-header__primary-actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.emergency-os-header__action {
+.caredroid-header__action {
   min-height: 30px;
   border: 1px solid #1f2937;
   border-radius: 9px;
@@ -123,18 +123,18 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__action--primary {
+.caredroid-header__action--primary {
   border-color: rgba(37, 99, 235, 0.74);
   background: #2563eb;
   color: #f9fafb;
 }
 
-.emergency-os-header__action:disabled {
+.caredroid-header__action:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.emergency-os-header__icon-button {
+.caredroid-header__icon-button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -149,15 +149,15 @@
   cursor: pointer;
 }
 
-.emergency-os-header__icon-button:hover,
-.emergency-os-header__icon-button:focus-visible {
+.caredroid-header__icon-button:hover,
+.caredroid-header__icon-button:focus-visible {
   border-color: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 42%, transparent);
   color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 18%, transparent);
 }
 
-.emergency-os-header__notification-badge {
+.caredroid-header__notification-badge {
   position: absolute;
   inset-block-start: -6px;
   inset-inline-end: -6px;
@@ -356,7 +356,7 @@
   gap: 6px;
 }
 
-.emergency-os-header__lookup {
+.caredroid-header__lookup {
   position: relative;
   display: flex;
   align-items: center;
@@ -369,7 +369,7 @@
   color: #6b7280;
 }
 
-.emergency-os-header__lookup--primary {
+.caredroid-header__lookup--primary {
   width: min(36vw, 420px);
   min-width: 260px;
   height: 38px;
@@ -377,12 +377,12 @@
   background: rgba(37, 99, 235, 0.12);
 }
 
-.emergency-os-header__lookup > svg {
+.caredroid-header__lookup > svg {
   margin-left: 10px;
   flex-shrink: 0;
 }
 
-.emergency-os-header__lookup input {
+.caredroid-header__lookup input {
   width: 100%;
   min-width: 0;
   height: 100%;
@@ -395,7 +395,7 @@
   padding: 0 9px 0 7px;
 }
 
-.emergency-os-header__lookup-results {
+.caredroid-header__lookup-results {
   position: absolute;
   top: 42px;
   right: 0;
@@ -409,7 +409,7 @@
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
 }
 
-.emergency-os-header__lookup-results button {
+.caredroid-header__lookup-results button {
   display: grid;
   gap: 3px;
   width: 100%;
@@ -423,15 +423,15 @@
   text-align: left;
 }
 
-.emergency-os-header__lookup-results button:last-child {
+.caredroid-header__lookup-results button:last-child {
   border-bottom: 0;
 }
 
-.emergency-os-header__lookup-results button:hover {
+.caredroid-header__lookup-results button:hover {
   background: #1c2333;
 }
 
-.emergency-os-header__lookup-results span {
+.caredroid-header__lookup-results span {
   overflow: hidden;
   color: #9ca3af;
   font-size: 11px;
@@ -439,7 +439,7 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__operational-strip {
+.caredroid-header__operational-strip {
   display: grid;
   grid-template-columns: repeat(8, minmax(104px, 1fr));
   gap: 1px;
@@ -450,7 +450,7 @@
   scrollbar-width: thin;
 }
 
-.emergency-os-header__operational-metric {
+.caredroid-header__operational-metric {
   display: grid;
   align-content: center;
   gap: 2px;
@@ -465,16 +465,16 @@
   text-align: left;
 }
 
-.emergency-os-header__operational-metric:first-child {
+.caredroid-header__operational-metric:first-child {
   border-left: 0;
 }
 
-.emergency-os-header__operational-metric:disabled {
+.caredroid-header__operational-metric:disabled {
   cursor: not-allowed;
   opacity: 0.72;
 }
 
-.emergency-os-header__operational-metric strong {
+.caredroid-header__operational-metric strong {
   overflow: hidden;
   color: #f9fafb;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -484,7 +484,7 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__operational-metric span {
+.caredroid-header__operational-metric span {
   overflow: hidden;
   color: #9ca3af;
   font-size: 10px;
@@ -496,37 +496,37 @@
   white-space: nowrap;
 }
 
-.emergency-os-header__operational-metric[data-tone='success'] strong {
+.caredroid-header__operational-metric[data-tone='success'] strong {
   color: #a7f3d0;
 }
 
-.emergency-os-header__operational-metric[data-tone='info'] strong {
+.caredroid-header__operational-metric[data-tone='info'] strong {
   color: #bfdbfe;
 }
 
-.emergency-os-header__operational-metric[data-tone='warning'] strong {
+.caredroid-header__operational-metric[data-tone='warning'] strong {
   color: #fde68a;
 }
 
-.emergency-os-header__operational-metric[data-tone='critical'] strong {
+.caredroid-header__operational-metric[data-tone='critical'] strong {
   color: #fca5a5;
 }
 
-.emergency-os-header__operational-metric:not(:disabled):hover {
+.caredroid-header__operational-metric:not(:disabled):hover {
   background: #111827;
 }
 
 @media (max-width: 1024px) {
-  .emergency-os-header {
+  .caredroid-header {
     grid-template-rows: 48px 42px !important;
   }
 
-  .emergency-os-header__topbar {
+  .caredroid-header__topbar {
     gap: 10px !important;
     padding-inline: 10px !important;
   }
 
-  .emergency-os-header__wordmark {
+  .caredroid-header__wordmark {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -535,36 +535,36 @@
     white-space: nowrap;
   }
 
-  .emergency-os-header__aiios-pill {
+  .caredroid-header__copilot-pill {
     display: none;
   }
 
-  .emergency-os-header__page-title span {
+  .caredroid-header__page-title span {
     display: none;
   }
 
-  .emergency-os-header__central-status {
+  .caredroid-header__central-status {
     max-width: 42vw;
   }
 
-  .emergency-os-header__primary-actions {
+  .caredroid-header__primary-actions {
     gap: 4px;
   }
 
-  .emergency-os-header__action {
+  .caredroid-header__action {
     padding-inline: 7px;
   }
 
-  .emergency-os-header__lookup {
+  .caredroid-header__lookup {
     width: 150px;
     min-width: 132px;
   }
 
-  .emergency-os-header__operational-strip {
+  .caredroid-header__operational-strip {
     grid-template-columns: repeat(8, minmax(96px, 1fr));
   }
 
-  .emergency-os-header__operational-metric {
+  .caredroid-header__operational-metric {
     min-width: 96px;
     min-height: 41px;
     padding-inline: 8px;
@@ -578,49 +578,49 @@
 }
 
 @media (max-width: 768px) {
-  .emergency-os-header__topbar,
-  .emergency-os-header__operational-strip {
+  .caredroid-header__topbar,
+  .caredroid-header__operational-strip {
     overflow-x: auto;
     scrollbar-width: none;
   }
 
-  .emergency-os-header__topbar::-webkit-scrollbar,
-  .emergency-os-header__operational-strip::-webkit-scrollbar {
+  .caredroid-header__topbar::-webkit-scrollbar,
+  .caredroid-header__operational-strip::-webkit-scrollbar {
     display: none;
   }
 
-  .emergency-os-header button,
-  .emergency-os-header select {
+  .caredroid-header button,
+  .caredroid-header select {
     min-height: 44px !important;
   }
 
-  .emergency-os-header button {
+  .caredroid-header button {
     min-width: 44px !important;
   }
 
-  .emergency-os-header button:active {
+  .caredroid-header button:active {
     border-color: #3b82f6 !important;
     color: #f9fafb !important;
   }
 
-  .emergency-os-header__central-node {
+  .caredroid-header__central-node {
     display: none;
   }
 
-  .emergency-os-header__primary-actions {
+  .caredroid-header__primary-actions {
     display: none;
   }
 
-  .emergency-os-header__lookup {
+  .caredroid-header__lookup {
     width: 44vw;
     min-width: 150px;
   }
 
-  .emergency-os-header__operational-strip {
+  .caredroid-header__operational-strip {
     grid-template-columns: repeat(8, minmax(112px, 1fr));
   }
 
-  .emergency-os-header__notification-badge {
+  .caredroid-header__notification-badge {
     inset-block-start: 0;
     inset-inline-end: 0;
   }
@@ -661,16 +661,16 @@
 }
 
 @media (max-width: 390px) {
-  .emergency-os-header__page-title strong {
+  .caredroid-header__page-title strong {
     max-width: 40vw;
   }
 
-  .emergency-os-header__lookup {
+  .caredroid-header__lookup {
     width: 38vw;
     min-width: 118px;
   }
 
-  .emergency-os-header__lookup input {
+  .caredroid-header__lookup input {
     font-size: 16px;
   }
 

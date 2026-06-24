@@ -206,20 +206,20 @@ describe('pilot walkthrough', () => {
   beforeEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
     vi.clearAllMocks();
-    global.fetch?.mockRejectedValue?.(new Error('Pilot test uses local Emergency OS fixtures.'));
+    global.fetch?.mockRejectedValue?.(new Error('Pilot test uses local CareDroid fixtures.'));
   });
 
   afterEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('drives the Emergency OS pilot from demo access through discharge and analytics', async () => {
+  it('drives the CareDroid pilot from demo access through discharge and analytics', async () => {
     const user = userEvent.setup();
     const beforePatientIds = new Set(useEmergencyStore.getState().patients.map((patient) => patient.id));
 
     render(<AppRouteHarness />);
 
-    expect(await screen.findByText('Emergency OS')).toBeInTheDocument();
+    expect(await screen.findByText('CareDroid')).toBeInTheDocument();
     expect(await screen.findByText('Total', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
 
     await user.click(screen.getByLabelText('Pilot open intake'));

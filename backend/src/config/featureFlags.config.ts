@@ -54,7 +54,7 @@ export const FEATURE_FLAG_REGISTRY: FeatureFlagDefinition[] = [
     category: FeatureFlagCategory.AI,
     defaultState: FeatureFlagState.ENABLED,
     route: '/assistant',
-    owner: 'Clinical AI',
+    owner: 'CareDroid',
     assetIds: ['assistant', 'agent-clinical', 'differential-ai', 'patient-summary-ai'],
   },
   {
@@ -63,7 +63,7 @@ export const FEATURE_FLAG_REGISTRY: FeatureFlagDefinition[] = [
     category: FeatureFlagCategory.AI,
     defaultState: FeatureFlagState.BETA,
     route: '/documentation',
-    owner: 'Clinical AI',
+    owner: 'CareDroid',
     assetIds: ['ambient-scribe', 'documentation-assistant', 'order-set-ai'],
   },
   {

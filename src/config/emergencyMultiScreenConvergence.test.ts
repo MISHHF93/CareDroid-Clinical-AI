@@ -53,7 +53,7 @@ const PRIMARY_SCREEN_MODES = Object.freeze([
 ]);
 
 describe('emergencyMultiScreenConvergence', () => {
-  it('uses one AppShell and one mounted Emergency OS route tree', () => {
+  it('uses one AppShell and one mounted CareDroid route tree', () => {
     expect(appSource).toContain("import { AppShell } from './components/AppShell'");
     expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
     expect(appSource).toContain('<Outlet />');

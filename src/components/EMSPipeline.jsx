@@ -59,7 +59,7 @@ function formatFreshness(timestamp) {
 }
 
 function sourceLabel(source) {
-  if (!source) return 'local Emergency OS state - no live EMS CAD integration';
+  if (!source) return 'local CareDroid state - no live EMS CAD integration';
   return /fixture|demo|fallback|scenario|first-customer/i.test(source)
     ? 'walkthrough/local dataset - no live EMS CAD integration'
     : source;
@@ -511,7 +511,7 @@ export default function EMSPipeline() {
       ) : null}
 
       {emsModule.loading && !emsArrivals.length ? (
-        <p className="ems-pipeline__empty" role="status">Loading Emergency OS EMS intake...</p>
+        <p className="ems-pipeline__empty" role="status">Loading CareDroid EMS intake...</p>
       ) : null}
       {emsModule.error ? (
         <p className="ems-pipeline__empty" role="alert">
@@ -636,7 +636,7 @@ export default function EMSPipeline() {
                     />
                   ))
                 ) : (
-                  <p className="ems-pipeline__empty">No inbound EMS units in the active Emergency OS state.</p>
+                  <p className="ems-pipeline__empty">No inbound EMS units in the active CareDroid state.</p>
                 )}
               </div>
             </section>

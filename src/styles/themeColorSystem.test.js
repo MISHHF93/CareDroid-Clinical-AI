@@ -21,7 +21,7 @@ const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
 const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 
 describe('theme color system revamp', () => {
-  it('defines Emergency OS light and dark root palettes', () => {
+  it('defines CareDroid light and dark root palettes', () => {
     expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-bg:\s*#f6f8fb/);
     expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-surface-1:\s*#ffffff/);
     expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-bg:\s*#0b1220/);

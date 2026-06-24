@@ -61,7 +61,7 @@ const DEFAULT_PROFILE: Omit<OperationalPresentationProfile, 'screenMode'> = Obje
   stripAriaLabel: 'Operational metrics',
   pageEyebrow: EMERGENCY_OS_BRANDING.platformLine,
   pageTitle: EMERGENCY_OS_BRANDING.productName,
-  pageSubtitle: 'Shared Emergency OS surface with role-aware operational payloads.',
+  pageSubtitle: 'Shared CareDroid surface with role-aware operational payloads.',
   emptyLabel: 'All clear',
   emptyHint: 'No operational signals need attention right now.',
   density: 'comfortable',

@@ -1,5 +1,5 @@
 /**
- * Canonical CareDroid screen mode registry — one Emergency OS surface, role-driven layouts.
+ * Canonical CareDroid screen mode registry — one CareDroid surface, role-driven layouts.
  * Same AppShell and routes; screen modes control widgets, actions, density, PHI, and landing.
  */
 import { CANONICAL_ROUTES } from './routes.config';

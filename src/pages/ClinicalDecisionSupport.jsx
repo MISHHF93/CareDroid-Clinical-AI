@@ -27,8 +27,8 @@ function buildPatientContext(patient) {
   return {
     age: patient?.age != null ? String(patient.age) : '',
     sex: patient?.sex || 'not specified',
-    vitals: formatPatientVitals(patient) || 'No current vitals in Emergency OS store',
-    history: patient?.history || patient?.chiefComplaint || 'No additional history in Emergency OS store',
+    vitals: formatPatientVitals(patient) || 'No current vitals in CareDroid store',
+    history: patient?.history || patient?.chiefComplaint || 'No additional history in CareDroid store',
   };
 }
 

@@ -20,7 +20,7 @@ export class SettingsFeaturesController {
 
   @Get()
   @TenantScoped({ requireWorkspaceId: false })
-  @ApiOperation({ summary: 'Get Emergency OS feature flags for the current tenant' })
+  @ApiOperation({ summary: 'Get CareDroid feature flags for the current tenant' })
   async getFeatureSettings(@Req() req: any) {
     return this.organizationsService.getEmergencyFeatureSettings(
       req.user,
@@ -34,7 +34,7 @@ export class SettingsFeaturesController {
     admin: 'organization',
     permissions: [Permission.CONFIGURE_SYSTEM],
   })
-  @ApiOperation({ summary: 'Update an Emergency OS feature flag for the current tenant' })
+  @ApiOperation({ summary: 'Update an CareDroid feature flag for the current tenant' })
   async updateFeatureSettings(@Req() req: any, @Body() body: Record<string, any>) {
     const result = await this.organizationsService.updateEmergencyFeatureSetting(
       req.user,

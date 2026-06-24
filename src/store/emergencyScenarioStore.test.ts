@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from './emergencyStore';
 
-describe('Emergency OS scenario store wiring', () => {
+describe('CareDroid scenario store wiring', () => {
   beforeEach(() => {
     window.localStorage.clear();
     useEmergencyStore.getState().setActiveScenario('normal-day');

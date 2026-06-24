@@ -432,7 +432,7 @@ export default function ClinicalCalculatorHub() {
     <section className="clinical-calculator-hub">
       <section className="clinical-calculator-hub__header" aria-labelledby="clinical-tools-title">
         <div>
-          <span className="clinical-calculator-hub__eyebrow">Emergency OS</span>
+          <span className="clinical-calculator-hub__eyebrow">CareDroid</span>
           <h1 id="clinical-tools-title">Clinical Calculator Hub</h1>
           <p>One searchable hub for clinical calculators and score workflows. {HUMAN_REVIEW_DISCLAIMER}</p>
         </div>

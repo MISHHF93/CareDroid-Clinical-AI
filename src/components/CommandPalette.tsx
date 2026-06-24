@@ -387,7 +387,7 @@ function createEmergencyRouteCommands(
     return {
       id: command.id,
       label: command.label.replace(/^Open /, ''),
-      description: `${command.label} in the active Emergency OS shell.`,
+      description: `${command.label} in the active CareDroid shell.`,
       shortcut: command.hint ? `G ${command.hint}` : undefined,
       group: 'Navigation',
       keywords: [...command.keywords],
@@ -576,7 +576,7 @@ function createCommands(
       .map((command) => ({
       ...command,
       group: 'Clinical' as const,
-      description: command.description?.replace(' in the active Emergency OS shell.', ' in Medical Tools.'),
+      description: command.description?.replace(' in the active CareDroid shell.', ' in Medical Tools.'),
     })),
     {
       id: 'patient-lookup',
@@ -604,7 +604,7 @@ function createCommands(
     {
       id: 'toggle-copilot',
       label: 'Toggle Copilot',
-      description: 'Show or hide human-reviewed Emergency OS Copilot context.',
+      description: 'Show or hide human-reviewed CareDroid Copilot context.',
       shortcut: 'C',
       group: 'Department',
       keywords: ['copilot', 'ai', 'chat', 'assistant'],

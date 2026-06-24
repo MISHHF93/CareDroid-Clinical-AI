@@ -52,7 +52,7 @@ describe('AssetRegistryService', () => {
     ...qsofaAsset,
     id: 'agent-clinical',
     assetType: PlatformAssetType.AI_AGENT,
-    title: 'Clinical AI',
+    title: 'CareDroid',
     category: 'AI Agent',
     route: '/assistant',
   };

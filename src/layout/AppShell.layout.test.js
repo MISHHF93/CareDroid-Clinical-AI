@@ -43,7 +43,7 @@ describe('single AppShell contract', () => {
   });
 
   it('header contains the required shared controls', () => {
-    expect(appShellJsx).toContain('Emergency OS');
+    expect(appShellJsx).toContain('CareDroid');
     expect(appShellJsx).toContain('formatShiftClock(clock)');
     expect(appShellJsx).toContain('<CapacityBadge');
     expect(appShellJsx).toContain('<Bell');

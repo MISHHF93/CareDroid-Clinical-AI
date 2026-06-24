@@ -107,7 +107,7 @@ export function navigateToEmergencySurface(navigate, surfaceId, options = {}) {
 }
 
 export function getEmergencySurfaceTitle(surfaceId) {
-  return getEmergencySurface(surfaceId)?.label || 'Emergency OS';
+  return getEmergencySurface(surfaceId)?.label || 'CareDroid';
 }
 
 export default navigateToEmergencySurface;

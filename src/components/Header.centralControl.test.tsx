@@ -20,8 +20,8 @@ describe('Header central control', () => {
 
     expect(screen.queryByText(/Central Node: Input only/i)).toBeNull();
     expect(screen.queryByText(/Physician input/i)).toBeNull();
-    expect(screen.queryByLabelText('Emergency OS demo scenario')).toBeNull();
-    expect(screen.queryByLabelText('Demo Emergency OS role')).toBeNull();
+    expect(screen.queryByLabelText('CareDroid demo scenario')).toBeNull();
+    expect(screen.queryByLabelText('Demo CareDroid role')).toBeNull();
   });
 
   it('renders the global operational command metrics', () => {

@@ -66,7 +66,7 @@ describe('ClinicalDocumentationAssistant', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /export draft/i }));
     expect(screen.getAllByText(/ed-follow-up-documentation-draft-note.txt/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/CareDroid Clinical Documentation Assistant Export/i)).toBeInTheDocument();
+    expect(screen.getByText(/CareDroid Documentation Assistant Export/i)).toBeInTheDocument();
   });
 
   it('generates patient instructions with the selected AI action', async () => {

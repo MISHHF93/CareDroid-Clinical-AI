@@ -10,7 +10,7 @@ import {
   buildEmergencySettingsPatchFromThresholds,
 } from './emergencySettings.config';
 
-describe('Emergency OS settings config', () => {
+describe('CareDroid settings config', () => {
   it('unifies settings form options with default module config', () => {
     expect(DEFAULT_EMERGENCY_MODULES.map((module) => module.label)).toEqual([
       'Whiteboard',

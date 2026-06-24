@@ -97,7 +97,7 @@ const HOSPITAL_OPERATIONS_ASSET_IDS = [
 const AI_AGENT_ASSETS = [
   {
     id: 'agent-clinical',
-    title: 'Clinical AI',
+    title: 'CareDroid',
     description:
       'General clinical reasoning, documentation support, care guidance, and safe handoff assistance.',
     route: '/assistant',
@@ -1068,21 +1068,21 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
   [
     'calculator-recommender-ai',
     'Calculator Recommender AI',
-    'Clinical AI',
+    'CareDroid',
     '/tools/calculator-recommender',
     AssetRegistryType.AI_AGENT,
   ],
   [
     'workflow-builder-ai',
     'Workflow Builder AI',
-    'Clinical AI',
+    'CareDroid',
     '/tools/workflow-builder-ai',
     AssetRegistryType.AI_AGENT,
   ],
   [
     'clinical-reasoning-engine',
     'Clinical Reasoning Engine',
-    'Clinical AI',
+    'CareDroid',
     '/tools/clinical-reasoning-engine',
     AssetRegistryType.AI_AGENT,
   ],
@@ -1093,7 +1093,7 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
     '/tools/guideline-rag',
     AssetRegistryType.CLINICAL_TOOL,
   ],
-  ['why-engine', 'Why Engine', 'Clinical AI', '/tools/why-engine', AssetRegistryType.AI_AGENT],
+  ['why-engine', 'Why Engine', 'CareDroid', '/tools/why-engine', AssetRegistryType.AI_AGENT],
   [
     'audit-trail-ai',
     'Audit Trail AI',
@@ -1111,7 +1111,7 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
   [
     'patient-summary-ai',
     'Patient Summary AI',
-    'Clinical AI',
+    'CareDroid',
     '/patients/:patientId/summary',
     AssetRegistryType.AI_AGENT,
   ],
@@ -1125,7 +1125,7 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
   [
     'clinical-event-ai',
     'Clinical Event AI',
-    'Clinical AI',
+    'CareDroid',
     '/patients/:patientId/events',
     AssetRegistryType.AI_AGENT,
   ],
@@ -1345,7 +1345,7 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
     category === 'Review' ||
     category === 'Audit'
       ? ['governance-compliance-pack']
-      : category === 'Clinical AI' || category === 'Documentation'
+      : category === 'CareDroid' || category === 'Documentation'
         ? ['ai-workflow-pack']
         : ['hospital-operations'],
 }));

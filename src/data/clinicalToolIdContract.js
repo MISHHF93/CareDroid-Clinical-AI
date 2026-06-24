@@ -1052,7 +1052,7 @@ export const HOSPITAL_OPERATIONS_REGISTRY_IDS = Object.freeze([
   REGISTRY.capacityPredictionEngine,
 ]);
 
-// —— Clinical AI operations pages (non-calculator tools) ——
+// —— CareDroid tool operations pages (non-calculator tools) ——
 
 export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
   REGISTRY.drugCheck,

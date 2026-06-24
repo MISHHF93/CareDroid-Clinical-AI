@@ -18,7 +18,7 @@ const patient = {
   },
 };
 
-describe('ClinicalScoreCalculator Emergency OS modal', () => {
+describe('ClinicalScoreCalculator CareDroid modal', () => {
   it('pre-fills HEART age from linked patient and saves score payload', async () => {
     const user = userEvent.setup();
     const onSaveScore = vi.fn();

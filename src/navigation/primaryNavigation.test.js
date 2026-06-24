@@ -38,7 +38,7 @@ const SIDEBAR_MODEL = [
 ];
 
 describe('primaryNavigation', () => {
-  it('exposes the canonical sidebar-first Emergency OS model in order', () => {
+  it('exposes the canonical sidebar-first CareDroid model in order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(SIDEBAR_MODEL);
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.route)).toEqual(
       SIDEBAR_MODEL.map(([, path]) => path),
@@ -184,7 +184,7 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/workspace/emergency/boarding')?.id).toBeUndefined();
   });
 
-  it('keeps only canonical Emergency OS sidebar surfaces primary', () => {
+  it('keeps only canonical CareDroid sidebar surfaces primary', () => {
     const expected = [
       ['/emergency', 'whiteboard'],
       ['/emergency/whiteboard', 'whiteboard'],

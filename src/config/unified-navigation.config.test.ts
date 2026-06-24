@@ -3,7 +3,9 @@ import {
   DEFAULT_ROUTE,
   NAVIGATION_ITEMS,
   NAV_ITEMS,
+  PILOT_CORE_NAV_ITEM_IDS,
   PILOT_CUSTOMER_MODE,
+  PILOT_EXTENSION_NAV_ITEM_IDS,
   getPilotCustomerNavigationItems,
   getVisibleNavigation,
   getVisibleNavigationForSaasRole,
@@ -144,12 +146,70 @@ const REQUESTED_ITEMS = [
     route: '/emergency/shift',
     featureGate: null,
   },
+  {
+    id: 'fleet',
+    label: 'Fleet',
+    icon: 'ambulance',
+    route: '/fleet/command',
+    featureGate: null,
+  },
+  {
+    id: 'surveillance',
+    label: 'Surveillance',
+    icon: 'activity',
+    route: '/surveillance/nexus',
+    featureGate: null,
+  },
+  {
+    id: 'simulation',
+    label: 'Simulation',
+    icon: 'list-check',
+    route: '/simulation',
+    featureGate: null,
+  },
+  {
+    id: 'laboratory',
+    label: 'Laboratory',
+    icon: 'stethoscope',
+    route: '/laboratory',
+    featureGate: null,
+  },
+  {
+    id: 'knowledge',
+    label: 'Knowledge Graph',
+    icon: 'chart-bar',
+    route: '/knowledge-graph',
+    featureGate: null,
+  },
+  {
+    id: 'audit',
+    label: 'Audit',
+    icon: 'report',
+    route: '/audit',
+    featureGate: null,
+  },
+  {
+    id: 'ai-center',
+    label: 'AI Center',
+    icon: 'robot',
+    route: '/ai-command-center',
+    featureGate: null,
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: 'settings',
+    route: '/admin',
+    featureGate: null,
+  },
 ];
 
-const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS;
+const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS.filter((item) =>
+  (PILOT_CORE_NAV_ITEM_IDS as readonly string[]).includes(item.id),
+);
 
 describe('unified navigation config', () => {
-  it('exports the exact requested Emergency OS nav items in order', () => {
+  it('exports the exact requested CareDroid nav items in order', () => {
     expect(DEFAULT_ROUTE).toBe('/emergency/reception');
     expect(NAV_ITEMS).toEqual(REQUESTED_ITEMS);
     expect(
@@ -168,7 +228,7 @@ describe('unified navigation config', () => {
 
   it('keeps every item complete and route-backed', () => {
     for (const item of NAVIGATION_ITEMS) {
-      expect(item.id, item.label).toMatch(/^[a-z0-9_]+$/);
+      expect(item.id, item.label).toMatch(/^[a-z0-9_-]+$/);
       expect(item.path, item.label).toMatch(/^\//);
       expect(item.route, item.label).toMatch(/^\//);
       expect(item.icon, item.label).toMatch(/^[a-z0-9-]+$/);
@@ -177,11 +237,13 @@ describe('unified navigation config', () => {
     }
   });
 
-  it('preserves the complete canonical navigation in pilot mode', () => {
+  it('scopes pilot mode to core ED nav and hides extension surfaces', () => {
     expect(PILOT_CUSTOMER_MODE.enabled).toBe(true);
-    expect(getPilotCustomerNavigationItems().map((item) => item.id)).toEqual(
-      PILOT_VISIBLE_ITEMS.map((item) => item.id),
-    );
+    const pilotNavIds = getPilotCustomerNavigationItems().map((item) => item.id);
+    expect(pilotNavIds).toEqual(PILOT_VISIBLE_ITEMS.map((item) => item.id));
+    for (const extensionId of PILOT_EXTENSION_NAV_ITEM_IDS) {
+      expect(pilotNavIds).not.toContain(extensionId);
+    }
     expect(PILOT_CUSTOMER_MODE.hiddenNavItemIds).toEqual([]);
     expect(PILOT_CUSTOMER_MODE.retainedDirectRoutes).toEqual([
       '/emergency/analytics',
@@ -204,6 +266,8 @@ describe('unified navigation config', () => {
       (label) => label !== 'Intake',
     );
     expect(adminLabels.sort()).toEqual(expectedAdminLabels.sort());
+    expect(adminLabels).not.toContain('Cosmos');
+    expect(adminLabels).not.toContain('Fleet');
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
     expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics']);
@@ -239,11 +303,19 @@ describe('unified navigation config', () => {
     const adminNavIds = getVisibleNavigation('admin').map((item) => item.id);
     expect(adminNavIds).toContain('settings');
     expect(adminNavIds).toContain('integrations');
+    expect(adminNavIds).not.toContain('fleet');
+    expect(adminNavIds).not.toContain('cosmos');
+  });
+
+  it('annotates navigation items with normalized suite metadata', () => {
+    const whiteboard = NAVIGATION_ITEMS.find((item) => item.id === 'whiteboard');
+    expect(whiteboard?.suiteId).toBe('emergency_whiteboard');
+    expect(whiteboard?.suiteLabel).toBe('Emergency Whiteboard Suite');
   });
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
-    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'platform']);
+    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics']);
     expect(physicianNavIds).not.toContain('reception');
     expect(physicianNavIds).not.toContain('queues');
     expect(physicianNavIds).not.toContain('reassessment');

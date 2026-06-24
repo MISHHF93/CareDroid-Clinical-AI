@@ -316,7 +316,7 @@ function bodyForBackendRequest(request: AIRequest): Record<string, unknown> {
     patientId: request.patientId,
     encounterId: request.encounterId,
     stream: request.stream === true,
-    purpose: 'Emergency OS clinical decision support; human review required',
+    purpose: 'CareDroid clinical decision support; human review required',
     sourceModule: 'emergency-os',
   };
 }
@@ -813,7 +813,7 @@ function buildActionCard(toolCall: ToolCallResult): ActionCard {
     description: action.description,
     patientName,
     warningText:
-      'Requires human confirmation. The AI cannot directly modify Emergency OS state.',
+      'Requires human confirmation. The AI cannot directly modify CareDroid state.',
     onConfirm: () => applyConfirmedToolAction(action),
     onDismiss: () => removeCard(id),
   };

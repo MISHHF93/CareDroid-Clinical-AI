@@ -86,7 +86,7 @@ describe('CommandDashboard', () => {
     renderDashboard();
 
     expect(screen.getByRole('heading', { level: 1, name: /emergency whiteboard/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/emergency os/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/caredroid/i).length).toBeGreaterThan(0);
     for (const name of [
       /^actions$/i,
       /ai assistant/i,
@@ -104,7 +104,7 @@ describe('CommandDashboard', () => {
     expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/volume/i)).toBeInTheDocument();
     expect(within(screen.getByLabelText(/whiteboard context summary/i)).getByText(/50-150/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/emergency os operating brief/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/caredroid operating brief/i)).not.toBeInTheDocument();
   });
 
   it('renders compact action cards for primary dashboard entry points', () => {
@@ -195,13 +195,13 @@ describe('CommandDashboard', () => {
   it('seeds free text into assistant and routes to the focused workspace', () => {
     renderDashboard();
 
-    fireEvent.change(screen.getByLabelText(/ask emergency os copilot what you need to do next/i), {
+    fireEvent.change(screen.getByLabelText(/ask caredroid copilot what you need to do next/i), {
       target: { value: 'Help me triage chest pain' },
     });
     fireEvent.click(screen.getByRole('button', { name: /ask assistant/i }));
 
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('[Emergency OS]'),
+      expect.stringContaining('[CareDroid]'),
       'user'
     );
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(

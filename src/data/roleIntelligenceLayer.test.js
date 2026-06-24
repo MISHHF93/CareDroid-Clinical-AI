@@ -85,7 +85,7 @@ describe('role intelligence layer', () => {
     const agents = getRoleIntelligenceAgentRecommendations({
       profile: researcher,
       agents: [
-        { id: 'agent-clinical', title: 'Clinical AI', roleAwareness: ['emergency physician'] },
+        { id: 'agent-clinical', title: 'CareDroid', roleAwareness: ['emergency physician'] },
         { id: 'agent-research', title: 'Research AI', roleAwareness: ['researcher'] },
       ],
     }).map((agent) => agent.id);

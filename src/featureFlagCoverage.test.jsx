@@ -47,7 +47,7 @@ describe('feature flag UI coverage', () => {
     expect(defaults.simulation_engine).toBe(Boolean(import.meta.env.DEV));
   });
 
-  it('mounts canonical route panels through the consolidated Emergency OS router', () => {
+  it('mounts canonical route panels through the consolidated CareDroid router', () => {
     const appSource = readSource('App.jsx');
 
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyEms}');

@@ -30,7 +30,7 @@ export default function IntegrationHubPage() {
         <p className="integration-hub-page__eyebrow">CareDroid Integration Hub</p>
         <h1>Integration Hub</h1>
         <p>
-          Connector status, review queue, and recent interoperability events. Emergency OS fixture
+          Connector status, review queue, and recent interoperability events. CareDroid fixture
           envelope is merged with live `/api/interoperability/*` when available.
         </p>
         <div className="integration-hub-page__links">

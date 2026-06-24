@@ -104,7 +104,7 @@ export function saveEmergencyOsSettings(payload) {
 }
 
 /**
- * Persist Emergency OS settings to the active organization when tenant context exists.
+ * Persist CareDroid settings to the active organization when tenant context exists.
  * Falls back to the global emergency settings endpoint.
  * @param {Partial<import('./emergencySettingsApi').EmergencyOsSettings>} payload
  */

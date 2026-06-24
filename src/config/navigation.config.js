@@ -1,7 +1,7 @@
 /**
  * Compatibility projections for navigation consumers.
  *
- * The Emergency OS shell now derives from `unified-navigation.config.ts`.
+ * The CareDroid shell now derives from `unified-navigation.config.ts`.
  * `navigation/primaryNavigation.js` is still a compatibility re-export.
  */
 import {

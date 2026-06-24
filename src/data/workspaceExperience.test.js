@@ -9,11 +9,11 @@ describe('workspace experience profiles', () => {
   it('makes Emergency feel like its own operating mode', () => {
     const profile = getWorkspaceExperienceProfile({ id: 'emergency', name: 'Emergency' });
 
-    expect(profile.operatingLabel).toBe('Emergency OS');
+    expect(profile.operatingLabel).toBe('CareDroid');
     expect(profile.dashboardTitle).toMatch(/Emergency Whiteboard/);
-    expect(profile.toolsTitle).toMatch(/Emergency OS Console/);
-    expect(profile.recommendationsTitle).toMatch(/Emergency OS Recommendations/);
-    expect(profile.assistantTitle).toMatch(/Emergency OS Copilot/);
+    expect(profile.toolsTitle).toMatch(/CareDroid Console/);
+    expect(profile.recommendationsTitle).toMatch(/CareDroid Recommendations/);
+    expect(profile.assistantTitle).toMatch(/CareDroid Copilot/);
     expect(profile.focusMetrics).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ label: 'Volume', value: '50-150' }),

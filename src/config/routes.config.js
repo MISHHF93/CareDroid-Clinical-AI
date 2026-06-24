@@ -443,7 +443,7 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     navGroup: 'solutions',
     notes:
-      'Retired standalone recommendations route redirects into Emergency OS tools with recommendation filters.',
+      'Retired standalone recommendations route redirects into CareDroid tools with recommendation filters.',
   }),
   Object.freeze({
     id: 'knowledgeHub',

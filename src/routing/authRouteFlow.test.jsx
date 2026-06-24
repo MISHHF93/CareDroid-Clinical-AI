@@ -15,7 +15,7 @@ describe('auth canonical flow wiring', () => {
     expect(routeConfigSource).not.toContain("['/auth', CANONICAL_ROUTES.emergencyWhiteboard]");
   });
 
-  it('keeps Emergency OS routes inside the AppShell while UserProvider supplies platform access', () => {
+  it('keeps CareDroid routes inside the AppShell while UserProvider supplies platform access', () => {
     expect(appSource).not.toContain('buildAuthRedirectSearch(location)');
     expect(appSource).toContain('function RootLayout()');
     expect(appSource).toContain('<AppShell>');

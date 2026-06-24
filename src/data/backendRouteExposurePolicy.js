@@ -155,23 +155,23 @@ const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
 
   'GET /api/v1/governance/registry': {
     strategy: 'backend-only',
-    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+    reason: 'Compatibility alias; SPA uses canonical CareDroid governance route',
   },
   'GET /api/v1/governance/safety-rules': {
     strategy: 'backend-only',
-    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+    reason: 'Compatibility alias; SPA uses canonical CareDroid governance route',
   },
   'GET /api/v1/governance/compliance': {
     strategy: 'backend-only',
-    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+    reason: 'Compatibility alias; SPA uses canonical CareDroid governance route',
   },
   'GET /api/v1/governance/violations': {
     strategy: 'backend-only',
-    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+    reason: 'Compatibility alias; SPA uses canonical CareDroid governance route',
   },
   'GET /api/v1/governance/validate-prompts': {
     strategy: 'backend-only',
-    reason: 'Compatibility alias; SPA uses canonical Emergency OS governance route',
+    reason: 'Compatibility alias; SPA uses canonical CareDroid governance route',
   },
 
   'GET /api/tools/statistics': {

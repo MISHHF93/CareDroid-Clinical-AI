@@ -27,15 +27,16 @@ function expectRoutePath(path) {
 }
 
 describe('canonical route tree', () => {
-  it('exports the clean Emergency OS route tree', () => {
+  it('exports the clean CareDroid route tree', () => {
     expect(CANONICAL_APP_ROUTE_TREE).toEqual([
-      { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
+      { path: '/', type: 'redirect', to: '/emergency/reception' },
       { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
       { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
-      { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
+      { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
       { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
       { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
       { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
+      { path: '/emergency/reception', type: 'page', componentKey: 'ReceptionWorkspace' },
       { path: '/emergency/intake', type: 'page', componentKey: 'SmartIntake' },
       { path: '/emergency/queues', type: 'page', componentKey: 'EmergencyQueueRoute' },
       { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyReassessmentRoute' },
@@ -48,17 +49,23 @@ describe('canonical route tree', () => {
       { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
       { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
-      { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
+      { path: '*', type: 'redirect', to: '/emergency/reception' },
     ]);
   });
 
   it('mounts canonical ED routes inside the flattened AppShell', () => {
     for (const route of CANONICAL_APP_ROUTE_TREE.filter((item) => item.type !== 'redirect')) {
+      if (route.path === '/auth-callback') {
+        expect(appSource).toContain('CANONICAL_ROUTES.authCallback');
+        continue;
+      }
       expectRoutePath(route.path);
     }
 
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<EMSPipeline />');
+    expect(appSource).toContain('<ReceptionWorkspace />');
+    expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyReception}');
     expect(appSource).toContain('<SmartIntake />');
     expect(appSource).toContain('<QueueRoute />');
     expect(appSource).toContain('<ReferralPanel />');
@@ -122,15 +129,13 @@ describe('canonical route tree', () => {
     );
   });
 
-  it('redirects non-ED workspace routes while preserving Emergency OS fallbacks', () => {
+  it('redirects non-ED workspace routes while preserving CareDroid fallbacks', () => {
     expect(appSource).toContain('path="/app"');
     expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
     expect(appSource).toContain('path="/mobile"');
     expect(appSource).toContain('path="/emergency/*"');
     expect(appSource).toContain('NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (');
-    expect(appSource).toContain(
-      'element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}',
-    );
+    expect(appSource).toContain('element={<NonEmergencyWorkspaceRedirect />}');
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/analytics', moduleName: 'Analytics' }),
@@ -148,9 +153,9 @@ describe('canonical route tree', () => {
   });
 
   it('keeps auth callbacks deep-linkable and catches all unknown routes', () => {
-    expect(appSource).toContain(
-      '<Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />',
-    );
+    expect(appSource).toContain('<Route path="*" element={<EmergencyDefaultRedirect />} />');
+    expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyWhiteboard}');
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyReception');
     expect(appSource).not.toContain('Page not found');
     expect(appSource).not.toContain('<ToolNotFound');
   });

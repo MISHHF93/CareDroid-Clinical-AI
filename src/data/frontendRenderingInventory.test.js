@@ -129,7 +129,7 @@ describe('frontend rendering — per-tool layers', () => {
 });
 
 describe('frontend rendering — App.jsx routes', () => {
-  it('redirects retired tools routes into the Emergency OS whiteboard', () => {
+  it('redirects retired tools routes into the CareDroid whiteboard', () => {
     expect(appSource).not.toContain("path: '/tools/calculators'");
     expect(appSource).not.toContain('<LegacyCalculatorRouteRedirect />');
     expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
@@ -150,7 +150,7 @@ describe('frontend rendering — App.jsx routes', () => {
     }
   });
 
-  it('keeps fleet routes out of the active Emergency OS app', () => {
+  it('keeps fleet routes out of the active CareDroid app', () => {
     for (const id of FLEET_TIER_A_REGISTRY_IDS) {
       const row = buildFrontendRenderingRow(id);
       expect(row.route.startsWith('/fleet/')).toBe(true);

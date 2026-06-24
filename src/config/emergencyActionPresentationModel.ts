@@ -1,6 +1,6 @@
 /**
  * Permission presentation — derives visible / hidden / disabled / readonly for any
- * Emergency OS action, composing matrix overrides with registry grants.
+ * CareDroid action, composing matrix overrides with registry grants.
  */
 import {
   EMERGENCY_PERMISSION_KEYS,

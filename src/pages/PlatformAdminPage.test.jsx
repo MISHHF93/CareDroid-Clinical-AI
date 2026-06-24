@@ -20,7 +20,7 @@ vi.mock('../contexts/UserIdentityContext', () => ({
     organization: { id: 'org-platform', name: 'North Memorial' },
     platformContext: {
       organization: { id: 'org-platform', name: 'North Memorial' },
-      assignedProducts: [{ id: 'clinical-os', name: 'Clinical OS' }],
+      assignedProducts: [{ id: 'clinical-os', name: 'CareDroid' }],
       entitledPacks: [{ id: 'emergency-pack', name: 'Emergency Pack' }],
       entitledAssetIds: ['asset-1', 'asset-2', 'asset-3'],
       subscription: { tier: 'enterprise', status: 'active' },

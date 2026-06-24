@@ -15,16 +15,16 @@ export default registerAs('email', () => {
       },
     },
     from: {
-      name: 'CareDroid-Clinical-AI',
+      name: 'CareDroid',
       address: process.env.SMTP_FROM_EMAIL || 'noreply@caredroid.health',
     },
     templates: {
       verification: {
-        subject: 'Verify your email - CareDroid-Clinical-AI',
+        subject: 'Verify your email - CareDroid',
         expiryMinutes: parseInt(process.env.EMAIL_VERIFICATION_EXPIRY || '60', 10),
       },
       passwordReset: {
-        subject: 'Reset your password - CareDroid-Clinical-AI',
+        subject: 'Reset your password - CareDroid',
         expiryMinutes: parseInt(process.env.PASSWORD_RESET_EXPIRY || '30', 10),
       },
       twoFactorCode: {

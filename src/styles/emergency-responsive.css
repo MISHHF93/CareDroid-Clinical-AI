@@ -1,7 +1,7 @@
 /**
- * Emergency OS responsive utilities.
+ * CareDroid responsive utilities.
  *
- * This layer adapts the active src/ Emergency OS surfaces to the current
+ * This layer adapts the active src/ CareDroid surfaces to the current
  * design-token stack. It intentionally does not replace AppShell, routing, or
  * page architecture.
  */
@@ -247,7 +247,7 @@
 
 @media print {
   .sidebar,
-  .emergency-os-header,
+  .caredroid-header,
   .ed-copilot-panel,
   .patient-detail-panel,
   .command-palette__overlay,

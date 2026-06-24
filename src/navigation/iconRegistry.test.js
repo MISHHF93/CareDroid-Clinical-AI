@@ -43,7 +43,7 @@ describe('iconRegistry semantic icon map', () => {
     expect(getNavIcon('settings')).toBe(CHROME_ICONS.settings);
   });
 
-  it('keeps Emergency OS rail icons semantically distinct', () => {
+  it('keeps CareDroid rail icons semantically distinct', () => {
     expect(getNavIcon('emergency-whiteboard')).toBe(CHROME_ICONS.layoutDashboard);
     expect(getNavIcon('layout-dashboard')).toBe(CHROME_ICONS.layoutDashboard);
     expect(getNavIcon('emergency-patients')).toBe(CHROME_ICONS.users);

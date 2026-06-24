@@ -284,7 +284,7 @@ function FutureWorkspacePanel({ workspace, onLaunchEmergency }) {
         </p>
       </div>
       <button type="button" className="workspace-secondary-action" onClick={onLaunchEmergency}>
-        Open Emergency OS
+        Open CareDroid
       </button>
     </section>
   );
@@ -586,7 +586,7 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">Smart Arrival</p>
           <h2>{smartArrival.title || 'Smart Arrival'}</h2>
-          <p>{smartArrival.operatingModel || 'Embedded in Emergency OS.'}</p>
+          <p>{smartArrival.operatingModel || 'Embedded in CareDroid.'}</p>
         </div>
         <div className="emergency-journey-summary" aria-label="Smart Arrival summary">
           <span>{(smartArrival.capturePipeline || []).length} capture steps</span>
@@ -595,7 +595,7 @@ function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAs
             {smartArrivalConfirmation.finalizationStatus ||
               'blocked until patient or staff confirmation'}
           </span>
-          <span>{smartArrivalFeed.arrivalState || 'patient summarized inside Emergency OS'}</span>
+          <span>{smartArrivalFeed.arrivalState || 'patient summarized inside CareDroid'}</span>
         </div>
         <div className="emergency-journey-insights">
           {(smartArrival.capturePipeline || []).map((step) => (
@@ -930,7 +930,7 @@ function EmergencyPatientContextPanel({ intake = {}, onAskAssistant }) {
       <div className="workspace-panel">
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">Smart Arrival finalized snapshot</p>
-          <h2>Patient arrives summarized in Emergency OS</h2>
+          <h2>Patient arrives summarized in CareDroid</h2>
           <p>
             {smartArrival.confirmationGate?.rule ||
               'Patient confirmation or staff confirmation is required before finalizing the Patient Snapshot.'}
@@ -1177,7 +1177,7 @@ function EmergencyIntakeAnalyticsPanel({ intake = {} }) {
       <div className="workspace-panel">
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">Patient Journey Engine whiteboard updates</p>
-          <h2>All intake automations update Emergency OS</h2>
+          <h2>All intake automations update CareDroid</h2>
           <p>
             Every intake feature declares valid patient journey states and remains review-controlled.
           </p>
@@ -1218,7 +1218,7 @@ function EmergencyIntakeAnalyticsPanel({ intake = {} }) {
           <p className="workspace-eyebrow">Emergency Intake OS surfaces</p>
           <h2>Product surfaces connected</h2>
           <p>
-            Intake dashboards, review workspaces, queue surfaces, and Emergency OS views share one
+            Intake dashboards, review workspaces, queue surfaces, and CareDroid views share one
             governed model.
           </p>
         </div>
@@ -1307,7 +1307,7 @@ function EmergencyDigitalWhiteboardPanel({
         <p className="workspace-eyebrow">Primary workspace screen · No dashboard hopping</p>
         <h2 id="emergency-whiteboard-title">{whiteboard.title || 'Emergency Whiteboard'}</h2>
         <p>
-          Emergency OS is organized around Patient Flow, Queue Flow, EMS Flow, Capacity
+          CareDroid is organized around Patient Flow, Queue Flow, EMS Flow, Capacity
           Flow, and Decision Support for small teams handling 50-150 patients/day with fewer than 10
           staff.
         </p>
@@ -2907,7 +2907,7 @@ function EmergencyComplaintLauncher({ onLaunchRoute, onWorkspaceAction }) {
         <p className="workspace-eyebrow">Complaint launcher</p>
         <h2 id="emergency-complaint-launcher-title">Start with the presentation</h2>
         <p>
-          Choose the complaint first. Emergency OS surfaces the workflow, calculators, protocols,
+          Choose the complaint first. CareDroid surfaces the workflow, calculators, protocols,
           referrals, and AI Copilot context automatically.
         </p>
       </div>
@@ -3049,7 +3049,7 @@ function resolveEmergencyCopilotCommand(command) {
       summary:
         'Open Queue Intelligence with bottleneck queue, queue health, oldest waits, and pressure indicators.',
       prompt:
-        'Show the current Emergency OS bottleneck. Summarize queue pressure, oldest wait, reassessment needs, capacity state, and human-reviewed operational next actions.',
+        'Show the current CareDroid bottleneck. Summarize queue pressure, oldest wait, reassessment needs, capacity state, and human-reviewed operational next actions.',
       actions: [
         { label: 'Queues', target: '/workspace/emergency/queues' },
         { label: 'Operations', target: '/workspace/emergency/flow' },
@@ -4352,7 +4352,7 @@ function EmergencyTriageOrchestrator({ orchestrator, intake, onAskAssistant }) {
         <p className="workspace-eyebrow">Dynamic Risk Bundle Engine</p>
         <h2 id="emergency-triage-title">Single Triage Workflow</h2>
         <p>
-          Enter complaint, vitals, age, and risk factors once. Emergency OS returns one consolidated
+          Enter complaint, vitals, age, and risk factors once. CareDroid returns one consolidated
           Emergency Risk Profile.
         </p>
         <p>{orchestrator.safetyStatement}</p>
@@ -4975,7 +4975,7 @@ function EmergencyDemoModePanel({ demoTenant, demoEnvironment, onLaunchRoute }) 
             <p className="workspace-eyebrow">Demo data</p>
             <h2>{title}</h2>
             <p>
-              Prospect-ready sample content for evaluating Emergency OS without
+              Prospect-ready sample content for evaluating CareDroid without
               integrations.
             </p>
           </div>
@@ -5013,7 +5013,7 @@ function EmergencySimulationScenariosPanel({ simulationScenarios = {} }) {
         <p className="workspace-eyebrow">Emergency Simulation Scenarios</p>
         <h2 id="emergency-simulation-scenarios-title">Operational Training</h2>
         <p>
-          Training mirrors real ED operational problems by reusing Emergency OS signals,
+          Training mirrors real ED operational problems by reusing CareDroid signals,
           KPIs, queues, resources, and escalations.
         </p>
       </div>
@@ -5179,7 +5179,7 @@ function EmergencyDeploymentBlueprintPanel({ blueprint }) {
         </div>
         {blueprint.minimumSellableCapabilities?.length ? (
           <article className="emergency-deployment-principle">
-            <strong>Minimum sellable Emergency OS</strong>
+            <strong>Minimum sellable CareDroid</strong>
             <span>{blueprint.minimumSellableCapabilities.join(', ')}</span>
           </article>
         ) : null}
@@ -5241,7 +5241,7 @@ function EmergencyImplementationSummaryPanel({ summary, onLaunchRoute }) {
   return (
     <section
       className="emergency-deployment-layout"
-      aria-label="Emergency OS implementation summary"
+      aria-label="CareDroid implementation summary"
     >
       <div className="workspace-panel">
         <div className="workspace-panel__header">
@@ -6391,7 +6391,7 @@ export default function WorkspaceHome() {
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
       eyebrow={workspaceExperience.operatingLabel}
-      title={isEmergencyWorkspace ? 'Emergency OS' : `${model.workspace.label} Workspace`}
+      title={isEmergencyWorkspace ? 'CareDroid' : `${model.workspace.label} Workspace`}
       description={workspaceExperience.dashboardSubtitle || model.workspace.description}
       actions={
         !isEmergencyWorkspace ? (

@@ -8,7 +8,7 @@ import { getPilotCustomerNavigationItems } from '../config/unified-navigation.co
 const PILOT_VISIBLE_PATHS = getPilotCustomerNavigationItems().map((item) => item.path);
 
 describe('search-first discovery index', () => {
-  it('indexes every primary Emergency OS route as a searchable destination', () => {
+  it('indexes every primary CareDroid route as a searchable destination', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const emergencyOsPaths = new Set(
       entries
@@ -24,7 +24,7 @@ describe('search-first discovery index', () => {
     );
   });
 
-  it('keeps default discovery scoped to active Emergency OS destinations', () => {
+  it('keeps default discovery scoped to active CareDroid destinations', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const paths = new Set(entries.map((entry) => entry.path));
     const kinds = new Set(entries.map((entry) => entry.kind));
@@ -128,7 +128,7 @@ describe('search-first discovery index', () => {
     );
   });
 
-  it('does not expose subsidiary navigation pages in the default Emergency OS search', () => {
+  it('does not expose subsidiary navigation pages in the default CareDroid search', () => {
     expect(buildSearchFirstResults({ query: 'global search' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'search', path: '/search' }),

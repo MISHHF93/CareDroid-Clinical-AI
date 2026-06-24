@@ -7,6 +7,7 @@ import {
   isRouteAllowedInCompiledProfile,
   isToolLaunchableForProfile,
 } from './userProfileCompiler';
+import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
 
 export type OperationArea = Readonly<{
   title: string;

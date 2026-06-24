@@ -262,7 +262,7 @@ describe('EmergencySettings', () => {
     render(<EmergencySettings />);
 
     expect(
-      await screen.findByRole('heading', { name: 'Emergency OS Settings' }),
+      await screen.findByRole('heading', { name: 'CareDroid Settings' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Identity and Modules')).toBeInTheDocument();
     expect(screen.getByText('AI Settings')).toBeInTheDocument();
@@ -297,7 +297,7 @@ describe('EmergencySettings', () => {
   it('saves capacity thresholds through the settings API and local store', async () => {
     render(<EmergencySettings />);
 
-    await screen.findByRole('heading', { name: 'Emergency OS Settings' });
+    await screen.findByRole('heading', { name: 'CareDroid Settings' });
     fireEvent.change(screen.getByLabelText('Capacity orange %'), { target: { value: '76' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save Capacity' }));
 

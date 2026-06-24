@@ -440,11 +440,11 @@ function emergencyOsDestinationEntries() {
       type: 'navigation',
       title: destination.title,
       label: destination.title,
-      description: `Open ${destination.title} in Emergency OS.`,
+      description: `Open ${destination.title} in CareDroid.`,
       path: destination.path,
       workspaceIds: ['emergency'],
       aliases: unique([destination.id, ...(destination.aliases || [])]),
-      assistantPrompt: `Open or explain the ${destination.title} Emergency OS workflow.`,
+      assistantPrompt: `Open or explain the ${destination.title} CareDroid workflow.`,
   }));
 }
 

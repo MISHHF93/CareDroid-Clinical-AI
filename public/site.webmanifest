@@ -1,7 +1,7 @@
 {
-  "name": "CareDroid Clinical AI",
+  "name": "CareDroid",
   "short_name": "CareDroid",
-  "description": "Clinical decision support platform",
+  "description": "Emergency department operating platform with human-reviewed clinical copilot support",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

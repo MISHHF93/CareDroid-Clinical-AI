@@ -28,7 +28,7 @@ function renderSidebarWithDefaultNavigation(initialPath = '/emergency/whiteboard
 }
 
 describe('Sidebar unified navigation rendering', () => {
-  it('renders only the requested Emergency OS pages for admin users', () => {
+  it('renders only the requested CareDroid pages for admin users', () => {
     renderSidebar('admin');
     const desktopNav = within(
       screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),

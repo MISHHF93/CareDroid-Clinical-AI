@@ -151,7 +151,7 @@ describe('ChatInterface NLU integration', () => {
       capacitySnapshot: expect.objectContaining({ score: emergencyState.capacity.score }),
     });
     expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Human review is required/i);
-    expect(payload.messages[0].content).toMatch(/You are AIIOS ED Copilot for a busy Emergency Department/i);
+    expect(payload.messages[0].content).toMatch(/You are CareDroid Copilot for a busy Emergency Department/i);
     expect(payload.messages[0].content).toMatch(/Current department snapshot:/);
     expect(payload.messages[0].content).toMatch(/Priorities: P1 first\. Flag deteriorating patients\./);
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({

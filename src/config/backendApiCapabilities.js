@@ -64,7 +64,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   reportsGenerate: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyOperationalAnalytics: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyShiftReportExport: BACKEND_CAPABILITY_STATUS.DISABLED,
-  /** Mounted Emergency OS module envelopes under /api/emergency/*; currently fixture/demo backed. */
+  /** Mounted CareDroid module envelopes under /api/emergency/*; currently fixture/demo backed. */
   emergencyCentralNode: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyWhiteboard: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyPatients: BACKEND_CAPABILITY_STATUS.DEMO,
@@ -86,7 +86,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
-  /** Optional / absent Emergency OS routes; keep frontend clients from calling them until mounted. */
+  /** Optional / absent CareDroid routes; keep frontend clients from calling them until mounted. */
   emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyCapacityHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyQueueAnalytics: BACKEND_CAPABILITY_STATUS.DISABLED,

@@ -55,6 +55,13 @@
   text-transform: uppercase;
 }
 
+.emergency-analytics__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .emergency-analytics__header h1 {
   margin: var(--space-1) 0;
   font-size: var(--font-size-2xl);

@@ -287,7 +287,7 @@ export interface IUnifiedPatient extends Document {
   modifiedAt: Date;
   mergeTracking?: IMergeTracking;
 
-  // Legacy fields retained so older Emergency OS services can safely migrate to canonical names.
+  // Legacy fields retained so older CareDroid services can safely migrate to canonical names.
   chief_complaint: string;
   previous_names: string[];
   date_of_birth?: string | null;

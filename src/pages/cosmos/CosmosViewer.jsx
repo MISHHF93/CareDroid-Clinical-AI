@@ -65,7 +65,7 @@ export default function CosmosViewer() {
             </div>
             <p>
               Integration topology maps FHIR, HL7, and device telemetry into the real Integration
-              Hub. Emergency OS still consumes the fixture envelope at GET /api/emergency/integrations
+              Hub. CareDroid still consumes the fixture envelope at GET /api/emergency/integrations
               until store consumers are wired.
             </p>
             <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>

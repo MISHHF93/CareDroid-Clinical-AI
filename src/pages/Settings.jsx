@@ -502,7 +502,7 @@ const Settings = () => {
                   <h3 id="settings-audit-log-title">Audit Log</h3>
                   <p>
                     Last 20 current-user audit events from the protected backend audit trail,
-                    including Emergency OS sync events when available.
+                    including CareDroid sync events when available.
                   </p>
                 </div>
                 <span className="settings-billing-card__badge">Audit</span>

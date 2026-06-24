@@ -711,7 +711,7 @@ describe('ProductCatalogService', () => {
         },
         {
           id: 'agent-clinical',
-          title: 'Clinical AI',
+          title: 'CareDroid',
           description: 'Clinical support.',
           assetType: 'ai_agent',
           category: 'AI Agent',
@@ -746,7 +746,7 @@ describe('ProductCatalogService', () => {
           id: 'patient-summary-ai',
           title: 'Patient Summary AI',
           assetType: 'ai_agent',
-          category: 'Clinical AI',
+          category: 'CareDroid',
           route: '/patients/:patientId/summary',
           launchType: 'route',
           riskLevel: 'clinical-decision-support',
@@ -820,7 +820,7 @@ describe('ProductCatalogService', () => {
       },
       {
         id: 'agent-clinical',
-        title: 'Clinical AI',
+        title: 'CareDroid',
         assetType: 'ai_agent',
         route: '/assistant',
       },
@@ -834,7 +834,7 @@ describe('ProductCatalogService', () => {
     ]);
     expect(result.workflows).toEqual([expect.objectContaining({ id: 'workflows' })]);
     expect(result.simulations).toEqual([expect.objectContaining({ id: 'sepsis-deterioration' })]);
-    expect(result.aiAgent).toMatchObject({ id: 'agent-clinical', title: 'Clinical AI' });
+    expect(result.aiAgent).toMatchObject({ id: 'agent-clinical', title: 'CareDroid' });
     expect(result.linkedAssetCounts).toEqual({
       calculators: 1,
       protocols: 1,

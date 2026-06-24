@@ -199,11 +199,11 @@ describe('emergencyOperatingSystem complaint router', () => {
     expect(EMERGENCY_ANALYTICS_MVP.humanReviewStatement).toMatch(/do not score autonomous clinical quality/i);
   });
 
-  it('defines a 10-minute hospital onboarding walkthrough for Emergency OS', () => {
+  it('defines a 10-minute hospital onboarding walkthrough for CareDroid', () => {
     expect(EMERGENCY_ONBOARDING_EXPERIENCE.route).toBe('/workspace/emergency/onboarding');
     expect(EMERGENCY_ONBOARDING_EXPERIENCE.goal).toMatch(/10 minutes/i);
     expect(EMERGENCY_ONBOARDING_EXPERIENCE.sections.map((section) => section.label)).toEqual([
-      'Emergency OS overview',
+      'CareDroid overview',
       'Calculators',
       'Protocols',
       'AI Copilot',
@@ -225,7 +225,7 @@ describe('emergencyOperatingSystem complaint router', () => {
     expect(EMERGENCY_DEMO_TENANT).toEqual(
       expect.objectContaining({
         tenantId: 'emergency-demo-tenant',
-        tenantName: 'Emergency OS Demo Hospital',
+        tenantName: 'CareDroid Demo Hospital',
         workspaceRoute: '/workspace/emergency/demo',
         dataPosture: expect.stringMatching(/No live EHR/i),
       })
@@ -282,7 +282,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   it('defines the first customer deployment blueprint as phased low-risk rollout', () => {
     expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.route).toBe('/workspace/emergency/deployment');
     expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.map((phase) => phase.title)).toEqual([
-      'Standalone Emergency OS',
+      'Standalone CareDroid',
       'Protocol Library',
       'AI Copilot',
       'Analytics',

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialEmergencyStoreState, DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from './emergency-store';
 
-describe('Emergency OS store shim', () => {
-  it('re-exports the canonical Emergency OS store', () => {
+describe('CareDroid store shim', () => {
+  it('re-exports the canonical CareDroid store', () => {
     expect(useEmergencyStore.getState().patients.length).toBeGreaterThan(0);
     expect(useEmergencyStore.getState().capacity).toEqual(
       expect.objectContaining({ score: expect.any(Number), band: expect.any(String) }),
@@ -51,7 +51,7 @@ describe('Emergency OS store shim', () => {
     expect(useEmergencyStore.getState().thresholds).toEqual(DEFAULT_EMERGENCY_THRESHOLDS);
   });
 
-  it('routes realtime central node snapshots through canonical Emergency OS state', () => {
+  it('routes realtime central node snapshots through canonical CareDroid state', () => {
     const store = useEmergencyStore.getState();
     const generatedAt = '2026-06-14T06:30:00.000Z';
     const capacity = {

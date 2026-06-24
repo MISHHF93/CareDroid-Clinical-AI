@@ -30,7 +30,7 @@ export const ADMIN_OPS_SECTIONS: readonly AdminOpsSection[] = Object.freeze([
     id: 'ed-workflows',
     title: 'ED staff & workflows',
     description:
-      'Map reception, triage, waiting room, provider, and command workflows to canonical SaaS roles and Emergency OS screens.',
+      'Map reception, triage, waiting room, provider, and command workflows to canonical SaaS roles and CareDroid screens.',
     primaryLink: {
       route: CANONICAL_ROUTES.adminEdStaff,
       label: 'Manage ED workflows →',

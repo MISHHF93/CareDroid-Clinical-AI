@@ -738,11 +738,11 @@ export default function EmergencySettings() {
   };
 
   return (
-    <section className="emergency-settings" aria-label="Emergency OS settings">
+    <section className="emergency-settings" aria-label="CareDroid settings">
       <header className="emergency-settings__hero">
         <div>
           <span>{EMERGENCY_OS_BRANDING.platformLine} Admin</span>
-          <h1>Emergency OS Settings</h1>
+          <h1>CareDroid Settings</h1>
           <p>
             Tenant identity, modules, {EMERGENCY_OS_BRANDING.aiiosName} controls, integrations,
             provincial health, notifications, and operational thresholds.{' '}
@@ -1217,7 +1217,7 @@ export default function EmergencySettings() {
       <Section
         id="identity"
         title="Identity and Modules"
-        subtitle="Tenant name, default workspace, and enabled Emergency OS modules."
+        subtitle="Tenant name, default workspace, and enabled CareDroid modules."
         action={
           <button
             type="button"
@@ -1358,7 +1358,7 @@ export default function EmergencySettings() {
       <Section
         id="ai"
         title="AI Settings"
-        subtitle="AIIOS routing, context, evidence, workflow support, and human-review controls."
+        subtitle="CareDroid Copilot routing, context, evidence, workflow support, and human-review controls."
         action={
           <button
             type="button"

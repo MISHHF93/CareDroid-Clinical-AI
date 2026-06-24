@@ -298,12 +298,12 @@ const IMPLEMENTATION_CLASSIFICATIONS: CompleteImplementationRequirementClassific
 const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] = [
   {
     id: 'active-vite-spa',
-    requirement: 'Build the Emergency OS frontend application shell and route surface.',
+    requirement: 'Build the CareDroid frontend application shell and route surface.',
     classification: 'ALREADY_IMPLEMENTED_COMPATIBLE',
     activeSpineDecision:
       'Keep the active Vite React SPA under src/ with the existing AppShell and pilot route family.',
     implementationState:
-      'src/App.jsx, src/components/AppShell.tsx, and the active Emergency OS pages already define the mounted app spine.',
+      'src/App.jsx, src/components/AppShell.tsx, and the active CareDroid pages already define the mounted app spine.',
     evidence: ['src/App.jsx', 'src/components/AppShell.tsx', 'src/config/routes.config.js'],
     safeNextStep: 'Extend existing pages or service hooks only when a mounted route needs data.',
   },
@@ -326,7 +326,7 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
   },
   {
     id: 'api-v1-surface',
-    requirement: 'Switch or add the Emergency OS API under /api/v1.',
+    requirement: 'Switch or add the CareDroid API under /api/v1.',
     classification: 'CONFLICTS_WITH_ACTIVE_SPINE',
     activeSpineDecision: 'Keep canonical active calls on the Nest /api/emergency/* surface.',
     implementationState:
@@ -341,7 +341,7 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
   },
   {
     id: 'backend-domain-models',
-    requirement: 'Add backend models, interfaces, and services for Emergency OS capabilities.',
+    requirement: 'Add backend models, interfaces, and services for CareDroid capabilities.',
     classification: 'PARTIALLY_IMPLEMENTED_NEEDS_EXTENSION',
     activeSpineDecision:
       'Use the existing Nest EmergencyOsModule and typed contracts instead of a parallel backend surface.',
@@ -360,7 +360,7 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
     requirement: 'Reconcile the complete implementation prompt against current repo state.',
     classification: 'SAFE_TO_IMPLEMENT_NOW',
     activeSpineDecision:
-      'Expose a fixture-backed readiness registry from the existing Emergency OS module for audits and docs.',
+      'Expose a fixture-backed readiness registry from the existing CareDroid module for audits and docs.',
     implementationState:
       'Implemented as a typed /api/emergency/implementation-readiness contract in this safe slice.',
     evidence: [
@@ -372,12 +372,12 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
   },
   {
     id: 'database-migrations',
-    requirement: 'Run or add migrations for new Emergency OS persistence.',
+    requirement: 'Run or add migrations for new CareDroid persistence.',
     classification: 'REQUIRES_MANUAL_APPROVAL',
     activeSpineDecision:
       'Do not run database migrations during reconciliation without explicit database target approval.',
     implementationState:
-      'TypeORM migration commands exist, while active Emergency OS services are fixture/in-memory backed.',
+      'TypeORM migration commands exist, while active CareDroid services are fixture/in-memory backed.',
     evidence: ['backend/package.json', 'backend/src/app.module.ts'],
     safeNextStep:
       'Design persistence entities and dry-run migrations against a named local database first.',
@@ -394,7 +394,7 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
     activeSpineDecision:
       'Do not delete broad modules in a dirty tree or while concurrent workers may be editing adjacent files.',
     implementationState:
-      'Legacy and review-only surfaces remain in the repo; active navigation is already narrowed to Emergency OS.',
+      'Legacy and review-only surfaces remain in the repo; active navigation is already narrowed to CareDroid.',
     evidence: [
       'docs/architecture/legacy-platform-removal-report.md',
       'src/config/routes.config.js',
@@ -405,7 +405,7 @@ const COMPLETE_IMPLEMENTATION_REQUIREMENTS: CompleteImplementationRequirement[] 
   },
   {
     id: 'health-and-env',
-    requirement: 'Add health checks and environment configuration for Emergency OS dependencies.',
+    requirement: 'Add health checks and environment configuration for CareDroid dependencies.',
     classification: 'ALREADY_IMPLEMENTED_COMPATIBLE',
     activeSpineDecision:
       'Retain current health/config checks and keep optional integrations marked not-configured until wired.',
@@ -543,7 +543,7 @@ export class WorkflowActionLogService {
       module: input.source || 'emergency-os-backend',
       purpose: input.metadata?.purpose
         ? String(input.metadata.purpose)
-        : 'Emergency OS operational workflow audit',
+        : 'CareDroid operational workflow audit',
       result: input.status || 'recorded',
       error: input.metadata?.error ? String(input.metadata.error) : undefined,
       source: input.source || 'emergency-os-backend',
@@ -1280,7 +1280,7 @@ export class ReferralService {
       targetDepartment: String(input.targetDepartment || 'Other'),
       specialty: String(input.targetDepartment || input.specialty || 'Other'),
       urgency: String(input.urgency || 'Routine'),
-      reason: String(input.reason || 'Referral requested from Emergency OS.'),
+      reason: String(input.reason || 'Referral requested from CareDroid.'),
       clinicalSummary: String(input.clinicalSummary || input.reason || 'Clinical summary pending.'),
       status: String(input.status || 'Sent'),
       workflow: String(input.workflow || 'Referral'),
@@ -1449,7 +1449,7 @@ export class EDCopilotService {
         ? `${longestWait.firstName} ${longestWait.lastName} has waited ${minutesSince(
             longestWait.arrivalTime,
           )} minutes and is currently in ${longestWait.state}.`
-        : 'No active patients are available in the Emergency OS fixture.';
+        : 'No active patients are available in the CareDroid fixture.';
       data = { patient: longestWait || null };
     } else if (lowerQuery.includes('reassessment') || lowerQuery.includes('needs attention')) {
       response = `${reassessmentPatients.length} patient(s) need reassessment or high-priority review.`;

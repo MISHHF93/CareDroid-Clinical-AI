@@ -52,7 +52,7 @@ function buildFlagModel(state = 'enabled') {
         category: 'AI',
         defaultState: 'enabled',
         state,
-        owner: 'Clinical AI',
+        owner: 'CareDroid',
         route: '/assistant',
         description: 'Assistant rollout.',
         rolloutNotes: 'Default-on for authenticated users.',

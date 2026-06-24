@@ -17,7 +17,7 @@ describe('orphanDetectionAudit report', () => {
   it('builds orphan findings across categories', { timeout: 60_000 }, () => {
     const report = buildOrphanDetectionReport();
     expect(report.summary.total).toBeGreaterThan(0);
-    // Emergency OS intentionally retired the broad platform route surface; this
+    // CareDroid intentionally retired the broad platform route surface; this
     // count now covers active ED routes plus legacy redirects into the ED shell.
     expect(report.summary.appRouteCount).toBeGreaterThanOrEqual(EMERGENCY_OS_APP_ROUTE_RANGE.min);
     expect(report.summary.appRouteCount).toBeLessThanOrEqual(EMERGENCY_OS_APP_ROUTE_RANGE.max);

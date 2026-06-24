@@ -85,7 +85,7 @@ describe('HospitalSolutionBuilderService', () => {
     },
     {
       id: 'agent-clinical',
-      title: 'Clinical AI',
+      title: 'CareDroid',
       assetType: 'ai_agent',
       route: '/assistant',
       packIds: ['core-platform'],
@@ -180,7 +180,7 @@ describe('HospitalSolutionBuilderService', () => {
       listAgents: jest.fn().mockResolvedValue([
         {
           id: 'agent-clinical',
-          title: 'Clinical AI',
+          title: 'CareDroid',
           description: 'Clinical support.',
           workspaceAwareness: ['emergency', 'icu'],
           assetAccess: [{ id: 'qsofa' }],

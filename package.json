@@ -2,7 +2,7 @@
   "name": "caredroid-clinical-ai",
   "private": true,
   "version": "1.0.0",
-  "description": "CareDroid-Clinical-AI - Medical AI clinical co-pilot with emergency escalation and RBAC",
+  "description": "CareDroid — SaaS emergency department operating platform with embedded CareDroid Copilot",
   "type": "module",
   "packageManager": "npm@10",
   "engines": {

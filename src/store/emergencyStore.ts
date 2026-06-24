@@ -971,7 +971,7 @@ const normalizeRecommendation = (value: unknown, index: number): EmergencyRecomm
   if (isObject(value)) return { id: stringFrom(value.id) || `recommendation-${index}`, ...value };
   return {
     id: `recommendation-${index}`,
-    message: stringFrom(value) || 'Review Emergency OS recommendation.',
+    message: stringFrom(value) || 'Review CareDroid recommendation.',
   };
 };
 
@@ -1188,7 +1188,7 @@ const normalizeOperationalAlert = (
     stringFrom(firstValue(record, ['title', 'label', 'name'])) || 'Operational alert';
   const message =
     stringFrom(firstValue(record, ['message', 'summary', 'reason', 'description'])) ||
-    'Emergency OS operational alert requires review.';
+    'CareDroid operational alert requires review.';
   if (!title && !message) return null;
 
   return {
@@ -1412,7 +1412,7 @@ const extractOperationalAlertsFromEmergencyModules = (payload: EmergencyDashboar
 const normalizeRealtimeAlert = (value: unknown, index = 0): Alert => {
   const record = asRecord(value);
   const title =
-    stringFrom(firstValue(record, ['title', 'headline', 'subject'])) || 'Emergency OS alert';
+    stringFrom(firstValue(record, ['title', 'headline', 'subject'])) || 'CareDroid alert';
   const message =
     stringFrom(firstValue(record, ['message', 'body', 'summary', 'description'])) ||
     title;
@@ -1460,7 +1460,7 @@ const normalizeWorkflowLog = (value: unknown, index = 0): WorkflowActionLog => {
   const title = stringFrom(record.title) || workflowTitles[type];
   const summary =
     stringFrom(firstValue(record, ['summary', 'message', 'description'])) ||
-    `${title} received from Emergency OS realtime.`;
+    `${title} received from CareDroid realtime.`;
   return createWorkflowLog({
     id: stringFrom(record.id) || stableId('workflow-realtime', value, index),
     type,
@@ -3181,7 +3181,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                   createPatientTimelineEvent(
                     patient,
                     'DispositionUpdated',
-                    options.note || 'Patient discharged from Emergency OS.',
+                    options.note || 'Patient discharged from CareDroid.',
                     { from: patient.state, to: PatientState.Discharge, staffId },
                   ),
                 ],
@@ -3939,7 +3939,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return result;
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Emergency OS backend unavailable.';
+          error instanceof Error ? error.message : 'CareDroid backend unavailable.';
         set((state) => ({
           backendAvailable: false,
           persistenceMode: 'local',
@@ -3970,7 +3970,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             error:
               error instanceof Error
                 ? error.message
-                : `Unable to load Emergency OS ${label} data.`,
+                : `Unable to load CareDroid ${label} data.`,
           };
         }
       };
@@ -4055,7 +4055,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         if (!response.ok) {
           throw new Error(
             stringFrom(firstValue(data, ['message', 'error', 'detail'])) ||
-              `Emergency OS request failed with status ${response.status}.`,
+              `CareDroid request failed with status ${response.status}.`,
           );
         }
         const event = {
@@ -4099,7 +4099,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         if (!response.ok) {
           throw new Error(
             stringFrom(firstValue(raw, ['message', 'error', 'detail'])) ||
-              `Emergency OS request failed with status ${response.status}.`,
+              `CareDroid request failed with status ${response.status}.`,
           );
         }
         const data = unwrapData(raw);
@@ -4175,7 +4175,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                 ...asRecord(payload),
                 type: 'integration_event_received',
                 title: 'Settings updated',
-                summary: 'Emergency OS settings updated from realtime event.',
+                summary: 'CareDroid settings updated from realtime event.',
                 source: 'emergency-realtime',
               }),
             ],
@@ -5204,7 +5204,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           loadedAt: new Date().toISOString(),
           message: envelope?.remainingGaps?.length
             ? envelope.remainingGaps.join(' ')
-            : 'Using Emergency OS backend analytics.',
+            : 'Using CareDroid backend analytics.',
           data: buildBackendEmergencyAnalytics(state, backendData),
         };
         set({ emergencyAnalytics: nextState });
@@ -5217,7 +5217,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           message:
             error instanceof Error
               ? `Backend analytics unavailable: ${error.message}`
-              : 'Using local Emergency OS operational state.',
+              : 'Using local CareDroid operational state.',
           data: buildLocalEmergencyAnalytics(state),
         };
         set({ emergencyAnalytics: nextState });

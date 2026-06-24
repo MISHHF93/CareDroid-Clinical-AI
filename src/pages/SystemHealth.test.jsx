@@ -14,7 +14,7 @@ vi.mock('../services/systemHealthService', async (importOriginal) => {
         statusCode: 200,
         data: {
           status: 'ok',
-          service: 'CareDroid-Clinical-AI API',
+          service: 'CareDroid API',
           version: '1.0.0',
           timestamp: '2026-05-30T14:00:00.000Z',
         },

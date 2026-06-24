@@ -23,6 +23,6 @@ describe('useScreenModeCapabilities', () => {
     expect(capabilities.showOperationalStrip).toBe(true);
     expect(capabilities.showReassessAction).toBe(true);
     expect(capabilities.showEmsCriticalOverlay).toBe(true);
-    expect(capabilities.productLabel).toBe('Emergency OS');
+    expect(capabilities.productLabel).toBe('CareDroid');
   });
 });

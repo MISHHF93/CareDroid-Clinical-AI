@@ -148,7 +148,7 @@ describe('backendFrontendExposure scan', () => {
     }
   });
 
-  it('classifies optional Mongoose Emergency OS routes separately from always-mounted Nest routes', () => {
+  it('classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes', () => {
     const optionalRoutes = getOptionalRuntimeBackendRoutes();
 
     expect(optionalRoutes).toEqual(
@@ -166,7 +166,7 @@ describe('backendFrontendExposure scan', () => {
     expect(BACKEND_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toBeUndefined();
   });
 
-  it('gates optional Emergency OS frontend calls when the optional runtime is disabled', () => {
+  it('gates optional CareDroid frontend calls when the optional runtime is disabled', () => {
     const scan = runBackendFrontendExposureScan();
     const optionalSmartIntakeIds = [
       'emergency-smart-intake-session-create',

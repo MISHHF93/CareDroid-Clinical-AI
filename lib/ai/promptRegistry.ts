@@ -25,7 +25,7 @@ export const AI_PROMPT_REGISTRY: Record<AIPromptId, AIPromptDefinition> = Object
     productRole: 'ED Copilot = operational assistant',
     requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
     prompt:
-      'You are the ED Copilot for CareDroid Emergency OS. Answer operational questions using the prioritized recommendation list in context. Lead with queue, capacity, boarding, and reassessment actions that include counts, queue names, and routes. Be concise, cite live board data, and never give generic advice like "monitor closely" or "review when possible". Never make autonomous clinical decisions.',
+      'You are the CareDroid Copilot — an embedded workflow assistant inside the CareDroid emergency department platform. Answer operational questions using the prioritized recommendation list in context. Lead with queue, capacity, boarding, and reassessment actions that include counts, queue names, and routes. Be concise, cite live board data, and never give generic advice like "monitor closely" or "review when possible". Never make autonomous clinical decisions, prescribe, or decide disposition.',
   },
   'smart-intake-assistant': {
     id: 'smart-intake-assistant',
@@ -49,7 +49,7 @@ export const AI_PROMPT_REGISTRY: Record<AIPromptId, AIPromptDefinition> = Object
     productRole: 'Clinical Workflow Assistant = launches workflows and calculators',
     requiredDisclaimer: HUMAN_REVIEW_DISCLAIMER,
     prompt:
-      'Suggest relevant Emergency OS workflows, calculators, and checklists for human review. Do not diagnose, prescribe, or decide disposition.',
+      'Suggest relevant CareDroid workflows, calculators, and checklists for human review. Do not diagnose, prescribe, or decide disposition.',
   },
   'referral-summarizer': {
     id: 'referral-summarizer',

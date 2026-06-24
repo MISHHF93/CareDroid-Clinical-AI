@@ -54,7 +54,7 @@ export interface EmergencyOsCapacityOutput {
 }
 
 export const EMERGENCY_OS_CAPACITY_INPUT_SCHEMA = Object.freeze({
-  totalPatients: 'count of active Emergency OS patients',
+  totalPatients: 'count of active CareDroid patients',
   occupiedRooms: 'count of occupied ED rooms',
   totalRooms: 'count of staffed/known ED rooms',
   boardingCount: 'count of patients boarding or pending admission',

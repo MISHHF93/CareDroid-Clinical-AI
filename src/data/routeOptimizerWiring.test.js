@@ -48,7 +48,7 @@ describe('Route Optimizer (route-optimizer) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('keeps the fleet page component available while the Emergency OS shell redirects fleet paths', () => {
+  it('keeps the fleet page component available while the CareDroid shell redirects fleet paths', () => {
     expect(routeOptimizerSource).toContain('RouteOptimizer');
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
   });

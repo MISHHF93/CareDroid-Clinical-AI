@@ -243,7 +243,7 @@ if ('PushManager' in self) {
       requireInteraction: false,
     };
 
-    event.waitUntil(self.registration.showNotification('CareDroid-Clinical-AI', options));
+    event.waitUntil(self.registration.showNotification('CareDroid', options));
   });
 
   self.addEventListener('notificationclick', (event) => {

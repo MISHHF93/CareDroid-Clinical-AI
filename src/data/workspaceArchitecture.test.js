@@ -137,7 +137,7 @@ describe('workspaceArchitecture', () => {
     const mode = getWorkspaceFunctionalityMode('emergency');
 
     expect(emergency.defaultNavigationGroups).toEqual(['whiteboard', 'patients', 'ems', 'operations', 'copilot']);
-    expect(mode.modeName).toBe('Emergency OS');
+    expect(mode.modeName).toBe('CareDroid');
     expect(mode.purpose).toMatch(/patient flow, queue flow, EMS flow, capacity flow, and decision support/i);
     expect(emergency.defaultDashboardWidgets).toEqual([
       'current-patients',

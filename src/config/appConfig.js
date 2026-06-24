@@ -41,7 +41,7 @@ const appEnvironment = normalizeAppEnvironment(rawAppEnvironment);
 
 const appConfig = {
   app: {
-    name: getEnvValue('VITE_APP_NAME', 'CareDroid-Clinical-AI'),
+    name: getEnvValue('VITE_APP_NAME', 'CareDroid'),
     version: getEnvValue('VITE_APP_VERSION', '1.0.0'),
     environment: appEnvironment,
     environmentValidation: {

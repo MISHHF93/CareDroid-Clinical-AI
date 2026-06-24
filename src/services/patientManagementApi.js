@@ -503,6 +503,6 @@ export async function searchPatientsFromBackend(query, { localPatients = [], lim
       error: bundle.ok ? '' : bundle.error,
     })),
     message:
-      'No dedicated backend patient search endpoint exists; matched active Emergency OS patients were verified through existing patient detail endpoints.',
+      'No dedicated backend patient search endpoint exists; matched active CareDroid patients were verified through existing patient detail endpoints.',
   };
 }

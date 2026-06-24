@@ -48,7 +48,7 @@ function buildAuditEvent(automation, status, context = {}, extra = {}) {
     tenant: context.tenant || { id: 'local-demo-tenant', name: 'Local Demo Tenant' },
     workspace: {
       id: automation?.workspace || context.workspaceId || 'workspace',
-      name: `${automation?.workspace || context.workspaceId || 'Emergency OS'} Emergency OS`,
+      name: `${automation?.workspace || context.workspaceId || 'CareDroid'} CareDroid`,
     },
     aiInvolvement: {
       involved: Boolean(automation?.aiInvolvement),

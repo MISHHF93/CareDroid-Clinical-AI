@@ -112,7 +112,7 @@ describe('WorkspaceDataPipelineService', () => {
           emergencyWorkspaceFeed: expect.objectContaining({
             route: '/workspace/emergency',
             separateIntakeAppCreated: false,
-            arrivalState: expect.stringMatching(/inside Emergency OS already summarized/i),
+            arrivalState: expect.stringMatching(/inside CareDroid already summarized/i),
           }),
         }),
         analytics: expect.objectContaining({
@@ -409,7 +409,7 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.implementationSummary).toEqual(
       expect.objectContaining({
         route: '/workspace/emergency/implementation',
-        title: 'Emergency OS MVP Implementation Summary',
+        title: 'CareDroid MVP Implementation Summary',
         sourceDocument: 'docs/emergency-os-mvp-implementation-summary.md',
         coverage: expect.arrayContaining([
           expect.objectContaining({
@@ -724,7 +724,7 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.demoTenant).toEqual(
       expect.objectContaining({
-        tenantName: 'Emergency OS Demo Hospital',
+        tenantName: 'CareDroid Demo Hospital',
         dataPosture: expect.stringMatching(/Demo\/local data only/i),
         samplePatients: expect.arrayContaining([
           expect.objectContaining({ dataLabel: 'Demo data', integrationLabel: 'No live integration' }),
@@ -747,7 +747,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         route: '/workspace/emergency/deployment',
         phases: expect.arrayContaining([
-          expect.objectContaining({ title: 'Standalone Emergency OS' }),
+          expect.objectContaining({ title: 'Standalone CareDroid' }),
           expect.objectContaining({ title: 'Protocol Library' }),
           expect.objectContaining({ title: 'AI Copilot' }),
           expect.objectContaining({ title: 'Analytics' }),
@@ -827,7 +827,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         route: '/workspace/emergency/onboarding',
         sections: expect.arrayContaining([
-          expect.objectContaining({ label: 'Emergency OS overview' }),
+          expect.objectContaining({ label: 'CareDroid overview' }),
           expect.objectContaining({ label: 'Calculators' }),
           expect.objectContaining({ label: 'Protocols' }),
           expect.objectContaining({ label: 'AI Copilot' }),

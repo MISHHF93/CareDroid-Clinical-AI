@@ -25,7 +25,7 @@ describe('canonical route/auth architecture', () => {
     expect(redirectsByPath['/auth']).toBeUndefined();
   });
 
-  it('keeps one AppShell owner for canonical Emergency OS routes', () => {
+  it('keeps one AppShell owner for canonical CareDroid routes', () => {
     expect(appSource).not.toContain('<TenantRequired>');
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');

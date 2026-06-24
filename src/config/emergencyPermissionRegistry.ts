@@ -1,5 +1,5 @@
 /**
- * Canonical Emergency OS permission registry — actions, routes, screens, and display modes.
+ * Canonical CareDroid permission registry — actions, routes, screens, and display modes.
  */
 import { CANONICAL_ROUTES } from './routes.config';
 import {
@@ -27,7 +27,7 @@ export type EmergencyPermissionDefinition = {
   blockedForReadOnlyRole?: boolean;
 };
 
-/** Canonical permission keys — single vocabulary for Emergency OS. */
+/** Canonical permission keys — single vocabulary for CareDroid. */
 export const EMERGENCY_PERMISSION_KEYS = Object.freeze({
   patientCreate: 'patient.create',
   patientDemographicsEdit: 'patient.demographics.edit',
@@ -95,10 +95,10 @@ export const EMERGENCY_PERMISSION_REGISTRY: readonly EmergencyPermissionDefiniti
   { key: K.patientDischarge, category: 'action', label: 'Discharge patient', description: 'Complete discharge workflow.', legacyAliases: ['patient.discharge'], blockedInPublicDisplay: true, blockedForReadOnlyRole: true },
   { key: K.patientAssignStaff, category: 'action', label: 'Assign staff', description: 'Assign responsible clinicians to patients.', legacyAliases: ['patient.assignStaff'], blockedInPublicDisplay: true },
   { key: K.patientAssignRoom, category: 'action', label: 'Assign room', description: 'Assign patient care locations and rooms.', legacyAliases: ['patient.assignRoom'], blockedInPublicDisplay: true },
-  { key: K.copilotUse, category: 'action', label: 'Use copilot', description: 'Access Emergency OS Copilot.', legacyAliases: ['copilot.use'] },
+  { key: K.copilotUse, category: 'action', label: 'Use copilot', description: 'Access CareDroid Copilot.', legacyAliases: ['copilot.use'] },
   { key: K.analyticsView, category: 'action', label: 'View analytics', description: 'Open operational analytics surfaces.', legacyAliases: ['analytics.view'] },
   { key: K.simulationRun, category: 'action', label: 'Run simulation', description: 'Execute ED simulation scenarios.', legacyAliases: ['simulation.run'], blockedInPublicDisplay: true },
-  { key: K.settingsManage, category: 'action', label: 'Manage settings', description: 'Configure tenant Emergency OS settings.', legacyAliases: ['settings.manage'], blockedInPublicDisplay: true },
+  { key: K.settingsManage, category: 'action', label: 'Manage settings', description: 'Configure tenant CareDroid settings.', legacyAliases: ['settings.manage'], blockedInPublicDisplay: true },
   { key: K.displayPublicWaitboard, category: 'display', label: 'Public waiting board', description: 'View aggregate public waiting-room wall display.', blockedForReadOnlyRole: false },
   { key: K.displayPublicPublish, category: 'action', label: 'Publish public display', description: 'Publish or update public waiting-room and hallway wall displays.', legacyAliases: ['display.public.publish'], blockedInPublicDisplay: true },
   { key: K.displayWhiteboardReadonly, category: 'display', label: 'Read-only whiteboard', description: 'View departmental read-only whiteboard display.', blockedForReadOnlyRole: false },

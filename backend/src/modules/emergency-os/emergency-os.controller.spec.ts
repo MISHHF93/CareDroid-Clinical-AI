@@ -66,7 +66,7 @@ describe('EmergencyOsController', () => {
     controller = moduleRef.get(EmergencyOsController);
   });
 
-  it('returns backend envelopes for all normalized Emergency OS modules', () => {
+  it('returns backend envelopes for all normalized CareDroid modules', () => {
     const modules = [
       controller.getWhiteboard(),
       controller.getCentralNodeSnapshot(),
@@ -123,7 +123,7 @@ describe('EmergencyOsController', () => {
     expect(controller.getAnalytics().data.activeCensus).toBeGreaterThan(0);
   });
 
-  it('persists referrals through the Emergency OS referral surface', () => {
+  it('persists referrals through the CareDroid referral surface', () => {
     const createdPatient = controller.createIntakePatient({
       mrn: 'ED-REF-1',
       firstName: 'Referral',
@@ -201,7 +201,7 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('returns and updates the cohesive Emergency OS settings contract', () => {
+  it('returns and updates the cohesive CareDroid settings contract', () => {
     const settings = controller.getSettings();
 
     expect(settings.data).toMatchObject({
@@ -251,7 +251,7 @@ describe('EmergencyOsController', () => {
     expect(controller.getSettings().data.tenantName).toBe('North Command ED');
   });
 
-  it('exposes a central node operational snapshot across Emergency OS modules', () => {
+  it('exposes a central node operational snapshot across CareDroid modules', () => {
     const snapshot = controller.getCentralNodeSnapshot();
 
     expect(snapshot).toMatchObject({
@@ -310,7 +310,7 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('classifies the complete implementation prompt against the active Emergency OS spine', () => {
+  it('classifies the complete implementation prompt against the active CareDroid spine', () => {
     const readiness = controller.getImplementationReadiness();
 
     expect(readiness).toMatchObject({
@@ -468,11 +468,11 @@ describe('EmergencyOsController', () => {
     expect(scenario.data.scenario.metrics.confidenceIntervals.averageWaitMinutes).toHaveLength(2);
   });
 
-  it('exposes the Advanced Emergency OS upgrade harness with safety and audit metadata', () => {
+  it('exposes the Advanced CareDroid upgrade harness with safety and audit metadata', () => {
     const harness = controller.getUpgradeHarness();
 
     expect(harness).toMatchObject({
-      module: 'Advanced Emergency OS Upgrade Harness',
+      module: 'Advanced CareDroid Upgrade Harness',
       status: 'placeholder',
       data: {
         harnessId: 'advanced-emergency-os-upgrade-harness',

@@ -28,7 +28,7 @@ export const BACKEND_INTERNAL_SERVICES = Object.freeze([
     symbol: 'FHIRService / MPIService / OCRService / TextMiningService',
     module: 'services + api/smart-intake.routes',
     strategy: 'optional-runtime',
-    reason: 'Mounted only by the optional Mongoose Emergency OS smart-intake workflow',
+    reason: 'Mounted only by the optional Mongoose CareDroid smart-intake workflow',
   },
   {
     symbol: 'LiveTrackingService legacy adapters',
@@ -41,7 +41,7 @@ export const BACKEND_INTERNAL_SERVICES = Object.freeze([
     symbol: 'EdgeAIAmbulanceService',
     module: 'services + api/ems.socket',
     strategy: 'backend-only',
-    reason: 'Emergency OS WebSocket support registered from backend startup',
+    reason: 'CareDroid WebSocket support registered from backend startup',
   },
 ]);
 

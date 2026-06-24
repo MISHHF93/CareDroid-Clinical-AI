@@ -115,7 +115,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'layouts',
     title: 'Layouts',
-    canonical: '`src/components/AppShell.tsx` (active Emergency OS app chrome)',
+    canonical: '`src/components/AppShell.tsx` (active CareDroid app chrome)',
     secondary: '`src/layout/AppShell.jsx` (legacy/manual-review shell helper, not runtime-mounted)',
     duplicates: [
       {

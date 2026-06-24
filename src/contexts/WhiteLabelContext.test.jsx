@@ -62,7 +62,7 @@ describe('WhiteLabelProvider', () => {
     expect(screen.getByText('white-labeled')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(document.title).toBe('Demo Care | Clinical AI');
+      expect(document.title).toBe('Demo Care');
       expect(document.documentElement.style.getPropertyValue('--tenant-primary-color')).toBe('#0f766e');
       expect(document.documentElement.style.getPropertyValue('--tenant-accent-color')).toBe('#2563eb');
       expect(document.querySelector('link[data-white-label-favicon="true"]')).toHaveAttribute(

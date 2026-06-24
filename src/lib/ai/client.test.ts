@@ -50,7 +50,7 @@ describe('canonical AI client', () => {
     expect(response.usage.totalTokens).toBe(19);
   });
 
-  it('routes browser Emergency OS AI calls through canonical emergency endpoints', async () => {
+  it('routes browser CareDroid AI calls through canonical emergency endpoints', async () => {
     vi.stubGlobal('window', {});
     vi.stubGlobal('document', {});
     apiClientMocks.apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));

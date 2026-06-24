@@ -37,7 +37,7 @@ export const AI_MODEL_REGISTRY = Object.freeze([
     status: 'active',
     costProfile: 'retrieval-plus-generation',
     riskLevel: 'high',
-    owner: 'Clinical AI',
+    owner: 'CareDroid',
     route: TOOL_LAUNCH_PATHS.research,
   }),
   Object.freeze({

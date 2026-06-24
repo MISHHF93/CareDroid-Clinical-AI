@@ -69,6 +69,16 @@
   font-weight: 800;
 }
 
+.feature-toggle-panel__suite-badge {
+  border-color: rgba(0, 255, 136, 0.34) !important;
+  background: rgba(0, 255, 136, 0.08) !important;
+  color: #7dffc0 !important;
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .feature-toggle-panel button {
   border: 1px solid var(--panel-border);
   border-radius: 999px;

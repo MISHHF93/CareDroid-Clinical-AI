@@ -249,7 +249,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll } = {}) {
     onStatus?.({
       status: 'reconnecting',
       mode: 'polling',
-      message: 'Emergency OS realtime unavailable; polling every 30 seconds.',
+      message: 'CareDroid realtime unavailable; polling every 30 seconds.',
       updatedAt: new Date().toISOString(),
     });
   };

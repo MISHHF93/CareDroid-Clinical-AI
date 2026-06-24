@@ -1,5 +1,5 @@
 /**
- * Canonical Emergency OS role → screen-mode matrix.
+ * Canonical CareDroid role → screen-mode matrix.
  * Single resolver for route, role, tenant settings, and wall-display query params.
  */
 import { CANONICAL_ROUTES } from './routes.config';

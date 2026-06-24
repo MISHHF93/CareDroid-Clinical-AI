@@ -7,7 +7,7 @@ describe('UnifiedPatient model', () => {
     expect(UnifiedPatient.collection.name).toBe('unified_patients');
   });
 
-  it('defines indexes required by Emergency OS patient lookups', () => {
+  it('defines indexes required by CareDroid patient lookups', () => {
     const indexFields = UnifiedPatientSchema.indexes().map(([fields]) => fields);
 
     expect(indexFields).toEqual(
@@ -24,7 +24,7 @@ describe('UnifiedPatient model', () => {
     );
   });
 
-  it('normalizes legacy Emergency OS fields into canonical fields', async () => {
+  it('normalizes legacy CareDroid fields into canonical fields', async () => {
     const patient = new UnifiedPatient({
       name: 'Test Patient',
       chief_complaint: 'Chest pain',

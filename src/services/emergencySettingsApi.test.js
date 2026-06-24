@@ -20,7 +20,7 @@ vi.mock('./tenantContextStore', () => ({
 
 const { fetchEmergencyOsSettings, saveEmergencyOsSettings } = await import('./emergencySettingsApi');
 
-describe('emergencySettingsApi Emergency OS settings contract', () => {
+describe('emergencySettingsApi CareDroid settings contract', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     isBackendCapabilityEnabled.mockReturnValue(true);
@@ -33,7 +33,7 @@ describe('emergencySettingsApi Emergency OS settings contract', () => {
     });
   });
 
-  it('fetches the Emergency OS settings endpoint', async () => {
+  it('fetches the CareDroid settings endpoint', async () => {
     const result = await fetchEmergencyOsSettings();
 
     expect(result.ok).toBe(true);

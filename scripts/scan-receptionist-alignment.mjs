@@ -125,12 +125,12 @@ async function liveScan() {
       await page.locator('[data-nav-id]').evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-nav-id'))),
     ),
   ];
-  const headerText = await page.locator('.emergency-os-header').innerText().catch(() => '');
+  const headerText = await page.locator('.caredroid-header').innerText().catch(() => '');
   const hasErrorBoundary = await page.getByText(/encountered an error/i).count();
   const hasEmsPanel = await page.getByText(/Inbound ambulances/i).count();
   const hasOpsStrip = await page.getByText(/^CAP /).count();
   const commandPaletteButtons = await page.getByLabel('Open command palette').count();
-  const prepareButtons = await page.locator('.emergency-os-header__action--primary').filter({ hasText: /Intake|Prepare/i }).count();
+  const prepareButtons = await page.locator('.caredroid-header__action--primary').filter({ hasText: /Intake|Prepare/i }).count();
 
   if (hasErrorBoundary === 0) pass('live-no-crash', 'Reception page renders without error boundary');
   else fail('live-no-crash', 'Reception page shows error boundary');

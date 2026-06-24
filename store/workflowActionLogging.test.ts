@@ -12,7 +12,7 @@ afterEach(() => {
   useEmergencyStore.setState(originalState, true);
 });
 
-describe('Emergency OS workflow action logging', () => {
+describe('CareDroid workflow action logging', () => {
   it('records and selects normalized logs across patient, EMS, reassessment, referral, and external workflows', () => {
     const initial = useEmergencyStore.getState();
     const template = initial.patients[0];

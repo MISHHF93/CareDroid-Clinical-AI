@@ -46,7 +46,7 @@ const assets = [
   },
   {
     id: 'agent-clinical',
-    title: 'Clinical AI',
+    title: 'CareDroid',
     assetType: 'ai_agent',
     lifecycle: 'beta',
   },
@@ -73,7 +73,7 @@ describe('AssetLifecycleAdmin', () => {
     );
 
     expect(await screen.findByRole('heading', { name: /asset lifecycle/i })).toBeInTheDocument();
-    expect(screen.getByText('Clinical AI')).toBeInTheDocument();
+    expect(screen.getByText('CareDroid')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /^Archived$/i }).length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getAllByRole('button', { name: /^Archived$/i })[0]);

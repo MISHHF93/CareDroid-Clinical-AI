@@ -60,18 +60,18 @@ const MUTATING_TOOLS = new Set<EmergencyToolName>([
 const TOOL_BY_NAME: Record<EmergencyToolName, ToolDefinition> = {
   get_patient_details: {
     name: 'get_patient_details',
-    description: 'Read the full Emergency OS patient object for a patient id.',
+    description: 'Read the full CareDroid patient object for a patient id.',
     input_schema: {
       type: 'object',
       properties: {
-        patientId: { type: 'string', description: 'Emergency OS patient id.' },
+        patientId: { type: 'string', description: 'CareDroid patient id.' },
       },
       required: ['patientId'],
     },
   },
   get_queue_status: {
     name: 'get_queue_status',
-    description: 'Read queue statistics for one queue or all Emergency OS queues.',
+    description: 'Read queue statistics for one queue or all CareDroid queues.',
     input_schema: {
       type: 'object',
       properties: {
@@ -161,7 +161,7 @@ const TOOL_BY_NAME: Record<EmergencyToolName, ToolDefinition> = {
   },
   get_capacity_status: {
     name: 'get_capacity_status',
-    description: 'Read the full current Emergency OS CapacitySnapshot.',
+    description: 'Read the full current CareDroid CapacitySnapshot.',
     input_schema: {
       type: 'object',
       properties: {},
@@ -171,7 +171,7 @@ const TOOL_BY_NAME: Record<EmergencyToolName, ToolDefinition> = {
   search_patients: {
     name: 'search_patients',
     description:
-      'Search Emergency OS patients by query and optional partial patient fields. Returns only summary fields.',
+      'Search CareDroid patients by query and optional partial patient fields. Returns only summary fields.',
     input_schema: {
       type: 'object',
       properties: {
@@ -184,7 +184,7 @@ const TOOL_BY_NAME: Record<EmergencyToolName, ToolDefinition> = {
   dispatch_alert: {
     name: 'dispatch_alert',
     description:
-      'Propose dispatching an Emergency OS alert. Requires human confirmation before adding it.',
+      'Propose dispatching an CareDroid alert. Requires human confirmation before adding it.',
     input_schema: {
       type: 'object',
       properties: {
@@ -247,7 +247,7 @@ export function executeEmergencyTool(
   input: Record<string, any> = {},
 ): EmergencyToolResult {
   if (!TOOL_BY_NAME[toolName]) {
-    return { ok: false, toolName, error: `Unknown Emergency OS tool: ${toolName}` };
+    return { ok: false, toolName, error: `Unknown CareDroid tool: ${toolName}` };
   }
 
   if (isMutatingTool(toolName)) {
@@ -256,7 +256,7 @@ export function executeEmergencyTool(
 
   const state = getStoreState();
   if (!state) {
-    return { ok: false, toolName, error: 'Emergency OS store is not available.' };
+    return { ok: false, toolName, error: 'CareDroid store is not available.' };
   }
 
   try {
@@ -284,7 +284,7 @@ export function executeEmergencyTool(
 export async function applyConfirmedToolAction(action: PendingToolAction): Promise<EmergencyToolResult> {
   const state = getStoreState();
   if (!state) {
-    return { ok: false, toolName: action.toolName, error: 'Emergency OS store is not available.' };
+    return { ok: false, toolName: action.toolName, error: 'CareDroid store is not available.' };
   }
 
   try {
@@ -571,13 +571,13 @@ function actionDescription(toolName: EmergencyToolName, input: Record<string, an
     case 'flag_patient':
       return input.reason || 'Add a patient flag for human review.';
     case 'move_patient_state':
-      return 'Move the patient in the Emergency OS journey timeline.';
+      return 'Move the patient in the CareDroid journey timeline.';
     case 'launch_calculator':
       return 'Open the calculator UI for human-entered scoring.';
     case 'create_referral':
       return input.summary || 'Create a draft referral.';
     case 'dispatch_alert':
-      return input.message || 'Dispatch an Emergency OS alert.';
+      return input.message || 'Dispatch an CareDroid alert.';
     default:
       return 'Confirm AI-suggested action.';
   }

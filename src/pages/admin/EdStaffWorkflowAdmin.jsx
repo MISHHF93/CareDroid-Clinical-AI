@@ -47,7 +47,7 @@ export default function EdStaffWorkflowAdmin() {
       <section className="admin-ops-card" style={{ marginBottom: 16 }}>
         <h3>ED workflow A–Z (frontend ↔ backend)</h3>
         <p>
-          Each step maps to Emergency OS routes. Profile and workspace APIs are production-backed;
+          Each step maps to CareDroid routes. Profile and workspace APIs are production-backed;
           emergency reads use demo envelopes until persistence ships.
         </p>
         <ol style={{ marginTop: 12, paddingLeft: 20 }}>
@@ -68,7 +68,7 @@ export default function EdStaffWorkflowAdmin() {
       <section className="admin-ops-card" style={{ marginBottom: 16 }}>
         <h3>Emergency department workflow lanes</h3>
         <p>
-          Each lane maps to Emergency OS surfaces. Administrators assign a canonical SaaS role; the
+          Each lane maps to CareDroid surfaces. Administrators assign a canonical SaaS role; the
           catalog resolves navigation, tools, and screen mode.
         </p>
         <div className="admin-ops-lanes" style={{ marginTop: 12 }}>

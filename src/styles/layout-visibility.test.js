@@ -62,7 +62,7 @@ describe('layout-visibility.css', () => {
 });
 
 describe('AppShell.css — scroll vs conversation', () => {
-  it('Emergency OS main shell owns the route scrollport without clipping route content', () => {
+  it('CareDroid main shell owns the route scrollport without clipping route content', () => {
     expect(appShellCss).toMatch(
       /\.ed-os-shell__body\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\) var\(--ed-copilot-width\)/
     );

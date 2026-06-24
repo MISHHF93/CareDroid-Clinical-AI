@@ -11,7 +11,7 @@ export class ModelRegistryService {
   listModels() {
     return [
       {
-        modelName: 'CareDroid Clinical Router',
+        modelName: 'CareDroid',
         version: 'v1',
         status: 'active',
         approvalState: 'approved',

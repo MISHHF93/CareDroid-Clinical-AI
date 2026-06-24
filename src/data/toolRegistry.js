@@ -3803,7 +3803,7 @@ const toolRegistry = [
       'Backend logging evidence',
     ],
     useCases: [
-      'Clinical AI audit review',
+      'CareDroid tool audit review',
       'Compliance spot checks',
       'Execution trace troubleshooting',
       'Safety and governance review',

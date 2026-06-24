@@ -313,7 +313,7 @@ function sourceSnapshotFindings(sourceSnapshot = {}) {
     );
   }
 
-  if (appShellJsx && !appShellJsx.includes('aria-label="Emergency OS navigation"')) {
+  if (appShellJsx && !appShellJsx.includes('aria-label="CareDroid navigation"')) {
     findings.push(
       issue({
         id: 'a11y-nav-rail-label',
@@ -321,7 +321,7 @@ function sourceSnapshotFindings(sourceSnapshot = {}) {
         surface: UX_SURFACE_TYPES.NAVIGATION,
         severity: 'high',
         title: 'AppShell navigation rail lacks an accessible label',
-        evidence: 'Missing aria-label="Emergency OS navigation".',
+        evidence: 'Missing aria-label="CareDroid navigation".',
         recommendation: 'Keep the AppShell rail labelled so collapsed icon navigation is announced.',
       })
     );

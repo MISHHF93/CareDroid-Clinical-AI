@@ -122,7 +122,7 @@ function buildRouteEntry({ path, source, generatedKind, owner, block = '', targe
     wildcard: normalized.includes('*'),
     authRequired: ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized),
     permissioned: /permission:\s*/.test(block),
-    navigationEntry: ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized) ? 'Emergency OS' : '',
+    navigationEntry: ACTIVE_EMERGENCY_ROUTE_PATHS.has(normalized) ? 'CareDroid' : '',
     inventoryEntry: '',
     backendContract: '',
   };

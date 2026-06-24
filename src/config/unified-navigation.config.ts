@@ -13,10 +13,16 @@ import {
 } from './emergencyNavPolicy.js';
 import { SAAS_USER_ROLES } from './saasProfileConstants';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
+import {
+  getNavSuiteId,
+  getSuiteById,
+  type CareDroidSuiteId,
+} from '../../lib/features/suiteRegistry';
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
-export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+/** Core ED operating nav shown during pilot customer mode. */
+export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'reception',
   'whiteboard',
   'intake',
@@ -32,11 +38,14 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'analytics',
   'settings',
   'integrations',
-  'cosmos',
-  'platform',
   'pulse',
   'shift',
-  // Full nav normalization: include additional core surfaces
+]);
+
+/** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
+export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'cosmos',
+  'platform',
   'fleet',
   'surveillance',
   'simulation',
@@ -46,6 +55,8 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
   'ai-center',
   'admin',
 ]);
+
+export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = PILOT_CORE_NAV_ITEM_IDS;
 
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
@@ -97,6 +108,8 @@ export type NavigationItem = Readonly<{
   order: number;
   roles: readonly string[];
   isEmergencyCore: boolean;
+  suiteId?: CareDroidSuiteId;
+  suiteLabel?: string;
   activePaths?: readonly string[];
   mobileLabel?: string;
 }>;
@@ -340,8 +353,12 @@ export function resolveFeatureGate(featureGate: string | null | undefined): stri
 }
 
 function navigationItem(item: NavigationItem): NavigationItem {
+  const suiteId = item.suiteId ?? getNavSuiteId(item.id);
+  const suite = suiteId ? getSuiteById(suiteId) : undefined;
   return Object.freeze({
     ...item,
+    suiteId,
+    suiteLabel: suite?.label,
     roles: Object.freeze([...item.roles]),
     activePaths: Object.freeze(item.activePaths ? [...item.activePaths] : [item.path]),
   });

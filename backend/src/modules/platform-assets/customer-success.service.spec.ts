@@ -98,7 +98,7 @@ describe('CustomerSuccessService', () => {
       },
       {
         id: 'agent-clinical',
-        title: 'Clinical AI',
+        title: 'CareDroid',
         assetType: PlatformAssetType.AI_AGENT,
         route: '/assistant',
       },

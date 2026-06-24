@@ -80,7 +80,7 @@ export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
   },
   {
     id: 'clinical-pages',
-    title: 'Clinical AI pages',
+    title: 'CareDroid tool pages',
     items: [
       {
         id: 'diagnosis-procedures',

@@ -13,7 +13,7 @@ import { LMECSService } from '../../services/lmecs.service';
 import { OrganizationalDigitalTwin } from '../../services/organizational-digital-twin.service';
 import { ERPulseHandoverService } from '../../services/smart-handover-v2.service';
 
-describe('Emergency OS research controllers', () => {
+describe('CareDroid research controllers', () => {
   let handoverController: ERPulseHandoverController;
   let federatedEMSController: FederatedEMSController;
   let lmecsController: LMECSController;

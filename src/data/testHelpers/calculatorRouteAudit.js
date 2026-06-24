@@ -2,7 +2,7 @@
  * Shared assertions for calculator deep links.
  *
  * `CALCULATOR_ROUTE_DEFS` remains the historical inventory/index for calculator slugs. App.jsx no
- * longer mounts calculator routes in the active Emergency OS-only product surface.
+ * longer mounts calculator routes in the active CareDroid-only product surface.
  */
 
 import { expect } from 'vitest';

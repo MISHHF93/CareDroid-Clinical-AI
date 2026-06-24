@@ -222,7 +222,7 @@ const carePathwayDetail = {
       route: '/simulation/sepsis-deterioration',
     },
   ],
-  aiAgent: { id: 'agent-clinical', title: 'Clinical AI', route: '/assistant' },
+  aiAgent: { id: 'agent-clinical', title: 'CareDroid', route: '/assistant' },
   linkedAssetCounts: {
     calculators: 1,
     protocols: 1,
@@ -591,7 +591,7 @@ describe('Commercial builder pages', () => {
     expect(screen.getByText('Sepsis Management')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /simulations/i })).toBeInTheDocument();
     expect(screen.getByText('Sepsis Deterioration')).toBeInTheDocument();
-    expect(screen.getByText('Clinical AI')).toBeInTheDocument();
+    expect(screen.getByText('CareDroid')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /open ai guidance/i })).toHaveAttribute(
       'href',
       '/assistant?agent=agent-clinical',

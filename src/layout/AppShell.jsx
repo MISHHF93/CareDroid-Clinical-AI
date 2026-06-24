@@ -105,7 +105,7 @@ const SHORTCUT_GROUPS = [
 
 const CHARGE_NURSE_PULSE_DEFAULT_KEY = 'caredroid.ed.departmentPulse.chargeDefaultSeen';
 const AI_AGENT_PREFILL_LABELS = Object.freeze({
-  'agent-clinical': 'Clinical AI',
+  'agent-clinical': 'CareDroid',
   'agent-emergency': 'Emergency AI',
   'agent-lab': 'Laboratory AI',
   'agent-operations': 'Operations AI',
@@ -1596,7 +1596,7 @@ const AppShell = ({
       <Sidebar />
 
       <div className="ed-os-shell__workspace">
-        <header className="ed-os-header" aria-label="Emergency OS header">
+        <header className="ed-os-header" aria-label="CareDroid header">
           <div className="ed-os-header__left">
             <button
               type="button"
@@ -1604,7 +1604,7 @@ const AppShell = ({
               onClick={() => navigate('/emergency/whiteboard')}
               aria-label="Go to Emergency Whiteboard"
             >
-              Emergency OS
+              CareDroid
             </button>
             <button
               type="button"

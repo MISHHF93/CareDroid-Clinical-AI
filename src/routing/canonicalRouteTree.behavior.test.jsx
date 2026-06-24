@@ -150,7 +150,7 @@ describe('canonical route tree behavior', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('/emergency/whiteboard renders the active Emergency OS whiteboard', async () => {
+  it('/emergency/whiteboard renders the active CareDroid whiteboard', async () => {
     renderRoute('/emergency/whiteboard');
 
     expect(await screen.findByRole('link', { name: 'Whiteboard' })).toHaveAttribute(
@@ -260,8 +260,8 @@ describe('canonical route tree behavior', () => {
   it('/emergency/copilot renders the active Copilot route context', async () => {
     renderRoute('/emergency/copilot');
 
-    expect(await findRouteHeading('AIIOS ED Copilot')).toBeInTheDocument();
-    expect(screen.getByText(/Use the docked AIIOS ED Copilot/i)).toBeInTheDocument();
+    expect(await findRouteHeading('CareDroid Copilot')).toBeInTheDocument();
+    expect(screen.getByText(/Use the docked CareDroid Copilot/i)).toBeInTheDocument();
   });
 
   it.each(['/assistant', '/chat', '/ai', '/copilot'])(
@@ -270,7 +270,7 @@ describe('canonical route tree behavior', () => {
       renderRoute(aliasPath);
 
       expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/copilot');
-      expect(await findRouteHeading('AIIOS ED Copilot')).toBeInTheDocument();
+      expect(await findRouteHeading('CareDroid Copilot')).toBeInTheDocument();
     },
   );
 
@@ -280,7 +280,7 @@ describe('canonical route tree behavior', () => {
     expect(
       await screen.findByRole(
         'heading',
-        { level: 1, name: /^emergency os console$/i },
+        { level: 1, name: /^caredroid console$/i },
         { timeout: ROUTE_LOAD_TIMEOUT },
       ),
     ).toBeInTheDocument();
@@ -327,13 +327,13 @@ describe('canonical route tree behavior', () => {
     );
   }, ROUTE_LOAD_TIMEOUT);
 
-  it('/emergency/analytics renders the Emergency OS analytics route', async () => {
+  it('/emergency/analytics renders the CareDroid analytics route', async () => {
     renderRoute('/emergency/analytics');
 
     expect(await findRouteHeading('Emergency Analytics')).toBeInTheDocument();
   });
 
-  it('/emergency/settings renders settings inside the primary Emergency OS route family', async () => {
+  it('/emergency/settings renders settings inside the primary CareDroid route family', async () => {
     renderRoute('/emergency/settings');
 
     expect(await screen.findByRole('main')).toBeInTheDocument();
@@ -348,7 +348,7 @@ describe('canonical route tree behavior', () => {
       expect(screen.getByRole('main')).toBeInTheDocument();
       expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();
-      expect(screen.queryByText('Emergency OS page unavailable')).toBeNull();
+      expect(screen.queryByText('CareDroid page unavailable')).toBeNull();
 
       unmount();
     }
@@ -391,7 +391,7 @@ describe('canonical route tree behavior', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/workspace');
   });
 
-  it('redirects retired Emergency OS routes to the whiteboard', async () => {
+  it('redirects retired CareDroid routes to the whiteboard', async () => {
     renderRoute('/emergency/simulation');
 
     expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');

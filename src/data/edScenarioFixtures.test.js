@@ -27,7 +27,7 @@ describe('ED scenario fixtures', () => {
     );
   });
 
-  it('populates every active Emergency OS surface for each scenario', () => {
+  it('populates every active CareDroid surface for each scenario', () => {
     REQUESTED_SCENARIO_IDS.forEach((id) => {
       const fixture = buildEdScenarioFixture(id, { now: new Date('2026-06-13T09:00:00-04:00') });
 
@@ -51,7 +51,7 @@ describe('ED scenario fixtures', () => {
     });
   });
 
-  it('exposes module envelopes consumed by Emergency OS hooks', () => {
+  it('exposes module envelopes consumed by CareDroid hooks', () => {
     const capacityEnvelope = buildEmergencyScenarioModuleEnvelope('capacity', 'capacity-red');
     const queuesEnvelope = buildEmergencyScenarioModuleEnvelope('queues', 'capacity-red');
     const copilotEnvelope = buildEmergencyScenarioModuleEnvelope('copilot', 'capacity-red');

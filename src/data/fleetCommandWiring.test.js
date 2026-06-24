@@ -52,7 +52,7 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('documents the future route while the Emergency OS shell redirects fleet paths', () => {
+  it('documents the future route while the CareDroid shell redirects fleet paths', () => {
     const routeRecord = ROUTE_RECORDS.find((record) => record.id === 'fleetCommand');
     expect(routeRecord).toMatchObject({
       path,

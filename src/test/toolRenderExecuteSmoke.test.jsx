@@ -130,7 +130,7 @@ describe('toolRenderExecuteSmoke — clinical pages non-empty', () => {
     ['/tools/protocols', Protocols, /search for a protocol/i],
     ['/tools/diagnosis', DiagnosisAssistant, /patient presentation/i],
     ['/tools/procedures', ProcedureGuide, /search for a procedure/i],
-    ['/tools', ToolsOverview, /^Emergency OS Tool Console$/i],
+    ['/tools', ToolsOverview, /caredroid console/i],
   ])('%s renders primary UI', async (path, Page, matcher) => {
     const { container } = renderAt(path, <Page />);
     expect(await screen.findByText(matcher)).toBeInTheDocument();

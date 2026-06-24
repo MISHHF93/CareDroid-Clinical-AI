@@ -1,5 +1,5 @@
 /**
- * Emergency OS architecture artifact registry — harmonization audit surface.
+ * CareDroid architecture artifact registry — harmonization audit surface.
  * Classifications drive consolidation work; not a second permission system.
  */
 export const EMERGENCY_ARCHITECTURE_CLASSIFICATION = Object.freeze({
@@ -122,7 +122,7 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     path: 'src/components/emergency/OperationalStrip.jsx',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
     canonical: 'src/config/emergencyOperationalPresentationModel.ts',
-    note: 'Single metric strip component with role-aware variants for all Emergency OS surfaces',
+    note: 'Single metric strip component with role-aware variants for all CareDroid surfaces',
   },
   {
     id: 'multi-role-workflow-validation',
@@ -356,7 +356,7 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     path: 'src/components/whiteboard/WaitingRoomSafetyBoard.jsx',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
     canonical: 'src/components/whiteboard/waitingRoomSafetyBoardModel.ts',
-    note: 'Operational waiting room safety table within Emergency OS whiteboard and queues surfaces',
+    note: 'Operational waiting room safety table within CareDroid whiteboard and queues surfaces',
   },
   {
     id: 'high-risk-complaint-flags',

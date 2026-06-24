@@ -1,2 +1,2 @@
-// Compatibility shim: canonical Emergency OS frontend types live in src/types/emergency.ts.
+// Compatibility shim: canonical CareDroid frontend types live in src/types/emergency.ts.
 export * from '../src/types/emergency';

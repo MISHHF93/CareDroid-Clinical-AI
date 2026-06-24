@@ -9,7 +9,7 @@ describe('frontend operating system model', () => {
   it('defines the canonical frontend shell flow', () => {
     expect(FRONTEND_OS_FLOW.map((step) => step.label)).toEqual([
       'AppShell',
-      'Emergency OS',
+      'CareDroid',
       'Whiteboard',
       'Asset Launch',
       'Workflow',
@@ -37,6 +37,6 @@ describe('frontend operating system model', () => {
     expect(state.workspaceLabel).toBe('Medical IoT');
     expect(state.currentStage.label).toBe('Workflow');
     expect(state.flowSteps.find((step) => step.id === 'workflow')?.state).toBe('current');
-    expect(state.summary).toContain('Medical IoT Emergency OS');
+    expect(state.summary).toContain('Medical IoT');
   });
 });

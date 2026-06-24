@@ -106,8 +106,8 @@ function groupBackendSurfaces(): BackendSurfaceGroup[] {
   return [
     {
       id: 'emergency-core',
-      label: 'Emergency OS Core',
-      status: 'Mounted as Emergency OS workflow',
+      label: 'CareDroid Core',
+      status: 'Mounted as CareDroid workflow',
       guidance: 'These surfaces are allowed to drive left-sidebar clinical workflows.',
       routes: routes.filter((route) => route.path.startsWith('/api/emergency/')),
     },
@@ -140,7 +140,7 @@ function groupBackendSurfaces(): BackendSurfaceGroup[] {
       id: 'platform-legacy',
       label: 'Platform, Tenant, Product, Organization',
       status: 'Legacy/platform administration',
-      guidance: 'Represented here for traceability; not promoted into Emergency OS bedside workflows.',
+      guidance: 'Represented here for traceability; not promoted into CareDroid bedside workflows.',
       routes: routes.filter((route) =>
         routeMatches(route, [
           'Platform',
@@ -239,7 +239,7 @@ export default function AIGovernanceDashboard() {
     <main style={{ padding: 24, color: '#F9FAFB', minHeight: '100%' }}>
       <header style={{ marginBottom: 24 }}>
         <p style={{ color: '#60A5FA', margin: 0, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}>
-          Emergency OS
+          CareDroid
         </p>
         <h1 style={{ margin: '6px 0 0', fontSize: 26 }}>AI Governance Dashboard</h1>
         <p style={{ color: '#9CA3AF', maxWidth: 760 }}>

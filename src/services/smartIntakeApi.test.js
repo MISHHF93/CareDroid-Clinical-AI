@@ -23,7 +23,7 @@ describe('SmartIntakeApi', () => {
     parseApiResponse.mockResolvedValue({ sessionId: 'session-1' });
   });
 
-  it('does not call optional Emergency OS runtime when Smart Intake is disabled', async () => {
+  it('does not call optional CareDroid runtime when Smart Intake is disabled', async () => {
     await expect(SmartIntakeApi.createSession('RN')).rejects.toThrow(
       'Backend Smart Intake endpoint is not available yet.'
     );

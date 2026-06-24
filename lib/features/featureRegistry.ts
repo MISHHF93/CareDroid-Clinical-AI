@@ -1,3 +1,12 @@
+import {
+  getFeatureSuiteAssignment,
+  type CareDroidSuiteId,
+  type FeatureSuiteAssignment,
+  type MaturityLabel,
+  type SuiteLayer,
+  type WhiteboardLink,
+} from './suiteRegistry';
+
 export type FeatureCategory =
   | 'clinical'
   | 'operational'
@@ -25,14 +34,28 @@ export interface Feature {
   sidebarRoute?: string;
   backendEndpoint?: string;
   relatedTools?: string[];
+  /** Normalized CareDroid suite (see lib/features/suiteRegistry.ts). */
+  suiteId?: CareDroidSuiteId;
+  suiteLayer?: SuiteLayer;
+  maturity?: MaturityLabel;
+  whiteboardLink?: WhiteboardLink;
 }
 
 type FeatureInput = Omit<Feature, 'dependencies'> & Partial<Pick<Feature, 'dependencies'>>;
 
-const feature = (definition: FeatureInput): Feature => ({
-  dependencies: [],
-  ...definition,
-});
+function applySuiteMetadata(definition: FeatureInput): Feature {
+  const assignment = getFeatureSuiteAssignment(definition.id);
+  return {
+    dependencies: [],
+    ...definition,
+    suiteId: assignment?.suiteId,
+    suiteLayer: assignment?.layer,
+    maturity: assignment?.maturity,
+    whiteboardLink: assignment?.whiteboardLink,
+  };
+}
+
+const feature = (definition: FeatureInput): Feature => applySuiteMetadata(definition);
 
 const calculator = (
   id: string,
@@ -60,7 +83,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'emergency_whiteboard',
     label: 'Emergency Whiteboard',
-    description: 'Default CareDroid Emergency OS patient-flow workspace for small ED and urgent care teams.',
+    description: 'Default CareDroid patient-flow whiteboard for ED and urgent care teams.',
     category: 'operational',
     tier: 'core',
     status: 'stable',
@@ -71,7 +94,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'emergency_patients',
     label: 'Patients',
-    description: 'Patient list and snapshots sourced from the Emergency OS journey state.',
+    description: 'Patient list and snapshots sourced from the CareDroid journey state.',
     category: 'operational',
     tier: 'core',
     status: 'stable',
@@ -88,7 +111,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'pulse',
-    sidebarRoute: '/emergency/whiteboard',
+    sidebarRoute: '/emergency/pulse',
   }),
   feature({
     id: 'smart_intake',
@@ -347,7 +370,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'emergency_analytics',
     label: 'Analytics',
-    description: 'Emergency OS throughput, safety, EMS, reassessment, and capacity trends.',
+    description: 'CareDroid throughput, safety, EMS, reassessment, and capacity trends.',
     category: 'analytics',
     tier: 'professional',
     status: 'beta',
@@ -370,8 +393,8 @@ export const FEATURE_REGISTRY: Feature[] = [
 
   feature({
     id: 'ed_copilot',
-    label: 'ED Copilot',
-    description: 'Unified Emergency OS AI assistant for decision-support chat.',
+    label: 'CareDroid Copilot',
+    description: 'Case-aware workflow copilot for human-reviewed decision support — not autonomous clinical authority.',
     category: 'ai',
     tier: 'core',
     status: 'stable',
@@ -383,7 +406,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'copilot_tool_actions',
     label: 'Copilot Tool Actions',
-    description: 'AI-triggered Emergency OS tool calls with confirmation for state changes.',
+    description: 'Copilot-triggered tool calls with human confirmation before state changes.',
     category: 'ai',
     tier: 'professional',
     status: 'beta',
@@ -504,13 +527,13 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'shift_summary',
     label: 'Shift Handoff',
-    description: 'Shift summary, handoff brief, and quality metrics for Emergency OS teams.',
+    description: 'Shift summary, handoff brief, and quality metrics for ED command teams.',
     category: 'operational',
     tier: 'core',
     status: 'stable',
     defaultEnabled: true,
     sidebarIcon: 'shift',
-    sidebarRoute: '/emergency/whiteboard',
+    sidebarRoute: '/emergency/shift',
   }),
   feature({
     id: 'audit_log',
@@ -583,7 +606,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'emergency_settings',
     label: 'Settings',
-    description: 'CareDroid Emergency OS settings, staff, thresholds, and feature controls.',
+    description: 'CareDroid settings, staff, thresholds, and feature controls.',
     category: 'admin',
     tier: 'core',
     status: 'stable',
@@ -594,7 +617,7 @@ export const FEATURE_REGISTRY: Feature[] = [
   feature({
     id: 'settings_thresholds',
     label: 'Settings Thresholds',
-    description: 'Emergency OS threshold and alert rule configuration.',
+    description: 'ED threshold and alert rule configuration.',
     category: 'admin',
     tier: 'professional',
     status: 'beta',
@@ -641,3 +664,7 @@ export const FEATURE_REGISTRY: Feature[] = [
 export const FEATURE_REGISTRY_BY_ID: Readonly<Record<string, Feature>> = Object.freeze(
   Object.fromEntries(FEATURE_REGISTRY.map((featureDefinition) => [featureDefinition.id, featureDefinition])),
 );
+
+export function getFeatureSuiteMeta(featureId: string): FeatureSuiteAssignment | undefined {
+  return getFeatureSuiteAssignment(featureId);
+}

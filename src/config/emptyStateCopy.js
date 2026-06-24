@@ -1,5 +1,5 @@
 /**
- * Centralized empty-state copy for Emergency OS operational surfaces.
+ * Centralized empty-state copy for CareDroid operational surfaces.
  * Each entry: guidance, status, nextSteps (string[]), optional action labels.
  */
 export const EMPTY_STATE_COPY = Object.freeze({
@@ -7,7 +7,7 @@ export const EMPTY_STATE_COPY = Object.freeze({
     loading: {
       title: 'Refreshing patient board',
       guidance: 'Pulling the latest patients, flags, and queue assignments.',
-      status: 'Board data is syncing from Emergency OS.',
+      status: 'Board data is syncing from CareDroid.',
       nextSteps: ['Cards will appear as soon as the refresh completes.'],
     },
     empty: {

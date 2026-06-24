@@ -164,7 +164,7 @@ export function assessDataCatalog() {
     Object.freeze({ id: 'DS-004', type: 'dataset', name: 'Audit logs', domain: 'compliance', discoverable: true }),
     Object.freeze({ id: 'ENT-001', type: 'entity', name: 'Organization', domain: 'tenant', discoverable: true }),
     Object.freeze({ id: 'ENT-002', type: 'entity', name: 'Platform asset', domain: 'catalog', discoverable: true }),
-    Object.freeze({ id: 'API-001', type: 'api', name: 'Emergency OS API', domain: 'clinical', discoverable: true, endpointCount: 24 }),
+    Object.freeze({ id: 'API-001', type: 'api', name: 'CareDroid API', domain: 'clinical', discoverable: true, endpointCount: 24 }),
     Object.freeze({ id: 'API-002', type: 'api', name: 'Platform assets API', domain: 'commercial', discoverable: true, endpointCount: 18 }),
   ]);
   const discoverable = catalog.filter((item) => item.discoverable).length;

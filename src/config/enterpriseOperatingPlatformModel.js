@@ -294,7 +294,7 @@ export function assessEnterpriseAssetRegistry(context = {}) {
     Object.freeze({ id: 'AST-002', type: 'system', name: 'Timing & results feed', zone: 'Technology', status: 'operational', lastInspection: '2026-06-10' }),
     Object.freeze({ id: 'AST-003', type: 'equipment', name: 'Starting gate A', zone: 'Racing', status: 'operational', lastInspection: '2026-06-12' }),
     Object.freeze({ id: 'AST-004', type: 'infrastructure', name: 'Track irrigation loop', zone: 'Grounds', status: 'watch', lastInspection: '2026-05-20' }),
-    Object.freeze({ id: 'AST-005', type: 'system', name: 'Emergency OS platform', zone: 'Operations', status: 'operational', lastInspection: '2026-06-15' }),
+    Object.freeze({ id: 'AST-005', type: 'system', name: 'CareDroid platform', zone: 'Operations', status: 'operational', lastInspection: '2026-06-15' }),
     Object.freeze({ id: 'AST-006', type: 'equipment', name: 'Ambulance staging cart', zone: 'Medical', status: 'operational', lastInspection: '2026-06-14' }),
   ]);
 

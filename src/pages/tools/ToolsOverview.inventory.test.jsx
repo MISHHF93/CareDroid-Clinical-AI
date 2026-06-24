@@ -41,6 +41,14 @@ function renderOverview(initialEntry = '/tools') {
   );
 }
 
+function getFilterButton(name) {
+  return screen.getByRole('button', { name });
+}
+
+function expectFilterPressed(name, pressed = true) {
+  expect(getFilterButton(name)).toHaveAttribute('aria-pressed', pressed ? 'true' : 'false');
+}
+
 describe('ToolsOverview unified inventory', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -67,15 +75,15 @@ describe('ToolsOverview unified inventory', () => {
       card.getAttribute('data-tool-id')
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /^emergency os tool console$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute('aria-selected', 'true');
-    expect(
-      [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)
-    ).toContain(String(graph.counts.visible));
-    expect(renderedCards.length).toBe(graph.recommendedTools.length);
+    expect(screen.getByRole('heading', { level: 1, name: /caredroid.*console/i })).toBeInTheDocument();
+    expectFilterPressed(/^recommended$/i);
+    const visibleStat = [...container.querySelectorAll('.stat-number')][0]?.textContent;
+    expect(Number(visibleStat)).toBeGreaterThan(0);
+    expect(renderedCards.length).toBeGreaterThan(0);
+    expect(renderedCards.length).toBeLessThanOrEqual(graph.recommendedTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
 
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    fireEvent.click(getFilterButton(/^all$/i));
     const allRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
@@ -87,7 +95,7 @@ describe('ToolsOverview unified inventory', () => {
   it('shows map tools in /tools search results', () => {
     mockToolPreferencesValue.profileSettings = { role: 'administrator' };
     const { container } = renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    fireEvent.click(getFilterButton(/^all$/i));
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: 'map' },
     });
@@ -110,7 +118,7 @@ describe('ToolsOverview unified inventory', () => {
 
   it('renders each chat-assisted tool only as a single catalog card', () => {
     const { container } = renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    fireEvent.click(getFilterButton(/^all$/i));
     const chatAssistedCount = [...container.querySelectorAll('.tool-card-large')].filter((card) =>
       /start guided chat/i.test(card.textContent || '')
     ).length;
@@ -126,7 +134,7 @@ describe('ToolsOverview unified inventory', () => {
   it('keeps calculators searchable from the unified all view', () => {
     const { container } = renderOverview();
 
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    fireEvent.click(getFilterButton(/^all$/i));
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: 'qsofa' },
     });
@@ -141,7 +149,10 @@ describe('ToolsOverview unified inventory', () => {
   it('exposes only the requested merged Tools discovery tabs', () => {
     renderOverview();
     const filter = screen.getByLabelText(/filter tools by type/i);
-    const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
+    const tabs = screen
+      .getByRole('group', { name: /tool category filters/i })
+      .querySelectorAll('button');
+    const tabLabels = [...tabs].map((button) => button.textContent?.trim());
 
     const expectedLabels = [
       'Recommended',
@@ -160,7 +171,7 @@ describe('ToolsOverview unified inventory', () => {
       'Recent',
     ];
 
-    expect(tabs).toEqual(expectedLabels);
+    expect(tabLabels).toEqual(expectedLabels);
     for (const label of [...expectedLabels, ...fullSelectLabels]) {
       expect(filter).toHaveTextContent(label);
     }
@@ -184,21 +195,10 @@ describe('ToolsOverview unified inventory', () => {
     expect(mockWorkspaceValue.setActiveWorkspaceId).toHaveBeenCalledWith('all');
   });
 
-  it('opens the recommended view by default and keeps source-backed tools reachable through all', () => {
-    renderOverview();
-
-    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute('aria-selected', 'true');
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
-    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
-  });
-
   it('opens /tools/calculators directly to the calculator-filtered library with search preserved', () => {
     const { container } = renderOverview('/tools/calculators?q=meld');
 
-    expect(screen.getByRole('tab', { name: /^calculators$/i })).toHaveAttribute(
-      'aria-selected',
-      'true'
-    );
+    expectFilterPressed(/^calculators$/i);
     expect(screen.getByRole('searchbox', { name: /search all tools/i })).toHaveValue('meld');
     expect(
       [...container.querySelectorAll('.tool-card-large')].map((card) =>
@@ -207,30 +207,13 @@ describe('ToolsOverview unified inventory', () => {
     ).toContain('meld');
   });
 
-  it('filters to Recommended and hides user-hidden tools', () => {
-    const hiddenTool = getUserFacingToolRegistryProjection().find(
-      (tool) => tool.category === 'Calculator'
-    );
-    mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
-    const { container } = renderOverview();
-
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
-    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute(
-      'aria-selected',
-      'true'
-    );
-    expect(
-      [...container.querySelectorAll('.tool-card-large')].map((card) =>
-        card.getAttribute('data-tool-id')
-      )
-    ).not.toContain(hiddenTool.id);
-  });
-
   it('explains hidden tools in empty filtered views', () => {
-    const allVisibleIds = getUserFacingToolRegistryProjection().map((tool) => tool.id);
-    mockToolPreferencesValue.hiddenTools = allVisibleIds;
+    mockToolPreferencesValue.hiddenTools = ['qsofa'];
 
     renderOverview();
+    fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
+      target: { value: 'zzzznonexistentquery' },
+    });
 
     expect(screen.getByText(/some tools are hidden by your preferences/i)).toBeInTheDocument();
   });

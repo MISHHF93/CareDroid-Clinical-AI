@@ -300,7 +300,7 @@ import {
 import EmergencySurfaceRedirect from './pages/emergency/EmergencySurfaceRedirect';
 import { shouldRedirectEmergencySurface } from './services/navigateToEmergencySurface';
 
-function RouteLoadingFallback({ label = 'Loading Emergency OS module...' }) {
+function RouteLoadingFallback({ label = 'Loading CareDroid module...' }) {
   return (
     <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
       {label}
@@ -353,9 +353,9 @@ function EmergencyAccessDenied({ requestedPath }) {
         >
           Access denied
         </span>
-        <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>Emergency OS page unavailable</h1>
+        <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>CareDroid page unavailable</h1>
         <p style={{ color: '#9CA3AF', lineHeight: 1.5 }}>
-          {emergencyRole.roleLabel} does not have access to this Emergency OS page.
+          {emergencyRole.roleLabel} does not have access to this CareDroid page.
         </p>
         <Link
           to={fallbackPath}
@@ -370,7 +370,7 @@ function EmergencyAccessDenied({ requestedPath }) {
             fontWeight: 700,
           }}
         >
-          Go to permitted Emergency OS page
+          Go to permitted CareDroid page
         </Link>
       </div>
     </section>

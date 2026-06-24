@@ -274,7 +274,7 @@ export function dischargePatientSafely(
   if (!patient) return { ok: false as const, reason: 'not_found' as const };
 
   const staffId = options.actorId || 'queue-assignment';
-  const note = options.note || 'Patient discharged from Emergency OS.';
+  const note = options.note || 'Patient discharged from CareDroid.';
 
   if (isLegalTransition(patient.state, PatientState.Discharge)) {
     try {

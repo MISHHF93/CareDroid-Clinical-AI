@@ -125,7 +125,7 @@ export default function EmergencyShiftSummaryPage() {
           <span className="shift-summary__eyebrow">Shift operations</span>
           <h1 id="shift-summary-title">Emergency Shift Summary</h1>
           <p>
-            Data-driven handoff view computed from the Emergency OS store, patient timelines,
+            Data-driven handoff view computed from the CareDroid store, patient timelines,
             referrals, alerts, capacity state, and EMS records.
           </p>
         </div>

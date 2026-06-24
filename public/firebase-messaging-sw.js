@@ -19,7 +19,7 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.messagin
 
   messaging.onBackgroundMessage((payload) => {
     const notification = payload?.notification || {};
-    const notificationTitle = notification.title || 'CareDroid-Clinical-AI notification';
+    const notificationTitle = notification.title || 'CareDroid notification';
     const notificationOptions = {
       body: notification.body,
       icon: notification.icon || '/logo.svg',

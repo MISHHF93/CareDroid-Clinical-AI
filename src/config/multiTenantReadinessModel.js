@@ -22,7 +22,7 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
   Object.freeze({
     id: 'settings-modules',
     domain: MULTI_TENANT_CONFIG_DOMAIN.SETTINGS,
-    label: 'Emergency OS modules & department settings',
+    label: 'CareDroid modules & department settings',
     intendedStorage: 'organization.settings.emergencyOs',
     actualStorage: 'organization.settings.emergencyOs + org-scoped EmergencySettingsService map',
     readPaths: [
@@ -72,7 +72,7 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
   Object.freeze({
     id: 'branding-emergency-os-copy',
     domain: MULTI_TENANT_CONFIG_DOMAIN.BRANDING,
-    label: 'Emergency OS product copy (copilot name, safety line)',
+    label: 'CareDroid product copy (copilot name, safety line)',
     intendedStorage: 'organization.settings.emergencyOs.branding',
     actualStorage: 'getOrgEmergencyBranding(emergencyOsSettings) over EMERGENCY_OS_BRANDING',
     readPaths: ['getOrgEmergencyBranding', 'EMERGENCY_OS_BRANDING fallback'],
@@ -150,7 +150,7 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
   Object.freeze({
     id: 'roles-emergency-rbac',
     domain: MULTI_TENANT_CONFIG_DOMAIN.ROLES,
-    label: 'Emergency OS role matrix (routes & actions)',
+    label: 'CareDroid role matrix (routes & actions)',
     intendedStorage: 'organization.settings.emergencyRoleOverrides',
     actualStorage: 'resolveEmergencyRoleId + hasEmergencyActionPermission with permissionsOverrides',
     readPaths: [
@@ -309,7 +309,7 @@ export function auditMultiTenantReadiness() {
     passesAudit: evaluation.passesAudit,
     conclusion: evaluation.passesAudit
       ? 'All domains are org-configurable.'
-      : 'Multi-tenant infrastructure exists but Emergency OS runtime config is not fully org-scoped.',
+      : 'Multi-tenant infrastructure exists but CareDroid runtime config is not fully org-scoped.',
   });
 }
 

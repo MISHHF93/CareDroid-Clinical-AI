@@ -9,6 +9,7 @@ import {
 } from './emergencyRoutePages';
 import {
   EmergencyRoutePage,
+  MaturityChip,
   MetricGrid,
   PatientGrid,
   isHighRisk,
@@ -29,6 +30,7 @@ describe('emergency page modules smoke', () => {
 
   it('exports shared emergency route helpers', () => {
     expect(typeof EmergencyRoutePage).toBe('function');
+    expect(typeof MaturityChip).toBe('function');
     expect(typeof MetricGrid).toBe('function');
     expect(typeof PatientGrid).toBe('function');
     expect(typeof isHighRisk).toBe('function');
