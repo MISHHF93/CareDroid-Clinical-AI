@@ -57,7 +57,7 @@ function toolMatchesComplaintRoute(
   tool: OrchestrationToolDefinition,
   complaintRoute: ComplaintRouteSnapshot | null,
 ): boolean {
-  if (!complaintRoute?.scoreIds.length) return false;
+  if (!(complaintRoute?.scoreIds?.length ?? 0)) return false;
   return complaintRoute.scoreIds.some((scoreId) => toolMatchesComplaintRouteScore(tool, scoreId));
 }
 

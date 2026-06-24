@@ -9,7 +9,7 @@ import { buildCommandCenterSurgeSnapshot } from '../../services/commandCenterSur
 import { buildDiagnosticSafetyDashboardSnapshot } from '../../services/diagnosticSafetyDashboardModel';
 import { buildDepartmentStaffBarSnapshot } from '../../services/departmentStaffBarModel';
 import { summarizeEmsAwareness } from '../../components/whiteboard/emsAwarenessModel';
-import { normalizeWhiteboardPatient } from '../../utils/patientVitals';
+import { normalizeWhiteboardPatient } from '../../services/patientArrivalBackendSync';
 
 function malformedApiPatient(overrides: Partial<Patient> = {}): Patient {
   return {

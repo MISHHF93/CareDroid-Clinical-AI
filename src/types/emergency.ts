@@ -1,4 +1,8 @@
 import type { TriageAssistEnvelope } from '../../lib/patient-orchestration/types';
+import type {
+  PatientDocumentArtifact,
+  PatientDocumentSource,
+} from './patientDocumentArtifact';
 
 export type EntityId = string;
 export type ISODateString = string;
@@ -597,6 +601,10 @@ export interface Patient {
   whiteboardAutomation?: WhiteboardAutomationSnapshot;
   /** Assigned attending / physician for role-based whiteboard automation. */
   assignedPhysicianId?: EntityId | null;
+  /** Structured, auditable extracts from patient documents and Copilot synthesis. */
+  documentArtifacts?: PatientDocumentArtifact[];
+  /** Source documents that produced patient-card artifacts. */
+  documentSources?: PatientDocumentSource[];
 }
 
 /** Fit-to-sit / fit-to-wait seating classification — human review required. */

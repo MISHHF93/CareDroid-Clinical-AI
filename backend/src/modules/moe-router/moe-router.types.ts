@@ -8,6 +8,7 @@ export const experts = [
   'gastroenterology',
   'neurology',
   'psychiatry',
+  'musculoskeletal',
   'fleet',
   'hospital-map',
   'medical-iot',

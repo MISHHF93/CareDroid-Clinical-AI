@@ -10,10 +10,10 @@ import {
   X,
 } from 'lucide-react';
 import ChatInterface from '../components/ChatInterface';
-import CommandPalette from '../components/CommandPalette.tsx';
+import CommandPalette from '../components/CommandPalette';
 import EMSCriticalBroadcast, { EMSCriticalCountdownBadge } from '../components/EMSCriticalBroadcast';
 import PediatricDrugCalculator from '../components/PediatricDrugCalculator';
-import ReassessmentDrawer from '../components/ReassessmentDrawer.tsx';
+import ReassessmentDrawer from '../components/ReassessmentDrawer';
 import { Sidebar } from '../components/Sidebar';
 import WorkloadBalancePanel from '../components/WorkloadBalancePanel';
 import { useConversation } from '../contexts/ConversationContext';

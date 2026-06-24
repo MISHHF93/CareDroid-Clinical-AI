@@ -99,6 +99,32 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: ['fleet-logistics'],
   },
   {
+    assetIds: [
+      'admission-prediction',
+      'journey-prediction',
+      'command-predictive-alerts',
+      'predictive-analytics-dashboard',
+    ],
+    category: ENTITLEMENT_CATEGORIES.AI_AGENTS,
+    featureFlagId: 'predictive-analytics-pack',
+    requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack', 'analytics-pack'],
+  },
+  {
+    assetIds: ['patient-whiteboard', 'patient-room-display', 'digital-door-sign'],
+    category: ENTITLEMENT_CATEGORIES.TOOLS,
+    featureFlagId: 'patient-experience-pack',
+    requiredPlan: SUBSCRIPTION_TIERS.FREE,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
+    assetIds: ['ems-pre-arrival', 'pre-arrival-activation', 'trauma-team-activation'],
+    category: ENTITLEMENT_CATEGORIES.TOOLS,
+    featureFlagId: 'ems-pre-arrival-pack',
+    requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
     assetIds: ['agent-clinical', 'agent-operations', 'agent-lab', 'agent-fleet', 'agent-education', 'agent-research'],
     category: ENTITLEMENT_CATEGORIES.AI_AGENTS,
     featureFlagId: 'ai-clinical-copilot',

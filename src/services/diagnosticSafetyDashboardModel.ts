@@ -1,3 +1,4 @@
+import { buildClinicalAcuityEntry } from '../../lib/native-ai/clinicalAcuityModel';
 import { calculateAnticipatedAdmissionScore } from '../engine/anticipatedAdmissionScore';
 import { latestPatientVitals } from '../utils/patientVitals';
 import {
@@ -116,11 +117,19 @@ export function buildDiagnosticSafetyDashboardSnapshot(
 
   const entries = activePatients.map((patient) => {
     const adta = calculateAnticipatedAdmissionScore({ patient });
+    const acuity = buildClinicalAcuityEntry(patient, { now: now.getTime() });
     const ruleDrivers = clinicalRuleDrivers(patient);
-    const riskDrivers = [...new Set([...ruleDrivers, ...adta.envelope.rationale.slice(0, 2)])];
+    const riskDrivers = [
+      ...new Set([
+        ...ruleDrivers,
+        ...adta.envelope.rationale.slice(0, 2),
+        `Clinical acuity score ${acuity.acuityScore}`,
+        acuity.orientation ? `Predicted orientation: ${acuity.orientation}` : null,
+      ].filter(Boolean) as string[]),
+    ];
     const riskScore = Math.min(
       100,
-      adta.score + ruleDrivers.length * 8 + (hasAbnormalVitals(patient) ? 10 : 0),
+      Math.max(acuity.acuityScore, adta.score + ruleDrivers.length * 8 + (hasAbnormalVitals(patient) ? 10 : 0)),
     );
 
     return {

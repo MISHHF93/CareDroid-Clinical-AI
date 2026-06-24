@@ -48,6 +48,8 @@ import {
   startSmartIntakeTelemetry,
 } from '../../utils/smartIntakeTelemetry';
 import { captureIntakeArtifact } from '../../services/intakeArtifactCapture';
+import useFeature from '../../hooks/useFeature';
+import { buildClientTriageAssist } from '../../services/triageAssist';
 import { mergeExtractedFieldRows } from '../../utils/intakeArtifactFields';
 import {
   getIntakeArtifact,
@@ -111,6 +113,11 @@ export default function SmartIntake({
   const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
   const patients = useEmergencyStore((state) => state.patients);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const extractAndAttachDocumentArtifacts = useEmergencyStore(
+    (state) => state.extractAndAttachDocumentArtifacts,
+  );
+  const { enabled: documentArtifactsEnabled } = useFeature('patient_document_artifacts');
+  const { enabled: nlpTriageExpertEnabled } = useFeature('nlp_triage_expert_system');
 
   const intakeParam = (key) => {
     if (intakeOptions && intakeOptions[key] != null && intakeOptions[key] !== '') {
@@ -466,6 +473,28 @@ export default function SmartIntake({
       }
       setDocumentCaptured(true);
       setActiveStepTracked(SMART_INTAKE_STEP_INDEX.match, 'document-upload');
+
+      const targetPatientId = boardPatient?.id || contextPatientId;
+      if (documentArtifactsEnabled && targetPatientId) {
+        const captureText = [captured.rawText, supplementalCaptureText].filter(Boolean).join('\n');
+        void extractAndAttachDocumentArtifacts({
+          patientId: targetPatientId,
+          documentType: captured.documentType || captured.artifactLabel,
+          sourceType:
+            captured.artifactId === 'referral'
+              ? 'referral_note'
+              : captured.artifactId === 'allergy'
+                ? 'scanned_note'
+                : captured.artifactId === 'medication'
+                  ? 'scanned_note'
+                  : 'uploaded_document',
+          rawText: captureText,
+          filename: captured.filename,
+          parser: selectedArtifact?.parser,
+          sourceState: 'extracted',
+          isAiDerived: captured.source === 'ai_assist' || captured.source === 'text_parser',
+        }).catch(() => undefined);
+      }
     } catch {
       setOcrUploadStatus('Document upload failed. Continue with manual field verification.');
     } finally {
@@ -481,17 +510,35 @@ export default function SmartIntake({
       ...event,
       patientId: patient.id,
     }));
-    addPatient(
-      {
-        ...patient,
-        vitals: Array.isArray(patient.vitals) ? patient.vitals : [patient.vitals],
-        timeline,
-      },
-      { syncToBackend: false },
-    );
+    const patientRecord = {
+      ...patient,
+      vitals: Array.isArray(patient.vitals) ? patient.vitals : [patient.vitals],
+      timeline,
+    };
+    if (nlpTriageExpertEnabled) {
+      const triageAssist = buildClientTriageAssist(patientRecord, patients, {
+        handoffSource: 'smart-intake',
+        arrivalReason: patientRecord.chiefComplaint,
+        complaintCategory: patientRecord.complaintCategory,
+      });
+      patientRecord.triageAssist = triageAssist;
+      patientRecord.triageAssistGeneratedAt = triageAssist.generatedAt;
+      patientRecord.triagePending = true;
+    }
+    addPatient(patientRecord, { syncToBackend: false });
     applyIntakeArrivalContext(store, patient.id, resolveIntakeArrivalReason());
     registerArrivalControl(patient.id, { source: 'smart-intake' });
     selectPatient(patient.id);
+    if (documentArtifactsEnabled && supplementalCaptureText.trim()) {
+      void extractAndAttachDocumentArtifacts({
+        patientId: patient.id,
+        documentType: selectedArtifact?.label || 'Intake document',
+        sourceType: 'staff_paste',
+        rawText: supplementalCaptureText,
+        sourceState: 'staff_entered',
+        isAiDerived: false,
+      }).catch(() => undefined);
+    }
     finishIntakeNavigation(patient.id);
     return patient;
   };

@@ -41,7 +41,7 @@ import { findMatchingChecklists, type Checklist } from '../config/criticalCheckl
 import CriticalChecklist from './CriticalChecklist';
 import SepsisBundleTracker from './SepsisBundleTracker';
 import StrokeCodeProtocol from './StrokeCodeProtocol';
-import WhoNextPanel from './WhoNextPanel.tsx';
+import WhoNextPanel from './WhoNextPanel';
 import ErrorBoundary from './ErrorBoundary';
 import AiTriageAssistPanel from './reception/AiTriageAssistPanel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';

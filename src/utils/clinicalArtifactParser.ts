@@ -62,7 +62,7 @@ export function parseMedicationArtifactText(text = ''): ClinicalArtifactData {
 
 export function parseAllergyArtifactText(text = ''): ClinicalArtifactData {
   const normalized = String(text || '');
-  const substance = labeled(normalized, ['allergy', 'allergen', 'substance']);
+  const substance = labeled(normalized, ['allergies', 'allergy', 'allergen', 'substance']);
   const reaction = labeled(normalized, ['reaction', 'manifestation']);
   const severity = labeled(normalized, ['severity', 'risk']);
   const combined = [substance, reaction].filter(Boolean).join(' - ');

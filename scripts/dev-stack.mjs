@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import http from 'node:http';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = resolve(rootDir, 'backend');
@@ -26,6 +27,7 @@ const args = new Set(rawArgs);
 
 const backendOnly = args.has('--backend-only') || args.has('--api-only');
 const frontendOnly = args.has('--frontend-only') || args.has('--web-only');
+const forceRestart = args.has('--force-restart');
 
 if (backendOnly && frontendOnly) {
   console.error('Choose either --backend-only or --frontend-only, not both.');
@@ -98,6 +100,7 @@ const backendEnv = withDefaults({
   REDIS_HOST: '',
   ENCRYPTION_MASTER_KEY: '0000000000000000000000000000000000000000000000000000000000000000',
   DEV_LOGIN_EMAIL: 'dev@example.com',
+  ENABLE_DEV_AUTH_BYPASS: 'true',
 });
 
 if (backendEnv.REDIS_ENABLED !== 'true') {
@@ -105,14 +108,39 @@ if (backendEnv.REDIS_ENABLED !== 'true') {
   backendEnv.REDIS_HOST = '';
 }
 
+const probeBackendHealth = (port) =>
+  new Promise((resolveProbe) => {
+    const request = http.get(
+      {
+        host: '127.0.0.1',
+        port,
+        path: '/health',
+        timeout: 1500,
+      },
+      (response) => {
+        response.resume();
+        resolveProbe(response.statusCode === 200);
+      },
+    );
+
+    request.on('timeout', () => {
+      request.destroy();
+      resolveProbe(false);
+    });
+    request.on('error', () => resolveProbe(false));
+  });
+
+const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
+
 const commands = [
-  !frontendOnly && {
-    name: 'api',
-    cwd: backendDir,
-    command: npmCommand,
-    args: ['run', 'start:dev'],
-    env: backendEnv,
-  },
+  !frontendOnly &&
+    !backendAlreadyHealthy && {
+      name: 'api',
+      cwd: backendDir,
+      command: npmCommand,
+      args: ['run', 'start:dev'],
+      env: backendEnv,
+    },
   !backendOnly && {
     name: 'web',
     cwd: rootDir,
@@ -169,7 +197,21 @@ console.log('Starting CareDroid local stack...');
 console.log(`Frontend: ${frontendOrigin}`);
 console.log(`Backend:  http://localhost:${backendPort}`);
 console.log(`Health:   http://localhost:${backendPort}/health`);
+if (backendAlreadyHealthy) {
+  console.log(
+    `Backend already healthy on port ${backendPort}; skipping API restart. Use --force-restart to start a new instance.`,
+  );
+}
 console.log('');
+
+if (!commands.length) {
+  if (backendOnly && backendAlreadyHealthy) {
+    console.log('Backend is ready. No additional processes started.');
+  } else {
+    console.error('Nothing to start.');
+  }
+  process.exit(0);
+}
 
 for (const entry of commands) {
   let child;
@@ -197,9 +239,23 @@ for (const entry of commands) {
     shutdown(1);
   });
 
-  child.on('exit', (code, signal) => {
+  child.on('exit', async (code, signal) => {
     if (stopping) return;
     const exitCode = code ?? (signal ? 1 : 0);
+
+    if (entry.name === 'api' && exitCode !== 0) {
+      const healthy = await probeBackendHealth(backendPort);
+      if (healthy) {
+        console.warn(
+          `[api] failed to bind port ${backendPort}, but an existing backend is healthy. Continuing.`,
+        );
+        if (children.every((child) => child.exitCode !== null)) {
+          return;
+        }
+        return;
+      }
+    }
+
     console.error(
       `[${entry.name}] exited${signal ? ` with signal ${signal}` : ` with code ${exitCode}`}`,
     );

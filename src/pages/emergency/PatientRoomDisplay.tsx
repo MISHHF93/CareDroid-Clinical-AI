@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PatientRoomWhiteboard from '../../components/patient-experience/PatientRoomWhiteboard';
+import PatientWhiteboard from '../../components/patient-experience/PatientWhiteboard';
 import DigitalDoorSign from '../../components/whiteboard/DigitalDoorSign';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import './PatientRoomDisplay.css';
@@ -55,7 +56,13 @@ export default function PatientRoomDisplay() {
           <DigitalDoorSign room={room} patient={patient} staff={staff} />
         </div>
       ) : null}
-      {patient ? <PatientRoomWhiteboard patient={patient} staff={staff} /> : null}
+      {patient ? (
+        mode === 'staff' ? (
+          <PatientRoomWhiteboard patient={patient} staff={staff} />
+        ) : (
+          <PatientWhiteboard patient={patient} staff={staff} />
+        )
+      ) : null}
     </section>
   );
 }

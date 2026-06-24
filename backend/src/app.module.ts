@@ -80,6 +80,7 @@ import { ProductCatalogModule } from './modules/product-catalog/product-catalog.
 import { TenantContextModule } from './modules/tenant-context/tenant-context.module';
 import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
 import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
+import { NativeAiModule } from './modules/native-ai/native-ai.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -227,6 +228,7 @@ function resolveDatabaseClient() {
     TenantContextModule,
     AutomationAuditModule,
     EmergencyOsModule,
+    NativeAiModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

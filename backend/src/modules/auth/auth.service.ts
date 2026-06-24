@@ -19,6 +19,18 @@ import {
   SubscriptionTier,
   SubscriptionStatus,
 } from '../subscriptions/entities/subscription.entity';
+import { Organization } from '../workspaces/entities/organization.entity';
+import {
+  OrganizationMembership,
+  OrganizationMembershipRole,
+} from '../organizations/entities/organization-membership.entity';
+import { Workspace, WorkspaceType } from '../workspaces/entities/workspace.entity';
+import {
+  WorkspaceMembership,
+  WorkspaceMembershipRole,
+  WorkspaceMembershipStatus,
+} from '../workspaces/entities/workspace-membership.entity';
+import { OrganizationType } from '../platform-assets/enums/platform-asset.enums';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
@@ -35,6 +47,14 @@ export class AuthService {
     private readonly oauthRepository: Repository<OAuthAccount>,
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
+    @InjectRepository(OrganizationMembership)
+    private readonly organizationMembershipRepository: Repository<OrganizationMembership>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepository: Repository<Workspace>,
+    @InjectRepository(WorkspaceMembership)
+    private readonly workspaceMembershipRepository: Repository<WorkspaceMembership>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
@@ -326,10 +346,96 @@ export class AuthService {
       metadata: { mode: 'development' },
     });
 
+    const tenantContext = await this.ensureDevTenantForUser(user);
     const tokens = await this.generateTokens(user);
     return {
       ...tokens,
       user: this.sanitizeUser(user),
+      tenantContext,
+    };
+  }
+
+  private async ensureDevTenantForUser(user: User) {
+    const DEV_ORG_SLUG = 'caredroid-dev-clinic';
+    const DEV_WORKSPACE_SLUG = 'caredroid-dev-emergency';
+
+    let organization = await this.organizationRepository.findOne({ where: { slug: DEV_ORG_SLUG } });
+    if (!organization) {
+      organization = await this.organizationRepository.save(
+        this.organizationRepository.create({
+          name: 'CareDroid Dev Clinic',
+          slug: DEV_ORG_SLUG,
+          organizationType: OrganizationType.HOSPITAL,
+          country: 'CA',
+          branding: { displayName: 'CareDroid Dev Clinic' },
+          settings: { source: 'dev-session-bootstrap' },
+        }),
+      );
+    }
+
+    let organizationMembership = await this.organizationMembershipRepository.findOne({
+      where: { organizationId: organization.id, userId: user.id },
+    });
+    if (!organizationMembership) {
+      organizationMembership = await this.organizationMembershipRepository.save(
+        this.organizationMembershipRepository.create({
+          organizationId: organization.id,
+          userId: user.id,
+          role: OrganizationMembershipRole.OWNER,
+        }),
+      );
+    }
+
+    let workspace = await this.workspaceRepository.findOne({
+      where: { slug: DEV_WORKSPACE_SLUG, organizationId: organization.id },
+    });
+    if (!workspace) {
+      workspace = await this.workspaceRepository.save(
+        this.workspaceRepository.create({
+          name: 'Emergency Operations',
+          slug: DEV_WORKSPACE_SLUG,
+          type: WorkspaceType.EMERGENCY,
+          organizationId: organization.id,
+          ownerUserId: user.id,
+        }),
+      );
+    }
+
+    let workspaceMembership = await this.workspaceMembershipRepository.findOne({
+      where: { workspaceId: workspace.id, userId: user.id },
+    });
+    if (!workspaceMembership) {
+      workspaceMembership = await this.workspaceMembershipRepository.save(
+        this.workspaceMembershipRepository.create({
+          workspaceId: workspace.id,
+          userId: user.id,
+          role: WorkspaceMembershipRole.OWNER,
+          status: WorkspaceMembershipStatus.ACTIVE,
+        }),
+      );
+    }
+
+    const profile =
+      user.profile || (await this.profileRepository.findOne({ where: { userId: user.id } }));
+    if (profile && profile.organizationId !== organization.id) {
+      profile.organizationId = organization.id;
+      await this.profileRepository.save(profile);
+    }
+
+    const subscription =
+      user.subscription ||
+      (await this.subscriptionRepository.findOne({ where: { userId: user.id } }));
+
+    return {
+      organizationId: organization.id,
+      organizationName: organization.name,
+      workspaceId: workspace.id,
+      workspaceName: workspace.name,
+      userId: user.id,
+      role: user.role,
+      subscriptionPlan: subscription?.tier || SubscriptionTier.FREE,
+      source: 'dev-session',
+      isDemoTenant: true,
     };
   }
 

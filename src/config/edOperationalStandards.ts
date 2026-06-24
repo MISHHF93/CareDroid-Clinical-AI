@@ -35,7 +35,10 @@ export type WhiteboardOperationalEventId =
   | 'critical-labs'
   | 'sepsis-alert'
   | 'fall-risk'
-  | 'adta-elevated';
+  | 'adta-elevated'
+  | 'document-review-pending'
+  | 'native-ai-routing'
+  | 'pre-triage-voice';
 
 export interface WhiteboardOperationalIcon {
   id: WhiteboardOperationalEventId;
@@ -64,6 +67,9 @@ export const WHITEBOARD_OPERATIONAL_ICONS: Record<
   'sepsis-alert': { id: 'sepsis-alert', glyph: '🦠', label: 'Sepsis', tone: 'critical', title: 'Sepsis alert active' },
   'fall-risk': { id: 'fall-risk', glyph: '⚠️', label: 'Fall risk', tone: 'warning', title: 'Fall risk precautions' },
   'adta-elevated': { id: 'adta-elevated', glyph: '📈', label: 'ADTA elevated', tone: 'warning', title: 'Anticipated admission score elevated — staff review' },
+  'document-review-pending': { id: 'document-review-pending', glyph: '📄', label: 'Doc review', tone: 'info', title: 'Patient document artifacts pending human review' },
+  'native-ai-routing': { id: 'native-ai-routing', glyph: '🧭', label: 'AI routing', tone: 'info', title: 'Native AI panel-of-experts routing active' },
+  'pre-triage-voice': { id: 'pre-triage-voice', glyph: '🎙️', label: 'Pre-triage', tone: 'warning', title: 'Voice interview pre-triage pending nurse review' },
 };
 
 export interface OperationalScoreEnvelope<T> {

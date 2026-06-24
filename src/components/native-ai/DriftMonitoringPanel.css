@@ -1,0 +1,92 @@
+.drift-monitoring-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--nai-border, rgba(148, 163, 184, 0.22));
+  border-radius: 0.6rem;
+  background: var(--nai-surface, rgba(15, 23, 42, 0.82));
+  color: var(--nai-text, #f8fafc);
+}
+
+.drift-monitoring-panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.drift-monitoring-panel__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.drift-monitoring-panel__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.drift-monitoring-panel__summary {
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.45rem;
+  font-size: 0.82rem;
+  background: color-mix(in srgb, var(--status-success, #16a34a) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-success, #16a34a) 25%, transparent);
+}
+
+.drift-monitoring-panel__summary--alert {
+  background: color-mix(in srgb, var(--status-warning, #d97706) 12%, transparent);
+  border-color: color-mix(in srgb, var(--status-warning, #d97706) 35%, transparent);
+}
+
+.drift-monitoring-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+}
+
+.drift-monitoring-panel__card {
+  padding: 0.6rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  font-size: 0.8rem;
+}
+
+.drift-monitoring-panel__card h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+}
+
+.drift-monitoring-panel__card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.drift-monitoring-panel__card li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.drift-monitoring-panel__card small {
+  color: var(--color-text-muted, #64748b);
+}
+
+.drift-monitoring-panel__policy {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.drift-monitoring-panel__alert--retrain_required strong {
+  color: var(--status-danger, #dc2626);
+}

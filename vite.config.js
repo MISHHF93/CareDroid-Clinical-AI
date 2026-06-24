@@ -132,13 +132,14 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), './src'),
+        '@lib': path.resolve(process.cwd(), './lib'),
       },
     },
     define: {
       __CARE_BUILD_INFO__: JSON.stringify(buildInfo),
     },
     esbuild: {
-      drop: ['console', 'debugger'],
+      drop: mode === 'production' ? ['console', 'debugger'] : [],
     },
     server: {
       port: frontendPort,

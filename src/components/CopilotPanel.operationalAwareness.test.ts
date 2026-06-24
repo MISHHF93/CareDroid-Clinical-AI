@@ -5,6 +5,16 @@ import { describe, expect, it } from 'vitest';
 const source = readFileSync(join(process.cwd(), 'src/components/CopilotPanel.tsx'), 'utf8');
 
 describe('Copilot operational awareness wiring', () => {
+  it('uses a tabbed Copilot shell so chat, context, and safety panels do not compete for height', () => {
+    expect(source).toContain('CopilotShell');
+    expect(source).toContain("id: 'chat', label: 'Chat'");
+    expect(source).toContain("id: 'context', label: 'Context'");
+    expect(source).toContain("id: 'safety', label: 'Safety'");
+    expect(source).toContain('chatContent={chatContent}');
+    expect(source).toContain('contextContent={contextContent}');
+    expect(source).toContain('safetyContent={safetyContent}');
+  });
+
   it('feeds central node pressure, queue, reassessment, and alert context into Copilot', () => {
     expect(source).toContain('useOperationalIntelligence({ screenMode: \'PHYSICIAN_SCREEN\' })');
     expect(source).toContain('centralSnapshot.emsPressure');

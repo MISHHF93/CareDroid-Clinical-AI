@@ -7,6 +7,7 @@ import {
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { PatientFlag, PatientState, type Patient } from '../types/emergency';
 import { postTriageAssist } from './emergencyOsApi';
+import { enrichTriageAssistWithNativeAi } from './nativeAiTriageBridge';
 
 export type TriageAssistBuildOptions = {
   arrivalReason?: string;
@@ -27,7 +28,7 @@ export function buildClientTriageAssist(
     ).length,
   });
 
-  return buildTriageAssistEnvelope(
+  const envelope = buildTriageAssistEnvelope(
     {
       ...patientInputFromEmergencyRecord(patient),
       arrivalReason: options.arrivalReason || patient.chiefComplaint,
@@ -36,6 +37,8 @@ export function buildClientTriageAssist(
     },
     { operationalContext },
   );
+
+  return enrichTriageAssistWithNativeAi(envelope, patient);
 }
 
 export async function refreshTriageAssistFromBackend(

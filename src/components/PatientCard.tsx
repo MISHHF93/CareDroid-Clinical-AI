@@ -61,6 +61,13 @@ import { hasPatientFlag, latestPatientVitals, patientFlags } from '../utils/pati
 import WhiteboardOperationalIconStrip from './whiteboard/WhiteboardOperationalIconStrip';
 import { resolveWhiteboardStateLabel } from '../services/whiteboardViewModel';
 import JourneyPredictionBadge from './predictive/JourneyPredictionBadge';
+import AdmissionProbabilityBadge from './predictive/AdmissionProbabilityBadge';
+import PatientDocumentArtifactsStrip from './patient-card/PatientDocumentArtifactsStrip';
+import NativeAiRoutingBadge from './native-ai/NativeAiRoutingBadge';
+import SpecialistInferenceBadge from './native-ai/SpecialistInferenceBadge';
+import TriageExpertBadge from './native-ai/TriageExpertBadge';
+import PostEdOrientationBadge from './predictive/PostEdOrientationBadge';
+import useFeature from '../hooks/useFeature';
 import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../services/boardingSignals';
 import './PatientCard.css';
 
@@ -335,6 +342,12 @@ function PatientCard({
   const allPatients = useEmergencyStore((store) => store.patients);
   const rooms = useEmergencyStore((store) => store.rooms);
   const workflowLogs = useEmergencyStore((store) => store.workflowLogs);
+  const { enabled: admissionPredictionEnabled } = useFeature('admission_prediction');
+  const { enabled: documentArtifactsEnabled } = useFeature('patient_document_artifacts');
+  const { enabled: nativeAiRoutingEnabled } = useFeature('native_ai_routing');
+  const { enabled: nlpTriageExpertEnabled } = useFeature('nlp_triage_expert_system');
+  const { enabled: postEdOrientationEnabled } = useFeature('post_ed_orientation');
+  const syncDocumentArtifactsFromPatient = useEmergencyStore((store) => store.syncDocumentArtifactsFromPatient);
   const patientRoom = useMemo(
     () => rooms.find((room) => room.id === patient.roomId) || null,
     [patient.roomId, rooms],
@@ -350,6 +363,13 @@ function PatientCard({
       cancelled = true;
     };
   }, [patient.id, patient.state]);
+
+  useEffect(() => {
+    if (!documentArtifactsEnabled) return;
+    if (patient.documentArtifacts?.length) return;
+    syncDocumentArtifactsFromPatient(patient.id);
+  }, [documentArtifactsEnabled, patient.documentArtifacts?.length, patient.id, syncDocumentArtifactsFromPatient]);
+
   const dataQualitySnapshot = useMemo(
     () => buildDataQualitySnapshot(allPatients),
     [allPatients],
@@ -675,7 +695,15 @@ function PatientCard({
           boardingSignals={boardingSignals}
           compact
         />
-        {workflowProfile === 'charge' || workflowProfile === 'physician' ? (
+        {admissionPredictionEnabled ? (
+          <AdmissionProbabilityBadge
+            patient={patient}
+            boardingSignals={boardingSignals}
+            consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
+            compact
+          />
+        ) : null}
+        {admissionPredictionEnabled && (workflowProfile === 'charge' || workflowProfile === 'physician') ? (
           <JourneyPredictionBadge
             patient={patient}
             boardingSignals={boardingSignals}
@@ -864,6 +892,19 @@ function PatientCard({
       </div>
 
       <PatientCardToolChips patient={patient} readOnlyDisplay={readOnlyDisplay} />
+
+      {nativeAiRoutingEnabled ? <NativeAiRoutingBadge patient={patient} compact /> : null}
+      {nativeAiRoutingEnabled ? <SpecialistInferenceBadge patient={patient} compact /> : null}
+      {nlpTriageExpertEnabled ? <TriageExpertBadge patient={patient} compact /> : null}
+      {postEdOrientationEnabled ? <PostEdOrientationBadge patient={patient} compact /> : null}
+
+      {documentArtifactsEnabled ? (
+        <PatientDocumentArtifactsStrip
+          patient={patient}
+          compact={cardDensity.variant !== 'expanded'}
+          readOnly={readOnlyDisplay}
+        />
+      ) : null}
 
       <button
         type="button"

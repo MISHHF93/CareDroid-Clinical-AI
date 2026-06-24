@@ -50,6 +50,7 @@ import {
   SmartIntakeService,
   WorkflowActionLogService,
 } from './emergency-os.services';
+import { PatientDocumentArtifactService } from './patient-document-artifact.service';
 
 @Module({
   imports: [
@@ -116,6 +117,7 @@ import {
     AICallInterrogationService,
     EdgeAIAmbulanceService,
     OrganizationalDigitalTwin,
+    PatientDocumentArtifactService,
   ],
 })
 export class EmergencyOsModule {}

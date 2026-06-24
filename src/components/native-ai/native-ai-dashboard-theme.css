@@ -1,0 +1,152 @@
+/**
+ * Dark-theme tokens for Native AI dashboard surfaces on the emergency command board.
+ * Prevents inherited light text on white card backgrounds.
+ */
+.native-ai-command-suite,
+.native-ai-command-suite .clinical-acuity-leaderboard,
+.native-ai-command-suite .drift-monitoring-panel,
+.native-ai-command-suite .ai-transparency-dashboard,
+.native-ai-command-suite .copilot-risk-layer-panel {
+  --nai-surface: rgba(15, 23, 42, 0.82);
+  --nai-surface-elevated: rgba(30, 41, 59, 0.92);
+  --nai-border: rgba(148, 163, 184, 0.22);
+  --nai-text: #f8fafc;
+  --nai-muted: #94a3b8;
+  --nai-accent: #38bdf8;
+  color: var(--nai-text);
+}
+
+.native-ai-command-suite__header h2,
+.clinical-acuity-leaderboard h3,
+.drift-monitoring-panel h3,
+.drift-monitoring-panel h4,
+.ai-transparency-dashboard__header h2,
+.ai-transparency-dashboard__routing h3,
+.copilot-risk-layer-panel header h3 {
+  color: var(--nai-text);
+  margin: 0.15rem 0 0;
+}
+
+.native-ai-command-suite__eyebrow,
+.clinical-acuity-leaderboard__eyebrow,
+.clinical-acuity-leaderboard__subtitle,
+.drift-monitoring-panel__eyebrow,
+.drift-monitoring-panel__subtitle,
+.drift-monitoring-panel__policy,
+.ai-transparency-dashboard__eyebrow,
+.ai-transparency-dashboard__subtitle,
+.copilot-risk-layer-panel__eyebrow {
+  color: var(--nai-muted);
+}
+
+.native-ai-command-suite__thresholds label {
+  color: var(--nai-muted);
+}
+
+.native-ai-command-suite__thresholds input,
+.clinical-acuity-leaderboard__row button {
+  border: 1px solid var(--nai-border);
+  border-radius: 0.4rem;
+  background: rgba(2, 6, 23, 0.55);
+  color: var(--nai-text);
+  font: inherit;
+}
+
+.clinical-acuity-leaderboard,
+.drift-monitoring-panel,
+.ai-transparency-dashboard {
+  border: 1px solid var(--nai-border);
+  border-radius: 0.75rem;
+  background: var(--nai-surface);
+}
+
+.clinical-acuity-leaderboard__row--head {
+  color: var(--nai-muted);
+}
+
+.clinical-acuity-leaderboard__row:not(.clinical-acuity-leaderboard__row--head):hover {
+  background: color-mix(in srgb, var(--nai-accent) 10%, transparent);
+}
+
+.clinical-acuity-leaderboard__row small {
+  color: var(--nai-muted);
+}
+
+.drift-monitoring-panel__card,
+.ai-transparency-dashboard__routing li,
+.ai-transparency-dashboard__record,
+.copilot-risk-layer-panel__layer {
+  border: 1px solid var(--nai-border);
+  border-radius: 0.5rem;
+  background: var(--nai-surface-elevated);
+  color: var(--nai-text);
+}
+
+.drift-monitoring-panel__header button {
+  border: 1px solid color-mix(in srgb, var(--nai-accent) 45%, var(--nai-border));
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--nai-accent) 14%, transparent);
+  color: var(--nai-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.65rem;
+}
+
+.drift-monitoring-panel__card small,
+.ai-transparency-dashboard__routing li span,
+.ai-transparency-dashboard__routing li small,
+.ai-transparency-dashboard__record p,
+.ai-transparency-dashboard__record small,
+.copilot-risk-layer-panel__layer p,
+.copilot-risk-layer-panel__layer ul,
+.copilot-risk-layer-panel__layer small {
+  color: var(--nai-muted);
+}
+
+.copilot-risk-layer-panel__layer-head span {
+  color: var(--nai-accent);
+}
+
+.copilot-risk-layer-panel__cds-detail {
+  border-top-color: var(--nai-border);
+}
+
+.native-ai-command-suite__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+}
+
+.native-ai-command-suite__status span {
+  border: 1px solid var(--nai-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  color: var(--nai-muted);
+}
+
+.native-ai-command-suite__status span[data-state='api'] {
+  border-color: color-mix(in srgb, #22c55e 40%, var(--nai-border));
+  color: #86efac;
+}
+
+.native-ai-command-suite__status span[data-state='local'] {
+  border-color: color-mix(in srgb, #f59e0b 40%, var(--nai-border));
+  color: #fcd34d;
+}
+
+.native-ai-command-suite__status span[data-state='error'] {
+  border-color: color-mix(in srgb, #ef4444 40%, var(--nai-border));
+  color: #fca5a5;
+}
+
+.ai-transparency-dashboard__empty {
+  margin: 0;
+  padding: 0.65rem;
+  border: 1px dashed var(--nai-border);
+  border-radius: 0.5rem;
+  color: var(--nai-muted);
+  font-size: 0.82rem;
+}

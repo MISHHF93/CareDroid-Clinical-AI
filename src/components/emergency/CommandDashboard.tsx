@@ -131,6 +131,85 @@ export default function CommandDashboard({
         {snapshot.bottleneckLabel}
       </p>
 
+      {snapshot.chargeNurseAlerts.length ? (
+        <section className="command-dashboard__alerts" aria-label="Charge nurse predictive alerts">
+          <div className="command-dashboard__alerts-heading">
+            <h3>Charge nurse alerts</h3>
+            <span>Based on admission probability and pre-arrival rules</span>
+          </div>
+          <ul className="command-dashboard__alert-list">
+            {snapshot.chargeNurseAlerts.map((alert) => (
+              <li key={alert}>{alert}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {snapshot.prolongedStayAlerts?.length ? (
+        <section className="command-dashboard__pending-beds" aria-label="Prolonged stay risk alerts">
+          <h3>Prolonged ED stay risk</h3>
+          <ul>
+            {snapshot.prolongedStayAlerts.map((alert) => (
+              <li key={alert.patientId}>
+                <strong>{alert.patientLabel}</strong>
+                <span>
+                  Risk {alert.probabilityPercent}% · projected {alert.predictedHours}h
+                </span>
+                <small>{alert.action}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {snapshot.orientationPredictions?.length ? (
+        <section className="command-dashboard__activations" aria-label="Post-ED orientation predictions">
+          <h3>Post-ED orientation (ML)</h3>
+          <ul>
+            {snapshot.orientationPredictions.map((prediction) => (
+              <li key={prediction.patientId}>
+                <strong>{prediction.patientLabel}</strong>
+                <span>
+                  {prediction.orientation.toUpperCase()} · {prediction.probabilityPercent}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {snapshot.pendingBedAssignments.length ? (
+        <section className="command-dashboard__pending-beds" aria-label="Pending bed assignments">
+          <h3>Pending bed assignment</h3>
+          <ul>
+            {snapshot.pendingBedAssignments.map((assignment) => (
+              <li key={assignment.patientId}>
+                <strong>{assignment.patientLabel}</strong>
+                <span>
+                  Admit score {assignment.admitScore}/10 ({assignment.probabilityPercent}%)
+                </span>
+                <small>{assignment.action}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {snapshot.resourceActivations.length ? (
+        <section className="command-dashboard__activations" aria-label="Pre-arrival resource activations">
+          <h3>Resource activations</h3>
+          <ul>
+            {snapshot.resourceActivations.map((activation) => (
+              <li key={activation.id} className={`command-dashboard__activation--${activation.severity}`}>
+                <strong>{activation.title}</strong>
+                <span>{activation.summary}</span>
+                <small>{activation.chargeNurseAction}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <div className="command-dashboard__metrics" aria-label="Department operational metrics">
         {snapshot.metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />

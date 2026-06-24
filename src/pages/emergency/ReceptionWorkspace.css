@@ -233,3 +233,15 @@
 .reception-workspace--desk-slim .reception-workspace__description {
   margin: 0;
 }
+
+.reception-workspace__native-ai {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (min-width: 960px) {
+  .reception-workspace__native-ai {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Patient } from '../types/emergency';
+import { normalizeWhiteboardPatient } from '../services/patientArrivalBackendSync';
 import {
   asPatientVitalsArray,
   hasPatientFlag,
   latestPatientVitals,
   normalizePatientVitals,
-  normalizeWhiteboardPatient,
 } from './patientVitals';
 
 describe('patientVitals', () => {

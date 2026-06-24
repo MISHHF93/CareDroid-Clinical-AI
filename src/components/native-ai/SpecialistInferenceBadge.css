@@ -1,0 +1,32 @@
+.specialist-inference-badge {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary, #2563eb) 25%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #2563eb) 8%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.specialist-inference-badge__label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.65rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.specialist-inference-badge__value {
+  font-weight: 600;
+}
+
+.specialist-inference-badge__meta {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.65rem;
+}
+
+.specialist-inference-badge--compact {
+  padding: 0.15rem 0.35rem;
+}

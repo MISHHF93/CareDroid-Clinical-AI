@@ -1,0 +1,30 @@
+.native-ai-routing-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.4rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent, #2563eb) 35%, transparent);
+  background: color-mix(in srgb, var(--color-accent, #2563eb) 8%, transparent);
+  font-size: 0.72rem;
+}
+
+.native-ai-routing-badge--compact {
+  font-size: 0.66rem;
+}
+
+.native-ai-routing-badge__label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-accent, #2563eb);
+}
+
+.native-ai-routing-badge__value {
+  color: var(--color-text-primary, #0f172a);
+}
+
+.native-ai-routing-badge__meta {
+  color: var(--color-text-muted, #64748b);
+}

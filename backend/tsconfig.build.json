@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "outDir": "./dist"
+  },
+  "include": [
+    "src/**/*",
+    "../lib/**/*",
+    "../src/lib/ai/**/*",
+    "../src/types/**/*",
+    "../types/**/*",
+    "../src/config/user-profile-catalog.data.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "../lib/**/*.test.ts",
+    "../src/store/**/*",
+    "../src/components/**/*",
+    "../src/pages/**/*",
+    "../src/hooks/**/*",
+    "../src/services/**/*",
+    "../src/utils/**/*",
+    "../src/engine/**/*",
+    "../engine/**/*",
+    "../store/**/*"
+  ]
+}

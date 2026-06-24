@@ -34,7 +34,15 @@ function mergeOrchestrationContexts(
     ...local,
     sourceState: remote.sourceState === 'live' ? 'live' : local.sourceState,
     blockedReasons: { ...remote.blockedReasons, ...local.blockedReasons },
-    workflowActions: local.workflowActions.length ? local.workflowActions : remote.workflowActions,
+    workflowActions: local.workflowActions.length ? local.workflowActions : remote.workflowActions ?? [],
+    prioritizedRecommendations:
+      remote.prioritizedRecommendations?.length
+        ? remote.prioritizedRecommendations
+        : local.prioritizedRecommendations ?? [],
+    secondaryRecommendations:
+      remote.secondaryRecommendations?.length
+        ? remote.secondaryRecommendations
+        : local.secondaryRecommendations ?? [],
   };
 }
 

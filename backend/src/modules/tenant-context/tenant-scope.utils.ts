@@ -75,5 +75,8 @@ export function isTenantBootstrapPath(request: TenantContextRequest): boolean {
     return true;
   }
 
+  // Native AI routes are stateless lib computations and do not require tenant scoping.
+  if (path.startsWith('/api/native-ai')) return true;
+
   return false;
 }

@@ -10,17 +10,17 @@ export function formatPatientOrchestrationForCopilot(
 export function formatPatientToolRecommendationsForCopilot(
   context: PatientCardOrchestrationContext | null | undefined,
 ): string {
-  if (!context?.prioritizedRecommendations.length) {
+  const prioritized = context?.prioritizedRecommendations ?? [];
+  const secondary = context?.secondaryRecommendations ?? [];
+  if (!prioritized.length) {
     return 'No patient-specific tool recommendations for this case.';
   }
   return [
     'Patient-card tool recommendations (staff must confirm):',
-    ...context.prioritizedRecommendations.map(
+    ...prioritized.map(
       (rec) =>
         `- ${rec.label} [${rec.launchKind}]: ${rec.reason}${rec.completed ? ' (already documented)' : ''}`,
     ),
-    ...context.secondaryRecommendations.slice(0, 4).map(
-      (rec) => `- Secondary: ${rec.label}: ${rec.reason}`,
-    ),
+    ...secondary.slice(0, 4).map((rec) => `- Secondary: ${rec.label}: ${rec.reason}`),
   ].join('\n');
 }

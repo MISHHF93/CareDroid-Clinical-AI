@@ -22,7 +22,7 @@ describe('buildCopilotPatientArtifactContext', () => {
       notes: [
         {
           id: 'n1',
-          content: 'Pain worsening after meals',
+          text: 'Pain worsening after meals',
           createdAt: '2026-06-24T08:12:00.000Z',
           authorStaffId: 's1',
         },
@@ -34,5 +34,85 @@ describe('buildCopilotPatientArtifactContext', () => {
     expect(context?.demographics).toEqual({ age: 35, sex: 'F', dob: '1990-01-01' });
     expect(context?.recentNotes).toHaveLength(1);
     expect(context?.recentNotes?.[0]?.content).toContain('Pain worsening');
+  });
+
+  it('includes native AI routing and specialist inference context', () => {
+    const patient: Patient = {
+      id: 'p-ai',
+      mrn: 'ED-AI',
+      firstName: 'Alex',
+      lastName: 'Kim',
+      dob: '1960-01-01',
+      age: 66,
+      sex: 'M',
+      arrivalTime: '2026-06-24T08:00:00.000Z',
+      chiefComplaint: 'Chest pain radiating to left arm',
+      complaintCategory: 'Cardiac',
+      state: PatientState.Triage,
+      priority: Priority.P3,
+      vitals: [{ hr: 104, sbp: 88, spo2: 95, recordedAt: '2026-06-24T08:05:00.000Z' }],
+      flags: [],
+      notes: [],
+      timeline: [],
+    };
+
+    const context = buildCopilotPatientArtifactContext(patient, null);
+    expect(context?.nativeAi?.routing?.specialists).toContain('cardiac_vascular');
+    expect(context?.nativeAi?.specialistInferences?.length).toBeGreaterThan(0);
+    expect(context?.nativeAi?.admissionMl).toBeTruthy();
+  });
+
+  it('includes document artifact summary when patient has artifacts', () => {
+    const patient: Patient = {
+      id: 'p-doc',
+      mrn: 'ED-DOC',
+      firstName: 'Riley',
+      lastName: 'Ng',
+      dob: '1978-02-02',
+      age: 48,
+      sex: 'M',
+      arrivalTime: '2026-06-24T08:00:00.000Z',
+      chiefComplaint: 'Chest pain',
+      complaintCategory: 'Cardiac',
+      state: PatientState.Assessment,
+      priority: Priority.P2,
+      vitals: [],
+      flags: [],
+      notes: [],
+      timeline: [],
+      documentArtifacts: [
+        {
+          id: 'a1',
+          patientId: 'p-doc',
+          patientCardId: 'p-doc',
+          artifactType: 'ALLERGY',
+          clinicalStatus: 'suggested',
+          reviewStatus: 'pending_human_review',
+          label: 'Penicillin allergy',
+          value: { substance: 'penicillin' },
+          confidence: 0.86,
+          provenance: {
+            sourceType: 'referral_note',
+            sourceSystem: 'uploaded_document',
+            extractedBy: 'CareDroid Copilot',
+            modelVersion: 'document-extractor-v1',
+            extractedAt: '2026-06-24T12:00:00.000Z',
+          },
+          safety: {
+            isAiDerived: true,
+            requiresHumanReview: true,
+            mayAffectClinicalWorkflow: true,
+          },
+          visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
+          sourceState: 'extracted',
+          createdAt: '2026-06-24T12:00:00.000Z',
+          updatedAt: '2026-06-24T12:00:00.000Z',
+        },
+      ],
+    };
+
+    const context = buildCopilotPatientArtifactContext(patient, null);
+    expect(context?.documentArtifacts).toBeTruthy();
+    expect((context?.documentArtifacts as { pendingReviewCount?: number })?.pendingReviewCount).toBe(1);
   });
 });

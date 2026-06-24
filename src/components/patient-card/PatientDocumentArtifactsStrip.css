@@ -1,0 +1,98 @@
+.patient-doc-artifacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--color-surface-elevated, #f8fafc) 88%, var(--color-accent, #2563eb) 12%);
+  border: 1px solid color-mix(in srgb, var(--color-border, #cbd5e1) 80%, transparent);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.patient-doc-artifacts--compact {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+.patient-doc-artifacts__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.patient-doc-artifacts__section--copilot {
+  border-top: 1px dashed color-mix(in srgb, var(--color-border, #cbd5e1) 70%, transparent);
+  padding-top: 0.35rem;
+}
+
+.patient-doc-artifacts__heading {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #64748b);
+}
+
+.patient-doc-artifacts__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.patient-doc-artifacts__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.35rem;
+}
+
+.patient-doc-artifacts__type {
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+}
+
+.patient-doc-artifacts__label {
+  color: var(--color-text-primary, #0f172a);
+}
+
+.patient-doc-artifacts__status {
+  color: var(--color-text-muted, #64748b);
+}
+
+.patient-doc-artifacts__status--pending {
+  color: var(--status-warning, #d97706);
+}
+
+.patient-doc-artifacts__status--confirmed {
+  color: var(--status-success, #059669);
+}
+
+.patient-doc-artifacts__accept {
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--status-success, #059669) 45%, transparent);
+  background: transparent;
+  color: var(--status-success, #059669);
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.patient-doc-artifacts__accept:hover {
+  background: color-mix(in srgb, var(--status-success, #059669) 12%, transparent);
+}
+
+.patient-doc-artifacts__advisory {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--status-warning, #d97706);
+  border: 1px solid color-mix(in srgb, var(--status-warning, #d97706) 35%, transparent);
+  border-radius: 0.25rem;
+  padding: 0 0.25rem;
+}

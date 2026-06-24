@@ -1,0 +1,155 @@
+import type { ModelMaturityLabel, ModelPerformanceSnapshot } from './types';
+
+export type RegisteredNativeAiModel = {
+  id: string;
+  label: string;
+  version: string;
+  domain: string;
+  algorithm: 'xgboost' | 'random_forest' | 'logistic_regression' | 'rules' | 'router' | 'nlp_hybrid';
+  status: 'active' | 'shadow' | 'deprecated' | 'rollback_candidate';
+  maturity: ModelMaturityLabel;
+  metrics: {
+    f1?: number;
+    accuracy?: number;
+    auc?: number;
+  };
+  deployedAt: string;
+  rollbackVersion?: string;
+  requiresHumanReview: true;
+};
+
+const REGISTRY: RegisteredNativeAiModel[] = [
+  {
+    id: 'native-ai-router',
+    label: 'Panel-of-Experts Router',
+    version: '1.0.0',
+    domain: 'routing',
+    algorithm: 'router',
+    status: 'active',
+    maturity: 'live',
+    metrics: { f1: 0.82, accuracy: 0.86 },
+    deployedAt: '2026-01-15T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'post-ed-orientation',
+    label: 'Post-ED Orientation Classifier',
+    version: '1.0.0',
+    domain: 'disposition',
+    algorithm: 'xgboost',
+    status: 'active',
+    maturity: 'demo',
+    metrics: { accuracy: 0.68, f1: 0.61 },
+    deployedAt: '2026-03-01T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'prolonged-stay',
+    label: 'Prolonged ED Stay Predictor',
+    version: '1.0.0',
+    domain: 'operations',
+    algorithm: 'xgboost',
+    status: 'active',
+    maturity: 'demo',
+    metrics: { accuracy: 0.71, auc: 0.74 },
+    deployedAt: '2026-03-01T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'admission-likelihood',
+    label: 'Admission Likelihood Classifier',
+    version: '1.0.0',
+    domain: 'operations',
+    algorithm: 'xgboost',
+    status: 'active',
+    maturity: 'demo',
+    metrics: { accuracy: 0.73, f1: 0.67 },
+    deployedAt: '2026-03-01T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'nlp-triage-expert',
+    label: 'NLP-augmented Triage Expert System',
+    version: '1.0.0',
+    domain: 'triage',
+    algorithm: 'nlp_hybrid',
+    status: 'active',
+    maturity: 'live',
+    metrics: { f1: 0.79 },
+    deployedAt: '2026-02-01T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'multi-channel-text',
+    label: 'Multi-Channel Clinical Text Extractor',
+    version: '1.0.0',
+    domain: 'copilot',
+    algorithm: 'nlp_hybrid',
+    status: 'shadow',
+    maturity: 'demo',
+    metrics: { f1: 0.76 },
+    deployedAt: '2026-04-01T00:00:00.000Z',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'native-ai-cardiac-vascular-v1',
+    label: 'Cardiac-Vascular Domain Specialist',
+    version: '1.0.0',
+    domain: 'cardiac_vascular',
+    algorithm: 'nlp_hybrid',
+    status: 'active',
+    maturity: 'live',
+    metrics: { f1: 0.81, accuracy: 0.84 },
+    deployedAt: '2026-02-15T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+  {
+    id: 'native-ai-pulmonary-v1',
+    label: 'Pulmonary Domain Specialist',
+    version: '1.0.0',
+    domain: 'pulmonary',
+    algorithm: 'nlp_hybrid',
+    status: 'active',
+    maturity: 'live',
+    metrics: { f1: 0.78, accuracy: 0.82 },
+    deployedAt: '2026-02-15T00:00:00.000Z',
+    rollbackVersion: '0.9.0',
+    requiresHumanReview: true,
+  },
+];
+
+export function listRegisteredModels(): RegisteredNativeAiModel[] {
+  return REGISTRY.map((model) => ({ ...model }));
+}
+
+export function getRegisteredModel(modelId: string): RegisteredNativeAiModel | null {
+  return REGISTRY.find((model) => model.id === modelId) || null;
+}
+
+export function getActiveModelVersion(modelId: string): string | null {
+  return getRegisteredModel(modelId)?.version || null;
+}
+
+export function proposeModelRollback(modelId: string): RegisteredNativeAiModel | null {
+  const model = getRegisteredModel(modelId);
+  if (!model?.rollbackVersion) return null;
+  return {
+    ...model,
+    version: model.rollbackVersion,
+    status: 'rollback_candidate',
+  };
+}
+
+export function recordModelPerformance(snapshot: ModelPerformanceSnapshot): void {
+  const model = REGISTRY.find((entry) => entry.id === snapshot.modelId);
+  if (!model) return;
+  if (snapshot.metric === 'f1') model.metrics.f1 = snapshot.value;
+  if (snapshot.metric === 'accuracy') model.metrics.accuracy = snapshot.value;
+  if (snapshot.metric === 'auc') model.metrics.auc = snapshot.value;
+}

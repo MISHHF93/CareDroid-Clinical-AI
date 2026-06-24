@@ -1,0 +1,27 @@
+.triage-expert-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.4rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--status-warning, #d97706) 40%, transparent);
+  background: color-mix(in srgb, var(--status-warning, #d97706) 10%, transparent);
+  font-size: 0.72rem;
+  color: var(--color-text-primary, #0f172a);
+}
+
+.triage-expert-badge--compact {
+  font-size: 0.66rem;
+}
+
+.triage-expert-badge small {
+  color: var(--color-text-muted, #64748b);
+}
+
+.triage-expert-badge__review {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--status-warning, #d97706);
+}

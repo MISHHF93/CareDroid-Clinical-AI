@@ -123,4 +123,22 @@ describe('operationalCommandDashboardModel', () => {
     expect(snapshot.zoneOccupancy.length).toBeGreaterThan(0);
     expect(snapshot.summaryLine).toContain('4 total');
   });
+
+  it('surfaces pending bed assignment alerts when admission probability is elevated', () => {
+    const patients = [
+      patient({
+        id: 'admit-1',
+        state: PatientState.Admission,
+        priority: Priority.P1,
+        chiefComplaint: 'Stroke',
+        flags: [PatientFlag.PendingAdmission],
+        age: 80,
+      }),
+    ];
+
+    const snapshot = buildOperationalCommandDashboardSnapshot({ patients, rooms });
+    expect(snapshot.metrics.find((metric) => metric.id === 'pending-bed-assignment')?.value).toBeGreaterThan(0);
+    expect(snapshot.pendingBedAssignments.length).toBeGreaterThan(0);
+    expect(snapshot.chargeNurseAlerts[0]).toContain('pending bed assignment');
+  });
 });

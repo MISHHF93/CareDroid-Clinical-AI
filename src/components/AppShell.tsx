@@ -9,6 +9,7 @@ import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
 import { probeBackendReachability } from '../services/backendReachability';
+import { ensureDevBackendSession } from '../services/devBackendAuth';
 import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
 import { CANONICAL_ROUTES } from '../config/routes.config';
@@ -243,6 +244,7 @@ export function AppShell({ children }: AppShellProps) {
 
     bootstrapAiPlatformIntegrations();
     void (async () => {
+      await ensureDevBackendSession();
       await probeBackendReachability({ force: true });
       await useEmergencyStore.getState().initializeFromBackend();
       useEmergencyStore.getState().updateAlerts();

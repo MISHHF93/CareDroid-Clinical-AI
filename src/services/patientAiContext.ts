@@ -1,5 +1,7 @@
 import type { PatientCardOrchestrationContext } from '../../lib/patient-orchestration';
 import type { Patient } from '../types/emergency';
+import { summarizeArtifactsForCopilot } from './patientDocumentArtifactModel';
+import { buildNativeAiPatientSnapshot, formatRoutingLabel } from './nativeAiCore';
 import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
 import { latestPatientVitals } from '../utils/patientVitals';
 
@@ -53,7 +55,7 @@ export function buildCopilotPatientArtifactContext(
           complaintRoute: orchestration.complaintRoute?.complaint || null,
           scoresMissing: orchestration.scoresMissing,
           scoresCompleted: orchestration.scoresCompleted,
-          recommendations: orchestration.prioritizedRecommendations.map((rec) => ({
+          recommendations: (orchestration.prioritizedRecommendations ?? []).map((rec) => ({
             toolId: rec.toolId,
             label: rec.label,
             launchKind: rec.launchKind,
@@ -62,6 +64,34 @@ export function buildCopilotPatientArtifactContext(
           })),
         }
       : null,
+    documentArtifacts: patient.documentArtifacts?.length
+      ? summarizeArtifactsForCopilot(patient.documentArtifacts)
+      : null,
+    nativeAi: (() => {
+      const snapshot = buildNativeAiPatientSnapshot(patient);
+      return {
+        routing: {
+          specialists: snapshot.routing.specialistDomains,
+          label: formatRoutingLabel(snapshot.routing),
+          confidence: snapshot.routing.confidence,
+          keySignals: snapshot.routing.keySignals,
+          sourceState: snapshot.sourceState,
+        },
+        specialistInferences: (snapshot.specialistInferences ?? []).map((inference) => ({
+          domain: inference.domainId,
+          label: inference.specialistLabel,
+          prediction: inference.prediction,
+          confidence: inference.confidence,
+          keyPredictors: inference.keyPredictors,
+          recommendedTools: inference.recommendedTools,
+        })),
+        triageInference: snapshot.triageInference,
+        orientation: snapshot.orientation,
+        prolongedStay: snapshot.prolongedStay,
+        admissionMl: snapshot.admissionMl,
+        textFeatures: (snapshot.textFeatures.fusedFeatures ?? []).slice(0, 6),
+      };
+    })(),
   };
 }
 

@@ -36,6 +36,10 @@ import {
 } from '../../lib/patient-orchestration';
 import { launchOrchestrationRecommendation } from '../services/orchestrationToolLaunch';
 import { buildCopilotPatientArtifactContext } from '../services/patientAiContext';
+import CopilotRiskLayerPanel from './copilot/CopilotRiskLayerPanel';
+import AiTransparencyDashboard from './copilot/AiTransparencyDashboard';
+import CopilotShell, { type CopilotShellTab } from './copilot/CopilotShell';
+import useFeature from '../hooks/useFeature';
 
 type CopilotMessage = {
   id: string;
@@ -294,8 +298,8 @@ function buildDepartmentPrompt({
     'Operational intelligence snapshot:',
     `- Mode: ${intelligenceSnapshot.mode}`,
     `- Data freshness: ${intelligenceSnapshot.dataFreshness.status}`,
-    `- Anomalies: ${intelligenceSnapshot.anomalies.length}`,
-    `- Advisory recommendations: ${intelligenceSnapshot.recommendations.map((rec) => `${rec.action} (${rec.route || 'no route'})`).join('; ') || 'None'}`,
+    `- Anomalies: ${(intelligenceSnapshot.anomalies ?? []).length}`,
+    `- Advisory recommendations: ${(intelligenceSnapshot.recommendations ?? []).map((rec) => `${rec.action} (${rec.route || 'no route'})`).join('; ') || 'None'}`,
     `- ${intelligenceSnapshot.disclaimers.operational}`,
     `- ${intelligenceSnapshot.disclaimers.clinical}`,
     selectedPatient?.triageAssist
@@ -305,7 +309,7 @@ function buildDepartmentPrompt({
           `- Patient: ${summarizePatient(selectedPatient)}`,
           `- Suggested priority: ${selectedPatient.triageAssist.suggestedPriority}`,
           `- Suggested queue: ${selectedPatient.triageAssist.suggestedQueue}`,
-          `- Rationale: ${selectedPatient.triageAssist.rationale.join(' | ')}`,
+          `- Rationale: ${(selectedPatient.triageAssist.rationale ?? []).join(' | ') || 'Not recorded'}`,
           `- ${selectedPatient.triageAssist.disclaimers?.[0] || HUMAN_REVIEW_DISCLAIMER}`,
         ].join('\n')
       : null,
@@ -441,6 +445,7 @@ export function CopilotPanel() {
   const [composerStatus, setComposerStatus] = useState('');
   const [voiceListening, setVoiceListening] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<CopilotShellTab>('chat');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const speechRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -468,6 +473,7 @@ export function CopilotPanel() {
     [patients, selectedPatientId],
   );
   const patientOrchestration = usePatientOrchestration(selectedPatient);
+  const { enabled: aiTransparencyEnabled } = useFeature('ai_transparency_dashboard');
   const patientOrchestrationPrompt = useMemo(
     () => formatPatientOrchestrationForCopilot(patientOrchestration),
     [patientOrchestration],
@@ -869,152 +875,167 @@ export function CopilotPanel() {
     window.dispatchEvent(new CustomEvent(action.eventName, { detail: action.detail }));
   };
 
-  return (
-    <aside className="ed-copilot-panel">
-      <header className="ed-copilot-panel__header">
-        <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
-        <div className="ed-copilot-panel__identity">
-          <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
-          <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
+  const contextBadgeCount = copilotRecommendations.length + (selectedPatient ? 1 : 0);
+  const safetyBadgeCount = (selectedPatient ? 1 : 0) + (aiTransparencyEnabled && selectedPatient ? 1 : 0);
+
+  const copilotHeader = (
+    <header className="ed-copilot-panel__header">
+      <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
+      <div className="ed-copilot-panel__identity">
+        <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
+        <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
+      </div>
+      <div className="ed-copilot-panel__status-strip" aria-label="Copilot context snapshot">
+        {[activePatients.length, capacity?.band ?? '—', reassessmentCount].map((value, index) => (
+          <span key={`${value}-${index}`}>{value}</span>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => setCopilotOpen(false)}
+        aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
+        className="ed-copilot-panel__close"
+      >
+        X
+      </button>
+    </header>
+  );
+
+  const chatContent = (
+    <div
+      aria-label={`${EMERGENCY_OS_BRANDING.copilotName} messages`}
+      className="ed-copilot-panel__messages"
+    >
+      {backendSafetyRule || backendCopilot.error ? (
+        <div
+          role="status"
+          className="ed-copilot-panel__policy"
+          data-state={backendCopilot.error ? 'error' : 'policy'}
+        >
+          {backendCopilot.error
+            ? `${EMERGENCY_OS_BRANDING.copilotName} backend context unavailable; using local board state.`
+            : `Backend safety policy: ${backendSafetyRule}`}
         </div>
-        <div className="ed-copilot-panel__status-strip" aria-label="Copilot context snapshot">
-          {[activePatients.length, capacity.band, reassessmentCount].map((value, index) => (
-            <span
-              key={`${value}-${index}`}
-            >
-              {value}
-            </span>
+      ) : null}
+      {messages.map((message) => (
+        <div key={message.id} className="ed-copilot-panel__message" data-role={message.role}>
+          <div className="ed-copilot-panel__bubble">
+            {message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)}
+            {message.attachments?.length ? (
+              <div className="ed-copilot-panel__message-attachments">
+                {message.attachments.map((attachment) => (
+                  <span key={attachment.id}>
+                    Image: {attachment.name} · {attachmentSizeLabel(attachment.size)}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <time>
+            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </time>
+        </div>
+      ))}
+      {!messages.length && !loading ? (
+        <OperationalEmptyState
+          size="inline"
+          icon="💬"
+          title={EMPTY_STATE_COPY.copilot.noMessages.title}
+          guidance={EMPTY_STATE_COPY.copilot.noMessages.guidance}
+          status={EMPTY_STATE_COPY.copilot.noMessages.status}
+          nextSteps={EMPTY_STATE_COPY.copilot.noMessages.nextSteps}
+          actions={EMPTY_STATE_COPY.copilot.noMessages.nextSteps.map((prompt) => (
+            <OperationalEmptyAction key={prompt} secondary onClick={() => sendQuickAction(prompt)}>
+              {prompt}
+            </OperationalEmptyAction>
+          ))}
+        />
+      ) : null}
+      {loading && messages[messages.length - 1]?.content ? (
+        <div style={{ alignSelf: 'flex-start' }}>
+          <TypingIndicator />
+        </div>
+      ) : null}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+
+  const contextContent = (
+    <>
+      {selectedPatient && patientOrchestration ? (
+        <section aria-label="Selected patient case tools" className="ed-copilot-panel__awareness">
+          <strong>
+            Case tools · {selectedPatient.firstName} {selectedPatient.lastName}
+          </strong>
+          <p className="ed-copilot-panel__recommendations-empty">
+            Stage: {patientOrchestration.operationalStage}
+            {patientOrchestration.complaintRoute
+              ? ` · ${patientOrchestration.complaintRoute.complaint}`
+              : ''}
+          </p>
+        </section>
+      ) : null}
+      <section aria-label="Copilot operational awareness" className="ed-copilot-panel__awareness">
+        <strong>Priority actions</strong>
+        {copilotRecommendations.length ? (
+          <div className="ed-copilot-panel__recommendations" aria-label="Copilot recommendations">
+            {copilotRecommendations.map((recommendation) => (
+              <button
+                key={recommendation.id}
+                type="button"
+                className="ed-copilot-panel__recommendation"
+                data-domain={recommendation.domain}
+                data-severity={recommendation.severity}
+                onClick={() => openRecommendation(recommendation.route)}
+                disabled={loading}
+              >
+                <span>{recommendation.domain}</span>
+                <strong>{recommendation.action}</strong>
+                <small>{recommendation.detail}</small>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="ed-copilot-panel__recommendations-empty">
+            No queue, capacity, boarding, or reassessment actions flagged.
+          </p>
+        )}
+        <div className="ed-copilot-panel__awareness-grid">
+          {awarenessCards.map((card) => (
+            <div key={card.label} className="ed-copilot-panel__awareness-card">
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <small>{card.detail}</small>
+            </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => setCopilotOpen(false)}
-          aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
-          className="ed-copilot-panel__close"
-        >
-          X
-        </button>
-      </header>
+      </section>
+    </>
+  );
 
-      <div
-        aria-label={`${EMERGENCY_OS_BRANDING.copilotName} messages`}
-        className="ed-copilot-panel__messages"
-      >
-        {backendSafetyRule || backendCopilot.error ? (
-          <div
-            role="status"
-            className="ed-copilot-panel__policy"
-            data-state={backendCopilot.error ? 'error' : 'policy'}
-          >
-            {backendCopilot.error
-              ? `${EMERGENCY_OS_BRANDING.copilotName} backend context unavailable; using local board state.`
-              : `Backend safety policy: ${backendSafetyRule}`}
-          </div>
-        ) : null}
-        {selectedPatient && patientOrchestration ? (
-          <section
-            aria-label="Selected patient case tools"
-            className="ed-copilot-panel__awareness"
-          >
-            <strong>
-              Case tools · {selectedPatient.firstName} {selectedPatient.lastName}
-            </strong>
-            <p className="ed-copilot-panel__recommendations-empty">
-              Stage: {patientOrchestration.operationalStage}
-              {patientOrchestration.complaintRoute
-                ? ` · ${patientOrchestration.complaintRoute.complaint}`
-                : ''}
-            </p>
-          </section>
-        ) : null}
-        <section
-          aria-label="Copilot operational awareness"
-          className="ed-copilot-panel__awareness"
-        >
-          <strong>Priority actions</strong>
-          {copilotRecommendations.length ? (
-            <div className="ed-copilot-panel__recommendations" aria-label="Copilot recommendations">
-              {copilotRecommendations.map((recommendation) => (
-                <button
-                  key={recommendation.id}
-                  type="button"
-                  className="ed-copilot-panel__recommendation"
-                  data-domain={recommendation.domain}
-                  data-severity={recommendation.severity}
-                  onClick={() => openRecommendation(recommendation.route)}
-                  disabled={loading}
-                >
-                  <span>{recommendation.domain}</span>
-                  <strong>{recommendation.action}</strong>
-                  <small>{recommendation.detail}</small>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="ed-copilot-panel__recommendations-empty">
-              No queue, capacity, boarding, or reassessment actions flagged.
-            </p>
-          )}
-          <div className="ed-copilot-panel__awareness-grid">
-            {awarenessCards.map((card) => (
-              <div key={card.label} className="ed-copilot-panel__awareness-card">
-                <span>{card.label}</span>
-                <strong>{card.value}</strong>
-                <small>{card.detail}</small>
-              </div>
-            ))}
-          </div>
-        </section>
-        {messages.map((message) => {
-          return (
-            <div
-              key={message.id}
-              className="ed-copilot-panel__message"
-              data-role={message.role}
-            >
-              <div
-                className="ed-copilot-panel__bubble"
-              >
-                {message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)}
-                {message.attachments?.length ? (
-                  <div className="ed-copilot-panel__message-attachments">
-                    {message.attachments.map((attachment) => (
-                      <span key={attachment.id}>
-                        Image: {attachment.name} · {attachmentSizeLabel(attachment.size)}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-              <time>
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </time>
-            </div>
-          );
-        })}
-        {!messages.length && !loading ? (
-          <OperationalEmptyState
-            size="inline"
-            icon="💬"
-            title={EMPTY_STATE_COPY.copilot.noMessages.title}
-            guidance={EMPTY_STATE_COPY.copilot.noMessages.guidance}
-            status={EMPTY_STATE_COPY.copilot.noMessages.status}
-            nextSteps={EMPTY_STATE_COPY.copilot.noMessages.nextSteps}
-            actions={EMPTY_STATE_COPY.copilot.noMessages.nextSteps.map((prompt) => (
-              <OperationalEmptyAction key={prompt} secondary onClick={() => sendQuickAction(prompt)}>
-                {prompt}
-              </OperationalEmptyAction>
-            ))}
-          />
-        ) : null}
-        {loading && messages[messages.length - 1]?.content ? (
-          <div style={{ alignSelf: 'flex-start' }}>
-            <TypingIndicator />
-          </div>
-        ) : null}
-        <div ref={messagesEndRef} />
-      </div>
+  const safetyContent = (
+    <>
+      <CopilotRiskLayerPanel
+        activeLayerId="clinical_decision_support"
+        patient={selectedPatient}
+        className="ed-copilot-panel__risk-layers"
+      />
+      {aiTransparencyEnabled && selectedPatient ? (
+        <AiTransparencyDashboard
+          patients={[selectedPatient]}
+          compact
+          className="ed-copilot-panel__transparency"
+        />
+      ) : (
+        <p className="ed-copilot-panel__recommendations-empty">
+          Select a patient to review native AI transparency and routing provenance.
+        </p>
+      )}
+    </>
+  );
 
+  const chatFooter = (
+    <>
       <div className="ed-copilot-panel__quick-actions">
         {selectedPatient ? (
           <button
@@ -1027,20 +1048,15 @@ export function CopilotPanel() {
           </button>
         ) : null}
         {quickActions.map((action) => (
-          <button
-            key={action}
-            type="button"
-            onClick={() => sendQuickAction(action)}
-            disabled={loading}
-          >
+          <button key={action} type="button" onClick={() => sendQuickAction(action)} disabled={loading}>
             {action}
           </button>
         ))}
       </div>
 
       <div className="ed-copilot-panel__tool-actions" role="toolbar" aria-label="Open Copilot tools">
-        {selectedPatient && patientOrchestration?.prioritizedRecommendations.length
-          ? patientOrchestration.prioritizedRecommendations.map((recommendation) => (
+        {selectedPatient && (patientOrchestration?.prioritizedRecommendations?.length ?? 0) > 0
+          ? (patientOrchestration?.prioritizedRecommendations ?? []).map((recommendation) => (
               <button
                 key={recommendation.id}
                 type="button"
@@ -1071,10 +1087,7 @@ export function CopilotPanel() {
             ))}
       </div>
 
-      <div
-        className="ed-copilot-panel__multimodal"
-        aria-label="CareDroid multimodal input controls"
-      >
+      <div className="ed-copilot-panel__multimodal" aria-label="CareDroid multimodal input controls">
         <div className="ed-copilot-panel__multimodal-actions">
           <input
             ref={fileInputRef}
@@ -1113,7 +1126,9 @@ export function CopilotPanel() {
                 ) : null}
                 <div>
                   <strong>{attachment.name}</strong>
-                  <span>{attachment.type || 'image'} · {attachmentSizeLabel(attachment.size)}</span>
+                  <span>
+                    {attachment.type || 'image'} · {attachmentSizeLabel(attachment.size)}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -1132,10 +1147,7 @@ export function CopilotPanel() {
         </p>
       </div>
 
-      <form
-        onSubmit={submitMessage}
-        className="ed-copilot-panel__composer"
-      >
+      <form onSubmit={submitMessage} className="ed-copilot-panel__composer">
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
@@ -1150,6 +1162,25 @@ export function CopilotPanel() {
           <IconSend size={17} stroke={2.2} />
         </button>
       </form>
+    </>
+  );
+
+  return (
+    <aside className="ed-copilot-panel">
+      <CopilotShell
+        header={copilotHeader}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabs={[
+          { id: 'chat', label: 'Chat' },
+          { id: 'context', label: 'Context', badge: contextBadgeCount },
+          { id: 'safety', label: 'Safety', badge: safetyBadgeCount },
+        ]}
+        chatContent={chatContent}
+        contextContent={contextContent}
+        safetyContent={safetyContent}
+        footer={chatFooter}
+      />
     </aside>
   );
 }

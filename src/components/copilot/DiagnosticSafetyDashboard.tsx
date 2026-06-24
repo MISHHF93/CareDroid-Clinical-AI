@@ -27,9 +27,10 @@ export default function DiagnosticSafetyDashboard({
   className = '',
 }: DiagnosticSafetyDashboardProps) {
   const snapshot = useMemo(
-    () => buildDiagnosticSafetyDashboardSnapshot(patients),
+    () => buildDiagnosticSafetyDashboardSnapshot(patients ?? []),
     [patients],
   );
+  const entries = snapshot.entries ?? [];
 
   return (
     <section
@@ -60,7 +61,7 @@ export default function DiagnosticSafetyDashboard({
       </header>
 
       <div className="diagnostic-safety-dashboard__list" role="list">
-        {snapshot.entries.map((entry) => (
+        {entries.map((entry) => (
           <article
             key={entry.patientId}
             className={`diagnostic-safety-dashboard__row diagnostic-safety-dashboard__row--${entry.riskTier}`}
@@ -98,7 +99,7 @@ export default function DiagnosticSafetyDashboard({
               </p>
               <p className="diagnostic-safety-dashboard__meta">{entry.chiefComplaint}</p>
               <div className="diagnostic-safety-dashboard__drivers">
-                {entry.riskDrivers.map((driver) => (
+                {(entry.riskDrivers ?? []).map((driver) => (
                   <span key={`${entry.patientId}-${driver}`} className="diagnostic-safety-dashboard__driver">
                     {driver}
                   </span>

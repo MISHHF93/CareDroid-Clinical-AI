@@ -1,5 +1,4 @@
 import type { Patient, Vitals } from '../types/emergency';
-import { ensurePatientArrivalBlock } from '../services/patientArrivalBackendSync';
 
 export function asPatientVitalsArray(vitals: Patient['vitals'] | Vitals | null | undefined): Vitals[] {
   if (!vitals) return [];
@@ -34,14 +33,5 @@ export function normalizePatientVitals<T extends Pick<Patient, 'vitals'>>(patien
   return {
     ...patient,
     vitals: asPatientVitalsArray(patient.vitals),
-  };
-}
-
-export function normalizeWhiteboardPatient(patient: Patient): Patient {
-  const withArrival = ensurePatientArrivalBlock(patient);
-  return {
-    ...withArrival,
-    vitals: asPatientVitalsArray(withArrival.vitals),
-    flags: patientFlags(withArrival),
   };
 }

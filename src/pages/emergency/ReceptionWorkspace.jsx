@@ -70,6 +70,11 @@ import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../../config/rece
 import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
+import TriageRuleBuilder from '../../components/reception/TriageRuleBuilder';
+import VoiceInterviewKiosk from '../../components/reception/VoiceInterviewKiosk';
+import useFeature from '../../hooks/useFeature';
+import { logNativeAiDashboardAudit } from '../../services/nativeAiAudit';
+import { buildClientTriageAssist } from '../../services/triageAssist';
 import './ReceptionWorkspace.css';
 
 export default function ReceptionWorkspace() {
@@ -97,8 +102,11 @@ export default function ReceptionWorkspace() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const capacity = useEmergencyStore((state) => state.capacity);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const addPatient = useEmergencyStore((state) => state.addPatient);
   const submitReceptionEscalation = useEmergencyStore((state) => state.submitReceptionEscalation);
   const store = useEmergencyStore();
+  const { enabled: nlpTriageExpertEnabled } = useFeature('nlp_triage_expert_system');
+  const { enabled: voiceInterviewEnabled } = useFeature('voice_interview_assistant');
 
   const query = searchParams.get('q') || '';
   const arrivedPatientId = searchParams.get('arrived') || '';
@@ -343,6 +351,58 @@ export default function ReceptionWorkspace() {
     setShowQuickIntake(false);
     profileNavigate(handoff.receptionPath);
   };
+
+  const handleVoicePreTriageReady = useCallback(
+    ({ patient, suggestedPriority, transcript }) => {
+      const now = new Date().toISOString();
+      const triageAssist = buildClientTriageAssist(
+        { ...patient, priority: suggestedPriority, chiefComplaint: patient.chiefComplaint },
+        patients,
+        { handoffSource: 'voice-interview', arrivalReason: patient.chiefComplaint },
+      );
+      const enrichedPatient = {
+        ...patient,
+        priority: suggestedPriority,
+        source: 'voice-interview',
+        triageAssist,
+        triageAssistGeneratedAt: triageAssist.generatedAt,
+        notes: [
+          ...(patient.notes || []),
+          {
+            id: `voice-note-${Date.now()}`,
+            text: transcript,
+            type: 'Clinical',
+            createdAt: now,
+            metadata: { source: 'voice-interview-assistant' },
+          },
+        ],
+        arrival: patient.arrival
+          ? {
+              ...patient.arrival,
+              triageAcuity: suggestedPriority,
+              chiefComplaint: patient.chiefComplaint,
+              triagePending: true,
+            }
+          : undefined,
+      };
+      addPatient(enrichedPatient);
+      logNativeAiDashboardAudit({
+        action: 'voice_pre_triage_created',
+        patientId: enrichedPatient.id,
+        details: {
+          suggestedPriority,
+          transcriptPreview: transcript.slice(0, 160),
+        },
+      });
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.set('queue', 'pretriage');
+      nextParams.set('patient', enrichedPatient.id);
+      setSearchParams(nextParams, { replace: true });
+      setExpandedPretriagePatientId(enrichedPatient.id);
+      selectPatient(enrichedPatient.id);
+    },
+    [addPatient, searchParams, selectPatient, setSearchParams],
+  );
 
   const handlePrepareEmsRegistration = (arrival) => {
     const placeholder = registerEmsPreArrivalPlaceholder(arrival.id);
@@ -730,6 +790,20 @@ export default function ReceptionWorkspace() {
           >
             {RECEPTION_COPY.escalation.openAction}
           </button>
+        </div>
+      ) : null}
+
+      {nlpTriageExpertEnabled || voiceInterviewEnabled ? (
+        <div className="reception-workspace__native-ai" aria-label="Native AI reception tools">
+          {nlpTriageExpertEnabled ? (
+            <TriageRuleBuilder className="reception-workspace__triage-rules" />
+          ) : null}
+          {voiceInterviewEnabled ? (
+            <VoiceInterviewKiosk
+              className="reception-workspace__voice-kiosk"
+              onPreTriageReady={handleVoicePreTriageReady}
+            />
+          ) : null}
         </div>
       ) : null}
 

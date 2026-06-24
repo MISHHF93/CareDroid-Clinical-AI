@@ -5,6 +5,7 @@ import {
   hasRequiredTenantContext,
   setTenantContext,
 } from '../services/tenantContextStore';
+import { readDevTenantContext } from '../services/devBackendAuth';
 import { useUser } from './UserContext';
 import logger from '../utils/logger';
 
@@ -117,6 +118,11 @@ export function TenantContextProvider({ children }) {
       return applyTenantContext(resolvedContext);
     } catch (tenantError) {
       const message = tenantError?.message || 'Tenant context unavailable.';
+      const devTenantContext = readDevTenantContext();
+      if (devTenantContext && hasRequiredTenantContext(devTenantContext)) {
+        setError('');
+        return applyTenantContext(devTenantContext);
+      }
       if (canUseDemoTenant) {
         const demoContext = buildDemoTenantContext(user);
         setError('');

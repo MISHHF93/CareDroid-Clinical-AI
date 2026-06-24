@@ -2,12 +2,24 @@ import {
   PatientFlag,
   PatientState,
   type CapacitySnapshot,
+  type EMSArrival,
   type Patient,
   type Room,
 } from '../types/emergency';
 import type { EmergencyBoardingMetrics } from '../store/emergencyStore';
 import { waitMinutesForWhiteboard } from '../utils/emergencyWhiteboardSorting';
 import { formatDepartmentDuration } from '../components/whiteboard/departmentStatusScreenModel';
+import {
+  ADMISSION_PROBABILITY_ALERT_THRESHOLD,
+  scanPatientsForAdmissionAlerts,
+  type PatientAdmissionAssessment,
+} from './predictiveAdmissionModel';
+import {
+  scanEmsArrivalsForActivations,
+  type PreArrivalActivationAlert,
+} from './preArrivalActivationRules';
+import { scanProlongedStayAlerts } from './nativeAiCore';
+import { predictPostEdOrientation } from './nativeAiCore';
 
 export type OperationalDashboardTone = 'green' | 'amber' | 'red';
 
@@ -15,7 +27,8 @@ export type OperationalDashboardMetricId =
   | 'total-patients'
   | 'waiting-room-count'
   | 'boarding-patients'
-  | 'average-wait-time';
+  | 'average-wait-time'
+  | 'pending-bed-assignment';
 
 export type OperationalDashboardMetric = {
   id: OperationalDashboardMetricId;
@@ -35,13 +48,57 @@ export type ZoneBedOccupancy = {
   tone: OperationalDashboardTone;
 };
 
+export type PredictiveBedAssignmentAlert = {
+  patientId: string;
+  patientLabel: string;
+  probabilityPercent: number;
+  admitScore: number;
+  action: string;
+};
+
+export type ProlongedStayAlert = {
+  patientId: string;
+  patientLabel: string;
+  probabilityPercent: number;
+  predictedHours: number;
+  action: string;
+};
+
+export type OrientationPredictionAlert = {
+  patientId: string;
+  patientLabel: string;
+  orientation: 'admit' | 'edou' | 'discharge';
+  probabilityPercent: number;
+};
+
 export type OperationalCommandDashboardSnapshot = {
   metrics: OperationalDashboardMetric[];
   zoneOccupancy: ZoneBedOccupancy[];
   bottleneckLabel: string;
   summaryLine: string;
   updatedAt: string;
+  pendingBedAssignments: PredictiveBedAssignmentAlert[];
+  prolongedStayAlerts: ProlongedStayAlert[];
+  orientationPredictions: OrientationPredictionAlert[];
+  chargeNurseAlerts: string[];
+  resourceActivations: PreArrivalActivationAlert[];
 };
+
+function toneForPendingBedAssignment(count: number): OperationalDashboardTone {
+  if (count >= 4) return 'red';
+  if (count >= 2) return 'amber';
+  return count > 0 ? 'amber' : 'green';
+}
+
+function toPredictiveBedAlerts(assessments: PatientAdmissionAssessment[]): PredictiveBedAssignmentAlert[] {
+  return assessments.map((assessment) => ({
+    patientId: assessment.patientId,
+    patientLabel: assessment.patientLabel,
+    probabilityPercent: assessment.probabilityPercent,
+    admitScore: assessment.admitScore,
+    action: 'Pending bed assignment — notify charge nurse and bed management.',
+  }));
+}
 
 type ZoneBucket = {
   zoneId: string;
@@ -197,6 +254,9 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   rooms?: Room[];
   capacity?: CapacitySnapshot;
   boardingMetrics?: EmergencyBoardingMetrics;
+  emsArrivals?: EMSArrival[];
+  admissionAlertThreshold?: number;
+  prolongedStayAlertThreshold?: number;
   now?: Date;
 } = {}): OperationalCommandDashboardSnapshot {
   const now = input.now || new Date();
@@ -209,6 +269,61 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const boardingCount = boardingPatients(patients, capacity, input.boardingMetrics);
   const avgWait = averageWaitMinutes(patients, now);
   const zoneOccupancy = buildZoneBedOccupancy(rooms);
+
+  const admissionThreshold = input.admissionAlertThreshold ?? ADMISSION_PROBABILITY_ALERT_THRESHOLD;
+  const elevatedAdmissions = scanPatientsForAdmissionAlerts(patients, {
+    alertThreshold: admissionThreshold,
+  });
+  const pendingBedAssignments = toPredictiveBedAlerts(elevatedAdmissions);
+  const prolongedStayThreshold = input.prolongedStayAlertThreshold;
+  const prolongedStayAlerts = scanProlongedStayAlerts(patients, {
+    alertThreshold: prolongedStayThreshold,
+    now: now.getTime(),
+  }).map(
+    (prediction) => {
+      const patient = patients.find((entry) => entry.id === prediction.patientId);
+      return {
+        patientId: prediction.patientId,
+        patientLabel:
+          `${patient?.firstName || ''} ${patient?.lastName || ''}`.trim() || patient?.mrn || prediction.patientId,
+        probabilityPercent: prediction.probabilityPercent,
+        predictedHours: prediction.predictedHours,
+        action: 'Prolonged ED stay risk — initiate bed cleaning / assignment workflow.',
+      };
+    },
+  );
+  const orientationPredictions = active
+    .map((patient) => {
+      const prediction = predictPostEdOrientation(patient);
+      const topProbability = prediction.probabilities[prediction.orientation];
+      if (topProbability < 50) return null;
+      return {
+        patientId: patient.id,
+        patientLabel: `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn,
+        orientation: prediction.orientation,
+        probabilityPercent: topProbability,
+      };
+    })
+    .filter((entry): entry is OrientationPredictionAlert => Boolean(entry))
+    .slice(0, 8);
+  const resourceActivations = scanEmsArrivalsForActivations(input.emsArrivals || []);
+  const chargeNurseAlerts = [
+    ...pendingBedAssignments.map(
+      (alert) =>
+        `${alert.patientLabel}: admission probability ${alert.probabilityPercent}% — pending bed assignment`,
+    ),
+    ...prolongedStayAlerts.map(
+      (alert) =>
+        `${alert.patientLabel}: prolonged stay risk ${alert.probabilityPercent}% (~${alert.predictedHours}h)`,
+    ),
+    ...orientationPredictions
+      .filter((entry) => entry.orientation === 'admit')
+      .map(
+        (entry) =>
+          `${entry.patientLabel}: predicted post-ED orientation Admit (${entry.probabilityPercent}%)`,
+      ),
+    ...resourceActivations.map((activation) => `${activation.title}: ${activation.summary}`),
+  ];
 
   const metrics: OperationalDashboardMetric[] = [
     {
@@ -243,6 +358,14 @@ export function buildOperationalCommandDashboardSnapshot(input: {
       detail: 'Mean elapsed time since arrival for waiting and pre-provider patients',
       thresholdLabel: 'Green <45m · Amber 45-89m · Red ≥90m',
     },
+    {
+      id: 'pending-bed-assignment',
+      label: 'Pending bed assignment',
+      value: pendingBedAssignments.length,
+      tone: toneForPendingBedAssignment(pendingBedAssignments.length),
+      detail: `Patients with admission probability ≥${admissionThreshold}%`,
+      thresholdLabel: 'Green 0 · Amber 1-3 · Red ≥4',
+    },
   ];
 
   const bottleneckLabel = buildBottleneckLabel({
@@ -260,11 +383,19 @@ export function buildOperationalCommandDashboardSnapshot(input: {
       `${totalPatients} total`,
       `${waitingCount} waiting`,
       `${boardingCount} boarding`,
+      pendingBedAssignments.length
+        ? `${pendingBedAssignments.length} pending bed assignment`
+        : null,
       avgWait != null ? `${avgWait}m avg wait` : null,
     ]
       .filter(Boolean)
       .join(' · '),
     updatedAt: capacity?.updatedAt || now.toISOString(),
+    pendingBedAssignments,
+    prolongedStayAlerts,
+    orientationPredictions,
+    chargeNurseAlerts,
+    resourceActivations,
   };
 }
 

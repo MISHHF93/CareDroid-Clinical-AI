@@ -54,6 +54,53 @@
   font-weight: 600;
 }
 
+.command-dashboard__alerts,
+.command-dashboard__pending-beds,
+.command-dashboard__activations {
+  padding: 14px 16px;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.command-dashboard__alerts-heading,
+.command-dashboard__pending-beds h3,
+.command-dashboard__activations h3 {
+  margin: 0 0 8px;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.command-dashboard__alerts-heading span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.command-dashboard__alert-list,
+.command-dashboard__pending-beds ul,
+.command-dashboard__activations ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #e2e8f0;
+  font-size: 13px;
+}
+
+.command-dashboard__pending-beds li,
+.command-dashboard__activations li {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.command-dashboard__pending-beds small,
+.command-dashboard__activations small {
+  color: #94a3b8;
+}
+
+.command-dashboard__activation--critical strong {
+  color: #fecaca;
+}
+
 .command-dashboard__metrics {
   display: grid;
   gap: 12px;

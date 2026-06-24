@@ -1,0 +1,31 @@
+.voice-interview-kiosk {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  background: #fff;
+}
+
+.voice-interview-kiosk input,
+.voice-interview-kiosk textarea {
+  width: 100%;
+  margin-top: 0.25rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.5rem;
+  padding: 0.55rem;
+  font: inherit;
+}
+
+.voice-interview-kiosk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.voice-interview-kiosk__status {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted, #64748b);
+}

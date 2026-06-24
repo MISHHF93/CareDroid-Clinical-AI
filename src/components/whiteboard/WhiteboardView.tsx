@@ -31,7 +31,7 @@ export type WhiteboardViewProps = {
   boardTitle?: string;
 };
 
-export default function WhiteboardView({
+function WhiteboardView({
   patients,
   rooms,
   staff,
@@ -211,3 +211,5 @@ export default function WhiteboardView({
     </section>
   );
 }
+
+export default WhiteboardView;

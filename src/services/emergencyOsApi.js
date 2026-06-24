@@ -17,6 +17,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   operationalIntelligenceEvaluate: '/api/emergency/operational-intelligence/evaluate',
   whiteboard: '/api/emergency/whiteboard',
   patients: '/api/emergency/patients',
+  patientDocumentArtifacts: '/api/emergency/patients',
   journey: '/api/emergency/journey',
   ems: '/api/emergency/ems',
   receptionSnapshot: '/api/emergency/reception/snapshot',

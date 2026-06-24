@@ -103,6 +103,20 @@ import {
   type LabResultPostedInput,
   type PhysicianDiagnosisInput,
 } from '../services/whiteboardAutomationEngine';
+import type {
+  ExtractDocumentArtifactsInput,
+  PatientDocumentArtifactReviewInput,
+  PatientDocumentSource,
+} from '../types/patientDocumentArtifact';
+import {
+  extractArtifactsFromPatient,
+  mergePatientDocumentArtifacts,
+} from '../services/patientDocumentArtifactModel';
+import {
+  extractPatientDocumentArtifacts,
+  reviewPatientDocumentArtifact,
+} from '../services/patientDocumentArtifactApi';
+import type { PatientDocumentArtifact } from '../types/patientDocumentArtifact';
 import { calculateCapacity } from '../engine/capacityEngine';
 import { normalizeAlert } from '../engine/alertEngineDerived';
 import {
@@ -2344,6 +2358,14 @@ interface EmergencyStoreState {
   setPatients: (patients: Patient[]) => void;
   removePatient: (patientId: string) => void;
   updatePatient: (patientId: string, patch: Partial<Patient>) => void;
+  attachDocumentArtifacts: (
+    patientId: string,
+    artifacts: PatientDocumentArtifact[],
+    sources?: PatientDocumentSource[],
+  ) => void;
+  syncDocumentArtifactsFromPatient: (patientId: string) => void;
+  extractAndAttachDocumentArtifacts: (input: ExtractDocumentArtifactsInput) => Promise<PatientDocumentArtifact[]>;
+  reviewDocumentArtifact: (patientId: string, input: PatientDocumentArtifactReviewInput) => Promise<void>;
   recordPhysicianDiagnosis: (patientId: string, input: PhysicianDiagnosisInput) => void;
   recordLabResultPosted: (patientId: string, input?: LabResultPostedInput) => void;
   setFitToWaitClassification: (
@@ -2997,6 +3019,84 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           }),
         };
       }),
+
+    attachDocumentArtifacts: (patientId, artifacts, sources = []) =>
+      set((state) => {
+        const patients = state.patients.map((patient) => {
+          if (patient.id !== patientId) return patient;
+          return {
+            ...patient,
+            documentArtifacts: mergePatientDocumentArtifacts(patient.documentArtifacts, artifacts),
+            documentSources: [...(patient.documentSources || []), ...sources],
+          };
+        });
+        return {
+          patients,
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'attachDocumentArtifacts',
+            patientId,
+            staffId: 'system',
+            details: { artifactCount: artifacts.length },
+          }),
+        };
+      }),
+
+    syncDocumentArtifactsFromPatient: (patientId) =>
+      set((state) => {
+        const patient = state.patients.find((candidate) => candidate.id === patientId);
+        if (!patient) return {};
+        const derived = extractArtifactsFromPatient(patient);
+        const patients = state.patients.map((candidate) =>
+          candidate.id === patientId
+            ? {
+                ...candidate,
+                documentArtifacts: mergePatientDocumentArtifacts(candidate.documentArtifacts, derived),
+              }
+            : candidate,
+        );
+        return {
+          patients,
+          auditLog: appendAuditLog(state.auditLog, {
+            action: 'syncDocumentArtifactsFromPatient',
+            patientId,
+            staffId: 'system',
+            details: { artifactCount: derived.length },
+          }),
+        };
+      }),
+
+    extractAndAttachDocumentArtifacts: async (input) => {
+      const envelope = await extractPatientDocumentArtifacts(input);
+      const artifacts = envelope.data.artifacts;
+      const sources = envelope.data.sources || [];
+      get().attachDocumentArtifacts(input.patientId, artifacts, sources);
+      return artifacts;
+    },
+
+    reviewDocumentArtifact: async (patientId, reviewInput) => {
+      const current = get().patients.find((patient) => patient.id === patientId);
+      const envelope = await reviewPatientDocumentArtifact(
+        patientId,
+        reviewInput,
+        current?.documentArtifacts || [],
+      );
+      set((state) => ({
+        patients: state.patients.map((patient) =>
+          patient.id === patientId
+            ? { ...patient, documentArtifacts: envelope.data.artifacts }
+            : patient,
+        ),
+        auditLog: appendAuditLog(state.auditLog, {
+          action: 'reviewDocumentArtifact',
+          patientId,
+          staffId: reviewInput.reviewer || 'system',
+          details: {
+            artifactId: reviewInput.artifactId,
+            reviewStatus: reviewInput.reviewStatus,
+          },
+        }),
+      }));
+    },
 
     recordPhysicianDiagnosis: (patientId, input) =>
       set((state) => {

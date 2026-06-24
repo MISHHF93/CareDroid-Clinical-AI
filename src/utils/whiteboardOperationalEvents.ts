@@ -4,6 +4,8 @@ import { calculateAnticipatedAdmissionScore } from '../engine/anticipatedAdmissi
 import type { BoardingSignals } from '../services/boardingSignals';
 import { isPreArrivalPlaceholder } from '../services/preArrivalWorkflow';
 import { PatientFlag, PatientState, type Patient, type Room } from '../types/emergency';
+import { countPendingReviewArtifacts } from '../services/patientDocumentArtifactModel';
+import { buildNativeAiPatientSnapshot, formatRoutingLabel } from '../services/nativeAiCore';
 import { hasPatientFlag } from './patientVitals';
 
 export type WhiteboardOperationalEvent = {
@@ -117,6 +119,23 @@ export function deriveWhiteboardOperationalEvents(
   });
   if (adta.thresholdBreached) {
     icon('adta-elevated', `ADTA ${adta.score}`);
+  }
+
+  const pendingDocReview = countPendingReviewArtifacts(patient.documentArtifacts);
+  if (pendingDocReview > 0) {
+    icon('document-review-pending', `${pendingDocReview} artifact${pendingDocReview === 1 ? '' : 's'} pending review`);
+  }
+
+  if (patient.source === 'voice-interview' && patient.triagePending) {
+    icon('pre-triage-voice', 'Voice interview — charge nurse review');
+  }
+
+  const complaint = `${patient.chiefComplaint || ''} ${patient.complaint || ''}`.trim();
+  if (complaint) {
+    const nativeAi = buildNativeAiPatientSnapshot(patient);
+    if (nativeAi.routing.specialistDomains.length) {
+      icon('native-ai-routing', formatRoutingLabel(nativeAi.routing));
+    }
   }
 
   const seen = new Set<string>();

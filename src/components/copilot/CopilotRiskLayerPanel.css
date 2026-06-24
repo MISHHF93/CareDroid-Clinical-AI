@@ -1,0 +1,64 @@
+.copilot-risk-layer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.copilot-risk-layer-panel__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.copilot-risk-layer-panel__layers {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.copilot-risk-layer-panel__layer {
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--nai-border, rgba(148, 163, 184, 0.22));
+  background: var(--nai-surface-elevated, rgba(30, 41, 59, 0.92));
+  color: var(--nai-text, #f8fafc);
+}
+
+.copilot-risk-layer-panel__layer--active {
+  border-color: color-mix(in srgb, var(--color-accent, #2563eb) 45%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent, #2563eb) 20%, transparent);
+}
+
+.copilot-risk-layer-panel__layer--blocked {
+  opacity: 0.72;
+}
+
+.copilot-risk-layer-panel__layer-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.copilot-risk-layer-panel__layer-head span {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-accent, #2563eb);
+}
+
+.copilot-risk-layer-panel__layer p,
+.copilot-risk-layer-panel__layer ul,
+.copilot-risk-layer-panel__layer small {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+}
+
+.copilot-risk-layer-panel__cds-detail {
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--color-border, #cbd5e1);
+}
+
+.copilot-risk-layer-panel__cds-detail ul {
+  padding-left: 1rem;
+}

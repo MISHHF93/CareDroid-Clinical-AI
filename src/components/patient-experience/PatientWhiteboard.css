@@ -1,0 +1,76 @@
+.patient-whiteboard {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #0f172a;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.patient-whiteboard__header span {
+  display: block;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.patient-whiteboard__header h1 {
+  margin: 6px 0 4px;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+}
+
+.patient-whiteboard__header p {
+  margin: 0;
+  color: #334155;
+}
+
+.patient-whiteboard__card {
+  padding: 16px 18px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.patient-whiteboard__card--highlight {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.patient-whiteboard h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.patient-whiteboard ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.patient-whiteboard li {
+  margin-bottom: 0.35rem;
+}
+
+.patient-whiteboard__wait {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.patient-whiteboard__status {
+  margin: 6px 0 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.patient-whiteboard__footer {
+  color: #64748b;
+  font-size: 0.92rem;
+  text-align: center;
+}

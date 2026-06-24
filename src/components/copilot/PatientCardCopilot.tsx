@@ -191,8 +191,8 @@ export default function PatientCardCopilot({
             ))}
 
             <h4>Recommended tools</h4>
-            {orchestration?.prioritizedRecommendations.length ? (
-              orchestration.prioritizedRecommendations.map((recommendation) => (
+            {(orchestration?.prioritizedRecommendations?.length ?? 0) > 0 ? (
+              (orchestration?.prioritizedRecommendations ?? []).map((recommendation) => (
                 <button
                   key={recommendation.id}
                   type="button"

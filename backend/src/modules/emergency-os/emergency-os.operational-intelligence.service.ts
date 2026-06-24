@@ -9,6 +9,11 @@ import {
   EmergencySettingsService,
   WorkflowActionLogService,
 } from './emergency-os.services';
+import {
+  buildNativeAiDriftEvaluations,
+  buildOperationalDriftReport,
+} from '../../../../lib/native-ai/driftMonitoring';
+import { listRegisteredModels } from '../../../../lib/native-ai/modelRegistry';
 import type {
   EmergencyModuleEnvelope,
   OperationalAlert,
@@ -333,8 +338,31 @@ export class OperationalIntelligenceService {
       advisoryOnly: true,
     }));
 
+    const driftReport = settings.driftMonitoringEnabled
+      ? buildOperationalDriftReport(buildNativeAiDriftEvaluations())
+      : null;
+
+    const nativeAiModels = listRegisteredModels().map((model) => ({
+      modelOrRuleId: model.id,
+      version: model.version,
+      status: (model.status === 'deprecated' ? 'fallback' : 'active') as 'active' | 'fallback' | 'unavailable',
+      inputSchemaValid: true,
+      missingValues: 0,
+      dataFreshnessMinutes: syncAgeMinutes === Number.POSITIVE_INFINITY ? 999 : syncAgeMinutes,
+      errorRate: 0,
+      latencyMs: 18,
+      lastTrainedAt: model.deployedAt,
+      lastEvaluatedAt: generatedAt,
+      fallbackMode: model.maturity !== 'live',
+      driftDetected: driftReport?.alerts.some((alert) => alert.modelId === model.id) ?? false,
+    }));
+
     const modelHealth: OperationalModelHealth = {
-      status: settings.modelMonitoringEnabled ? 'fallback' : 'healthy',
+      status: settings.modelMonitoringEnabled
+        ? driftReport?.driftDetected
+          ? 'degraded'
+          : 'fallback'
+        : 'healthy',
       mode: settings.operationalIntelligenceMode,
       models: [
         {
@@ -351,6 +379,7 @@ export class OperationalIntelligenceService {
           fallbackMode: true,
           driftDetected: false,
         },
+        ...nativeAiModels,
       ],
       generatedAt,
     };
@@ -424,17 +453,16 @@ export class OperationalIntelligenceService {
       recommendations: settings.recommendationsEnabled ? recommendations : [],
       alerts: settings.autoAlertingEnabled ? alerts : [],
       modelHealth,
-      dataDrift: {
-        enabled: settings.driftMonitoringEnabled,
-        driftDetected: false,
-        featureDistributionShift: false,
-        predictionDistributionShift: false,
-        confidenceDistributionShift: false,
-        summary: settings.driftMonitoringEnabled
-          ? 'Rule-based baseline active. ML drift monitoring reserved for future models.'
-          : 'Drift monitoring disabled.',
-        generatedAt,
-      },
+      dataDrift: driftReport ?? {
+            enabled: false,
+            driftDetected: false,
+            featureDistributionShift: false,
+            predictionDistributionShift: false,
+            confidenceDistributionShift: false,
+            summary: 'Drift monitoring disabled.',
+            generatedAt,
+            alerts: [],
+          },
       dataFreshness: {
         status: dataFreshnessStatus,
         lastSyncedAt: central.generatedAt,

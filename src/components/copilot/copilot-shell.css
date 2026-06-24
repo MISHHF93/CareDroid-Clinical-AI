@@ -1,0 +1,174 @@
+.ed-copilot-shell {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ed-copilot-shell__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex-shrink: 0;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--copilot-border);
+  background: color-mix(in srgb, var(--copilot-bg) 90%, transparent);
+}
+
+.ed-copilot-shell__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  border: 1px solid var(--copilot-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--copilot-surface-soft) 84%, transparent);
+  color: var(--copilot-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 6px 8px;
+  text-transform: uppercase;
+}
+
+.ed-copilot-shell__tab[data-active='true'] {
+  border-color: var(--copilot-border-strong);
+  background: color-mix(in srgb, var(--copilot-ai) 14%, var(--copilot-surface-soft));
+  color: var(--copilot-text);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--copilot-ai) 18%, transparent);
+}
+
+.ed-copilot-shell__tab:hover,
+.ed-copilot-shell__tab:focus-visible {
+  border-color: var(--copilot-border-strong);
+  outline: none;
+}
+
+.ed-copilot-shell__tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--copilot-ai) 24%, var(--copilot-surface-soft));
+  color: color-mix(in srgb, var(--copilot-ai) 82%, white);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0 5px;
+}
+
+.ed-copilot-shell__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ed-copilot-shell__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ed-copilot-shell__panel[hidden] {
+  display: none !important;
+}
+
+.ed-copilot-shell__panel--chat .ed-copilot-panel__messages {
+  flex: 1;
+  min-height: 0;
+}
+
+.ed-copilot-shell__panel--context,
+.ed-copilot-shell__panel--safety {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.ed-copilot-shell__footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--copilot-border);
+  background: color-mix(in srgb, var(--copilot-bg) 92%, transparent);
+}
+
+.ed-copilot-shell__footer .ed-copilot-panel__quick-actions,
+.ed-copilot-shell__footer .ed-copilot-panel__tool-actions {
+  padding-top: 10px;
+}
+
+.ed-copilot-shell__footer .ed-copilot-panel__multimodal {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ed-copilot-panel .copilot-risk-layer-panel__layer,
+.ed-copilot-panel .ai-transparency-dashboard__routing li,
+.ed-copilot-panel .ai-transparency-dashboard__record {
+  border-color: var(--copilot-border);
+  background: color-mix(in srgb, var(--copilot-surface-soft) 90%, transparent);
+  color: var(--copilot-text);
+}
+
+.ed-copilot-panel .copilot-risk-layer-panel__eyebrow,
+.ed-copilot-panel .copilot-risk-layer-panel__layer p,
+.ed-copilot-panel .copilot-risk-layer-panel__layer ul,
+.ed-copilot-panel .copilot-risk-layer-panel__layer small,
+.ed-copilot-panel .ai-transparency-dashboard__eyebrow,
+.ed-copilot-panel .ai-transparency-dashboard__subtitle {
+  color: var(--copilot-muted);
+}
+
+.ed-copilot-panel .copilot-risk-layer-panel header h3,
+.ed-copilot-panel .ai-transparency-dashboard__header h2,
+.ed-copilot-panel .ai-transparency-dashboard__routing h3 {
+  color: var(--copilot-text);
+  font-size: 13px;
+  margin: 0;
+}
+
+.ed-copilot-panel .copilot-risk-layer-panel__layer-head strong,
+.ed-copilot-panel .ai-transparency-dashboard__routing li strong {
+  color: var(--copilot-text);
+}
+
+.ed-copilot-panel .copilot-risk-layer-panel__cds-detail {
+  border-top-color: var(--copilot-border);
+}
+
+.ed-copilot-panel .ai-transparency-dashboard {
+  border-color: var(--copilot-border);
+  background: color-mix(in srgb, var(--copilot-surface-soft) 88%, transparent);
+  color: var(--copilot-text);
+  padding: 0;
+  border: 0;
+}
+
+.ed-copilot-panel .ai-transparency-dashboard--compact {
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .ed-copilot-shell__tabs {
+    padding-inline: 10px;
+  }
+
+  .ed-copilot-shell__tab {
+    min-height: 40px;
+    font-size: 10px;
+  }
+}

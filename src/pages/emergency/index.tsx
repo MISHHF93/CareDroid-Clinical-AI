@@ -35,7 +35,7 @@ import useReadOnlyWhiteboardScreen from '../../hooks/useReadOnlyWhiteboardScreen
 import useCommandCenterScreen from '../../hooks/useCommandCenterScreen';
 
 import QuickIntake from '../../components/QuickIntake';
-import WhoNextPanel from '../../components/WhoNextPanel.tsx';
+import WhoNextPanel from '../../components/WhoNextPanel';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import OperationalEmptyState, {
   OperationalEmptyAction,
@@ -118,7 +118,11 @@ import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/w
 import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import DiagnosticSafetyDashboard from '../../components/copilot/DiagnosticSafetyDashboard';
-import { normalizeWhiteboardPatient } from '../../utils/patientVitals';
+import NativeAiCommandSuitePanel from '../../components/native-ai/NativeAiCommandSuitePanel';
+import useFeature from '../../hooks/useFeature';
+import { useNativeAiBackendSync } from '../../hooks/useNativeAiBackendSync';
+import { useNativeAiPeriodicRefresh } from '../../hooks/useNativeAiPeriodicRefresh';
+import { normalizeWhiteboardPatient } from '../../services/patientArrivalBackendSync';
 import '../../components/EmergencyWhiteboard.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
@@ -364,6 +368,11 @@ export default function EmergencyWhiteboard() {
   const publicWaiting = usePublicWaitingScreen();
   const readOnlyWhiteboard = useReadOnlyWhiteboardScreen();
   const commandCenter = useCommandCenterScreen();
+  const { enabled: clinicalAcuityDashboardEnabled } = useFeature('clinical_acuity_dashboard');
+  const { enabled: aiTransparencyDashboardEnabled } = useFeature('ai_transparency_dashboard');
+  const showNativeAiCommandSuite = clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled;
+  useNativeAiBackendSync(showNativeAiCommandSuite, { force: true });
+  const nativeAiRefreshTick = useNativeAiPeriodicRefresh();
   const storePatients = useEmergencyStore((state) => state.patients);
   const storeCapacity = useEmergencyStore((state) => state.capacity);
   const storeLoading = useEmergencyStore((state) => state.loading);
@@ -725,9 +734,10 @@ export default function EmergencyWhiteboard() {
         rooms,
         capacity,
         boardingMetrics,
-        now: new Date(clockTick),
+        emsArrivals,
+        now: new Date(Math.max(clockTick, nativeAiRefreshTick)),
       }),
-    [boardingMetrics, capacity, clockTick, patients, rooms],
+    [boardingMetrics, capacity, clockTick, emsArrivals, nativeAiRefreshTick, patients, rooms],
   );
 
   const stablePublicWaitingSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
@@ -1491,6 +1501,16 @@ export default function EmergencyWhiteboard() {
           title={presentation.pageTitle}
           subtitle={presentation.pageSubtitle}
         />
+        {showNativeAiCommandSuite ? (
+          <div style={{ padding: '0 14px 14px' }}>
+            <NativeAiCommandSuitePanel
+              patients={patients}
+              rooms={rooms}
+              capacity={capacity}
+              onSelectPatient={(patientId) => selectPatient(patientId)}
+            />
+          </div>
+        ) : null}
         <CommandCenterThroughputScreen
           performanceMode
           snapshot={stableCommandCenterSnapshot}
@@ -2341,6 +2361,17 @@ export default function EmergencyWhiteboard() {
         />
       ) : null}
 
+      {charge.isChargeNurseScreen && showNativeAiCommandSuite && !display.isDisplayMode ? (
+        <div style={{ padding: '0 14px 14px' }}>
+          <NativeAiCommandSuitePanel
+            patients={patients}
+            rooms={rooms}
+            capacity={capacity}
+            onSelectPatient={(patientId) => selectPatient(patientId)}
+          />
+        </div>
+      ) : null}
+
       {whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
         <ChargeNurseOperationalStrip
           patients={patients}
@@ -3099,7 +3130,7 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : whiteboardDensity.surfaces.patientGrid.visible && boardPatients.length > 0 ? (
         <>
-        {physician.isPhysicianScreen && !display.isDisplayMode ? (
+        {physician.isPhysicianScreen && !display.isDisplayMode && !showNativeAiCommandSuite ? (
           <div style={{ padding: '12px 14px 0' }}>
             <DiagnosticSafetyDashboard
               patients={patients}

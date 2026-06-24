@@ -1,4 +1,5 @@
 import type { Patient, PatientArrivalRecord } from '../types/emergency';
+import { asPatientVitalsArray, patientFlags } from '../utils/patientVitals';
 import { normalizePatientArrival, syncPatientFromArrival } from './patientArrivalModel';
 
 export const REQUIRED_PATIENT_ARRIVAL_FIELDS: ReadonlyArray<keyof PatientArrivalRecord> = [
@@ -52,4 +53,14 @@ export function assertPatientArrivalContract(patient: Patient, label = 'patient'
   if (violations.length) {
     throw new Error(`${label} missing arrival fields: ${violations.join(', ')}`);
   }
+}
+
+/** Normalizes API/store patient payloads for whiteboard rendering. */
+export function normalizeWhiteboardPatient(patient: Patient): Patient {
+  const withArrival = ensurePatientArrivalBlock(patient);
+  return {
+    ...withArrival,
+    vitals: asPatientVitalsArray(withArrival.vitals),
+    flags: patientFlags(withArrival),
+  };
 }

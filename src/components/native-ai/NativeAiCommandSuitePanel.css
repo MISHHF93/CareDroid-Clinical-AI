@@ -1,0 +1,49 @@
+.native-ai-command-suite {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.native-ai-command-suite__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.native-ai-command-suite__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.native-ai-command-suite__alert-banner {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--status-warning, #d97706) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-warning, #d97706) 35%, transparent);
+  font-size: 0.82rem;
+}
+
+.native-ai-command-suite__thresholds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.65rem;
+}
+
+.native-ai-command-suite__thresholds label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+}
+
+.native-ai-command-suite__thresholds input {
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+}

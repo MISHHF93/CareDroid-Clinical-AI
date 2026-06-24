@@ -91,6 +91,7 @@ const PUBLIC_API_PATH_PATTERNS = [
   /^\/api\/auth(\/|$)/,
   /^\/api\/config\/system$/,
   /^\/api\/emergency(\/|$)/,
+  /^\/api\/native-ai(\/|$)/,
   /^\/api\/governance(\/|$)/,
 ];
 
@@ -135,6 +136,7 @@ const DEV_GRACEFUL_EMPTY_PATHS = [
   /\/config\//,
   /\/boarding/,
   /\/auth\//,
+  /\/native-ai\//,
 ];
 
 function buildDevOfflineJsonBody(path) {

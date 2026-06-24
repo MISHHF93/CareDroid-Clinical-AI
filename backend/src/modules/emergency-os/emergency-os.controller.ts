@@ -33,7 +33,12 @@ import {
   SmartIntakeService,
   WorkflowActionLogService,
 } from './emergency-os.services';
+import { PatientDocumentArtifactService } from './patient-document-artifact.service';
 import type { EmergencyOsSettingsPatch, EmergencyPatient } from './emergency-os.types';
+import type {
+  ExtractDocumentArtifactsInput,
+  PatientDocumentArtifactReviewInput,
+} from '../../../../src/types/patientDocumentArtifact';
 
 @ApiTags('emergency')
 @ApiBearerAuth()
@@ -66,6 +71,7 @@ export class EmergencyOsController {
     private readonly operationalIntelligenceService: OperationalIntelligenceService,
     private readonly receptionWorkspaceService: ReceptionWorkspaceService,
     private readonly orchestrationService: PatientOrchestrationService,
+    private readonly documentArtifactService: PatientDocumentArtifactService,
   ) {}
 
   @Get('whiteboard')
@@ -129,6 +135,31 @@ export class EmergencyOsController {
   @Get('patients/:patientId/workflow-logs')
   getPatientWorkflowLogs(@Param('patientId') patientId: string) {
     return this.workflowActionLogService.getEnvelope(patientId);
+  }
+
+  @Get('patients/:patientId/document-artifacts')
+  getPatientDocumentArtifacts(@Param('patientId') patientId: string) {
+    return this.documentArtifactService.getEnvelope(patientId);
+  }
+
+  @Post('patients/:patientId/document-artifacts/extract')
+  extractPatientDocumentArtifacts(
+    @Param('patientId') patientId: string,
+    @Body() body: ExtractDocumentArtifactsInput,
+  ) {
+    return this.documentArtifactService.extract(patientId, { ...body, patientId });
+  }
+
+  @Patch('patients/:patientId/document-artifacts/:artifactId/review')
+  reviewPatientDocumentArtifact(
+    @Param('patientId') patientId: string,
+    @Param('artifactId') artifactId: string,
+    @Body() body: PatientDocumentArtifactReviewInput,
+  ) {
+    return this.documentArtifactService.review(patientId, artifactId, {
+      ...body,
+      artifactId,
+    });
   }
 
   @Get('patients/:patientId/orchestration')
