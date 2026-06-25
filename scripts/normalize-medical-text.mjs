@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, relative } from 'node:path';
 import { globSync } from 'glob';
+import { fixJsxMedicalThemeAttributes } from './normalize-medical-jsx-fix.mjs';
 
 const root = process.cwd();
 const files = globSync('src/**/*.{css,tsx,jsx}', {
@@ -122,6 +123,7 @@ for (const file of files) {
     }
     if (next.includes('MEDICAL_THEME.') || next.includes('MEDICAL_TYPE.')) {
       next = ensureMedicalImport(next, file);
+      next = fixJsxMedicalThemeAttributes(next);
     }
   }
 
