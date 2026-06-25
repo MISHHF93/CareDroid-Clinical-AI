@@ -1,3 +1,6 @@
+/* Legacy ED shell styles for layout/AppShell.jsx — canonical shell lives in components/app-shell.css */
+@import '../components/app-shell.css';
+
 .ed-os-shell {
   --ed-rail-width: 60px;
   --ed-header-height: 48px;

@@ -111,8 +111,7 @@ export class PlatformContextService {
     );
 
     const pilotStrict =
-      settings.pilotStrictSaasEntitlements === true ||
-      settings.strictSaasEntitlements === true;
+      settings.pilotStrictSaasEntitlements === true || settings.strictSaasEntitlements === true;
 
     return {
       organization: organization

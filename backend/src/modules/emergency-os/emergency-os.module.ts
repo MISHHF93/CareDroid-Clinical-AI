@@ -61,7 +61,12 @@ import { PatientDocumentArtifactService } from './patient-document-artifact.serv
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const config = configService.get<{ secret?: string; accessTokenExpiry?: string; issuer?: string; audience?: string }>('jwt');
+        const config = configService.get<{
+          secret?: string;
+          accessTokenExpiry?: string;
+          issuer?: string;
+          audience?: string;
+        }>('jwt');
         return {
           secret: config?.secret,
           signOptions: {

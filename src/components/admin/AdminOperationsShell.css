@@ -27,6 +27,13 @@
   max-width: 720px;
 }
 
+.admin-ops-shell__role {
+  margin: 8px 0 0;
+  color: var(--muted-text);
+  max-width: 720px;
+  font-size: 0.9rem;
+}
+
 .admin-ops-shell__nav {
   display: flex;
   flex-wrap: wrap;
@@ -125,6 +132,62 @@
 .admin-ops-table th {
   color: var(--muted-text);
   font-weight: 600;
+}
+
+.admin-ops-card--spaced {
+  margin-bottom: 16px;
+}
+
+.admin-ops-page-header {
+  margin-bottom: 16px;
+}
+
+.admin-ops-page-header__title {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.admin-ops-page-header__lead {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.875rem;
+  max-width: 720px;
+}
+
+.admin-ops-card--raised {
+  margin-top: 16px;
+}
+
+.admin-ops-workflow-list {
+  margin-top: 12px;
+  padding-left: 20px;
+}
+
+.admin-ops-workflow-list li {
+  margin-bottom: 8px;
+}
+
+.admin-ops-lanes--raised {
+  margin-top: 12px;
+}
+
+.admin-ops-lane__roles {
+  margin: 0 0 6px;
+}
+
+.admin-ops-lane__saas-roles {
+  margin: 0;
+}
+
+.admin-ops-role-select {
+  display: grid;
+  gap: 6px;
+  max-width: 360px;
+  margin-top: 12px;
+}
+
+.admin-ops-spaced-text {
+  margin-top: 12px;
 }
 
 .admin-ops-lanes {

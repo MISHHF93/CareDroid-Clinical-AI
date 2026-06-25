@@ -1,0 +1,401 @@
+/* src\layout\AppShell.css — part 6/7 */
+
+.ed-route-panel__header h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.ed-route-panel__header p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.ed-route-panel__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ed-route-panel__tabs a {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ed-route-panel__tabs a[aria-current='page'],
+.ed-route-panel__tabs a:hover,
+.ed-route-panel__tabs a:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info) 55%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-surface));
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.ed-route-panel__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.ed-route-panel__metrics article,
+.ed-route-panel__list article {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  box-shadow: var(--shadow-sm);
+  animation: ed-panel-card-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ed-route-panel__metrics article:hover,
+.ed-route-panel__list article:hover {
+  border-color: color-mix(in srgb, var(--status-info) 32%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 6%, var(--color-surface));
+  transform: translateY(-1px);
+}
+
+.ed-route-panel__metrics article {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+}
+
+.ed-route-panel__metrics strong {
+  color: var(--color-text-primary);
+  font-size: 1.9rem;
+}
+
+.ed-route-panel__metrics small,
+.ed-route-panel__list span {
+  color: var(--color-text-secondary);
+}
+
+.ed-route-panel__list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ed-route-panel__list article {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+}
+
+.ed-route-panel__list article div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ed-route-panel--queue .queue-intel {
+  width: min(920px, 100%);
+  max-width: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.ed-copilot-panel {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid var(--color-border-subtle);
+  background: var(--bg-surface);
+  overflow: hidden;
+  transition:
+    background-color var(--motion-transition-normal),
+    border-color var(--motion-transition-normal),
+    transform var(--motion-transition-normal);
+}
+
+.ed-copilot-panel__toggle {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  background: var(--color-elevated);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ed-copilot-panel__content {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  transition:
+    opacity var(--motion-transition-normal),
+    visibility 0ms linear var(--motion-duration-normal, 180ms);
+}
+
+.ed-os-shell--copilot-collapsed .ed-copilot-panel {
+  background: var(--bg-elevated);
+}
+
+.ed-os-shell--copilot-collapsed .ed-copilot-panel__toggle {
+  display: inline-flex;
+  inset-inline-start: 8px;
+  border-color: color-mix(in srgb, var(--status-stable) 35%, transparent);
+  color: var(--status-success);
+}
+
+.ed-os-shell--copilot-collapsed .ed-copilot-panel__content {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.ed-copilot-panel__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 74px;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-elevated);
+  animation: ed-panel-card-enter var(--motion-transition-normal) both;
+}
+
+.ed-copilot-panel__heading {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ed-copilot-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.ed-copilot-panel__title-row strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.1;
+}
+
+.ed-copilot-panel__title-row span:not(.ed-copilot-panel__live-dot) {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ed-copilot-panel__live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--status-success);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-stable) 12%, transparent);
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
+}
+
+.ed-copilot-panel__snapshot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.ed-copilot-panel__snapshot span {
+  padding: 4px 7px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast);
+}
+
+.ed-copilot-panel__actions {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.ed-copilot-panel__new,
+.ed-copilot-panel__minimize {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ed-copilot-panel__minimize {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ed-copilot-panel .chat-interface__messages {
+  padding: var(--space-3);
+  gap: var(--space-3);
+}
+
+.ed-copilot-panel .chat-interface__bubble {
+  border-radius: var(--radius-lg);
+}
+
+.ed-copilot-panel .chat-interface__input-area {
+  padding: var(--space-3);
+  background: var(--color-surface);
+}
+
+.ed-copilot-panel .chat-interface__composer {
+  width: 100%;
+}
+
+.ed-copilot-panel .chat-interface__textarea {
+  min-height: 42px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+}
+
+.ed-copilot-panel .chat-interface__send {
+  min-height: 42px;
+  padding: 0 var(--space-3);
+}
+
+@media (max-width: 1180px) {
+  .ed-os-header {
+    grid-template-columns: minmax(200px, 1fr) auto minmax(220px, 1fr);
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+  }
+
+  .ed-shift-signout {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ed-route-panel__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ed-os-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 64px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ed-nav-rail {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 950;
+    width: auto;
+    min-width: 0;
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--color-border-subtle);
+    border-right: 0;
+    background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  .ed-nav-rail__items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+    gap: 0;
+    padding: 0;
+  }
+
+  .ed-nav-rail__item {
+    display: flex;
+    height: 64px;
+    min-height: 44px;
+    border-left: 0;
+    border-top: 3px solid transparent;
+  }
+
+  .ed-nav-rail__item--active {
+    border-top-color: var(--status-info);
+    border-left-color: transparent;
+  }
+
+  .ed-os-header {
+    grid-template-columns: minmax(190px, 1fr) auto minmax(180px, 1fr);
+    min-height: 56px;
+  }
+
+  .ed-shift-status span:last-child {
+    display: none;
+  }
+
+  .ed-os-shell__body,
+  .ed-os-shell--copilot-collapsed .ed-os-shell__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ed-capacity-badge,
+  .ed-reassessment-badge,
+  .ed-icon-button,
+  .ed-shift-signout,
+  .ed-copilot-panel__new,
+  .ed-copilot-panel__minimize,
+  .ed-copilot-panel__toggle,
+  .ed-alert-drawer__header button,
+  .ed-alert-drawer__actions button,
+  .ed-alert-toast button,
+  .capacity-detail-panel__header button,
+  .capacity-detail-panel__list button,
+  .ed-shortcuts-modal__header button {
+    min-width: 44px;
+    min-height: 44px;

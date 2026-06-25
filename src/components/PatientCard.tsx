@@ -68,6 +68,7 @@ import SpecialistInferenceBadge from './native-ai/SpecialistInferenceBadge';
 import TriageExpertBadge from './native-ai/TriageExpertBadge';
 import PostEdOrientationBadge from './predictive/PostEdOrientationBadge';
 import useFeature from '../hooks/useFeature';
+import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
 import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../services/boardingSignals';
 import './PatientCard.css';
 
@@ -322,6 +323,8 @@ function PatientCard({
   densityVariant: densityVariantProp,
   onKeyboardFocus,
 }: PatientCardProps) {
+  const patientCardSurfaces = getPractitionerSurfaceVisibility().patientCard;
+  const maxPatientCardBadges = patientCardSurfaces.badgeLimit;
   const emergencyRole = useEmergencyRolePermissions();
   const screenDensity = useScreenDensityMode();
   const densityVariant = densityVariantProp ?? screenDensity.patientCardVariant;
@@ -375,8 +378,11 @@ function PatientCard({
     [allPatients],
   );
   const dataQualityRisks = useMemo(
-    () => getPatientDataQualityRisks(patient, dataQualitySnapshot),
-    [dataQualitySnapshot, patient],
+    () =>
+      !patientCardSurfaces.showDataQualitySignals
+        ? []
+        : getPatientDataQualityRisks(patient, dataQualitySnapshot),
+    [dataQualitySnapshot, patient, patientCardSurfaces.showDataQualitySignals],
   );
   const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
   const patientName = formatPrivacySafePatientName(patient, privacyPolicy);
@@ -695,7 +701,7 @@ function PatientCard({
           boardingSignals={boardingSignals}
           compact
         />
-        {admissionPredictionEnabled ? (
+        {admissionPredictionEnabled && patientCardSurfaces.showPredictiveBadges ? (
           <AdmissionProbabilityBadge
             patient={patient}
             boardingSignals={boardingSignals}
@@ -703,7 +709,9 @@ function PatientCard({
             compact
           />
         ) : null}
-        {admissionPredictionEnabled && (workflowProfile === 'charge' || workflowProfile === 'physician') ? (
+        {admissionPredictionEnabled &&
+        patientCardSurfaces.showPredictiveBadges &&
+        (workflowProfile === 'charge' || workflowProfile === 'physician') ? (
           <JourneyPredictionBadge
             patient={patient}
             boardingSignals={boardingSignals}
@@ -776,11 +784,24 @@ function PatientCard({
         ) : null}
         {patient.state === PatientState.Waiting ? <FitToWaitBadge patient={patient} compact /> : null}
         {signalBadges.length ? (
-          signalBadges.map((signal) => (
-            <span key={signal.id} className={`patient-card__signal patient-card__signal--${signal.tone}`}>
-              {signal.label}
-            </span>
-          ))
+          <>
+            {signalBadges.slice(0, maxPatientCardBadges).map((signal) => (
+              <span key={signal.id} className={`patient-card__signal patient-card__signal--${signal.tone}`}>
+                {signal.label}
+              </span>
+            ))}
+            {signalBadges.length > maxPatientCardBadges ? (
+              <span
+                className="patient-card__signal patient-card__signal--overflow"
+                title={signalBadges
+                  .slice(maxPatientCardBadges)
+                  .map((signal) => signal.label)
+                  .join(' · ')}
+              >
+                +{signalBadges.length - maxPatientCardBadges}
+              </span>
+            ) : null}
+          </>
         ) : (
           <span className="patient-card__signal patient-card__signal--stable">No active risk flags</span>
         )}
@@ -871,32 +892,58 @@ function PatientCard({
       ) : null}
 
       <div className="patient-card__flags" aria-label="Patient flags and statuses">
-        {patientFlags(patient).map((flag) => {
-          const color = flagColors[flag];
-          const label = flagLabels[flag];
-          if (!color || !label) return null;
-          return (
-            <span
-              key={flag}
-              title={flag}
-              aria-label={label}
-              style={{
-                '--patient-flag-color': color,
-              } as CSSProperties}
-              className="patient-card__flag"
-            >
-              {label}
-            </span>
+        {(() => {
+          const visibleFlags = patientFlags(patient).filter(
+            (flag) => flagColors[flag] && flagLabels[flag],
           );
-        })}
+          const overflow = visibleFlags.length - maxPatientCardBadges;
+          return (
+            <>
+              {visibleFlags.slice(0, maxPatientCardBadges).map((flag) => (
+                <span
+                  key={flag}
+                  title={flag}
+                  aria-label={flagLabels[flag]}
+                  style={{
+                    '--patient-flag-color': flagColors[flag],
+                  } as CSSProperties}
+                  className="patient-card__flag"
+                >
+                  {flagLabels[flag]}
+                </span>
+              ))}
+              {overflow > 0 ? (
+                <span
+                  className="patient-card__flag patient-card__flag--overflow"
+                  title={visibleFlags
+                    .slice(maxPatientCardBadges)
+                    .map((flag) => flagLabels[flag])
+                    .join(' · ')}
+                >
+                  +{overflow}
+                </span>
+              ) : null}
+            </>
+          );
+        })()}
       </div>
 
-      <PatientCardToolChips patient={patient} readOnlyDisplay={readOnlyDisplay} />
+      {patientCardSurfaces.showToolChips ? (
+        <PatientCardToolChips patient={patient} readOnlyDisplay={readOnlyDisplay} />
+      ) : null}
 
-      {nativeAiRoutingEnabled ? <NativeAiRoutingBadge patient={patient} compact /> : null}
-      {nativeAiRoutingEnabled ? <SpecialistInferenceBadge patient={patient} compact /> : null}
-      {nlpTriageExpertEnabled ? <TriageExpertBadge patient={patient} compact /> : null}
-      {postEdOrientationEnabled ? <PostEdOrientationBadge patient={patient} compact /> : null}
+      {patientCardSurfaces.showNativeAiBadges && nativeAiRoutingEnabled ? (
+        <NativeAiRoutingBadge patient={patient} compact />
+      ) : null}
+      {patientCardSurfaces.showNativeAiBadges && nativeAiRoutingEnabled ? (
+        <SpecialistInferenceBadge patient={patient} compact />
+      ) : null}
+      {patientCardSurfaces.showNativeAiBadges && nlpTriageExpertEnabled ? (
+        <TriageExpertBadge patient={patient} compact />
+      ) : null}
+      {patientCardSurfaces.showNativeAiBadges && postEdOrientationEnabled ? (
+        <PostEdOrientationBadge patient={patient} compact />
+      ) : null}
 
       {documentArtifactsEnabled ? (
         <PatientDocumentArtifactsStrip

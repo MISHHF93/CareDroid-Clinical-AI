@@ -43,6 +43,10 @@ import {
 } from '../../services/roleIntelligenceTelemetry';
 import { fetchToolExecutorCatalog } from '../../services/clinicalToolsApi';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { PILOT_CUSTOMER_MODE } from '../../config/unified-navigation.config';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import './ToolsOverview.css';
 
 const EmbeddedCalculators = lazy(() => import('./Calculators'));
@@ -117,6 +121,7 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
 ]);
 
 const COMMON_TOOL_FILTER_VALUES = new Set(['recommended', 'all', 'calculator', 'ai-workflows', 'operations']);
+const PILOT_TOOL_FILTER_VALUES = new Set(['recommended', 'all', 'calculator', 'clinical-tools', 'ai-workflows']);
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
 
 function normalizeSearch(value) {
@@ -560,6 +565,7 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
 }
 
 const ToolsOverview = () => {
+  const surfaces = getPractitionerSurfaceVisibility();
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const location = useLocation();
@@ -1020,7 +1026,10 @@ const ToolsOverview = () => {
   }, [filteredTools, pinnedToolIdSet]);
   const showWorkspaceEmpty = !isAllToolsWorkspace && workspaceInventoryCount === 0;
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
-  const filterTabs = TOOL_FILTER_OPTIONS.filter((option) => COMMON_TOOL_FILTER_VALUES.has(option.value));
+  const visibleToolFilterValues = PILOT_CUSTOMER_MODE.enabled
+    ? PILOT_TOOL_FILTER_VALUES
+    : COMMON_TOOL_FILTER_VALUES;
+  const filterTabs = TOOL_FILTER_OPTIONS.filter((option) => visibleToolFilterValues.has(option.value));
   const emptyStateCopy =
     hiddenTools.length > 0
       ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
@@ -1034,46 +1043,53 @@ const ToolsOverview = () => {
       searchParams.has('tool') ||
       searchParams.has('calc'));
 
+  const toolsDescription =
+    roleIntelligenceProfile.toolsSubtitle ||
+    workspaceExperience.toolsSubtitle ||
+    'Calculators, clinical tools, and human-reviewed AI workflows for case review.';
+
   return (
-    <div className="tools-overview">
-      <div className="tools-overview-header">
-        <div className="header-content">
-          <h1>
-            <span className="tools-overview-title-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.tools} size={28} />
-            </span>{' '}
-            {roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle}
-          </h1>
-          <p className="header-subtitle">
-            {roleIntelligenceProfile.toolsSubtitle || workspaceExperience.toolsSubtitle}
-          </p>
-          <div className="tools-workspace-os" aria-label="Active workspace operating mode">
-            <strong>{workspaceExperience.operatingLabel}</strong>
-            <span>{workspaceExperience.modeSummary}</span>
+    <div className={`tools-overview${PILOT_CUSTOMER_MODE.enabled ? ' tools-overview--compact' : ''}`}>
+      <PageShell
+        eyebrow="Clinical decision support"
+        title={roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle || 'Medical Tools'}
+        description={surfaces.tools.showOverviewContextRow ? toolsDescription : CAREDROID_PRODUCT.safetyShort}
+        leadingIcon={<NavIcon icon={CHROME_ICONS.tools} size={24} />}
+        className="tools-overview-shell"
+        contentClassName="tools-overview-shell__content"
+      >
+          {surfaces.tools.showOverviewContextRow ? (
+          <div className="tools-overview-context-row">
+            <div className="tools-workspace-os" aria-label="Active workspace operating mode">
+              <strong>{workspaceExperience.operatingLabel}</strong>
+              <span>{workspaceExperience.modeSummary}</span>
+            </div>
+            <div className="tools-profile-summary" aria-label="Profile tool graph summary">
+              <span>{roleIntelligenceProfile.roleLabel}</span>
+              <span>{workspaceExperience.shortLabel}</span>
+              <span>{profile.specialty}</span>
+              <span>{workspaceRecommendedTools.length} recommended</span>
+            </div>
           </div>
-          <div className="tools-profile-summary" aria-label="Profile tool graph summary">
-            <span>{roleIntelligenceProfile.roleLabel}</span>
-            <span>{workspaceExperience.shortLabel}</span>
-            <span>{profile.specialty}</span>
-            <span>{workspaceRecommendedTools.length} recommended</span>
-            <span>{profileToolGraph.counts.restricted} restricted</span>
-          </div>
-          <section className="tools-execution-legend" aria-label="Technical and medical execution modes">
-            <div>
-              <strong>How tools run</strong>
+          ) : null}
+          {surfaces.tools.showOverviewExecutionLegend ? (
+          <details className="tools-execution-legend tools-execution-legend--compact" aria-label="Technical and medical execution modes">
+            <summary>How tools run</summary>
+            <div className="tools-execution-legend__body">
               <p>Each mode connects the technical path to the medical safety boundary.</p>
+              <div className="tools-execution-legend__items">
+                {EXECUTION_MODE_LEGEND.map((mode) => (
+                  <div key={mode.tone} className="tools-execution-legend__item">
+                    <span className={`tools-execution-badge tools-execution-badge--${mode.tone}`}>
+                      {mode.label}
+                    </span>
+                    <span>{mode.detail}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="tools-execution-legend__items">
-              {EXECUTION_MODE_LEGEND.map((mode) => (
-                <div key={mode.tone} className="tools-execution-legend__item">
-                  <span className={`tools-execution-badge tools-execution-badge--${mode.tone}`}>
-                    {mode.label}
-                  </span>
-                  <span>{mode.detail}</span>
-                </div>
-              ))}
-            </div>
-          </section>
+          </details>
+          ) : null}
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
             <select
@@ -1105,6 +1121,7 @@ const ToolsOverview = () => {
                 aria-label="Search all tools"
               />
             </label>
+            {!PILOT_CUSTOMER_MODE.enabled ? (
             <label className="tools-filter-field">
               <span>Filter</span>
               <select
@@ -1119,6 +1136,7 @@ const ToolsOverview = () => {
                 ))}
               </select>
             </label>
+            ) : null}
           </div>
           <div className="tools-filter-tabs" role="group" aria-label="Tool category filters">
             {filterTabs.map((option) => (
@@ -1134,6 +1152,7 @@ const ToolsOverview = () => {
               </button>
             ))}
           </div>
+          {surfaces.tools.showOverviewHeaderStats ? (
           <div className="header-stats">
             <div className="stat">
               <span className="stat-number">{profileToolGraph.counts.visible}</span>
@@ -1154,8 +1173,7 @@ const ToolsOverview = () => {
               <span className="stat-label">Recommended</span>
             </div>
           </div>
-        </div>
-      </div>
+          ) : null}
 
       {activeTool ? (
         <ActiveToolSurface
@@ -1463,6 +1481,7 @@ const ToolsOverview = () => {
         </div>
       )}
 
+      {!PILOT_CUSTOMER_MODE.enabled ? (
       <div className="tools-tips">
         <h2 className="tools-tips-title">
           <NavIcon icon={CHROME_ICONS.lightbulb} size={28} />
@@ -1505,6 +1524,8 @@ const ToolsOverview = () => {
           </div>
         </div>
       </div>
+      ) : null}
+      </PageShell>
     </div>
   );
 };

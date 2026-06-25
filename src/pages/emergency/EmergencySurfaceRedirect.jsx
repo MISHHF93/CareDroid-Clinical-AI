@@ -5,6 +5,7 @@ import {
   resolveEmergencySurfacePath,
   shouldRedirectEmergencySurface,
 } from '../../services/navigateToEmergencySurface';
+import { readPatientRouteContext } from '../../utils/receptionQueryParams';
 
 export { shouldRedirectEmergencySurface };
 
@@ -17,15 +18,16 @@ export default function EmergencySurfaceRedirect({ surfaceId, children }) {
     return children;
   }
 
+  const { contextPatientId, queuePatientId } = readPatientRouteContext(searchParams);
   const target = resolveEmergencySurfacePath(surfaceId, {
     role: emergencyRole.role,
-    patientId: searchParams.get('patientId') || undefined,
+    patientId: contextPatientId || queuePatientId || undefined,
     query: searchParams.get('q') || searchParams.get('patientSearch') || undefined,
     queue: searchParams.get('queue') || 'pretriage',
     intakeOptions: {
       step: searchParams.get('step') || undefined,
       mode: searchParams.get('mode') || undefined,
-      patientId: searchParams.get('patientId') || undefined,
+      patientId: contextPatientId || undefined,
       emsArrivalId: searchParams.get('emsArrivalId') || undefined,
     },
     resetReceptionQuery: false,

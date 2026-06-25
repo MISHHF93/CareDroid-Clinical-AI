@@ -57,10 +57,7 @@ export const SAAS_PROFILE_API_PERMISSIONS: Record<SaasUserRole, Permission[]> = 
     Permission.USE_PROTOCOLS,
     Permission.USE_AI_CHAT,
   ],
-  'registration-clerk': [
-    Permission.READ_PHI,
-    Permission.WRITE_PHI,
-  ],
+  'registration-clerk': [Permission.READ_PHI, Permission.WRITE_PHI],
   nurse: [
     Permission.READ_PHI,
     Permission.WRITE_PHI,
@@ -71,11 +68,7 @@ export const SAAS_PROFILE_API_PERMISSIONS: Record<SaasUserRole, Permission[]> = 
     Permission.USE_AI_CHAT,
     Permission.TRIGGER_EMERGENCY_PROTOCOL,
   ],
-  pharmacist: [
-    Permission.READ_PHI,
-    Permission.USE_DRUG_CHECKER,
-    Permission.USE_AI_CHAT,
-  ],
+  pharmacist: [Permission.READ_PHI, Permission.USE_DRUG_CHECKER, Permission.USE_AI_CHAT],
   'lab-technician': [Permission.READ_PHI, Permission.USE_LAB_INTERPRETER],
   'biomedical-engineer': [
     Permission.VIEW_OPERATIONS,
@@ -91,16 +84,8 @@ export const SAAS_PROFILE_API_PERMISSIONS: Record<SaasUserRole, Permission[]> = 
     Permission.VIEW_GOVERNANCE,
     Permission.VIEW_SURVEILLANCE,
   ],
-  researcher: [
-    Permission.USE_CALCULATORS,
-    Permission.USE_AI_CHAT,
-    Permission.VIEW_ANALYTICS,
-  ],
-  educator: [
-    Permission.USE_CALCULATORS,
-    Permission.USE_PROTOCOLS,
-    Permission.USE_AI_CHAT,
-  ],
+  researcher: [Permission.USE_CALCULATORS, Permission.USE_AI_CHAT, Permission.VIEW_ANALYTICS],
+  educator: [Permission.USE_CALCULATORS, Permission.USE_PROTOCOLS, Permission.USE_AI_CHAT],
   student: [
     Permission.USE_CALCULATORS,
     Permission.USE_DRUG_CHECKER,
@@ -138,11 +123,7 @@ export const SAAS_PROFILE_API_PERMISSIONS: Record<SaasUserRole, Permission[]> = 
     Permission.MANAGE_RACEDAY_OPERATIONS,
     Permission.VIEW_SURVEILLANCE,
   ],
-  steward: [
-    Permission.VIEW_TRACKMIND,
-    Permission.MANAGE_STEWARDING,
-    Permission.VIEW_AUDIT_LOGS,
-  ],
+  steward: [Permission.VIEW_TRACKMIND, Permission.MANAGE_STEWARDING, Permission.VIEW_AUDIT_LOGS],
   'equine-welfare-officer': [
     Permission.VIEW_TRACKMIND,
     Permission.VIEW_TRACKMIND_MATURITY,

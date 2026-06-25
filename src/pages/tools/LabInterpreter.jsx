@@ -336,10 +336,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
             >
               {loading ? (
                 <>
-                  <div
-                    className="lab-spinner"
-                    style={{ width: '20px', height: '20px', borderWidth: '2px' }}
-                  ></div>
+                  <div className="lab-spinner lab-spinner--sm"></div>
                   Interpreting...
                 </>
               ) : (
@@ -402,7 +399,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
                 <NavIcon icon={CHROME_ICONS.microscope} size={56} />
               </div>
               <p>No results yet</p>
-              <p style={{ fontSize: '14px', marginTop: '8px' }}>
+              <p className="lab-results-empty-hint">
                 Add lab values and click "Interpret Lab Values" to see results
               </p>
             </div>
@@ -437,13 +434,13 @@ const LabResults = ({ results }) => {
             <div className="lab-stat-label">Total Values</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: 'var(--accent-1)' }}>
+            <div className="lab-stat-value lab-stat-value--normal">
               {summary.normal}
             </div>
             <div className="lab-stat-label">Normal</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: 'var(--warning)' }}>
+            <div className="lab-stat-value lab-stat-value--abnormal">
               {summary.abnormal}
             </div>
             <div className="lab-stat-label">Abnormal</div>
@@ -472,7 +469,7 @@ const LabResults = ({ results }) => {
               </li>
             ))}
           </ul>
-          <p style={{ marginTop: '12px', fontSize: '14px' }}>
+          <p className="lab-critical-alert-note">
             Immediate clinical review and intervention required.
           </p>
         </div>
@@ -525,11 +522,11 @@ const LabResults = ({ results }) => {
                 <tbody>
                   {labs.map((lab, index) => (
                     <tr key={index}>
-                      <td style={{ fontWeight: 500 }}>{lab.name}</td>
-                      <td style={{ fontFamily: 'monospace', color: 'var(--accent-2)' }}>
+                      <td className="lab-values-table__name">{lab.name}</td>
+                      <td className="lab-values-table__value">
                         {lab.value} {lab.unit}
                       </td>
-                      <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                      <td className="lab-values-table__range">
                         {lab.referenceRange}
                       </td>
                       <td>

@@ -1,0 +1,19 @@
+.reception-queue-badge-stack {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.reception-queue-badge-stack__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--status-info, #60a5fa) 12%, var(--color-elevated, #1f2937));
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 11px;
+  font-weight: 700;
+}

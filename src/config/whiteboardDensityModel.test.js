@@ -124,7 +124,7 @@ describe('whiteboardDensityModel', () => {
     expect(density.surfaces.waitingRoomSafety.visible).toBe(false);
   });
 
-  it('defers audit strips to progressive ops detail', () => {
+  it('hides ops detail audit drawer during practitioner cleanup', () => {
     const density = evaluateWhiteboardDensity({
       waitingPatients: 6,
       emsArrivals: 1,
@@ -134,9 +134,9 @@ describe('whiteboardDensityModel', () => {
       signals: { emsAttention: true },
     });
 
-    expect(density.surfaces.opsDetail.visible).toBe(true);
+    expect(density.surfaces.opsDetail.visible).toBe(false);
     expect(density.surfaces.opsDetail.tier).toBe(WHITEBOARD_DENSITY_TIER.PROGRESSIVE);
-    expect(density.surfaces.opsDetail.defaultExpanded).toBe(true);
+    expect(density.surfaces.opsDetail.defaultExpanded).toBe(false);
   });
 
   it('suppresses domain strips when shift handoff is active', () => {
@@ -201,7 +201,8 @@ describe('whiteboardDensityModel', () => {
     });
 
     expect(density.surfaces.missionControl.visible).toBe(true);
-    expect(density.surfaces.chargeNurseStrip.visible).toBe(true);
+    // Role strips are suppressed during practitioner cleanup (pilot mode).
+    expect(density.surfaces.chargeNurseStrip.visible).toBe(false);
     expect(density.surfaces.patientGrid.maxVisibleCards).toBe(48);
   });
 

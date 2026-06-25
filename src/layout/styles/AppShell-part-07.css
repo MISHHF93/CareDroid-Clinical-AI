@@ -1,0 +1,163 @@
+/* src\layout\AppShell.css — part 7/7 */
+  }
+
+  .capacity-detail-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    width: auto;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .capacity-detail-panel,
+  .ed-os-shell:has(.crisis-action-panel):not(:has(.ems-critical-checklist--expanded)) .capacity-detail-panel {
+    inset: 0;
+    width: auto;
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .ed-whiteboard,
+  .ed-os-shell:has(.ems-critical-banner) .ed-whiteboard {
+    padding-block-start: 0;
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .ed-alert-toast-stack {
+    inset-block-start: auto;
+    inset-inline-end: var(--space-3);
+    inset-inline-start: var(--space-3);
+    inset-block-end: calc(64px + env(safe-area-inset-bottom, 0px) + var(--space-3));
+    width: auto;
+  }
+
+  .ed-alert-drawer {
+    position: fixed;
+    inset-block-start: 56px;
+    inset-inline: 0;
+  }
+
+  .ed-copilot-panel {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: calc(64px + env(safe-area-inset-bottom, 0px));
+    z-index: 930;
+    height: 50vh;
+    min-height: 320px;
+    border: 1px solid var(--color-border-subtle);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+    box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.48);
+    transform: translateY(0);
+    transition: transform 180ms var(--ease-smooth, ease);
+    backdrop-filter: blur(14px);
+  }
+
+  .ed-os-shell--copilot-collapsed .ed-copilot-panel {
+    transform: translateY(calc(100% - 56px));
+  }
+
+  .ed-copilot-panel::before {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-start: 50%;
+    z-index: 4;
+    width: 48px;
+    height: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-text-muted) 55%, transparent);
+    content: '';
+    transform: translateX(-50%);
+  }
+
+  .ed-copilot-panel__toggle {
+    inset-block-start: 14px;
+    inset-inline-start: var(--space-3);
+  }
+
+  .ed-copilot-panel__content {
+    padding-top: 16px;
+  }
+
+  .ed-copilot-panel__header {
+    min-height: 70px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ed-os-banner--route-notice {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ed-route-panel {
+    padding: var(--space-3);
+  }
+
+  .ed-route-panel__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ed-route-panel__list article {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-nav-rail__item,
+  .ed-nav-context-menu,
+  .ed-shift-control__panel,
+  .ed-capacity-badge,
+  .ed-capacity-badge--red .ed-capacity-badge__dot,
+  .capacity-detail-panel,
+  .capacity-detail-panel__score-card,
+  .capacity-detail-panel__section,
+  .capacity-detail-panel__metrics div,
+  .capacity-detail-panel__deductions article,
+  .capacity-detail-panel__list article,
+  .ed-shortcuts-modal,
+  .ed-shortcuts-modal__panel,
+  .ed-alert-toast,
+  .ed-alert-menu__tray,
+  .ed-reassessment-badge,
+  .ed-icon-button,
+  .ed-staff-panel,
+  .ed-critical-vitals-banner,
+  .ed-os-banner,
+  .ed-route-panel,
+  .ed-route-panel__metrics article,
+  .ed-route-panel__list article,
+  .ed-copilot-panel,
+  .ed-copilot-panel__header {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+
+  .ed-nav-rail__item:hover,
+  .ed-nav-rail__item:focus-visible,
+  .ed-capacity-badge:hover,
+  .ed-capacity-badge:focus-visible,
+  .capacity-detail-panel__metrics div:hover,
+  .capacity-detail-panel__deductions article:hover,
+  .capacity-detail-panel__list article:hover,
+  .capacity-detail-panel__list button:hover,
+  .capacity-detail-panel__list button:focus-visible,
+  .ed-icon-button:hover,
+  .ed-icon-button:focus-visible,
+  .ed-shift-signout:hover,
+  .ed-shift-signout:focus-visible,
+  .ed-copilot-panel__new:hover,
+  .ed-copilot-panel__new:focus-visible,
+  .ed-copilot-panel__minimize:hover,
+  .ed-copilot-panel__minimize:focus-visible,
+  .ed-copilot-panel__toggle:hover,
+  .ed-copilot-panel__toggle:focus-visible,
+  .ed-route-panel__tabs a[aria-current='page'],
+  .ed-route-panel__tabs a:hover,
+  .ed-route-panel__tabs a:focus-visible,
+  .ed-route-panel__metrics article:hover,
+  .ed-route-panel__list article:hover {
+    transform: none;
+  }
+}

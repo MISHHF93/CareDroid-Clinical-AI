@@ -17,7 +17,7 @@ function trendGlyph(direction) {
 export default function CommandCenterThroughputScreen({
   snapshot,
   surgeSnapshot = null,
-  title = 'Command center',
+  title = 'Department Whiteboard',
   refreshIntervalMs = 30000,
   refreshStatus = null,
   performanceMode = false,
@@ -104,7 +104,7 @@ export default function CommandCenterThroughputScreen({
       ]
         .filter(Boolean)
         .join(' ')}
-      aria-label="Emergency department command center throughput"
+      aria-label="Department throughput metrics"
     >
       <header className="command-center-throughput__header">
         <div>

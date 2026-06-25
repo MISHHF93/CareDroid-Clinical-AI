@@ -235,16 +235,13 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
               <div className="result-card">
                 <h3 className="result-title">⚠️ Drug Interactions Found</h3>
                 {results.interactions.map((interaction, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="interaction-item"
-                    style={{ borderLeftColor: getSeverityColor(interaction.severity) }}
+                    style={{ '--severity-color': getSeverityColor(interaction.severity) }}
                   >
                     <div className="interaction-header">
-                      <span 
-                        className="severity-badge"
-                        style={{ backgroundColor: getSeverityColor(interaction.severity) }}
-                      >
+                      <span className="severity-badge">
                         {interaction.severity.toUpperCase()}
                       </span>
                       <span className="interacting-drugs">
@@ -314,9 +311,9 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
             <div className="reference-item">
               <h4>Severity Levels</h4>
               <ul>
-                <li><span style={{ color: '#EF4444' }}>●</span> Major: Avoid combination</li>
-                <li><span style={{ color: '#F59E0B' }}>●</span> Moderate: Monitor closely</li>
-                <li><span style={{ color: '#10B981' }}>●</span> Minor: Usually safe</li>
+                <li><span className="drug-severity-dot drug-severity-dot--major">●</span> Major: Avoid combination</li>
+                <li><span className="drug-severity-dot drug-severity-dot--moderate">●</span> Moderate: Monitor closely</li>
+                <li><span className="drug-severity-dot drug-severity-dot--minor">●</span> Minor: Usually safe</li>
               </ul>
             </div>
             <div className="reference-item">

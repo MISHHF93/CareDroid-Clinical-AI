@@ -13,10 +13,6 @@ vi.mock('./UserContext', () => ({
   useUser: () => mockUserState,
 }));
 
-vi.mock('../components/ApiConfigDegradedBanner', () => ({
-  default: () => null,
-}));
-
 vi.mock('../services/configService', () => ({
   default: {
     getSystemConfig: vi.fn(),

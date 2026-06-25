@@ -254,7 +254,11 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     id: 'musculoskeletal',
     label: 'Musculoskeletal expert',
     clinical: true,
-    intents: [PrimaryIntent.CLINICAL_TOOL, PrimaryIntent.MEDICAL_REFERENCE, PrimaryIntent.EMERGENCY],
+    intents: [
+      PrimaryIntent.CLINICAL_TOOL,
+      PrimaryIntent.MEDICAL_REFERENCE,
+      PrimaryIntent.EMERGENCY,
+    ],
     keywords: [
       'fracture',
       'sprain',

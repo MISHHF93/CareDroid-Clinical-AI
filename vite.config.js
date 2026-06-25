@@ -275,7 +275,13 @@ export default defineConfig(({ mode }) => {
     },
     // Optimize dependencies
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom'],
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        path.resolve(process.cwd(), './lib/native-ai/index.ts'),
+        path.resolve(process.cwd(), './lib/patient-orchestration/index.ts'),
+      ],
       exclude: ['@capacitor/core', '@capacitor/android'],
     },
   };

@@ -4,6 +4,11 @@
  */
 
 import { evaluateWhiteboardOperationalLoad } from '../components/whiteboard/whiteboardOperationalLoadModel.js';
+import {
+  shouldForceOperationalAwareness,
+  shouldSuppressWhiteboardOpsDetail,
+  shouldSuppressWhiteboardRoleStrips,
+} from './practitionerCleanup.config';
 
 export const WHITEBOARD_DENSITY_TIER = Object.freeze({
   ALWAYS_VISIBLE: 'always_visible',
@@ -14,7 +19,7 @@ export const WHITEBOARD_DENSITY_TIER = Object.freeze({
 export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
   Object.freeze({
     id: 'hero-title',
-    label: 'Command center title',
+    label: 'Department title',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     rationale: 'Orientation anchor — who/where am I.',
   }),
@@ -140,7 +145,7 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
   }),
   Object.freeze({
     id: 'command-center-throughput',
-    label: 'Command center throughput',
+    label: 'Department throughput',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
     rationale: 'Manager/director throughput dashboard — arrivals, waits, boarding, forecast.',
   }),
@@ -185,7 +190,9 @@ export function evaluateWhiteboardDensity(context = {}) {
   const publicWaitingKiosk = publicWaitingDisplay;
   const showShiftHandoffStrip = Boolean(context.showShiftHandoffStrip);
   const prioritizeAwareness =
-    Boolean(context.prioritizeAwareness) || operationalLoad.prioritizeAwareness;
+    shouldForceOperationalAwareness() ||
+    Boolean(context.prioritizeAwareness) ||
+    operationalLoad.prioritizeAwareness;
   const signals = context.signals || {};
   const opsDetailCount = Number(signals.opsDetailCount) || 0;
   const duplicateDomainChrome = showShiftHandoffStrip || prioritizeAwareness;
@@ -297,7 +304,8 @@ export function evaluateWhiteboardDensity(context = {}) {
         (!operationalLoad.hideChargeNurseStrip || preferOperationalStrips) &&
         !showShiftHandoffStrip &&
         !displayMode &&
-        !commandCenterScreen,
+        !commandCenterScreen &&
+        !shouldSuppressWhiteboardRoleStrips(),
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     waitingRoomSafety: Object.freeze({
@@ -329,8 +337,12 @@ export function evaluateWhiteboardDensity(context = {}) {
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),
     opsDetail: Object.freeze({
-      visible: !wallKioskDisplay && !commandCenterScreen && !showShiftHandoffStrip,
-      defaultExpanded: !prioritizeAwareness,
+      visible:
+        !wallKioskDisplay &&
+        !commandCenterScreen &&
+        !showShiftHandoffStrip &&
+        !shouldSuppressWhiteboardOpsDetail(),
+      defaultExpanded: !prioritizeAwareness && !operationalLoad.hideMissionControl,
       signalCount: opsDetailCount,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
     }),

@@ -24,14 +24,14 @@ export default function AdminOperationsShell() {
   return (
     <div className="admin-ops-shell">
       <header className="admin-ops-shell__header">
-        <p className="admin-ops-shell__eyebrow">Administration</p>
-        <h1 className="admin-ops-shell__title">Emergency department operations console</h1>
+        <p className="admin-ops-shell__eyebrow">Platform admin</p>
+        <h1 className="admin-ops-shell__title">Operations console</h1>
         <p className="admin-ops-shell__subtitle">
-          Assign canonical roles, preview workflow access, invite staff, and configure tenant policies.
-          {isAdmin ? null : ' You are viewing admin tools in demo mode — changes stay local during the build phase.'}
+          Role assignments, workflow previews, team invites, and tenant policies.
+          {isAdmin ? null : ' Demo mode — changes stay local during the build phase.'}
         </p>
         {accessSummary ? (
-          <p className="admin-ops-shell__subtitle" style={{ marginTop: 8 }}>
+          <p className="admin-ops-shell__role">
             Current role: <strong>{accessSummary.saasRole.replace(/-/g, ' ')}</strong>
           </p>
         ) : null}

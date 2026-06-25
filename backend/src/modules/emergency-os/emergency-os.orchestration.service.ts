@@ -124,9 +124,7 @@ export class PatientOrchestrationService {
   private isLlmTriageAssistEnabled(): boolean {
     const settings = this.settingsService.getSettings().data;
     const apiKey =
-      this.configService.get<string>('ANTHROPIC_API_KEY') ||
-      process.env.ANTHROPIC_API_KEY ||
-      '';
+      this.configService.get<string>('ANTHROPIC_API_KEY') || process.env.ANTHROPIC_API_KEY || '';
     return Boolean(settings.aiSettings?.triageAssistEnabled && apiKey && this.chatService);
   }
 

@@ -1,3 +1,5 @@
+@import '../../styles/emergency-tokens.css';
+
 .tool-page {
   padding: 32px;
   max-width: 1200px;
@@ -606,6 +608,154 @@
 }
 
 /* Mobile-first split — base rules in mobile-first-layout.css */
+
+.simple-tool-label {
+  display: block;
+  font-size: var(--ed-type-section);
+  font-weight: 600;
+  color: var(--app-fg-muted, var(--ed-text-secondary));
+  margin: var(--ed-space-3) 0 var(--ed-space-1);
+}
+
+.simple-tool-label:first-of-type {
+  margin-top: 0;
+}
+
+.tool-panel-title,
+.diagnosis-panel > h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--app-fg, var(--ed-text-primary));
+  margin: 0 0 var(--ed-space-5);
+}
+
+.tool-form-stack {
+  margin-bottom: var(--ed-space-5);
+}
+
+.tool-form-stack--loose {
+  margin-bottom: var(--ed-space-6);
+}
+
+.tool-form-label {
+  display: block;
+  font-size: var(--ed-type-section);
+  font-weight: 500;
+  color: var(--app-fg, var(--ed-text-primary));
+  margin-bottom: var(--ed-space-2);
+}
+
+.tool-form-label--muted {
+  font-size: var(--ed-type-section);
+  font-weight: 400;
+  color: var(--app-fg-muted, var(--ed-text-secondary));
+  margin-bottom: 6px;
+}
+
+.tool-form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ed-space-4);
+  margin-bottom: var(--ed-space-5);
+}
+
+.tool-form-actions {
+  display: flex;
+  gap: var(--ed-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--ed-space-4);
+}
+
+.tool-form-actions--flush {
+  margin-top: 0;
+}
+
+.tool-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--ed-space-3);
+  margin-bottom: var(--ed-space-6);
+}
+
+.tool-search-block {
+  margin-bottom: var(--ed-space-6);
+}
+
+.diagnosis-field--medium {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.tool-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px var(--ed-space-5);
+  text-align: center;
+  gap: var(--ed-space-4);
+}
+
+.tool-loading-state--tall {
+  padding: 60px var(--ed-space-5);
+}
+
+.tool-loading-state__message {
+  color: var(--app-fg-muted, var(--ed-text-secondary));
+  margin: 0;
+}
+
+.tool-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px var(--ed-space-5);
+  text-align: center;
+  color: var(--app-fg-muted, var(--ed-text-secondary));
+}
+
+.tool-empty-state__icon {
+  font-size: 64px;
+  margin-bottom: var(--ed-space-4);
+  opacity: 0.3;
+}
+
+.calc-input-field--spaced {
+  margin-bottom: var(--ed-space-2);
+}
+
+.calc-spinner--sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.drug-severity-dot {
+  display: inline-block;
+}
+
+.drug-severity-dot--major {
+  color: var(--status-critical, #ef4444);
+}
+
+.drug-severity-dot--moderate {
+  color: var(--status-warning, #f59e0b);
+}
+
+.drug-severity-dot--minor {
+  color: var(--status-success, #10b981);
+}
+
+.tool-inline-check {
+  display: flex;
+  gap: var(--ed-space-2);
+  align-items: center;
+}
+
+.tool-review-actions {
+  margin-top: var(--ed-space-3);
+}
+
 .diagnosis-tool-grid {
   max-width: var(--app-fluid-container-max-wide, min(100%, 87.5rem));
 }

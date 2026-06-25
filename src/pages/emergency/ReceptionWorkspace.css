@@ -5,8 +5,24 @@
 }
 
 .reception-workspace__intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+}
+
+.reception-workspace__intro-copy {
   display: grid;
   gap: 4px;
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.reception-workspace__intro .reception-workspace__data-source {
+  flex: 1 1 220px;
+  max-width: 360px;
 }
 
 .reception-workspace__hero {

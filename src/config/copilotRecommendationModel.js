@@ -3,6 +3,7 @@
  * Priority order: queue → capacity → boarding → reassessment.
  * Node-safe.
  */
+import { getCopilotRecommendationLimit } from './practitionerCleanup.config';
 
 export const COPILOT_RECOMMENDATION_DOMAIN = Object.freeze({
   QUEUE: 'queue',
@@ -21,7 +22,7 @@ export const COPILOT_DOMAIN_PRIORITY = Object.freeze([
 export const COPILOT_ROUTES = Object.freeze({
   queues: '/emergency/queues',
   capacity: '/emergency/capacity',
-  boarding: '/emergency/boarding',
+  boarding: '/emergency/capacity?view=boarding',
   reassessment: '/emergency/reassessment',
   whiteboard: '/emergency/whiteboard',
   ems: '/emergency/ems',
@@ -217,7 +218,7 @@ export function buildCopilotRecommendations(context = {}) {
           domainRank(left.domain) - domainRank(right.domain) ||
           severityRank(left.severity) - severityRank(right.severity),
       )
-      .slice(0, 6),
+      .slice(0, getCopilotRecommendationLimit()),
   );
 }
 

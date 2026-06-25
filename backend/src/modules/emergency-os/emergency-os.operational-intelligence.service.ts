@@ -33,8 +33,7 @@ const OI_LAYER = 'CareDroidOperationalIntelligence' as const;
 const OI_VERSION = '1.0.0-rule-baseline';
 const CLINICAL_DISCLAIMER =
   'Human review required. This is not a replacement for clinical judgment.';
-const OPERATIONAL_DISCLAIMER =
-  'Operational intelligence is advisory. Human review required.';
+const OPERATIONAL_DISCLAIMER = 'Operational intelligence is advisory. Human review required.';
 
 const BLOCKED_AUTONOMOUS_ACTIONS = Object.freeze([
   'change_patient_journey_state',
@@ -345,7 +344,10 @@ export class OperationalIntelligenceService {
     const nativeAiModels = listRegisteredModels().map((model) => ({
       modelOrRuleId: model.id,
       version: model.version,
-      status: (model.status === 'deprecated' ? 'fallback' : 'active') as 'active' | 'fallback' | 'unavailable',
+      status: (model.status === 'deprecated' ? 'fallback' : 'active') as
+        | 'active'
+        | 'fallback'
+        | 'unavailable',
       inputSchemaValid: true,
       missingValues: 0,
       dataFreshnessMinutes: syncAgeMinutes === Number.POSITIVE_INFINITY ? 999 : syncAgeMinutes,
@@ -413,7 +415,8 @@ export class OperationalIntelligenceService {
         ? {
             id: 'badge-capacity-risk',
             label: `Capacity ${central.capacityStatus.band}`,
-            tone: central.capacityStatus.band === 'Red' ? ('critical' as const) : ('warning' as const),
+            tone:
+              central.capacityStatus.band === 'Red' ? ('critical' as const) : ('warning' as const),
             module: 'capacity',
           }
         : null,
@@ -454,15 +457,15 @@ export class OperationalIntelligenceService {
       alerts: settings.autoAlertingEnabled ? alerts : [],
       modelHealth,
       dataDrift: driftReport ?? {
-            enabled: false,
-            driftDetected: false,
-            featureDistributionShift: false,
-            predictionDistributionShift: false,
-            confidenceDistributionShift: false,
-            summary: 'Drift monitoring disabled.',
-            generatedAt,
-            alerts: [],
-          },
+        enabled: false,
+        driftDetected: false,
+        featureDistributionShift: false,
+        predictionDistributionShift: false,
+        confidenceDistributionShift: false,
+        summary: 'Drift monitoring disabled.',
+        generatedAt,
+        alerts: [],
+      },
       dataFreshness: {
         status: dataFreshnessStatus,
         lastSyncedAt: central.generatedAt,

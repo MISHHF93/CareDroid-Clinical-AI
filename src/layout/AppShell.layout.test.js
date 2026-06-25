@@ -6,6 +6,8 @@ import { COMPACT_MEDIA_QUERY } from './breakpoints';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
+const canonicalAppShellCss = readFileSync(join(__dirname, '../components/app-shell.css'), 'utf8');
+const shellCssBundle = `${appShellCss}\n${canonicalAppShellCss}`;
 const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
@@ -61,8 +63,9 @@ describe('single AppShell contract', () => {
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-main,[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
-    expect(appShellCss).toMatch(/\.ed-os-main,[\s\S]*\.app-shell-main-content\s*\{[\s\S]*min-width:\s*0/);
+    expect(shellCssBundle).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(shellCssBundle).toMatch(/\.app-shell-main-content\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
   });
 
   it('keeps document scroll unlocked outside explicit overlay locks', () => {
@@ -101,8 +104,9 @@ describe('single AppShell contract', () => {
     expect(appShellJsx).toContain('href="#main-content"');
     expect(appShellJsx).toContain('Skip to main content');
     expect(appShellJsx).toContain('tabIndex={-1}');
-    expect(appShellCss).toMatch(/\.ed-skip-link[\s\S]*transform:\s*translateY/);
-    expect(appShellCss).toMatch(/\.ed-skip-link:focus[\s\S]*outline:\s*2px solid/);
+    expect(shellCssBundle).toMatch(/\.ed-skip-link[\s\S]*transform:\s*translateY/);
+    expect(shellCssBundle).toMatch(/\.ed-skip-link:focus[\s\S]*outline:\s*2px solid/);
+    expect(canonicalAppShellCss).toContain('.ed-skip-link');
   });
 
   it('keeps required authenticated page roots from nesting main landmarks', () => {

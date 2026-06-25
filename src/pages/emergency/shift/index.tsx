@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import HandoffBriefGenerator from '../../../components/HandoffBriefGenerator';
+import OperationalEmptyState from '../../../components/ui/OperationalEmptyState';
+import { PageShell } from '../../../components/ui/CareDroidPrimitives';
+import { EMPTY_STATE_COPY } from '../../../config/emptyStateCopy';
 import { useEmergencyStore } from '../../../store/emergencyStore';
 import {
   buildShiftSummary,
@@ -119,20 +122,22 @@ export default function EmergencyShiftSummaryPage() {
   };
 
   return (
-    <section className="shift-summary" aria-labelledby="shift-summary-title">
-      <header className="shift-summary__hero">
-        <div>
-          <span className="shift-summary__eyebrow">Shift operations</span>
-          <h1 id="shift-summary-title">Emergency Shift Summary</h1>
-          <p>
-            Data-driven handoff view computed from the CareDroid store, patient timelines,
-            referrals, alerts, capacity state, and EMS records.
-          </p>
-        </div>
+    <PageShell
+      as="section"
+      eyebrow="Shift operations"
+      title="Emergency Shift Summary"
+      titleId="shift-summary-title"
+      description="Data-driven handoff view computed from the CareDroid store, patient timelines, referrals, alerts, capacity state, and EMS records."
+      actions={
         <button type="button" className="shift-summary__handoff" onClick={triggerHandoffBrief}>
           Generate Handoff Brief
         </button>
-      </header>
+      }
+      className="shift-summary cd-page-shell"
+      headerClassName="shift-summary__hero"
+      contentClassName="shift-summary__content"
+      aria-labelledby="shift-summary-title"
+    >
 
       <section className="shift-summary__header-card" aria-label="Shift header">
         <div>
@@ -152,6 +157,15 @@ export default function EmergencyShiftSummaryPage() {
         </div>
       </section>
       {handoffStatus ? <p className="shift-summary__status">{handoffStatus}</p> : null}
+
+      {summary.volume.active === 0 ? (
+        <OperationalEmptyState
+          title={EMPTY_STATE_COPY.shift.empty.title}
+          guidance={EMPTY_STATE_COPY.shift.empty.guidance}
+          status={EMPTY_STATE_COPY.shift.empty.status}
+          nextSteps={EMPTY_STATE_COPY.shift.empty.nextSteps}
+        />
+      ) : null}
 
       <Section title="Volume Metrics">
         <div className="shift-summary__stat-grid">
@@ -306,6 +320,6 @@ export default function EmergencyShiftSummaryPage() {
           </ul>
         </aside>
       ) : null}
-    </section>
+    </PageShell>
   );
 }

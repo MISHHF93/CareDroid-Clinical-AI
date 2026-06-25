@@ -7,6 +7,7 @@ import {
   filterAdminOpsLinks,
   getVisibleAdminOpsSections,
 } from '../../config/adminOperationsModel';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 
 const SURVEILLANCE_STATUS = [
   { id: 'surveillanceNexus', label: 'Surveillance nexus API', path: CANONICAL_ROUTES.surveillanceNexus },
@@ -29,6 +30,7 @@ function statusLabel(status) {
 }
 
 export default function AdminOperationsHome() {
+  const surfaces = getPractitionerSurfaceVisibility();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const visibleSections = useMemo(() => getVisibleAdminOpsSections(saasRole), [saasRole]);
   const surveillanceLinks = useMemo(
@@ -65,7 +67,7 @@ export default function AdminOperationsHome() {
           <h3>{section.title}</h3>
           <p>{section.description}</p>
           <Link to={section.primaryLink.route}>{section.primaryLink.label}</Link>
-          {section.id === 'surveillance-iot' ? (
+          {section.id === 'surveillance-iot' && surfaces.admin.showSurveillanceDetailList ? (
             <ul className="admin-ops-status-list">
               {SURVEILLANCE_STATUS.map((item) => (
                 <li key={item.id}>
@@ -80,7 +82,9 @@ export default function AdminOperationsHome() {
               ))}
             </ul>
           ) : null}
-          {section.secondaryLinks?.length && section.id !== 'surveillance-iot' ? (
+          {section.secondaryLinks?.length &&
+          surfaces.admin.showSecondaryLinks &&
+          section.id !== 'surveillance-iot' ? (
             <div className="admin-ops-secondary-links">
               {filterAdminOpsLinks(saasRole, section.secondaryLinks).map((link) => (
                 <Link key={link.route} to={link.route}>

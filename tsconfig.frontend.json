@@ -13,9 +13,17 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@lib/*": ["lib/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "dist", "backend", "e2e"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "backend",
+    "e2e",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
 }

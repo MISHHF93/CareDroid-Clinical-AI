@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   IconActivity,
   IconAmbulance,
@@ -151,11 +151,13 @@ function alertMatchesNavigation(alert: Alert, item: SidebarNavItem): boolean {
 
 export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
+  const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
   const alerts = useEmergencyStore((state) => state.alerts);
   const patients = useEmergencyStore((state) => state.patients);
   const activeAlerts = useMemo(() => alerts.filter((alert) => !alert.dismissed), [alerts]);
@@ -243,12 +245,49 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     [activeAlerts, reassessmentDueCount],
   );
 
+  const openDockedCopilot = useCallback(() => {
+    setCopilotOpen(true);
+    if (location.pathname === CANONICAL_ROUTES.emergencyCopilot) {
+      navigate(`${CANONICAL_ROUTES.emergencyWhiteboard}${location.search}`);
+    }
+  }, [location.pathname, location.search, navigate, setCopilotOpen]);
+
   const desktopNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
-    const active = isActiveRoute(location.pathname, item, location.search);
+    const active =
+      item.id === 'copilot'
+        ? copilotOpen
+        : isActiveRoute(location.pathname, item, location.search);
     const alertCount = navAlertCount(item);
     const destination =
       item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
+
+    if (item.id === 'copilot') {
+      if (!canUseCopilot) return null;
+      return (
+        <button
+          key={item.id}
+          type="button"
+          className={[
+            'sidebar-nav-item',
+            active ? 'sidebar-nav-item--active' : '',
+            item.isEmergencyCore === false ? 'sidebar-nav-item--utility' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={openDockedCopilot}
+          aria-label={item.label}
+          aria-pressed={copilotOpen}
+          title={item.label}
+          data-nav-id={item.id}
+          data-icon-key={item.icon}
+        >
+          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+          <span className="sidebar-nav-item__tooltip">{item.label}</span>
+        </button>
+      );
+    }
+
     const navLink = (
       <Link
         key={item.id}
@@ -285,11 +324,38 @@ export function Sidebar({ navigationItems }: SidebarProps) {
 
   const mobileNavLink = (item: SidebarNavItem) => {
     const IconComponent = ICONS[item.icon] || IconLayoutDashboard;
-    const active = isActiveRoute(location.pathname, item, location.search);
+    const active =
+      item.id === 'copilot'
+        ? copilotOpen
+        : isActiveRoute(location.pathname, item, location.search);
     const label = item.id === 'whiteboard' ? 'Whiteboard' : item.mobileLabel || item.label;
     const alertCount = navAlertCount(item);
     const destination =
       item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
+
+    if (item.id === 'copilot') {
+      if (!canUseCopilot) return null;
+      return (
+        <button
+          key={item.id}
+          type="button"
+          className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
+          onClick={() => {
+            setMoreOpen(false);
+            openDockedCopilot();
+          }}
+          aria-label={label}
+          aria-pressed={copilotOpen}
+          title={label}
+          data-nav-id={item.id}
+          data-icon-key={item.icon}
+        >
+          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+          <label>{label}</label>
+        </button>
+      );
+    }
+
     const navLink = (
       <Link
         key={item.id}

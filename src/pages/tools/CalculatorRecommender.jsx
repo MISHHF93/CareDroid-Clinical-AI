@@ -133,7 +133,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
               placeholder="e.g., ACS, PE, sepsis, cirrhosis, TIA"
             />
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button type="button" className="diagnosis-primary-btn" onClick={handleRecommend}>
                 Suggest tools
               </button>
@@ -156,9 +156,9 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
             <ApiStateBanner error={error} onRetry={handleRecommend} />
 
             {chatLoading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Building calculator recommendations...</p>
+                <p className="tool-loading-state__message">Building calculator recommendations...</p>
               </div>
             ) : result?.recommendations?.length ? (
               <div className="diagnosis-results-body">
@@ -197,7 +197,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
                 No matching calculator found yet. Add more specific symptoms, chief complaint, or clinical keywords.
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Try “chest pain with elevated troponin” to suggest HEART, TIMI, GRACE, and ASCVD tools.
               </div>
             )}

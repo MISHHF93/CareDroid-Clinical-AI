@@ -139,7 +139,7 @@ describe('PatientDetailPanel clinical intelligence', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('heading', { name: /Avery Stone/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /Avery Stone/i })).toBeInTheDocument();
     expect(screen.getByText('MRN-AI-1')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /move to next state/i })).toBeInTheDocument();
 

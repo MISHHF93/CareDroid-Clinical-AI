@@ -32,6 +32,8 @@ import { callAI } from '../../lib/ai/client';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
+import { EmergencyRoutePage } from './emergencyRouteShared';
+import './emergency-route.css';
 import {
   SMART_INTAKE_STEP_INDEX,
   SMART_INTAKE_STREAMLINED_STEPS,
@@ -712,62 +714,34 @@ export default function SmartIntake({
     }
   };
 
-  return (
-    <section
-      className={`smart-intake${embedded ? ' smart-intake--embedded' : ''}`}
-      aria-labelledby="smart-intake-title"
-    >
-      <header className="smart-intake__hero">
-        <div>
-          {fromReception || embedded ? (
-            <>
-              <span>Reception</span>
-              <h1 id="smart-intake-title">{RECEPTION_COPY.identityCheck.title}</h1>
-              <p>{RECEPTION_COPY.identityCheck.description}</p>
-            </>
-          ) : (
-            <>
-              <span>CareDroid</span>
-              <h1 id="smart-intake-title">Patient Verification</h1>
-              <p>
-                One workflow for identity, OCR, duplicate detection, and manual review before
-                creating, linking, or continuing as an unknown patient.
-              </p>
-            </>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            recordSmartIntakeClick('start-session');
-            void startBackendSession();
-          }}
-          disabled={isStarting || !canVerifyIntake || sessionReady}
-        >
-          <FileScan size={18} aria-hidden />
-          {isStarting
-            ? fromReception || embedded
-              ? RECEPTION_COPY.identityCheck.starting
-              : 'Starting...'
-            : sessionReady
-              ? fromReception || embedded
-                ? RECEPTION_COPY.identityCheck.sessionActive
-                : 'Session active'
-              : fromReception || embedded
-                ? RECEPTION_COPY.identityCheck.begin
-                : 'Start Intake'}
-        </button>
-        {embedded ? (
-          <button type="button" onClick={onClose}>
-            {RECEPTION_COPY.identityCheck.close}
-          </button>
-        ) : fromReception ? (
-          <button type="button" onClick={() => profileNavigate(CANONICAL_ROUTES.emergencyReception)}>
-            {RECEPTION_COPY.identityCheck.backToReception}
-          </button>
-        ) : null}
-      </header>
+  const isStandaloneRoute = !embedded && !fromReception;
 
+  const sessionStartButton = (
+    <button
+      type="button"
+      onClick={() => {
+        recordSmartIntakeClick('start-session');
+        void startBackendSession();
+      }}
+      disabled={isStarting || !canVerifyIntake || sessionReady}
+    >
+      <FileScan size={18} aria-hidden />
+      {isStarting
+        ? fromReception || embedded
+          ? RECEPTION_COPY.identityCheck.starting
+          : 'Starting...'
+        : sessionReady
+          ? fromReception || embedded
+            ? RECEPTION_COPY.identityCheck.sessionActive
+            : 'Session active'
+          : fromReception || embedded
+            ? RECEPTION_COPY.identityCheck.begin
+            : 'Start Intake'}
+    </button>
+  );
+
+  const intakeBody = (
+    <>
       {!embedded && !fromReception ? (
       <div className="smart-intake__status" role="status">
         <strong>Session:</strong> {sessionId} · {statusMessage}
@@ -901,6 +875,46 @@ export default function SmartIntake({
           );
         }}
       />
+    </>
+  );
+
+  if (isStandaloneRoute) {
+    return (
+      <EmergencyRoutePage
+        eyebrow={RECEPTION_COPY.workspace.eyebrow}
+        title={RECEPTION_COPY.identityCheck.title}
+        titleId="smart-intake-title"
+        description={RECEPTION_COPY.identityCheck.description}
+        actions={sessionStartButton}
+      >
+        <section className="smart-intake smart-intake--standalone">{intakeBody}</section>
+      </EmergencyRoutePage>
+    );
+  }
+
+  return (
+    <section
+      className={`smart-intake${embedded ? ' smart-intake--embedded' : ''}`}
+      aria-labelledby="smart-intake-title"
+    >
+      <header className="smart-intake__hero">
+        <div>
+          <span>{fromReception || embedded ? 'Reception' : RECEPTION_COPY.workspace.eyebrow}</span>
+          <h1 id="smart-intake-title">{RECEPTION_COPY.identityCheck.title}</h1>
+          <p>{RECEPTION_COPY.identityCheck.description}</p>
+        </div>
+        {sessionStartButton}
+        {embedded ? (
+          <button type="button" onClick={onClose}>
+            {RECEPTION_COPY.identityCheck.close}
+          </button>
+        ) : fromReception ? (
+          <button type="button" onClick={() => profileNavigate(CANONICAL_ROUTES.emergencyReception)}>
+            {RECEPTION_COPY.identityCheck.backToReception}
+          </button>
+        ) : null}
+      </header>
+      {intakeBody}
     </section>
   );
 }

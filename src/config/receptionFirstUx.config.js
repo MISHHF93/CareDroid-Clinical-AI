@@ -12,7 +12,7 @@ export const RECEPTION_FIRST_UX = Object.freeze({
   demoteCommandCenterInNav: true,
   pipelineShellEnabled: true,
   redirectStandaloneIntake: true,
-  redirectStandaloneQueues: false,
+  redirectStandaloneQueues: true,
   redirectStandalonePatientsForClerk: true,
   deskUiEnabled: true,
 });

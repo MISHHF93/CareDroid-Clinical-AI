@@ -46,6 +46,12 @@ import {
   type OperationalSearchEntityType,
   type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
+import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
+import {
+  isPilotExtensionNavItem,
+  shouldLimitOperationalSearchForClerk,
+  shouldSuppressExtensionPaletteCommands,
+} from '../config/practitionerCleanup.config';
 
 export type CommandGroup =
   | 'Quick actions'
@@ -82,6 +88,7 @@ type CommandWithVisibility = Command & {
 
 type RouteCommandConfig = {
   id: string;
+  navItemId?: string;
   label: string;
   hint?: string;
   keywords: readonly string[];
@@ -378,9 +385,18 @@ function createEmergencyRouteCommands(
   commands: readonly RouteCommandConfig[] = EMERGENCY_OS_ROUTE_COMMANDS,
   saasRole?: string,
 ): CommandWithVisibility[] {
-  const visibleCommands = commands.filter(
-    (command) => !COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has(command.id),
-  );
+  const visibleCommands = commands.filter((command) => {
+    if (COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has(command.id)) return false;
+    if (
+      shouldSuppressExtensionPaletteCommands() &&
+      'navItemId' in command &&
+      typeof command.navItemId === 'string' &&
+      isPilotExtensionNavItem(command.navItemId)
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   return visibleCommands.map((command) => {
     const action = command.build();
@@ -704,15 +720,17 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
 
   const computedResults = useMemo(() => {
     const patientResults = searchPatientsByName(patients, query);
-    const operationalResults = searchOperationalEntitiesForPalette(navigate, {
-      patients,
-      referrals,
-      emsArrivals,
-      queues,
-      query,
-      emergencyRole,
-      saasRole,
-    });
+    const operationalResults = shouldLimitOperationalSearchForClerk(emergencyRole.role)
+      ? []
+      : searchOperationalEntitiesForPalette(navigate, {
+          patients,
+          referrals,
+          emsArrivals,
+          queues,
+          query,
+          emergencyRole,
+          saasRole,
+        });
     const commandResults = buildCommandResults(commands, query, recentCommandIds);
     return normalizeSearch(query)
       ? [...patientResults, ...operationalResults, ...commandResults]

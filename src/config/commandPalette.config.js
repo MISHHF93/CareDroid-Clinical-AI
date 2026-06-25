@@ -41,14 +41,9 @@ const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
     keywords: ['reassessment', 'due', 'safety', 'review'],
   },
   capacity: {
-    label: 'Open Capacity',
+    label: 'Open Flow & Capacity',
     hint: 'C',
-    keywords: ['capacity', 'rooms', 'pressure', 'occupancy'],
-  },
-  boarding: {
-    label: 'Open Boarding',
-    hint: 'B',
-    keywords: ['boarding', 'admission pending', 'boarders'],
+    keywords: ['capacity', 'flow', 'rooms', 'pressure', 'occupancy', 'boarding'],
   },
   referrals: {
     label: 'Open Referrals',
@@ -90,6 +85,17 @@ function routeCommandFromNavigationItem(item) {
 }
 
 const RETAINED_DIRECT_ROUTE_COMMANDS = Object.freeze([
+  {
+    id: 'open-boarding',
+    navItemId: 'boarding',
+    label: 'Open Boarding',
+    hint: 'B',
+    keywords: ['boarding', 'admission pending', 'boarders', 'inpatient bed'],
+    build: () => ({
+      type: 'OPEN_ROUTE',
+      path: `${CANONICAL_ROUTES.emergencyCapacity}?view=boarding`,
+    }),
+  },
   {
     id: 'open-pulse',
     navItemId: 'pulse',

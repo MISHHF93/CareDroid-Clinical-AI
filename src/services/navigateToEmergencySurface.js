@@ -9,6 +9,7 @@ import {
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import { NAVIGATION_ITEMS } from '../config/unified-navigation.config';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+import { buildReceptionDeepLink } from '../utils/receptionQueryParams';
 
 const FRONT_DOOR_REDIRECT_ROLES = new Set([
   'registration_clerk',
@@ -56,13 +57,10 @@ export function resolveEmergencySurfacePath(surfaceId, options = {}) {
   }
 
   if (surfaceId === 'patients' && isReceptionFirstUxEnabled() && prefersReceptionForPatientSearch(role)) {
-    if (options.patientId) {
-      return `${CANONICAL_ROUTES.emergencyReception}?patientId=${encodeURIComponent(options.patientId)}`;
-    }
-    if (options.query) {
-      return `${CANONICAL_ROUTES.emergencyReception}?q=${encodeURIComponent(options.query)}`;
-    }
-    return CANONICAL_ROUTES.emergencyReception;
+    return buildReceptionDeepLink({
+      patientId: options.patientId,
+      query: options.query,
+    });
   }
 
   if (surfaceId === 'intake' && isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.redirectStandaloneIntake) {
@@ -72,8 +70,10 @@ export function resolveEmergencySurfacePath(surfaceId, options = {}) {
   }
 
   if (surfaceId === 'queues' && isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.redirectStandaloneQueues) {
-    const queue = options.queue || 'pretriage';
-    return `${CANONICAL_ROUTES.emergencyReception}?queue=${encodeURIComponent(queue)}`;
+    return buildReceptionDeepLink({
+      queue: options.queue || 'pretriage',
+      patientId: options.patientId,
+    });
   }
 
   return surface.canonicalRoute;

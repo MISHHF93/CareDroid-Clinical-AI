@@ -8,6 +8,7 @@ import { RECEPTION_COPY } from './receptionCopy';
 import AiTriageAssistPanel from './AiTriageAssistPanel';
 import { patientLabel, selectReceptionQueues } from './receptionQueueModel';
 import ArrivalControlBadge from './ArrivalControlBadge';
+import ReceptionQueueBadgeStack from './ReceptionQueueBadgeStack';
 import HighRiskComplaintFlagBadge from './HighRiskComplaintFlagBadge';
 import { QueueAuditBadge } from '../queues/QueueOperationalPanel';
 import DataQualityRiskBadge from '../dataQuality/DataQualityRiskBadge';
@@ -181,43 +182,45 @@ export default function ReceptionWorkQueues({
                   <span className="reception-work-queues__primary">
                     <span>
                       {patientLabel(patient)}
-                      {showTabBadges && qualityRisks.length ? (
-                        <DataQualityRiskBadge risks={qualityRisks} limit={2} />
-                      ) : null}
-                      <HighRiskComplaintFlagBadge patient={patient} compact />
-                      {queueDensity.showSafetyBadges ? (
-                        <>
-                          <PatientExperienceStatusBadge
+                      <ReceptionQueueBadgeStack>
+                        {showTabBadges && qualityRisks.length ? (
+                          <DataQualityRiskBadge risks={qualityRisks} limit={2} />
+                        ) : null}
+                        <HighRiskComplaintFlagBadge patient={patient} compact />
+                        {queueDensity.showSafetyBadges ? (
+                          <>
+                            <PatientExperienceStatusBadge
+                              patient={patient}
+                              referrals={referrals}
+                              compact
+                              showStaffDetail
+                            />
+                            <TriageBreachBadge patient={patient} settings={settings} compact showElapsed />
+                          </>
+                        ) : null}
+                        {queueDensity.showQueueReason ? (
+                          <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} compact showAll />
+                        ) : null}
+                        {queueDensity.showSafetyBadges ? (
+                          <WhatHappensNextBadge
                             patient={patient}
                             referrals={referrals}
-                            compact
-                            showStaffDetail
-                          />
-                          <TriageBreachBadge patient={patient} settings={settings} compact showElapsed />
-                        </>
-                      ) : null}
-                      {queueDensity.showQueueReason ? (
-                        <QueueReasonBadge patient={patient} referrals={referrals} staff={staff} compact showAll />
-                      ) : null}
-                      {queueDensity.showSafetyBadges ? (
-                        <WhatHappensNextBadge
-                          patient={patient}
-                          referrals={referrals}
-                          staff={staff}
-                          compact
-                        />
-                      ) : null}
-                      {queueDensity.showSafetyBadges && activeTab === 'pretriage' ? (
-                        <>
-                          <DeteriorationWatchBadge
-                            patient={patient}
-                            emsArrivals={emsArrivals}
+                            staff={staff}
                             compact
                           />
-                          <FitToWaitBadge patient={patient} compact />
-                          <ReassessmentTimerBadge patient={patient} thresholds={settings?.thresholds} />
-                        </>
-                      ) : null}
+                        ) : null}
+                        {queueDensity.showSafetyBadges && activeTab === 'pretriage' ? (
+                          <>
+                            <DeteriorationWatchBadge
+                              patient={patient}
+                              emsArrivals={emsArrivals}
+                              compact
+                            />
+                            <FitToWaitBadge patient={patient} compact />
+                            <ReassessmentTimerBadge patient={patient} thresholds={settings?.thresholds} />
+                          </>
+                        ) : null}
+                      </ReceptionQueueBadgeStack>
                     </span>
                     <ArrivalControlBadge patient={patient} compact />
                   </span>
@@ -260,7 +263,7 @@ export default function ReceptionWorkQueues({
                 ) : null}
                 {activeTab === 'ems' && onOpenEms ? (
                   <OperationalEmptyAction secondary onClick={onOpenEms}>
-                    Open EMS Intake
+                    Open EMS coordination
                   </OperationalEmptyAction>
                 ) : null}
               </>

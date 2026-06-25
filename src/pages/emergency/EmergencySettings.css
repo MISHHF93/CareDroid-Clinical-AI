@@ -10,6 +10,17 @@
   animation: emergency-settings-page-enter var(--motion-transition-slow) both;
 }
 
+.emergency-settings__content {
+  display: grid;
+  gap: var(--component-card-gap);
+}
+
+.emergency-settings__module-count {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--status-info);
+}
+
 .emergency-settings__hero,
 .emergency-settings__section {
   border: 0;

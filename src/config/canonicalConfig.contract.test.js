@@ -205,6 +205,7 @@ describe('canonical configuration contract', () => {
     expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-main-content');
     expect(LAYOUT_SCROLL_CONTRACT.normalPagesCreateViewportScrollShells).toBe(false);
     expect(read('layout/AppShell.jsx')).toContain("from '../config/layout.config'");
-    expect(read('layout/AppShell.css')).toContain('.app-shell-main-content');
+    expect(read('components/app-shell.css')).toContain('.app-shell-main-content');
+    expect(read('layout/AppShell.css')).toContain("@import '../components/app-shell.css'");
   });
 });

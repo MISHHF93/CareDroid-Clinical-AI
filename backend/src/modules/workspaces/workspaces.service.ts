@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -250,7 +255,9 @@ export class WorkspacesService {
       throw new BadRequestException('Invitation has expired.');
     }
 
-    const normalizedUserEmail = String(user.email || '').toLowerCase().trim();
+    const normalizedUserEmail = String(user.email || '')
+      .toLowerCase()
+      .trim();
     if (invitation.email !== normalizedUserEmail) {
       throw new ForbiddenException('This invitation was sent to a different email address.');
     }

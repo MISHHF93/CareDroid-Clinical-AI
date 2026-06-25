@@ -111,15 +111,16 @@ export default function AiExplainability({ embedded = false, onCloseEmbedded } =
               placeholder="25"
             />
 
-            <button
-              type="button"
-              className="diagnosis-primary-btn"
-              onClick={loadTrace}
-              disabled={loading}
-              style={{ marginTop: '16px' }}
-            >
-              {loading ? 'Loading trace...' : 'Load explainability trace'}
-            </button>
+            <div className="tool-form-actions">
+              <button
+                type="button"
+                className="diagnosis-primary-btn"
+                onClick={loadTrace}
+                disabled={loading}
+              >
+                {loading ? 'Loading trace...' : 'Load explainability trace'}
+              </button>
+            </div>
           </section>
 
           <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="ai-explainability-output">
@@ -127,9 +128,9 @@ export default function AiExplainability({ embedded = false, onCloseEmbedded } =
             <ApiStateBanner error={error} onRetry={loadTrace} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Loading confidence and execution trace...</p>
+                <p className="tool-loading-state__message">Loading confidence and execution trace...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -185,7 +186,7 @@ export default function AiExplainability({ embedded = false, onCloseEmbedded } =
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Load a trace to review confidence, sources, reasoning, tool chain, and logs.
               </div>
             )}

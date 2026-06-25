@@ -1,6 +1,6 @@
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 
-export const SAFETY_BOUNDED_ASSISTANT_LABEL = 'Safety-bounded assistant';
+export const SAFETY_BOUNDED_ASSISTANT_LABEL = 'Staff review required';
 
 export const COPILOT_SAFETY_BOUNDED_DISCLAIMER =
   `${SAFETY_BOUNDED_ASSISTANT_LABEL} — ${HUMAN_REVIEW_DISCLAIMER}`;

@@ -21,6 +21,7 @@ import {
   fetchSubscriptionPlans,
 } from '../services/subscriptionApi';
 import { fetchMyAuditLogs } from '../services/auditApi';
+import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
 import './Settings.css';
 
 const DATA_DELETE_CONFIRMATION = 'DELETE MY DATA';
@@ -48,6 +49,7 @@ function downloadJsonExport(data) {
 }
 
 const Settings = () => {
+  const surfaces = getPractitionerSurfaceVisibility();
   const [notifications, setNotifications] = useState(true);
   const [safetyBanner, setSafetyBanner] = useState(true);
   const [privacyDrawerAction, setPrivacyDrawerAction] = useState(null);
@@ -330,26 +332,21 @@ const Settings = () => {
 
   return (
     <div className="settings-page">
-      <Card style={{ width: '100%', maxWidth: '840px' }}>
-        <h2 style={{ marginTop: 0 }}>Settings</h2>
-        <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-          Configure CareDroid preferences and notifications.
-        </p>
+      <Card>
+        <h2 className="settings-card__title">Settings</h2>
+        {surfaces.settings.showNestedSubtitles ? (
+          <p className="settings-card__subtitle">
+            Configure CareDroid preferences and notifications.
+          </p>
+        ) : null}
 
-        {canViewPlatformAdmin ? (
-          <div
-            style={{
-              marginTop: '16px',
-              padding: '12px',
-              borderRadius: '12px',
-              border: '1px solid var(--panel-border)',
-            }}
-          >
-            <div style={{ fontWeight: 600 }}>Organization platform</div>
-            <p style={{ fontSize: '12px', color: 'var(--muted-text)', margin: '6px 0 10px' }}>
+        {surfaces.settings.showPlatformStrip && canViewPlatformAdmin ? (
+          <div className="settings-platform-strip">
+            <div className="settings-platform-strip__title">Organization platform</div>
+            <p className="settings-platform-strip__description">
               Admin, billing, product, and configuration hubs are separated from normal preferences.
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="settings-platform-strip__actions">
               {hasPermission?.(Permission.VIEW_ANALYTICS) || hasPermission?.(Permission.MANAGE_USERS) ? (
                 <Link to="/organization">
                   <Button variant="secondary">Organization dashboard</Button>
@@ -384,31 +381,18 @@ const Settings = () => {
           </div>
         ) : null}
 
-        <div style={{ marginTop: '20px', display: 'grid', gap: '14px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px',
-            borderRadius: '12px',
-            border: '1px solid var(--panel-border)'
-          }}>
+        <div className="settings-toggle-grid">
+          <div className="settings-toggle-row">
             <div>
-              <div style={{ fontWeight: 600 }}>Theme preference</div>
-              <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>
+              <div className="settings-toggle-row__title">Theme preference</div>
+              <div className="settings-toggle-row__description">
                 System, light, or dark (active: {resolvedTheme})
               </div>
             </div>
             <select
               value={preference}
               onChange={(e) => setPreference(e.target.value)}
-              style={{
-                background: 'transparent',
-                color: 'var(--text-color)',
-                border: '1px solid var(--panel-border)',
-                borderRadius: '8px',
-                padding: '6px 10px'
-              }}
+              className="settings-theme-select"
             >
               <option value="system">System</option>
               <option value="light">Light</option>
@@ -416,17 +400,10 @@ const Settings = () => {
             </select>
           </div>
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px',
-            borderRadius: '12px',
-            border: '1px solid var(--panel-border)'
-          }}>
+          <div className="settings-toggle-row">
             <div>
-              <div style={{ fontWeight: 600 }}>Notifications</div>
-              <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>AI results and alerts</div>
+              <div className="settings-toggle-row__title">Notifications</div>
+              <div className="settings-toggle-row__description">AI results and alerts</div>
             </div>
             <input
               type="checkbox"
@@ -435,17 +412,10 @@ const Settings = () => {
             />
           </div>
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px',
-            borderRadius: '12px',
-            border: '1px solid var(--panel-border)'
-          }}>
+          <div className="settings-toggle-row">
             <div>
-              <div style={{ fontWeight: 600 }}>Safety banner</div>
-              <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>Always show clinical disclaimer</div>
+              <div className="settings-toggle-row__title">Safety banner</div>
+              <div className="settings-toggle-row__description">Always show clinical disclaimer</div>
             </div>
             <input
               type="checkbox"
@@ -534,6 +504,7 @@ const Settings = () => {
             </section>
           </FeatureGate>
 
+          {surfaces.settings.showEnterpriseSections ? (
           <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">
             <div className="settings-billing-card__header">
               <div>
@@ -581,7 +552,9 @@ const Settings = () => {
               </>
             )}
           </section>
+          ) : null}
 
+          {surfaces.settings.showEnterpriseSections ? (
           <section className="settings-billing-card" aria-labelledby="tenant-isolation-title">
             <div className="settings-billing-card__header">
               <div>
@@ -634,6 +607,7 @@ const Settings = () => {
               </>
             )}
           </section>
+          ) : null}
 
           <section className="settings-billing-card" aria-labelledby="settings-billing-title">
             <div className="settings-billing-card__header">
@@ -743,9 +717,9 @@ const Settings = () => {
           </section>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+        <div className="settings-footer-actions">
           <Button onClick={handleSave}>Save changes</Button>
-          <Link to="/profile" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
+          <Link to="/profile" className="settings-back-link">
             Back to Profile
           </Link>
         </div>

@@ -492,7 +492,7 @@ export function ProductDetailPage() {
   const { product, packs, assets, routes, backendServices } = detail;
   const launchAsset = (asset) => {
     applyRegistryToolLaunch(asset.id, {
-      navigate,
+      navigate: profileNavigate,
       replace: false,
       state: { source: 'product-detail', productSlug: product.slug },
     });
@@ -508,7 +508,7 @@ export function ProductDetailPage() {
         </Link>
       }
     >
-      <Card className="commercial-card" style={{ marginBottom: 16 }}>
+      <Card className="commercial-card commercial-card--spaced">
         <h2>Solution packs</h2>
         <ul>
           {packs.map((p) => (
@@ -532,31 +532,31 @@ export function ProductDetailPage() {
         <BuyerStakeholderSummary item={product} />
         {product.targetBuyers?.length > 0 && (
           <>
-            <h2 style={{ marginTop: 16 }}>Target buyers</h2>
+            <h2 className="commercial-section-heading">Target buyers</h2>
             <ChipList items={product.targetBuyers} />
           </>
         )}
         {product.targetUsers?.length > 0 && (
           <>
-            <h2 style={{ marginTop: 16 }}>Target users</h2>
+            <h2 className="commercial-section-heading">Target users</h2>
             <ChipList items={product.targetUsers} />
           </>
         )}
         {product.roles?.length > 0 && (
           <>
-            <h2 style={{ marginTop: 16 }}>Roles</h2>
+            <h2 className="commercial-section-heading">Roles</h2>
             <ChipList items={product.roles} />
           </>
         )}
         {product.workspaces?.length > 0 && (
           <>
-            <h2 style={{ marginTop: 16 }}>Workspaces</h2>
+            <h2 className="commercial-section-heading">Workspaces</h2>
             <ChipList items={product.workspaces} />
           </>
         )}
         {product.outcomes?.length > 0 && (
           <>
-            <h2 style={{ marginTop: 16 }}>Outcomes</h2>
+            <h2 className="commercial-section-heading">Outcomes</h2>
             <ul>
               {product.outcomes.map((o) => (
                 <li key={o}>{o}</li>
@@ -565,7 +565,7 @@ export function ProductDetailPage() {
           </>
         )}
       </Card>
-      <div className="commercial-grid" style={{ marginBottom: 16 }}>
+      <div className="commercial-grid commercial-grid--spaced">
         <ProductizationList
           title="Required backend capabilities"
           items={product.requiredBackendCapabilities}
@@ -574,12 +574,12 @@ export function ProductDetailPage() {
         <ProductizationList title="AI workflows" items={product.aiWorkflows} />
         <ProductizationList title="Dashboards" items={product.dashboards} />
       </div>
-      <div className="commercial-grid" style={{ marginBottom: 16 }}>
+      <div className="commercial-grid commercial-grid--spaced">
         <ProductizationList title="Routes" items={(routes || []).map((r) => `${r.route} (${r.assetId})`)} />
         <ProductizationList title="Backend services" items={backendServices || []} />
       </div>
       {(packs || []).map((pack) => (
-        <Card key={pack.id} className="commercial-card" style={{ marginBottom: 12 }}>
+        <Card key={pack.id} className="commercial-card commercial-card--compact">
           <h2>{pack.name}</h2>
           <p>{pack.description}</p>
           <p>
@@ -612,7 +612,7 @@ export function ProductDetailPage() {
                 {(a.route || a.isLaunchable === false) && (
                   <Button
                     variant={a.isLaunchable === false ? 'secondary' : 'ghost'}
-                    style={{ marginLeft: 8 }}
+                    className="commercial-asset-action"
                     disabled={a.isLaunchable === false}
                     onClick={() => launchAsset(a)}
                   >
@@ -624,7 +624,7 @@ export function ProductDetailPage() {
           </ul>
         </Card>
       ))}
-      <Card className="commercial-card" style={{ marginBottom: 12 }}>
+      <Card className="commercial-card commercial-card--compact">
         <h2>All product assets</h2>
         <p>{assets?.length || 0} assets included through product packs and highlights.</p>
         <ChipList items={(assets || []).map((asset) => asset.id)} />
@@ -727,7 +727,7 @@ export function CommercialPlansPage() {
           </Card>
         ))}
       </div>
-      <div style={{ marginTop: 20 }}>
+      <div className="commercial-link-spacer">
         <Link to="/products">View product catalog →</Link>
       </div>
     </PageShell>
@@ -863,7 +863,7 @@ export function CarePathwayDetailPage() {
       </div>
 
       {!!pathway.outcomes?.length && (
-        <Card className="commercial-card" style={{ marginBottom: 16 }}>
+        <Card className="commercial-card commercial-card--spaced">
           <h2>Target outcomes</h2>
           <ChipList items={pathway.outcomes} />
         </Card>
@@ -885,7 +885,7 @@ export function CarePathwayDetailPage() {
           </Link>
         </Card>
       )}
-      <div style={{ marginTop: 16 }}>
+      <div className="commercial-link-spacer--compact">
         <Link to="/care-pathways">← Pathways</Link>
       </div>
     </PageShell>
@@ -1133,7 +1133,7 @@ export function MaturityAssessmentPage() {
       </div>
 
       {(questionnaire?.questions || DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE.questions).map((q) => (
-        <Card key={q.id} className="commercial-card" style={{ marginBottom: 12 }}>
+        <Card key={q.id} className="commercial-card commercial-card--compact">
           <h2>{q.question}</h2>
           <div className="commercial-chip-list">
             {(q.options || []).map((opt) => (
@@ -2012,12 +2012,12 @@ export function ConfigurationStudioPage() {
           Save configuration
         </Button>
       </Card>
-      <div className="commercial-grid" style={{ marginTop: 16 }}>
+      <div className="commercial-grid commercial-grid--raised">
         <BuilderMetric label="Selected products" value={selectedProducts.length} />
         <BuilderMetric label="Selected packs" value={selectedPacks.length} />
         <BuilderMetric label="Selected assets" value={selectedAssets.size} />
       </div>
-      <Card className="commercial-card" style={{ marginTop: 16 }}>
+      <Card className="commercial-card commercial-card--raised">
         <h2>Packaging preview</h2>
         {selectedProducts.length === 0 ? (
           <p>Select products to preview their packs, assets, routes, and services.</p>
@@ -2765,7 +2765,7 @@ export function OrganizationOnboardingPage() {
       </div>
       <Card className="commercial-card">
         <h2>{ONBOARDING_STEPS[step]}</h2>
-        {error && <p style={{ color: '#ff6b6b' }}>{error}</p>}
+        {error && <p className="commercial-error-text">{error}</p>}
         {renderStep()}
         <div className="commercial-actions">
           <Button variant="secondary" disabled={step === 0} onClick={() => setStep(step - 1)}>

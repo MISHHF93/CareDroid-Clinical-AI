@@ -72,10 +72,17 @@ export class AuthService {
   }
 
   private normalizeEmail(email: string): string {
-    return String(email || '').trim().toLowerCase();
+    return String(email || '')
+      .trim()
+      .toLowerCase();
   }
 
-  async register(registerDto: { email: string; password: string; fullName: string; role?: UserRole }) {
+  async register(registerDto: {
+    email: string;
+    password: string;
+    fullName: string;
+    role?: UserRole;
+  }) {
     const email = this.normalizeEmail(registerDto.email);
     const { password, fullName } = registerDto;
 

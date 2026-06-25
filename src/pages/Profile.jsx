@@ -10,6 +10,7 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildCompetencyCredentialingSnapshot } from '../data/competencyCredentialingCatalog';
 import { toolRegistryById } from '../data/toolRegistry';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
+import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
 import './Profile.css';
 
 const ACTION_LABELS = {
@@ -42,6 +43,7 @@ function formatDate(value) {
 }
 
 const Profile = () => {
+  const surfaces = getPractitionerSurfaceVisibility();
   const { user, hasPermission } = useUser();
   const { account, preferences, activity, activeWorkspace, accessSummary, saasProfile } = useUserIdentity();
   const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();
@@ -162,36 +164,39 @@ const Profile = () => {
       profileCopy={profileCopy}
     >
     {saasProfile?.onboardingStatus && saasProfile.onboardingStatus !== 'complete' ? (
-      <Card style={{ marginBottom: 16, padding: 16 }}>
+      <Card className="profile-onboarding-banner">
         <strong>Finish setting up your profile</strong>
-        <p style={{ margin: '8px 0', color: 'var(--muted-text)', fontSize: 14 }}>
+        <p>
           Complete the welcome wizard to personalize focus areas and safety preferences.
         </p>
-        <Link to="/welcome" style={{ color: '#00FF88' }}>
+        <Link to="/welcome">
           Continue onboarding →
         </Link>
       </Card>
     ) : null}
     <section className="profile-page">
-      <Card style={{ width: '100%', maxWidth: '820px' }}>
-        <h2 style={{ marginTop: 0 }}>Profile</h2>
-        <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-          Review your account profile, recent activity, and access visibility.
-        </p>
-        <div style={{ marginTop: '18px' }}>
+      <Card>
+        <h2 className="profile-card__title">Profile</h2>
+        {surfaces.profile.showNestedSubtitles ? (
+          <p className="profile-card__subtitle">
+            Review your account profile, recent activity, and access visibility.
+          </p>
+        ) : null}
+        <div className="profile-summary-wrap">
           <ProfileSummaryCard />
         </div>
-        <div style={{
-          marginTop: '18px',
-          display: 'grid',
-          gap: '12px',
-          fontSize: '14px'
-        }}>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Name:</strong> {displayName}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Email:</strong> {email}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Role:</strong> {role}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Workspace:</strong> {workspaceName}</div>
+        {surfaces.profile.showNestedSubtitles ? (
+        <div className="profile-detail-grid">
+          <div className="card-subtle profile-detail-row"><strong>Name:</strong> {displayName}</div>
+          <div className="card-subtle profile-detail-row"><strong>Email:</strong> {email}</div>
+          <div className="card-subtle profile-detail-row"><strong>Role:</strong> {role}</div>
+          <div className="card-subtle profile-detail-row"><strong>Workspace:</strong> {workspaceName}</div>
         </div>
+        ) : (
+          <p className="profile-card__workspace" role="status">
+            {role} · {workspaceName}
+          </p>
+        )}
 
         <section className="profile-overview-grid" aria-label="Profile tools and preferences">
           <div className="profile-overview-card">
@@ -213,6 +218,7 @@ const Profile = () => {
             </div>
           </div>
 
+          {surfaces.profile.showCompetencyCard ? (
           <div className="profile-overview-card profile-competency-status">
             <div className="profile-overview-card__header">
               <h3>Competency Status</h3>
@@ -228,8 +234,12 @@ const Profile = () => {
                 <span>active credentials</span>
               </div>
             </div>
-            <div className="profile-competency-progress" aria-label="Profile competency readiness">
-              <span style={{ width: `${competencySnapshot.summary.overallReadiness}%` }} />
+            <div
+              className="profile-competency-progress"
+              aria-label="Profile competency readiness"
+              style={{ '--competency-progress': `${competencySnapshot.summary.overallReadiness}%` }}
+            >
+              <span />
             </div>
             <div className="profile-overview-row">
               <span>Training status: {competencySnapshot.summary.trainingStatus}</span>
@@ -240,6 +250,7 @@ const Profile = () => {
               skill, CME, and certification state.
             </p>
           </div>
+          ) : null}
 
           <div className="profile-overview-card">
             <div className="profile-overview-card__header">
@@ -285,11 +296,13 @@ const Profile = () => {
         <section className="profile-activity-card" aria-labelledby="profile-activity-title">
           <div className="profile-activity-card__header">
             <div>
-              <h3 id="profile-activity-title">Profile Activity / My Access Logs</h3>
+              <h3 id="profile-activity-title">Recent activity</h3>
+              {surfaces.profile.showNestedSubtitles ? (
               <p>
                 Recent account activity comes from your protected audit log endpoint. Admin-only audit
                 logs remain behind role-based access control.
               </p>
+              ) : null}
             </div>
             <span className="profile-activity-card__badge">My logs</span>
           </div>
@@ -338,12 +351,15 @@ const Profile = () => {
               <span className="profile-activity-summary__value">{activityState.total}</span>
               <span className="profile-activity-summary__label">personal audit events</span>
             </div>
-            <div>
-              <span className="profile-activity-summary__value">{recentPhiCount}</span>
-              <span className="profile-activity-summary__label">recent PHI-marked events</span>
-            </div>
+            {surfaces.profile.showPhiActivity ? (
+              <div>
+                <span className="profile-activity-summary__value">{recentPhiCount}</span>
+                <span className="profile-activity-summary__label">recent PHI-marked events</span>
+              </div>
+            ) : null}
           </div>
 
+          {surfaces.profile.showPhiActivity ? (
           <div className="profile-phi-panel">
             <div>
               <h4>PHI Access Visibility</h4>
@@ -384,17 +400,10 @@ const Profile = () => {
               </div>
             )}
           </div>
+          ) : null}
         </section>
 
-        <div
-          style={{
-            marginTop: '24px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
-            fontSize: '14px',
-          }}
-        >
+        <div className="profile-nav-links">
           <Link to="/profile/settings">Edit profile</Link>
           <Link to="/profile/tool-preferences">Tool preferences</Link>
           <Link to="/profile/activity">Activity</Link>
@@ -403,8 +412,8 @@ const Profile = () => {
           <Link to="/settings">Platform settings</Link>
           {canViewPhiAccess && <Link to="/audit">Audit logs</Link>}
         </div>
-        <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/dashboard" style={{ color: '#00FF88', textDecoration: 'none' }}>
+        <div className="profile-back-link-wrap">
+          <Link to="/dashboard" className="profile-back-link">
             ← Back to Dashboard
           </Link>
         </div>

@@ -9,6 +9,30 @@
   overflow-x: clip;
 }
 
+.tools-overview--compact {
+  padding: var(--app-page-padding, 12px);
+  padding-block: var(--app-page-padding, 12px);
+}
+
+.tools-overview-shell.cd-page-shell {
+  gap: var(--compact-page-gap, 12px);
+}
+
+.tools-overview-shell__content {
+  display: grid;
+  gap: var(--compact-page-gap, 12px);
+}
+
+.tools-overview--compact .tools-discovery-controls {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.tools-overview--compact .tools-workspace {
+  margin-bottom: 0;
+}
+
 .tools-overview-header {
   margin-bottom: var(--compact-page-gap, 14px);
   text-align: left;
@@ -132,6 +156,25 @@
   color: var(--text-secondary);
 }
 
+.tools-overview-context-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ed-space-2, 8px);
+  align-items: stretch;
+  margin: 0 0 var(--ed-space-3, 12px);
+}
+
+.tools-overview-context-row .tools-workspace-os {
+  flex: 1 1 280px;
+  margin: 0;
+}
+
+.tools-overview-context-row .tools-profile-summary {
+  flex: 1 1 280px;
+  margin: 0;
+  align-content: center;
+}
+
 .tools-execution-legend {
   display: grid;
   gap: 10px;
@@ -140,6 +183,44 @@
   border: 1px solid var(--panel-border);
   border-radius: var(--compact-panel-radius, 14px);
   background: var(--app-surface-1, var(--panel-background));
+}
+
+.tools-execution-legend--compact {
+  padding: 0;
+}
+
+.tools-execution-legend--compact > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.tools-execution-legend--compact > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tools-execution-legend--compact > summary::after {
+  content: ' ▾';
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.tools-execution-legend--compact[open] > summary::after {
+  content: ' ▴';
+}
+
+.tools-execution-legend--compact .tools-execution-legend__body {
+  display: grid;
+  gap: 10px;
+  padding: 0 10px 10px;
+  border-top: 1px solid color-mix(in srgb, var(--panel-border) 72%, transparent);
+}
+
+.tools-execution-legend--compact .tools-execution-legend__body > p {
+  margin: 10px 0 0;
 }
 
 .tools-execution-legend strong {

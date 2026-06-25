@@ -3,6 +3,7 @@ import {
   buildFirstCustomerDemoApiEnvelope,
   buildFirstCustomerDemoMode,
 } from './firstCustomerDemoMode';
+import { dedupePatientsByMrn } from '../utils/patientSeedUtils';
 
 const STORAGE_KEY = 'caredroid.edScenarioId';
 
@@ -445,7 +446,7 @@ function scenarioPatients(id, now) {
     );
   }
 
-  return patients;
+  return dedupePatientsByMrn(patients);
 }
 
 function buildRooms(patients, id) {

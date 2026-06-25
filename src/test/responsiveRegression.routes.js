@@ -24,7 +24,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'workflows', path: '/workflows', match: 'heading', heading: /^workflows$/i },
   { id: 'operations', path: '/operations', match: 'heading', heading: /emergency operations/i },
-  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /caredroid console/i },
+  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /careDroid tool console/i },
   { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },
   { id: 'documentation', path: '/documentation', match: 'heading', heading: /clinical documentation assistant/i },
@@ -63,17 +63,12 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading',
     heading: /clinical alerts management/i,
   },
-  {
-    id: 'tools-catalog',
-    path: '/tools/catalog',
-    match: 'heading',
-    heading: /developer catalog \/ source audit/i,
-  },
+
   {
     id: 'calculators-library-filter',
     path: '/tools/calculators',
     match: 'heading',
-    heading: /caredroid console/i,
+    heading: /careDroid tool console/i,
   },
   {
     id: 'ambient-scribe',

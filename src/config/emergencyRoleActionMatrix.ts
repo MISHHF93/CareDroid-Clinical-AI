@@ -70,17 +70,6 @@ export const PERMISSION_TO_ROLE_ACTION: Record<string, EmergencyRoleActionId> = 
   [K.settingsManage]: EMERGENCY_ROLE_ACTIONS.settingsEdit,
   [K.displayPublicPublish]: EMERGENCY_ROLE_ACTIONS.publicDisplayPublish,
   [K.displayPublicWaitboard]: EMERGENCY_ROLE_ACTIONS.publicDisplayPublish,
-  'patient.create': EMERGENCY_ROLE_ACTIONS.patientCreate,
-  'demographics.edit': EMERGENCY_ROLE_ACTIONS.demographicsEdit,
-  'encounter.create': EMERGENCY_ROLE_ACTIONS.encounterCreate,
-  'triage.assign_acuity': EMERGENCY_ROLE_ACTIONS.assignAcuity,
-  'queue.move': EMERGENCY_ROLE_ACTIONS.moveQueue,
-  'reassessment.complete': EMERGENCY_ROLE_ACTIONS.completeReassessment,
-  'ems.handoff.complete': EMERGENCY_ROLE_ACTIONS.completeEmsHandoff,
-  'referral.create': EMERGENCY_ROLE_ACTIONS.createReferral,
-  'patient.discharge': EMERGENCY_ROLE_ACTIONS.disposition,
-  'settings.manage': EMERGENCY_ROLE_ACTIONS.settingsEdit,
-  'display.public.publish': EMERGENCY_ROLE_ACTIONS.publicDisplayPublish,
 });
 
 const H = EMERGENCY_ROLE_ACTIONS;

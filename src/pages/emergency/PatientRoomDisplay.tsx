@@ -4,11 +4,12 @@ import PatientRoomWhiteboard from '../../components/patient-experience/PatientRo
 import PatientWhiteboard from '../../components/patient-experience/PatientWhiteboard';
 import DigitalDoorSign from '../../components/whiteboard/DigitalDoorSign';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { readPatientRouteContext } from '../../utils/receptionQueryParams';
 import './PatientRoomDisplay.css';
 
 export default function PatientRoomDisplay() {
   const [searchParams] = useSearchParams();
-  const patientId = searchParams.get('patientId') || '';
+  const { focusPatientId: patientId } = readPatientRouteContext(searchParams);
   const roomId = searchParams.get('roomId') || '';
   const mode = searchParams.get('mode') || 'whiteboard';
 

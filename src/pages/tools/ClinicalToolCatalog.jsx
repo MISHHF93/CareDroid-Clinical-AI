@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { shouldSuppressDeveloperToolCatalog } from '../../config/practitionerCleanup.config';
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -570,6 +573,10 @@ const ClinicalToolCatalog = () => {
     () => medicalSort.applySort(filteredMedical),
     [filteredMedical, medicalSort.sortKey, medicalSort.sortDir]
   );
+
+  if (shouldSuppressDeveloperToolCatalog()) {
+    return <Navigate to={CANONICAL_ROUTES.emergencyTools} replace />;
+  }
 
   const rowsForStatus = (status) =>
     scanSort.applySort(

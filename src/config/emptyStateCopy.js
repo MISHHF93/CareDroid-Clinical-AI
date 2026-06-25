@@ -30,13 +30,9 @@ export const EMPTY_STATE_COPY = Object.freeze({
   copilot: {
     noMessages: {
       title: 'Ask about the department',
-      guidance: 'Copilot uses live board state. Every response requires human review before clinical action.',
-      status: 'Operational awareness is current above.',
-      nextSteps: [
-        'Summarize who is waiting longest.',
-        'List patients with reassessment due.',
-        'Explain EMS inbound status.',
-      ],
+      guidance: 'Answers use live board data. Review before any clinical action.',
+      status: '',
+      nextSteps: [],
     },
   },
   reception: {
@@ -111,6 +107,18 @@ export const EMPTY_STATE_COPY = Object.freeze({
       title: 'No protocol bundles match',
       guidance: 'No deterministic protocol suggestion for this complaint — review manually.',
       nextSteps: ['Open Medical Tools for calculators', 'Select protocol from order set'],
+    },
+  },
+  shift: {
+    empty: {
+      title: 'Shift summary will populate as patients move',
+      guidance: 'Volume, queue breaches, and LWBS metrics compute from active board data during the shift.',
+      status: 'No elevated handoff signals yet.',
+      nextSteps: [
+        'Register or convert arrivals from Reception.',
+        'Load the ED-18 walkthrough dataset in Settings for a demo shift.',
+        'Generate handoff brief when charge nurse requests end-of-shift review.',
+      ],
     },
   },
   strips: {

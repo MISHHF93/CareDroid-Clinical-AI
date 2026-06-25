@@ -21,29 +21,32 @@ import {
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
-/** Core ED operating nav shown during pilot customer mode. */
+/** Primary ED operating nav shown during pilot customer mode. */
 export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'reception',
   'whiteboard',
-  'intake',
   'ems',
   'patients',
   'queues',
   'reassessment',
   'capacity',
-  'boarding',
   'referrals',
   'copilot',
   'tools',
   'analytics',
   'settings',
-  'integrations',
+]);
+
+/** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
+export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
 ]);
 
 /** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
 export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'intake',
+  'integrations',
   'cosmos',
   'platform',
   'fleet',
@@ -56,7 +59,10 @@ export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'admin',
 ]);
 
-export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = PILOT_CORE_NAV_ITEM_IDS;
+export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  ...PILOT_CORE_NAV_ITEM_IDS,
+  ...PILOT_UTILITY_NAV_ITEM_IDS,
+]);
 
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
@@ -86,6 +92,7 @@ export const PILOT_CUSTOMER_MODE = Object.freeze({
     CANONICAL_ROUTES.emergencyPulse,
     CANONICAL_ROUTES.emergencySettings,
     CANONICAL_ROUTES.emergencyShift,
+    CANONICAL_ROUTES.emergencyBoarding,
   ]),
 });
 
@@ -168,17 +175,10 @@ export const NAV_ITEMS = Object.freeze([
   },
   {
     id: 'capacity',
-    label: 'Capacity',
+    label: 'Flow & Capacity',
     icon: 'capacity',
     route: CANONICAL_ROUTES.emergencyCapacity,
     featureGate: 'capacity_intel',
-  },
-  {
-    id: 'boarding',
-    label: 'Boarding',
-    icon: 'boarding',
-    route: CANONICAL_ROUTES.emergencyBoarding,
-    featureGate: null,
   },
   {
     id: 'referrals',

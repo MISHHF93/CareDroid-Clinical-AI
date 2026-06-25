@@ -75,6 +75,7 @@ export default function OperationalStrip({
             key={metric.id}
             type="button"
             className="operational-strip__metric"
+            data-metric-id={metric.id}
             data-tone={tone}
             onClick={() => interactive && onMetricSelect?.(metric)}
             disabled={readOnly || !interactive}

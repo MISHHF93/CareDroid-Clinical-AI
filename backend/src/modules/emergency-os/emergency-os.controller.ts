@@ -177,9 +177,7 @@ export class EmergencyOsController {
       'admin',
     ]);
     const role = (
-      allowedRoles.has(String(roleQuery || ''))
-        ? roleQuery
-        : 'physician'
+      allowedRoles.has(String(roleQuery || '')) ? roleQuery : 'physician'
     ) as import('../../../../lib/patient-orchestration').EmergencyRoleId;
     const orchestration = this.orchestrationService.buildPatientOrchestration(patientId, role);
     return {
@@ -378,7 +376,9 @@ export class EmergencyOsController {
   }
 
   @Post('copilot/query')
-  queryCopilot(@Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
+  queryCopilot(
+    @Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> },
+  ) {
     return this.copilotService.processQuery(dto || {});
   }
 

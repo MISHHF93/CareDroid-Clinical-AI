@@ -26,7 +26,10 @@ const LEVEL_PRIORITY: Record<1 | 2 | 3 | 4 | 5, EmergencyPriority> = {
   5: 'P5',
 };
 
-function normalizeArrivalMode(input?: string | null, patient?: Partial<EmergencyPatient>): ArrivalMode {
+function normalizeArrivalMode(
+  input?: string | null,
+  patient?: Partial<EmergencyPatient>,
+): ArrivalMode {
   if (patient?.flags?.includes('EMSArrival')) return 'EMS';
 
   const normalized = String(input || patient?.arrivalMode || '')
@@ -158,7 +161,8 @@ export function normalizePatientArrival(patient: Partial<EmergencyPatient>): Pat
         patient.chiefComplaint ||
         'Unspecified complaint',
       arrivalMode: normalizeArrivalMode(patient.arrival.arrivalMode, patient),
-      arrivalTimestamp: patient.arrival.arrivalTimestamp || patient.arrivalTime || new Date().toISOString(),
+      arrivalTimestamp:
+        patient.arrival.arrivalTimestamp || patient.arrivalTime || new Date().toISOString(),
     };
   }
 

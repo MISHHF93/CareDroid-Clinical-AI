@@ -18,7 +18,7 @@ describe('whiteboardOperationalLoadModel', () => {
     expect(evaluation.loadLevel).toBe('critical');
     expect(evaluation.prioritizeAwareness).toBe(true);
     expect(evaluation.compactChrome).toBe(true);
-    expect(evaluation.maxVisibleCards).toBe(24);
+    expect(evaluation.maxVisibleCards).toBe(18);
     expect(evaluation.readabilityScore).toBeLessThan(55);
     expect(evaluation.issues.length).toBeGreaterThan(0);
     expect(evaluation.primaryFocus[0]?.id).toBe('reassess');

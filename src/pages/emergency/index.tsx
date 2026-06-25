@@ -54,17 +54,9 @@ import { resolveScreenDensityProfile } from '../../config/screenDensityModeModel
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
 import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
-import PatientExperienceStatusStrip from '../../components/patient-experience/PatientExperienceStatusStrip';
-import WhatHappensNextStrip from '../../components/guidance/WhatHappensNextStrip';
-import LwbsRiskStrip from '../../components/waiting-room/LwbsRiskStrip';
-import DeteriorationWatchStrip from '../../components/waiting-room/DeteriorationWatchStrip';
-import WaitingRoomSafetyEscalationStrip from '../../components/waiting-room/WaitingRoomSafetyEscalationStrip';
-import HighRiskComplaintAttentionStrip from '../../components/waiting-room/HighRiskComplaintAttentionStrip';
-import FitToWaitAttentionStrip from '../../components/waiting-room/FitToWaitAttentionStrip';
-import QueueReasonAttentionStrip from '../../components/queues/QueueReasonAttentionStrip';
-import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
+
+import WhiteboardWaitingRoomAlertRail from '../../components/whiteboard/WhiteboardWaitingRoomAlertRail';
 import ProviderWaitBreachStrip from '../../components/provider-wait/ProviderWaitBreachStrip';
-import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
 import PatientCommunicationStatusPanel from '../../components/waiting-room/PatientCommunicationStatusPanel';
 import DepartmentStatusScreen from '../../components/whiteboard/DepartmentStatusScreen';
 import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
@@ -110,6 +102,11 @@ import { formatEta as formatEmsEta } from '../../utils/emsArrivalDisplay';
 import { resolvePatientCardWorkflowProfile, shouldShowPhysicianOperationalStrip } from '../../components/whiteboard/physicianWorkflowModel';
 import { resolvePhysicianStaffId } from '../../utils/whoNext';
 import { sortWhiteboardPatients } from '../../utils/emergencyWhiteboardSorting';
+import {
+  clearPatientRouteParam,
+  PATIENT_ROUTE_PARAM_KEYS,
+  readPatientRouteContext,
+} from '../../utils/receptionQueryParams';
 import WhiteboardView from '../../components/whiteboard/WhiteboardView';
 import { completeIntakeHandoff, refreshIntakeHandoffSurfaces } from '../../services/receptionHandoff';
 import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
@@ -117,6 +114,9 @@ import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
 import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/whiteboardOperationalLoadModel';
 import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
+import { mergePractitionerDensityProfile, shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 import DiagnosticSafetyDashboard from '../../components/copilot/DiagnosticSafetyDashboard';
 import NativeAiCommandSuitePanel from '../../components/native-ai/NativeAiCommandSuitePanel';
 import useFeature from '../../hooks/useFeature';
@@ -124,6 +124,7 @@ import { useNativeAiBackendSync } from '../../hooks/useNativeAiBackendSync';
 import { useNativeAiPeriodicRefresh } from '../../hooks/useNativeAiPeriodicRefresh';
 import { normalizeWhiteboardPatient } from '../../services/patientArrivalBackendSync';
 import '../../components/EmergencyWhiteboard.css';
+import './emergency-whiteboard-cleanup.css';
 
 type FilterId = 'All' | 'Waiting' | 'Assessment' | 'High Risk' | 'EMS' | 'Boarding' | 'Reassess';
 type UpgradeHarnessSignal = {
@@ -197,82 +198,37 @@ function StatCard({
   onClick?: () => void;
   emphasized?: boolean;
 }) {
-  const toneColor =
-    tone === 'critical'
-      ? 'var(--status-critical, #EF4444)'
-      : tone === 'warning'
-        ? 'var(--status-warning, #F59E0B)'
-        : tone === 'success'
-          ? 'var(--status-stable, #10B981)'
-          : tone === 'info'
-            ? 'var(--status-info, #60A5FA)'
-            : 'var(--color-text-primary, #F9FAFB)';
+  const statClassName = [
+    'emergency-whiteboard-page__stat',
+    onClick ? 'emergency-whiteboard-page__stat--interactive' : '',
+    emphasized ? 'emergency-whiteboard-page__stat--emphasized' : '',
+    `emergency-whiteboard-page__stat--tone-${tone}`,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
-  const sharedStyle = {
-    flex: '1 1 0',
-    minWidth: 120,
-    padding: '14px 16px',
-    borderRight: '1px solid var(--color-border-subtle, #1F2937)',
-    background: emphasized
-      ? 'color-mix(in srgb, var(--status-warning, #F59E0B) 10%, var(--color-surface, #111827))'
-      : undefined,
-    boxShadow: emphasized
-      ? 'inset 0 3px 0 color-mix(in srgb, var(--status-warning, #F59E0B) 72%, transparent)'
-      : undefined,
-  } as const;
+  const valueNode = (
+    <>
+      <div className="emergency-whiteboard-page__stat-value">{value}</div>
+      <div
+        className={`emergency-whiteboard-page__stat-label emergency-whiteboard-page__stat-label--tone-${tone}`}
+      >
+        {label}
+      </div>
+    </>
+  );
 
   if (onClick) {
     return (
-      <button
-        type="button"
-        className="emergency-whiteboard-page__stat emergency-whiteboard-page__stat--interactive"
-        title={title}
-        onClick={onClick}
-        style={{
-          ...sharedStyle,
-          border: emphasized ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-subtle, #1F2937))' : '0',
-          borderRight: emphasized
-            ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-subtle, #1F2937))'
-            : '1px solid var(--color-border-subtle, #1F2937)',
-          color: 'inherit',
-          cursor: 'pointer',
-          textAlign: 'left',
-        }}
-      >
-        <div
-          style={{
-            color: 'var(--color-text-primary, #F9FAFB)',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-            fontSize: 24,
-            lineHeight: 1.1,
-            fontWeight: 700,
-          }}
-        >
-          {value}
-        </div>
-        <div style={{ color: toneColor, fontSize: 12, fontWeight: tone === 'default' ? 500 : 800, marginTop: 4 }}>{label}</div>
+      <button type="button" className={statClassName} title={title} onClick={onClick}>
+        {valueNode}
       </button>
     );
   }
 
   return (
-    <div
-      className="emergency-whiteboard-page__stat"
-      title={title}
-      style={sharedStyle}
-    >
-      <div
-        style={{
-          color: 'var(--color-text-primary, #F9FAFB)',
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          fontSize: 24,
-          lineHeight: 1.1,
-          fontWeight: 700,
-        }}
-      >
-        {value}
-      </div>
-      <div style={{ color: toneColor, fontSize: 12, fontWeight: tone === 'default' ? 500 : 800, marginTop: 4 }}>{label}</div>
+    <div className={statClassName} title={title}>
+      {valueNode}
     </div>
   );
 }
@@ -333,24 +289,7 @@ function MissionButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      style={{
-        border: '1px solid var(--color-border-subtle, #1F2937)',
-        borderRadius: 12,
-        background:
-          tone === 'primary'
-            ? 'var(--component-button-primary-bg, #2563EB)'
-            : tone === 'warning'
-              ? 'color-mix(in srgb, var(--status-warning, #F59E0B) 14%, var(--color-card, #172033))'
-              : 'var(--color-floating-surface, #1E293B)',
-        color: disabled ? 'var(--color-text-muted, #6B7280)' : 'var(--color-text-primary, #F9FAFB)',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        fontSize: 12,
-        fontWeight: 850,
-        minHeight: 36,
-        opacity: disabled ? 0.58 : 1,
-        padding: '8px 10px',
-        textAlign: 'left',
-      }}
+      className={`emergency-whiteboard-page__mission-btn emergency-whiteboard-page__mission-btn--${tone}`}
     >
       {label}
     </button>
@@ -358,6 +297,7 @@ function MissionButton({
 }
 
 export default function EmergencyWhiteboard() {
+  const surfaces = getPractitionerSurfaceVisibility();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
@@ -370,7 +310,9 @@ export default function EmergencyWhiteboard() {
   const commandCenter = useCommandCenterScreen();
   const { enabled: clinicalAcuityDashboardEnabled } = useFeature('clinical_acuity_dashboard');
   const { enabled: aiTransparencyDashboardEnabled } = useFeature('ai_transparency_dashboard');
-  const showNativeAiCommandSuite = clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled;
+  const showNativeAiCommandSuite =
+    surfaces.whiteboard.showNativeAiPanels &&
+    (clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled);
   useNativeAiBackendSync(showNativeAiCommandSuite, { force: true });
   const nativeAiRefreshTick = useNativeAiPeriodicRefresh();
   const storePatients = useEmergencyStore((state) => state.patients);
@@ -400,6 +342,7 @@ export default function EmergencyWhiteboard() {
   const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
   const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
   const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const setActiveScenario = useEmergencyStore((state) => state.setActiveScenario);
   const display = useWhiteboardDisplayMode();
   const presentationScreenMode = display.isWaitingRoomDisplay
     ? CARE_DROID_SCREEN_MODES.publicWaiting
@@ -872,21 +815,22 @@ export default function EmergencyWhiteboard() {
   }, []);
 
   useEffect(() => {
-    const patientId = searchParams.get('patient');
-    if (!patientId) return undefined;
+    const { queuePatientId } = readPatientRouteContext(searchParams);
+    if (!queuePatientId) return undefined;
 
-    const patient = patients.find((entry) => entry.id === patientId);
+    const patient = patients.find((entry) => entry.id === queuePatientId);
     if (!patient) return undefined;
 
-    selectPatient(patientId);
+    selectPatient(queuePatientId);
     if (patient.state === PatientState.Triage) {
       setQueueFilter('Triage');
       setActiveFilter('All');
     }
 
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.delete('patient');
-    setSearchParams(nextParams, { replace: true });
+    setSearchParams(
+      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.queue),
+      { replace: true },
+    );
 
     return undefined;
   }, [patients, searchParams, selectPatient, setQueueFilter, setSearchParams]);
@@ -969,6 +913,7 @@ export default function EmergencyWhiteboard() {
 
   const showPhysicianStrip = useMemo(
     () =>
+      surfaces.whiteboard.showRoleStrips &&
       (!physician.isPhysicianScreen || physician.showOperationalStrip) &&
       shouldShowPhysicianOperationalStrip({
         screenMode: routeScreenMode,
@@ -983,6 +928,7 @@ export default function EmergencyWhiteboard() {
       physician.showOperationalStrip,
       routeScreenMode,
       showShiftHandoffStrip,
+      surfaces.whiteboard.showRoleStrips,
     ],
   );
 
@@ -1036,6 +982,11 @@ export default function EmergencyWhiteboard() {
     ],
   );
 
+  const practitionerScreenDensity = useMemo(
+    () => mergePractitionerDensityProfile(screenDensity),
+    [screenDensity],
+  );
+
   const whiteboardDensity = useMemo(
     () =>
       evaluateWhiteboardDensity({
@@ -1044,7 +995,7 @@ export default function EmergencyWhiteboard() {
         publicWaitingDisplay: display.isWaitingRoomDisplay,
         commandCenterScreen: commandCenter.isCommandCenterScreen,
         screenMode: routeScreenMode,
-        densityProfile: screenDensity,
+        densityProfile: practitionerScreenDensity,
         showShiftHandoffStrip,
         prioritizeAwareness,
         signals: {
@@ -1054,7 +1005,7 @@ export default function EmergencyWhiteboard() {
           chargeNurseStrip: showChargeNurseStrip,
           waitingRoomSafety: chargeNurseSurfaceSignals.waitingRoomSafety,
           inboundEmsBanner: chargeNurseSurfaceSignals.inboundEmsBanner,
-          opsDetailCount: 3,
+          opsDetailCount: practitionerScreenDensity ? 0 : 3,
         },
       }),
     [
@@ -1064,7 +1015,7 @@ export default function EmergencyWhiteboard() {
       operationalLoad,
       prioritizeAwareness,
       routeScreenMode,
-      screenDensity,
+      practitionerScreenDensity,
       showChargeNurseStrip,
       showShiftHandoffStrip,
       chargeNurseSurfaceSignals.emsAttention,
@@ -1316,8 +1267,8 @@ export default function EmergencyWhiteboard() {
       if (metric.whiteboardAction === 'focus-boarding') {
         setActiveFilter('Boarding');
         setQueueFilter(null);
-        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyBoarding)) {
-          openRoute(CANONICAL_ROUTES.emergencyBoarding);
+        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyCapacity)) {
+          openRoute(`${CANONICAL_ROUTES.emergencyCapacity}?view=boarding`);
         }
         return;
       }
@@ -1381,17 +1332,6 @@ export default function EmergencyWhiteboard() {
 
   const closeIntake = useCallback(() => setShowIntake(false), []);
 
-  const awarenessChipStyle = {
-    border: '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 40%, var(--color-border-subtle, #1F2937))',
-    borderRadius: 999,
-    background: 'var(--color-floating-surface, #1E293B)',
-    color: '#FDE68A',
-    cursor: 'pointer',
-    fontSize: 12,
-    fontWeight: 800,
-    padding: '6px 12px',
-  } as const;
-
   const handlePatientAdded = useCallback(
     (patient: Patient) => {
       const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
@@ -1412,7 +1352,6 @@ export default function EmergencyWhiteboard() {
       <section
         className="emergency-whiteboard-page emergency-whiteboard-page--public-waiting-kiosk"
         aria-label="Public waiting room display"
-        style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
       >
         <PublicWaitingDisplay
           kioskMode
@@ -1463,7 +1402,6 @@ export default function EmergencyWhiteboard() {
       <section
         className="emergency-whiteboard-page emergency-whiteboard-page--read-only-whiteboard-kiosk"
         aria-label="Read-only department operations display"
-        style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
       >
         <DepartmentStatusScreen
           kioskMode
@@ -1487,8 +1425,7 @@ export default function EmergencyWhiteboard() {
     return (
       <section
         className="emergency-whiteboard-page emergency-whiteboard-page--command-center"
-        aria-label="Command center operational performance"
-        style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
+        aria-label="Department operational performance"
       >
         <OperationalCommandDashboard
           patients={patients}
@@ -1502,7 +1439,7 @@ export default function EmergencyWhiteboard() {
           subtitle={presentation.pageSubtitle}
         />
         {showNativeAiCommandSuite ? (
-          <div style={{ padding: '0 14px 14px' }}>
+          <div className="emergency-whiteboard-page__native-ai-wrap">
             <NativeAiCommandSuitePanel
               patients={patients}
               rooms={rooms}
@@ -1632,13 +1569,13 @@ export default function EmergencyWhiteboard() {
       className={[
         'emergency-whiteboard-page',
         prioritizeAwareness ? 'emergency-whiteboard-page--awareness' : '',
+        surfaces.compactLayout ? 'emergency-whiteboard-page--practitioner-compact' : '',
         whiteboardDensity.surfaces.departmentStatusScreen.visible
           ? 'emergency-whiteboard-page--department-wall'
           : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{ minHeight: '100%', background: 'var(--color-background, #0B1220)' }}
     >
       {whiteboardDensity.surfaces.departmentStatusScreen.visible ? (
         <DepartmentStatusScreen
@@ -1657,36 +1594,23 @@ export default function EmergencyWhiteboard() {
       ) : null}
       {!whiteboardDensity.surfaces.departmentStatusScreen.visible ? (
       <>
-      <div
-        className="emergency-whiteboard-page__hero"
-        style={{
-          display: 'grid',
-          gap: 8,
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-          background: 'var(--color-card, #172033)',
-          boxShadow: 'none',
-        }}
-      >
+      <div className="emergency-whiteboard-page__hero emergency-whiteboard-page__hero--compact">
         <div>
-          <span
-            style={{
-              color: 'var(--status-info, #93C5FD)',
-              fontSize: 11,
-              fontWeight: 900,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {presentation.pageEyebrow}
-          </span>
-          <h1 style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 24, lineHeight: 1.08, margin: '3px 0 0' }}>
+          {surfaces.whiteboard.showHeroChrome ? (
+            <span className="emergency-whiteboard-page__eyebrow">
+              {presentation.pageEyebrow}
+            </span>
+          ) : null}
+          <h1 className="emergency-whiteboard-page__title">
             {presentation.pageTitle}
           </h1>
-          <p style={{ color: 'var(--color-text-secondary, #CBD5E1)', margin: '4px 0 0', maxWidth: 920, fontSize: 13 }}>
-            {presentation.pageSubtitle}
-          </p>
+          {surfaces.whiteboard.showHeroChrome ? (
+            <p className="emergency-whiteboard-page__subtitle">
+              {presentation.pageSubtitle}
+            </p>
+          ) : null}
           <EdDataSourceBanner
+            compact={surfaces.compactLayout}
             envelope={whiteboard.data as { source?: string; generatedAt?: string } | null}
             loading={whiteboard.loading}
             error={whiteboard.error}
@@ -1696,13 +1620,8 @@ export default function EmergencyWhiteboard() {
         </div>
         {whiteboardDensity.surfaces.heroDetail.visible ? (
         <div
-          className="emergency-whiteboard-page__status"
-          aria-label="CareDroid command center status"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 8,
-          }}
+          className="emergency-whiteboard-page__status emergency-whiteboard-page__status--chips"
+          aria-label="Department operational status"
         >
           {(
             prioritizeAwareness
@@ -1728,30 +1647,21 @@ export default function EmergencyWhiteboard() {
                   EMERGENCY_OS_BRANDING.safetyShort,
                 ]
           ).map((item) => (
-            <span
-              key={item}
-              style={{
-                border: '1px solid var(--color-border-subtle, #1F2937)',
-                borderRadius: 999,
-                background: 'var(--color-floating-surface, #1E293B)',
-                color: 'var(--color-text-primary, #E5E7EB)',
-                fontSize: 12,
-                fontWeight: 750,
-                padding: '6px 10px',
-              }}
-            >
+            <span key={item} className="emergency-whiteboard-page__status-chip">
               {item}
             </span>
           ))}
         </div>
         ) : null}
-        <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 12 }}>
-          {prioritizeAwareness
-            ? showShiftHandoffStrip
-              ? 'Operational awareness mode — Patient, EMS, Referral, and Admission summaries are in the handoff bar above. Click any metric to filter.'
-              : 'Operational awareness mode — attention signals first. Use filters to drill into waiting, reassess, EMS, or referral queues.'
-            : `${EMERGENCY_OS_BRANDING.roleFlowSummary} Inputs flow into ${centralControl.inputProfile.escalationPath.replace(/-/g, ' ')} and remain subject to central policy.`}
-        </p>
+        {surfaces.whiteboard.showHeroChrome ? (
+          <p className="emergency-whiteboard-page__hero-note">
+            {prioritizeAwareness
+              ? showShiftHandoffStrip
+                ? 'Operational awareness mode — Patient, EMS, Referral, and Admission summaries are in the handoff bar above. Click any metric to filter.'
+                : 'Operational awareness mode — attention signals first. Use filters to drill into waiting, reassess, EMS, or referral queues.'
+              : `${EMERGENCY_OS_BRANDING.roleFlowSummary} Inputs flow into ${centralControl.inputProfile.escalationPath.replace(/-/g, ' ')} and remain subject to central policy.`}
+          </p>
+        ) : null}
       </div>
       <CapacityCrisisMode
         capacity={capacity}
@@ -1777,26 +1687,17 @@ export default function EmergencyWhiteboard() {
         <section
           aria-label="Whiteboard display mode"
           role="status"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            padding: '10px 16px',
-            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-            background: 'color-mix(in srgb, var(--status-info, #2563EB) 14%, var(--color-surface, #111827))',
-          }}
+          className="emergency-whiteboard-page__display-banner"
         >
-          <div style={{ display: 'grid', gap: 2 }}>
-            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>
+          <div className="emergency-whiteboard-page__display-banner-copy">
+            <strong className="emergency-whiteboard-page__display-banner-title">
               {display.isWaitingRoomDisplay
                 ? `${display.label} · public information only`
                 : display.isReadOnlyWhiteboardDisplay
                   ? `${display.label} · hallway operations`
                   : `${display.label} · operational awareness only`}
             </strong>
-            <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12 }}>
+            <span className="emergency-whiteboard-page__display-banner-subtitle">
               {display.isWaitingRoomDisplay
                 ? `Patient waiting-area display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no names or clinical details`
                 : display.isReadOnlyWhiteboardDisplay
@@ -1804,7 +1705,7 @@ export default function EmergencyWhiteboard() {
                   : `Read-only wall display · auto-refresh every ${Math.round(display.refreshIntervalMs / 1000)}s · no editing actions`}
             </span>
           </div>
-          <span style={{ color: 'var(--color-text-secondary, #CBD5E1)', fontSize: 12, fontWeight: 750 }}>
+          <span className="emergency-whiteboard-page__display-banner-meta">
             Updated {formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
           </span>
         </section>
@@ -1849,7 +1750,7 @@ export default function EmergencyWhiteboard() {
         <CommandCenterThroughputScreen
           snapshot={stableCommandCenterSnapshot}
           surgeSnapshot={commandCenterSurgeSnapshot}
-          title="Command center throughput"
+          title="Department throughput"
           refreshIntervalMs={display.refreshIntervalMs}
           refreshStatus={isNormalizedDisplayRefresh ? displayRefreshStatus : null}
           showTriageAwaiting={
@@ -1947,19 +1848,13 @@ export default function EmergencyWhiteboard() {
       !commandCenter.hideCommandLayer ? (
       <section
         aria-label="Operational command layer metrics"
-        style={{
-          display: 'grid',
-          gap: 10,
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-          background: 'var(--color-surface, #111827)',
-        }}
+        className="emergency-whiteboard-page__command-layer"
       >
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-          <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>
+        <div className="emergency-whiteboard-page__command-layer-header">
+          <strong className="emergency-whiteboard-page__command-layer-title">
             Operational command layer
           </strong>
-          <span style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12, fontWeight: 750 }}>
+          <span className="emergency-whiteboard-page__command-layer-meta">
             {centralSnapshot.sync.source === 'backend-snapshot' ? 'Backend snapshot' : 'Local store'} -{' '}
             {formatFreshness(centralSnapshot.sync.lastSyncedAt || centralSnapshot.generatedAt)}
             {intelligenceSnapshot.badges.length
@@ -1967,47 +1862,31 @@ export default function EmergencyWhiteboard() {
               : ''}
           </span>
         </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-            gap: 8,
-          }}
-        >
+        <div className="emergency-whiteboard-page__command-layer-grid">
           {commandLayerMetrics.map((metric) => {
             const canOpen = canOpenOperationalMetricOnWhiteboard(metric.key, {
               displayMode: display.isDisplayMode,
               canAccessRoute: (path) => emergencyRole.canAccessRoute(path),
             });
-            const toneColor =
-              metric.tone === 'critical'
-                ? 'var(--status-critical, #EF4444)'
-                : metric.tone === 'warning'
-                  ? 'var(--status-warning, #F59E0B)'
-                  : metric.tone === 'success'
-                    ? 'var(--status-stable, #10B981)'
-                    : 'var(--status-info, #60A5FA)';
+            const metricToneClass =
+              metric.tone === 'critical' ||
+              metric.tone === 'warning' ||
+              metric.tone === 'success'
+                ? metric.tone
+                : 'info';
 
             return display.isDisplayMode ? (
               <div
                 key={metric.key}
+                className="emergency-whiteboard-page__command-metric"
                 title={`${metric.label}: ${metric.value}. Source: ${metric.source}.`}
-                style={{
-                  border: '1px solid var(--color-border-subtle, #1F2937)',
-                  borderRadius: 12,
-                  background: 'var(--color-card, #172033)',
-                  color: 'var(--color-text-primary, #F9FAFB)',
-                  display: 'grid',
-                  gap: 4,
-                  minHeight: 68,
-                  padding: 12,
-                  textAlign: 'left',
-                }}
               >
-                <strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 22 }}>
+                <strong className="emergency-whiteboard-page__command-metric-value">
                   {metric.value}
                 </strong>
-                <span style={{ color: toneColor, fontSize: 12, fontWeight: 850 }}>
+                <span
+                  className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                >
                   {metric.label}
                 </span>
               </div>
@@ -2015,27 +1894,17 @@ export default function EmergencyWhiteboard() {
               <button
                 key={metric.key}
                 type="button"
+                className="emergency-whiteboard-page__command-metric-btn"
                 onClick={() => handleOperationalMetricClick(metric.key)}
                 disabled={!canOpen}
                 title={`${metric.label}: ${metric.value}. Source: ${metric.source}. ${centralSnapshot.sync.message}`}
-                style={{
-                  border: '1px solid var(--color-border-subtle, #1F2937)',
-                  borderRadius: 12,
-                  background: 'var(--color-card, #172033)',
-                  color: canOpen ? 'var(--color-text-primary, #F9FAFB)' : 'var(--color-text-muted, #9CA3AF)',
-                  cursor: canOpen ? 'pointer' : 'not-allowed',
-                  display: 'grid',
-                  gap: 4,
-                  minHeight: 68,
-                  opacity: canOpen ? 1 : 0.58,
-                  padding: 12,
-                  textAlign: 'left',
-                }}
               >
-                <strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 22 }}>
+                <strong className="emergency-whiteboard-page__command-metric-value">
                   {metric.value}
                 </strong>
-                <span style={{ color: toneColor, fontSize: 12, fontWeight: 850 }}>
+                <span
+                  className={`emergency-whiteboard-page__command-metric-label emergency-whiteboard-page__command-metric-label--${metricToneClass}`}
+                >
                   {metric.label}
                 </span>
               </button>
@@ -2045,16 +1914,7 @@ export default function EmergencyWhiteboard() {
       </section>
       ) : null}
       {whiteboardDensity.surfaces.primaryStats.visible ? (
-      <div
-        className="emergency-whiteboard-page__stats"
-        style={{
-          background: 'var(--color-surface, #111827)',
-          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-          display: 'flex',
-          alignItems: 'stretch',
-          overflowX: 'auto',
-        }}
-      >
+      <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
         <StatCard value={stats.waiting} label="Waiting" emphasized={prioritizeAwareness && stats.waiting > 0} />
         {whiteboardDensity.surfaces.secondaryStats.visible ? (
           <>
@@ -2262,7 +2122,7 @@ export default function EmergencyWhiteboard() {
       !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
       (!charge.isChargeNurseScreen || charge.showOffloadDelays) &&
       (emsOffloadPanelOpen || (emsAwareness.delayedOffloadCount ?? 0) > 0) ? (
-        <div style={{ padding: '0 16px 12px' }}>
+        <div className="emergency-whiteboard-page__offload-panel-wrap">
           <EmsOffloadTrackerPanel
             emsArrivals={emsArrivals}
             patients={patients}
@@ -2280,18 +2140,12 @@ export default function EmergencyWhiteboard() {
       {whiteboardDensity.surfaces.emsInboundBanner.visible ? (
         <section
           aria-label="Inbound EMS operational awareness"
-          style={{
-            display: 'grid',
-            gap: 8,
-            padding: '10px 16px',
-            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-            background: 'color-mix(in srgb, var(--color-secondary, #38BDF8) 8%, var(--color-surface, #111827))',
-          }}
+          className="emergency-whiteboard-page__inbound-banner"
         >
-          <strong style={{ color: '#BAE6FD', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <strong className="emergency-whiteboard-page__inbound-banner-title">
             Inbound EMS · operational awareness
           </strong>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+          <div className="emergency-whiteboard-page__inbound-banner-grid">
             {emsAwareness.inboundArrivals.slice(0, 3).map((arrival) => {
               const remaining = minutesRemaining(arrival);
               const offloadMinutes = getArrivalOffloadMinutes(arrival, clockTick);
@@ -2299,29 +2153,18 @@ export default function EmergencyWhiteboard() {
                 <button
                   key={arrival.id}
                   type="button"
+                  className="emergency-whiteboard-page__inbound-banner-card"
                   onClick={() => {
                     setActiveFilter('EMS');
                     setQueueFilter(null);
                   }}
-                  style={{
-                    border: '1px solid color-mix(in srgb, var(--color-secondary, #38BDF8) 34%, var(--color-border-default, #1F2937))',
-                    borderRadius: 12,
-                    background: 'var(--color-card, #172033)',
-                    boxShadow: 'inset 3px 0 0 var(--color-secondary, #38BDF8)',
-                    color: '#E0F2FE',
-                    cursor: 'pointer',
-                    display: 'grid',
-                    gap: 4,
-                    padding: 10,
-                    textAlign: 'left',
-                  }}
                 >
                   <strong>{arrival.unitId} · {formatEmsEta(remaining, arrival.status)}</strong>
-                  <span style={{ color: '#93C5FD', fontSize: 12 }}>
+                  <span className="emergency-whiteboard-page__inbound-banner-card-detail">
                     Risk {arrival.severity}
                     {offloadMinutes !== null ? ` · Offload ${offloadMinutes}m` : ''}
                   </span>
-                  <span style={{ color: '#9CA3AF', fontSize: 12 }}>
+                  <span className="emergency-whiteboard-page__inbound-banner-card-meta">
                     {arrival.chiefComplaint || arrival.prearrivalComplaint}
                   </span>
                 </button>
@@ -2347,7 +2190,9 @@ export default function EmergencyWhiteboard() {
         />
       ) : null}
 
-      {charge.isChargeNurseScreen && whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
+      {surfaces.whiteboard.showCommandDashboard &&
+      charge.isChargeNurseScreen &&
+      whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
         <OperationalCommandDashboard
           patients={patients}
           rooms={rooms}
@@ -2362,7 +2207,7 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {charge.isChargeNurseScreen && showNativeAiCommandSuite && !display.isDisplayMode ? (
-        <div style={{ padding: '0 14px 14px' }}>
+        <div className="emergency-whiteboard-page__native-ai-wrap">
           <NativeAiCommandSuitePanel
             patients={patients}
             rooms={rooms}
@@ -2415,77 +2260,31 @@ export default function EmergencyWhiteboard() {
 
       {whiteboardDensity.surfaces.waitingRoomSafety.visible ? (
         <>
-          {!display.isDisplayMode && !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
-            <>
-              <PatientExperienceStatusStrip
-                patients={patients}
-                referrals={referrals}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              <WhatHappensNextStrip patients={patients} referrals={referrals} staff={staff} />
-              <LwbsRiskStrip
-                patients={patients}
-                workflowLogs={workflowLogs}
-                staff={staff}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              <HighRiskComplaintAttentionStrip
-                patients={patients}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              <FitToWaitAttentionStrip
-                patients={patients}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              <QueueReasonAttentionStrip
-                patients={patients}
-                referrals={referrals}
-                staff={staff}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              <DeteriorationWatchStrip
-                patients={patients}
-                emsArrivals={emsArrivals}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              {reception.isReceptionScreen ||
-              ((charge.isChargeNurseScreen && !charge.showWaitingRoomSafetyEscalation) ||
-                (triage.isTriageScreen && !triage.showWaitingRoomSafetyEscalation)) ? null : (
-                <WaitingRoomSafetyEscalationStrip
-                  patients={patients}
-                  workflowLogs={workflowLogs}
-                  staff={staff}
-                  alerts={alerts}
-                  communicationOverdueMinutes={
-                    Number(emergencySettings?.thresholds?.communicationOverdueMinutes ?? 30) || 30
-                  }
-                  onSelectPatient={handleWaitingRoomSafetySelect}
-                />
-              )}
-              {(charge.isChargeNurseScreen && !charge.showTriageBreach) ||
-              (triage.isTriageScreen && !triage.showTriageBreach) ? null : (
-              <TriageBreachStrip
-                patients={patients}
-                settings={emergencySettings}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-              )}
-              {(charge.isChargeNurseScreen && !charge.showProviderWaitBreaches) ? null : (
-                <ProviderWaitBreachStrip
-                  patients={patients}
-                  settings={emergencySettings}
-                  onSelectPatient={handleWaitingRoomSafetySelect}
-                />
-              )}
-              <ReceptionEscalationAttentionStrip
-                alerts={alerts}
-                roleId={emergencyRole.role}
-                onSelectPatient={handleWaitingRoomSafetySelect}
-              />
-            </>
+          {surfaces.whiteboard.showAlertRails &&
+          !display.isDisplayMode &&
+          !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
+            <WhiteboardWaitingRoomAlertRail
+              patients={patients}
+              alerts={alerts}
+              referrals={referrals}
+              staff={staff}
+              workflowLogs={workflowLogs}
+              emsArrivals={emsArrivals}
+              settings={emergencySettings}
+              roleId={emergencyRole.role}
+              features={{
+                showTriageBreach:
+                  !((charge.isChargeNurseScreen && !charge.showTriageBreach) ||
+                    (triage.isTriageScreen && !triage.showTriageBreach)),
+                showProviderWait: !(charge.isChargeNurseScreen && !charge.showProviderWaitBreaches),
+              }}
+              onSelectPatient={handleWaitingRoomSafetySelect}
+              className="emergency-whiteboard-page__alert-rail"
+            />
           ) : null}
-          {(charge.isChargeNurseScreen && charge.showWidget('communication-status')) ||
-          (triage.isTriageScreen && triage.showWidget('communication-status')) ? (
+          {surfaces.whiteboard.showCommunicationPanel &&
+          ((charge.isChargeNurseScreen && charge.showWidget('communication-status')) ||
+          (triage.isTriageScreen && triage.showWidget('communication-status'))) ? (
             <PatientCommunicationStatusPanel
               patients={patients}
               workflowLogs={workflowLogs}
@@ -2522,31 +2321,15 @@ export default function EmergencyWhiteboard() {
       <section
         className="emergency-whiteboard-page__mission"
         aria-labelledby="whiteboard-mission-control-title"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(260px, 1.1fr) minmax(260px, 1fr) minmax(240px, 0.9fr)',
-          gap: 12,
-          padding: 16,
-          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-          background: 'var(--color-background, #0B1220)',
-        }}
       >
-        <div
-          className="emergency-whiteboard-page__mission-card"
-          style={{
-            border: '1px solid var(--color-border-subtle, #1F2937)',
-            borderRadius: 14,
-            background: 'var(--color-card, #172033)',
-            padding: 12,
-          }}
-        >
-          <span style={{ color: 'var(--status-info, #93C5FD)', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Mission control
+        <div className="emergency-whiteboard-page__mission-card">
+          <span className="emergency-whiteboard-page__mission-eyebrow">
+            Board actions
           </span>
-          <h2 id="whiteboard-mission-control-title" style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 16, margin: '4px 0 8px' }}>
-            Critical actions from the board
+          <h2 id="whiteboard-mission-control-title" className="emergency-whiteboard-page__mission-title">
+            Next steps from the whiteboard
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+          <div className="emergency-whiteboard-page__mission-actions">
             {isRegistrationClerk ? (
               <MissionButton
                 label="Open Reception"
@@ -2594,19 +2377,12 @@ export default function EmergencyWhiteboard() {
           </div>
         </div>
 
-        <div
-          className="emergency-whiteboard-page__mission-card"
-          style={{
-            border: '1px solid var(--color-border-subtle, #1F2937)',
-            borderRadius: 14,
-            background: 'var(--color-card, #172033)',
-            padding: 12,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>EMS arrivals</strong>
+        <div className="emergency-whiteboard-page__mission-card">
+          <div className="emergency-whiteboard-page__mission-card-header">
+            <strong className="emergency-whiteboard-page__mission-card-heading">EMS arrivals</strong>
             <button
               type="button"
+              className="emergency-whiteboard-page__mission-link-btn"
               disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)}
               onClick={() => openRoute(CANONICAL_ROUTES.emergencyEms)}
               title={
@@ -2614,20 +2390,11 @@ export default function EmergencyWhiteboard() {
                   ? 'Open EMS arrivals'
                   : 'EMS is restricted for this role'
               }
-              style={{
-                border: 0,
-                background: 'transparent',
-                color: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)
-                  ? 'var(--status-info, #93C5FD)'
-                  : 'var(--color-text-muted, #94A3B8)',
-                cursor: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms) ? 'pointer' : 'not-allowed',
-                fontWeight: 850,
-              }}
             >
               Open EMS
             </button>
           </div>
-          <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+          <div className="emergency-whiteboard-page__mission-list">
             {activeEmsArrivals.length ? activeEmsArrivals.slice(0, 3).map((arrival) => {
               const isIncoming = arrival.status === 'Inbound' && minutesRemaining(arrival) > 0;
               const canConvertNow = !isIncoming && !arrival.patientId;
@@ -2635,33 +2402,23 @@ export default function EmergencyWhiteboard() {
                 <article
                   className="emergency-whiteboard-page__arrival-card"
                   key={arrival.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    gap: 8,
-                    border: '1px solid color-mix(in srgb, var(--status-info, #38BDF8) 32%, var(--color-border-default, #1F2937))',
-                    borderRadius: 12,
-                    background: 'var(--color-surface, #111827)',
-                    boxShadow: 'inset 3px 0 0 var(--status-info, #38BDF8)',
-                    padding: 10,
-                  }}
                 >
                   <div>
-                    <strong style={{ color: 'var(--color-text-primary, #E0F2FE)', fontSize: 13 }}>{arrival.unitId} · {formatEta(arrival)}</strong>
-                    <p style={{ color: 'var(--color-text-muted, #9CA3AF)', fontSize: 12, margin: '3px 0 0' }}>
+                    <strong className="emergency-whiteboard-page__arrival-title">{arrival.unitId} · {formatEta(arrival)}</strong>
+                    <p className="emergency-whiteboard-page__arrival-detail">
                       {arrival.chiefComplaint} · {arrival.severity}
                     </p>
                   </div>
-                  <div style={{ display: 'grid', gap: 6 }}>
+                  <div className="emergency-whiteboard-page__arrival-actions">
                     {(prepareBayPresentation.visible || convertEmsPresentation.visible) ? (
                       <>
                         {prepareBayPresentation.visible ? (
                         <button
                           type="button"
+                          className="emergency-whiteboard-page__arrival-btn--prepare"
                           onClick={() => prepareEMSBay(arrival.id)}
                           disabled={!isIncoming || !canPrepareBay || Boolean(arrival.preparedRoomId)}
                           title={arrival.preparedRoomId ? 'Bay already prepared' : 'Prepare a bay for this inbound EMS unit'}
-                          style={{ border: '1px solid color-mix(in srgb, var(--status-info, #38BDF8) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'var(--color-floating-surface, #1E293B)', color: '#BAE6FD', cursor: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 'pointer' : 'not-allowed', opacity: isIncoming && canPrepareBay && !arrival.preparedRoomId ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
                         >
                           {arrival.preparedRoomId ? 'Bay Ready' : 'Prepare Bay'}
                         </button>
@@ -2669,10 +2426,10 @@ export default function EmergencyWhiteboard() {
                         {convertEmsPresentation.visible ? (
                         <button
                           type="button"
+                          className="emergency-whiteboard-page__arrival-btn--convert"
                           onClick={() => convertArrival(arrival)}
                           disabled={!canConvertNow || !canConvertEmsArrival}
                           title={canConvertNow ? 'Convert arrived EMS unit to a whiteboard patient' : 'Conversion is available after arrival'}
-                          style={{ border: '1px solid color-mix(in srgb, var(--status-stable, #10B981) 40%, var(--color-border-default, #1F2937))', borderRadius: 8, background: 'color-mix(in srgb, var(--status-stable, #10B981) 12%, var(--color-card, #172033))', color: '#A7F3D0', cursor: canConvertNow && canConvertEmsArrival ? 'pointer' : 'not-allowed', opacity: canConvertNow && canConvertEmsArrival ? 1 : 0.55, fontWeight: 800, padding: '5px 7px' }}
                         >
                           Add to Board
                         </button>
@@ -2683,46 +2440,30 @@ export default function EmergencyWhiteboard() {
                 </article>
               );
             }) : (
-              <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 13 }}>No active EMS arrivals. Use EMS Intake for the full pipeline.</p>
+              <p className="emergency-whiteboard-page__mission-empty">No active EMS arrivals. Use EMS Intake for the full pipeline.</p>
             )}
           </div>
         </div>
 
-        <div
-          className="emergency-whiteboard-page__mission-card"
-          style={{
-            border: '1px solid var(--color-border-subtle, #1F2937)',
-            borderRadius: 14,
-            background: 'var(--color-card, #172033)',
-            padding: 12,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)', fontSize: 13 }}>Immediate tasks</strong>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="emergency-whiteboard-page__mission-card">
+          <div className="emergency-whiteboard-page__tasks-header">
+            <strong className="emergency-whiteboard-page__tasks-heading">Immediate tasks</strong>
+            <div className="emergency-whiteboard-page__referral-buckets">
               {[
-                { label: 'Pending', value: referralAwareness.buckets.pending, tone: '#FDE68A' },
-                { label: 'Accepted', value: referralAwareness.buckets.accepted, tone: '#A7F3D0' },
-                { label: 'Delayed', value: referralAwareness.buckets.delayed, tone: '#FCA5A5' },
+                { label: 'Pending', value: referralAwareness.buckets.pending },
+                { label: 'Accepted', value: referralAwareness.buckets.accepted },
+                { label: 'Delayed', value: referralAwareness.buckets.delayed },
               ].map((item) => (
                 <span
                   key={item.label}
-                  style={{
-                    border: '1px solid var(--color-border-subtle, #1F2937)',
-                    borderRadius: 999,
-                    background: 'var(--color-floating-surface, #1E293B)',
-                    color: item.tone,
-                    fontSize: 11,
-                    fontWeight: 800,
-                    padding: '4px 8px',
-                  }}
+                  className={`emergency-whiteboard-page__referral-bucket-chip emergency-whiteboard-page__referral-bucket-chip--${item.label.toLowerCase()}`}
                 >
                   {item.label} {item.value}
                 </span>
               ))}
             </div>
           </div>
-          <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+          <div className="emergency-whiteboard-page__task-list">
             {[...referralAwareness.grouped.delayed, ...referralAwareness.grouped.pending, ...referralAwareness.grouped.accepted]
               .slice(0, 3)
               .map((referral) => {
@@ -2737,53 +2478,31 @@ export default function EmergencyWhiteboard() {
                   <button
                     key={referral.id}
                     type="button"
+                    className="emergency-whiteboard-page__referral-task-btn"
                     onClick={() => openReferralWorkflow(referral.patientId, bucket.toLowerCase())}
-                    style={{
-                      border: '1px solid color-mix(in srgb, var(--color-accent, #A78BFA) 34%, var(--color-border-default, #1F2937))',
-                      borderRadius: 12,
-                      background: 'color-mix(in srgb, var(--color-accent, #A78BFA) 12%, var(--color-card, #172033))',
-                      boxShadow: 'inset 3px 0 0 var(--color-accent, #A78BFA)',
-                      color: '#EDE9FE',
-                      cursor: 'pointer',
-                      display: 'grid',
-                      gap: 2,
-                      padding: 10,
-                      textAlign: 'left',
-                    }}
                   >
                     <strong>{patient ? patientName(patient) : referral.patientId} · {bucket}</strong>
-                    <span style={{ color: 'var(--color-text-secondary, #D1D5DB)', fontSize: 12 }}>
+                    <span className="emergency-whiteboard-page__referral-task-detail">
                       {referral.targetDepartment || referral.service || 'Specialty'} · {referral.reason || referral.summary || 'Referral active'}
                     </span>
                   </button>
                 );
               })}
             {!referralAwareness.total ? (
-              <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 13 }}>No active referrals in workflow.</p>
+              <p className="emergency-whiteboard-page__mission-empty">No active referrals in workflow.</p>
             ) : null}
             {reassessmentPatients.length ? reassessmentPatients.slice(0, 3).map((patient) => (
               <button
                 key={patient.id}
                 type="button"
+                className="emergency-whiteboard-page__reassess-task-btn"
                 onClick={() => focusReassessmentOnBoard(patient.id)}
-                style={{
-                  border: '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 34%, var(--color-border-default, #1F2937))',
-                  borderRadius: 12,
-                  background: 'color-mix(in srgb, var(--status-warning, #F59E0B) 12%, var(--color-card, #172033))',
-                  boxShadow: 'inset 3px 0 0 var(--status-warning, #F59E0B)',
-                  color: '#FDE68A',
-                  cursor: 'pointer',
-                  display: 'grid',
-                  gap: 2,
-                  padding: 10,
-                  textAlign: 'left',
-                }}
               >
                 <strong>{patientName(patient)}</strong>
-                <span style={{ color: 'var(--color-text-secondary, #D1D5DB)', fontSize: 12 }}>{patient.priority} · {patient.chiefComplaint}</span>
+                <span className="emergency-whiteboard-page__reassess-task-detail">{patient.priority} · {patient.chiefComplaint}</span>
               </button>
             )) : (
-              <p style={{ color: 'var(--color-text-muted, #9CA3AF)', margin: 0, fontSize: 13 }}>No reassessment tasks are due.</p>
+              <p className="emergency-whiteboard-page__mission-empty">No reassessment tasks are due.</p>
             )}
             <MissionButton
               label="Filter Waiting Queue"
@@ -2799,63 +2518,55 @@ export default function EmergencyWhiteboard() {
         <section
           aria-label="Operational awareness summary"
           className="emergency-whiteboard-page__awareness-banner"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: '12px 16px',
-            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-            background: 'color-mix(in srgb, var(--status-warning, #F59E0B) 10%, var(--color-surface, #111827))',
-          }}
         >
-          <div style={{ display: 'grid', gap: 4 }}>
-            <strong style={{ color: '#FDE68A', fontSize: 13 }}>
+          <div className="emergency-whiteboard-page__awareness-banner-copy">
+            <strong className="emergency-whiteboard-page__awareness-banner-title">
               Department under pressure — focus on what needs action now
             </strong>
-            <span style={{ color: '#CBD5E1', fontSize: 12 }}>
-              {operationalLoad.primaryFocus.map((focus) => `${focus.value} ${focus.label.toLowerCase()}`).join(' · ')}
-            </span>
+            {surfaces.whiteboard.showAwarenessSubtitle ? (
+              <span className="emergency-whiteboard-page__awareness-banner-subtitle">
+                {operationalLoad.primaryFocus.map((focus) => `${focus.value} ${focus.label.toLowerCase()}`).join(' · ')}
+              </span>
+            ) : null}
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <div className="emergency-whiteboard-page__awareness-banner-chips">
             <button
               type="button"
+              className="emergency-whiteboard-page__awareness-chip"
               onClick={() => {
                 setActiveFilter('Reassess');
                 setQueueFilter(null);
               }}
-              style={awarenessChipStyle}
             >
               Reassess ({reassessmentAttentionCount})
             </button>
             <button
               type="button"
+              className="emergency-whiteboard-page__awareness-chip"
               onClick={() => {
                 setActiveFilter('EMS');
                 setQueueFilter(null);
               }}
-              style={awarenessChipStyle}
             >
               EMS ({emsAwareness.inboundCount || activeEmsArrivals.length})
             </button>
             <button
               type="button"
+              className="emergency-whiteboard-page__awareness-chip"
               onClick={() => {
                 setActiveFilter('All');
                 setQueueFilter('referral');
               }}
-              style={awarenessChipStyle}
             >
               Referrals ({referralAwareness.buckets.pending})
             </button>
             <button
               type="button"
+              className="emergency-whiteboard-page__awareness-chip"
               onClick={() => {
                 setActiveFilter('Waiting');
                 setQueueFilter(null);
               }}
-              style={awarenessChipStyle}
             >
               Waiting ({stats.waiting})
             </button>
@@ -2864,61 +2575,31 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {whiteboardDensity.surfaces.filters.visible ? (
-      <div
-        className="emergency-whiteboard-page__controls"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 16,
-          padding: 16,
-          borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-        }}
-      >
-        <div className="emergency-whiteboard-page__filters" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <div className="emergency-whiteboard-page__controls">
+        <div className="emergency-whiteboard-page__filters emergency-whiteboard-page__filters--row">
           {FILTERS.map((filter) => {
             const active = filter === activeFilter;
             const reassessCount = filter === 'Reassess' ? reassessmentAttentionCount : 0;
             const label = reassessCount > 0 ? `Reassess (${reassessCount})` : filter;
             const highlightReassess = filter === 'Reassess' && reassessCount > 0;
+            const filterChipClassName = [
+              'emergency-whiteboard-page__filter-chip',
+              active ? 'emergency-whiteboard-page__filter-chip--active' : '',
+              highlightReassess ? 'emergency-whiteboard-page__filter-chip--reassess' : '',
+            ]
+              .filter(Boolean)
+              .join(' ');
             return (
               <button
                 key={filter}
                 type="button"
+                className={filterChipClassName}
                 onClick={() => {
                   setActiveFilter(filter);
                   setQueueFilter(null);
                   if (filter === 'Reassess' && reassessCount > 0) {
                     document.dispatchEvent(new Event('open-reassessment-drawer'));
                   }
-                }}
-                style={{
-                  border: highlightReassess
-                    ? '1px solid color-mix(in srgb, var(--status-warning, #F59E0B) 52%, var(--color-border-subtle, #1F2937))'
-                    : '1px solid var(--color-border-subtle, #1F2937)',
-                  borderRadius: 999,
-                  background: active
-                    ? highlightReassess
-                      ? 'var(--status-warning, #F59E0B)'
-                      : 'var(--color-text-primary, #F9FAFB)'
-                    : highlightReassess
-                      ? 'color-mix(in srgb, var(--status-warning, #F59E0B) 14%, transparent)'
-                      : 'transparent',
-                  color: active
-                    ? highlightReassess
-                      ? 'var(--color-background, #111827)'
-                      : 'var(--color-background, #111827)'
-                    : highlightReassess
-                      ? '#FDE68A'
-                      : 'var(--color-text-muted, #9CA3AF)',
-                  padding: '8px 14px',
-                  fontSize: 13,
-                  fontWeight: highlightReassess ? 800 : 600,
-                  cursor: 'pointer',
-                  boxShadow: highlightReassess && !active
-                    ? '0 0 0 1px color-mix(in srgb, var(--status-warning, #F59E0B) 24%, transparent)'
-                    : undefined,
                 }}
               >
                 {label}
@@ -2927,13 +2608,15 @@ export default function EmergencyWhiteboard() {
           })}
         </div>
 
-        <div className="emergency-whiteboard-page__card-key" aria-label="Patient card visual key">
-          <span><i style={{ background: 'var(--priority-p1, #EF4444)' }} /> CTAS band</span>
-          <span><i style={{ background: 'var(--status-danger, #EF4444)' }} /> Critical risk</span>
-          <span><i style={{ background: 'var(--status-warning, #F59E0B)' }} /> Wait/reassess</span>
-          <span><i style={{ background: 'var(--color-secondary, #38BDF8)' }} /> EMS</span>
-          <span><i style={{ background: 'var(--color-accent, #A78BFA)' }} /> Boarding</span>
-        </div>
+        {surfaces.whiteboard.showCardKey ? (
+          <div className="emergency-whiteboard-page__card-key" aria-label="Patient card visual key">
+            <span><i className="emergency-whiteboard-page__card-key-swatch--ctas" /> CTAS band</span>
+            <span><i className="emergency-whiteboard-page__card-key-swatch--critical" /> Critical risk</span>
+            <span><i className="emergency-whiteboard-page__card-key-swatch--wait" /> Wait/reassess</span>
+            <span><i className="emergency-whiteboard-page__card-key-swatch--ems" /> EMS</span>
+            <span><i className="emergency-whiteboard-page__card-key-swatch--boarding" /> Boarding</span>
+          </div>
+        ) : null}
 
         {display.isDisplayMode ? null : isRegistrationClerk ? (
           <button
@@ -2942,17 +2625,6 @@ export default function EmergencyWhiteboard() {
             onClick={() => openRoute(CANONICAL_ROUTES.emergencyReception)}
             disabled={!emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)}
             title="Open the Reception arrival dashboard for patient creation"
-            style={{
-              border: '1px solid var(--color-border-subtle, #1F2937)',
-              borderRadius: 12,
-              background: 'var(--component-button-primary-bg, #2563EB)',
-              color: 'var(--component-button-primary-fg, #F9FAFB)',
-              padding: '10px 14px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
           >
             Open Reception
           </button>
@@ -2967,18 +2639,6 @@ export default function EmergencyWhiteboard() {
                 ? 'Send a new patient input to the Central Node'
                 : `${emergencyRole.roleLabel} cannot submit central intake inputs`
             }
-            style={{
-              border: '1px solid var(--color-border-subtle, #1F2937)',
-              borderRadius: 12,
-              background: 'var(--component-button-primary-bg, #2563EB)',
-              color: 'var(--component-button-primary-fg, #F9FAFB)',
-              padding: '10px 14px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: canUseCentralIntake ? 'pointer' : 'not-allowed',
-              opacity: canUseCentralIntake ? 1 : 0.58,
-              whiteSpace: 'nowrap',
-            }}
           >
             + Central Intake
           </button>
@@ -3006,35 +2666,14 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {activeQueueFilter && whiteboardDensity.surfaces.patientGrid.visible ? (
-        <div
-          role="status"
-          style={{
-            alignItems: 'center',
-            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-            color: 'var(--color-text-primary, #F9FAFB)',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 10,
-            justifyContent: 'space-between',
-            padding: '10px 16px',
-          }}
-        >
-          <span style={{ color: '#BFDBFE', fontSize: 13, fontWeight: 850 }}>
+        <div role="status" className="emergency-whiteboard-page__queue-filter-bar">
+          <span className="emergency-whiteboard-page__queue-filter-label">
             Showing the {activeQueueFilter} queue on the Whiteboard.
           </span>
           <button
             type="button"
+            className="emergency-whiteboard-page__queue-filter-clear"
             onClick={() => setQueueFilter(null)}
-            style={{
-              border: '1px solid var(--color-border-subtle, #1F2937)',
-              borderRadius: 999,
-              background: 'transparent',
-              color: 'var(--color-text-primary, #F9FAFB)',
-              cursor: 'pointer',
-              fontSize: 12,
-              fontWeight: 850,
-              padding: '6px 10px',
-            }}
           >
             Clear queue filter
           </button>
@@ -3052,58 +2691,29 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {toast ? (
-        <div
-          role="status"
-          style={{
-            position: 'fixed',
-            right: 20,
-            bottom: 20,
-            zIndex: 320,
-            border: '1px solid #10B981',
-            borderRadius: 12,
-            background: '#052E2B',
-            color: '#D1FAE5',
-            padding: '12px 14px',
-            fontWeight: 700,
-            boxShadow: 'none',
-          }}
-        >
+        <div role="status" className="emergency-whiteboard-page__toast">
           {toast}
         </div>
       ) : null}
 
       {whiteboardDensity.surfaces.patientGrid.visible && !whiteboard.loading && activeQueueFilter === 'Triage' && canReviewTriage && selectedPatientId ? (
-        <div style={{ padding: '0 14px', marginTop: 12 }}>
+        <div className="emergency-whiteboard-page__triage-assist-wrap">
           <AiTriageAssistPanelForPatientId patientId={selectedPatientId} />
         </div>
       ) : null}
 
       {whiteboardDensity.surfaces.patientGrid.visible && hiddenBoardCount > 0 ? (
-        <div
-          role="status"
-          className="emergency-whiteboard-page__board-limit"
-          style={{
-            alignItems: 'center',
-            borderBottom: '1px solid var(--color-border-subtle, #1F2937)',
-            color: '#FDE68A',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 10,
-            justifyContent: 'space-between',
-            padding: '10px 16px',
-            background: 'color-mix(in srgb, var(--status-warning, #F59E0B) 8%, var(--color-surface, #111827))',
-          }}
-        >
-          <span style={{ fontSize: 13, fontWeight: 750 }}>
+        <div role="status" className="emergency-whiteboard-page__board-limit">
+          <span className="emergency-whiteboard-page__board-limit-copy">
             Showing {boardPatients.length} of {visiblePatients.length} patients on the All view — use Waiting, Reassess, or EMS filters for the full list.
           </span>
           <button
             type="button"
+            className="emergency-whiteboard-page__awareness-chip"
             onClick={() => {
               setActiveFilter(operationalLoad.suggestedFilter as FilterId);
               setQueueFilter(null);
             }}
-            style={awarenessChipStyle}
           >
             Filter {operationalLoad.suggestedFilter}
           </button>
@@ -3113,7 +2723,6 @@ export default function EmergencyWhiteboard() {
       {whiteboardDensity.surfaces.patientGrid.visible && whiteboard.loading && boardPatients.length === 0 ? (
         <div
           className="emergency-whiteboard-page__grid emergency-whiteboard-page__grid--loading"
-          style={{ padding: 14 }}
           role="status"
           aria-label="Loading patient board"
         >
@@ -3130,8 +2739,11 @@ export default function EmergencyWhiteboard() {
         </div>
       ) : whiteboardDensity.surfaces.patientGrid.visible && boardPatients.length > 0 ? (
         <>
-        {physician.isPhysicianScreen && !display.isDisplayMode && !showNativeAiCommandSuite ? (
-          <div style={{ padding: '12px 14px 0' }}>
+        {physician.isPhysicianScreen &&
+        !display.isDisplayMode &&
+        !showNativeAiCommandSuite &&
+        surfaces.whiteboard.showDiagnosticDashboard ? (
+          <div className="emergency-whiteboard-page__diagnostic-wrap">
             <DiagnosticSafetyDashboard
               patients={patients}
               onSelectPatient={(patientId) => selectPatient(patientId)}
@@ -3150,16 +2762,7 @@ export default function EmergencyWhiteboard() {
         />
         </>
       ) : whiteboardDensity.surfaces.patientGrid.visible ? (
-        <div
-          className="ed-whiteboard__empty"
-          style={{
-            minHeight: 360,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 14,
-          }}
-        >
+        <div className="ed-whiteboard__empty emergency-whiteboard-page__empty-grid">
           <OperationalEmptyState
             size="panel"
             icon="◎"
@@ -3209,12 +2812,24 @@ export default function EmergencyWhiteboard() {
                     Start intake
                   </OperationalEmptyAction>
                 ) : null}
+                {!activeQueueFilter &&
+                activeFilter === 'All' &&
+                shouldShowWalkthroughActionOnEmptyBoard() ? (
+                  <OperationalEmptyAction
+                    secondary
+                    onClick={() => setActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id)}
+                  >
+                    Load ED-18 walkthrough
+                  </OperationalEmptyAction>
+                ) : null}
               </>
             }
           />
         </div>
       ) : null}
-      {!display.isDisplayMode && (!physician.isPhysicianScreen || physician.showAssignedPatients) ? (
+      {!display.isDisplayMode &&
+      surfaces.whiteboard.showWhoNextPanel &&
+      (!physician.isPhysicianScreen || physician.showAssignedPatients) ? (
         <WhoNextPanel mode="floating" />
       ) : null}
       </>

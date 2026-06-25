@@ -44,15 +44,23 @@ export default function EdStaffWorkflowAdmin() {
 
   return (
     <div>
-      <section className="admin-ops-card" style={{ marginBottom: 16 }}>
+      <header className="admin-ops-page-header">
+        <p className="admin-ops-shell__eyebrow">ED workflows</p>
+        <h2 className="admin-ops-page-header__title">Staff lanes &amp; role preview</h2>
+        <p className="admin-ops-page-header__lead">
+          Map canonical SaaS roles to reception, triage, whiteboard, and command surfaces.
+        </p>
+      </header>
+
+      <section className="admin-ops-card admin-ops-card--spaced">
         <h3>ED workflow A–Z (frontend ↔ backend)</h3>
         <p>
           Each step maps to CareDroid routes. Profile and workspace APIs are production-backed;
           emergency reads use demo envelopes until persistence ships.
         </p>
-        <ol style={{ marginTop: 12, paddingLeft: 20 }}>
+        <ol className="admin-ops-workflow-list">
           {workflowAz.map((step) => (
-            <li key={step.id} style={{ marginBottom: 8 }}>
+            <li key={step.id}>
               <strong>{step.title}</strong> — {step.summary}
               {step.route ? (
                 <>
@@ -65,21 +73,21 @@ export default function EdStaffWorkflowAdmin() {
         </ol>
       </section>
 
-      <section className="admin-ops-card" style={{ marginBottom: 16 }}>
+      <section className="admin-ops-card admin-ops-card--spaced">
         <h3>Emergency department workflow lanes</h3>
         <p>
           Each lane maps to CareDroid surfaces. Administrators assign a canonical SaaS role; the
           catalog resolves navigation, tools, and screen mode.
         </p>
-        <div className="admin-ops-lanes" style={{ marginTop: 12 }}>
+        <div className="admin-ops-lanes admin-ops-lanes--raised">
           {ED_WORKFLOW_LANES.map((lane) => (
             <div key={lane.id} className="admin-ops-lane">
               <strong>{lane.label}</strong>
               <div>
-                <p style={{ margin: '0 0 6px' }}>
+                <p className="admin-ops-lane__roles">
                   Emergency roles: {lane.emergencyRoles.join(', ')}
                 </p>
-                <p style={{ margin: 0 }}>
+                <p className="admin-ops-lane__saas-roles">
                   Typical SaaS roles: {lane.saasRoles.join(', ')}
                 </p>
               </div>
@@ -88,12 +96,12 @@ export default function EdStaffWorkflowAdmin() {
         </div>
       </section>
 
-      <section className="admin-ops-card" style={{ marginBottom: 16 }}>
+      <section className="admin-ops-card admin-ops-card--spaced">
         <h3>Role access preview</h3>
         <p className="org-pack-meta">
           Preview what a user sees before assigning <code>{rolePreviewId}</code> in tenant settings.
         </p>
-        <label style={{ display: 'grid', gap: 6, maxWidth: 360, marginTop: 12 }}>
+        <label className="admin-ops-role-select">
           Canonical role
           <select value={rolePreviewId} onChange={(event) => setRolePreviewId(event.target.value)}>
             {catalogRoleOptions.map((role) => (
@@ -103,7 +111,7 @@ export default function EdStaffWorkflowAdmin() {
             ))}
           </select>
         </label>
-        <p style={{ marginTop: 12 }}>{rolePreviewSummary.profileBenefits}</p>
+        <p className="admin-ops-spaced-text">{rolePreviewSummary.profileBenefits}</p>
         <ul>
           <li>{rolePreviewSummary.navigationRoutes.length} navigation routes</li>
           <li>Workspaces: {rolePreviewSummary.allowedWorkspaces.join(', ')}</li>
@@ -112,7 +120,7 @@ export default function EdStaffWorkflowAdmin() {
             {getEmergencyRoleHomeRoute(rolePreviewSummary.emergencyRole || rolePreviewId)}
           </li>
         </ul>
-        <p style={{ marginTop: 12 }}>
+        <p className="admin-ops-spaced-text">
           <Link to={`${CANONICAL_ROUTES.adminOperations}/tenant`}>
             Assign roles in tenant administration →
           </Link>
@@ -143,7 +151,7 @@ export default function EdStaffWorkflowAdmin() {
         </table>
       </section>
 
-      <section className="admin-ops-card" style={{ marginTop: 16 }}>
+      <section className="admin-ops-card admin-ops-card--raised">
         <h3>Lane → role quick reference</h3>
         <table className="admin-ops-table">
           <thead>

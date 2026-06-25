@@ -2752,20 +2752,18 @@ const SOFACalculator = ({ onResultChange }) => {
           <input
             type="number"
             step="0.01"
-            className="calc-input-field"
+            className="calc-input-field calc-input-field--spaced"
             placeholder="Dopamine"
             value={inputs.dopamine}
             onChange={(e) => setInputs({ ...inputs, dopamine: e.target.value })}
-            style={{ marginBottom: '8px' }}
           />
           <input
             type="number"
             step="0.01"
-            className="calc-input-field"
+            className="calc-input-field calc-input-field--spaced"
             placeholder="Norepinephrine"
             value={inputs.norepinephrine}
             onChange={(e) => setInputs({ ...inputs, norepinephrine: e.target.value })}
-            style={{ marginBottom: '8px' }}
           />
           <input
             type="number"
@@ -2845,7 +2843,7 @@ const SOFACalculator = ({ onResultChange }) => {
           >
             {loading ? (
               <>
-                <div className="calc-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>
+                <div className="calc-spinner calc-spinner--sm"></div>
                 Calculating...
               </>
             ) : (

@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { isPractitionerCleanupEnabled } from '../../config/practitionerCleanup.config';
 import { mapLiveSourceStatusToNormalized } from '../../config/integrationStatusModel';
 import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
 import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { useIntegrationHub } from '../../hooks/useIntegrationHub';
 import './IntegrationHubPage.css';
 
@@ -13,6 +15,10 @@ function sourceLabel(source) {
 export default function IntegrationHubPage() {
   const { status, error, envelope, interoperabilitySummary, recentEvents, refresh } =
     useIntegrationHub();
+
+  if (isPractitionerCleanupEnabled()) {
+    return <Navigate to={`${CANONICAL_ROUTES.emergencySettings}#integrations`} replace />;
+  }
 
   const sources = envelope?.data?.sources || [];
   const reviewQueue = envelope?.data?.reviewQueue || [];
@@ -25,23 +31,24 @@ export default function IntegrationHubPage() {
       : 'unknown';
 
   return (
-    <div className="integration-hub-page">
-      <header className="integration-hub-page__hero">
-        <p className="integration-hub-page__eyebrow">CareDroid Integration Hub</p>
-        <h1>Integration Hub</h1>
-        <p>
-          Connector status, review queue, and recent interoperability events. CareDroid fixture
-          envelope is merged with live `/api/interoperability/*` when available.
-        </p>
-        <div className="integration-hub-page__links">
+    <PageShell
+      as="div"
+      eyebrow="Integrations"
+      title="Integration Hub"
+      description="Connector status, review queue, and recent interoperability events."
+      actions={
+        <div className="integration-hub-page__actions">
           <Link to={CANONICAL_ROUTES.emergencySettings}>Emergency Settings</Link>
-          <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
           <button type="button" onClick={() => void refresh()}>
             Refresh
           </button>
         </div>
-      </header>
-
+      }
+      className="integration-hub-page cd-page-shell"
+      headerClassName="integration-hub-page__hero"
+      contentClassName="integration-hub-page__content"
+      aria-label="Integration Hub"
+    >
       <IntegrationStatusPanel liveSources={sources} />
 
       <div className="integration-hub-page__cards" aria-label="Integration Hub summary">
@@ -96,7 +103,7 @@ export default function IntegrationHubPage() {
                         mapLiveSourceStatusToNormalized(source.status) || 'placeholder'
                       }
                     />
-                    <small style={{ display: 'block', marginTop: 4, color: '#64748b' }}>
+                    <small className="integration-hub-page__status-detail">
                       {String(source.status || 'unknown')}
                     </small>
                   </td>
@@ -150,6 +157,6 @@ export default function IntegrationHubPage() {
           </p>
         )}
       </section>
-    </div>
+    </PageShell>
   );
 }

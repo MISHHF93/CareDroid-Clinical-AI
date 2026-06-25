@@ -10,7 +10,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
     color: '#FFD93D',
     description: 'Differential diagnosis and diagnostic support',
     shortcut: 'Ctrl+5',
-    category: 'Diagnostic'
+    category: 'Diagnostic',
   };
 
   const [symptoms, setSymptoms] = useState('');
@@ -32,7 +32,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
       const message = `Generate a differential diagnosis for: ${symptoms}${
         patientInfo.age ? `\nPatient age: ${patientInfo.age}` : ''
       }${patientInfo.sex ? `\nSex: ${patientInfo.sex}` : ''}${
-        patientInfo.history ?`\nRelevant history: ${patientInfo.history}` : ''
+        patientInfo.history ? `\nRelevant history: ${patientInfo.history}` : ''
       }`;
 
       const { ok, data } = await sendClinicalChatMessage({
@@ -54,15 +54,14 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
     <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
       <div className="diagnosis-tool-grid">
         <div className="diagnosis-panel">
-          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--app-fg)', marginBottom: '20px' }}>
-            📋 Patient Presentation
-          </h2>
+          <h2 className="tool-panel-title">Patient Presentation</h2>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--app-fg)', marginBottom: '8px' }}>
+          <div className="tool-form-stack">
+            <label className="tool-form-label" htmlFor="diagnosis-symptoms">
               Presenting Symptoms / Chief Complaint
             </label>
             <textarea
+              id="diagnosis-symptoms"
               className="diagnosis-field diagnosis-field--tall"
               placeholder="e.g., Chest pain with diaphoresis and nausea, onset 2 hours ago, radiating to left arm..."
               value={symptoms}
@@ -70,12 +69,13 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+          <div className="tool-form-row-2">
             <div>
-              <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
+              <label className="tool-form-label--muted" htmlFor="diagnosis-age">
                 Age (optional)
               </label>
               <input
+                id="diagnosis-age"
                 type="number"
                 className="diagnosis-field"
                 placeholder="Years"
@@ -84,10 +84,11 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
+              <label className="tool-form-label--muted" htmlFor="diagnosis-sex">
                 Sex (optional)
               </label>
               <select
+                id="diagnosis-sex"
                 className="diagnosis-field"
                 value={patientInfo.sex}
                 onChange={(e) => setPatientInfo({ ...patientInfo, sex: e.target.value })}
@@ -99,27 +100,27 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
             </div>
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
+          <div className="tool-form-stack--loose">
+            <label className="tool-form-label--muted" htmlFor="diagnosis-history">
               Relevant Medical History (optional)
             </label>
             <textarea
-              className="diagnosis-field"
-              style={{ minHeight: '80px', resize: 'vertical' }}
+              id="diagnosis-history"
+              className="diagnosis-field diagnosis-field--medium"
               placeholder="e.g., HTN, DM, prior MI..."
               value={patientInfo.history}
               onChange={(e) => setPatientInfo({ ...patientInfo, history: e.target.value })}
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="tool-form-actions tool-form-actions--flush">
             <button
               type="button"
               className="diagnosis-primary-btn"
               onClick={handleGenerate}
               disabled={loading}
             >
-              {loading ? 'Generating...' : '🔍 Generate DDx'}
+              {loading ? 'Generating...' : 'Generate DDx'}
             </button>
             <button
               type="button"
@@ -137,26 +138,26 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
         </div>
 
         <div className="diagnosis-panel diagnosis-panel--scroll">
-          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--app-fg)', marginBottom: '20px' }}>
-            🎯 Differential Diagnosis
-          </h2>
+          <h2 className="tool-panel-title">Differential Diagnosis</h2>
 
           {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', gap: '16px' }}>
+            <div className="tool-loading-state" aria-busy="true">
               <div className="simple-tool-spinner diagnosis-spinner" />
-              <p style={{ color: 'var(--app-fg-muted)' }}>Analyzing symptoms and generating differential diagnosis...</p>
+              <p className="tool-loading-state__message">
+                Analyzing symptoms and generating differential diagnosis...
+              </p>
             </div>
           ) : error ? (
             <div className="diagnosis-error-box">
               <strong>Error:</strong> {error}
             </div>
           ) : results ? (
-            <div className="diagnosis-results-body">
-              {results}
-            </div>
+            <div className="diagnosis-results-body">{results}</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
-              <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>🔍</div>
+            <div className="tool-empty-state">
+              <div className="tool-empty-state__icon" aria-hidden>
+                🔍
+              </div>
               <p>Enter patient symptoms and click &quot;Generate DDx&quot; to begin</p>
             </div>
           )}

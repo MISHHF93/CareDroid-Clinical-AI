@@ -171,7 +171,7 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded } =
               placeholder="Optional recent note or handoff text"
             />
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button type="button" className="diagnosis-primary-btn" onClick={handleGenerate} disabled={loading}>
                 {loading ? 'Generating summary...' : 'Generate patient summary'}
               </button>
@@ -186,9 +186,9 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded } =
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Extracting patient summary sections...</p>
+                <p className="tool-loading-state__message">Extracting patient summary sections...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -268,7 +268,7 @@ export default function PatientSummaryAi({ embedded = false, onCloseEmbedded } =
                 </SummarySection>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Add chart context to generate active problems, medications, labs, alerts, and risk factors.
               </div>
             )}

@@ -15,7 +15,8 @@ import {
 import { summarizeReferralAwareness } from './whiteboard/referralAwarenessModel';
 import { OPERATIONAL_AUDIT_DOMAIN } from '../config/operationalAuditModel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
-import { MaturityChip } from '../pages/emergency/emergencyRouteShared';
+import EdDataSourceBanner from './emergency/EdDataSourceBanner';
+import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
 import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
@@ -306,6 +307,7 @@ export default function ReferralPanel() {
   const [searchParams] = useSearchParams();
   const referralsModule = useReferrals();
   const referrals = useEmergencyStore((state) => state.referrals);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const patients = useEmergencyStore((state) => state.patients);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const staff = useEmergencyStore((state) => state.staff);
@@ -370,31 +372,19 @@ export default function ReferralPanel() {
   const awareness = useMemo(() => summarizeReferralAwareness(referrals), [referrals]);
   const statusFilter = (searchParams.get('status') || '').toLowerCase();
 
-  const metrics = useMemo(() => {
-    const acknowledgementSamples = referrals.map(acknowledgementMinutes).filter(Number.isFinite);
-    const avgAcknowledgement = acknowledgementSamples.length
-      ? Math.round(
-          acknowledgementSamples.reduce((sum, minutes) => sum + minutes, 0) /
-            acknowledgementSamples.length
-        )
-      : 0;
-    const department = referrals.find((referral) => Number.isFinite(acknowledgementMinutes(referral)))
-      ?.targetDepartment;
-
-    return {
+  const metrics = useMemo(
+    () => ({
       active: referrals.filter((referral) => !['Completed', 'Declined'].includes(referral.status))
         .length,
       emergent: referrals.filter(
-        (referral) => referral.urgency === 'Emergent' && !['Completed', 'Declined'].includes(referral.status)
+        (referral) =>
+          referral.urgency === 'Emergent' && !['Completed', 'Declined'].includes(referral.status),
       ).length,
       pending: awareness.buckets.pending,
-      accepted: awareness.buckets.accepted,
       delayed: awareness.buckets.delayed,
-      transfers: referrals.filter((referral) => referral.workflow === 'Transfer').length,
-      avgAcknowledgement,
-      acknowledgementDepartment: department || 'All services',
-    };
-  }, [awareness.buckets.accepted, awareness.buckets.delayed, awareness.buckets.pending, referrals]);
+    }),
+    [awareness.buckets.delayed, awareness.buckets.pending, referrals],
+  );
 
   const selectFormPatient = (patient) => {
     setForm((current) => ({
@@ -517,68 +507,76 @@ export default function ReferralPanel() {
     }
 
     selectPatient(patientId);
-    profileNavigate(CANONICAL_ROUTES.emergencyPatients);
+    profileNavigate(
+      `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`,
+    );
   };
 
+  const headerActions = (
+    <>
+      {referralPresentation.visible ? (
+        <button
+          type="button"
+          className="referral-panel__action-btn"
+          disabled={!canManageReferral}
+          title={
+            canManageReferral
+              ? 'Create a new referral'
+              : `${emergencyRole.roleLabel} cannot create referrals`
+          }
+          onClick={() => {
+            if (!canManageReferral) return;
+            setForm((current) => ({ ...current, workflow: 'Referral' }));
+            setFormOpen((open) => !open);
+          }}
+        >
+          <FilePlus2 size={16} aria-hidden />
+          New Referral
+        </button>
+      ) : null}
+      {transferPresentation.visible ? (
+        <button
+          type="button"
+          className="referral-panel__action-btn"
+          disabled={!canManageTransfer}
+          title={
+            canManageTransfer
+              ? 'Create a new transfer request'
+              : `${emergencyRole.roleLabel} cannot create transfers`
+          }
+          onClick={() => {
+            if (!canManageTransfer) return;
+            setForm((current) => ({
+              ...current,
+              workflow: 'Transfer',
+              targetDepartment: 'Other',
+              urgency: 'Urgent',
+            }));
+            setFormOpen(true);
+          }}
+        >
+          New Transfer
+        </button>
+      ) : null}
+    </>
+  );
+
   return (
-    <section className="referral-panel" aria-labelledby="referral-panel-title">
-      <header className="referral-panel__header">
-        <div>
-          <span>Referral Intelligence</span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
-            <h1 id="referral-panel-title">Referrals</h1>
-            <MaturityChip maturity="demo" />
-          </div>
-          <p>
-            Specialty requests, transfer workflows, and delay signals. Source: {referralSource};{' '}
-            {referralFreshness}.
-          </p>
-        </div>
-        <div className="referral-panel__header-actions">
-          {referralPresentation.visible ? (
-          <button
-            type="button"
-            disabled={!canManageReferral}
-            title={
-              canManageReferral
-                ? 'Create a new referral'
-                : `${emergencyRole.roleLabel} cannot create referrals`
-            }
-            onClick={() => {
-              if (!canManageReferral) return;
-              setForm((current) => ({ ...current, workflow: 'Referral' }));
-              setFormOpen((open) => !open);
-            }}
-          >
-            <FilePlus2 size={16} aria-hidden />
-            New Referral
-          </button>
-          ) : null}
-          {transferPresentation.visible ? (
-          <button
-            type="button"
-            disabled={!canManageTransfer}
-            title={
-              canManageTransfer
-                ? 'Create a new transfer request'
-                : `${emergencyRole.roleLabel} cannot create transfers`
-            }
-            onClick={() => {
-              if (!canManageTransfer) return;
-              setForm((current) => ({
-                ...current,
-                workflow: 'Transfer',
-                targetDepartment: 'Other',
-                urgency: 'Urgent',
-              }));
-              setFormOpen(true);
-            }}
-          >
-            New Transfer
-          </button>
-          ) : null}
-        </div>
-      </header>
+    <EmergencyRoutePage
+      eyebrow="Flow coordination"
+      title="Referrals"
+      maturity="demo"
+      description="Specialty requests, transfer workflows, and delay signals."
+      actions={headerActions}
+    >
+      <div className="referral-panel__content">
+      <EdDataSourceBanner
+        envelope={referralsModule.data}
+        loading={referralsModule.loading}
+        error={referralsModule.error}
+        activeScenarioId={activeScenarioId}
+        compact
+      />
 
       {referralsModule.loading && !referrals.length ? (
         <p className="referral-panel__backend-status" role="status">
@@ -590,10 +588,6 @@ export default function ReferralPanel() {
           {referralsModule.error}. Showing the last local referral queue; confirm live referral status before external handoff.
         </p>
       ) : null}
-      <p className="referral-panel__backend-status" role="status">
-        Source: {referralSource}; {referralFreshness}. Referral rows are local CareDroid workflow records unless a backend confirmation is shown.
-      </p>
-
       <div className="referral-panel__metrics" aria-label="Referral metrics">
         <div>
           <span>Active</span>
@@ -604,21 +598,12 @@ export default function ReferralPanel() {
           <strong>{metrics.pending}</strong>
         </div>
         <div>
-          <span>Accepted</span>
-          <strong>{metrics.accepted}</strong>
-        </div>
-        <div>
           <span>Delayed</span>
           <strong>{metrics.delayed}</strong>
         </div>
         <div>
           <span>Emergent</span>
           <strong>{metrics.emergent}</strong>
-        </div>
-        <div>
-          <span>Avg acknowledgement</span>
-          <strong>{metrics.avgAcknowledgement}m</strong>
-          <small>{metrics.acknowledgementDepartment}</small>
         </div>
       </div>
 
@@ -836,6 +821,7 @@ export default function ReferralPanel() {
           </section>
         ))}
       </div>
-    </section>
+      </div>
+    </EmergencyRoutePage>
   );
 }

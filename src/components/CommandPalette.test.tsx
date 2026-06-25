@@ -159,6 +159,9 @@ describe('CommandPalette helpers', () => {
     expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-whiteboard')).toBe(true);
     expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-ems')).toBe(true);
     expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-reassessment')).toBe(true);
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-tools')).toBe(true);
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-calculators')).toBe(true);
+    expect(COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has('open-capacity')).toBe(true);
   });
 
   it('hides command actions that the active CareDroid role cannot perform', () => {

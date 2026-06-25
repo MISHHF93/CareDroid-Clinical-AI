@@ -63,7 +63,7 @@ export default function Patients() {
     }
 
     applyRegistryToolLaunch(action.toolId, {
-      navigate,
+      navigate: profileNavigate,
       addMessage,
       selectTool,
       setActiveTool,

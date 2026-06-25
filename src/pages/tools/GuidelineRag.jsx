@@ -89,7 +89,7 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded } = {})
               placeholder="e.g., emergency medicine, cardiology, infectious disease"
             />
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button
                 type="button"
                 className="diagnosis-primary-btn"
@@ -109,9 +109,9 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded } = {})
             <ApiStateBanner error={error} onRetry={query.trim() ? handleSearch : undefined} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Retrieving guideline passages and citations...</p>
+                <p className="tool-loading-state__message">Retrieving guideline passages and citations...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -187,7 +187,7 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded } = {})
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Enter a guideline question to retrieve cited evidence and explain how the summary was assembled.
               </div>
             )}

@@ -90,11 +90,17 @@
 
 .ed-copilot-shell__panel--context,
 .ed-copilot-shell__panel--safety {
+  gap: 10px;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 12px;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
+}
+
+.ed-copilot-shell__panel--context .ed-copilot-panel__awareness,
+.ed-copilot-shell__panel--safety .copilot-risk-layer-panel {
+  margin-top: 0;
 }
 
 .ed-copilot-shell__footer {

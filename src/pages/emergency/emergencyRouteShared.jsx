@@ -1,61 +1,19 @@
 import PatientCard from '../../components/PatientCard';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
+import { shouldShowDeveloperApiBanners } from '../../config/practitionerCleanup.config';
+import './emergency-route.css';
 
+/** @deprecated Use emergency-route.css classes instead */
 export const emergencyRouteStyles = {
-  page: {
-    minHeight: '100%',
-    display: 'grid',
-    alignContent: 'start',
-    gap: 'var(--space-4, 16px)',
-    padding: 'var(--space-4, 16px)',
-    background: 'var(--color-background, #0A0E1A)',
-    color: 'var(--color-text-primary, #F9FAFB)',
-  },
-  hero: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 'var(--space-4, 16px)',
-    border: '1px solid var(--color-border-subtle, #1F2937)',
-    borderRadius: 'var(--radius-xl, 16px)',
-    background: 'var(--color-card, #172033)',
-    padding: 'var(--space-4, 16px)',
-    boxShadow: 'none',
-  },
-  eyebrow: {
-    color: 'var(--status-info, #60A5FA)',
-    fontSize: 'var(--font-size-xs, 12px)',
-    fontWeight: 900,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-  },
-  title: {
-    margin: 'var(--space-1, 4px) 0 0',
-    color: 'var(--color-text-primary, #F9FAFB)',
-    fontSize: 'var(--font-size-2xl, 24px)',
-    lineHeight: 1.05,
-  },
-  description: {
-    color: 'var(--color-text-secondary, #9CA3AF)',
-    fontSize: 'var(--font-size-sm, 14px)',
-    margin: 'var(--space-1, 4px) 0 0',
-    maxWidth: 860,
-  },
-  card: {
-    border: '1px solid var(--color-border-subtle, #1F2937)',
-    borderRadius: 'var(--radius-lg, 12px)',
-    background: 'var(--color-surface, #111827)',
-  },
-  muted: {
-    color: 'var(--color-text-muted, #6B7280)',
-  },
-};
-
-const MATURITY_CHIP_STYLES = {
-  demo: { border: '1px solid rgba(245, 158, 11, 0.45)', background: 'rgba(245, 158, 11, 0.12)', color: '#FCD34D' },
-  preview: { border: '1px solid rgba(96, 165, 250, 0.45)', background: 'rgba(96, 165, 250, 0.12)', color: '#93C5FD' },
-  planned: { border: '1px solid rgba(156, 163, 175, 0.45)', background: 'rgba(156, 163, 175, 0.12)', color: '#D1D5DB' },
+  page: {},
+  hero: {},
+  eyebrow: {},
+  title: {},
+  description: {},
+  card: {},
+  muted: {},
 };
 
 const MATURITY_CHIP_LABELS = {
@@ -67,22 +25,9 @@ const MATURITY_CHIP_LABELS = {
 export function MaturityChip({ maturity }) {
   if (!maturity || maturity === 'live' || !MATURITY_CHIP_LABELS[maturity]) return null;
 
-  const chipStyle = MATURITY_CHIP_STYLES[maturity];
-
   return (
     <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        borderRadius: 999,
-        fontSize: 11,
-        fontWeight: 900,
-        letterSpacing: '0.06em',
-        lineHeight: 1,
-        padding: '5px 10px',
-        textTransform: 'uppercase',
-        ...chipStyle,
-      }}
+      className={`emergency-route-maturity-chip emergency-route-maturity-chip--${maturity}`}
       aria-label={`${MATURITY_CHIP_LABELS[maturity]} surface`}
     >
       {MATURITY_CHIP_LABELS[maturity]}
@@ -90,69 +35,77 @@ export function MaturityChip({ maturity }) {
   );
 }
 
-export function EmergencyRoutePage({ eyebrow, title, description, children, actions, maturity }) {
+export function FlowCapacityViewTabs({ activeView, onViewChange }) {
+  const views = [
+    { id: 'capacity', label: 'Capacity' },
+    { id: 'boarding', label: 'Boarding' },
+  ];
+
   return (
-    <section style={emergencyRouteStyles.page}>
-      <header style={emergencyRouteStyles.hero}>
-        <div>
-          {eyebrow ? <span style={emergencyRouteStyles.eyebrow}>{eyebrow}</span> : null}
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
-            <h1 style={{ ...emergencyRouteStyles.title, margin: 'var(--space-1, 4px) 0 0' }}>{title}</h1>
-            <MaturityChip maturity={maturity} />
-          </div>
-          {description ? <p style={emergencyRouteStyles.description}>{description}</p> : null}
-        </div>
-        {actions ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{actions}</div> : null}
-      </header>
-      {children}
-    </section>
+    <div className="emergency-route-view-tabs" role="tablist" aria-label="Flow and capacity views">
+      {views.map((view) => (
+        <button
+          key={view.id}
+          type="button"
+          role="tab"
+          aria-selected={activeView === view.id}
+          className={`emergency-route-view-tabs__btn${
+            activeView === view.id ? ' emergency-route-view-tabs__btn--active' : ''
+          }`}
+          onClick={() => onViewChange(view.id)}
+        >
+          {view.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
+export function EmergencyRoutePage({
+  eyebrow,
+  title,
+  titleId,
+  description,
+  children,
+  actions,
+  maturity,
+}) {
+  const headerActions = (
+    <>
+      {actions}
+      <MaturityChip maturity={maturity} />
+    </>
+  );
+
+  return (
+    <PageShell
+      as="section"
+      eyebrow={eyebrow}
+      title={title}
+      titleId={titleId}
+      description={description}
+      actions={actions || maturity ? headerActions : null}
+      className="emergency-route-page cd-page-shell"
+      headerClassName="emergency-route-page__hero"
+      contentClassName="emergency-route-page__content"
+      aria-label={title}
+    >
+      {children}
+    </PageShell>
+  );
+}
 
 export function MetricGrid({ metrics }) {
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-        gap: 12,
-      }}
-    >
+    <div className="emergency-route-metric-grid">
       {metrics.map((metric) => (
         <article
           key={metric.label}
-          style={{
-            ...emergencyRouteStyles.card,
-            display: 'grid',
-            gap: 6,
-            minWidth: 0,
-            padding: 'var(--space-3, 12px)',
-          }}
+          className="emergency-route-card emergency-route-metric-card"
+          style={metric.color ? { '--metric-color': metric.color } : undefined}
         >
-          <strong
-            style={{
-              display: 'block',
-              color: metric.color || 'var(--color-text-primary, #F9FAFB)',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-              fontSize: 28,
-              lineHeight: 1,
-            }}
-          >
-            {metric.value}
-          </strong>
-          <span
-            style={{
-              display: 'block',
-              color: 'var(--color-text-secondary, #9CA3AF)',
-              fontSize: 12,
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {metric.label}
-          </span>
+          <strong className="emergency-route-metric-card__value">{metric.value}</strong>
+          <span className="emergency-route-metric-card__label">{metric.label}</span>
         </article>
       ))}
     </div>
@@ -162,29 +115,14 @@ export function MetricGrid({ metrics }) {
 export function PatientGrid({ patients, emptyMessage }) {
   if (!patients.length) {
     return (
-      <div
-        role="status"
-        style={{
-          ...emergencyRouteStyles.card,
-          borderStyle: 'dashed',
-          color: 'var(--color-text-muted, #9CA3AF)',
-          padding: 'var(--space-6, 24px)',
-          textAlign: 'center',
-        }}
-      >
+      <div role="status" className="emergency-route-card emergency-route-empty">
         {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-        gap: 10,
-      }}
-    >
+    <div className="emergency-route-patient-grid">
       {patients.map((patient) => (
         <PatientCard key={patient.id} patient={patient} />
       ))}
@@ -200,16 +138,13 @@ export function ApiStateBanner({
   moduleState,
   fallbackText = 'Showing the last local CareDroid state. Verify against the current department record before operational decisions.',
 }) {
+  if (!shouldShowDeveloperApiBanners()) {
+    return null;
+  }
+
   if (moduleState.loading && !moduleState.data) {
     return (
-      <div
-        role="status"
-        style={{
-          ...emergencyRouteStyles.card,
-          color: 'var(--color-text-secondary, #9CA3AF)',
-          padding: 'var(--space-3, 12px)',
-        }}
-      >
+      <div role="status" className="emergency-route-card emergency-route-banner">
         Loading department data...
       </div>
     );
@@ -217,16 +152,7 @@ export function ApiStateBanner({
 
   if (moduleState.error) {
     return (
-      <div
-        role="alert"
-        style={{
-          border: '1px solid color-mix(in srgb, var(--status-critical, #EF4444) 54%, var(--color-border-default, #7F1D1D))',
-          borderRadius: 'var(--radius-lg, 12px)',
-          background: 'color-mix(in srgb, var(--status-critical, #EF4444) 12%, var(--color-surface, #111827))',
-          color: 'var(--status-critical, #FCA5A5)',
-          padding: 'var(--space-3, 12px)',
-        }}
-      >
+      <div role="alert" className="emergency-route-banner emergency-route-banner--error">
         {moduleState.error}. {fallbackText}
       </div>
     );
@@ -234,15 +160,7 @@ export function ApiStateBanner({
 
   if (moduleState.isEmpty) {
     return (
-      <div
-        role="status"
-        style={{
-          ...emergencyRouteStyles.card,
-          borderStyle: 'dashed',
-          color: 'var(--color-text-muted, #9CA3AF)',
-          padding: 'var(--space-3, 12px)',
-        }}
-      >
+      <div role="status" className="emergency-route-card emergency-route-empty">
         No active records are available for this module yet. Add or load department data before using this view for handoff decisions.
       </div>
     );
@@ -252,6 +170,10 @@ export function ApiStateBanner({
 }
 
 export function DataSourceNote({ moduleState }) {
+  if (!shouldShowDeveloperApiBanners()) {
+    return null;
+  }
+
   const generatedAt = moduleState.data?.generatedAt;
   const source = moduleState.data?.source;
   const freshness = dataFreshness(generatedAt);
@@ -260,12 +182,7 @@ export function DataSourceNote({ moduleState }) {
     <div
       role="status"
       title={freshness.stale ? 'Data may be stale. Validate against current department state.' : undefined}
-      style={{
-        color: freshness.stale
-          ? 'var(--status-warning, #F59E0B)'
-          : 'var(--color-text-muted, #6B7280)',
-        fontSize: 12,
-      }}
+      className={`emergency-route-data-source${freshness.stale ? ' emergency-route-data-source--stale' : ''}`}
     >
       Source: {sourceLabel} | {freshness.label}
       {freshness.stale ? ' | validate before operational decisions' : ''}

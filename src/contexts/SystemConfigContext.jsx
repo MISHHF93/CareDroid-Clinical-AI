@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useUser } from './UserContext';
 import configService from '../services/configService';
 import logger from '../utils/logger';
-import ApiConfigDegradedBanner from '../components/ApiConfigDegradedBanner';
+
 
 const SystemConfigContext = createContext();
 
@@ -143,17 +143,7 @@ export function SystemConfigProvider({ children }) {
     sessionConfig: systemConfig?.session,
   };
 
-  return (
-    <SystemConfigContext.Provider value={value}>
-      <ApiConfigDegradedBanner
-        configDegraded={configDegraded}
-        error={error}
-        loading={loading}
-        refresh={loadSystemConfig}
-      />
-      {children}
-    </SystemConfigContext.Provider>
-  );
+  return <SystemConfigContext.Provider value={value}>{children}</SystemConfigContext.Provider>;
 }
 
 export function useSystemConfig() {

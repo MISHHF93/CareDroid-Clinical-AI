@@ -148,6 +148,13 @@ npm run compose:app:ml
 
 The root `docker-compose.yml` provides the full database, cache, monitoring, and observability stack.
 
+## Documentation
+
+| Document | Audience |
+|----------|----------|
+| [User Manual](docs/USER-MANUAL.md) | ED staff, clinical evaluators, Codespace manual testers |
+| [User Manual § Cleanup Playbook](docs/USER-MANUAL.md#10-cleanup-playbook--making-the-platform-practitioner-ready) | Data, visual, and process cleanup before pilot onboarding |
+
 ## Key routes
 
 Canonical paths are defined in `src/config/routes.config.js`.

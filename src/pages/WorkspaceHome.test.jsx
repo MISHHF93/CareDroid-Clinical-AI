@@ -10,6 +10,10 @@ import {
 
 vi.mock('./WorkspaceHome.css', () => ({}));
 
+vi.mock('../config/practitionerCleanup.config', () => ({
+  isPractitionerCleanupEnabled: () => false,
+}));
+
 vi.mock('../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
 }));

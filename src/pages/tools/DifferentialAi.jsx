@@ -107,7 +107,7 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded } = {
               placeholder="e.g., HTN, diabetes, prior DVT, smoking"
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="tool-form-row-2">
               <div>
                 <label className="simple-tool-label" htmlFor="differential-age">
                   Age
@@ -134,7 +134,7 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded } = {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button
                 type="button"
                 className="diagnosis-primary-btn"
@@ -154,9 +154,9 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded } = {
             <ApiStateBanner error={error} onRetry={symptoms.trim() ? handleGenerate : undefined} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Analyzing inputs and building ranked differential...</p>
+                <p className="tool-loading-state__message">Analyzing inputs and building ranked differential...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -220,7 +220,7 @@ export default function DifferentialAi({ embedded = false, onCloseEmbedded } = {
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Enter symptoms, labs, history, and demographics to generate a clinician-reviewed differential.
               </div>
             )}

@@ -104,7 +104,7 @@ const PRESENTATION_BY_MODE: Readonly<
     stripEyebrow: 'Flow command',
     stripAriaLabel: 'Charge nurse flow metrics',
     pageEyebrow: 'Department flow',
-    pageTitle: 'Charge nurse command',
+    pageTitle: 'Department Whiteboard',
     pageSubtitle: 'Waiting volume, provider breaches, reassessments, capacity, and offload pressure.',
     emptyHint: 'No flow signals need charge nurse attention right now.',
     density: 'compact',
@@ -122,7 +122,7 @@ const PRESENTATION_BY_MODE: Readonly<
   [CARE_DROID_SCREEN_MODES.commandCenter]: Object.freeze({
     emphasis: 'throughput',
     stripEyebrow: 'Throughput',
-    stripAriaLabel: 'Command center throughput metrics',
+    stripAriaLabel: 'Department throughput metrics',
     pageEyebrow: EMERGENCY_OS_BRANDING.platformLine,
     pageTitle: EMERGENCY_OS_BRANDING.commandCenterName,
     pageSubtitle: EMERGENCY_OS_BRANDING.commandCenterSummary,

@@ -83,15 +83,16 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded } = {}
               placeholder="50"
             />
 
-            <button
-              type="button"
-              className="diagnosis-primary-btn"
-              onClick={loadLogs}
-              disabled={loading}
-              style={{ marginTop: '16px' }}
-            >
-              {loading ? 'Loading audit logs...' : 'Load execution logs'}
-            </button>
+            <div className="tool-form-actions">
+              <button
+                type="button"
+                className="diagnosis-primary-btn"
+                onClick={loadLogs}
+                disabled={loading}
+              >
+                {loading ? 'Loading audit logs...' : 'Load execution logs'}
+              </button>
+            </div>
           </section>
 
           <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="clinical-audit-output">
@@ -99,9 +100,9 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded } = {}
             <ApiStateBanner error={error} onRetry={loadLogs} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Loading clinical audit execution logs...</p>
+                <p className="tool-loading-state__message">Loading clinical audit execution logs...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -156,7 +157,7 @@ export default function ClinicalAudit({ embedded = false, onCloseEmbedded } = {}
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Load audit logs to review execution traces and integrity metadata.
               </div>
             )}

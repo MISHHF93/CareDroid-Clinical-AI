@@ -28,7 +28,8 @@ const CATALOG_BY_ROLE = new Map<string, UserProfileCatalogEntry>(
   (catalogData as UserProfileCatalogEntry[]).map((entry) => [entry.saasRole, entry]),
 );
 
-export const USER_PROFILE_CATALOG: readonly UserProfileCatalogEntry[] = catalogData as UserProfileCatalogEntry[];
+export const USER_PROFILE_CATALOG: readonly UserProfileCatalogEntry[] =
+  catalogData as UserProfileCatalogEntry[];
 
 export function resolveUserProfileFromSaasRole(role?: string | null) {
   const saasRole = normalizeSaasRole(role);
@@ -68,4 +69,10 @@ export function isSaasRoleCatalogComplete(): boolean {
   return SAAS_USER_ROLES.every((role) => CATALOG_BY_ROLE.has(role));
 }
 
-export { SAAS_USER_ROLES, ROLE_PERMISSION_PRESETS, normalizeSaasRole, DEFAULT_SAAS_PROFILE, SaasUserRole };
+export {
+  SAAS_USER_ROLES,
+  ROLE_PERMISSION_PRESETS,
+  normalizeSaasRole,
+  DEFAULT_SAAS_PROFILE,
+  SaasUserRole,
+};

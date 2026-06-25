@@ -32,6 +32,27 @@ vi.mock('../services/auditApi', () => ({
   fetchPhiAccessLogs: vi.fn(),
 }));
 
+vi.mock('../config/practitionerSurfaceVisibility', () => ({
+  getPractitionerSurfaceVisibility: () => ({
+    active: false,
+    compactLayout: false,
+    profile: {
+      showShellEyebrow: true,
+      showAccessSummary: true,
+      showNestedSubtitles: true,
+      showCompetencyCard: true,
+      showPhiActivity: true,
+    },
+    whiteboard: {},
+    reception: {},
+    patientCard: { badgeLimit: 2 },
+    tools: {},
+    settings: {},
+    chrome: {},
+    analytics: {},
+  }),
+}));
+
 function renderProfile() {
   return render(
     <MemoryRouter>
@@ -68,7 +89,7 @@ describe('Profile activity audit visibility', () => {
   it('shows personal activity and restricted PHI empty state for normal users', async () => {
     renderProfile();
 
-    expect(screen.getByRole('heading', { name: /profile activity \/ my access logs/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /recent activity/i })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Login')).toBeInTheDocument();

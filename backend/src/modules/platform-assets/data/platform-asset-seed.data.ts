@@ -474,7 +474,8 @@ const RAW_SEED_ASSET_PACKS = [
     id: 'trackmind',
     name: 'TrackMind Operations Pack',
     slug: 'trackmind',
-    description: 'Race-day operations, surveillance nexus, stewarding, and equine welfare surfaces.',
+    description:
+      'Race-day operations, surveillance nexus, stewarding, and equine welfare surfaces.',
     organizationTypes: [OrganizationType.HEALTH_SYSTEM, OrganizationType.RACETRACK],
     assetIds: [
       'analytics',

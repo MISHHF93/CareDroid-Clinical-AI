@@ -358,8 +358,8 @@ function buildCrowdingForecast(input: {
     };
   }
 
-  const band = input.capacity?.band || input.centralSnapshot?.capacityStatus.band;
-  const score = input.capacity?.score ?? input.centralSnapshot?.capacityStatus.score;
+  const band = input.capacity?.band || input.centralSnapshot?.capacityStatus?.band;
+  const score = input.capacity?.score ?? input.centralSnapshot?.capacityStatus?.score;
   const breachedQueues = input.centralSnapshot?.queueHealth.filter((queue) => queue.breached).length ?? 0;
 
   if (band && score != null) {
@@ -388,13 +388,13 @@ function buildSystemHealth(input: {
   analyticsSource?: string | null;
 }): CommandCenterSystemHealth {
   const syncTimestamp =
-    input.centralSnapshot?.sync.lastSyncedAt || input.centralSnapshot?.generatedAt || null;
+    input.centralSnapshot?.sync?.lastSyncedAt || input.centralSnapshot?.generatedAt || null;
   const freshness = formatFreshnessLabel(syncTimestamp);
   const source =
-    input.centralSnapshot?.sync.source === 'backend-snapshot'
+    input.centralSnapshot?.sync?.source === 'backend-snapshot'
       ? 'Backend central node'
       : 'Local operational snapshot';
-  const stale = Boolean(input.centralSnapshot?.sync.stale);
+  const stale = Boolean(input.centralSnapshot?.sync?.stale);
   const modelHealth = input.intelligenceSnapshot?.modelHealth?.status;
   const analyticsLabel = input.analyticsSource ? ` · analytics ${input.analyticsSource}` : '';
 
@@ -459,12 +459,12 @@ export function buildCommandCenterThroughputSnapshot(input: {
   const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
   const waitingCount =
     capacity?.waitingCount ??
-    input.centralSnapshot?.currentDepartmentStatus.waitingPatients ??
+    input.centralSnapshot?.currentDepartmentStatus?.waitingPatients ??
     waitingPatients.length;
   const maxCapacity =
     capacity?.maxCapacity ??
     capacity?.staffedRoomCount ??
-    input.centralSnapshot?.capacityStatus.totalPatients ??
+    input.centralSnapshot?.capacityStatus?.totalPatients ??
     null;
 
   const triageSummary = summarizeTriageBreachBoard(patients, {
@@ -495,7 +495,7 @@ export function buildCommandCenterThroughputSnapshot(input: {
       providerCandidates,
       (patient) => minutesSince(patient.triageTime || patient.arrivalTime, now),
       now,
-    ) ?? input.centralSnapshot?.currentDepartmentStatus.averageWait ?? null;
+    ) ?? input.centralSnapshot?.currentDepartmentStatus?.averageWait ?? null;
 
   const emsVisibility = buildEmsOffloadVisibilitySnapshot(input.emsArrivals || [], {
     patients,
@@ -518,14 +518,14 @@ export function buildCommandCenterThroughputSnapshot(input: {
       ? formatDepartmentDuration(medianBoarding)
       : longestBoarding
         ? formatDepartmentDuration(longestBoarding)
-        : input.centralSnapshot?.boardingStatus.boarders
+        : input.centralSnapshot?.boardingStatus?.boarders
           ? `${input.centralSnapshot.boardingStatus.boarders} boarders`
           : '—';
 
   const referralSummary = summarizeReferralAwareness(referrals);
   const referralsPending =
     referralSummary.buckets.pending ||
-    input.centralSnapshot?.referralStatus.pending ||
+    input.centralSnapshot?.referralStatus?.pending ||
     0;
 
   const lwbsCounts = summarizeLwbsRiskBoard(patients, {
@@ -537,7 +537,7 @@ export function buildCommandCenterThroughputSnapshot(input: {
   const peakHourLabel = buildPeakHourLabel(hourlyArrivals);
   const longestWaitMinutes =
     capacity?.longestWaitMinutes ??
-    input.centralSnapshot?.currentDepartmentStatus.longestWait ??
+    input.centralSnapshot?.currentDepartmentStatus?.longestWait ??
     waitingPatients.reduce(
       (max, patient) =>
         Math.max(max, minutesSince(patient.triageTime || patient.arrivalTime, now)),
@@ -829,12 +829,12 @@ export function buildCommandCenterThroughputSnapshot(input: {
             : boardingMetrics?.patientsBoarding.length
               ? 'watch'
               : 'stable',
-      detail: `${boardingMetrics?.patientsBoarding.length ?? input.centralSnapshot?.boardingStatus.boarders ?? 0} boarding · median ${formatDepartmentDuration(medianBoarding)}`,
+      detail: `${boardingMetrics?.patientsBoarding.length ?? input.centralSnapshot?.boardingStatus?.boarders ?? 0} boarding · median ${formatDepartmentDuration(medianBoarding)}`,
       trend: buildMetricTrend(
         boardingMetrics?.patientsBoarding.length ??
-          input.centralSnapshot?.boardingStatus.boarders ??
+          input.centralSnapshot?.boardingStatus?.boarders ??
           0,
-        input.centralSnapshot?.boardingStatus.boarders ?? 0,
+        input.centralSnapshot?.boardingStatus?.boarders ?? 0,
         true,
       ),
     },
@@ -846,7 +846,7 @@ export function buildCommandCenterThroughputSnapshot(input: {
       detail: `${referralSummary.buckets.delayed} delayed · ${referralSummary.buckets.accepted} accepted awaiting action`,
       trend: buildMetricTrend(
         referralsPending,
-        input.centralSnapshot?.referralStatus.pending ?? referralsPending,
+        input.centralSnapshot?.referralStatus?.pending ?? referralsPending,
         true,
       ),
     },
@@ -911,7 +911,7 @@ export function buildCommandCenterThroughputSnapshot(input: {
     dailyVolume: input.dailyVolume,
     waitingCount,
     longestWaitMinutes,
-    capacityScore: capacity?.score ?? input.centralSnapshot?.capacityStatus.score ?? null,
+    capacityScore: capacity?.score ?? input.centralSnapshot?.capacityStatus?.score ?? null,
     crowdPressureScore: crowdLevel.signals.pressureScore,
     now,
   });

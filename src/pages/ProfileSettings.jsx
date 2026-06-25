@@ -174,9 +174,8 @@ const ProfileSettings = ({ authToken }) => {
           )}
           {status.message && (
             <div
-              className={`api-state-banner api-state-banner--${status.type === 'error' ? 'error' : status.type === 'success' ? 'success' : 'info'}`}
+              className={`api-state-banner api-state-banner--${status.type === 'error' ? 'error' : status.type === 'success' ? 'success' : 'info'} profile-settings-status`}
               role="status"
-              style={{ marginTop: '16px' }}
             >
               {status.message}
             </div>
@@ -184,7 +183,7 @@ const ProfileSettings = ({ authToken }) => {
           <form
             id="profile-settings-form"
             onSubmit={handleSave}
-            style={{ display: 'grid', gap: '12px', marginTop: '18px' }}
+            className="profile-settings-form"
           >
             <Input
               type="text"
@@ -231,7 +230,7 @@ const ProfileSettings = ({ authToken }) => {
                 onChange={(e) => setTimezone(e.target.value)}
               />
             </div>
-            <div className="card-subtle" style={{ padding: '12px 16px', fontSize: '14px' }}>
+            <div className="card-subtle profile-settings-role-note">
               <strong>Account role:</strong> {accountRole}. Role changes stay controlled by backend
               membership and RBAC policies.
             </div>
@@ -245,7 +244,7 @@ const ProfileSettings = ({ authToken }) => {
             >
               Save profile
             </Button>
-            <Link to="/profile" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
+            <Link to="/profile" className="profile-settings-back-link">
               Back to Profile
             </Link>
           </ActionRow>

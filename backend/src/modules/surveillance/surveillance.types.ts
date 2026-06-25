@@ -26,7 +26,14 @@ export interface FacilityZone {
   facilityId: string;
   facilityLabel: string;
   floorId?: string;
-  zoneType: 'restricted' | 'public' | 'clinical' | 'paddock' | 'track' | 'back_of_house' | 'welfare';
+  zoneType:
+    | 'restricted'
+    | 'public'
+    | 'clinical'
+    | 'paddock'
+    | 'track'
+    | 'back_of_house'
+    | 'welfare';
   privacyTier: 'public' | 'operational' | 'restricted' | 'welfare_safe';
   geofence?: {
     coordinateSystem: string;

@@ -24,10 +24,17 @@ import {
 } from '../../config/operationalMetricsModel';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { summarizeTriageBreachAnalytics } from '../../services/triageBreachTimer';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { MaturityChip } from './emergencyRouteShared';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 import './EmergencyAnalytics.css';
 
-const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
+const CHART_COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
+
+function heatBucket(count) {
+  return Math.min(6, Math.round(((count || 0) / 6) * 6));
+}
 
 function ChartCard({ title, subtitle, children }) {
   return (
@@ -91,9 +98,11 @@ function signalMeta(signal) {
 }
 
 export default function EmergencyAnalytics() {
+  const surfaces = getPractitionerSurfaceVisibility();
   const emergencyRole = useEmergencyRolePermissions();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const patients = useEmergencyStore((state) => state.patients);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
@@ -155,25 +164,35 @@ export default function EmergencyAnalytics() {
     void loadEmergencyAnalytics({ force: true });
   }, [loadEmergencyAnalytics]);
 
+  const sourceStatus =
+    emergencyAnalytics.status === 'loading'
+      ? 'Loading'
+      : analyticsSourceLabel(emergencyAnalytics.source);
+
   return (
-    <section className="emergency-analytics" aria-label="Emergency operational analytics">
-      <header className="emergency-analytics__header">
-        <div>
-          <span>Operational Command</span>
-          <div className="emergency-analytics__title-row">
-            <h1>Emergency Analytics</h1>
-            <MaturityChip maturity="demo" />
-          </div>
-          <p>
-            Current shift, arrival, wait-time, and complaint-mix signals for ED leadership review.
-          </p>
-        </div>
-        <strong>
-          {emergencyAnalytics.status === 'loading'
-            ? 'Loading'
-            : analyticsSourceLabel(emergencyAnalytics.source)}
-        </strong>
-      </header>
+    <PageShell
+      as="section"
+      eyebrow="Analytics"
+      title="Department Analytics"
+      description="Shift throughput, arrivals, wait times, and complaint mix for department review."
+      actions={
+        <>
+          <MaturityChip maturity="demo" />
+          <strong className="emergency-analytics__source-status">{sourceStatus}</strong>
+        </>
+      }
+      className="emergency-analytics cd-page-shell"
+      headerClassName="emergency-analytics__header"
+      contentClassName="emergency-analytics__content"
+      aria-label="Emergency operational analytics"
+    >
+      <EdDataSourceBanner
+        envelope={emergencyAnalytics}
+        loading={emergencyAnalytics.status === 'loading'}
+        error={emergencyAnalytics.status === 'error' ? emergencyAnalytics.message : undefined}
+        activeScenarioId={activeScenarioId}
+        compact
+      />
 
       {emergencyAnalytics.status === 'loading' ? (
         <p className="emergency-analytics__state" role="status">
@@ -191,6 +210,8 @@ export default function EmergencyAnalytics() {
         </p>
       ) : null}
 
+      {surfaces.analytics.showPlatformLayers ? (
+      <>
       <section
         className="emergency-analytics__command-layer"
         aria-label="Central node operational command layer"
@@ -287,8 +308,11 @@ export default function EmergencyAnalytics() {
           ) : null}
         </div>
       </section>
+      </>
+      ) : null}
 
-      <div className="emergency-analytics__grid" aria-label="Operational hidden artifact links">
+      {surfaces.analytics.showDepartmentShortcuts ? (
+      <div className="emergency-analytics__grid" aria-label="Department shortcut links">
         <ChartCard title="Department Pulse" subtitle="Live command view">
           <strong>Queues, staff, EMS, alerts</strong>
           <small>Compact charge-nurse view surfaced from the CareDroid store.</small>
@@ -312,8 +336,9 @@ export default function EmergencyAnalytics() {
           )}
         </ChartCard>
       </div>
+      ) : null}
 
-      {upgradeHarness.data?.data ? (
+      {surfaces.analytics.showPlatformLayers && upgradeHarness.data?.data ? (
         <div className="emergency-analytics__grid" aria-label="Advanced CareDroid upgrade harness analytics">
           <ChartCard title="Upgrade Harness" subtitle="Pilot readiness">
             <strong>
@@ -402,7 +427,7 @@ export default function EmergencyAnalytics() {
               {hourlyArrivals.map((hour) => (
                 <span
                   key={hour.hour}
-                  style={{ '--heat': Math.min(1, (hour.count || 0) / 6) }}
+                  className={`emergency-analytics__heatmap-cell emergency-analytics__heatmap-cell--${heatBucket(hour.count)}`}
                   title={`${hour.hour}: ${hour.count} arrivals`}
                 >
                   {hour.hour.slice(0, 2)}
@@ -451,7 +476,7 @@ export default function EmergencyAnalytics() {
                     paddingAngle={2}
                   >
                     {topComplaints.map((entry, index) => (
-                      <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -460,7 +485,7 @@ export default function EmergencyAnalytics() {
               <div className="emergency-analytics__legend">
                 {topComplaints.slice(0, 6).map((item, index) => (
                   <span key={item.name}>
-                    <i style={{ background: COLORS[index % COLORS.length] }} />
+                    <i className={`emergency-analytics__legend-swatch emergency-analytics__legend-swatch--${index % 6}`} />
                     {item.name}: {item.count}
                   </span>
                 ))}
@@ -471,6 +496,6 @@ export default function EmergencyAnalytics() {
           )}
         </ChartCard>
       </div>
-    </section>
+    </PageShell>
   );
 }

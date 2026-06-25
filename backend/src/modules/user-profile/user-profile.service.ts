@@ -93,10 +93,7 @@ export class UserProfileService {
     if (!dto || Object.keys(dto).length === 0) {
       throw new BadRequestException('No profile fields were provided.');
     }
-    if (
-      dto.role !== undefined &&
-      !options.canAssignRole
-    ) {
+    if (dto.role !== undefined && !options.canAssignRole) {
       throw new BadRequestException(
         'Role assignment is managed by your organization administrator.',
       );

@@ -13,8 +13,12 @@ export class TextMiningService {
     const demographics: Partial<ExtractedDemographics> = {};
     const normalized = String(text);
 
-    const firstName = normalized.match(/\b(?:first\s*name|given\s*name)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
-    const lastName = normalized.match(/\b(?:last\s*name|surname|family\s*name)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
+    const firstName = normalized.match(
+      /\b(?:first\s*name|given\s*name)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+    );
+    const lastName = normalized.match(
+      /\b(?:last\s*name|surname|family\s*name)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+    );
     const dob = normalized.match(
       /\b(?:dob|date of birth|birth date|born)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})/i,
     );
@@ -37,7 +41,12 @@ export class TextMiningService {
     if (email?.[0]) demographics.email = email[0];
     if (sex?.[1]) {
       const token = sex[1].toLowerCase();
-      demographics.sex = token === 'm' || token === 'male' ? 'Male' : token === 'f' || token === 'female' ? 'Female' : titleCase(token);
+      demographics.sex =
+        token === 'm' || token === 'male'
+          ? 'Male'
+          : token === 'f' || token === 'female'
+            ? 'Female'
+            : titleCase(token);
     }
 
     return demographics;

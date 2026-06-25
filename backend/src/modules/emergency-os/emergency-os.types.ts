@@ -97,13 +97,7 @@ export interface EmergencyEncounter {
   timelineEventIds: string[];
 }
 
-export type ArrivalMode =
-  | 'walk-in'
-  | 'EMS'
-  | 'referral'
-  | 'self-check-in'
-  | 'police'
-  | 'transfer';
+export type ArrivalMode = 'walk-in' | 'EMS' | 'referral' | 'self-check-in' | 'police' | 'transfer';
 
 export type TriageAcuityStatus = 'unassigned' | 'suggested' | 'confirmed';
 export type TriageAcuitySystem = 'CTAS' | 'ESI' | 'PRIORITY';

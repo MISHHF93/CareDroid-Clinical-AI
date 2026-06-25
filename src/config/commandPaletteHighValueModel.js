@@ -13,7 +13,15 @@ export const COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS = Object.freeze([
 
 /** Route commands duplicated by Quick actions — hidden from Navigation group. */
 export const COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS = Object.freeze(
-  new Set(['open-whiteboard', 'open-ems', 'open-reassessment', 'open-intake']),
+  new Set([
+    'open-whiteboard',
+    'open-ems',
+    'open-reassessment',
+    'open-intake',
+    'open-tools',
+    'open-calculators',
+    'open-capacity',
+  ]),
 );
 
 /** Legacy command ids still stored in recent-command localStorage. */

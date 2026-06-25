@@ -129,12 +129,15 @@ const CostAnalyticsDashboard = () => {
           <span className="cost-label">Last 30 days</span>
           {costLimit && (
             <div className="cost-progress">
-              <div 
-                className="cost-progress-bar" 
-                style={{ 
-                  width: `${Math.min((costData.monthlyCost / costLimit) * 100, 100)}%`,
-                  backgroundColor: isCostLimitExceeded ? '#EF4444' : isCostLimitApproaching ? '#F59E0B' : '#10B981'
-                }}
+              <div
+                className={`cost-progress-bar${
+                  isCostLimitExceeded
+                    ? ' cost-progress-bar--danger'
+                    : isCostLimitApproaching
+                      ? ' cost-progress-bar--warn'
+                      : ' cost-progress-bar--ok'
+                }`}
+                style={{ width: `${Math.min((costData.monthlyCost / costLimit) * 100, 100)}%` }}
               />
             </div>
           )}
@@ -167,7 +170,9 @@ const CostAnalyticsDashboard = () => {
           </div>
           <div className="roi-metric">
             <span className="roi-label">Net Value</span>
-            <strong className="roi-value" style={{ color: parseFloat(roiMetrics.netValue) > 0 ? '#10B981' : '#EF4444' }}>
+            <strong
+              className={`roi-value${parseFloat(roiMetrics.netValue) > 0 ? ' roi-value--positive' : ' roi-value--negative'}`}
+            >
               ${roiMetrics.netValue}
             </strong>
           </div>
@@ -202,10 +207,7 @@ const CostAnalyticsDashboard = () => {
                 <div className="cost-row-bar">
                   <div
                     className="cost-row-fill"
-                    style={{
-                      width: `${percentage}%`,
-                      backgroundColor: tool.color,
-                    }}
+                    style={{ width: `${percentage}%`, '--tool-color': tool.color }}
                   />
                 </div>
                 <span className="cost-row-amount">${item.cost.toFixed(2)}</span>
@@ -233,11 +235,8 @@ const CostAnalyticsDashboard = () => {
                   </div>
                   <div className="cost-row-bar">
                     <div
-                      className="cost-row-fill"
-                      style={{
-                        width: `${percentage}%`,
-                        backgroundColor: '#4F46E5',
-                      }}
+                      className="cost-row-fill cost-row-fill--category"
+                      style={{ width: `${percentage}%` }}
                     />
                   </div>
                   <span className="cost-row-amount">${cost.toFixed(2)}</span>

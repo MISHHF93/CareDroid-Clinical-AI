@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 import './ProfileSettingsShell.css';
 
 const PROFILE_NAV = Object.freeze([
@@ -20,6 +21,7 @@ export default function ProfileSettingsShell({
   accessSummary = null,
   profileCopy = null,
 }) {
+  const surfaces = getPractitionerSurfaceVisibility();
   const location = useLocation();
   const resolvedSubtitle = subtitle || profileCopy?.profileShellSubtitle;
 
@@ -27,15 +29,17 @@ export default function ProfileSettingsShell({
     <div className="profile-settings-shell">
       <header className="profile-settings-shell__header">
         <div>
-          <p className="profile-settings-shell__eyebrow">
-            {profileCopy?.workspaceEyebrow || 'User profile'}
-          </p>
+          {surfaces.profile.showShellEyebrow ? (
+            <p className="profile-settings-shell__eyebrow">
+              {profileCopy?.workspaceEyebrow || 'User profile'}
+            </p>
+          ) : null}
           <h1>{title}</h1>
-          {resolvedSubtitle ? (
+          {surfaces.profile.showNestedSubtitles && resolvedSubtitle ? (
             <p className="profile-settings-shell__subtitle">{resolvedSubtitle}</p>
           ) : null}
         </div>
-        {accessSummary ? (
+        {surfaces.profile.showAccessSummary && accessSummary ? (
           <div className="profile-settings-shell__access" role="status">
             <strong>{profileCopy?.personaTitle || accessSummary.profileBenefits}</strong>
             <span>{accessSummary.profileBenefits}</span>

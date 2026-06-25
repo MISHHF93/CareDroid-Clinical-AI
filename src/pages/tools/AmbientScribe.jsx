@@ -199,7 +199,7 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded } = {}
               placeholder="e.g., emphasize medication reconciliation, include return precautions"
             />
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button
                 type="button"
                 className="diagnosis-primary-btn"
@@ -222,9 +222,9 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded } = {}
             <ApiStateBanner error={error} onRetry={transcriptText.trim() ? handleGenerate : undefined} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>
+                <p className="tool-loading-state__message">
                   Generating a documentation draft with safety checks...
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded } = {}
                     This draft is not signed and has not modified the chart. Review, edit, and verify all
                     facts before using it in documentation.
                   </p>
-                  <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <label className="tool-inline-check">
                     <input
                       type="checkbox"
                       checked={reviewed}
@@ -261,16 +261,15 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded } = {}
                   </label>
                   <button
                     type="button"
-                    className="diagnosis-primary-btn"
+                    className="diagnosis-primary-btn tool-review-actions"
                     disabled={!reviewed}
-                    style={{ marginTop: '12px' }}
                   >
                     Ready for clinician copy-forward
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Add encounter text, choose a draft type, and generate a note. The output will require review.
               </div>
             )}

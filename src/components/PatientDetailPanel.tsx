@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { FormEvent, TouchEvent } from 'react';
+import type { CSSProperties, FormEvent, TouchEvent } from 'react';
 import {
   CartesianGrid,
   Line,
@@ -306,9 +306,9 @@ function trendArrow(label: string, current?: number, previous?: number): VitalTr
 
 function TooltipRow({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, color }}>
+    <div className="patient-detail-vitals-tooltip__row" style={{ color }}>
       <span>{label}</span>
-      <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>{value}</span>
+      <span className="patient-detail-vitals-tooltip__mono">{value}</span>
     </div>
   );
 }
@@ -324,19 +324,8 @@ function VitalsTooltip({
   if (!active || !point) return null;
 
   return (
-    <div
-      style={{
-        background: '#1C2333',
-        border: '1px solid #374151',
-        borderRadius: 10,
-        color: '#F9FAFB',
-        fontSize: 12,
-        padding: 10,
-        minWidth: 132,
-        boxShadow: '0 12px 30px rgba(0,0,0,0.28)',
-      }}
-    >
-      <div style={{ color: '#9CA3AF', marginBottom: 6 }}>{point.time}</div>
+    <div className="patient-detail-vitals-tooltip">
+      <div className="patient-detail-vitals-tooltip__time">{point.time}</div>
       <TooltipRow label="HR" value={point.hr ?? '--'} color={vitalTone('HR', point.hr)} />
       <TooltipRow label="BP" value={`${point.sbp ?? '--'}/${point.dbp ?? '--'}`} color={vitalTone('SBP', point.sbp)} />
       <TooltipRow label="SpO2" value={point.spo2 ?? '--'} color={vitalTone('SpO2', point.spo2)} />
@@ -358,7 +347,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
 
   if (vitals.length === 0) {
     return (
-      <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+      <p className="patient-detail-vitals-empty">
         {EMPTY_STATE_COPY.vitals.none.title} — {EMPTY_STATE_COPY.vitals.none.guidance}
       </p>
     );
@@ -366,8 +355,8 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
 
   if (vitals.length === 1) {
     return (
-      <p style={{ margin: '12px 0 0', color: '#9CA3AF', fontSize: 13 }} role="status">
-        <strong style={{ color: '#D1D5DB' }}>{EMPTY_STATE_COPY.vitals.single.title}.</strong>{' '}
+      <p className="patient-detail-vitals-empty" role="status">
+        <strong>{EMPTY_STATE_COPY.vitals.single.title}.</strong>{' '}
         {EMPTY_STATE_COPY.vitals.single.guidance} {EMPTY_STATE_COPY.vitals.single.nextSteps[0]}
       </p>
     );
@@ -390,25 +379,18 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
   };
 
   return (
-    <section style={{ marginTop: 16 }} aria-labelledby="vitals-trend-heading">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <h4 id="vitals-trend-heading" style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>
+    <section className="patient-detail-vitals-trend" aria-labelledby="vitals-trend-heading">
+      <div className="patient-detail-vitals-trend__header">
+        <h4 id="vitals-trend-heading" className="patient-detail-vitals-trend__title">
           Vitals Trend
         </h4>
-        <div style={{ display: 'inline-flex', border: '1px solid #374151', borderRadius: 999, overflow: 'hidden' }}>
+        <div className="patient-detail-vitals-trend__toggle">
           {(['chart', 'table'] as const).map((mode) => (
             <button
               key={mode}
               type="button"
               onClick={() => setView(mode)}
-              style={{
-                border: 0,
-                background: view === mode ? '#2563EB' : 'transparent',
-                color: '#F9FAFB',
-                cursor: 'pointer',
-                fontSize: 11,
-                padding: '5px 9px',
-              }}
+              className={`patient-detail-vitals-trend__toggle-btn${view === mode ? ' patient-detail-vitals-trend__toggle-btn--active' : ''}`}
             >
               {mode === 'chart' ? 'Chart' : 'Table'}
             </button>
@@ -418,7 +400,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
 
       {view === 'chart' ? (
         <>
-          <div style={{ height: 160, marginTop: 10 }}>
+          <div className="patient-detail-vitals-trend__chart">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 2, left: -18 }}>
                 <CartesianGrid stroke="#1F2937" strokeOpacity={0.45} vertical={false} />
@@ -454,33 +436,18 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div
-            aria-label="Toggle vitals trend lines"
-            style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap' }}
-          >
+          <div className="patient-detail-vitals-trend__legend" aria-label="Toggle vitals trend lines">
             {vitalsLineConfig.map((line) => (
               <button
                 key={line.key}
                 type="button"
                 onClick={() => toggleLine(line.key)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  border: 0,
-                  background: 'transparent',
-                  color: hiddenLines[line.key] ? '#6B7280' : '#D1D5DB',
-                  cursor: 'pointer',
-                  fontSize: 11,
-                  padding: 0,
-                }}
+                className={`patient-detail-vitals-trend__legend-btn${hiddenLines[line.key] ? ' patient-detail-vitals-trend__legend-btn--hidden' : ''}`}
               >
                 <span
                   aria-hidden
+                  className="patient-detail-vitals-trend__legend-swatch"
                   style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 999,
                     background: line.color,
                     opacity: hiddenLines[line.key] ? 0.35 : 1,
                   }}
@@ -491,39 +458,27 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
           </div>
         </>
       ) : (
-        <div style={{ overflowX: 'auto', marginTop: 10 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+        <div className="patient-detail-vitals-trend__table-wrap">
+          <table className="patient-detail-vitals-trend__table">
             <thead>
-              <tr style={{ color: '#9CA3AF', textAlign: 'left' }}>
+              <tr>
                 {['Time', 'HR', 'BP', 'SpO2', 'Temp', 'RR', 'GCS'].map((heading) => (
-                  <th key={heading} style={{ borderBottom: '1px solid #1F2937', fontWeight: 600, padding: '6px 5px' }}>
-                    {heading}
-                  </th>
+                  <th key={heading}>{heading}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {chartData.map((point) => (
-                <tr key={point.timestamp} style={{ color: '#D1D5DB' }}>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px' }}>{point.time}</td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('HR', point.hr) }}>
-                    {point.hr ?? '--'}
-                  </td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('SBP', point.sbp) }}>
+                <tr key={point.timestamp}>
+                  <td>{point.time}</td>
+                  <td style={{ color: vitalTone('HR', point.hr) }}>{point.hr ?? '--'}</td>
+                  <td style={{ color: vitalTone('SBP', point.sbp) }}>
                     {point.sbp ?? '--'}/{point.dbp ?? '--'}
                   </td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('SpO2', point.spo2) }}>
-                    {point.spo2 ?? '--'}
-                  </td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('Temp', point.temp) }}>
-                    {point.temp ?? '--'}
-                  </td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('RR', point.rr) }}>
-                    {point.rr ?? '--'}
-                  </td>
-                  <td style={{ borderBottom: '1px solid #1F2937', padding: '6px 5px', color: vitalTone('GCS', point.gcs) }}>
-                    {point.gcs ?? '--'}
-                  </td>
+                  <td style={{ color: vitalTone('SpO2', point.spo2) }}>{point.spo2 ?? '--'}</td>
+                  <td style={{ color: vitalTone('Temp', point.temp) }}>{point.temp ?? '--'}</td>
+                  <td style={{ color: vitalTone('RR', point.rr) }}>{point.rr ?? '--'}</td>
+                  <td style={{ color: vitalTone('GCS', point.gcs) }}>{point.gcs ?? '--'}</td>
                 </tr>
               ))}
             </tbody>
@@ -556,17 +511,7 @@ function parseVitals(form: VitalsForm, recordedBy: string): Vitals {
 
 function Badge({ children, color }: { children: string; color: string }) {
   return (
-    <span
-      style={{
-        background: '#1C2333',
-        color,
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 999,
-        padding: '4px 9px',
-        fontSize: 12,
-        fontWeight: 700,
-      }}
-    >
+    <span className="patient-detail-panel__badge" style={{ '--badge-accent': color } as CSSProperties}>
       {children}
     </span>
   );
@@ -576,25 +521,24 @@ function FieldButton({
   children,
   onClick,
   disabled = false,
+  variant = 'default',
+  className = '',
+  title,
 }: {
   children: string;
   onClick: () => void;
   disabled?: boolean;
+  variant?: 'default' | 'primary';
+  className?: string;
+  title?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        background: 'transparent',
-        border: '1px solid #374151',
-        color: '#F9FAFB',
-        borderRadius: 10,
-        padding: '8px 10px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.55 : 1,
-      }}
+      title={title}
+      className={`patient-detail-panel__field-btn${variant === 'primary' ? ' patient-detail-panel__field-btn--primary' : ''}${className ? ` ${className}` : ''}`}
     >
       {children}
     </button>
@@ -969,6 +913,11 @@ export default function PatientDetailPanel() {
     setSwipeOffset(0);
   };
 
+  const panelSwipeStyle: CSSProperties | undefined =
+    swipeOffset > 0
+      ? { transform: `translateY(${swipeOffset}px)`, transition: 'none' }
+      : undefined;
+
   return (
     <aside
       className="patient-detail-panel"
@@ -976,42 +925,18 @@ export default function PatientDetailPanel() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      style={{
-        position: 'fixed',
-        right: 0,
-        top: 0,
-        width: 480,
-        height: '100vh',
-        background: '#111827',
-        borderLeft: 0,
-        zIndex: 100,
-        overflowY: 'auto',
-        color: '#F9FAFB',
-        boxShadow: '-24px 0 60px rgba(0,0,0,0.36)',
-        transform: swipeOffset > 0 ? `translateY(${swipeOffset}px)` : undefined,
-        transition: swipeOffset > 0 ? 'none' : 'transform 180ms ease',
-        touchAction: 'pan-y',
-      }}
+      style={panelSwipeStyle}
     >
       <div className="patient-detail-panel__drag-handle" aria-hidden="true" />
-      <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 2,
-          background: '#111827',
-          padding: 16,
-          borderBottom: '1px solid #1F2937',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+      <header className="patient-detail-panel__header">
+        <div className="patient-detail-panel__header-top">
           <div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 500 }}>
+            <h2 className="patient-detail-panel__title">
               {selectedPatient.firstName} {selectedPatient.lastName}
             </h2>
-            <div style={{ marginTop: 4, color: '#9CA3AF', fontSize: 12 }}>{selectedPatient.mrn}</div>
+            <div className="patient-detail-panel__mrn">{selectedPatient.mrn}</div>
             {selectedPatient.state === PatientState.Waiting || selectedPatient.state === PatientState.Triage ? (
-              <div style={{ marginTop: 8 }}>
+              <div className="patient-detail-panel__header-slot">
                 <WaitingRoomCommunicationBadge
                   patient={selectedPatient}
                   workflowLogs={patientWorkflowLogs}
@@ -1024,22 +949,13 @@ export default function PatientDetailPanel() {
             type="button"
             onClick={() => selectPatient(null)}
             aria-label="Close patient detail"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #374151',
-              background: 'transparent',
-              color: '#F9FAFB',
-              cursor: 'pointer',
-              fontSize: 18,
-            }}
+            className="patient-detail-panel__close-btn"
           >
             X
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+        <div className="patient-detail-panel__badge-row">
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
           <Badge color="#9CA3AF">{selectedPatient.state}</Badge>
           <PatientExperienceStatusBadge
@@ -1067,42 +983,27 @@ export default function PatientDetailPanel() {
           staff={staff}
         />
 
-        <div style={{ marginTop: 12 }}>
+        <div className="patient-detail-panel__orchestration-cluster">
           <SavedClinicalScoresStrip patient={selectedPatient} />
-        </div>
-
-        <div style={{ marginTop: 12 }}>
           <RecommendedToolsStrip patient={selectedPatient} />
         </div>
 
         <PatientCardCopilot patient={selectedPatient} />
 
         {selectedPatient.state === PatientState.Triage ? (
-          <div style={{ marginTop: 12 }}>
+          <div className="patient-detail-panel__header-slot">
             <AiTriageAssistPanel patient={selectedPatient} />
           </div>
         ) : null}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+        <div className="patient-detail-panel__action-row">
           {!isSepsisChecklistBlocked ? (
-            <button
-              type="button"
-              onClick={openManualChecklist}
-              style={{
-                background: 'transparent',
-                border: '1px solid #374151',
-                color: '#F9FAFB',
-                borderRadius: 10,
-                padding: '8px 10px',
-                cursor: 'pointer',
-              }}
-            >
-              Open Checklist
-            </button>
+            <FieldButton onClick={openManualChecklist}>Open Checklist</FieldButton>
           ) : null}
           {transitionPresentation.visible ? (
-          <button
-            type="button"
+          <FieldButton
+            className="patient-detail-panel__field-btn--push-end"
+            title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
             onClick={() => {
               const nextState = getDefaultNextPatientState(selectedPatient);
               if (!nextState || !canTransition) return;
@@ -1115,63 +1016,43 @@ export default function PatientDetailPanel() {
               });
             }}
             disabled={!canTransition || !getDefaultNextPatientState(selectedPatient)}
-            title={canTransition ? 'Move to the next patient state' : `${emergencyRole.roleLabel} cannot move patient state`}
-            style={{
-              marginLeft: 'auto',
-              background: 'transparent',
-              border: '1px solid #374151',
-              color: '#F9FAFB',
-              borderRadius: 10,
-              padding: '8px 10px',
-              cursor: canTransition ? 'pointer' : 'not-allowed',
-              opacity: canTransition ? 1 : 0.55,
-            }}
           >
             Move to Next State
-          </button>
+          </FieldButton>
           ) : null}
         </div>
       </header>
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Journey Timeline</h3>
-        <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-          <div style={{ display: 'flex', minWidth: 760, alignItems: 'flex-start' }}>
+      <section className="patient-detail-panel__section">
+        <h3 className="patient-detail-panel__section-title">Journey Timeline</h3>
+        <div className="patient-detail-journey">
+          <div className="patient-detail-journey__track">
             {patientStateOrder.map((state, index) => {
               const completed = index < currentStateIndex;
               const current = state === selectedPatient.state;
               const timestamp = completed ? journeyTimestamp(selectedPatient, state) : undefined;
 
               return (
-                <div key={state} style={{ flex: 1, position: 'relative', textAlign: 'center' }}>
+                <div key={state} className="patient-detail-journey__step">
                   {index < patientStateOrder.length - 1 ? (
                     <div
-                      style={{
-                        position: 'absolute',
-                        top: 8,
-                        left: '50%',
-                        right: '-50%',
-                        height: 2,
-                        background: completed ? '#3B82F6' : '#374151',
-                      }}
+                      className={`patient-detail-journey__connector${completed ? ' patient-detail-journey__connector--complete' : ''}`}
                     />
                   ) : null}
                   <div
-                    className={current ? 'patient-detail-timeline-dot--current' : undefined}
-                    style={{
-                      width: 16,
-                      height: 16,
-                      margin: '0 auto',
-                      borderRadius: 999,
-                      border: `2px solid ${completed || current ? '#3B82F6' : '#6B7280'}`,
-                      background: completed || current ? '#3B82F6' : 'transparent',
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
+                    className={[
+                      'patient-detail-journey__dot',
+                      current ? 'patient-detail-timeline-dot--current patient-detail-journey__dot--active' : '',
+                      completed ? 'patient-detail-journey__dot--complete' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
                   />
-                  <div style={{ marginTop: 8, fontSize: 10, color: current ? '#F9FAFB' : '#9CA3AF' }}>{state}</div>
+                  <div className={`patient-detail-journey__label${current ? ' patient-detail-journey__label--current' : ''}`}>
+                    {state}
+                  </div>
                   {timestamp ? (
-                    <div style={{ marginTop: 3, fontSize: 10, color: '#6B7280' }}>{formatTime(timestamp)}</div>
+                    <div className="patient-detail-journey__time">{formatTime(timestamp)}</div>
                   ) : null}
                 </div>
               );
@@ -1181,7 +1062,7 @@ export default function PatientDetailPanel() {
       </section>
 
       {selectedPatient.state === PatientState.Waiting ? (
-        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+        <section className="patient-detail-panel__section">
           <ReassessmentTimerPanel
             timer={selectReassessmentTimerForPatient(selectedPatient)}
             onOpenReassessment={(patientId) => {
@@ -1192,17 +1073,17 @@ export default function PatientDetailPanel() {
         </section>
       ) : null}
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }} aria-labelledby="patient-timeline-heading">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+      <section className="patient-detail-panel__section" aria-labelledby="patient-timeline-heading">
+        <div className="patient-detail-panel__section-header">
           <div>
-            <h3 id="patient-timeline-heading" style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>
+            <h3 id="patient-timeline-heading" className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">
               Patient Timeline
             </h3>
-            <p style={{ margin: '4px 0 0', color: '#6B7280', fontSize: 11 }}>
+            <p className="patient-detail-panel__section-lead">
               Intake, journey, triage, queue, reassessment, EMS, referral, boarding, discharge, AI, and provincial events.
             </p>
           </div>
-          <span style={{ color: '#9CA3AF', fontSize: 11, whiteSpace: 'nowrap' }}>{patientTimeline.length} events</span>
+          <span className="patient-detail-panel__section-meta">{patientTimeline.length} events</span>
         </div>
 
         {timelineContextState.loading ? (
@@ -1243,7 +1124,7 @@ export default function PatientDetailPanel() {
       </section>
 
       {patientQualitySnapshot?.summary.patientsWithRisks ? (
-        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+        <section className="patient-detail-panel__section">
           <DataQualityRiskPanel
             snapshot={patientQualitySnapshot}
             title="Data quality"
@@ -1263,7 +1144,7 @@ export default function PatientDetailPanel() {
         </section>
       ) : null}
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+      <section className="patient-detail-panel__section">
         <WaitingRoomCommunicationPanel
           patient={selectedPatient}
           workflowLogs={patientWorkflowLogs}
@@ -1281,7 +1162,7 @@ export default function PatientDetailPanel() {
         />
       </section>
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
+      <section className="patient-detail-panel__section">
         <OperationalHistoryPanel
           logs={patientWorkflowLogs}
           patientId={selectedPatient.id}
@@ -1291,31 +1172,22 @@ export default function PatientDetailPanel() {
         />
       </section>
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <h3 style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>Latest Vitals</h3>
+      <section className="patient-detail-panel__section">
+        <div className="patient-detail-panel__section-header">
+          <h3 className="patient-detail-panel__section-title patient-detail-panel__section-title--flush">Latest Vitals</h3>
           {vitalsPresentation.visible ? (
           <FieldButton disabled={!canWriteVitals} onClick={() => setShowVitalsForm((open) => !open)}>Add Vitals</FieldButton>
           ) : null}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
+        <div className="patient-detail-vitals-grid">
           {latestVitalEntries.map(({ label, value, trend }) => (
-            <div
-              key={label}
-              className="patient-detail-vital-tile"
-              style={{ background: '#0B1120', border: '1px solid #1F2937', borderRadius: 10, padding: 10 }}
-            >
-              <div style={{ color: '#9CA3AF', fontSize: 11 }}>{label}</div>
+            <div key={label} className="patient-detail-vital-tile">
+              <div className="patient-detail-vital-tile__label">{label}</div>
               <div
+                className="patient-detail-vital-tile__value"
                 style={{
                   color: vitalTone(String(label), typeof value === 'number' ? value : undefined),
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                  fontSize: 22,
-                  marginTop: 3,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
                 }}
               >
                 <span>{value ?? '--'}</span>
@@ -1323,7 +1195,8 @@ export default function PatientDetailPanel() {
                   <span
                     aria-label={trend.label}
                     title={trend.label}
-                    style={{ color: trend.color, fontSize: 13, lineHeight: 1, marginTop: 2 }}
+                    className="patient-detail-vital-tile__trend"
+                    style={{ color: trend.color }}
                   >
                     {trend.symbol}
                   </span>
@@ -1336,7 +1209,7 @@ export default function PatientDetailPanel() {
         <VitalsHistoryChart vitals={vitalsHistory} />
 
         {showVitalsForm && canWriteVitals ? (
-          <form onSubmit={submitVitals} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
+          <form onSubmit={submitVitals} className="patient-detail-vitals-form">
             {Object.keys(emptyVitalsForm).map((key) => (
               <input
                 key={key}
@@ -1344,28 +1217,10 @@ export default function PatientDetailPanel() {
                 placeholder={key.toUpperCase()}
                 value={vitalsForm[key as keyof VitalsForm]}
                 onChange={(event) => setVitalsForm((form) => ({ ...form, [key]: event.target.value }))}
-                style={{
-                  background: '#0B1120',
-                  border: '1px solid #374151',
-                  borderRadius: 8,
-                  color: '#F9FAFB',
-                  padding: 9,
-                  minWidth: 0,
-                }}
+                className="patient-detail-vitals-form__input"
               />
             ))}
-            <button
-              type="submit"
-              style={{
-                gridColumn: 'span 4',
-                background: '#2563EB',
-                border: 'none',
-                borderRadius: 10,
-                color: '#F9FAFB',
-                padding: 10,
-                cursor: 'pointer',
-              }}
-            >
+            <button type="submit" className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-vitals-form__submit">
               Save Vitals
             </button>
           </form>
@@ -1373,51 +1228,31 @@ export default function PatientDetailPanel() {
       </section>
 
       {upgradeFlowCards.length ? (
-        <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>
-            Advanced Upgrade Harness
-          </h3>
-          <div style={{ display: 'grid', gap: 8 }}>
+        <section className="patient-detail-panel__section">
+          <h3 className="patient-detail-panel__section-title">Pilot signals</h3>
+          <ul className="patient-detail-upgrade-list">
             {upgradeFlowCards.map((card) => (
-              <article
-                key={card.title}
-                style={{
-                  background: '#0B1120',
-                  border: '1px solid #1F2937',
-                  borderRadius: 10,
-                  padding: 10,
-                }}
-              >
-                <strong style={{ color: '#BFDBFE', fontSize: 13 }}>{card.title}</strong>
-                <p style={{ margin: '5px 0', color: '#D1D5DB', fontSize: 12 }}>{card.body}</p>
-                <small style={{ color: '#FDE68A' }}>{card.meta}</small>
-              </article>
+              <li key={card.title} className="patient-detail-upgrade-row">
+                <div className="patient-detail-upgrade-row__main">
+                  <strong>{card.title}</strong>
+                  <span>{card.body}</span>
+                </div>
+                <small>{card.meta}</small>
+              </li>
             ))}
-          </div>
-          <p style={{ margin: '10px 0 0', color: '#6B7280', fontSize: 11 }}>
+          </ul>
+          <p className="patient-detail-upgrade-footnote">
             Pilot-only outputs require human review and cannot diagnose, prescribe, disposition, or
             match patients autonomously.
           </p>
         </section>
       ) : null}
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Active Flags</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <section className="patient-detail-panel__section">
+        <h3 className="patient-detail-panel__section-title">Active Flags</h3>
+        <div className="patient-detail-flags">
           {selectedPatient.flags.map((flag) => (
-            <span
-              key={patientFlagKey(flag)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                background: '#1C2333',
-                color: '#F9FAFB',
-                borderRadius: 999,
-                padding: '5px 8px',
-                fontSize: 12,
-              }}
-            >
+            <span key={patientFlagKey(flag)} className="patient-detail-flag-chip">
               {formatPatientFlag(flag)}
               <button
                 type="button"
@@ -1426,19 +1261,19 @@ export default function PatientDetailPanel() {
                 }}
                 disabled={!canManageFlags}
                 aria-label={`Remove ${formatPatientFlag(flag)}`}
-                style={{ border: 0, background: 'transparent', color: '#9CA3AF', cursor: canManageFlags ? 'pointer' : 'not-allowed', opacity: canManageFlags ? 1 : 0.45 }}
+                className="patient-detail-flag-chip__remove"
               >
                 x
               </button>
             </span>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <div className="patient-detail-flags-form">
           <select
             value={flagToAdd}
             onChange={(event) => setFlagToAdd(event.target.value as PatientFlag)}
             disabled={!canManageFlags}
-            style={{ flex: 1, background: '#0B1120', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 9 }}
+            className="patient-detail-panel__select"
           >
             {Object.values(PatientFlag).map((flag) => (
               <option key={flag} value={flag}>{flag}</option>
@@ -1457,49 +1292,39 @@ export default function PatientDetailPanel() {
         onOpenCalculator={openCalculatorHub}
       />
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Notes</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <section className="patient-detail-panel__section">
+        <h3 className="patient-detail-panel__section-title">Notes</h3>
+        <div className="patient-detail-notes">
           {sortedNotes.map((note) => (
-            <div
-              key={note.id}
-              className="patient-detail-note-row"
-              style={{ background: '#0B1120', borderRadius: 10, padding: 10 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#9CA3AF', fontSize: 11 }}>
+            <div key={note.id} className="patient-detail-note-row">
+              <div className="patient-detail-note-row__header">
                 <span>{initials(staffName(staff, note.authorId || note.authorStaffId || 'system'))}</span>
                 <span>{formatTime(note.timestamp)}</span>
               </div>
-              <div style={{ color: '#F9FAFB', fontSize: 13, marginTop: 6 }}>{note.text || note.body}</div>
+              <div className="patient-detail-note-row__body">{note.text || note.body}</div>
             </div>
           ))}
         </div>
-        <form onSubmit={submitNote} style={{ marginTop: 12 }}>
+        <form onSubmit={submitNote} className="patient-detail-note-form">
           <textarea
             value={noteText}
             onChange={(event) => setNoteText(event.target.value)}
             disabled={!canWriteNote}
             placeholder="Add Note"
-            style={{
-              width: '100%',
-              minHeight: 76,
-              boxSizing: 'border-box',
-              resize: 'vertical',
-              background: '#0B1120',
-              border: '1px solid #374151',
-              borderRadius: 10,
-              color: '#F9FAFB',
-              padding: 10,
-            }}
+            className="patient-detail-panel__textarea"
           />
-          <button type="submit" disabled={!canWriteNote} style={{ marginTop: 8, background: '#2563EB', border: 0, borderRadius: 10, color: '#F9FAFB', padding: '9px 12px', cursor: canWriteNote ? 'pointer' : 'not-allowed', opacity: canWriteNote ? 1 : 0.55 }}>
+          <button
+            type="submit"
+            disabled={!canWriteNote}
+            className="patient-detail-panel__field-btn patient-detail-panel__field-btn--primary patient-detail-note-form__submit"
+          >
             Submit Note
           </button>
         </form>
       </section>
 
       {actionMode ? (
-        <section className="patient-detail-action-panel" style={{ padding: 16, borderBottom: '1px solid #1F2937', background: '#0B1120' }}>
+        <section className="patient-detail-panel__section patient-detail-action-panel">
           {actionMode === 'staff' ? (
             <select
               defaultValue={selectedPatient.assignedStaffId || ''}
@@ -1509,7 +1334,7 @@ export default function PatientDetailPanel() {
                 setActionMode(null);
               }}
               disabled={!canAssignStaff}
-              style={{ width: '100%', background: '#111827', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 10 }}
+              className="patient-detail-panel__select patient-detail-panel__select--full"
             >
               <option value="">Choose staff</option>
               {staff.map((member) => (
@@ -1526,7 +1351,7 @@ export default function PatientDetailPanel() {
                 setActionMode(null);
               }}
               disabled={!canAssignRoom}
-              style={{ width: '100%', background: '#111827', color: '#F9FAFB', border: '1px solid #374151', borderRadius: 8, padding: 10 }}
+              className="patient-detail-panel__select patient-detail-panel__select--full"
             >
               <option value="">Choose room</option>
               {rooms.map((room: Room) => (
@@ -1536,13 +1361,13 @@ export default function PatientDetailPanel() {
           ) : null}
           {actionMode === 'escalate' ? (
             <div>
-              <p style={{ margin: '0 0 10px', color: '#F9FAFB' }}>Escalate this patient and create a critical alert?</p>
+              <p className="patient-detail-action-panel__prompt">Escalate this patient and create a critical alert?</p>
               <FieldButton disabled={!canEscalate} onClick={escalate}>Confirm Escalation</FieldButton>
             </div>
           ) : null}
           {actionMode === 'discharge' ? (
             <div>
-              <p style={{ margin: '0 0 10px', color: '#F9FAFB' }}>Discharge this patient?</p>
+              <p className="patient-detail-action-panel__prompt">Discharge this patient?</p>
               <FieldButton
                 onClick={() => {
                   if (!canDischarge) return;
@@ -1561,57 +1386,27 @@ export default function PatientDetailPanel() {
         </section>
       ) : null}
 
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 13, color: '#9CA3AF' }}>Clinical Calculators</h3>
+      <section className="patient-detail-panel__section">
+        <h3 className="patient-detail-panel__section-title">Clinical Calculators</h3>
         {suggestedScores.length ? (
-          <div
-            aria-label="Suggested scores"
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
+          <div className="patient-detail-calculators__suggested" aria-label="Suggested scores">
             {suggestedScores.map((scoreId) => (
-              <span
-                key={scoreId}
-                style={{
-                  border: '1px solid #2563EB',
-                  borderRadius: 999,
-                  background: '#1D4ED81F',
-                  color: '#BFDBFE',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  padding: '5px 8px',
-                }}
-              >
+              <span key={scoreId} className="patient-detail-calculators__chip">
                 {scoreId}
               </span>
             ))}
           </div>
         ) : null}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="patient-detail-calculators__actions">
           <FieldButton onClick={() => setHeartScoreOpen(true)}>HEART Score</FieldButton>
           <FieldButton onClick={() => setQsofaOpen(true)}>qSOFA</FieldButton>
           <FieldButton onClick={() => setPediatricDrugCalcOpen(true)}>Peds Drugs</FieldButton>
         </div>
       </section>
 
-      <div
-        style={{
-          position: 'sticky',
-          bottom: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          padding: 16,
-          background: '#111827',
-          borderTop: '1px solid #1F2937',
-        }}
-      >
+      <div className="patient-detail-panel__footer">
         <WhoNextPanel />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+        <div className="patient-detail-panel__footer-actions">
           {assignStaffPresentation.visible ? (
           <FieldButton disabled={!canAssignStaff} onClick={() => setActionMode(actionMode === 'staff' ? null : 'staff')}>Assign Staff</FieldButton>
           ) : null}
@@ -1628,21 +1423,21 @@ export default function PatientDetailPanel() {
       </div>
       {heartScoreOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
             <HEARTScore patientId={selectedPatient.id} onClose={() => setHeartScoreOpen(false)} />
           </Suspense>
         </ErrorBoundary>
       ) : null}
       {qsofaOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
             <QSOFA patientId={selectedPatient.id} onClose={() => setQsofaOpen(false)} />
           </Suspense>
         </ErrorBoundary>
       ) : null}
       {pediatricDrugCalcOpen ? (
         <ErrorBoundary fallbackText="Calculator modal encountered an error. Refresh to reload.">
-          <Suspense fallback={<div style={{ padding: 16, color: '#9CA3AF' }}>Loading calculator...</div>}>
+          <Suspense fallback={<div className="patient-detail-panel__loading">Loading calculator...</div>}>
             <PediatricDrugCalc patientId={selectedPatient.id} onClose={() => setPediatricDrugCalcOpen(false)} />
           </Suspense>
         </ErrorBoundary>

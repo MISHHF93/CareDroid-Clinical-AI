@@ -429,6 +429,44 @@
   animation: spin 1s linear infinite;
 }
 
+.lab-spinner--sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.lab-results-empty-hint {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.lab-stat-value--normal {
+  color: var(--accent-1);
+}
+
+.lab-stat-value--abnormal {
+  color: var(--warning);
+}
+
+.lab-critical-alert-note {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.lab-values-table__name {
+  font-weight: 500;
+}
+
+.lab-values-table__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--accent-2);
+}
+
+.lab-values-table__range {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

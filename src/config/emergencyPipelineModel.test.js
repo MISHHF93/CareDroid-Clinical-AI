@@ -38,7 +38,7 @@ describe('emergencyPipelineModel', () => {
 
   it('passes nav coverage audit for emergency target routes', () => {
     const audit = auditNavCoverage({
-      retainedDirectRoutes: ['/emergency/pulse', '/emergency/shift'],
+      retainedDirectRoutes: ['/emergency/pulse', '/emergency/shift', '/emergency/boarding'],
     });
     expect(audit.passesAudit).toBe(true);
     expect(audit.orphans).toHaveLength(0);

@@ -22,6 +22,9 @@ import ResourceActivationStrip from './ems/ResourceActivationStrip';
 import HandoffClosePanel from './ems/HandoffClosePanel';
 import { resolveAmbulanceHandoffChecklist } from '../services/ambulanceHandoffChecklist';
 import { syncResourceActivationsForArrival } from '../services/resourceActivation';
+import EdDataSourceBanner from './emergency/EdDataSourceBanner';
+import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
+import { buildPatientsPatientHref } from '../utils/receptionQueryParams';
 import './EMSPipeline.css';
 
 function minutesRemaining(arrival, now) {
@@ -129,6 +132,9 @@ function EMSArrivalRow({
   showEtaDisplay = true,
   actorName,
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(
+    () => arrival.status === 'Arrived' || arrival.status === 'Handoff',
+  );
   const remaining = minutesRemaining(arrival, now);
   const tone = etaTone(remaining, arrival.status);
   const isIncoming = arrival.status === 'Inbound' && remaining > 0;
@@ -147,6 +153,11 @@ function EMSArrivalRow({
       arrival.status === 'Arrived' ||
       arrival.status === 'Handoff' ||
       Boolean(arrival.patientId));
+  const hasExpandableDetails =
+    isIncoming ||
+    arrival.status === 'Inbound' ||
+    showHandoffChecklist;
+  const showDetails = detailsOpen;
 
   return (
     <article className={`ems-pipeline__row ems-pipeline__row--${tone}`}>
@@ -268,10 +279,20 @@ function EMSArrivalRow({
         {arrival.patientId && arrival.handoffCompletedAt ? (
           <span className="ems-pipeline__prepared">Handoff complete</span>
         ) : null}
+        {hasExpandableDetails ? (
+          <button
+            type="button"
+            className="ems-pipeline__details-toggle"
+            aria-expanded={showDetails}
+            onClick={() => setDetailsOpen((open) => !open)}
+          >
+            {showDetails ? 'Hide details' : 'Show details'}
+          </button>
+        ) : null}
       </div>
 
-      {isIncoming || arrival.status === 'Inbound' ? (
-        <>
+      {showDetails && (isIncoming || arrival.status === 'Inbound') ? (
+        <div className="ems-pipeline__row-details">
           <ResourceActivationStrip arrival={arrival} patient={linkedPatient} />
           <PreArrivalNotificationForm
             notification={arrival.preArrivalNotification}
@@ -279,29 +300,28 @@ function EMSArrivalRow({
             canEdit={canCompleteHandoff}
             onUpdate={(notification) => onUpdatePreArrivalNotification?.(arrival.id, notification)}
           />
-        </>
+        </div>
       ) : null}
 
-      {showHandoffChecklist ? (
-        <AmbulanceHandoffChecklistPanel
-          arrival={arrival}
-          patient={linkedPatient}
-          rooms={rooms}
-          actorName={actorName}
-          canEdit={canCompleteHandoff}
-          onUpdate={onUpdateHandoffChecklist}
-        />
-      ) : null}
-
-      {showHandoffChecklist ? (
-        <HandoffClosePanel
-          arrival={arrival}
-          checklist={handoffChecklist}
-          handoffClose={arrival.handoffClose}
-          actorName={actorName}
-          canEdit={canCompleteHandoff}
-          onUpdate={(record) => onUpdateHandoffClose?.(arrival.id, record)}
-        />
+      {showDetails && showHandoffChecklist ? (
+        <div className="ems-pipeline__row-details">
+          <AmbulanceHandoffChecklistPanel
+            arrival={arrival}
+            patient={linkedPatient}
+            rooms={rooms}
+            actorName={actorName}
+            canEdit={canCompleteHandoff}
+            onUpdate={onUpdateHandoffChecklist}
+          />
+          <HandoffClosePanel
+            arrival={arrival}
+            checklist={handoffChecklist}
+            handoffClose={arrival.handoffClose}
+            actorName={actorName}
+            canEdit={canCompleteHandoff}
+            onUpdate={(record) => onUpdateHandoffClose?.(arrival.id, record)}
+          />
+        </div>
       ) : null}
     </article>
   );
@@ -313,6 +333,7 @@ export default function EMSPipeline() {
   const ems = useEmsScreen();
   const emsModule = useEMSIntake();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
@@ -518,7 +539,7 @@ export default function EMSPipeline() {
   const openPatient = (patientId) => {
     if (!patientId) return;
     selectPatient(patientId);
-    profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`);
+    profileNavigate(buildPatientsPatientHref(patientId));
   };
 
   const handleEmsStripMetricSelect = (metric) => {
@@ -535,29 +556,36 @@ export default function EMSPipeline() {
     }
   };
 
+  const headerActions = (
+    <>
+      {showOffloadSection ? (
+        <span
+          className={`ems-pipeline__offload-kpi${offloadBreachCount ? ' ems-pipeline__offload-kpi--breach' : ''}`}
+          title={`${offloadBreachCount} crews over ${offloadTargetMinutes} minutes`}
+        >
+          Avg offload {avgOffload}m
+        </span>
+      ) : null}
+      {showPressureWidget ? <EMSPressureScore /> : null}
+    </>
+  );
+
   return (
-    <section className="ems-pipeline" aria-labelledby="ems-pipeline-title">
-      <header className="ems-pipeline__header">
-        <div>
-          <span>Pre-arrival coordination</span>
-          <h1 id="ems-pipeline-title">EMS Pipeline</h1>
-          <p className="ems-pipeline__source">
-            Track inbound units, bay preparation, handoff timing, and diversion awareness.
-            {` Source: ${emsSource}; ${emsFreshness}.`}
-          </p>
-        </div>
-        <div className="ems-pipeline__header-actions">
-          {showOffloadSection ? (
-            <span
-              className={`ems-pipeline__offload-kpi${offloadBreachCount ? ' ems-pipeline__offload-kpi--breach' : ''}`}
-              title={`${offloadBreachCount} crews over ${offloadTargetMinutes} minutes`}
-            >
-              Avg offload {avgOffload}m
-            </span>
-          ) : null}
-          {showPressureWidget ? <EMSPressureScore /> : null}
-        </div>
-      </header>
+    <EmergencyRoutePage
+      eyebrow="Flow coordination"
+      title="EMS Coordination"
+      maturity="demo"
+      description={`Inbound units, bay prep, handoff timing, and diversion awareness. Source: ${emsSource}; ${emsFreshness}.`}
+      actions={headerActions}
+    >
+      <div className="ems-pipeline">
+      <EdDataSourceBanner
+        envelope={emsModule.data}
+        loading={emsModule.loading}
+        error={emsModule.error}
+        activeScenarioId={activeScenarioId}
+        compact
+      />
 
       {showOperationalStrip ? (
         <EmsOperationalStrip
@@ -758,6 +786,7 @@ export default function EMSPipeline() {
           </section>
         ) : null}
       </div>
-    </section>
+      </div>
+    </EmergencyRoutePage>
   );
 }

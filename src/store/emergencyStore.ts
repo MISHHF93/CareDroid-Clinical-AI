@@ -4132,9 +4132,24 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     setLoading: (loading) => set((state) => ({ loading, ui: { ...state.ui, loading } })),
 
-    toggleCopilot: () => set((state) => ({ copilotOpen: !state.copilotOpen })),
+    toggleCopilot: () =>
+      set((state) => {
+        const nextOpen = !state.copilotOpen;
+        if (typeof sessionStorage !== 'undefined') {
+          if (nextOpen) sessionStorage.removeItem('ed:copilot-dismissed');
+          else sessionStorage.setItem('ed:copilot-dismissed', '1');
+        }
+        return { copilotOpen: nextOpen };
+      }),
 
-    setCopilotOpen: (open) => set({ copilotOpen: Boolean(open) }),
+    setCopilotOpen: (open) => {
+      const nextOpen = Boolean(open);
+      if (typeof sessionStorage !== 'undefined') {
+        if (nextOpen) sessionStorage.removeItem('ed:copilot-dismissed');
+        else sessionStorage.setItem('ed:copilot-dismissed', '1');
+      }
+      set({ copilotOpen: nextOpen });
+    },
 
     clearError: () => set((state) => ({ ui: { ...state.ui, error: null } })),
 

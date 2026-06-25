@@ -90,7 +90,9 @@ describe('feature flag UI coverage', () => {
     expect(FEATURE_REGISTRY_BY_ID.reassessment_engine.sidebarRoute).toBe('/emergency/reassessment');
     expect(FEATURE_REGISTRY_BY_ID.referral_intelligence.sidebarRoute).toBe('/emergency/referrals');
     expect(FEATURE_REGISTRY_BY_ID.capacity_intelligence.sidebarRoute).toBe('/emergency/capacity');
-    expect(FEATURE_REGISTRY_BY_ID.boarding_intelligence.sidebarRoute).toBe('/emergency/boarding');
+    expect(FEATURE_REGISTRY_BY_ID.boarding_intelligence.sidebarRoute).toBe(
+      '/emergency/capacity?view=boarding',
+    );
     expect(FEATURE_REGISTRY_BY_ID.emergency_analytics.sidebarRoute).toBe('/emergency/analytics');
     expect(FEATURE_REGISTRY_BY_ID.emergency_settings.sidebarRoute).toBe('/emergency/settings');
     expect(FEATURE_REGISTRY_BY_ID.vitals_history_chart).toBeTruthy();

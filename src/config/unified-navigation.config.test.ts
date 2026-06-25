@@ -4,6 +4,8 @@ import {
   NAVIGATION_ITEMS,
   NAV_ITEMS,
   PILOT_CORE_NAV_ITEM_IDS,
+  PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS,
+  PILOT_UTILITY_NAV_ITEM_IDS,
   PILOT_CUSTOMER_MODE,
   PILOT_EXTENSION_NAV_ITEM_IDS,
   getPilotCustomerNavigationItems,
@@ -64,17 +66,10 @@ const REQUESTED_ITEMS = [
   },
   {
     id: 'capacity',
-    label: 'Capacity',
+    label: 'Flow & Capacity',
     icon: 'capacity',
     route: '/emergency/capacity',
     featureGate: 'capacity_intel',
-  },
-  {
-    id: 'boarding',
-    label: 'Boarding',
-    icon: 'boarding',
-    route: '/emergency/boarding',
-    featureGate: null,
   },
   {
     id: 'referrals',
@@ -205,7 +200,7 @@ const REQUESTED_ITEMS = [
 ];
 
 const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS.filter((item) =>
-  (PILOT_CORE_NAV_ITEM_IDS as readonly string[]).includes(item.id),
+  (PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS as readonly string[]).includes(item.id),
 );
 
 describe('unified navigation config', () => {
@@ -250,6 +245,7 @@ describe('unified navigation config', () => {
       '/emergency/pulse',
       '/emergency/settings',
       '/emergency/shift',
+      '/emergency/boarding',
     ]);
   });
 
@@ -299,10 +295,11 @@ describe('unified navigation config', () => {
     expect(clerkNavIds).not.toContain('copilot');
   });
 
-  it('shows integrations alongside settings for admin users', () => {
+  it('hides extension integrations nav in pilot while keeping settings', () => {
     const adminNavIds = getVisibleNavigation('admin').map((item) => item.id);
     expect(adminNavIds).toContain('settings');
-    expect(adminNavIds).toContain('integrations');
+    expect(adminNavIds).not.toContain('integrations');
+    expect(adminNavIds).not.toContain('intake');
     expect(adminNavIds).not.toContain('fleet');
     expect(adminNavIds).not.toContain('cosmos');
   });
@@ -313,12 +310,17 @@ describe('unified navigation config', () => {
     expect(whiteboard?.suiteLabel).toBe('Emergency Whiteboard Suite');
   });
 
-  it('assigns suite metadata to every pilot core nav item', () => {
-    for (const navId of PILOT_CORE_NAV_ITEM_IDS) {
+  it('assigns suite metadata to every pilot visible nav item', () => {
+    for (const navId of PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS) {
       const item = NAVIGATION_ITEMS.find((entry) => entry.id === navId);
       expect(item, `missing nav item: ${navId}`).toBeDefined();
       expect(item?.suiteId, `${navId} missing suiteId`).toBeTruthy();
       expect(item?.suiteLabel, `${navId} missing suiteLabel`).toBeTruthy();
+    }
+    expect(PILOT_UTILITY_NAV_ITEM_IDS).toEqual(['pulse', 'shift']);
+    for (const extensionId of ['intake', 'integrations']) {
+      expect(PILOT_EXTENSION_NAV_ITEM_IDS).toContain(extensionId);
+      expect(PILOT_CORE_NAV_ITEM_IDS).not.toContain(extensionId);
     }
   });
 

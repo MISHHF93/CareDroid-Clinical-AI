@@ -41,8 +41,7 @@ describe('EmergencyRealtimeController', () => {
     const events: Array<{ type?: string }> = [];
     const subscription = controller.stream().subscribe({
       next: (message) => {
-        const payload =
-          typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
+        const payload = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
         events.push(payload);
       },
     });
@@ -58,8 +57,7 @@ describe('EmergencyRealtimeController', () => {
     const events: Array<{ type?: string }> = [];
     const subscription = controller.stream().subscribe({
       next: (message) => {
-        const payload =
-          typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
+        const payload = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
         events.push(payload);
       },
     });

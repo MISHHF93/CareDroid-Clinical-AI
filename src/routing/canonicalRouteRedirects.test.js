@@ -62,6 +62,7 @@ describe('canonical route tree', () => {
       expectRoutePath(route.path);
     }
 
+    expect(appSource).toContain('<PilotExtensionRouteGuard>');
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<EMSPipeline />');
     expect(appSource).toContain('<ReceptionWorkspace />');
@@ -95,6 +96,7 @@ describe('canonical route tree', () => {
         expect.objectContaining({ path: '/emergency/queue', to: '/emergency/queues' }),
         expect.objectContaining({ path: '/workspace/emergency', to: '/emergency/whiteboard' }),
         expect.objectContaining({ path: '/settings/general', to: '/emergency/settings' }),
+        expect.objectContaining({ path: '/patients', to: '/emergency/patients' }),
       ]),
     );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(

@@ -46,6 +46,10 @@ vi.mock('./account/DemoPersonaPanel', () => ({
   default: () => null,
 }));
 
+vi.mock('./chrome/SessionChromeBar', () => ({
+  default: () => null,
+}));
+
 vi.mock('./Sidebar', () => ({
   Sidebar: () => <nav aria-label="Sidebar" />,
 }));

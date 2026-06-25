@@ -522,9 +522,7 @@ type WorkflowActionInput = Omit<
 export class WorkflowActionLogService {
   private readonly logs: WorkflowActionLog[] = [];
 
-  constructor(
-    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
-  ) {}
+  constructor(@Optional() private readonly realtimeService?: EmergencyRealtimeService) {}
 
   record(input: WorkflowActionInput): WorkflowActionLog {
     const timestamp = input.timestamp || new Date().toISOString();
@@ -1181,10 +1179,14 @@ export class ReceptionWorkspaceService {
     return envelope('Reception Handoff', {
       ok: true,
       patientId,
-      patient: this.patientService.listPatients().find((entry) => entry.id === patientId) || patient,
+      patient:
+        this.patientService.listPatients().find((entry) => entry.id === patientId) || patient,
       triageAssist: input.triageAssist || patient.triageAssist || null,
       triageAssistGeneratedAt:
-        input.triageAssistGeneratedAt || input.triageAssist?.generatedAt || patient.triageAssistGeneratedAt || null,
+        input.triageAssistGeneratedAt ||
+        input.triageAssist?.generatedAt ||
+        patient.triageAssistGeneratedAt ||
+        null,
       receptionPath: `/emergency/reception?arrived=${encodeURIComponent(patientId)}`,
       queuesPath: `/emergency/reception?queue=pretriage&patient=${encodeURIComponent(patientId)}`,
       whiteboardPath: `/emergency/whiteboard?patient=${encodeURIComponent(patientId)}${input.encounterId ? `&encounter=${encodeURIComponent(input.encounterId)}` : ''}`,
@@ -1282,7 +1284,9 @@ export class ReferralService {
 
   createReferral(input: Record<string, unknown>) {
     const patientId = String(input.patientId || '');
-    const patient = this.patientService.listPatients().find((candidate) => candidate.id === patientId);
+    const patient = this.patientService
+      .listPatients()
+      .find((candidate) => candidate.id === patientId);
     const now = new Date().toISOString();
     const referral = {
       id: String(input.id || `ref-${patientId || 'patient'}-${Date.now()}`),
@@ -1426,15 +1430,16 @@ export class EDCopilotService {
         capacity: this.patientService.computeCapacity(),
         safetyRule: HUMAN_REVIEW_DISCLAIMER,
       },
-      quickActions: ['Queue bottlenecks', 'Capacity status', 'Boarding pressure', 'Reassessment queue'],
+      quickActions: [
+        'Queue bottlenecks',
+        'Capacity status',
+        'Boarding pressure',
+        'Reassessment queue',
+      ],
     });
   }
 
-  processQuery(input: {
-    query?: string;
-    user_role?: string;
-    context?: Record<string, unknown>;
-  }) {
+  processQuery(input: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
     const query = String(input.query || '').trim();
     const lowerQuery = query.toLowerCase();
     const patients = this.patientService.listPatients();
@@ -1444,7 +1449,8 @@ export class EDCopilotService {
     );
     const emsPatients = patients.filter(
       (patient) =>
-        patient.flags.includes('EMSArrival') || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
+        patient.flags.includes('EMSArrival') ||
+        /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
     );
     let response =
       'Ask about longest wait, reassessment queue, EMS inbound, current capacity, or major clinical workflows.';
@@ -1483,7 +1489,10 @@ export class EDCopilotService {
       requiresReview = capacity.band !== 'Green';
     } else if (lowerQuery.includes('chest pain')) {
       response = `Chest pain workflow: ECG within 10 minutes, troponin, aspirin if not contraindicated, and clinician-directed risk stratification. ${HUMAN_REVIEW_DISCLAIMER}`;
-      data = { protocol: 'chest_pain', steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'] };
+      data = {
+        protocol: 'chest_pain',
+        steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'],
+      };
       requiresReview = true;
     } else if (lowerQuery.includes('sepsis')) {
       response = `Sepsis workflow: lactate, blood cultures before antibiotics, broad-spectrum antibiotics, fluids as appropriate, and escalation for shock. ${HUMAN_REVIEW_DISCLAIMER}`;
@@ -1599,10 +1608,7 @@ export class EmergencySettingsService {
   updateSettings(patch: EmergencyOsSettingsPatch, organizationId?: string) {
     const key = this.organizationKey(organizationId);
     const current = this.materializeSettings(organizationId);
-    const next = mergeSettings(
-      current,
-      (patch || {}) as Partial<EmergencyOsSettingsContract>,
-    );
+    const next = mergeSettings(current, (patch || {}) as Partial<EmergencyOsSettingsContract>);
     const reassessmentIntervals =
       next.thresholds?.reassessmentIntervals || current.thresholds.reassessmentIntervals;
     const reassessmentThresholds = next.reassessmentThresholds || current.reassessmentThresholds;

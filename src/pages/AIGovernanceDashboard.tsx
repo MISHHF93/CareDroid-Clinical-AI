@@ -9,6 +9,10 @@ import {
   BACKEND_HTTP_ROUTES,
   OPTIONAL_RUNTIME_BACKEND_ROUTES,
 } from '../data/backendHttpRouteInventory';
+import { PageShell } from '../components/ui/CareDroidPrimitives';
+import { NavIcon } from '../navigation/NavIcon';
+import { CHROME_ICONS } from '../navigation/iconRegistry';
+import './AIGovernanceDashboard.css';
 
 interface ComplianceReport {
   period: { start: string; end: string };
@@ -87,12 +91,17 @@ function SummaryCard({
   value: string | number;
   tone?: 'neutral' | 'good' | 'warning';
 }) {
-  const color = tone === 'good' ? '#34D399' : tone === 'warning' ? '#F87171' : '#F9FAFB';
+  const toneClass =
+    tone === 'good'
+      ? ' dashboard-summary-card--good'
+      : tone === 'warning'
+        ? ' dashboard-summary-card--warning'
+        : '';
 
   return (
-    <article style={{ background: '#111827', border: '1px solid #1F2937', borderRadius: 12, padding: 16 }}>
-      <div style={{ color: '#9CA3AF', fontSize: 12 }}>{label}</div>
-      <div style={{ color, fontSize: 24, fontWeight: 700, marginTop: 6 }}>{value}</div>
+    <article className={`dashboard-summary-card${toneClass}`}>
+      <div className="dashboard-summary-card__label">{label}</div>
+      <div className="dashboard-summary-card__value">{value}</div>
     </article>
   );
 }
@@ -236,28 +245,23 @@ export default function AIGovernanceDashboard() {
   const totalBackendRoutes = backendSurfaceGroups.reduce((sum, group) => sum + group.routes.length, 0);
 
   return (
-    <main style={{ padding: 24, color: '#F9FAFB', minHeight: '100%' }}>
-      <header style={{ marginBottom: 24 }}>
-        <p style={{ color: '#60A5FA', margin: 0, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}>
-          CareDroid
-        </p>
-        <h1 style={{ margin: '6px 0 0', fontSize: 26 }}>AI Governance Dashboard</h1>
-        <p style={{ color: '#9CA3AF', maxWidth: 760 }}>
-          Enterprise oversight for AI usage, safety constraints, human review, and audit posture. Live metrics use the formal governance API with a labeled local fallback for offline development.
-        </p>
-        <p style={{ color: '#6B7280', marginTop: 8, fontSize: 12 }}>
-          Registry source: {registry.storageMode || report.storageMode || 'api'} | Frameworks: {(registry.governanceFrameworks || []).join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}
-        </p>
-      </header>
+    <PageShell
+      className="ai-governance-dashboard"
+      contentClassName="cd-page-stack cd-page-stack--compact ai-governance-dashboard__content"
+      eyebrow="CareDroid"
+      title="AI Governance Dashboard"
+      description="Enterprise oversight for AI usage, safety constraints, human review, and audit posture. Live metrics use the formal governance API with a labeled local fallback for offline development."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.shield} size={28} />}
+    >
+      <p className="dashboard-meta-line">
+        Registry source: {registry.storageMode || report.storageMode || 'api'} | Frameworks:{' '}
+        {(registry.governanceFrameworks || []).join(', ') || 'NIST AI RMF, WHO, HIPAA, FDA SaMD'}
+      </p>
 
-      {loading ? <p style={{ color: '#9CA3AF' }}>Loading governance dashboard...</p> : null}
-      {error ? (
-        <div style={{ background: '#3F1D1D', border: '1px solid #7F1D1D', borderRadius: 12, padding: 14, marginBottom: 20 }}>
-          {error}
-        </div>
-      ) : null}
+      {loading ? <p className="dashboard-loading">Loading governance dashboard...</p> : null}
+      {error ? <div className="dashboard-banner--error">{error}</div> : null}
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
+      <section className="dashboard-metric-grid">
         <SummaryCard label="Total AI Interactions" value={report.totalInteractions} />
         <SummaryCard
           label="Safety Violations"
@@ -272,32 +276,32 @@ export default function AIGovernanceDashboard() {
       </section>
 
       {!loading && !serviceEntries.length ? (
-        <div style={{ padding: 16, border: '1px solid #1F2937', borderRadius: 12, background: '#111827', color: '#9CA3AF', marginBottom: 24 }}>
-          No AI governance registry entries are available.
-        </div>
+        <div className="dashboard-empty">No AI governance registry entries are available.</div>
       ) : null}
 
-      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14, marginBottom: 24 }}>
-        <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>AI Services Registry</h2>
-          <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+      <section className="dashboard-panel">
+        <div className="dashboard-panel__header">
+          <h2 className="dashboard-panel__title">AI Services Registry</h2>
+          <p className="dashboard-panel__lead">
             Registry entries describe configured AI and rule services; local prediction models are advisory registry entries, not live backend endpoints.
           </p>
         </div>
-        <div style={{ padding: 18, display: 'grid', gap: 12 }}>
+        <div className="dashboard-panel__body">
           {serviceEntries.map((service) => (
-            <article key={service.id} style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <article key={service.id} className="dashboard-card">
+              <div className="dashboard-card__header">
                 <strong>{service.name}</strong>
-                <span style={{ color: service.requiresHumanReview ? '#FBBF24' : '#34D399' }}>
+                <span
+                  className={`dashboard-status${service.requiresHumanReview ? ' dashboard-status--review' : ' dashboard-status--ok'}`}
+                >
                   {service.requiresHumanReview ? 'Human review required' : 'Rule/extraction support'}
                 </span>
               </div>
-              <p style={{ color: '#9CA3AF', margin: '8px 0' }}>{service.purpose}</p>
-              <div style={{ color: '#CBD5E1', fontSize: 13 }}>
+              <p className="dashboard-card__purpose">{service.purpose}</p>
+              <div className="dashboard-card__meta">
                 Provider: {service.provider} | Model: {service.model} | Owner: {service.owner || 'Clinical Informatics'} | Risk: {service.riskLevel || 'medium'} | Audit: {service.auditLevel} | Interactions: {service.interactions}
               </div>
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 8 }}>
+              <div className="dashboard-card__detail">
                 Safety constraints: {service.safetyConstraints.join('; ')}
               </div>
             </article>
@@ -305,21 +309,21 @@ export default function AIGovernanceDashboard() {
         </div>
       </section>
 
-      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14, marginBottom: 24 }}>
-        <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>Enforced Safety Rules</h2>
+      <section className="dashboard-panel">
+        <div className="dashboard-panel__header">
+          <h2 className="dashboard-panel__title">Enforced Safety Rules</h2>
         </div>
-        <div style={{ padding: 18, display: 'grid', gap: 18 }}>
+        <div className="dashboard-panel__body dashboard-panel__body--loose">
           <div>
-            <h3 style={{ marginTop: 0 }}>Cannot Lower Priority For</h3>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <h3>Cannot Lower Priority For</h3>
+            <div className="dashboard-chip-row">
               {registry.safetyRules.cannotLowerPriorityFor.dpsScores.map((score) => (
-                <span key={score} style={{ background: '#7F1D1D', color: '#FECACA', padding: '4px 8px', borderRadius: 999 }}>
+                <span key={score} className="dashboard-chip--danger">
                   DPS {score}
                 </span>
               ))}
               {registry.safetyRules.cannotLowerPriorityFor.conditions.map((condition) => (
-                <span key={condition} style={{ background: '#7F1D1D', color: '#FECACA', padding: '4px 8px', borderRadius: 999 }}>
+                <span key={condition} className="dashboard-chip--danger">
                   {condition}
                 </span>
               ))}
@@ -327,7 +331,7 @@ export default function AIGovernanceDashboard() {
           </div>
           <div>
             <h3>Required Disclaimers</h3>
-            <ul style={{ color: '#CBD5E1' }}>
+            <ul className="dashboard-list">
               {registry.safetyRules.requiredDisclaimers.map((disclaimer) => (
                 <li key={disclaimer}>{disclaimer}</li>
               ))}
@@ -335,9 +339,9 @@ export default function AIGovernanceDashboard() {
           </div>
           <div>
             <h3>Rate Limits</h3>
-            <div style={{ display: 'grid', gap: 6, color: '#CBD5E1' }}>
+            <div className="dashboard-rate-list">
               {Object.entries(registry.safetyRules.rateLimits).map(([role, limits]) => (
-                <div key={role} style={{ display: 'flex', justifyContent: 'space-between', maxWidth: 360 }}>
+                <div key={role} className="dashboard-rate-row">
                   <span>{role}</span>
                   <span>{limits.requestsPerMinute} requests/minute</span>
                 </div>
@@ -347,54 +351,64 @@ export default function AIGovernanceDashboard() {
           <div>
             <h3>Prompt Validation</h3>
             {validationIssues.length ? (
-              <ul style={{ color: '#FCA5A5' }}>
+              <ul className="dashboard-list dashboard-list--danger">
                 {validationIssues.map((issue) => (
                   <li key={issue}>{issue}</li>
                 ))}
               </ul>
             ) : !promptValidationAvailable ? (
-              <p style={{ color: '#FBBF24' }}>Prompt validation is unavailable; keep human review enabled until the validation API responds.</p>
+              <p className="dashboard-text--warning">
+                Prompt validation is unavailable; keep human review enabled until the validation API responds.
+              </p>
             ) : (
-              <p style={{ color: '#34D399' }}>All registered prompt templates include required variables and human-review language.</p>
+              <p className="dashboard-text--success">
+                All registered prompt templates include required variables and human-review language.
+              </p>
             )}
           </div>
         </div>
       </section>
 
-      <section style={{ background: '#0B1220', border: '1px solid #1F2937', borderRadius: 14 }}>
-        <div style={{ padding: 18, borderBottom: '1px solid #1F2937' }}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>Backend Surface Console</h2>
-          <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
+      <section className="dashboard-panel">
+        <div className="dashboard-panel__header">
+          <h2 className="dashboard-panel__title">Backend Surface Console</h2>
+          <p className="dashboard-panel__lead">
             Controlled route trace for mounted backend surfaces. Legacy, platform, and demo APIs are visible here for governance review instead of being added to clinical left-sidebar workflows.
           </p>
         </div>
-        <div style={{ padding: 18, display: 'grid', gap: 12 }}>
+        <div className="dashboard-panel__body">
           {backendSurfaceGroups.map((group) => (
-            <article key={group.id} style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <article key={group.id} className="dashboard-card">
+              <div className="dashboard-card__header">
                 <strong>{group.label}</strong>
-                <span style={{ color: group.id.includes('optional') ? '#FBBF24' : '#93C5FD' }}>
+                <span
+                  className={`dashboard-status${group.id.includes('optional') ? ' dashboard-status--warn' : ' dashboard-status--info'}`}
+                >
                   {group.status} | {group.routes.length} routes
                 </span>
               </div>
-              <p style={{ color: '#9CA3AF', margin: '8px 0' }}>{group.guidance}</p>
-              <div style={{ display: 'grid', gap: 6, color: '#CBD5E1', fontSize: 12 }}>
+              <p className="dashboard-card__purpose">{group.guidance}</p>
+              <div className="dashboard-route-list">
                 {group.routes.slice(0, 8).map((route) => (
-                  <div key={`${group.id}-${route.method}-${route.path}`} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ color: '#60A5FA', minWidth: 48 }}>{route.method}</span>
+                  <div key={`${group.id}-${route.method}-${route.path}`} className="dashboard-route-row">
+                    <span className="dashboard-route-row__method">{route.method}</span>
                     <code>{route.path}</code>
-                    <span style={{ color: '#6B7280' }}>{route.controller}</span>
-                    {route.mountFlag ? <span style={{ color: '#FBBF24' }}>{route.mountFlag}</span> : null}
+                    <span className="dashboard-route-row__controller">{route.controller}</span>
+                    {route.mountFlag ? (
+                      <span className="dashboard-route-row__flag">{route.mountFlag}</span>
+                    ) : null}
                   </div>
                 ))}
                 {group.routes.length > 8 ? (
-                  <div style={{ color: '#6B7280' }}>+{group.routes.length - 8} more routes in the route inventory.</div>
+                  <div className="dashboard-route-row__overflow">
+                    +{group.routes.length - 8} more routes in the route inventory.
+                  </div>
                 ) : null}
               </div>
             </article>
           ))}
         </div>
       </section>
-    </main>
+    </PageShell>
   );
 }

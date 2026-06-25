@@ -31,7 +31,6 @@ describe('suiteRegistry', () => {
       'queues',
       'reassessment',
       'capacity',
-      'boarding',
       'referrals',
       'copilot',
       'tools',

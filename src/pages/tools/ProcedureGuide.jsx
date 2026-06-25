@@ -11,7 +11,7 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
     color: '#6BCB77',
     description: 'Procedural guidance and step-by-step instructions',
     shortcut: 'Ctrl+6',
-    category: 'Reference'
+    category: 'Reference',
   };
 
   const [query, setQuery] = useState('');
@@ -58,7 +58,7 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   return (
     <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
       <div className="simple-tool-page-inner">
-        <div style={{ marginBottom: '24px' }}>
+        <div className="tool-search-block">
           <input
             type="text"
             className="simple-tool-search-input"
@@ -69,13 +69,16 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>
-          {commonProcedures.map(procedure => (
+        <div className="tool-chip-grid">
+          {commonProcedures.map((procedure) => (
             <button
               key={procedure}
               type="button"
               className="simple-tool-chip-btn"
-              onClick={() => { setQuery(procedure); handleSearch(procedure); }}
+              onClick={() => {
+                setQuery(procedure);
+                handleSearch(procedure);
+              }}
             >
               {procedure}
             </button>
@@ -85,17 +88,17 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
         {error ? <ToolApiErrorBanner message={error} onRetry={() => handleSearch()} /> : null}
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div className="tool-loading-state tool-loading-state--tall" aria-busy="true">
             <div className="simple-tool-spinner" />
-            <p style={{ marginTop: '16px', color: 'var(--app-fg-muted)' }}>Loading procedure guide...</p>
+            <p className="tool-loading-state__message">Loading procedure guide...</p>
           </div>
         ) : results ? (
-          <div className="simple-tool-result-panel">
-            {results}
-          </div>
+          <div className="simple-tool-result-panel">{results}</div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--app-fg-muted)' }}>
-            <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>⚕️</div>
+          <div className="tool-empty-state">
+            <div className="tool-empty-state__icon" aria-hidden>
+              ⚕️
+            </div>
             <p>Search for a procedure or click a common procedure above</p>
           </div>
         )}

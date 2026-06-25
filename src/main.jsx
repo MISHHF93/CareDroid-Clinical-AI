@@ -11,6 +11,8 @@ import './index.css';
 
 import './styles/design-tokens.css';
 
+import './styles/emergency-tokens.css';
+
 import './styles/theme-legacy-bridge.css';
 
 import './styles/theme-surfaces.css';
@@ -26,6 +28,8 @@ import './styles/mobile-first-layout.css';
 import './styles/mobile-performance.css';
 
 import './styles/visual-consistency.css';
+
+import './styles/practitioner-compact.css';
 
 import './styles/mobile-first-recovery.css';
 

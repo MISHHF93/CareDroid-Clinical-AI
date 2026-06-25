@@ -51,6 +51,46 @@
   padding: 18px;
 }
 
+.commercial-card--spaced {
+  margin-bottom: 16px;
+}
+
+.commercial-card--compact {
+  margin-bottom: 12px;
+}
+
+.commercial-card--raised {
+  margin-top: 16px;
+}
+
+.commercial-section-heading {
+  margin-top: 16px;
+}
+
+.commercial-grid--spaced {
+  margin-bottom: 16px;
+}
+
+.commercial-grid--raised {
+  margin-top: 16px;
+}
+
+.commercial-link-spacer {
+  margin-top: 20px;
+}
+
+.commercial-link-spacer--compact {
+  margin-top: 16px;
+}
+
+.commercial-error-text {
+  color: #ff6b6b;
+}
+
+.commercial-asset-action {
+  margin-left: 8px;
+}
+
 .commercial-card h2 {
   margin: 0 0 8px;
   font-size: 1.1rem;

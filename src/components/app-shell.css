@@ -1,0 +1,86 @@
+/* Canonical emergency app shell — imported by components/AppShell.tsx */
+@import '../styles/emergency-tokens.css';
+
+.emergency-app-shell {
+  display: flex;
+  height: var(--app-viewport-height, 100dvh);
+  overflow: hidden;
+  background: var(--ed-surface-base, var(--color-background, #0a0e1a));
+  color: var(--ed-text-primary, var(--color-text-primary, #f9fafb));
+  font-family: var(--font-ui, Inter, system-ui, sans-serif);
+}
+
+.ed-skip-link {
+  position: fixed;
+  inset-block-start: var(--space-2, 8px);
+  inset-inline-start: var(--space-2, 8px);
+  z-index: var(--z-toast, 1200);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--status-info, #06b6d4);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-elevated, #111827);
+  color: var(--color-text-primary, #f9fafb);
+  font-size: var(--font-size-sm, 13px);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-4, 16px)));
+  transition: transform 160ms var(--ease-smooth, ease);
+}
+
+.ed-skip-link:focus,
+.ed-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--status-info, #06b6d4);
+  outline-offset: 2px;
+}
+
+.emergency-app-shell__main-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.emergency-wall-kiosk-header {
+  padding: var(--ed-space-3, 12px) var(--ed-space-5, 20px);
+  border-bottom: 1px solid var(--ed-border-subtle);
+  background: var(--ed-surface-base, var(--color-background, #0b1220));
+}
+
+.emergency-wall-kiosk-header__safety {
+  margin-left: var(--ed-space-3, 12px);
+  opacity: 0.72;
+  font-size: var(--ed-type-section, 13px);
+}
+
+.app-shell-main-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-shell-main-content--mobile-nav {
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+}
+
+.app-shell-main-content:focus {
+  outline: none;
+}
+
+.app-shell-route-loading {
+  padding: 24px;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.emergency-app-shell--density-compact .app-shell-main-content {
+  --app-shell-content-padding-y: 10px;
+}
+
+.emergency-app-shell--density-wall .app-shell-main-content {
+  --app-shell-content-padding-y: 6px;
+}

@@ -74,6 +74,30 @@
   color: #991B1B;
 }
 
+.cost-progress-bar--ok {
+  background-color: #10b981;
+}
+
+.cost-progress-bar--warn {
+  background-color: #f59e0b;
+}
+
+.cost-progress-bar--danger {
+  background-color: #ef4444;
+}
+
+.roi-value--positive {
+  color: #10b981;
+}
+
+.roi-value--negative {
+  color: #ef4444;
+}
+
+.cost-row-fill--category {
+  background-color: #4f46e5;
+}
+
 .cost-alert-warning {
   background-color: #FEF3C7;
   border-color: #F59E0B;
@@ -259,6 +283,7 @@
 
 .cost-row-fill {
   height: 100%;
+  background-color: var(--tool-color, #4f46e5);
   transition: width 0.3s ease;
 }
 

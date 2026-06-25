@@ -1,0 +1,22 @@
+.whiteboard-alert-rail {
+  padding: 0 16px 8px;
+}
+
+.whiteboard-alert-rail__strip.operational-strip--compact {
+  border-radius: 10px;
+  border: 1px solid var(--color-border-subtle, #1f2937);
+  background: color-mix(in srgb, var(--color-surface, #111827) 92%, transparent);
+}
+
+.whiteboard-alert-rail__strip .operational-strip__metric {
+  min-height: 36px;
+  padding: 4px 10px;
+}
+
+.whiteboard-alert-rail__strip .operational-strip__metric strong {
+  font-size: 15px;
+}
+
+.whiteboard-alert-rail__strip .operational-strip__metric span {
+  font-size: 10px;
+}

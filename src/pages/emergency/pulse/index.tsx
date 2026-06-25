@@ -20,6 +20,7 @@ import {
   Priority,
 } from '../../../types/emergency';
 import type { Alert, CapacitySnapshot, Patient, Referral, Staff, WorkflowActionLog } from '../../../types/emergency';
+import { PageShell } from '../../../components/ui/CareDroidPrimitives';
 import './DepartmentPulse.css';
 
 const LAST_VIEW_KEY = 'caredroid.ed.departmentPulse.lastView.v1';
@@ -528,11 +529,17 @@ export default function DepartmentPulse() {
   ];
 
   return (
-    <section className="emergency-pulse" aria-labelledby="emergency-pulse-title">
-      <h1 id="emergency-pulse-title" className="emergency-pulse__sr-only">
-        Department Pulse
-      </h1>
-
+    <PageShell
+      as="section"
+      eyebrow="Analytics"
+      title="Department Pulse"
+      titleId="emergency-pulse-title"
+      description="Live queues, staff load, EMS inbound, and attention patients for charge review."
+      className="emergency-pulse cd-page-shell"
+      headerClassName="emergency-pulse__hero"
+      contentClassName="emergency-pulse__content"
+      aria-labelledby="emergency-pulse-title"
+    >
       <div className="emergency-pulse__timebar">
         <strong>
           {isReturningAfterAway
@@ -651,6 +658,6 @@ export default function DepartmentPulse() {
           ))}
         </div>
       </section>
-    </section>
+    </PageShell>
   );
 }

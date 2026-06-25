@@ -1,7 +1,14 @@
 import { useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
+import {
+  shouldHidePatientJourneyEngineCard,
+  shouldSuppressCopilotRouteMetrics,
+  shouldSuppressCopilotRouteUpgradeSignals,
+} from '../../config/practitionerCleanup.config';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import {
   useBoardingStatus,
@@ -17,11 +24,11 @@ import {
 } from '../../hooks/useEmergencyOs';
 import {
   EmergencyRoutePage,
+  FlowCapacityViewTabs,
   MetricGrid,
   PatientGrid,
   ApiStateBanner,
   DataSourceNote,
-  emergencyRouteStyles,
   isHighRisk,
   isBoarding,
   needsReassessmentAttention,
@@ -29,18 +36,23 @@ import {
   findUpgradeSignal,
   displayPatientName,
 } from './emergencyRouteShared';
-import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
 import QueueReasonBadge from '../../components/queues/QueueReasonBadge';
+import {
+  clearPatientRouteParam,
+  PATIENT_ROUTE_PARAM_KEYS,
+  readPatientRouteContext,
+} from '../../utils/receptionQueryParams';
 
 
 export function PatientsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const storePatients = useEmergencyStore((state) => state.patients);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const patientsModule = useEmergencyPatients();
   const journeyModule = usePatientJourney();
   const patients = patientsModule.data?.data?.patients || storePatients;
-  const patientIdParam = searchParams.get('patientId') || '';
+  const { contextPatientId: patientIdParam } = readPatientRouteContext(searchParams);
   const patientSearchParam = searchParams.get('patientSearch') || '';
   const query = searchParams.get('q') || patientSearchParam || '';
   const requestedPatient = useMemo(
@@ -84,8 +96,13 @@ export function PatientsRoute() {
   }, [patients, query, requestedPatient]);
 
   useEffect(() => {
-    if (requestedPatient?.id) selectPatient(requestedPatient.id);
-  }, [requestedPatient?.id, selectPatient]);
+    if (!patientIdParam || !requestedPatient?.id) return;
+    selectPatient(requestedPatient.id);
+    setSearchParams(
+      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context),
+      { replace: true },
+    );
+  }, [patientIdParam, requestedPatient?.id, searchParams, selectPatient, setSearchParams]);
 
   const updateQuery = (value) => {
     const nextParams = new URLSearchParams(searchParams);
@@ -97,42 +114,27 @@ export function PatientsRoute() {
   return (
     <EmergencyRoutePage
       eyebrow="Patients"
-      title="Emergency Patients"
+      title="Department Patients"
       description="Find active patients, search by name or MRN, and open a patient card for next steps."
       actions={
-        <label
-          style={{
-            display: 'grid',
-            gap: 4,
-            minWidth: 260,
-            color: 'var(--color-text-secondary, #9CA3AF)',
-            fontSize: 11,
-            fontWeight: 900,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <label className="emergency-route-search-field">
           Search patients
           <input
             type="search"
             value={query}
             placeholder="Name, MRN, complaint..."
             onChange={(event) => updateQuery(event.target.value)}
-            style={{
-              minHeight: 38,
-              border: '1px solid var(--color-border-subtle, #1F2937)',
-              borderRadius: 'var(--radius-md, 10px)',
-              background: 'var(--color-elevated, #0B1120)',
-              color: 'var(--color-text-primary, #F9FAFB)',
-              font: 'inherit',
-              fontSize: 13,
-              padding: '0 12px',
-              textTransform: 'none',
-            }}
           />
         </label>
       }
     >
+      <EdDataSourceBanner
+        envelope={patientsModule.data}
+        loading={patientsModule.loading}
+        error={patientsModule.error}
+        activeScenarioId={activeScenarioId}
+        compact
+      />
       <ApiStateBanner moduleState={patientsModule} />
       <MetricGrid
         metrics={[
@@ -149,63 +151,30 @@ export function PatientsRoute() {
         moduleState={journeyModule}
         fallbackText="Patient Journey endpoint is unavailable; patient cards remain available."
       />
-      <article
-        aria-label="Patient Journey backend status"
-        style={{
-          ...emergencyRouteStyles.card,
-          display: 'grid',
-          gap: 10,
-          padding: 'var(--space-3, 12px)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <div>
-            <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>
-              Patient Journey Engine
-            </strong>
-            <p style={{ margin: '4px 0 0', color: 'var(--color-text-secondary, #9CA3AF)', fontSize: 13 }}>
-              Backend state-count and timeline-event envelope rendered through the active Patients route.
-            </p>
+      {!shouldHidePatientJourneyEngineCard() ? (
+        <article aria-label="Patient Journey backend status" className="emergency-route-card emergency-route-journey-card">
+          <div className="emergency-route-section-card__header">
+            <div>
+              <strong>Patient Journey Engine</strong>
+              <p className="emergency-route-section-card__lead">
+                Backend state-count and timeline-event envelope rendered through the active Patients route.
+              </p>
+            </div>
+            <span className="emergency-route-journey-card__count">{journeyEvents.length} events</span>
           </div>
-          <span
-            style={{
-              borderRadius: 999,
-              background: 'var(--color-elevated, #0B1120)',
-              color: '#BFDBFE',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-              fontSize: 12,
-              fontWeight: 900,
-              padding: '6px 10px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {journeyEvents.length} events
-          </span>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {visibleJourneyStates.length ? (
-            visibleJourneyStates.map(([state, count]) => (
-              <span
-                key={state}
-                style={{
-                  border: '1px solid var(--color-border-subtle, #1F2937)',
-                  borderRadius: 999,
-                  color: 'var(--color-text-secondary, #9CA3AF)',
-                  fontSize: 12,
-                  fontWeight: 800,
-                  padding: '5px 9px',
-                }}
-              >
-                {state}: {count}
-              </span>
-            ))
-          ) : (
-            <span style={{ color: 'var(--color-text-muted, #6B7280)', fontSize: 13 }}>
-              No active journey state counts yet.
-            </span>
-          )}
-        </div>
-      </article>
+          <div className="emergency-route-chip-row">
+            {visibleJourneyStates.length ? (
+              visibleJourneyStates.map(([state, count]) => (
+                <span key={state} className="emergency-route-state-chip">
+                  {state}: {count}
+                </span>
+              ))
+            ) : (
+              <span className="emergency-route-section-card__lead">No active journey state counts yet.</span>
+            )}
+          </div>
+        </article>
+      ) : null}
       <PatientGrid
         patients={visiblePatients}
         emptyMessage={
@@ -224,11 +193,10 @@ export function QueueRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const referrals = useEmergencyStore((state) => state.referrals);
-  const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const setFitToWaitClassification = useEmergencyStore((state) => state.setFitToWaitClassification);
   const queues = useEmergencyQueues();
   const requestedQueueFilter =
     searchParams.get('queue') || searchParams.get('filter') || searchParams.get('queueFilter') || '';
@@ -355,10 +323,16 @@ export function QueueRoute() {
 
   return (
     <EmergencyRoutePage
-      eyebrow="Operations"
-      title="Queues"
+      eyebrow="Queues"
+      title="Department Queues"
       description="See who is waiting, which queues need attention, and where the next handoff is blocked."
     >
+      <EdDataSourceBanner
+        envelope={queues.data}
+        loading={queues.loading}
+        error={queues.error}
+        activeScenarioId={activeScenarioId}
+      />
       <ApiStateBanner moduleState={queues} />
       <MetricGrid
         metrics={[
@@ -374,62 +348,21 @@ export function QueueRoute() {
           },
         ]}
       />
-      {(activeFilterKey === 'waiting' || !activeFilterKey) && (
-        <WaitingRoomSafetyBoard
-          patients={patients}
-          staff={staff}
-          referrals={referrals}
-          workflowLogs={workflowLogs}
-          activeQueueFilter={effectiveQueueFilter}
-          variant="focused"
-          onSelectPatient={(patientId) => {
-            selectPatient(patientId);
-            document.dispatchEvent(new Event('open-reassessment-drawer'));
-          }}
-          onOpenReassessment={(patientId) => {
-            selectPatient(patientId);
-            document.dispatchEvent(new Event('open-reassessment-drawer'));
-          }}
-          onClassifyFitToWait={(patientId, classificationId) => {
-            setFitToWaitClassification(patientId, classificationId, { staffName: 'Staff' });
-          }}
-        />
-      )}
+      <p className="emergency-route-card emergency-route-muted" role="note">
+        Waiting-room safety and fit-to-wait review live on the{' '}
+        <Link to={CANONICAL_ROUTES.emergencyWhiteboard}>Emergency Whiteboard</Link>.
+      </p>
       {effectiveQueueFilter ? (
-        <div
-          role="status"
-          style={{
-            ...emergencyRouteStyles.card,
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 10,
-            justifyContent: 'space-between',
-            padding: 'var(--space-3, 12px)',
-          }}
-        >
-          <span style={{ color: '#BFDBFE', fontSize: 13, fontWeight: 800 }}>
+        <div role="status" className="emergency-route-card emergency-route-filter-banner">
+          <span className="emergency-route-filter-banner__label">
             Showing the {effectiveQueueFilter} queue requested from the whiteboard.
           </span>
-          <button
-            type="button"
-            onClick={clearQueueFilter}
-            style={{
-              border: '1px solid var(--color-border-subtle, #1F2937)',
-              borderRadius: 999,
-              background: 'transparent',
-              color: 'var(--color-text-primary, #F9FAFB)',
-              cursor: 'pointer',
-              fontSize: 12,
-              fontWeight: 800,
-              padding: '6px 10px',
-            }}
-          >
+          <button type="button" onClick={clearQueueFilter} className="emergency-route-filter-banner__btn">
             Clear queue filter
           </button>
         </div>
       ) : null}
-      <div style={{ display: 'grid', gap: 'var(--space-3, 12px)' }}>
+      <div className="emergency-route-stack">
         {filteredQueueRows.map((queue) => {
           const patientsInQueue = queue.patients || [];
           const movementStages =
@@ -449,53 +382,18 @@ export function QueueRoute() {
           return (
             <article
               key={queue.label}
-              style={{
-                ...emergencyRouteStyles.card,
-                display: 'grid',
-                gridTemplateColumns: '1fr auto auto',
-                gap: 12,
-                alignItems: 'center',
-                borderLeft: `4px solid ${breached ? '#EF4444' : '#60A5FA'}`,
-                padding: 'var(--space-3, 12px)',
-              }}
+              className={`emergency-route-card emergency-route-queue-row${breached ? ' emergency-route-queue-row--breached' : ''}`}
             >
               <div>
-                <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>{queue.label}</strong>
-                <div
-                  aria-label={`${queue.label} queue patients`}
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 6,
-                    margin: '6px 0 0',
-                    color: 'var(--color-text-secondary, #9CA3AF)',
-                    fontSize: 13,
-                  }}
-                >
+                <strong>{queue.label}</strong>
+                <div className="emergency-route-queue-row__patients" aria-label={`${queue.label} queue patients`}>
                   {patientsInQueue.length ? (
                     patientsInQueue.slice(0, 3).map((patient) => (
-                      <span
-                        key={patient.id}
-                        style={{
-                          display: 'inline-flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          gap: 4,
-                        }}
-                      >
+                      <span key={patient.id} className="emergency-route-queue-row__patient">
                         <button
                           type="button"
                           onClick={() => selectPatient(patient.id)}
-                          style={{
-                            border: '1px solid var(--color-border-subtle, #1F2937)',
-                            borderRadius: 999,
-                            background: 'var(--color-elevated, #0B1120)',
-                            color: 'var(--color-text-primary, #F9FAFB)',
-                            cursor: 'pointer',
-                            fontSize: 12,
-                            fontWeight: 800,
-                            padding: '4px 8px',
-                          }}
+                          className="emergency-route-queue-row__patient-btn"
                         >
                           {displayPatientName(patient)}
                         </button>
@@ -513,23 +411,17 @@ export function QueueRoute() {
                   )}
                 </div>
                 {movementStages.length ? (
-                  <small style={{ color: '#BFDBFE', display: 'block', fontSize: 12, fontWeight: 800, marginTop: 4 }}>
+                  <small className="emergency-route-queue-row__movement">
                     Movement stage: {movementStages.join(' / ')}
                   </small>
                 ) : null}
               </div>
-              <strong
-                style={{
-                  borderRadius: 999,
-                  background: 'var(--color-elevated, #0B1120)',
-                  color: 'var(--color-text-primary, #F9FAFB)',
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                  padding: '5px 10px',
-                }}
-              >
+              <strong className="emergency-route-queue-row__count">
                 {queue.count ?? patientsInQueue.length}
               </strong>
-              <span style={{ color: breached ? '#EF4444' : '#10B981', fontSize: 12, fontWeight: 900 }}>
+              <span
+                className={`emergency-route-queue-row__oldest${breached ? ' emergency-route-queue-row__oldest--breached' : ' emergency-route-queue-row__oldest--ok'}`}
+              >
                 Oldest {oldestWait}m
               </span>
             </article>
@@ -542,11 +434,12 @@ export function QueueRoute() {
 }
 
 export function ReassessmentRoute() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const reassessment = useReassessmentQueue();
-  const patientIdParam = searchParams.get('patientId') || '';
+  const { contextPatientId: patientIdParam } = readPatientRouteContext(searchParams);
   const requestedPatient = useMemo(
     () => (patientIdParam ? patients.find((patient) => patient.id === patientIdParam) || null : null),
     [patientIdParam, patients],
@@ -573,8 +466,13 @@ export function ReassessmentRoute() {
   );
 
   useEffect(() => {
-    if (requestedPatient?.id) selectPatient(requestedPatient.id);
-  }, [requestedPatient?.id, selectPatient]);
+    if (!patientIdParam || !requestedPatient?.id) return;
+    selectPatient(requestedPatient.id);
+    setSearchParams(
+      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context),
+      { replace: true },
+    );
+  }, [patientIdParam, requestedPatient?.id, searchParams, selectPatient, setSearchParams]);
 
   return (
     <EmergencyRoutePage
@@ -582,6 +480,12 @@ export function ReassessmentRoute() {
       title="Reassessment"
       description="Patients due for another look. Open a patient card to review details and update the plan."
     >
+      <EdDataSourceBanner
+        envelope={reassessment.data}
+        loading={reassessment.loading}
+        error={reassessment.error}
+        activeScenarioId={activeScenarioId}
+      />
       <ApiStateBanner moduleState={reassessment} />
       <MetricGrid
         metrics={[
@@ -601,40 +505,17 @@ export function ReassessmentRoute() {
 }
 
 export function BoardingRoute() {
-  const patients = useEmergencyStore((state) => state.patients);
-  const boarding = useBoardingStatus();
-  const boardingPatients = boarding.data?.data?.patients || patients.filter(isBoarding);
-
-  return (
-    <EmergencyRoutePage
-      eyebrow="Flow"
-      title="Boarding"
-      maturity="demo"
-      description="Patients waiting for an inpatient bed and the boarding pressure affecting department flow."
-    >
-      <ApiStateBanner moduleState={boarding} />
-      <MetricGrid
-        metrics={[
-          { label: 'Boarding patients', value: boardingPatients.length, color: '#F59E0B' },
-          {
-            label: 'Longest boarding',
-            value: `${boarding.data?.data?.longestBoardingMinutes ?? 0}m`,
-            color: '#F97316',
-          },
-          { label: 'Escalation', value: boarding.data?.data?.escalation || 'No escalation' },
-        ]}
-      />
-      <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
-      <DataSourceNote moduleState={boarding} />
-    </EmergencyRoutePage>
-  );
+  return <Navigate to={`${CANONICAL_ROUTES.emergencyCapacity}?view=boarding`} replace />;
 }
 
 export function CapacityRoute() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const storeCapacity = useEmergencyStore((state) => state.capacity);
   const storeRooms = useEmergencyStore((state) => state.rooms);
   const patients = useEmergencyStore((state) => state.patients);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const capacityStatus = useCapacityStatus();
+  const boarding = useBoardingStatus();
   const upgradeCapacity = useUpgradeHarnessCapacity();
   const capacity = capacityStatus.data?.data?.capacity || storeCapacity;
   const rooms = capacityStatus.data?.data?.rooms || storeRooms;
@@ -643,80 +524,113 @@ export function CapacityRoute() {
   const bragSignal = findUpgradeSignal(upgradeSignals, 'brag_forecast_10h');
   const availableRooms = rooms.filter((room) => room.status === 'Available').length;
   const blockedRooms = rooms.filter((room) => room.status === 'Blocked').length;
-  const boardingPatients = patients.filter(isBoarding);
+  const boardingPatients = boarding.data?.data?.patients || patients.filter(isBoarding);
+  const activeView = searchParams.get('view') === 'boarding' ? 'boarding' : 'capacity';
+
+  const setActiveView = (view) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (view === 'boarding') nextParams.set('view', 'boarding');
+    else nextParams.delete('view');
+    setSearchParams(nextParams, { replace: true });
+  };
 
   return (
     <EmergencyRoutePage
-      eyebrow="Capacity"
-      title="Capacity"
-      description="Current room availability, boarding load, and department pressure in one view."
+      eyebrow="Flow coordination"
+      title="Flow & Capacity"
+      maturity={activeView === 'boarding' ? 'demo' : undefined}
+      description="Room pressure, boarding load, and department flow in one coordinated view."
     >
-      <ApiStateBanner moduleState={capacityStatus} />
-      <MetricGrid
-        metrics={[
-          {
-            label: 'Capacity score',
-            value: `${capacity.score} ${capacity.band}`,
-            color: '#60A5FA',
-          },
-          { label: 'Occupied rooms', value: capacity.occupiedRooms },
-          { label: 'Available rooms', value: availableRooms, color: '#10B981' },
-          { label: 'Blocked rooms', value: blockedRooms, color: '#F97316' },
-          { label: 'Boarding patients', value: capacity.boardingCount, color: '#F59E0B' },
-          { label: 'Reassessment due', value: capacity.reassessmentDue, color: '#EF4444' },
-        ]}
-      />
-      {capacityStatus.data?.data?.recommendations?.length ? (
-        <div style={{ display: 'grid', gap: 8 }}>
-          {capacityStatus.data.data.recommendations.map((recommendation) => (
-            <div
-              key={recommendation}
-              style={{
-                ...emergencyRouteStyles.card,
-                borderColor: 'color-mix(in srgb, var(--status-info, #60A5FA) 36%, var(--color-border-default, #1F2937))',
-                background:
-                  'color-mix(in srgb, var(--status-info, #60A5FA) 8%, var(--color-surface, #111827))',
-                color: '#BFDBFE',
-                padding: 'var(--space-3, 12px)',
-              }}
-            >
-              {recommendation}
+      <FlowCapacityViewTabs activeView={activeView} onViewChange={setActiveView} />
+      {activeView === 'boarding' ? (
+        <>
+          <EdDataSourceBanner
+            envelope={boarding.data}
+            loading={boarding.loading}
+            error={boarding.error}
+            activeScenarioId={activeScenarioId}
+          />
+          <ApiStateBanner moduleState={boarding} />
+          <MetricGrid
+            metrics={[
+              { label: 'Boarding patients', value: boardingPatients.length, color: '#F59E0B' },
+              {
+                label: 'Longest boarding',
+                value: `${boarding.data?.data?.longestBoardingMinutes ?? 0}m`,
+                color: '#F97316',
+              },
+              { label: 'Escalation', value: boarding.data?.data?.escalation || 'No escalation' },
+            ]}
+          />
+          <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
+          <DataSourceNote moduleState={boarding} />
+        </>
+      ) : (
+        <>
+          <EdDataSourceBanner
+            envelope={capacityStatus.data}
+            loading={capacityStatus.loading}
+            error={capacityStatus.error}
+            activeScenarioId={activeScenarioId}
+          />
+          <ApiStateBanner moduleState={capacityStatus} />
+          <MetricGrid
+            metrics={[
+              {
+                label: 'Capacity score',
+                value: `${capacity.score} ${capacity.band}`,
+                color: '#60A5FA',
+              },
+              { label: 'Occupied rooms', value: capacity.occupiedRooms },
+              { label: 'Available rooms', value: availableRooms, color: '#10B981' },
+              { label: 'Blocked rooms', value: blockedRooms, color: '#F97316' },
+              { label: 'Boarding patients', value: capacity.boardingCount, color: '#F59E0B' },
+              { label: 'Reassessment due', value: capacity.reassessmentDue, color: '#EF4444' },
+            ]}
+          />
+          {capacityStatus.data?.data?.recommendations?.length ? (
+            <div className="emergency-route-stack">
+              {capacityStatus.data.data.recommendations.map((recommendation) => (
+                <div key={recommendation} className="emergency-route-card emergency-route-recommendation">
+                  {recommendation}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : null}
-      {simulationSignal || bragSignal ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
-          {simulationSignal ? (
-            <article style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
-              <strong style={{ color: '#BFDBFE' }}>Adaptive policy simulation</strong>
-              <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                Pressure {simulationSignal.data.currentPressureScore};{' '}
-                {simulationSignal.data.recommendedPolicyReview}
-              </p>
-              <small style={{ color: '#FDE68A' }}>{simulationSignal.safety.humanReviewMessage}</small>
-            </article>
           ) : null}
-          {bragSignal ? (
-            <article style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
-              <strong style={{ color: '#BFDBFE' }}>10-hour BRAG forecast</strong>
-              <p style={{ margin: '6px 0 0', color: '#9CA3AF', fontSize: 13 }}>
-                Peak band {bragSignal.data.peakBand};{' '}
-                {(bragSignal.data.forecast || []).slice(-1)[0]?.humanReviewTrigger}
-              </p>
-              <small style={{ color: '#FDE68A' }}>
-                Confidence {Math.round((bragSignal.confidence || 0) * 100)}% ┬╖ Audit{' '}
-                {String(bragSignal.audit.immutableLedgerHash).slice(0, 10)}
-              </small>
-            </article>
+          {simulationSignal || bragSignal ? (
+            <div className="emergency-route-signal-grid">
+              {simulationSignal ? (
+                <article className="emergency-route-card emergency-route-signal-row">
+                  <div className="emergency-route-signal-row__main">
+                    <strong>Adaptive policy simulation</strong>
+                    <span>
+                      Pressure {simulationSignal.data.currentPressureScore};{' '}
+                      {simulationSignal.data.recommendedPolicyReview}
+                    </span>
+                  </div>
+                  <small>{simulationSignal.safety.humanReviewMessage}</small>
+                </article>
+              ) : null}
+              {bragSignal ? (
+                <article className="emergency-route-card emergency-route-signal-row">
+                  <div className="emergency-route-signal-row__main">
+                    <strong>10-hour BRAG forecast</strong>
+                    <span>
+                      Peak band {bragSignal.data.peakBand};{' '}
+                      {(bragSignal.data.forecast || []).slice(-1)[0]?.humanReviewTrigger}
+                    </span>
+                  </div>
+                  <small>
+                    Confidence {Math.round((bragSignal.confidence || 0) * 100)}% · Audit{' '}
+                    {String(bragSignal.audit.immutableLedgerHash).slice(0, 10)}
+                  </small>
+                </article>
+              ) : null}
+            </div>
           ) : null}
-        </div>
-      ) : null}
-      <PatientGrid
-        patients={boardingPatients}
-        emptyMessage="No active boarders affecting capacity."
-      />
-      <DataSourceNote moduleState={capacityStatus} />
+          <DataSourceNote moduleState={capacityStatus} />
+        </>
+      )}
     </EmergencyRoutePage>
   );
 }
@@ -724,7 +638,7 @@ export function CapacityRoute() {
 export function CopilotRoute() {
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
-  const alerts = useEmergencyStore((state) => state.alerts);
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const copilot = useEDCopilot();
   const upgradeClinical = useUpgradeHarnessClinicalIntelligence();
   const upgradeAudit = useUpgradeHarnessAuditSummary();
@@ -736,75 +650,55 @@ export function CopilotRoute() {
   const auditSignal = upgradeAudit.data?.data?.signals?.[0] || null;
   const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
   const highRiskPatients = activePatients.filter(isHighRisk);
+  const showUpgradeSignals = !shouldSuppressCopilotRouteUpgradeSignals();
+  const showRouteMetrics = !shouldSuppressCopilotRouteMetrics();
 
   return (
     <EmergencyRoutePage
-      eyebrow={EMERGENCY_OS_BRANDING.aiiosName}
+      eyebrow="Clinical copilot"
       title={EMERGENCY_OS_BRANDING.copilotName}
-      description={EMERGENCY_OS_BRANDING.copilotIntro}
+      description="Human-reviewed workflow support for routing, context, and next-step prompts."
     >
-      <ApiStateBanner moduleState={copilot} />
-      <MetricGrid
-        metrics={[
-          { label: 'Active patients', value: promptContext.patientCount ?? activePatients.length },
-          {
-            label: 'High risk',
-            value: promptContext.highRiskCount ?? highRiskPatients.length,
-            color: '#EF4444',
-          },
-          {
-            label: 'Capacity band',
-            value: promptContext.capacity?.band ?? capacity.band,
-            color: '#60A5FA',
-          },
-          {
-            label: 'Active alerts',
-            value: alerts.filter((alert) => !alert.dismissed).length,
-            color: '#F59E0B',
-          },
-        ]}
+      <EdDataSourceBanner
+        envelope={copilot.data}
+        loading={copilot.loading}
+        error={copilot.error}
+        activeScenarioId={activeScenarioId}
+        compact
       />
-      {copilot.data?.data?.quickActions?.length ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      {showRouteMetrics ? <ApiStateBanner moduleState={copilot} /> : null}
+      {showRouteMetrics ? (
+        <MetricGrid
+          metrics={[
+            { label: 'Active patients', value: promptContext.patientCount ?? activePatients.length },
+            {
+              label: 'High risk',
+              value: promptContext.highRiskCount ?? highRiskPatients.length,
+              color: '#EF4444',
+            },
+            {
+              label: 'Capacity band',
+              value: promptContext.capacity?.band ?? capacity.band,
+              color: '#60A5FA',
+            },
+          ]}
+        />
+      ) : null}
+      {showRouteMetrics && copilot.data?.data?.quickActions?.length ? (
+        <div className="emergency-route-chip-row">
           {copilot.data.data.quickActions.map((action) => (
-            <span
-              key={action}
-              style={{
-                border: '1px solid color-mix(in srgb, var(--status-info, #60A5FA) 34%, var(--color-border-default, #1F2937))',
-                borderRadius: 999,
-                background:
-                  'color-mix(in srgb, var(--status-info, #60A5FA) 10%, var(--color-surface, #111827))',
-                color: '#BFDBFE',
-                padding: '6px 10px',
-                fontSize: 12,
-                fontWeight: 800,
-              }}
-            >
+            <span key={action} className="emergency-route-action-chip">
               {action}
             </span>
           ))}
         </div>
       ) : null}
-      <p
-        style={{
-          ...emergencyRouteStyles.card,
-          borderColor:
-            'color-mix(in srgb, var(--status-warning, #F59E0B) 40%, var(--color-border-default, #1F2937))',
-          background:
-            'color-mix(in srgb, var(--status-warning, #F59E0B) 8%, var(--color-surface, #111827))',
-          color: 'var(--color-text-secondary, #9CA3AF)',
-          margin: 0,
-          padding: 'var(--space-3, 12px)',
-        }}
-      >
-        Use the docked {EMERGENCY_OS_BRANDING.copilotName} to ask about who needs attention,
-        capacity pressure, EMS status, or reassessment priorities.{' '}
-        The active panel supports typed prompts, browser image attachment metadata, and voice dictation
-        for staff-reviewed context.{' '}
-        {EMERGENCY_OS_BRANDING.safetyLine}
+      <p className="emergency-route-card emergency-route-copilot-hint">
+        Open the docked {EMERGENCY_OS_BRANDING.copilotName} panel to ask who needs attention, capacity
+        pressure, EMS status, or reassessment priorities. {EMERGENCY_OS_BRANDING.safetyLine}
       </p>
-      {cdssSignal || telephoneSignal || federatedSignal || auditSignal ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+      {showUpgradeSignals && (cdssSignal || telephoneSignal || federatedSignal || auditSignal) ? (
+        <div className="emergency-route-signal-grid">
           {[
             cdssSignal && {
               title: 'CDSS safety gate',
@@ -829,15 +723,17 @@ export function CopilotRoute() {
           ]
             .filter(Boolean)
             .map((card) => (
-              <article key={card.title} style={{ ...emergencyRouteStyles.card, padding: 'var(--space-3, 12px)' }}>
-                <strong style={{ color: '#BFDBFE' }}>{card.title}</strong>
-                <p style={{ margin: '6px 0', color: '#9CA3AF', fontSize: 13 }}>{card.body}</p>
-                <small style={{ color: '#FDE68A' }}>{card.meta}</small>
+              <article key={card.title} className="emergency-route-card emergency-route-signal-row">
+                <div className="emergency-route-signal-row__main">
+                  <strong>{card.title}</strong>
+                  <span>{card.body}</span>
+                </div>
+                <small>{card.meta}</small>
               </article>
             ))}
         </div>
       ) : null}
-      <DataSourceNote moduleState={copilot} />
+      {showRouteMetrics ? <DataSourceNote moduleState={copilot} /> : null}
     </EmergencyRoutePage>
   );
 }

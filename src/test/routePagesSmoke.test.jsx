@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import ClinicalToolCatalog from '../pages/tools/ClinicalToolCatalog';
+
 import Calculators from '../pages/tools/Calculators';
 import ToolsOverview from '../pages/tools/ToolsOverview';
 import FleetDashboard from '../pages/fleet/FleetDashboard';
@@ -699,7 +699,7 @@ const PAGE_BY_ID = {
   devices: DeviceFleetManagement,
   'clinical-alerts': ClinicalAlertsPage,
   'tools-overview': ToolsOverview,
-  'tools-catalog': ClinicalToolCatalog,
+
   'calculators-library-filter': ToolsOverview,
   'ambient-scribe': AmbientScribe,
   'calculator-recommender-ai': CalculatorRecommender,
@@ -764,7 +764,7 @@ const THEME_ROUTE_SMOKE_IDS = new Set([
   'tools-overview',
   'fleet-live-map',
   'calculators-library-filter',
-  'tools-catalog',
+
   'medical-iot',
   'devices',
   'clinical-alerts',

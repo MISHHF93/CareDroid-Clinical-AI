@@ -445,10 +445,7 @@ export class CustomerSuccessService {
     return { key: 'month', start, end };
   }
 
-  private buildOnboardingProgress(
-    entitlements: OrganizationEntitlement[],
-    products: Product[],
-  ) {
+  private buildOnboardingProgress(entitlements: OrganizationEntitlement[], products: Product[]) {
     const steps = [
       {
         id: 'asset-packs',
@@ -512,9 +509,7 @@ export class CustomerSuccessService {
       features,
       utilizedCount,
       totalFeatures: registry.length,
-      utilizationRate: registry.length
-        ? Math.round((utilizedCount / registry.length) * 100)
-        : 0,
+      utilizationRate: registry.length ? Math.round((utilizedCount / registry.length) * 100) : 0,
     };
   }
 
@@ -595,7 +590,8 @@ export class CustomerSuccessService {
     );
     return {
       score,
-      status: score >= 80 ? 'ready' : score >= 60 ? 'preparing' : score >= 40 ? 'at-risk' : 'critical',
+      status:
+        score >= 80 ? 'ready' : score >= 60 ? 'preparing' : score >= 40 ? 'at-risk' : 'critical',
       factors,
     };
   }

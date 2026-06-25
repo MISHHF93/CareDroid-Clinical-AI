@@ -138,8 +138,8 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     canonicalRoute: CANONICAL_ROUTES.emergencyBoarding,
     zone: EMERGENCY_SURFACE_ZONE.CLINICAL,
     embedInReception: false,
-    sidebarNavId: 'boarding',
-    standaloneAllowed: true,
+    sidebarNavId: null,
+    standaloneAllowed: false,
     panelKey: null,
   }),
   Object.freeze({

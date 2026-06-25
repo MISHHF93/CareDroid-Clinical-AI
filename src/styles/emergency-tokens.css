@@ -1,0 +1,41 @@
+/**
+ * Emergency OS visual tokens — shared aliases for shell, copilot, and board surfaces.
+ * Maps product-specific vars to one spacing/type/surface vocabulary.
+ */
+
+:root {
+  --ed-space-1: var(--space-1, 4px);
+  --ed-space-2: var(--space-2, 8px);
+  --ed-space-3: var(--space-3, 12px);
+  --ed-space-4: var(--space-4, 16px);
+  --ed-space-5: var(--space-5, 20px);
+  --ed-space-6: var(--space-6, 24px);
+
+  --ed-radius-sm: var(--radius-sm, 6px);
+  --ed-radius-md: var(--radius-md, 10px);
+  --ed-radius-lg: var(--radius-lg, 14px);
+
+  --ed-surface-base: var(--color-background, var(--app-bg, #0a0e1a));
+  --ed-surface-raised: var(--color-surface, var(--color-elevated, #111827));
+  --ed-surface-overlay: var(--color-floating-surface, #1e293b);
+
+  --ed-text-primary: var(--color-text-primary, var(--app-fg, #f9fafb));
+  --ed-text-secondary: var(--color-text-secondary, #9ca3af);
+  --ed-text-meta: var(--color-text-muted, #64748b);
+
+  --ed-border-subtle: color-mix(in srgb, var(--color-border-default, #1f2937) 72%, transparent);
+  --ed-border-strong: color-mix(in srgb, var(--status-info, #60a5fa) 34%, var(--color-border-default, #1f2937));
+
+  --ed-type-page: var(--font-18, 18px);
+  --ed-type-section: var(--font-13, 13px);
+  --ed-type-body: var(--font-12, 12px);
+  --ed-type-meta: var(--font-10, 10px);
+
+  --ed-chrome-height: 36px;
+  --ed-header-height-target: 64px;
+
+  /* Aliases for existing product tokens */
+  --copilot-bg: var(--ed-surface-base);
+  --nai-text: var(--ed-text-primary);
+  --nai-border: var(--ed-border-subtle);
+}

@@ -340,7 +340,7 @@ export const FEATURE_REGISTRY: Feature[] = [
     defaultEnabled: true,
     dependencies: ['capacity_intelligence'],
     sidebarIcon: 'capacity',
-    sidebarRoute: '/emergency/boarding',
+    sidebarRoute: '/emergency/capacity?view=boarding',
     backendEndpoint: '/api/emergency/analytics',
   }),
   feature({

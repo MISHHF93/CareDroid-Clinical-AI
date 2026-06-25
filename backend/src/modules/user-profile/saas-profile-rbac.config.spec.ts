@@ -13,9 +13,7 @@ describe('saas-profile-rbac.config', () => {
     );
     expect(permissions).not.toContain(Permission.USE_AI_CHAT);
     expect(hasSaasProfilePermission('registration-clerk', Permission.READ_PHI)).toBe(true);
-    expect(hasSaasProfilePermission('registration-clerk', Permission.CONFIGURE_SYSTEM)).toBe(
-      false,
-    );
+    expect(hasSaasProfilePermission('registration-clerk', Permission.CONFIGURE_SYSTEM)).toBe(false);
   });
 
   it('maps reception desk pack policy for registration clerk', () => {

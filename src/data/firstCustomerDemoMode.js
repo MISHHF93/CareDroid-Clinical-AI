@@ -1,12 +1,15 @@
+import { PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS } from '../config/practitionerCleanup.constants';
+import { dedupePatientsByMrn } from '../utils/patientSeedUtils';
+
 export const FIRST_CUSTOMER_DEMO_MODE = Object.freeze({
   id: 'first-customer-demo-mode',
-  label: 'Live Customer Walkthrough',
-  tenantName: 'Metro General Emergency Department',
-  sourceLabel: 'Metro General ED walkthrough dataset',
+  label: 'ED-18 Practitioner Walkthrough',
+  tenantName: 'Emergency Department 18',
+  sourceLabel: 'ED-18 walkthrough dataset',
   patientVolumePerDay: 100,
 });
 
-const ACTIVE_DEMO_CENSUS = 42;
+const ACTIVE_DEMO_CENSUS = PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS;
 const DAILY_DISCHARGED_COUNT = FIRST_CUSTOMER_DEMO_MODE.patientVolumePerDay - ACTIVE_DEMO_CENSUS;
 
 const SIMPLE_FLAG_SEVERITY = Object.freeze({
@@ -78,12 +81,12 @@ const DEMO_NAMES = Object.freeze([
 ]);
 
 const STATE_PLAN = Object.freeze([
-  ...Array.from({ length: 16 }, () => 'Waiting'),
-  ...Array.from({ length: 5 }, () => 'Triage'),
-  ...Array.from({ length: 8 }, () => 'Assessment'),
-  ...Array.from({ length: 4 }, () => 'Orders'),
-  ...Array.from({ length: 3 }, () => 'Results'),
-  ...Array.from({ length: 6 }, () => 'Admission'),
+  ...Array.from({ length: 6 }, () => 'Waiting'),
+  ...Array.from({ length: 2 }, () => 'Triage'),
+  ...Array.from({ length: 3 }, () => 'Assessment'),
+  ...Array.from({ length: 2 }, () => 'Orders'),
+  ...Array.from({ length: 1 }, () => 'Results'),
+  ...Array.from({ length: 4 }, () => 'Admission'),
 ]);
 
 function isoMinutesFrom(now, offsetMinutes) {
@@ -123,11 +126,11 @@ function flagsFor(state, priority, globalIndex, stateIndex) {
   if (priority === 'P1' || priority === 'P2') flags.push('HighRisk');
   if (state === 'Waiting' && stateIndex < 6) flags.push('ReassessmentDue');
   if (state === 'Waiting' && stateIndex < 4) flags.push('DeteriorationRisk');
-  if (state === 'Waiting' && stateIndex >= 8) flags.push('LongWait');
+  if (state === 'Waiting' && stateIndex >= 4) flags.push('LongWait');
   if (state !== 'Waiting' && globalIndex % 5 === 0) flags.push('ReassessmentDue');
   if (state === 'Admission') flags.push('PendingAdmission');
-  if ([18, 23, 29, 34].includes(globalIndex)) flags.push('EMSArrival');
-  if (globalIndex === 7 || globalIndex === 35) flags.push('Isolation');
+  if ([4, 9, 14].includes(globalIndex)) flags.push('EMSArrival');
+  if (globalIndex === 7 || globalIndex === 15) flags.push('Isolation');
   return [...new Set(flags)];
 }
 
@@ -763,7 +766,7 @@ function buildCopilotContext(simplePatients, capacity, alerts, emsArrivals) {
       band: capacity.band,
       score: capacity.score,
     },
-    topRisks: highRiskPatients.slice(0, 5).map((patient) => ({
+    topRisks: highRiskPatients.slice(0, 3).map((patient) => ({
       patientId: patient.id,
       patientName: `${patient.firstName} ${patient.lastName}`,
       reason: `${patient.priority} ${patient.complaintCategory}`,
@@ -775,7 +778,7 @@ function buildCopilotContext(simplePatients, capacity, alerts, emsArrivals) {
 
 export function buildFirstCustomerDemoMode(nowInput = new Date()) {
   const now = new Date(nowInput);
-  const activeModels = buildActivePatientModels(now);
+  const activeModels = dedupePatientsByMrn(buildActivePatientModels(now));
   const dischargedModels = buildDischargedPatientModels(now);
   const simplePatients = activeModels.map(buildSimplePatient);
   const rootPatients = [...activeModels, ...dischargedModels].map(buildRootPatient);

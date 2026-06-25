@@ -73,25 +73,25 @@ describe('ED scenario fixtures', () => {
     const rootState = buildRootEmergencyScenarioState(FIRST_CUSTOMER_DEMO_MODE.id);
 
     expect(fixture.patientVolumePerDay).toBe(100);
-    expect(fixture.patients).toHaveLength(42);
-    expect(fixture.patients.filter((patient) => patient.state === 'Waiting').length).toBeGreaterThanOrEqual(12);
+    expect(fixture.patients).toHaveLength(18);
+    expect(fixture.patients.filter((patient) => patient.state === 'Waiting').length).toBeGreaterThanOrEqual(4);
     expect(
       fixture.patients.filter(
         (patient) =>
           patient.state === 'Waiting' &&
           (patient.priority === 'P1' || patient.priority === 'P2' || patient.flags.includes('HighRisk'))
       ).length
-    ).toBeGreaterThanOrEqual(5);
-    expect(fixture.reassessment.patients.length).toBeGreaterThanOrEqual(8);
-    expect(fixture.boarding.patients.length).toBeGreaterThanOrEqual(6);
-    expect(fixture.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length).toBeGreaterThanOrEqual(4);
+    ).toBeGreaterThanOrEqual(2);
+    expect(fixture.reassessment.patients.length).toBeGreaterThanOrEqual(3);
+    expect(fixture.boarding.patients.length).toBeGreaterThanOrEqual(3);
+    expect(fixture.emsArrivals.filter((arrival) => arrival.status === 'Inbound').length).toBeGreaterThanOrEqual(2);
     expect(fixture.capacity.band).toMatch(/Orange|Red/);
 
-    expect(whiteboard.data.patients).toHaveLength(42);
+    expect(whiteboard.data.patients).toHaveLength(18);
     expect(queues.data.queues.some((queue) => queue.label === 'High-risk waiting patients')).toBe(true);
     expect(copilot.data.promptContext).toEqual(
       expect.objectContaining({
-        patientCount: 42,
+        patientCount: 18,
         emsInboundCount: expect.any(Number),
         safetyBoundary: expect.stringMatching(/Walkthrough data only/i),
       })

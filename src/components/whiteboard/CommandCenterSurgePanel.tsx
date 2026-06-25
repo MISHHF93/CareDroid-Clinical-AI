@@ -21,7 +21,7 @@ export default function CommandCenterSurgePanel({
       ]
         .filter(Boolean)
         .join(' ')}
-      aria-label="Command center surge status"
+      aria-label="Department surge status"
       role="status"
     >
       <header>

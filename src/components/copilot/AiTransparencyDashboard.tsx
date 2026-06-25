@@ -4,7 +4,7 @@ import {
   buildAiTransparencyDashboardSnapshot,
   normalizeAiTransparencySnapshot,
 } from '../../services/aiTransparencyModel';
-import { COPILOT_RISK_LAYERS } from '../../../lib/native-ai';
+import { COPILOT_RISK_LAYERS } from '@lib/native-ai';
 import '../native-ai/native-ai-dashboard-theme.css';
 import './AiTransparencyDashboard.css';
 
@@ -28,6 +28,9 @@ export default function AiTransparencyDashboard({
   const routingTraces = snapshot.routingTraces;
   const records = snapshot.records;
 
+  const visibleTraces = compact ? routingTraces.slice(0, 1) : routingTraces;
+  const visibleRecords = compact ? records.slice(0, 1) : records;
+
   return (
     <section
       className={[
@@ -37,66 +40,70 @@ export default function AiTransparencyDashboard({
       ]
         .filter(Boolean)
         .join(' ')}
-      aria-label="AI transparency dashboard"
+      aria-label="AI transparency"
     >
-      <header className="ai-transparency-dashboard__header">
-        <p className="ai-transparency-dashboard__eyebrow">Native AI transparency</p>
-        <h2>{compact ? 'AI transparency' : 'AI Transparency Dashboard'}</h2>
-        {!compact ? (
+      {!compact ? (
+        <header className="ai-transparency-dashboard__header">
+          <p className="ai-transparency-dashboard__eyebrow">Native AI</p>
+          <h2>Transparency</h2>
           <p className="ai-transparency-dashboard__subtitle">
-            Provenance, routing, confidence, and key predictors for CareDroid native AI recommendations.
+            Routing, confidence, and model provenance for native AI outputs.
           </p>
-        ) : null}
-      </header>
+        </header>
+      ) : null}
 
-      <div className="ai-transparency-dashboard__routing" aria-label="Router dispatch decisions">
-        <h3>Router dispatch</h3>
-        {!routingTraces.length ? (
+      <div className="ai-transparency-dashboard__routing" aria-label="Routing">
+        {!compact ? <h3>Routing</h3> : null}
+        {!visibleTraces.length ? (
           <p className="ai-transparency-dashboard__empty">
-            No routing traces yet. Select patients on the board to populate native AI provenance.
+            {compact ? 'No routing data for this patient yet.' : 'No routing traces yet.'}
           </p>
         ) : null}
         <ul>
-          {routingTraces.map((trace) => (
+          {visibleTraces.map((trace) => (
             <li key={trace.runId}>
               <strong>{trace.chiefComplaint}</strong>
               <span>
-                Routed to {(trace.specialistDomains ?? []).join(', ') || 'general'} ·{' '}
-                {Math.round((trace.confidence ?? 0) * 100)}% · {trace.sourceState}
+                {(trace.specialistDomains ?? []).join(', ') || 'General'} ·{' '}
+                {Math.round((trace.confidence ?? 0) * 100)}%
               </span>
-              <small>{(trace.keySignals ?? []).join(' · ') || 'No routing signals recorded'}</small>
+              {!compact ? (
+                <small>{(trace.keySignals ?? []).join(' · ') || 'No signals recorded'}</small>
+              ) : null}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="ai-transparency-dashboard__records" role="list">
-        {!records.length ? (
-          <p className="ai-transparency-dashboard__empty">
-            No transparency records for the current patient set. Native AI scores appear after board patients load.
-          </p>
-        ) : null}
-        {records.map((record) => (
-          <article key={record.id} className="ai-transparency-dashboard__record" role="listitem">
-            <div className="ai-transparency-dashboard__record-head">
-              <strong>{record.capabilityLabel}</strong>
-              <span className={`ai-transparency-dashboard__state ai-transparency-dashboard__state--${record.sourceState}`}>
-                {record.sourceState}
-              </span>
-            </div>
-            <p>
-              Layer {LAYER_LABELS[record.layer] || record.layer} · Confidence {Math.round(record.confidence * 100)}% ·{' '}
-              {record.modelId} v{record.modelVersion}
-            </p>
-            <ul>
-              {(record.keyPredictors ?? []).map((predictor) => (
-                <li key={predictor}>{predictor}</li>
-              ))}
-            </ul>
-            <small>{record.disclaimer}</small>
-          </article>
-        ))}
-      </div>
+      {!compact ? (
+        <div className="ai-transparency-dashboard__records" role="list">
+          {!visibleRecords.length ? (
+            <p className="ai-transparency-dashboard__empty">No transparency records yet.</p>
+          ) : null}
+          {visibleRecords.map((record) => (
+            <article key={record.id} className="ai-transparency-dashboard__record" role="listitem">
+              <div className="ai-transparency-dashboard__record-head">
+                <strong>{record.capabilityLabel}</strong>
+                <span
+                  className={`ai-transparency-dashboard__state ai-transparency-dashboard__state--${record.sourceState}`}
+                >
+                  {record.sourceState}
+                </span>
+              </div>
+              <p>
+                {LAYER_LABELS[record.layer] || record.layer} · {Math.round(record.confidence * 100)}% ·{' '}
+                {record.modelId}
+              </p>
+              <ul>
+                {(record.keyPredictors ?? []).slice(0, 3).map((predictor) => (
+                  <li key={predictor}>{predictor}</li>
+                ))}
+              </ul>
+              <small>{record.disclaimer}</small>
+            </article>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

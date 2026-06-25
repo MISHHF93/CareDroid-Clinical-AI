@@ -39,7 +39,8 @@ export class PatientDocumentArtifactService {
     const bucket = this.ensureStore(patientId);
     const pendingReviewCount = bucket.artifacts.filter(
       (artifact) =>
-        artifact.reviewStatus === 'pending_human_review' || artifact.reviewStatus === 'needs_clarification',
+        artifact.reviewStatus === 'pending_human_review' ||
+        artifact.reviewStatus === 'needs_clarification',
     ).length;
 
     return {
@@ -128,7 +129,8 @@ export class PatientDocumentArtifactService {
         safety: {
           ...artifact.safety,
           requiresHumanReview:
-            input.reviewStatus === 'pending_human_review' || input.reviewStatus === 'needs_clarification',
+            input.reviewStatus === 'pending_human_review' ||
+            input.reviewStatus === 'needs_clarification',
         },
       };
     });
@@ -155,7 +157,9 @@ export class PatientDocumentArtifactService {
     );
   }
 
-  private extractArtifactsFromText(input: ExtractDocumentArtifactsInput): PatientDocumentArtifact[] {
+  private extractArtifactsFromText(
+    input: ExtractDocumentArtifactsInput,
+  ): PatientDocumentArtifact[] {
     const rawText = String(input.rawText || '').trim();
     if (!rawText) return [];
 
@@ -164,7 +168,10 @@ export class PatientDocumentArtifactService {
     const artifacts: PatientDocumentArtifact[] = [];
 
     const push = (
-      artifact: Omit<PatientDocumentArtifact, 'id' | 'createdAt' | 'updatedAt' | 'patientCardId'> & {
+      artifact: Omit<
+        PatientDocumentArtifact,
+        'id' | 'createdAt' | 'updatedAt' | 'patientCardId'
+      > & {
         patientCardId?: string;
       },
     ) => {
@@ -185,7 +192,11 @@ export class PatientDocumentArtifactService {
       clinicalStatus: 'confirmed',
       reviewStatus: 'accepted',
       label: input.documentType,
-      value: { documentType: input.documentType, sourceType: input.sourceType, filename: input.filename },
+      value: {
+        documentType: input.documentType,
+        sourceType: input.sourceType,
+        filename: input.filename,
+      },
       confidence: 1,
       provenance: {
         sourceType: input.sourceType,
@@ -209,7 +220,11 @@ export class PatientDocumentArtifactService {
       return undefined;
     };
 
-    const chiefComplaint = labeled(['chief complaint', 'presenting complaint', 'reason for referral']);
+    const chiefComplaint = labeled([
+      'chief complaint',
+      'presenting complaint',
+      'reason for referral',
+    ]);
     if (chiefComplaint) {
       push({
         patientId: input.patientId,

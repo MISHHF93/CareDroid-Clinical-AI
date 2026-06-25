@@ -43,11 +43,11 @@ describe('copilotRecommendationModel', () => {
     });
 
     expect(recommendations[0]?.domain).toBe(COPILOT_RECOMMENDATION_DOMAIN.QUEUE);
+    expect(recommendations.length).toBeLessThanOrEqual(3);
     expect(recommendations.map((rec) => rec.domain)).toEqual([
       COPILOT_RECOMMENDATION_DOMAIN.QUEUE,
       COPILOT_RECOMMENDATION_DOMAIN.CAPACITY,
       COPILOT_RECOMMENDATION_DOMAIN.BOARDING,
-      COPILOT_RECOMMENDATION_DOMAIN.REASSESSMENT,
     ]);
   });
 

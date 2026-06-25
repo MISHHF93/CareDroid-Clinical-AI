@@ -1,0 +1,67 @@
+.operational-alert-rail {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.operational-alert-rail__strip.operational-strip--compact {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  grid-template-columns: none;
+}
+
+.operational-alert-rail__strip .operational-strip__metric {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  min-height: auto;
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid rgba(31, 41, 55, 0.9);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #cbd5e1;
+  flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.operational-alert-rail__strip .operational-strip__metric strong {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.operational-alert-rail__strip .operational-strip__metric span:empty {
+  display: none;
+}
+
+.operational-alert-rail__strip .operational-strip__metric[data-tone='success'] {
+  border-color: rgba(16, 185, 129, 0.34);
+  color: #a7f3d0;
+}
+
+.operational-alert-rail__strip .operational-strip__metric[data-tone='warning'] {
+  border-color: rgba(245, 158, 11, 0.38);
+  color: #fde68a;
+}
+
+.operational-alert-rail__strip .operational-strip__metric[data-tone='critical'] {
+  border-color: rgba(239, 68, 68, 0.42);
+  color: #fca5a5;
+}
+
+.operational-alert-rail--sync-pulse
+  .operational-strip__metric[data-metric-id='sync-status'] {
+  animation: emergency-os-sync-pulse 1.2s ease-out;
+}

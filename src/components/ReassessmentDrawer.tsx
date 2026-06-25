@@ -142,7 +142,7 @@ export function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 export function filterFlaggedReassessmentPatients(patients: Patient[]): Patient[] {
-  return collectReassessmentAttentionPatients(patients);
+  return patients.filter(isPatientFlaggedForReassessment);
 }
 
 export function getMostSevereReassessmentFlag(patient: Patient): ReassessmentAttentionFlag | null {
@@ -168,25 +168,44 @@ export function getPatientDisplayName(patient: Patient): string {
   return patient.name || `${patient.firstName} ${patient.lastName}`.trim();
 }
 
+function compareReassessmentPatients(
+  a: Patient,
+  b: Patient,
+  sortMode: ReassessmentSortMode,
+  now: number,
+): number {
+  const aFlag = getMostSevereReassessmentFlag(a);
+  const bFlag = getMostSevereReassessmentFlag(b);
+  const severityDelta =
+    REASSESSMENT_ATTENTION_FLAGS.indexOf(aFlag as ReassessmentAttentionFlag) -
+    REASSESSMENT_ATTENTION_FLAGS.indexOf(bFlag as ReassessmentAttentionFlag);
+  const waitDelta = getWaitMinutes(b, now) - getWaitMinutes(a, now);
+
+  if (sortMode === 'wait') {
+    return waitDelta || severityDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
+  }
+
+  return severityDelta || waitDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
+}
+
+export function sortReassessmentAttentionPatients(
+  patients: Patient[],
+  sortMode: ReassessmentSortMode = 'severity',
+  now = Date.now(),
+): Patient[] {
+  return [...patients].sort((a, b) => compareReassessmentPatients(a, b, sortMode, now));
+}
+
 export function sortFlaggedReassessmentPatients(
   patients: Patient[],
   sortMode: ReassessmentSortMode = 'severity',
   now = Date.now(),
 ): Patient[] {
-  return filterFlaggedReassessmentPatients(patients).sort((a, b) => {
-    const aFlag = getMostSevereReassessmentFlag(a);
-    const bFlag = getMostSevereReassessmentFlag(b);
-    const severityDelta =
-      REASSESSMENT_ATTENTION_FLAGS.indexOf(aFlag as ReassessmentAttentionFlag) -
-      REASSESSMENT_ATTENTION_FLAGS.indexOf(bFlag as ReassessmentAttentionFlag);
-    const waitDelta = getWaitMinutes(b, now) - getWaitMinutes(a, now);
-
-    if (sortMode === 'wait') {
-      return waitDelta || severityDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
-    }
-
-    return severityDelta || waitDelta || getPatientDisplayName(a).localeCompare(getPatientDisplayName(b));
-  });
+  return sortReassessmentAttentionPatients(
+    filterFlaggedReassessmentPatients(patients),
+    sortMode,
+    now,
+  );
 }
 
 export function getFlagTimestampInfo(
@@ -278,7 +297,10 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const [sortMode, setSortMode] = useState<ReassessmentSortMode>('severity');
 
-  const sortedPatients = useMemo(() => sortFlaggedReassessmentPatients(patients, sortMode), [patients, sortMode]);
+  const sortedPatients = useMemo(
+    () => sortReassessmentAttentionPatients(collectReassessmentAttentionPatients(patients), sortMode),
+    [patients, sortMode],
+  );
   const attentionCount = count ?? sortedPatients.length;
 
   useEffect(() => {

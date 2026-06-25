@@ -6,8 +6,7 @@ import QuickIntake from '../../components/QuickIntake';
 import ArrivalDashboard from '../../components/reception/ArrivalDashboard';
 import ReceptionOperationalStrip from '../../components/reception/ReceptionOperationalStrip';
 import TriageOperationalStrip from '../../components/triage/TriageOperationalStrip';
-import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
-import WaitingRoomSafetyEscalationStrip from '../../components/waiting-room/WaitingRoomSafetyEscalationStrip';
+import ReceptionAlertRail from '../../components/reception/ReceptionAlertRail';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
 import IntakeArtifactPicker from '../../components/reception/IntakeArtifactPicker';
 import DuplicatePatientBanner from '../../components/reception/DuplicatePatientBanner';
@@ -40,10 +39,7 @@ import { registerEmsPreArrivalPlaceholder } from '../../services/preArrivalWorkf
 import { useIntegrationPreArrivalSync } from '../../hooks/useIntegrationPreArrivalSync';
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import ReceptionEscalationPanel from '../../components/reception/ReceptionEscalationPanel';
-import ReceptionEscalationStrip from '../../components/reception/ReceptionEscalationStrip';
 import ReceptionEscalationQuickActions from '../../components/reception/ReceptionEscalationQuickActions';
-import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
-import HighRiskComplaintAttentionStrip from '../../components/waiting-room/HighRiskComplaintAttentionStrip';
 import ReceptionThroughputAttentionCluster from '../../components/reception/ReceptionThroughputAttentionCluster';
 import OperationalPresentationFrame from '../../components/emergency/OperationalPresentationFrame';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
@@ -68,6 +64,7 @@ import {
 } from '../../config/emergencyPipelineModel';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
 import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
 import TriageRuleBuilder from '../../components/reception/TriageRuleBuilder';
@@ -75,9 +72,18 @@ import VoiceInterviewKiosk from '../../components/reception/VoiceInterviewKiosk'
 import useFeature from '../../hooks/useFeature';
 import { logNativeAiDashboardAudit } from '../../services/nativeAiAudit';
 import { buildClientTriageAssist } from '../../services/triageAssist';
+import {
+  applyPatientRouteIntent,
+  clearPatientRouteParam,
+  PATIENT_ROUTE_PARAM_KEYS,
+  readPatientRouteContext,
+} from '../../utils/receptionQueryParams';
+import { buildPostHandoffNavigationPaths } from '../../services/receptionHandoff';
 import './ReceptionWorkspace.css';
+import './emergency-route.css';
 
 export default function ReceptionWorkspace() {
+  const surfaces = getPractitionerSurfaceVisibility();
   const { profileNavigate } = useProfileNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
@@ -109,9 +115,12 @@ export default function ReceptionWorkspace() {
   const { enabled: voiceInterviewEnabled } = useFeature('voice_interview_assistant');
 
   const query = searchParams.get('q') || '';
-  const arrivedPatientId = searchParams.get('arrived') || '';
-  const contextPatientId = searchParams.get('patientId') || '';
-  const queuePatientId = searchParams.get('patient') || '';
+  const {
+    arrivedPatientId,
+    contextPatientId,
+    queuePatientId,
+    focusPatientId: routeFocusPatientId,
+  } = readPatientRouteContext(searchParams);
   const queueParam = searchParams.get('queue') || '';
   const activeQueueTab = ['ems', 'verification', 'pretriage'].includes(queueParam) ? queueParam : 'ems';
   const [expandedPretriagePatientId, setExpandedPretriagePatientId] = useState(queuePatientId);
@@ -298,26 +307,27 @@ export default function ReceptionWorkspace() {
     selectPatient(patientId);
   };
 
-  const focusedPatientId =
-    expandedPretriagePatientId || contextPatientId || queuePatientId || arrivedPatientId || null;
+  const focusedPatientId = expandedPretriagePatientId || routeFocusPatientId || null;
 
   const showPatientAnswersDesk = reception.showWidget('patient-answers') && !triage.isTriageScreen;
 
   useEffect(() => {
     if (!contextPatientId) return;
     handlePatientSelect(contextPatientId);
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.delete('patientId');
-    setSearchParams(nextParams, { replace: true });
+    setSearchParams(
+      clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.context),
+      { replace: true },
+    );
   }, [contextPatientId]);
 
   useEffect(() => {
     if (!arrivedPatientId) return undefined;
     const timer = window.setTimeout(() => {
-      const nextParams = new URLSearchParams(searchParams);
-      if (nextParams.get('arrived') !== arrivedPatientId) return;
-      nextParams.delete('arrived');
-      setSearchParams(nextParams, { replace: true });
+      if (searchParams.get(PATIENT_ROUTE_PARAM_KEYS.handoff) !== arrivedPatientId) return;
+      setSearchParams(
+        clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.handoff),
+        { replace: true },
+      );
     }, 2500);
     return () => window.clearTimeout(timer);
   }, [arrivedPatientId, searchParams, setSearchParams]);
@@ -394,10 +404,10 @@ export default function ReceptionWorkspace() {
           transcriptPreview: transcript.slice(0, 160),
         },
       });
-      const nextParams = new URLSearchParams(searchParams);
-      nextParams.set('queue', 'pretriage');
-      nextParams.set('patient', enrichedPatient.id);
-      setSearchParams(nextParams, { replace: true });
+      setSearchParams(
+        applyPatientRouteIntent(searchParams, enrichedPatient.id, 'queue'),
+        { replace: true },
+      );
       setExpandedPretriagePatientId(enrichedPatient.id);
       selectPatient(enrichedPatient.id);
     },
@@ -482,18 +492,33 @@ export default function ReceptionWorkspace() {
     <OperationalPresentationFrame
       screenMode={triage.isTriageScreen ? triage.screenMode : reception.screenMode}
       as="section"
-      className={`reception-workspace${deskUi.slim ? ' reception-workspace--desk-slim' : ''}${reception.isReceptionScreen ? ' reception-workspace--screen-mode' : ''}`}
+      className={[
+        'reception-workspace',
+        deskUi.slim ? 'reception-workspace--desk-slim' : '',
+        reception.isReceptionScreen ? 'reception-workspace--screen-mode' : '',
+        surfaces.compactLayout ? 'reception-workspace--practitioner-compact' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       aria-labelledby="reception-workspace-title"
       data-reception-focus={reception.defaultFocus}
     >
-      <header className="reception-workspace__intro">
-        <h1 id="reception-workspace-title">{RECEPTION_COPY.workspace.title}</h1>
-        <p className="reception-workspace__description">
-          {deskUi.slim
-            ? RECEPTION_COPY.workspace.deskDescription
-            : RECEPTION_COPY.workspace.description}
-        </p>
+      <header className="reception-workspace__intro emergency-route-page__hero">
+        <div className="reception-workspace__intro-copy">
+          <span className="emergency-route-page__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</span>
+          <h1 className="emergency-route-page__title" id="reception-workspace-title">
+            {RECEPTION_COPY.workspace.title}
+          </h1>
+          {surfaces.reception.showIntroDescription ? (
+            <p className="emergency-route-page__description">
+              {deskUi.slim
+                ? RECEPTION_COPY.workspace.deskDescription
+                : RECEPTION_COPY.workspace.description}
+            </p>
+          ) : null}
+        </div>
         <EdDataSourceBanner
+          compact={surfaces.compactLayout}
           className="reception-workspace__data-source"
           envelope={receptionSnapshot}
           loading={receptionLoading}
@@ -514,33 +539,25 @@ export default function ReceptionWorkspace() {
               resolveTriageStripMetricIds(CARE_DROID_SCREEN_MODES.triage)
             }
           />
-          {triage.showTriageBreach ? (
-            <TriageBreachStrip
+          {surfaces.reception.showAlertRail ? (
+            <ReceptionAlertRail
               patients={patients}
-              settings={emergencySettings}
-              onSelectPatient={handlePatientSelect}
-              className="reception-workspace__triage-breach"
-            />
-          ) : null}
-          {triage.showWaitingRoomSafetyEscalation ? (
-            <WaitingRoomSafetyEscalationStrip
-              patients={patients}
-              workflowLogs={workflowLogs}
-              staff={staff}
               alerts={alerts}
-              communicationOverdueMinutes={
-                Number(emergencySettings?.thresholds?.communicationOverdueMinutes ?? 30) || 30
-              }
+              referrals={referrals}
+              staff={staff}
+              workflowLogs={workflowLogs}
+              emsArrivals={emsArrivals}
+              rooms={store.rooms}
+              settings={emergencySettings}
+              roleId={emergencyRole.role}
+              features={{
+                showTriageBreach: triage.showTriageBreach,
+                showSafetyEscalation: triage.showWaitingRoomSafetyEscalation,
+              }}
               onSelectPatient={handlePatientSelect}
-              className="reception-workspace__safety-escalation"
+              className="reception-workspace__alert-rail"
             />
           ) : null}
-          <ReceptionEscalationAttentionStrip
-            alerts={alerts}
-            roleId={emergencyRole.role}
-            onSelectPatient={handlePatientSelect}
-            className="reception-workspace__escalation-attention"
-          />
         </>
       ) : reception.showWidget('operational-strip') ? (
       <ReceptionOperationalStrip
@@ -577,7 +594,8 @@ export default function ReceptionWorkspace() {
         />
       ) : null}
 
-      {reception.showWidget('process-education') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
+      {surfaces.reception.showProcessEducation &&
+      reception.showWidget('process-education') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
         <WaitingRoomProcessEducation
           audience="staff"
           variant="compact"
@@ -585,7 +603,8 @@ export default function ReceptionWorkspace() {
         />
       ) : null}
 
-      {reception.showWidget('operational-strip') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
+      {surfaces.reception.showStatusMessagingStrip &&
+      reception.showWidget('operational-strip') && !showPatientAnswersDesk && !triage.isTriageScreen ? (
         <WaitingRoomStatusMessagingStrip
           patients={patients}
           referrals={referrals}
@@ -595,7 +614,8 @@ export default function ReceptionWorkspace() {
         />
       ) : null}
 
-      {reception.showWidget('communication-status') || triage.showWidget('communication-status') ? (
+      {surfaces.reception.showCommunicationPanel &&
+      (reception.showWidget('communication-status') || triage.showWidget('communication-status')) ? (
         <PatientCommunicationStatusPanel
           patients={patients}
           workflowLogs={workflowLogs}
@@ -644,34 +664,24 @@ export default function ReceptionWorkspace() {
             }}
             className="reception-workspace__escalation-quick-actions"
           />
-          <ReceptionEscalationStrip alerts={alerts} className="reception-workspace__escalation-strip" />
         </>
       ) : null}
 
-      {reception.showWidget('operational-strip') && !triage.isTriageScreen ? (
-        <>
-          <HighRiskComplaintAttentionStrip
-            patients={patients}
-            onSelectPatient={handlePatientSelect}
-            className="reception-workspace__high-risk-complaint-strip"
-          />
-          {(reception.showWidget('triage-breach') || reception.showWidget('operational-strip')) ? (
-          <ReceptionThroughputAttentionCluster
-            patients={patients}
-            emsArrivals={emsArrivals}
-            referrals={referrals}
-            staff={staff}
-            rooms={store.rooms}
-            workflowLogs={workflowLogs}
-            emergencySettings={emergencySettings}
-            alerts={alerts}
-            showSafetyEscalation={reception.showWidget('waiting-room-safety-escalation')}
-            onSelectPatient={handlePatientSelect}
-            onSelectEmsArrival={(arrival) => handleConvertEmsArrival(arrival)}
-            className="reception-workspace__throughput-cluster"
-          />
-          ) : null}
-        </>
+      {surfaces.reception.showThroughputCluster &&
+      reception.showWidget('operational-strip') && !triage.isTriageScreen ? (
+        <ReceptionThroughputAttentionCluster
+          patients={patients}
+          emsArrivals={emsArrivals}
+          referrals={referrals}
+          staff={staff}
+          rooms={store.rooms}
+          workflowLogs={workflowLogs}
+          emergencySettings={emergencySettings}
+          alerts={alerts}
+          showSafetyEscalation={reception.showWidget('waiting-room-safety-escalation')}
+          onSelectPatient={handlePatientSelect}
+          className="reception-workspace__throughput-cluster"
+        />
       ) : null}
 
       {duplicateCandidates.length ? (
@@ -847,8 +857,8 @@ export default function ReceptionWorkspace() {
           nextParams.set('tab', 'ems');
           setSearchParams(nextParams, { replace: true });
         }}
-        dataQualitySnapshot={dataQualitySnapshot}
-        queueAuditSnapshot={queueAuditSnapshot}
+        dataQualitySnapshot={surfaces.reception.showDataQualityAudits ? dataQualitySnapshot : null}
+        queueAuditSnapshot={surfaces.reception.showDataQualityAudits ? queueAuditSnapshot : null}
         onVerifyPatient={(patientId) => openSmartIntake('verify', patientId)}
         onCaptureComplaint={(patientId) => {
           selectPatient(patientId);
@@ -860,7 +870,8 @@ export default function ReceptionWorkspace() {
       </ReceptionPipelineShell>
       ) : null}
 
-      {deskUi.show(RECEPTION_DESK_UI.surfaces.operationalHistory) ? (
+      {deskUi.show(RECEPTION_DESK_UI.surfaces.operationalHistory) &&
+      surfaces.reception.showOperationalHistory ? (
       <OperationalHistoryPanel
         logs={workflowLogs}
         title="Reception operational history"
@@ -889,11 +900,28 @@ export default function ReceptionWorkspace() {
             <button
               type="button"
               onClick={() => {
-                const nextParams = new URLSearchParams(searchParams);
-                nextParams.set('queue', 'pretriage');
-                nextParams.set('patient', arrivedPatient.id);
-                nextParams.delete('arrived');
-                setSearchParams(nextParams, { replace: true });
+                selectPatient(arrivedPatient.id);
+              }}
+            >
+              {RECEPTION_COPY.workspace.openPatientCard}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                profileNavigate(
+                  buildPostHandoffNavigationPaths(arrivedPatient.id).whiteboardPath,
+                );
+              }}
+            >
+              {RECEPTION_COPY.workspace.viewWhiteboard}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchParams(
+                  applyPatientRouteIntent(searchParams, arrivedPatient.id, 'queue'),
+                  { replace: true },
+                );
                 setExpandedPretriagePatientId(arrivedPatient.id);
               }}
             >
@@ -902,9 +930,10 @@ export default function ReceptionWorkspace() {
             <button
               type="button"
               onClick={() => {
-                const nextParams = new URLSearchParams(searchParams);
-                nextParams.delete('arrived');
-                setSearchParams(nextParams, { replace: true });
+                setSearchParams(
+                  clearPatientRouteParam(searchParams, PATIENT_ROUTE_PARAM_KEYS.handoff),
+                  { replace: true },
+                );
                 if (isRegistrationClerkRole(emergencyRole.role)) {
                   openQuickIntake();
                   return;

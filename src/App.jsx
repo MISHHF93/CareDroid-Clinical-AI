@@ -26,6 +26,7 @@ import { TenantContextProvider } from './contexts/TenantContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import { SimulationModeProvider } from './contexts/SimulationModeContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import PilotExtensionRouteGuard from './components/PilotExtensionRouteGuard';
 import { AppShell } from './components/AppShell';
 const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader, exportName) =>
@@ -702,7 +703,9 @@ function RootLayout() {
   return (
     <AppShell>
       <ProfileRouteGuard>
-        <Outlet />
+        <PilotExtensionRouteGuard>
+          <Outlet />
+        </PilotExtensionRouteGuard>
       </ProfileRouteGuard>
     </AppShell>
   );

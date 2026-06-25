@@ -20,19 +20,19 @@ export type IdArtifactDemographics = {
 };
 
 const BLOOD_TYPE_PATTERN =
-  /\b(?:blood\s*(?:type|group)|grp\.?)\s*[:\-]?\s*(A|B|AB|O)\s*([+-]|positive|negative|pos|neg)?\b/i;
+  /\b(?:blood\s*(?:type|group)|grp\.?)\s*[-:]?\s*(A|B|AB|O)\s*([+-]|positive|negative|pos|neg)?\b/i;
 
 const DOB_PATTERNS = [
-  /\b(?:dob|date\s*of\s*birth|birth\s*date|born)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})\b/i,
-  /\b(?:dob|date\s*of\s*birth|birth\s*date|born)\s*[:\-]?\s*([0-9]{1,2}[\/\-.][0-9]{1,2}[\/\-.][0-9]{2,4})\b/i,
+  /\b(?:dob|date\s*of\s*birth|birth\s*date|born)\s*[-:]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})\b/i,
+  /\b(?:dob|date\s*of\s*birth|birth\s*date|born)\s*[-:]?\s*([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{2,4})\b/i,
   /\b([0-9]{4}-[0-9]{2}-[0-9]{2})\b/,
-  /\b([0-9]{1,2}[\/\-.][0-9]{1,2}[\/\-.][0-9]{4})\b/,
+  /\b([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})\b/,
 ];
 
 const NAME_PATTERNS = [
-  /\b(?:first\s*name|given\s*name|prénom)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
-  /\b(?:last\s*name|surname|family\s*name|nom)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
-  /\bname\s*[:\-]\s*([A-Za-z][A-Za-z' -]{1,40})\s+([A-Za-z][A-Za-z' -]{1,40})\b/i,
+  /\b(?:first\s*name|given\s*name|prénom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+  /\b(?:last\s*name|surname|family\s*name|nom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i,
+  /\bname\s*[-:]\s*([A-Za-z][A-Za-z' -]{1,40})\s+([A-Za-z][A-Za-z' -]{1,40})\b/i,
   /\b([A-Za-z][A-Za-z' -]{1,40}),\s*([A-Za-z][A-Za-z' -]{1,40})\b/,
 ];
 
@@ -55,7 +55,7 @@ export function normalizeDateOfBirth(raw: string | undefined): string | undefine
 
   if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value)) return value;
 
-  const slashMatch = value.match(/^([0-9]{1,2})[\/\-.]([0-9]{1,2})[\/\-.]([0-9]{2,4})$/);
+  const slashMatch = value.match(/^([0-9]{1,2})[/.-]([0-9]{1,2})[/.-]([0-9]{2,4})$/);
   if (!slashMatch) return value;
 
   let [, month, day, year] = slashMatch;
@@ -85,7 +85,7 @@ function parseBloodType(text: string): string | undefined {
 }
 
 function parseSex(text: string): string | undefined {
-  const labeled = text.match(/\b(?:sex|gender)\s*[:\-]\s*(male|female|m|f|other|x)\b/i);
+  const labeled = text.match(/\b(?:sex|gender)\s*[-:]\s*(male|female|m|f|other|x)\b/i);
   if (labeled) {
     const token = labeled[1].toLowerCase();
     if (token === 'm' || token === 'male') return 'Male';
@@ -98,8 +98,8 @@ function parseSex(text: string): string | undefined {
 function parseNames(text: string): Pick<IdArtifactDemographics, 'firstName' | 'lastName'> {
   const result: Pick<IdArtifactDemographics, 'firstName' | 'lastName'> = {};
 
-  const first = text.match(/\b(?:first\s*name|given\s*name|prénom)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
-  const last = text.match(/\b(?:last\s*name|surname|family\s*name|nom)\s*[:\-]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
+  const first = text.match(/\b(?:first\s*name|given\s*name|prénom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
+  const last = text.match(/\b(?:last\s*name|surname|family\s*name|nom)\s*[-:]\s*([A-Za-z][A-Za-z' -]{0,40})\b/i);
   if (first) result.firstName = titleCaseName(first[1].trim());
   if (last) result.lastName = titleCaseName(last[1].trim());
   if (result.firstName && result.lastName) return result;
@@ -120,11 +120,11 @@ function parseNames(text: string): Pick<IdArtifactDemographics, 'firstName' | 'l
 
 function parseIdentifiers(text: string): Pick<IdArtifactDemographics, 'healthCardNumber' | 'mrn' | 'documentNumber'> {
   const healthCard = text.match(
-    /\b(?:health\s*card|hcn|ohip|ramq|phn|health\s*#)\s*[:\-#]?\s*([A-Z0-9][A-Z0-9\- ]{4,})\b/i,
+    /\b(?:health\s*card|hcn|ohip|ramq|phn|health\s*#)\s*[-#:]?\s*([A-Z0-9][-A-Z0-9 ]{4,})\b/i,
   );
-  const mrn = text.match(/\b(?:mrn|medical\s*record)\s*[:\-#]?\s*([A-Z0-9\-]{4,})\b/i);
+  const mrn = text.match(/\b(?:mrn|medical\s*record)\s*[-#:]?\s*([-A-Z0-9]{4,})\b/i);
   const documentNumber = text.match(
-    /\b(?:licen[cs]e|document|id|passport)\s*(?:no\.?|number|#)?\s*[:\-#]?\s*([A-Z0-9\-]{4,})\b/i,
+    /\b(?:licen[cs]e|document|id|passport)\s*(?:no\.?|number|#)?\s*[-#:]?\s*([-A-Z0-9]{4,})\b/i,
   );
 
   return {
@@ -145,7 +145,7 @@ export function inferTextHintsFromFilename(filename: string): string {
   const blood =
     base.match(/\b(AB|A|B|O)([+-])\b/i) || base.match(/(?:^|\s)(AB|A|B|O)([+-])$/i);
   const isoDob = base.match(/\b([0-9]{4}-[0-9]{2}-[0-9]{2})\b/);
-  const slashDob = base.match(/\b([0-9]{1,2}[\/\-.][0-9]{1,2}[\/\-.][0-9]{2,4})\b/);
+  const slashDob = base.match(/\b([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{2,4})\b/);
 
   const tokens = base
     .split(/\s+/)
@@ -189,23 +189,23 @@ export function parseIdArtifactText(text = ''): IdArtifactDemographics {
   const sex = parseSex(normalized);
   if (sex) demographics.sex = sex;
 
-  const phone = normalized.match(/\b(?:phone|tel|mobile|cell)\s*[:\-]?\s*([+0-9().\-\s]{7,})\b/i);
+  const phone = normalized.match(/\b(?:phone|tel|mobile|cell)\s*[-:]?\s*([+0-9().\-\s]{7,})\b/i);
   if (phone?.[1]) demographics.phone = cleanValue(phone[1]);
 
   const email = normalized.match(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i);
   if (email?.[0]) demographics.email = email[0];
 
-  const address = normalized.match(/\b(?:address|addr)\s*[:\-]\s*([^\n;]{6,80})/i);
+  const address = normalized.match(/\b(?:address|addr)\s*[-:]\s*([^\n;]{6,80})/i);
   if (address?.[1]) demographics.address = cleanValue(address[1]);
 
   const bloodType = parseBloodType(normalized);
   if (bloodType) demographics.bloodType = bloodType;
 
-  const nationality = normalized.match(/\b(?:nationality|citizen(?:ship)?)\s*[:\-]\s*([A-Za-z][A-Za-z ]{2,30})\b/i);
+  const nationality = normalized.match(/\b(?:nationality|citizen(?:ship)?)\s*[-:]\s*([A-Za-z][A-Za-z ]{2,30})\b/i);
   if (nationality?.[1]) demographics.nationality = titleCaseName(nationality[1].trim());
 
   const expiry = normalized.match(
-    /\b(?:exp(?:iry|ires)?|valid\s*until)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}[\/\-.][0-9]{1,2}[\/\-.][0-9]{2,4})\b/i,
+    /\b(?:exp(?:iry|ires)?|valid\s*until)\s*[-:]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{2,4})\b/i,
   );
   if (expiry?.[1]) demographics.documentExpiry = normalizeDateOfBirth(expiry[1]);
 

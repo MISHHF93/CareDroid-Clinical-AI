@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
@@ -18,8 +13,7 @@ export class JwtQueryAuthGuard implements CanActivate {
       typeof header === 'string' && header.startsWith('Bearer ')
         ? header.slice('Bearer '.length)
         : '';
-    const queryToken =
-      typeof request.query?.token === 'string' ? request.query.token : '';
+    const queryToken = typeof request.query?.token === 'string' ? request.query.token : '';
     const token = bearer || queryToken;
 
     if (!token) {

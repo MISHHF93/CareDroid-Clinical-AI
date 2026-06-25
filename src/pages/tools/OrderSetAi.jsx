@@ -120,7 +120,7 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded } = {}) {
               placeholder="Local protocol, renal dosing, stewardship, formulary, contraindications"
             />
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+            <div className="tool-form-actions">
               <button type="button" className="diagnosis-primary-btn" onClick={handleGenerate} disabled={loading}>
                 {loading ? 'Generating suggestions...' : 'Suggest order bundles'}
               </button>
@@ -135,9 +135,9 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded } = {}) {
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Matching protocols and bundle suggestions...</p>
+                <p className="tool-loading-state__message">Matching protocols and bundle suggestions...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -218,7 +218,7 @@ export default function OrderSetAi({ embedded = false, onCloseEmbedded } = {}) {
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Enter a clinical scenario to generate review-required order bundle suggestions.
               </div>
             )}

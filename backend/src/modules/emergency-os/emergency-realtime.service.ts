@@ -122,7 +122,8 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
 
   publishEmsUpdate(): void {
     try {
-      const { EMSIntakeService } = require('./emergency-os.services') as typeof import('./emergency-os.services');
+      const { EMSIntakeService } =
+        require('./emergency-os.services') as typeof import('./emergency-os.services');
       const ems = this.moduleRef.get(EMSIntakeService, { strict: false });
       if (ems) {
         this.publish({ type: 'ems_updated', payload: ems.getEMSIntake() });

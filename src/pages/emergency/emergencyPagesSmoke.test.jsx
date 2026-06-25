@@ -43,4 +43,12 @@ describe('emergency page modules smoke', () => {
     );
     expect(shouldRedirectEmergencySurface('patients', EMERGENCY_ROLE_IDS.physician)).toBe(false);
   });
+
+  it('redirects front-desk queues route through reception when reception-first', () => {
+    expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
+      true,
+    );
+    expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
+    expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.physician)).toBe(false);
+  });
 });

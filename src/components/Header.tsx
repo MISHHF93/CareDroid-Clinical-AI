@@ -10,7 +10,7 @@ import {
   groupOperationalAlertsByMetric,
   resolveOperationalAlertRoute,
 } from '../config/operationalMetricsModel';
-import { filterOperationalMetricsByScreenMode } from '../config/emergencyScreenKpiPolicy';
+
 import {
   getAlertClassificationTier,
   sortAlertsByClassification,
@@ -78,7 +78,7 @@ import StaffWorkloadPanel from './StaffWorkloadPanel';
 import UserAccountMenu from './account/UserAccountMenu';
 import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
 import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
-import SimulationModeToggle from './simulation/SimulationModeToggle';
+import OperationalAlertRail from './emergency/OperationalAlertRail';
 import './ReassessmentDrawer.css';
 import './Header.css';
 
@@ -277,10 +277,6 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
   const showProfileSwitcher = useProfileSwitcherVisibility();
   const operationalSummary = centralSnapshot.operationalSummary;
-  const headerOperationalMetrics = useMemo(() => {
-    const surfaceMetrics = filterOperationalMetrics(operationalSummary.metrics, 'header');
-    return filterOperationalMetricsByScreenMode(surfaceMetrics, routeScreenMode);
-  }, [operationalSummary.metrics, routeScreenMode]);
   const alertsSurfaceMetrics = useMemo(
     () => filterOperationalMetrics(operationalSummary.metrics, 'alerts'),
     [operationalSummary.metrics],
@@ -879,35 +875,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   }, [emergencyRole.role, selectPatient]);
 
   return (
-    <header
-      className="caredroid-header"
-      style={{
-        height: screenCapabilities.showOperationalStrip ? 92 : 48,
-        width: '100%',
-        background: '#0D1117',
-        borderBottom: '1px solid #1F2937',
-        display: 'grid',
-        gridTemplateRows: screenCapabilities.showOperationalStrip ? '48px 44px' : '48px',
-        flexShrink: 0,
-        boxSizing: 'border-box',
-        position: 'relative',
-      }}
-    >
-      <div
-        className="caredroid-header__topbar"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 16,
-          minWidth: 0,
-          padding: '0 16px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+    <header className="caredroid-header caredroid-header--compact">
+      <div className="caredroid-header__topbar">
+        <div className="caredroid-header__brand">
           <span
             className="caredroid-header__wordmark"
             title={EMERGENCY_OS_BRANDING.platformLine}
-            style={{ fontSize: 14, fontWeight: 500, color: '#F9FAFB' }}
           >
             {screenCapabilities.productLabel}
           </span>
@@ -917,19 +890,10 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           <Clock />
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-          }}
-        >
+        <div className="caredroid-header__center">
           <div
             className="caredroid-header__page-title"
             aria-label="Current CareDroid page"
-            style={{ display: 'grid', minWidth: 0, justifyItems: 'center' }}
           >
             {screenCapabilities.isRegistrationScreen ? (
               pageSubtitle ? <span>{pageSubtitle}</span> : null
@@ -950,70 +914,19 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             </span>
           ) : null}
           {screenCapabilities.showOperationalStrip ? (
-          <div
-            className="caredroid-header__central-status"
-            aria-label="CareDroid central node live status"
-          >
-            <span
-              data-tone={
-                centralSnapshot.operationalSummary.metrics.find(
-                  (metric) => metric.key === 'capacityScore',
-                )?.tone || 'neutral'
-              }
-            >
-              CAP {centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}
-            </span>
-            <span
-              data-tone={
-                centralSnapshot.emsPressure.status === 'critical'
-                  ? 'critical'
-                  : centralSnapshot.emsPressure.inbound
-                    ? 'warning'
-                    : 'success'
-              }
-            >
-              EMS {centralSnapshot.emsPressure.inbound}
-            </span>
-            <span data-tone={centralSnapshot.reassessmentStatus.due ? 'critical' : 'success'}>
-              REA {centralSnapshot.reassessmentStatus.due}
-            </span>
-            <span
-              data-tone={
-                centralSnapshot.currentDepartmentStatus.activeAlerts ? 'critical' : 'success'
-              }
-            >
-              ALR {centralSnapshot.currentDepartmentStatus.activeAlerts}
-            </span>
-            <span
-              className={syncPulse ? 'caredroid-header__sync-pill--pulse' : ''}
-              data-tone={syncStale ? 'warning' : 'success'}
-              title={syncTitle}
-            >
-              {syncLabel}
-            </span>
-            {intelligenceSnapshot.enabled ? (
-              <span
-                className="caredroid-header__copilot-pill"
-                data-tone={
-                  intelligenceSnapshot.dataFreshness.status === 'stale'
-                    ? 'warning'
-                    : intelligenceSnapshot.anomalies.length
-                      ? 'critical'
-                      : 'success'
-                }
-                title={intelligenceSnapshot.disclaimers.operational}
-              >
-                OI {intelligenceSnapshot.mode.replace('_', ' ')}
-                {intelligenceSnapshot.dataFreshness.visible
-                  ? ` · ${intelligenceSnapshot.dataFreshness.status}`
-                  : ''}
-              </span>
-            ) : null}
-          </div>
+            <OperationalAlertRail
+              className="caredroid-header__central-status"
+              centralSnapshot={centralSnapshot}
+              syncLabel={syncLabel}
+              syncTitle={syncTitle}
+              syncStale={syncStale}
+              syncPulse={syncPulse}
+              intelligenceSnapshot={intelligenceSnapshot}
+            />
           ) : null}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        <div className="caredroid-header__actions">
           <div
             className="caredroid-header__primary-actions"
             aria-label="CareDroid primary actions"
@@ -1151,21 +1064,10 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           {!screenCapabilities.isRegistrationScreen ? (
           <button
             type="button"
+            className="caredroid-header__palette-trigger"
             onClick={() => document.dispatchEvent(new Event('open-command-palette'))}
             aria-label="Open command palette"
             title="Search patients, encounters, referrals, EMS, and queues"
-            style={{
-              width: 32,
-              height: 32,
-              border: '1px solid #1F2937',
-              borderRadius: 8,
-              background: '#111827',
-              color: '#9CA3AF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
           >
             <IconSearch size={18} stroke={2} />
           </button>
@@ -1202,13 +1104,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
 
           {showProfileSwitcher ? <ProfileRoleSwitcher variant="compact" /> : null}
 
-          <SimulationModeToggle />
-
           <UserAccountMenu />
 
           {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen && workloadPresentation.visible ? (
             <button
               type="button"
+              className="caredroid-header__workload-trigger"
               onClick={() => {
                 if (canManageWorkload) setStaffWorkloadOpen((open) => !open);
               }}
@@ -1225,55 +1126,12 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
                   ? 'Staff workload'
                   : `${emergencyRole.roleLabel} cannot reassign workload`
               }
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 999,
-                border: '1px solid #1F2937',
-                background: '#1C2333',
-                color: '#9CA3AF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 700,
-                cursor: canManageWorkload ? 'pointer' : 'not-allowed',
-                opacity: canManageWorkload ? 1 : 0.6,
-              }}
             >
               DA
             </button>
           ) : null}
         </div>
       </div>
-
-      {screenCapabilities.showOperationalStrip ? (
-      <nav
-        className="caredroid-header__operational-strip"
-        aria-label="Operational command context"
-      >
-        {headerOperationalMetrics.map((metric) => {
-          const route = getOperationalMetricRoute(metric.key);
-          const canOpenRoute = route ? emergencyRole.canAccessRoute(routePermissionPath(route)) : false;
-          return (
-            <button
-              key={metric.key}
-              type="button"
-              className="caredroid-header__operational-metric"
-              data-tone={metric.tone || 'neutral'}
-              onClick={() => {
-                if (canOpenRoute) navigateEmergencyRoute(route);
-              }}
-              disabled={!canOpenRoute}
-              title={`${metric.label}: ${metric.value}. Source: ${metric.source}`}
-            >
-              <strong>{metric.value}</strong>
-              <span>{metric.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-      ) : null}
 
       {alertDrawerOpen ? (
         <div

@@ -17,6 +17,8 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
   emergencyStoreState: {
     patients: [],
     copilotOpen: false,
+    toggleCopilot: vi.fn(),
+    setCopilotOpen: vi.fn(),
     selectPatient: vi.fn(),
     initializeFromBackend: vi.fn().mockResolvedValue(undefined),
     updateAlerts: vi.fn(),
@@ -49,6 +51,10 @@ vi.mock('../hooks/useEmergencyRolePermissions', () => ({
 }));
 
 vi.mock('../components/account/DemoPersonaPanel', () => ({
+  default: () => null,
+}));
+
+vi.mock('../components/chrome/SessionChromeBar', () => ({
   default: () => null,
 }));
 

@@ -20,6 +20,7 @@ import {
   PageShell,
   Surface,
 } from '../../components/ui/CareDroidPrimitives';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
 import './ToolPageLayout.css';
 
 const AI_DOCUMENTATION_TOOL_IDS = new Set([
@@ -63,6 +64,7 @@ const ToolPageLayout = ({
   embedded = false,
   onCloseEmbedded,
 }) => {
+  const surfaces = getPractitionerSurfaceVisibility();
   const { profileNavigate } = useProfileNavigate();
   const { selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
@@ -154,13 +156,15 @@ const ToolPageLayout = ({
           <span>Share Results</span>
         </button>
       )}
-      <button
-        className="btn-share-tool"
-        onClick={handleShareSession}
-        type="button"
-      >
-        Share Local Session
-      </button>
+      {surfaces.tools.showShareLocalSession ? (
+        <button
+          className="btn-share-tool"
+          onClick={handleShareSession}
+          type="button"
+        >
+          Share Local Session
+        </button>
+      ) : null}
       {embedded ? (
         <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>
           <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
@@ -181,11 +185,11 @@ const ToolPageLayout = ({
       className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}
       contentClassName="cd-page-stack cd-page-stack--compact tool-page__content"
       title={tool.name}
-      description={tool.description}
+      description={surfaces.tools.showPageMetaBadges ? tool.description : undefined}
       leadingIcon={<NavIcon icon={getToolIcon(tool.id)} size={28} />}
       actions={headerActions}
     >
-      {!embedded && (
+      {!embedded && surfaces.tools.showPageBreadcrumbs ? (
         <div className="tool-breadcrumb">
           <button type="button" onClick={() => profileNavigate('/dashboard')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
@@ -203,14 +207,16 @@ const ToolPageLayout = ({
           <span className="breadcrumb-separator">›</span>
           <span className="breadcrumb-current">{tool.name}</span>
         </div>
-      )}
+      ) : null}
 
+      {surfaces.tools.showPageMetaBadges ? (
       <div className="tool-header-meta tool-header-meta--shell">
         <span className="tool-category-badge">
           {tool.category}
         </span>
         {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
       </div>
+      ) : null}
 
       {/* Tool Content */}
       <Surface className="tool-content">
@@ -218,7 +224,7 @@ const ToolPageLayout = ({
         {children}
       </Surface>
 
-      {(clinicalInsights || riskData) && (
+      {surfaces.tools.showClinicalIntelligencePanel && (clinicalInsights || riskData) && (
         <Surface className={`clinical-insights-panel severity-${(riskData?.severity || clinicalInsights?.severity)}`}>
           <div className="clinical-insights-header">
             <h3>Clinical Intelligence</h3>

@@ -3,6 +3,19 @@
   background: color-mix(in srgb, var(--app-accent, #00ff88) 8%, transparent);
 }
 
+.demo-persona-panel--drawer {
+  border: 1px solid var(--ed-border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: var(--ed-radius-md, 10px);
+  background: color-mix(in srgb, var(--ed-surface-overlay, #1e293b) 88%, transparent);
+}
+
+.demo-persona-panel__bar--compact .demo-persona-panel__subtitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .demo-persona-panel__bar {
   display: flex;
   align-items: flex-start;

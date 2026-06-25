@@ -1,5 +1,9 @@
 import type { PatientCardOrchestrationContext } from '../../lib/patient-orchestration';
 import type { Patient } from '../types/emergency';
+import {
+  getCopilotOrchestrationRecLimit,
+  getCopilotRecentNotesLimit,
+} from '../config/practitionerCleanup.config';
 import { summarizeArtifactsForCopilot } from './patientDocumentArtifactModel';
 import { buildNativeAiPatientSnapshot, formatRoutingLabel } from './nativeAiCore';
 import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
@@ -14,7 +18,7 @@ export function buildCopilotPatientArtifactContext(
   const vitals = latestPatientVitals(patient);
   const savedScores = formatScoresForCopilot(patient);
   const recentNotes = (patient.notes || [])
-    .slice(-5)
+    .slice(-getCopilotRecentNotesLimit())
     .map((note) => ({
       id: note.id,
       content: note.text || note.body || '',
@@ -55,7 +59,9 @@ export function buildCopilotPatientArtifactContext(
           complaintRoute: orchestration.complaintRoute?.complaint || null,
           scoresMissing: orchestration.scoresMissing,
           scoresCompleted: orchestration.scoresCompleted,
-          recommendations: (orchestration.prioritizedRecommendations ?? []).map((rec) => ({
+          recommendations: (orchestration.prioritizedRecommendations ?? [])
+            .slice(0, getCopilotOrchestrationRecLimit())
+            .map((rec) => ({
             toolId: rec.toolId,
             label: rec.label,
             launchKind: rec.launchKind,

@@ -874,7 +874,9 @@ export class ChatService {
   }
 
   private normalizeEdCopilotIntentName(intent?: string): string {
-    const normalized = String(intent || '').trim().toUpperCase();
+    const normalized = String(intent || '')
+      .trim()
+      .toUpperCase();
     if (normalized === 'FILTER_COMPLAINT') return 'FILTER_BY_COMPLAINT';
     if (normalized === 'ACTION_FLAG') return 'ACTION_FLAG_REASSESSMENT';
     return normalized;

@@ -10,7 +10,9 @@ export const WHITEBOARD_STRESS_SCENARIO = Object.freeze({
   referralsPending: 8,
 });
 
-export const WHITEBOARD_CARD_PREVIEW_LIMIT = 24;
+import { PRACTITIONER_WHITEBOARD_CARD_LIMIT } from '../../config/practitionerCleanup.constants';
+
+export const WHITEBOARD_CARD_PREVIEW_LIMIT = PRACTITIONER_WHITEBOARD_CARD_LIMIT;
 
 export const WHITEBOARD_LOAD_THRESHOLDS = Object.freeze({
   waitingElevated: 20,

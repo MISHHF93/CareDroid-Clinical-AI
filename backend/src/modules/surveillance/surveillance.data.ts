@@ -529,11 +529,38 @@ const INTEGRATION_CONTRACTS: SurveillanceIntegrationContract[] = [
 ];
 
 const KPI_ARTIFACTS: SurveillanceKpiArtifact[] = [
-  { id: 'cameras_online', label: 'Cameras online', value: 4, unit: '/6', trend: 'flat', domain: 'security' },
-  { id: 'iot_online', label: 'IoT devices online', value: 6, unit: '/7', trend: 'down', domain: 'facilities' },
+  {
+    id: 'cameras_online',
+    label: 'Cameras online',
+    value: 4,
+    unit: '/6',
+    trend: 'flat',
+    domain: 'security',
+  },
+  {
+    id: 'iot_online',
+    label: 'IoT devices online',
+    value: 6,
+    unit: '/7',
+    trend: 'down',
+    domain: 'facilities',
+  },
   { id: 'zones_covered', label: 'Mapped zones', value: 4, domain: 'facilities' },
-  { id: 'open_alerts', label: 'Open surveillance alerts', value: 1, trend: 'up', domain: 'security' },
-  { id: 'health_score', label: 'Platform health score', value: 90, unit: '%', trend: 'flat', domain: 'audit' },
+  {
+    id: 'open_alerts',
+    label: 'Open surveillance alerts',
+    value: 1,
+    trend: 'up',
+    domain: 'security',
+  },
+  {
+    id: 'health_score',
+    label: 'Platform health score',
+    value: 90,
+    unit: '%',
+    trend: 'flat',
+    domain: 'audit',
+  },
   { id: 'welfare_safe_zones', label: 'Welfare-safe zones', value: 1, domain: 'equine_welfare' },
   { id: 'raceday_ready', label: 'Race-day readiness', value: 'Hold', domain: 'race_day' },
 ];

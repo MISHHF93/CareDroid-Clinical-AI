@@ -59,6 +59,20 @@
   border-top: 1px dashed var(--color-border, #cbd5e1);
 }
 
+.copilot-risk-layer-panel--compact .copilot-risk-layer-panel__layers {
+  grid-template-columns: 1fr;
+}
+
+.copilot-risk-layer-panel--compact .copilot-risk-layer-panel__layer p {
+  margin-top: 0.35rem;
+}
+
+.copilot-risk-layer-panel__hint {
+  margin: 0;
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.78rem;
+}
+
 .copilot-risk-layer-panel__cds-detail ul {
   padding-left: 1rem;
 }

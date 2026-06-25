@@ -6,6 +6,11 @@
   background: var(--color-surface, #111827);
 }
 
+.reception-throughput-cluster--compact {
+  gap: 0;
+  padding: 8px 16px 10px;
+}
+
 .reception-throughput-cluster__header h2 {
   margin: 4px 0 0;
   font-size: 16px;

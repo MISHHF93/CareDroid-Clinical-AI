@@ -174,6 +174,39 @@ export function OverflowCanvas({ children, minWidth, className = '', as: Element
   );
 }
 
+export function MetricChip({ label, value, title, className = '', ...props }) {
+  return (
+    <span
+      className={['cd-metric-chip', className].filter(Boolean).join(' ')}
+      title={title || (label && value !== undefined ? `${value} ${label}` : undefined)}
+      {...props}
+    >
+      {value !== undefined && value !== null ? (
+        <span className="cd-metric-chip__value">{value}</span>
+      ) : null}
+      {label ? <span className="cd-metric-chip__label">{label}</span> : null}
+    </span>
+  );
+}
+
+export function SurfaceCard({ children, tone = 'default', padding = 'standard', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element
+      className={[
+        'cd-surface-card',
+        `cd-surface-card--${tone}`,
+        `cd-surface-card--${padding}`,
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
+      {children}
+    </Element>
+  );
+}
+
 export function MetricCard({ label, value, helper, suffix = '', tone = 'neutral', className = '', ...props }) {
   return (
     <Card compact className={['cd-metric-card', `cd-metric-card--${tone}`, className].filter(Boolean).join(' ')} {...props}>

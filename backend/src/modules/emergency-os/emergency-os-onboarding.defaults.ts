@@ -68,7 +68,8 @@ export function buildEmergencyOsOnboardingSeed(options: {
       clinicScale,
     },
     roles: {
-      defaultRoleProfileId: options.defaultRoleProfileId || (clinicScale ? 'nurse' : 'emergency-physician'),
+      defaultRoleProfileId:
+        options.defaultRoleProfileId || (clinicScale ? 'nurse' : 'emergency-physician'),
       emergencyRoleMapping: {
         nurse: 'triage_nurse',
         physician: 'physician',

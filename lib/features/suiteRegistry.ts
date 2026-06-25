@@ -218,7 +218,7 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
     ems_pipeline: {
       suiteId: 'ems_referral_boarding',
       layer: 'core',
-      maturity: 'live',
+      maturity: 'demo',
       whiteboardLink: 'board_workflow_panel',
       route: '/emergency/ems',
     },
@@ -244,7 +244,7 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
       layer: 'core',
       maturity: 'demo',
       whiteboardLink: 'patient_card',
-      route: '/emergency/boarding',
+      route: '/emergency/capacity?view=boarding',
     },
 
     ed_copilot: {
@@ -340,6 +340,96 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
     integration_status: { suiteId: 'integration_hub_automation', layer: 'platform', maturity: 'demo', whiteboardLink: 'platform_admin' },
     laboratory: { suiteId: 'integration_hub_automation', layer: 'legacy', maturity: 'planned', whiteboardLink: 'none', route: '/laboratory' },
     knowledge_graph: { suiteId: 'integration_hub_automation', layer: 'legacy', maturity: 'planned', whiteboardLink: 'none', route: '/knowledge-graph' },
+
+    native_ai_routing: {
+      suiteId: 'physician_clinical_copilot',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'patient_card_drawer',
+      route: '/emergency/copilot',
+    },
+    native_ai_drift_monitoring: {
+      suiteId: 'analytics_simulation_qa',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'role_view',
+      route: '/emergency/analytics',
+    },
+    nlp_triage_expert_system: {
+      suiteId: 'reception_arrival',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'patient_card',
+      route: '/emergency/reception',
+    },
+    post_ed_orientation: {
+      suiteId: 'analytics_simulation_qa',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'patient_card',
+    },
+    voice_interview_assistant: {
+      suiteId: 'reception_arrival',
+      layer: 'core',
+      maturity: 'preview',
+      whiteboardLink: 'patient_card',
+      route: '/emergency/reception',
+    },
+    ai_transparency_dashboard: {
+      suiteId: 'physician_clinical_copilot',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'patient_card_drawer',
+      route: '/emergency/whiteboard',
+    },
+    clinical_acuity_dashboard: {
+      suiteId: 'emergency_whiteboard',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'board_queue_state',
+      route: '/emergency/whiteboard',
+    },
+    patient_document_artifacts: {
+      suiteId: 'physician_clinical_copilot',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'patient_card_drawer',
+    },
+    admission_prediction: {
+      suiteId: 'charge_nurse_command',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'role_view',
+      route: '/emergency/whiteboard',
+    },
+    journey_prediction: {
+      suiteId: 'charge_nurse_command',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'role_view',
+      route: '/emergency/whiteboard',
+    },
+    command_predictive_alerts: {
+      suiteId: 'charge_nurse_command',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'role_view',
+      route: '/emergency/whiteboard',
+    },
+    patient_whiteboard: {
+      suiteId: 'emergency_whiteboard',
+      layer: 'core',
+      maturity: 'live',
+      whiteboardLink: 'patient_card',
+      route: '/emergency/patient-room',
+    },
+    pre_arrival_activation: {
+      suiteId: 'ems_referral_boarding',
+      layer: 'core',
+      maturity: 'demo',
+      whiteboardLink: 'board_workflow_panel',
+      route: '/emergency/ems',
+    },
   });
 
 export const NAV_SUITE_ASSIGNMENTS: Readonly<Record<string, CareDroidSuiteId>> = Object.freeze({

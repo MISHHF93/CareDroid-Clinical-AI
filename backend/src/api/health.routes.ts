@@ -457,25 +457,26 @@ function determineOverallStatus(components: HealthComponents): OverallStatus {
 
 router.get('/', async (req, res) => {
   const startedAt = Date.now();
-  const [database, sqlDatabase, services, websocket, mqtt, mohFhirApi, wearableApi] = await Promise.all([
-    checkDatabaseConnectivity(),
-    checkSqlDatabaseConnectivity(req),
-    checkRegisteredServices(),
-    checkWebSocketStatus(req),
-    checkMqttBroker(),
-    checkExternalApi('MoH FHIR', [
-      'MOH_FHIR_BASE_URL',
-      'MOH_FHIR_URL',
-      'FHIR_BASE_URL',
-      'FHIR_API_URL',
-    ]),
-    checkExternalApi('Wearable API', [
-      'WEARABLE_API_URL',
-      'WEARABLES_API_URL',
-      'WEARABLE_RPM_API_URL',
-      'WEARABLE_BASE_URL',
-    ]),
-  ]);
+  const [database, sqlDatabase, services, websocket, mqtt, mohFhirApi, wearableApi] =
+    await Promise.all([
+      checkDatabaseConnectivity(),
+      checkSqlDatabaseConnectivity(req),
+      checkRegisteredServices(),
+      checkWebSocketStatus(req),
+      checkMqttBroker(),
+      checkExternalApi('MoH FHIR', [
+        'MOH_FHIR_BASE_URL',
+        'MOH_FHIR_URL',
+        'FHIR_BASE_URL',
+        'FHIR_API_URL',
+      ]),
+      checkExternalApi('Wearable API', [
+        'WEARABLE_API_URL',
+        'WEARABLES_API_URL',
+        'WEARABLE_RPM_API_URL',
+        'WEARABLE_BASE_URL',
+      ]),
+    ]);
   const components: HealthComponents = {
     database,
     sqlDatabase,

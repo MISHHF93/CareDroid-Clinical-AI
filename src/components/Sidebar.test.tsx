@@ -35,44 +35,48 @@ describe('Sidebar unified navigation rendering', () => {
     );
 
     for (const [label, path] of [
+      ['Reception', '/emergency/reception'],
       ['Whiteboard', '/emergency/whiteboard'],
       ['Patients', '/emergency/patients'],
       ['EMS', '/emergency/ems'],
-      ['Intake', '/emergency/intake'],
       ['Queues', '/emergency/queues'],
       ['Reassess', '/emergency/reassessment'],
-      ['Capacity', '/emergency/capacity'],
-      ['Boarding', '/emergency/boarding'],
+      ['Flow & Capacity', '/emergency/capacity'],
       ['Referrals', '/emergency/referrals'],
-      ['Copilot', '/emergency/copilot'],
+      ['Copilot', null],
       ['Medical Tools', '/emergency/tools'],
       ['Analytics', '/emergency/analytics'],
       ['Settings', '/emergency/settings'],
     ]) {
-      const link = desktopNav.getByRole('link', { name: label });
-      expect(link).toBeTruthy();
-      expect(link.getAttribute('href')).toBe(path);
-      expect(link.getAttribute('title')).toBe(label);
+      if (path) {
+        const link = desktopNav.getByRole('link', { name: label });
+        expect(link).toBeTruthy();
+        expect(link.getAttribute('href')).toBe(path);
+        expect(link.getAttribute('title')).toBe(label);
+      } else {
+        const button = desktopNav.getByRole('button', { name: label });
+        expect(button).toBeTruthy();
+        expect(button.getAttribute('title')).toBe(label);
+        expect(button.getAttribute('aria-pressed')).toBe('false');
+      }
     }
 
-    for (const hiddenLabel of ['Pulse', 'Provincial', 'Integrations']) {
+    for (const hiddenLabel of ['Cosmos', 'Fleet', 'AI Governance']) {
       expect(desktopNav.queryByRole('link', { name: hiddenLabel })).toBeNull();
     }
-    expect(desktopNav.queryByRole('link', { name: 'AI Governance' })).toBeNull();
   });
 
   it('renders only read-only visible pages and marks the active route', () => {
-    renderSidebar('read_only_viewer', '/emergency/capacity');
+    renderSidebar('read_only_viewer', '/emergency/analytics');
     const desktopNav = within(
       screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
     );
 
-    expect(desktopNav.getByRole('link', { name: 'Capacity' }).getAttribute('aria-current')).toBe(
+    expect(desktopNav.getByRole('link', { name: 'Analytics' }).getAttribute('aria-current')).toBe(
       'page',
     );
     expect(desktopNav.getByRole('link', { name: 'Whiteboard' })).toBeTruthy();
-    expect(desktopNav.getByRole('link', { name: 'Patients' })).toBeTruthy();
-    expect(desktopNav.getByRole('link', { name: 'Queues' })).toBeTruthy();
+    expect(desktopNav.queryByRole('link', { name: 'Patients' })).toBeNull();
     expect(desktopNav.queryByRole('link', { name: 'Settings' })).toBeNull();
     expect(desktopNav.queryByRole('link', { name: 'AI Governance' })).toBeNull();
   });
@@ -98,14 +102,13 @@ describe('Sidebar unified navigation rendering', () => {
       screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
     );
     const expectedIconKeyByLabel = new Map([
+      ['Reception', 'user-check'],
       ['Whiteboard', 'layout-dashboard'],
       ['Patients', 'emergency-patients'],
       ['EMS', 'ambulance'],
-      ['Intake', 'intake'],
       ['Queues', 'queues'],
       ['Reassess', 'reassessment'],
-      ['Capacity', 'capacity'],
-      ['Boarding', 'boarding'],
+      ['Flow & Capacity', 'capacity'],
       ['Referrals', 'referrals'],
       ['Copilot', 'ed-copilot'],
       ['Medical Tools', 'clinical-tools'],
@@ -115,9 +118,12 @@ describe('Sidebar unified navigation rendering', () => {
     const iconKeys: string[] = [];
 
     for (const [label, iconKey] of expectedIconKeyByLabel) {
-      const link = desktopNav.getByRole('link', { name: label });
-      expect(link.getAttribute('data-icon-key')).toBe(iconKey);
-      iconKeys.push(link.getAttribute('data-icon-key') || '');
+      const item =
+        label === 'Copilot'
+          ? desktopNav.getByRole('button', { name: label })
+          : desktopNav.getByRole('link', { name: label });
+      expect(item.getAttribute('data-icon-key')).toBe(iconKey);
+      iconKeys.push(item.getAttribute('data-icon-key') || '');
     }
 
     expect(new Set(iconKeys).size).toBe(iconKeys.length);
@@ -149,7 +155,7 @@ describe('Sidebar unified navigation rendering', () => {
     });
 
     try {
-      renderSidebarWithDefaultNavigation();
+      renderSidebar('admin');
       const desktopNav = within(
         screen.getByRole('navigation', { name: 'Emergency desktop navigation' }),
       );

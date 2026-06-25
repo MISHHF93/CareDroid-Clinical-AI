@@ -1,0 +1,272 @@
+/**
+ * Practitioner compact layout — global flatter chrome for pilot / manual onboarding.
+ * Activated when data-practitioner-compact is set on <main> (pilot cleanup mode).
+ */
+
+[data-practitioner-compact] {
+  --ed-page-pad: 10px 12px;
+  --ed-section-gap: 8px;
+  --ed-whiteboard-card-min: 220px;
+  --app-shell-content-padding-y: 8px;
+  --cd-page-stack-gap: 10px;
+  --cd-page-title-size: 18px;
+  --cd-page-subtitle-size: 12px;
+}
+
+[data-practitioner-compact] .app-shell-main-content {
+  padding-top: var(--app-shell-content-padding-y, 8px);
+}
+
+/* App header + session chrome */
+[data-practitioner-compact] .emergency-header {
+  min-height: 48px;
+  padding: 6px 12px;
+}
+
+[data-practitioner-compact] .emergency-header__title {
+  font-size: 15px;
+}
+
+[data-practitioner-compact] .session-chrome-bar {
+  min-height: 32px;
+  padding: 4px 10px;
+}
+
+[data-practitioner-compact] .sidebar-nav__item {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
+/* PageShell / CareDroid primitives */
+[data-practitioner-compact] .cd-page-shell {
+  gap: var(--cd-page-stack-gap, 10px);
+  padding: 10px 12px 16px;
+}
+
+[data-practitioner-compact] .cd-page-shell__title {
+  font-size: var(--cd-page-title-size, 18px);
+}
+
+[data-practitioner-compact] .cd-page-shell__description {
+  font-size: var(--cd-page-subtitle-size, 12px);
+}
+
+[data-practitioner-compact] .cd-page-stack {
+  gap: var(--cd-page-stack-gap, 10px);
+}
+
+[data-practitioner-compact] .cd-surface {
+  padding: 10px 12px;
+}
+
+/* Whiteboard */
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__hero {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__hero > div:first-child {
+  align-items: baseline;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__title {
+  font-size: 16px;
+  margin: 0;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stats--bar {
+  padding: 0;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat {
+  min-height: 52px;
+  padding: 8px 10px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner {
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner-title {
+  font-size: 12px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-chip {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__controls {
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__filter-chip {
+  font-size: 12px;
+  padding: 6px 11px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__grid {
+  gap: 8px !important;
+  padding: 8px 12px !important;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__card-key {
+  display: none;
+}
+
+/* Reception */
+.reception-workspace--practitioner-compact {
+  gap: 8px;
+  padding: 0 0 16px;
+}
+
+.reception-workspace--practitioner-compact .reception-workspace__intro {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.reception-workspace--practitioner-compact .reception-workspace__intro h1 {
+  font-size: 18px;
+}
+
+.reception-workspace--practitioner-compact .reception-workspace__data-source {
+  margin: 0;
+}
+
+/* Profile shell */
+[data-practitioner-compact] .profile-settings-shell {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+
+[data-practitioner-compact] .profile-settings-shell__header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  justify-content: space-between;
+}
+
+[data-practitioner-compact] .profile-settings-shell__header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+[data-practitioner-compact] .profile-settings-shell__nav {
+  gap: 6px;
+}
+
+[data-practitioner-compact] .profile-settings-shell__nav a {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+[data-practitioner-compact] .profile-page {
+  gap: 10px;
+}
+
+[data-practitioner-compact] .profile-overview-grid {
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+[data-practitioner-compact] .profile-overview-card {
+  padding: 10px 12px;
+}
+
+[data-practitioner-compact] .profile-card__subtitle,
+[data-practitioner-compact] .settings-card__subtitle {
+  display: none;
+}
+
+/* Settings */
+[data-practitioner-compact] .settings-page {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+
+[data-practitioner-compact] .settings-card__title {
+  font-size: 18px;
+}
+
+[data-practitioner-compact] .settings-section {
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+/* Tools overview */
+[data-practitioner-compact] .tools-overview {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+
+[data-practitioner-compact] .tools-overview-header .header-content h1 {
+  font-size: 18px;
+}
+
+[data-practitioner-compact] .tools-overview-header .header-subtitle {
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
+[data-practitioner-compact] .tools-discovery-controls {
+  gap: 8px;
+}
+
+[data-practitioner-compact] .tools-filter-tabs {
+  gap: 6px;
+}
+
+[data-practitioner-compact] .tools-filter-tab {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+[data-practitioner-compact] .tools-grid {
+  gap: 8px;
+}
+
+[data-practitioner-compact] .tool-card {
+  padding: 10px 12px;
+}
+
+/* Tool page layout */
+[data-practitioner-compact] .tool-page .cd-page-shell__description {
+  display: none;
+}
+
+[data-practitioner-compact] .tool-header-actions {
+  gap: 6px;
+}
+
+[data-practitioner-compact] .tool-content {
+  padding: 10px 12px;
+}
+
+/* Patient cards */
+[data-practitioner-compact] .patient-card {
+  gap: 6px;
+}
+
+[data-practitioner-compact] .patient-card__meta-grid {
+  gap: 4px;
+}
+
+/* Copilot — collapsed footprint */
+[data-practitioner-compact] .ed-copilot-panel__header {
+  min-height: 40px;
+  padding: 6px 10px;
+}

@@ -218,7 +218,7 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded } = {}) {
               </article>
             ))}
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div className="tool-form-actions tool-form-actions--flush">
               <button type="button" className="btn-diagnosis-secondary" onClick={addEncounter}>
                 Add encounter
               </button>
@@ -233,9 +233,9 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded } = {}) {
             <ApiStateBanner error={error} onRetry={handleGenerate} />
 
             {loading ? (
-              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+              <div className="tool-loading-state" aria-busy="true">
                 <div className="simple-tool-spinner diagnosis-spinner" />
-                <p style={{ color: 'var(--app-fg-muted)' }}>Summarizing encounters and detecting trends...</p>
+                <p className="tool-loading-state__message">Summarizing encounters and detecting trends...</p>
               </div>
             ) : result ? (
               <div className="diagnosis-results-body">
@@ -316,7 +316,7 @@ export default function TimelineAi({ embedded = false, onCloseEmbedded } = {}) {
                 </section>
               </div>
             ) : (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+              <div className="tool-empty-state">
                 Add encounters to render a responsive patient timeline with trends and abnormal progression.
               </div>
             )}

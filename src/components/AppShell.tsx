@@ -15,6 +15,7 @@ import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
+import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
@@ -28,11 +29,12 @@ import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
-import DemoPersonaPanel from './account/DemoPersonaPanel';
-import SimulationModeBanner from './simulation/SimulationModeBanner';
 import { useSimulationMode } from '../contexts/SimulationModeContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
+import SessionChromeBar from './chrome/SessionChromeBar';
+import './app-shell.css';
 import './CopilotPanel.css';
+import { CopilotPanel } from './CopilotPanel';
 import {
   resolveScreenDensityProfile,
   screenDensityShellClassName,
@@ -41,9 +43,6 @@ import { PatientFlag, type Patient } from '../types/emergency';
 import { patientFlags } from '../utils/patientVitals';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
-const CopilotPanel = lazy(() =>
-  import('./CopilotPanel').then((module) => ({ default: module.CopilotPanel })),
-);
 const CommandPalette = lazy(() => import('./CommandPalette'));
 const EMSCriticalBroadcast = lazy(() => import('./EMSCriticalBroadcast'));
 const ReassessmentDrawer = lazy(() => import('./ReassessmentDrawer'));
@@ -74,14 +73,14 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
-  [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS`,
+  [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS Coordination`,
   [CANONICAL_ROUTES.emergencyIntake]: `${EMERGENCY_OS_BRANDING.productName} - Intake`,
   [CANONICAL_ROUTES.emergencyReception]: EMERGENCY_OS_BRANDING.receptionName,
   [CANONICAL_ROUTES.emergencyQueues]: `${EMERGENCY_OS_BRANDING.productName} - Queues`,
   [CANONICAL_ROUTES.emergencyReassessment]: `${EMERGENCY_OS_BRANDING.productName} - Reassessment`,
   [CANONICAL_ROUTES.emergencyReferrals]: `${EMERGENCY_OS_BRANDING.productName} - Referrals`,
-  [CANONICAL_ROUTES.emergencyCapacity]: `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
-  [CANONICAL_ROUTES.emergencyBoarding]: `${EMERGENCY_OS_BRANDING.productName} - Boarding`,
+  [CANONICAL_ROUTES.emergencyCapacity]: `${EMERGENCY_OS_BRANDING.productName} - Flow & Capacity`,
+  [CANONICAL_ROUTES.emergencyBoarding]: `${EMERGENCY_OS_BRANDING.productName} - Flow & Capacity`,
   [CANONICAL_ROUTES.emergencyCopilot]: `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
   [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Medical Tools`,
   [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
@@ -97,13 +96,13 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
   [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
-  [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS, offload pressure, and handoff actions.',
+  [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS coordination, offload pressure, and handoff actions.',
   [CANONICAL_ROUTES.emergencyIntake]: 'Identity verification and patient creation workflow.',
   [CANONICAL_ROUTES.emergencyReception]: EMERGENCY_OS_BRANDING.receptionSummary,
   [CANONICAL_ROUTES.emergencyQueues]: 'Queue bottlenecks and queue-level operating metrics.',
   [CANONICAL_ROUTES.emergencyReassessment]: 'Due and overdue reassessment tasks.',
-  [CANONICAL_ROUTES.emergencyCapacity]: 'Capacity score, rooms, boarders, and pressure inputs.',
-  [CANONICAL_ROUTES.emergencyBoarding]: 'Admission boarders and boarding escalation status.',
+  [CANONICAL_ROUTES.emergencyCapacity]: 'Room pressure, boarding load, and department flow.',
+  [CANONICAL_ROUTES.emergencyBoarding]: 'Room pressure, boarding load, and department flow.',
   [CANONICAL_ROUTES.emergencyReferrals]: 'Referral and transfer queue status.',
   [CANONICAL_ROUTES.emergencyCopilot]: 'Safe CareDroid Copilot context and actions.',
   [CANONICAL_ROUTES.emergencyTools]:
@@ -144,6 +143,53 @@ function routePermissionPath(path: string): string {
   return path.split(/[?#]/)[0] || path;
 }
 
+const COPILOT_AGENT_PREFILL_LABELS: Record<string, string> = {
+  'agent-clinical': 'CareDroid',
+  'agent-emergency': 'Emergency AI',
+  'agent-lab': 'Laboratory AI',
+  'agent-operations': 'Operations AI',
+  'agent-fleet': 'Fleet AI',
+  'agent-education': 'Education AI',
+  'agent-research': 'Research AI',
+  'agent-governance': 'Governance AI',
+};
+
+function buildCopilotPrefillFromSearch(search: string): { message: string; patientId?: string } {
+  const params = new URLSearchParams(search);
+  const patientId = params.get('patientId') || undefined;
+  const prompt = params.get('prompt');
+  if (prompt) return { message: prompt, patientId };
+
+  const agent = params.get('agent');
+  if (agent) {
+    const agentLabel = COPILOT_AGENT_PREFILL_LABELS[agent] || agent;
+    return {
+      message: [
+        `Use ${agentLabel} (${agent}) for this ED Copilot conversation.`,
+        'Keep output concise, source-aware, human-reviewed, and scoped to Emergency Department operations.',
+        'Do not make autonomous clinical decisions.',
+      ].join(' '),
+      patientId,
+    };
+  }
+
+  const tool = params.get('tool') || params.get('calc');
+  if (!tool) return { message: '', patientId };
+
+  const complaint = params.get('complaint');
+  return {
+    message: [
+      `Launch ${tool} in ED Copilot workflow.`,
+      patientId ? `Patient ID: ${patientId}.` : '',
+      complaint ? `Complaint: ${complaint}.` : '',
+      'Keep output concise, human-reviewed, and scoped to Emergency Department operations.',
+    ]
+      .filter(Boolean)
+      .join(' '),
+    patientId,
+  };
+}
+
 function buildEmergencyToolsPath(params: Record<string, string | null | undefined>): string {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -154,6 +200,7 @@ function buildEmergencyToolsPath(params: Record<string, string | null | undefine
 }
 
 export function AppShell({ children }: AppShellProps) {
+  const surfaces = getPractitionerSurfaceVisibility();
   const navigate = useNavigate();
   const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
@@ -189,12 +236,11 @@ export function AppShell({ children }: AppShellProps) {
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
+  const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
   const patients = useEmergencyStore((state) => state.patients);
   const { active: simulationModeActive } = useSimulationMode();
 
-  // Dev simplification flag — used to cut down initial UI noise and side panels.
-  const isDev = typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta.env.DEV);
+
   const reassessmentCount = useMemo(
     () => patients.filter(isPatientFlaggedForReassessment).length,
     [patients],
@@ -324,6 +370,44 @@ export function AppShell({ children }: AppShellProps) {
     if (isInitialMount) return;
     void useEmergencyStore.getState().initializeFromBackend();
   }, [simulationModeActive]);
+
+  useEffect(() => {
+    if (!canUseCopilot || useKioskShell) return;
+    if (RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) return;
+    const dismissed =
+      typeof sessionStorage !== 'undefined' && sessionStorage.getItem('ed:copilot-dismissed');
+    if (isEmergencyBoardRoute && !dismissed && !copilotOpen && surfaces.chrome.copilotAutoOpen) {
+      setCopilotOpen(true);
+    }
+  }, [
+    canUseCopilot,
+    copilotOpen,
+    isEmergencyBoardRoute,
+    screenCapabilities.isRegistrationScreen,
+    setCopilotOpen,
+    useKioskShell,
+  ]);
+
+  useEffect(() => {
+    if (location.pathname !== CANONICAL_ROUTES.emergencyCopilot || !canUseCopilot) return;
+
+    const prefill = buildCopilotPrefillFromSearch(location.search);
+    setCopilotOpen(true);
+    profileNavigate(`${CANONICAL_ROUTES.emergencyWhiteboard}${location.search}`, { replace: true });
+
+    if (prefill.message || prefill.patientId) {
+      const timer = window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent('ed:copilot-prefill', {
+            detail: { message: prefill.message, patientId: prefill.patientId },
+          }),
+        );
+      }, 100);
+      return () => window.clearTimeout(timer);
+    }
+
+    return undefined;
+  }, [canUseCopilot, location.pathname, location.search, profileNavigate, setCopilotOpen]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return undefined;
@@ -591,60 +675,36 @@ export function AppShell({ children }: AppShellProps) {
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{
-        display: 'flex',
-        height: 'var(--app-viewport-height, 100dvh)',
-        background: 'var(--color-background, var(--app-bg, #0A0E1A))',
-        color: 'var(--color-text-primary, var(--app-fg, #F9FAFB))',
-        fontFamily: 'var(--font-ui, Inter, system-ui, sans-serif)',
-        overflow: 'hidden',
-      }}
     >
       <a className="ed-skip-link" href="#main-content">
         Skip to main content
       </a>
       {useKioskShell ? null : <Sidebar navigationItems={visibleNavigationItems} />}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="emergency-app-shell__main-column">
         {useWallKioskChrome ? (
-          <header
-            className="emergency-wall-kiosk-header"
-            style={{
-              padding: '12px 20px',
-              borderBottom: '1px solid rgba(148,163,184,0.2)',
-              background: 'var(--color-background, #0B1220)',
-            }}
-          >
+          <header className="emergency-wall-kiosk-header">
             <strong>{screenCapabilities.label}</strong>
-            <span style={{ marginLeft: 12, opacity: 0.72, fontSize: 13 }}>
-              {EMERGENCY_OS_BRANDING.safetyLine}
-            </span>
+            <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
           </header>
         ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
-          <Header pageTitle={currentPage.label} pageSubtitle={currentPage.subtitle} />
+          <Header
+            pageTitle={currentPage.label}
+            pageSubtitle={surfaces.chrome.showHeaderSubtitle ? currentPage.subtitle : undefined}
+          />
         )}
-        <SimulationModeBanner />
-        <DemoPersonaPanel />
-        {isDev && (
-          <div style={{ padding: '4px 12px', background: '#1f2937', fontSize: 11, color: '#93c5fd', display: 'flex', alignItems: 'center', gap: 8 }}>
-            DEV — Use the Profile bar above to switch user profilings/roles. Main surface defaults to the Whiteboard.
-          </div>
-        )}
+        {!useKioskShell ? <SessionChromeBar /> : null}
         <main
           id="main-content"
-          className="app-shell-main-content"
+          className={[
+            'app-shell-main-content',
+            isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           role="main"
           tabIndex={-1}
           data-screen-density-mode={screenDensityProfile.id}
-          style={{
-            flex: 1,
-            minWidth: 0,
-            minHeight: 0,
-            overflow: 'auto',
-            overscrollBehavior: 'contain',
-            scrollbarGutter: 'stable',
-            WebkitOverflowScrolling: 'touch',
-            paddingBottom: isMobileViewport ? 'calc(60px + env(safe-area-inset-bottom, 0px))' : 0,
-          }}
+          data-practitioner-compact={surfaces.compactLayout ? 'true' : undefined}
         >
           <ErrorBoundary
             key={location.pathname}
@@ -653,7 +713,7 @@ export function AppShell({ children }: AppShellProps) {
           >
             <Suspense
               fallback={
-                <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
+                <div role="status" className="app-shell-route-loading">
                   Loading {screenCapabilities.productLabel} page...
                 </div>
               }
@@ -663,7 +723,7 @@ export function AppShell({ children }: AppShellProps) {
           </ErrorBoundary>
         </main>
       </div>
-      {!screenCapabilities.isRegistrationScreen && !useKioskShell && !(isDev as boolean) ? (
+      {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
         <Suspense fallback={null}>
           <PatientDetailPanel />
@@ -679,9 +739,7 @@ export function AppShell({ children }: AppShellProps) {
           resetKey={`${copilotOpen}-${location.pathname}`}
           fallbackText="CopilotPanel encountered an error. Refresh to reload."
         >
-          <Suspense fallback={null}>
-            <CopilotPanel />
-          </Suspense>
+          <CopilotPanel />
         </ErrorBoundary>
       ) : null}
       {canUseCopilot &&

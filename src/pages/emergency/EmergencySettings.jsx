@@ -28,6 +28,8 @@ import {
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
+import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { listScreenModesForSettings } from '../../config/careDroidScreenModes';
 import {
   PUBLIC_DISPLAY_PRIVACY_OPTIONS,
@@ -281,6 +283,7 @@ function promptValidationIssues(validation = {}) {
 }
 
 export default function EmergencySettings() {
+  const surfaces = getPractitionerSurfaceVisibility();
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
@@ -738,21 +741,25 @@ export default function EmergencySettings() {
   };
 
   return (
-    <section className="emergency-settings" aria-label="CareDroid settings">
-      <header className="emergency-settings__hero">
-        <div>
-          <span>{EMERGENCY_OS_BRANDING.platformLine} Admin</span>
-          <h1>CareDroid Settings</h1>
-          <p>
-            Tenant identity, modules, {EMERGENCY_OS_BRANDING.aiiosName} controls, integrations,
-            provincial health, notifications, and operational thresholds.{' '}
-            {EMERGENCY_OS_BRANDING.safetyLine}
-          </p>
-        </div>
-        <strong>
-          {loading ? 'Loading department data...' : `${enabledCount} modules enabled`}
+    <PageShell
+      as="section"
+      eyebrow="Department settings"
+      title="CareDroid Settings"
+      description={
+        surfaces.settings.showNestedSubtitles
+          ? `Modules, thresholds, displays, and operational preferences. ${EMERGENCY_OS_BRANDING.safetyShort}`
+          : EMERGENCY_OS_BRANDING.safetyShort
+      }
+      actions={
+        <strong className="emergency-settings__module-count">
+          {loading ? 'Loading…' : `${enabledCount} modules`}
         </strong>
-      </header>
+      }
+      className="emergency-settings cd-page-shell"
+      headerClassName="emergency-settings__hero"
+      contentClassName="emergency-settings__content"
+      aria-label="CareDroid settings"
+    >
 
       {status ? <div className="emergency-settings__banner">{status}</div> : null}
       {error ? (
@@ -766,8 +773,8 @@ export default function EmergencySettings() {
 
       <Section
         id="first-customer-demo"
-        title="Department Walkthrough Dataset"
-        subtitle="Loads a stable high-volume department picture for customer walkthroughs without changing the pilot dashboard surface."
+        title="ED-18 Walkthrough Dataset"
+        subtitle="Loads 18 representative active patients across every queue state — enough to demo the full ED journey without overwhelming practitioners."
         action={
           <button type="button" onClick={loadFirstCustomerDemo}>
             {isFirstCustomerDemoActive ? 'Reload Dataset' : 'Load Dataset'}
@@ -789,9 +796,9 @@ export default function EmergencySettings() {
             className="emergency-settings__demo-metrics"
             aria-label="Department walkthrough dataset metrics"
           >
-            <span>100 patients/day</span>
-            <span>42 active census</span>
-            <span>Walkthrough dataset</span>
+            <span>100 patients/day throughput</span>
+            <span>18 active census</span>
+            <span>ED-18 walkthrough</span>
           </div>
           <button type="button" onClick={resetDemoScenario} disabled={!isFirstCustomerDemoActive}>
             Reset Dataset
@@ -799,6 +806,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
+      {surfaces.settings.showEnterpriseSections ? (
       <Section
         id="central-control"
         title="Central Control Node"
@@ -942,6 +950,7 @@ export default function EmergencySettings() {
         </div>
         <DeviceContextPanel className="emergency-settings__device-context" />
       </Section>
+      ) : null}
 
       <Section
         id="screen-modes"
@@ -1004,7 +1013,7 @@ export default function EmergencySettings() {
           />
           <SettingsField
             type="checkbox"
-            label="Command center mode"
+            label="Department display mode"
             value={draft.commandCenterMode}
             onChange={(value) => updateDraft({ commandCenterMode: value })}
           />
@@ -2020,6 +2029,6 @@ export default function EmergencySettings() {
           ))}
         </div>
       </Section>
-    </section>
+    </PageShell>
   );
 }

@@ -1,0 +1,400 @@
+/* src\components\EmergencyWhiteboard.css — part 2/3 */
+.ed-whiteboard__stat-card {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--component-inner-radius);
+  background: var(--component-inner-row-bg);
+  box-shadow: none;
+  animation: ed-whiteboard-card-enter var(--motion-transition-normal) both;
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+
+.ed-whiteboard__stat-card:hover {
+  background: color-mix(in srgb, var(--status-info) 7%, var(--component-inner-row-bg));
+  transform: translateY(-1px);
+}
+
+.ed-whiteboard__stat-card strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xl);
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ed-whiteboard__stat-card span {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ed-whiteboard__body {
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(196px, 16vw, 224px) minmax(0, 1fr);
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-3);
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+.ed-whiteboard__body--queue-collapsed {
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+.ed-whiteboard__content {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-background);
+  box-shadow: none;
+}
+
+.ed-whiteboard__detail-overlay {
+  position: absolute;
+  inset-block: var(--space-3);
+  inset-inline-end: var(--space-3);
+  z-index: 12;
+  width: min(420px, 42vw);
+  min-width: 360px;
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.ed-whiteboard__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 0;
+  height: 100%;
+  padding: var(--space-4);
+  overflow-y: auto;
+  background: var(--color-background);
+  scroll-behavior: smooth;
+  scroll-padding: var(--space-4);
+}
+
+.ed-whiteboard__grid--virtualized {
+  contain: content;
+}
+
+.ed-whiteboard__virtual-spacer {
+  grid-column: 1 / -1;
+  pointer-events: none;
+}
+
+.ed-whiteboard__skeleton-card {
+  height: 120px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-surface) 86%, white 0%) 0%,
+    color-mix(in srgb, var(--color-surface) 72%, white 9%) 42%,
+    color-mix(in srgb, var(--color-surface) 86%, white 0%) 84%
+  );
+  background-size: 220% 100%;
+  animation: ed-whiteboard-skeleton var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite;
+}
+
+@keyframes ed-whiteboard-skeleton {
+  0% {
+    background-position: 120% 0;
+  }
+
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+.ed-whiteboard__list {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: var(--space-4);
+  overflow: auto;
+  background: var(--color-background);
+}
+
+.ed-whiteboard__list table {
+  width: 100%;
+  min-width: 860px;
+  border-spacing: 0;
+  border-collapse: separate;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.ed-whiteboard__list th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 34px;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-background);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.ed-whiteboard__sort-button {
+  min-height: 26px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.ed-whiteboard__sort-button:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--status-info);
+  outline-offset: 2px;
+}
+
+.ed-whiteboard__list td {
+  height: 42px;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  vertical-align: middle;
+}
+
+.ed-whiteboard__list tr {
+  cursor: pointer;
+}
+
+.ed-whiteboard__list tbody tr:hover td,
+.ed-whiteboard__list tbody tr:focus td,
+.ed-whiteboard__list tbody tr:focus-visible td {
+  background: color-mix(in srgb, var(--status-info) 8%, var(--color-surface));
+  outline: none;
+}
+
+.ed-whiteboard__list td {
+  transition:
+    background-color var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast);
+}
+
+.ed-whiteboard__list tbody .ed-whiteboard__row--keyboard-selected td {
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-surface));
+  box-shadow: inset 3px 0 0 var(--status-info);
+}
+
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-warning td {
+  background: color-mix(in srgb, var(--status-warning) 8%, var(--color-surface));
+}
+
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-critical td,
+.ed-whiteboard__list tbody .ed-whiteboard__row--long-wait-lwbs td {
+  background: color-mix(in srgb, var(--status-critical) 10%, var(--color-surface));
+  box-shadow: inset 3px 0 0 var(--status-critical);
+}
+
+.ed-whiteboard__list td strong {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+}
+
+.ed-whiteboard__list td small,
+.ed-whiteboard__flag-list {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.ed-whiteboard__wait {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  font-weight: 850;
+}
+
+.ed-whiteboard__wait--warning {
+  color: var(--status-warning);
+  font-weight: 950;
+}
+
+.ed-whiteboard__wait--critical,
+.ed-whiteboard__wait--lwbs {
+  color: var(--status-critical);
+  font-weight: 1000;
+}
+
+.ed-whiteboard__priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.ed-whiteboard__priority--P1 {
+  background: color-mix(in srgb, var(--status-critical) 20%, var(--color-elevated));
+  color: var(--status-critical);
+}
+
+.ed-whiteboard__priority--P2,
+.ed-whiteboard__priority--P3 {
+  background: color-mix(in srgb, var(--status-warning) 20%, var(--color-elevated));
+  color: var(--status-warning);
+}
+
+.ed-whiteboard__priority--P4 {
+  background: color-mix(in srgb, var(--status-stable) 16%, var(--color-elevated));
+  color: var(--status-stable);
+}
+
+.ed-whiteboard__priority--P5 {
+  background: var(--color-elevated);
+  color: var(--color-text-muted);
+}
+
+.ed-whiteboard__empty {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  height: 100%;
+  color: var(--color-text-muted);
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-align: center;
+  animation: ed-whiteboard-card-enter var(--motion-transition-slow) both;
+}
+
+@keyframes ed-whiteboard-banner-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ed-whiteboard-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__hero p:last-child {
+  max-width: 720px;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__stats {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__grid {
+  gap: 10px;
+}
+
+.emergency-whiteboard-page--awareness .emergency-whiteboard-page__card-key {
+  display: none;
+}
+
+.emergency-whiteboard-page__awareness-banner button:hover,
+.emergency-whiteboard-page__board-limit button:hover {
+  filter: brightness(1.08);
+}
+
+.emergency-whiteboard-page__mission-card,
+.emergency-whiteboard-page__arrival-card {
+  border-color: var(--component-inner-surface-border) !important;
+  border-radius: var(--component-inner-radius) !important;
+  background: var(--color-card) !important;
+  box-shadow: none !important;
+}
+
+.emergency-whiteboard-page__mission-card button {
+  box-shadow: none !important;
+}
+
+.emergency-whiteboard-page__arrival-card button,
+.emergency-whiteboard-page__mission-card > div:last-child > button {
+  background: transparent !important;
+}
+
+.emergency-whiteboard-page__card-key {
+  align-items: center;
+  display: flex;
+  flex: 1 1 360px;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.emergency-whiteboard-page__card-key span {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-floating-surface) 76%, transparent);
+  border: 1px solid var(--component-inner-surface-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.emergency-whiteboard-page__card-key i {
+  border-radius: 999px;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+
+.emergency-whiteboard-page__queue-intelligence {
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-background);
+  padding: 12px 16px;
+}
+
+.emergency-whiteboard-page__queue-intelligence .queue-intel {
+  height: auto;
+  min-height: 214px;
+}

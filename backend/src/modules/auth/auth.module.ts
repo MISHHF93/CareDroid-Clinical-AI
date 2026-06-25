@@ -16,13 +16,9 @@ import { UserProfile } from '../users/entities/user-profile.entity';
 import { OAuthAccount } from '../users/entities/oauth-account.entity';
 import { Subscription } from '../subscriptions/entities/subscription.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
-import {
-  OrganizationMembership,
-} from '../organizations/entities/organization-membership.entity';
+import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
 import { Workspace } from '../workspaces/entities/workspace.entity';
-import {
-  WorkspaceMembership,
-} from '../workspaces/entities/workspace-membership.entity';
+import { WorkspaceMembership } from '../workspaces/entities/workspace-membership.entity';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { BiometricConfig } from './entities/biometric-config.entity';
 import { UsersModule } from '../users/users.module';
