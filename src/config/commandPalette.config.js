@@ -70,6 +70,11 @@ const ROUTE_COMMAND_METADATA_BY_NAV_ID = Object.freeze({
     hint: 'Shift',
     keywords: ['shift', 'shift summary', 'handoff', 'brief', 'handover'],
   },
+  help: {
+    label: 'Open Guide',
+    hint: '?',
+    keywords: ['guide', 'help', 'manual', 'procedure', 'training'],
+  },
 });
 
 function routeCommandFromNavigationItem(item) {
@@ -120,6 +125,30 @@ export const EMERGENCY_OS_ROUTE_COMMANDS = Object.freeze(
     ...RETAINED_DIRECT_ROUTE_COMMANDS,
   ],
 );
+
+export const EMERGENCY_OS_HELP_COMMANDS = Object.freeze([
+  {
+    id: 'open-guide',
+    label: 'Open CareDroid Guide',
+    hint: '?',
+    keywords: ['help', 'guide', 'manual', 'procedure', 'process', 'how to', 'training', 'walkthrough'],
+    build: () => ({ type: 'OPEN_HELP', tab: 'page' }),
+  },
+  {
+    id: 'open-guide-role',
+    label: 'Open my role playbook',
+    hint: 'Role',
+    keywords: ['role', 'playbook', 'permissions', 'what can i do'],
+    build: () => ({ type: 'OPEN_HELP', tab: 'role' }),
+  },
+  {
+    id: 'open-guide-process',
+    label: 'Open full ED process (A–K)',
+    hint: 'A–K',
+    keywords: ['journey', 'walkthrough', 'demo', 'a-k', 'process', 'patient flow'],
+    build: () => ({ type: 'OPEN_HELP', tab: 'process' }),
+  },
+]);
 
 export const EMERGENCY_OS_TOOL_COMMANDS = Object.freeze([
   {

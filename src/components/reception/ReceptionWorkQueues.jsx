@@ -34,6 +34,12 @@ export const RECEPTION_QUEUE_TABS = [
   { id: 'pretriage', label: RECEPTION_COPY.queues.tabs.pretriage },
 ];
 
+const RECEPTION_QUEUE_HELP_TOPIC = {
+  ems: 'ems',
+  verification: 'reception',
+  pretriage: 'reception',
+};
+
 export default function ReceptionWorkQueues({
   patients = [],
   activeTab: activeTabProp = 'ems',
@@ -254,6 +260,7 @@ export default function ReceptionWorkQueues({
             guidance={emptyGuidance?.guidance}
             status="Queue is clear for this lane."
             nextSteps={emptyGuidance?.nextSteps || []}
+            helpTopicId={RECEPTION_QUEUE_HELP_TOPIC[activeTab] || 'reception'}
             actions={
               <>
                 {onRegisterWalkIn ? (

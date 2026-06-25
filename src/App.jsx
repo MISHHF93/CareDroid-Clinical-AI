@@ -39,6 +39,7 @@ const SelfArrivalCheckIn = lazyRoute(() => import('./pages/emergency/SelfArrival
 const PatientRoomDisplay = lazyRoute(() => import('./pages/emergency/PatientRoomDisplay'));
 const EmergencyAnalytics = lazyRoute(() => import('./pages/emergency/EmergencyAnalytics'));
 const EmergencySettings = lazyRoute(() => import('./pages/emergency/EmergencySettings'));
+const HelpHubPage = lazyRoute(() => import('./pages/emergency/HelpHubPage'));
 const EMSPipeline = lazyRoute(() => import('./components/EMSPipeline'));
 const ToolsOverview = lazyRoute(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazyRoute(() => import('./pages/tools/ClinicalToolCatalog'));
@@ -964,6 +965,16 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
               <LazyRoute label="Loading settings...">
                 <EmergencySettings />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyHelp}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
+              <LazyRoute label="Loading guide...">
+                <HelpHubPage />
               </LazyRoute>
             </EmergencyRouteGuard>
           }

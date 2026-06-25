@@ -99,6 +99,7 @@ export default function EmsPreArrivalPanel({
           guidance={EMPTY_STATE_COPY.reception.emsPreArrival.guidance}
           status="No inbound units on the feed."
           nextSteps={EMPTY_STATE_COPY.reception.emsPreArrival.nextSteps}
+          helpTopicId="ems"
           actions={
             onRefresh ? (
               <OperationalEmptyAction secondary onClick={onRefresh}>

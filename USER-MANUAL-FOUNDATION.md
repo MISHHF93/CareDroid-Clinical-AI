@@ -480,18 +480,30 @@ When the UI changes, update manual content from these files first:
 | Demo journey | `src/config/demoPersonaModel.ts` |
 | Reception-first policy | `src/config/receptionFirstUx.config.js` |
 | Practitioner UI visibility | `src/config/practitionerSurfaceVisibility.js` |
+| Embedded manual content | `src/config/userManual.config.ts` |
+| In-app HelpHub UI | `src/components/help/HelpHub.tsx`, `src/contexts/HelpHubContext.tsx` |
 | Existing practitioner guide | `docs/USER-MANUAL.md` |
 
 ---
 
-## 12. Next steps
+## 12. Implementation status (June 2026)
 
-1. **Approve this TOC** — adjust chapter numbering before splitting content.  
-2. **Extract L2 empty states** — add “Full guide →” links to `help/chapters/*`.  
-3. **Implement `help/manual.manifest.json`** — map routes to chapters for in-app drawer.  
-4. **Split `docs/USER-MANUAL.md`** — move role playbooks into `help/roles/` without duplicating safety copy.  
-5. **Add Help entry** — Settings + command palette + session chrome `?` icon.  
-6. **Screenshot pass** — one visual per chapter using demo persona roles A–K.  
+The embedded manual platform is **live in the app**. Content is authored in code, not a separate manifest file.
+
+| Layer | Location |
+|-------|----------|
+| Procedure content (17 topics, role playbooks, patient journey) | `src/config/userManual.config.ts` |
+| Route + role resolver | `src/hooks/useContextualHelp.ts` |
+| Drawer + full page UI | `src/components/help/HelpHub.tsx`, `src/pages/emergency/HelpHubPage.tsx` |
+| Global open/close events | `src/contexts/HelpHubContext.tsx` |
+| Entry points | Sidebar **Guide** (`/emergency/help`), header `?`, session chrome **Guide ?**, command palette, `?` keyboard shortcut |
+| Empty-state links | `OperationalEmptyState` `helpTopicId` prop on Reception, Whiteboard, Copilot, Shift |
+
+### Remaining authoring work
+
+1. **Approve Part I–VI TOC** (§9) — adjust chapter numbering before splitting `docs/USER-MANUAL.md`.  
+2. **Screenshot pass** — one visual per topic using demo persona roles A–K.  
+3. **Expand topics** — add specialty calculator and platform-extension chapters when those surfaces ship to pilot.  
 
 ---
 

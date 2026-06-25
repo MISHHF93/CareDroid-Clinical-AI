@@ -3,6 +3,8 @@ import './OperationalEmptyState.css';
 /**
  * Structured operational empty state — guidance, actions, status, and next steps.
  */
+import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
+
 export default function OperationalEmptyState({
   icon = '○',
   title,
@@ -11,6 +13,7 @@ export default function OperationalEmptyState({
   statusTone = 'stable',
   nextSteps = [],
   actions = null,
+  helpTopicId = null,
   size = 'card',
   className = '',
   role = 'status',
@@ -52,7 +55,19 @@ export default function OperationalEmptyState({
           ))}
         </ul>
       ) : null}
-      {actions ? <div className="operational-empty-state__actions">{actions}</div> : null}
+      {actions || helpTopicId ? (
+        <div className="operational-empty-state__actions">
+          {actions}
+          {helpTopicId ? (
+            <OperationalEmptyAction
+              secondary
+              onClick={() => dispatchOpenHelpHub({ tab: 'topics', topicId: helpTopicId })}
+            >
+              Open procedure guide
+            </OperationalEmptyAction>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }

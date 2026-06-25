@@ -39,6 +39,7 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
 
 /** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'help',
   'pulse',
   'shift',
 ]);
@@ -213,6 +214,13 @@ export const NAV_ITEMS = Object.freeze([
     label: 'Settings',
     icon: 'settings',
     route: CANONICAL_ROUTES.emergencySettings,
+    featureGate: null,
+  },
+  {
+    id: 'help',
+    label: 'Guide',
+    icon: 'procedures',
+    route: CANONICAL_ROUTES.emergencyHelp,
     featureGate: null,
   },
   {

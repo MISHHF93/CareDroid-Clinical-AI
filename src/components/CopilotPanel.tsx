@@ -941,6 +941,7 @@ export function CopilotPanel() {
           icon="💬"
           title={EMPTY_STATE_COPY.copilot.noMessages.title}
           guidance={EMPTY_STATE_COPY.copilot.noMessages.guidance}
+          helpTopicId="copilot"
           actions={QUICK_ACTIONS.slice(0, quickActionLimit).map((prompt) => (
             <OperationalEmptyAction key={prompt} secondary onClick={() => sendQuickAction(prompt)}>
               {prompt}

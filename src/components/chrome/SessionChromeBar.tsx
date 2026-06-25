@@ -12,6 +12,7 @@ import DemoPersonaDrawer from '../account/DemoPersonaDrawer';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import type { CopilotShellTab } from '../copilot/CopilotShell';
+import HelpTrigger from '../help/HelpTrigger';
 import './SessionChromeBar.css';
 
 function isLocalDevHost(): boolean {
@@ -75,10 +76,6 @@ export default function SessionChromeBar() {
     window.addEventListener('ed:copilot-tab-changed', handleTabChanged);
     return () => window.removeEventListener('ed:copilot-tab-changed', handleTabChanged);
   }, []);
-
-  if (!hasStatusSegments && !showDemoPanel && !showSessionCopilot) {
-    return null;
-  }
 
   return (
     <div
@@ -157,6 +154,7 @@ export default function SessionChromeBar() {
       </div>
 
       <div className="session-chrome-bar__actions">
+        <HelpTrigger variant="pill" label="Guide ?" tab="page" />
         {showDemoPanel ? (
           <button
             type="button"

@@ -302,6 +302,7 @@ const TOOL_ICONS = {
   protocols: ClipboardList,
   diagnosis: Stethoscope,
   procedures: BookOpen,
+  help: BookOpen,
   'ambient-scribe': FileEdit,
   'calculator-recommender-ai': Lightbulb,
   'guideline-rag': ScrollText,

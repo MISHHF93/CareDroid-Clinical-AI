@@ -37,6 +37,7 @@ import { useSimulationMode } from '../contexts/SimulationModeContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+import { HelpHubProvider, dispatchOpenHelpHub } from '../contexts/HelpHubContext';
 import './app-shell.css';
 import './CopilotPanel.css';
 import { CopilotPanel } from './CopilotPanel';
@@ -51,6 +52,7 @@ const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
 const CommandPalette = lazy(() => import('./CommandPalette'));
 const EMSCriticalBroadcast = lazy(() => import('./EMSCriticalBroadcast'));
 const ReassessmentDrawer = lazy(() => import('./ReassessmentDrawer'));
+const HelpHub = lazy(() => import('./help/HelpHub'));
 
 const REASSESSMENT_FLAGS = new Set<string>([
   PatientFlag.DeteriorationRisk,
@@ -88,6 +90,7 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyBoarding]: `${EMERGENCY_OS_BRANDING.productName} - Flow & Capacity`,
   [CANONICAL_ROUTES.emergencyCopilot]: `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
   [CANONICAL_ROUTES.emergencyTools]: `${EMERGENCY_OS_BRANDING.productName} - Medical Tools`,
+  [CANONICAL_ROUTES.emergencyHelp]: `${EMERGENCY_OS_BRANDING.productName} - Guide`,
   [CANONICAL_ROUTES.emergencyAnalytics]: `${EMERGENCY_OS_BRANDING.productName} - Analytics`,
   [CANONICAL_ROUTES.workspace]: `${EMERGENCY_OS_BRANDING.productName} - Platform`,
   [CANONICAL_ROUTES.workspaces]: `${EMERGENCY_OS_BRANDING.productName} - Workspaces`,
@@ -129,6 +132,8 @@ type CommandAction = {
   patientId?: string;
   value?: string;
   calculatorId?: string;
+  tab?: 'page' | 'role' | 'process' | 'topics' | 'shortcuts';
+  topicId?: string;
 };
 
 function isEditableShortcutTarget(target: EventTarget | null): boolean {
@@ -207,7 +212,9 @@ function buildEmergencyToolsPath(params: Record<string, string | null | undefine
 export function AppShell({ children }: AppShellProps) {
   return (
     <PractitionerVisibilityProvider>
-      <AppShellFrame>{children}</AppShellFrame>
+      <HelpHubProvider>
+        <AppShellFrame>{children}</AppShellFrame>
+      </HelpHubProvider>
     </PractitionerVisibilityProvider>
   );
 }
@@ -460,6 +467,7 @@ function AppShellFrame({ children }: AppShellProps) {
       if (inInput) return;
 
       if (e.key === 'Escape') {
+        document.dispatchEvent(new Event('close-help-hub'));
         if (store.copilotOpen) {
           store.setCopilotOpen(false);
           return;
@@ -467,6 +475,12 @@ function AppShellFrame({ children }: AppShellProps) {
         store.selectPatient(null);
         setShowReassessmentDrawer(false);
         document.dispatchEvent(new Event('close-all-panels'));
+        return;
+      }
+
+      if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
+        e.preventDefault();
+        dispatchOpenHelpHub({ tab: 'page' });
         return;
       }
 
@@ -669,6 +683,9 @@ function AppShellFrame({ children }: AppShellProps) {
         document.dispatchEvent(new Event('clear-whiteboard-filters'));
         profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard);
         break;
+      case 'OPEN_HELP':
+        dispatchOpenHelpHub({ tab: action.tab || 'page', topicId: action.topicId });
+        break;
       default:
         break;
     }
@@ -785,6 +802,13 @@ function AppShellFrame({ children }: AppShellProps) {
               onClose={() => setShowPalette(false)}
               onExecute={handleCommandExecute}
             />
+          </Suspense>
+        </ErrorBoundary>
+      ) : null}
+      {!useKioskShell ? (
+        <ErrorBoundary fallbackText="Guide panel encountered an error.">
+          <Suspense fallback={null}>
+            <HelpHub />
           </Suspense>
         </ErrorBoundary>
       ) : null}

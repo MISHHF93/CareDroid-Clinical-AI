@@ -2817,6 +2817,9 @@ export default function EmergencyWhiteboard() {
                 ? EMPTY_STATE_COPY.whiteboard.empty.nextSteps
                 : EMPTY_STATE_COPY.whiteboard.filtered.nextSteps
             }
+            helpTopicId={
+              !activeQueueFilter && activeFilter === 'All' ? 'whiteboard' : 'queues'
+            }
             actions={
               <>
                 {activeQueueFilter || activeFilter !== 'All' ? (

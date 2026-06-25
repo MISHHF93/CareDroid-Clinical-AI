@@ -1,0 +1,422 @@
+.help-hub-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1100);
+  background: color-mix(in srgb, var(--medical-ink, #111827) 28%, transparent);
+}
+
+.help-hub {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: calc(var(--z-modal, 1100) + 1);
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 520px);
+  border-inline-start: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-body, #111827);
+  box-shadow: -12px 0 40px rgba(2, 6, 23, 0.12);
+}
+
+.help-hub--page {
+  position: static;
+  width: 100%;
+  max-width: var(--app-visual-page-max, 960px);
+  margin-inline: auto;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: var(--ed-radius-lg, 12px);
+  box-shadow: var(--shadow-1, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.help-hub__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-page, #f0f9ff);
+}
+
+.help-hub__header-main {
+  min-width: 0;
+}
+
+.help-hub__eyebrow {
+  margin: 0;
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.help-hub__title {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.help-hub__subtitle {
+  margin: 6px 0 0;
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.help-hub__close {
+  flex-shrink: 0;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 8px;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 10px;
+}
+
+.help-hub__tabs {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+}
+
+.help-hub__tab {
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 999px;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
+.help-hub__tab[data-active='true'] {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 50%, transparent);
+  background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
+  color: var(--medical-text-body, #111827);
+}
+
+.help-hub__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  overscroll-behavior: contain;
+}
+
+.help-hub__intro {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--medical-card-accent-border, rgba(14, 165, 233, 0.35));
+  border-radius: 10px;
+  background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
+}
+
+.help-hub__intro p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.help-hub__intro ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.help-hub__safety {
+  margin-top: 10px;
+  color: var(--medical-status-success-text, #15803d);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.help-hub__role-card {
+  padding: 12px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 10px;
+  background: var(--medical-surface-page, #f0f9ff);
+}
+
+.help-hub__role-card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.help-hub__role-card h4 {
+  margin: 12px 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--medical-text-muted, #6b7280);
+}
+
+.help-hub__role-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.help-hub__role-card li + li {
+  margin-top: 4px;
+}
+
+.help-hub__journey-step {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+}
+
+.help-hub__journey-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
+  color: var(--app-accent-interactive, #0ea5e9);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.help-hub__journey-body strong {
+  display: block;
+  font-size: 13px;
+}
+
+.help-hub__journey-body p {
+  margin: 4px 0 0;
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.help-hub__go-btn {
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 8px;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--app-accent-interactive, #0ea5e9);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.help-hub__topic-list {
+  display: grid;
+  gap: 8px;
+}
+
+.help-hub__topic-btn {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 10px;
+  background: var(--medical-surface-card, #ffffff);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.help-hub__topic-btn strong {
+  font-size: 13px;
+}
+
+.help-hub__topic-btn span {
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.help-hub__shortcut-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.help-hub__shortcut-table th,
+.help-hub__shortcut-table td {
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  padding: 8px 4px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.help-hub__shortcut-table th {
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.help-hub__shortcut-table code {
+  border-radius: 6px;
+  background: var(--medical-surface-page, #f0f9ff);
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.help-topic__header {
+  margin-bottom: 14px;
+}
+
+.help-topic__eyebrow {
+  margin: 0;
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.help-topic__title {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.help-topic__purpose,
+.help-topic__when,
+.help-topic__not-for {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.help-topic__section {
+  margin-top: 14px;
+}
+
+.help-topic__section h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--medical-text-muted, #6b7280);
+}
+
+.help-topic__steps {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.help-topic__steps li + li {
+  margin-top: 8px;
+}
+
+.help-topic__queues {
+  margin: 0;
+}
+
+.help-topic__queue-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  font-size: 12px;
+}
+
+.help-topic__queue-row dt {
+  font-weight: 800;
+}
+
+.help-topic__queue-row dd {
+  margin: 0;
+  color: var(--medical-text-muted, #6b7280);
+}
+
+.help-topic__tips {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.help-topic__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--medical-border, #e0f2fe);
+}
+
+.help-topic__route-link {
+  color: var(--app-accent-interactive, #0ea5e9);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.help-topic__related {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.help-topic__related-btn {
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 999px;
+  background: var(--medical-surface-page, #f0f9ff);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+
+.help-hub__footer {
+  border-top: 1px solid var(--medical-border, #e0f2fe);
+  margin-top: auto;
+  padding: 10px 14px 12px;
+}
+
+.help-hub__footer p {
+  color: var(--medical-text-muted, #64748b);
+  font-size: 10px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.help-hub__footer code {
+  font-size: 10px;
+}
+
+.help-hub-page {
+  padding: 12px 16px 24px;
+}
+
+@media (max-width: 768px) {
+  .help-hub {
+    width: 100%;
+  }
+}

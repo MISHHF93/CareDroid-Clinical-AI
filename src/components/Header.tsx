@@ -51,8 +51,8 @@ import {
 } from '../services/emsOffloadTracker';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
-import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+import HelpTrigger from './help/HelpTrigger';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
@@ -993,6 +993,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             >
               {isReceptionRoute ? RECEPTION_COPY.header.register : 'Create'}
             </button>
+            <HelpTrigger variant="icon" tab="page" />
             {screenCapabilities.showReassessAction ? (
             <button
               type="button"

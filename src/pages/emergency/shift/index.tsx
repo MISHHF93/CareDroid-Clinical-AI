@@ -186,6 +186,7 @@ export default function EmergencyShiftSummaryPage() {
           guidance={EMPTY_STATE_COPY.shift.empty.guidance}
           status={EMPTY_STATE_COPY.shift.empty.status}
           nextSteps={EMPTY_STATE_COPY.shift.empty.nextSteps}
+          helpTopicId="shift"
         />
       ) : null}
 

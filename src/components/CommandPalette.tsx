@@ -23,6 +23,7 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../config/userProfileCompiler';
 import {
   EMERGENCY_OS_ROUTE_COMMANDS,
+  EMERGENCY_OS_HELP_COMMANDS,
   EMERGENCY_OS_TOOL_COMMANDS,
 } from '../config/commandPalette.config';
 import { RECEPTION_FIRST_UX, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
@@ -32,6 +33,7 @@ import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+import { dispatchOpenHelpHub } from '../contexts/HelpHubContext';
 import type { EmergencyRoleActionPresentation } from '../config/emergencyRoleActionMatrix';
 import type { Patient } from '../types/emergency';
 import { getPatientDisplayName, rankPatientsBySearch, scorePatientSearch } from '../utils/patientSearch';
@@ -609,6 +611,20 @@ function createCommands(
       group: 'Clinical' as const,
       description: command.description?.replace(' in the active CareDroid shell.', ' in Medical Tools.'),
     })),
+    ...EMERGENCY_OS_HELP_COMMANDS.map((command) => {
+      const built = command.build() as { type: string; tab?: 'page' | 'role' | 'process' | 'topics' | 'shortcuts'; topicId?: string };
+      return {
+        id: command.id,
+        label: command.label.replace(/^Open /, ''),
+        description: 'CareDroid process guide and role procedures',
+        shortcut: command.hint,
+        group: 'Help' as const,
+        keywords: [...command.keywords],
+        action: () => {
+          dispatchOpenHelpHub({ tab: built.tab, topicId: built.topicId });
+        },
+      };
+    }),
     {
       id: 'patient-lookup',
       label: 'Patient Lookup',

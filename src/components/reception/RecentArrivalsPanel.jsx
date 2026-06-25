@@ -53,6 +53,7 @@ export default function RecentArrivalsPanel({ patients = [], onSelectPatient, on
           guidance={EMPTY_STATE_COPY.reception.recentArrivals.guidance}
           status="No registrations in the last 30 minutes."
           nextSteps={EMPTY_STATE_COPY.reception.recentArrivals.nextSteps}
+          helpTopicId="reception"
           actions={
             onRegisterWalkIn ? (
               <OperationalEmptyAction onClick={onRegisterWalkIn}>Register walk-in</OperationalEmptyAction>
