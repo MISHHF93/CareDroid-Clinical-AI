@@ -418,7 +418,7 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
                   width={36}
                 />
                 <Tooltip content={<VitalsTooltip />} cursor={{ stroke: '#e0f2fe', strokeDasharray: '3 3' }} />
-                <ReferenceLine y={94} stroke=MEDICAL_THEME.accent strokeDasharray="4 4" strokeOpacity={0.45} />
+                <ReferenceLine y={94} stroke={MEDICAL_THEME.accent} strokeDasharray="4 4" strokeOpacity={0.45} />
                 <ReferenceLine y={100} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.4} />
                 <ReferenceLine y={90} stroke="#F59E0B" strokeDasharray="4 4" strokeOpacity={0.45} />
                 {vitalsLineConfig.map((line) => (
@@ -958,7 +958,7 @@ export default function PatientDetailPanel() {
 
         <div className="patient-detail-panel__badge-row">
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
-          <Badge color=MEDICAL_THEME.inkSubtle>{selectedPatient.state}</Badge>
+          <Badge color={MEDICAL_THEME.inkSubtle}>{selectedPatient.state}</Badge>
           <PatientExperienceStatusBadge
             patient={selectedPatient}
             referrals={referrals}

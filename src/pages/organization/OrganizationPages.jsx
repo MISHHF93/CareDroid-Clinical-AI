@@ -367,7 +367,7 @@ export function OrganizationSettings() {
             Accent color
             <input
               value={form.accentColor}
-              placeholder=MEDICAL_THEME.accent
+              placeholder={MEDICAL_THEME.accent}
               onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
             />
           </label>
@@ -1851,7 +1851,7 @@ export function TenantAdministrationCenter() {
             Accent color
             <input
               value={form.accentColor}
-              placeholder=MEDICAL_THEME.accent
+              placeholder={MEDICAL_THEME.accent}
               onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
             />
           </label>
