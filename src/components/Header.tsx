@@ -51,7 +51,6 @@ import {
 } from '../services/emsOffloadTracker';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
-import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import HelpTrigger from './help/HelpTrigger';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
