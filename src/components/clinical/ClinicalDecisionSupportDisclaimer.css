@@ -6,7 +6,7 @@
   padding: 0.75rem 1rem;
   border-radius: 8px;
   border: 1px solid var(--app-border, rgba(148, 163, 184, 0.35));
-  background: var(--app-surface-muted, rgba(15, 23, 42, 0.04));
+  background: var(--app-surface-muted, var(--medical-surface-page, #f0f9ff));
   font-size: clamp(0.8125rem, 2vw + 0.45rem, 0.875rem);
   line-height: 1.45;
   color: var(--app-fg-muted, #475569);

@@ -1,12 +1,12 @@
 .demo-persona-panel {
   border-bottom: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.08));
-  background: color-mix(in srgb, var(--app-accent, #00ff88) 8%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
 }
 
 .demo-persona-panel--drawer {
   border: 1px solid var(--ed-border-subtle, rgba(255, 255, 255, 0.08));
   border-radius: var(--ed-radius-md, 10px);
-  background: color-mix(in srgb, var(--ed-surface-overlay, #1e293b) 88%, transparent);
+  background: color-mix(in srgb, var(--ed-surface-overlay, var(--app-surface-elevated, #ffffff)) 88%, transparent);
 }
 
 .demo-persona-panel__bar--compact .demo-persona-panel__subtitle {
@@ -100,12 +100,12 @@
 }
 
 .demo-persona-panel__role-chip:hover {
-  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 45%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 45%, transparent);
 }
 
 .demo-persona-panel__role-chip.is-active {
-  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 60%, transparent);
-  background: color-mix(in srgb, var(--app-accent, #00ff88) 14%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 60%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
   font-weight: 650;
 }
 
@@ -156,7 +156,7 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  background: color-mix(in srgb, var(--app-accent, #00ff88) 18%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
 }
 
 .demo-persona-panel__journey-copy strong {

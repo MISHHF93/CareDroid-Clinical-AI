@@ -1,7 +1,7 @@
 .shift-summary {
   min-height: 100%;
-  background: #0a0e1a;
-  color: #f9fafb;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-ink, #111827);
   display: grid;
   gap: 18px;
   padding: 24px;
@@ -11,9 +11,9 @@
 .shift-summary__header-card,
 .shift-summary__section,
 .shift-summary__limitations {
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 18px;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
 
@@ -26,7 +26,7 @@
 }
 
 .shift-summary__eyebrow {
-  color: #60a5fa;
+  color: var(--app-accent-interactive);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -52,7 +52,7 @@
 .shift-summary p,
 .shift-summary small,
 .shift-summary__section-header p {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .shift-summary__hero p {
@@ -63,8 +63,8 @@
 .shift-summary__handoff {
   border: 1px solid rgba(96, 165, 250, 0.45);
   border-radius: 12px;
-  background: #2563eb;
-  color: #f9fafb;
+  background: var(--app-accent-interactive);
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   font-weight: 800;
   padding: 11px 14px;
@@ -81,7 +81,7 @@
   display: grid;
   gap: 5px;
   padding: 18px;
-  border-right: 1px solid #1f2937;
+  border-right: 1px solid var(--medical-border, #e0f2fe);
 }
 
 .shift-summary__header-card > div:last-child {
@@ -91,7 +91,7 @@
 .shift-summary__header-card span,
 .shift-summary__clinical-grid span,
 .shift-summary__stat span {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .shift-summary__status {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 13px;
 }
 
@@ -127,9 +127,9 @@
 
 .shift-summary__stat,
 .shift-summary__clinical-grid article {
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
-  background: rgba(15, 23, 42, 0.82);
+  background: var(--medical-surface-card, #ffffff);
   display: grid;
   gap: 7px;
   padding: 16px;
@@ -137,13 +137,13 @@
 
 .shift-summary__stat strong,
 .shift-summary__clinical-grid strong {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 28px;
   line-height: 1;
 }
 
 .shift-summary__stat--blue strong {
-  color: #60a5fa;
+  color: var(--app-accent-interactive);
 }
 
 .shift-summary__stat--green strong {
@@ -174,13 +174,13 @@
 
 .shift-summary__table th,
 .shift-summary__table td {
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
   padding: 12px;
   text-align: left;
 }
 
 .shift-summary__table th {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -199,14 +199,14 @@
 
 .shift-summary__timeline article {
   align-items: center;
-  border-left: 3px solid #60a5fa;
+  border-left: 3px solid var(--app-accent-interactive);
   display: grid;
   gap: 3px;
   padding: 6px 0 6px 12px;
 }
 
 .shift-summary__timeline time {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 12px;
   font-weight: 800;
 }
@@ -224,8 +224,8 @@
 }
 
 .shift-summary__capacity-track {
-  background: #0f172a;
-  border: 1px solid #1f2937;
+  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   height: 12px;
   overflow: hidden;
@@ -263,7 +263,7 @@
 }
 
 .shift-summary__limitations {
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
   padding: 16px 18px;
 }
 
@@ -277,7 +277,7 @@
 }
 
 .shift-summary__limitations li {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   margin-top: 4px;
 }
 
@@ -300,6 +300,6 @@
 
   .shift-summary__header-card > div {
     border-right: 0;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid var(--medical-border, #e0f2fe);
   }
 }

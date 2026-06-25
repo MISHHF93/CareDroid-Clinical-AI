@@ -1,18 +1,18 @@
 :root,
 html {
-  /* Emergency Operations Mission Control primitives */
-  --color-primary: #3b82f6;
+  /* Standard medical palette — white surfaces + sky blue accent */
+  --color-primary: #0ea5e9;
   --color-secondary: #38bdf8;
-  --color-accent: #22d3ee;
-  --color-background: #0b1220;
-  --color-surface: #111827;
-  --color-card: #172033;
-  --color-floating-surface: #1e293b;
-  --color-border-default: #2d3748;
-  --color-border-subtle: color-mix(in srgb, var(--color-border-default) 72%, transparent);
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted: color-mix(in srgb, var(--color-text-secondary) 74%, transparent);
+  --color-accent: #7dd3fc;
+  --color-background: #f0f9ff;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-floating-surface: #ffffff;
+  --color-border-default: #e0f2fe;
+  --color-border-subtle: #e0f2fe;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
 
   --bg-base: var(--color-background);
   --bg-surface: var(--color-surface);
@@ -27,7 +27,7 @@ html {
   --status-warning: #f59e0b;
   --status-danger: #ef4444;
   --status-critical: #ef4444;
-  --status-info: #06b6d4;
+  --status-info: #0ea5e9;
   --status-emergency: #dc2626;
   --status-stable: var(--status-success);
   --status-inactive: var(--color-text-secondary);
@@ -78,9 +78,9 @@ html {
   --radius-pill: 999px;
 
   --elevation-none: none;
-  --elevation-card: 0 10px 24px rgba(2, 6, 23, 0.22);
-  --elevation-floating: 0 18px 40px rgba(2, 6, 23, 0.3);
-  --elevation-modal: 0 24px 60px rgba(2, 6, 23, 0.38);
+  --elevation-card: 0 8px 20px rgba(14, 165, 233, 0.06);
+  --elevation-floating: 0 16px 36px rgba(14, 165, 233, 0.08);
+  --elevation-modal: 0 24px 60px rgba(14, 165, 233, 0.12);
   --component-button-height: 40px;
   --component-button-radius: 12px;
 
@@ -115,7 +115,7 @@ html {
   --app-accent-2: var(--color-secondary);
   --app-accent-interactive: var(--color-primary);
   --app-accent-action: var(--color-primary);
-  --app-accent-hover: color-mix(in srgb, var(--color-primary) 82%, white);
+  --app-accent-hover: #0284c7;
   --app-danger: var(--status-danger);
   --app-warning: var(--status-warning);
   --app-success: var(--status-success);
@@ -124,8 +124,8 @@ html {
   --app-focus: color-mix(in srgb, var(--color-primary) 22%, transparent);
   --app-focus-ring-aa: var(--color-primary);
   --app-hover: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  --app-input-bg: color-mix(in srgb, var(--color-floating-surface) 76%, var(--color-background));
-  --app-input-bg-hover: var(--color-floating-surface);
+  --app-input-bg: #ffffff;
+  --app-input-bg-hover: #ffffff;
   --app-input-border: var(--color-border-default);
   --app-table-header-bg: color-mix(in srgb, var(--color-floating-surface) 70%, var(--color-background));
   --app-table-row-hover: color-mix(in srgb, var(--color-primary) 8%, transparent);
@@ -135,10 +135,10 @@ html {
   --app-warning-contrast: #1f1600;
   --app-success-contrast: #04111f;
   --app-mesh-cyan: color-mix(in srgb, var(--color-accent) 5%, transparent);
-  --app-mesh-green: color-mix(in srgb, var(--status-success) 3%, transparent);
-  --app-scrollbar-track: color-mix(in srgb, var(--color-surface) 82%, var(--color-background));
-  --app-scrollbar-thumb: var(--color-border-default);
-  --app-scrollbar-thumb-hover: var(--color-text-secondary);
+  --app-mesh-green: transparent;
+  --app-scrollbar-track: color-mix(in srgb, var(--color-background) 72%, var(--color-surface));
+  --app-scrollbar-thumb: color-mix(in srgb, var(--color-primary) 24%, var(--color-border-default));
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--color-primary) 40%, var(--color-border-default));
   --app-code-bg: var(--color-background);
   --app-tool-card-body-bg: var(--color-surface);
   --app-tool-card-body-fg: var(--color-text-primary);
@@ -229,36 +229,9 @@ html {
   --info: var(--status-info);
 }
 
+html,
 html[data-theme='light'] {
   color-scheme: light;
-  --color-primary: #2563eb;
-  --color-secondary: #0ea5e9;
-  --color-accent: #06b6d4;
-  --color-background: #f6f8fb;
-  --color-surface: #ffffff;
-  --color-card: #ffffff;
-  --color-floating-surface: #ffffff;
-  --color-border-default: #e5e7eb;
-  --color-border-subtle: #e5e7eb;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
-  --elevation-card: 0 8px 20px rgba(17, 24, 39, 0.07);
-  --elevation-floating: 0 16px 36px rgba(17, 24, 39, 0.1);
-  --elevation-modal: 0 24px 60px rgba(17, 24, 39, 0.16);
-  --app-accent-contrast: #ffffff;
-  --app-input-bg: #ffffff;
-  --app-input-bg-hover: #ffffff;
-  --app-table-header-bg: color-mix(in srgb, var(--color-background) 78%, var(--color-surface));
-  --app-scrollbar-track: color-mix(in srgb, var(--color-background) 72%, var(--color-surface));
-  --app-scrollbar-thumb: color-mix(in srgb, var(--color-primary) 24%, var(--color-border-default));
-  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--color-primary) 40%, var(--color-border-default));
-  --app-mesh-cyan: color-mix(in srgb, var(--color-accent) 3%, transparent);
-  --app-mesh-green: transparent;
-}
-
-html[data-theme='dark'] {
-  color-scheme: dark;
 }
 
 body {

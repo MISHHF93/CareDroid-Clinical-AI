@@ -2,7 +2,7 @@
   border: 1px solid var(--color-border, #d8dee8);
   border-radius: 10px;
   padding: 0.85rem 1rem;
-  background: var(--color-surface-raised, #f8fafc);
+  background: var(--color-surface-raised, var(--medical-card-muted-bg, #f0f9ff));
   margin-top: 0.75rem;
 }
 
@@ -28,7 +28,7 @@
 .pre-arrival-form__completion {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--color-accent, #2563eb);
+  color: var(--color-accent, var(--app-accent-interactive));
   white-space: nowrap;
 }
 
@@ -49,9 +49,9 @@
 }
 
 .pre-arrival-form__framework button.is-active {
-  background: var(--color-accent, #2563eb);
-  border-color: var(--color-accent, #2563eb);
-  color: #fff;
+  background: var(--color-accent, var(--app-accent-interactive));
+  border-color: var(--color-accent, var(--app-accent-interactive));
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .pre-arrival-form__framework-label {

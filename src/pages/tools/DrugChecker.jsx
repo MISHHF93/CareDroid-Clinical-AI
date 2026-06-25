@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useMemo, useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
@@ -154,7 +155,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
       case 'major': return '#EF4444';
       case 'moderate': return '#F59E0B';
       case 'minor': return '#10B981';
-      default: return '#6B7280';
+      default: return MEDICAL_THEME.inkMuted;
     }
   };
 

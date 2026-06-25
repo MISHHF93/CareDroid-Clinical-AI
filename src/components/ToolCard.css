@@ -165,7 +165,7 @@
 
 .tool-card-pill--warn {
   background: color-mix(in srgb, var(--app-warning) 75%, var(--app-accent-contrast));
-  color: #0f172a;
+  color: var(--medical-card-fg, #111827);
 }
 
 .tool-card-pill--info {

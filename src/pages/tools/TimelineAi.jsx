@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { generateTimelineAi } from '../../services/clinicalIntelligenceApi';
 import ToolPageLayout from './ToolPageLayout';
@@ -8,7 +9,7 @@ const TOOL_CONFIG = {
   id: 'timeline-ai',
   name: 'Patient Timeline AI',
   path: '/tools/timeline-ai',
-  color: '#2563EB',
+  color: MEDICAL_THEME.accent,
   description: 'Summarize encounters, identify trends, and highlight abnormal progression',
   shortcut: 'Ctrl+Shift+J',
   category: 'Diagnostic',

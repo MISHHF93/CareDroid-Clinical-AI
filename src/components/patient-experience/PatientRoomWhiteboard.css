@@ -2,7 +2,7 @@
   min-height: 100%;
   padding: 1.25rem 1.5rem 2rem;
   background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
-  color: #0f172a;
+  color: var(--medical-card-fg, #111827);
 }
 
 .patient-room-whiteboard__header span {
@@ -31,7 +31,7 @@
   border-radius: 12px;
   padding: 0.9rem 1rem;
   margin-bottom: 0.75rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 3px rgba(14, 165, 233, 0.05);
 }
 
 .patient-room-whiteboard h2 {

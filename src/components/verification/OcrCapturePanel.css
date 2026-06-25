@@ -5,7 +5,7 @@
 
 .ocr-capture-panel header h3 {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 15px;
 }
 
@@ -25,7 +25,7 @@
   min-height: 32px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   background: transparent;
   color: var(--color-text-secondary, #9ca3af);
   font-size: 11px;
@@ -34,8 +34,8 @@
 }
 
 .ocr-capture-panel__artifact-chip--active {
-  border-color: #38bdf8;
-  color: var(--color-text-primary, #f9fafb);
+  border-color: var(--medical-text-link, #0ea5e9);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   background: rgba(56, 189, 248, 0.12);
 }
 
@@ -56,10 +56,10 @@
   gap: 6px;
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 10px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -81,7 +81,7 @@
   max-height: 200px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
 }
 
 .ocr-capture-panel__preview figcaption {
@@ -102,23 +102,23 @@
   min-height: 72px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
 }
 
 .ocr-capture-panel__extracted {
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .ocr-capture-panel__extracted h4 {
   margin: 0 0 8px;
   font-size: 12px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .ocr-capture-panel__extracted ul {
@@ -138,7 +138,7 @@
 }
 
 .ocr-capture-panel__extracted strong {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-weight: 600;
 }
 

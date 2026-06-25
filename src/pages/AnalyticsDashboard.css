@@ -42,7 +42,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-color, #4f46e5);
+  color: var(--app-accent-interactive);
 }
 
 .analytics-header p {
@@ -224,7 +224,7 @@
 
 .analytics-decision--merge {
   background: rgba(37, 99, 235, 0.14);
-  color: #2563eb;
+  color: var(--app-accent-interactive);
 }
 
 .analytics-decision--hide {
@@ -238,7 +238,7 @@
 }
 
 .analytics-row-fill--trend {
-  background: linear-gradient(90deg, #2563eb, #14b8a6);
+  background: linear-gradient(90deg, var(--app-accent-interactive), var(--app-accent-2));
 }
 
 .analytics-empty {
@@ -264,10 +264,10 @@
 }
 
 .analytics-recommendations {
-  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+  background: linear-gradient(135deg, var(--medical-surface-page, #f0f9ff) 0%, var(--medical-card-bg, #ffffff) 100%);
   border-radius: 20px;
   padding: 24px;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .analytics-recommendations h2 {
@@ -307,7 +307,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .recommendation-card h3 {

@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import React from 'react';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 
@@ -49,7 +50,7 @@ const CitationBadge = ({ citation, index, onClick }) => {
 const Citations = ({ citations, onViewDetails }) => {
   if (!citations || citations.length === 0) {
     return (
-      <p style={{ marginTop: 12, fontSize: 12, color: '#9CA3AF' }} role="status">
+      <p style={{ marginTop: 12, fontSize: 12, color: MEDICAL_THEME.inkSubtle }} role="status">
         {EMPTY_STATE_COPY.clinical.noCitations.guidance}
       </p>
     );

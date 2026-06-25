@@ -2,9 +2,9 @@
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
-  background: #0b1120;
+  background: var(--medical-surface-page, #f0f9ff);
 }
 
 .waiting-room-communication-quick-log__label {
@@ -13,7 +13,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .waiting-room-communication-quick-log__actions {
@@ -23,7 +23,7 @@
 }
 
 .waiting-room-communication-quick-log__button {
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 999px;
   background: transparent;
   color: #e5e7eb;
@@ -42,14 +42,14 @@
   display: grid;
   gap: 4px;
   font-size: 11px;
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .waiting-room-communication-quick-log__note input {
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 8px;
-  background: #111827;
-  color: #f9fafb;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #111827);
   font-size: 12px;
   padding: 7px 10px;
 }

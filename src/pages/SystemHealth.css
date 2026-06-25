@@ -164,7 +164,7 @@
   overflow: auto;
   padding: 12px;
   border-radius: 14px;
-  background: var(--app-code-bg, rgba(15, 23, 42, 0.08));
+  background: var(--app-code-bg, var(--medical-surface-page, #f0f9ff));
   color: var(--app-fg);
   font-size: 0.82rem;
 }

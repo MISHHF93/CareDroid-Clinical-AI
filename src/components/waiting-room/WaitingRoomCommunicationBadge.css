@@ -25,17 +25,17 @@
 .waiting-room-communication-badge--watch {
   background: rgba(59, 130, 246, 0.12);
   border-color: rgba(59, 130, 246, 0.35);
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
 }
 
 .waiting-room-communication-badge--warning {
   background: rgba(245, 158, 11, 0.12);
   border-color: rgba(245, 158, 11, 0.35);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .waiting-room-communication-badge--critical {
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.35);
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }

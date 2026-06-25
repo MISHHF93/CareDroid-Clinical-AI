@@ -140,10 +140,6 @@ body {
 }
 
 :where(select) {
-  color-scheme: dark;
-}
-
-html[data-theme='light'] :where(select) {
   color-scheme: light;
 }
 
@@ -265,7 +261,7 @@ html[data-theme='light'] :where(select) {
 }
 
 :where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover) {
-  background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #020617)) !important;
+  background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #f0f9ff)) !important;
   color: var(--app-danger-contrast) !important;
 }
 

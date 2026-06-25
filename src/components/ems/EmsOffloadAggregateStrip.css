@@ -3,9 +3,9 @@
   gap: 10px;
   margin: 0 16px 12px;
   padding: 12px 14px;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .ems-offload-aggregate-strip__header {
@@ -32,15 +32,15 @@
 
 .ems-offload-aggregate-strip__subtitle {
   margin: 4px 0 0;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
   max-width: 52ch;
 }
 
 .ems-offload-aggregate-strip__open {
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 999px;
-  background: #1f2937;
+  background: var(--medical-border, #e0f2fe);
   color: #e5e7eb;
   font-size: 12px;
   font-weight: 700;
@@ -59,8 +59,8 @@
   gap: 2px;
   padding: 10px;
   border-radius: 10px;
-  background: #0b1220;
-  border: 1px solid #1f2937;
+  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--medical-border, #e0f2fe);
 }
 
 .ems-offload-aggregate-strip__count strong {
@@ -69,7 +69,7 @@
 }
 
 .ems-offload-aggregate-strip__count span {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
 }
 
@@ -82,7 +82,7 @@
 }
 
 .ems-offload-aggregate-strip__count[data-tone='watch'] strong {
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .ems-offload-aggregate-strip__count[data-tone='info'] strong {

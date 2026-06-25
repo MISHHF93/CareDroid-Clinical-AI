@@ -227,14 +227,14 @@ export default function PlatformNavigationPage() {
             gap: 20px;
             align-content: start;
             padding: 20px;
-            background: var(--color-background, #0A0E1A);
-            color: var(--color-text-primary, #F9FAFB);
+            background: var(--color-background, #f0f9ff);
+            color: var(--color-text-primary, #111827);
           }
           .platform-navigation-hero,
           .platform-navigation-section {
-            border: 1px solid var(--color-border-subtle, #1F2937);
+            border: 1px solid var(--color-border-subtle, #e0f2fe);
             border-radius: var(--radius-xl, 16px);
-            background: var(--color-card, #172033);
+            background: var(--color-card, #f0f9ff);
             padding: 18px;
           }
           .platform-navigation-hero {
@@ -245,7 +245,7 @@ export default function PlatformNavigationPage() {
           }
           .platform-navigation-eyebrow,
           .platform-navigation-route-count {
-            color: var(--status-info, #60A5FA);
+            color: var(--status-info, #0ea5e9);
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.08em;
@@ -271,7 +271,7 @@ export default function PlatformNavigationPage() {
           .platform-navigation-card {
             display: grid;
             gap: 6px;
-            border: 1px solid var(--color-border-subtle, #1F2937);
+            border: 1px solid var(--color-border-subtle, #e0f2fe);
             border-radius: var(--radius-lg, 12px);
             background: var(--color-surface, #111827);
             color: inherit;
@@ -280,7 +280,7 @@ export default function PlatformNavigationPage() {
           }
           .platform-navigation-card:hover,
           .platform-navigation-card:focus-visible {
-            border-color: var(--status-info, #60A5FA);
+            border-color: var(--status-info, #0ea5e9);
             outline: none;
           }
           .platform-navigation-card span {

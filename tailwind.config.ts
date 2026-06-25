@@ -5,6 +5,8 @@ const config = {
       transparent: 'transparent',
       current: 'currentColor',
       inherit: 'inherit',
+      primary: 'var(--app-accent-interactive)',
+      accent: 'var(--app-accent-interactive)',
       background: 'var(--color-background)',
       surface: 'var(--color-surface)',
       elevated: 'var(--color-elevated)',

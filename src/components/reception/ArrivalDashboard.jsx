@@ -96,7 +96,9 @@ export default function ArrivalDashboard({
         />
       </div>
 
-      <TriageBreachPanel patients={patients} settings={settings} className="arrival-dashboard__triage-breach" />
+      {!deskUi.slim ? (
+        <TriageBreachPanel patients={patients} settings={settings} className="arrival-dashboard__triage-breach" />
+      ) : null}
 
       <ReceptionWorkQueues
         patients={patients}

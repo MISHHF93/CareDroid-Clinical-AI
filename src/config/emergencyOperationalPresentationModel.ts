@@ -9,6 +9,7 @@ import {
   type ScreenModeDensity,
 } from './careDroidScreenModes';
 import { EMERGENCY_OS_BRANDING } from './emergencyOsBranding.config';
+import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 
 export type OperationalPresentationEmphasis =
   | 'speed'
@@ -181,11 +182,23 @@ export function resolveOperationalPresentation(
 ): OperationalPresentationProfile {
   const mode = screenMode || CARE_DROID_SCREEN_MODES.chargeNurse;
   const patch = PRESENTATION_BY_MODE[mode] || {};
-  return Object.freeze({
+  const profile = Object.freeze({
     screenMode: mode,
     ...DEFAULT_PROFILE,
     ...patch,
     density: getScreenModeDensity(mode),
+  });
+
+  if (!isPractitionerCleanupEnabled()) {
+    return profile;
+  }
+
+  return Object.freeze({
+    ...profile,
+    stripLayout: 'compact' as OperationalStripLayout,
+    showStripEyebrow: false,
+    metricLabelsUppercase: false,
+    density: profile.density === 'wall' ? profile.density : 'compact',
   });
 }
 

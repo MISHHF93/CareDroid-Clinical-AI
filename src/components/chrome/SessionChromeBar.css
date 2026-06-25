@@ -69,7 +69,7 @@
 .session-chrome-bar__pill {
   border: 1px solid var(--ed-border-subtle);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--status-info, #60a5fa) 12%, var(--ed-surface-overlay));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, #0ea5e9)) 12%, var(--ed-surface-overlay));
   color: var(--ed-text-primary);
   cursor: pointer;
   font: inherit;
@@ -87,7 +87,7 @@
 
 .session-chrome-bar__pill[aria-expanded='true'] {
   border-color: var(--ed-border-strong);
-  background: color-mix(in srgb, var(--status-info, #60a5fa) 18%, var(--ed-surface-overlay));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, #0ea5e9)) 18%, var(--ed-surface-overlay));
 }
 
 .session-chrome-bar__retry {

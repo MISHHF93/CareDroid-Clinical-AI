@@ -1,0 +1,43 @@
+/**
+ * Layer 3 — final surface + shadow normalization for the locked light medical theme.
+ * Loaded after text-normalization.css.
+ */
+
+:root {
+  --nai-surface: var(--medical-surface-card, #ffffff);
+  --nai-surface-elevated: var(--medical-surface-card, #ffffff);
+  --nai-border: var(--medical-border, #e0f2fe);
+  --nai-text: var(--medical-text-body, #111827);
+  --nai-muted: var(--medical-text-muted, #6b7280);
+  --nai-accent: var(--medical-accent, #0ea5e9);
+  --surface-elevated: var(--medical-surface-card, #ffffff);
+  --app-surface-card: var(--medical-surface-card, #ffffff);
+}
+
+/* Native AI command suite — light medical, not dark overlay */
+.native-ai-command-suite,
+.native-ai-command-suite .clinical-acuity-leaderboard,
+.native-ai-command-suite .drift-monitoring-panel,
+.native-ai-command-suite .ai-transparency-dashboard,
+.native-ai-command-suite .copilot-risk-layer-panel {
+  color: var(--nai-text);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='-panel'],
+    [class*='-card'],
+    [class*='-strip'],
+    [class*='-dashboard'],
+    [class*='-board']
+  ):not([class*='--danger']):not([class*='--critical']):not([class*='--dark']) {
+  --component-surface-fallback: var(--medical-surface-card, #ffffff);
+  --component-border-fallback: var(--medical-border, #e0f2fe);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .operational-strip__chip,
+    .charge-nurse-operational-strip__chip,
+    .whiteboard-alert-rail__item
+  ) {
+  --strip-tint-base: var(--medical-surface-card, #ffffff);
+}

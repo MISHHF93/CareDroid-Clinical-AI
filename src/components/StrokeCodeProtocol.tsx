@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { dispatchAlert } from '../engine/alertEngine';
 import { routeComplaint, type ComplaintRoute } from '../engine/complaintRouter';
 import { useEmergencyStore, hasPatientFlag } from '../store/emergencyStore';
@@ -208,9 +209,9 @@ function toneColor(tone: DtnClassification['tone'] | TpaEligibilityResult['tone'
 
 function buttonStyle(variant: 'primary' | 'secondary' | 'danger' = 'secondary') {
   return {
-    border: variant === 'primary' ? 'none' : '1px solid #374151',
-    background: variant === 'primary' ? '#2563EB' : variant === 'danger' ? '#7F1D1D' : 'transparent',
-    color: '#F9FAFB',
+    border: variant === 'primary' ? 'none' : '1px solid #e0f2fe',
+    background: variant === 'primary' ? MEDICAL_THEME.accent : variant === 'danger' ? '#7F1D1D' : 'transparent',
+    color: 'var(--medical-ink, #111827)',
     borderRadius: 10,
     padding: '8px 10px',
     cursor: 'pointer',
@@ -232,7 +233,7 @@ function CheckboxGroup({
 }) {
   return (
     <div>
-      <h5 style={{ margin: '0 0 8px', color: '#D1D5DB', fontSize: 12 }}>{title}</h5>
+      <h5 style={{ margin: '0 0 8px', color: MEDICAL_THEME.inkDisabled, fontSize: 12 }}>{title}</h5>
       <div style={{ display: 'grid', gap: 7 }}>
         {criteria.map((criterion) => (
           <label key={criterion.id} style={{ display: 'flex', gap: 8, color: '#E5E7EB', fontSize: 12, lineHeight: 1.35 }}>
@@ -308,11 +309,11 @@ export default function StrokeCodeProtocol({
 
   if (!active && !strokeRouteMatch) {
     return (
-      <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }} aria-labelledby="stroke-manual-heading">
-        <h3 id="stroke-manual-heading" style={{ margin: '0 0 8px', fontSize: 13, color: '#9CA3AF' }}>
+      <section style={{ padding: 16, borderBottom: '1px solid #e0f2fe' }} aria-labelledby="stroke-manual-heading">
+        <h3 id="stroke-manual-heading" style={{ margin: '0 0 8px', fontSize: 13, color: MEDICAL_THEME.inkSubtle }}>
           Stroke Protocol
         </h3>
-        <p style={{ margin: '0 0 10px', color: '#6B7280', fontSize: 12 }}>
+        <p style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkMuted, fontSize: 12 }}>
           Manual physician activation is available for concerning neurologic presentations not matched by the complaint router.
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -328,7 +329,7 @@ export default function StrokeCodeProtocol({
   }
 
   return (
-    <section style={{ padding: 16, borderBottom: '1px solid #1F2937' }} aria-labelledby="stroke-code-heading">
+    <section style={{ padding: 16, borderBottom: '1px solid #e0f2fe' }} aria-labelledby="stroke-code-heading">
       {!active ? (
         <div
           style={{
@@ -360,10 +361,10 @@ export default function StrokeCodeProtocol({
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
             <div>
-              <h3 id="stroke-code-heading" style={{ margin: 0, color: '#F9FAFB', fontSize: 14 }}>
+              <h3 id="stroke-code-heading" style={{ margin: 0, color: 'var(--medical-ink, #111827)', fontSize: 14 }}>
                 Stroke Code Active
               </h3>
-              <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 12 }}>
+              <p style={{ margin: '4px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
                 Activated {formatClock(parsedState.activatedAt)} by {parsedState.activatedBy || 'unknown staff'}
               </p>
             </div>
@@ -372,7 +373,7 @@ export default function StrokeCodeProtocol({
 
           <div style={{ marginTop: 14, overflowX: 'auto' }}>
             <div style={{ minWidth: 560, position: 'relative', padding: '18px 4px 8px' }}>
-              <div style={{ position: 'absolute', top: 26, left: 22, right: 22, height: 2, background: '#374151' }} />
+              <div style={{ position: 'absolute', top: 26, left: 22, right: 22, height: 2, background: '#e0f2fe' }} />
               <div style={{ position: 'absolute', top: 14, right: 22, width: 2, height: 44, background: '#EF4444' }} />
               <div style={{ position: 'absolute', top: 0, right: 0, color: '#EF4444', fontSize: 10 }}>+60min</div>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STROKE_TIMELINE_STEPS.length}, 1fr)`, gap: 8 }}>
@@ -403,7 +404,7 @@ export default function StrokeCodeProtocol({
                         zIndex: 1,
                         border: 0,
                         background: 'transparent',
-                        color: '#F9FAFB',
+                        color: 'var(--medical-ink, #111827)',
                         cursor: canWriteNote ? 'pointer' : 'not-allowed',
                         display: 'grid',
                         justifyItems: 'center',
@@ -417,8 +418,8 @@ export default function StrokeCodeProtocol({
                           width: 20,
                           height: 20,
                           borderRadius: 999,
-                          border: `2px solid ${stepState ? '#10B981' : isCurrent ? '#3B82F6' : '#6B7280'}`,
-                          background: stepState ? '#10B981' : isCurrent ? '#3B82F6' : '#111827',
+                          border: `2px solid ${stepState ? '#10B981' : isCurrent ? MEDICAL_THEME.accent : MEDICAL_THEME.inkMuted}`,
+                          background: stepState ? '#10B981' : isCurrent ? MEDICAL_THEME.accent : MEDICAL_THEME.ink,
                           display: 'grid',
                           placeItems: 'center',
                           fontSize: 12,
@@ -427,8 +428,8 @@ export default function StrokeCodeProtocol({
                         {stepState ? '✓' : ''}
                       </span>
                       <strong style={{ fontSize: 11 }}>{step}</strong>
-                      <span style={{ color: '#9CA3AF', fontSize: 10 }}>{formatClock(stepState?.completedAt)}</span>
-                      {duration !== null ? <span style={{ color: '#6B7280', fontSize: 10 }}>+{duration}min</span> : null}
+                      <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 10 }}>{formatClock(stepState?.completedAt)}</span>
+                      {duration !== null ? <span style={{ color: MEDICAL_THEME.inkMuted, fontSize: 10 }}>+{duration}min</span> : null}
                     </button>
                   );
                 })}
@@ -440,7 +441,7 @@ export default function StrokeCodeProtocol({
             style={{
               marginTop: 12,
               border: `1px solid ${toneColor(tpaTime && dtnClassification ? dtnClassification.tone : runningTone)}`,
-              background: '#0B1120',
+              background: MEDICAL_THEME.surfaceCard,
               borderRadius: 10,
               padding: 10,
             }}
@@ -459,9 +460,9 @@ export default function StrokeCodeProtocol({
       )}
 
       {cincinnatiOpen ? (
-        <div style={{ marginTop: 12, border: '1px solid #374151', borderRadius: 10, background: '#0B1120', padding: 10 }}>
-          <h4 style={{ margin: '0 0 8px', color: '#F9FAFB', fontSize: 13 }}>Cincinnati Screen</h4>
-          <p style={{ margin: '0 0 8px', color: '#9CA3AF', fontSize: 12 }}>
+        <div style={{ marginTop: 12, border: '1px solid #e0f2fe', borderRadius: 10, background: MEDICAL_THEME.surfaceCard, padding: 10 }}>
+          <h4 style={{ margin: '0 0 8px', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>Cincinnati Screen</h4>
+          <p style={{ margin: '0 0 8px', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
             Lightweight checklist until a dedicated Cincinnati calculator exists.
           </p>
           {['Facial droop', 'Arm drift', 'Speech abnormality'].map((item) => (
@@ -475,7 +476,7 @@ export default function StrokeCodeProtocol({
 
       {active ? (
         <div style={{ marginTop: 16 }}>
-          <h4 style={{ margin: '0 0 10px', color: '#F9FAFB', fontSize: 13 }}>tPA Eligibility Checklist</h4>
+          <h4 style={{ margin: '0 0 10px', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>tPA Eligibility Checklist</h4>
           <div style={{ display: 'grid', gap: 14 }}>
             <CheckboxGroup
               title="Include criteria"

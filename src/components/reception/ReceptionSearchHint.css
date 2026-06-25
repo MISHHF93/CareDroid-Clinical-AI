@@ -5,16 +5,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-md, 10px);
+  background: var(--medical-surface-page, #f0f9ff) 72%, transparent);
 }
 
 .reception-search-hint__copy {
   display: flex;
   gap: 8px;
   align-items: center;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--reception-text-secondary, var(--color-text-secondary, #9ca3af));
   font-size: 12px;
 }
 
@@ -24,7 +24,7 @@
 }
 
 .reception-search-hint__copy strong {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
 }
 
 .reception-search-hint__copy kbd {
@@ -42,10 +42,10 @@
   align-items: center;
   min-height: 30px;
   padding: 0 10px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 999px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--reception-surface-inset, var(--color-elevated, var(--medical-surface-page, #f0f9ff)));
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font: inherit;
   font-size: 11px;
   font-weight: 700;

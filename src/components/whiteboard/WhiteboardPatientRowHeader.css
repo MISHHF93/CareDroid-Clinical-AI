@@ -1,8 +1,8 @@
 .whiteboard-patient-row-header {
   --patient-row-columns: 52px minmax(132px, 1.15fr) 80px 112px minmax(148px, 2.2fr) 88px 96px 84px;
   align-items: center;
-  background: color-mix(in srgb, var(--color-floating-surface, #111827) 88%, transparent);
-  border: 1px solid var(--color-border-subtle, #374151);
+  background: color-mix(in srgb, var(--color-floating-surface, var(--app-surface-1, #ffffff)) 88%, transparent);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 12px 12px 0 0;
   color: var(--color-text-muted, #9ca3af);
   display: grid;
@@ -48,12 +48,12 @@
 
 .whiteboard-patient-row-header__sort:hover,
 .whiteboard-patient-row-header__sort:focus-visible {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   outline: none;
 }
 
 .whiteboard-patient-row-header__sort--active {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .whiteboard-patient-row-header__sort-indicator {

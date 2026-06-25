@@ -2,7 +2,7 @@
   border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.35));
   border-radius: 10px;
   padding: 0.85rem 1rem;
-  background: var(--surface-elevated, rgba(15, 23, 42, 0.55));
+  background: var(--surface-elevated, var(--medical-surface-card, #ffffff));
   margin-top: 0.65rem;
 }
 
@@ -75,15 +75,15 @@
 }
 
 .amb-handoff-checklist__steps li[data-status='complete'] span {
-  color: #86efac;
+  color: var(--medical-status-success-text, #15803d);
 }
 
 .amb-handoff-checklist__steps li[data-status='warning'] span {
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .amb-handoff-checklist__steps li[data-status='pending'] span {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .amb-handoff-checklist__steps small {
@@ -152,8 +152,8 @@
   border: 0;
   border-radius: 6px;
   padding: 0.35rem 0.55rem;
-  background: var(--accent, #2563eb);
-  color: #fff;
+  background: var(--accent, var(--app-accent-interactive));
+  color: var(--medical-text-on-solid, #ffffff);
   cursor: pointer;
 }
 

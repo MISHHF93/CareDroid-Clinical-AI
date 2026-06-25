@@ -1,15 +1,9 @@
-import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
+import { COPILOT_PLATFORM } from './copilotPlatform.config';
 
-export const SAFETY_BOUNDED_ASSISTANT_LABEL = 'Staff review required';
+export const SAFETY_BOUNDED_ASSISTANT_LABEL = COPILOT_PLATFORM.safety.boundedLabel;
 
-export const COPILOT_SAFETY_BOUNDED_DISCLAIMER =
-  `${SAFETY_BOUNDED_ASSISTANT_LABEL} — ${HUMAN_REVIEW_DISCLAIMER}`;
+export const COPILOT_SAFETY_BOUNDED_DISCLAIMER = COPILOT_PLATFORM.safety.boundedDisclaimer;
 
-export const PATIENT_STATUS_SUMMARY_PROMPT =
-  "Summarize this patient's current status based on the provided data.";
+export const PATIENT_STATUS_SUMMARY_PROMPT = COPILOT_PLATFORM.quickActions.patient[0];
 
-export const PATIENT_COPILOT_QUICK_ACTIONS = Object.freeze([
-  PATIENT_STATUS_SUMMARY_PROMPT,
-  'Recommend clinical tools for this case',
-  'What reassessment or escalation signals should I review?',
-] as const);
+export const PATIENT_COPILOT_QUICK_ACTIONS = COPILOT_PLATFORM.quickActions.patient;

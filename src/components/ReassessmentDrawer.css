@@ -8,7 +8,7 @@
   border: 1px solid rgba(248, 113, 113, 0.85);
   border-radius: 999px;
   background: #dc2626;
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
   font-size: 12px;
   font-weight: 800;
   line-height: 1;
@@ -56,9 +56,9 @@
   max-height: min(50vh, calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px)));
   overflow-y: auto;
   border-bottom: 1px solid rgba(248, 113, 113, 0.35);
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   pointer-events: auto;
   animation: reassessment-drawer-slide var(--motion-transition-normal) both;
 }
@@ -74,7 +74,7 @@
   min-height: 64px;
   padding: 12px 18px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.96);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .reassessment-drawer__title-group {
@@ -86,7 +86,7 @@
 
 .reassessment-drawer__header h2 {
   margin: 0;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 18px;
   line-height: 1.1;
 }
@@ -109,16 +109,16 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
 .reassessment-drawer__sort button,
 .reassessment-drawer__close {
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.9);
-  color: #cbd5e1;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
   cursor: pointer;
   transition:
     background-color var(--motion-transition-fast),
@@ -137,7 +137,7 @@
 .reassessment-drawer__sort button[aria-pressed='true'] {
   border-color: rgba(59, 130, 246, 0.72);
   background: rgba(37, 99, 235, 0.2);
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
 }
 
 .reassessment-drawer__close {
@@ -146,7 +146,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-weight: 900;
 }
 
@@ -155,7 +155,7 @@
 .reassessment-drawer__close:hover,
 .reassessment-drawer__close:focus-visible {
   border-color: rgba(248, 113, 113, 0.72);
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
   outline: none;
   transform: translateY(-1px);
 }
@@ -243,7 +243,7 @@
   border: 0;
   border-radius: 999px;
   background: var(--component-inner-surface-bg);
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
   font-weight: 900;
 }
@@ -299,7 +299,7 @@
 
 .reassessment-drawer__name-line strong {
   overflow: hidden;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -307,7 +307,7 @@
 
 .reassessment-drawer__name-line span,
 .reassessment-drawer__flag-time {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
 }
 
@@ -325,7 +325,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -351,12 +351,12 @@
 
 .reassessment-drawer__flag-label--red,
 .reassessment-drawer__wait--red {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .reassessment-drawer__flag-label--orange,
 .reassessment-drawer__wait--orange {
-  color: #fdba74;
+  color: var(--medical-status-high-text, #c2410c);
 }
 
 .reassessment-drawer__flag-label--yellow,
@@ -384,8 +384,8 @@
   padding: 0 12px;
   border: 1px solid rgba(59, 130, 246, 0.76);
   border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
+  background: var(--app-accent-interactive);
+  color: var(--medical-text-on-solid, #ffffff);
   font-size: 12px;
   font-weight: 900;
   white-space: nowrap;
@@ -398,7 +398,7 @@
 
 .reassessment-drawer__assess:hover,
 .reassessment-drawer__assess:focus-visible {
-  background: #3b82f6;
+  background: var(--app-accent-interactive);
   outline: none;
   transform: translateY(-1px);
 }
@@ -414,7 +414,7 @@
   gap: 6px;
   min-height: 180px;
   padding: 32px 18px 40px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   animation: reassessment-row-enter var(--motion-transition-slow) both;
 }
 
@@ -586,5 +586,5 @@
 .reassessment-drawer__history {
   margin: 0 20px 20px;
   padding-top: 12px;
-  border-top: 1px solid var(--color-border-subtle, #1f2937);
+  border-top: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
 }

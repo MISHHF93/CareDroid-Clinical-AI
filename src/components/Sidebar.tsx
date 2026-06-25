@@ -385,23 +385,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   };
 
   return (
-    <aside
-      className="sidebar"
-      style={{
-        width: 56,
-        height: 'var(--app-viewport-height, 100dvh)',
-        flexShrink: 0,
-        background: '#0D1117',
-        borderRight: '1px solid #1F2937',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '8px 0',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-      }}
-      aria-label="Emergency navigation"
-    >
+    <aside className="sidebar" aria-label="Emergency navigation">
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
         {desktopPrimaryNav.map(desktopNavLink)}
         {desktopUtilityNav.length ? (

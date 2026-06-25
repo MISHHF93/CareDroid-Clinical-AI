@@ -45,7 +45,7 @@
   min-height: 40px;
   border: 1px solid var(--copilot-border);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--copilot-bg) 88%, #020617);
+  background: color-mix(in srgb, var(--copilot-bg) 88%, #f0f9ff);
   color: var(--copilot-text);
   font: inherit;
   font-size: 13px;
@@ -351,11 +351,11 @@
   right: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 40;
-  border: 1px solid color-mix(in srgb, var(--status-info, #06b6d4) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 40%, transparent);
   border-radius: 999px;
   padding: 10px 14px;
-  background: color-mix(in srgb, var(--color-surface, #111827) 92%, #020617);
-  color: var(--color-text-primary, #f9fafb);
+  background: color-mix(in srgb, var(--color-surface, var(--app-surface-1, #ffffff)) 92%, #f0f9ff);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 0.8125rem;
   font-weight: 700;
   cursor: pointer;
@@ -364,6 +364,6 @@
 
 .ed-copilot-launch:hover,
 .ed-copilot-launch:focus-visible {
-  border-color: color-mix(in srgb, var(--status-info, #06b6d4) 70%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 70%, transparent);
   transform: translateY(-1px);
 }

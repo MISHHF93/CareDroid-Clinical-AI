@@ -55,7 +55,7 @@ const MODULE_LIST = Object.freeze([
   {
     id: 'calculators',
     label: 'Calculators',
-    route: '/tools/calculators',
+    route: '/emergency/tools?filter=calculator',
     group: 'decision-support',
     summary: 'Risk scores, severity scores, and clinical calculations',
   },

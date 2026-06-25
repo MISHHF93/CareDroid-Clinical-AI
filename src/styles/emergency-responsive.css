@@ -57,7 +57,7 @@
 }
 
 .emergency-whiteboard-page {
-  background: #0a0e1a;
+  background: var(--medical-surface-page, #f0f9ff);
 }
 
 .emergency-whiteboard-page__hero,

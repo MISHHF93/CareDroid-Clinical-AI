@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
@@ -159,10 +160,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           maxWidth: 760,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -174,7 +175,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -182,7 +183,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               Pediatric Drug Calculator
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patient.firstName} {patient.lastName} · Age {patient.age} · {patient.mrn}
               </div>
             ) : null}
@@ -195,9 +196,9 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -217,7 +218,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             }}
           >
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 700 }}>Weight (kg)</span>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Weight (kg)</span>
               <input
                 autoFocus
                 type="number"
@@ -229,10 +230,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                 placeholder="Enter weight in kg"
                 style={{
                   width: '100%',
-                  border: '1px solid #374151',
+                  border: '1px solid #e0f2fe',
                   borderRadius: 12,
-                  background: '#0B1120',
-                  color: '#F9FAFB',
+                  background: MEDICAL_THEME.surfaceCard,
+                  color: 'var(--medical-ink, #111827)',
                   fontSize: 24,
                   fontWeight: 700,
                   padding: '12px 14px',
@@ -246,10 +247,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                 type="button"
                 onClick={() => setWeightInput(String(estimatedWeight))}
                 style={{
-                  border: '1px solid #2563EB',
+                  border: '1px solid #0ea5e9',
                   borderRadius: 10,
-                  background: '#2563EB',
-                  color: '#F9FAFB',
+                  background: MEDICAL_THEME.accent,
+                  color: 'var(--medical-ink, #111827)',
                   cursor: 'pointer',
                   fontWeight: 700,
                   padding: '12px 14px',
@@ -263,10 +264,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               type="button"
               onClick={() => window.print()}
               style={{
-                border: '1px solid #374151',
+                border: '1px solid #e0f2fe',
                 borderRadius: 10,
                 background: 'transparent',
-                color: '#F9FAFB',
+                color: 'var(--medical-ink, #111827)',
                 cursor: 'pointer',
                 fontWeight: 700,
                 padding: '12px 14px',
@@ -280,10 +281,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                 onClick={saveToPatient}
                 disabled={weight === null}
                 style={{
-                  border: '1px solid #2563EB',
+                  border: '1px solid #0ea5e9',
                   borderRadius: 10,
-                  background: weight === null ? '#1F2937' : '#2563EB',
-                  color: '#F9FAFB',
+                  background: weight === null ? '#e0f2fe' : MEDICAL_THEME.accent,
+                  color: 'var(--medical-ink, #111827)',
                   cursor: weight === null ? 'not-allowed' : 'pointer',
                   fontWeight: 700,
                   padding: '12px 14px',
@@ -295,7 +296,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           </section>
 
           {canEstimateWeight && estimatedWeight !== null ? (
-            <div data-print-hide="true" style={{ color: '#60A5FA', fontSize: 12 }}>
+            <div data-print-hide="true" style={{ color: MEDICAL_THEME.accent, fontSize: 12 }}>
               Estimated weight uses Luscombe formula: (age x 2) + 8 kg = {estimatedWeight} kg.
             </div>
           ) : null}
@@ -303,19 +304,19 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           <section className="pediatric-drug-print-area">
             <div data-print-hide="true" style={{ marginBottom: 12 }}>
               <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>Pediatric Drug Doses</h3>
-              <div style={{ color: '#9CA3AF', fontSize: 13 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>
                 Weight: {weight === null ? 'not entered' : `${weight.toFixed(1)} kg`}
               </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
                 <thead>
-                  <tr style={{ background: '#0B1120', color: '#9CA3AF', textAlign: 'left', fontSize: 12 }}>
-                    <th style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>Drug</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>Dose/kg</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>CALCULATED DOSE</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>Max</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>Unit</th>
+                  <tr style={{ background: MEDICAL_THEME.surfaceCard, color: MEDICAL_THEME.inkSubtle, textAlign: 'left', fontSize: 12 }}>
+                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Drug</th>
+                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Dose/kg</th>
+                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>CALCULATED DOSE</th>
+                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Max</th>
+                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Unit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -327,28 +328,28 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                         background: drug.critical ? '#7F1D1D20' : 'transparent',
                       }}
                     >
-                      <td style={{ padding: 10, borderBottom: '1px solid #1F2937' }}>
+                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>
                         <strong>{drug.name}</strong>
-                        <div style={{ color: '#9CA3AF', fontSize: 12 }}>{drug.category}</div>
+                        <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{drug.category}</div>
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #1F2937', color: '#D1D5DB' }}>
+                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>
                         {dosePerKgLabel(drug)}
                       </td>
                       <td
                         style={{
                           padding: 10,
-                          borderBottom: '1px solid #1F2937',
+                          borderBottom: '1px solid #e0f2fe',
                           fontWeight: 800,
                           fontSize: 16,
-                          color: weight === null ? '#6B7280' : '#F9FAFB',
+                          color: weight === null ? MEDICAL_THEME.inkMuted : MEDICAL_THEME.accent,
                         }}
                       >
                         {calculatedDose(weight, drug)}
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #1F2937', color: '#D1D5DB' }}>
+                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>
                         {drug.max.toFixed(drug.max < 10 ? 2 : 0)}
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #1F2937', color: '#D1D5DB' }}>{drug.unit}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>{drug.unit}</td>
                     </tr>
                   ))}
                 </tbody>

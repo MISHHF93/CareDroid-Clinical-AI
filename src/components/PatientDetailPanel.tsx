@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, TouchEvent } from 'react';
 import {
@@ -69,7 +70,7 @@ const priorityColors: Record<Priority, string> = {
   [Priority.P2]: '#F97316',
   [Priority.P3]: '#F59E0B',
   [Priority.P4]: '#10B981',
-  [Priority.P5]: '#6B7280',
+  [Priority.P5]: MEDICAL_THEME.inkMuted,
 };
 
 const patientStateOrder: PatientState[] = [
@@ -141,7 +142,7 @@ type UpgradePatientFlowState = {
 
 const vitalsLineConfig: Array<{ key: VitalsLineKey; label: string; color: string }> = [
   { key: 'hr', label: 'HR', color: '#EF4444' },
-  { key: 'spo2', label: 'SpO2', color: '#3B82F6' },
+  { key: 'spo2', label: 'SpO2', color: MEDICAL_THEME.accent },
   { key: 'sbp', label: 'SBP', color: '#F59E0B' },
   { key: 'temp', label: 'Temp', color: '#10B981' },
 ];
@@ -261,20 +262,20 @@ function formatSignalMeta(signal?: UpgradeHarnessSignal | null): string {
 }
 
 function vitalTone(label: string, value?: number): string {
-  if (value === undefined) return '#F9FAFB';
+  if (value === undefined) return MEDICAL_THEME.inkSubtle;
   if (label === 'SpO2' && value < 94) return '#EF4444';
   if (label === 'HR' && (value > 120 || value < 50)) return '#EF4444';
   if (label === 'SBP' && (value > 180 || value < 90)) return '#F59E0B';
   if (label === 'Temp' && (value >= 38 || value < 36)) return '#F59E0B';
   if (label === 'RR' && (value > 24 || value < 10)) return '#F59E0B';
   if (label === 'GCS' && value < 15) return '#F59E0B';
-  return '#F9FAFB';
+  return MEDICAL_THEME.ink;
 }
 
 function trendArrow(label: string, current?: number, previous?: number): VitalTrend | null {
   if (current === undefined || previous === undefined) return null;
   const diff = current - previous;
-  const stable: VitalTrend = { symbol: '→', color: '#9CA3AF', label: `${label} stable` };
+  const stable: VitalTrend = { symbol: '→', color: MEDICAL_THEME.inkSubtle, label: `${label} stable` };
 
   if (label === 'HR') {
     if (diff > 10) return { symbol: '↑', color: '#EF4444', label: 'HR trending up' };
@@ -297,7 +298,7 @@ function trendArrow(label: string, current?: number, previous?: number): VitalTr
 
   if (label === 'Temp') {
     if (diff > 0.5) return { symbol: '↑', color: '#F59E0B', label: 'Temperature trending up' };
-    if (diff < -0.5) return { symbol: '↓', color: '#3B82F6', label: 'Temperature trending down' };
+    if (diff < -0.5) return { symbol: '↓', color: MEDICAL_THEME.accent, label: 'Temperature trending down' };
     return stable;
   }
 
@@ -403,21 +404,21 @@ function VitalsHistoryChart({ vitals }: { vitals: Vitals[] }) {
           <div className="patient-detail-vitals-trend__chart">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 2, left: -18 }}>
-                <CartesianGrid stroke="#1F2937" strokeOpacity={0.45} vertical={false} />
+                <CartesianGrid stroke="#e0f2fe" strokeOpacity={0.45} vertical={false} />
                 <XAxis
                   dataKey="time"
-                  tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                  tick={{ fill: MEDICAL_THEME.inkSubtle, fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: '#1F2937' }}
+                  axisLine={{ stroke: '#e0f2fe' }}
                 />
                 <YAxis
-                  tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                  tick={{ fill: MEDICAL_THEME.inkSubtle, fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: '#1F2937' }}
+                  axisLine={{ stroke: '#e0f2fe' }}
                   width={36}
                 />
-                <Tooltip content={<VitalsTooltip />} cursor={{ stroke: '#374151', strokeDasharray: '3 3' }} />
-                <ReferenceLine y={94} stroke="#3B82F6" strokeDasharray="4 4" strokeOpacity={0.45} />
+                <Tooltip content={<VitalsTooltip />} cursor={{ stroke: '#e0f2fe', strokeDasharray: '3 3' }} />
+                <ReferenceLine y={94} stroke=MEDICAL_THEME.accent strokeDasharray="4 4" strokeOpacity={0.45} />
                 <ReferenceLine y={100} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.4} />
                 <ReferenceLine y={90} stroke="#F59E0B" strokeDasharray="4 4" strokeOpacity={0.45} />
                 {vitalsLineConfig.map((line) => (
@@ -957,7 +958,7 @@ export default function PatientDetailPanel() {
 
         <div className="patient-detail-panel__badge-row">
           <Badge color={priorityColors[selectedPatient.priority]}>{selectedPatient.priority}</Badge>
-          <Badge color="#9CA3AF">{selectedPatient.state}</Badge>
+          <Badge color=MEDICAL_THEME.inkSubtle>{selectedPatient.state}</Badge>
           <PatientExperienceStatusBadge
             patient={selectedPatient}
             referrals={referrals}

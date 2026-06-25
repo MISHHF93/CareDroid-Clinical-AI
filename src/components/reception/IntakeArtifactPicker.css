@@ -13,8 +13,8 @@
   max-height: min(88vh, 900px);
   overflow: auto;
   border-radius: 16px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: var(--color-surface, #111827);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
   padding: 18px;
   display: grid;
   gap: 16px;
@@ -37,7 +37,7 @@
 .intake-artifact-picker__header h2 {
   margin: 4px 0;
   font-size: 20px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .intake-artifact-picker__header p {
@@ -64,7 +64,7 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .intake-artifact-picker__options {
@@ -79,9 +79,9 @@
   text-align: left;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
 }
 

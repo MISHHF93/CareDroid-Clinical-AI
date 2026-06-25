@@ -9,7 +9,10 @@ import {
   type CompiledUserProfile,
   type CompileUserProfileInput,
 } from '../config/userProfileCompiler';
-import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
+import {
+  canAccessEmergencyRoute,
+  EMERGENCY_ROLE_IDS,
+} from '../config/emergencyRolePermissions';
 import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
 import {
   getUserFacingToolRegistryProjection,
@@ -155,6 +158,23 @@ export function resolveClinicalToolLaunchTarget(
   }
 
   if (input.kind === 'copilot') {
+    const canAccessCopilot = input.emergencyRoleId
+      ? canAccessEmergencyRoute(input.emergencyRoleId, CANONICAL_ROUTES.emergencyCopilot)
+      : true;
+    if (!canAccessCopilot) {
+      if (calculatorId) {
+        return resolveClinicalToolLaunchTarget({
+          ...input,
+          kind: 'calculator',
+          calculatorId,
+        });
+      }
+      return resolveClinicalToolLaunchTarget({
+        ...input,
+        kind: 'reception-embed',
+        source: input.source || 'clinical-tools',
+      });
+    }
     return Object.freeze({
       pathname: CANONICAL_ROUTES.emergencyCopilot,
       search: input.patientId ? buildSearch({ patientId: input.patientId }) : '',
@@ -178,15 +198,44 @@ export function resolveClinicalToolLaunchTarget(
 
 export function remapRegistryNavigationForRole(
   plan: { pathname: string; search?: string },
-  context: { emergencyRoleId?: string | null; canAccessToolsRoute?: boolean },
+  context: {
+    emergencyRoleId?: string | null;
+    canAccessToolsRoute?: boolean;
+    toolId?: string | null;
+    launchMode?: string | null;
+  },
 ): { pathname: string; search: string } {
   const search = plan.search || '';
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  const toolId =
+    context.toolId || params.get('open') || params.get('calc') || params.get('q');
+  const canAccessCopilot = context.emergencyRoleId
+    ? canAccessEmergencyRoute(context.emergencyRoleId, CANONICAL_ROUTES.emergencyCopilot)
+    : true;
+
+  if (plan.pathname === CANONICAL_ROUTES.emergencyCopilot && !canAccessCopilot) {
+    const remapped = resolveClinicalToolLaunchTarget({
+      emergencyRoleId: context.emergencyRoleId,
+      canAccessToolsRoute: context.canAccessToolsRoute,
+      kind:
+        toolId && isCalculatorArtifact(toolId)
+          ? 'calculator'
+          : context.launchMode === 'chat-assisted'
+            ? 'reception-embed'
+            : 'tools-hub',
+      toolId,
+      calculatorId: toolId,
+      patientId: params.get('patientId'),
+      filter: 'calculator',
+      source: params.get('source') || 'clinical-tools',
+    });
+    return { pathname: remapped.pathname, search: remapped.search };
+  }
+
   if (plan.pathname !== CANONICAL_ROUTES.emergencyTools) {
     return { pathname: plan.pathname, search };
   }
 
-  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
-  const toolId = params.get('open') || params.get('calc') || params.get('q');
   const remapped = resolveClinicalToolLaunchTarget({
     emergencyRoleId: context.emergencyRoleId,
     canAccessToolsRoute: context.canAccessToolsRoute,
@@ -219,6 +268,32 @@ export function listReceptionDeskCalculatorTools(
       tool.surface === 'calculator-form' ||
       tool.id === 'calculators',
   ) as ToolInventoryRecord[];
+}
+
+export function listReceptionDeskCalculatorIds(
+  compiled: CompiledUserProfile,
+): string[] {
+  const ids = new Set<string>();
+  for (const tool of listReceptionDeskCalculatorTools(compiled)) {
+    const slug = resolveCalculatorSlug(tool.id);
+    if (slug) ids.add(slug);
+    else if (tool.calculatorSlug) ids.add(String(tool.calculatorSlug));
+    else if (tool.id && tool.id !== 'calculators') ids.add(tool.id);
+  }
+  return [...ids];
+}
+
+export function resolveReceptionDeskCalculatorIds(input: {
+  saasRole?: string | null;
+  emergencyRoleId?: string | null;
+} = {}): string[] {
+  const profile = getUnifiedClinicalToolsProfile({
+    saasRole: input.saasRole || 'student',
+    entitlementContext: input.emergencyRoleId
+      ? { emergencyRoleId: input.emergencyRoleId, user: { role: input.emergencyRoleId } }
+      : undefined,
+  });
+  return listReceptionDeskCalculatorIds(profile);
 }
 
 export function listOrchestrationToolsForRole(emergencyRoleId: string) {

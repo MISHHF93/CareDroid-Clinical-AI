@@ -14,6 +14,15 @@ interface RecommendationRule {
   recommendations: CalculatorRecommendation[];
 }
 
+/** Canonical frontend route for calculator launches (reception-first ED shell). */
+function emergencyCalculatorRoute(calculatorId: string, hubOnly = false): string {
+  if (hubOnly) {
+    return '/emergency/tools?source=recommender&filter=calculator';
+  }
+  const encoded = encodeURIComponent(calculatorId);
+  return `/emergency/tools?source=recommender&filter=calculator&open=${encoded}&q=${encoded}`;
+}
+
 const RULES: RecommendationRule[] = [
   {
     id: 'chest-pain',
@@ -23,26 +32,26 @@ const RULES: RecommendationRule[] = [
       {
         id: 'heart-score',
         label: 'HEART score',
-        route: '/tools/calculators/heart-score',
+        route: emergencyCalculatorRoute('heart-score'),
         rationale:
           'Chest pain risk stratification from history, ECG, age, risk factors, and troponin.',
       },
       {
         id: 'timi-ua-nstemi',
         label: 'TIMI (UA/NSTEMI)',
-        route: '/tools/calculators/timi-ua-nstemi',
+        route: emergencyCalculatorRoute('timi-ua-nstemi'),
         rationale: 'UA/NSTEMI event-risk context when ACS is being evaluated.',
       },
       {
         id: 'grace-acs',
         label: 'GRACE ACS',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('grace-acs', true),
         rationale: 'ACS prognosis context through the chat-assisted calculator hub.',
       },
       {
         id: 'ascvd-risk',
         label: 'ASCVD 10-year risk',
-        route: '/tools/calculators/ascvd-risk',
+        route: emergencyCalculatorRoute('ascvd-risk'),
         rationale:
           'Primary-prevention cardiovascular risk context after acute evaluation is addressed.',
       },
@@ -56,25 +65,25 @@ const RULES: RecommendationRule[] = [
       {
         id: 'wells-pe',
         label: 'Wells PE',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('wells-pe', true),
         rationale: 'Pre-test probability support for suspected pulmonary embolism.',
       },
       {
         id: 'perc',
         label: 'PERC',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('perc', true),
         rationale: 'PE rule-out criteria when the patient is otherwise low risk.',
       },
       {
         id: 'wells-dvt-calculator',
         label: 'Wells DVT',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('wells-dvt-calculator', true),
         rationale: 'DVT probability support when leg symptoms or DVT concern is present.',
       },
       {
         id: 'news2',
         label: 'NEWS2',
-        route: '/tools/calculators/news2',
+        route: emergencyCalculatorRoute('news2'),
         rationale: 'Physiologic deterioration screen from routine observations.',
       },
     ],
@@ -87,25 +96,25 @@ const RULES: RecommendationRule[] = [
       {
         id: 'qsofa',
         label: 'qSOFA',
-        route: '/tools/calculators/qsofa',
+        route: emergencyCalculatorRoute('qsofa'),
         rationale: 'Bedside suspected-infection risk screen.',
       },
       {
         id: 'news2',
         label: 'NEWS2',
-        route: '/tools/calculators/news2',
+        route: emergencyCalculatorRoute('news2'),
         rationale: 'Early warning score for acute deterioration.',
       },
       {
         id: 'sofa-score',
         label: 'SOFA Score',
-        route: '/tools/calculator/sofa',
+        route: emergencyCalculatorRoute('sofa'),
         rationale: 'Organ dysfunction context for ICU/sepsis workflows.',
       },
       {
         id: 'curb65-calculator',
         label: 'CURB-65',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('curb65-calculator', true),
         rationale: 'Pneumonia severity context when CAP is the working syndrome.',
       },
     ],
@@ -118,19 +127,19 @@ const RULES: RecommendationRule[] = [
       {
         id: 'nihss',
         label: 'NIHSS',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('nihss', true),
         rationale: 'Stroke severity documentation support.',
       },
       {
         id: 'abcd2',
         label: 'ABCD2',
-        route: '/tools/calculators/abcd2',
+        route: emergencyCalculatorRoute('abcd2'),
         rationale: 'Short-term stroke risk context after suspected TIA.',
       },
       {
         id: 'gcs-calculator',
         label: 'GCS',
-        route: '/tools/calculators',
+        route: emergencyCalculatorRoute('gcs-calculator', true),
         rationale: 'Level-of-consciousness documentation when relevant.',
       },
     ],
@@ -143,25 +152,25 @@ const RULES: RecommendationRule[] = [
       {
         id: 'meld',
         label: 'MELD',
-        route: '/tools/calculators/meld',
+        route: emergencyCalculatorRoute('meld'),
         rationale: 'Chronic liver disease severity context.',
       },
       {
         id: 'meld-na',
         label: 'MELD-Na',
-        route: '/tools/calculators/meld-na',
+        route: emergencyCalculatorRoute('meld-na'),
         rationale: 'MELD context with sodium adjustment.',
       },
       {
         id: 'child-pugh',
         label: 'Child-Pugh',
-        route: '/tools/calculators/child-pugh',
+        route: emergencyCalculatorRoute('child-pugh'),
         rationale: 'Cirrhosis severity class support.',
       },
       {
         id: 'ckd-staging',
         label: 'CKD staging',
-        route: '/tools/calculators/ckd-staging',
+        route: emergencyCalculatorRoute('ckd-staging'),
         rationale: 'Kidney function and albuminuria staging support.',
       },
     ],

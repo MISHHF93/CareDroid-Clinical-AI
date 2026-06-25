@@ -2,9 +2,9 @@
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 10px;
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
 }
 
 .high-risk-complaint-selector__header {
@@ -15,7 +15,7 @@
 }
 
 .high-risk-complaint-selector__title {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 12px;
   font-weight: 750;
 }
@@ -33,9 +33,9 @@
 }
 
 .high-risk-complaint-selector__chip {
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 999px;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
   color: #e5e7eb;
   cursor: pointer;
   font-size: 11px;
@@ -67,6 +67,6 @@
 }
 
 .high-risk-complaint-selector__routing {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
 }

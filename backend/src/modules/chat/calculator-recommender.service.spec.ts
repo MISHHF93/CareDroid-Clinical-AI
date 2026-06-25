@@ -14,6 +14,8 @@ describe('CalculatorRecommenderService', () => {
       'ascvd-risk',
     ]);
     expect(result.safety.warnings.join(' ')).toMatch(/not diagnose/i);
+    expect(result.recommendations[0]?.route).toContain('/emergency/tools');
+    expect(result.recommendations[0]?.route).toContain('open=heart-score');
   });
 
   it('returns needs_more_context when no calculator context is present', () => {

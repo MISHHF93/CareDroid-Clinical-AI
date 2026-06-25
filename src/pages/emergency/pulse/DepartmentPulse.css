@@ -1,6 +1,6 @@
 .emergency-pulse {
-  background: #0a0e1a;
-  color: #f9fafb;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-ink, #111827);
   display: grid;
   gap: 16px;
   min-height: 100%;
@@ -17,8 +17,8 @@
 
 .emergency-pulse__timebar {
   align-items: center;
-  background: #111827;
-  border: 1px solid #1f2937;
+  background: var(--app-surface-1, #ffffff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
   display: flex;
   height: 48px;
@@ -33,7 +33,7 @@
 
 .emergency-pulse__live {
   align-items: center;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   display: inline-flex;
   font-size: 12px;
   gap: 8px;
@@ -56,11 +56,11 @@
 
 .emergency-pulse__stat {
   align-items: center;
-  background: #111827;
-  border: 1px solid #1f2937;
-  border-left: 4px solid #3b82f6;
+  background: var(--app-surface-1, #ffffff);
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-left: 4px solid var(--app-accent-interactive);
   border-radius: 14px;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -73,13 +73,13 @@
 
 .emergency-pulse__stat:hover,
 .emergency-pulse__stat:focus-visible {
-  background: #172033;
+  background: var(--app-surface-2, #ffffff);
   outline: none;
   transform: translateY(-1px);
 }
 
 .emergency-pulse__stat span {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
   font-weight: 650;
 }
@@ -106,12 +106,12 @@
 }
 
 .emergency-pulse__stat--blue {
-  border-left-color: #3b82f6;
+  border-left-color: var(--app-accent-interactive);
 }
 
 .emergency-pulse__panel {
-  background: #111827;
-  border: 1px solid #1f2937;
+  background: var(--app-surface-1, #ffffff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 16px;
   padding: 16px;
 }
@@ -130,7 +130,7 @@
 }
 
 .emergency-pulse__section-heading span {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -145,7 +145,7 @@
 .emergency-pulse__changes li,
 .emergency-pulse__empty,
 .emergency-pulse__bottleneck {
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 13px;
   margin: 0;
 }
@@ -168,11 +168,11 @@
 }
 
 .emergency-pulse__attention-row button {
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
   border: 1px solid #243044;
   border-left: 4px solid #f97316;
   border-radius: 14px;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   display: grid;
   flex: 0 0 230px;
@@ -184,12 +184,12 @@
 
 .emergency-pulse__attention-row button:hover,
 .emergency-pulse__attention-row button:focus-visible {
-  border-color: #60a5fa;
+  border-color: var(--app-accent-interactive);
   outline: none;
 }
 
 .emergency-pulse__priority {
-  background: #1c2333;
+  background: var(--app-surface-muted, #f0f9ff);
   border-radius: 999px;
   color: #fbbf24;
   font-size: 11px;
@@ -204,7 +204,7 @@
 
 .emergency-pulse__attention-row small,
 .emergency-pulse__attention-row em {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
   font-style: normal;
   overflow: hidden;
@@ -219,8 +219,8 @@
 
 .emergency-pulse__queue-row {
   align-items: center;
-  background: #0f172a;
-  border: 1px solid #1f2937;
+  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
   display: grid;
   gap: 12px;
@@ -234,7 +234,7 @@
 
 .emergency-pulse__queue-row span:not(.emergency-pulse__health),
 .emergency-pulse__queue-row small {
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
   text-align: right;
 }
@@ -263,7 +263,7 @@
 }
 
 .emergency-pulse__health--blue {
-  background: #3b82f6;
+  background: var(--app-accent-interactive);
 }
 
 .emergency-pulse__staff-row {
@@ -273,8 +273,8 @@
 }
 
 .emergency-pulse__staff {
-  background: #0f172a;
-  border: 1px solid #1f2937;
+  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
   display: grid;
   flex: 0 0 172px;
@@ -285,9 +285,9 @@
 .emergency-pulse__staff img,
 .emergency-pulse__staff > span {
   align-items: center;
-  background: #1c2333;
+  background: var(--app-surface-muted, #f0f9ff);
   border-radius: 999px;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   display: flex;
   font-size: 12px;
   font-weight: 800;
@@ -301,32 +301,32 @@
 }
 
 .emergency-pulse__staff strong {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 13px;
 }
 
 .emergency-pulse__staff small {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
 .emergency-pulse__staff--red strong {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .emergency-pulse__staff--green strong {
-  color: #86efac;
+  color: var(--medical-status-success-text, #15803d);
 }
 
 .emergency-pulse__workload {
-  background: #1f2937;
+  background: var(--medical-border, #e0f2fe);
   border-radius: 999px;
   height: 7px;
   overflow: hidden;
 }
 
 .emergency-pulse__workload span {
-  background: #60a5fa;
+  background: var(--app-accent-interactive);
   border-radius: inherit;
   display: block;
   height: 100%;

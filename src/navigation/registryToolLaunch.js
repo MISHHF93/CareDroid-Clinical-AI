@@ -352,6 +352,8 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     {
       emergencyRoleId,
       canAccessToolsRoute: canAccessEmergencyRoute(emergencyRoleId, CANONICAL_ROUTES.emergencyTools),
+      toolId: plan.registryId || toolId,
+      launchMode: plan.mode,
     },
   );
 

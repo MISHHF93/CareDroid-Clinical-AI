@@ -28,6 +28,10 @@ import {
   type Patient,
   type Referral,
 } from '../types/emergency';
+import {
+  resolvePilotHeaderOperationalMetricKeys,
+  resolvePilotStationKpiIds,
+} from './stationKpiPolicy';
 
 export type EmergencyScreenKpiTone =
   | 'stable'
@@ -504,7 +508,7 @@ export function resolveScreenModeKpiIds(
     }
   }
 
-  return kpiIds;
+  return resolvePilotStationKpiIds(screenMode, kpiIds);
 }
 
 export function resolveReceptionStripMetricIds(
@@ -615,7 +619,11 @@ export function resolveCommandCenterWidgetVisibility(
 export function resolveHeaderOperationalMetricKeys(
   screenMode: CareDroidScreenMode,
 ): string[] | null {
-  return SCREEN_MODE_HEADER_OPERATIONAL_KEYS[screenMode] || null;
+  return (
+    resolvePilotHeaderOperationalMetricKeys(screenMode) ||
+    SCREEN_MODE_HEADER_OPERATIONAL_KEYS[screenMode] ||
+    null
+  );
 }
 
 export function filterOperationalMetricsByScreenMode<

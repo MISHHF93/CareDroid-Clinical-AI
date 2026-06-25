@@ -6,6 +6,10 @@
   overflow: hidden;
 }
 
+.ed-copilot-shell--chat-only .ed-copilot-shell__body {
+  border-top: 0;
+}
+
 .ed-copilot-shell__tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

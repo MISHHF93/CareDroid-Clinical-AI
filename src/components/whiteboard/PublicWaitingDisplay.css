@@ -2,8 +2,8 @@
   display: grid;
   gap: 20px;
   padding: 20px 24px 32px;
-  border-bottom: 1px solid #1f2937;
-  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  background: linear-gradient(135deg, var(--medical-surface-page, #f0f9ff), var(--medical-card-bg, #ffffff)) 100%);
 }
 
 .public-waiting-display--kiosk {
@@ -87,7 +87,7 @@
 .public-waiting-display__clock {
   font-size: clamp(22px, 3vw, 36px);
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   letter-spacing: 0.02em;
 }
 
@@ -108,7 +108,7 @@
 .public-waiting-display__footer p {
   margin: 0;
   font-size: clamp(13px, 1.5vw, 17px);
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   line-height: 1.5;
 }
 
@@ -156,27 +156,27 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__header h2 {
   margin: 4px 0 0;
   font-size: clamp(24px, 3vw, 34px);
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .public-waiting-display__subtitle {
   margin: 6px 0 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .public-waiting-display__meta {
   display: grid;
   gap: 4px;
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   text-align: right;
 }
 
 .public-waiting-display__summary {
   margin: 0;
   font-size: 15px;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
   font-weight: 600;
 }
 
@@ -184,13 +184,13 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   margin: 0;
   font-size: 12px;
   line-height: 1.5;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .public-waiting-display__disclaimer-inline {
   font-size: 11px;
   line-height: 1.45;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .public-waiting-display__grid {
@@ -206,12 +206,12 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   padding: 18px;
   border-radius: 16px;
   border: 1px solid #334155;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .public-waiting-display__tile[data-tone='critical'] {
   border-color: #ef4444;
-  background: linear-gradient(180deg, #2a1215 0%, #111827 100%);
+  background: linear-gradient(180deg, #2a1215 0%, var(--app-surface-1, #ffffff) 100%);
 }
 
 .public-waiting-display__tile[data-tone='warning'] {
@@ -219,7 +219,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 }
 
 .public-waiting-display__tile[data-tone='watch'] {
-  border-color: #60a5fa;
+  border-color: var(--app-accent-interactive);
 }
 
 .public-waiting-display__tile[data-tone='stable'] {
@@ -229,18 +229,18 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__value {
   font-size: clamp(28px, 4vw, 42px);
   line-height: 1.05;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .public-waiting-display__label {
   font-size: 14px;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .public-waiting-display__detail {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   line-height: 1.45;
 }
 
@@ -248,13 +248,13 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__guidance h3 {
   margin: 0 0 8px;
   font-size: 16px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .public-waiting-display__stages-note {
   margin: 0 0 12px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .public-waiting-display__stage-list {
@@ -273,20 +273,20 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid #334155;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .public-waiting-display__stage-label {
   font-size: 14px;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .public-waiting-display__stage-count {
   min-width: 36px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #1e293b;
-  color: #f8fafc;
+  background: var(--app-surface-elevated, #ffffff);
+  color: var(--medical-text-heading, #111827);
   font-size: 13px;
   font-weight: 700;
   text-align: center;
@@ -297,7 +297,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   padding-left: 20px;
   display: grid;
   gap: 8px;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -306,7 +306,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid #f59e0b;
-  background: linear-gradient(180deg, #2a1f0d 0%, #111827 100%);
+  background: linear-gradient(180deg, #2a1f0d 0%, var(--app-surface-1, #ffffff) 100%);
 }
 
 .public-waiting-display__escalation strong {

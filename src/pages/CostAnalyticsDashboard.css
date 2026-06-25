@@ -23,7 +23,7 @@
 .cost-header-title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   margin: 0 0 0.5rem 0;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .cost-row-fill--category {
-  background-color: #4f46e5;
+  background-color: var(--app-accent-interactive);
 }
 
 .cost-alert-warning {
@@ -174,7 +174,7 @@
 .cost-panel h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   margin: 0 0 1.5rem 0;
 }
 
@@ -199,7 +199,7 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  background-color: #F9FAFB;
+  background-color: var(--medical-ink, #111827);
   border-radius: 6px;
 }
 
@@ -223,7 +223,7 @@
 .roi-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
 }
 
 .roi-metric-highlight .roi-value {
@@ -262,7 +262,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -283,13 +283,13 @@
 
 .cost-row-fill {
   height: 100%;
-  background-color: var(--tool-color, #4f46e5);
+  background-color: var(--tool-color, var(--app-accent-interactive));
   transition: width 0.3s ease;
 }
 
 .cost-row-amount {
   font-weight: 600;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   min-width: 4rem;
   text-align: right;
 }
@@ -361,7 +361,7 @@
 .modal h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   margin: 0 0 0.5rem 0;
 }
 
@@ -421,12 +421,12 @@
 
 .btn-secondary {
   background-color: var(--app-surface-1);
-  color: var(--text-primary, #1F2937);
+  color: var(--text-primary, #e0f2fe);
   border: 1px solid var(--border-color, #E5E7EB);
 }
 
 .btn-secondary:hover {
-  background-color: #F9FAFB;
+  background-color: var(--medical-ink, #111827);
 }
 
 .btn-danger {

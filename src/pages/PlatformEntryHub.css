@@ -83,7 +83,7 @@
 }
 
 .platform-entry__card:hover {
-  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 40%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 40%, transparent);
   transform: translateY(-1px);
 }
 
@@ -101,7 +101,7 @@
 
 .platform-entry__cta {
   font-weight: 600;
-  color: var(--app-accent, #00ff88);
+  color: var(--app-accent-interactive);
 }
 
 .platform-entry__flow {
@@ -129,5 +129,5 @@
 }
 
 .platform-entry__card--primary {
-  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 25%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 25%, transparent);
 }

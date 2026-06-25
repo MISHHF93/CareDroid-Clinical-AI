@@ -1,4 +1,5 @@
 import { Suspense, useEffect } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from './config/medicalTheme.constants';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import {
   BrowserRouter,
@@ -308,7 +309,7 @@ import { shouldRedirectEmergencySurface } from './services/navigateToEmergencySu
 
 function RouteLoadingFallback({ label = 'Loading CareDroid module...' }) {
   return (
-    <div role="status" style={{ padding: 24, color: '#9CA3AF' }}>
+    <div role="status" style={{ padding: 24, color: MEDICAL_THEME.inkSubtle }}>
       {label}
     </div>
   );
@@ -333,7 +334,7 @@ function EmergencyAccessDenied({ requestedPath }) {
         display: 'grid',
         placeItems: 'center',
         padding: 24,
-        background: '#0A0E1A',
+        background: MEDICAL_THEME.surfacePage,
       }}
     >
       <div
@@ -342,15 +343,15 @@ function EmergencyAccessDenied({ requestedPath }) {
           maxWidth: 560,
           border: '1px solid #7F1D1D',
           borderRadius: 16,
-          background: '#111827',
-          color: '#F9FAFB',
+          background: MEDICAL_THEME.surfaceCard,
+          color: MEDICAL_THEME.ink,
           padding: 24,
           boxShadow: 'none',
         }}
       >
         <span
           style={{
-            color: '#FCA5A5',
+            color: MEDICAL_TYPE.statusCritical,
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: '0.08em',
@@ -360,7 +361,7 @@ function EmergencyAccessDenied({ requestedPath }) {
           Access denied
         </span>
         <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>CareDroid page unavailable</h1>
-        <p style={{ color: '#9CA3AF', lineHeight: 1.5 }}>
+        <p style={{ color: MEDICAL_THEME.inkSubtle, lineHeight: 1.5 }}>
           {emergencyRole.roleLabel} does not have access to this CareDroid page.
         </p>
         <Link
@@ -369,8 +370,8 @@ function EmergencyAccessDenied({ requestedPath }) {
             display: 'inline-flex',
             marginTop: 10,
             borderRadius: 10,
-            background: '#2563EB',
-            color: '#F9FAFB',
+            background: MEDICAL_THEME.accent,
+            color: MEDICAL_THEME.onAccent,
             padding: '10px 13px',
             textDecoration: 'none',
             fontWeight: 700,

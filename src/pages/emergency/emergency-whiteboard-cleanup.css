@@ -2,20 +2,20 @@
 
 .emergency-whiteboard-page {
   min-height: 100%;
-  background: var(--color-background, #0b1220);
+  background: var(--color-background, var(--medical-surface-page, #f0f9ff));
 }
 
 /* Primary stats bar */
 .emergency-whiteboard-page__stats--bar {
   align-items: stretch;
-  background: var(--color-surface, #111827);
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   overflow-x: auto;
 }
 
 .emergency-whiteboard-page__stat-label--tone-info {
-  color: var(--status-info, #60a5fa);
+  color: var(--app-accent-interactive, var(--status-info));
 }
 
 .emergency-whiteboard-page__stat-label--tone-warning {
@@ -31,13 +31,13 @@
 }
 
 .emergency-whiteboard-page__stat-label--tone-default {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 /* Operational command layer */
 .emergency-whiteboard-page__command-layer {
-  background: var(--color-surface, #111827);
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
   gap: 10px;
   padding: 12px 16px;
@@ -51,7 +51,7 @@
 }
 
 .emergency-whiteboard-page__command-layer-title {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
@@ -69,10 +69,10 @@
 
 .emergency-whiteboard-page__command-metric,
 .emergency-whiteboard-page__command-metric-btn {
-  background: var(--color-card, #172033);
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   display: grid;
   gap: 4px;
   min-height: 68px;
@@ -113,13 +113,13 @@
 }
 
 .emergency-whiteboard-page__command-metric-label--info {
-  color: var(--status-info, #60a5fa);
+  color: var(--app-accent-interactive, var(--status-info));
 }
 
 /* Mission control */
 .emergency-whiteboard-page__mission {
-  background: var(--color-background, #0b1220);
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-background, var(--medical-surface-page, #f0f9ff));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
   gap: 12px;
   grid-template-columns: minmax(260px, 1.1fr) minmax(260px, 1fr) minmax(240px, 0.9fr);
@@ -127,14 +127,14 @@
 }
 
 .emergency-whiteboard-page__mission-card {
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 14px;
-  background: var(--color-card, #172033);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
   padding: 12px;
 }
 
 .emergency-whiteboard-page__mission-eyebrow {
-  color: var(--status-info, #93c5fd);
+  color: var(--status-info, #38bdf8);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -142,7 +142,7 @@
 }
 
 .emergency-whiteboard-page__mission-title {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 16px;
   margin: 4px 0 8px;
 }
@@ -160,14 +160,14 @@
 }
 
 .emergency-whiteboard-page__mission-card-heading {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
 .emergency-whiteboard-page__mission-link-btn {
   background: transparent;
   border: 0;
-  color: var(--status-info, #93c5fd);
+  color: var(--status-info, #38bdf8);
   cursor: pointer;
   font-weight: 850;
 }
@@ -190,9 +190,9 @@
 }
 
 .emergency-whiteboard-page__mission-btn {
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
   font-size: 12px;
   font-weight: 850;
@@ -202,15 +202,15 @@
 }
 
 .emergency-whiteboard-page__mission-btn--primary {
-  background: var(--component-button-primary-bg, #2563eb);
+  background: var(--component-button-primary-bg, var(--app-accent-interactive));
 }
 
 .emergency-whiteboard-page__mission-btn--warning {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, var(--color-card, #172033));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, var(--color-card, var(--app-surface-2, #ffffff)));
 }
 
 .emergency-whiteboard-page__mission-btn--default {
-  background: var(--color-floating-surface, #1e293b);
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
 }
 
 .emergency-whiteboard-page__mission-btn:disabled {
@@ -221,8 +221,8 @@
 
 /* EMS arrival cards */
 .emergency-whiteboard-page__arrival-card {
-  background: var(--color-surface, #111827);
-  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 32%, var(--color-border-default, #1f2937));
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 32%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--status-info, #38bdf8);
   display: grid;
@@ -248,8 +248,8 @@
 }
 
 .emergency-whiteboard-page__arrival-btn--prepare {
-  background: var(--color-floating-surface, #1e293b);
-  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 40%, var(--color-border-default, #1f2937));
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 8px;
   color: #bae6fd;
   cursor: pointer;
@@ -263,10 +263,10 @@
 }
 
 .emergency-whiteboard-page__arrival-btn--convert {
-  background: color-mix(in srgb, var(--status-stable, #10b981) 12%, var(--color-card, #172033));
-  border: 1px solid color-mix(in srgb, var(--status-stable, #10b981) 40%, var(--color-border-default, #1f2937));
+  background: color-mix(in srgb, var(--status-stable, #10b981) 12%, var(--color-card, var(--app-surface-2, #ffffff)));
+  border: 1px solid color-mix(in srgb, var(--status-stable, #10b981) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 8px;
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
   cursor: pointer;
   font-weight: 800;
   padding: 5px 7px;
@@ -286,7 +286,7 @@
 }
 
 .emergency-whiteboard-page__tasks-heading {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
@@ -297,8 +297,8 @@
 }
 
 .emergency-whiteboard-page__referral-bucket-chip {
-  background: var(--color-floating-surface, #1e293b);
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
@@ -306,15 +306,15 @@
 }
 
 .emergency-whiteboard-page__referral-bucket-chip--pending {
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .emergency-whiteboard-page__referral-bucket-chip--accepted {
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
 }
 
 .emergency-whiteboard-page__referral-bucket-chip--delayed {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .emergency-whiteboard-page__task-list {
@@ -324,8 +324,8 @@
 }
 
 .emergency-whiteboard-page__referral-task-btn {
-  background: color-mix(in srgb, var(--color-accent, #a78bfa) 12%, var(--color-card, #172033));
-  border: 1px solid color-mix(in srgb, var(--color-accent, #a78bfa) 34%, var(--color-border-default, #1f2937));
+  background: color-mix(in srgb, var(--color-accent, #a78bfa) 12%, var(--color-card, var(--app-surface-2, #ffffff)));
+  border: 1px solid color-mix(in srgb, var(--color-accent, #a78bfa) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--color-accent, #a78bfa);
   color: #ede9fe;
@@ -343,11 +343,11 @@
 }
 
 .emergency-whiteboard-page__reassess-task-btn {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 12%, var(--color-card, #172033));
-  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 34%, var(--color-border-default, #1f2937));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 12%, var(--color-card, var(--app-surface-2, #ffffff)));
+  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--status-warning, #f59e0b);
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   cursor: pointer;
   display: grid;
   gap: 2px;
@@ -358,8 +358,8 @@
 /* Awareness banner & chips */
 .emergency-whiteboard-page__awareness-banner {
   align-items: center;
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 10%, var(--color-surface, #111827));
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 10%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -373,12 +373,12 @@
 }
 
 .emergency-whiteboard-page__awareness-banner-title {
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 13px;
 }
 
 .emergency-whiteboard-page__awareness-banner-subtitle {
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
 }
 
@@ -389,10 +389,10 @@
 }
 
 .emergency-whiteboard-page__awareness-chip {
-  background: var(--color-floating-surface, #1e293b);
-  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-subtle, #1f2937));
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 999px;
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   cursor: pointer;
   font-size: 12px;
   font-weight: 800;
@@ -400,7 +400,7 @@
 }
 
 .emergency-whiteboard-page__awareness-panel {
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 14px;
   display: grid;
   gap: 10px;
@@ -416,7 +416,7 @@
 }
 
 .emergency-whiteboard-page__awareness-title {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
@@ -433,7 +433,7 @@
 }
 
 .emergency-whiteboard-page__awareness-card {
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
   display: grid;
   gap: 4px;
@@ -452,8 +452,8 @@
 
 /* Inbound EMS banner */
 .emergency-whiteboard-page__inbound-banner {
-  background: color-mix(in srgb, var(--color-secondary, #38bdf8) 8%, var(--color-surface, #111827));
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: color-mix(in srgb, var(--color-secondary, #38bdf8) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
   gap: 8px;
   padding: 10px 16px;
@@ -474,8 +474,8 @@
 }
 
 .emergency-whiteboard-page__inbound-banner-card {
-  background: var(--color-card, #172033);
-  border: 1px solid color-mix(in srgb, var(--color-secondary, #38bdf8) 34%, var(--color-border-default, #1f2937));
+  background: var(--color-card, var(--app-surface-2, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--color-secondary, #38bdf8) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--color-secondary, #38bdf8);
   color: #e0f2fe;
@@ -487,12 +487,12 @@
 }
 
 .emergency-whiteboard-page__inbound-banner-card-detail {
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 12px;
 }
 
 .emergency-whiteboard-page__inbound-banner-card-meta {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -527,14 +527,14 @@
 }
 
 .emergency-whiteboard-page__inbound-hint {
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 12px;
 }
 
 /* Filter controls */
 .emergency-whiteboard-page__controls {
   align-items: center;
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -544,7 +544,7 @@
 
 .emergency-whiteboard-page__filter-chip {
   background: transparent;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
   color: var(--color-text-muted, #9ca3af);
   cursor: pointer;
@@ -554,24 +554,24 @@
 }
 
 .emergency-whiteboard-page__filter-chip--active {
-  background: var(--color-text-primary, #f9fafb);
-  color: var(--color-background, #111827);
+  background: var(--color-text-primary, var(--medical-ink, #111827));
+  color: var(--color-background, var(--app-surface-1, #ffffff));
 }
 
 .emergency-whiteboard-page__filter-chip--reassess {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 52%, var(--color-border-subtle, #1f2937));
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 52%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   font-weight: 800;
 }
 
 .emergency-whiteboard-page__filter-chip--reassess:not(.emergency-whiteboard-page__filter-chip--active) {
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-warning, #f59e0b) 24%, transparent);
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .emergency-whiteboard-page__filter-chip--reassess.emergency-whiteboard-page__filter-chip--active {
   background: var(--status-warning, #f59e0b);
-  color: var(--color-background, #111827);
+  color: var(--color-background, var(--app-surface-1, #ffffff));
 }
 
 /* Card key legend swatches */
@@ -597,8 +597,8 @@
 
 /* Intake button */
 .emergency-whiteboard-page__intake-button {
-  background: var(--component-button-primary-bg, #2563eb);
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  background: var(--component-button-primary-bg, var(--app-accent-interactive));
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
   color: var(--component-button-primary-fg, #f9fafb);
   cursor: pointer;
@@ -616,8 +616,8 @@
 /* Queue filter bar */
 .emergency-whiteboard-page__queue-filter-bar {
   align-items: center;
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
-  color: var(--color-text-primary, #f9fafb);
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -626,16 +626,16 @@
 }
 
 .emergency-whiteboard-page__queue-filter-label {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 13px;
   font-weight: 850;
 }
 
 .emergency-whiteboard-page__queue-filter-clear {
   background: transparent;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
   font-size: 12px;
   font-weight: 850;
@@ -660,9 +660,9 @@
 /* Board limit banner */
 .emergency-whiteboard-page__board-limit {
   align-items: center;
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--color-surface, #111827));
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
-  color: #fde68a;
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  color: var(--medical-status-warning-text, #b45309);
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -708,8 +708,8 @@
 
 .emergency-whiteboard-page__display-banner {
   align-items: center;
-  background: color-mix(in srgb, var(--status-info, #2563eb) 14%, var(--color-surface, #111827));
-  border-bottom: 1px solid var(--color-border-subtle, #1f2937);
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 14%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -723,7 +723,7 @@
 }
 
 .emergency-whiteboard-page__display-banner-title {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 

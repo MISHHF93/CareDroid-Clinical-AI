@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 250;
-  background: #0b1120;
+  background: var(--medical-surface-page, #f0f9ff);
   overflow-y: auto;
 }
 

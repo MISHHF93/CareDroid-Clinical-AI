@@ -1,3 +1,4 @@
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import { Patient, PatientState, Priority } from '../types/emergency';
@@ -53,10 +54,10 @@ function calculateAge(dob: string): number {
 }
 
 const inputStyle: CSSProperties = {
-  border: '1px solid #374151',
+  border: '1px solid #e0f2fe',
   borderRadius: 10,
-  background: '#0B1120',
-  color: '#F9FAFB',
+  background: MEDICAL_THEME.surfaceCard,
+  color: 'var(--medical-ink, #111827)',
   padding: '11px 12px',
   outline: 'none',
   fontSize: 15,
@@ -258,9 +259,9 @@ export default function ExpressRegistration({
         style={{
           width: 'min(440px, calc(100vw - 24px))',
           maxWidth: '100%',
-          background: '#111827',
+          background: MEDICAL_THEME.surfaceCard,
           borderRadius: 14,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
           overflow: 'hidden',
         }}
@@ -272,14 +273,14 @@ export default function ExpressRegistration({
             justifyContent: 'space-between',
             gap: 12,
             padding: '14px 16px',
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
             <h2 id="express-registration-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
               {RECEPTION_COPY.express.title}
             </h2>
-            <p style={{ margin: '4px 0 0', color: '#9CA3AF', fontSize: 12 }}>
+            <p style={{ margin: '4px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
               {RECEPTION_COPY.express.subtitle}
             </p>
           </div>
@@ -291,9 +292,9 @@ export default function ExpressRegistration({
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -318,7 +319,7 @@ export default function ExpressRegistration({
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>First name</span>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>First name</span>
               <input
                 ref={firstNameRef}
                 value={firstName}
@@ -329,7 +330,7 @@ export default function ExpressRegistration({
               />
             </label>
             <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Last name</span>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Last name</span>
               <input
                 value={lastName}
                 onChange={(event) => setLastName(event.target.value)}
@@ -341,7 +342,7 @@ export default function ExpressRegistration({
           </div>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>
+            <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>
               Date of birth {dob ? `(age ${age})` : ''}
             </span>
             <input
@@ -354,7 +355,7 @@ export default function ExpressRegistration({
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Health card</span>
+            <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Health card</span>
             <input
               value={healthCard}
               onChange={(event) => setHealthCard(event.target.value)}
@@ -367,7 +368,7 @@ export default function ExpressRegistration({
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Phone</span>
+            <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Phone</span>
             <input
               type="tel"
               value={phone}
@@ -381,7 +382,7 @@ export default function ExpressRegistration({
           </label>
 
           <div>
-            <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 6 }}>
+            <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 6 }}>
               Arrival reason
             </span>
             <div
@@ -400,10 +401,10 @@ export default function ExpressRegistration({
                       setSubmitError('');
                     }}
                     style={{
-                      border: active ? '1px solid #60A5FA' : '1px solid #374151',
+                      border: active ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
                       borderRadius: 999,
-                      background: active ? '#1D4ED81F' : '#0B1120',
-                      color: '#F9FAFB',
+                      background: active ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
+                      color: 'var(--medical-ink, #111827)',
                       padding: '6px 10px',
                       fontSize: 12,
                       fontWeight: 700,
@@ -425,7 +426,7 @@ export default function ExpressRegistration({
           </div>
 
           {submitError ? (
-            <p role="alert" style={{ margin: 0, color: '#FCA5A5', fontSize: 12 }}>
+            <p role="alert" style={{ margin: 0, color: MEDICAL_TYPE.statusCritical, fontSize: 12 }}>
               {submitError}
             </p>
           ) : null}
@@ -434,8 +435,8 @@ export default function ExpressRegistration({
         <footer
           style={{
             padding: 16,
-            borderTop: '1px solid #1F2937',
-            background: '#111827',
+            borderTop: '1px solid #e0f2fe',
+            background: MEDICAL_THEME.surfaceCard,
           }}
         >
           <button
@@ -446,8 +447,8 @@ export default function ExpressRegistration({
               height: 48,
               border: 0,
               borderRadius: 12,
-              background: submitting || !canCreatePatient ? '#1E3A8A' : '#2563EB',
-              color: '#F9FAFB',
+              background: submitting || !canCreatePatient ? '#1E3A8A' : MEDICAL_THEME.accent,
+              color: 'var(--medical-ink, #111827)',
               cursor: submitting ? 'progress' : 'pointer',
               fontWeight: 800,
               fontSize: 15,

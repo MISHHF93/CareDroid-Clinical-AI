@@ -95,6 +95,10 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressCopilotStatusStrip: true,
   suppressCopilotMultimodalInput: true,
   suppressCopilotOrchestrationActions: true,
+  /** Narrow docked panel + hide safety badge row for chat-first pilot */
+  forceCompactCopilotLayout: true,
+  suppressCopilotSafetyBadge: true,
+  maxCopilotQuickActions: 2,
   /** Tools — search + grid; hide platform education chrome */
   suppressToolsOverviewContextRow: true,
   suppressToolsOverviewExecutionLegend: true,
@@ -162,6 +166,10 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressReceptionPatientAnswersPanel: true,
   /** Keep all roles on the trimmed reception desk layout during pilot */
   forceSlimReceptionDeskForAllRoles: true,
+  /** Operational strips — inline chip layout, no command eyebrow */
+  forceCompactOperationalStrip: true,
+  /** Whiteboard primary stat row — waiting + high risk only */
+  maxPrimaryWhiteboardStats: 2,
 });
 
 export const PILOT_EXTENSION_NAV_ITEM_ID_SET = new Set(PILOT_EXTENSION_NAV_ITEM_IDS);
@@ -230,6 +238,22 @@ export function shouldShowWalkthroughActionOnEmptyBoard() {
 
 export function shouldSuppressCopilotAutoOpen() {
   return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCopilotAutoOpen;
+}
+
+const COPILOT_QUICK_ACTION_LIMIT_FALLBACK = 3;
+
+export function shouldForceCompactCopilotLayout() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.forceCompactCopilotLayout;
+}
+
+export function shouldSuppressCopilotSafetyBadge() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCopilotSafetyBadge;
+}
+
+export function getMaxCopilotQuickActions() {
+  return isPractitionerCleanupEnabled()
+    ? PRACTITIONER_CLEANUP.maxCopilotQuickActions
+    : COPILOT_QUICK_ACTION_LIMIT_FALLBACK;
 }
 
 export function shouldSuppressCopilotRouteUpgradeSignals() {
@@ -490,6 +514,16 @@ export function shouldSuppressReceptionPatientAnswersPanel() {
 
 export function shouldForceSlimReceptionDeskForAllRoles() {
   return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.forceSlimReceptionDeskForAllRoles;
+}
+
+export function shouldForceCompactOperationalStrip() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.forceCompactOperationalStrip;
+}
+
+export function getMaxPrimaryWhiteboardStats() {
+  return isPractitionerCleanupEnabled()
+    ? PRACTITIONER_CLEANUP.maxPrimaryWhiteboardStats
+    : null;
 }
 
 /**

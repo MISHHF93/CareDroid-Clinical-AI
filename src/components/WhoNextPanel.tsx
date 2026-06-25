@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import OperationalEmptyState from './ui/OperationalEmptyState';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -201,8 +202,8 @@ function isTextEntryTarget(target: EventTarget | null): boolean {
 const buttonStyle: CSSProperties = {
   border: '1px solid rgba(255,255,255,0.14)',
   borderRadius: 9,
-  background: '#1C2333',
-  color: '#F9FAFB',
+  background: '#f0f9ff',
+  color: 'var(--medical-ink, #111827)',
   cursor: 'pointer',
   fontSize: 12,
   fontWeight: 700,
@@ -302,17 +303,17 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
     <aside style={containerStyle} aria-label="See next patient recommendation">
       <div
         style={{
-          background: '#111827',
-          border: pinned ? '1px solid #3B82F6' : '1px solid #1F2937',
-          borderLeft: '4px solid #3B82F6',
+          background: MEDICAL_THEME.surfaceCard,
+          border: pinned ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
+          borderLeft: '4px solid #0ea5e9',
           borderRadius: 12,
           boxShadow: mode === 'floating' ? '0 18px 48px rgba(0,0,0,0.38)' : 'none',
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           padding: 12,
         }}
       >
         <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-          <strong style={{ color: '#93C5FD', fontSize: 11, letterSpacing: '0.12em' }}>SEE NEXT</strong>
+          <strong style={{ color: '#38bdf8', fontSize: 11, letterSpacing: '0.12em' }}>SEE NEXT</strong>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               type="button"
@@ -320,8 +321,8 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
               onClick={() => setPinned((current) => !current)}
               style={{
                 ...buttonStyle,
-                background: pinned ? '#1D4ED8' : '#1C2333',
-                color: pinned ? '#F9FAFB' : '#BFDBFE',
+                background: pinned ? '#0284c7' : '#f0f9ff',
+                color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
                 padding: '5px 8px',
               }}
             >
@@ -333,7 +334,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
               onClick={closePanel}
               style={{
                 ...buttonStyle,
-                color: '#9CA3AF',
+                color: MEDICAL_THEME.inkSubtle,
                 padding: '5px 8px',
               }}
             >
@@ -344,21 +345,21 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
 
         {recommendation ? (
           <>
-            <div style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 700, marginTop: 10 }}>
+            <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700, marginTop: 10 }}>
               {patientName(recommendation.patient)} · {patientLocation(recommendation.patient, rooms)} ·{' '}
               {truncate(recommendation.patient.chiefComplaint, 36)}
             </div>
-            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 5 }}>
+            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 5 }}>
               {recommendation.detailParts.join(' · ')}
             </div>
-            <div style={{ color: '#BFDBFE', fontSize: 12, fontWeight: 700, marginTop: 6 }}>
+            <div style={{ color: MEDICAL_THEME.accent, fontSize: 12, fontWeight: 700, marginTop: 6 }}>
               {recommendation.reason || 'Assigned patient needs review'}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: recommendationNeedsReassessment ? '1fr 1fr' : '1fr 1fr', gap: 8, marginTop: 12 }}>
               <button
                 type="button"
                 onClick={() => selectPatient(recommendation.patient.id)}
-                style={{ ...buttonStyle, background: '#2563EB', borderColor: '#2563EB' }}
+                style={{ ...buttonStyle, background: MEDICAL_THEME.accent, borderColor: MEDICAL_THEME.accent }}
               >
                 Go to Patient
               </button>
@@ -368,7 +369,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
                   onClick={openReassessment}
                   style={{
                     ...buttonStyle,
-                    background: 'color-mix(in srgb, #F59E0B 18%, #1C2333)',
+                    background: 'color-mix(in srgb, #F59E0B 18%, #f0f9ff)',
                     borderColor: '#F59E0B',
                     color: '#FDE68A',
                   }}

@@ -1,0 +1,32 @@
+/**
+ * Layer 0b — canonical medical typography / text-role tokens.
+ * Pair with medical-color-layer.css for full design language.
+ */
+:root {
+  --medical-text-heading: var(--medical-ink);
+  --medical-text-body: var(--medical-ink);
+  --medical-text-muted: var(--medical-ink-muted);
+  --medical-text-subtle: var(--medical-ink-subtle);
+  --medical-text-disabled: #d1d5db;
+  --medical-text-placeholder: var(--medical-ink-subtle);
+  --medical-text-link: var(--medical-accent);
+  --medical-text-link-hover: var(--medical-accent-hover);
+  --medical-text-on-accent: #ffffff;
+  --medical-text-on-solid: #ffffff;
+  --medical-text-inverse: #ffffff;
+
+  /* Semantic status text (readable on light tinted surfaces) */
+  --medical-status-critical-text: #b91c1c;
+  --medical-status-high-text: #c2410c;
+  --medical-status-warning-text: #b45309;
+  --medical-status-info-text: #0284c7;
+  --medical-status-success-text: #15803d;
+  --medical-status-neutral-text: var(--medical-ink-muted);
+
+  /* Legacy text alias bridge */
+  --app-text-heading: var(--medical-text-heading);
+  --app-text-body: var(--medical-text-body);
+  --app-text-muted: var(--medical-text-muted);
+  --app-text-subtle: var(--medical-text-subtle);
+  --app-text-link: var(--medical-text-link);
+}

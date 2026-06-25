@@ -1,4 +1,6 @@
 import { useMemo } from 'react';
+import type { CareDroidScreenMode } from '../../config/careDroidScreenModes';
+import { shouldForceCompactOperationalStrip } from '../../config/practitionerCleanup.config';
 import OperationalStrip from './OperationalStrip';
 import {
   buildHeaderOperationalAlertMetrics,
@@ -10,6 +12,7 @@ type OperationalAlertRailProps = BuildOperationalAlertMetricsInput & {
   ariaLabel?: string;
   className?: string;
   readOnly?: boolean;
+  screenMode?: CareDroidScreenMode | null;
 };
 
 export default function OperationalAlertRail({
@@ -22,7 +25,10 @@ export default function OperationalAlertRail({
   syncStale = false,
   syncPulse = false,
   intelligenceSnapshot = null,
+  screenMode = null,
 }: OperationalAlertRailProps) {
+  const dense = shouldForceCompactOperationalStrip();
+
   const metrics = useMemo(
     () =>
       buildHeaderOperationalAlertMetrics({
@@ -32,8 +38,17 @@ export default function OperationalAlertRail({
         syncStale,
         syncPulse,
         intelligenceSnapshot,
+        screenMode,
       }),
-    [centralSnapshot, intelligenceSnapshot, syncLabel, syncPulse, syncStale, syncTitle],
+    [
+      centralSnapshot,
+      intelligenceSnapshot,
+      screenMode,
+      syncLabel,
+      syncPulse,
+      syncStale,
+      syncTitle,
+    ],
   );
 
   if (!metrics.length) return null;
@@ -51,6 +66,7 @@ export default function OperationalAlertRail({
     <div
       className={[
         'operational-alert-rail',
+        dense ? 'operational-alert-rail--dense' : '',
         syncPulse ? 'operational-alert-rail--sync-pulse' : '',
         className,
       ]
@@ -59,11 +75,12 @@ export default function OperationalAlertRail({
     >
       <OperationalStrip
         metrics={stripMetrics}
+        screenMode={screenMode}
         layout="compact"
         ariaLabel={ariaLabel}
         eyebrow={null}
         readOnly={readOnly}
-        metricLabelsUppercase
+        metricLabelsUppercase={!dense}
         className="operational-alert-rail__strip"
       />
     </div>

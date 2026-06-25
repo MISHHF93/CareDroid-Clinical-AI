@@ -53,7 +53,7 @@ export const DEFAULT_SAAS_PROFILE = Object.freeze({
   hiddenAssets: [],
   recentAssets: [],
   preferredAIStyle: 'concise',
-  themePreference: 'system',
+  themePreference: 'light',
   compactMode: false,
   onboardingStatus: 'complete',
 });

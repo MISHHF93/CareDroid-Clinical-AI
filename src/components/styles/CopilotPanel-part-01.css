@@ -12,15 +12,21 @@
   text-align: center;
 }
 
+.emergency-app-shell .ed-copilot-panel {
+  align-self: stretch;
+  height: 100%;
+  max-height: var(--app-viewport-height, 100dvh);
+}
+
 .ed-copilot-panel {
-  --copilot-bg: color-mix(in srgb, var(--color-surface, #111827) 90%, #020617);
-  --copilot-surface: color-mix(in srgb, var(--color-floating-surface, #1e293b) 76%, #020617);
-  --copilot-surface-soft: color-mix(in srgb, var(--color-card, #172033) 68%, #020617);
-  --copilot-border: color-mix(in srgb, var(--color-border-default, #2d3748) 76%, transparent);
-  --copilot-border-strong: color-mix(in srgb, var(--status-info, #06b6d4) 34%, var(--color-border-default, #2d3748));
-  --copilot-ai: var(--status-info, #06b6d4);
-  --copilot-action: var(--color-primary, #3b82f6);
-  --copilot-text: var(--color-text-primary, #f9fafb);
+  --copilot-bg: color-mix(in srgb, var(--color-surface, var(--app-surface-1, #ffffff)) 90%, #f0f9ff);
+  --copilot-surface: color-mix(in srgb, var(--color-floating-surface, var(--app-surface-elevated, #ffffff)) 76%, #f0f9ff);
+  --copilot-surface-soft: color-mix(in srgb, var(--color-card, var(--app-surface-2, #ffffff)) 68%, #f0f9ff);
+  --copilot-border: color-mix(in srgb, var(--color-border-default, var(--medical-border, #e0f2fe)) 76%, transparent);
+  --copilot-border-strong: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  --copilot-ai: var(--app-accent-interactive, var(--status-info));
+  --copilot-action: var(--app-accent-interactive, var(--color-primary));
+  --copilot-text: var(--color-text-primary, var(--medical-ink, #111827));
   --copilot-muted: var(--color-text-secondary, #9ca3af);
   --copilot-warning: var(--status-warning, #f59e0b);
   position: relative;
@@ -39,6 +45,61 @@
     linear-gradient(180deg, var(--copilot-surface), var(--copilot-bg));
   color: var(--copilot-text);
   box-shadow: -18px 0 44px rgba(2, 6, 23, 0.22);
+}
+
+.ed-copilot-panel--compact {
+  width: min(300px, 24vw);
+  min-width: 280px;
+  box-shadow: -12px 0 32px rgba(2, 6, 23, 0.18);
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__header {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__identity span {
+  font-size: 13px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__messages {
+  gap: 8px;
+  padding: 10px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__bubble {
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 10px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__quick-actions {
+  gap: 6px;
+  padding: 0 10px 8px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__quick-actions button {
+  min-height: 30px;
+  font-size: 11px;
+  padding: 5px 9px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__composer {
+  gap: 6px;
+  padding: 8px 10px 10px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__composer input {
+  min-height: 36px;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.ed-copilot-panel--compact .ed-copilot-panel__composer button {
+  width: 36px;
+  height: 36px;
 }
 
 .ed-copilot-panel__header {

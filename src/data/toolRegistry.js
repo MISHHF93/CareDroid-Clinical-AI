@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 /**
  * Clinical tools registry (sidebar, workspaces, deep links).
  *
@@ -517,7 +518,7 @@ const toolRegistry = [
     path: '/tools/calculators/serum-osmolality',
     panelTool: 'calculators',
     initialCalc: 'serum-osmolality',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description: 'Calculated serum osmolality from sodium, glucose, BUN, and optional ethanol',
     category: 'Calculator',
     features: ['Sodium', 'Glucose', 'BUN / urea', 'Optional ethanol'],
@@ -952,7 +953,7 @@ const toolRegistry = [
     id: 'behavioral-analytics-dashboard',
     name: 'Behavioral Analytics Dashboard',
     path: '/tools/psychiatry/behavioral-analytics-dashboard',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Behavioral analytics dashboard concept for screening volumes, queues, and safety-review gaps',
     category: 'Reference',
@@ -1019,7 +1020,7 @@ const toolRegistry = [
     id: 'population-screening-dashboard',
     name: 'Population Screening Dashboard',
     path: '/tools/psychiatry/population-screening-dashboard',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Population screening dashboard concept for panel completion, positive screens, and follow-up gaps',
     category: 'Reference',
@@ -1482,7 +1483,7 @@ const toolRegistry = [
     id: 'respiratory-command-center',
     name: 'Respiratory Command Center',
     path: '/tools/pulmonology/respiratory-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Respiratory command-center view for oxygen, ventilator, asthma/COPD, and sleep queues',
     category: 'Reference',
@@ -1530,7 +1531,7 @@ const toolRegistry = [
     id: 'renal-monitoring-dashboard',
     name: 'Renal Monitoring Dashboard',
     path: '/tools/nephrology/renal-monitoring-dashboard',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Renal monitoring dashboard for creatinine, eGFR, urine output, electrolytes, and acid-base trends',
     category: 'Reference',
@@ -1661,7 +1662,7 @@ const toolRegistry = [
     id: 'glucose-telemetry-dashboard',
     name: 'Glucose Telemetry Dashboard',
     path: '/tools/endocrine/glucose-telemetry-dashboard',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Backend-backed glucose telemetry dashboard concept for CGM/point-of-care trends and review queues',
     category: 'Reference',
@@ -1725,7 +1726,7 @@ const toolRegistry = [
     id: 'continuous-glucose-command-center',
     name: 'Continuous Glucose Command Center',
     path: '/tools/endocrine/continuous-glucose-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'CGM command-center view for glucose telemetry, data freshness, hypoglycemia, and unresolved review queues',
     category: 'Reference',
@@ -1882,7 +1883,7 @@ const toolRegistry = [
     id: 'gi-command-center',
     name: 'GI Command Center',
     path: '/tools/gastroenterology/gi-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'GI command-center view for bleed, liver, pancreatitis, endoscopy, and surveillance queues',
     category: 'Reference',
@@ -2235,7 +2236,7 @@ const toolRegistry = [
     id: 'neonatal-dashboard',
     name: 'Neonatal Dashboard',
     path: '/tools/pediatrics-obgyn/neonatal-dashboard',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Neonatal dashboard concept for vitals, feeding, bilirubin, growth, screening, and review queues',
     category: 'Reference',
@@ -2267,7 +2268,7 @@ const toolRegistry = [
     id: 'pediatric-command-center',
     name: 'Pediatric Command Center',
     path: '/tools/pediatrics-obgyn/pediatric-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Pediatric command-center view for deterioration, sepsis, vitals, growth, and unresolved review items',
     category: 'Reference',
@@ -2331,7 +2332,7 @@ const toolRegistry = [
     id: 'stroke-workflow-assistant',
     name: 'Stroke Workflow Assistant',
     path: '/tools/neurology/stroke-workflow-assistant',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Stroke workflow checklist support for last-known-well, deficits, imaging, and handoff prompts',
     category: 'Calculator',
@@ -2389,7 +2390,7 @@ const toolRegistry = [
     id: 'neuro-telemetry-dashboard',
     name: 'Neuro Telemetry Dashboard',
     path: '/tools/neurology/neuro-telemetry-dashboard',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Neuro telemetry dashboard concept for neuro checks, consciousness scores, seizures, and gaps',
     category: 'Reference',
@@ -2400,7 +2401,7 @@ const toolRegistry = [
     id: 'stroke-command-center',
     name: 'Stroke Command Center',
     path: '/tools/neurology/stroke-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description: 'Stroke command-center view for activation, imaging milestones, and review queues',
     category: 'Reference',
     features: ['Activation queue', 'Last-known-well', 'Imaging milestones', 'Handoff status'],
@@ -2532,7 +2533,7 @@ const toolRegistry = [
     path: '/tools/calculators/turnaround-time-calculator',
     panelTool: 'calculators',
     initialCalc: 'turnaround-time-calculator',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Operational turnaround-time calculator for assignment, travel, service, and ready-time segments',
     category: 'Calculator',
@@ -2692,7 +2693,7 @@ const toolRegistry = [
     name: 'Resource Allocation Assistant',
     path: '/tools/calculators',
     panelTool: 'calculators',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Chat-assisted resource allocation planning for beds, staff, devices, and transport options with human approval required',
     category: 'Hospital Operations',
@@ -2802,7 +2803,7 @@ const toolRegistry = [
     id: 'fleet-live-map',
     name: 'Fleet Live Map',
     path: '/fleet/map',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Visible fleet vehicle tracking map with demo GPS coordinates, route overlays, stale/offline markers, alerts, and vehicle detail drawer',
     category: 'Fleet',
@@ -2938,7 +2939,7 @@ const toolRegistry = [
     id: 'hospital-operations-command',
     name: 'Hospital Operations Command',
     path: '/hospital-map',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Operational command layer that summarizes hospital map, Medical IoT, device fleet, telemetry, alerts, maintenance, and utilization',
     shortcut: 'Ctrl+Shift+O',
@@ -2961,7 +2962,7 @@ const toolRegistry = [
     id: 'digital-operations-center',
     name: 'Operations Hub',
     path: '/operations',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Single operations hub combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based views',
     shortcut: 'Ctrl+Alt+O',
@@ -3022,7 +3023,7 @@ const toolRegistry = [
     id: 'hospital-operations-cockpit',
     name: 'Hospital Operations Cockpit',
     path: '/hospital-map',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Operations cockpit combining hospital map, device fleet, telemetry, maintenance, battery, and capacity status',
     category: 'Hospital Operations',
@@ -3390,7 +3391,7 @@ const toolRegistry = [
     id: 'cardiology-command-center',
     name: 'Cardiology Command Center',
     path: '/tools/cardiology/cardiology-command-center',
-    color: '#1D4ED8',
+    color: '#0284c7',
     description:
       'Cardiology operations command view for ACS queues, telemetry risk, and unresolved review items',
     shortcut: 'Ctrl+Alt+C',
@@ -3411,7 +3412,7 @@ const toolRegistry = [
     id: 'ai-gateway',
     name: 'AI Gateway',
     path: '/assistant',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Assistant gateway envelope for clinical AI routing, trace metadata, and guarded responses',
     shortcut: 'Ctrl+Alt+G',
@@ -3565,7 +3566,7 @@ const toolRegistry = [
     id: 'ai-command-center',
     name: 'AI Command Center',
     path: '/ai-command-center',
-    color: '#111827',
+    color: MEDICAL_THEME.ink,
     description:
       'Unified AI operations dashboard spanning health, experts, RAG, memory, tools, costs, evaluation, and audit logs',
     shortcut: 'Ctrl+Alt+X',
@@ -3698,7 +3699,7 @@ const toolRegistry = [
     id: 'timeline-ai',
     name: 'Patient Timeline AI',
     path: '/tools/timeline-ai',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Tier C clinical intelligence workflow that summarizes encounters, identifies trends, and highlights abnormal progression',
     shortcut: 'Ctrl+Shift+J',
@@ -3767,7 +3768,7 @@ const toolRegistry = [
     id: 'ai-explainability',
     name: 'AI Explainability',
     path: '/tools/ai-explainability',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Tier C clinical intelligence workflow that displays confidence, sources, reasoning, tool chain, and sanitized execution logs',
     shortcut: 'Ctrl+Shift+E',
@@ -3813,7 +3814,7 @@ const toolRegistry = [
     id: 'clinical-decision-support',
     name: 'Clinical Decision Support Engine',
     path: '/clinical-decision-support',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Patient-context-aware clinical decision support for symptom intake, risk stratification, calculator recommendations, workflow, labs, imaging, escalation, and explainability',
     shortcut: 'Ctrl+Shift+D',
@@ -3885,7 +3886,7 @@ const toolRegistry = [
     id: 'predictive-analytics-dashboard',
     name: 'Predictive Analytics Dashboard',
     path: '/predictive-analytics',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Clearly labeled demo predictive analytics for deterioration, readmission, sepsis, ICU transfer, device failure, and fleet maintenance risks',
     shortcut: 'Ctrl+Shift+P',
@@ -4084,7 +4085,7 @@ const toolRegistry = [
     id: 'medical-3d-viewer',
     name: '3D Viewer',
     path: '/3d-viewer',
-    color: '#2563EB',
+    color: MEDICAL_THEME.accent,
     description:
       'Asset-safe demo medical model viewer shell for anatomy, organ, model, and radiology-volume workflows without missing asset imports',
     shortcut: 'Ctrl+Alt+3',

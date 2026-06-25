@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 /**
  * Canonical normalized tool inventory.
  *
@@ -425,7 +426,7 @@ const DEFAULT_COLOR_BY_CATEGORY = Object.freeze({
   Reference: '#A8E6CF',
   'Education & Simulation': '#7C3AED',
   Laboratory: '#0EA5A6',
-  Visualization: '#2563EB',
+  Visualization: MEDICAL_THEME.accent,
   Fleet: '#6C8CFF',
   Other: '#94A3B8',
   'Hospital Operations': '#0EA5A6',

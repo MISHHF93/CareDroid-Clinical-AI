@@ -8,7 +8,7 @@
   gap: 16px;
   width: 100%;
   padding: 0 16px;
-  color: #F9FAFB;
+  color: var(--medical-ink, #111827);
   backdrop-filter: blur(10px);
   animation: capacity-crisis-banner-enter var(--motion-transition-normal) both;
 }
@@ -39,22 +39,22 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #FDE68A;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .capacity-crisis-banner--red .capacity-crisis-banner__actions {
-  color: #FCA5A5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .capacity-crisis-banner button,
 .capacity-crisis-drawer button {
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid color-mix(in srgb, var(--medical-border) 70%, transparent);
   border-radius: 10px;
-  background: rgba(249, 250, 251, 0.1);
-  color: #F9FAFB;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   font: inherit;
   font-size: 13px;
@@ -88,8 +88,8 @@
   grid-template-rows: auto minmax(0, 1fr);
   width: min(480px, 100vw);
   border-left: 1px solid rgba(148, 163, 184, 0.22);
-  background: #0F172A;
-  color: #F9FAFB;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-ink, #111827);
   box-shadow: -24px 0 60px rgba(0, 0, 0, 0.48);
   animation: capacity-crisis-drawer-enter var(--motion-transition-normal) both;
 }
@@ -101,7 +101,7 @@
   gap: 16px;
   padding: 18px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .capacity-crisis-drawer__header span {
@@ -147,7 +147,7 @@
   padding: 14px;
   border: 0;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.46);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .capacity-crisis-section h3 {
@@ -155,7 +155,7 @@
 }
 
 .capacity-crisis-section p {
-  color: #CBD5E1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -185,7 +185,7 @@
 .capacity-crisis-factor span {
   display: block;
   margin-top: 2px;
-  color: #94A3B8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 

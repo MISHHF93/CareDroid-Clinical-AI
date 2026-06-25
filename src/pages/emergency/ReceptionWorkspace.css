@@ -1,7 +1,21 @@
 .reception-workspace {
   display: grid;
-  gap: 16px;
+  gap: var(--ed-space-3, 12px);
   padding: 4px 0 24px;
+}
+
+.reception-workspace__desk-description {
+  margin: 0;
+  max-width: 52rem;
+}
+
+.reception-workspace__desk-toolbar {
+  margin: 0;
+}
+
+.reception-workspace__desk-primary {
+  display: grid;
+  gap: var(--ed-space-3, 12px);
 }
 
 .reception-workspace__tools-access {
@@ -10,12 +24,13 @@
 }
 
 .reception-workspace__tools-access-btn {
-  border: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.12));
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
+  border: 1px solid var(--reception-border, var(--app-panel-border, rgba(255, 255, 255, 0.12)));
+  border-radius: var(--reception-radius-md, 8px);
+  background: var(--reception-surface-inset, transparent);
+  color: var(--reception-text-primary, inherit);
   cursor: pointer;
   font-size: 0.8125rem;
+  font-weight: 700;
   padding: 6px 12px;
 }
 
@@ -24,7 +39,7 @@
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--ed-space-3, 12px);
   margin: 0;
 }
 
@@ -40,36 +55,20 @@
   max-width: 360px;
 }
 
-.reception-workspace__hero {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 14px;
-  background: var(--color-card, #172033);
-}
-
 .reception-workspace__intro h1 {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font-size: 22px;
   font-weight: 800;
-}
-
-.reception-workspace__description {
-  margin: 4px 0 0;
-  color: var(--color-text-secondary, #9ca3af);
-  font-size: 13px;
-  line-height: 1.45;
 }
 
 .reception-workspace__search {
   width: 100%;
   min-height: 48px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 12px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-md, 12px);
+  background: var(--reception-surface-inset, var(--color-elevated, var(--medical-surface-page, #f0f9ff)));
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font: inherit;
   font-size: 16px;
   padding: 0 16px;
@@ -81,13 +80,14 @@
   gap: 10px;
 }
 
-.reception-workspace__actions--secondary {
+.reception-workspace__actions--secondary,
+.reception-workspace__actions--secondary-only {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
 .reception-workspace__action--escalate {
-  border-color: rgba(239, 68, 68, 0.45);
-  background: rgba(220, 38, 38, 0.14);
+  border-color: color-mix(in srgb, var(--reception-danger, #f87171) 45%, transparent);
+  background: color-mix(in srgb, var(--reception-danger, #f87171) 14%, transparent);
   color: #fecaca;
 }
 
@@ -99,10 +99,10 @@
 
 .reception-workspace__action {
   min-height: 48px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 12px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-md, 12px);
+  background: var(--reception-surface-inset, var(--color-elevated, var(--medical-surface-page, #f0f9ff)));
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font: inherit;
   font-size: 14px;
   font-weight: 800;
@@ -110,8 +110,8 @@
 }
 
 .reception-workspace__action--primary {
-  border-color: rgba(59, 130, 246, 0.45);
-  background: rgba(37, 99, 235, 0.18);
+  border-color: var(--reception-accent-border, rgba(59, 130, 246, 0.45));
+  background: var(--reception-accent-strong, rgba(37, 99, 235, 0.18));
 }
 
 .reception-workspace__action:disabled {
@@ -121,10 +121,10 @@
 
 .reception-workspace__banner {
   padding: 12px 14px;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 12px;
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid color-mix(in srgb, var(--reception-success, #34d399) 35%, transparent);
+  border-radius: var(--reception-radius-md, 12px);
+  background: color-mix(in srgb, var(--reception-success, #34d399) 12%, var(--reception-surface-inset, var(--medical-surface-page, #f0f9ff)));
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -141,8 +141,8 @@
 .reception-workspace__banner-actions button {
   border: 0;
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.55);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--medical-surface-page, #f0f9ff) 55%, transparent);
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font: inherit;
   font-size: 12px;
   font-weight: 800;
@@ -160,17 +160,17 @@
   display: grid;
   gap: 4px;
   padding: 12px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 12px;
-  background: var(--color-card, #172033);
-  color: var(--color-text-secondary, #9ca3af);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-md, 12px);
+  background: var(--reception-surface-card, var(--color-card, var(--app-surface-2, #ffffff)));
+  color: var(--reception-text-secondary, var(--color-text-secondary, #9ca3af));
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
 .arrival-metrics__card strong {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font-size: 22px;
 }
 
@@ -180,9 +180,9 @@
 }
 
 .reception-workspace__panel {
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 14px;
-  background: var(--color-card, #172033);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-lg, 14px);
+  background: var(--reception-surface-card, var(--color-card, var(--app-surface-2, #ffffff)));
   padding: 14px;
   display: grid;
   gap: 10px;
@@ -190,7 +190,7 @@
 
 .reception-workspace__panel h2 {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font-size: 16px;
 }
 
@@ -207,10 +207,10 @@
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
-  border-radius: 10px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--reception-radius-md, 10px);
+  background: var(--reception-surface-inset, var(--color-elevated, var(--medical-surface-page, #f0f9ff)));
+  color: var(--reception-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   font: inherit;
   font-size: 13px;
   padding: 10px 12px;
@@ -237,32 +237,27 @@
   margin-top: 12px;
 }
 
-.reception-workspace__process-education {
-  margin-top: 4px;
-}
-
-.reception-workspace__status-messaging {
-  margin-top: 4px;
-}
-
-.reception-workspace__communication-status {
-  margin-top: 4px;
-}
-
+.reception-workspace__process-education,
+.reception-workspace__status-messaging,
+.reception-workspace__communication-status,
 .reception-workspace__patient-answers {
   margin-top: 4px;
 }
 
 .reception-workspace--desk-slim .reception-operational-strip {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .reception-workspace--desk-slim .reception-workspace__intro h1 {
   font-size: 20px;
 }
 
-.reception-workspace--desk-slim .reception-workspace__description {
-  margin: 0;
+.reception-workspace--desk-slim .reception-workspace__desk-description {
+  font-size: 13px;
+}
+
+.reception-workspace--desk-slim .reception-workspace__actions--secondary-only {
+  display: none;
 }
 
 .reception-workspace__native-ai {

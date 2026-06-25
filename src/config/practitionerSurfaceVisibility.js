@@ -49,13 +49,15 @@ const FULL_VISIBILITY = Object.freeze({
     showDataQualitySignals: true,
     badgeLimit: 2,
   }),
-  copilot: Object.freeze({
-    showContextTab: true,
-    showSafetyTab: true,
-    showStatusStrip: true,
-    showMultimodalInput: true,
-    showOrchestrationActions: true,
-  }),
+    copilot: Object.freeze({
+      showContextTab: true,
+      showSafetyTab: true,
+      showStatusStrip: true,
+      showMultimodalInput: true,
+      showOrchestrationActions: true,
+      compactLayout: false,
+      showSafetyBadge: true,
+    }),
   profile: Object.freeze({
     showShellEyebrow: true,
     showAccessSummary: true,
@@ -198,6 +200,8 @@ function buildPilotVisibility(context = {}) {
       showStatusStrip: !c.suppressCopilotStatusStrip,
       showMultimodalInput: !c.suppressCopilotMultimodalInput,
       showOrchestrationActions: !c.suppressCopilotOrchestrationActions,
+      compactLayout: c.forceCompactCopilotLayout,
+      showSafetyBadge: !c.suppressCopilotSafetyBadge,
     }),
     profile: Object.freeze({
       showShellEyebrow: !c.suppressProfileShellEyebrow,

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildOperationalAlertMetrics } from './operationalAlertRailModel';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
+import {
+  buildHeaderOperationalAlertMetrics,
+  buildOperationalAlertMetrics,
+} from './operationalAlertRailModel';
 import type { CareDroidCentralNodeSnapshot } from '../../central-node/careDroidCentralNode';
 
 function buildSnapshot(
@@ -34,14 +38,31 @@ function buildSnapshot(
     referralStatus: { pending: 0 },
     operationalSummary: {
       generatedAt: '2026-06-24T12:00:00.000Z',
-      metrics: [],
+      metrics: [
+        { key: 'waiting', label: 'Waiting', value: 3, tone: 'warning', source: 'queue' },
+        {
+          key: 'triageBreached',
+          label: 'Triage Breached',
+          value: 2,
+          tone: 'critical',
+          source: 'triage',
+        },
+        {
+          key: 'longestWait',
+          label: 'Longest Wait',
+          value: '42m',
+          tone: 'warning',
+          source: 'department',
+        },
+        { key: 'capacityScore', label: 'Capacity Score', value: '72 Green', tone: 'success' },
+      ],
     },
     ...overrides,
   } as CareDroidCentralNodeSnapshot;
 }
 
 describe('operationalAlertRailModel', () => {
-  it('builds header operational metrics with sync and alert tones', () => {
+  it('builds legacy header operational metrics with sync and alert tones', () => {
     const metrics = buildOperationalAlertMetrics({
       centralSnapshot: buildSnapshot(),
       syncLabel: 'POLLING 12s',
@@ -75,5 +96,49 @@ describe('operationalAlertRailModel', () => {
 
     expect(metrics.at(-1)?.id).toBe('operational-intelligence');
     expect(metrics.at(-1)?.tone).toBe('success');
+  });
+
+  it('caps pilot header metrics to two station signals per screen mode', () => {
+    const metrics = buildHeaderOperationalAlertMetrics({
+      centralSnapshot: buildSnapshot(),
+      syncLabel: 'POLLING 12s',
+      syncStale: false,
+      screenMode: CARE_DROID_SCREEN_MODES.chargeNurse,
+    });
+
+    expect(metrics.map((metric) => metric.id)).toEqual(['waiting', 'triageBreached']);
+    expect(metrics.find((metric) => metric.id === 'waiting')).toMatchObject({
+      label: 'Waiting',
+      value: 3,
+    });
+    expect(metrics.find((metric) => metric.id === 'triageBreached')).toMatchObject({
+      label: 'Breached',
+      value: 2,
+      tone: 'critical',
+    });
+  });
+
+  it('appends sync chip during pilot only when sync is stale', () => {
+    const staleMetrics = buildHeaderOperationalAlertMetrics({
+      centralSnapshot: buildSnapshot(),
+      syncLabel: 'POLLING stale',
+      syncStale: true,
+      screenMode: CARE_DROID_SCREEN_MODES.triage,
+    });
+
+    expect(staleMetrics.map((metric) => metric.id)).toEqual([
+      'triageBreached',
+      'longestWait',
+      'sync-status',
+    ]);
+
+    const freshMetrics = buildHeaderOperationalAlertMetrics({
+      centralSnapshot: buildSnapshot(),
+      syncLabel: 'POLLING now',
+      syncStale: false,
+      screenMode: CARE_DROID_SCREEN_MODES.triage,
+    });
+
+    expect(freshMetrics.map((metric) => metric.id)).toEqual(['triageBreached', 'longestWait']);
   });
 });

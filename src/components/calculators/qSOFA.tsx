@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import type { Patient, Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -161,8 +162,8 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         alignItems: 'center',
         gap: 12,
         width: '100%',
-        border: criteria[keyName] ? '1px solid #60A5FA' : '1px solid #1F2937',
-        background: criteria[keyName] ? '#1D4ED81F' : '#0B1120',
+        border: criteria[keyName] ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
+        background: criteria[keyName] ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
         borderRadius: 12,
         padding: 14,
         cursor: 'pointer',
@@ -172,13 +173,13 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         type="checkbox"
         checked={criteria[keyName]}
         onChange={() => toggleCriteria(keyName)}
-        style={{ width: 22, height: 22, accentColor: '#2563EB' }}
+        style={{ width: 22, height: 22, accentColor: MEDICAL_THEME.accent }}
       />
       <span style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <strong style={{ color: '#F9FAFB', fontSize: 14 }}>{label}</strong>
-        {current ? <span style={{ color: '#9CA3AF', fontSize: 12 }}>{current}</span> : null}
+        <strong style={{ color: 'var(--medical-ink, #111827)', fontSize: 14 }}>{label}</strong>
+        {current ? <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{current}</span> : null}
         {autoFilledFromVitals ? (
-          <span style={{ color: '#60A5FA', fontSize: 12, fontWeight: 700 }}>Auto-filled from vitals</span>
+          <span style={{ color: MEDICAL_THEME.accent, fontSize: 12, fontWeight: 700 }}>Auto-filled from vitals</span>
         ) : null}
       </span>
     </label>
@@ -208,10 +209,10 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
           maxWidth: 480,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -222,7 +223,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -230,7 +231,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               qSOFA
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patient.firstName} {patient.lastName} · {patient.mrn}
               </div>
             ) : null}
@@ -243,9 +244,9 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -287,13 +288,13 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               {total}/3
             </div>
             {result.alert ? (
-              <div style={{ color: '#FCA5A5', fontSize: 13, marginTop: 6, fontWeight: 700 }}>
+              <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13, marginTop: 6, fontWeight: 700 }}>
                 SEPSIS ALERT - High risk for organ dysfunction
                 <br />
                 Initiate sepsis bundle immediately
               </div>
             ) : (
-              <div style={{ color: '#F9FAFB', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
+              <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
             )}
           </section>
 
@@ -303,9 +304,9 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               type="button"
               onClick={saveToPatient}
               style={{
-                background: '#2563EB',
+                background: MEDICAL_THEME.accent,
                 border: 'none',
-                color: '#F9FAFB',
+                color: 'var(--medical-ink, #111827)',
                 borderRadius: 10,
                 padding: '10px 12px',
                 cursor: 'pointer',

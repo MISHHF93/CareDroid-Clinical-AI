@@ -32,6 +32,14 @@
   padding: 4px 10px;
 }
 
+[data-practitioner-compact] .caredroid-header--pilot-metrics .caredroid-header__topbar {
+  gap: 10px;
+}
+
+[data-practitioner-compact] .caredroid-header--pilot-metrics .caredroid-header__central-status {
+  max-width: min(48vw, 360px);
+}
+
 [data-practitioner-compact] .sidebar-nav__item {
   min-height: 36px;
   padding: 6px 10px;
@@ -88,8 +96,30 @@
 }
 
 .emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat {
-  min-height: 52px;
-  padding: 8px 10px;
+  flex: 1 1 auto;
+  min-height: 44px;
+  min-width: 0;
+  padding: 6px 10px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stats--bar {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat-value {
+  font-size: 18px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-practitioner-compact] .operational-strip--dense {
+  max-width: 100%;
 }
 
 .emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner {
@@ -144,6 +174,16 @@
 
 .reception-workspace--practitioner-compact .reception-workspace__data-source {
   margin: 0;
+}
+
+.reception-workspace--practitioner-compact .reception-desk-toolbar {
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.reception-workspace--practitioner-compact .reception-desk-toolbar__action {
+  min-height: 36px;
+  font-size: 12px;
 }
 
 /* Profile shell */
@@ -265,10 +305,32 @@
   gap: 4px;
 }
 
-/* Copilot — collapsed footprint */
+/* Copilot — chat-first dock aligned with compact page chrome */
 [data-practitioner-compact] .ed-copilot-panel__header {
   min-height: 40px;
   padding: 6px 10px;
+}
+
+[data-practitioner-compact] .ed-copilot-shell__tabs {
+  padding: 6px 10px;
+  gap: 4px;
+}
+
+[data-practitioner-compact] .ed-copilot-shell__tab {
+  min-height: 30px;
+  font-size: 10px;
+  padding: 4px 7px;
+}
+
+[data-practitioner-compact] .ed-copilot-launch {
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+[data-practitioner-compact] .app-shell-main-content--mobile-nav {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Emergency satellite routes */

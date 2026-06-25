@@ -18,13 +18,13 @@ describe('receptionDeskUiModel', () => {
     expect(desk.stripMetricIds).toEqual(RECEPTION_DESK_UI.coreStripMetricIds);
   });
 
-  it('keeps full surfaces for charge nurse on reception route', () => {
+  it('uses slim desk metrics for charge nurse on reception route during pilot', () => {
     const desk = resolveReceptionDeskUi({
       role: EMERGENCY_ROLE_IDS.chargeNurse,
       isReceptionRoute: true,
     });
-    expect(desk.slim).toBe(false);
-    expect(desk.show(RECEPTION_DESK_UI.surfaces.queueAuditPanel)).toBe(true);
+    expect(desk.slim).toBe(true);
+    expect(desk.show(RECEPTION_DESK_UI.surfaces.queueAuditPanel)).toBe(false);
     expect(desk.stripMetricIds).toEqual(RECEPTION_DESK_UI.coreStripMetricIds);
   });
 
@@ -37,6 +37,6 @@ describe('receptionDeskUiModel', () => {
       ],
       RECEPTION_DESK_UI.coreStripMetricIds,
     );
-    expect(filtered.map((metric) => metric.id)).toEqual(['arrivals-today', 'ems-inbound']);
+    expect(filtered.map((metric) => metric.id)).toEqual(['arrivals-today']);
   });
 });

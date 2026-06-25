@@ -1,0 +1,169 @@
+/**
+ * Card contrast contracts — ensures foreground always matches card surface.
+ * Loaded after surface-normalization.css.
+ */
+
+/* Base contract for all card-like surfaces */
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    .card-subtle,
+    .card-glass,
+    .card-elevated,
+    .cd-dashboard-card,
+    .cd-tool-card,
+    .cd-insight-card,
+    .cd-metric-card,
+    .cd-status-widget,
+    .cd-hero-panel,
+    .cd-surface,
+    .cd-dashboard-section,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel']:not([class*='modal']):not([class*='overlay']),
+    [class*='-panel ']:not([class*='modal']):not([class*='overlay'])
+  ) {
+  --card-contract-bg: var(--medical-card-bg, #ffffff);
+  --card-contract-fg: var(--medical-card-fg, #111827);
+  --card-contract-fg-muted: var(--medical-card-fg-muted, #6b7280);
+  --card-contract-fg-subtle: var(--medical-card-fg-subtle, #9ca3af);
+  --card-contract-border: var(--medical-card-border, #e0f2fe);
+  background-color: var(--card-contract-bg);
+  border-color: var(--card-contract-border);
+  color: var(--card-contract-fg);
+}
+
+.card-subtle,
+.cd-surface--subtle,
+[class*='-card--muted'],
+[class*='-card--inset'] {
+  --card-contract-bg: var(--medical-card-muted-bg, #f0f9ff);
+  --card-contract-fg: var(--medical-card-muted-fg, #111827);
+  --card-contract-fg-muted: var(--medical-card-muted-fg-muted, #6b7280);
+}
+
+[class*='-card--accent'],
+[class*='-card--info'],
+.card-glow {
+  --card-contract-bg: var(--medical-card-accent-bg);
+  --card-contract-fg: var(--medical-card-accent-fg);
+  --card-contract-fg-muted: var(--medical-card-accent-fg-muted);
+  --card-contract-border: var(--medical-card-accent-border);
+}
+
+[class*='-card--solid'],
+[class*='-card--primary'],
+[class*='__cta'] {
+  --card-contract-bg: var(--medical-card-solid-bg);
+  --card-contract-fg: var(--medical-card-solid-fg);
+}
+
+[class*='-card--success'],
+[class*='-card--stable'] {
+  --card-contract-bg: var(--medical-card-success-bg);
+  --card-contract-fg: var(--medical-card-success-fg);
+}
+
+[class*='-card--warning'] {
+  --card-contract-bg: var(--medical-card-warning-bg);
+  --card-contract-fg: var(--medical-card-warning-fg);
+}
+
+[class*='-card--critical'],
+[class*='-card--danger'] {
+  --card-contract-bg: var(--medical-card-critical-bg);
+  --card-contract-fg: var(--medical-card-critical-fg);
+}
+
+/* Typography roles inside cards — never inherit white from legacy tokens */
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel ']
+  )
+  :is(h1, h2, h3, h4, h5, h6, strong, dt) {
+  color: var(--card-contract-fg, var(--medical-card-fg));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel ']
+  )
+  :is(p, li, td, th, label, span, small, figcaption) {
+  color: inherit;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel ']
+  )
+  :is(
+    [class*='__meta'],
+    [class*='-meta'],
+    [class*='__subtitle'],
+    [class*='-subtitle'],
+    [class*='__hint'],
+    [class*='-hint'],
+    [class*='__caption'],
+    [class*='-caption']
+  ) {
+  color: var(--card-contract-fg-muted, var(--medical-card-fg-muted));
+}
+
+/* Light card bodies must not use on-solid text (except explicit solid badges) */
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel ']
+  )
+  :is(p, span, li, td, th, label, small, h1, h2, h3, h4, h5, h6):not(
+    [class*='badge']
+  ):not([class*='pill']):not([class*='chip']):not([class*='--solid']):not([class*='--primary']) {
+  color: inherit;
+}
+
+/* Solid badges/pills on light cards keep on-solid only when background is saturated */
+:is(.app-shell, .emergency-app-shell) [class*='pill']:not([class*='--warn']),
+:is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--solid'],
+:is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--danger'],
+:is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--primary'] {
+  color: var(--medical-card-solid-fg, #ffffff);
+}
+
+/* Copilot / native-ai cards resolve to medical contract */
+.context-insight-card,
+.diagnostic-safety-dashboard,
+.patient-card-copilot,
+.ai-transparency-dashboard,
+.drift-monitoring-panel,
+.copilot-risk-layer-panel,
+.clinical-acuity-leaderboard {
+  --card-contract-bg: var(--medical-card-bg);
+  --card-contract-fg: var(--medical-card-fg);
+  --card-contract-fg-muted: var(--medical-card-fg-muted);
+  --nai-text: var(--medical-card-fg);
+  --nai-muted: var(--medical-card-fg-muted);
+  background: var(--card-contract-bg);
+  color: var(--card-contract-fg);
+}
+
+.context-insight-card :is(h3, p, [class*='__meta']),
+.patient-card-copilot :is(h3, p, [class*='__subtitle']),
+.ai-transparency-dashboard :is(h2, h3, p, small),
+.drift-monitoring-panel :is(h3, h4, p, small) {
+  color: inherit;
+}
+
+.context-insight-card [class*='__meta'],
+.context-insight-card p {
+  color: var(--card-contract-fg-muted);
+}

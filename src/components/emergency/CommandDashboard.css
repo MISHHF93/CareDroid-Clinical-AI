@@ -2,8 +2,8 @@
   display: grid;
   gap: 18px;
   padding: 20px 24px 28px;
-  border-bottom: 1px solid #1f2937;
-  background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  background: linear-gradient(180deg, var(--medical-surface-page, #f0f9ff) 0%, var(--app-surface-1, #ffffff) 100%);
 }
 
 .command-dashboard__header {
@@ -16,7 +16,7 @@
 
 .command-dashboard__eyebrow {
   margin: 0;
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -25,20 +25,20 @@
 
 .command-dashboard__header h2 {
   margin: 4px 0 0;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: clamp(24px, 3vw, 32px);
 }
 
 .command-dashboard__subtitle {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 13px;
 }
 
 .command-dashboard__meta {
   display: grid;
   gap: 4px;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
   text-align: right;
 }
@@ -46,10 +46,10 @@
 .command-dashboard__bottleneck {
   margin: 0;
   padding: 10px 14px;
-  border: 1px solid color-mix(in srgb, #f59e0b 34%, #1f2937);
+  border: 1px solid color-mix(in srgb, #f59e0b 34%, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  background: color-mix(in srgb, #f59e0b 10%, #111827);
-  color: #fde68a;
+  background: color-mix(in srgb, #f59e0b 10%, var(--app-surface-1, #ffffff));
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 14px;
   font-weight: 600;
 }
@@ -60,19 +60,19 @@
   padding: 14px 16px;
   border: 1px solid #334155;
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.72);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .command-dashboard__alerts-heading,
 .command-dashboard__pending-beds h3,
 .command-dashboard__activations h3 {
   margin: 0 0 8px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 14px;
 }
 
 .command-dashboard__alerts-heading span {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -81,7 +81,7 @@
 .command-dashboard__activations ul {
   margin: 0;
   padding-left: 1.1rem;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 13px;
 }
 
@@ -94,7 +94,7 @@
 
 .command-dashboard__pending-beds small,
 .command-dashboard__activations small {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .command-dashboard__activation--critical strong {
@@ -110,7 +110,7 @@
 .command-dashboard__metric {
   border: 1px solid #334155;
   border-radius: 14px;
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
   display: grid;
   gap: 6px;
   min-height: 132px;
@@ -142,7 +142,7 @@
 
 .command-dashboard__metric-label,
 .command-dashboard__zone-head span:first-child {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -160,21 +160,21 @@
 
 .command-dashboard__rag--green {
   background: color-mix(in srgb, #22c55e 18%, transparent);
-  color: #86efac;
+  color: var(--medical-status-success-text, #15803d);
 }
 
 .command-dashboard__rag--amber {
   background: color-mix(in srgb, #f59e0b 18%, transparent);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .command-dashboard__rag--red {
   background: color-mix(in srgb, #ef4444 18%, transparent);
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .command-dashboard__metric-value {
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 30px;
   line-height: 1;
 }
@@ -182,7 +182,7 @@
 .command-dashboard__metric-detail,
 .command-dashboard__empty {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
 }
 
@@ -207,12 +207,12 @@
 
 .command-dashboard__zones-heading h3 {
   margin: 0;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 15px;
 }
 
 .command-dashboard__zones-heading span {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -228,7 +228,7 @@
 .command-dashboard__zone {
   border: 1px solid #334155;
   border-radius: 12px;
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
   display: grid;
   gap: 6px;
   padding: 12px;
@@ -247,12 +247,12 @@
 }
 
 .command-dashboard__zone strong {
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 18px;
 }
 
 .command-dashboard__zone-bar {
-  background: #1e293b;
+  background: var(--app-surface-elevated, #ffffff);
   border-radius: 999px;
   height: 8px;
   overflow: hidden;

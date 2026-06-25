@@ -13,19 +13,19 @@
 .waiting-room-communication-panel__header h3 {
   margin: 0;
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .waiting-room-communication-panel__header p {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .waiting-room-communication-panel__recency {
   margin: 0;
   font-size: 12px;
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
 }
 
 .waiting-room-communication-panel__list {
@@ -37,8 +37,8 @@
 }
 
 .waiting-room-communication-panel__item {
-  background: #0b1120;
-  border: 1px solid #1f2937;
+  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
   padding: 10px 12px;
 }
@@ -52,7 +52,7 @@
 .waiting-room-communication-panel__item p {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .waiting-room-communication-panel__meta {
@@ -61,11 +61,11 @@
   gap: 8px;
   margin-top: 6px;
   font-size: 11px;
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .waiting-room-communication-panel__empty {
   margin: 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }

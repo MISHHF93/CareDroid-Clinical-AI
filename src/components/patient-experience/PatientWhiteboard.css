@@ -4,7 +4,7 @@
   max-width: 720px;
   margin: 0 auto;
   padding: 20px;
-  color: #0f172a;
+  color: var(--medical-card-fg, #111827);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -36,7 +36,7 @@
 }
 
 .patient-whiteboard__card--highlight {
-  border-color: #93c5fd;
+  border-color: var(--medical-text-link, #0ea5e9);
   background: #eff6ff;
 }
 

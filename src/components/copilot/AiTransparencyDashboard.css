@@ -5,8 +5,8 @@
   padding: 1rem;
   border-radius: 0.75rem;
   border: 1px solid var(--nai-border, rgba(148, 163, 184, 0.22));
-  background: var(--nai-surface, rgba(15, 23, 42, 0.82));
-  color: var(--nai-text, #f8fafc);
+  background: var(--nai-surface, var(--medical-surface-card, #ffffff));
+  color: var(--nai-text, var(--medical-card-fg, #111827));
 }
 
 .ai-transparency-dashboard--compact {
@@ -45,7 +45,7 @@
   border-radius: 0.5rem;
   background: var(--nai-surface-elevated, rgba(30, 41, 59, 0.92));
   border: 1px solid var(--nai-border, rgba(148, 163, 184, 0.22));
-  color: var(--nai-text, #f8fafc);
+  color: var(--nai-text, var(--medical-card-fg, #111827));
 }
 
 .ai-transparency-dashboard__records {

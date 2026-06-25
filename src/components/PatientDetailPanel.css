@@ -107,7 +107,7 @@
 }
 
 .patient-detail-panel__badge {
-  background: var(--component-inner-row-bg, #1c2333);
+  background: var(--component-inner-row-bg, #f0f9ff);
   color: var(--badge-accent, var(--ed-text-secondary));
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
@@ -131,7 +131,7 @@
 }
 
 .patient-detail-panel__field-btn--primary {
-  background: var(--status-info, #2563eb);
+  background: var(--app-accent-interactive, var(--status-info));
   border: none;
   color: var(--app-on-solid, #f9fafb);
 }
@@ -201,7 +201,7 @@
 }
 
 .patient-detail-journey__connector--complete {
-  background: var(--status-info, #3b82f6);
+  background: var(--status-info, var(--app-accent-interactive));
 }
 
 .patient-detail-journey__dot {
@@ -217,8 +217,8 @@
 
 .patient-detail-journey__dot--active,
 .patient-detail-journey__dot--complete {
-  border-color: var(--status-info, #3b82f6);
-  background: var(--status-info, #3b82f6);
+  border-color: var(--status-info, var(--app-accent-interactive));
+  background: var(--status-info, var(--app-accent-interactive));
 }
 
 .patient-detail-journey__label {
@@ -278,7 +278,7 @@
 .patient-detail-vitals-form__input,
 .patient-detail-panel__select,
 .patient-detail-panel__textarea {
-  background: var(--component-inner-row-bg, #0b1120);
+  background: var(--component-inner-row-bg, var(--medical-surface-page, #f0f9ff));
   border: 1px solid var(--ed-border-subtle);
   border-radius: var(--ed-radius-sm);
   color: var(--ed-text-primary);
@@ -341,7 +341,7 @@
 }
 
 .patient-detail-vitals-trend__toggle-btn--active {
-  background: var(--status-info, #2563eb);
+  background: var(--app-accent-interactive, var(--status-info));
 }
 
 .patient-detail-vitals-trend__chart {
@@ -415,7 +415,7 @@
 }
 
 .patient-detail-vitals-tooltip {
-  background: #1c2333;
+  background: var(--app-surface-muted, #f0f9ff);
   border: 1px solid var(--ed-border-subtle);
   border-radius: var(--ed-radius-md);
   color: var(--ed-text-primary);
@@ -498,7 +498,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--component-inner-row-bg, #1c2333);
+  background: var(--component-inner-row-bg, #f0f9ff);
   color: var(--ed-text-primary);
   border-radius: 999px;
   padding: 5px 8px;
@@ -556,7 +556,7 @@
 }
 
 .patient-detail-action-panel {
-  background: var(--component-inner-row-bg, #0b1120);
+  background: var(--component-inner-row-bg, var(--medical-surface-page, #f0f9ff));
 }
 
 .patient-detail-action-panel__prompt {
@@ -572,9 +572,9 @@
 }
 
 .patient-detail-calculators__chip {
-  border: 1px solid var(--status-info, #2563eb);
+  border: 1px solid var(--app-accent-interactive, var(--status-info));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--status-info, #2563eb) 12%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 12%, transparent);
   color: var(--status-info, #bfdbfe);
   font-size: var(--ed-type-body);
   font-weight: 700;

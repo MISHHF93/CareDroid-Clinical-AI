@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { apiFetch } from '../services/apiClient';
 import { probeBackendReachability } from '../services/backendReachability';
 
@@ -28,7 +29,7 @@ const statusColors: Record<ComponentStatus, string> = {
   healthy: '#10B981',
   degraded: '#F59E0B',
   unhealthy: '#EF4444',
-  'not-configured': '#6B7280',
+  'not-configured': MEDICAL_THEME.inkMuted,
 };
 
 const statusLabels: Record<ComponentStatus, string> = {
@@ -170,17 +171,17 @@ export function SystemHealth() {
     <section
       aria-label="System health"
       style={{
-        background: '#0D1117',
-        border: '1px solid #1F2937',
+        background: MEDICAL_THEME.surfaceCard,
+        border: `1px solid ${MEDICAL_THEME.border}`,
         borderRadius: 16,
-        color: '#F9FAFB',
+        color: MEDICAL_THEME.ink,
         padding: 20,
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start' }}>
         <div>
           <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>System Health</h2>
-          <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0 }}>
+          <p style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13, margin: 0 }}>
             Refreshes every 30 seconds. Last checked{' '}
             {health?.timestamp ? formatTime(health.timestamp) : 'not yet available'}.
           </p>
@@ -192,10 +193,10 @@ export function SystemHealth() {
             onClick={() => void fetchHealth(true)}
             disabled={refreshing}
             style={{
-              background: '#111827',
-              border: '1px solid #374151',
+              background: MEDICAL_THEME.accent,
+              border: `1px solid ${MEDICAL_THEME.accent}`,
               borderRadius: 10,
-              color: '#F9FAFB',
+              color: MEDICAL_THEME.onAccent,
               cursor: refreshing ? 'wait' : 'pointer',
               fontSize: 13,
               fontWeight: 700,
@@ -208,7 +209,7 @@ export function SystemHealth() {
       </div>
 
       {loading ? (
-        <p style={{ color: '#9CA3AF', margin: '20px 0 0' }}>Loading system health...</p>
+        <p style={{ color: MEDICAL_THEME.inkSubtle, margin: '20px 0 0' }}>Loading system health...</p>
       ) : null}
 
       {error ? (
@@ -218,7 +219,7 @@ export function SystemHealth() {
             background: '#7F1D1D33',
             border: '1px solid #EF4444',
             borderRadius: 12,
-            color: '#FCA5A5',
+            color: MEDICAL_TYPE.statusCritical,
             marginTop: 16,
             padding: 12,
           }}
@@ -231,7 +232,7 @@ export function SystemHealth() {
         <>
           <div
             style={{
-              color: '#9CA3AF',
+              color: MEDICAL_THEME.inkSubtle,
               display: 'flex',
               flexWrap: 'wrap',
               fontSize: 13,
@@ -255,8 +256,8 @@ export function SystemHealth() {
               <article
                 key={name}
                 style={{
-                  background: '#111827',
-                  border: '1px solid #1F2937',
+                  background: MEDICAL_THEME.surfaceCard,
+                  border: '1px solid #e0f2fe',
                   borderRadius: 12,
                   padding: 14,
                 }}
@@ -274,7 +275,7 @@ export function SystemHealth() {
                 </div>
                 <dl
                   style={{
-                    color: '#D1D5DB',
+                    color: MEDICAL_THEME.inkDisabled,
                     display: 'grid',
                     gap: 6,
                     gridTemplateColumns: 'auto 1fr',
@@ -282,17 +283,17 @@ export function SystemHealth() {
                     margin: '12px 0 0',
                   }}
                 >
-                  <dt style={{ color: '#9CA3AF' }}>Response</dt>
+                  <dt style={{ color: MEDICAL_THEME.inkSubtle }}>Response</dt>
                   <dd style={{ margin: 0 }}>{component.responseTimeMs}ms</dd>
-                  <dt style={{ color: '#9CA3AF' }}>Checked</dt>
+                  <dt style={{ color: MEDICAL_THEME.inkSubtle }}>Checked</dt>
                   <dd style={{ margin: 0 }}>{formatTime(component.checkedAt)}</dd>
-                  <dt style={{ color: '#9CA3AF' }}>Role</dt>
+                  <dt style={{ color: MEDICAL_THEME.inkSubtle }}>Role</dt>
                   <dd style={{ margin: 0 }}>{component.critical ? 'Critical' : 'Optional'}</dd>
-                  <dt style={{ color: '#9CA3AF' }}>Details</dt>
+                  <dt style={{ color: MEDICAL_THEME.inkSubtle }}>Details</dt>
                   <dd style={{ margin: 0 }}>{summarizeDetails(component.details)}</dd>
                 </dl>
                 {component.error ? (
-                  <p style={{ color: '#FCA5A5', fontSize: 13, margin: '10px 0 0' }}>{component.error}</p>
+                  <p style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13, margin: '10px 0 0' }}>{component.error}</p>
                 ) : null}
               </article>
             ))}

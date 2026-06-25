@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -41,9 +42,15 @@ import AiTransparencyDashboard from './copilot/AiTransparencyDashboard';
 import CopilotShell, { type CopilotShellTab } from './copilot/CopilotShell';
 import useFeature from '../hooks/useFeature';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
+import {
+  COPILOT_PLATFORM,
+  getCopilotOperationalQuickActions,
+  getCopilotToolLaunchActions,
+  getCopilotWelcomeMessage,
+  resolveCopilotRuntimeLimits,
+} from '../config/copilotPlatform.config';
+import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import { MetricChip } from './ui/CareDroidPrimitives';
-
-const COPILOT_QUICK_ACTION_LIMIT = 3;
 
 type CopilotMessage = {
   id: string;
@@ -77,34 +84,10 @@ type SpeechRecognitionLike = {
 
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
-const QUICK_ACTIONS = [
-  'Queue bottlenecks',
-  'Capacity status',
-  'Boarding pressure',
-  'Reassessment queue',
-];
-const TOOL_ACTIONS = Object.freeze([
-  {
-    id: 'medical-tools',
-    label: 'Medical tools',
-    eventName: 'ed:open-tools',
-    detail: { source: 'copilot', filter: 'all' },
-  },
-  {
-    id: 'calculator-hub',
-    label: 'Calculators',
-    eventName: 'ed:open-tools',
-    detail: { source: 'calculators', filter: 'calculator' },
-  },
-  {
-    id: 'qsofa-calculator',
-    label: 'qSOFA',
-    eventName: 'ed:open-calculator',
-    detail: { calculatorId: 'qsofa' },
-  },
-]);
-const MAX_COPILOT_ATTACHMENTS = 3;
-const MAX_COPILOT_ATTACHMENT_BYTES = 8 * 1024 * 1024;
+const QUICK_ACTIONS = [...getCopilotOperationalQuickActions()];
+const TOOL_ACTIONS = getCopilotToolLaunchActions();
+const MAX_COPILOT_ATTACHMENTS = COPILOT_PLATFORM.inputs.multimodal.maxAttachments;
+const MAX_COPILOT_ATTACHMENT_BYTES = COPILOT_PLATFORM.inputs.multimodal.maxAttachmentBytes;
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -265,11 +248,10 @@ function buildDepartmentPrompt({
   const attachmentSummary = attachmentPromptSummary(attachments || []);
 
   return [
-    getAIPrompt('ed-copilot').prompt,
+    getAIPrompt(COPILOT_PLATFORM.identity.promptId).prompt,
     HUMAN_REVIEW_DISCLAIMER,
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
-    'Keep answers brief, operationally useful, and explicit about uncertainty.',
-    'Do not repeat generic advice. Every suggestion must name a queue, count, route, or filter.',
+    ...COPILOT_PLATFORM.prompts.styleRules,
     formatCopilotRecommendationsForPrompt(copilotRecommendations),
     attachmentSummary
       ? `Multimodal input attached: ${attachmentSummary}. Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
@@ -396,7 +378,7 @@ function TypingIndicator() {
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: '#9CA3AF',
+            background: MEDICAL_THEME.surfaceCardSubtle,
             animationDelay: `${index * 120}ms`,
           }}
         />
@@ -418,16 +400,19 @@ export function CopilotPanel() {
   const recordWorkflowAction = useEmergencyStore((store) => store.recordWorkflowAction);
   const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
   const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'PHYSICIAN_SCREEN' });
+  const routeScreenMode = useRouteScreenMode();
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const { saasRole } = useEffectiveUserProfile();
   const emergencyRole = useEmergencyRolePermissions();
-  const copilotSurfaces = usePractitionerSurfaceVisibility().copilot;
+  const practitionerSurfaces = usePractitionerSurfaceVisibility();
+  const copilotSurfaces = practitionerSurfaces.copilot;
+  const copilotLimits = resolveCopilotRuntimeLimits();
+  const quickActionLimit = copilotLimits.maxQuickActions;
   const welcomeMessage = useMemo(
-    () =>
-      `${EMERGENCY_OS_BRANDING.copilotName} is ready. Ask about patients, queues, capacity, or boarding.`,
-    [],
+    () => getCopilotWelcomeMessage(copilotSurfaces.compactLayout),
+    [copilotSurfaces.compactLayout],
   );
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
@@ -515,8 +500,8 @@ export function CopilotPanel() {
         setInput(detail.message);
       }
     };
-    window.addEventListener('ed:copilot-prefill', handlePrefill);
-    return () => window.removeEventListener('ed:copilot-prefill', handlePrefill);
+    window.addEventListener(COPILOT_PLATFORM.identity.dockEvent, handlePrefill);
+    return () => window.removeEventListener(COPILOT_PLATFORM.identity.dockEvent, handlePrefill);
   }, [selectPatient, setCopilotOpen]);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
   const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
@@ -718,11 +703,11 @@ export function CopilotPanel() {
       emsInbound: centralSnapshot.emsPressure.inbound,
     });
     recordWorkflowAction({
-      type: 'copilot_used',
+      type: COPILOT_PLATFORM.outputs.workflowActionType,
       title: 'Copilot used',
       summary: `ED Copilot prompt submitted: ${promptText.slice(0, 80)}${promptText.length > 80 ? '...' : ''}`,
       actorStaffId: 'current-user',
-      source: 'ed-copilot-panel',
+      source: COPILOT_PLATFORM.outputs.workflowSource,
       metadata: {
         promptLength: promptText.length,
         multimodalAttachmentCount: submittedAttachments.length,
@@ -780,14 +765,14 @@ export function CopilotPanel() {
       );
 
       const response = await callAI({
-        requestType: 'COPILOT_CHAT',
+        requestType: COPILOT_PLATFORM.identity.requestType,
         systemPrompt,
         message: promptText,
         messages: requestMessages,
         patientId: selectedPatient?.id,
         context: {
           aiRequest: {
-            requestType: 'COPILOT_CHAT',
+            requestType: COPILOT_PLATFORM.identity.requestType,
             patientId: selectedPatient?.id,
             patientContext: patientOrchestrationPrompt,
             complaint: selectedPatient?.chiefComplaint || selectedPatient?.complaint,
@@ -811,15 +796,14 @@ export function CopilotPanel() {
             safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
             backendContext: backendCopilotContext,
             multimodal: {
-              enabledInputs: ['text', 'image-metadata', 'voice-dictation'],
+              enabledInputs: [...COPILOT_PLATFORM.inputs.multimodal.enabledInputs],
               attachments: submittedAttachments.map((attachment) => ({
                 name: attachment.name,
                 type: attachment.type,
                 size: attachment.size,
               })),
-              visionModelConnected: false,
-              safetyBoundary:
-                'Do not infer clinical findings from image attachments unless a reviewed vision model contract is connected.',
+              visionModelConnected: COPILOT_PLATFORM.safety.visionModelConnected,
+              safetyBoundary: COPILOT_PLATFORM.safety.multimodalBoundary,
             },
           },
         },
@@ -841,7 +825,10 @@ export function CopilotPanel() {
         raw: response.data,
       });
     } catch {
-      const fallbackResponse = `${EMERGENCY_OS_BRANDING.copilotName} unavailable - check connection. Continue clinical review with human oversight.`;
+      const fallbackResponse = COPILOT_PLATFORM.prompts.fallbackUnavailable.replace(
+        'CareDroid Copilot',
+        EMERGENCY_OS_BRANDING.copilotName,
+      );
       await streamIntoMessage(
         fallbackResponse,
         assistantId,
@@ -880,7 +867,9 @@ export function CopilotPanel() {
       <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
       <div className="ed-copilot-panel__identity">
         <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
-        <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
+        {copilotSurfaces.showSafetyBadge ? (
+          <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
+        ) : null}
       </div>
       {copilotSurfaces.showStatusStrip ? (
         <div className="ed-copilot-panel__status-strip" aria-label="Department snapshot">
@@ -907,7 +896,7 @@ export function CopilotPanel() {
     >
       {backendCopilot.error ? (
         <div role="status" className="ed-copilot-panel__policy" data-state="error">
-          Using local board data — live Copilot context is temporarily unavailable.
+          {COPILOT_PLATFORM.prompts.backendContextDegraded}
         </div>
       ) : null}
       {messages.map((message) => (
@@ -935,7 +924,7 @@ export function CopilotPanel() {
           icon="💬"
           title={EMPTY_STATE_COPY.copilot.noMessages.title}
           guidance={EMPTY_STATE_COPY.copilot.noMessages.guidance}
-          actions={QUICK_ACTIONS.slice(0, 3).map((prompt) => (
+          actions={QUICK_ACTIONS.slice(0, quickActionLimit).map((prompt) => (
             <OperationalEmptyAction key={prompt} secondary onClick={() => sendQuickAction(prompt)}>
               {prompt}
             </OperationalEmptyAction>
@@ -967,7 +956,9 @@ export function CopilotPanel() {
         <strong>Suggestions</strong>
         {copilotRecommendations.length ? (
           <div className="ed-copilot-panel__recommendations" aria-label="Copilot recommendations">
-            {copilotRecommendations.slice(0, 4).map((recommendation) => (
+            {copilotRecommendations
+              .slice(0, COPILOT_PLATFORM.ui.contextRecommendationPreviewLimit)
+              .map((recommendation) => (
               <button
                 key={recommendation.id}
                 type="button"
@@ -1030,7 +1021,7 @@ export function CopilotPanel() {
             Patient summary
           </button>
         ) : null}
-        {quickActions.slice(0, COPILOT_QUICK_ACTION_LIMIT).map((action) => (
+        {quickActions.slice(0, quickActionLimit).map((action) => (
           <button key={action} type="button" onClick={() => sendQuickAction(action)} disabled={loading}>
             {action}
           </button>
@@ -1041,7 +1032,9 @@ export function CopilotPanel() {
       selectedPatient &&
       (patientOrchestration?.prioritizedRecommendations?.length ?? 0) > 0 ? (
         <div className="ed-copilot-panel__tool-actions" role="toolbar" aria-label="Patient tool shortcuts">
-          {(patientOrchestration?.prioritizedRecommendations ?? []).slice(0, 3).map((recommendation) => (
+          {(patientOrchestration?.prioritizedRecommendations ?? [])
+            .slice(0, COPILOT_PLATFORM.ui.orchestrationActionPreviewLimit)
+            .map((recommendation) => (
             <button
               key={recommendation.id}
               type="button"
@@ -1187,7 +1180,14 @@ export function CopilotPanel() {
   }, [activeTab, copilotTabs]);
 
   return (
-    <aside className="ed-copilot-panel">
+    <aside
+      className={[
+        'ed-copilot-panel',
+        copilotSurfaces.compactLayout ? 'ed-copilot-panel--compact' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <CopilotShell
         header={copilotHeader}
         activeTab={activeTab}

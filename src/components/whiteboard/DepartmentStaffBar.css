@@ -2,9 +2,9 @@
   display: grid;
   gap: 10px;
   padding: 12px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.72);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .department-staff-bar--compact {
@@ -21,7 +21,7 @@
 
 .department-staff-bar__eyebrow {
   margin: 0;
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -29,7 +29,7 @@
 }
 
 .department-staff-bar__meta {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
@@ -49,8 +49,8 @@
   gap: 6px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .department-staff-bar__card--charge {
@@ -67,7 +67,7 @@
 
 .department-staff-bar__name {
   margin: 0;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
@@ -75,7 +75,7 @@
 
 .department-staff-bar__title {
   margin: 2px 0 0;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
 }
 
@@ -90,7 +90,7 @@
   text-transform: uppercase;
   background: rgba(245, 158, 11, 0.18);
   border: 1px solid rgba(245, 158, 11, 0.4);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
   white-space: nowrap;
 }
 
@@ -106,13 +106,13 @@
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 11px;
-  color: #dbeafe;
+  color: var(--medical-text-link, #0ea5e9);
   background: rgba(59, 130, 246, 0.14);
   border: 1px solid rgba(96, 165, 250, 0.28);
 }
 
 .department-staff-bar__empty {
   margin: 0;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 13px;
 }

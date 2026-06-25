@@ -12,10 +12,10 @@
   gap: 2px;
   min-width: 108px;
   padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid #1f2937;
-  background: #111827;
-  color: #f9fafb;
+  border-radius: var(--reception-radius-md, 10px);
+  border: 1px solid var(--reception-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  background: var(--reception-surface-inset, var(--color-elevated, var(--app-surface-1, #ffffff)));
+  color: var(--reception-text-primary, #111827);
   cursor: pointer;
   text-align: left;
 }
@@ -26,13 +26,13 @@
 }
 
 .arrival-control-summary__metric:not(:disabled):hover {
-  border-color: #374151;
-  background: #1a2233;
+  border-color: var(--reception-accent-border, #e0f2fe);
+  background: var(--reception-accent-strong, #1a2233);
 }
 
 .arrival-control-summary__label {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--reception-text-secondary, #9ca3af);
   line-height: 1.2;
 }
 

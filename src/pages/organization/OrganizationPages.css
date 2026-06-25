@@ -211,7 +211,7 @@
 
 .org-status-pill--beta {
   background: #dbeafe;
-  color: #1d4ed8;
+  color: #0284c7;
 }
 
 .org-status-pill--active {
@@ -303,7 +303,7 @@
 }
 
 .org-department-card.selected {
-  border-color: #2563eb;
+  border-color: var(--app-accent-interactive);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
 }
 

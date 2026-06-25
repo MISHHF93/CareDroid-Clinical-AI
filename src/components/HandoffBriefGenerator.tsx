@@ -220,12 +220,12 @@ function responseText(response: AIResponse): string {
 
 const COMPONENT_STYLES = `
 .handoff-brief-generator {
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 18px;
-  background: rgba(15, 23, 42, 0.78);
-  color: #f8fafc;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-body, #111827);
   padding: 20px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+  box-shadow: var(--medical-shadow-lift, 0 16px 36px rgba(14, 165, 233, 0.08));
 }
 
 .handoff-brief-generator__header,
@@ -239,7 +239,7 @@ const COMPONENT_STYLES = `
 }
 
 .handoff-brief-generator__eyebrow {
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -253,7 +253,7 @@ const COMPONENT_STYLES = `
 
 .handoff-brief-generator p {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .handoff-brief-generator__toolbar {
@@ -262,18 +262,19 @@ const COMPONENT_STYLES = `
 
 .handoff-brief-generator button,
 .handoff-brief-generator__toggle {
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
-  background: rgba(30, 41, 59, 0.9);
-  color: #f8fafc;
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
   cursor: pointer;
   font: inherit;
   padding: 9px 13px;
 }
 
 .handoff-brief-generator button:first-child {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--medical-accent, #0ea5e9);
+  border-color: var(--medical-accent, #0ea5e9);
+  color: var(--medical-text-on-accent, #ffffff);
 }
 
 .handoff-brief-generator button:disabled {
@@ -288,10 +289,10 @@ const COMPONENT_STYLES = `
 }
 
 .handoff-brief-generator__error {
-  border: 1px solid rgba(248, 113, 113, 0.4);
+  border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: 12px;
-  background: rgba(127, 29, 29, 0.35);
-  color: #fecaca;
+  background: #fef2f2;
+  color: var(--medical-status-critical-text, #b91c1c);
   margin: 0 0 12px;
   padding: 10px 12px;
 }
@@ -302,10 +303,10 @@ const COMPONENT_STYLES = `
   max-height: 560px;
   resize: vertical;
   overflow: auto;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
-  background: #020617;
-  color: #e2e8f0;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-text-body, #111827);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92rem;
   line-height: 1.55;
@@ -313,11 +314,11 @@ const COMPONENT_STYLES = `
 }
 
 .handoff-brief-generator__textarea:read-only {
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .handoff-brief-generator__counts {
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 0.85rem;
   margin-top: 10px;
 }

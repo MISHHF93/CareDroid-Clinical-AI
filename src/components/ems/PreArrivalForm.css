@@ -41,7 +41,7 @@
 .pre-arrival-intake__completion {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--color-accent, #2563eb);
+  color: var(--color-accent, var(--app-accent-interactive));
   white-space: nowrap;
 }
 
@@ -97,9 +97,9 @@
 }
 
 .pre-arrival-intake__eta-presets button.is-active {
-  background: var(--color-accent, #2563eb);
-  border-color: var(--color-accent, #2563eb);
-  color: #fff;
+  background: var(--color-accent, var(--app-accent-interactive));
+  border-color: var(--color-accent, var(--app-accent-interactive));
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .pre-arrival-intake__framework {
@@ -120,7 +120,7 @@
 .pre-arrival-intake__framework button.is-active {
   background: var(--color-secondary, #0f766e);
   border-color: var(--color-secondary, #0f766e);
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .pre-arrival-intake__framework-label {
@@ -167,8 +167,8 @@
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  background: var(--color-accent, #2563eb);
-  color: #fff;
+  background: var(--color-accent, var(--app-accent-interactive));
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .pre-arrival-intake__submit:disabled {

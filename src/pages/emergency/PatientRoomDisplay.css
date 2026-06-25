@@ -8,7 +8,7 @@
   place-items: center;
   min-height: 100vh;
   padding: 1rem;
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
 }
 
 .patient-room-display__door-sign {

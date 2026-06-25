@@ -1,0 +1,110 @@
+/**
+ * Layer 2 — platform-wide text hierarchy for the locked light medical theme.
+ * Loaded after color-normalization.css.
+ */
+
+html,
+html[data-theme='light'],
+:is(.app-shell, .emergency-app-shell) {
+  color: var(--app-text-primary, var(--medical-text-body));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--medical-text-heading);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+:is(.app-shell, .emergency-app-shell) p {
+  color: var(--medical-text-body);
+  line-height: 1.5;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(label, legend, .form-label, [class*='__label']) {
+  color: var(--medical-text-muted);
+  font-weight: 600;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(small, .text-caption, [class*='__caption'], [class*='-caption']) {
+  color: var(--medical-text-subtle);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='__meta'],
+    [class*='-meta'],
+    [class*='__eyebrow'],
+    [class*='-eyebrow'],
+    [class*='__hint'],
+    [class*='-hint'],
+    [class*='__subtitle'],
+    [class*='-subtitle']
+  ) {
+  color: var(--medical-text-muted);
+}
+
+:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']) {
+  color: var(--medical-text-link);
+  text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
+}
+
+:is(.app-shell, .emergency-app-shell)
+  a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
+  color: var(--medical-text-link-hover);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(input, select, textarea)::placeholder {
+  color: var(--medical-text-placeholder);
+  opacity: 1;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(input, select, textarea):disabled,
+:is(.app-shell, .emergency-app-shell) [aria-disabled='true'] {
+  color: var(--medical-text-disabled);
+}
+
+/* Calculator modals inherit medical ink hierarchy */
+.clinical-calculator-modal {
+  color: var(--medical-text-body);
+}
+
+.clinical-calculator-modal :is(h1, h2, h3, h4, h5, h6, strong) {
+  color: var(--medical-text-heading);
+}
+
+.clinical-calculator-modal :is(label, th) {
+  color: var(--medical-text-muted);
+}
+
+.clinical-calculator-modal :is(small, .calc-text-subtle) {
+  color: var(--medical-text-subtle);
+}
+
+.clinical-calculator-modal .calc-text-muted {
+  color: var(--medical-text-muted);
+}
+
+/* Copilot / safety panels — light medical surfaces */
+:is(
+    .diagnostic-safety-dashboard,
+    .patient-card-copilot,
+    .copilot-risk-layer-panel,
+    .ai-transparency-dashboard
+  ) {
+  color: var(--medical-text-body);
+  background: var(--medical-surface-card);
+  border-color: var(--medical-border);
+}
+
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is(h1, h2, h3, h4, h5, h6, [class*='__title']) {
+  color: var(--medical-text-heading);
+}
+
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is([class*='__subtitle'], [class*='__toggle']) {
+  color: var(--medical-text-muted);
+}
+
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) [class*='__eyebrow'] {
+  color: var(--medical-text-link);
+}

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { apiFetch } from '../services/apiClient';
 import logger from '../utils/logger';
 
@@ -84,7 +85,7 @@ class ErrorBoundary extends Component {
       if (this.props.fallbackText || this.props.fallback) {
         return (
           this.props.fallback || (
-            <div role="alert" style={{ padding: 16, color: '#FCA5A5' }}>
+            <div role="alert" style={{ padding: 16, color: MEDICAL_TYPE.statusCritical }}>
               <p style={{ margin: '0 0 12px' }}>{this.props.fallbackText}</p>
               {this.state.error && (
                 <details

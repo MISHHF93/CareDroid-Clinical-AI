@@ -192,7 +192,8 @@ describe('full platform consolidation contract', () => {
   it('keeps theme and mobile scrolling consolidated at the shell layer', () => {
     expect(themeTokensCss).toContain('--app-bg');
     expect(themeTokensCss).toContain('--app-accent');
-    expect(themeTokensCss).toContain("html[data-theme='dark']");
+    expect(themeTokensCss).toContain("html[data-theme='light']");
+    expect(themeTokensCss).toContain('--app-bg');
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.ed-os-main,\s*[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);

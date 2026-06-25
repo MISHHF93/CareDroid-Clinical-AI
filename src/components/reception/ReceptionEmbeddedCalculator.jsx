@@ -1,7 +1,10 @@
-import React, { Suspense, lazy, useCallback } from 'react';
+import React, { Suspense, lazy, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ClinicalCalculatorHub from '../ClinicalCalculatorHub';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
+import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { resolveReceptionDeskCalculatorIds } from '../../services/unifiedClinicalToolsBridge';
 import './ReceptionEmbeddedCalculator.css';
 
 const EmbeddedCalculators = lazy(() => import('../../pages/tools/Calculators'));
@@ -12,6 +15,16 @@ export default function ReceptionEmbeddedCalculator({
   onClose,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { saasRole } = useEffectiveUserProfile();
+  const emergencyRole = useEmergencyRolePermissions();
+  const allowedCalculatorIds = useMemo(
+    () =>
+      resolveReceptionDeskCalculatorIds({
+        saasRole,
+        emergencyRoleId: emergencyRole.role,
+      }),
+    [emergencyRole.role, saasRole],
+  );
   const activeCalc = calculatorId || searchParams.get('calc') || searchParams.get('open');
   const showHub = !activeCalc || activeCalc === 'hub' || searchParams.get('tools') === 'calculators';
 
@@ -38,10 +51,13 @@ export default function ReceptionEmbeddedCalculator({
       </header>
 
       {showHub ? (
-        <ClinicalCalculatorHub />
+        <ClinicalCalculatorHub
+          embedded
+          allowedCalculatorIds={allowedCalculatorIds}
+        />
       ) : (
         <Suspense fallback={<p className="reception-embedded-calculator__loading">Loading calculator…</p>}>
-          <EmbeddedCalculators initialCalculatorId={activeCalc} embedded />
+          <EmbeddedCalculators initialCalculatorId={activeCalc} embedded patientId={patientId} />
         </Suspense>
       )}
     </section>

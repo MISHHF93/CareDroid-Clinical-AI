@@ -203,24 +203,46 @@ export function listEdWorkflowLanes() {
   return ED_WORKFLOW_LANES;
 }
 
-export function summarizeBackendFrontendSync(): BackendFrontendSyncSummary {
+type BackendFrontendSyncRuntime = {
+  backendAvailable?: boolean;
+  persistenceMode?: string;
+};
+
+function resolveRuntimePersistenceMode(
+  runtime: BackendFrontendSyncRuntime | undefined,
+  fallback: BackendFrontendSyncSummary['persistenceMode'],
+): BackendFrontendSyncSummary['persistenceMode'] {
+  const mode = runtime?.persistenceMode;
+  if (mode === 'backend' || mode === 'local' || mode === 'simulation') {
+    if (mode === 'backend') return 'hybrid';
+    if (mode === 'local') return 'local-first';
+    return 'demo-fixture';
+  }
+  return fallback;
+}
+
+export function summarizeBackendFrontendSync(
+  runtime: BackendFrontendSyncRuntime = {},
+): BackendFrontendSyncSummary {
   const profileWired =
     BACKEND_API_CAPABILITY_STATUS.operationalProfile === 'real' &&
     BACKEND_API_CAPABILITY_STATUS.userProfile === 'real';
   const emergencyReadWired =
+    runtime.backendAvailable === true ||
     BACKEND_API_CAPABILITY_STATUS.emergencyWhiteboard !== 'disabled';
   const emergencyWriteWired =
     BACKEND_API_CAPABILITY_STATUS.emergencyReceptionHandoff === 'real' ||
     BACKEND_API_CAPABILITY_STATUS.emergencyTriageAssist === 'real';
   const realtimeWired =
     BACKEND_API_CAPABILITY_STATUS.emergencyCentralNode !== 'disabled';
+  const fallbackPersistenceMode = emergencyWriteWired ? 'hybrid' : 'demo-fixture';
 
   return {
-    profileWired,
+    profileWired: runtime.backendAvailable === false ? false : profileWired,
     emergencyReadWired,
     emergencyWriteWired,
     realtimeWired,
-    persistenceMode: emergencyWriteWired ? 'hybrid' : 'demo-fixture',
+    persistenceMode: resolveRuntimePersistenceMode(runtime, fallbackPersistenceMode),
     notes: Object.freeze([
       'Profile and workspace APIs are production-backed.',
       'CareDroid reads use /api/emergency/* demo envelopes until persistence ships.',

@@ -357,7 +357,7 @@
 }
 
 .ai-integration-panel {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--app-accent-2, var(--accent-2)) 100%);
   color: var(--app-on-solid);
   border-radius: 12px;
   padding: 32px;

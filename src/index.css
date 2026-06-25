@@ -688,10 +688,10 @@ textarea {
   inset-inline-start: var(--space-2, 8px);
   z-index: var(--z-toast, 1200);
   padding: var(--space-2, 8px) var(--space-3, 12px);
-  border: 1px solid var(--status-info, #60a5fa);
+  border: 1px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
   border-radius: var(--radius-md, 8px);
-  background: var(--color-elevated, #111827);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--color-elevated, var(--app-surface-1, #ffffff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: 700;
   text-decoration: none;
@@ -702,7 +702,7 @@ textarea {
 .ed-skip-link:focus,
 .ed-skip-link:focus-visible {
   transform: translateY(0);
-  outline: 2px solid var(--status-info, #60a5fa);
+  outline: 2px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
   outline-offset: 2px;
 }
 

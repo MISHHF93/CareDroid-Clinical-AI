@@ -16,7 +16,7 @@
   width: 100%;
   min-width: 10rem;
   border-radius: 6px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid var(--medical-border, #e0f2fe);
   background: rgba(2, 6, 23, 0.35);
   color: inherit;
   padding: 0.3rem 0.45rem;

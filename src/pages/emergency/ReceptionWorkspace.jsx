@@ -68,6 +68,7 @@ import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVis
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
 import ReceptionEmbeddedCalculator from '../../components/reception/ReceptionEmbeddedCalculator';
+import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
 import { shouldEmbedToolsOnReception } from '../../services/unifiedClinicalToolsBridge';
 import TriageRuleBuilder from '../../components/reception/TriageRuleBuilder';
 import VoiceInterviewKiosk from '../../components/reception/VoiceInterviewKiosk';
@@ -81,6 +82,7 @@ import {
   readPatientRouteContext,
 } from '../../utils/receptionQueryParams';
 import { buildPostHandoffNavigationPaths } from '../../services/receptionHandoff';
+import '../../styles/reception-desk-theme.css';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
 
@@ -527,8 +529,8 @@ export default function ReceptionWorkspace() {
           <h1 className="emergency-route-page__title" id="reception-workspace-title">
             {RECEPTION_COPY.workspace.title}
           </h1>
-          {surfaces.reception.showIntroDescription ? (
-            <p className="emergency-route-page__description">
+          {surfaces.reception.showIntroDescription || deskUi.slim ? (
+            <p className="emergency-route-page__description reception-workspace__desk-description">
               {deskUi.slim
                 ? RECEPTION_COPY.workspace.deskDescription
                 : RECEPTION_COPY.workspace.description}
@@ -577,7 +579,43 @@ export default function ReceptionWorkspace() {
             />
           ) : null}
         </>
-      ) : reception.showWidget('operational-strip') ? (
+      ) : null}
+
+      {!triage.isTriageScreen && reception.isReceptionScreen ? (
+        <ReceptionDeskToolbar
+          className="reception-workspace__desk-toolbar"
+          canCreatePatient={canCreatePatient}
+          canVerifyIntake={canVerifyIntake}
+          canEscalateToNurse={canEscalateToNurse}
+          canOpenPrepareChooser={reception.showWidget('prepare-chooser')}
+          canOpenSmartIntake={canOpenSmartIntake}
+          activeQueueTab={activeQueueTab}
+          onRegisterWalkIn={openQuickIntake}
+          onCheckIdentity={openArtifactCapture}
+          onOtherArrivals={() => setShowPrepareChooser(true)}
+          onEscalate={() => {
+            setEscalationReasonId(null);
+            setShowEscalationPanel(true);
+          }}
+          onFocusEms={() => {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.delete('queue');
+            setSearchParams(nextParams, { replace: true });
+          }}
+          onFocusVerification={() => {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set('queue', 'verification');
+            setSearchParams(nextParams, { replace: true });
+          }}
+          onFocusPretriage={() => {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set('queue', 'pretriage');
+            setSearchParams(nextParams, { replace: true });
+          }}
+        />
+      ) : null}
+
+      {reception.showWidget('operational-strip') && !triage.isTriageScreen ? (
       <ReceptionOperationalStrip
         patients={patients}
         emsInbound={emsInbound}
@@ -740,6 +778,7 @@ export default function ReceptionWorkspace() {
         />
       ) : null}
 
+      <div className="reception-workspace__desk-primary">
       {useInlineQuickIntake ? (
         <ReceptionQuickIntake
           variant="inline"
@@ -844,6 +883,7 @@ export default function ReceptionWorkspace() {
           </button>
         </div>
       ) : null}
+      </div>
 
       {nlpTriageExpertEnabled || voiceInterviewEnabled ? (
         <div className="reception-workspace__native-ai" aria-label="Native AI reception tools">

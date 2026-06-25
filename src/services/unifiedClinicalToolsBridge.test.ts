@@ -4,9 +4,12 @@ import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import {
   buildReceptionCalculatorEmbedPath,
   isCalculatorArtifact,
+  listReceptionDeskCalculatorIds,
   remapRegistryNavigationForRole,
   resolveClinicalToolLaunchTarget,
+  resolveReceptionDeskCalculatorIds,
   shouldEmbedToolsOnReception,
+  getUnifiedClinicalToolsProfile,
 } from './unifiedClinicalToolsBridge';
 
 describe('unifiedClinicalToolsBridge', () => {
@@ -75,5 +78,42 @@ describe('unifiedClinicalToolsBridge', () => {
         kind: 'tools-hub',
       }),
     ).toBe(true);
+  });
+
+  it('remaps copilot launches to reception for front-desk roles', () => {
+    const remapped = remapRegistryNavigationForRole(
+      { pathname: CANONICAL_ROUTES.emergencyCopilot, search: '' },
+      {
+        emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+        canAccessToolsRoute: false,
+        toolId: 'wells-pe',
+        launchMode: 'chat-assisted',
+      },
+    );
+
+    expect(remapped.pathname).toBe(CANONICAL_ROUTES.emergencyReception);
+    expect(remapped.search).toContain('tools=calculators');
+  });
+
+  it('routes chat-assisted copilot requests to reception when clerk lacks copilot access', () => {
+    const target = resolveClinicalToolLaunchTarget({
+      emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+      canAccessToolsRoute: false,
+      kind: 'copilot',
+      toolId: 'wells-pe',
+    });
+
+    expect(target.pathname).toBe(CANONICAL_ROUTES.emergencyReception);
+    expect(target.mode).toBe('reception-embed');
+  });
+
+  it('lists reception-desk calculator ids from the unified tools profile', () => {
+    const profile = getUnifiedClinicalToolsProfile({ saasRole: 'student' });
+    const ids = listReceptionDeskCalculatorIds(profile);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(ids).toContain('qsofa');
+    expect(resolveReceptionDeskCalculatorIds({
+      emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+    }).length).toBeGreaterThan(0);
   });
 });

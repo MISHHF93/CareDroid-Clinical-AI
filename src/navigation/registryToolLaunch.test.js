@@ -17,6 +17,7 @@ import {
 } from '../data/toolInventory';
 import { getMountedCapabilityGraph } from '../data/mountedCapabilityGraph';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 
 const ACTIVE_EMERGENCY_LAUNCH_ROUTES = new Set([
   CANONICAL_ROUTES.emergencyCopilot,
@@ -176,6 +177,30 @@ describe('registryToolLaunch', () => {
     expect(handlers.navigate).toHaveBeenCalledWith(
       { pathname: '/emergency/tools', search: '?entitlement=denied&reason=locked' },
       { replace: true }
+    );
+  });
+
+  it('remaps calculator registry launches to reception embed for registration clerk', () => {
+    const handlers = {
+      navigate: vi.fn(),
+      addMessage: vi.fn(),
+      selectTool: vi.fn(),
+      setActiveTool: vi.fn(),
+      recordToolAccess: vi.fn(),
+      context: {
+        emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+        user: { role: EMERGENCY_ROLE_IDS.registrationClerk },
+      },
+    };
+
+    applyRegistryToolLaunch('qsofa', handlers);
+
+    expect(handlers.navigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pathname: CANONICAL_ROUTES.emergencyReception,
+        search: expect.stringContaining('calc=qsofa'),
+      }),
+      expect.objectContaining({ replace: true }),
     );
   });
 

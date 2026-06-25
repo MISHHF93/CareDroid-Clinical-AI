@@ -41,7 +41,7 @@ const DEFAULT_SAAS_PROFILE = Object.freeze({
   hiddenAssets: [],
   recentAssets: [],
   preferredAIStyle: 'concise',
-  themePreference: 'system',
+  themePreference: 'light',
   density: 'standard',
   compactMode: false,
   onboardingStatus: 'complete',
@@ -158,7 +158,7 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
       clinicalInterests: [],
     },
     preferences: {
-      theme: themePreference || 'system',
+      theme: themePreference || 'light',
       language: profile.languagePreference || 'en',
       defaultDashboard: 'command',
       density: DEFAULT_SAAS_PROFILE.density,
@@ -279,7 +279,7 @@ export const UserIdentityProvider = ({ children }) => {
   const { refreshTenantContext } = useTenantContext();
   const { workspaces: localWorkspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const toolPrefs = useToolPreferences();
-  const { preference: themePreference, setPreference } = useTheme();
+  const { preference: themePreference } = useTheme();
   const [operationalProfile, setOperationalProfile] = useState(null);
   const [platformContext, setPlatformContext] = useState(null);
   const [memoryFabricContext, setMemoryFabricContext] = useState(LOCAL_MEMORY_FABRIC_CONTEXT);
@@ -446,7 +446,7 @@ export const UserIdentityProvider = ({ children }) => {
 
   const savePreferences = useCallback(
     async (updates) => {
-      if (updates?.theme) setPreference(updates.theme);
+      if (updates?.theme) updates.theme = 'light';
       const result = await UserIdentityApi.updatePreferences(updates);
       if (!result.ok) {
         setError(result.message);
@@ -459,7 +459,7 @@ export const UserIdentityProvider = ({ children }) => {
       setError('');
       return result;
     },
-    [fallbackProfile, setPreference],
+    [fallbackProfile],
   );
 
   const updateProfile = useCallback(

@@ -1735,7 +1735,7 @@
   gap: 8px;
   margin: 0;
   padding: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
 }
 
@@ -2037,9 +2037,9 @@
   display: grid;
   gap: 4px;
   padding: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
-  background: rgba(15, 23, 42, 0.24);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .emergency-core-capability-list small {

@@ -4,12 +4,12 @@
   border: 1px solid var(--app-panel-border, var(--panel-border, #d0d7de));
   border-radius: var(--compact-card-radius, 16px);
   background: var(--app-surface-1, var(--panel-background, #fff));
-  color: var(--text-color, var(--text-primary, #111827));
+  color: var(--text-color, var(--text-primary, var(--app-surface-1, #ffffff)));
   padding: 14px 16px;
 }
 
 .state-source-notice strong {
-  color: var(--text-color, var(--text-primary, #111827));
+  color: var(--text-color, var(--text-primary, var(--app-surface-1, #ffffff)));
 }
 
 .state-source-notice p {
@@ -45,7 +45,7 @@
   min-width: min(100%, 180px);
   border: 1px solid var(--app-panel-border, var(--panel-border, #d0d7de));
   border-radius: 12px;
-  background: var(--app-surface-2, rgba(15, 23, 42, 0.04));
+  background: var(--app-surface-2, var(--medical-surface-page, #f0f9ff));
   padding: 8px 10px;
 }
 

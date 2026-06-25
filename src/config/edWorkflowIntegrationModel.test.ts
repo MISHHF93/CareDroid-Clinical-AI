@@ -47,4 +47,20 @@ describe('edWorkflowIntegrationModel', () => {
     expect(sync.emergencyReadWired).toBe(true);
     expect(ED_WORKFLOW_AZ_STEPS.every((step) => step.laneId)).toBe(true);
   });
+
+  it('reflects live store backend availability when provided', () => {
+    const offline = summarizeBackendFrontendSync({
+      backendAvailable: false,
+      persistenceMode: 'local',
+    });
+    expect(offline.profileWired).toBe(false);
+    expect(offline.persistenceMode).toBe('local-first');
+
+    const online = summarizeBackendFrontendSync({
+      backendAvailable: true,
+      persistenceMode: 'backend',
+    });
+    expect(online.emergencyReadWired).toBe(true);
+    expect(online.persistenceMode).toBe('hybrid');
+  });
 });

@@ -62,16 +62,47 @@ function dispatchCopilotPrefill(patientId: string, message: string) {
   );
 }
 
-function navigateToolsPath(path: string) {
-  window.history.pushState(null, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-}
-
 function navigateUnifiedToolsPath(
   input: Parameters<typeof resolveClinicalToolLaunchTarget>[0],
 ) {
   const target = resolveClinicalToolLaunchTarget(input);
-  navigateToolsPath(`${target.pathname}${target.search}`);
+
+  if (target.mode === 'reception-embed') {
+    const params = new URLSearchParams(
+      target.search.startsWith('?') ? target.search.slice(1) : target.search,
+    );
+    const calculatorId = params.get('calc') || params.get('open') || params.get('q');
+    if (calculatorId) {
+      dispatchCalculatorOpen(calculatorId, input.patientId || '');
+      return;
+    }
+    dispatchToolsOpen({
+      source: input.source || 'orchestration',
+      filter: 'calculator',
+      patientId: input.patientId,
+    });
+    return;
+  }
+
+  if (target.mode === 'copilot') {
+    if (input.patientId) {
+      dispatchCopilotPrefill(
+        input.patientId,
+        `Open clinical tools for patient ${input.patientId}. Staff confirmation required.`,
+      );
+    }
+    return;
+  }
+
+  const params = new URLSearchParams(
+    target.search.startsWith('?') ? target.search.slice(1) : target.search,
+  );
+  dispatchToolsOpen({
+    source: input.source || 'orchestration',
+    filter: params.get('filter') || input.filter || 'all',
+    query: params.get('open') || params.get('q') || input.toolId,
+    patientId: input.patientId || params.get('patientId') || undefined,
+  });
 }
 
 /**
@@ -124,7 +155,12 @@ export function launchOrchestrationRecommendation({
 }
 
 export function launchOrchestrationMoreTools(patientId: string, query = '') {
-  navigateToolsPath(buildToolsPath(patientId, query || undefined, 'all'));
+  dispatchToolsOpen({
+    source: 'orchestration',
+    filter: 'all',
+    patientId,
+    query: query || undefined,
+  });
 }
 
 /**

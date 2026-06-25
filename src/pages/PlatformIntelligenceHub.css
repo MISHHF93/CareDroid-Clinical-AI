@@ -96,7 +96,7 @@
 }
 
 .pi-status--ready { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
-.pi-status--developing { background: color-mix(in srgb, #3b82f6 18%, transparent); color: #2563eb; }
+.pi-status--developing { background: color-mix(in srgb, var(--app-accent-interactive) 18%, transparent); color: var(--app-accent-interactive); }
 .pi-status--watch { background: color-mix(in srgb, #eab308 18%, transparent); color: #ca8a04; }
 .pi-status--at-risk { background: color-mix(in srgb, #ef4444 18%, transparent); color: #ef4444; }
 

@@ -1,8 +1,15 @@
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { API_ROUTES } from '../config/api.config';
-import { apiFetch, parseApiResponse } from './apiClient';
 import { setTenantContext } from './tenantContextStore';
+
+async function readJsonBody(response, fallback = {}) {
+  try {
+    return await response.json();
+  } catch {
+    return fallback;
+  }
+}
 
 const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
 const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
@@ -75,8 +82,12 @@ export async function ensureDevBackendSession({ force = false } = {}) {
   }
 
   try {
-    const response = await apiFetch(API_ROUTES.auth.devSession, { method: 'POST' });
-    const payload = await parseApiResponse(response, { fallback: {} });
+    // Raw fetch avoids a circular import with apiClient (which bootstraps this session).
+    const response = await fetch(API_ROUTES.auth.devSession, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+    });
+    const payload = await readJsonBody(response, {});
     if (!response.ok || !payload?.accessToken) {
       return { token: existingToken || BYPASS_TOKEN, source: 'fallback-bypass', error: payload?.message };
     }

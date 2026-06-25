@@ -5,7 +5,7 @@
 
 .identity-field-review header h3 {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 15px;
 }
 
@@ -36,9 +36,9 @@
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
 }
 
 .identity-field-review__field span {
@@ -61,7 +61,7 @@
 
 .identity-field-review__field dd {
   margin: 2px 0 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
@@ -79,10 +79,10 @@
 }
 
 .identity-field-review__field footer button {
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 8px;
   background: transparent;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   padding: 5px 8px;
   font-size: 11px;
   cursor: pointer;

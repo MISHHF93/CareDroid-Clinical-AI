@@ -17,6 +17,8 @@ export function useEdWorkflowIntegration(): EdWorkflowIntegrationState {
   const { user } = useUser();
   const { operationalProfile } = useUserIdentity();
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const persistenceMode = useEmergencyStore((state) => state.persistenceMode);
   const isDemo = isDemoPersonaUser(user);
 
   return useMemo(() => {
@@ -28,9 +30,12 @@ export function useEdWorkflowIntegration(): EdWorkflowIntegrationState {
     });
     return {
       ...normalized,
-      backendSync: summarizeBackendFrontendSync(),
+      backendSync: summarizeBackendFrontendSync({
+        backendAvailable,
+        persistenceMode,
+      }),
     };
-  }, [emergencySettings, isDemo, operationalProfile, user]);
+  }, [backendAvailable, emergencySettings, isDemo, operationalProfile, persistenceMode, user]);
 }
 
 export default useEdWorkflowIntegration;

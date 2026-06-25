@@ -4,8 +4,8 @@
   gap: 0.1rem;
   padding: 0.25rem 0.45rem;
   border-radius: 0.4rem;
-  border: 1px solid color-mix(in srgb, var(--color-primary, #2563eb) 25%, transparent);
-  background: color-mix(in srgb, var(--color-primary, #2563eb) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, var(--app-accent-interactive)) 25%, transparent);
+  background: color-mix(in srgb, var(--color-primary, var(--app-accent-interactive)) 8%, transparent);
   font-size: 0.72rem;
   line-height: 1.2;
 }

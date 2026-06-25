@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
@@ -172,10 +173,10 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
           maxWidth: 480,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -186,7 +187,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -194,7 +195,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
               HEART Score
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patient.firstName} {patient.lastName} · {patient.mrn}
               </div>
             ) : null}
@@ -207,9 +208,9 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -219,8 +220,8 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
 
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {FIELD_OPTIONS.map((field) => (
-            <section key={field.key} style={{ border: '1px solid #1F2937', borderRadius: 10, padding: 12 }}>
-              <h3 style={{ margin: '0 0 10px', color: '#9CA3AF', fontSize: 12 }}>{field.title}</h3>
+            <section key={field.key} style={{ border: '1px solid #e0f2fe', borderRadius: 10, padding: 12 }}>
+              <h3 style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{field.title}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {field.options.map((option) => (
                   <label
@@ -230,7 +231,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 8,
-                      color: '#F9FAFB',
+                      color: 'var(--medical-ink, #111827)',
                       fontSize: 13,
                       cursor: 'pointer',
                     }}
@@ -265,7 +266,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 32, marginTop: 4 }}>
               {total}/10
             </div>
-            <div style={{ color: '#F9FAFB', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
+            <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
           </section>
 
           {patient ? (
@@ -274,9 +275,9 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
               type="button"
               onClick={saveToPatient}
               style={{
-                background: '#2563EB',
+                background: MEDICAL_THEME.accent,
                 border: 'none',
-                color: '#F9FAFB',
+                color: 'var(--medical-ink, #111827)',
                 borderRadius: 10,
                 padding: '10px 12px',
                 cursor: 'pointer',

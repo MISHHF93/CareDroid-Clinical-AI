@@ -184,7 +184,7 @@
 .route-optimizer-btn--primary {
   border: none;
   background: var(--app-accent, #4a7c9e);
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .route-optimizer-btn--secondary {

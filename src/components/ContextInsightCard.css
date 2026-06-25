@@ -3,10 +3,11 @@
   gap: 0.55rem;
   min-width: 0;
   padding: clamp(0.85rem, 2vw, 1rem);
-  border: 1px solid var(--app-border-color, rgba(148, 163, 184, 0.24));
+  border: 1px solid var(--medical-card-border, #e0f2fe);
   border-radius: var(--app-card-radius, 16px);
-  background: color-mix(in srgb, var(--app-surface, #101827) 92%, transparent);
-  box-shadow: var(--app-shadow-sm, 0 10px 30px rgba(15, 23, 42, 0.12));
+  background: var(--medical-card-bg, #ffffff);
+  box-shadow: var(--medical-shadow-soft, 0 8px 20px rgba(14, 165, 233, 0.06));
+  color: var(--medical-card-fg, #111827);
 }
 
 .context-insight-card--live {
@@ -51,28 +52,31 @@
 }
 
 .context-insight-card__badge {
-  color: var(--app-text-strong, #f8fafc);
-  background: rgba(59, 130, 246, 0.18);
+  color: var(--medical-card-accent-fg, #111827);
+  background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
+  border: 1px solid var(--medical-card-accent-border, rgba(14, 165, 233, 0.35));
 }
 
 .context-insight-card__source {
-  color: var(--app-muted-text, #94a3b8);
-  background: rgba(148, 163, 184, 0.12);
+  color: var(--medical-card-fg-muted, #6b7280);
+  background: var(--medical-card-muted-bg, #f0f9ff);
+  border: 1px solid var(--medical-card-border, #e0f2fe);
 }
 
 .context-insight-card h3 {
   margin: 0;
   font-size: clamp(0.98rem, 2vw, 1.08rem);
+  color: var(--medical-card-fg, #111827);
 }
 
 .context-insight-card p {
   margin: 0;
-  color: var(--app-muted-text, #94a3b8);
+  color: var(--medical-card-fg-muted, #6b7280);
   line-height: 1.45;
 }
 
 .context-insight-card__meta {
-  color: var(--app-muted-text, #94a3b8);
+  color: var(--medical-card-fg-muted, #6b7280);
   font-size: 0.78rem;
 }
 
@@ -81,7 +85,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--app-link, #38bdf8);
+  color: var(--medical-text-link, #0ea5e9);
   font: inherit;
   font-weight: 700;
   text-decoration: none;
@@ -97,4 +101,3 @@
     padding: 0.8rem;
   }
 }
-

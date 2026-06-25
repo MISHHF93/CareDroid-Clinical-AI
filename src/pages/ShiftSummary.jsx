@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState } from '../types/emergency';
 import { longWaitShiftMetrics } from '../utils/longWaitRescue';
@@ -10,13 +11,13 @@ function isShiftPatient(patient) {
 function MetricRow({ label, value }) {
   return (
     <article style={{
-      background: '#111827',
-      border: '1px solid #1F2937',
+      background: MEDICAL_THEME.surfaceCard,
+      border: '1px solid #e0f2fe',
       borderRadius: 12,
       padding: 14,
     }}>
-      <span style={{ color: '#9CA3AF', fontSize: 12 }}>{label}</span>
-      <strong style={{ color: '#F9FAFB', display: 'block', fontSize: 22, marginTop: 4 }}>{value}</strong>
+      <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{label}</span>
+      <strong style={{ color: 'var(--medical-ink, #111827)', display: 'block', fontSize: 22, marginTop: 4 }}>{value}</strong>
     </article>
   );
 }
@@ -32,8 +33,8 @@ export default function ShiftSummary() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ fontSize: 20, fontWeight: 500, color: '#F9FAFB' }}>Shift Summary</h1>
-      <p style={{ color: '#9CA3AF', marginTop: 8 }}>
+      <h1 style={{ fontSize: 20, fontWeight: 500, color: 'var(--medical-ink, #111827)' }}>Shift Summary</h1>
+      <p style={{ color: MEDICAL_THEME.inkSubtle, marginTop: 8 }}>
         {activeShift.label} started {new Date(activeShift.startTime).toLocaleString()}.
       </p>
       <section

@@ -1,5 +1,8 @@
 import './theme-init.js';
 
+import './styles/medical-color-layer.css';
+import './styles/medical-type-layer.css';
+import './styles/medical-card-layer.css';
 import './styles/theme-tokens.css';
 
 import React from 'react';
@@ -36,6 +39,14 @@ import './styles/mobile-first-recovery.css';
 import './styles/emergency-responsive.css';
 
 import './globals.css';
+
+import './styles/color-normalization.css';
+
+import './styles/text-normalization.css';
+
+import './styles/surface-normalization.css';
+
+import './styles/card-contrast-normalization.css';
 
 import logger from './utils/logger';
 

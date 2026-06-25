@@ -15,7 +15,7 @@
   font-size: 12px;
   line-height: 1;
   border: 1px solid transparent;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .wb-op-icon-strip__icon small {
@@ -30,7 +30,7 @@
 
 .wb-op-icon-strip__icon--warning {
   border-color: rgba(245, 158, 11, 0.45);
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .wb-op-icon-strip__icon--info,
@@ -41,7 +41,7 @@
 
 .wb-op-icon-strip__icon--neutral {
   border-color: rgba(148, 163, 184, 0.35);
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .wb-op-icon-strip--compact .wb-op-icon-strip__icon {

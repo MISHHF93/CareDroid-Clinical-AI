@@ -44,6 +44,8 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.copilot.showContextTab).toBe(false);
     expect(surfaces.copilot.showSafetyTab).toBe(false);
     expect(surfaces.copilot.showMultimodalInput).toBe(false);
+    expect(surfaces.copilot.compactLayout).toBe(true);
+    expect(surfaces.copilot.showSafetyBadge).toBe(false);
     expect(surfaces.emergencyRoutes.showDescriptions).toBe(false);
     expect(surfaces.emergencyRoutes.showMetricCards).toBe(false);
     expect(surfaces.emergencyRoutes.showCrossLinks).toBe(false);

@@ -20,7 +20,7 @@
 }
 
 .feature-toggle-panel__eyebrow {
-  color: var(--accent-green, #00ff88);
+  color: var(--app-accent-interactive);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -219,7 +219,7 @@
   padding: 8px 12px;
   border-color: rgba(0, 255, 136, 0.38);
   background: rgba(0, 255, 136, 0.12);
-  color: var(--accent-green, #00ff88);
+  color: var(--app-accent-interactive);
 }
 
 .feature-toggle-panel__surfacing-icon {
@@ -260,7 +260,7 @@
 
 .feature-toggle-panel__effort {
   display: inline-flex;
-  border: 1px solid rgba(148, 163, 184, 0.34);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   padding: 2px 8px;
   font-weight: 900;
@@ -268,7 +268,7 @@
 
 .feature-toggle-panel__effort--low {
   border-color: rgba(0, 255, 136, 0.36);
-  color: var(--accent-green, #00ff88);
+  color: var(--app-accent-interactive);
 }
 
 .feature-toggle-panel__effort--medium {
@@ -314,7 +314,7 @@
 
 .feature-toggle-panel__setup-checklist li span {
   min-width: 3rem;
-  border: 1px solid rgba(148, 163, 184, 0.34);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   padding: 1px 6px;
   color: var(--muted-text);
@@ -330,7 +330,7 @@
 
 .feature-toggle-panel__setup-checklist-item--done span {
   border-color: rgba(0, 255, 136, 0.36) !important;
-  color: var(--accent-green, #00ff88) !important;
+  color: var(--app-accent-interactive) !important;
 }
 
 .feature-toggle-panel__filters > div,
@@ -343,7 +343,7 @@
 .feature-toggle-panel__filter--active {
   border-color: rgba(0, 255, 136, 0.44) !important;
   background: rgba(0, 255, 136, 0.12) !important;
-  color: var(--accent-green, #00ff88) !important;
+  color: var(--app-accent-interactive) !important;
 }
 
 .feature-toggle-panel__sections {
@@ -511,8 +511,8 @@
 .feature-toggle-panel__spinner {
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(15, 23, 42, 0.25);
-  border-top-color: #0f172a;
+  border: 2px solid rgba(14, 165, 233, 0.12);
+  border-top-color: var(--medical-card-fg, #111827);
   border-radius: 999px;
   animation: feature-toggle-spin 700ms linear infinite;
 }

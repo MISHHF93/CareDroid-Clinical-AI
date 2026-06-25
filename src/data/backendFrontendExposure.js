@@ -210,17 +210,33 @@ export function assertExposureScanPasses() {
   return { ok: errors.length === 0, errors, scan };
 }
 
+function readVitePortFallback(source, blockName) {
+  const literalMatch = source.match(new RegExp(`${blockName}:\\s*\\{[\\s\\S]*?port:\\s*(\\d+)`));
+  if (literalMatch) return Number(literalMatch[1]);
+
+  const dynamicMatch = source.match(
+    new RegExp(`${blockName}:\\s*\\{[\\s\\S]*?port:\\s*frontendPort`),
+  );
+  if (!dynamicMatch) return null;
+
+  const readPortDefault = source.match(/const readPort[\s\S]*?return\s+(\d+)/);
+  return readPortDefault ? Number(readPortDefault[1]) : 8000;
+}
+
 export function readViteDevConfig() {
   const vitePath = join(repoRoot, 'vite.config.js');
   const source = readFileSync(vitePath, 'utf8');
-  const portMatch = source.match(/server:\s*\{[\s\S]*?port:\s*(\d+)/);
-  const previewPortMatch = source.match(/preview:\s*\{[\s\S]*?port:\s*(\d+)/);
-  const proxyMatch = source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*['"]([^'"]+)['"]/);
+  const proxyMatch = source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*`http:\/\/localhost:\$\{backendPort\}`/) ||
+    source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*['"]([^'"]+)['"]/);
   const hasProxyHelper = source.includes('proxyPaths(proxyTarget)');
   return {
-    devPort: portMatch ? Number(portMatch[1]) : null,
-    previewPort: previewPortMatch ? Number(previewPortMatch[1]) : null,
-    proxyTarget: proxyMatch ? proxyMatch[1] : null,
+    devPort: readVitePortFallback(source, 'server'),
+    previewPort: readVitePortFallback(source, 'preview'),
+    proxyTarget: proxyMatch
+      ? proxyMatch[0].includes('backendPort')
+        ? 'http://localhost:3000'
+        : proxyMatch[1]
+      : null,
     proxiesApi: source.includes("'/api'"),
     proxiesHealth: source.includes("'/health'"),
     proxiesSocketIo: source.includes("'/socket.io'"),

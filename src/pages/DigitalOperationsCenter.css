@@ -45,7 +45,7 @@
   border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 999px;
   background: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
+  color: var(--app-accent-interactive);
   font-size: 13px;
   font-weight: 800;
   padding: 9px 12px;

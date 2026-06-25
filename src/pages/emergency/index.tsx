@@ -1922,13 +1922,33 @@ export default function EmergencyWhiteboard() {
       {whiteboardDensity.surfaces.primaryStats.visible ? (
       <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
         <StatCard value={stats.waiting} label="Waiting" emphasized={prioritizeAwareness && stats.waiting > 0} />
-        {whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {surfaces.compactLayout ? (
+          <StatCard
+            value={stats.highRisk}
+            label="High risk"
+            tone={stats.highRisk ? 'critical' : 'success'}
+            emphasized={Boolean(stats.highRisk) && !display.isDisplayMode}
+            title="Patients flagged high risk on the board"
+            onClick={
+              display.isDisplayMode || !stats.highRisk
+                ? undefined
+                : () => {
+                    setActiveFilter('All');
+                    setQueueFilter('high-risk');
+                  }
+            }
+          />
+        ) : null}
+        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
           <>
         <StatCard value={stats.total} label="Total" />
         <StatCard value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
           </>
         ) : null}
+        {!surfaces.compactLayout ? (
         <StatCard value={`${capacity.score} ${capacity.band}`} label="Capacity" tone={capacityTone(capacity.band)} />
+        ) : null}
+        {!surfaces.compactLayout ? (
         <StatCard
           value={stats.reassessmentDue}
           label="Reassess Due"
@@ -1941,6 +1961,8 @@ export default function EmergencyWhiteboard() {
           }
           onClick={display.isDisplayMode || !stats.reassessmentDue ? undefined : () => focusReassessmentOnBoard()}
         />
+        ) : null}
+        {!surfaces.compactLayout ? (
         <StatCard
           value={emsAwareness.soonestEtaLabel || emsAwareness.inboundCount || '—'}
           label="EMS ETA"
@@ -1966,7 +1988,8 @@ export default function EmergencyWhiteboard() {
                 }
           }
         />
-        {whiteboardDensity.surfaces.secondaryStats.visible ? (
+        ) : null}
+        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard
           value={emsAwareness.riskCount}
           label="EMS Risk"
@@ -1983,7 +2006,7 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard
           value={
             emsAwareness.awaitingHandoff
@@ -2013,9 +2036,10 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
         ) : null}
+        {!surfaces.compactLayout ? (
         <StatCard
           value={referralAwareness.buckets.pending}
           label="Referrals Pending"
@@ -2031,7 +2055,8 @@ export default function EmergencyWhiteboard() {
                 }
           }
         />
-        {whiteboardDensity.surfaces.secondaryStats.visible ? (
+        ) : null}
+        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
         <>
         <StatCard
           value={referralAwareness.buckets.accepted}

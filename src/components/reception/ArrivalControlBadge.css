@@ -18,7 +18,7 @@
 
 .arrival-control-badge__mode {
   background: rgba(37, 99, 235, 0.16);
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
 }
 
 .arrival-control-badge__status {
@@ -28,12 +28,12 @@
 
 .arrival-control-badge__triage {
   background: rgba(245, 158, 11, 0.16);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .arrival-control-badge__safety {
   background: rgba(239, 68, 68, 0.14);
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .arrival-control-badge--compact span {

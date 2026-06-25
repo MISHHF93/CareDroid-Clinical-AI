@@ -137,8 +137,8 @@
 }
 
 .tools-execution-badge--local {
-  border-color: color-mix(in srgb, var(--status-info, #60A5FA) 44%, var(--panel-border));
-  color: var(--status-info, #60A5FA);
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 44%, var(--panel-border));
+  color: var(--app-accent-interactive, var(--status-info));
 }
 
 .tools-execution-badge--platform {

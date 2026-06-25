@@ -5,7 +5,7 @@ type SkeletonLoaderProps = {
 
 const shimmerStyle = {
   background:
-    'linear-gradient(90deg, var(--color-surface, #111827) 0%, color-mix(in srgb, var(--status-info, #06b6d4) 12%, var(--color-floating-surface, #1F2937)) 45%, var(--color-surface, #111827) 90%)',
+    'linear-gradient(90deg, var(--color-surface, #111827) 0%, color-mix(in srgb, var(--status-info, #06b6d4) 12%, var(--color-floating-surface, #e0f2fe)) 45%, var(--color-surface, #111827) 90%)',
   backgroundSize: '220% 100%',
   animation:
     'caredroid-skeleton-shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite',
@@ -41,9 +41,9 @@ export default function SkeletonLoader({ variant = 'panel', rows = 3 }: Skeleton
           <div
             key={index}
             style={{
-              border: '1px solid var(--color-border-subtle, #1F2937)',
+              border: '1px solid var(--color-border-subtle, #e0f2fe)',
               borderRadius: 'var(--radius-lg, 12px)',
-              background: 'var(--color-card, #0B1120)',
+              background: 'var(--color-card, #ffffff)',
               padding: 14,
               minHeight: variant === 'card' || variant === 'whiteboard' ? 120 : 72,
             }}

@@ -16,7 +16,7 @@
 
 .fit-to-wait-attention-strip__eyebrow {
   margin: 0;
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -25,13 +25,13 @@
 
 .fit-to-wait-attention-strip__header h3 {
   margin: 4px 0 0;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 15px;
 }
 
 .fit-to-wait-attention-strip__subtitle {
   margin: 4px 0 0;
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
   font-size: 12px;
   max-width: 52rem;
 }
@@ -47,18 +47,18 @@
   min-width: 72px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid #374151;
-  background: #111827;
+  border: 1px solid #e0f2fe;
+  background: var(--app-surface-1, #ffffff);
   text-align: center;
 }
 
 .fit-to-wait-attention-strip__counts strong {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 18px;
 }
 
 .fit-to-wait-attention-strip__counts small {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -85,10 +85,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 999px;
-  background: #0b1120;
-  color: #f9fafb;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   font-size: 12px;
   font-weight: 650;

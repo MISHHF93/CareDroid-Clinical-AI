@@ -6,6 +6,12 @@ import { describe, expect, it } from 'vitest';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
 const themeTokensCss = readFileSync(join(__dirname, 'theme-tokens.css'), 'utf8');
+const colorNormalizationCss = readFileSync(join(__dirname, 'color-normalization.css'), 'utf8');
+const medicalColorLayerCss = readFileSync(join(__dirname, 'medical-color-layer.css'), 'utf8');
+const medicalTypeLayerCss = readFileSync(join(__dirname, 'medical-type-layer.css'), 'utf8');
+const textNormalizationCss = readFileSync(join(__dirname, 'text-normalization.css'), 'utf8');
+const medicalCardLayerCss = readFileSync(join(__dirname, 'medical-card-layer.css'), 'utf8');
+const cardContrastCss = readFileSync(join(__dirname, 'card-contrast-normalization.css'), 'utf8');
 const themeBridgeCss = readFileSync(join(__dirname, 'theme-legacy-bridge.css'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
 const commandDashboardCss = readFileSync(join(srcRoot, 'pages/CommandDashboard.css'), 'utf8');
@@ -21,18 +27,40 @@ const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
 const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 
 describe('theme color system revamp', () => {
-  it('defines CareDroid light and dark root palettes', () => {
-    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-bg:\s*#f6f8fb/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-surface-1:\s*#ffffff/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-bg:\s*#0b1220/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-surface-1:\s*#111827/);
+  it('defines the standard medical root palette on every color layer', () => {
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-bg:\s*#f0f9ff/);
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-surface-1:\s*#ffffff/);
+    expect(themeTokensCss).not.toMatch(/html\[data-theme='dark'\]/);
   });
 
-  it('uses blue as the product accent in both light and dark themes', () => {
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent:\s*#3b82f6/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent-interactive:\s*#3b82f6/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent:\s*#2563eb/);
-    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*#2563eb/);
+  it('normalizes legacy aliases through the medical color layer', () => {
+    expect(medicalColorLayerCss).toContain('--medical-accent:');
+    expect(colorNormalizationCss).toContain('--color-background: var(--medical-surface-page)');
+    expect(colorNormalizationCss).toContain('--status-info: var(--medical-accent)');
+    expect(colorNormalizationCss).toContain(':is(.app-shell, .emergency-app-shell)');
+  });
+
+  it('defines medical text hierarchy and shell-wide typography normalization', () => {
+    expect(medicalTypeLayerCss).toContain('--medical-text-heading:');
+    expect(medicalTypeLayerCss).toContain('--medical-text-link:');
+    expect(medicalTypeLayerCss).toContain('--medical-status-critical-text:');
+    expect(textNormalizationCss).toContain(':is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6)');
+    expect(textNormalizationCss).toContain('.clinical-calculator-modal');
+    expect(textNormalizationCss).toContain('var(--medical-text-link)');
+  });
+
+  it('defines card surface contracts with readable foreground pairings', () => {
+    expect(medicalCardLayerCss).toContain('--medical-card-bg:');
+    expect(medicalCardLayerCss).toContain('--medical-card-fg:');
+    expect(medicalCardLayerCss).toContain('--medical-card-solid-fg:');
+    expect(cardContrastCss).toContain('--card-contract-bg');
+    expect(cardContrastCss).toContain('--card-contract-fg');
+    expect(cardCss).toContain('var(--app-text-primary)');
+  });
+
+  it('uses sky blue as the medical product accent across the standard theme', () => {
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent:\s*#0ea5e9/);
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*#0ea5e9/);
   });
 
   it('exposes semantic aliases for accents, surfaces, focus, and charts', () => {

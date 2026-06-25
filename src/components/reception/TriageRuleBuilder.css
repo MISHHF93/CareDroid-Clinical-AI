@@ -27,8 +27,8 @@
   margin: 0;
   padding: 0.65rem;
   border-radius: 0.5rem;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-text-muted, #6b7280);
   font-size: 0.72rem;
   overflow: auto;
 }

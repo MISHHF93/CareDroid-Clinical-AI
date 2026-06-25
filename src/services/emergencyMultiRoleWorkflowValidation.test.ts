@@ -130,7 +130,7 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
     const receptionMetrics = selectReceptionOperationalStripMetrics([registered], 0, {
       metricIds: resolveReceptionStripMetricIds(CARE_DROID_SCREEN_MODES.reception) || [],
     });
-    expect(receptionMetrics.some((metric) => metric.id === 'awaiting-verification')).toBe(true);
+    expect(receptionMetrics.some((metric) => metric.id === 'awaiting-triage')).toBe(true);
 
     const triageQueued = buildPatient({
       state: PatientState.Triage,

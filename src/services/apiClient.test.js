@@ -8,6 +8,7 @@ const mockAppConfig = vi.hoisted(() => ({
     environment: 'test',
   },
   api: { baseUrl: '', wsUrl: '' },
+  dev: { bearerToken: 'dev-bypass-token' },
   features: {
     enableDemoMode: false,
     allowLocalDemoAuth: false,
@@ -123,7 +124,7 @@ describe('apiFetch timeout', () => {
   });
 
   it('aborts when the request exceeds timeoutMs', async () => {
-    localStorage.setItem('caredroid_access_token', 'test-jwt');
+    localStorage.setItem('caredroid_access_token', 'test.jwt.token');
     vi.stubGlobal(
       'fetch',
       vi.fn(

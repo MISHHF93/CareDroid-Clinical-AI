@@ -1,0 +1,70 @@
+/**
+ * Reception / registration desk — shared surface tokens and accents.
+ * Import once on the reception route (ReceptionWorkspace).
+ */
+
+.reception-workspace {
+  --reception-accent: var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  --reception-accent-strong: color-mix(in srgb, var(--reception-accent) 14%, var(--ed-surface-raised, var(--medical-surface-card, #ffffff)));
+  --reception-accent-border: color-mix(in srgb, var(--reception-accent) 38%, var(--ed-border-subtle, var(--medical-border, #e0f2fe)));
+  --reception-surface-card: var(--color-card, var(--ed-surface-overlay, var(--medical-surface-card, #ffffff)));
+  --reception-surface-inset: var(--color-elevated, var(--ed-surface-raised, var(--medical-surface-page, #f0f9ff)));
+  --reception-text-primary: var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
+  --reception-text-secondary: var(--ed-text-secondary, var(--color-text-secondary, var(--medical-ink-muted, #6b7280)));
+  --reception-border: var(--ed-border-subtle, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  --reception-radius-lg: var(--ed-radius-lg, 14px);
+  --reception-radius-md: var(--ed-radius-md, 10px);
+  --reception-success: var(--status-success, #34d399);
+  --reception-warning: var(--status-warning, #fbbf24);
+  --reception-danger: var(--status-danger, #f87171);
+}
+
+.reception-workspace .emergency-route-page__hero,
+.reception-workspace .arrival-dashboard,
+.reception-workspace .reception-work-queues,
+.reception-workspace .recent-arrivals,
+.reception-workspace .reception-quick-intake-inline .reception-quick-intake {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-card);
+  color: var(--reception-text-primary);
+}
+
+.reception-workspace .reception-pipeline-shell__stage {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-inset);
+  color: var(--reception-text-secondary);
+}
+
+.reception-workspace .reception-pipeline-shell__stage--active {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+  color: var(--reception-text-primary);
+}
+
+.reception-workspace .arrival-control-summary__metric {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-inset);
+  color: var(--reception-text-primary);
+}
+
+.reception-workspace .arrival-control-summary__metric:not(:disabled):hover {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+}
+
+.reception-workspace .reception-work-queues__tab--active,
+.reception-workspace .reception-desk-toolbar__action--active {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+  color: var(--reception-text-primary);
+}
+
+.reception-workspace .reception-workspace__action--primary {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+}
+
+.reception-workspace .reception-workspace__banner {
+  border-color: color-mix(in srgb, var(--reception-success) 42%, transparent);
+  background: color-mix(in srgb, var(--reception-success) 14%, var(--reception-surface-inset));
+}

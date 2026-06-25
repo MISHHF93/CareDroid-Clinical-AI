@@ -20,6 +20,8 @@ import PediatricDrugCalc from './calculators/PediatricDrugCalc';
 import QSOFA from './calculators/qSOFA';
 import Calculators from '../pages/tools/Calculators.jsx';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';
 import '../pages/emergency/ClinicalCalculatorHub.css';
 
 const EmbeddedCalculators = Calculators as ComponentType<{
@@ -358,7 +360,15 @@ function formatVitals(patient?: Patient): Array<[string, string | number | undef
   ];
 }
 
-export default function ClinicalCalculatorHub() {
+type ClinicalCalculatorHubProps = {
+  allowedCalculatorIds?: string[] | null;
+  embedded?: boolean;
+};
+
+export default function ClinicalCalculatorHub({
+  allowedCalculatorIds = null,
+  embedded = false,
+}: ClinicalCalculatorHubProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -390,14 +400,23 @@ export default function ClinicalCalculatorHub() {
     () => (patient ? getRecentSavedScores(patient) : []),
     [patient],
   );
+  const allowedIdSet = useMemo(
+    () =>
+      allowedCalculatorIds?.length
+        ? new Set(allowedCalculatorIds.map((id) => normalizeToolId(id)))
+        : null,
+    [allowedCalculatorIds],
+  );
+
   const filteredCalculators = useMemo(() => {
     const query = search.trim().toLowerCase();
     return CALCULATORS.filter((calculator) => {
+      if (allowedIdSet && !allowedIdSet.has(calculator.id)) return false;
       const categoryMatches = activeCategory === 'All' || calculator.category === activeCategory;
       const haystack = `${calculator.id} ${calculator.name} ${calculator.description} ${calculator.category} ${calculator.keywords.join(' ')}`.toLowerCase();
       return categoryMatches && (!query || haystack.includes(query));
     });
-  }, [activeCategory, search]);
+  }, [activeCategory, allowedIdSet, search]);
 
   const launchCalculator = useCallback((calculatorId: string) => {
     const params = new URLSearchParams(searchParams);
@@ -413,6 +432,21 @@ export default function ClinicalCalculatorHub() {
   const launchChatAssisted = useCallback((calculator: ClinicalCalculatorRegistryEntry) => {
     const launch = resolveCatalogLaunch(calculator.id);
     const registryId = launch.registryId || calculator.id;
+    const target = resolveClinicalToolLaunchTarget({
+      emergencyRoleId: emergencyRole.role,
+      canAccessToolsRoute: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools),
+      kind: 'copilot',
+      toolId: registryId,
+      calculatorId: calculator.id,
+      patientId: patient?.id,
+      source: embedded ? 'reception-tools' : 'calculators',
+    });
+
+    if (target.mode === 'reception-embed' || target.mode === 'calculator') {
+      navigate(`${target.pathname}${target.search}`);
+      return;
+    }
+
     chooseTool?.(registryId);
     activateTool?.(registryId);
     const seed =
@@ -428,7 +462,16 @@ export default function ClinicalCalculatorHub() {
       seedMessage?.(seed, 'user');
     }
     navigate(CANONICAL_ROUTES.emergencyCopilot);
-  }, [activateTool, chooseTool, navigate, patient, patientOrchestration, seedMessage]);
+  }, [
+    activateTool,
+    chooseTool,
+    embedded,
+    emergencyRole,
+    navigate,
+    patient,
+    patientOrchestration,
+    seedMessage,
+  ]);
 
   const closeCalculator = useCallback(() => {
     const params = new URLSearchParams(searchParams);
@@ -444,12 +487,17 @@ export default function ClinicalCalculatorHub() {
 
   const ActiveComponent = activeCalculator?.component;
   const surfaces = usePractitionerSurfaceVisibility();
+  const emergencyRole = useEmergencyRolePermissions();
 
   return (
     <section
-      className={`clinical-calculator-hub${
-        surfaces.compactLayout ? ' clinical-calculator-hub--practitioner-compact' : ''
-      }`}
+      className={[
+        'clinical-calculator-hub',
+        surfaces.compactLayout ? 'clinical-calculator-hub--practitioner-compact' : '',
+        embedded ? 'clinical-calculator-hub--embedded' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       <section className="clinical-calculator-hub__header" aria-labelledby="clinical-tools-title">
         <div>

@@ -268,9 +268,9 @@
 .smart-intake__ocr {
   margin: var(--space-3) 0;
   padding: var(--space-3);
-  border: 1px dashed #374151;
+  border: 1px dashed #e0f2fe;
   border-radius: 12px;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .smart-intake__ocr-upload {

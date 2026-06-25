@@ -38,7 +38,7 @@
 
 .cosmos-viewer__tabs button[aria-selected='true'] {
   background: var(--accent-soft, #dbeafe);
-  border-color: var(--accent, #2563eb);
+  border-color: var(--accent, var(--app-accent-interactive));
 }
 
 .cosmos-viewer__panel {
@@ -56,7 +56,7 @@
 }
 
 .cosmos-viewer__links a {
-  color: var(--link-color, #2563eb);
+  color: var(--link-color, var(--app-accent-interactive));
   text-decoration: none;
 }
 

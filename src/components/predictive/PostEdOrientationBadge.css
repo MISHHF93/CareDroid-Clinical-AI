@@ -20,9 +20,9 @@
 }
 
 .post-ed-orientation-badge--edou {
-  color: #1d4ed8;
-  background: color-mix(in srgb, #3b82f6 12%, transparent);
-  border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  color: #0284c7;
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
 }
 
 .post-ed-orientation-badge--discharge {

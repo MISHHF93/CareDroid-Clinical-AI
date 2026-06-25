@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IconBell, IconSearch } from '@tabler/icons-react';
@@ -79,6 +80,7 @@ import UserAccountMenu from './account/UserAccountMenu';
 import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
 import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
 import OperationalAlertRail from './emergency/OperationalAlertRail';
+import { isPilotStationKpiPolicyActive } from '../config/stationKpiPolicy';
 import './ReassessmentDrawer.css';
 import './Header.css';
 
@@ -170,7 +172,7 @@ function Clock() {
   return (
     <span
       style={{
-        color: '#9CA3AF',
+        color: MEDICAL_THEME.inkSubtle,
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
         fontSize: 12,
       }}
@@ -874,8 +876,18 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
       document.removeEventListener('reception-escalation-raised', handleReceptionEscalation);
   }, [emergencyRole.role, selectPatient]);
 
+  const pilotHeaderMetrics = isPilotStationKpiPolicyActive() && screenCapabilities.showOperationalStrip;
+
   return (
-    <header className="caredroid-header caredroid-header--compact">
+    <header
+      className={[
+        'caredroid-header',
+        'caredroid-header--compact',
+        pilotHeaderMetrics ? 'caredroid-header--pilot-metrics' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="caredroid-header__topbar">
         <div className="caredroid-header__brand">
           <span
@@ -922,6 +934,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
               syncStale={syncStale}
               syncPulse={syncPulse}
               intelligenceSnapshot={intelligenceSnapshot}
+              screenMode={routeScreenMode}
             />
           ) : null}
         </div>

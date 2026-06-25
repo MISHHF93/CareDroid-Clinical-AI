@@ -1,8 +1,8 @@
 .patient-experience-strip {
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
   padding: 0.85rem 1rem;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--medical-surface-card, #ffffff);
   margin-bottom: 0.75rem;
 }
 
@@ -16,13 +16,13 @@
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .patient-experience-strip__subtitle {
   margin: 0;
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .patient-experience-strip__counts {

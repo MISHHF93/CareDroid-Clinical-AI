@@ -18,14 +18,14 @@
   gap: var(--ed-space-4);
   border: 1px solid var(--ed-border-subtle);
   border-radius: var(--radius-xl, 16px);
-  background: var(--color-card, #172033);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
   padding: var(--ed-space-4);
   box-shadow: none;
   margin: 0;
 }
 
 .emergency-route-page__eyebrow {
-  color: var(--status-info, #60a5fa);
+  color: var(--app-accent-interactive, var(--status-info));
   font-size: var(--ed-type-body);
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -79,8 +79,8 @@
 }
 
 .emergency-route-view-tabs__btn--active {
-  border-color: color-mix(in srgb, var(--status-info, #60a5fa) 42%, var(--ed-border-subtle));
-  background: color-mix(in srgb, var(--status-info, #60a5fa) 12%, var(--ed-surface-raised));
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 42%, var(--ed-border-subtle));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 12%, var(--ed-surface-raised));
   color: var(--ed-text-primary);
 }
 
@@ -105,19 +105,19 @@
 .emergency-route-maturity-chip--demo {
   border: 1px solid rgba(245, 158, 11, 0.45);
   background: rgba(245, 158, 11, 0.12);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .emergency-route-maturity-chip--preview {
   border: 1px solid rgba(96, 165, 250, 0.45);
   background: rgba(96, 165, 250, 0.12);
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
 }
 
 .emergency-route-maturity-chip--planned {
   border: 1px solid rgba(156, 163, 175, 0.45);
   background: rgba(156, 163, 175, 0.12);
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
 }
 
 .emergency-route-metric-grid {
@@ -279,8 +279,8 @@
 
 .emergency-route-journey-card__count {
   border-radius: 999px;
-  background: var(--color-elevated, #0b1120);
-  color: #bfdbfe;
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  color: var(--medical-text-link, #0ea5e9);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--ed-type-body);
   font-weight: 900;
@@ -307,7 +307,7 @@
 }
 
 .emergency-route-filter-banner__label {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: var(--ed-type-section);
   font-weight: 800;
 }
@@ -329,7 +329,7 @@
   gap: var(--ed-space-3);
   align-items: center;
   padding: var(--ed-space-3);
-  border-left: 4px solid var(--queue-accent, var(--status-info, #60a5fa));
+  border-left: 4px solid var(--queue-accent, var(--app-accent-interactive, var(--status-info)));
 }
 
 .emergency-route-queue-row--breached {
@@ -355,7 +355,7 @@
 .emergency-route-queue-row__patient-btn {
   border: 1px solid var(--ed-border-subtle);
   border-radius: 999px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
   color: var(--ed-text-primary);
   cursor: pointer;
   font-size: var(--ed-type-body);
@@ -364,7 +364,7 @@
 }
 
 .emergency-route-queue-row__movement {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   display: block;
   font-size: var(--ed-type-body);
   font-weight: 800;
@@ -373,7 +373,7 @@
 
 .emergency-route-queue-row__count {
   border-radius: 999px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
   color: var(--ed-text-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   padding: 5px 10px;
@@ -393,9 +393,9 @@
 }
 
 .emergency-route-recommendation {
-  border-color: color-mix(in srgb, var(--status-info, #60a5fa) 36%, var(--color-border-default, #1f2937));
-  background: color-mix(in srgb, var(--status-info, #60a5fa) 8%, var(--ed-surface-raised));
-  color: #bfdbfe;
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 36%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 8%, var(--ed-surface-raised));
+  color: var(--medical-text-link, #0ea5e9);
   padding: var(--ed-space-3);
 }
 
@@ -420,7 +420,7 @@
 }
 
 .emergency-route-signal-row__main strong {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: var(--ed-type-section);
 }
 
@@ -442,7 +442,7 @@
 }
 
 .emergency-route-muted a {
-  color: var(--status-info, #60a5fa);
+  color: var(--app-accent-interactive, var(--status-info));
   font-weight: 700;
   text-decoration: none;
 }
@@ -452,7 +452,7 @@
 }
 
 .emergency-route-copilot-hint {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-default, #1f2937));
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--ed-surface-raised));
   color: var(--ed-text-secondary);
   margin: 0;
@@ -460,10 +460,10 @@
 }
 
 .emergency-route-action-chip {
-  border: 1px solid color-mix(in srgb, var(--status-info, #60a5fa) 34%, var(--color-border-default, #1f2937));
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--status-info, #60a5fa) 10%, var(--ed-surface-raised));
-  color: #bfdbfe;
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 10%, var(--ed-surface-raised));
+  color: var(--medical-text-link, #0ea5e9);
   padding: 6px 10px;
   font-size: var(--ed-type-body);
   font-weight: 800;

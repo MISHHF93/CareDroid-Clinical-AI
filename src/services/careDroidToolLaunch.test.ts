@@ -7,7 +7,6 @@ import {
 describe('careDroidToolLaunch', () => {
   beforeEach(() => {
     vi.stubGlobal('dispatchEvent', vi.fn());
-    vi.stubGlobal('history', { pushState: vi.fn() });
   });
 
   it('dispatches calculator open for orchestration calculator recommendations', () => {
@@ -50,6 +49,28 @@ describe('careDroidToolLaunch', () => {
     expect(dispatchEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'ed:copilot-prefill',
+      }),
+    );
+  });
+
+  it('dispatches tools open for orchestration workflow recommendations', () => {
+    launchOrchestrationRecommendation({
+      patientId: 'patient-4',
+      recommendation: {
+        toolId: 'protocols',
+        registryId: 'protocols',
+        label: 'Protocols',
+        reason: 'Care pathway',
+        launchKind: 'workflow',
+        category: 'clinical-tools',
+        priority: 1,
+        missing: false,
+      },
+    });
+
+    expect(dispatchEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ed:open-tools',
       }),
     );
   });

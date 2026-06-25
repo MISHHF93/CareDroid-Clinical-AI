@@ -2,9 +2,9 @@
   display: grid;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .patient-communication-status-panel__eyebrow {
@@ -77,12 +77,12 @@
 }
 
 .patient-communication-status-panel__overdue {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
   font-weight: 700;
 }
 
 .patient-communication-status-panel__current {
-  color: #86efac;
+  color: var(--medical-status-success-text, #15803d);
   font-weight: 600;
 }
 

@@ -11,8 +11,8 @@
   box-sizing: border-box;
   display: grid;
   grid-template-rows: 48px;
-  border-bottom: 1px solid #1f2937;
-  background: #0d1117;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--app-surface-1, #ffffff);
 }
 
 .caredroid-header__topbar {
@@ -31,7 +31,7 @@
 }
 
 .caredroid-header__wordmark {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 14px;
   font-weight: 500;
 }
@@ -43,6 +43,20 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__center {
+  justify-content: center;
+  gap: 8px;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__page-title {
+  display: none;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__central-status {
+  flex: 0 1 auto;
+  max-width: min(52vw, 420px);
 }
 
 .caredroid-header__page-title {
@@ -64,10 +78,10 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 8px;
-  background: #111827;
-  color: #9ca3af;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-subtle, #9ca3af);
   cursor: pointer;
 }
 
@@ -78,9 +92,9 @@
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  border: 1px solid #1f2937;
-  background: #1c2333;
-  color: #9ca3af;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--app-surface-muted, #f0f9ff);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 10px;
   font-weight: 700;
   cursor: pointer;
@@ -92,10 +106,10 @@
 }
 
 .caredroid-header__central-node {
-  border: 1px solid rgba(96, 165, 250, 0.35);
+  border: 1px solid var(--medical-accent-border, rgba(14, 165, 233, 0.35));
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.14);
-  color: #bfdbfe;
+  background: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -123,7 +137,7 @@
 .caredroid-header__page-title strong {
   max-width: min(24vw, 260px);
   overflow: hidden;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 13px;
   font-weight: 850;
   line-height: 1.1;
@@ -134,7 +148,7 @@
 .caredroid-header__page-title span {
   max-width: min(28vw, 360px);
   overflow: hidden;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
   line-height: 1.15;
   text-overflow: ellipsis;
@@ -145,7 +159,7 @@
   border: 1px solid rgba(16, 185, 129, 0.4);
   border-radius: 999px;
   background: rgba(16, 185, 129, 0.12);
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -160,10 +174,10 @@
 
 .caredroid-header__action {
   min-height: 30px;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 9px;
-  background: #111827;
-  color: #d1d5db;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
   cursor: pointer;
   font-size: 11px;
   font-weight: 850;
@@ -172,9 +186,9 @@
 }
 
 .caredroid-header__action--primary {
-  border-color: rgba(37, 99, 235, 0.74);
-  background: #2563eb;
-  color: #f9fafb;
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 74%, transparent);
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid, #f9fafb);
 }
 
 .caredroid-header__action:disabled {
@@ -190,19 +204,19 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, #1f2937));
+  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 9px;
-  background: var(--color-elevated, var(--app-surface-1, #111827));
+  background: var(--color-elevated, var(--app-surface-1, var(--app-surface-1, #ffffff)));
   color: var(--color-text-secondary, var(--app-text-secondary, #9ca3af));
   cursor: pointer;
 }
 
 .caredroid-header__icon-button:hover,
 .caredroid-header__icon-button:focus-visible {
-  border-color: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 42%, transparent);
-  color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 42%, transparent);
+  color: var(--color-text-primary, var(--app-text-primary, var(--medical-ink, #111827)));
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 18%, transparent);
 }
 
 .caredroid-header__notification-badge {
@@ -221,7 +235,7 @@
   font-size: 10px;
   font-weight: 900;
   line-height: 1;
-  box-shadow: 0 0 0 2px var(--bg-surface, var(--app-surface-0, #0d1117));
+  box-shadow: 0 0 0 2px var(--bg-surface, var(--app-surface-0, var(--app-surface-1, #ffffff)));
 }
 
 .emergency-os-notification-center {
@@ -235,10 +249,10 @@
   max-width: calc(100vw - 24px);
   max-height: min(640px, calc(100dvh - 112px));
   overflow: hidden;
-  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, #1f2937));
+  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 16px;
-  background: var(--color-elevated, var(--app-surface-1, #111827));
-  color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
+  background: var(--color-elevated, var(--app-surface-1, var(--app-surface-1, #ffffff)));
+  color: var(--color-text-primary, var(--app-text-primary, var(--medical-ink, #111827)));
   box-shadow: var(--app-elevation-overlay, 0 22px 64px rgba(0, 0, 0, 0.46));
 }
 
@@ -248,13 +262,13 @@
   justify-content: space-between;
   gap: var(--space-3, 12px);
   padding: 14px;
-  border-bottom: 1px solid var(--color-border-subtle, var(--app-border-subtle, #1f2937));
-  background: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 6%, transparent);
+  border-bottom: 1px solid var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 6%, transparent);
 }
 
 .emergency-os-notification-center__header span {
   display: block;
-  color: var(--status-info, var(--app-info, #60a5fa));
+  color: var(--app-accent-interactive, var(--status-info, var(--app-info)));
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -263,7 +277,7 @@
 
 .emergency-os-notification-center__header h2 {
   margin: 2px 0 0;
-  color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
+  color: var(--color-text-primary, var(--app-text-primary, var(--medical-ink, #111827)));
   font-size: 15px;
   line-height: 1.2;
 }
@@ -284,10 +298,10 @@
 .emergency-os-notification-center__header-actions button,
 .emergency-os-notification-card__actions button {
   min-height: 32px;
-  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, #1f2937));
+  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 9px;
-  background: var(--color-surface, var(--app-surface-0, #0b1120));
-  color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
+  background: var(--color-surface, var(--app-surface-0, var(--medical-surface-page, #f0f9ff)));
+  color: var(--color-text-primary, var(--app-text-primary, var(--medical-ink, #111827)));
   cursor: pointer;
   font: inherit;
   font-size: 11px;
@@ -305,8 +319,8 @@
 .emergency-os-notification-center__header-actions button:not(:disabled):focus-visible,
 .emergency-os-notification-card__actions button:not(:disabled):hover,
 .emergency-os-notification-card__actions button:not(:disabled):focus-visible {
-  border-color: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 42%, transparent);
-  background: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 10%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 42%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 10%, transparent);
   outline: none;
 }
 
@@ -323,7 +337,7 @@
 .emergency-os-notification-center__state {
   margin: 10px;
   padding: 18px 14px;
-  border: 1px dashed var(--color-border-subtle, var(--app-border-subtle, #1f2937));
+  border: 1px dashed var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   color: var(--color-text-secondary, var(--app-text-secondary, #9ca3af));
   font-size: 13px;
@@ -340,15 +354,15 @@
   display: grid;
   gap: 8px;
   min-width: 0;
-  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, #1f2937));
-  border-left: 4px solid var(--status-info, var(--app-info, #60a5fa));
+  border: 1px solid var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe)));
+  border-left: 4px solid var(--app-accent-interactive, var(--status-info, var(--app-info)));
   border-radius: 12px;
-  background: var(--color-surface, var(--app-surface-0, #0b1120));
+  background: var(--color-surface, var(--app-surface-0, var(--medical-surface-page, #f0f9ff)));
   padding: 10px;
 }
 
 .emergency-os-notification-card[data-read='false'] {
-  background: color-mix(in srgb, var(--status-info, var(--app-info, #60a5fa)) 8%, var(--color-surface, var(--app-surface-0, #0b1120)));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 8%, var(--color-surface, var(--app-surface-0, var(--medical-surface-page, #f0f9ff))));
 }
 
 .emergency-os-notification-card[data-severity='warning'] {
@@ -370,7 +384,7 @@
 .emergency-os-notification-card__meta span,
 .emergency-os-notification-card__meta time,
 .emergency-os-notification-card__context span {
-  border: 1px solid color-mix(in srgb, var(--color-border-subtle, var(--app-border-subtle, #1f2937)) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle, var(--app-border-subtle, var(--medical-border, #e0f2fe))) 78%, transparent);
   border-radius: var(--app-radius-pill, 999px);
   color: var(--color-text-secondary, var(--app-text-secondary, #9ca3af));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -382,7 +396,7 @@
 
 .emergency-os-notification-card__content h3 {
   margin: 0;
-  color: var(--color-text-primary, var(--app-text-primary, #f9fafb));
+  color: var(--color-text-primary, var(--app-text-primary, var(--medical-ink, #111827)));
   font-size: 13px;
   line-height: 1.25;
 }
@@ -411,10 +425,10 @@
   width: min(17vw, 220px);
   min-width: 160px;
   height: 32px;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 9px;
-  background: #111827;
-  color: #6b7280;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .caredroid-header__lookup--primary {
@@ -437,7 +451,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font: inherit;
   font-size: 12px;
   padding: 0 9px 0 7px;
@@ -451,9 +465,9 @@
   display: grid;
   width: min(420px, calc(100vw - 24px));
   overflow: hidden;
-  border: 1px solid #1f2937;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
 }
 
@@ -463,9 +477,9 @@
   width: 100%;
   min-height: 48px;
   border: 0;
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
   background: transparent;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   padding: 9px 11px;
   text-align: left;
@@ -476,12 +490,12 @@
 }
 
 .caredroid-header__lookup-results button:hover {
-  background: #1c2333;
+  background: var(--app-surface-muted, #f0f9ff);
 }
 
 .caredroid-header__lookup-results span {
   overflow: hidden;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -494,7 +508,7 @@
   min-width: 0;
   overflow-x: auto;
   border-top: 1px solid rgba(31, 41, 55, 0.82);
-  background: #020617;
+  background: var(--medical-surface-page, #f0f9ff);
   scrollbar-width: thin;
 }
 
@@ -506,8 +520,8 @@
   min-height: 43px;
   border: 0;
   border-left: 1px solid rgba(31, 41, 55, 0.86);
-  background: rgba(15, 23, 42, 0.94);
-  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--medical-text-muted, #6b7280);
   cursor: pointer;
   padding: 5px 10px;
   text-align: left;
@@ -524,7 +538,7 @@
 
 .caredroid-header__operational-metric strong {
   overflow: hidden;
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 15px;
   line-height: 1;
@@ -534,7 +548,7 @@
 
 .caredroid-header__operational-metric span {
   overflow: hidden;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.05em;
@@ -545,23 +559,23 @@
 }
 
 .caredroid-header__operational-metric[data-tone='success'] strong {
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
 }
 
 .caredroid-header__operational-metric[data-tone='info'] strong {
-  color: #bfdbfe;
+  color: var(--medical-text-link, #0ea5e9);
 }
 
 .caredroid-header__operational-metric[data-tone='warning'] strong {
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .caredroid-header__operational-metric[data-tone='critical'] strong {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .caredroid-header__operational-metric:not(:disabled):hover {
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 @media (max-width: 1024px) {
@@ -647,8 +661,8 @@
   }
 
   .caredroid-header button:active {
-    border-color: #3b82f6 !important;
-    color: #f9fafb !important;
+    border-color: var(--app-accent-interactive) !important;
+    color: var(--medical-ink, #111827) !important;
   }
 
   .caredroid-header__central-node {

@@ -4,6 +4,8 @@ import {
   resolveOperationalPresentation,
   resolveOperationalStripAccentClass,
 } from '../../config/emergencyOperationalPresentationModel';
+import { shouldForceCompactOperationalStrip } from '../../config/practitionerCleanup.config';
+import { compactOperationalStripMetrics } from '../../config/stationKpiPolicy';
 import './OperationalStrip.css';
 
 export default function OperationalStrip({
@@ -34,21 +36,24 @@ export default function OperationalStrip({
   const resolvedShowEmptyState = showEmptyState ?? profile.showStripEmptyState;
   const resolvedUppercase = metricLabelsUppercase ?? profile.metricLabelsUppercase;
   const showEyebrow = profile.showStripEyebrow && resolvedLayout === 'command';
+  const dense = shouldForceCompactOperationalStrip();
+  const displayMetrics = dense ? compactOperationalStripMetrics(metrics) : metrics;
 
-  if (!metrics.length && !resolvedShowEmptyState) return null;
+  if (!displayMetrics.length && !resolvedShowEmptyState) return null;
 
   const rootClassName = [
     'operational-strip',
     `operational-strip--${resolvedLayout}`,
+    dense ? 'operational-strip--dense' : '',
     resolveOperationalStripAccentClass(accent),
     resolvedUppercase ? '' : 'operational-strip--labels-normal',
-    !metrics.length && resolvedShowEmptyState ? 'operational-strip--clear' : '',
+    !displayMetrics.length && resolvedShowEmptyState ? 'operational-strip--clear' : '',
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  if (!metrics.length) {
+  if (!displayMetrics.length) {
     return (
       <nav className={rootClassName} aria-label={resolvedAriaLabel} data-emphasis={resolvedEmphasis}>
         {showEyebrow ? <span className="operational-strip__eyebrow">{resolvedEyebrow}</span> : null}
@@ -67,7 +72,7 @@ export default function OperationalStrip({
   return (
     <nav className={rootClassName} aria-label={resolvedAriaLabel} data-emphasis={resolvedEmphasis}>
       {showEyebrow ? <span className="operational-strip__eyebrow">{resolvedEyebrow}</span> : null}
-      {metrics.map((metric) => {
+      {displayMetrics.map((metric) => {
         const interactive = metric.interactive ?? Boolean(metric.queueTab && onMetricSelect);
         const tone = metric.tone || 'neutral';
         return (

@@ -156,8 +156,8 @@
 .knowledge-graph-node--role { border-left: 4px solid #f97316; }
 .knowledge-graph-node--route { border-left: 4px solid #64748b; }
 .knowledge-graph-node--simulation { border-left: 4px solid #a855f7; }
-.knowledge-graph-node--workflow { border-left: 4px solid #14b8a6; }
-.knowledge-graph-node--ai-agent { border-left: 4px solid #06b6d4; }
+.knowledge-graph-node--workflow { border-left: 4px solid var(--app-accent-2); }
+.knowledge-graph-node--ai-agent { border-left: 4px solid var(--app-accent-interactive); }
 .knowledge-graph-node--integration { border-left: 4px solid #ef4444; }
 
 .knowledge-graph-edge-list,

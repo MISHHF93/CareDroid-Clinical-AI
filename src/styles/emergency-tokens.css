@@ -1,6 +1,6 @@
 /**
  * Emergency OS visual tokens — shared aliases for shell, copilot, and board surfaces.
- * Maps product-specific vars to one spacing/type/surface vocabulary.
+ * Maps product-specific vars to the standard medical color layer.
  */
 
 :root {
@@ -15,16 +15,20 @@
   --ed-radius-md: var(--radius-md, 10px);
   --ed-radius-lg: var(--radius-lg, 14px);
 
-  --ed-surface-base: var(--color-background, var(--app-bg, #0a0e1a));
-  --ed-surface-raised: var(--color-surface, var(--color-elevated, #111827));
-  --ed-surface-overlay: var(--color-floating-surface, #1e293b);
+  --ed-surface-base: var(--color-background, var(--app-bg, var(--medical-surface-page, #f0f9ff)));
+  --ed-surface-raised: var(--color-surface, var(--app-surface-1, var(--medical-surface-card, #ffffff)));
+  --ed-surface-overlay: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
 
-  --ed-text-primary: var(--color-text-primary, var(--app-fg, #f9fafb));
-  --ed-text-secondary: var(--color-text-secondary, #9ca3af);
-  --ed-text-meta: var(--color-text-muted, #64748b);
+  --ed-text-primary: var(--color-text-primary, var(--app-fg, var(--medical-ink, #111827)));
+  --ed-text-secondary: var(--color-text-secondary, var(--app-fg-muted, var(--medical-ink-muted, #6b7280)));
+  --ed-text-meta: var(--color-text-muted, var(--medical-ink-subtle, #9ca3af));
 
-  --ed-border-subtle: color-mix(in srgb, var(--color-border-default, #1f2937) 72%, transparent);
-  --ed-border-strong: color-mix(in srgb, var(--status-info, #60a5fa) 34%, var(--color-border-default, #1f2937));
+  --ed-border-subtle: var(--app-border-subtle, var(--medical-border, #e0f2fe));
+  --ed-border-strong: color-mix(
+    in srgb,
+    var(--app-accent-interactive, var(--medical-accent, #0ea5e9)) 34%,
+    var(--color-border-default, var(--medical-border, #e0f2fe))
+  );
 
   --ed-type-page: var(--font-18, 18px);
   --ed-type-section: var(--font-13, 13px);

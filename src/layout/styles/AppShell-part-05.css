@@ -137,7 +137,7 @@
   border: 2px solid var(--color-surface);
   border-radius: var(--radius-pill);
   background: var(--status-warning);
-  color: #111827;
+  color: var(--app-surface-1, #ffffff);
   font-size: 10px;
   font-weight: 950;
   line-height: 1;

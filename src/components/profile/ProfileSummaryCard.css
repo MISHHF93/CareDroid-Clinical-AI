@@ -18,7 +18,7 @@
   justify-content: center;
   background: var(--panel-background);
   border: 1px solid var(--panel-border);
-  color: var(--accent-color, #00ff88);
+  color: var(--app-accent-interactive);
   font-weight: 700;
   overflow: hidden;
 }
@@ -82,7 +82,7 @@
 }
 
 .profile-summary-card__link {
-  color: var(--accent-color, #00ff88);
+  color: var(--app-accent-interactive);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;

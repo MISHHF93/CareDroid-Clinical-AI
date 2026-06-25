@@ -220,7 +220,7 @@
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);
   background: white;
-  color: #111827;
+  color: var(--app-surface-1, #ffffff);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
 }
 
@@ -241,14 +241,14 @@
 }
 
 .shift-summary__modal header span {
-  color: #6b7280;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .shift-summary__modal pre {
   margin: 0;
   padding: var(--space-4);
   overflow: auto;
-  color: #111827;
+  color: var(--app-surface-1, #ffffff);
   font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1.6;
@@ -256,7 +256,7 @@
 }
 
 .shift-summary__modal button {
-  color: #111827;
+  color: var(--app-surface-1, #ffffff);
 }
 
 .shift-handoff-brief {
@@ -402,7 +402,7 @@
   .shift-handoff-card {
     border: 0;
     background: white;
-    color: #111827;
+    color: var(--app-surface-1, #ffffff);
     box-shadow: none;
   }
 }

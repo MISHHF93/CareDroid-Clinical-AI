@@ -70,8 +70,8 @@
 }
 
 .surv-nexus__tabs button.is-active {
-  border-color: #00ff88;
-  color: #00ff88;
+  border-color: var(--app-accent-interactive);
+  color: var(--app-accent-interactive);
 }
 
 .surv-nexus__grid {
@@ -119,7 +119,7 @@
   text-transform: uppercase;
 }
 
-.surv-nexus__badge--good { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+.surv-nexus__badge--good { background: rgba(0, 255, 136, 0.15); color: var(--app-accent-interactive); }
 .surv-nexus__badge--warning { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
 .surv-nexus__badge--critical { background: rgba(255, 82, 82, 0.15); color: #ff5252; }
 .surv-nexus__badge--neutral { background: rgba(255, 255, 255, 0.08); color: #b0bac8; }
@@ -152,7 +152,7 @@
 }
 
 .surv-nexus__links a {
-  color: #00ff88;
+  color: var(--app-accent-interactive);
   text-decoration: none;
 }
 

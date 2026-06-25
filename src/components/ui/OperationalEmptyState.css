@@ -2,10 +2,10 @@
   display: grid;
   gap: 10px;
   padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--color-border-subtle, #374151) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle, #e0f2fe) 80%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--color-card, #111827) 92%, #0f172a);
-  color: var(--color-text-primary, #f9fafb);
+  background: color-mix(in srgb, var(--color-card, var(--app-surface-1, #ffffff)) 92%, #0f172a);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   text-align: left;
 }
 
@@ -58,14 +58,14 @@
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--status-stable, #10b981) 35%, transparent);
   background: color-mix(in srgb, var(--status-stable, #10b981) 10%, transparent);
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
   font-size: 12px;
   font-weight: 700;
 }
 
 .operational-empty-state__status--neutral {
-  border-color: color-mix(in srgb, var(--color-border-subtle, #374151) 80%, transparent);
-  background: var(--color-floating-surface, #1e293b);
+  border-color: color-mix(in srgb, var(--color-border-subtle, #e0f2fe) 80%, transparent);
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
   color: var(--color-text-muted, #9ca3af);
 }
 
@@ -104,7 +104,7 @@
 }
 
 .operational-empty-state__action--secondary {
-  border-color: color-mix(in srgb, var(--color-border-subtle, #374151) 80%, transparent);
-  background: var(--color-floating-surface, #1e293b);
-  color: var(--color-text-primary, #f9fafb);
+  border-color: color-mix(in srgb, var(--color-border-subtle, #e0f2fe) 80%, transparent);
+  background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }

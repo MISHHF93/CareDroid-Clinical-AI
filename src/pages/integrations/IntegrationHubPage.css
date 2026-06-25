@@ -71,7 +71,7 @@
 }
 
 .integration-hub-page__links a {
-  color: var(--link-color, #2563eb);
+  color: var(--link-color, var(--app-accent-interactive));
   text-decoration: none;
 }
 

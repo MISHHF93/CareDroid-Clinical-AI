@@ -41,6 +41,9 @@ import {
   shouldSuppressEmergencyRouteMetrics,
   shouldSuppressReceptionPatientAnswersPanel,
   shouldForceSlimReceptionDeskForAllRoles,
+  shouldForceCompactCopilotLayout,
+  shouldSuppressCopilotSafetyBadge,
+  getMaxCopilotQuickActions,
 } from './practitionerCleanup.config';
 import { PILOT_CUSTOMER_MODE } from './unified-navigation.config';
 
@@ -93,6 +96,9 @@ describe('practitionerCleanup.config', () => {
     expect(shouldSuppressEmergencyRouteMetrics()).toBe(true);
     expect(shouldSuppressReceptionPatientAnswersPanel()).toBe(true);
     expect(shouldForceSlimReceptionDeskForAllRoles()).toBe(true);
+    expect(shouldForceCompactCopilotLayout()).toBe(true);
+    expect(shouldSuppressCopilotSafetyBadge()).toBe(true);
+    expect(getMaxCopilotQuickActions()).toBe(2);
   });
 
   it('merges a lean whiteboard density profile for practitioner review', () => {

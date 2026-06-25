@@ -211,7 +211,7 @@ export default function PatientCardCopilot({
                 </button>
               ))
             ) : (
-              <p style={{ margin: 0, color: '#94a3b8', fontSize: 12 }}>
+              <p style={{ margin: 0, color: 'var(--medical-card-fg-muted, #6b7280)', fontSize: 12 }}>
                 No complaint- or vitals-based tool recommendations yet.
               </p>
             )}

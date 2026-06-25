@@ -2,9 +2,9 @@
   display: grid;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .waiting-room-status-strip__eyebrow {
@@ -37,8 +37,8 @@
   gap: 4px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .waiting-room-status-strip__card strong {

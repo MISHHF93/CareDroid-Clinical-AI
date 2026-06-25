@@ -16,9 +16,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
   color: var(--color-text-secondary, #9ca3af);
   padding: 6px 10px;
   font-size: 11px;
@@ -26,8 +26,8 @@
 }
 
 .patient-verification__step--active button {
-  border-color: var(--status-info, #60a5fa);
-  color: var(--color-text-primary, #f9fafb);
+  border-color: var(--app-accent-interactive, var(--status-info));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .patient-verification__steps span {
@@ -60,9 +60,9 @@
 }
 
 .patient-verification__warnings {
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  background: var(--color-card, #172033);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
   padding: 12px;
 }
 
@@ -70,7 +70,7 @@
 .patient-verification__finalize-copy h3,
 .patient-verification__audit h3 {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 15px;
 }
 
@@ -90,7 +90,7 @@
 
 .patient-verification__warnings p {
   margin: 0;
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 12px;
 }
 
@@ -104,10 +104,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 10px;
-  background: var(--color-elevated, #0b1120);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 700;
@@ -138,7 +138,7 @@
   border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 45%, transparent);
   border-radius: 10px;
   background: color-mix(in srgb, var(--status-info, #38bdf8) 14%, transparent);
-  color: #dbeafe;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 13px;
   font-weight: 800;
   padding: 8px 14px;

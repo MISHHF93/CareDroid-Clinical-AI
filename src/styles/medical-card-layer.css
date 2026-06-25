@@ -1,0 +1,44 @@
+/**
+ * Card surface contracts — paired bg/fg tokens for every card adaptation.
+ * Each variant defines background + readable foreground roles together.
+ */
+:root {
+  /* Default card (white on page) */
+  --medical-card-bg: var(--medical-surface-card, #ffffff);
+  --medical-card-fg: var(--medical-text-body, #111827);
+  --medical-card-fg-muted: var(--medical-text-muted, #6b7280);
+  --medical-card-fg-subtle: var(--medical-text-subtle, #9ca3af);
+  --medical-card-border: var(--medical-border, #e0f2fe);
+
+  /* Muted / inset card (sky tint) */
+  --medical-card-muted-bg: var(--medical-surface-page, #f0f9ff);
+  --medical-card-muted-fg: var(--medical-text-body, #111827);
+  --medical-card-muted-fg-muted: var(--medical-text-muted, #6b7280);
+
+  /* Accent-tint card */
+  --medical-card-accent-bg: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  --medical-card-accent-fg: var(--medical-text-body, #111827);
+  --medical-card-accent-fg-muted: var(--medical-text-muted, #6b7280);
+  --medical-card-accent-border: var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+
+  /* Solid accent card (CTA / primary chip) */
+  --medical-card-solid-bg: var(--medical-accent, #0ea5e9);
+  --medical-card-solid-fg: var(--medical-text-on-accent, #ffffff);
+
+  /* Semantic tint cards — ink on tinted surface, never white-on-tint */
+  --medical-card-success-bg: #ecfdf5;
+  --medical-card-success-fg: var(--medical-status-success-text, #15803d);
+  --medical-card-warning-bg: #fffbeb;
+  --medical-card-warning-fg: var(--medical-status-warning-text, #b45309);
+  --medical-card-critical-bg: #fef2f2;
+  --medical-card-critical-fg: var(--medical-status-critical-text, #b91c1c);
+
+  /* Legacy card aliases */
+  --app-card-bg: var(--medical-card-bg);
+  --app-card-fg: var(--medical-card-fg);
+  --app-card-fg-muted: var(--medical-card-fg-muted);
+  --app-card-border: var(--medical-card-border);
+  --app-text-strong: var(--medical-card-fg);
+  --app-muted-text: var(--medical-card-fg-muted);
+  --color-surface-raised: var(--medical-card-muted-bg);
+}

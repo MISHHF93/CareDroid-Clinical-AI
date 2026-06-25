@@ -198,7 +198,7 @@
 }
 
 .commercial-step-pill.active {
-  border-color: #00ff88;
+  border-color: var(--app-accent-interactive);
   background: rgba(0, 255, 136, 0.1);
 }
 
@@ -267,7 +267,7 @@ button.commercial-chip {
 }
 
 .commercial-chip.selected {
-  border-color: #00ff88;
+  border-color: var(--app-accent-interactive);
   background: rgba(0, 255, 136, 0.12);
 }
 

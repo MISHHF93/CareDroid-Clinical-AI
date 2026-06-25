@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag } from '../../types/emergency';
@@ -146,10 +147,10 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
           maxWidth: 720,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -160,7 +161,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -168,7 +169,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               NEWS2 Early Warning Score
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -181,9 +182,9 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -193,7 +194,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
 
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {autoFilled ? (
-            <div style={{ color: '#9CA3AF', fontSize: 13 }}>Auto-filled from vitals</div>
+            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>Auto-filled from vitals</div>
           ) : null}
 
           <section
@@ -219,10 +220,10 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
           {NEWS2_ITEMS.map((item) => {
             const currentScore = itemScore(item, values);
             return (
-              <section key={item.id} style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
+              <section key={item.id} style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
                 <label style={{ display: 'grid', gap: 8 }}>
-                  <span style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 700 }}>{item.label}</span>
-                  {'note' in item && item.note ? <span style={{ color: '#9CA3AF', fontSize: 12 }}>{item.note}</span> : null}
+                  <span style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700 }}>{item.label}</span>
+                  {'note' in item && item.note ? <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{item.note}</span> : null}
                   {item.input === 'number' ? (
                     <input
                       type="number"
@@ -230,10 +231,10 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
                       aria-label={item.label}
                       onChange={(event) => updateNumber(item.id, event.target.value)}
                       style={{
-                        border: '1px solid #374151',
+                        border: '1px solid #e0f2fe',
                         borderRadius: 8,
-                        background: '#020617',
-                        color: '#F9FAFB',
+                        background: '#f0f9ff',
+                        color: 'var(--medical-ink, #111827)',
                         padding: 10,
                       }}
                     />
@@ -243,10 +244,10 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
                       aria-label={item.label}
                       onChange={(event) => updateSelect(item.id, event.target.value)}
                       style={{
-                        border: '1px solid #374151',
+                        border: '1px solid #e0f2fe',
                         borderRadius: 8,
-                        background: '#020617',
-                        color: '#F9FAFB',
+                        background: '#f0f9ff',
+                        color: 'var(--medical-ink, #111827)',
                         padding: 10,
                       }}
                     >
@@ -258,7 +259,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
                     </select>
                   )}
                 </label>
-                <div style={{ color: currentScore === 3 ? '#FCA5A5' : '#9CA3AF', fontSize: 13, marginTop: 8 }}>
+                <div style={{ color: currentScore === 3 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle, fontSize: 13, marginTop: 8 }}>
                   Score: <strong>{currentScore}</strong>
                   {'unit' in item ? ` ${item.unit}` : ''}
                 </div>
@@ -271,9 +272,9 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               type="button"
               onClick={saveToPatient}
               style={{
-                background: '#2563EB',
+                background: MEDICAL_THEME.accent,
                 border: 'none',
-                color: '#F9FAFB',
+                color: 'var(--medical-ink, #111827)',
                 borderRadius: 10,
                 padding: '10px 12px',
                 cursor: 'pointer',

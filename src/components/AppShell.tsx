@@ -681,6 +681,7 @@ function AppShellFrame({ children }: AppShellProps) {
         screenDensityShellClassName(screenCapabilities.screenMode),
         isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
         isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
+        copilotOpen && canUseCopilot && !useKioskShell ? 'emergency-app-shell--copilot-open' : '',
       ]
         .filter(Boolean)
         .join(' ')}

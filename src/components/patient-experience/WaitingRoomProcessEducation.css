@@ -2,9 +2,9 @@
   display: grid;
   gap: 14px;
   padding: 16px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .waiting-room-process-education__eyebrow {
@@ -18,7 +18,7 @@
 .waiting-room-process-education__header h3 {
   margin: 0;
   font-size: 17px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .waiting-room-process-education__intro {
@@ -43,8 +43,8 @@
   align-items: start;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(17, 24, 39, 0.55);
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .waiting-room-process-education__step-number {
@@ -56,7 +56,7 @@
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--medical-card-fg, #111827);
   background: #34d399;
 }
 
@@ -67,7 +67,7 @@
 
 .waiting-room-process-education__step-copy strong {
   font-size: 14px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .waiting-room-process-education__step-copy p {
@@ -87,9 +87,9 @@
 
 .public-waiting-display .waiting-room-process-education {
   border-color: #334155;
-  background: #111827;
+  background: var(--app-surface-1, #ffffff);
 }
 
 .public-waiting-display .waiting-room-process-education__step {
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
 }

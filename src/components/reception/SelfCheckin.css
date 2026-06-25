@@ -6,7 +6,7 @@
   padding: 20px 16px 40px;
   display: grid;
   gap: 16px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .self-checkin--kiosk {
@@ -40,13 +40,13 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px dashed rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.65);
+  background: var(--medical-surface-card, #ffffff);
   font-size: 13px;
   color: var(--color-text-secondary, #cbd5e1);
 }
 
 .self-checkin__integration strong {
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .self-checkin__progress {
@@ -80,8 +80,8 @@
   gap: 14px;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: var(--color-elevated, #0b1120);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
 }
 
 .self-checkin__panel h2 {
@@ -117,9 +117,9 @@
   min-height: 48px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid var(--color-border-subtle, #374151);
-  background: var(--color-surface, #111827);
-  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
 }
 
@@ -145,9 +145,9 @@
   min-height: 44px;
   padding: 10px 14px;
   border-radius: 999px;
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   background: transparent;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
   font: inherit;
 }
@@ -158,7 +158,7 @@
 }
 
 .self-checkin__chip--active {
-  border-color: #38bdf8;
+  border-color: var(--medical-text-link, #0ea5e9);
   background: var(--self-checkin-accent-soft);
   color: #e0f2fe;
 }
@@ -220,7 +220,7 @@
 
 .self-checkin__button--primary {
   background: var(--self-checkin-accent);
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .self-checkin__button--primary:disabled {
@@ -230,13 +230,13 @@
 
 .self-checkin__button--secondary {
   background: transparent;
-  border-color: var(--color-border-subtle, #374151);
-  color: var(--color-text-primary, #f9fafb);
+  border-color: var(--color-border-subtle, #e0f2fe);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .self-checkin__error {
   margin: 0;
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
   font-size: 13px;
 }
 
@@ -244,7 +244,7 @@
   border: 1px solid color-mix(in srgb, var(--self-checkin-accent) 34%, transparent);
   border-radius: 12px;
   background: var(--self-checkin-accent-soft);
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
@@ -260,7 +260,7 @@
   border: 1px solid color-mix(in srgb, var(--self-checkin-accent) 34%, transparent);
   border-radius: 12px;
   background: var(--self-checkin-accent-soft);
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 14px;
   line-height: 1.5;
   margin: 0;

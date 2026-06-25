@@ -11,7 +11,7 @@
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .duplicate-patient-banner__header h2 {
@@ -39,21 +39,21 @@
   gap: 12px;
   align-items: center;
   padding: 10px 12px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-card, #172033);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
 }
 
 .duplicate-patient-banner__item strong {
   display: block;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .duplicate-patient-banner__item span {
   display: block;
   margin-top: 2px;
   font-size: 12px;
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
   font-weight: 700;
 }
 
@@ -68,8 +68,8 @@
 .duplicate-patient-banner__continue {
   border: 0;
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.55);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
   font-size: 12px;
   font-weight: 800;

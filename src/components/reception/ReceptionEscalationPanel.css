@@ -22,7 +22,7 @@
   padding: 18px;
   border: 1px solid #334155;
   border-radius: 16px;
-  background: #0f172a;
+  background: var(--medical-surface-page, #f0f9ff);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
 
@@ -44,13 +44,13 @@
 .reception-escalation-panel__header h2 {
   margin: 0;
   font-size: 20px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .reception-escalation-panel__header p {
   margin: 6px 0 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .reception-escalation-panel__close,
@@ -64,8 +64,8 @@
 
 .reception-escalation-panel__close {
   border: 1px solid #334155;
-  background: #111827;
-  color: #e2e8f0;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
   padding: 8px 12px;
 }
 
@@ -85,7 +85,7 @@
 .reception-escalation-panel__reasons legend {
   margin-bottom: 8px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .reception-escalation-panel__reason {
@@ -93,9 +93,9 @@
   grid-template-columns: auto 1fr;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid #1e293b;
+  border: 1px solid var(--app-surface-elevated, #ffffff);
   border-radius: 12px;
-  background: #0b1120;
+  background: var(--medical-surface-page, #f0f9ff);
   cursor: pointer;
 }
 
@@ -106,21 +106,21 @@
 
 .reception-escalation-panel__reason strong {
   display: block;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-size: 13px;
 }
 
 .reception-escalation-panel__reason small {
   display: block;
   margin-top: 4px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
 }
 
 .reception-escalation-panel__reason em {
   display: block;
   margin-top: 6px;
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
   font-style: normal;
   font-size: 11px;
 }
@@ -129,7 +129,7 @@
   display: grid;
   gap: 6px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .reception-escalation-panel__field select,
@@ -137,8 +137,8 @@
   width: 100%;
   border: 1px solid #334155;
   border-radius: 10px;
-  background: #0b1120;
-  color: #f8fafc;
+  background: var(--medical-surface-page, #f0f9ff);
+  color: var(--medical-text-heading, #111827);
   padding: 10px 12px;
   font: inherit;
 }
@@ -152,14 +152,14 @@
 .reception-escalation-panel__secondary {
   border: 1px solid #334155;
   background: transparent;
-  color: #e2e8f0;
+  color: var(--medical-text-muted, #6b7280);
   padding: 10px 14px;
 }
 
 .reception-escalation-panel__primary {
   border: 0;
   background: #dc2626;
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
   padding: 10px 16px;
   font-weight: 600;
 }
@@ -186,6 +186,6 @@
   margin-top: 12px;
   border: 1px solid rgba(16, 185, 129, 0.45);
   background: transparent;
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
   padding: 8px 12px;
 }

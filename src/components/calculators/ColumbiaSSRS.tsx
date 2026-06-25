@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -62,7 +63,7 @@ export function classifyRisk(answers: AnswerMap): RiskLevel {
 
 const RISK_DISPLAY: Record<RiskLevel, { color: string; background: string; label: string }> = {
   HIGH: {
-    color: '#FCA5A5',
+    color: MEDICAL_TYPE.statusCritical,
     background: '#7F1D1D66',
     label: 'HIGH RISK — Immediate psychiatric consultation required. Do not leave patient alone.',
   },
@@ -135,9 +136,9 @@ function AnswerButtons({
           onClick={() => onAnswer(answer)}
           style={{
             width: '100%',
-            border: value === answer ? '1px solid #60A5FA' : '1px solid #374151',
-            background: value === answer ? '#1D4ED84D' : '#020617',
-            color: '#F9FAFB',
+            border: value === answer ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
+            background: value === answer ? '#1D4ED84D' : '#f0f9ff',
+            color: 'var(--medical-ink, #111827)',
             borderRadius: 10,
             padding: '14px 16px',
             cursor: 'pointer',
@@ -264,10 +265,10 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
           maxWidth: 720,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -278,7 +279,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -286,7 +287,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
               Columbia Suicide Severity Rating Scale
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -299,9 +300,9 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -312,8 +313,8 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <section
             style={{
-              background: '#1C2333',
-              border: '1px solid #374151',
+              background: '#f0f9ff',
+              border: '1px solid #e0f2fe',
               borderRadius: 12,
               padding: 14,
               color: '#E5E7EB',
@@ -327,8 +328,8 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Ideation Section</h3>
             <div style={{ display: 'grid', gap: 12 }}>
               {visibleItems.map((item) => (
-                <section key={item.id} style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
-                  <strong style={{ display: 'block', color: '#F9FAFB', lineHeight: 1.45 }}>{item.question}</strong>
+                <section key={item.id} style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
+                  <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{item.question}</strong>
                   <AnswerButtons
                     label={item.id}
                     value={answers[item.id]}
@@ -337,17 +338,17 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                 </section>
               ))}
               {ideationStopped ? (
-                <div role="status" style={{ color: '#93C5FD', fontSize: 13, fontWeight: 700 }}>
+                <div role="status" style={{ color: '#38bdf8', fontSize: 13, fontWeight: 700 }}>
                   Ideation section complete
                 </div>
               ) : null}
             </div>
           </section>
 
-          <section style={{ border: '1px solid #1F2937', borderRadius: 12, padding: 14 }}>
+          <section style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
             <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Behavior Section</h3>
-            <strong style={{ display: 'block', color: '#F9FAFB', lineHeight: 1.45 }}>{BEHAVIOR.question}</strong>
-            <p style={{ margin: '8px 0 0', color: '#9CA3AF', fontSize: 13 }}>{BEHAVIOR.examples}</p>
+            <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{BEHAVIOR.question}</strong>
+            <p style={{ margin: '8px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>{BEHAVIOR.examples}</p>
             <AnswerButtons
               label={BEHAVIOR.id}
               value={answers.q6}
@@ -375,7 +376,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                   aria-label="Confirm Columbia SSR Scale save"
                   style={{ border: '1px solid #F97316', borderRadius: 12, padding: 14, background: '#7C2D1266' }}
                 >
-                  <p style={{ margin: '0 0 12px', color: '#F9FAFB', fontWeight: 700 }}>
+                  <p style={{ margin: '0 0 12px', color: 'var(--medical-ink, #111827)', fontWeight: 700 }}>
                     Saving this score will alert the clinical team. Continue?
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -386,7 +387,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                         border: 'none',
                         borderRadius: 10,
                         background: '#DC2626',
-                        color: '#F9FAFB',
+                        color: 'var(--medical-ink, #111827)',
                         padding: '10px 12px',
                         cursor: 'pointer',
                         fontWeight: 800,
@@ -398,10 +399,10 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                       type="button"
                       onClick={() => setConfirmingSave(false)}
                       style={{
-                        border: '1px solid #374151',
+                        border: '1px solid #e0f2fe',
                         borderRadius: 10,
                         background: 'transparent',
-                        color: '#F9FAFB',
+                        color: 'var(--medical-ink, #111827)',
                         padding: '10px 12px',
                         cursor: 'pointer',
                         fontWeight: 700,
@@ -416,9 +417,9 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                   type="button"
                   onClick={() => setConfirmingSave(true)}
                   style={{
-                    background: '#2563EB',
+                    background: MEDICAL_THEME.accent,
                     border: 'none',
-                    color: '#F9FAFB',
+                    color: 'var(--medical-ink, #111827)',
                     borderRadius: 10,
                     padding: '10px 12px',
                     cursor: 'pointer',

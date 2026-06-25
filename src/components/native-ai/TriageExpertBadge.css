@@ -8,7 +8,7 @@
   border: 1px solid color-mix(in srgb, var(--status-warning, #d97706) 40%, transparent);
   background: color-mix(in srgb, var(--status-warning, #d97706) 10%, transparent);
   font-size: 0.72rem;
-  color: var(--color-text-primary, #0f172a);
+  color: var(--medical-card-fg, #111827);
 }
 
 .triage-expert-badge--compact {

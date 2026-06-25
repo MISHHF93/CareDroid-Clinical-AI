@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { fetchAiExplainabilityTrace } from '../../services/clinicalIntelligenceApi';
 import ToolPageLayout from './ToolPageLayout';
@@ -7,7 +8,7 @@ const TOOL_CONFIG = {
   id: 'ai-explainability',
   name: 'AI Explainability',
   path: '/tools/ai-explainability',
-  color: '#2563EB',
+  color: MEDICAL_THEME.accent,
   description: 'Display confidence, source, reasoning, tool chain, and execution logs',
   shortcut: 'Ctrl+Shift+E',
   category: 'Reference',

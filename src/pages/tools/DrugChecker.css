@@ -261,7 +261,7 @@
 }
 
 .quick-reference {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #38bdf8 100%);
   color: var(--app-on-solid);
   padding: 32px;
   border-radius: 12px;

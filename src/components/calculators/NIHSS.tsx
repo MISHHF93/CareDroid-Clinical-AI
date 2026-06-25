@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 
@@ -163,7 +164,7 @@ export const NIHSS_ITEMS: NIHSSItem[] = [
 type NIHSSScores = Record<string, number | undefined>;
 
 function severityFor(total: number) {
-  if (total === 0) return { label: 'No stroke symptoms', color: '#9CA3AF' };
+  if (total === 0) return { label: 'No stroke symptoms', color: MEDICAL_THEME.inkSubtle };
   if (total <= 4) return { label: 'Minor stroke', color: '#10B981' };
   if (total <= 15) return { label: 'Moderate stroke', color: '#F59E0B' };
   if (total <= 20) return { label: 'Moderate-severe stroke', color: '#F97316' };
@@ -278,10 +279,10 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
           maxWidth: 760,
           maxHeight: '92vh',
           overflowY: 'auto',
-          background: '#111827',
-          border: '1px solid #1F2937',
+          background: MEDICAL_THEME.surfaceCard,
+          border: '1px solid #e0f2fe',
           borderRadius: 12,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -292,7 +293,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
@@ -300,7 +301,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               NIHSS
             </h2>
             {patient ? (
-              <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -313,9 +314,9 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -335,7 +336,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             <strong style={{ display: 'block', marginBottom: 10 }}>
               ⏱ Document time of symptom onset or last known well
             </strong>
-            <label style={{ display: 'grid', gap: 6, color: '#D1D5DB', fontSize: 13 }}>
+            <label style={{ display: 'grid', gap: 6, color: MEDICAL_THEME.inkDisabled, fontSize: 13 }}>
               Last Known Well time
               <input
                 type="datetime-local"
@@ -345,10 +346,10 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
                   setSavedMessage('');
                 }}
                 style={{
-                  border: '1px solid #374151',
+                  border: '1px solid #e0f2fe',
                   borderRadius: 8,
-                  background: '#020617',
-                  color: '#F9FAFB',
+                  background: '#f0f9ff',
+                  color: 'var(--medical-ink, #111827)',
                   padding: 10,
                 }}
               />
@@ -356,7 +357,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             <div
               aria-live="polite"
               style={{
-                color: lkwElapsed.outsideTpaWindow ? '#FCA5A5' : '#FDE68A',
+                color: lkwElapsed.outsideTpaWindow ? MEDICAL_TYPE.statusCritical : '#FDE68A',
                 fontSize: 13,
                 marginTop: 8,
                 fontWeight: 700,
@@ -386,13 +387,13 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             <fieldset
               key={item.id}
               style={{
-                border: '1px solid #1F2937',
+                border: '1px solid #e0f2fe',
                 borderRadius: 10,
                 padding: 12,
                 margin: 0,
               }}
             >
-              <legend style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 700, padding: '0 4px' }}>
+              <legend style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700, padding: '0 4px' }}>
                 {item.label}
               </legend>
               <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
@@ -403,7 +404,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 8,
-                      color: '#D1D5DB',
+                      color: MEDICAL_THEME.inkDisabled,
                       fontSize: 13,
                       cursor: 'pointer',
                     }}
@@ -432,9 +433,9 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               type="button"
               onClick={saveToPatient}
               style={{
-                background: '#2563EB',
+                background: MEDICAL_THEME.accent,
                 border: 'none',
-                color: '#F9FAFB',
+                color: 'var(--medical-ink, #111827)',
                 borderRadius: 10,
                 padding: '10px 12px',
                 cursor: 'pointer',

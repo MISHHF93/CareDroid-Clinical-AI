@@ -42,10 +42,17 @@ export default function CopilotShell({
     safety: safetyContent,
   };
 
+  const chatOnly = tabs.length <= 1;
+
   return (
-    <div className="ed-copilot-shell">
+    <div
+      className={['ed-copilot-shell', chatOnly ? 'ed-copilot-shell--chat-only' : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
       {header}
 
+      {chatOnly ? null : (
       <div className="ed-copilot-shell__tabs" role="tablist" aria-label="Copilot panel sections">
         {tabs.map((tab) => (
           <button
@@ -68,6 +75,7 @@ export default function CopilotShell({
           </button>
         ))}
       </div>
+      )}
 
       <div className="ed-copilot-shell__body">
         {tabs.map((tab) => (

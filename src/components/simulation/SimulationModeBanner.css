@@ -6,7 +6,7 @@
   padding: 8px 16px;
   background: linear-gradient(90deg, rgba(245, 158, 11, 0.18), rgba(251, 191, 36, 0.08));
   border-bottom: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 13px;
   line-height: 1.35;
 }
@@ -30,7 +30,7 @@
   text-transform: uppercase;
   background: rgba(245, 158, 11, 0.22);
   border: 1px solid rgba(245, 158, 11, 0.5);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .simulation-mode-banner__summary {
@@ -47,7 +47,7 @@
 .simulation-mode-banner__link {
   border: 0;
   background: transparent;
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 12px;
   font-weight: 700;
   text-decoration: underline;

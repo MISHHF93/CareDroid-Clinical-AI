@@ -54,7 +54,7 @@
 
 .tool-not-found-btn--primary {
   background: var(--primary, #4a7c9e);
-  color: #fff;
+  color: var(--medical-text-on-solid, #ffffff);
 }
 
 .tool-not-found-btn--secondary {

@@ -4,7 +4,7 @@
   padding: 12px 14px;
   border: 1px solid #7c2d12;
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(127, 29, 29, 0.18), rgba(15, 23, 42, 0.9));
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.85), var(--medical-surface-card, #ffffff));
 }
 
 .reception-escalation-quick-actions__eyebrow {
@@ -18,13 +18,13 @@
 .reception-escalation-quick-actions__header h3 {
   margin: 4px 0 0;
   font-size: 14px;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .reception-escalation-quick-actions__header p {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .reception-escalation-quick-actions__grid {
@@ -37,10 +37,10 @@
   display: grid;
   gap: 2px;
   text-align: left;
-  border: 1px solid #374151;
+  border: 1px solid #e0f2fe;
   border-radius: 10px;
-  background: #111827;
-  color: #f9fafb;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #111827);
   cursor: pointer;
   padding: 8px 10px;
 }
@@ -55,7 +55,7 @@
 
 .reception-escalation-quick-actions__button small {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .reception-escalation-quick-actions__button:disabled {
@@ -67,7 +67,7 @@
   justify-self: start;
   border: 0;
   background: transparent;
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   cursor: pointer;
   font-size: 12px;
   font-weight: 650;

@@ -1,0 +1,90 @@
+/**
+ * Layer 1 — normalizes legacy aliases and shell surfaces to the medical palette.
+ * Loaded after globals.css so all coloration layers resolve consistently.
+ */
+:root,
+html {
+  --color-background: var(--medical-surface-page);
+  --color-surface: var(--medical-surface-card);
+  --color-card: var(--medical-surface-card);
+  --color-floating-surface: var(--medical-surface-card);
+  --color-elevated: var(--medical-surface-card);
+  --color-border-default: var(--medical-border);
+  --color-border-subtle: var(--medical-border);
+  --color-text-primary: var(--medical-ink);
+  --color-text-secondary: var(--medical-ink-muted);
+  --color-text-muted: var(--medical-ink-subtle);
+  --color-primary: var(--medical-accent);
+  --color-secondary: var(--medical-accent-soft);
+  --color-accent: var(--medical-sky-300, #7dd3fc);
+  --status-info: var(--medical-accent);
+  --primary-color: var(--app-accent-interactive);
+  --accent-color: var(--app-accent-interactive);
+  --accent-green: var(--app-accent-interactive);
+  --bg-base: var(--medical-surface-page);
+  --bg-surface: var(--medical-surface-card);
+  --bg-elevated: var(--medical-surface-card);
+  --border-subtle: var(--medical-border);
+  --border-default: var(--medical-border);
+  --text-primary: var(--medical-ink);
+  --text-secondary: var(--medical-ink-muted);
+  --text-muted: var(--medical-ink-subtle);
+  --panel-bg: var(--medical-surface-card);
+  --panel-border: var(--medical-border);
+}
+
+/* Emergency shell uses the same normalized surface language as app-shell. */
+:is(.app-shell, .emergency-app-shell) {
+  color: var(--app-text-primary, var(--medical-ink));
+  background-color: var(--app-bg, var(--medical-surface-page));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .sidebar,
+    .caredroid-header--compact,
+    .ed-os-header,
+    .session-chrome-bar
+  ) {
+  background: var(--app-surface-1, var(--medical-surface-card));
+  border-color: var(--medical-border);
+  color: var(--medical-ink);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    button,
+    [role='button'],
+    .btn,
+    [class*='__action'],
+    [class*='-button']
+  ):not([class*='--danger']):not([class*='--primary']):not(.btn-danger) {
+  border-color: color-mix(in srgb, var(--medical-border) 88%, var(--medical-accent) 12%);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='--primary'],
+    .btn-primary,
+    [class*='cta']
+  ) {
+  background: var(--app-accent-interactive, var(--medical-accent));
+  border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
+  color: var(--app-on-solid, #ffffff);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(input, select, textarea) {
+  background: var(--app-input-bg, var(--medical-surface-card));
+  border-color: var(--app-input-border, var(--medical-border));
+  color: var(--medical-ink);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-strip'],
+    [class*='-strip ']
+  ) {
+  border-color: var(--app-border, var(--medical-border));
+  background-color: var(--app-surface-1, var(--medical-surface-card));
+  color: var(--app-text-primary, var(--medical-ink));
+}

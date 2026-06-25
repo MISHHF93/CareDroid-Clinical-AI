@@ -1,21 +1,7 @@
 /**
- * Runs before React/CSS paint. Keeps `data-theme` in sync with stored preference + OS.
- * ThemeContext updates the same attributes after hydration.
+ * Runs before React/CSS paint. CareDroid uses one standard light medical theme.
  */
-const STORAGE_KEY = 'caredroid_theme_preference';
+const STANDARD_THEME = 'light';
 
-function resolveTheme() {
-  try {
-    const pref = localStorage.getItem(STORAGE_KEY);
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? true;
-    if (pref === 'light') return 'light';
-    if (pref === 'dark') return 'dark';
-    return prefersDark ? 'dark' : 'light';
-  } catch {
-    return 'dark';
-  }
-}
-
-const resolved = resolveTheme();
-document.documentElement.dataset.theme = resolved;
-document.documentElement.style.colorScheme = resolved;
+document.documentElement.dataset.theme = STANDARD_THEME;
+document.documentElement.style.colorScheme = STANDARD_THEME;

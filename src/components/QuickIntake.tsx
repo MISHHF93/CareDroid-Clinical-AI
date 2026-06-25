@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import { Patient, PatientFlag, PatientState, Priority, Vitals } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -77,7 +78,7 @@ const PRIORITY_COLORS: Record<Priority, string> = {
   [Priority.P2]: '#F97316',
   [Priority.P3]: '#F59E0B',
   [Priority.P4]: '#10B981',
-  [Priority.P5]: '#6B7280',
+  [Priority.P5]: MEDICAL_THEME.inkMuted,
 };
 
 const SUGGESTED_PROTOCOLS: Partial<Record<ComplaintCategory, string[]>> = {
@@ -503,10 +504,10 @@ export default function QuickIntake({
           maxWidth: '100%',
           maxHeight: 'min(92vh, calc(var(--app-viewport-height, 100dvh) - 24px))',
           overflowY: 'auto',
-          background: '#111827',
+          background: MEDICAL_THEME.surfaceCard,
           border: 0,
           borderRadius: 14,
-          color: '#F9FAFB',
+          color: 'var(--medical-ink, #111827)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
         }}
       >
@@ -517,14 +518,14 @@ export default function QuickIntake({
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderBottom: '1px solid #1F2937',
+            borderBottom: '1px solid #e0f2fe',
           }}
         >
           <div>
             <h2 id="quick-intake-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
               {copy.title}
             </h2>
-            <div style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
               {variant === 'reception'
                 ? 'Fast registration for front desk — patient enters triage queue after submit.'
                 : `Unified input and escalation for ${centralControl.inputProfile.label}`}
@@ -538,9 +539,9 @@ export default function QuickIntake({
               width: 32,
               height: 32,
               borderRadius: 8,
-              border: '1px solid #374151',
+              border: '1px solid #e0f2fe',
               background: 'transparent',
-              color: '#F9FAFB',
+              color: 'var(--medical-ink, #111827)',
               cursor: 'pointer',
             }}
           >
@@ -574,7 +575,7 @@ export default function QuickIntake({
                 borderRadius: 12,
                 background: 'rgba(37, 99, 235, 0.12)',
                 boxShadow: 'inset 3px 0 0 rgba(96,165,250,0.72)',
-                color: '#BFDBFE',
+                color: MEDICAL_THEME.accent,
                 padding: 10,
                 fontSize: 12,
                 fontWeight: 700,
@@ -598,10 +599,10 @@ export default function QuickIntake({
                     onClick={() => chooseCategory(category.label)}
                     style={{
                       height: 56,
-                      border: active ? '1px solid #60A5FA' : '1px solid #374151',
+                      border: active ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
                       borderRadius: 12,
-                      background: active ? '#1D4ED81F' : '#0B1120',
-                      color: '#F9FAFB',
+                      background: active ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
+                      color: 'var(--medical-ink, #111827)',
                       cursor: 'pointer',
                       fontSize: 13,
                       fontWeight: 700,
@@ -619,7 +620,7 @@ export default function QuickIntake({
             </div>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 700 }}>Complaint</span>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Complaint</span>
               <textarea
                 ref={complaintInputRef}
                 value={complaint}
@@ -629,10 +630,10 @@ export default function QuickIntake({
                 style={{
                   resize: 'vertical',
                   minHeight: 68,
-                  border: '1px solid #374151',
+                  border: '1px solid #e0f2fe',
                   borderRadius: 12,
-                  background: '#0B1120',
-                  color: '#F9FAFB',
+                  background: MEDICAL_THEME.surfaceCard,
+                  color: 'var(--medical-ink, #111827)',
                   padding: 12,
                   outline: 'none',
                 }}
@@ -645,11 +646,11 @@ export default function QuickIntake({
                 style={{
                   border: 0,
                   borderRadius: 12,
-                  background: '#0B1120',
+                  background: MEDICAL_THEME.surfaceCard,
                   padding: 10,
                 }}
               >
-                <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+                <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
                   Suggested protocols
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -658,9 +659,9 @@ export default function QuickIntake({
                       key={protocol}
                       style={{
                         borderRadius: 999,
-                        background: '#1D4ED81F',
-                        border: '1px solid #2563EB',
-                        color: '#BFDBFE',
+                        background: 'rgba(14, 165, 233, 0.12)',
+                        border: '1px solid #0ea5e9',
+                        color: MEDICAL_THEME.accent,
                         padding: '5px 8px',
                         fontSize: 12,
                         fontWeight: 700,
@@ -681,7 +682,7 @@ export default function QuickIntake({
                   padding: 10,
                 }}
               >
-                <div style={{ color: '#FCA5A5', fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+                <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
                   High-risk complaint flags — staff alert only
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -702,7 +703,7 @@ export default function QuickIntake({
                     </span>
                   ))}
                 </div>
-                <p style={{ color: '#FCA5A5', fontSize: 11, margin: '8px 0 0' }}>
+                <p style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, margin: '8px 0 0' }}>
                   Sends to rapid review queue. Does not assign triage level.
                 </p>
               </div>
@@ -712,7 +713,7 @@ export default function QuickIntake({
           <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>First</span>
+                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>First</span>
                 <input
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
@@ -721,7 +722,7 @@ export default function QuickIntake({
                 />
               </label>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>Last</span>
+                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Last</span>
                 <input
                   value={lastName}
                   onChange={(event) => setLastName(event.target.value)}
@@ -732,7 +733,7 @@ export default function QuickIntake({
             </div>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>
                 DOB {dob ? `(Age ${age})` : ''}
               </span>
               <input
@@ -745,7 +746,7 @@ export default function QuickIntake({
             </label>
 
             <div>
-              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
                 Sex
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
@@ -755,10 +756,10 @@ export default function QuickIntake({
                     type="button"
                     onClick={() => setSex(candidate)}
                     style={{
-                      border: sex === candidate ? '1px solid #60A5FA' : '1px solid #374151',
+                      border: sex === candidate ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
                       borderRadius: 10,
-                      background: sex === candidate ? '#1D4ED81F' : '#0B1120',
-                      color: '#F9FAFB',
+                      background: sex === candidate ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
+                      color: 'var(--medical-ink, #111827)',
                       padding: '8px 6px',
                       cursor: 'pointer',
                       fontWeight: 700,
@@ -771,17 +772,17 @@ export default function QuickIntake({
             </div>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700 }}>MRN</span>
+              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>MRN</span>
               <input
                 value={mrn}
                 readOnly
                 aria-readonly="true"
-                style={{ ...inputStyle, color: '#9CA3AF' }}
+                style={{ ...inputStyle, color: MEDICAL_THEME.inkSubtle }}
               />
             </label>
 
             <div>
-              <div style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
                 Vitals
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
@@ -820,8 +821,8 @@ export default function QuickIntake({
             justifyContent: 'space-between',
             gap: 12,
             padding: 16,
-            borderTop: '1px solid #1F2937',
-            background: '#111827',
+            borderTop: '1px solid #e0f2fe',
+            background: MEDICAL_THEME.surfaceCard,
           }}
         >
           <div style={{ position: 'relative' }}>
@@ -853,9 +854,9 @@ export default function QuickIntake({
                   display: 'flex',
                   gap: 6,
                   padding: 8,
-                  border: '1px solid #374151',
+                  border: '1px solid #e0f2fe',
                   borderRadius: 12,
-                  background: '#0B1120',
+                  background: MEDICAL_THEME.surfaceCard,
                   boxShadow: '0 18px 40px rgba(0,0,0,0.35)',
                 }}
               >
@@ -886,7 +887,7 @@ export default function QuickIntake({
           </div>
 
           {submitError ? (
-            <div role="alert" style={{ color: '#FCA5A5', fontSize: 12, flex: '1 1 auto' }}>
+            <div role="alert" style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 12, flex: '1 1 auto' }}>
               {submitError}
             </div>
           ) : null}
@@ -899,8 +900,8 @@ export default function QuickIntake({
               height: 48,
               border: 0,
               borderRadius: 12,
-              background: submitting || !canSubmitCentralInput ? '#1E3A8A' : '#2563EB',
-              color: '#F9FAFB',
+              background: submitting || !canSubmitCentralInput ? '#1E3A8A' : MEDICAL_THEME.accent,
+              color: 'var(--medical-ink, #111827)',
               cursor: submitting ? 'progress' : canSubmitCentralInput ? 'pointer' : 'not-allowed',
               opacity: canSubmitCentralInput ? 1 : 0.65,
               fontWeight: 800,
@@ -917,10 +918,10 @@ export default function QuickIntake({
 }
 
 const inputStyle = {
-  border: '1px solid #374151',
+  border: '1px solid #e0f2fe',
   borderRadius: 10,
-  background: '#0B1120',
-  color: '#F9FAFB',
+  background: MEDICAL_THEME.surfaceCard,
+  color: 'var(--medical-ink, #111827)',
   padding: '9px 10px',
   outline: 'none',
 } satisfies CSSProperties;

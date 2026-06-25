@@ -17,7 +17,7 @@
   --app-normalized-dashboard-grid-min: minmax(min(100%, var(--app-grid-card-min-density, 14rem)), 1fr);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     [class$='-page'],
     [class*='-page '],
     [class$='-dashboard'],
@@ -27,7 +27,7 @@
     .org-page,
     .biometric-container,
     .consent-container,
-    .app-shell-page-body > main
+    :is(.app-shell, .emergency-app-shell)-page-body > main
   ) {
   min-width: 0;
   width: 100%;
@@ -35,7 +35,7 @@
   margin-inline: auto;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     [class$='-page'],
     [class*='-page '],
     [class$='-dashboard'],
@@ -48,7 +48,7 @@
 }
 
 /* Final normalization pass: one dashboard/card/form/table/search language. */
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .analytics-summary,
     .cost-summary,
     .header-stats,
@@ -64,7 +64,7 @@
   min-width: 0;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .analytics-grid,
     .cost-grid,
     .platform-workflow-layout,
@@ -78,7 +78,7 @@
   min-width: 0;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .cd-page-header,
     [class$='-hero'],
     [class*='-hero '],
@@ -97,7 +97,7 @@
   padding: var(--app-visual-header-padding);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .cd-page-header,
     [class$='-hero'],
     [class*='-hero '],
@@ -113,7 +113,7 @@
   letter-spacing: -0.02em;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .cd-page-header,
     [class$='-hero'],
     [class*='-hero '],
@@ -128,21 +128,21 @@
   line-height: var(--type-body-line-height);
 }
 
-.app-shell :is(h1, h2, h3, h4, h5, h6) {
+:is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6) {
   color: var(--app-text-primary);
   font-family: inherit;
   line-height: var(--type-heading-line-height);
 }
 
-.app-shell :is(h2, h3) {
+:is(.app-shell, .emergency-app-shell) :is(h2, h3) {
   letter-spacing: -0.01em;
 }
 
-.app-shell :is(p, li, td, th, label, input, select, textarea, button, a) {
+:is(.app-shell, .emergency-app-shell) :is(p, li, td, th, label, input, select, textarea, button, a) {
   font-family: inherit;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .card,
     [class$='-card'],
     [class*='-card '],
@@ -163,7 +163,7 @@
   box-shadow: var(--app-elevation-none);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .summary-card,
     .cost-card,
     .analytics-panel,
@@ -182,7 +182,7 @@
   box-shadow: var(--app-elevation-none);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     [class$='-card'],
     [class*='-card '],
     [class$='-panel'],
@@ -197,7 +197,7 @@
   padding: var(--app-visual-card-padding);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .card,
     [class$='-card'],
     [class*='-card '],
@@ -211,10 +211,10 @@
   line-height: var(--type-subheading-line-height);
 }
 
-.app-shell :is(button, a)[class*='btn'],
-.app-shell :is(button, a)[class*='button'],
-.app-shell :is(button, a)[class*='action'],
-.app-shell :is(button, a)[class*='control'] {
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='btn'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='button'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='action'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='control'] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -228,7 +228,7 @@
   white-space: normal;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     button[class*='secondary'],
     a[class*='secondary'],
     button[class*='ghost'],
@@ -241,7 +241,7 @@
   color: var(--app-text-primary);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     button[class*='icon'],
     a[class*='icon'],
     button[class*='marker'],
@@ -250,12 +250,12 @@
   flex: 0 0 auto;
 }
 
-.app-shell :is(button, a) :is(svg, .nav-icon, [class*='icon']) {
+:is(.app-shell, .emergency-app-shell) :is(button, a) :is(svg, .nav-icon, [class*='icon']) {
   width: var(--app-icon-size-sm);
   height: var(--app-icon-size-sm);
 }
 
-.app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+:is(.app-shell, .emergency-app-shell) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
   min-height: var(--app-input-height);
   border: 1px solid var(--app-input-border);
   border-radius: var(--app-visual-control-radius);
@@ -265,11 +265,11 @@
   line-height: var(--type-body-line-height);
 }
 
-.app-shell :is(form, fieldset, [class*='form'], [class*='filter'], [class*='controls']) {
+:is(.app-shell, .emergency-app-shell) :is(form, fieldset, [class*='form'], [class*='filter'], [class*='controls']) {
   min-width: 0;
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .cd-filter-panel,
     [role='search'],
     [class$='-controls'],
@@ -282,22 +282,22 @@
   gap: var(--app-visual-control-gap);
 }
 
-.app-shell :is(.cd-form-field, [class*='input-group'], [class*='field']) {
+:is(.app-shell, .emergency-app-shell) :is(.cd-form-field, [class*='input-group'], [class*='field']) {
   display: grid;
   gap: var(--app-space-xs);
 }
 
-.app-shell label {
+:is(.app-shell, .emergency-app-shell) label {
   gap: var(--app-space-xs);
 }
 
-.app-shell :is(label, legend, th, [class*='label']) {
+:is(.app-shell, .emergency-app-shell) :is(label, legend, th, [class*='label']) {
   color: var(--app-text-muted);
   font-size: var(--app-type-caption);
   font-weight: 750;
 }
 
-.app-shell :is([class*='table-wrap'], [class*='table-wrapper'], [class*='table-container']) {
+:is(.app-shell, .emergency-app-shell) :is([class*='table-wrap'], [class*='table-wrapper'], [class*='table-container']) {
   max-width: 100%;
   border: 1px solid var(--app-border);
   border-radius: var(--app-visual-panel-radius);
@@ -306,7 +306,7 @@
   background: var(--app-surface);
 }
 
-.app-shell :is(
+:is(.app-shell, .emergency-app-shell) :is(
     .cd-table-wrap,
     .catalog-table-wrap,
     .device-fleet-table-wrap,
@@ -322,21 +322,21 @@
   overflow-x: auto;
 }
 
-.app-shell table {
+:is(.app-shell, .emergency-app-shell) table {
   width: 100%;
   border-collapse: collapse;
   color: var(--app-text-primary);
   font-size: var(--app-type-small);
 }
 
-.app-shell :is(th, td) {
+:is(.app-shell, .emergency-app-shell) :is(th, td) {
   padding: var(--app-visual-table-cell-padding);
   border-bottom: 1px solid var(--app-border);
   text-align: left;
   vertical-align: top;
 }
 
-.app-shell th {
+:is(.app-shell, .emergency-app-shell) th {
   background: var(--app-table-header-bg);
   color: var(--app-text-muted);
   font-size: var(--app-type-caption);
@@ -346,13 +346,13 @@
 }
 
 /* Preserve explicit hierarchy on the primary shell/dashboard surfaces. */
-.app-shell .app-shell-route-identity {
+:is(.app-shell, .emergency-app-shell) :is(.app-shell, .emergency-app-shell)-route-identity {
   border-left: 3px solid var(--app-accent-interactive);
   background: color-mix(in srgb, var(--app-surface-glass) 82%, transparent);
   box-shadow: var(--shadow-1);
 }
 
-.app-shell .command-hero {
+:is(.app-shell, .emergency-app-shell) .command-hero {
   padding: clamp(18px, 2.4vw, 28px);
   background:
     linear-gradient(135deg, var(--workspace-os-surface, var(--app-surface-2)), transparent 58%),
@@ -360,17 +360,17 @@
   box-shadow: var(--app-elevation-card, var(--shadow-1));
 }
 
-.app-shell .command-hero h1 {
+:is(.app-shell, .emergency-app-shell) .command-hero h1 {
   font-size: clamp(1.75rem, 3vw, 2.75rem);
   line-height: 1.05;
 }
 
-.app-shell .command-panel {
+:is(.app-shell, .emergency-app-shell) .command-panel {
   background: color-mix(in srgb, var(--app-surface-1) 94%, var(--app-bg));
   box-shadow: var(--app-elevation-none);
 }
 
-.app-shell .command-compact-action--primary {
+:is(.app-shell, .emergency-app-shell) .command-compact-action--primary {
   background:
     linear-gradient(
       135deg,
@@ -380,14 +380,14 @@
   box-shadow: var(--app-elevation-card, var(--shadow-1));
 }
 
-.app-shell :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {
+:is(.app-shell, .emergency-app-shell) :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {
   border-radius: var(--app-radius-pill);
   font-size: var(--app-type-caption);
   line-height: 1.2;
 }
 
 @media (max-width: 768px) {
-  .app-shell :is(
+  :is(.app-shell, .emergency-app-shell) :is(
       .cd-page-header,
       [class$='-hero'],
       [class*='-hero '],
@@ -399,7 +399,7 @@
     padding: var(--app-card-padding-compact);
   }
 
-  .app-shell :is(
+  :is(.app-shell, .emergency-app-shell) :is(
       button[class*='btn'],
       a[class*='btn'],
       button[class*='button'],

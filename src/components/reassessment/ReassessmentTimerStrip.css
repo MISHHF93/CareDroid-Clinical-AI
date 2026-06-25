@@ -11,12 +11,12 @@
   min-width: 52px;
   padding: 4px 6px;
   border-radius: 8px;
-  border: 1px solid #1f2937;
-  background: #0b1120;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  background: var(--medical-surface-page, #f0f9ff);
 }
 
 .reassessment-timer-strip__pill small {
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -24,7 +24,7 @@
 }
 
 .reassessment-timer-strip__pill strong {
-  color: #f9fafb;
+  color: var(--medical-ink, #111827);
   font-size: 11px;
   font-weight: 750;
   line-height: 1.2;

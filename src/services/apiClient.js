@@ -103,6 +103,31 @@ const isPublicApiPath = (apiPath) =>
 const isDev = typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
 
+const looksLikeJwt = (token) => {
+  if (!token || typeof token !== 'string') return false;
+  const parts = token.split('.');
+  return parts.length === 3 && parts.every((part) => part.length > 0);
+};
+
+let devSessionBootstrapPromise = null;
+
+async function bootstrapDevSessionIfNeeded(path) {
+  if (!isDev) return;
+  const apiPath = normalizeApiPath(path);
+  if (apiPath === '/api/auth/dev-session') return;
+  if (looksLikeJwt(getStoredAccessToken())) return;
+
+  if (!devSessionBootstrapPromise) {
+    devSessionBootstrapPromise = import('./devBackendAuth.js')
+      .then(({ ensureDevBackendSession }) => ensureDevBackendSession())
+      .catch(() => undefined)
+      .finally(() => {
+        devSessionBootstrapPromise = null;
+      });
+  }
+  await devSessionBootstrapPromise;
+}
+
 function shouldSilenceInDev(status, url) {
   if (!isDev) return false;
   if (status === 401 || status === 403) return true; // auth is often bypassed or not fully set in pure demo
@@ -267,6 +292,7 @@ export const apiFetch = async (path, options = {}) => {
     ...fetchOptions
   } = options;
 
+  await bootstrapDevSessionIfNeeded(path);
   const mergedHeaders = buildRequestHeaders(path, optionHeaders);
 
   if (shouldShortCircuitProtectedApi(path, mergedHeaders)) {

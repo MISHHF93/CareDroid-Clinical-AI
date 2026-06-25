@@ -80,7 +80,7 @@
 }
 
 .ai-source-panel__title span {
-  color: #00b4ff;
+  color: var(--medical-text-link, #0ea5e9);
   font-weight: 700;
 }
 
@@ -123,7 +123,7 @@
 .ai-source-panel__link {
   display: inline-flex;
   margin-top: 10px;
-  color: #00b4ff;
+  color: var(--medical-text-link, #0ea5e9);
   font-size: 13px;
   font-weight: 600;
 }

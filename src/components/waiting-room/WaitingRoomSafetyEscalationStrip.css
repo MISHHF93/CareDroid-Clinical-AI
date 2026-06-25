@@ -5,7 +5,7 @@
   padding: 12px 14px;
   border: 1px solid #7f1d1d;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(69, 10, 10, 0.55), rgba(15, 23, 42, 0.92));
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.9), var(--medical-surface-card, #ffffff));
 }
 
 .waiting-room-safety-escalation-strip__header h3 {
@@ -15,7 +15,7 @@
 
 .waiting-room-safety-escalation-strip__eyebrow {
   margin: 0;
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -24,7 +24,7 @@
 
 .waiting-room-safety-escalation-strip__subtitle {
   margin: 4px 0 0;
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
   font-size: 12px;
   max-width: 62ch;
 }
@@ -40,7 +40,7 @@
   gap: 2px;
   padding: 10px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.75);
+  background: var(--medical-surface-card, #ffffff);
   border: 1px solid rgba(248, 113, 113, 0.18);
 }
 
@@ -49,20 +49,20 @@
 }
 
 .waiting-room-safety-escalation-strip__count span {
-  color: #d1d5db;
+  color: var(--medical-text-disabled, #d1d5db);
   font-size: 11px;
 }
 
 .waiting-room-safety-escalation-strip__count[data-tone='critical'] strong {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .waiting-room-safety-escalation-strip__count[data-tone='warning'] strong {
-  color: #fdba74;
+  color: var(--medical-status-high-text, #c2410c);
 }
 
 .waiting-room-safety-escalation-strip__count[data-tone='watch'] strong {
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .waiting-room-safety-escalation-strip__list {
@@ -81,7 +81,7 @@
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid rgba(248, 113, 113, 0.2);
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--medical-surface-card, #ffffff);
   color: inherit;
   text-align: left;
   cursor: pointer;
@@ -89,7 +89,7 @@
 
 .waiting-room-safety-escalation-strip__item small {
   display: block;
-  color: #9ca3af;
+  color: var(--medical-text-subtle, #9ca3af);
   margin-top: 2px;
 }
 

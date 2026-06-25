@@ -4,9 +4,9 @@
   gap: 1px;
   min-width: 0;
   overflow-x: auto;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
   scrollbar-width: thin;
 }
 
@@ -18,7 +18,7 @@
   min-height: 40px;
   border: 0;
   border-right: 1px solid rgba(31, 41, 55, 0.86);
-  background: rgba(15, 23, 42, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--color-text-secondary, #9ca3af);
   cursor: pointer;
   padding: 4px 10px;
@@ -36,7 +36,7 @@
 
 .reception-operational-strip__metric strong {
   overflow: hidden;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 14px;
   line-height: 1;
@@ -56,7 +56,7 @@
 }
 
 .reception-operational-strip__metric[data-tone='info'] strong {
-  color: var(--status-info, #93c5fd);
+  color: var(--status-info, #38bdf8);
 }
 
 .reception-operational-strip__metric[data-tone='warning'] strong {

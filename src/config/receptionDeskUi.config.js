@@ -8,11 +8,7 @@ import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 export const RECEPTION_DESK_UI = Object.freeze({
   enabled: true,
   slimRoles: Object.freeze([EMERGENCY_ROLE_IDS.registrationClerk]),
-  coreStripMetricIds: Object.freeze([
-    'arrivals-today',
-    'awaiting-triage',
-    'ems-inbound',
-  ]),
+  coreStripMetricIds: Object.freeze(['arrivals-today', 'awaiting-triage']),
   surfaces: Object.freeze({
     operationalHistory: 'operationalHistory',
     queueAuditPanel: 'queueAuditPanel',
@@ -25,8 +21,6 @@ export const RECEPTION_DESK_UI = Object.freeze({
     'operationalHistory',
     'queueAuditPanel',
     'dataQualityPanel',
-    'searchHint',
-    'queueTabBadges',
     'shiftStripLink',
   ]),
   /** Pin quick intake inline on the reception desk — no modal open step. */

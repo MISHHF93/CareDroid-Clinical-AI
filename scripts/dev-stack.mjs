@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
@@ -22,6 +23,7 @@ const spawnDevProcess = (entry) => {
 
   return spawn(entry.command, entry.args, options);
 };
+
 const rawArgs = process.argv.slice(2);
 const args = new Set(rawArgs);
 
@@ -130,25 +132,24 @@ const probeBackendHealth = (port) =>
     request.on('error', () => resolveProbe(false));
   });
 
-const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
+const sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 
-const commands = [
-  !frontendOnly &&
-    !backendAlreadyHealthy && {
-      name: 'api',
-      cwd: backendDir,
-      command: npmCommand,
-      args: ['run', 'start:dev'],
-      env: backendEnv,
-    },
-  !backendOnly && {
-    name: 'web',
-    cwd: rootDir,
-    command: npmCommand,
-    args: ['run', 'dev'],
-    env: frontendEnv,
-  },
-].filter(Boolean);
+const waitForBackend = async (port, { timeoutMs = 180000, intervalMs = 750 } = {}) => {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    if (await probeBackendHealth(port)) return true;
+    await sleep(intervalMs);
+  }
+  return false;
+};
+
+const resolveBackendStartArgs = () => {
+  const distMain = resolve(backendDir, 'dist', 'main.js');
+  if (existsSync(distMain)) {
+    return ['run', 'start:prod'];
+  }
+  return ['run', 'start:watch'];
+};
 
 const children = [];
 let stopping = false;
@@ -193,27 +194,7 @@ const shutdown = (code = 0) => {
   setTimeout(() => process.exit(code), 250);
 };
 
-console.log('Starting CareDroid local stack...');
-console.log(`Frontend: ${frontendOrigin}`);
-console.log(`Backend:  http://localhost:${backendPort}`);
-console.log(`Health:   http://localhost:${backendPort}/health`);
-if (backendAlreadyHealthy) {
-  console.log(
-    `Backend already healthy on port ${backendPort}; skipping API restart. Use --force-restart to start a new instance.`,
-  );
-}
-console.log('');
-
-if (!commands.length) {
-  if (backendOnly && backendAlreadyHealthy) {
-    console.log('Backend is ready. No additional processes started.');
-  } else {
-    console.error('Nothing to start.');
-  }
-  process.exit(0);
-}
-
-for (const entry of commands) {
+const spawnManagedProcess = (entry) => {
   let child;
   try {
     child = spawnDevProcess(entry);
@@ -223,7 +204,7 @@ for (const entry of commands) {
     );
     console.error(error?.stack || error?.message || error);
     shutdown(1);
-    break;
+    return null;
   }
 
   children.push(child);
@@ -249,9 +230,6 @@ for (const entry of commands) {
         console.warn(
           `[api] failed to bind port ${backendPort}, but an existing backend is healthy. Continuing.`,
         );
-        if (children.every((child) => child.exitCode !== null)) {
-          return;
-        }
         return;
       }
     }
@@ -261,7 +239,70 @@ for (const entry of commands) {
     );
     shutdown(exitCode);
   });
+
+  return child;
+};
+
+const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
+
+console.log('Starting CareDroid local stack...');
+console.log(`Frontend: ${frontendOrigin}`);
+console.log(`Backend:  http://localhost:${backendPort}`);
+console.log(`Health:   http://localhost:${backendPort}/health`);
+if (backendAlreadyHealthy) {
+  console.log(
+    `Backend already healthy on port ${backendPort}; skipping API restart. Use --force-restart to start a new instance.`,
+  );
+}
+console.log('');
+
+if (backendOnly && backendAlreadyHealthy) {
+  console.log('Backend is ready. No additional processes started.');
+  process.exit(0);
+}
+
+if (backendOnly && frontendOnly) {
+  console.error('Nothing to start.');
+  process.exit(1);
 }
 
 process.on('SIGINT', () => shutdown(0));
 process.on('SIGTERM', () => shutdown(0));
+
+if (!frontendOnly && !backendAlreadyHealthy) {
+  const backendArgs = resolveBackendStartArgs();
+  console.log(`[api] starting backend (${backendArgs.slice(1).join(' ')})...`);
+  const apiChild = spawnManagedProcess({
+    name: 'api',
+    cwd: backendDir,
+    command: npmCommand,
+    args: backendArgs,
+    env: backendEnv,
+  });
+  if (!apiChild) {
+    process.exit(1);
+  }
+
+  if (!backendOnly) {
+    console.log('[web] waiting for API health before starting Vite (avoids ERR_CONNECTION_REFUSED)...');
+    const ready = await waitForBackend(backendPort);
+    if (!ready) {
+      console.error(
+        `[web] backend did not respond on http://localhost:${backendPort}/health within 3 minutes.`,
+      );
+      shutdown(1);
+      process.exit(1);
+    }
+    console.log('[web] API ready — starting Vite dev server.');
+  }
+}
+
+if (!backendOnly) {
+  spawnManagedProcess({
+    name: 'web',
+    cwd: rootDir,
+    command: npmCommand,
+    args: ['run', 'dev'],
+    env: frontendEnv,
+  });
+}

@@ -33,10 +33,10 @@
 }
 
 .operational-history-panel__tab {
-  border: 1px solid var(--color-border-subtle, #374151);
+  border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 999px;
-  background: var(--color-floating-surface, #111827);
-  color: var(--color-text-primary, #f9fafb);
+  background: var(--color-floating-surface, var(--app-surface-1, #ffffff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 11px;
   font-weight: 700;
   padding: 5px 10px;
@@ -61,14 +61,14 @@
   display: grid;
   gap: 4px;
   padding: 10px 12px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-card, #0b1120);
+  background: var(--color-card, var(--medical-surface-page, #f0f9ff));
 }
 
 .operational-history-panel__item strong {
   font-size: 13px;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .operational-history-panel__item p {
@@ -89,7 +89,7 @@
 .operational-history-panel__empty {
   margin: 0;
   padding: 12px;
-  border: 1px dashed var(--color-border-subtle, #374151);
+  border: 1px dashed var(--color-border-subtle, #e0f2fe);
   border-radius: 10px;
   color: var(--color-text-muted, #9ca3af);
   font-size: 12px;

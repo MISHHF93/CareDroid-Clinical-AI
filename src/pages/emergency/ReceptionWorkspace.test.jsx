@@ -22,13 +22,15 @@ describe('Reception-first experience wiring', () => {
     expect(receptionSource).toContain('convertEmsArrivalForReception');
     expect(receptionSource).toContain('findDuplicateCandidatesFromQuery');
     expect(receptionSource).toContain('ReceptionSearchHint');
+    expect(receptionSource).toContain('ReceptionDeskToolbar');
+    expect(receptionSource).toContain('reception-desk-theme.css');
     expect(receptionSource).toContain('RECEPTION_COPY');
     expect(receptionSource).toContain('registerWalkIn');
     expect(receptionSource).toContain('checkIdentity');
     expect(receptionSource).toContain('useReceptionScreen');
     expect(receptionSource).toContain('reception.showWidget');
     expect(receptionSource).toContain('canOpenSmartIntake');
-    expect(receptionSource).not.toContain('buildPostHandoffNavigationPaths');
+    expect(receptionSource).toContain('buildPostHandoffNavigationPaths');
   });
 
   it('uses header lookup as the primary reception search surface', () => {

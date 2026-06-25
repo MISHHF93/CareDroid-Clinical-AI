@@ -22,7 +22,7 @@
 
 .profile-settings-shell__header h1 {
   margin: 0;
-  color: var(--color-text-primary, #f8fafc);
+  color: var(--color-text-primary, #111827);
   font-size: 28px;
 }
 
@@ -38,13 +38,13 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--color-border-subtle, #334155);
-  background: var(--color-card, #172033);
+  background: var(--color-card, var(--app-surface-2, #ffffff));
   color: var(--color-text-secondary, #cbd5e1);
   font-size: 13px;
 }
 
 .profile-settings-shell__access strong {
-  color: var(--color-text-primary, #f8fafc);
+  color: var(--color-text-primary, #111827);
   font-size: 14px;
 }
 
@@ -76,9 +76,9 @@
 }
 
 .profile-settings-shell__nav a.is-active {
-  border-color: color-mix(in srgb, var(--status-info, #3b82f6) 50%, transparent);
-  background: color-mix(in srgb, var(--status-info, #3b82f6) 16%, transparent);
-  color: var(--color-text-primary, #f8fafc);
+  border-color: color-mix(in srgb, var(--status-info, var(--app-accent-interactive)) 50%, transparent);
+  background: color-mix(in srgb, var(--status-info, var(--app-accent-interactive)) 16%, transparent);
+  color: var(--color-text-primary, #111827);
 }
 
 .profile-settings-shell__content {

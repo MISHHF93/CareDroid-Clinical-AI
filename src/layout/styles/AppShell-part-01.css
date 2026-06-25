@@ -21,7 +21,7 @@
       color-mix(in srgb, var(--status-info) 10%, transparent),
       transparent 32rem
     ),
-    linear-gradient(180deg, var(--bg-base) 0%, #070b14 100%);
+    linear-gradient(180deg, var(--medical-surface-page, #f0f9ff) 0%, var(--app-surface-1, #ffffff) 100%);
   color: var(--color-text-primary);
   font-family: var(--font-ui);
 }
@@ -33,9 +33,9 @@
   width: var(--ed-rail-width);
   min-width: var(--ed-rail-width);
   height: 100%;
-  border-right: 1px solid var(--border-subtle);
-  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-base) 100%);
-  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--border-default) 42%, transparent);
+  border-right: 1px solid var(--nav-border, var(--medical-border, #e0f2fe));
+  background: linear-gradient(180deg, var(--sidebar-gradient-from, #ffffff) 0%, var(--sidebar-gradient-to, #f0f9ff) 100%);
+  box-shadow: var(--sidebar-shadow, var(--medical-shadow-soft));
 }
 
 .ed-nav-rail__items {

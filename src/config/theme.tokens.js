@@ -16,11 +16,17 @@ export {
 } from '../layout/designTokens';
 
 export const THEME_CONFIG = Object.freeze({
-  storageKey: 'caredroid_theme_preference',
-  supportedThemes: Object.freeze(['light', 'dark']),
-  defaultTheme: 'dark',
+  standardTheme: 'light',
+  themePreferenceEnabled: false,
   cssTokenSources: Object.freeze([
+    'src/styles/medical-color-layer.css',
+    'src/styles/medical-type-layer.css',
+    'src/styles/medical-card-layer.css',
     'src/styles/theme-tokens.css',
     'src/styles/design-tokens.css',
+    'src/styles/color-normalization.css',
+    'src/styles/text-normalization.css',
+    'src/styles/surface-normalization.css',
+    'src/styles/card-contrast-normalization.css',
   ]),
 });

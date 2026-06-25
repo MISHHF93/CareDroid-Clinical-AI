@@ -1,5 +1,5 @@
 .ems-offload-tracker {
-  --ems-offload-border: #1f2937;
+  --ems-offload-border: var(--medical-border, #e0f2fe);
   --ems-offload-muted: #9ca3af;
 }
 
@@ -48,7 +48,7 @@
 
 .ems-offload-tracker__summary span[data-tone='watch'] {
   border-color: #f59e0b;
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   background: #78350f33;
 }
 
@@ -113,7 +113,7 @@
 .ems-offload-tracker__action {
   border: 0;
   background: transparent;
-  color: #93c5fd;
+  color: var(--medical-text-link, #0ea5e9);
   cursor: pointer;
   font-weight: 700;
   padding: 0;

@@ -11,12 +11,12 @@
 .display-refresh-status__clock {
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
 }
 
 .display-refresh-status__warning {
   flex-basis: 100%;
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   font-weight: 700;
 }
 

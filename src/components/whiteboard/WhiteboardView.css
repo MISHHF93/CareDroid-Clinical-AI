@@ -25,7 +25,7 @@
 }
 
 .whiteboard-view__title {
-  color: #f8fafc;
+  color: var(--medical-text-heading, #111827);
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 18px;
   font-weight: 800;
@@ -71,7 +71,7 @@
 }
 
 .whiteboard-view__filter-label {
-  color: #86efac;
+  color: var(--medical-status-success-text, #15803d);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -104,7 +104,7 @@
   background: transparent;
   border: 1px dashed color-mix(in srgb, #fbbf24 55%, #14532d);
   border-radius: 8px;
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -140,7 +140,7 @@
 }
 
 .whiteboard-view__patient-list {
-  background: color-mix(in srgb, #0f172a 18%, transparent);
+  background: var(--medical-surface-page, #f0f9ff);
   border-radius: 10px;
   min-width: 0;
 }
@@ -152,12 +152,12 @@
 }
 
 .whiteboard-view__patient-list .patient-card--row {
-  background: color-mix(in srgb, #0f172a 78%, transparent);
-  border-color: color-mix(in srgb, #86efac 16%, #1f2937);
+  background: var(--medical-surface-page, #f0f9ff);
+  border-color: color-mix(in srgb, #86efac 16%, var(--medical-border, #e0f2fe));
 }
 
 .whiteboard-view__filtered-empty {
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   font-size: 14px;
   font-weight: 600;
   padding: 28px 16px;

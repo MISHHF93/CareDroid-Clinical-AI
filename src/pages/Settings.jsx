@@ -6,7 +6,6 @@ import { Drawer } from '../components/ui/Drawer';
 import FeatureGate from '../components/FeatureGate';
 import { useFeature } from '../hooks/useFeature';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import { useTheme } from '../contexts/ThemeContext';
 import { Permission, useUser } from '../contexts/UserContext';
 import {
   requestComplianceAccountDeletion,
@@ -73,7 +72,6 @@ const Settings = () => {
     message: '',
     logs: [],
   });
-  const { preference, resolvedTheme, setPreference } = useTheme();
   const { user, authToken, isAuthenticated, isLoading: authLoading, hasPermission } = useUser();
   const { success, error } = useNotificationActions();
   const { enabled: auditLogEnabled } = useFeature('audit_log');
@@ -382,24 +380,6 @@ const Settings = () => {
         ) : null}
 
         <div className="settings-toggle-grid">
-          <div className="settings-toggle-row">
-            <div>
-              <div className="settings-toggle-row__title">Theme preference</div>
-              <div className="settings-toggle-row__description">
-                System, light, or dark (active: {resolvedTheme})
-              </div>
-            </div>
-            <select
-              value={preference}
-              onChange={(e) => setPreference(e.target.value)}
-              className="settings-theme-select"
-            >
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
-
           <div className="settings-toggle-row">
             <div>
               <div className="settings-toggle-row__title">Notifications</div>

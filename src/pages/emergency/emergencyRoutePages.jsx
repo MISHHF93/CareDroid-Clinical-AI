@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
@@ -137,7 +138,7 @@ export function PatientsRoute() {
       <ApiStateBanner moduleState={patientsModule} />
       <MetricGrid
         metrics={[
-          { label: 'Total patients', value: patients.length, color: '#60A5FA' },
+          { label: 'Total patients', value: patients.length, color: MEDICAL_THEME.accent },
           { label: 'High risk', value: patients.filter(isHighRisk).length, color: '#EF4444' },
           {
             label: 'Waiting',
@@ -339,7 +340,7 @@ export function QueueRoute() {
       <ApiStateBanner moduleState={queues} />
       <MetricGrid
         metrics={[
-          { label: 'Total queued', value: queueMetrics.totalQueued, color: '#60A5FA' },
+          { label: 'Total queued', value: queueMetrics.totalQueued, color: MEDICAL_THEME.accent },
           {
             label: 'Breached queues',
             value: queueMetrics.breachedQueues,
@@ -588,7 +589,7 @@ export function CapacityRoute() {
               {
                 label: 'Capacity score',
                 value: `${capacity.score} ${capacity.band}`,
-                color: '#60A5FA',
+                color: MEDICAL_THEME.accent,
               },
               { label: 'Occupied rooms', value: capacity.occupiedRooms },
               { label: 'Available rooms', value: availableRooms, color: '#10B981' },
@@ -690,7 +691,7 @@ export function CopilotRoute() {
             {
               label: 'Capacity band',
               value: promptContext.capacity?.band ?? capacity.band,
-              color: '#60A5FA',
+              color: MEDICAL_THEME.accent,
             },
           ]}
         />

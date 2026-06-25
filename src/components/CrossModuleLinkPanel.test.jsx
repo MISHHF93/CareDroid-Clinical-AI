@@ -15,7 +15,10 @@ describe('CrossModuleLinkPanel', () => {
 
     expect(screen.getByRole('heading', { name: /connected decision support/i })).toBeVisible();
     expect(screen.getByText(/protocols -> calculators -> ai agents/i)).toBeVisible();
-    expect(screen.getByRole('link', { name: /calculators/i })).toHaveAttribute('href', '/tools/calculators');
+    expect(screen.getByRole('link', { name: /calculators/i })).toHaveAttribute(
+      'href',
+      '/emergency/tools?filter=calculator',
+    );
     expect(screen.getByRole('link', { name: /ai agents/i })).toHaveAttribute('href', '/assistant');
     expect(screen.getByText(/clinical pathways already reference calculators/i)).toBeVisible();
   });

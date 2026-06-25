@@ -2,9 +2,9 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  background: var(--color-elevated, #0b1120);
+  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
 }
 
 .reassessment-timer-panel__header {
@@ -16,7 +16,7 @@
 
 .reassessment-timer-panel__eyebrow {
   margin: 0;
-  color: var(--status-info, #93c5fd);
+  color: var(--status-info, #38bdf8);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -25,7 +25,7 @@
 
 .reassessment-timer-panel__header h3 {
   margin: 4px 0 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 15px;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .reassessment-timer-panel__status strong {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
@@ -70,7 +70,7 @@
   display: grid;
   gap: 4px;
   padding: 8px 10px;
-  border: 1px solid var(--color-border-subtle, #1f2937);
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
 }
@@ -83,16 +83,16 @@
 }
 
 .reassessment-timer-panel__cell strong {
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
 }
 
 .reassessment-timer-panel__cell[data-tone='warning'] strong {
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .reassessment-timer-panel__cell[data-tone='critical'] strong {
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }
 
 .reassessment-timer-panel__meta {
@@ -109,7 +109,7 @@
 
 .reassessment-timer-panel__meta dd {
   margin: 0;
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .reassessment-timer-panel__action {
@@ -141,15 +141,15 @@
   font-size: 10px;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.06);
-  color: var(--color-text-primary, #f9fafb);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
 .reassessment-timer-badge[data-tone='watch'] {
   background: rgba(245, 158, 11, 0.16);
-  color: #fcd34d;
+  color: var(--medical-status-warning-text, #b45309);
 }
 
 .reassessment-timer-badge[data-tone='critical'] {
   background: rgba(239, 68, 68, 0.16);
-  color: #fca5a5;
+  color: var(--medical-status-critical-text, #b91c1c);
 }

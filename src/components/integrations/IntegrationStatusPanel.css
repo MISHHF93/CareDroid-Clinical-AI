@@ -11,19 +11,19 @@
 }
 
 .integration-status-badge--implemented {
-  color: #a7f3d0;
+  color: var(--medical-status-success-text, #15803d);
   background: color-mix(in srgb, #10b981 14%, transparent);
   border-color: color-mix(in srgb, #10b981 35%, transparent);
 }
 
 .integration-status-badge--partial {
-  color: #fde68a;
+  color: var(--medical-status-warning-text, #b45309);
   background: color-mix(in srgb, #f59e0b 14%, transparent);
   border-color: color-mix(in srgb, #f59e0b 35%, transparent);
 }
 
 .integration-status-badge--placeholder {
-  color: #cbd5e1;
+  color: var(--medical-text-muted, #6b7280);
   background: color-mix(in srgb, #64748b 16%, transparent);
   border-color: color-mix(in srgb, #64748b 35%, transparent);
 }
@@ -52,7 +52,7 @@
   padding: 12px;
   border: 1px solid var(--color-border-subtle, #334155);
   border-radius: 12px;
-  background: var(--color-floating-surface, #0f172a);
+  background: var(--medical-surface-card, #ffffff);
 }
 
 .integration-status-panel__category header {
@@ -93,7 +93,7 @@
 .integration-status-panel__table th,
 .integration-status-panel__table td {
   padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border-subtle, #1e293b);
+  border-bottom: 1px solid var(--color-border-subtle, var(--app-surface-elevated, #ffffff));
   text-align: left;
   vertical-align: top;
 }

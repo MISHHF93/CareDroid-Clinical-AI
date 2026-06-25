@@ -14,130 +14,54 @@ import {
   resolveScreenModeKpiIds,
   resolveTriageStripMetricIds,
 } from './emergencyScreenKpiPolicy';
+import { PILOT_STATION_KPI_IDS } from './stationKpiPolicy';
 
 describe('emergencyScreenKpiPolicy', () => {
-  it('defines KPI sets per requested screen modes', () => {
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.reception)).toEqual([
-      'arrivals-today',
-      'awaiting-verification',
-      'awaiting-triage',
-      'longest-untriaged-wait',
-      'triage-breach-approaching',
-      'triage-breached',
-      'rapid-review-flags',
-      'queue-size',
-      'ems-inbound',
-      'crowd-level',
-    ]);
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.triage)).toEqual([
-      'triage-pending',
-      'longest-untriaged-wait',
-      'triage-breach-approaching',
-      'triage-breached',
-      'rapid-review-flags',
-      'ems-handoffs-pending',
-    ]);
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.chargeNurse)).toEqual([
-      'triage-pending',
-      'longest-untriaged-wait',
-      'triage-breach-approaching',
-      'triage-breached',
-      'rapid-review-flags',
-      'waiting-count',
-      'awaiting-clinician',
-      'longest-provider-wait',
-      'average-provider-wait',
-      'provider-wait-approaching',
-      'provider-wait-breached',
-      'reassessments-due',
-      'capacity-score',
-      'crowd-level',
-      'boarders',
-      'ems-inbound',
-      'offload-delays',
-      'offload-duration',
-      'handoff-pending',
-    ]);
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.physician)).toEqual([
-      'awaiting-clinician',
-      'longest-provider-wait',
-      'average-provider-wait',
-      'provider-wait-approaching',
-      'provider-wait-breached',
-    ]);
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.publicWaiting)).toEqual([
-      'average-wait-range',
-      'crowd-level',
-      'ems-crowding-impact',
-      'process-stage-messaging',
-    ]);
-    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.commandCenter)).toEqual([
-      'triage-pending',
-      'longest-untriaged-wait',
-      'triage-breach-approaching',
-      'triage-breached',
-      'rapid-review-flags',
-      'awaiting-clinician',
-      'longest-provider-wait',
-      'average-provider-wait',
-      'provider-wait-approaching',
-      'provider-wait-breached',
-      'throughput',
-      'crowding',
-      'offload',
-      'boarding',
-      'referrals',
-      'trend-metrics',
-    ]);
+  it('defines pilot KPI sets per requested screen modes during practitioner cleanup', () => {
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.reception)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.reception],
+    );
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.triage)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.triage],
+    );
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.chargeNurse)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.chargeNurse],
+    );
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.physician)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.physician],
+    );
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.publicWaiting)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.publicWaiting],
+    );
+    expect(resolveScreenModeKpiIds(CARE_DROID_SCREEN_MODES.commandCenter)).toEqual(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.commandCenter],
+    );
+  });
+
+  it('retains full enterprise KPI catalogs for settings and documentation', () => {
+    expect(EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.reception]).toHaveLength(10);
+    expect(EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.chargeNurse]).toHaveLength(19);
+    expect(EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.commandCenter]).toHaveLength(16);
   });
 
   it('maps reception KPIs to existing strip metric ids', () => {
     expect(resolveReceptionStripMetricIds(CARE_DROID_SCREEN_MODES.reception)).toEqual([
       'arrivals-today',
-      'awaiting-verification',
       'awaiting-triage',
-      'door-to-triage',
-      'triage-breach-risk',
-      'triage-breached',
-      'rapid-review',
-      'queue-size',
-      'ems-inbound',
-      'crowd-level',
     ]);
   });
 
   it('maps triage KPIs to strip metric ids', () => {
     expect(resolveTriageStripMetricIds(CARE_DROID_SCREEN_MODES.triage)).toEqual([
       'triage-pending',
-      'longest-untriaged-wait',
-      'triage-breach-approaching',
       'triage-breached',
-      'rapid-review-flags',
-      'ems-handoffs-pending',
     ]);
   });
 
   it('maps charge nurse KPIs to strip metric ids', () => {
     expect(resolveChargeNurseStripMetricIds(CARE_DROID_SCREEN_MODES.chargeNurse)).toEqual([
-      'triage-awaiting',
-      'longest-untriaged',
-      'triage-approaching',
-      'triage-breached',
-      'rapid-review',
       'waiting-count',
-      'provider-awaiting',
-      'longest-provider-wait',
-      'average-provider-wait',
-      'provider-approaching',
-      'provider-breached',
-      'reassessments',
-      'capacity',
-      'crowd-level',
-      'boarding',
-      'ems-inbound',
-      'offload-delays',
-      'offload-duration',
-      'handoff-pending',
+      'triage-breached',
     ]);
   });
 
@@ -145,39 +69,22 @@ describe('emergencyScreenKpiPolicy', () => {
     expect(resolvePublicWaitingKpiWidgets(CARE_DROID_SCREEN_MODES.publicWaiting)).toEqual([
       'wait-range',
       'crowd-level',
-      'ems-crowding-impact',
-      'care-process-stages',
-      'patient-guidance',
     ]);
   });
 
   it('maps command center KPI groups to throughput widgets and metrics', () => {
     const widgets = resolveCommandCenterWidgetVisibility(CARE_DROID_SCREEN_MODES.commandCenter);
-    expect(widgets?.['triage-awaiting']).toBe(true);
     expect(widgets?.['triage-breached']).toBe(true);
-    expect(widgets?.['arrivals-by-hour']).toBe(true);
-    expect(widgets?.['ems-offload-delays']).toBe(true);
-    expect(widgets?.['ems-inbound']).toBe(true);
-    expect(widgets?.['offload-duration']).toBe(true);
-    expect(widgets?.['handoff-pending']).toBe(true);
-    expect(widgets?.['boarding-duration']).toBe(true);
-    expect(widgets?.['referrals-backlog']).toBe(true);
-    expect(widgets?.['lwbs-risk']).toBe(true);
+    expect(widgets?.['crowd-level']).toBe(true);
+    expect(widgets?.['capacity-score']).toBe(true);
+    expect(widgets?.['triage-awaiting']).toBe(false);
+    expect(widgets?.['arrivals-by-hour']).toBe(false);
 
     const metricIds = resolveCommandCenterMetricIds(CARE_DROID_SCREEN_MODES.commandCenter);
-    expect(metricIds).toContain('triage-awaiting');
     expect(metricIds).toContain('triage-breached');
-    expect(metricIds).toContain('rapid-review-flags');
-    expect(metricIds).toContain('provider-awaiting');
-    expect(metricIds).toContain('provider-breached');
-    expect(metricIds).toContain('avg-wait-provider');
-    expect(metricIds).toContain('ems-inbound');
-    expect(metricIds).toContain('offload-duration');
-    expect(metricIds).toContain('handoff-pending');
-    expect(metricIds).toContain('ems-offload-delays');
-    expect(metricIds).toContain('boarding-duration');
-    expect(metricIds).toContain('referrals-backlog');
-    expect(metricIds).toContain('lwbs-risk');
+    expect(metricIds).toContain('crowd-level');
+    expect(metricIds).toContain('capacity-score');
+    expect(metricIds).not.toContain('triage-awaiting');
   });
 
   it('filters header operational metrics by screen mode policy', () => {
@@ -190,7 +97,7 @@ describe('emergencyScreenKpiPolicy', () => {
       metrics,
       CARE_DROID_SCREEN_MODES.chargeNurse,
     );
-    expect(chargeFiltered.map((metric) => metric.key)).toEqual(['waiting', 'boarders']);
+    expect(chargeFiltered.map((metric) => metric.key)).toEqual(['waiting']);
   });
 
   it('builds triage KPI values from patient and EMS data', () => {
@@ -227,8 +134,12 @@ describe('emergencyScreenKpiPolicy', () => {
       patients,
       emsInbound: 2,
     });
-    expect(snapshot.kpis).toHaveLength(EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.reception].length);
-    expect(snapshot.kpis.find((kpi) => kpi.id === 'ems-inbound')?.value).toBe(2);
+    expect(snapshot.kpis).toHaveLength(
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.reception]!.length,
+    );
+    expect(snapshot.kpis.find((kpi) => kpi.id === 'awaiting-triage')?.value).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it('builds command center and public waiting KPI snapshots from throughput builders', () => {
@@ -259,10 +170,10 @@ describe('emergencyScreenKpiPolicy', () => {
       now: new Date('2026-06-20T10:00:00.000Z'),
     });
     expect(commandSnapshot.kpis).toHaveLength(
-      EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.commandCenter].length,
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.commandCenter]!.length,
     );
-    expect(commandSnapshot.kpis.find((kpi) => kpi.id === 'provider-wait-breached')).toBeTruthy();
-    expect(commandSnapshot.kpis.find((kpi) => kpi.id === 'throughput')?.value).toBeTruthy();
+    expect(commandSnapshot.kpis.find((kpi) => kpi.id === 'triage-breached')).toBeTruthy();
+    expect(commandSnapshot.kpis.find((kpi) => kpi.id === 'crowding')?.value).toBeTruthy();
 
     const publicSnapshot = buildScreenModeKpiSnapshot({
       screenMode: CARE_DROID_SCREEN_MODES.publicWaiting,
@@ -271,7 +182,7 @@ describe('emergencyScreenKpiPolicy', () => {
       now: new Date('2026-06-20T10:00:00.000Z'),
     });
     expect(publicSnapshot.kpis).toHaveLength(
-      EMERGENCY_SCREEN_KPI_POLICY[CARE_DROID_SCREEN_MODES.publicWaiting].length,
+      PILOT_STATION_KPI_IDS[CARE_DROID_SCREEN_MODES.publicWaiting]!.length,
     );
     expect(publicSnapshot.kpis.find((kpi) => kpi.id === 'crowd-level')?.value).toBeTruthy();
   });
@@ -291,6 +202,6 @@ describe('emergencyScreenKpiPolicy', () => {
           [CARE_DROID_SCREEN_MODES.reception]: ['arrivals-today', 'queue-size'],
         },
       }),
-    ).toEqual(['arrivals-today', 'queue-size']);
+    ).toEqual(['arrivals-today']);
   });
 });

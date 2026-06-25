@@ -215,7 +215,7 @@ describe('medical expansion cross-pack validation', () => {
     }
   });
 
-  it('covers all pack routes in mobile widths and app light/dark theme wiring', () => {
+  it('covers all pack routes in mobile widths and standard light theme wiring', () => {
     const responsiveRegistryIds = new Set(RESPONSIVE_QA_PAGES.map((page) => page.registryId).filter(Boolean));
     for (const id of allPackIds) {
       expect(responsiveRegistryIds.has(id), `missing responsive QA route for ${id}`).toBe(true);
@@ -225,8 +225,8 @@ describe('medical expansion cross-pack validation', () => {
       expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024])
     );
     expect(appSource).toContain('<ThemeProvider>');
-    expect(themeContextSource).toMatch(/light|dark/);
-    expect(themeTestSource).toMatch(/light|dark/);
+    expect(themeContextSource).toMatch(/standardTheme|STANDARD_THEME/);
+    expect(themeTestSource).toMatch(/light/);
   });
 
   it('surfaces safety disclaimers for clinical, operational, and demo workflows', () => {
