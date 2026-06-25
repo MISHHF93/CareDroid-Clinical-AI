@@ -50,6 +50,9 @@ import {
   buildEmsOffloadTrackerSummary,
 } from '../services/emsOffloadTracker';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
@@ -202,6 +205,9 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
+  const { canUseCopilot } = useCopilotChromeAccess();
+  const copilotOpen = useEmergencyStore((store) => store.copilotOpen);
+  const toggleCopilot = useEmergencyStore((store) => store.toggleCopilot);
   const { saasRole } = useEffectiveUserProfile();
   const routeScreenMode = useRouteScreenMode();
   const screenCapabilities = useScreenModeCapabilities();
@@ -897,7 +903,26 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             {screenCapabilities.productLabel}
           </span>
           {!screenCapabilities.isRegistrationScreen ? (
-            <span className="caredroid-header__copilot-pill">{EMERGENCY_OS_BRANDING.aiiosName}</span>
+            canUseCopilot && emergencyRole.actionEnabled(EMERGENCY_ACTIONS.useCopilot) ? (
+              <button
+                type="button"
+                className={[
+                  'caredroid-header__copilot-pill',
+                  copilotOpen ? 'caredroid-header__copilot-pill--active' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-pressed={copilotOpen}
+                title={`${copilotOpen ? 'Close' : 'Open'} ${EMERGENCY_OS_BRANDING.copilotName} (C)`}
+                onClick={toggleCopilot}
+              >
+                {EMERGENCY_OS_BRANDING.aiiosName}
+              </button>
+            ) : (
+              <span className="caredroid-header__copilot-pill caredroid-header__copilot-pill--static">
+                {EMERGENCY_OS_BRANDING.aiiosName}
+              </span>
+            )
           ) : null}
           <Clock />
         </div>

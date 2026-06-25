@@ -3,6 +3,21 @@
  * Loaded after surface-normalization.css.
  */
 
+.session-chrome-bar__drawer :is(
+    .card,
+    .cd-dashboard-card,
+    .cd-surface,
+    [class$='-card']
+  ) {
+  --card-contract-bg: var(--medical-card-bg, #ffffff);
+  --card-contract-fg: var(--medical-card-fg, #111827);
+  --card-contract-fg-muted: var(--medical-card-fg-muted, #6b7280);
+  --card-contract-border: var(--medical-card-border, #e0f2fe);
+  background-color: var(--card-contract-bg);
+  border-color: var(--card-contract-border);
+  color: var(--card-contract-fg);
+}
+
 /* Base contract for all card-like surfaces */
 :is(.app-shell, .emergency-app-shell) :is(
     .card,

@@ -21,6 +21,14 @@
   min-width: 0;
 }
 
+.session-chrome-bar__copilot-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ed-space-2, 8px);
+  min-width: 0;
+}
+
 .session-chrome-bar__segment {
   display: inline-flex;
   align-items: center;
@@ -32,6 +40,37 @@
   line-height: 1.2;
   padding: 4px 8px;
   white-space: nowrap;
+}
+
+button.session-chrome-bar__segment {
+  cursor: pointer;
+  font: inherit;
+}
+
+button.session-chrome-bar__segment:hover,
+button.session-chrome-bar__segment:focus-visible {
+  border-color: var(--ed-border-strong);
+  outline: none;
+}
+
+.session-chrome-bar__segment--copilot {
+  border-color: var(--medical-card-accent-border, rgba(14, 165, 233, 0.35));
+  background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
+  color: var(--medical-card-accent-fg, #111827);
+}
+
+.session-chrome-bar__segment--copilot strong {
+  color: var(--medical-card-accent-fg, #111827);
+}
+
+.session-chrome-bar__segment--copilot.session-chrome-bar__segment--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, var(--ed-surface-overlay));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, transparent);
+}
+
+.session-chrome-bar--with-copilot {
+  border-bottom-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, var(--ed-border-subtle));
 }
 
 .session-chrome-bar__segment strong {
@@ -88,6 +127,20 @@
 .session-chrome-bar__pill[aria-expanded='true'] {
   border-color: var(--ed-border-strong);
   background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, #0ea5e9)) 18%, var(--ed-surface-overlay));
+}
+
+.session-chrome-bar__pill--copilot-tab {
+  font-size: var(--ed-type-meta, 10px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+  text-transform: uppercase;
+}
+
+.session-chrome-bar__pill--copilot-tab.session-chrome-bar__pill--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, var(--ed-surface-overlay));
+  color: var(--medical-card-accent-fg, #111827);
 }
 
 .session-chrome-bar__retry {

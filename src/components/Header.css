@@ -166,6 +166,27 @@
   padding: 4px 7px;
 }
 
+button.caredroid-header__copilot-pill {
+  cursor: pointer;
+  font: inherit;
+}
+
+button.caredroid-header__copilot-pill:hover,
+button.caredroid-header__copilot-pill:focus-visible {
+  border-color: rgba(16, 185, 129, 0.65);
+  outline: none;
+}
+
+.caredroid-header__copilot-pill--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, rgba(16, 185, 129, 0.4));
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, rgba(16, 185, 129, 0.12));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, transparent);
+}
+
+.caredroid-header__copilot-pill--static {
+  cursor: default;
+}
+
 .caredroid-header__primary-actions {
   display: flex;
   align-items: center;

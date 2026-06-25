@@ -36,6 +36,7 @@ import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { useSimulationMode } from '../contexts/SimulationModeContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
+import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
 import './app-shell.css';
 import './CopilotPanel.css';
 import { CopilotPanel } from './CopilotPanel';
@@ -257,8 +258,7 @@ function AppShellFrame({ children }: AppShellProps) {
     () => patients.filter(isPatientFlaggedForReassessment).length,
     [patients],
   );
-  const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
-  const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
+  const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const profileNavigate = useCallback(
     (to: Parameters<typeof navigate>[0], options?: { replace?: boolean; state?: unknown }) =>
@@ -385,7 +385,7 @@ function AppShellFrame({ children }: AppShellProps) {
 
   useEffect(() => {
     if (!canUseCopilot || useKioskShell) return;
-    if (RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) return;
+    if (hiddenOnReception) return;
     const dismissed =
       typeof sessionStorage !== 'undefined' && sessionStorage.getItem('ed:copilot-dismissed');
     if (isEmergencyBoardRoute && !dismissed && !copilotOpen && surfaces.chrome.copilotAutoOpen) {
@@ -394,9 +394,10 @@ function AppShellFrame({ children }: AppShellProps) {
   }, [
     canUseCopilot,
     copilotOpen,
+    hiddenOnReception,
     isEmergencyBoardRoute,
-    screenCapabilities.isRegistrationScreen,
     setCopilotOpen,
+    surfaces.chrome.copilotAutoOpen,
     useKioskShell,
   ]);
 
@@ -740,10 +741,7 @@ function AppShellFrame({ children }: AppShellProps) {
         </Suspense>
       </ErrorBoundary>
       ) : null}
-      {canUseCopilot &&
-      !useKioskShell &&
-      !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
-      copilotOpen ? (
+      {canUseCopilot && !useKioskShell && !hiddenOnReception && copilotOpen ? (
         <ErrorBoundary
           key={`copilot-${copilotOpen ? 'open' : 'closed'}-${location.pathname}`}
           resetKey={`${copilotOpen}-${location.pathname}`}
@@ -752,10 +750,7 @@ function AppShellFrame({ children }: AppShellProps) {
           <CopilotPanel />
         </ErrorBoundary>
       ) : null}
-      {canUseCopilot &&
-      !useKioskShell &&
-      !(RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen) &&
-      !copilotOpen ? (
+      {canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot ? (
         <button
           type="button"
           className="ed-copilot-launch"

@@ -29,6 +29,7 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.reception.showAlertRail).toBe(false);
     expect(surfaces.patientCard.badgeLimit).toBe(1);
     expect(surfaces.chrome.copilotAutoOpen).toBe(false);
+    expect(surfaces.chrome.showSessionCopilot).toBe(true);
     expect(surfaces.profile.showAccessSummary).toBe(false);
     expect(surfaces.tools.showClinicalIntelligencePanel).toBe(false);
     expect(surfaces.settings.showPlatformStrip).toBe(false);

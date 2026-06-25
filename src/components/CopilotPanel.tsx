@@ -503,6 +503,23 @@ export function CopilotPanel() {
     window.addEventListener(COPILOT_PLATFORM.identity.dockEvent, handlePrefill);
     return () => window.removeEventListener(COPILOT_PLATFORM.identity.dockEvent, handlePrefill);
   }, [selectPatient, setCopilotOpen]);
+
+  useEffect(() => {
+    const handleSetTab = (event: Event) => {
+      const tab = (event as CustomEvent<{ tab?: CopilotShellTab }>).detail?.tab;
+      if (tab) {
+        setActiveTab(tab);
+      }
+    };
+    window.addEventListener('ed:copilot-set-tab', handleSetTab);
+    return () => window.removeEventListener('ed:copilot-set-tab', handleSetTab);
+  }, []);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent('ed:copilot-tab-changed', { detail: { tab: activeTab } }),
+    );
+  }, [activeTab]);
   const highRiskCount = useMemo(() => activePatients.filter(isHighRiskPatient).length, [activePatients]);
   const reassessmentCount = useMemo(() => activePatients.filter(isReassessmentDue).length, [activePatients]);
   const activeOperationalAlerts = useMemo(
