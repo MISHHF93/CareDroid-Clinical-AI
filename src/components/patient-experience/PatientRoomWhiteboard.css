@@ -20,7 +20,7 @@
 .patient-room-whiteboard__header p {
   margin: 0.35rem 0 1rem;
   font-size: 1.05rem;
-  color: #334155;
+  color: var(--medical-border, #e0f2fe);
 }
 
 .patient-room-whiteboard__status,

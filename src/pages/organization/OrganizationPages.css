@@ -73,7 +73,7 @@
 .org-lifecycle-table td {
   text-align: left;
   padding: 0.5rem;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
 }
 
 .org-pack-meta {
@@ -129,7 +129,7 @@
   display: grid;
   gap: 0.15rem;
   padding: 0.45rem 0;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
 }
 
 .org-asset-list small {
@@ -157,7 +157,7 @@
   gap: 1rem;
   align-items: center;
   padding: 0.65rem;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 0.75rem;
 }
 
@@ -186,7 +186,7 @@
 
 .org-status-pill--available {
   background: #e2e8f0;
-  color: #334155;
+  color: var(--medical-border, #e0f2fe);
 }
 
 .org-status-pill--healthy {
@@ -264,7 +264,7 @@
   justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
   padding-bottom: 0.5rem;
 }
 
@@ -295,7 +295,7 @@
   gap: 0.25rem;
   text-align: left;
   padding: 0.85rem;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 0.85rem;
   background: var(--card, #fff);
   color: inherit;

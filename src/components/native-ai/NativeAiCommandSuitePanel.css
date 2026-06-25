@@ -42,7 +42,7 @@
 }
 
 .native-ai-command-suite__thresholds input {
-  border: 1px solid var(--color-border, #cbd5e1);
+  border: 1px solid var(--color-border, var(--medical-text-muted, #6b7280));
   border-radius: 0.4rem;
   padding: 0.35rem 0.5rem;
   font: inherit;

@@ -421,10 +421,10 @@ const EXECUTOR_TEST_COVERAGE = Object.freeze({
 });
 
 const DEFAULT_COLOR_BY_CATEGORY = Object.freeze({
-  Diagnostic: '#FF6B9D',
+  Diagnostic: '#0ea5e9',
   Calculator: '#95E1D3',
   Reference: '#A8E6CF',
-  'Education & Simulation': '#7C3AED',
+  'Education & Simulation': '#38bdf8',
   Laboratory: '#0EA5A6',
   Visualization: MEDICAL_THEME.accent,
   Fleet: '#6C8CFF',

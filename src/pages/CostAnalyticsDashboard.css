@@ -23,7 +23,7 @@
 .cost-header-title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   margin: 0 0 0.5rem 0;
 }
 
@@ -136,7 +136,7 @@
 .cost-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary-color, #4F46E5);
+  color: var(--app-accent-interactive, #0ea5e9);
   margin: 0.5rem 0;
 }
 
@@ -174,7 +174,7 @@
 .cost-panel h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   margin: 0 0 1.5rem 0;
 }
 
@@ -199,12 +199,12 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  background-color: var(--medical-ink, #111827);
+  background-color: var(--medical-surface-card, #ffffff);
   border-radius: 6px;
 }
 
 .roi-metric-highlight {
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   color: var(--app-on-solid);
 }
 
@@ -223,7 +223,7 @@
 .roi-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
 }
 
 .roi-metric-highlight .roi-value {
@@ -262,7 +262,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -289,7 +289,7 @@
 
 .cost-row-amount {
   font-weight: 600;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   min-width: 4rem;
   text-align: right;
 }
@@ -319,7 +319,7 @@
 
 .cost-chart-bar {
   width: 100%;
-  background: linear-gradient(180deg, #4F46E5 0%, #7C3AED 100%);
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
   border-radius: 2px 2px 0 0;
   min-height: 2px;
   transition: height 0.3s ease;
@@ -361,7 +361,7 @@
 .modal h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   margin: 0 0 0.5rem 0;
 }
 
@@ -387,7 +387,7 @@
 
 .input-field:focus {
   outline: none;
-  border-color: var(--primary-color, #4F46E5);
+  border-color: var(--app-accent-interactive, #0ea5e9);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
@@ -411,7 +411,7 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-color, #4F46E5);
+  background-color: var(--app-accent-interactive, #0ea5e9);
   color: var(--app-on-solid);
 }
 
@@ -421,12 +421,12 @@
 
 .btn-secondary {
   background-color: var(--app-surface-1);
-  color: var(--text-primary, #e0f2fe);
+  color: var(--medical-text-body, #111827);
   border: 1px solid var(--border-color, #E5E7EB);
 }
 
 .btn-secondary:hover {
-  background-color: var(--medical-ink, #111827);
+  background-color: var(--medical-surface-card, #ffffff);
 }
 
 .btn-danger {

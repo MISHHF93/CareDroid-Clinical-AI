@@ -46,7 +46,7 @@
 }
 
 .self-diagnostics-hero span {
-  color: var(--app-text-secondary, #cbd5e1);
+  color: var(--app-text-secondary, var(--medical-text-muted, #6b7280));
 }
 
 .self-diagnostics-score {
@@ -80,7 +80,7 @@
 
 .self-diagnostics-score p {
   margin: 0;
-  color: var(--app-text-secondary, #cbd5e1);
+  color: var(--app-text-secondary, var(--medical-text-muted, #6b7280));
 }
 
 .self-diagnostics-score--healthy {
@@ -153,7 +153,7 @@
 
 .self-diagnostics-category-grid p {
   margin: 0;
-  color: var(--app-text-secondary, #cbd5e1);
+  color: var(--app-text-secondary, var(--medical-text-muted, #6b7280));
 }
 
 .self-diagnostics-status-grid {
@@ -216,7 +216,7 @@
 .self-diagnostics-card p,
 .self-diagnostics-empty {
   margin: 0;
-  color: var(--app-text-secondary, #cbd5e1);
+  color: var(--app-text-secondary, var(--medical-text-muted, #6b7280));
 }
 
 .self-diagnostics-card ul {
@@ -224,7 +224,7 @@
   gap: 0.35rem;
   margin: 0;
   padding-left: 1.1rem;
-  color: var(--app-text-secondary, #cbd5e1);
+  color: var(--app-text-secondary, var(--medical-text-muted, #6b7280));
 }
 
 .self-diagnostics-card small {

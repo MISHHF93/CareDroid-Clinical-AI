@@ -2,7 +2,7 @@
   margin-top: 0.65rem;
   padding: 0.7rem 0.85rem;
   border-radius: 8px;
-  border: 1px dashed var(--color-border, #cbd5e1);
+  border: 1px dashed var(--color-border, var(--medical-text-muted, #6b7280));
   background: #fff;
 }
 

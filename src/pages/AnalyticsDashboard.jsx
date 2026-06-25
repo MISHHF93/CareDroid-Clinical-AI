@@ -177,7 +177,7 @@ const AnalyticsDashboard = () => {
                   className="analytics-row-fill"
                   style={{
                     width: `${Math.round((tool.usage / maxToolCount) * 100)}%`,
-                    backgroundColor: 'var(--primary-color, #4F46E5)',
+                    backgroundColor: 'var(--app-accent-interactive, #0ea5e9)',
                   }}
                 />
               </div>

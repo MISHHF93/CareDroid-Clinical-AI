@@ -56,7 +56,7 @@
 .copilot-risk-layer-panel__cds-detail {
   margin-top: 0.45rem;
   padding-top: 0.45rem;
-  border-top: 1px dashed var(--color-border, #cbd5e1);
+  border-top: 1px dashed var(--color-border, var(--medical-text-muted, #6b7280));
 }
 
 .copilot-risk-layer-panel--compact .copilot-risk-layer-panel__layers {

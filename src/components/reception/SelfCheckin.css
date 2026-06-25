@@ -42,7 +42,7 @@
   border: 1px dashed rgba(148, 163, 184, 0.35);
   background: var(--medical-surface-card, #ffffff);
   font-size: 13px;
-  color: var(--color-text-secondary, #cbd5e1);
+  color: var(--medical-text-muted, #6b7280);
 }
 
 .self-checkin__integration strong {

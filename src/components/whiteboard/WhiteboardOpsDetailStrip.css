@@ -25,7 +25,7 @@
 }
 
 .whiteboard-ops-detail-strip__summary {
-  color: var(--color-text-secondary, #cbd5e1);
+  color: var(--medical-text-muted, #6b7280);
   flex: 1;
   font-size: 12px;
   font-weight: 650;

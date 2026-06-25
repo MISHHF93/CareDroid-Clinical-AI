@@ -7,7 +7,7 @@ const TOOL_CONFIG = {
   id: 'order-set-ai',
   name: 'Intelligent Order Set Assistant',
   path: '/tools/order-set-ai',
-  color: '#7C3AED',
+  color: '#38bdf8',
   description: 'Suggest evidence-linked order bundles and protocol pathways for clinician review',
   shortcut: 'Ctrl+Shift+V',
   category: 'Reference',

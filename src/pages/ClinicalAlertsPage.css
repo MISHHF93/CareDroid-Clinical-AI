@@ -64,13 +64,13 @@
 .search-input:focus,
 .severity-select:focus {
   outline: none;
-  border-color: rgba(79, 70, 229, 0.5);
-  background: rgba(79, 70, 229, 0.1);
+  border-color: rgba(14, 165, 233, 0.5);
+  background: rgba(14, 165, 233, 0.1);
 }
 
 .severity-select option {
-  background: #1a1a1a;
-  color: var(--app-on-solid);
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text-body, #111827);
 }
 
 .summary-badges {
@@ -97,7 +97,7 @@
 }
 
 .summary-badge.total {
-  border-color: rgba(79, 70, 229, 0.3);
+  border-color: rgba(14, 165, 233, 0.3);
 }
 
 .summary-badge.unacknowledged {

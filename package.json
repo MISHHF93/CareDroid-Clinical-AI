@@ -45,7 +45,7 @@
     "e2e-matrix:write-docs": "node scripts/write-e2e-docs.mjs",
     "inventory:report": "node scripts/print-platform-inventory.mjs",
     "inventory:visual-cleanup": "node scripts/visual-cleanup-inventory.mjs",
-    "normalize:medical": "node scripts/normalize-medical-full-scale.mjs && node scripts/normalize-medical-colors.mjs && node scripts/normalize-medical-text.mjs && node scripts/normalize-card-contrast.mjs",
+    "normalize:medical": "node scripts/normalize-medical-full-scale.mjs && node scripts/normalize-medical-colors.mjs && node scripts/normalize-medical-text.mjs && node scripts/normalize-card-contrast.mjs && node scripts/normalize-platform-theme.mjs",
     "split:large-css": "node scripts/split-large-css.mjs",
     "check:inline-styles": "node scripts/check-inline-styles.mjs",
     "test:visibility-matrix": "vitest run src/data/toolVisibilityMatrix.test.js",

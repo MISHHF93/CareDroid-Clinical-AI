@@ -25,7 +25,7 @@
 
 .patient-whiteboard__header p {
   margin: 0;
-  color: #334155;
+  color: var(--medical-border, #e0f2fe);
 }
 
 .patient-whiteboard__card {

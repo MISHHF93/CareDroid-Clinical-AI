@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  border: 1px solid var(--color-border, #cbd5e1);
+  border: 1px solid var(--color-border, var(--medical-text-muted, #6b7280));
   border-radius: 0.75rem;
   background: #fff;
 }
@@ -12,7 +12,7 @@
   width: 100%;
   margin-top: 0.35rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--color-border, #cbd5e1);
+  border: 1px solid var(--color-border, var(--medical-text-muted, #6b7280));
   padding: 0.6rem;
   font: inherit;
 }

@@ -124,7 +124,7 @@
   min-height: var(--touch-target-min);
   padding: 14px 28px;
   border: none;
-  background: #FF6B9D;
+  background: var(--app-accent-interactive, #0ea5e9);
   color: var(--app-on-solid);
   border-radius: 8px;
   font-weight: 600;

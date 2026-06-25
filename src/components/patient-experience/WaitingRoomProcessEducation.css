@@ -86,7 +86,7 @@
 }
 
 .public-waiting-display .waiting-room-process-education {
-  border-color: #334155;
+  border-color: var(--medical-border, #e0f2fe);
   background: var(--app-surface-1, #ffffff);
 }
 

@@ -20,7 +20,7 @@
   overflow: auto;
   margin: 12px;
   padding: 18px;
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 16px;
   background: var(--medical-surface-page, #f0f9ff);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
@@ -63,7 +63,7 @@
 }
 
 .reception-escalation-panel__close {
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   background: var(--app-surface-1, #ffffff);
   color: var(--medical-text-muted, #6b7280);
   padding: 8px 12px;
@@ -135,7 +135,7 @@
 .reception-escalation-panel__field select,
 .reception-escalation-panel__field textarea {
   width: 100%;
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
   background: var(--medical-surface-page, #f0f9ff);
   color: var(--medical-text-heading, #111827);
@@ -150,7 +150,7 @@
 }
 
 .reception-escalation-panel__secondary {
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   background: transparent;
   color: var(--medical-text-muted, #6b7280);
   padding: 10px 14px;

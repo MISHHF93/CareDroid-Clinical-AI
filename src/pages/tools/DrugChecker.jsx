@@ -56,7 +56,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
     id: 'drug-check',
     name: 'Drug Checker',
     path: '/tools/drug-checker',
-    color: '#FF6B9D',
+    color: '#0ea5e9',
     description: 'Check drug interactions, contraindications, and dosing',
     shortcut: 'Ctrl+1',
     category: 'Diagnostic'

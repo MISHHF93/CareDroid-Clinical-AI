@@ -173,7 +173,7 @@
 }
 
 .emergency-whiteboard-page__mission-link-btn:disabled {
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
   cursor: not-allowed;
 }
 
@@ -733,7 +733,7 @@
 }
 
 .emergency-whiteboard-page__display-banner-meta {
-  color: var(--color-text-secondary, #cbd5e1);
+  color: var(--medical-text-muted, #6b7280);
   font-size: 12px;
   font-weight: 750;
 }

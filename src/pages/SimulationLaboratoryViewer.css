@@ -405,11 +405,12 @@
   padding: 10px;
   border-radius: var(--radius-md);
   background: var(--medical-surface-card, #ffffff);
-  color: white;
+  color: var(--medical-card-fg, #111827);
+  border: 1px solid var(--medical-card-border, #e0f2fe);
 }
 
 .medical-viewer-fallback span {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--medical-card-fg-muted, #6b7280);
   font-size: var(--font-12);
 }
 

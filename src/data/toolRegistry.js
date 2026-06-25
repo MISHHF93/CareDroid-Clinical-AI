@@ -9,7 +9,7 @@ const toolRegistry = [
     id: 'drug-check',
     name: 'Drug Checker',
     path: '/tools/drug-checker',
-    color: '#FF6B9D',
+    color: '#0ea5e9',
     description: 'Check drug interactions, contraindications, and dosing',
     shortcut: 'Ctrl+1',
     category: 'Diagnostic',
@@ -485,7 +485,7 @@ const toolRegistry = [
     path: '/tools/calculators/homa-ir',
     panelTool: 'calculators',
     initialCalc: 'homa-ir',
-    color: '#7C3AED',
+    color: '#38bdf8',
     description: 'Insulin resistance estimate from fasting glucose and fasting insulin',
     category: 'Calculator',
     features: [
@@ -969,7 +969,7 @@ const toolRegistry = [
     id: 'screening-trend-engine',
     name: 'Screening Trend Engine',
     path: '/tools/psychiatry/screening-trend-engine',
-    color: '#4F46E5',
+    color: '#0284c7',
     description: 'Screening trend engine for serial behavioral-health screening score visibility',
     category: 'Reference',
     features: [

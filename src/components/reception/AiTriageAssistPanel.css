@@ -20,7 +20,7 @@
 }
 
 .ai-triage-assist__eyebrow {
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -37,7 +37,7 @@
 .ai-triage-assist__esi {
   margin: 4px 0 0;
   font-size: 12px;
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .ai-triage-assist__overrides {
@@ -50,7 +50,7 @@
   display: grid;
   gap: 4px;
   font-size: 11px;
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .ai-triage-assist__overrides select {
@@ -74,7 +74,7 @@
 }
 
 .ai-triage-assist__rationale {
-  color: var(--color-text-secondary, #cbd5e1);
+  color: var(--medical-text-muted, #6b7280);
   display: grid;
   gap: 4px;
   font-size: 13px;
@@ -84,7 +84,7 @@
 
 .ai-triage-assist__context,
 .ai-triage-assist__disclaimer {
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 12px;
   margin: 0;
 }
@@ -96,7 +96,7 @@
 }
 
 .ai-triage-assist__action {
-  border: 1px solid var(--color-border-subtle, #334155);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   background: var(--color-surface, var(--app-surface-1, #ffffff));
   color: var(--medical-card-fg, #111827);

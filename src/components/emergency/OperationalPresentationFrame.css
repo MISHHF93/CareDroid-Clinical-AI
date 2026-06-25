@@ -51,7 +51,7 @@
 .operational-presentation-frame__subtitle {
   margin: 0;
   max-width: 920px;
-  color: var(--color-text-secondary, #cbd5e1);
+  color: var(--medical-text-muted, #6b7280);
   font-size: 0.8125rem;
   line-height: 1.45;
 }

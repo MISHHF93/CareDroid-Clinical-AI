@@ -205,7 +205,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   min-height: 128px;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   background: var(--app-surface-1, #ffffff);
 }
 
@@ -272,7 +272,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   gap: 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid var(--medical-border, #e0f2fe);
   background: var(--app-surface-1, #ffffff);
 }
 

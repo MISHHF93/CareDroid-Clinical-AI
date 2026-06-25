@@ -35,7 +35,7 @@
 
 .integration-status-panel__intro {
   margin: 0;
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -50,7 +50,7 @@
   display: grid;
   gap: 6px;
   padding: 12px;
-  border: 1px solid var(--color-border-subtle, #334155);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
   background: var(--medical-surface-card, #ffffff);
 }
@@ -71,7 +71,7 @@
 .integration-status-panel__category p {
   margin: 0;
   font-size: 12px;
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
   line-height: 1.45;
 }
 
@@ -102,7 +102,7 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-text-muted, #94a3b8);
+  color: var(--medical-text-subtle, #9ca3af);
 }
 
 .integration-status-panel__live {

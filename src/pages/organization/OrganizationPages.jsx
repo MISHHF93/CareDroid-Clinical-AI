@@ -1,3 +1,4 @@
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
@@ -366,7 +367,7 @@ export function OrganizationSettings() {
             Accent color
             <input
               value={form.accentColor}
-              placeholder="#0ea5e9"
+              placeholder=MEDICAL_THEME.accent
               onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
             />
           </label>
@@ -1850,7 +1851,7 @@ export function TenantAdministrationCenter() {
             Accent color
             <input
               value={form.accentColor}
-              placeholder="#0ea5e9"
+              placeholder=MEDICAL_THEME.accent
               onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
             />
           </label>
