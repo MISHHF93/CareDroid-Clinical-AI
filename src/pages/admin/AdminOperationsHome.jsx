@@ -7,7 +7,7 @@ import {
   filterAdminOpsLinks,
   getVisibleAdminOpsSections,
 } from '../../config/adminOperationsModel';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 
 const SURVEILLANCE_STATUS = [
   { id: 'surveillanceNexus', label: 'Surveillance nexus API', path: CANONICAL_ROUTES.surveillanceNexus },
@@ -30,7 +30,7 @@ function statusLabel(status) {
 }
 
 export default function AdminOperationsHome() {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const visibleSections = useMemo(() => getVisibleAdminOpsSections(saasRole), [saasRole]);
   const surveillanceLinks = useMemo(

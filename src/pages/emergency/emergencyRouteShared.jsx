@@ -2,7 +2,7 @@ import PatientCard from '../../components/PatientCard';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
-import { shouldShowDeveloperApiBanners } from '../../config/practitionerCleanup.config';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './emergency-route.css';
 
 /** @deprecated Use emergency-route.css classes instead */
@@ -70,6 +70,9 @@ export function EmergencyRoutePage({
   actions,
   maturity,
 }) {
+  const surfaces = usePractitionerSurfaceVisibility();
+  const compactLayout = surfaces.compactLayout;
+  const showDescription = description && surfaces.emergencyRoutes.showDescriptions;
   const headerActions = (
     <>
       {actions}
@@ -83,9 +86,11 @@ export function EmergencyRoutePage({
       eyebrow={eyebrow}
       title={title}
       titleId={titleId}
-      description={description}
+      description={showDescription ? description : undefined}
       actions={actions || maturity ? headerActions : null}
-      className="emergency-route-page cd-page-shell"
+      className={`emergency-route-page cd-page-shell${
+        compactLayout ? ' emergency-route-page--practitioner-compact' : ''
+      }`}
       headerClassName="emergency-route-page__hero"
       contentClassName="emergency-route-page__content"
       aria-label={title}
@@ -96,6 +101,27 @@ export function EmergencyRoutePage({
 }
 
 export function MetricGrid({ metrics }) {
+  const surfaces = usePractitionerSurfaceVisibility();
+  const useCompactStrip = surfaces.active && !surfaces.emergencyRoutes.showMetricCards;
+
+  if (useCompactStrip) {
+    return (
+      <div className="emergency-route-metric-strip" role="list" aria-label="Route metrics">
+        {metrics.map((metric) => (
+          <span
+            key={metric.label}
+            role="listitem"
+            className="emergency-route-metric-strip__item"
+            style={metric.color ? { '--metric-color': metric.color } : undefined}
+          >
+            <strong className="emergency-route-metric-strip__value">{metric.value}</strong>
+            <span className="emergency-route-metric-strip__label">{metric.label}</span>
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="emergency-route-metric-grid">
       {metrics.map((metric) => (
@@ -138,7 +164,8 @@ export function ApiStateBanner({
   moduleState,
   fallbackText = 'Showing the last local CareDroid state. Verify against the current department record before operational decisions.',
 }) {
-  if (!shouldShowDeveloperApiBanners()) {
+  const surfaces = usePractitionerSurfaceVisibility();
+  if (!surfaces.chrome.showDeveloperApiBanners) {
     return null;
   }
 
@@ -170,7 +197,8 @@ export function ApiStateBanner({
 }
 
 export function DataSourceNote({ moduleState }) {
-  if (!shouldShowDeveloperApiBanners()) {
+  const surfaces = usePractitionerSurfaceVisibility();
+  if (!surfaces.chrome.showDeveloperApiBanners) {
     return null;
   }
 

@@ -7,6 +7,10 @@ import {
   PRACTITIONER_CLEANUP,
 } from './practitionerCleanup.config';
 import { PRACTITIONER_PATIENT_CARD_BADGE_LIMIT } from './practitionerCleanup.constants';
+import {
+  applyRoleSurfaceOverrides,
+  resolvePractitionerPatientCardBadgeLimit,
+} from './practitionerRoleSurfacePolicy';
 
 const FULL_VISIBILITY = Object.freeze({
   active: false,
@@ -35,6 +39,7 @@ const FULL_VISIBILITY = Object.freeze({
     showAlertRail: true,
     showOperationalHistory: true,
     showDataQualityAudits: true,
+    showTriageRuleBuilder: true,
   }),
   patientCard: Object.freeze({
     showPredictiveBadges: true,
@@ -65,11 +70,26 @@ const FULL_VISIBILITY = Object.freeze({
     showPageMetaBadges: true,
     showClinicalIntelligencePanel: true,
     showShareLocalSession: true,
+    showDeveloperCatalog: true,
+  }),
+  copilotRoute: Object.freeze({
+    showUpgradeSignals: true,
+    showRouteMetrics: true,
   }),
   settings: Object.freeze({
     showPlatformStrip: true,
     showEnterpriseSections: true,
     showNestedSubtitles: true,
+    showAuditSections: true,
+    showGovernanceSections: true,
+    showScreenModes: true,
+    showWalkthroughDetail: true,
+  }),
+  pulse: Object.freeze({
+    showDescriptions: true,
+    showStatCards: true,
+    showQueuePanel: true,
+    showStaffPanel: true,
   }),
   chrome: Object.freeze({
     showDeveloperApiBanners: true,
@@ -81,15 +101,55 @@ const FULL_VISIBILITY = Object.freeze({
   analytics: Object.freeze({
     showPlatformLayers: true,
     showDepartmentShortcuts: true,
+    showDescriptions: true,
+    showKpiCards: true,
+    showSecondaryCharts: true,
+  }),
+  calculatorHub: Object.freeze({
+    showHeroDescription: true,
+    showCardDescriptions: true,
+    compactPatientBar: false,
+  }),
+  intake: Object.freeze({
+    showHeroDescription: true,
+    showVerificationWarnings: true,
+    showVerificationAuditLog: true,
+  }),
+  patientRoom: Object.freeze({
+    showDoorSignDuplicate: true,
   }),
   admin: Object.freeze({
     showSurveillanceDetailList: true,
     showSecondaryLinks: true,
   }),
+  emergencyRoutes: Object.freeze({
+    showDescriptions: true,
+    showMetricCards: true,
+    showCrossLinks: true,
+    showCapacityUpgradeHarness: true,
+    showJourneyEngineCard: true,
+  }),
+  ems: Object.freeze({
+    showFleetUnitGrid: true,
+    showOffloadTrackerPanel: true,
+  }),
+  shift: Object.freeze({
+    showSecondarySections: true,
+  }),
 });
 
-function buildPilotVisibility() {
+/**
+ * @typedef {object} PractitionerVisibilityContext
+ * @property {string} [role]
+ * @property {string} [screenMode]
+ */
+
+function buildPilotVisibility(context = {}) {
   const c = PRACTITIONER_CLEANUP;
+  const badgeLimit =
+    context.role || context.screenMode
+      ? resolvePractitionerPatientCardBadgeLimit(context)
+      : PRACTITIONER_PATIENT_CARD_BADGE_LIMIT;
   return Object.freeze({
     active: true,
     compactLayout: c.forceCompactLayout,
@@ -117,13 +177,14 @@ function buildPilotVisibility() {
       showAlertRail: !c.suppressReceptionAlertRail,
       showOperationalHistory: !c.suppressReceptionOperationalHistory,
       showDataQualityAudits: !c.suppressReceptionDataQualityAudits,
+      showTriageRuleBuilder: !c.suppressReceptionTriageRuleBuilder,
     }),
     patientCard: Object.freeze({
       showPredictiveBadges: !c.suppressPatientCardPredictiveBadges,
       showToolChips: !c.suppressPatientCardToolChips,
       showNativeAiBadges: !c.suppressPatientCardNativeAiBadges,
       showDataQualitySignals: !c.suppressPatientCardDataQualitySignals,
-      badgeLimit: PRACTITIONER_PATIENT_CARD_BADGE_LIMIT,
+      badgeLimit,
     }),
     copilot: Object.freeze({
       showContextTab: !c.suppressCopilotContextTab,
@@ -147,11 +208,31 @@ function buildPilotVisibility() {
       showPageMetaBadges: !c.suppressToolPageMetaBadges,
       showClinicalIntelligencePanel: !c.suppressToolClinicalIntelligencePanel,
       showShareLocalSession: !c.suppressToolShareLocalSession,
+      showDeveloperCatalog: !c.suppressDeveloperToolCatalog,
+    }),
+    copilotRoute: Object.freeze({
+      showUpgradeSignals: !c.suppressCopilotRouteUpgradeSignals,
+      showRouteMetrics: !c.suppressCopilotRouteMetrics,
     }),
     settings: Object.freeze({
       showPlatformStrip: !c.suppressSettingsPlatformStrip,
       showEnterpriseSections: !c.suppressSettingsEnterpriseSections,
       showNestedSubtitles: !c.suppressSettingsNestedSubtitles,
+      showAuditSections: !c.suppressEmergencySettingsAuditSections,
+      showGovernanceSections: !c.suppressEmergencySettingsGovernanceSections,
+      showScreenModes: !c.suppressEmergencySettingsScreenModes,
+      showWalkthroughDetail: !c.suppressEmergencySettingsWalkthroughDetail,
+    }),
+    pulse: Object.freeze({
+      showDescriptions: !c.suppressDepartmentPulseDescriptions,
+      showStatCards: !c.suppressDepartmentPulseStatCards,
+      showQueuePanel: !c.suppressDepartmentPulseQueuePanel,
+      showStaffPanel: !c.suppressDepartmentPulseStaffPanel,
+    }),
+    intake: Object.freeze({
+      showHeroDescription: !c.suppressSmartIntakeHeroDescription,
+      showVerificationWarnings: !c.suppressSmartIntakeVerificationWarnings,
+      showVerificationAuditLog: !c.suppressSmartIntakeVerificationAuditLog,
     }),
     chrome: Object.freeze({
       showDeveloperApiBanners: !c.suppressDeveloperApiBanners,
@@ -163,27 +244,78 @@ function buildPilotVisibility() {
     analytics: Object.freeze({
       showPlatformLayers: !c.suppressAnalyticsPlatformLayers,
       showDepartmentShortcuts: !c.suppressAnalyticsPlatformLayers,
+      showDescriptions: !c.suppressAnalyticsDescriptions,
+      showKpiCards: !c.suppressAnalyticsKpiCards,
+      showSecondaryCharts: !c.suppressAnalyticsSecondaryCharts,
+    }),
+    calculatorHub: Object.freeze({
+      showHeroDescription: !c.suppressCalculatorHubHeroDescription,
+      showCardDescriptions: !c.suppressCalculatorHubCardDescriptions,
+      compactPatientBar: c.compactCalculatorHubPatientBar,
+    }),
+    patientRoom: Object.freeze({
+      showDoorSignDuplicate: !c.suppressPatientRoomDoorSignDuplicate,
     }),
     admin: Object.freeze({
       showSurveillanceDetailList: !c.suppressAdminSurveillanceDetailList,
       showSecondaryLinks: !c.suppressAdminSecondaryLinks,
     }),
+    emergencyRoutes: Object.freeze({
+      showDescriptions: !c.suppressEmergencyRouteDescriptions,
+      showMetricCards: !c.suppressEmergencyRouteMetricCards,
+      showCrossLinks: !c.suppressEmergencyRouteCrossLinks,
+      showCapacityUpgradeHarness: !c.suppressCapacityUpgradeHarness,
+      showJourneyEngineCard: !c.hidePatientJourneyEngineCard,
+    }),
+    ems: Object.freeze({
+      showFleetUnitGrid: !c.suppressEmsFleetUnitGrid,
+      showOffloadTrackerPanel: !c.suppressEmsOffloadTrackerPanel,
+    }),
+    shift: Object.freeze({
+      showSecondarySections: !c.suppressShiftSecondarySections,
+    }),
   });
 }
 
 /**
+ * @param {PractitionerVisibilityContext} [context]
  * @returns {typeof FULL_VISIBILITY}
  */
-export function getPractitionerSurfaceVisibility() {
+function hasExplicitVisibilityContext(context = {}) {
+  return Boolean(context.role || context.screenMode);
+}
+
+function mergeWithFullVisibility(surfaces) {
+  if (!surfaces) {
+    return FULL_VISIBILITY;
+  }
+  const merged = { ...surfaces };
+  for (const key of Object.keys(FULL_VISIBILITY)) {
+    const fallback = FULL_VISIBILITY[key];
+    const current = surfaces[key];
+    if (fallback && typeof fallback === 'object') {
+      merged[key] = Object.freeze({ ...fallback, ...(current || {}) });
+    } else if (current === undefined) {
+      merged[key] = fallback;
+    }
+  }
+  return Object.freeze(merged);
+}
+
+export function getPractitionerSurfaceVisibility(context = {}) {
   if (!isPractitionerCleanupEnabled()) {
     return FULL_VISIBILITY;
   }
-  return buildPilotVisibility();
+  const pilot = buildPilotVisibility(context);
+  const resolved = !hasExplicitVisibilityContext(context)
+    ? pilot
+    : applyRoleSurfaceOverrides(pilot, context);
+  return mergeWithFullVisibility(resolved);
 }
 
-/** @param {keyof typeof FULL_VISIBILITY} surface */
-export function practitionerShows(surface, key) {
-  const visibility = getPractitionerSurfaceVisibility();
+/** @param {keyof typeof FULL_VISIBILITY} surface @param {string} key @param {PractitionerVisibilityContext} [context] */
+export function practitionerShows(surface, key, context = {}) {
+  const visibility = getPractitionerSurfaceVisibility(context);
   const section = visibility[surface];
   return section && typeof section === 'object' ? Boolean(section[key]) : false;
 }

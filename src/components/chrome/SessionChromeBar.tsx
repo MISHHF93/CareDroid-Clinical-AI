@@ -7,7 +7,7 @@ import useProfileSwitcherVisibility from '../../hooks/useProfileSwitcherVisibili
 import useEmergencyRolePermissions from '../../hooks/useEmergencyRolePermissions';
 import SimulationModeToggle from '../simulation/SimulationModeToggle';
 import DemoPersonaDrawer from '../account/DemoPersonaDrawer';
-import { shouldSuppressSessionChromeDevSegments } from '../../config/practitionerCleanup.config';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './SessionChromeBar.css';
 
 function isLocalDevHost(): boolean {
@@ -17,6 +17,7 @@ function isLocalDevHost(): boolean {
 }
 
 export default function SessionChromeBar() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const isDev = isLocalDevHost();
   const { enabled: simulationEnabled, active: simulationActive } = useSimulationMode();
   const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
@@ -28,7 +29,7 @@ export default function SessionChromeBar() {
   const emergencyRole = useEmergencyRolePermissions();
   const [demoOpen, setDemoOpen] = useState(false);
 
-  const suppressDevSegments = shouldSuppressSessionChromeDevSegments();
+  const suppressDevSegments = !surfaces.chrome.showSessionDevSegments;
   const showSimulation = simulationEnabled && simulationActive;
   const showApiDegraded = configDegraded && !configLoading;
   const showDevSegment = isDev && !suppressDevSegments;

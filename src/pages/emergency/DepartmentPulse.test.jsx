@@ -50,9 +50,10 @@ describe('DepartmentPulse', () => {
     expect(screen.getByText('High risk')).toBeInTheDocument();
     expect(screen.getAllByText('Reassessment due').length).toBeGreaterThan(0);
     expect(screen.getAllByText('EMS inbound').length).toBeGreaterThan(0);
-    expect(screen.getByRole('heading', { name: /Attention List/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Queue Snapshot/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Staff Snapshot/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Attention list/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Queue snapshot/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Staff snapshot/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Live\. Updated/i)).toBeInTheDocument();
+    expect(document.querySelector('.emergency-pulse__stat-strip')).toBeTruthy();
   });
 });

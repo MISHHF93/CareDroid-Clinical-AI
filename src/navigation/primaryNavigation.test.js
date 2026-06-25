@@ -13,29 +13,10 @@ import {
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from './primaryNavigation';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { getPilotCustomerNavigationItems } from '../config/unified-navigation.config';
 
 const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
-const SIDEBAR_MODEL = [
-  ['Reception', '/emergency/reception'],
-  ['Whiteboard', '/emergency/whiteboard'],
-  ['Intake', '/emergency/intake'],
-  ['EMS', '/emergency/ems'],
-  ['Patients', '/emergency/patients'],
-  ['Queues', '/emergency/queues'],
-  ['Reassess', '/emergency/reassessment'],
-  ['Capacity', '/emergency/capacity'],
-  ['Boarding', '/emergency/boarding'],
-  ['Referrals', '/emergency/referrals'],
-  ['Copilot', '/emergency/copilot'],
-  ['Medical Tools', '/emergency/tools'],
-  ['Analytics', '/emergency/analytics'],
-  ['Settings', '/emergency/settings'],
-  ['Integrations', '/integrations/hub'],
-  ['Cosmos', '/cosmos'],
-  ['Platform', '/workspace'],
-  ['Pulse', '/emergency/pulse'],
-  ['Shift', '/emergency/shift'],
-];
+const SIDEBAR_MODEL = getPilotCustomerNavigationItems().map((item) => [item.label, item.path]);
 
 describe('primaryNavigation', () => {
   it('exposes the canonical sidebar-first CareDroid model in order', () => {
@@ -188,13 +169,13 @@ describe('primaryNavigation', () => {
     const expected = [
       ['/emergency', 'whiteboard'],
       ['/emergency/whiteboard', 'whiteboard'],
-      ['/emergency/intake', 'intake'],
+      ['/emergency/intake', undefined],
       ['/emergency/ems', 'ems'],
       ['/emergency/patients', 'patients'],
       ['/emergency/queues', 'queues'],
       ['/emergency/reassessment', 'reassessment'],
       ['/emergency/capacity', 'capacity'],
-      ['/emergency/boarding', 'boarding'],
+      ['/emergency/boarding', undefined],
       ['/emergency/referrals', 'referrals'],
       ['/emergency/copilot', 'copilot'],
       ['/emergency/analytics', 'analytics'],
@@ -208,8 +189,8 @@ describe('primaryNavigation', () => {
       ['/emergency/tools', 'tools'],
       ['/emergency/shift', 'shift'],
       ['/profile', undefined],
-      ['/workspaces', 'platform'],
-      ['/workspace', 'platform'],
+      ['/workspaces', undefined],
+      ['/workspace', undefined],
       ['/tenant-admin', 'tenant-admin'],
     ];
 

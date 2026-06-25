@@ -20,7 +20,7 @@ import {
   PageShell,
   Surface,
 } from '../../components/ui/CareDroidPrimitives';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './ToolPageLayout.css';
 
 const AI_DOCUMENTATION_TOOL_IDS = new Set([
@@ -64,7 +64,7 @@ const ToolPageLayout = ({
   embedded = false,
   onCloseEmbedded,
 }) => {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const { profileNavigate } = useProfileNavigate();
   const { selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();

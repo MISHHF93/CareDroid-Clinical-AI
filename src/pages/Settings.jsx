@@ -21,7 +21,7 @@ import {
   fetchSubscriptionPlans,
 } from '../services/subscriptionApi';
 import { fetchMyAuditLogs } from '../services/auditApi';
-import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import './Settings.css';
 
 const DATA_DELETE_CONFIRMATION = 'DELETE MY DATA';
@@ -49,7 +49,7 @@ function downloadJsonExport(data) {
 }
 
 const Settings = () => {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const [notifications, setNotifications] = useState(true);
   const [safetyBanner, setSafetyBanner] = useState(true);
   const [privacyDrawerAction, setPrivacyDrawerAction] = useState(null);

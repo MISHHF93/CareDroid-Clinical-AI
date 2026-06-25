@@ -43,7 +43,7 @@ import {
 } from '../../services/roleIntelligenceTelemetry';
 import { fetchToolExecutorCatalog } from '../../services/clinicalToolsApi';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { PILOT_CUSTOMER_MODE } from '../../config/unified-navigation.config';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
@@ -565,7 +565,7 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
 }
 
 const ToolsOverview = () => {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const location = useLocation();

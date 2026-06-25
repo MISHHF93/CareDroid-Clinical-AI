@@ -5,9 +5,11 @@ import PatientWhiteboard from '../../components/patient-experience/PatientWhiteb
 import DigitalDoorSign from '../../components/whiteboard/DigitalDoorSign';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { readPatientRouteContext } from '../../utils/receptionQueryParams';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './PatientRoomDisplay.css';
 
 export default function PatientRoomDisplay() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const [searchParams] = useSearchParams();
   const { focusPatientId: patientId } = readPatientRouteContext(searchParams);
   const roomId = searchParams.get('roomId') || '';
@@ -52,7 +54,7 @@ export default function PatientRoomDisplay() {
 
   return (
     <section className="patient-room-display">
-      {room ? (
+      {room && surfaces.patientRoom.showDoorSignDuplicate ? (
         <div className="patient-room-display__door-sign">
           <DigitalDoorSign room={room} patient={patient} staff={staff} />
         </div>

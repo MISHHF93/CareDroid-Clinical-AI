@@ -37,6 +37,8 @@ export default function PatientVerificationExperience({
   pendingAction = '',
   warnings = [],
   auditLog = [],
+  showWarningsExpanded = true,
+  showAuditExpanded = true,
   onLinkPatient,
   onCreatePatient,
   onProvisionalIntake,
@@ -177,11 +179,20 @@ export default function PatientVerificationExperience({
       ) : null}
 
       {warnings.length ? (
-        <div className="patient-verification__warnings" role="note">
-          {warnings.map((warning) => (
-            <p key={warning}>{warning}</p>
-          ))}
-        </div>
+        showWarningsExpanded ? (
+          <div className="patient-verification__warnings" role="note">
+            {warnings.map((warning) => (
+              <p key={warning}>{warning}</p>
+            ))}
+          </div>
+        ) : (
+          <details className="patient-verification__warnings patient-verification__warnings--collapsed">
+            <summary>{warnings.length} verification note{warnings.length === 1 ? '' : 's'}</summary>
+            {warnings.map((warning) => (
+              <p key={warning}>{warning}</p>
+            ))}
+          </details>
+        )
       ) : null}
 
       <section className="patient-verification__actions" aria-label="Verification finalize actions">
@@ -210,12 +221,21 @@ export default function PatientVerificationExperience({
       </section>
 
       {auditLog.length ? (
-        <section className="patient-verification__audit" aria-label="Identity audit log">
-          <h3>Identity audit log</h3>
-          {auditLog.map((entry) => (
-            <span key={entry}>{entry}</span>
-          ))}
-        </section>
+        showAuditExpanded ? (
+          <section className="patient-verification__audit" aria-label="Identity audit log">
+            <h3>Identity audit log</h3>
+            {auditLog.map((entry) => (
+              <span key={entry}>{entry}</span>
+            ))}
+          </section>
+        ) : (
+          <details className="patient-verification__audit patient-verification__audit--collapsed">
+            <summary>Identity audit ({auditLog.length})</summary>
+            {auditLog.map((entry) => (
+              <span key={entry}>{entry}</span>
+            ))}
+          </details>
+        )
       ) : null}
     </div>
   );

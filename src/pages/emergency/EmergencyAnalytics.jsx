@@ -27,7 +27,8 @@ import { summarizeTriageBreachAnalytics } from '../../services/triageBreachTimer
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { MaturityChip } from './emergencyRouteShared';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
+import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import './EmergencyAnalytics.css';
 
 const CHART_COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -98,11 +99,10 @@ function signalMeta(signal) {
 }
 
 export default function EmergencyAnalytics() {
-  const surfaces = getPractitionerSurfaceVisibility();
-  const emergencyRole = useEmergencyRolePermissions();
+  const surfaces = usePractitionerSurfaceVisibility();
+  const { backendAvailable, activeScenarioId } = useEdRouteDataContext();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const patients = useEmergencyStore((state) => state.patients);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
@@ -168,20 +168,37 @@ export default function EmergencyAnalytics() {
     emergencyAnalytics.status === 'loading'
       ? 'Loading'
       : analyticsSourceLabel(emergencyAnalytics.source);
+  const useCompactKpis = !surfaces.analytics.showKpiCards;
+  const shiftKpis = [
+    { label: 'Patients seen', value: shift.patientsSeen ?? 0 },
+    { label: 'Discharges', value: shift.dischargeCount ?? 0 },
+    { label: 'Daily volume', value: totalDailyVolume },
+    { label: 'Avg wait', value: `${shift.averageWaitMinutes ?? 0}m` },
+    { label: 'Boarding', value: shift.boardingCount ?? 0 },
+    { label: 'High risk', value: shift.highRiskCount ?? 0 },
+    { label: 'Reassess due', value: shift.reassessmentDueCount ?? 0 },
+    { label: 'Top complaint', value: topComplaint ? `${topComplaint.count}` : '0' },
+  ];
 
   return (
     <PageShell
       as="section"
       eyebrow="Analytics"
       title="Department Analytics"
-      description="Shift throughput, arrivals, wait times, and complaint mix for department review."
+      description={
+        surfaces.analytics.showDescriptions
+          ? 'Shift throughput, arrivals, wait times, and complaint mix for department review.'
+          : undefined
+      }
       actions={
         <>
           <MaturityChip maturity="demo" />
           <strong className="emergency-analytics__source-status">{sourceStatus}</strong>
         </>
       }
-      className="emergency-analytics cd-page-shell"
+      className={`emergency-analytics cd-page-shell${
+        surfaces.compactLayout ? ' emergency-analytics--practitioner-compact' : ''
+      }`}
       headerClassName="emergency-analytics__header"
       contentClassName="emergency-analytics__content"
       aria-label="Emergency operational analytics"
@@ -191,6 +208,7 @@ export default function EmergencyAnalytics() {
         loading={emergencyAnalytics.status === 'loading'}
         error={emergencyAnalytics.status === 'error' ? emergencyAnalytics.message : undefined}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
         compact
       />
 
@@ -199,7 +217,7 @@ export default function EmergencyAnalytics() {
           Loading CareDroid analytics...
         </p>
       ) : null}
-      {statusMessage ? (
+      {statusMessage && surfaces.analytics.showDescriptions ? (
         <p className="emergency-analytics__state">
           {statusMessage}
         </p>
@@ -377,32 +395,43 @@ export default function EmergencyAnalytics() {
         </div>
       ) : null}
 
-      <div className="emergency-analytics__grid" aria-label="Emergency analytics KPIs">
-        <ChartCard title="Patients Seen" subtitle="Current shift">
-          <strong>{shift.patientsSeen ?? 0}</strong>
-        </ChartCard>
-        <ChartCard title="Discharges" subtitle="Current shift">
-          <strong>{shift.dischargeCount ?? 0}</strong>
-        </ChartCard>
-        <ChartCard title="Daily Volume Total" subtitle="Last 7 days">
-          <strong>{totalDailyVolume}</strong>
-        </ChartCard>
-        <ChartCard title="Top Complaint" subtitle="Current board">
-          <strong>{topComplaint ? `${topComplaint.name}: ${topComplaint.count}` : 'No volume'}</strong>
-        </ChartCard>
-        <ChartCard title="Average Wait" subtitle="Backend current">
-          <strong>{shift.averageWaitMinutes ?? 0}m</strong>
-        </ChartCard>
-        <ChartCard title="Boarding" subtitle="Active boarders">
-          <strong>{shift.boardingCount ?? 0}</strong>
-        </ChartCard>
-        <ChartCard title="High Risk" subtitle="Active patients">
-          <strong>{shift.highRiskCount ?? 0}</strong>
-        </ChartCard>
-        <ChartCard title="Reassessment Due" subtitle="Safety queue">
-          <strong>{shift.reassessmentDueCount ?? 0}</strong>
-        </ChartCard>
-      </div>
+      {useCompactKpis ? (
+        <div className="emergency-analytics__kpi-strip" aria-label="Emergency analytics KPIs">
+          {shiftKpis.map((kpi) => (
+            <span key={kpi.label} className="emergency-analytics__kpi-strip-item">
+              <strong>{kpi.value}</strong>
+              <span>{kpi.label}</span>
+            </span>
+          ))}
+        </div>
+      ) : (
+        <div className="emergency-analytics__grid" aria-label="Emergency analytics KPIs">
+          <ChartCard title="Patients Seen" subtitle="Current shift">
+            <strong>{shift.patientsSeen ?? 0}</strong>
+          </ChartCard>
+          <ChartCard title="Discharges" subtitle="Current shift">
+            <strong>{shift.dischargeCount ?? 0}</strong>
+          </ChartCard>
+          <ChartCard title="Daily Volume Total" subtitle="Last 7 days">
+            <strong>{totalDailyVolume}</strong>
+          </ChartCard>
+          <ChartCard title="Top Complaint" subtitle="Current board">
+            <strong>{topComplaint ? `${topComplaint.name}: ${topComplaint.count}` : 'No volume'}</strong>
+          </ChartCard>
+          <ChartCard title="Average Wait" subtitle="Backend current">
+            <strong>{shift.averageWaitMinutes ?? 0}m</strong>
+          </ChartCard>
+          <ChartCard title="Boarding" subtitle="Active boarders">
+            <strong>{shift.boardingCount ?? 0}</strong>
+          </ChartCard>
+          <ChartCard title="High Risk" subtitle="Active patients">
+            <strong>{shift.highRiskCount ?? 0}</strong>
+          </ChartCard>
+          <ChartCard title="Reassessment Due" subtitle="Safety queue">
+            <strong>{shift.reassessmentDueCount ?? 0}</strong>
+          </ChartCard>
+        </div>
+      )}
 
       <div className="emergency-analytics__grid">
         <ChartCard title="Daily Patient Volume" subtitle="Last 7 days">
@@ -421,80 +450,84 @@ export default function EmergencyAnalytics() {
           )}
         </ChartCard>
 
-        <ChartCard title="Hourly Arrival Heatmap" subtitle="Today">
-          {hourlyArrivals.length ? (
-            <div className="emergency-analytics__heatmap">
-              {hourlyArrivals.map((hour) => (
-                <span
-                  key={hour.hour}
-                  className={`emergency-analytics__heatmap-cell emergency-analytics__heatmap-cell--${heatBucket(hour.count)}`}
-                  title={`${hour.hour}: ${hour.count} arrivals`}
-                >
-                  {hour.hour.slice(0, 2)}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <ChartEmpty>No hourly arrival data returned.</ChartEmpty>
-          )}
-        </ChartCard>
+        {surfaces.analytics.showSecondaryCharts ? (
+          <>
+            <ChartCard title="Hourly Arrival Heatmap" subtitle="Today">
+              {hourlyArrivals.length ? (
+                <div className="emergency-analytics__heatmap">
+                  {hourlyArrivals.map((hour) => (
+                    <span
+                      key={hour.hour}
+                      className={`emergency-analytics__heatmap-cell emergency-analytics__heatmap-cell--${heatBucket(hour.count)}`}
+                      title={`${hour.hour}: ${hour.count} arrivals`}
+                    >
+                      {hour.hour.slice(0, 2)}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <ChartEmpty>No hourly arrival data returned.</ChartEmpty>
+              )}
+            </ChartCard>
 
-        <ChartCard title="Average Wait Time Trend" subtitle="7-day">
-          {waitTrend.length ? (
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={waitTrend}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="avgWaitMinutes"
-                  name="Avg wait"
-                  stroke="var(--status-warning)"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <ChartEmpty>No wait time trend returned.</ChartEmpty>
-          )}
-        </ChartCard>
+            <ChartCard title="Average Wait Time Trend" subtitle="7-day">
+              {waitTrend.length ? (
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={waitTrend}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="avgWaitMinutes"
+                      name="Avg wait"
+                      stroke="var(--status-warning)"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <ChartEmpty>No wait time trend returned.</ChartEmpty>
+              )}
+            </ChartCard>
 
-        <ChartCard title="Top Chief Complaints" subtitle="Top 10">
-          {topComplaints.length ? (
-            <>
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie
-                    data={topComplaints}
-                    dataKey="count"
-                    nameKey="name"
-                    innerRadius={46}
-                    outerRadius={82}
-                    paddingAngle={2}
-                  >
-                    {topComplaints.map((entry, index) => (
-                      <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+            <ChartCard title="Top Chief Complaints" subtitle="Top 10">
+              {topComplaints.length ? (
+                <>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={topComplaints}
+                        dataKey="count"
+                        nameKey="name"
+                        innerRadius={46}
+                        outerRadius={82}
+                        paddingAngle={2}
+                      >
+                        {topComplaints.map((entry, index) => (
+                          <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="emergency-analytics__legend">
+                    {topComplaints.slice(0, 6).map((item, index) => (
+                      <span key={item.name}>
+                        <i className={`emergency-analytics__legend-swatch emergency-analytics__legend-swatch--${index % 6}`} />
+                        {item.name}: {item.count}
+                      </span>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="emergency-analytics__legend">
-                {topComplaints.slice(0, 6).map((item, index) => (
-                  <span key={item.name}>
-                    <i className={`emergency-analytics__legend-swatch emergency-analytics__legend-swatch--${index % 6}`} />
-                    {item.name}: {item.count}
-                  </span>
-                ))}
-              </div>
-            </>
-          ) : (
-            <ChartEmpty>No complaint mix returned.</ChartEmpty>
-          )}
-        </ChartCard>
+                  </div>
+                </>
+              ) : (
+                <ChartEmpty>No complaint mix returned.</ChartEmpty>
+              )}
+            </ChartCard>
+          </>
+        ) : null}
       </div>
     </PageShell>
   );

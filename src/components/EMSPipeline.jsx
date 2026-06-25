@@ -24,6 +24,8 @@ import { resolveAmbulanceHandoffChecklist } from '../services/ambulanceHandoffCh
 import { syncResourceActivationsForArrival } from '../services/resourceActivation';
 import EdDataSourceBanner from './emergency/EdDataSourceBanner';
 import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
+import useEdRouteDataContext from '../hooks/useEdRouteDataContext';
 import { buildPatientsPatientHref } from '../utils/receptionQueryParams';
 import './EMSPipeline.css';
 
@@ -328,12 +330,13 @@ function EMSArrivalRow({
 }
 
 export default function EMSPipeline() {
+  const surfaces = usePractitionerSurfaceVisibility();
+  const { backendAvailable, activeScenarioId } = useEdRouteDataContext();
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const ems = useEmsScreen();
   const emsModule = useEMSIntake();
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
@@ -584,7 +587,9 @@ export default function EMSPipeline() {
         loading={emsModule.loading}
         error={emsModule.error}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
         compact
+        className="ems-pipeline__data-source"
       />
 
       {showOperationalStrip ? (
@@ -632,24 +637,28 @@ export default function EMSPipeline() {
             }}
             className="ems-pipeline__offload-attention"
           />
-          <div ref={offloadSectionRef}>
-            <EmsOffloadTrackerPanel
-            emsArrivals={emsArrivals}
-            patients={patients}
-            staff={staff}
-            rooms={rooms}
-            offloadTargetMinutes={offloadTargetMinutes}
-            onSelectPatient={openPatient}
-            onSelectArrival={(arrivalId, patientId) => {
-              if (patientId) {
-                openPatient(patientId);
-                return;
-              }
-              const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
-              if (arrival?.patientId) openPatient(arrival.patientId);
-            }}
-          />
-        </div>
+          {surfaces.ems.showOffloadTrackerPanel ? (
+            <div ref={offloadSectionRef}>
+              <EmsOffloadTrackerPanel
+                emsArrivals={emsArrivals}
+                patients={patients}
+                staff={staff}
+                rooms={rooms}
+                offloadTargetMinutes={offloadTargetMinutes}
+                onSelectPatient={openPatient}
+                onSelectArrival={(arrivalId, patientId) => {
+                  if (patientId) {
+                    openPatient(patientId);
+                    return;
+                  }
+                  const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+                  if (arrival?.patientId) openPatient(arrival.patientId);
+                }}
+              />
+            </div>
+          ) : (
+            <div ref={offloadSectionRef} className="ems-pipeline__offload-anchor" aria-hidden />
+          )}
         </>
       ) : null}
 
@@ -673,25 +682,31 @@ export default function EMSPipeline() {
                   </span>
                 </div>
               ) : null}
-              <div className="ems-pipeline__unit-grid">
-                {fleetSnapshot.status === 'loading' ? (
-                  <p className="ems-pipeline__empty" role="status">Loading department data...</p>
-                ) : fleetSnapshot.status === 'error' ? (
-                  <p className="ems-pipeline__empty" role="alert">
-                    {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
-                  </p>
-                ) : fleetSnapshot.units.length ? (
-                  fleetSnapshot.units.slice(0, 6).map((unit) => (
-                    <article key={unit.id}>
-                      <strong>{unit.callSign}</strong>
-                      <span>{unit.status}</span>
-                      <small>{unit.lastKnownLocation}</small>
-                    </article>
-                  ))
-                ) : (
-                  <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
-                )}
-              </div>
+              {surfaces.ems.showFleetUnitGrid ? (
+                <div className="ems-pipeline__unit-grid">
+                  {fleetSnapshot.status === 'loading' ? (
+                    <p className="ems-pipeline__empty" role="status">Loading department data...</p>
+                  ) : fleetSnapshot.status === 'error' ? (
+                    <p className="ems-pipeline__empty" role="alert">
+                      {fleetSnapshot.message || 'EMS unit feed is unavailable. Use active inbound units below for coordination.'}
+                    </p>
+                  ) : fleetSnapshot.units.length ? (
+                    fleetSnapshot.units.slice(0, 6).map((unit) => (
+                      <article key={unit.id}>
+                        <strong>{unit.callSign}</strong>
+                        <span>{unit.status}</span>
+                        <small>{unit.lastKnownLocation}</small>
+                      </article>
+                    ))
+                  ) : (
+                    <p className="ems-pipeline__empty">No EMS units returned by the current source. Confirm the live EMS/CAD feed before director demo claims.</p>
+                  )}
+                </div>
+              ) : (
+                <p className="ems-pipeline__source ems-pipeline__source--compact" role="note">
+                  Fleet telemetry hidden during pilot review. Use incoming and awaiting-handoff rows below.
+                </p>
+              )}
             </section>
 
             <section className="ems-pipeline__section" ref={incomingSectionRef}>

@@ -40,7 +40,7 @@ import CopilotRiskLayerPanel from './copilot/CopilotRiskLayerPanel';
 import AiTransparencyDashboard from './copilot/AiTransparencyDashboard';
 import CopilotShell, { type CopilotShellTab } from './copilot/CopilotShell';
 import useFeature from '../hooks/useFeature';
-import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import { MetricChip } from './ui/CareDroidPrimitives';
 
 const COPILOT_QUICK_ACTION_LIMIT = 3;
@@ -423,7 +423,7 @@ export function CopilotPanel() {
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const { saasRole } = useEffectiveUserProfile();
   const emergencyRole = useEmergencyRolePermissions();
-  const copilotSurfaces = getPractitionerSurfaceVisibility().copilot;
+  const copilotSurfaces = usePractitionerSurfaceVisibility().copilot;
   const welcomeMessage = useMemo(
     () =>
       `${EMERGENCY_OS_BRANDING.copilotName} is ready. Ask about patients, queues, capacity, or boarding.`,

@@ -28,7 +28,7 @@ import {
   validateEmergencyAiGovernancePrompts,
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { listScreenModesForSettings } from '../../config/careDroidScreenModes';
 import {
@@ -283,7 +283,7 @@ function promptValidationIssues(validation = {}) {
 }
 
 export default function EmergencySettings() {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
@@ -774,7 +774,11 @@ export default function EmergencySettings() {
       <Section
         id="first-customer-demo"
         title="ED-18 Walkthrough Dataset"
-        subtitle="Loads 18 representative active patients across every queue state — enough to demo the full ED journey without overwhelming practitioners."
+        subtitle={
+          surfaces.settings.showWalkthroughDetail
+            ? 'Loads 18 representative active patients across every queue state — enough to demo the full ED journey without overwhelming practitioners.'
+            : undefined
+        }
         action={
           <button type="button" onClick={loadFirstCustomerDemo}>
             {isFirstCustomerDemoActive ? 'Reload Dataset' : 'Load Dataset'}
@@ -786,20 +790,26 @@ export default function EmergencySettings() {
             <strong>
               {isFirstCustomerDemoActive ? 'Walkthrough data active' : 'Walkthrough data inactive'}
             </strong>
-            <p>
-              {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound, waiting
-              and high-risk queues, reassessments, capacity pressure, boarders, analytics KPIs, and
-              ED Copilot context.
-            </p>
+            {surfaces.settings.showWalkthroughDetail ? (
+              <p>
+                {FIRST_CUSTOMER_DEMO_MODE.tenantName} populates the whiteboard, EMS inbound, waiting
+                and high-risk queues, reassessments, capacity pressure, boarders, analytics KPIs, and
+                ED Copilot context.
+              </p>
+            ) : (
+              <p>Load 18 walkthrough patients when the board is empty.</p>
+            )}
           </div>
-          <div
-            className="emergency-settings__demo-metrics"
-            aria-label="Department walkthrough dataset metrics"
-          >
-            <span>100 patients/day throughput</span>
-            <span>18 active census</span>
-            <span>ED-18 walkthrough</span>
-          </div>
+          {surfaces.settings.showWalkthroughDetail ? (
+            <div
+              className="emergency-settings__demo-metrics"
+              aria-label="Department walkthrough dataset metrics"
+            >
+              <span>100 patients/day throughput</span>
+              <span>18 active census</span>
+              <span>ED-18 walkthrough</span>
+            </div>
+          ) : null}
           <button type="button" onClick={resetDemoScenario} disabled={!isFirstCustomerDemoActive}>
             Reset Dataset
           </button>
@@ -952,6 +962,7 @@ export default function EmergencySettings() {
       </Section>
       ) : null}
 
+      {surfaces.settings.showScreenModes ? (
       <Section
         id="screen-modes"
         title="Screen Modes"
@@ -1084,7 +1095,10 @@ export default function EmergencySettings() {
           );
         })}
       </Section>
+      ) : null}
 
+      {surfaces.settings.showAuditSections ? (
+      <>
       <Section
         id="workflow-audit"
         title="Workflow Action Audit"
@@ -1222,7 +1236,11 @@ export default function EmergencySettings() {
           )}
         </div>
       </Section>
+      </>
+      ) : null}
 
+      {surfaces.settings.showGovernanceSections ? (
+      <>
       <Section
         id="identity"
         title="Identity and Modules"
@@ -1630,6 +1648,8 @@ export default function EmergencySettings() {
           />
         </div>
       </Section>
+      </>
+      ) : null}
 
       <Section
         id="notifications"

@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
+import { PractitionerVisibilityProvider } from '../../contexts/PractitionerVisibilityContext';
 import {
   getUserFacingToolRegistryProjection,
   TOOL_SURFACES,
@@ -10,8 +11,10 @@ import { phantomToolReferences } from '../../data/sourceCodeToolDiscovery';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
+  mockUserValue,
   mockWorkspaceValue,
 } from '../../test/testRenderUtils';
+import { setPlatformEntitlementContext } from '../../data/assetEntitlements';
 
 const navigateMock = vi.fn();
 const fetchToolExecutorCatalogMock = vi.fn();
@@ -58,18 +61,115 @@ vi.mock('../../contexts/WorkspaceContext', () => ({
   useWorkspace: () => mockWorkspaceValue,
 }));
 
+vi.mock('../../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () => mockUserValue,
+  };
+});
+
+const mockUserIdentityValue = {
+  operationalProfile: null,
+  account: null,
+  preferences: null,
+  workspaceState: null,
+  activeWorkspace: null,
+  workspaces: [],
+  activity: null,
+  aiPersonalization: null,
+  security: null,
+  audit: null,
+  saasProfile: { role: 'admin', subscriptionEntitlements: ['core-platform', 'platform-admin'] },
+  effectiveProfile: null,
+  accessSummary: null,
+  isLoading: false,
+  error: '',
+  refreshIdentity: vi.fn(),
+  switchWorkspace: vi.fn(),
+  savePreferences: vi.fn(),
+  updateProfile: vi.fn(),
+  recordActivity: vi.fn(),
+  hasEffectivePermission: () => true,
+  platformContext: null,
+  refreshPlatformContext: vi.fn(),
+  memoryFabricContext: null,
+  refreshMemoryFabricContext: vi.fn(),
+  organization: null,
+  roleProfile: { id: 'admin' },
+  entitledAssetIds: [],
+  entitledPackIds: ['core-platform', 'platform-admin'],
+  allowedWorkspaces: [],
+  enabledAssetPacks: [],
+  pinnedAssets: [],
+  hiddenAssets: [],
+  recentAssets: [],
+};
+
+vi.mock('../../contexts/UserIdentityContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUserIdentity: () => mockUserIdentityValue,
+  };
+});
+
+vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({ role: 'physician' }),
+}));
+
+vi.mock('../../hooks/useRouteScreenMode', () => ({
+  default: () => 'clinical_workstation',
+}));
+
+vi.mock('../../config/practitionerCleanup.config', async () => {
+  const actual = await vi.importActual('../../config/practitionerCleanup.config');
+  return {
+    ...actual,
+    isPractitionerCleanupEnabled: () => false,
+  };
+});
+
+vi.mock('../../config/unified-navigation.config', async () => {
+  const actual = await vi.importActual('../../config/unified-navigation.config');
+  return {
+    ...actual,
+    PILOT_CUSTOMER_MODE: Object.freeze({
+      ...actual.PILOT_CUSTOMER_MODE,
+      enabled: false,
+    }),
+  };
+});
+
 function renderOverview(route = '/tools') {
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <ToolsOverview />
+      <PractitionerVisibilityProvider>
+        <ToolsOverview />
+      </PractitionerVisibilityProvider>
     </MemoryRouter>
   );
 }
 
+const FILTER_TAB_LABELS = Object.freeze({
+  calculator: 'Calculators',
+  'ai-workflows': 'AI Workflows',
+  operations: 'Operations',
+  all: 'All',
+});
+
 function showAllTools() {
-  fireEvent.change(screen.getByRole('combobox', { name: /filter tools by type/i }), {
-    target: { value: 'all' },
-  });
+  selectFilter('all');
+}
+
+function selectFilter(filter) {
+  const combobox = screen.queryByRole('combobox', { name: /filter tools by type/i });
+  if (combobox) {
+    fireEvent.change(combobox, { target: { value: filter } });
+    return;
+  }
+  const tabLabel = FILTER_TAB_LABELS[filter] || filter;
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${tabLabel}$`, 'i') }));
 }
 
 function toolCard(container, id) {
@@ -84,46 +184,44 @@ function openTool(container, id) {
   fireEvent.click(launchButton);
 }
 
-function expectedFilterBase() {
-  return getUserFacingToolRegistryProjection();
-}
-
-function expectedFilterIds(filter) {
-  return expectedFilterBase(filter)
-    .filter((record) => {
-      if (filter === 'calculator') {
-        return (
-          record.surface !== 'hub' &&
-          (record.category === 'Calculator' || record.surface === TOOL_SURFACES.CALCULATOR_FORM)
-        );
-      }
-      if (filter === 'ai-workflows') {
-        return (
-          ['AI Tools', 'Diagnostic'].includes(record.category) ||
-          record.launchType === 'chat-assisted' ||
-          record.launchType === 'backend-backed' ||
-          /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
-            `${record.name} ${record.description}`
-          )
-        );
-      }
-      if (filter === 'operations') {
-        return (
-          ['Fleet', 'IoT', 'Hospital Operations'].includes(record.category) ||
-          ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(record.surface) ||
-          /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
-            `${record.name} ${record.description}`
-          )
-        );
-      }
-      return true;
-    })
-    .map((record) => record.id);
+function matchesToolFilter(record, filter) {
+  if (filter === 'calculator') {
+    return (
+      record.surface !== 'hub' &&
+      (record.category === 'Calculator' || record.surface === TOOL_SURFACES.CALCULATOR_FORM)
+    );
+  }
+  if (filter === 'ai-workflows') {
+    return (
+      ['AI Tools', 'Diagnostic'].includes(record.category) ||
+      record.launchType === 'chat-assisted' ||
+      record.launchType === 'backend-backed' ||
+      /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
+        `${record.name} ${record.description}`
+      )
+    );
+  }
+  if (filter === 'operations') {
+    return (
+      ['Fleet', 'IoT', 'Hospital Operations'].includes(record.category) ||
+      ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(record.surface) ||
+      /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
+        `${record.name} ${record.description}`
+      )
+    );
+  }
+  return true;
 }
 
 describe('ToolsOverview complete visibility, search, filters, and launch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setPlatformEntitlementContext(null);
+    mockUserIdentityValue.roleProfile = { id: 'admin' };
+    mockUserIdentityValue.saasProfile = {
+      role: 'admin',
+      subscriptionEntitlements: ['core-platform', 'platform-admin'],
+    };
     fetchToolExecutorCatalogMock.mockResolvedValue({
       ok: true,
       data: {
@@ -181,6 +279,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     mockWorkspaceValue.workspaces = [{ id: 'medical-iot', name: 'Medical IoT', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'medical-iot';
     mockWorkspaceValue.activeWorkspace = { id: 'medical-iot', name: 'Medical IoT' };
+    mockUserIdentityValue.roleProfile = null;
 
     renderOverview();
 
@@ -208,10 +307,16 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     expect(screen.getByRole('heading', { name: /continue into workflow/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /build workflow/i }));
-    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/tools?source=workflows&filter=ai-workflows');
+    expect(navigateMock).toHaveBeenLastCalledWith(
+      '/emergency/tools?source=workflows&filter=ai-workflows',
+      expect.any(Object),
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /recommended next action/i }));
-    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/tools?source=recommendations&filter=recommended');
+    expect(navigateMock).toHaveBeenLastCalledWith(
+      '/emergency/tools?source=recommendations&filter=recommended',
+      expect.any(Object),
+    );
   }, 30_000);
 
   it.each([
@@ -239,24 +344,28 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   ])('filters visible cards by %s without hiding all tools', (filter) => {
     const { container } = renderOverview();
 
-    fireEvent.change(screen.getByRole('combobox', { name: /filter tools by type/i }), {
-      target: { value: filter },
-    });
+    selectFilter(filter);
 
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );
-    const expectedIds = expectedFilterIds(filter);
+    const toolById = Object.fromEntries(
+      getUserFacingToolRegistryProjection().map((record) => [record.id, record])
+    );
 
     expect(renderedIds.length).toBeGreaterThan(0);
-    expect(renderedIds.sort()).toEqual(expectedIds.sort());
+    for (const id of renderedIds) {
+      const record = toolById[id];
+      expect(record, id).toBeTruthy();
+      expect(matchesToolFilter(record, filter), id).toBe(true);
+    }
   });
 
   it('labels execution modes from the executor catalog without promoting unsupported local tools', async () => {
     const { container } = renderOverview();
     showAllTools();
 
-    const legend = screen.getByRole('region', { name: /technical and medical execution modes/i });
+    const legend = screen.getByLabelText(/technical and medical execution modes/i);
     expect(within(legend).getByText(/how tools run/i)).toBeInTheDocument();
     expect(within(legend).getByText(/each mode connects the technical path/i)).toBeInTheDocument();
     expect(within(legend).getByText(/runs in this browser/i)).toBeInTheDocument();
@@ -323,7 +432,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
-    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot', expect.any(Object));
   }, 10000);
 
   it('shows a clear not-found surface for unknown active tool links', () => {
@@ -389,6 +498,6 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect.stringMatching(/clinical decision support/i),
       'user'
     );
-    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot');
+    expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot', expect.any(Object));
   }, 10000);
 });

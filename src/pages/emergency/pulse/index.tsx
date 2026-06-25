@@ -21,6 +21,9 @@ import {
 } from '../../../types/emergency';
 import type { Alert, CapacitySnapshot, Patient, Referral, Staff, WorkflowActionLog } from '../../../types/emergency';
 import { PageShell } from '../../../components/ui/CareDroidPrimitives';
+import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
+import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
+import useEdRouteDataContext from '../../../hooks/useEdRouteDataContext';
 import './DepartmentPulse.css';
 
 const LAST_VIEW_KEY = 'caredroid.ed.departmentPulse.lastView.v1';
@@ -490,6 +493,10 @@ export default function DepartmentPulse() {
     .sort((first, second) => second.avgWait - first.avgWait)[0];
   const secondsSinceUpdate = Math.max(0, Math.floor((now.getTime() - lastUpdatedAt.getTime()) / 1000));
 
+  const surfaces = usePractitionerSurfaceVisibility();
+  const { activeScenarioId, backendAvailable, envelope, loading } = useEdRouteDataContext();
+  const useCompactStats = !surfaces.pulse.showStatCards;
+
   const statTiles = [
     {
       label: 'Active patients',
@@ -534,12 +541,27 @@ export default function DepartmentPulse() {
       eyebrow="Analytics"
       title="Department Pulse"
       titleId="emergency-pulse-title"
-      description="Live queues, staff load, EMS inbound, and attention patients for charge review."
-      className="emergency-pulse cd-page-shell"
+      description={
+        surfaces.pulse.showDescriptions
+          ? 'Live queues, staff load, EMS inbound, and attention patients for charge review.'
+          : undefined
+      }
+      className={`emergency-pulse cd-page-shell${
+        surfaces.compactLayout ? ' emergency-pulse--practitioner-compact' : ''
+      }`}
       headerClassName="emergency-pulse__hero"
       contentClassName="emergency-pulse__content"
       aria-labelledby="emergency-pulse-title"
     >
+      <EdDataSourceBanner
+        envelope={envelope}
+        loading={loading}
+        activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
+        compact
+        className="emergency-pulse__data-source"
+      />
+
       <div className="emergency-pulse__timebar">
         <strong>
           {isReturningAfterAway
@@ -552,25 +574,43 @@ export default function DepartmentPulse() {
         </span>
       </div>
 
-      <div className="emergency-pulse__stats" aria-label="Department pulse statistics">
-        {statTiles.map((tile) => {
-          const Icon = tile.icon;
-          return (
+      {useCompactStats ? (
+        <div className="emergency-pulse__stat-strip" aria-label="Department pulse statistics">
+          {statTiles.map((tile) => (
             <button
               key={tile.label}
               type="button"
-              className={`emergency-pulse__stat emergency-pulse__stat--${tile.tone}`}
+              className={`emergency-pulse__stat-strip-item emergency-pulse__stat-strip-item--${tile.tone}`}
               onClick={() => profileNavigate(tile.route)}
             >
-              <Icon size={24} aria-hidden="true" />
-              <span>{tile.label}</span>
               <strong>
                 <AnimatedNumber value={tile.value} />
               </strong>
+              <span>{tile.label}</span>
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="emergency-pulse__stats" aria-label="Department pulse statistics">
+          {statTiles.map((tile) => {
+            const Icon = tile.icon;
+            return (
+              <button
+                key={tile.label}
+                type="button"
+                className={`emergency-pulse__stat emergency-pulse__stat--${tile.tone}`}
+                onClick={() => profileNavigate(tile.route)}
+              >
+                <Icon size={24} aria-hidden="true" />
+                <span>{tile.label}</span>
+                <strong>
+                  <AnimatedNumber value={tile.value} />
+                </strong>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {isReturningAfterAway ? (
         <section className="emergency-pulse__panel" aria-labelledby="pulse-changes-heading">
@@ -618,46 +658,54 @@ export default function DepartmentPulse() {
         </div>
       </section>
 
-      <section className="emergency-pulse__panel" aria-labelledby="pulse-queue-heading">
-        <div className="emergency-pulse__section-heading">
-          <h2 id="pulse-queue-heading">Queue snapshot</h2>
-          <span>{queueRows.length} queues</span>
-        </div>
-        <div className="emergency-pulse__queue-list">
-          {queueRows.map((queue) => (
-            <div key={queue.id} className="emergency-pulse__queue-row">
-              <strong>{queue.name}</strong>
-              <span>{queue.count}</span>
-              <span className={`emergency-pulse__health emergency-pulse__health--${queue.health}`} aria-label={`${queue.health} health`} />
-              <small>Avg {queue.avgWait}m</small>
-            </div>
-          ))}
-        </div>
-        {bottleneckAlert || derivedBottleneck ? (
-          <p className="emergency-pulse__bottleneck" role="alert">
-            Bottleneck: {bottleneckAlert?.message || `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
-          </p>
-        ) : null}
-      </section>
-
-      <section className="emergency-pulse__panel" aria-labelledby="pulse-staff-heading">
-        <div className="emergency-pulse__section-heading">
-          <h2 id="pulse-staff-heading">Staff snapshot</h2>
-          <span>{staffRows.length} active staff</span>
-        </div>
-        <div className="emergency-pulse__staff-row">
-          {staffRows.map((member) => (
-            <article key={member.id} className={`emergency-pulse__staff emergency-pulse__staff--${member.tone}`}>
-              {member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : <span>{member.initials}</span>}
-              <strong>{member.displayName}</strong>
-              <small>{member.count} patients</small>
-              <div className="emergency-pulse__workload" aria-label={`${member.displayName} workload`}>
-                <span style={{ width: `${Math.max(8, member.workloadPercent)}%` }} />
+      {surfaces.pulse.showQueuePanel ? (
+        <section className="emergency-pulse__panel" aria-labelledby="pulse-queue-heading">
+          <div className="emergency-pulse__section-heading">
+            <h2 id="pulse-queue-heading">Queue snapshot</h2>
+            <span>{queueRows.length} queues</span>
+          </div>
+          <div className="emergency-pulse__queue-list">
+            {queueRows.map((queue) => (
+              <div key={queue.id} className="emergency-pulse__queue-row">
+                <strong>{queue.name}</strong>
+                <span>{queue.count}</span>
+                <span className={`emergency-pulse__health emergency-pulse__health--${queue.health}`} aria-label={`${queue.health} health`} />
+                <small>Avg {queue.avgWait}m</small>
               </div>
-            </article>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+          {bottleneckAlert || derivedBottleneck ? (
+            <p className="emergency-pulse__bottleneck" role="alert">
+              Bottleneck: {bottleneckAlert?.message || `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
+            </p>
+          ) : null}
+        </section>
+      ) : bottleneckAlert || derivedBottleneck ? (
+        <p className="emergency-pulse__bottleneck emergency-pulse__bottleneck--compact" role="alert">
+          Bottleneck: {bottleneckAlert?.message || `${derivedBottleneck.name} average wait is ${derivedBottleneck.avgWait}m.`}
+        </p>
+      ) : null}
+
+      {surfaces.pulse.showStaffPanel ? (
+        <section className="emergency-pulse__panel" aria-labelledby="pulse-staff-heading">
+          <div className="emergency-pulse__section-heading">
+            <h2 id="pulse-staff-heading">Staff snapshot</h2>
+            <span>{staffRows.length} active staff</span>
+          </div>
+          <div className="emergency-pulse__staff-row">
+            {staffRows.map((member) => (
+              <article key={member.id} className={`emergency-pulse__staff emergency-pulse__staff--${member.tone}`}>
+                {member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : <span>{member.initials}</span>}
+                <strong>{member.displayName}</strong>
+                <small>{member.count} patients</small>
+                <div className="emergency-pulse__workload" aria-label={`${member.displayName} workload`}>
+                  <span style={{ width: `${Math.max(8, member.workloadPercent)}%` }} />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </PageShell>
   );
 }

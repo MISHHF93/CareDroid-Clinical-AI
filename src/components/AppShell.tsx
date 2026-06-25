@@ -15,7 +15,10 @@ import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
-import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
+import {
+  PractitionerVisibilityProvider,
+  usePractitionerSurfaceVisibility,
+} from '../contexts/PractitionerVisibilityContext';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
@@ -200,11 +203,19 @@ function buildEmergencyToolsPath(params: Record<string, string | null | undefine
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const surfaces = getPractitionerSurfaceVisibility();
+  return (
+    <PractitionerVisibilityProvider>
+      <AppShellFrame>{children}</AppShellFrame>
+    </PractitionerVisibilityProvider>
+  );
+}
+
+function AppShellFrame({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
+  const surfaces = usePractitionerSurfaceVisibility();
   const screenDensityProfile = useMemo(
     () => resolveScreenDensityProfile(screenCapabilities.screenMode),
     [screenCapabilities.screenMode],

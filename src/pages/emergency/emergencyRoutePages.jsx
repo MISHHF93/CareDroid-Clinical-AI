@@ -3,12 +3,9 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
-import {
-  shouldHidePatientJourneyEngineCard,
-  shouldSuppressCopilotRouteMetrics,
-  shouldSuppressCopilotRouteUpgradeSignals,
-} from '../../config/practitionerCleanup.config';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import {
   useBoardingStatus,
@@ -45,9 +42,10 @@ import {
 
 
 export function PatientsRoute() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const storePatients = useEmergencyStore((state) => state.patients);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const patientsModule = useEmergencyPatients();
   const journeyModule = usePatientJourney();
@@ -133,6 +131,7 @@ export function PatientsRoute() {
         loading={patientsModule.loading}
         error={patientsModule.error}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
         compact
       />
       <ApiStateBanner moduleState={patientsModule} />
@@ -147,11 +146,12 @@ export function PatientsRoute() {
           },
         ]}
       />
-      <ApiStateBanner
-        moduleState={journeyModule}
-        fallbackText="Patient Journey endpoint is unavailable; patient cards remain available."
-      />
-      {!shouldHidePatientJourneyEngineCard() ? (
+      {surfaces.emergencyRoutes.showJourneyEngineCard ? (
+        <>
+          <ApiStateBanner
+            moduleState={journeyModule}
+            fallbackText="Patient Journey endpoint is unavailable; patient cards remain available."
+          />
         <article aria-label="Patient Journey backend status" className="emergency-route-card emergency-route-journey-card">
           <div className="emergency-route-section-card__header">
             <div>
@@ -174,6 +174,7 @@ export function PatientsRoute() {
             )}
           </div>
         </article>
+        </>
       ) : null}
       <PatientGrid
         patients={visiblePatients}
@@ -189,11 +190,12 @@ export function PatientsRoute() {
 }
 
 export function QueueRoute() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const referrals = useEmergencyStore((state) => state.referrals);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const setActiveQueueFilter = useEmergencyStore((state) => state.setActiveQueueFilter);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
@@ -332,6 +334,7 @@ export function QueueRoute() {
         loading={queues.loading}
         error={queues.error}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
       />
       <ApiStateBanner moduleState={queues} />
       <MetricGrid
@@ -348,10 +351,12 @@ export function QueueRoute() {
           },
         ]}
       />
-      <p className="emergency-route-card emergency-route-muted" role="note">
-        Waiting-room safety and fit-to-wait review live on the{' '}
-        <Link to={CANONICAL_ROUTES.emergencyWhiteboard}>Emergency Whiteboard</Link>.
-      </p>
+      {surfaces.emergencyRoutes.showCrossLinks ? (
+        <p className="emergency-route-card emergency-route-muted" role="note">
+          Waiting-room safety and fit-to-wait review live on the{' '}
+          <Link to={CANONICAL_ROUTES.emergencyWhiteboard}>Emergency Whiteboard</Link>.
+        </p>
+      ) : null}
       {effectiveQueueFilter ? (
         <div role="status" className="emergency-route-card emergency-route-filter-banner">
           <span className="emergency-route-filter-banner__label">
@@ -436,7 +441,7 @@ export function QueueRoute() {
 export function ReassessmentRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const reassessment = useReassessmentQueue();
   const { contextPatientId: patientIdParam } = readPatientRouteContext(searchParams);
@@ -485,6 +490,7 @@ export function ReassessmentRoute() {
         loading={reassessment.loading}
         error={reassessment.error}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
       />
       <ApiStateBanner moduleState={reassessment} />
       <MetricGrid
@@ -509,11 +515,12 @@ export function BoardingRoute() {
 }
 
 export function CapacityRoute() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const [searchParams, setSearchParams] = useSearchParams();
   const storeCapacity = useEmergencyStore((state) => state.capacity);
   const storeRooms = useEmergencyStore((state) => state.rooms);
   const patients = useEmergencyStore((state) => state.patients);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const capacityStatus = useCapacityStatus();
   const boarding = useBoardingStatus();
   const upgradeCapacity = useUpgradeHarnessCapacity();
@@ -549,6 +556,7 @@ export function CapacityRoute() {
             loading={boarding.loading}
             error={boarding.error}
             activeScenarioId={activeScenarioId}
+            backendAvailable={backendAvailable}
           />
           <ApiStateBanner moduleState={boarding} />
           <MetricGrid
@@ -572,6 +580,7 @@ export function CapacityRoute() {
             loading={capacityStatus.loading}
             error={capacityStatus.error}
             activeScenarioId={activeScenarioId}
+            backendAvailable={backendAvailable}
           />
           <ApiStateBanner moduleState={capacityStatus} />
           <MetricGrid
@@ -597,7 +606,7 @@ export function CapacityRoute() {
               ))}
             </div>
           ) : null}
-          {simulationSignal || bragSignal ? (
+          {surfaces.emergencyRoutes.showCapacityUpgradeHarness && (simulationSignal || bragSignal) ? (
             <div className="emergency-route-signal-grid">
               {simulationSignal ? (
                 <article className="emergency-route-card emergency-route-signal-row">
@@ -636,9 +645,10 @@ export function CapacityRoute() {
 }
 
 export function CopilotRoute() {
+  const surfaces = usePractitionerSurfaceVisibility();
   const patients = useEmergencyStore((state) => state.patients);
   const capacity = useEmergencyStore((state) => state.capacity);
-  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const { activeScenarioId, backendAvailable } = useEdRouteDataContext();
   const copilot = useEDCopilot();
   const upgradeClinical = useUpgradeHarnessClinicalIntelligence();
   const upgradeAudit = useUpgradeHarnessAuditSummary();
@@ -650,8 +660,8 @@ export function CopilotRoute() {
   const auditSignal = upgradeAudit.data?.data?.signals?.[0] || null;
   const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
   const highRiskPatients = activePatients.filter(isHighRisk);
-  const showUpgradeSignals = !shouldSuppressCopilotRouteUpgradeSignals();
-  const showRouteMetrics = !shouldSuppressCopilotRouteMetrics();
+  const showUpgradeSignals = surfaces.copilotRoute.showUpgradeSignals;
+  const showRouteMetrics = surfaces.copilotRoute.showRouteMetrics;
 
   return (
     <EmergencyRoutePage
@@ -664,6 +674,7 @@ export function CopilotRoute() {
         loading={copilot.loading}
         error={copilot.error}
         activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
         compact
       />
       {showRouteMetrics ? <ApiStateBanner moduleState={copilot} /> : null}

@@ -116,7 +116,10 @@ import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTr
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import { mergePractitionerDensityProfile, shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import {
+  usePractitionerSurfaceVisibility,
+  usePractitionerVisibilityContext,
+} from '../../contexts/PractitionerVisibilityContext';
 import DiagnosticSafetyDashboard from '../../components/copilot/DiagnosticSafetyDashboard';
 import NativeAiCommandSuitePanel from '../../components/native-ai/NativeAiCommandSuitePanel';
 import useFeature from '../../hooks/useFeature';
@@ -297,7 +300,6 @@ function MissionButton({
 }
 
 export default function EmergencyWhiteboard() {
-  const surfaces = getPractitionerSurfaceVisibility();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
@@ -310,11 +312,6 @@ export default function EmergencyWhiteboard() {
   const commandCenter = useCommandCenterScreen();
   const { enabled: clinicalAcuityDashboardEnabled } = useFeature('clinical_acuity_dashboard');
   const { enabled: aiTransparencyDashboardEnabled } = useFeature('ai_transparency_dashboard');
-  const showNativeAiCommandSuite =
-    surfaces.whiteboard.showNativeAiPanels &&
-    (clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled);
-  useNativeAiBackendSync(showNativeAiCommandSuite, { force: true });
-  const nativeAiRefreshTick = useNativeAiPeriodicRefresh();
   const storePatients = useEmergencyStore((state) => state.patients);
   const storeCapacity = useEmergencyStore((state) => state.capacity);
   const storeLoading = useEmergencyStore((state) => state.loading);
@@ -357,6 +354,13 @@ export default function EmergencyWhiteboard() {
             : undefined;
   const presentation = useOperationalPresentation(presentationScreenMode);
   const routeScreenMode = display.screenMode;
+  const practitionerVisibilityContext = usePractitionerVisibilityContext();
+  const surfaces = usePractitionerSurfaceVisibility();
+  const showNativeAiCommandSuite =
+    surfaces.whiteboard.showNativeAiPanels &&
+    (clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled);
+  useNativeAiBackendSync(showNativeAiCommandSuite, { force: true });
+  const nativeAiRefreshTick = useNativeAiPeriodicRefresh();
   const screenDensity = useScreenDensityMode();
   const whiteboard = useEmergencyWhiteboard();
   const upgradePatientFlow = useUpgradeHarnessPatientFlow();
@@ -983,8 +987,8 @@ export default function EmergencyWhiteboard() {
   );
 
   const practitionerScreenDensity = useMemo(
-    () => mergePractitionerDensityProfile(screenDensity),
-    [screenDensity],
+    () => mergePractitionerDensityProfile(screenDensity, practitionerVisibilityContext),
+    [screenDensity, practitionerVisibilityContext],
   );
 
   const whiteboardDensity = useMemo(
@@ -996,6 +1000,7 @@ export default function EmergencyWhiteboard() {
         commandCenterScreen: commandCenter.isCommandCenterScreen,
         screenMode: routeScreenMode,
         densityProfile: practitionerScreenDensity,
+        practitionerSurfaces: surfaces,
         showShiftHandoffStrip,
         prioritizeAwareness,
         signals: {
@@ -1016,6 +1021,7 @@ export default function EmergencyWhiteboard() {
       prioritizeAwareness,
       routeScreenMode,
       practitionerScreenDensity,
+      surfaces,
       showChargeNurseStrip,
       showShiftHandoffStrip,
       chargeNurseSurfaceSignals.emsAttention,

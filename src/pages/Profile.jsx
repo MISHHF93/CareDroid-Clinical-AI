@@ -10,7 +10,7 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildCompetencyCredentialingSnapshot } from '../data/competencyCredentialingCatalog';
 import { toolRegistryById } from '../data/toolRegistry';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
-import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import './Profile.css';
 
 const ACTION_LABELS = {
@@ -43,7 +43,7 @@ function formatDate(value) {
 }
 
 const Profile = () => {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const { user, hasPermission } = useUser();
   const { account, preferences, activity, activeWorkspace, accessSummary, saasProfile } = useUserIdentity();
   const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();

@@ -45,6 +45,20 @@
 .patient-verification__content,
 .patient-verification__actions,
 .patient-verification__audit,
+.patient-verification__warnings--collapsed,
+.patient-verification__audit--collapsed {
+  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.2));
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.patient-verification__warnings--collapsed summary,
+.patient-verification__audit--collapsed summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .patient-verification__warnings {
   border: 1px solid var(--color-border-subtle, #1f2937);
   border-radius: 12px;

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import { shouldSuppressDeveloperToolCatalog } from '../../config/practitionerCleanup.config';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -410,6 +410,7 @@ function CategoryBadge({ category }) {
 }
 
 const ClinicalToolCatalog = () => {
+  const surfaces = usePractitionerSurfaceVisibility();
   const { profileNavigate, rawNavigate } = useProfileNavigate();
   const { setActiveTool, addMessage, selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
@@ -574,7 +575,7 @@ const ClinicalToolCatalog = () => {
     [filteredMedical, medicalSort.sortKey, medicalSort.sortDir]
   );
 
-  if (shouldSuppressDeveloperToolCatalog()) {
+  if (!surfaces.tools.showDeveloperCatalog) {
     return <Navigate to={CANONICAL_ROUTES.emergencyTools} replace />;
   }
 

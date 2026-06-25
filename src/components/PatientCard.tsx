@@ -47,6 +47,7 @@ import { findPatientReferralAwareness } from './whiteboard/referralAwarenessMode
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import useEmergencyDisplayPrivacy from '../hooks/useEmergencyDisplayPrivacy';
 import useScreenDensityMode from '../hooks/useScreenDensityMode';
+
 import type { PatientCardDensityVariant } from '../config/screenDensityModeModel';
 import {
   formatPrivacySafeComplaint,
@@ -68,7 +69,7 @@ import SpecialistInferenceBadge from './native-ai/SpecialistInferenceBadge';
 import TriageExpertBadge from './native-ai/TriageExpertBadge';
 import PostEdOrientationBadge from './predictive/PostEdOrientationBadge';
 import useFeature from '../hooks/useFeature';
-import { getPractitionerSurfaceVisibility } from '../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../services/boardingSignals';
 import './PatientCard.css';
 
@@ -323,10 +324,10 @@ function PatientCard({
   densityVariant: densityVariantProp,
   onKeyboardFocus,
 }: PatientCardProps) {
-  const patientCardSurfaces = getPractitionerSurfaceVisibility().patientCard;
-  const maxPatientCardBadges = patientCardSurfaces.badgeLimit;
   const emergencyRole = useEmergencyRolePermissions();
   const screenDensity = useScreenDensityMode();
+  const patientCardSurfaces = usePractitionerSurfaceVisibility().patientCard;
+  const maxPatientCardBadges = patientCardSurfaces.badgeLimit;
   const densityVariant = densityVariantProp ?? screenDensity.patientCardVariant;
   const cardDensity = screenDensity.patientCard;
   const defaultPrivacyPolicy = useEmergencyDisplayPrivacy();

@@ -84,7 +84,9 @@ import {
   mockConversationValue,
   mockToolPreferencesValue,
   mockUserValue,
+  mockWorkspaceValue,
   expectNonEmptyPage,
+  renderPageWithRouter,
 } from './testRenderUtils';
 
 const mockFetchFleetCommandSnapshot = vi.fn();
@@ -103,6 +105,27 @@ vi.mock('../contexts/ToolPreferencesContext', () => ({
 
 vi.mock('../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
+}));
+
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => mockWorkspaceValue,
+}));
+
+vi.mock('../hooks/useEffectiveUserProfile', () => ({
+  default: () => ({ saasRole: 'emergency-physician', emergencyRole: 'physician' }),
+}));
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({
+    role: 'physician',
+    roleLabel: 'Physician',
+    canAccessRoute: () => true,
+    presentAction: () => ({ visible: true, enabled: true }),
+  }),
+}));
+
+vi.mock('../hooks/useRouteScreenMode', () => ({
+  default: () => 'clinical_workstation',
 }));
 
 vi.mock('../contexts/CostTrackingContext', () => ({
@@ -817,13 +840,12 @@ function setViewportWidth(width) {
 }
 
 function renderRoute(path, Page) {
-  return render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path={path} element={<Page />} />
-        <Route path="*" element={<Page />} />
-      </Routes>
-    </MemoryRouter>
+  return renderPageWithRouter(
+    <Routes>
+      <Route path={path} element={<Page />} />
+      <Route path="*" element={<Page />} />
+    </Routes>,
+    { route: path },
   );
 }
 

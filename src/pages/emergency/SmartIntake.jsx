@@ -33,6 +33,7 @@ import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
 import { EmergencyRoutePage } from './emergencyRouteShared';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './emergency-route.css';
 import {
   SMART_INTAKE_STEP_INDEX,
@@ -715,6 +716,8 @@ export default function SmartIntake({
   };
 
   const isStandaloneRoute = !embedded && !fromReception;
+  const surfaces = usePractitionerSurfaceVisibility();
+  const showIntakeHeroDescription = surfaces.intake.showHeroDescription;
 
   const sessionStartButton = (
     <button
@@ -820,6 +823,8 @@ export default function SmartIntake({
         pendingAction={pendingAction}
         warnings={SMART_INTAKE_DEMO.warnings}
         auditLog={identityAuditLog}
+        showWarningsExpanded={surfaces.intake.showVerificationWarnings}
+        showAuditExpanded={surfaces.intake.showVerificationAuditLog}
         highlightProvisional={Boolean(provisionalKindFromIntakeMode(intakeMode))}
         steps={fromReception || embedded ? RECEPTION_COPY.identityCheck.steps : undefined}
         displaySteps={fromReception || embedded ? SMART_INTAKE_STREAMLINED_STEPS : null}
@@ -884,7 +889,9 @@ export default function SmartIntake({
         eyebrow={RECEPTION_COPY.workspace.eyebrow}
         title={RECEPTION_COPY.identityCheck.title}
         titleId="smart-intake-title"
-        description={RECEPTION_COPY.identityCheck.description}
+        description={
+          showIntakeHeroDescription ? RECEPTION_COPY.identityCheck.description : undefined
+        }
         actions={sessionStartButton}
       >
         <section className="smart-intake smart-intake--standalone">{intakeBody}</section>
@@ -901,7 +908,7 @@ export default function SmartIntake({
         <div>
           <span>{fromReception || embedded ? 'Reception' : RECEPTION_COPY.workspace.eyebrow}</span>
           <h1 id="smart-intake-title">{RECEPTION_COPY.identityCheck.title}</h1>
-          <p>{RECEPTION_COPY.identityCheck.description}</p>
+          {showIntakeHeroDescription ? <p>{RECEPTION_COPY.identityCheck.description}</p> : null}
         </div>
         {sessionStartButton}
         {embedded ? (

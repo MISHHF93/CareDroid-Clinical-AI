@@ -64,7 +64,7 @@ import {
 } from '../../config/emergencyPipelineModel';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
 import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
 import TriageRuleBuilder from '../../components/reception/TriageRuleBuilder';
@@ -83,7 +83,7 @@ import './ReceptionWorkspace.css';
 import './emergency-route.css';
 
 export default function ReceptionWorkspace() {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const { profileNavigate } = useProfileNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
@@ -805,7 +805,7 @@ export default function ReceptionWorkspace() {
 
       {nlpTriageExpertEnabled || voiceInterviewEnabled ? (
         <div className="reception-workspace__native-ai" aria-label="Native AI reception tools">
-          {nlpTriageExpertEnabled ? (
+          {nlpTriageExpertEnabled && surfaces.reception.showTriageRuleBuilder ? (
             <TriageRuleBuilder className="reception-workspace__triage-rules" />
           ) : null}
           {voiceInterviewEnabled ? (

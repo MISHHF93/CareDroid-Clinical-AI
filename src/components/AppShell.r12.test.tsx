@@ -13,6 +13,19 @@ const mocks = vi.hoisted(() => ({
   startSimulation: vi.fn(() => [333]),
   stopSimulation: vi.fn(),
   startEmergencyRealtime: vi.fn(() => vi.fn()),
+  calculateCapacity: vi.fn(() => ({
+    score: 42,
+    band: 'Green',
+    label: 'Green capacity',
+    riskLevel: 'Green',
+    totalPatients: 0,
+    occupiedRooms: 0,
+    boardingCount: 0,
+    reassessmentDue: 0,
+    currentOccupancy: 0,
+    maxCapacity: 15,
+    occupancyPercent: 0,
+  })),
 }));
 
 vi.mock('../services/emergencyRealtimeService', () => ({
@@ -21,6 +34,7 @@ vi.mock('../services/emergencyRealtimeService', () => ({
 
 vi.mock('../engine/capacityEngine', () => ({
   startCapacityEngine: mocks.startCapacityEngine,
+  calculateCapacity: mocks.calculateCapacity,
 }));
 
 vi.mock('../engine/reassessmentEngine', () => ({
@@ -40,6 +54,15 @@ const emergencyRoleMock = vi.hoisted(() => {
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
   useEmergencyRolePermissions: () => emergencyRoleMock,
   default: () => emergencyRoleMock,
+}));
+
+vi.mock('../contexts/SimulationModeContext', () => ({
+  useSimulationMode: () => ({
+    enabled: true,
+    active: true,
+    setActive: vi.fn(),
+    toggle: vi.fn(),
+  }),
 }));
 
 vi.mock('./account/DemoPersonaPanel', () => ({
@@ -113,7 +136,7 @@ describe('AppShell R12 startup wiring', () => {
       </MemoryRouter>,
     );
 
-    expect(initializeFromBackend).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(1));
     expect(mocks.startEmergencyRealtime).toHaveBeenCalledTimes(1);
     expect(startReassessmentEngine).toHaveBeenCalledTimes(1);
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);

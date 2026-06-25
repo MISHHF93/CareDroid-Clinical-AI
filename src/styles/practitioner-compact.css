@@ -270,3 +270,220 @@
   min-height: 40px;
   padding: 6px 10px;
 }
+
+/* Emergency satellite routes */
+.emergency-route-page--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-page__hero {
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 12px;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-page__title {
+  font-size: 18px;
+}
+
+[data-practitioner-compact] .emergency-route-page__description {
+  display: none;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-metric-strip {
+  padding: 6px 10px;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-patient-grid {
+  gap: 8px;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-queue-row {
+  padding: 8px 10px;
+}
+
+/* EMS pipeline */
+[data-practitioner-compact] .ems-pipeline__section-heading h2 {
+  font-size: 15px;
+}
+
+[data-practitioner-compact] .ems-pipeline__source--compact {
+  font-size: 12px;
+  margin: 0;
+}
+
+[data-practitioner-compact] .ems-pipeline__offload-anchor {
+  display: none;
+}
+
+/* Shift summary */
+.shift-summary--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__hero {
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 12px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__header-card {
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__stat-grid {
+  gap: 8px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__stat {
+  min-height: 52px;
+  padding: 8px 10px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__section-header h2 {
+  font-size: 16px;
+}
+
+.shift-summary--practitioner-compact .shift-summary__section-header p {
+  display: none;
+}
+
+/* Department Pulse */
+.emergency-pulse--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+
+.emergency-pulse--practitioner-compact .emergency-pulse__hero {
+  padding: 8px 12px;
+}
+
+.emergency-pulse--practitioner-compact .emergency-pulse__timebar {
+  padding: 6px 10px;
+}
+
+.emergency-pulse__stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.2));
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.emergency-pulse__stat-strip-item {
+  align-items: baseline;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 6px;
+  padding: 2px 4px;
+}
+
+.emergency-pulse__stat-strip-item strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 16px;
+}
+
+.emergency-pulse__stat-strip-item span {
+  color: var(--ed-text-secondary, #94a3b8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emergency-pulse__bottleneck--compact {
+  border-radius: 10px;
+  font-size: 13px;
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.emergency-pulse--practitioner-compact .emergency-pulse__panel {
+  padding: 10px 12px;
+}
+
+.emergency-pulse--practitioner-compact .emergency-pulse__section-heading h2 {
+  font-size: 15px;
+}
+
+/* Emergency analytics */
+.emergency-analytics__kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.2));
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.emergency-analytics__kpi-strip-item {
+  align-items: baseline;
+  display: inline-flex;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.emergency-analytics__kpi-strip-item strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 16px;
+}
+
+.emergency-analytics__kpi-strip-item span {
+  color: var(--ed-text-secondary, #94a3b8);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emergency-analytics--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+
+/* Clinical calculator hub */
+.clinical-calculator-hub--practitioner-compact {
+  gap: 10px;
+  padding: 10px 12px 16px;
+}
+
+.clinical-calculator-hub--practitioner-compact .clinical-calculator-hub__header {
+  gap: 10px;
+  padding: 12px;
+}
+
+.clinical-calculator-hub--practitioner-compact .clinical-calculator-hub__header h1 {
+  font-size: 18px;
+}
+
+.clinical-calculator-hub__patient-bar--compact {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 12px;
+}
+
+.clinical-calculator-card__category {
+  color: var(--app-text-secondary, #94a3b8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.clinical-calculator-hub--practitioner-compact .clinical-calculator-card {
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+.clinical-calculator-hub--practitioner-compact .clinical-calculator-card p {
+  display: none;
+}

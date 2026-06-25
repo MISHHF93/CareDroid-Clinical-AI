@@ -19,6 +19,7 @@ import NEWS2 from './calculators/NEWS2';
 import PediatricDrugCalc from './calculators/PediatricDrugCalc';
 import QSOFA from './calculators/qSOFA';
 import Calculators from '../pages/tools/Calculators.jsx';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import '../pages/emergency/ClinicalCalculatorHub.css';
 
 const EmbeddedCalculators = Calculators as ComponentType<{
@@ -442,14 +443,21 @@ export default function ClinicalCalculatorHub() {
   }, [activeCalculatorId, location.state, searchParams, setSearchParams]);
 
   const ActiveComponent = activeCalculator?.component;
+  const surfaces = usePractitionerSurfaceVisibility();
 
   return (
-    <section className="clinical-calculator-hub">
+    <section
+      className={`clinical-calculator-hub${
+        surfaces.compactLayout ? ' clinical-calculator-hub--practitioner-compact' : ''
+      }`}
+    >
       <section className="clinical-calculator-hub__header" aria-labelledby="clinical-tools-title">
         <div>
           <span className="clinical-calculator-hub__eyebrow">CareDroid</span>
           <h1 id="clinical-tools-title">Clinical Calculator Hub</h1>
-          <p>One searchable hub for clinical calculators and score workflows. {HUMAN_REVIEW_DISCLAIMER}</p>
+          {surfaces.calculatorHub.showHeroDescription ? (
+            <p>One searchable hub for clinical calculators and score workflows. {HUMAN_REVIEW_DISCLAIMER}</p>
+          ) : null}
         </div>
         <label className="clinical-calculator-hub__search">
           <span>Search calculators</span>
@@ -475,7 +483,12 @@ export default function ClinicalCalculatorHub() {
         ))}
       </div>
 
-      <section className="clinical-calculator-hub__patient-bar" aria-label="Patient context">
+      <section
+        className={`clinical-calculator-hub__patient-bar${
+          surfaces.calculatorHub.compactPatientBar ? ' clinical-calculator-hub__patient-bar--compact' : ''
+        }`}
+        aria-label="Patient context"
+      >
         {patient ? (
           <>
             <div>
@@ -483,9 +496,11 @@ export default function ClinicalCalculatorHub() {
               <strong>
                 {patientName(patient)} · {patient.mrn}
               </strong>
-              <small>
-                Age {patient.age ?? '--'} · {patient.sex || 'sex not specified'}
-              </small>
+              {!surfaces.calculatorHub.compactPatientBar ? (
+                <small>
+                  Age {patient.age ?? '--'} · {patient.sex || 'sex not specified'}
+                </small>
+              ) : null}
             </div>
             <div className="clinical-calculator-hub__vitals">
               {formatVitals(patient).map(([label, value]) => (
@@ -494,7 +509,7 @@ export default function ClinicalCalculatorHub() {
                 </span>
               ))}
             </div>
-            {recentSavedScores.length ? (
+            {!surfaces.calculatorHub.compactPatientBar && recentSavedScores.length ? (
               <div className="clinical-calculator-hub__saved-scores" aria-label="Recent saved scores">
                 {recentSavedScores.map((score) => (
                   <span key={`${score.toolId || score.shortLabel}-${score.timestamp}`}>
@@ -509,7 +524,9 @@ export default function ClinicalCalculatorHub() {
           <div>
             <span>Standalone mode</span>
             <strong>Manual entry only</strong>
-            <small>No patient selected, so save-to-patient is disabled.</small>
+            {!surfaces.calculatorHub.compactPatientBar ? (
+              <small>No patient selected, so save-to-patient is disabled.</small>
+            ) : null}
           </div>
         )}
       </section>
@@ -522,12 +539,21 @@ export default function ClinicalCalculatorHub() {
           >
             <div className="clinical-calculator-card__header">
               <strong>{calculator.name}</strong>
+              <span className="clinical-calculator-card__category">{calculator.category}</span>
             </div>
-            <p>{calculator.description}</p>
-            <div className="clinical-calculator-card__meta">
-              <span>{calculator.category}</span>
-              {calculator.timeCritical ? <span>Time critical</span> : null}
-            </div>
+            {surfaces.calculatorHub.showCardDescriptions ? (
+              <p>{calculator.description}</p>
+            ) : null}
+            {surfaces.calculatorHub.showCardDescriptions ? (
+              <div className="clinical-calculator-card__meta">
+                <span>{calculator.category}</span>
+                {calculator.timeCritical ? <span>Time critical</span> : null}
+              </div>
+            ) : calculator.timeCritical ? (
+              <div className="clinical-calculator-card__meta">
+                <span>Time critical</span>
+              </div>
+            ) : null}
             <button
               type="button"
               aria-label={`${calculator.launchMode === 'chat' ? 'Ask Assistant about' : 'Launch'} ${calculator.name}`}

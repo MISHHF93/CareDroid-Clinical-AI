@@ -50,8 +50,8 @@ import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import {
   isPilotExtensionNavItem,
   shouldLimitOperationalSearchForClerk,
-  shouldSuppressExtensionPaletteCommands,
 } from '../config/practitionerCleanup.config';
+import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 
 export type CommandGroup =
   | 'Quick actions'
@@ -384,11 +384,12 @@ function createEmergencyRouteCommands(
   emergencyRole: EmergencyCommandPermissions,
   commands: readonly RouteCommandConfig[] = EMERGENCY_OS_ROUTE_COMMANDS,
   saasRole?: string,
+  suppressExtensionPaletteCommands = false,
 ): CommandWithVisibility[] {
   const visibleCommands = commands.filter((command) => {
     if (COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS.has(command.id)) return false;
     if (
-      shouldSuppressExtensionPaletteCommands() &&
+      suppressExtensionPaletteCommands &&
       'navItemId' in command &&
       typeof command.navItemId === 'string' &&
       isPilotExtensionNavItem(command.navItemId)
@@ -577,12 +578,25 @@ function createCommands(
   emergencyRole: EmergencyCommandPermissions,
   selectedPatientId: string | null,
   saasRole?: string,
+  suppressExtensionPaletteCommands = false,
 ): Command[] {
   const compiled = saasRole ? compileUserProfile({ saasRole }) : null;
   const commands: CommandWithVisibility[] = [
     ...createHighValueCommands(navigate, emergencyRole, saasRole),
-    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_ROUTE_COMMANDS, saasRole),
-    ...createEmergencyRouteCommands(navigate, emergencyRole, EMERGENCY_OS_TOOL_COMMANDS, saasRole)
+    ...createEmergencyRouteCommands(
+      navigate,
+      emergencyRole,
+      EMERGENCY_OS_ROUTE_COMMANDS,
+      saasRole,
+      suppressExtensionPaletteCommands,
+    ),
+    ...createEmergencyRouteCommands(
+      navigate,
+      emergencyRole,
+      EMERGENCY_OS_TOOL_COMMANDS,
+      saasRole,
+      suppressExtensionPaletteCommands,
+    )
       .filter(
         (command) =>
           !compiled ||
@@ -698,6 +712,7 @@ function patientInitials(label: string): string {
 }
 
 export default function CommandPalette({ open, onClose, onExecute }: CommandPaletteProps) {
+  const surfaces = usePractitionerSurfaceVisibility();
   const navigate = useNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const { saasRole } = useEffectiveUserProfile();
@@ -713,9 +728,25 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
   const [recentCommandIds, setRecentCommandIds] = useState(() => readRecentCommandIds());
   const [results, setResults] = useState<PaletteResult[]>([]);
 
+  const suppressExtensionPaletteCommands = !surfaces.chrome.showExtensionPaletteCommands;
   const commands = useMemo(
-    () => createCommands(navigate, toggleCopilot, emergencyRole, selectedPatientId, saasRole),
-    [emergencyRole, navigate, saasRole, selectedPatientId, toggleCopilot],
+    () =>
+      createCommands(
+        navigate,
+        toggleCopilot,
+        emergencyRole,
+        selectedPatientId,
+        saasRole,
+        suppressExtensionPaletteCommands,
+      ),
+    [
+      emergencyRole,
+      navigate,
+      saasRole,
+      selectedPatientId,
+      suppressExtensionPaletteCommands,
+      toggleCopilot,
+    ],
   );
 
   const computedResults = useMemo(() => {

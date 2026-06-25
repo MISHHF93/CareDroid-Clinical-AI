@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
-import { getPractitionerSurfaceVisibility } from '../../config/practitionerSurfaceVisibility';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './ProfileSettingsShell.css';
 
 const PROFILE_NAV = Object.freeze([
@@ -21,7 +21,7 @@ export default function ProfileSettingsShell({
   accessSummary = null,
   profileCopy = null,
 }) {
-  const surfaces = getPractitionerSurfaceVisibility();
+  const surfaces = usePractitionerSurfaceVisibility();
   const location = useLocation();
   const resolvedSubtitle = subtitle || profileCopy?.profileShellSubtitle;
 

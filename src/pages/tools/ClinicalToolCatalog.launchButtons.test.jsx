@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ClinicalToolCatalog from './ClinicalToolCatalog';
+import { PractitionerVisibilityProvider } from '../../contexts/PractitionerVisibilityContext';
 import { getMedicalToolsCatalogRows } from '../../data/medicalToolsCatalogIndex';
 
 const navigate = vi.fn();
@@ -29,10 +30,28 @@ vi.mock('../../services/clinicalToolsApi', () => ({
   fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
 }));
 
+vi.mock('../../config/practitionerCleanup.config', async () => {
+  const actual = await vi.importActual('../../config/practitionerCleanup.config');
+  return {
+    ...actual,
+    isPractitionerCleanupEnabled: () => false,
+  };
+});
+
+vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({ role: 'physician' }),
+}));
+
+vi.mock('../../hooks/useRouteScreenMode', () => ({
+  default: () => 'clinical_workstation',
+}));
+
 function renderCatalog() {
   return render(
     <MemoryRouter>
-      <ClinicalToolCatalog />
+      <PractitionerVisibilityProvider>
+        <ClinicalToolCatalog />
+      </PractitionerVisibilityProvider>
     </MemoryRouter>
   );
 }

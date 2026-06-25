@@ -293,38 +293,32 @@ describe('EmergencySettings', () => {
     expect(
       await screen.findByRole('heading', { name: 'CareDroid Settings' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Identity and Modules')).toBeInTheDocument();
-    expect(screen.getByText('AI Settings')).toBeInTheDocument();
-    expect(screen.getByText('Integration Settings')).toBeInTheDocument();
-    expect(screen.getByText('Provincial Health Settings')).toBeInTheDocument();
+    expect(screen.queryByText('Identity and Modules')).not.toBeInTheDocument();
+    expect(screen.queryByText('AI Settings')).not.toBeInTheDocument();
+    expect(screen.queryByText('Integration Settings')).not.toBeInTheDocument();
+    expect(screen.queryByText('Provincial Health Settings')).not.toBeInTheDocument();
     expect(screen.getByText('Notification Settings')).toBeInTheDocument();
     expect(screen.getByText('Reassessment Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Capacity Thresholds')).toBeInTheDocument();
     expect(screen.getByText('EMS Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Boarding Thresholds')).toBeInTheDocument();
     expect(screen.getByText('Alert Rules')).toBeInTheDocument();
-    expect(screen.getByText('Central Control Node')).toBeInTheDocument();
-    expect(screen.getByLabelText('Central control enabled')).toBeChecked();
-    expect(screen.getByLabelText('Dashboard authority')).toHaveValue('central-node');
-    expect(screen.getByLabelText('User input mode')).toHaveValue('central-escalation-input');
-    expect(screen.getByText('department operating mode')).toBeInTheDocument();
-    expect(screen.getByText('patient intake')).toBeInTheDocument();
-    expect(await screen.findByText('governed AI services')).toBeInTheDocument();
-    expect(screen.getByText('Human review coverage')).toBeInTheDocument();
-    expect(screen.getByText('Blocked autonomous actions')).toBeInTheDocument();
-    expect(screen.getByText('Copilot runtime config')).toBeInTheDocument();
+    expect(screen.queryByText('Central Control Node')).not.toBeInTheDocument();
+    expect(screen.queryByText('Screen Modes')).not.toBeInTheDocument();
+    expect(screen.queryByText('Workflow Action Audit')).not.toBeInTheDocument();
+    expect(screen.queryByText('governed AI services')).not.toBeInTheDocument();
   });
 
-  it('renders fetched workflow action audit logs', async () => {
+  it('hides workflow audit sections during practitioner pilot cleanup', async () => {
     render(
       <MemoryRouter>
         <EmergencySettings />
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText('Workflow Action Audit')).toBeInTheDocument();
-    expect((await screen.findAllByText('Created patient Audit Render.')).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Workflow audit loaded/i)).toBeInTheDocument();
+    await screen.findByRole('heading', { name: 'CareDroid Settings' });
+    expect(screen.queryByText('Workflow Action Audit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Audit Log')).not.toBeInTheDocument();
   });
 
   it('saves capacity thresholds through the settings API and local store', async () => {

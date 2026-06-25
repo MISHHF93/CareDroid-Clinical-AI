@@ -13,7 +13,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     id: 'dashboard',
     path: '/dashboard',
     match: 'heading',
-    heading: /emergency whiteboard/i,
+    heading: /careDroid command center/i,
   },
   {
     id: 'executive',
@@ -23,7 +23,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   },
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'workflows', path: '/workflows', match: 'heading', heading: /^workflows$/i },
-  { id: 'operations', path: '/operations', match: 'heading', heading: /emergency operations/i },
+  { id: 'operations', path: '/operations', match: 'heading', heading: /default operations/i },
   { id: 'tools-overview', path: '/tools', match: 'heading', heading: /careDroid tool console/i },
   { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },

@@ -126,6 +126,41 @@
   gap: var(--ed-space-3);
 }
 
+.emergency-route-metric-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  border: 1px solid var(--ed-border-subtle);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--ed-surface-raised);
+  padding: 8px 12px;
+}
+
+.emergency-route-metric-strip__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--ed-text-secondary);
+  font-size: var(--ed-type-body);
+  font-weight: 700;
+}
+
+.emergency-route-metric-strip__value {
+  color: var(--metric-color, var(--ed-text-primary));
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--font-size-lg, 18px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.emergency-route-metric-strip__label {
+  font-size: var(--ed-type-meta);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .emergency-route-metric-card {
   display: grid;
   gap: 6px;

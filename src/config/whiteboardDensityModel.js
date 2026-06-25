@@ -4,11 +4,8 @@
  */
 
 import { evaluateWhiteboardOperationalLoad } from '../components/whiteboard/whiteboardOperationalLoadModel.js';
-import {
-  shouldForceOperationalAwareness,
-  shouldSuppressWhiteboardOpsDetail,
-  shouldSuppressWhiteboardRoleStrips,
-} from './practitionerCleanup.config';
+import { shouldForceOperationalAwareness } from './practitionerCleanup.config';
+import { getPractitionerSurfaceVisibility } from './practitionerSurfaceVisibility';
 
 export const WHITEBOARD_DENSITY_TIER = Object.freeze({
   ALWAYS_VISIBLE: 'always_visible',
@@ -170,8 +167,15 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
  * @param {number} [context.signals.opsDetailCount]
  * @param {string} [context.screenMode]
  * @param {object} [context.densityProfile]
+ * @param {object} [context.practitionerSurfaces]
  */
 export function evaluateWhiteboardDensity(context = {}) {
+  const practitionerWhiteboard =
+    context.practitionerSurfaces?.whiteboard ||
+    getPractitionerSurfaceVisibility({
+      role: context.role,
+      screenMode: context.screenMode,
+    }).whiteboard;
   const densityProfile = context.densityProfile || null;
   const operationalLoad =
     context.operationalLoad ||
@@ -305,7 +309,7 @@ export function evaluateWhiteboardDensity(context = {}) {
         !showShiftHandoffStrip &&
         !displayMode &&
         !commandCenterScreen &&
-        !shouldSuppressWhiteboardRoleStrips(),
+        practitionerWhiteboard.showRoleStrips,
       tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
     }),
     waitingRoomSafety: Object.freeze({
@@ -341,7 +345,7 @@ export function evaluateWhiteboardDensity(context = {}) {
         !wallKioskDisplay &&
         !commandCenterScreen &&
         !showShiftHandoffStrip &&
-        !shouldSuppressWhiteboardOpsDetail(),
+        practitionerWhiteboard.showOpsDetail,
       defaultExpanded: !prioritizeAwareness && !operationalLoad.hideMissionControl,
       signalCount: opsDetailCount,
       tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,

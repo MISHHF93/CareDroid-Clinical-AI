@@ -1,5 +1,7 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import * as cleanupConfig from './practitionerCleanup.config';
+import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
+import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 import { getPractitionerSurfaceVisibility, practitionerShows } from './practitionerSurfaceVisibility';
 
 describe('practitionerSurfaceVisibility', () => {
@@ -38,6 +40,25 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.copilot.showContextTab).toBe(false);
     expect(surfaces.copilot.showSafetyTab).toBe(false);
     expect(surfaces.copilot.showMultimodalInput).toBe(false);
+    expect(surfaces.emergencyRoutes.showDescriptions).toBe(false);
+    expect(surfaces.emergencyRoutes.showMetricCards).toBe(false);
+    expect(surfaces.emergencyRoutes.showCrossLinks).toBe(false);
+    expect(surfaces.emergencyRoutes.showCapacityUpgradeHarness).toBe(false);
+    expect(surfaces.ems.showFleetUnitGrid).toBe(false);
+    expect(surfaces.ems.showOffloadTrackerPanel).toBe(false);
+    expect(surfaces.shift.showSecondarySections).toBe(false);
+    expect(surfaces.pulse.showStatCards).toBe(false);
+    expect(surfaces.pulse.showQueuePanel).toBe(false);
+    expect(surfaces.settings.showGovernanceSections).toBe(false);
+    expect(surfaces.settings.showAuditSections).toBe(false);
+    expect(surfaces.reception.showTriageRuleBuilder).toBe(false);
+    expect(surfaces.intake.showHeroDescription).toBe(false);
+    expect(surfaces.intake.showVerificationWarnings).toBe(false);
+    expect(surfaces.analytics.showKpiCards).toBe(false);
+    expect(surfaces.analytics.showSecondaryCharts).toBe(false);
+    expect(surfaces.calculatorHub.showCardDescriptions).toBe(false);
+    expect(surfaces.calculatorHub.compactPatientBar).toBe(true);
+    expect(surfaces.patientRoom.showDoorSignDuplicate).toBe(false);
   });
 
   it('practitionerShows reads nested keys', () => {
@@ -45,5 +66,27 @@ describe('practitionerSurfaceVisibility', () => {
     expect(practitionerShows('reception', 'showProcessEducation')).toBe(false);
     expect(practitionerShows('tools', 'showPageBreadcrumbs')).toBe(false);
     expect(practitionerShows('profile', 'showCompetencyCard')).toBe(false);
+  });
+
+  it('restores operational whiteboard surfaces for charge nurse during pilot', () => {
+    const surfaces = getPractitionerSurfaceVisibility({
+      role: EMERGENCY_ROLE_IDS.chargeNurse,
+      screenMode: CARE_DROID_SCREEN_MODES.chargeNurse,
+    });
+
+    expect(surfaces.whiteboard.showCommandDashboard).toBe(true);
+    expect(surfaces.whiteboard.showRoleStrips).toBe(true);
+    expect(surfaces.whiteboard.showWhoNextPanel).toBe(true);
+  });
+
+  it('restores physician copilot tabs during pilot', () => {
+    const surfaces = getPractitionerSurfaceVisibility({
+      role: EMERGENCY_ROLE_IDS.physician,
+      screenMode: CARE_DROID_SCREEN_MODES.physician,
+    });
+
+    expect(surfaces.copilot.showContextTab).toBe(true);
+    expect(surfaces.copilot.showSafetyTab).toBe(true);
+    expect(surfaces.patientCard.badgeLimit).toBe(2);
   });
 });

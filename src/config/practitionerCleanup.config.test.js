@@ -20,6 +20,20 @@ import {
   shouldSuppressReceptionAlertRail,
   getPractitionerPatientCardBadgeLimit,
   mergePractitionerDensityProfile,
+  shouldSuppressEmergencyRouteDescriptions,
+  shouldSuppressEmergencyRouteMetricCards,
+  shouldSuppressEmergencyRouteCrossLinks,
+  shouldSuppressCapacityUpgradeHarness,
+  shouldSuppressEmsFleetUnitGrid,
+  shouldSuppressEmsOffloadTrackerPanel,
+  shouldSuppressShiftSecondarySections,
+  shouldSuppressDepartmentPulseStatCards,
+  shouldSuppressEmergencySettingsGovernanceSections,
+  shouldSuppressReceptionTriageRuleBuilder,
+  shouldSuppressAnalyticsKpiCards,
+  shouldSuppressAnalyticsSecondaryCharts,
+  shouldSuppressCalculatorHubCardDescriptions,
+  shouldSuppressSmartIntakeVerificationWarnings,
 } from './practitionerCleanup.config';
 import { PILOT_CUSTOMER_MODE } from './unified-navigation.config';
 
@@ -51,10 +65,25 @@ describe('practitionerCleanup.config', () => {
     expect(shouldSuppressWhiteboardRoleStrips()).toBe(true);
     expect(shouldSuppressReceptionAlertRail()).toBe(true);
     expect(getPractitionerPatientCardBadgeLimit()).toBe(1);
+    expect(shouldSuppressEmergencyRouteDescriptions()).toBe(true);
+    expect(shouldSuppressEmergencyRouteMetricCards()).toBe(true);
+    expect(shouldSuppressEmergencyRouteCrossLinks()).toBe(true);
+    expect(shouldSuppressCapacityUpgradeHarness()).toBe(true);
+    expect(shouldSuppressEmsFleetUnitGrid()).toBe(true);
+    expect(shouldSuppressEmsOffloadTrackerPanel()).toBe(true);
+    expect(shouldSuppressShiftSecondarySections()).toBe(true);
+    expect(shouldSuppressDepartmentPulseStatCards()).toBe(true);
+    expect(shouldSuppressEmergencySettingsGovernanceSections()).toBe(true);
+    expect(shouldSuppressReceptionTriageRuleBuilder()).toBe(true);
+    expect(shouldSuppressAnalyticsKpiCards()).toBe(true);
+    expect(shouldSuppressAnalyticsSecondaryCharts()).toBe(true);
+    expect(shouldSuppressCalculatorHubCardDescriptions()).toBe(true);
+    expect(shouldSuppressSmartIntakeVerificationWarnings()).toBe(true);
   });
 
   it('merges a lean whiteboard density profile for practitioner review', () => {
-    const merged = mergePractitionerDensityProfile({
+    const merged = mergePractitionerDensityProfile(
+      {
       id: 'high-operational',
       whiteboard: {
         showMissionControl: true,
@@ -80,12 +109,50 @@ describe('practitionerCleanup.config', () => {
         showReassessmentTimer: true,
         showMetaGrid: true,
       },
-    });
+      },
+      { role: 'registration_clerk', screenMode: 'RECEPTION_SCREEN' },
+    );
 
     expect(merged.whiteboard.showMissionControl).toBe(false);
     expect(merged.whiteboard.maxVisibleCards).toBe(18);
     expect(merged.whiteboard.gridMinCardWidth).toBe(220);
     expect(merged.whiteboard.gridGap).toBe(8);
     expect(merged.patientCard.showScores).toBe(false);
+  });
+
+  it('preserves operational density for charge nurse during pilot', () => {
+    const merged = mergePractitionerDensityProfile(
+      {
+        id: 'high-operational',
+        whiteboard: {
+          showMissionControl: true,
+          showQueueIntelligence: true,
+          showSecondaryStats: true,
+          showWaitingRoomSafety: true,
+          showAttentionStrips: true,
+          preferOperationalStrips: true,
+          maxVisibleCards: 48,
+          gridMinCardWidth: 250,
+          gridGap: 10,
+        },
+        patientCard: {
+          showScores: true,
+          showSafetyFlags: true,
+          showSignalsRow: true,
+          showVitalsGrid: true,
+          showExperienceBadge: true,
+          showWhatHappensNext: true,
+          showQueueReason: true,
+          showMetaGrid: true,
+          showReassessmentTimer: true,
+        },
+      },
+      { role: 'charge_nurse', screenMode: 'CHARGE_NURSE_SCREEN' },
+    );
+
+    expect(merged.whiteboard.showMissionControl).toBe(true);
+    expect(merged.whiteboard.showQueueIntelligence).toBe(true);
+    expect(merged.patientCard.showScores).toBe(true);
+    expect(merged.whiteboard.maxVisibleCards).toBe(18);
   });
 });

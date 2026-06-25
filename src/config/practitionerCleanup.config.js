@@ -2,11 +2,13 @@
  * Practitioner cleanup — reduces data noise, developer chrome, and extension surfaces
  * while Pilot Customer Mode is active.
  *
- * Pages should prefer `getPractitionerSurfaceVisibility()` from
- * `practitionerSurfaceVisibility.js` over calling many shouldSuppress* helpers.
+ * Pages should prefer `usePractitionerSurfaceVisibility()` from
+ * `contexts/PractitionerVisibilityContext.tsx` (or `getPractitionerSurfaceVisibility({ role, screenMode })`
+ * outside React) over calling many shouldSuppress* helpers.
  * User-facing documentation: `docs/USER-MANUAL.md` §4.5 and §10.
  */
 import { PILOT_CUSTOMER_MODE, PILOT_EXTENSION_NAV_ITEM_IDS } from './unified-navigation.config';
+import { mergeRoleAwarePractitionerDensityProfile } from './practitionerRoleSurfacePolicy';
 import {
   PRACTITIONER_COPILOT_NOTES_LIMIT,
   PRACTITIONER_COPILOT_ORCHESTRATION_LIMIT,
@@ -110,6 +112,42 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   /** Admin home — primary links only; hide API status laundry lists */
   suppressAdminSurveillanceDetailList: true,
   suppressAdminSecondaryLinks: true,
+  /** Emergency satellite routes — patients, queues, reassessment, capacity */
+  suppressEmergencyRouteDescriptions: true,
+  suppressEmergencyRouteMetricCards: true,
+  suppressEmergencyRouteCrossLinks: true,
+  suppressCapacityUpgradeHarness: true,
+  /** EMS — handoff rows first; hide demo fleet grid and duplicate offload panel */
+  suppressEmsFleetUnitGrid: true,
+  suppressEmsOffloadTrackerPanel: true,
+  /** Shift summary — volume/queue/handoff only during pilot */
+  suppressShiftSecondarySections: true,
+  /** Department Pulse — attention-first; hide duplicate queue/staff dashboards */
+  suppressDepartmentPulseDescriptions: true,
+  suppressDepartmentPulseStatCards: true,
+  suppressDepartmentPulseQueuePanel: true,
+  suppressDepartmentPulseStaffPanel: true,
+  /** Emergency settings — walkthrough + thresholds only during pilot */
+  suppressEmergencySettingsAuditSections: true,
+  suppressEmergencySettingsGovernanceSections: true,
+  suppressEmergencySettingsScreenModes: true,
+  suppressEmergencySettingsWalkthroughDetail: true,
+  /** TR / triage expert — nurse workflow + copilot drawer; not reception admin UI */
+  suppressReceptionTriageRuleBuilder: true,
+  /** Smart intake embedded hero copy */
+  suppressSmartIntakeHeroDescription: true,
+  suppressSmartIntakeVerificationWarnings: true,
+  suppressSmartIntakeVerificationAuditLog: true,
+  /** Analytics — shift KPI strip + primary chart only */
+  suppressAnalyticsDescriptions: true,
+  suppressAnalyticsKpiCards: true,
+  suppressAnalyticsSecondaryCharts: true,
+  /** Clinical calculator hub — search + grid; trim hero and card prose */
+  suppressCalculatorHubHeroDescription: true,
+  suppressCalculatorHubCardDescriptions: true,
+  compactCalculatorHubPatientBar: true,
+  /** Patient room display — in-room board only; no duplicate door sign */
+  suppressPatientRoomDoorSignDuplicate: true,
 });
 
 export const PILOT_EXTENSION_NAV_ITEM_ID_SET = new Set(PILOT_EXTENSION_NAV_ITEM_IDS);
@@ -308,33 +346,125 @@ export function getPractitionerPatientCardBadgeLimit() {
  * Merges practitioner cleanup density caps into the active screen density profile.
  * @param {import('./screenDensityModeModel').ScreenDensityProfile | null | undefined} profile
  */
-export function mergePractitionerDensityProfile(profile) {
+export function shouldSuppressEmergencyRouteDescriptions() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencyRouteDescriptions;
+}
+
+export function shouldSuppressEmergencyRouteMetricCards() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencyRouteMetricCards;
+}
+
+export function shouldSuppressEmergencyRouteCrossLinks() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencyRouteCrossLinks;
+}
+
+export function shouldSuppressCapacityUpgradeHarness() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCapacityUpgradeHarness;
+}
+
+export function shouldSuppressEmsFleetUnitGrid() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmsFleetUnitGrid;
+}
+
+export function shouldSuppressEmsOffloadTrackerPanel() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmsOffloadTrackerPanel;
+}
+
+export function shouldSuppressShiftSecondarySections() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressShiftSecondarySections;
+}
+
+export function shouldSuppressDepartmentPulseDescriptions() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressDepartmentPulseDescriptions;
+}
+
+export function shouldSuppressDepartmentPulseStatCards() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressDepartmentPulseStatCards;
+}
+
+export function shouldSuppressDepartmentPulseQueuePanel() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressDepartmentPulseQueuePanel;
+}
+
+export function shouldSuppressDepartmentPulseStaffPanel() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressDepartmentPulseStaffPanel;
+}
+
+export function shouldSuppressEmergencySettingsAuditSections() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsAuditSections;
+}
+
+export function shouldSuppressEmergencySettingsGovernanceSections() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsGovernanceSections;
+}
+
+export function shouldSuppressEmergencySettingsScreenModes() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsScreenModes;
+}
+
+export function shouldSuppressEmergencySettingsWalkthroughDetail() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencySettingsWalkthroughDetail;
+}
+
+export function shouldSuppressReceptionTriageRuleBuilder() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionTriageRuleBuilder;
+}
+
+export function shouldSuppressSmartIntakeHeroDescription() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeHeroDescription;
+}
+
+export function shouldSuppressSmartIntakeVerificationWarnings() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationWarnings;
+}
+
+export function shouldSuppressSmartIntakeVerificationAuditLog() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSmartIntakeVerificationAuditLog;
+}
+
+export function shouldSuppressAnalyticsDescriptions() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressAnalyticsDescriptions;
+}
+
+export function shouldSuppressAnalyticsKpiCards() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressAnalyticsKpiCards;
+}
+
+export function shouldSuppressAnalyticsSecondaryCharts() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressAnalyticsSecondaryCharts;
+}
+
+export function shouldSuppressCalculatorHubHeroDescription() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubHeroDescription;
+}
+
+export function shouldSuppressCalculatorHubCardDescriptions() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressCalculatorHubCardDescriptions;
+}
+
+export function shouldCompactCalculatorHubPatientBar() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.compactCalculatorHubPatientBar;
+}
+
+export function shouldSuppressPatientRoomDoorSignDuplicate() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientRoomDoorSignDuplicate;
+}
+
+/**
+ * @param {import('./screenDensityModeModel').ScreenDensityProfile | null | undefined} profile
+ * @param {{ role?: string | null, screenMode?: string | null }} [context]
+ */
+export function mergePractitionerDensityProfile(profile, context = {}) {
   if (!isPractitionerCleanupEnabled() || !profile) {
     return profile ?? null;
   }
 
-  return {
-    ...profile,
-    whiteboard: {
-      ...profile.whiteboard,
-      showMissionControl: false,
-      showQueueIntelligence: false,
-      showSecondaryStats: false,
-      showWaitingRoomSafety: false,
-      showAttentionStrips: false,
-      preferOperationalStrips: false,
-      maxVisibleCards: PRACTITIONER_CLEANUP.maxWhiteboardVisibleCards,
-      gridMinCardWidth: 220,
-      gridGap: 8,
-    },
-    patientCard: {
-      ...profile.patientCard,
-      showExperienceBadge: false,
-      showWhatHappensNext: false,
-      showLwbsAndDeterioration: false,
-      showCommunicationBadge: false,
-      showScores: false,
-      showQueueReason: false,
-    },
-  };
+  if (!context?.role && !context?.screenMode) {
+    return mergeRoleAwarePractitionerDensityProfile(profile, {
+      role: 'registration_clerk',
+      screenMode: 'RECEPTION_SCREEN',
+    });
+  }
+
+  return mergeRoleAwarePractitionerDensityProfile(profile, context);
 }
