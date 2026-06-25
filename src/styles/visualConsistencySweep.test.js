@@ -48,7 +48,13 @@ describe('visual consistency sweep', () => {
   });
 
   it('keeps the sweep scoped to the authenticated app shell', () => {
-    expect(visualConsistencyCss).toContain('.app-shell :is');
+    expect(visualConsistencyCss).toContain(':is(.app-shell, .emergency-app-shell)');
     expect(visualConsistencyCss).toContain('@media (max-width: 768px)');
+  });
+
+  it('does not emit invalid :is()-suffix class selectors', () => {
+    expect(visualConsistencyCss).not.toMatch(/:is\(\.app-shell,\s*\.emergency-app-shell\)-/);
+    expect(visualConsistencyCss).toContain('.app-shell-page-body > main');
+    expect(visualConsistencyCss).toContain('.app-shell-route-identity');
   });
 });

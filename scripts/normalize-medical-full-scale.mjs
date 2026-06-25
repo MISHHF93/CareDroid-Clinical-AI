@@ -5,7 +5,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, relative } from 'node:path';
 import { globSync } from 'glob';
-import { fixJsxMedicalThemeAttributes } from './normalize-medical-jsx-fix.mjs';
+import {
+  fixBrokenAppShellIsSelectors,
+  fixJsxMedicalThemeAttributes,
+} from './normalize-medical-jsx-fix.mjs';
 
 const root = process.cwd();
 
@@ -144,6 +147,7 @@ for (const file of cssFiles) {
   for (const [pattern, value] of cssReplacements) {
     next = next.replace(pattern, value);
   }
+  next = fixBrokenAppShellIsSelectors(next);
   if (next !== original) {
     writeFileSync(file, next);
     cssTouched += 1;
