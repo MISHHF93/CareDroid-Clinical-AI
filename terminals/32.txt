@@ -3,7 +3,7 @@ pid: 39272
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "Stop-Process -Id 4496 -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2; cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && set PORT=3000&& set NODE_ENV=development&& set DATABASE_CLIENT=sqlite&& set SQLITE_PATH=caredroid.dev.sqlite&& set ENABLE_MONGOOSE_EMERGENCY_OS=false&& set REDIS_ENABLED=false&& set AI_ENABLED=false&& set ENABLE_DEV_AUTH_BYPASS=true&& set DEV_LOGIN_EMAIL=dev@example.com&& node dist/backend/src/main.js\""
 started_at: 2026-06-24T18:38:09.484Z
-running_for_ms: 4215009  
+running_for_ms: 28304996 
 ---
 [Nest] 36752  - 06/24/2026, 2:38:16 PM     LOG [NestFactory] Starting Nest application...
 [Nest] 36752  - 06/24/2026, 2:38:16 PM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +81ms

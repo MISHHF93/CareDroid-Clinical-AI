@@ -1,0 +1,12 @@
+---
+pid: 2740
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npx vite --strictPort --port 5173\""
+started_at: 2026-06-25T05:35:23.975Z
+running_for_ms: 22845010 
+---
+
+  VITE v7.3.5  ready in 349 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.2.220:5173/

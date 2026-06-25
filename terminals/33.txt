@@ -1,0 +1,3459 @@
+---
+pid: 25852
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node node_modules\\vite\\bin\\vite.js --port 8000 --strictPort\""
+started_at: 2026-06-24T19:53:18.403Z
+running_for_ms: 23795005 
+---
+
+  VITE v7.3.5  ready in 416 ms
+
+
+CareDroid API is not reachable at http://localhost:3000.
+  Full stack: npm run dev:fullstack
+  API only:   npm run dev:api
+
+  ➜  Local:   http://localhost:8000/
+  ➜  Network: http://192.168.2.220:8000/
+3:53:25 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:25 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:25 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:26 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:28 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:28 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:28 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:28 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:53:46 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:54:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:54:56 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:54:56 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:54:56 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:55:26 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:55:26 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:55:26 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:55:46 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:26 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:26 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:26 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:56 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:56 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:56 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:59 PM [vite] http proxy error: /api/audit/my-logs?limit=5
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:56:59 PM [vite] http proxy error: /api/audit/my-logs?limit=5
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:10 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:10 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:10 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:26 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:26 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:46 PM [vite] (client) hmr update /src/components/AppShell.tsx
+3:57:46 PM [vite] (client) page reload src/store/emergencyStore.ts
+3:57:46 PM [vite] (client) hmr update /src/components/AppShell.tsx
+3:57:46 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:46 PM [vite] (client) hmr update /src/components/AppShell.tsx
+3:57:46 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] (client) hmr update /src/components/AppShell.tsx
+3:57:47 PM [vite] (client) hmr update /src/components/AppShell.tsx
+3:57:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:57:53 PM [vite] (client) hmr update /src/components/Sidebar.tsx
+3:57:53 PM [vite] (client) hmr update /src/components/CopilotPanel.css
+3:57:53 PM [vite] (client) hmr update /src/components/Sidebar.tsx
+3:58:03 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:58:03 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:58:03 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:58:03 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:58:07 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:58:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:18 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:18 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:48 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+3:59:48 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:00:07 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:30 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:30 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:30 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:48 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:48 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:52 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:01:53 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:02:07 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:02:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:02:48 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:02:48 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:03:18 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:03:18 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:03:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:03:19 PM [vite] vite.config.js changed, restarting server...
+4:03:19 PM [vite] (client) hmr update /src/components/AppShell.tsx
+4:03:19 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.tsx
+4:03:19 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:03:19 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+4:03:19 PM [vite] (client) hmr update /src/components/AppShell.tsx
+4:03:19 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+4:03:19 PM [vite] server restarted.
+
+CareDroid API is not reachable at http://localhost:3000.
+  Full stack: npm run dev:fullstack
+  API only:   npm run dev:api
+
+4:04:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ETIMEDOUT]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:26 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:27 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:04:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:05:27 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:05:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:05:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:05:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:06:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:06:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:06:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:06:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:07:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:08:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:08:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:08:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:08:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:09:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:10:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:10:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:10:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:10:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:11:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:12:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:12:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:12:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:12:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:13:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:14:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:14:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:14:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:14:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:15:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:16:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:16:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:16:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:16:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:17:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:18:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:18:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:18:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:18:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:19:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:20:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:20:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:20:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:20:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:21:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:22:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:22:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:22:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:22:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:23:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:24:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:24:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:24:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:24:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:25:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:26:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:26:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:26:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:26:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:27:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:28:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:28:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:28:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:28:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:29:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:30:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:30:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:30:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:30:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:31:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:32:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:32:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:32:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:32:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:33:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:34:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:34:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:34:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:34:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:35:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:36:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:36:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:36:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:36:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:37:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:38:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:38:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:38:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:38:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:28 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:28 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:39:58 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:40:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:40:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:40:28 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:40:47 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx, /src/components/copilot/DiagnosticSafetyDashboard.tsx
+4:40:47 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.tsx
+4:40:47 PM [vite] (client) hmr update /src/components/PatientSearchResults.tsx, /src/components/CopilotPanel.tsx, /src/components/whiteboard/WaitingRoomSafetyBoard.jsx, /src/pages/emergency/index.tsx, /src/components/WhoNextPanel.tsx, /src/components/whiteboard/ReferralAttentionStrip.jsx, /src/components/whiteboard/EmsAttentionStrip.jsx, /src/components/whiteboard/ReassessmentAttentionStrip.jsx
+4:40:47 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.css
+4:40:47 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:40:47 PM [vite] (client) hmr invalidate /src/components/WhoNextPanel.tsx Could not Fast Refresh ("buildWhoNextRecommendation" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+4:40:47 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+4:41:01 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:41:01 PM [vite] (client) hmr update /src/components/copilot/AiTransparencyDashboard.tsx
+4:41:01 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:41:01 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:41:05 PM [vite] (client) hmr update /src/components/copilot/copilot-shell.css
+4:41:09 PM [vite] (client) hmr update /src/components/CopilotPanel.css
+4:41:09 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:41:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:41:20 PM [vite] (client) hmr update /src/components/AppShell.tsx
+4:41:20 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+4:41:20 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:41:20 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:41:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:41:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:41:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:42:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:42:20 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:42:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:42:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:42:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:43:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:44:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:45:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:46:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:47:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:48:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:49:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:50:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:51:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:52:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:53:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:54:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:55:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:56:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:57:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:58:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+4:59:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:00:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:01:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:02:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:03:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:04:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:05:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:06:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:07:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:08:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:09:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:10:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:11:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:12:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:13:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:14:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:15:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:16:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:17:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:18:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:19:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:20:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:21:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:48 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:22:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:18 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:27 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:27 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:40 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:57 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:23:57 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:02 PM [vite] (client) hmr update /src/components/account/DemoPersonaPanel.css
+5:24:02 PM [vite] (client) hmr update /src/components/account/DemoPersonaPanel.tsx
+5:24:15 PM [vite] (client) hmr update /src/components/AppShell.tsx
+5:24:15 PM [vite] (client) hmr update /src/components/AppShell.tsx
+5:24:16 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:22 PM [vite] (client) hmr update /src/components/AppShell.tsx
+5:24:22 PM [vite] (client) page reload src/main.jsx
+5:24:22 PM [vite] (client) hmr update /src/contexts/SystemConfigContext.jsx
+5:24:22 PM [vite] (client) hmr update /src/contexts/SystemConfigContext.jsx
+5:24:23 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:24 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:24:34 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+5:24:34 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+5:24:44 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:25:04 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+5:25:04 PM [vite] (client) hmr update /src/components/CopilotPanel.css
+5:25:04 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+5:25:08 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+5:25:24 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:25:55 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:25:55 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:25:55 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:00 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:00 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:00 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:00 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:00 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:09 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:09 PM [vite] (client) hmr update /src/components/Header.css
+5:26:09 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:09 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:09 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:14 PM [vite] (client) hmr update /src/components/Header.tsx
+5:26:15 PM [vite] http proxy error: /api/emergency/upgrade-harness/patient-flow
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/emergency/upgrade-harness/patient-flow
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:15 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:26:35 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:27:15 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:27:15 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:27:45 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:28:15 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:28:27 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:27 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:27 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:27 PM [vite] http proxy error: /api/emergency/upgrade-harness/patient-flow
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:28:27 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:28:35 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:28:35 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:35 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:35 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:36 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:36 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:36 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:42 PM [vite] (client) hmr update /src/components/PatientCard.tsx
+5:28:42 PM [vite] (client) hmr update /src/components/PatientCard.css
+5:28:42 PM [vite] (client) hmr update /src/components/PatientCard.tsx
+5:28:48 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:28:48 PM [vite] (client) hmr update /src/components/PatientCard.css
+5:28:48 PM [vite] (client) hmr update /src/components/EmergencyWhiteboard.css
+5:29:02 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+5:29:03 PM [vite] http proxy error: /api/emergency/upgrade-harness/patient-flow
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:29:03 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:29:29 PM [vite] (client) hmr update /src/components/whiteboard/WhiteboardWaitingRoomAlertRail.tsx
+5:29:29 PM [vite] (client) hmr update /src/components/whiteboard/WhiteboardWaitingRoomAlertRail.tsx, /src/components/whiteboard/WhiteboardAlertRail.tsx
+5:29:29 PM [vite] (client) hmr update /src/components/whiteboard/WhiteboardWaitingRoomAlertRail.tsx, /src/components/whiteboard/WhiteboardAlertRail.tsx
+5:29:29 PM [vite] (client) hmr update /src/components/whiteboard/WhiteboardWaitingRoomAlertRail.tsx, /src/components/whiteboard/WhiteboardAlertRail.tsx
+5:29:33 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:03 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:29 PM [vite] (client) page reload src/components/reception/receptionCopy.js
+5:30:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:30:50 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:31:30 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:32:46 PM [vite] (client) hmr update /src/pages/emergency/emergencyRouteShared.jsx
+5:32:46 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\pages\emergency\emergencyRouteShared.jsx: Unexpected token, expected "from" (1:12)
+
+> 1 | import type { CSSProperties } from 'react';
+    |             ^
+  2 | import PatientCard from '../../components/PatientCard';
+  3 | import { PatientFlag, PatientState } from '../../types/emergency';
+  4 | import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/pages/emergency/emergencyRouteShared.jsx:1:12
+  1  |  import type { CSSProperties } from 'react';
+     |              ^
+  2  |  import PatientCard from '../../components/PatientCard';
+  3  |  import { PatientFlag, PatientState } from '../../types/emergency';
+      at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+      at JSXParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+      at JSXParserMixin.unexpected (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6636:16)
+      at JSXParserMixin.expectContextual (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6895:12)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14260:10)
+      at JSXParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+      at JSXParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+      at JSXParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+      at JSXParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+      at JSXParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+      at JSXParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+      at JSXParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+      at JSXParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+      at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+      at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+      at normalizeFile.next (<anonymous>)
+      at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+      at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+      at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+      at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+5:32:50 PM [vite] (client) hmr update /src/pages/emergency/emergencyRouteShared.jsx
+5:32:50 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\pages\emergency\emergencyRouteShared.jsx: Unexpected token, expected "," (62:68)
+
+  60 |           key={metric.label}
+  61 |           className="emergency-route-card emergency-route-metric-card"
+> 62 |           style={metric.color ? ({ '--metric-color': metric.color } as CSSProperties) : undefined}
+     |                                                                     ^
+  63 |         >
+  64 |           <strong className="emergency-route-metric-card__value">{metric.value}</strong>
+  65 |           <span className="emergency-route-metric-card__label">{metric.label}</span>
+  Plugin: vite:react-babel
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/pages/emergency/emergencyRouteShared.jsx:62:68
+  60 |            key={metric.label}
+  61 |            className="emergency-route-card emergency-route-metric-card"
+  62 |            style={metric.color ? ({ '--metric-color': metric.color } as CSSProperties) : undefined}
+     |                                                                      ^
+  63 |          >
+  64 |            <strong className="emergency-route-metric-card__value">{metric.value}</strong>
+      at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+      at JSXParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+      at JSXParserMixin.unexpected (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6636:16)
+      at JSXParserMixin.expect (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6916:12)
+      at JSXParserMixin.parseParenAndDistinguishExpression (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11678:14)
+      at JSXParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11348:23)
+      at JSXParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4776:20)
+      at JSXParserMixin.parseExprSubscripts (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11098:23)
+      at JSXParserMixin.parseUpdate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11083:21)
+      at JSXParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11063:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10916:61)
+      at JSXParserMixin.parseExprOps (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10921:23)
+      at JSXParserMixin.parseMaybeConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10898:23)
+      at JSXParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10848:21)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:39
+      at JSXParserMixin.allowInAnd (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12443:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:17)
+      at JSXParserMixin.parseConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10908:30)
+      at JSXParserMixin.parseMaybeConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10902:17)
+      at JSXParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10848:21)
+      at JSXParserMixin.parseExpressionBase (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10801:23)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10797:39
+      at JSXParserMixin.allowInAnd (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12443:12)
+      at JSXParserMixin.parseExpression (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10797:17)
+      at JSXParserMixin.jsxParseExpressionContainer (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4644:31)
+      at JSXParserMixin.jsxParseAttributeValue (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4616:21)
+      at JSXParserMixin.jsxParseAttribute (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4665:38)
+      at JSXParserMixin.jsxParseOpeningElementAfterName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4679:28)
+      at JSXParserMixin.jsxParseOpeningElementAt (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4674:17)
+      at JSXParserMixin.jsxParseElementAt (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4698:33)
+      at JSXParserMixin.jsxParseElement (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4761:17)
+      at JSXParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4771:19)
+      at JSXParserMixin.parseExprSubscripts (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11098:23)
+      at JSXParserMixin.parseUpdate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11083:21)
+      at JSXParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11063:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10916:61)
+      at JSXParserMixin.parseExprOps (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10921:23)
+      at JSXParserMixin.parseMaybeConditional (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10898:23)
+      at JSXParserMixin.parseMaybeAssign (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10848:21)
+      at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:39
+      at JSXParserMixin.allowInAnd (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12443:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10817:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12510:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11692:28)
+      at JSXParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11348:23)
+      at JSXParserMixin.parseExprAtom (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4776:20)
+      at JSXParserMixin.parseExprSubscripts (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11098:23)
+      at JSXParserMixin.parseUpdate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11083:21)
+      at JSXParserMixin.parseMaybeUnary (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:11063:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10916:61)
+5:32:50 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:33:08 PM [vite] (client) hmr update /src/pages/emergency/emergencyRoutePages.jsx
+5:33:08 PM [vite] (client) hmr update /src/pages/emergency/emergencyRoutePages.jsx
+5:33:15 PM [vite] (client) hmr update /src/pages/emergency/emergencyRoutePages.jsx
+5:33:15 PM [vite] (client) hmr update /src/pages/emergency/emergencyRoutePages.jsx
+5:33:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:33:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:33:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:34:50 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:35:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:35:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:35:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:36:50 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:37:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:37:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:37:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:38:50 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:39:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:39:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:39:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:40:51 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:41:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:41:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:41:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:42:51 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:43:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:43:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:43:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:44:51 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:45:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:45:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:45:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:46:51 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:47:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:47:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:47:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:48:51 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:13 PM [vite] (client) hmr update /src/components/app-shell.css
+5:49:13 PM [vite] (client) hmr update /src/components/AppShell.tsx
+5:49:13 PM [vite] (client) hmr update /src/components/app-shell.css
+5:49:14 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:14 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:31 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:34 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:49:40 PM [vite] (client) hmr update /src/components/emergency/OperationalStrip.jsx
+5:49:44 PM [vite] (client) hmr update /src/components/Header.tsx
+5:49:44 PM [vite] (client) hmr update /src/components/Header.tsx
+5:49:58 PM [vite] (client) hmr update /src/components/Header.css
+5:50:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:50:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:50:01 PM [vite] http proxy error: /api/settings/features
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:50:08 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+5:50:08 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.css
+5:50:08 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+5:50:08 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:50:08 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+5:50:08 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+5:50:08 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:51:13 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:51:15 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:51:16 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:51:47 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:51:47 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:52:17 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:52:17 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:52:47 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:52:47 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:53:17 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:53:17 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:53:47 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:53:47 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:54:17 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:54:17 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:54:39 PM [vite] (client) page reload src/config/emergencyRoleActionMatrix.ts
+5:54:40 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:55:10 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:55:10 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:55:40 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:55:40 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:56:10 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:56:10 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:56:40 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:56:40 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:57:10 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:57:10 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:57:40 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:57:40 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:58:10 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:58:10 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:58:30 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:58:31 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:59:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:59:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:59:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+5:59:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:00:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:00:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:00:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:00:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:26 PM [vite] http proxy error: /api/crashes
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:56 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+6:01:58 PM [vite] (client) hmr update /src/components/emergency/OperationalAlertRail.tsx
+6:01:59 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:01:59 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:01 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:01 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:31 PM [vite] http proxy error: /api/users/profile
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:31 PM [vite] http proxy error: /api/notifications?limit=50
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/subscriptions/current
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/organizations/current/engine
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/platform/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/tenant/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /api/workspaces/context
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:02:44 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+6:03:04 PM [vite] http proxy error: /health
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)

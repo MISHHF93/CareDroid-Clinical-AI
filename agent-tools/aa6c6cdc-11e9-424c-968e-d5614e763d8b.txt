@@ -1,0 +1,1197 @@
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/pages/commercial/CommercialPages.test.jsx (16 tests) 4124ms
+     ✓ builds and applies a hospital solution recommendation  1006ms
+     ✓ saves full tenant configuration from configuration studio  795ms
+     ✓ reviews and activates the configured tenant profile payload  595ms
+ ❯ src/pages/ProfileSettings.test.jsx (3 tests | 1 failed) 1020ms
+     ✓ prefills operational profile fields and saves changes through the operational identity API  521ms
+     ✓ shows permission or API errors without updating local profile state  480ms
+     × saves AI, notification, and theme preferences from profile settings 16ms
+ ❯ src/pages/Settings.billing.test.jsx (6 tests | 1 failed) 1871ms
+     ✓ renders backend-returned plan, status, payment state, and plan details 79ms
+     ✓ starts checkout with a backend-returned plan id  364ms
+     ✓ opens the customer portal through the backend route 218ms
+     × shows auth-required empty state without calling protected billing routes 1013ms
+     ✓ renders enterprise identity provider registry readiness 97ms
+     ✓ renders tenant data isolation audit readiness 97ms
+ ✓ src/pages/Settings.privacyData.test.jsx (2 tests) 1088ms
+     ✓ requires acknowledgement before requesting a data export  648ms
+     ✓ requires email and destructive phrase before deleting data  438ms
+ ✓ src/pages/Profile.activity.test.jsx (2 tests) 529ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+     ✓ shows personal activity and restricted PHI empty state for normal users  388ms
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  2 failed | 27 passed (29)
+   Start at  17:46:33
+   Duration  17.85s (transform 1.49s, setup 754ms, import 3.48s, tests 8.63s, environment 4.29s)
+
+ FAIL  src/pages/ProfileSettings.test.jsx > ProfileSettings operational profile save > saves AI, notification, and theme preferences from profile settings
+TestingLibraryElementError: Unable to find a label with the text of: /theme/i
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="profile-settings-shell"
+    >
+      <header
+        class="profile-settings-shell__header"
+      >
+        <div>
+          <p
+            class="profile-settings-shell__eyebrow"
+          >
+            Learning
+          </p>
+          <h1>
+            Identity
+          </h1>
+          <p
+            class="profile-settings-shell__subtitle"
+          >
+            Clinical profile and institutional details. Your role is assigned by an administrator.
+          </p>
+        </div>
+        <div
+          class="profile-settings-shell__access"
+          role="status"
+        >
+          <strong>
+            Student
+          </strong>
+          <span>
+            Learning tools, assistant access, and supervised clinical calculators.
+          </span>
+          <span>
+            Role: 
+            student
+             
+            · 
+            12
+             routes ·
+             
+            2
+             workspaces
+          </span>
+          <ul
+            class="profile-settings-shell__functions"
+          >
+            <li
+              title="Learning modules, supervised calculators, and simulation suites."
+            >
+              Education & simulation
+            </li>
+            <li
+              title="Scores, protocols, drug checks, and decision support."
+            >
+              Clinical calculators & tools
+            </li>
+            <li
+              title="Voice and text capture of decisions, handoffs, and reassessments."
+            >
+              CareDroid copilot capture
+            </li>
+          </ul>
+        </div>
+      </header>
+      <nav
+        aria-label="Profile sections"
+        class="profile-settings-shell__nav"
+      >
+        <a
+          class=""
+          href="/profile"
+        >
+          Overview
+        </a>
+        <a
+          class=""
+          href="/profile/settings"
+        >
+          Identity
+        </a>
+        <a
+          class=""
+          href="/profile/preferences"
+        >
+          Preferences
+        </a>
+        <a
+          class=""
+          href="/profile/tool-preferences"
+        >
+          Tools
+        </a>
+        <a
+          class=""
+          href="/profile/workspaces"
+        >
+          Workspaces
+        </a>
+        <a
+          class=""
+          href="/profile/security"
+        >
+          Security
+        </a>
+        <a
+          class=""
+          href="/profile/activity"
+        >
+          Activity
+        </a>
+      </nav>
+      <div
+        class="profile-settings-shell__content"
+      >
+        <section
+          class="cd-dashboard-section profile-settings-section"
+        >
+          <header
+            class="cd-section-header"
+          >
+            <div
+              class="cd-section-header__main"
+            >
+              <div
+                class="cd-section-header__content"
+              >
+                <h2
+                  class="cd-section-header__title"
+                >
+                  Clinical profile
+                </h2>
+                <p
+                  class="cd-section-header__description"
+                >
+                  Backend-backed clinical profile and institutional details.
+                </p>
+              </div>
+            </div>
+          </header>
+          <div
+            class="cd-dashboard-section__content"
+          >
+            <form
+              class="profile-settings-form"
+              id="profile-settings-form"
+            >
+              <div
+                class="input-wrapper"
+              >
+                <label
+                  class="input-label "
+                  for=":rc:"
+                >
+                  Display name
+                </label>
+                <div
+                  class="input-container"
+                >
+                  <input
+                    class="input-field"
+                    id=":rc:"
+                    placeholder="Display name"
+                    required=""
+                    type="text"
+                    value="Dr. Avery Stone"
+                  />
+                </div>
+              </div>
+              <div
+                class="input-wrapper"
+              >
+                <label
+                  class="input-label "
+                  for=":rd:"
+                >
+                  Institution
+                </label>
+                <div
+                  class="input-container"
+                >
+                  <input
+                    class="input-field"
+                    id=":rd:"
+                    placeholder="Institution"
+                    type="text"
+                    value="County General"
+                  />
+                </div>
+              </div>
+              <div
+                class="input-wrapper"
+              >
+                <label
+                  class="input-label "
+                  for=":re:"
+                >
+                  Specialty
+                </label>
+                <div
+                  class="input-container"
+                >
+                  <input
+                    class="input-field"
+                    id=":re:"
+                    placeholder="Specialty (e.g., Emergency Medicine)"
+                    type="text"
+                    value="Emergency Medicine"
+                  />
+                </div>
+              </div>
+              <div
+                class="input-wrapper"
+              >
+                <label
+                  class="input-label "
+                  for=":rf:"
+                >
+                  License number
+                </label>
+                <div
+                  class="input-container"
+                >
+                  <input
+                    class="input-field"
+                    id=":rf:"
+                    placeholder="License number"
+                    type="text"
+                    value="MD-123"
+                  />
+                </div>
+              </div>
+              <div
+                class="profile-settings-grid"
+              >
+                <div
+                  class="input-wrapper"
+                >
+                  <label
+                    class="input-label "
+                    for=":rg:"
+                  >
+                    Country
+                  </label>
+                  <div
+                    class="input-container"
+                  >
+                    <input
+                      class="input-field"
+                      id=":rg:"
+                      placeholder="Country"
+                      type="text"
+                      value="US"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="input-wrapper"
+                >
+                  <label
+                    class="input-label "
+                    for=":rh:"
+                  >
+                    Timezone
+                  </label>
+                  <div
+                    class="input-container"
+                  >
+                    <input
+                      class="input-field"
+                      id=":rh:"
+                      placeholder="Timezone"
+                      type="text"
+                      value="America/New_York"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card-subtle profile-settings-role-note"
+              >
+                <strong>
+                  Account role:
+                </strong>
+                 
+                physician
+                . Role changes stay controlled by backend membership and RBAC policies.
+              </div>
+            </form>
+            <div
+              class="cd-action-row cd-action-row--start profile-settings-actions"
+            >
+              <button
+                class="btn btn-primary btn-md"
+                disabled=""
+                form="profile-settings-form"
+                type="submit"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Save profile
+                </span>
+              </button>
+              <a
+                class="profile-settings-back-link"
+                href="/profile"
+              >
+                Back to Profile
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getAllByLabelText node_modules/@testing-library/dom/dist/queries/label-text.js:111:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/pages/ProfileSettings.test.jsx:176:37
+    174|     renderProfileSettings();
+    175|
+    176|     await user.selectOptions(screen.getByLabelText(/theme/i), 'dark');
+       |                                     ^
+    177|     await user.selectOptions(screen.getByLabelText(/density/i), 'compa…
+    178|     await user.selectOptions(screen.getByLabelText(/ai response style/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/pages/Settings.billing.test.jsx > Settings Billing card > shows auth-required empty state without calling protected billing routes
+TestingLibraryElementError: Unable to find an element with the text: /sign in to view current plan/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="settings-page"
+    >
+      <div
+        class="card"
+        style="padding: var(--app-card-padding-compact, 14px);"
+      >
+        <h2
+          class="settings-card__title"
+        >
+          Settings
+        </h2>
+        <p
+          class="settings-card__subtitle"
+        >
+          Configure CareDroid preferences and notifications.
+        </p>
+        <div
+          class="settings-platform-strip"
+        >
+          <div
+            class="settings-platform-strip__title"
+          >
+            Organization platform
+          </div>
+          <p
+            class="settings-platform-strip__description"
+          >
+            Admin, billing, product, and configuration hubs are separated from normal preferences.
+          </p>
+          <div
+            class="settings-platform-strip__actions"
+          >
+            <a
+              href="/organization"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Organization dashboard
+                </span>
+              </button>
+            </a>
+            <a
+              href="/tenant-admin"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Tenant admin
+                </span>
+              </button>
+            </a>
+            <a
+              href="/billing"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Billing
+                </span>
+              </button>
+            </a>
+            <a
+              href="/products"
+            >
+              <button
+                class="btn btn-ghost btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Products
+                </span>
+              </button>
+            </a>
+            <a
+              href="/configuration-studio"
+            >
+              <button
+                class="btn btn-ghost btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Configuration studio
+                </span>
+              </button>
+            </a>
+            <a
+              href="/settings/features"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Feature management
+                </span>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div
+          class="settings-toggle-grid"
+        >
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Theme preference
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                System, light, or dark (active: 
+                dark
+                )
+              </div>
+            </div>
+            <select
+              class="settings-theme-select"
+            >
+              <option
+                value="system"
+              >
+                System
+              </option>
+              <option
+                value="light"
+              >
+                Light
+              </option>
+              <option
+                value="dark"
+              >
+                Dark
+              </option>
+            </select>
+          </div>
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Notifications
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                AI results and alerts
+              </div>
+            </div>
+            <input
+              checked=""
+              type="checkbox"
+            />
+          </div>
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Safety banner
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                Always show clinical disclaimer
+              </div>
+            </div>
+            <input
+              checked=""
+              type="checkbox"
+            />
+          </div>
+          <section
+            aria-labelledby="privacy-data-title"
+            class="settings-privacy-card"
+          >
+            <div
+              class="settings-privacy-card__header"
+            >
+              <div>
+                <h3
+                  id="privacy-data-title"
+                >
+                  Privacy & Data
+                </h3>
+                <p>
+                  Export your account data or request account data deletion using protected compliance routes. These actions require your active signed-in session.
+                </p>
+              </div>
+              <span
+                class="settings-privacy-card__badge"
+              >
+                Protected
+              </span>
+            </div>
+            <div
+              class="settings-privacy-warning"
+            >
+              Data exports may contain PHI or account identifiers. Deletion is irreversible and may retain anonymized audit records where required for compliance.
+            </div>
+            <div
+              class="settings-privacy-actions"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+                type="button"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Request data export
+                </span>
+              </button>
+              <button
+                class="btn btn-danger btn-md"
+                type="button"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Request data deletion
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-labelledby="enterprise-identity-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="enterprise-identity-title"
+                >
+                  Enterprise Identity
+                </h3>
+                <p>
+                  Identity Provider Registry for SSO, SAML, OIDC, Azure AD, Okta, and Google Workspace readiness.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Registry
+              </span>
+            </div>
+            <div
+              class="settings-billing-summary"
+            >
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Supported
+                </span>
+                <strong>
+                  1
+                </strong>
+              </div>
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Planned
+                </span>
+                <strong>
+                  5
+                </strong>
+              </div>
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Unavailable
+                </span>
+                <strong>
+                  0
+                </strong>
+              </div>
+            </div>
+            <div
+              class="settings-billing-plan-details"
+            >
+              <div>
+                <strong>
+                  Google Workspace
+                </strong>
+                <span>
+                  supported
+                   · 
+                  oauth2
+                   · /api/auth/google
+                </span>
+                <span>
+                  Google OAuth is configured.
+                </span>
+              </div>
+            </div>
+          </section>
+          <section
+            aria-labelledby="tenant-isolation-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="tenant-isolation-title"
+                >
+                  Tenant Data Isolation Audit
+                </h3>
+                <p>
+                  Organization, user, workspace, asset, analytics, and audit-log controls that prevent cross-tenant data access.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Tenant admin
+              </span>
+            </div>
+            <div
+              class="settings-billing-empty"
+            >
+              Open admin console as a tenant administrator to view the isolation audit.
+            </div>
+          </section>
+          <section
+            aria-labelledby="settings-billing-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="settings-billing-title"
+                >
+                  Billing
+                </h3>
+                <p>
+                  View your backend-returned subscription status and open Stripe checkout or the customer portal from protected subscription routes.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Demo mode
+              </span>
+            </div>
+            <div
+              class="settings-billing-empty"
+            >
+              Billing data loads when the backend subscription API is available. During the build phase, plan and checkout actions may stay disabled.
+            </div>
+          </section>
+        </div>
+        <div
+          class="settings-footer-actions"
+        >
+          <button
+            class="btn btn-primary btn-md"
+          >
+            <span
+              class="btn-content"
+            >
+              Save changes
+            </span>
+          </button>
+          <a
+            class="settings-back-link"
+            href="/profile"
+          >
+            Back to Profile
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="settings-page"
+    >
+      <div
+        class="card"
+        style="padding: var(--app-card-padding-compact, 14px);"
+      >
+        <h2
+          class="settings-card__title"
+        >
+          Settings
+        </h2>
+        <p
+          class="settings-card__subtitle"
+        >
+          Configure CareDroid preferences and notifications.
+        </p>
+        <div
+          class="settings-platform-strip"
+        >
+          <div
+            class="settings-platform-strip__title"
+          >
+            Organization platform
+          </div>
+          <p
+            class="settings-platform-strip__description"
+          >
+            Admin, billing, product, and configuration hubs are separated from normal preferences.
+          </p>
+          <div
+            class="settings-platform-strip__actions"
+          >
+            <a
+              href="/organization"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Organization dashboard
+                </span>
+              </button>
+            </a>
+            <a
+              href="/tenant-admin"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Tenant admin
+                </span>
+              </button>
+            </a>
+            <a
+              href="/billing"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Billing
+                </span>
+              </button>
+            </a>
+            <a
+              href="/products"
+            >
+              <button
+                class="btn btn-ghost btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Products
+                </span>
+              </button>
+            </a>
+            <a
+              href="/configuration-studio"
+            >
+              <button
+                class="btn btn-ghost btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Configuration studio
+                </span>
+              </button>
+            </a>
+            <a
+              href="/settings/features"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Feature management
+                </span>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div
+          class="settings-toggle-grid"
+        >
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Theme preference
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                System, light, or dark (active: 
+                dark
+                )
+              </div>
+            </div>
+            <select
+              class="settings-theme-select"
+            >
+              <option
+                value="system"
+              >
+                System
+              </option>
+              <option
+                value="light"
+              >
+                Light
+              </option>
+              <option
+                value="dark"
+              >
+                Dark
+              </option>
+            </select>
+          </div>
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Notifications
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                AI results and alerts
+              </div>
+            </div>
+            <input
+              checked=""
+              type="checkbox"
+            />
+          </div>
+          <div
+            class="settings-toggle-row"
+          >
+            <div>
+              <div
+                class="settings-toggle-row__title"
+              >
+                Safety banner
+              </div>
+              <div
+                class="settings-toggle-row__description"
+              >
+                Always show clinical disclaimer
+              </div>
+            </div>
+            <input
+              checked=""
+              type="checkbox"
+            />
+          </div>
+          <section
+            aria-labelledby="privacy-data-title"
+            class="settings-privacy-card"
+          >
+            <div
+              class="settings-privacy-card__header"
+            >
+              <div>
+                <h3
+                  id="privacy-data-title"
+                >
+                  Privacy & Data
+                </h3>
+                <p>
+                  Export your account data or request account data deletion using protected compliance routes. These actions require your active signed-in session.
+                </p>
+              </div>
+              <span
+                class="settings-privacy-card__badge"
+              >
+                Protected
+              </span>
+            </div>
+            <div
+              class="settings-privacy-warning"
+            >
+              Data exports may contain PHI or account identifiers. Deletion is irreversible and may retain anonymized audit records where required for compliance.
+            </div>
+            <div
+              class="settings-privacy-actions"
+            >
+              <button
+                class="btn btn-secondary btn-md"
+                type="button"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Request data export
+                </span>
+              </button>
+              <button
+                class="btn btn-danger btn-md"
+                type="button"
+              >
+                <span
+                  class="btn-content"
+                >
+                  Request data deletion
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-labelledby="enterprise-identity-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="enterprise-identity-title"
+                >
+                  Enterprise Identity
+                </h3>
+                <p>
+                  Identity Provider Registry for SSO, SAML, OIDC, Azure AD, Okta, and Google Workspace readiness.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Registry
+              </span>
+            </div>
+            <div
+              class="settings-billing-summary"
+            >
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Supported
+                </span>
+                <strong>
+                  1
+                </strong>
+              </div>
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Planned
+                </span>
+                <strong>
+                  5
+                </strong>
+              </div>
+              <div>
+                <span
+                  class="settings-billing-label"
+                >
+                  Unavailable
+                </span>
+                <strong>
+                  0
+                </strong>
+              </div>
+            </div>
+            <div
+              class="settings-billing-plan-details"
+            >
+              <div>
+                <strong>
+                  Google Workspace
+                </strong>
+                <span>
+                  supported
+                   · 
+                  oauth2
+                   · /api/auth/google
+                </span>
+                <span>
+                  Google OAuth is configured.
+                </span>
+              </div>
+            </div>
+          </section>
+          <section
+            aria-labelledby="tenant-isolation-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="tenant-isolation-title"
+                >
+                  Tenant Data Isolation Audit
+                </h3>
+                <p>
+                  Organization, user, workspace, asset, analytics, and audit-log controls that prevent cross-tenant data access.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Tenant admin
+              </span>
+            </div>
+            <div
+              class="settings-billing-empty"
+            >
+              Open admin console as a tenant administrator to view the isolation audit.
+            </div>
+          </section>
+          <section
+            aria-labelledby="settings-billing-title"
+            class="settings-billing-card"
+          >
+            <div
+              class="settings-billing-card__header"
+            >
+              <div>
+                <h3
+                  id="settings-billing-title"
+                >
+                  Billing
+                </h3>
+                <p>
+                  View your backend-returned subscription status and open Stripe checkout or the customer portal from protected subscription routes.
+                </p>
+              </div>
+              <span
+                class="settings-billing-card__badge"
+              >
+                Demo mode
+              </span>
+            </div>
+            <div
+              class="settings-billing-empty"
+            >
+              Billing data loads when the backend subscription API is available. During the build phase, plan and checkout actions may stay disabled.
+            </div>
+          </section>
+        </div>
+        <div
+          class="settings-footer-actions"
+        >
+          <button
+            class="btn btn-primary btn-md"
+          >
+            <span
+              class="btn-content"
+            >
+              Save changes
+            </span>
+          </button>
+          <a
+            class="settings-back-link"
+            href="/profile"
+          >
+            Back to Profile
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/Settings.billing.test.jsx:184:25
+    182|     renderSettings();
+    183|
+    184|     expect(await screen.findByText(/sign in to view current plan/i)).t…
+       |                         ^
+    185|     expect(fetchCurrentSubscription).not.toHaveBeenCalled();
+    186|     expect(fetchSubscriptionPlans).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

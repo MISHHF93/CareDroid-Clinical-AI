@@ -3,7 +3,7 @@ pid: 29220
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run dev\""
 started_at: 2026-06-24T18:07:30.278Z
-running_for_ms: 6055000  
+running_for_ms: 30140004 
 ---
 
 > caredroid-clinical-ai@1.0.0 dev

@@ -1,0 +1,18 @@
+---
+pid: 22644
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npx vite --strictPort --port 5173"
+started_at: 2026-06-25T02:47:26.441Z
+running_for_ms: 32845004 
+---
+At line:1 char:46
++ (cd "C:\\Users\\borah\\CareDroid-Clinical-AI" ; npx vite --strictPort ...
++                                              ~
+Missing closing ')' in expression.
+At line:1 char:82
++ ... s\\borah\\CareDroid-Clinical-AI" ; npx vite --strictPort --port 5173)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInExpression
+ 

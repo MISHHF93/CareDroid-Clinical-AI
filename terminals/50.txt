@@ -1,0 +1,59 @@
+---
+pid: 25840
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; $env:NODE_OPTIONS=\"--max-old-space-size=8192\"; npx.cmd vitest run src/routing/canonicalRouteTree.behavior.test.jsx --pool=forks --maxWorkers=1 --reporter=dot 2>&1"
+started_at: 2026-06-25T08:51:57.379Z
+running_for_ms: 10449938 
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+npx.cmd : 
+At line:1 char:101
++ ... size=8192"; npx.cmd vitest run src/routing/canonicalRouteTree.behavio ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+<--- Last few GCs --->
+[28580:0000026694CFC000]   682727 ms: Scavenge (interleaved) 8154.2 (8195.1) -> 8140.8 (8196.4) MB, pooled: 0 MB, 
+55.61 / 0.00 ms  (average mu = 0.361, current mu = 0.369) allocation failure; 
+[28580:0000026694CFC000]   716677 ms: Mark-Compact (reduce) 8142.6 (8196.4) -> 8128.3 (8165.4) MB, pooled: 0 MB, 
+28174.27 / 0.00 ms  (+ 134.2 ms in 26 steps since start of marking, biggest step 6.5 ms, walltime since start of 
+marking 28549 ms) (average mu
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+ 1: 00007FF711E60CCF node::OnFatalError+1343
+ 2: 00007FF712AAF697 v8::Function::NewInstance+423
+ 3: 00007FF7128B00C7 v8::base::AddressSpaceReservation::AddressSpaceReservation+322071
+ 4: 00007FF7128B3DD4 v8::base::AddressSpaceReservation::AddressSpaceReservation+337700
+ 5: 00007FF7128C2D2C v8::internal::StrongRootAllocatorBase::deallocate_impl+16604
+ 6: 00007FF7128C256B v8::internal::StrongRootAllocatorBase::deallocate_impl+14619
+ 7: 00007FF713D4E86D v8::base::UnsignedDivisionByConstant<unsigned __int64>+2794685
+ 8: 00007FF7128ADB90 v8::base::AddressSpaceReservation::AddressSpaceReservation+312544
+ 9: 00007FF7129318C9 v8::Unlocker::~Unlocker+9273
+10: 00007FF7124A5EE2 v8::String::Value::~Value+142450
+11: 00000266CD3775FA 
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+ Test Files   (1)
+      Tests   (22)
+     Errors  1 error
+   Start at  04:51:58
+   Duration  717.92s (transform 2.77s, setup 150ms, import 3.97s, tests 0ms, environment 536ms)
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-pool]: Worker forks emitted error.
+ ❯ EventEmitter.onTaskError node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:3459:21
+ ❯ EventEmitter.emit node:events:509:28
+ ❯ ChildProcess.emitUnexpectedExit node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:3025:22
+ ❯ ChildProcess.emit node:events:509:28
+ ❯ Process.ChildProcess._handle.onexit node:internal/child_process:295:12
+Caused by: Error: Worker exited unexpectedly
+ ❯ ChildProcess.emitUnexpectedExit node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:3023:33
+ ❯ ChildProcess.emit node:events:509:28
+ ❯ Process.ChildProcess._handle.onexit node:internal/child_process:295:12
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯

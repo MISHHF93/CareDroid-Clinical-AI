@@ -1,0 +1,12 @@
+---
+pid: 8344
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI; node scripts/screenshot-copilot.mjs 2>&1 | Select-Object -First 5; if (Test-Path agent-tools) { Get-ChildItem agent-tools -Filter \"*reception*\" -ErrorAction SilentlyContinue }"
+started_at: 2026-06-25T12:59:26.485Z
+running_for_ms: 15040001 
+---
+{
+  "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\agent-tools\\copilot-layout-after.png",
+  "panelCount": 0,
+  "tabCount": 0,
+  "panelBox": null,

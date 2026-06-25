@@ -3,7 +3,7 @@ pid: 4228
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && set NODE_ENV=development&& set PORT=3000&& set DATABASE_CLIENT=sqlite&& set SQLITE_PATH=caredroid.dev.sqlite&& set ENABLE_MONGOOSE_EMERGENCY_OS=false&& set REDIS_ENABLED=false&& set AI_ENABLED=false&& set DEV_LOGIN_EMAIL=dev@example.com&& set ENCRYPTION_MASTER_KEY=0000000000000000000000000000000000000000000000000000000000000000&& set FRONTEND_URL=http://localhost:8000&& set CORS_ORIGIN=http://localhost:8000&& node dist/backend/src/main.js\""
 started_at: 2026-06-24T13:43:08.599Z
-running_for_ms: 21920013 
+running_for_ms: 46005019 
 ---
 [Nest] 4496  - 06/24/2026, 9:43:11 AM     LOG [NestFactory] Starting Nest application...
 [Nest] 4496  - 06/24/2026, 9:43:11 AM     LOG [InstanceLoader] TypeOrmModule dependencies initialized +120ms

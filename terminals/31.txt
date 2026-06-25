@@ -3,7 +3,7 @@ pid: 35332
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npx vitest run src/components/EmergencyWhiteboard.storeReactivity.test.jsx src/components/EmergencyWhiteboard.malformedApi.test.jsx 2>&1\""
 started_at: 2026-06-24T18:10:45.937Z
-running_for_ms: 5740005  
+running_for_ms: 29825007 
 ---
 
  RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI

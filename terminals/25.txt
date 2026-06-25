@@ -3,7 +3,7 @@ pid: 3868
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && set PORT=3000&& set NODE_ENV=development&& set DATABASE_CLIENT=sqlite&& set SQLITE_PATH=caredroid.dev.sqlite&& set ENABLE_MONGOOSE_EMERGENCY_OS=false&& set REDIS_ENABLED=false&& set AI_ENABLED=false&& node dist/backend/src/main.js\""
 started_at: 2026-06-24T13:42:55.394Z
-running_for_ms: 21930007 
+running_for_ms: 46014997 
 ---
 [Nest] 30180  - 06/24/2026, 9:42:58 AM     LOG [NestFactory] Starting Nest application...
 [Nest] 30180  - 06/24/2026, 9:42:58 AM   ERROR [ExceptionHandler] Config validation error: "DEV_LOGIN_EMAIL" must be a valid email

@@ -1,0 +1,370 @@
+warning: in the working copy of 'backend/src/modules/chat/calculator-recommender.service.spec.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/modules/chat/calculator-recommender.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/modules/user-profile/saas-profile.constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/dev-stack.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/AppShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CapacityCrisisMode.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ClinicalCalculatorHub.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CommandPalette.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ContextInsightCard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CopilotPanel.operationalAwareness.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CopilotPanel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CriticalChecklist.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/CrossModuleLinkPanel.test.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ErrorBoundary.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ExpressRegistration.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/HandoffBriefGenerator.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Header.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Header.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/PatientCard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/PatientDetailPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/PatientDetailPanel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/PatientSearchResults.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/QuickIntake.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ReassessmentDrawer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Sidebar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/StaffWorkloadPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/StateSourceNotice.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/StrokeCodeProtocol.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/SystemHealth.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/WhoNextPanel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/account/DemoPersonaPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/account/ProfileRoleSwitcher.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/admin/AdminOperationsShell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/app-shell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/audit/OperationalHistoryPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/CIWAAr.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/ColumbiaSSRS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/HEARTScore.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/NEWS2.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/NIHSS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/PediatricDrugCalc.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/calculators/qSOFA.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/chat/AISourcePanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/chrome/SessionChromeBar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/clinical/ClinicalDecisionSupportDisclaimer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/AiTransparencyDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/CopilotRiskLayerPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/CopilotShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/DiagnosticSafetyDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/PatientCardCopilot.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/PatientCardCopilot.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/copilot/copilot-shell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/dataQuality/DataQualityRiskPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/CommandDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/DisplayRefreshStatusBar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/OperationalAlertRail.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/OperationalAlertRail.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/OperationalStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/OperationalStrip.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/operationalAlertRailModel.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/emergency/operationalAlertRailModel.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ems/EmsOffloadAggregateStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ems/PreArrivalForm.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ems/PreArrivalNotificationForm.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/integrations/IntegrationStatusPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/ClinicalAcuityLeaderboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/DriftMonitoringPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/NativeAiRoutingBadge.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/SpecialistInferenceBadge.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/TriageExpertBadge.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/native-ai/native-ai-dashboard-theme.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/orchestration/orchestration.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/patient-card/PatientDocumentArtifactsStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/patient-experience/PatientRoomWhiteboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/patient-experience/PatientWhiteboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/patient-experience/WaitingRoomProcessEducation.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/predictive/PostEdOrientationBadge.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/profile/ProfileSettingsShell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/queues/QueueOperationalPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/AiTriageAssistPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ArrivalControlSummaryStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ArrivalDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ArrivalDashboard.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/DuplicatePatientBanner.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/EmsPreArrivalPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/IntakeArtifactPicker.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/PreparePatientChooser.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionEmbeddedCalculator.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionOperationalStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionPatientAnswersPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionQueueBadgeStack.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionQuickIntake.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionSearchHint.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionSmartIntakeOverlay.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionThroughputAttentionCluster.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/SelfCheckin.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/TriageRuleBuilder.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/simulation/PlatformFeatureTransparencyPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/simulation/SimulationModeBanner.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/simulation/SimulationModeToggle.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/styles/CopilotPanel-part-01.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/styles/CopilotPanel-part-02.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/styles/EmergencyWhiteboard-part-03.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ui/OperationalEmptyState.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ui/Skeleton.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ui/SkeletonLoader.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/DuplicateCandidatePanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/DuplicateReviewAlert.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/IdentityFieldReview.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/OcrCapturePanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/PatientVerificationExperience.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/verification/ProvisionalIdentityPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/waiting-room/PatientCommunicationStatusPanel.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/waiting-room/WaitingRoomSafetyEscalationStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/ChargeNurseOperationalStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/DataQualityRiskStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/DepartmentStaffBar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/DigitalDoorSign.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/OperationalHandoffDomainBar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/OperationalHistoryStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/QueueAuditStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/WhiteboardAlertRail.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/WhiteboardOperationalIconStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/WhiteboardOpsDetailStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/WhiteboardPatientRowHeader.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/whiteboard/WhiteboardView.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/copilotSafety.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/edWorkflowIntegrationModel.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/edWorkflowIntegrationModel.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/emergencyOperationalPresentationModel.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/emergencyScreenKpiPolicy.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/practitionerCleanup.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/practitionerCleanup.config.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/practitionerSurfaceVisibility.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/practitionerSurfaceVisibility.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/receptionDeskUi.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/receptionDeskUiModel.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/saasProfileConstants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/theme.tokens.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/contexts/ThemeContext.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/contexts/ThemeContext.test.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/backendFrontendExposure.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/fullPlatformConsolidation.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/medicalExpansionCrossPackValidation.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/toolInventory.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/toolRegistry.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/future-modules/_review/components/ShiftSummary.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/future-modules/_review/pages/WorkspaceHome.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/globals.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/hooks/useEdWorkflowIntegration.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/layout/AppShell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/layout/styles/AppShell-part-01.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/layout/styles/AppShell-part-05.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/main.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/navigation/registryToolLaunch.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/navigation/registryToolLaunch.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/CapacityDetail.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/ClinicalKnowledgeGraph.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/DigitalOperationsCenter.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/EnterpriseOperatingPlatformHub.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/PlatformEntryHub.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/PlatformIntelligenceHub.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/PlatformNavigationPage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/PlatformSelfDiagnostics.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/ResearchEvidenceHub.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/ShiftSummary.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/SimulationLaboratoryViewer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/SystemHealth.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/commercial/CommercialPages.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/cosmos/CosmosViewer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/ClinicalCalculatorHub.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/EmergencySettings.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/PatientRoomDisplay.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/ReceptionPipelineShell.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/ReceptionWorkspace.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/ReceptionWorkspace.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/ReceptionWorkspace.test.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/SmartIntake.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/emergency-route.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/emergency-whiteboard-cleanup.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/emergencyRoutePages.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/index.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/pulse/DepartmentPulse.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/emergency/shift/ShiftSummary.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/fleet/PredictiveMaintenance.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/fleet/RouteOptimizer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/integrations/IntegrationHubPage.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/platform/PlatformSystemPage.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/settings/FeatureManagement.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/surveillance/SurveillanceNexusDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/tools/AiExplainability.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/tools/ClinicalToolCatalog.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/tools/TimelineAi.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/tools/TimelineAi.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/tools/ToolNotFound.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/careDroidToolLaunch.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/careDroidToolLaunch.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/crossModuleIntelligenceService.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/devBackendAuth.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/unifiedClinicalToolsBridge.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/services/unifiedClinicalToolsBridge.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/dashboard-route.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/emergency-responsive.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/emergency-tokens.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/practitioner-compact.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/theme-surfaces.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/theme-tokens.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/themeColorSystem.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/visual-consistency.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/theme-init.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tailwind.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/23.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/24.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/25.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/26.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/27.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/28.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/29.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/30.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/31.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/32.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/01d78038-6390-41a1-99f3-87da4a50615d.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/0db50c93-bac5-4fad-9914-aced068c45a9.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/1b277a87-b70c-4bcc-9f40-030294bce00a.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/1d3bb5fa-5df0-4280-91da-dccdab568b6c.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/2206f839-6efb-43b4-95ae-40b75dc6b653.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/35840441-3bb5-4e2e-8a11-b3c28ac12f3a.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/411b6a8c-85d8-41fe-a627-618f544e5392.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/624c1802-f116-4122-ac86-12cfa0b3372c.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/7817e3c1-d1f0-4c7a-a68d-14fe66c22603.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/8a3bee73-f7ac-4b4e-a924-0b231b5c8473.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/8e199ee9-99ad-4dd1-9c46-de5b6b4660d3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/8e342ae8-e86f-4cf2-a06f-bd7f8daa4a9d.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/937c1970-5876-42d0-9352-1fa2d75ab2db.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/9d86fe80-7f23-4624-9288-239c0255b1cc.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/a84c9f0a-666d-44a0-88c3-0a1c5bc33691.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/aa6c6cdc-11e9-424c-968e-d5614e763d8b.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/b687e8e5-da29-4406-b21b-ff23c060892d.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/b9029db1-77fe-45a7-ad0d-842c02b24ae3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/bd159845-27f9-43aa-b96c-16f49006c9f2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/c0157596-89dc-4542-aafd-2a388b59e735.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/c68e4f6d-7fdf-4fd7-9b8b-f85d0e90b32c.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/c7aea4d4-89a5-4325-a6ee-82b7ae2c0c1b.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/cc8678e7-9756-4a0b-821b-4e3050b5f256.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/d0b418f2-8d98-4ee8-94d1-dff4380d25ee.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/d15e152e-70b3-4635-b8d0-8d7fba1bdbbc.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/f40e3df2-c363-4c8a-a655-fcfb152f2e2a.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'agent-tools/f494ee19-4aa9-4b29-a1bf-f172e3bf007e.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/apply-medical-fallbacks.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/apply-medical-shell-colors.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/consolidate-medical-theme.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/normalize-card-contrast.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/normalize-medical-colors.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/normalize-medical-full-scale.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/normalize-medical-text.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/verify-stack-connection.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionDeskToolbar.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/reception/ReceptionDeskToolbar.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/copilotPlatform.config.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/copilotPlatform.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/medicalTheme.constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/stationKpiPolicy.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/stationKpiPolicy.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/card-contrast-normalization.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/color-normalization.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/medical-card-layer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/medical-color-layer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/medical-type-layer.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/medicalThemeAudit.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/reception-desk-theme.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/surface-normalization.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles/text-normalization.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/33.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/34.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/35.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/36.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/37.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/38.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/39.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/40.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/41.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/42.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/43.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/44.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/45.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/46.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/47.txt', LF will be replaced by CRLF the next time Git touches it
+Unstaged changes after reset:
+Mterminals/.next-id
+Mterminals/23.txt
+Mterminals/24.txt
+Mterminals/25.txt
+Mterminals/26.txt
+Mterminals/27.txt
+Mterminals/28.txt
+Mterminals/29.txt
+Mterminals/30.txt
+Mterminals/31.txt
+Mterminals/32.txt
+warning: in the working copy of 'terminals/48.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/49.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/50.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/51.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/52.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'terminals/53.txt', LF will be replaced by CRLF the next time Git touches it
+Unstaged changes after reset:
+Mterminals/.next-id
+Mterminals/23.txt
+Mterminals/24.txt
+Mterminals/25.txt
+Mterminals/26.txt
+Mterminals/27.txt
+Mterminals/28.txt
+Mterminals/29.txt
+Mterminals/30.txt
+Mterminals/31.txt
+Mterminals/32.txt
+Unstaged changes after reset:
+Mterminals/.next-id
+Mterminals/23.txt
+Mterminals/24.txt
+Mterminals/25.txt
+Mterminals/26.txt
+Mterminals/27.txt
+Mterminals/28.txt
+Mterminals/29.txt
+Mterminals/30.txt
+Mterminals/31.txt
+Mterminals/32.txt
+M  agent-tools/copilot-layout-after.png
+M  backend/src/modules/chat/calculator-recommender.service.spec.ts
+M  backend/src/modules/chat/calculator-recommender.service.ts
+M  backend/src/modules/user-profile/saas-profile.constants.ts
+M  index.html
+M  package.json
+A  scripts/apply-medical-fallbacks.mjs
+A  scripts/apply-medical-shell-colors.mjs
+A  scripts/consolidate-medical-theme.mjs
+M  scripts/dev-stack.mjs
+A  scripts/normalize-card-contrast.mjs
+A  scripts/normalize-medical-colors.mjs
+A  scripts/normalize-medical-full-scale.mjs
+A  scripts/normalize-medical-text.mjs
+A  scripts/verify-stack-connection.mjs
+M  src/App.jsx
+M  src/components/AppShell.tsx
+M  src/components/CapacityCrisisMode.css
+M  src/components/Citations.jsx
+M  src/components/ClinicalCalculatorHub.tsx
+M  src/components/CommandPalette.tsx
+M  src/components/ContextInsightCard.css
+M  src/components/CopilotPanel.operationalAwareness.test.ts
+M  src/components/CopilotPanel.tsx
+M  src/components/CriticalChecklist.tsx
+M  src/components/CrossModuleLinkPanel.test.jsx
+M  src/components/ErrorBoundary.jsx
+M  src/components/ExpressRegistration.tsx
+M  src/components/HandoffBriefGenerator.tsx
+M  src/components/Header.css
+---
+
+Lines Words Characters Property
+----- ----- ---------- --------
+  358                          
+
+

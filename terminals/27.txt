@@ -3,7 +3,7 @@ pid: 25904
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node scripts/dev-stack.mjs --backend-only\""
 started_at: 2026-06-24T13:44:32.990Z
-running_for_ms: 21835007 
+running_for_ms: 45920007 
 ---
 Starting CareDroid local stack...
 Frontend: http://localhost:8000
@@ -4474,3 +4474,5 @@ execute, POST} route +0ms
 [api] }
 [api] 
 [api] Node.js v24.16.0
+[api] [3:48:31 PM] File change detected. Starting incremental compilation...
+[api] 
