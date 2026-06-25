@@ -75,16 +75,16 @@ describe('practitionerRoleSurfacePolicy', () => {
     ).toBe('operational');
   });
 
-  it('restores charge-nurse whiteboard command surfaces during pilot', () => {
+  it('keeps charge-nurse whiteboard trimmed during pilot cleanup', () => {
     const surfaces = applyRoleSurfaceOverrides(PILOT_BASE, {
       role: EMERGENCY_ROLE_IDS.chargeNurse,
       screenMode: CARE_DROID_SCREEN_MODES.chargeNurse,
     });
 
-    expect(surfaces.whiteboard.showRoleStrips).toBe(true);
-    expect(surfaces.whiteboard.showMissionControl).toBe(true);
-    expect(surfaces.whiteboard.showCommandDashboard).toBe(true);
-    expect(surfaces.whiteboard.showWhoNextPanel).toBe(true);
+    expect(surfaces.whiteboard.showRoleStrips).toBe(false);
+    expect(surfaces.whiteboard.showMissionControl).toBe(false);
+    expect(surfaces.whiteboard.showCommandDashboard).toBe(false);
+    expect(surfaces.whiteboard.showWhoNextPanel).toBe(false);
   });
 
   it('restores physician copilot context tabs during pilot', () => {
@@ -110,15 +110,15 @@ describe('practitionerRoleSurfacePolicy', () => {
     expect(surfaces.copilot.showContextTab).toBe(false);
   });
 
-  it('preserves operational density profiles for charge nurse', () => {
+  it('flattens operational density profiles for charge nurse during pilot cleanup', () => {
     const merged = mergeRoleAwarePractitionerDensityProfile(HIGH_OPERATIONAL_PROFILE, {
       role: EMERGENCY_ROLE_IDS.chargeNurse,
       screenMode: CARE_DROID_SCREEN_MODES.chargeNurse,
     });
 
-    expect(merged.whiteboard.showMissionControl).toBe(true);
-    expect(merged.whiteboard.showQueueIntelligence).toBe(true);
-    expect(merged.patientCard.showScores).toBe(true);
+    expect(merged.whiteboard.showMissionControl).toBe(false);
+    expect(merged.whiteboard.showQueueIntelligence).toBe(false);
+    expect(merged.patientCard.showScores).toBe(false);
     expect(merged.whiteboard.maxVisibleCards).toBe(18);
   });
 

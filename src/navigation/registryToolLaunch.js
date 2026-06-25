@@ -29,6 +29,11 @@ import {
 } from '../data/assetEntitlements';
 import { trackRoleAssetUsage, trackRoleWorkflowLaunch } from '../services/roleIntelligenceTelemetry';
 import { navigateProfileAware } from './profileRouteLaunch';
+import { remapRegistryNavigationForRole } from '../services/unifiedClinicalToolsBridge';
+import {
+  canAccessEmergencyRoute,
+  normalizeEmergencyRole,
+} from '../config/emergencyRolePermissions';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -334,9 +339,25 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     handlers.entitlementContext?.membership?.roleProfileId ||
     handlers.entitlementContext?.saasRole;
 
+  const emergencyRoleId =
+    handlers.context?.emergencyRoleId ||
+    handlers.entitlementContext?.emergencyRoleId ||
+    normalizeEmergencyRole(
+      handlers.context?.user?.role ||
+        handlers.entitlementContext?.user?.role ||
+        saasRole,
+    );
+  const remapped = remapRegistryNavigationForRole(
+    { pathname: plan.pathname, search: plan.search || '' },
+    {
+      emergencyRoleId,
+      canAccessToolsRoute: canAccessEmergencyRoute(emergencyRoleId, CANONICAL_ROUTES.emergencyTools),
+    },
+  );
+
   navigateProfileAware(
     navigate,
-    { pathname: plan.pathname, search: plan.search || '' },
+    { pathname: remapped.pathname, search: remapped.search || '' },
     { replace, state, saasRole, context: handlers.context || handlers.entitlementContext },
   );
 

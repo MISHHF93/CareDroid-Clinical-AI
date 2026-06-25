@@ -3,6 +3,7 @@ import {
   type EdDataSourceInput,
 } from '../../utils/edDataSource';
 import { useSimulationMode } from '../../contexts/SimulationModeContext';
+import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './EdDataSourceBanner.css';
 
 type EdDataSourceBannerProps = EdDataSourceInput & {
@@ -15,7 +16,12 @@ export default function EdDataSourceBanner({
   compact = false,
   ...input
 }: EdDataSourceBannerProps) {
+  const surfaces = usePractitionerSurfaceVisibility();
   const { active: simulationModeActive } = useSimulationMode();
+
+  if (!surfaces.chrome.showEdDataSourceBanner) {
+    return null;
+  }
   const { sourceLabel, freshness, warnStale } = resolveEdDataSourcePresentation({
     ...input,
     simulationModeActive,

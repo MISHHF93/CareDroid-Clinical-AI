@@ -148,6 +148,20 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   compactCalculatorHubPatientBar: true,
   /** Patient room display — in-room board only; no duplicate door sign */
   suppressPatientRoomDoorSignDuplicate: true,
+  /** Hide technical data-source / API freshness lines on frontline screens */
+  suppressEdDataSourceBanner: true,
+  /** Hide simulation / training banners in session chrome */
+  suppressSessionChromeSimulation: true,
+  /** Hide page eyebrows ("Patients", "Queues", etc.) — title only */
+  suppressPageEyebrows: true,
+  /** Entry hub — hide backend wiring status for manual testers */
+  suppressEntryHubBackendSync: true,
+  /** Satellite ED routes — hide metric strips entirely (not just card layout) */
+  suppressEmergencyRouteMetrics: true,
+  /** Reception — patient-answers research panel stays in data layer only */
+  suppressReceptionPatientAnswersPanel: true,
+  /** Keep all roles on the trimmed reception desk layout during pilot */
+  forceSlimReceptionDeskForAllRoles: true,
 });
 
 export const PILOT_EXTENSION_NAV_ITEM_ID_SET = new Set(PILOT_EXTENSION_NAV_ITEM_IDS);
@@ -448,6 +462,34 @@ export function shouldCompactCalculatorHubPatientBar() {
 
 export function shouldSuppressPatientRoomDoorSignDuplicate() {
   return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPatientRoomDoorSignDuplicate;
+}
+
+export function shouldSuppressEdDataSourceBanner() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEdDataSourceBanner;
+}
+
+export function shouldSuppressSessionChromeSimulation() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressSessionChromeSimulation;
+}
+
+export function shouldSuppressPageEyebrows() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressPageEyebrows;
+}
+
+export function shouldSuppressEntryHubBackendSync() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEntryHubBackendSync;
+}
+
+export function shouldSuppressEmergencyRouteMetrics() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressEmergencyRouteMetrics;
+}
+
+export function shouldSuppressReceptionPatientAnswersPanel() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.suppressReceptionPatientAnswersPanel;
+}
+
+export function shouldForceSlimReceptionDeskForAllRoles() {
+  return isPractitionerCleanupEnabled() && PRACTITIONER_CLEANUP.forceSlimReceptionDeskForAllRoles;
 }
 
 /**

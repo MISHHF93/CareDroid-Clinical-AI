@@ -26,7 +26,7 @@ If the product feels “nested” or misleading, that is usually because **Pilot
 
 ### CareDroid is
 
-- A **reception-first, whiteboard-centered** emergency department operating layer.
+- A **reception-first, first-resolution** emergency department operating layer — the front desk resolves arrivals, verification, and pretriage handoff before clinical teams take over.
 - Built for roughly **100 patients/day** and teams under **10 staff**.
 - **Role-based**: registration clerk, triage nurse, charge nurse, physician, EMS, ED manager, and display roles each see a scoped view.
 - **Human-reviewed**: AI copilot assists with context, evidence, and workflow prompts — staff must review before any clinical action.
@@ -66,7 +66,7 @@ CareDroid groups work into **11 suites**. Frontline staff primarily use suites *
 | 8 | Fleet / Ambulance Extension | Dispatch (optional) | Hidden in pilot |
 | 9 | Telemetry / IoT / Digital Twin | Engineering / ops | Hidden in pilot |
 | 10 | Platform Admin / SaaS | Administrators | Direct URL only |
-| 11 | Integration Hub / Automation | Integrations team | **Visible** (Integrations) |
+| 11 | Integration Hub / Automation | Integrations team | Hidden in pilot |
 
 **Pilot Customer Mode** (currently enabled) shows only core ED navigation items. Extension items — Cosmos, Platform hub, Fleet, Surveillance, Simulation lab, Knowledge Graph, Audit, AI Center, Admin — are hidden from the sidebar unless entitlements expand.
 
@@ -160,8 +160,8 @@ Follow this sequence to understand the full platform without getting lost in nes
 |------|-------|--------------|--------------|
 | **A** | Choose your entry path | `/start` | Pick demo or admin |
 | **B** | Meet Dr. Cara George | — | One identity across lanes |
-| **C** | Command the department | ED Manager → Whiteboard | Department KPIs and flow |
-| **D** | Walk the reception desk | Registration Clerk → Reception | Arrival intake, escalation |
+| **C** | Walk the reception desk | Registration Clerk → Reception | Arrival intake, first resolution, escalation |
+| **D** | Command the department | ED Manager → Whiteboard | Department KPIs and flow |
 | **E** | Run triage | Triage Nurse → Reception pretriage | Acuity queues, breach timers |
 | **F** | Hold the waiting room | Charge Nurse → Whiteboard | Fit-to-wait, LWBS risk |
 | **G** | Round with physicians | Physician → Whiteboard | Provider queue, disposition |
@@ -310,23 +310,22 @@ These items appear in the sidebar during pilot:
 |----------|-------|
 | Reception | `/emergency/reception` |
 | Whiteboard | `/emergency/whiteboard` |
-| Intake | `/emergency/intake` |
 | EMS | `/emergency/ems` |
 | Patients | `/emergency/patients` |
 | Queues | `/emergency/queues` |
 | Reassess | `/emergency/reassessment` |
 | Capacity | `/emergency/capacity` |
-| Boarding | `/emergency/boarding` |
 | Referrals | `/emergency/referrals` |
 | Copilot | `/emergency/copilot` |
 | Medical Tools | `/emergency/tools` |
 | Analytics | `/emergency/analytics` |
 | Settings | `/emergency/settings` |
-| Integrations | `/integrations/hub` |
 | Pulse | `/emergency/pulse` |
 | Shift | `/emergency/shift` |
 
-**Hidden in pilot** (reachable by direct URL for developers): Cosmos, Platform, Fleet, Surveillance, Simulation, Laboratory, Knowledge Graph, Audit, AI Center, Admin.
+**Registration clerk pilot nav** (minimal shell): Reception, Patients, Pulse, Shift only.
+
+**Hidden in pilot** (reachable by direct URL for developers): Intake, Integrations, Cosmos, Platform, Fleet, Surveillance, Simulation, Laboratory, Knowledge Graph, Audit, AI Center, Admin.
 
 ---
 

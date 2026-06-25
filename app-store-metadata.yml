@@ -1,73 +1,52 @@
-# CareDroid AI - App Store Metadata
+# CareDroid — App Store Metadata (ED operating platform)
 
-name: "CareDroid AI - Medical Assistant"
-subtitle: "Your AI-Powered Healthcare Companion"
+name: "CareDroid"
+subtitle: "Reception-first emergency department operations"
 
 description: |
-  CareDroid AI is a comprehensive medical assistant application designed to help healthcare professionals and patients manage their health information securely and efficiently.
+  CareDroid is a reception-first emergency department operating platform for hospitals and ED teams.
 
-  KEY FEATURES:
-  
-  🤖 AI-Powered Chat Assistant
-  • Get instant answers to medical questions
-  • Evidence-based responses from trusted medical databases
-  • Natural language understanding for complex queries
-  
-  💊 Medication Management
-  • Drug interaction checker
-  • Medication reminders
-  • Dosage tracking and history
-  
-  🧪 Lab Results Interpreter
-  • Understand your lab results
-  • Track trends over time
-  • Get personalized insights
-  
-  📊 SOFA Score Calculator
-  • Clinical assessment tool for healthcare providers
-  • Sepsis-related organ failure assessment
-  • Real-time scoring and tracking
-  
-  🔒 Privacy & Security
-  • HIPAA-compliant data encryption
-  • Biometric authentication (Face ID/Touch ID)
-  • Secure offline storage
-  • No data sharing without consent
-  
-  📱 Offline-First Design
-  • Works without internet connection
-  • Automatic sync when online
-  • Access your data anytime, anywhere
-  
-  🚨 Emergency Features
-  • 911 dispatch integration
-  • Emergency contact management
-  • Critical alerts and notifications
-  
+  Built for roughly 100 patients per day and teams under 10 staff. Registration clerks resolve arrivals at the front desk; triage, charge nurse, physician, and display roles share one department whiteboard.
+
+  KEY CAPABILITIES:
+
+  Reception & Arrival
+  • EMS pre-arrival visibility
+  • Walk-in registration and identity verification
+  • Pretriage handoff to nursing staff
+
+  Emergency Whiteboard
+  • Patient cards, queue visibility, and reassessment timers
+  • Role-scoped views for charge nurse, physician, and manager
+
+  Clinical Support
+  • CareDroid Copilot — human-reviewed decision support
+  • ED calculators (qSOFA, NEWS2, HEART, Wells, GCS, NIHSS, and more)
+  • EMS offload and referral coordination
+
+  Operations
+  • Department pulse, shift summary, throughput analytics
+  • Simulation and training datasets for onboarding
+
   DESIGNED FOR:
-  • Healthcare professionals
-  • Patients managing chronic conditions
-  • Caregivers and family members
-  • Medical students and researchers
-  
-  COMPLIANCE:
-  CareDroid AI is fully compliant with HIPAA, GDPR, and other healthcare data protection regulations. Your privacy is our top priority.
-  
+  • Registration clerks and front-desk staff
+  • Triage nurses and charge nurses
+  • Emergency physicians and ED managers
+  • EMS handoff teams
+
   DISCLAIMER:
-  This app is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for medical decisions.
+  CareDroid is decision support only. It is not an autonomous clinician and does not replace professional medical judgment, prescribing, order entry, or EHR systems. Staff must review all AI output before clinical action.
 
 keywords:
-  - medical
-  - healthcare
-  - ai
-  - assistant
-  - hipaa
-  - lab results
-  - medication
-  - drug checker
-  - sofa score
-  - emergency
-  - offline
+  - emergency department
+  - ED whiteboard
+  - reception
+  - triage
+  - EMS
+  - hospital operations
+  - clinical decision support
+  - patient flow
+  - healthcare SaaS
 
 category: Medical
 age_rating: 17+
@@ -76,13 +55,10 @@ support_url: "https://caredroid.ai/support"
 marketing_url: "https://caredroid.ai"
 privacy_url: "https://caredroid.ai/privacy"
 
-# Release notes template
 release_notes: |
-  Bug fixes and performance improvements.
+  Reception-first ED operating platform updates.
   
   New in this version:
-  • Enhanced offline sync capabilities
-  • Improved biometric authentication
-  • Better notification management
-  • Updated medical knowledge base
-  • UI/UX improvements
+  • Reception-first landing and role-scoped navigation
+  • Practitioner cleanup for pilot customer mode
+  • Improved demo walkthrough and user manual alignment

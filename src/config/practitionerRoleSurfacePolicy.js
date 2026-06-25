@@ -8,7 +8,7 @@ import {
   CARE_DROID_SCREEN_MODES,
   normalizeCareDroidScreenMode,
 } from './careDroidScreenModes';
-import { PRACTITIONER_CLEANUP } from './practitionerCleanup.config';
+import { isPractitionerCleanupEnabled, PRACTITIONER_CLEANUP } from './practitionerCleanup.config';
 import { PRACTITIONER_PATIENT_CARD_BADGE_LIMIT } from './practitionerCleanup.constants';
 
 export const PRACTITIONER_LAYOUT_TIERS = Object.freeze({
@@ -128,14 +128,28 @@ function mergeSection(baseSection, overrideSection) {
  * @param {Record<string, unknown>} visibility
  * @param {{ role?: string | null, screenMode?: string | null }} [context]
  */
+function resolveTierSurfaceOverrides(tier) {
+  if (isPractitionerCleanupEnabled()) {
+    if (tier === PRACTITIONER_LAYOUT_TIERS.clinical) {
+      return TIER_SURFACE_OVERRIDES[PRACTITIONER_LAYOUT_TIERS.clinical];
+    }
+    return null;
+  }
+  return TIER_SURFACE_OVERRIDES[tier];
+}
+
 export function applyRoleSurfaceOverrides(visibility, context = {}) {
   const tier = resolvePractitionerLayoutTier(context);
-  const tierOverrides = TIER_SURFACE_OVERRIDES[tier];
+  const tierOverrides = resolveTierSurfaceOverrides(tier);
   const normalizedRole = normalizeEmergencyRole(context.role || '');
   const physicianOverrides =
-    normalizedRole === EMERGENCY_ROLE_IDS.physician ? PHYSICIAN_SURFACE_OVERRIDES : null;
+    !isPractitionerCleanupEnabled() && normalizedRole === EMERGENCY_ROLE_IDS.physician
+      ? PHYSICIAN_SURFACE_OVERRIDES
+      : null;
   const edManagerOverrides =
-    normalizedRole === EMERGENCY_ROLE_IDS.edManager ? ED_MANAGER_SURFACE_OVERRIDES : null;
+    !isPractitionerCleanupEnabled() && normalizedRole === EMERGENCY_ROLE_IDS.edManager
+      ? ED_MANAGER_SURFACE_OVERRIDES
+      : null;
 
   if (!tierOverrides && !physicianOverrides && !edManagerOverrides) {
     return visibility;
@@ -177,6 +191,32 @@ export function mergeRoleAwarePractitionerDensityProfile(profile, context = {}) 
   const tier = resolvePractitionerLayoutTier(context);
 
   if (tier === PRACTITIONER_LAYOUT_TIERS.operational || tier === PRACTITIONER_LAYOUT_TIERS.admin) {
+    if (isPractitionerCleanupEnabled()) {
+      return {
+        ...profile,
+        whiteboard: {
+          ...profile.whiteboard,
+          showMissionControl: false,
+          showQueueIntelligence: false,
+          showSecondaryStats: false,
+          showWaitingRoomSafety: false,
+          showAttentionStrips: false,
+          preferOperationalStrips: false,
+          maxVisibleCards: capVisibleCards(profile),
+          gridMinCardWidth: 240,
+          gridGap: 8,
+        },
+        patientCard: {
+          ...profile.patientCard,
+          showExperienceBadge: false,
+          showWhatHappensNext: false,
+          showLwbsAndDeterioration: false,
+          showCommunicationBadge: false,
+          showScores: false,
+          showQueueReason: false,
+        },
+      };
+    }
     return {
       ...profile,
       whiteboard: {

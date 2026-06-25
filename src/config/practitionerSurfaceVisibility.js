@@ -40,6 +40,7 @@ const FULL_VISIBILITY = Object.freeze({
     showOperationalHistory: true,
     showDataQualityAudits: true,
     showTriageRuleBuilder: true,
+    showPatientAnswersPanel: true,
   }),
   patientCard: Object.freeze({
     showPredictiveBadges: true,
@@ -93,9 +94,13 @@ const FULL_VISIBILITY = Object.freeze({
   }),
   chrome: Object.freeze({
     showDeveloperApiBanners: true,
+    showEdDataSourceBanner: true,
     showSessionDevSegments: true,
+    showSessionSimulation: true,
     showExtensionPaletteCommands: true,
     showHeaderSubtitle: true,
+    showPageEyebrow: true,
+    showEntryHubBackendSync: true,
     copilotAutoOpen: true,
   }),
   analytics: Object.freeze({
@@ -178,6 +183,7 @@ function buildPilotVisibility(context = {}) {
       showOperationalHistory: !c.suppressReceptionOperationalHistory,
       showDataQualityAudits: !c.suppressReceptionDataQualityAudits,
       showTriageRuleBuilder: !c.suppressReceptionTriageRuleBuilder,
+      showPatientAnswersPanel: !c.suppressReceptionPatientAnswersPanel,
     }),
     patientCard: Object.freeze({
       showPredictiveBadges: !c.suppressPatientCardPredictiveBadges,
@@ -236,9 +242,13 @@ function buildPilotVisibility(context = {}) {
     }),
     chrome: Object.freeze({
       showDeveloperApiBanners: !c.suppressDeveloperApiBanners,
+      showEdDataSourceBanner: !c.suppressEdDataSourceBanner,
       showSessionDevSegments: !c.suppressSessionChromeDevSegments,
+      showSessionSimulation: !c.suppressSessionChromeSimulation,
       showExtensionPaletteCommands: !c.suppressExtensionPaletteCommands,
       showHeaderSubtitle: !c.suppressHeaderPageSubtitle,
+      showPageEyebrow: !c.suppressPageEyebrows,
+      showEntryHubBackendSync: !c.suppressEntryHubBackendSync,
       copilotAutoOpen: !c.suppressCopilotAutoOpen,
     }),
     analytics: Object.freeze({
@@ -262,7 +272,8 @@ function buildPilotVisibility(context = {}) {
     }),
     emergencyRoutes: Object.freeze({
       showDescriptions: !c.suppressEmergencyRouteDescriptions,
-      showMetricCards: !c.suppressEmergencyRouteMetricCards,
+      showMetricCards:
+        !c.suppressEmergencyRouteMetricCards && !c.suppressEmergencyRouteMetrics,
       showCrossLinks: !c.suppressEmergencyRouteCrossLinks,
       showCapacityUpgradeHarness: !c.suppressCapacityUpgradeHarness,
       showJourneyEngineCard: !c.hidePatientJourneyEngineCard,

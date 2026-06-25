@@ -30,7 +30,8 @@ export default function SessionChromeBar() {
   const [demoOpen, setDemoOpen] = useState(false);
 
   const suppressDevSegments = !surfaces.chrome.showSessionDevSegments;
-  const showSimulation = simulationEnabled && simulationActive;
+  const showSimulation =
+    surfaces.chrome.showSessionSimulation && simulationEnabled && simulationActive;
   const showApiDegraded = configDegraded && !configLoading;
   const showDevSegment = isDev && !suppressDevSegments;
   const showApiSegment = showApiDegraded && !suppressDevSegments;

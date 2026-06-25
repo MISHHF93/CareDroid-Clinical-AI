@@ -83,7 +83,7 @@ export function EmergencyRoutePage({
   return (
     <PageShell
       as="section"
-      eyebrow={eyebrow}
+      eyebrow={surfaces.chrome.showPageEyebrow ? eyebrow : undefined}
       title={title}
       titleId={titleId}
       description={showDescription ? description : undefined}
@@ -102,24 +102,8 @@ export function EmergencyRoutePage({
 
 export function MetricGrid({ metrics }) {
   const surfaces = usePractitionerSurfaceVisibility();
-  const useCompactStrip = surfaces.active && !surfaces.emergencyRoutes.showMetricCards;
-
-  if (useCompactStrip) {
-    return (
-      <div className="emergency-route-metric-strip" role="list" aria-label="Route metrics">
-        {metrics.map((metric) => (
-          <span
-            key={metric.label}
-            role="listitem"
-            className="emergency-route-metric-strip__item"
-            style={metric.color ? { '--metric-color': metric.color } : undefined}
-          >
-            <strong className="emergency-route-metric-strip__value">{metric.value}</strong>
-            <span className="emergency-route-metric-strip__label">{metric.label}</span>
-          </span>
-        ))}
-      </div>
-    );
+  if (surfaces.active && !surfaces.emergencyRoutes.showMetricCards) {
+    return null;
   }
 
   return (

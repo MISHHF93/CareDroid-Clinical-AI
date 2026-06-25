@@ -24,9 +24,9 @@ export const DEMO_PERSONA = Object.freeze({
   profession: 'Emergency Medicine',
   specialty: 'Emergency Medicine',
   saasRole: 'emergency-physician',
-  defaultEmergencyRole: EMERGENCY_ROLE_IDS.edManager,
+  defaultEmergencyRole: EMERGENCY_ROLE_IDS.registrationClerk,
   tagline:
-    'CareDroid accompanies Dr. George across ED 18 — capturing inputs as she moves from command to bedside.',
+    'CareDroid accompanies Dr. George across ED 18 — starting at reception, then triage, charge, provider, and command views.',
 });
 
 export type DemoRoleView = Readonly<{
@@ -39,11 +39,18 @@ export type DemoRoleView = Readonly<{
 
 export const CURATED_DEMO_ROLE_VIEWS: readonly DemoRoleView[] = Object.freeze([
   {
-    emergencyRoleId: EMERGENCY_ROLE_IDS.edManager,
-    label: 'Command & operations',
-    sceneLabel: 'ED command center',
-    description: 'Throughput, staffing, and department-wide situational awareness.',
-    copilotHint: 'Summarize bottlenecks and recommend next operational moves.',
+    emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+    label: 'Reception desk',
+    sceneLabel: 'Reception-first intake',
+    description: 'First resolution at the front desk — registration, verification, and pretriage handoff.',
+    copilotHint: 'Log arrival details and route high-risk complaints quickly.',
+  },
+  {
+    emergencyRoleId: EMERGENCY_ROLE_IDS.triageNurse,
+    label: 'Triage & acuity',
+    sceneLabel: 'Triage queue',
+    description: 'Walk through pre-triage queues and acuity assignment.',
+    copilotHint: 'Document triage findings and escalation triggers.',
   },
   {
     emergencyRoleId: EMERGENCY_ROLE_IDS.chargeNurse,
@@ -60,18 +67,11 @@ export const CURATED_DEMO_ROLE_VIEWS: readonly DemoRoleView[] = Object.freeze([
     copilotHint: 'Capture differential notes and disposition rationale at bedside.',
   },
   {
-    emergencyRoleId: EMERGENCY_ROLE_IDS.triageNurse,
-    label: 'Triage & acuity',
-    sceneLabel: 'Triage queue',
-    description: 'Walk through pre-triage queues and acuity assignment.',
-    copilotHint: 'Document triage findings and escalation triggers.',
-  },
-  {
-    emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
-    label: 'Reception desk',
-    sceneLabel: 'Reception-first intake',
-    description: 'Registration, arrival control, and walk-in intake paths.',
-    copilotHint: 'Log arrival details and route high-risk complaints quickly.',
+    emergencyRoleId: EMERGENCY_ROLE_IDS.edManager,
+    label: 'Command & operations',
+    sceneLabel: 'ED command center',
+    description: 'Throughput, staffing, and department-wide situational awareness.',
+    copilotHint: 'Summarize bottlenecks and recommend next operational moves.',
   },
   {
     emergencyRoleId: EMERGENCY_ROLE_IDS.emsUser,
@@ -120,18 +120,18 @@ export const DEMO_JOURNEY_STEPS: readonly DemoJourneyStep[] = Object.freeze([
     summary: 'ED Clinical Director for Emergency Department 18 — one identity across every lane.',
   },
   {
-    id: 'command',
+    id: 'reception',
     letter: 'C',
-    title: 'Command the department',
-    summary: 'Land on the operations view as ED manager — department KPIs and flow.',
-    emergencyRoleId: EMERGENCY_ROLE_IDS.edManager,
+    title: 'Walk the reception desk',
+    summary: 'Start at registration clerk — first resolution, arrival intake, and escalation paths.',
+    emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
   },
   {
-    id: 'reception',
+    id: 'command',
     letter: 'D',
-    title: 'Walk the reception desk',
-    summary: 'Switch to registration clerk to see arrival intake and escalation paths.',
-    emergencyRoleId: EMERGENCY_ROLE_IDS.registrationClerk,
+    title: 'Command the department',
+    summary: 'Switch to ED manager for department KPIs, throughput, and operational flow.',
+    emergencyRoleId: EMERGENCY_ROLE_IDS.edManager,
   },
   {
     id: 'triage',

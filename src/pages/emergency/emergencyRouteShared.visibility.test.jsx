@@ -19,7 +19,7 @@ describe('emergencyRouteShared visibility', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders compact metric strip during practitioner cleanup', () => {
+  it('hides route metrics during practitioner cleanup', () => {
     vi.mocked(usePractitionerSurfaceVisibility).mockReturnValue({
       ...FULL_SURFACES,
       active: true,
@@ -38,10 +38,10 @@ describe('emergencyRouteShared visibility', () => {
       />,
     );
 
-    expect(container.querySelector('.emergency-route-metric-strip')).toBeTruthy();
+    expect(container.querySelector('.emergency-route-metric-strip')).toBeFalsy();
     expect(container.querySelector('.emergency-route-metric-grid')).toBeFalsy();
-    expect(screen.getByText('12')).toBeInTheDocument();
-    expect(screen.getByText('Total queued')).toBeInTheDocument();
+    expect(screen.queryByText('12')).not.toBeInTheDocument();
+    expect(screen.queryByText('Total queued')).not.toBeInTheDocument();
   });
 
   it('renders metric cards when cleanup is off', () => {

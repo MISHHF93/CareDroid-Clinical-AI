@@ -1,7 +1,11 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
+import { useUser } from '../contexts/UserContext';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
+import { getPlatformHomeRoute } from '../config/receptionFirstUx.config';
+import { resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
 
 function TrackMindAccessDenied({ requestedPath }) {
   const trackMindRole = useTrackMindRolePermissions();
@@ -19,8 +23,29 @@ function TrackMindAccessDenied({ requestedPath }) {
   );
 }
 
+function resolveSaasRoleFromUser(user) {
+  const profile = user?.profile || {};
+  return (
+    user?.saasRole ||
+    profile.saasRole ||
+    profile.roleProfileId ||
+    user?.role ||
+    ''
+  );
+}
+
+function hasTrackMindProfile(user) {
+  const saasRole = resolveSaasRoleFromUser(user);
+  const profile = resolveUserProfileFromSaasRole(saasRole);
+  return Boolean(profile.trackMindRoleId);
+}
+
 export default function TrackMindRouteGuard({ path, children }) {
+  const { user } = useUser();
   const trackMindRole = useTrackMindRolePermissions();
+  if (PILOT_CUSTOMER_MODE.enabled && !hasTrackMindProfile(user)) {
+    return <Navigate to={getPlatformHomeRoute()} replace />;
+  }
   if (!trackMindRole.canAccessRoute(path)) {
     return <TrackMindAccessDenied requestedPath={path} />;
   }

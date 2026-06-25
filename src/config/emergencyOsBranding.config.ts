@@ -4,6 +4,7 @@ import { CAREDROID_PRODUCT } from './caredroidProduct.config';
 export const EMERGENCY_OS_BRANDING = Object.freeze({
   productName: CAREDROID_PRODUCT.name,
   platformLine: CAREDROID_PRODUCT.platformLine,
+  firstResolutionLine: CAREDROID_PRODUCT.firstResolutionLine,
   /** @deprecated Legacy key; value is the copilot badge label, not a separate product identity. */
   aiiosName: CAREDROID_PRODUCT.copilotBadge,
   copilotName: CAREDROID_PRODUCT.copilotName,

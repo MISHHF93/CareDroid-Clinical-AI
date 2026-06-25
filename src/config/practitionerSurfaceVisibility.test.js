@@ -33,6 +33,10 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.tools.showClinicalIntelligencePanel).toBe(false);
     expect(surfaces.settings.showPlatformStrip).toBe(false);
     expect(surfaces.chrome.showHeaderSubtitle).toBe(false);
+    expect(surfaces.chrome.showEdDataSourceBanner).toBe(false);
+    expect(surfaces.chrome.showSessionSimulation).toBe(false);
+    expect(surfaces.chrome.showPageEyebrow).toBe(false);
+    expect(surfaces.chrome.showEntryHubBackendSync).toBe(false);
     expect(surfaces.analytics.showPlatformLayers).toBe(false);
     expect(surfaces.analytics.showDepartmentShortcuts).toBe(false);
     expect(surfaces.admin.showSurveillanceDetailList).toBe(false);
@@ -68,15 +72,18 @@ describe('practitionerSurfaceVisibility', () => {
     expect(practitionerShows('profile', 'showCompetencyCard')).toBe(false);
   });
 
-  it('restores operational whiteboard surfaces for charge nurse during pilot', () => {
+  it('keeps charge nurse on the same trimmed whiteboard shell during pilot', () => {
     const surfaces = getPractitionerSurfaceVisibility({
       role: EMERGENCY_ROLE_IDS.chargeNurse,
       screenMode: CARE_DROID_SCREEN_MODES.chargeNurse,
     });
 
-    expect(surfaces.whiteboard.showCommandDashboard).toBe(true);
-    expect(surfaces.whiteboard.showRoleStrips).toBe(true);
-    expect(surfaces.whiteboard.showWhoNextPanel).toBe(true);
+    expect(surfaces.whiteboard.showCommandDashboard).toBe(false);
+    expect(surfaces.whiteboard.showRoleStrips).toBe(false);
+    expect(surfaces.whiteboard.showWhoNextPanel).toBe(false);
+    expect(surfaces.chrome.showEdDataSourceBanner).toBe(false);
+    expect(surfaces.chrome.showPageEyebrow).toBe(false);
+    expect(surfaces.reception.showPatientAnswersPanel).toBe(false);
   });
 
   it('restores physician copilot tabs during pilot', () => {

@@ -7,7 +7,7 @@ import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { compileUserProfile } from '../../config/userProfileCompiler';
+import { getUnifiedClinicalToolsProfile } from '../../services/unifiedClinicalToolsBridge';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import {
   buildProfileToolGraph,
@@ -704,7 +704,7 @@ const ToolsOverview = () => {
 
   const compiledProfile = useMemo(
     () =>
-      compileUserProfile({
+      getUnifiedClinicalToolsProfile({
         saasRole: roleProfile?.id || saasProfile?.role || 'student',
         orgContext: {
           organizationType: platformContext?.organization?.type || 'hospital',

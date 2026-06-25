@@ -34,6 +34,6 @@ describe('PractitionerVisibilityContext', () => {
       </PractitionerVisibilityProvider>,
     );
 
-    expect(screen.getByTestId('command-dashboard')).toHaveTextContent('on');
+    expect(screen.getByTestId('command-dashboard')).toHaveTextContent('off');
   });
 });

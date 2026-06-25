@@ -16,7 +16,7 @@ describe('demoPersonaModel', () => {
   it('profiles Dr. Cara George as ED 18 clinical director', () => {
     const user = buildOpenAccessDemoUser();
     expect(user.fullName).toBe('Dr. Cara George');
-    expect(user.role).toBe(EMERGENCY_ROLE_IDS.edManager);
+    expect(user.role).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
     expect((user.profile as { department?: string }).department).toBe('Emergency Department 18');
     expect((user.profile as { title?: string }).title).toBe('ED Clinical Director');
   });

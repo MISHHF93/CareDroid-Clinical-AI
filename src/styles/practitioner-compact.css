@@ -287,6 +287,13 @@
   font-size: 18px;
 }
 
+[data-practitioner-compact] .ed-data-source,
+[data-practitioner-compact] .emergency-route-data-source,
+[data-practitioner-compact] .emergency-route-metric-strip,
+[data-practitioner-compact] .emergency-route-metric-grid {
+  display: none;
+}
+
 [data-practitioner-compact] .emergency-route-page__description {
   display: none;
 }

@@ -5,8 +5,12 @@
 
 export const CAREDROID_PRODUCT = Object.freeze({
   name: 'CareDroid',
-  tagline: 'Emergency department operating platform',
+  tagline: 'Reception-first emergency department operating platform',
   platformLine: 'Reception-first emergency department operations',
+  firstResolutionLine:
+    'First-resolution ED platform — reception and registration resolve arrivals before clinical handoff.',
+  evolutionSummary:
+    'Evolved from general medtech tooling to an emergency operating layer, then to a reception-first, role-profiled ED platform.',
   copilotBadge: 'Copilot',
   copilotName: 'CareDroid Copilot',
   receptionName: 'Arrival Dashboard',

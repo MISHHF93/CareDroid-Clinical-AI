@@ -12,6 +12,7 @@ import { probeBackendReachability } from '../services/backendReachability';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
 import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
+import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
@@ -557,34 +558,31 @@ function AppShellFrame({ children }: AppShellProps) {
   useEffect(() => {
     const openTools = (event: Event) => {
       const detail =
-        (event as CustomEvent<{ filter?: string; query?: string; source?: string }>).detail || {};
-      const targetPath = buildEmergencyToolsPath({
-        source: detail.source || 'chat',
+        (event as CustomEvent<{ filter?: string; query?: string; source?: string; patientId?: string }>).detail || {};
+      const target = resolveClinicalToolLaunchTarget({
+        emergencyRoleId: emergencyRole.role,
+        canAccessToolsRoute: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools),
+        kind: 'tools-hub',
+        toolId: detail.query,
+        patientId: detail.patientId,
         filter: detail.filter || 'all',
-        q: detail.query,
+        source: detail.source || 'chat',
       });
-      profileNavigate(
-        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
-          ? targetPath
-          : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
-      );
+      profileNavigate(`${target.pathname}${target.search}`);
     };
 
     const openCalculator = (event: Event) => {
       const detail =
         (event as CustomEvent<{ calculatorId?: string; patientId?: string | null }>).detail || {};
-      const targetPath = buildEmergencyToolsPath({
-        source: 'calculators',
-        filter: 'calculator',
-        q: detail.calculatorId,
-        open: detail.calculatorId,
+      const target = resolveClinicalToolLaunchTarget({
+        emergencyRoleId: emergencyRole.role,
+        canAccessToolsRoute: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools),
+        kind: 'calculator',
+        calculatorId: detail.calculatorId,
         patientId: detail.patientId || undefined,
+        source: 'calculators',
       });
-      profileNavigate(
-        emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools)
-          ? targetPath
-          : emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyTools),
-      );
+      profileNavigate(`${target.pathname}${target.search}`);
     };
 
     const openPatientDetail = (event: Event) => {

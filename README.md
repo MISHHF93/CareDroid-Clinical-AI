@@ -2,7 +2,7 @@
 
 SaaS emergency department operating platform for hospitals and emergency departments.
 
-Built for ~100 patients/day and teams under 10. The primary screen is the **Emergency Whiteboard**. CareDroid is reception-first, whiteboard-centered, and role-based, with an embedded clinical AI copilot.
+Built for ~100 patients/day and teams under 10. CareDroid is a **reception-first, first-resolution** emergency department operating platform: registration clerks prepare each patient card at the front desk, then triage, charge nurse, physician, and display roles consume the shared whiteboard. An embedded **CareDroid Copilot** provides human-reviewed decision support — not autonomous clinical authority.
 
 ## Product suites
 
@@ -161,15 +161,14 @@ Canonical paths are defined in `src/config/routes.config.js`.
 
 | Route | Purpose |
 |-------|---------|
-| `/emergency/whiteboard` | Primary ED whiteboard |
-| `/emergency/reception` | Reception workspace |
-| `/emergency/intake` | Smart intake |
-| `/emergency/ems` | EMS coordination |
-| `/emergency/command-center` | Charge nurse command center |
-| `/emergency/copilot` | Clinical copilot |
+| `/start` | Entry hub — demo, clinical home, admin |
+| `/emergency/reception` | **Default landing** — reception & arrival (first resolution) |
+| `/emergency/whiteboard` | Department whiteboard — operational awareness |
+| `/emergency/ems` | EMS coordination & handoff |
+| `/emergency/copilot` | CareDroid Copilot (human review required) |
 | `/tools/calculators` | Clinical calculators |
-| `/assistant` | General AI assistant |
-| `/admin` | Platform administration |
+| `/profile` | User profile & tool policy |
+| `/admin` | Platform administration (hidden in pilot nav) |
 
 ## Android build
 

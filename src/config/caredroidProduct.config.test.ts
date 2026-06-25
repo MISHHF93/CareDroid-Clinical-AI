@@ -21,4 +21,10 @@ describe('caredroidProduct identity', () => {
     expect(serialized).not.toMatch(LEGACY_PRODUCT_NAMES);
     expect(CAREDROID_PRODUCT.copilotRole).toContain('CareDroid Copilot');
   });
+
+  it('positions CareDroid as reception-first first-resolution ED platform', () => {
+    expect(CAREDROID_PRODUCT.tagline).toContain('Reception-first');
+    expect(CAREDROID_PRODUCT.firstResolutionLine).toContain('First-resolution');
+    expect(CAREDROID_PRODUCT.receptionRoute).toBe('/emergency/reception');
+  });
 });

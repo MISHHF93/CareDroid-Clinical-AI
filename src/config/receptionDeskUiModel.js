@@ -4,6 +4,7 @@ import { isReceptionDeskUiEnabled, RECEPTION_DESK_UI } from './receptionDeskUi.c
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 import { resolveReceptionStripMetricIds } from './emergencyScreenKpiPolicy';
 import { isReceptionScreenMode } from './receptionScreenModel';
+import { shouldForceSlimReceptionDeskForAllRoles } from './practitionerCleanup.config';
 
 export function resolveReceptionDeskUi({ role, isReceptionRoute = false, screenMode } = {}) {
   const enabled =
@@ -13,7 +14,8 @@ export function resolveReceptionDeskUi({ role, isReceptionRoute = false, screenM
   const normalizedRole = normalizeEmergencyRole(role);
   const slim =
     enabled &&
-    (isReceptionScreenMode(screenMode || '') ||
+    (shouldForceSlimReceptionDeskForAllRoles() ||
+      isReceptionScreenMode(screenMode || '') ||
       RECEPTION_DESK_UI.slimRoles.includes(normalizedRole));
   const hiddenSurfaces = slim ? new Set(RECEPTION_DESK_UI.slimHiddenSurfaces) : new Set();
 

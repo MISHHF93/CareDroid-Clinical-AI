@@ -67,6 +67,8 @@ import { RECEPTION_DESK_UI } from '../../config/receptionDeskUi.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import ReceptionPipelineShell from './ReceptionPipelineShell';
+import ReceptionEmbeddedCalculator from '../../components/reception/ReceptionEmbeddedCalculator';
+import { shouldEmbedToolsOnReception } from '../../services/unifiedClinicalToolsBridge';
 import TriageRuleBuilder from '../../components/reception/TriageRuleBuilder';
 import VoiceInterviewKiosk from '../../components/reception/VoiceInterviewKiosk';
 import useFeature from '../../hooks/useFeature';
@@ -115,6 +117,17 @@ export default function ReceptionWorkspace() {
   const { enabled: voiceInterviewEnabled } = useFeature('voice_interview_assistant');
 
   const query = searchParams.get('q') || '';
+  const embeddedCalculatorId =
+    searchParams.get('calc') || searchParams.get('open') || null;
+  const showEmbeddedCalculators =
+    Boolean(embeddedCalculatorId) || searchParams.get('tools') === 'calculators';
+  const canOpenEmbeddedCalculators =
+    reception.showWidget('patient-search') ||
+    shouldEmbedToolsOnReception({
+      emergencyRoleId: emergencyRole.role,
+      canAccessToolsRoute: emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyTools),
+      kind: 'reception-embed',
+    });
   const {
     arrivedPatientId,
     contextPatientId,
@@ -309,7 +322,10 @@ export default function ReceptionWorkspace() {
 
   const focusedPatientId = expandedPretriagePatientId || routeFocusPatientId || null;
 
-  const showPatientAnswersDesk = reception.showWidget('patient-answers') && !triage.isTriageScreen;
+  const showPatientAnswersDesk =
+    surfaces.reception.showPatientAnswersPanel &&
+    reception.showWidget('patient-answers') &&
+    !triage.isTriageScreen;
 
   useEffect(() => {
     if (!contextPatientId) return;
@@ -505,7 +521,9 @@ export default function ReceptionWorkspace() {
     >
       <header className="reception-workspace__intro emergency-route-page__hero">
         <div className="reception-workspace__intro-copy">
-          <span className="emergency-route-page__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</span>
+          {surfaces.chrome.showPageEyebrow ? (
+            <span className="emergency-route-page__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</span>
+          ) : null}
           <h1 className="emergency-route-page__title" id="reception-workspace-title">
             {RECEPTION_COPY.workspace.title}
           </h1>
@@ -626,6 +644,30 @@ export default function ReceptionWorkspace() {
           compact={deskUi.slim}
           className="reception-workspace__communication-status"
         />
+      ) : null}
+
+      {showEmbeddedCalculators ? (
+        <ReceptionEmbeddedCalculator
+          calculatorId={embeddedCalculatorId}
+          patientId={contextPatientId || queuePatientId || arrivedPatientId || null}
+        />
+      ) : null}
+
+      {!showEmbeddedCalculators && canOpenEmbeddedCalculators && reception.isReceptionScreen ? (
+        <div className="reception-workspace__tools-access">
+          <button
+            type="button"
+            className="reception-workspace__tools-access-btn"
+            onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.set('tools', 'calculators');
+              next.set('source', 'reception-desk');
+              setSearchParams(next, { replace: true });
+            }}
+          >
+            Open calculators
+          </button>
+        </div>
       ) : null}
 
       {reception.showWidget('patient-search') && (deskUi.show(RECEPTION_DESK_UI.surfaces.searchHint) || query.trim()) ? (

@@ -1,6 +1,7 @@
 import { setDepartmentContextStoreReader } from '../../lib/ai/contextEngine';
 import { setToolRegistryStoreReader } from '../../lib/ai/toolRegistry';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { getUnifiedArtifactSources } from './unifiedClinicalToolsBridge';
 
 let registered = false;
 
@@ -12,6 +13,9 @@ export function bootstrapAiPlatformIntegrations(): void {
   const readStore = () => useEmergencyStore.getState();
   setDepartmentContextStoreReader(readStore);
   setToolRegistryStoreReader(readStore);
+  if (import.meta.env.DEV) {
+    void getUnifiedArtifactSources();
+  }
 }
 
 export function teardownAiPlatformIntegrations(): void {

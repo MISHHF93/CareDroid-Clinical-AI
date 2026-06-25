@@ -34,6 +34,13 @@ import {
   shouldSuppressAnalyticsSecondaryCharts,
   shouldSuppressCalculatorHubCardDescriptions,
   shouldSuppressSmartIntakeVerificationWarnings,
+  shouldSuppressEdDataSourceBanner,
+  shouldSuppressSessionChromeSimulation,
+  shouldSuppressPageEyebrows,
+  shouldSuppressEntryHubBackendSync,
+  shouldSuppressEmergencyRouteMetrics,
+  shouldSuppressReceptionPatientAnswersPanel,
+  shouldForceSlimReceptionDeskForAllRoles,
 } from './practitionerCleanup.config';
 import { PILOT_CUSTOMER_MODE } from './unified-navigation.config';
 
@@ -79,6 +86,13 @@ describe('practitionerCleanup.config', () => {
     expect(shouldSuppressAnalyticsSecondaryCharts()).toBe(true);
     expect(shouldSuppressCalculatorHubCardDescriptions()).toBe(true);
     expect(shouldSuppressSmartIntakeVerificationWarnings()).toBe(true);
+    expect(shouldSuppressEdDataSourceBanner()).toBe(true);
+    expect(shouldSuppressSessionChromeSimulation()).toBe(true);
+    expect(shouldSuppressPageEyebrows()).toBe(true);
+    expect(shouldSuppressEntryHubBackendSync()).toBe(true);
+    expect(shouldSuppressEmergencyRouteMetrics()).toBe(true);
+    expect(shouldSuppressReceptionPatientAnswersPanel()).toBe(true);
+    expect(shouldForceSlimReceptionDeskForAllRoles()).toBe(true);
   });
 
   it('merges a lean whiteboard density profile for practitioner review', () => {
@@ -120,7 +134,7 @@ describe('practitionerCleanup.config', () => {
     expect(merged.patientCard.showScores).toBe(false);
   });
 
-  it('preserves operational density for charge nurse during pilot', () => {
+  it('flattens operational density for charge nurse during pilot', () => {
     const merged = mergePractitionerDensityProfile(
       {
         id: 'high-operational',
@@ -150,9 +164,9 @@ describe('practitionerCleanup.config', () => {
       { role: 'charge_nurse', screenMode: 'CHARGE_NURSE_SCREEN' },
     );
 
-    expect(merged.whiteboard.showMissionControl).toBe(true);
-    expect(merged.whiteboard.showQueueIntelligence).toBe(true);
-    expect(merged.patientCard.showScores).toBe(true);
+    expect(merged.whiteboard.showMissionControl).toBe(false);
+    expect(merged.whiteboard.showQueueIntelligence).toBe(false);
+    expect(merged.patientCard.showScores).toBe(false);
     expect(merged.whiteboard.maxVisibleCards).toBe(18);
   });
 });

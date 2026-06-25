@@ -10,9 +10,7 @@ export const RECEPTION_DESK_UI = Object.freeze({
   slimRoles: Object.freeze([EMERGENCY_ROLE_IDS.registrationClerk]),
   coreStripMetricIds: Object.freeze([
     'arrivals-today',
-    'awaiting-verification',
     'awaiting-triage',
-    'queue-size',
     'ems-inbound',
   ]),
   surfaces: Object.freeze({

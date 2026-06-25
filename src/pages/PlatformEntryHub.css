@@ -117,3 +117,17 @@
   color: var(--muted-text);
   font-size: 0.875rem;
 }
+
+.platform-entry__meta {
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
+  color: var(--muted-text);
+}
+
+.platform-entry__meta + .platform-entry__meta {
+  margin-top: 8px;
+}
+
+.platform-entry__card--primary {
+  border-color: color-mix(in srgb, var(--app-accent, #00ff88) 25%, transparent);
+}

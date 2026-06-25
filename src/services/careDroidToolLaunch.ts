@@ -5,6 +5,7 @@ import {
   resolveRegistryToolLaunchAccess,
   type RegistryToolNavigationPlan,
 } from '../navigation/registryToolLaunch';
+import { resolveClinicalToolLaunchTarget } from './unifiedClinicalToolsBridge';
 
 export type OrchestrationLaunchDetail = {
   patientId: string;
@@ -66,6 +67,13 @@ function navigateToolsPath(path: string) {
   window.dispatchEvent(new PopStateEvent('popstate'));
 }
 
+function navigateUnifiedToolsPath(
+  input: Parameters<typeof resolveClinicalToolLaunchTarget>[0],
+) {
+  const target = resolveClinicalToolLaunchTarget(input);
+  navigateToolsPath(`${target.pathname}${target.search}`);
+}
+
 /**
  * Launch a patient-card-aware orchestration recommendation (calculator, tool, copilot, workflow).
  */
@@ -97,7 +105,13 @@ export function launchOrchestrationRecommendation({
       break;
     case 'checklist':
     case 'workflow':
-      navigateToolsPath(buildToolsPath(patientId, registryId, 'clinical-tools'));
+      navigateUnifiedToolsPath({
+        kind: 'tools-hub',
+        toolId: registryId,
+        patientId,
+        filter: 'clinical-tools',
+        source: 'orchestration',
+      });
       break;
     default:
       dispatchToolsOpen({
