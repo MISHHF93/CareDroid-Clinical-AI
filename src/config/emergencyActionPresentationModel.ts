@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Permission presentation — derives visible / hidden / disabled / readonly for any
  * CareDroid action, composing matrix overrides with registry grants.
  */

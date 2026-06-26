@@ -1,4 +1,4 @@
-import { useEmergencyStore } from '../store/emergencyStore';
+﻿import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 
 const COMPLAINTS = [
@@ -86,5 +86,5 @@ export function startSimulation(): number[] {
 
 export function stopSimulation() {
   intervals.forEach(clearInterval);
-  intervals = [];
+  intervals = [] as any[];
 }

@@ -1,4 +1,4 @@
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
+﻿import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import { Patient, PatientState, Priority } from '../types/emergency';
@@ -202,7 +202,7 @@ export default function ExpressRegistration({
       );
       onAdded(persistedPatient);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       addPatient(patient);
       registerNewArrival(
         {

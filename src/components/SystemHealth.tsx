@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { apiFetch } from '../services/apiClient';
 import { probeBackendReachability } from '../services/backendReachability';
@@ -143,7 +143,7 @@ export function SystemHealth() {
 
         setHealth(payload);
         setError(null);
-      } catch (fetchError) {
+      } catch (fetchError: any) {
         setError(fetchError instanceof Error ? fetchError.message : String(fetchError));
       } finally {
         setLoading(false);

@@ -1,4 +1,4 @@
-import { CANONICAL_ROUTES } from './routes.config';
+﻿import { CANONICAL_ROUTES } from './routes.config';
 import {
   EMERGENCY_ROLE_IDS,
   getEmergencyRoleDefinition,
@@ -6,11 +6,11 @@ import {
   shouldHideStandaloneIntakeNav,
 } from './emergencyRolePermissions';
 import { PHYSICIAN_NAV_EXCLUDED_IDS } from '../components/whiteboard/physicianWorkflowModel';
-import { getReceptionNavActivePaths } from './emergencyPipelineModel.js';
+import { getReceptionNavActivePaths } from './emergencyPipelineModel';
 import {
   getHiddenNavItemIdsForRole,
   sortNavigationItemsForRole,
-} from './emergencyNavPolicy.js';
+} from './emergencyNavPolicy';
 import { SAAS_USER_ROLES } from './saasProfileConstants';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
 import {

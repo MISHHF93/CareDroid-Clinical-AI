@@ -2,11 +2,6 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { resolveClinicalHomeRoute } from '../config/platformEntryModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
 
-export type HydratedSession = {
-  user: Record<string, unknown> | null;
-  profile: Record<string, unknown> | null;
-};
-
 export function sanitizeReturnUrl(returnUrl?: string | null): string {
   const raw = String(returnUrl || '').trim();
   if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/auth')) {
@@ -25,18 +20,6 @@ export function buildAuthUrl({
 } = {}): string {
   const safe = sanitizeReturnUrl(returnUrl);
   return safe !== '/' ? safe : CANONICAL_ROUTES.platformStart;
-}
-
-export async function fetchAuthenticatedUser(_token: string) {
-  return null;
-}
-
-export async function fetchOperationalProfile(_token: string) {
-  return null;
-}
-
-export async function hydrateAuthenticatedSession(_token: string): Promise<HydratedSession> {
-  return { user: null, profile: null };
 }
 
 export function resolvePostAuthDestination({

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import {
   IconAlertTriangle,
   IconAmbulance,
@@ -87,7 +87,7 @@ function readPulseSnapshot(): PulseSnapshot {
         ? Number(parsed.activePatientCount)
         : undefined,
     };
-  } catch (_error) {
+  } catch (_error: any) {
     try {
       const raw = storage.getItem(LAST_VIEW_KEY);
       const numeric = Number(raw);

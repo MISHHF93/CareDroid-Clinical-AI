@@ -1,4 +1,4 @@
-import {
+﻿import {
   PatientFlag,
   PatientState,
   type ArrivalControlSnapshot,

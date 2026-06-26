@@ -1,4 +1,4 @@
-import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../types/emergency';
+﻿import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../types/emergency';
 import type { LwbsRiskContext } from '../../services/lwbsRiskLayer';
 import type { DeteriorationWatchContext } from '../../services/waitingRoomDeteriorationWatch';
 import type { QueueReasonContext } from '../../services/queueReasonVisibility';
@@ -59,14 +59,14 @@ function pushMetric(
 
 export function buildWaitingRoomAlertMetrics({
   patients,
-  alerts = [],
-  referrals = [],
-  staff = [],
-  workflowLogs = [],
-  emsArrivals = [],
+  alerts = [] as any[],
+  referrals = [] as any[],
+  staff = [] as any[],
+  workflowLogs = [] as any[],
+  emsArrivals = [] as any[],
   settings = null,
   roleId = null,
-  features = {},
+  features = {} as any,
 }: BuildWaitingRoomAlertMetricsInput): WhiteboardAlertMetric[] {
   const metrics: WhiteboardAlertMetric[] = [];
   const waitingCount = patients.filter((patient) => patient.state === 'Waiting').length;

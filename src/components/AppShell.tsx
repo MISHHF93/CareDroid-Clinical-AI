@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+﻿import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
@@ -335,7 +335,7 @@ function AppShellFrame({ children }: AppShellProps) {
             lastEventAt: new Date().toISOString(),
             message: 'CareDroid snapshot refreshed via polling fallback.',
           });
-        } catch (error) {
+        } catch (error: any) {
           const message =
             error instanceof Error ? error.message : 'Unable to refresh central node snapshot.';
           store.setWebSocketStatus({

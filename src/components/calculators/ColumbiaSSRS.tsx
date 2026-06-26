@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { saveCalculatorResult } from './calculatorSave';
@@ -102,7 +102,7 @@ function shouldStopIdeation(item: { id: string; stopIfNo: boolean }, answer?: An
 }
 
 function visibleIdeationItems(answers: AnswerMap) {
-  const visible = [];
+  const visible = [] as any[];
   for (const item of IDEATION) {
     visible.push(item);
     if (!answers[item.id]) break;

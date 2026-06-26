@@ -1,4 +1,4 @@
-import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+﻿import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import type { Patient, Referral } from '../types/emergency';
 import { summarizeWhatHappensNextBoard } from '../services/whatHappensNextGuidance';
 import {
@@ -60,9 +60,9 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
   centralSnapshot,
   settings,
   tenantId = 'CareDroid Emergency Department',
-  patients = [],
-  referrals = [],
-  workflowLogs = [],
+  patients = [] as any[],
+  referrals = [] as any[],
+  workflowLogs = [] as any[],
   backendSnapshot = null,
 }: BuildOperationalIntelligenceOptions): OperationalIntelligenceSnapshot {
   if (backendSnapshot?.layer === CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER) {

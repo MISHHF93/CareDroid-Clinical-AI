@@ -1,4 +1,4 @@
-import type { TriageAssistEnvelope } from '../../lib/patient-orchestration/types';
+﻿import type { TriageAssistEnvelope } from '../../lib/patient-orchestration/types';
 import {
   CARE_STREAMING_LANES,
   priorityToEsiLabel,

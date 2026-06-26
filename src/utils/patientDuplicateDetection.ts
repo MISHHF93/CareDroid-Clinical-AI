@@ -1,4 +1,4 @@
-import type { Patient } from '../types/emergency';
+﻿import type { Patient } from '../types/emergency';
 import { getPatientDisplayName, parseDobQuery } from './patientSearch';
 
 export const DUPLICATE_REVIEW_THRESHOLD = 65;
@@ -162,7 +162,7 @@ export function scorePatientDuplicate(
 export function findDuplicateCandidates(
   patients: Patient[],
   demographics: ExtractedPatientDemographics,
-  { minScore = DUPLICATE_REVIEW_THRESHOLD, limit = 5 } = {},
+  { minScore = DUPLICATE_REVIEW_THRESHOLD, limit = 5 }: any = {},
 ): PatientDuplicateCandidate[] {
   return patients
     .map((patient) => scorePatientDuplicate(patient, demographics))
@@ -262,7 +262,7 @@ export type DuplicatePatientPair = {
 
 export function discoverDuplicatePatientPairs(
   patients: Patient[],
-  { minScore = DUPLICATE_REVIEW_THRESHOLD } = {},
+  { minScore = DUPLICATE_REVIEW_THRESHOLD }: any = {},
 ): DuplicatePatientPair[] {
   const pairs: DuplicatePatientPair[] = [];
   const seen = new Set<string>();

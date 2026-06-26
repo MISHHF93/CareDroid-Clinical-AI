@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Patient queue reason layer — for every waiting or queued patient, derive why they
  * remain in the operational queue (staff-facing only; not shown on public displays).
  */

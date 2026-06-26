@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Reception desk patient-answers model — consolidates public waiting display status,
  * crowd level, wait explanation, process education, and per-patient checkpoints so
  * front desk staff can answer common questions without repeating themselves.
@@ -265,7 +265,7 @@ export function buildReceptionPatientAnswersSnapshot(
 
 export function formatReceptionCheckpointTime(
   timestamp: string | null | undefined,
-  now: Date,
+  now: Date = undefined as any,
 ): string {
   return formatCommunicationStatusTimestamp(timestamp, now, { unknownLabel: 'Not scheduled' });
 }

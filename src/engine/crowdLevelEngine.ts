@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Crowd Level Engine — unified LOW → CRITICAL classification from queue,
  * capacity, EMS, and wait-time signals.
  */

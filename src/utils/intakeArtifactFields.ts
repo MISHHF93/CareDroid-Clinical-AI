@@ -1,4 +1,4 @@
-import type { IntakeArtifactDefinition } from '../config/intakeArtifactRegistry';
+﻿import type { IntakeArtifactDefinition } from '../config/intakeArtifactRegistry';
 import type { IdArtifactDemographics } from './idArtifactParser';
 import {
   demographicsToFieldRows,
@@ -21,7 +21,7 @@ export function clinicalDataToFieldRows(
   artifact: IntakeArtifactDefinition,
   {
     boardPatient = null,
-    seedFields = [],
+    seedFields = [] as any[],
   }: {
     boardPatient?: Record<string, unknown> | null;
     seedFields?: IdentityExtractedField[];
@@ -49,10 +49,10 @@ export function clinicalDataToFieldRows(
 export function artifactExtractionToFieldRows(
   artifact: IntakeArtifactDefinition,
   {
-    demographics = {},
-    clinical = {},
+    demographics = {} as any,
+    clinical = {} as any,
     boardPatient = null,
-    seedFields = [],
+    seedFields = [] as any[],
   }: {
     demographics?: IdArtifactDemographics;
     clinical?: ClinicalArtifactData;

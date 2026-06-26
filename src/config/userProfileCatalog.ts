@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Canonical user profile catalog — maps admin-assigned SaaS roles to domain access.
  */
 import catalogData from './user-profile-catalog.data.json';

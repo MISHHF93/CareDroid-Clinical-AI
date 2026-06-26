@@ -1,4 +1,4 @@
-import type { useEmergencyStore } from '../store/emergencyStore';
+﻿import type { useEmergencyStore } from '../store/emergencyStore';
 import { registerArrivalControl } from './arrivalControlLayer';
 import {
   completeIntakeHandoff,

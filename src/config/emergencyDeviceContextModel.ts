@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Multi-screen device context — binds a physical workstation to a CareDroid screen mode.
  * Same user account, different device contexts; one app shell, no duplicate renderers.
  * Persists per browser; reuses existing kiosk / read-only wall display modes.

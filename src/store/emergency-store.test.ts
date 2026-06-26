@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createInitialEmergencyStoreState, DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from './emergency-store';
+import { createInitialEmergencyStoreState, DEFAULT_EMERGENCY_THRESHOLDS, useEmergencyStore } from './emergencyStore';
 
 describe('CareDroid store shim', () => {
   it('re-exports the canonical CareDroid store', () => {

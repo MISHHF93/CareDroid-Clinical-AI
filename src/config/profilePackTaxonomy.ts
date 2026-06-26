@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Maps catalog specialty packs to org entitlement packs and tool pack matching.
  */
 import { normalizeSaasRole } from './saasProfileConstants';

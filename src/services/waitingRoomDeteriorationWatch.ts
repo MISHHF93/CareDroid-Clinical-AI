@@ -1,4 +1,4 @@
-import { buildArrivalControlSnapshot } from './arrivalControlLayer';
+﻿import { buildArrivalControlSnapshot } from './arrivalControlLayer';
 import {
   collectHighRiskComplaintLabels,
   patientHasHighRiskComplaintFlags,

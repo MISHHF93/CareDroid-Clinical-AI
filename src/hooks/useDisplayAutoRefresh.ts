@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildDisplayRefreshStatus,
   resolveDisplayRefreshIntervalMs,
@@ -69,7 +69,7 @@ export function useDisplayAutoRefresh({
         setErrorMessage(null);
         setLastSuccessfulAt(new Date().toISOString());
       }
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(summarizeDisplayRefreshErrors(null, error));
     } finally {
       setIsRefreshing(false);

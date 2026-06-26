@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   buildCareDroidCentralNodeSnapshot,
@@ -121,7 +121,7 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
         message: 'Central node snapshot refreshed.',
       });
       return envelope;
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error instanceof Error ? error.message : 'Unable to refresh CareDroid Central Node.';
       setRefreshError(message);

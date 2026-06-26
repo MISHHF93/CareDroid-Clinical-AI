@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+﻿import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -223,10 +223,10 @@ export function patientNameMatchScore(
 export function searchOperationalEntitiesForPalette(
   navigate: NavigateFunction,
   {
-    patients = [],
-    referrals = [],
-    emsArrivals = [],
-    queues = [],
+    patients = [] as any[],
+    referrals = [] as any[],
+    emsArrivals = [] as any[],
+    queues = [] as any[],
     query = '',
     emergencyRole,
     saasRole,

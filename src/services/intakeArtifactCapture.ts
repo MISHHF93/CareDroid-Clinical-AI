@@ -1,4 +1,4 @@
-import { callAI } from '../lib/ai/client';
+﻿import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -166,7 +166,7 @@ export async function captureIntakeArtifact({
   staff = 'Current staff',
   supplementalText = '',
   boardPatient = null,
-  seedFields = [],
+  seedFields = [] as any[],
 }: CaptureIntakeArtifactOptions): Promise<CapturedIntakeArtifact> {
   const dataUrl = await readFileAsDataUrl(file);
   const mimeType = file.type || 'application/octet-stream';

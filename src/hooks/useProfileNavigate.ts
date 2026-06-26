@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+﻿import { useCallback } from 'react';
 import { useNavigate, type NavigateFunction, type To } from 'react-router-dom';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';
@@ -26,7 +26,7 @@ export function useProfileNavigate(): {
   const { saasRole } = useEffectiveUserProfile();
 
   const profileNavigate = useCallback<ProfileNavigate>(
-    (to, options = {}) =>
+    (to, options: any = {}) =>
       navigateProfileAware(rawNavigate, to, {
         saasRole,
         emergencyRole,

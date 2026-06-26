@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-25T04:26:23.873Z",
+  "generatedAt": "2026-06-26T04:03:50.986Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -139,7 +139,7 @@
     "receptionFirstEnabled": true
   },
   "palette": {
-    "commandCount": 17,
+    "commandCount": 18,
     "navItemIds": [
       "reception",
       "whiteboard",
@@ -153,6 +153,7 @@
       "tools",
       "analytics",
       "settings",
+      "help",
       "pulse",
       "shift",
       "boarding"

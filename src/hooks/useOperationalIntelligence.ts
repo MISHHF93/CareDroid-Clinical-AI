@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CareDroidScreenMode } from '../central-node/careDroidCentralNode';
 import { useCareDroidCentralNode } from './useCareDroidCentralNode';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -65,7 +65,7 @@ export function useOperationalIntelligence(options: UseOperationalIntelligenceOp
       setRefreshError('');
       await centralNode.refresh();
       return nextSnapshot;
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error instanceof Error ? error.message : 'Unable to refresh operational intelligence.';
       setRefreshError(message);

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Ambulance, Clock3, Send } from 'lucide-react';
 import {
   PRE_ARRIVAL_FRAMEWORK_LABELS,
@@ -138,7 +138,7 @@ export default function PreArrivalForm({
         notificationSource,
       });
       onSubmitted?.(result);
-    } catch (error) {
+    } catch (error: any) {
       setSubmitError(error instanceof Error ? error.message : 'Could not post pre-arrival');
     } finally {
       setSubmitting(false);

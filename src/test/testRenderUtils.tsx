@@ -1,0 +1,147 @@
+﻿/**
+ * Shared render helpers for responsive regression / page smoke tests.
+ */
+
+import { expect, vi } from 'vitest';
+import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { PractitionerVisibilityProvider } from '../contexts/PractitionerVisibilityContext';
+
+export const mockToolPreferencesValue = {
+  recordToolAccess: vi.fn(),
+  favorites: [],
+  pinned: [],
+  recentTools: [],
+  hiddenTools: [],
+  profileSettings: {},
+  toggleFavorite: vi.fn(),
+  togglePinned: vi.fn(),
+  toggleHidden: vi.fn(),
+  clearRecentTools: vi.fn(),
+  updateProfileSettings: vi.fn(),
+  resetToolRecommendations: vi.fn(),
+};
+
+export const mockConversationValue = {
+  conversations: [{ id: '1', title: 'Test', date: new Date().toISOString() }],
+  activeConversationId: '1',
+  messages: [{ id: 'm1', role: 'assistant', content: 'Clinical decision support ready.' }],
+  selectedTool: null,
+  isLoading: false,
+  addConversation: vi.fn(),
+  selectConversation: vi.fn(),
+  deleteConversation: vi.fn(),
+  addMessage: vi.fn(),
+  clearMessages: vi.fn(),
+  selectTool: vi.fn(),
+  setActiveTool: vi.fn(),
+  clearTool: vi.fn(),
+  setIsLoading: vi.fn(),
+};
+
+export function createMockUserValue(overrides: any = {}) {
+  const baseUser = {
+    id: 'test-user',
+    email: 'test@caredroid.local',
+    name: 'Test Clinician',
+    role: 'physician',
+    fullName: 'Test Clinician',
+  };
+
+  const mergedUser =
+    overrides.user === null ? null : { ...baseUser, ...(overrides.user || {}) };
+  const contextOverrides = { ...overrides };
+  delete contextOverrides.user;
+
+  return {
+    authToken: 'test-token',
+    isAuthenticated: Boolean(mergedUser),
+    isDevAuthBypass: false,
+    isLoading: false,
+    hasPermission: () => true,
+    hasAnyPermission: () => true,
+    hasAllPermissions: () => true,
+    setUser: vi.fn(),
+    setAuthToken: vi.fn(),
+    signOut: vi.fn(),
+    ...contextOverrides,
+    user: mergedUser,
+  };
+}
+
+export const mockUserValue = createMockUserValue();
+
+export const mockWorkspaceValue = {
+  workspaces: [{ id: 'default', name: 'Default', toolIds: [] }],
+  activeWorkspaceId: 'default',
+  activeWorkspace: { id: 'default', name: 'Default', toolIds: [] },
+  workspaceContext: null,
+  visibleAssetIds: [],
+  recommendations: [],
+  assistantContext: '',
+  shortcuts: [],
+  workspaceProfile: null,
+  defaultDashboardWidgets: [],
+  defaultFilters: {},
+  restrictedAssets: [],
+  recommendedAIAgents: [],
+  recommendedAssetPacks: [],
+  setActiveWorkspaceId: vi.fn(),
+  switchWorkspace: vi.fn(),
+  addWorkspace: vi.fn(),
+};
+
+export const mockNotificationsValue = {
+  notifications: [],
+  addNotification: vi.fn(),
+  markAsRead: vi.fn(),
+  clearAll: vi.fn(),
+};
+
+/**
+ * @param {import('react').ReactElement} ui
+ * @param {{ route?: string }} [options]
+ */
+export function renderWithRouter(ui, options: any = {}) {
+  const { route = '/', withVisibilityProvider = false } = options;
+  const tree = withVisibilityProvider ? (
+    <PractitionerVisibilityProvider>{ui}</PractitionerVisibilityProvider>
+  ) : (
+    ui
+  );
+  return render(<MemoryRouter initialEntries={[route]}>{tree}</MemoryRouter>);
+}
+
+/** Page smoke helper — mirrors AppShell visibility resolution for isolated page renders. */
+export function renderPageWithRouter(ui, options: any = {}) {
+  return renderWithRouter(ui, { ...options, withVisibilityProvider: true });
+}
+
+/**
+ * Mock compact layout media query (AppShell uses max-width: 900px).
+ * @param {boolean} matches
+ */
+export function mockCompactViewport(matches = true) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query) => ({
+      matches: matches && /max-width:\s*900px/.test(String(query)),
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
+/**
+ * @param {HTMLElement} container
+ */
+export function expectNonEmptyPage(container) {
+  const text = (container.textContent || '').replace(/\s+/g, ' ').trim();
+  expect(text.length).toBeGreaterThan(24);
+}

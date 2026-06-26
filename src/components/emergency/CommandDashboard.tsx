@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import type { ActiveShift, CapacitySnapshot, Patient, Room, Staff } from '../../types/emergency';
 import DepartmentStaffBar from '../whiteboard/DepartmentStaffBar';
 import type { EmergencyBoardingMetrics } from '../../store/emergencyStore';
@@ -76,7 +76,7 @@ function ZoneOccupancyRow({ zone }: { zone: ZoneBedOccupancy }) {
 export default function CommandDashboard({
   patients,
   rooms,
-  staff = [],
+  staff = [] as any[],
   activeShift = null,
   capacity,
   boardingMetrics,

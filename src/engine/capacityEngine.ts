@@ -1,4 +1,4 @@
-import { useEmergencyStore } from '../store/emergencyStore';
+﻿import { useEmergencyStore } from '../store/emergencyStore';
 import { dispatchAlert } from './alertEngine';
 import {
   PatientFlag,

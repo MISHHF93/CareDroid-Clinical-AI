@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Canonical CareDroid permission registry — actions, routes, screens, and display modes.
  */
 import { CANONICAL_ROUTES } from './routes.config';

@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import { collectReassessmentAttentionPatients } from './reassessmentAttentionPatients';
 
-function buildPatient(overrides = {}) {
+function buildPatient(overrides: any = {}) {
   return {
     id: 'patient-1',
     mrn: 'MRN-1',

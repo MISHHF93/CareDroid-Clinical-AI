@@ -1,11 +1,11 @@
-import type { Patient, Referral } from '../types/emergency';
+﻿import type { Patient, Referral } from '../types/emergency';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { buildQueueAuditSnapshot } from './queueAuditDiscovery';
 import {
   auditCopilotRecommendations,
   buildCopilotRecommendations,
   resolveCopilotQuickAction,
-} from '../config/copilotRecommendationModel.js';
+} from '../config/copilotRecommendationModel';
 
 export type CopilotRecommendationSnapshot = {
   recommendations: ReturnType<typeof buildCopilotRecommendations>;
@@ -14,7 +14,7 @@ export type CopilotRecommendationSnapshot = {
 
 export function buildCopilotRecommendationSnapshot({
   centralSnapshot,
-  patients = [],
+  patients = [] as any[],
   referrals = [] as Referral[],
   emsInbound = 0,
   generatedAt,
@@ -44,7 +44,7 @@ export function resolveCopilotQuickActionFromSnapshot(
   query: string,
   {
     centralSnapshot,
-    patients = [],
+    patients = [] as any[],
     referrals = [] as Referral[],
     emsInbound = 0,
   }: {

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import type { Alert, EMSArrival, Patient, Referral, Room, Staff } from '../../types/emergency';
 import WhiteboardAlertRail from '../whiteboard/WhiteboardAlertRail';
 import {
@@ -25,15 +25,15 @@ type ReceptionAlertRailProps = {
 
 export default function ReceptionAlertRail({
   patients,
-  alerts = [],
-  referrals = [],
-  staff = [],
-  workflowLogs = [],
-  emsArrivals = [],
-  rooms = [],
+  alerts = [] as any[],
+  referrals = [] as any[],
+  staff = [] as any[],
+  workflowLogs = [] as any[],
+  emsArrivals = [] as any[],
+  rooms = [] as any[],
   settings = null,
   roleId = null,
-  features = {},
+  features = {} as any,
   readOnly = false,
   className = '',
   onSelectPatient,

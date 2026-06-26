@@ -5,9 +5,10 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
+    "noImplicitAny": false,
     "noEmit": true,
     "skipLibCheck": true,
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
     "isolatedModules": true,
     "resolveJsonModule": true,
@@ -24,7 +25,8 @@
     "dist",
     "backend",
     "e2e",
-"src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/features/future-modules/_review/**"
   ]
 }

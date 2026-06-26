@@ -1,4 +1,4 @@
-import { PatientState, type Patient, type Referral, type Staff, type WorkflowActionLog } from '../types/emergency';
+﻿import { PatientState, type Patient, type Referral, type Staff, type WorkflowActionLog } from '../types/emergency';
 import {
   buildReassessmentTimerSnapshot,
   formatTimerClockTime,
@@ -93,7 +93,7 @@ function latestEventTimestamp(
 export function formatCommunicationStatusTimestamp(
   timestamp: string | null | undefined,
   now: Date,
-  { unknownLabel = '—' } = {},
+  { unknownLabel = '—' }: any = {},
 ): string {
   if (!timestamp) return unknownLabel;
   const minutes = minutesSince(timestamp, now);

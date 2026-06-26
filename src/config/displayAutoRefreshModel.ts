@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Normalized auto-refresh for wall / kiosk display modes.
  */
 import {

@@ -1,4 +1,4 @@
-import { deriveTriagePending } from './arrivalControlLayer';
+﻿import { deriveTriagePending } from './arrivalControlLayer';
 import {
   PatientState,
   type Alert,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
+﻿import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { unifiedAIClient } from '../lib/ai/client';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -242,7 +242,7 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
       const suggestions = parseStaffBalanceSuggestions(responseText, activeStaff, patients);
       setAiSuggestions(suggestions);
       setAiStatus(suggestions.length ? 'ready' : 'empty');
-    } catch (error) {
+    } catch (error: any) {
       setAiStatus('error');
       setAiError(error instanceof Error ? error.message : 'Unable to build suggestions.');
       setAiSuggestions([]);
@@ -466,7 +466,7 @@ function parseJsonCandidates(text: string): unknown[] {
   return candidates.flatMap((candidate) => {
     try {
       return [JSON.parse(candidate)];
-    } catch (_error) {
+    } catch (_error: any) {
       return [];
     }
   });

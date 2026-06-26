@@ -39,7 +39,7 @@ export async function fetchSurveillanceNexusSnapshot(): Promise<{
   snapshot: SurveillanceNexusSnapshot;
   capability: string;
 }> {
-  if (BACKEND_API_CAPABILITY_STATUS.surveillanceNexus === 'disabled') {
+  if ((BACKEND_API_CAPABILITY_STATUS as any).surveillanceNexus === 'disabled') {
     return { snapshot: buildDemoSnapshot(), capability: 'disabled' };
   }
 

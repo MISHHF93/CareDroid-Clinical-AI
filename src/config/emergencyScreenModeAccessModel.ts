@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Screen-mode role access — role allow-lists without KPI policy dependencies.
  */
 import {

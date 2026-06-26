@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Platform entry and landing — separates demo entry, clinical home, and admin console.
  */
 import { CANONICAL_ROUTES } from './routes.config';

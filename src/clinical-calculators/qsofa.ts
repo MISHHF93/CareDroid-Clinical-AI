@@ -4,7 +4,7 @@ import {
   qsofaCriteriaFromInputs,
   validateQsofaInputs,
 } from '../utils/qsofaCalculator';
-import type { AnyCalculatorResult, CalculatorValidationResult } from './types';
+import { asCalculatorSeverity, type AnyCalculatorResult, type CalculatorValidationResult } from './types';
 
 export const QSOFA_META = {
   id: 'qsofa' as const,
@@ -53,7 +53,7 @@ export function computeQsofa(input: QsofaInput): AnyCalculatorResult {
     interpretation: interpreted.interpretation,
     disclaimer: QSOFA_META.disclaimer,
     referenceLine: interpreted.referenceLine,
-    severity: interpreted.severity,
+    severity: asCalculatorSeverity(interpreted.severity),
     inputs: { ...input, criteria },
     breakdown: {
       respiratoryRateGte22: criteria.respiratoryRateGte22 ? 1 : 0,

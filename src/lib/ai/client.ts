@@ -1,4 +1,4 @@
-import {
+﻿import {
   buildDepartmentContext,
   buildSystemPrompt,
   type DepartmentContext,
@@ -398,7 +398,7 @@ async function callAnthropicAI(
       usage,
       requestType: request.requestType,
     };
-  } catch (error) {
+  } catch (error: any) {
     throw handleError(error, request.requestType);
   }
 }
@@ -465,7 +465,7 @@ function createStreamingHandler(
         }
         logMetadata(metadataLogger, request, maxTokens, usage, 0, true);
         controller.close();
-      } catch (error) {
+      } catch (error: any) {
         controller.error(handleError(error, request.requestType));
       } finally {
         reader.releaseLock();
@@ -697,7 +697,7 @@ export async function streamAIResponse(
     const parsed = parseAIResponse({ ...response, content });
     handlers.onParsed?.(parsed);
     return parsed;
-  } catch (error) {
+  } catch (error: any) {
     handlers.onError?.(error);
     throw error;
   } finally {
@@ -989,7 +989,7 @@ function extractJsonObjects(text: string): any[] {
     .map((block) => {
       try {
         return JSON.parse(block);
-      } catch (_error) {
+      } catch (_error: any) {
         return null;
       }
     })

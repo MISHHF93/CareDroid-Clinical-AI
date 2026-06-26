@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { PatientState, Priority } from '../types/emergency';
 import {
   isAwaitingTriage,
@@ -15,7 +15,7 @@ import {
 
 const STABLE_NOW = new Date('2026-06-20T10:12:00.000Z');
 
-function buildPatient(overrides = {}) {
+function buildPatient(overrides: any = {}) {
   return {
     id: 'patient-1',
     firstName: 'Alex',

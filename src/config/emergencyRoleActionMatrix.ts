@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Role-action matrix — canonical allowed / disabled / hidden / readonly states per role.
  * Composes with emergencyPermissionRegistry grants and display context overrides.
  */

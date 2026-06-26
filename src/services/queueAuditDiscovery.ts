@@ -1,9 +1,9 @@
-import type { Patient, Referral } from '../types/emergency';
+﻿import type { Patient, Referral } from '../types/emergency';
 import {
   auditAllQueues,
   summarizeQueueAudit,
   type QUEUE_AUDIT_DOMAIN,
-} from '../config/queueAuditModel.js';
+} from '../config/queueAuditModel';
 
 export type QueueAuditSnapshot = {
   rows: ReturnType<typeof auditAllQueues>;
@@ -11,7 +11,7 @@ export type QueueAuditSnapshot = {
 };
 
 export function buildQueueAuditSnapshot({
-  patients = [],
+  patients = [] as any[],
   emsInbound = 0,
   referrals = [] as Referral[],
   reassessmentOverdueGraceMinutes = 10,

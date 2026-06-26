@@ -1,8 +1,8 @@
-import type { Patient } from '../types/emergency';
+﻿import type { Patient } from '../types/emergency';
 import {
   assessPatientDataQualityRisks,
   summarizeDataQualityRisks,
-} from '../config/dataQualityModel.js';
+} from '../config/dataQualityModel';
 import { discoverDuplicatePatientPairs, type DuplicatePatientPair } from '../utils/patientDuplicateDetection';
 
 export type DataQualityRisk = ReturnType<typeof assessPatientDataQualityRisks>[number];
@@ -33,13 +33,13 @@ export function buildDataQualitySnapshot(patients: Patient[] = []): DataQualityS
 
   const topRisks = Object.entries(summary.byPatient)
     .flatMap(([patientId, risks]) =>
-      risks.map((risk: Record<string, unknown>) => ({
+      (risks as any[]).map((risk: Record<string, unknown>) => ({
         ...risk,
         patientId,
         patientLabel: patientLabel(patientById.get(patientId)!),
       })),
     )
-    .sort((left, right) => {
+    .sort((left: any, right: any) => {
       const severityRank = { warning: 0, info: 1 };
       return (
         (severityRank[left.severity as keyof typeof severityRank] ?? 2) -

@@ -1,4 +1,4 @@
-import { isLegalTransition } from '../../engine/journeyEngine';
+﻿import { isLegalTransition } from '../../engine/journeyEngine';
 import {
   PatientFlag,
   PatientState,

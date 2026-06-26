@@ -1,4 +1,4 @@
-import { create, type StoreApi, type UseBoundStore } from 'zustand';
+﻿import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import {
   Alert,
   ActiveShift,
@@ -1741,7 +1741,7 @@ function readLocalFeatureSnapshot(): Partial<FeatureSnapshot> {
       tier: parsed.tier && parsed.tier in TIER_RANK ? parsed.tier : undefined,
       lastSynced: parsed.lastSynced ? new Date(parsed.lastSynced) : null,
     };
-  } catch (_error) {
+  } catch (_error: any) {
     return {};
   }
 }
@@ -1773,7 +1773,7 @@ function readLastPulseViewTimestamp(): number | null {
     const viewedAt = stringFrom(parsed?.viewedAt);
     const parsedDate = viewedAt ? Date.parse(viewedAt) : Number.NaN;
     return Number.isFinite(parsedDate) ? parsedDate : null;
-  } catch (_error) {
+  } catch (_error: any) {
     const raw = localStorage.getItem(PULSE_LAST_VIEW_STORAGE_KEY);
     const numeric = Number(raw);
     if (Number.isFinite(numeric)) return numeric;
@@ -2525,7 +2525,7 @@ interface EmergencyStoreState {
   ) => void;
 }
 
-const initialScenarioState = buildSrcEmergencyScenarioState(getInitialEdScenarioId());
+const initialScenarioState = buildSrcEmergencyScenarioState(getInitialEdScenarioId()) as any;
 const initialCapacity =
   initialScenarioState.capacity || buildCapacitySnapshot(SEED_PATIENTS, SEED_ROOMS);
 const initialFeatureState = readLocalFeatureSnapshot();
@@ -2793,7 +2793,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     },
     activeScenarioId: initialScenarioState.activeScenarioId,
     activeScenario: initialScenarioState.activeScenario,
-    availableScenarios: ED_SCENARIO_DEMO_MODES,
+    availableScenarios: ED_SCENARIO_DEMO_MODES as any,
     scenarioData: initialScenarioState.scenarioData,
     queues: initialScenarioState.queues || [],
     selectedPatientId: null,
@@ -2915,12 +2915,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }
     },
 
-    registerArrivalControl: (patientId, options = {}) => {
+    registerArrivalControl: (patientId, options: any = {}) => {
       const state = get();
       return registerArrivalControlLayer(toArrivalControlStore(state as unknown as Parameters<typeof toArrivalControlStore>[0]), patientId, options);
     },
 
-    applyHighRiskComplaintFlags: (patientId, options = {}) => {
+    applyHighRiskComplaintFlags: (patientId, options: any = {}) => {
       const state = get();
       return applyHighRiskComplaintFlagsLayer(
         {
@@ -3022,7 +3022,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    attachDocumentArtifacts: (patientId, artifacts, sources = []) =>
+    attachDocumentArtifacts: (patientId, artifacts, sources = [] as any[]) =>
       set((state) => {
         const patients = state.patients.map((patient) => {
           if (patient.id !== patientId) return patient;
@@ -3134,7 +3134,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    recordLabResultPosted: (patientId, input = {}) =>
+    recordLabResultPosted: (patientId, input: any = {}) =>
       set((state) => {
         const patient = state.patients.find((candidate) => candidate.id === patientId);
         if (!patient) return {};
@@ -3350,7 +3350,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       );
     },
 
-    dischargePatient: (patientId, options = {}) =>
+    dischargePatient: (patientId, options: any = {}) =>
       set((state) => {
         const staffId = options.staffId || 's3';
         const patients = state.patients.map((patient) =>
@@ -3382,7 +3382,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    assignStaff: (patientId, staffId, options = {}) =>
+    assignStaff: (patientId, staffId, options: any = {}) =>
       set((state) => {
         const previousStaffId =
           state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ?? null;
@@ -3992,7 +3992,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       return nextReminder;
     },
 
-    completeReassessmentReminder: (patientId, reminderId, options = {}) =>
+    completeReassessmentReminder: (patientId, reminderId, options: any = {}) =>
       set((state) => {
         const timestamp = options.completedAt || options.timestamp || new Date().toISOString();
         const patient = state.patients.find((candidate) => candidate.id === patientId);
@@ -4103,7 +4103,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set((state) => {
         try {
           return buildUpdateAlertsPatch(state);
-        } catch (error) {
+        } catch (error: any) {
           console.error('[emergencyStore] updateAlerts failed', error);
           return {};
         }
@@ -4162,7 +4162,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       if (isSimulationModeActive()) {
         const scenarioId = getInitialEdScenarioId();
-        get().setActiveScenario(scenarioId);
+        get().setActiveScenario(scenarioId as string);
         set((state) => ({
           backendAvailable: false,
           persistenceMode: 'simulation',
@@ -4251,7 +4251,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         }));
 
         return result;
-      } catch (error) {
+      } catch (error: any) {
         const message =
           error instanceof Error ? error.message : 'CareDroid backend unavailable.';
         set((state) => ({
@@ -4293,7 +4293,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       ): Promise<{ data?: unknown; error?: string }> => {
         try {
           return { data: await fetcher() };
-        } catch (error) {
+        } catch (error: any) {
           return {
             error:
               error instanceof Error
@@ -4400,7 +4400,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
         set({ surgeStatus });
         return surgeStatus;
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : 'Unable to activate surge mode.';
         set((state) => ({ ui: { ...state.ui, error: message } }));
         throw error;
@@ -4449,7 +4449,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
         get().appendCopilotMessage(message);
         return message;
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : 'Unable to send Copilot query.';
         set((state) => ({ ui: { ...state.ui, error: message } }));
         throw error;
@@ -5118,7 +5118,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
         set(nextState);
         writeLocalFeatureSnapshot(nextState);
-      } catch (_error) {
+      } catch (_error: any) {
         const state = get();
         const localTier = state.tier || DEFAULT_TIER;
         const localDefaults = buildDefaultFlags(localTier);
@@ -5291,7 +5291,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       );
     },
 
-    requestAdditionalStaff: (input = {}) => {
+    requestAdditionalStaff: (input: any = {}) => {
       const state = get();
       const requestedAt = new Date().toISOString();
       const request: StaffingRequest = {
@@ -5336,8 +5336,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     },
 
     setActiveScenario: (scenarioId) =>
-      set(() => {
-        const scenarioState = buildSrcEmergencyScenarioState(scenarioId);
+      (set as any)(() => {
+        const scenarioState = buildSrcEmergencyScenarioState(scenarioId) as any;
         persistEdScenarioId(scenarioState.activeScenarioId);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(
@@ -5538,7 +5538,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
         set({ emergencyAnalytics: nextState });
         return nextState;
-      } catch (error) {
+      } catch (error: any) {
         const nextState: EmergencyAnalyticsState = {
           status: 'ready',
           source: 'client-fallback',
@@ -5937,5 +5937,44 @@ export const selectEmergencyOperationalSummary = (
         tone: referralsPending ? 'warning' : 'success',
       },
     ],
+  };
+};
+
+export const createInitialEmergencyStoreState = () => {
+  const state = useEmergencyStore.getState();
+  return {
+    patients: state.patients,
+    staff: state.staff,
+    rooms: state.rooms,
+    capacity: state.capacity,
+    capacityHistory: state.capacityHistory,
+    activeShift: state.activeShift,
+    emsUnits: state.emsUnits,
+    emsArrivals: state.emsArrivals,
+    referrals: state.referrals,
+    capacityMetrics: state.capacityMetrics,
+    boardingMetrics: state.boardingMetrics,
+    surgeStatus: state.surgeStatus,
+    copilotMessages: state.copilotMessages,
+    emsIncomingPatients: state.emsIncomingPatients,
+    ui: state.ui,
+    websocket: state.websocket,
+    integrationEvents: state.integrationEvents,
+    alerts: state.alerts,
+    workflowLogs: state.workflowLogs,
+    auditLog: state.auditLog,
+    thresholds: state.thresholds,
+    emergencySettings: state.emergencySettings,
+    selectedPatientId: null,
+    copilotOpen: false,
+    activeQueueFilter: null,
+    loading: false,
+    features: state.features,
+    flags: state.flags,
+    overrides: state.overrides,
+    tier: state.tier,
+    lastSynced: state.lastSynced,
+    backendAvailable: state.backendAvailable,
+    persistenceMode: state.persistenceMode,
   };
 };

@@ -1,4 +1,4 @@
-import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
+﻿import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
 import { classifyReferralBucket, isClosedReferralStatus } from '../components/whiteboard/referralAwarenessModel';
 import { deriveQueueDestination, deriveTriagePending } from './arrivalControlLayer';
 import {

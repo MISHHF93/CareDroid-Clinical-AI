@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Canonical CareDroid role → screen-mode matrix.
  * Single resolver for route, role, tenant settings, and wall-display query params.
  */

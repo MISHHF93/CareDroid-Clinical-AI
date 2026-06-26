@@ -120,6 +120,10 @@
   "dependencies": {
     "@capacitor/android": "^5.6.0",
     "@capacitor/core": "^5.6.0",
+    "@capacitor/network": "^5.0.8",
+    "@capacitor/preferences": "^5.0.8",
+    "@capacitor/push-notifications": "^5.1.2",
+    "@capacitor/share": "^5.0.8",
     "@tabler/icons-react": "^3.44.0",
     "axios": "^1.16.1",
     "dexie": "^4.3.0",

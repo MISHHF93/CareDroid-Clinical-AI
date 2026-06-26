@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TrackMind Nexus permission registry — routes, actions, sensitivity, and role grants.
  */
 import { CANONICAL_ROUTES } from './routes.config';

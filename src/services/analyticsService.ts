@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Analytics Service for CareDroid-AI
  * Tracks user behavior, feature usage, and application performance
  */
@@ -26,7 +26,7 @@ export class AnalyticsService {
   private userIdHash: string | null = null;
   private sessionId: string;
   private enabled: boolean = true;
-  private queue: any[] = [];
+  private queue = [] as any[];
 
   constructor() {
     this.sessionId = this.generateSessionId();
@@ -147,7 +147,7 @@ export class AnalyticsService {
     if (this.queue.length === 0) return;
 
     const eventsToFlush = [...this.queue];
-    this.queue = [];
+    this.queue = [] as any[];
 
     try {
       const response = await apiFetch('/api/analytics/events', {
@@ -164,7 +164,7 @@ export class AnalyticsService {
         // Re-queue on failure
         this.queue = [...eventsToFlush, ...this.queue];
       }
-    } catch (error) {
+    } catch (error: any) {
       // Re-queue on error
       this.queue = [...eventsToFlush, ...this.queue];
     }

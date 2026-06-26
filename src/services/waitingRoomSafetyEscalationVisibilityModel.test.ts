@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   buildWaitingRoomSafetyEscalationAlerts,
@@ -9,7 +9,7 @@ import {
 
 const now = new Date('2026-06-20T12:00:00.000Z');
 
-function waitingPatient(overrides = {}) {
+function waitingPatient(overrides: any = {}) {
   return {
     id: 'p-1',
     mrn: 'MRN-1',

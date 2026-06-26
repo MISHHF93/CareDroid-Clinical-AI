@@ -1,4 +1,4 @@
-import { DEFAULT_EMERGENCY_CTAS_TARGETS } from '../config/emergencySettings.config';
+﻿import { DEFAULT_EMERGENCY_CTAS_TARGETS } from '../config/emergencySettings.config';
 import {
   patientHasHighRiskComplaintFlags,
   patientNeedsRapidReview,

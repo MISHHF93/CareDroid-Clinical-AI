@@ -1,4 +1,4 @@
-import { summarizeEmsAwareness } from '../components/whiteboard/emsAwarenessModel';
+﻿import { summarizeEmsAwareness } from '../components/whiteboard/emsAwarenessModel';
 import type { EMSArrival, Patient, Staff } from '../types/emergency';
 
 export type EmsOffloadVisibilityMetricId =
@@ -60,9 +60,9 @@ function formatDuration(minutes: number | null | undefined): string {
 export function buildEmsOffloadVisibilitySnapshot(
   emsArrivals: EMSArrival[] = [],
   {
-    patients = [],
-    staff = [],
-    rooms = [],
+    patients = [] as any[],
+    staff = [] as any[],
+    rooms = [] as any[],
     now = new Date(),
     offloadTargetMinutes = 15,
   }: {
@@ -220,9 +220,9 @@ export function selectEmsOffloadVisibilityMetrics(
   emsArrivals: EMSArrival[] = [],
   {
     metricIds = null,
-    patients = [],
-    staff = [],
-    rooms = [],
+    patients = [] as any[],
+    staff = [] as any[],
+    rooms = [] as any[],
     now = new Date(),
     offloadTargetMinutes = 15,
     surface = 'whiteboard',
@@ -293,7 +293,7 @@ export function buildPublicEmsCrowdingImpact(
   emsArrivals: EMSArrival[] = [],
   {
     enabled = true,
-    patients = [],
+    patients = [] as any[],
     now = new Date(),
     offloadTargetMinutes = 15,
   }: {

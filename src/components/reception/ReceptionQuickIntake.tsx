@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { PatientFlag, type Patient, type ArrivalMode, type QuickSafetyFlag, type HighRiskComplaintFlagId } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -247,7 +247,7 @@ export default function ReceptionQuickIntake({
       } else {
         onClose?.();
       }
-    } catch (error) {
+    } catch (error: any) {
       setSubmitError(
         `${formatApiRecoveryMessage(error, 'registration form')} ${ERROR_RECOVERY_COPY.intakeForm}`,
       );

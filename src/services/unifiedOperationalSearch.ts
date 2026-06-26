@@ -1,4 +1,4 @@
-import { CANONICAL_ROUTES } from '../config/routes.config';
+﻿import { CANONICAL_ROUTES } from '../config/routes.config';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import type { EMSArrival, Patient, QueueSummary, Referral } from '../types/emergency';
 import { getExistingEncounterId } from './intakeEncounter';
@@ -288,10 +288,10 @@ function searchQueueHits(
 export function searchOperationalEntities(
   {
     query = '',
-    patients = [],
-    referrals = [],
-    emsArrivals = [],
-    queues = [],
+    patients = [] as any[],
+    referrals = [] as any[],
+    emsArrivals = [] as any[],
+    queues = [] as any[],
   }: {
     query?: string;
     patients?: Patient[];

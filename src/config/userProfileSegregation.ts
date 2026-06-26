@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Organization-type and entitlement-pack gating for SaaS profile assignment.
  */
 import { SAAS_ORGANIZATION_TYPES } from './saasProfileConstants';

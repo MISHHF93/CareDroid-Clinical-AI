@@ -1,4 +1,4 @@
-import type { JourneyEvent, Patient, Staff, WorkflowActionLog } from '../types/emergency';
+﻿import type { JourneyEvent, Patient, Staff, WorkflowActionLog } from '../types/emergency';
 import { PatientFlag, PatientState } from '../types/emergency';
 import { isQueueWorkflowLog } from '../config/operationalAuditModel';
 
@@ -116,7 +116,7 @@ function minutesSince(timestamp: string | null | undefined, now: Date): number |
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatCommunicationDuration(minutes: number | null, { unknownLabel = '—' } = {}): string {
+export function formatCommunicationDuration(minutes: number | null, { unknownLabel = '—' }: any = {}): string {
   if (minutes === null || !Number.isFinite(minutes)) return unknownLabel;
   if (minutes < 1) return '<1m ago';
   if (minutes < 60) return `${minutes}m ago`;

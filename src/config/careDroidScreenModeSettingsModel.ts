@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CareDroid screen mode settings — normalized tenant configuration for displays,
  * role access, privacy tiers, refresh cadence, and per-screen KPI visibility.
  */

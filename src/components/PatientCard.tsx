@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+﻿import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
 import {
   Ambulance,
   ArrowRightLeft,
@@ -160,7 +160,7 @@ function getSignalBadges({
   referralAwarenessLabel,
   referralAwarenessTone,
   hasCapacityPressure,
-  dataQualityRisks = [],
+  dataQualityRisks = [] as any[],
 }: {
   patient: Patient;
   arrival: PatientArrivalRecord;

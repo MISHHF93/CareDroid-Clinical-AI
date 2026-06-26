@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Screen-mode KPI policy — canonical KPI sets per CareDroid screen mode.
  * Values resolve from existing operational builders (central node, reception strip,
  * department status, public waiting, command center throughput).

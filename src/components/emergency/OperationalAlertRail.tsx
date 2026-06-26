@@ -75,12 +75,12 @@ export default function OperationalAlertRail({
     >
       <OperationalStrip
         metrics={stripMetrics}
-        screenMode={screenMode}
-        layout="compact"
-        ariaLabel={ariaLabel}
+        screenMode={screenMode as any}
+        layout={"compact" as any}
+        ariaLabel={ariaLabel as any}
         eyebrow={null}
-        readOnly={readOnly}
-        metricLabelsUppercase={!dense}
+        readOnly={readOnly as any}
+        metricLabelsUppercase={!dense as any}
         className="operational-alert-rail__strip"
       />
     </div>

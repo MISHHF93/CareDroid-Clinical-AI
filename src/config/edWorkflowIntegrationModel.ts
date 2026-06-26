@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Emergency Department workflow integration — normalizes profile → role → screen → landing
  * and documents the A–Z ED journey across frontend and backend capability contracts.
  */
@@ -229,12 +229,12 @@ export function summarizeBackendFrontendSync(
     BACKEND_API_CAPABILITY_STATUS.userProfile === 'real';
   const emergencyReadWired =
     runtime.backendAvailable === true ||
-    BACKEND_API_CAPABILITY_STATUS.emergencyWhiteboard !== 'disabled';
+    (BACKEND_API_CAPABILITY_STATUS as any).emergencyWhiteboard !== 'disabled';
   const emergencyWriteWired =
     BACKEND_API_CAPABILITY_STATUS.emergencyReceptionHandoff === 'real' ||
     BACKEND_API_CAPABILITY_STATUS.emergencyTriageAssist === 'real';
   const realtimeWired =
-    BACKEND_API_CAPABILITY_STATUS.emergencyCentralNode !== 'disabled';
+    (BACKEND_API_CAPABILITY_STATUS as any).emergencyCentralNode !== 'disabled';
   const fallbackPersistenceMode = emergencyWriteWired ? 'hybrid' : 'demo-fixture';
 
   return {

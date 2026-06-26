@@ -1,4 +1,4 @@
-import {
+﻿import {
   isAwaitingProvider,
   resolveTriageToProviderElapsedMinutes,
   summarizeProviderWaitBreachBoard,

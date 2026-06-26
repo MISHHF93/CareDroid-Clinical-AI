@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type Alert } from '../types/emergency';
 import {
   buildReceptionEscalationAlert,
@@ -15,7 +15,7 @@ import {
   syncReceptionEscalationOperationalSurfaces,
 } from './receptionEscalationWorkflow';
 
-function buildPatient(overrides = {}) {
+function buildPatient(overrides: any = {}) {
   return {
     id: 'patient-1',
     mrn: 'MRN-900',

@@ -1,4 +1,4 @@
-import type { Alert, EMSArrival, Patient, Referral, Room, Staff } from '../../types/emergency';
+﻿import type { Alert, EMSArrival, Patient, Referral, Room, Staff } from '../../types/emergency';
 import { buildEmsOffloadAttentionSnapshot } from '../../services/emsOffloadTracker';
 import {
   buildWaitingRoomAlertMetrics,
@@ -36,15 +36,15 @@ function pushMetric(
 
 export function buildReceptionAlertMetrics({
   patients,
-  alerts = [],
-  referrals = [],
-  staff = [],
-  workflowLogs = [],
-  emsArrivals = [],
-  rooms = [],
+  alerts = [] as any[],
+  referrals = [] as any[],
+  staff = [] as any[],
+  workflowLogs = [] as any[],
+  emsArrivals = [] as any[],
+  rooms = [] as any[],
   settings = null,
   roleId = null,
-  features = {},
+  features = {} as any,
 }: BuildReceptionAlertMetricsInput): WhiteboardAlertMetric[] {
   const metrics = buildWaitingRoomAlertMetrics({
     patients,

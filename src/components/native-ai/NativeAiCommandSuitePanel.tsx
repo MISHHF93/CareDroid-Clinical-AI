@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import type { Patient } from '../../types/emergency';
 import { useNativeAiDashboardData } from '../../hooks/useNativeAiDashboardData';
 import {
@@ -26,7 +26,7 @@ type NativeAiCommandSuitePanelProps = {
 
 export default function NativeAiCommandSuitePanel({
   patients,
-  rooms = [],
+  rooms = [] as any[],
   capacity,
   onSelectPatient,
   thresholds,

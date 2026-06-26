@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   QUEUE_REASON_DEFINITIONS,
@@ -8,7 +8,7 @@ import {
   summarizeQueueReasonBoard,
 } from './queueReasonVisibility';
 
-function buildPatient(overrides = {}) {
+function buildPatient(overrides: any = {}) {
   return {
     id: 'patient-1',
     firstName: 'Alex',

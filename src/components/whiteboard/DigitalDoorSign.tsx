@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import type { Patient, Room, Staff } from '../../types/emergency';
 import { buildDigitalDoorSignSnapshot } from '../../utils/digitalDoorSignModel';
 import './DigitalDoorSign.css';
@@ -13,7 +13,7 @@ type DigitalDoorSignProps = {
 export default function DigitalDoorSign({
   room,
   patient = null,
-  staff = [],
+  staff = [] as any[],
   className = '',
 }: DigitalDoorSignProps) {
   const snapshot = useMemo(

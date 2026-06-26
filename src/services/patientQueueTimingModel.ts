@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Harmonized patient queue timing — one elapsed/remaining view per queue scenario.
  */
 import { buildReassessmentTimerSnapshot } from '../engine/reassessmentTimerEngine';

@@ -43,16 +43,16 @@ export default function WhiteboardAlertRail({
     <div className={['whiteboard-alert-rail', className].filter(Boolean).join(' ')}>
       <OperationalStrip
         metrics={stripMetrics}
-        layout="compact"
-        ariaLabel={ariaLabel}
+        layout={"compact" as any}
+        ariaLabel={ariaLabel as any}
         eyebrow={null}
-        readOnly={readOnly}
+        readOnly={readOnly as any}
         className="whiteboard-alert-rail__strip"
-        onMetricSelect={(metric) => {
+        onMetricSelect={((metric) => {
           if (readOnly || !onSelectPatient) return;
           const patientId = (metric as { patientId?: string }).patientId;
           if (patientId) onSelectPatient(patientId);
-        }}
+        }) as any}
       />
     </div>
   );

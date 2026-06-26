@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Patient-safe wait range messaging — buckets internal minute metrics into
  * non-exact ranges suitable for public waiting-room displays.
  */

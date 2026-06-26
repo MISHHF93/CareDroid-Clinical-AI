@@ -1,4 +1,4 @@
-import {
+﻿import {
   PatientFlag,
   PatientState,
   Priority,
@@ -203,7 +203,7 @@ function minutesSince(timestamp?: string | null, now = new Date()): number | nul
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatTimerLabel(minutes: number | null, { unknownLabel = '—' } = {}): string {
+export function formatTimerLabel(minutes: number | null, { unknownLabel = '—' }: any = {}): string {
   if (minutes === null || !Number.isFinite(minutes)) return unknownLabel;
   if (minutes < 1) return '<1m';
   if (minutes < 60) return `${minutes}m`;

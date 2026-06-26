@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import { Patient, PatientFlag, PatientState, Priority, Vitals } from '../types/emergency';
@@ -386,7 +386,7 @@ export default function QuickIntake({
       );
       onAdded(persistedPatient);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       addPatient(patient);
       registerNewArrival(
         {

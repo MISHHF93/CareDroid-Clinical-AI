@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Crash Reporting Service for CareDroid-AI
  * Simplified implementation for error tracking
  * In production, integrate with Sentry by installing @sentry/react

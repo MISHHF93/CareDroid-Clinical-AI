@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
@@ -16,7 +16,7 @@ type PatientWhiteboardProps = {
 
 export default function PatientWhiteboard({
   patient,
-  staff = [],
+  staff = [] as any[],
   title,
   className = '',
 }: PatientWhiteboardProps) {

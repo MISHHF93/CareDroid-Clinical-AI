@@ -1,4 +1,4 @@
-import type { IdArtifactDemographics } from './idArtifactParser';
+﻿import type { IdArtifactDemographics } from './idArtifactParser';
 
 export type IdentityExtractedField = {
   field: string;
@@ -83,7 +83,7 @@ export function demographicsToFieldRows(
   {
     sourceLabel = 'Document capture',
     boardPatient = null,
-    seedFields = [],
+    seedFields = [] as any[],
   }: {
     sourceLabel?: string;
     boardPatient?: Record<string, unknown> | null;
