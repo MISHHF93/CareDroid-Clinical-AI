@@ -106,7 +106,7 @@ function buildProductionCorpus() {
 }
 
 function parseAppRoutePaths() {
-  const app = readRepoFile('src/App.jsx');
+  const app = readRepoFile('src/app/router.jsx');
   const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
   const jsxLiteralPaths = [...app.matchAll(/<Route\b[^>]*\spath=["']([^"']+)["']/g)].map((m) => m[1]);
   const jsxCanonicalRoutePaths = [...app.matchAll(/path=\{CANONICAL_ROUTES\.([A-Za-z0-9_]+)\}/g)]

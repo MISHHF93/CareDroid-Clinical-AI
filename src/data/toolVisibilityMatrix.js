@@ -61,7 +61,7 @@ const REGISTRY_PAGE_COMPONENT = Object.freeze({
   [REGISTRY.sofaScore]: 'src/pages/tools/Calculators.jsx',
 });
 
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
 const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.jsx'), 'utf8');
 

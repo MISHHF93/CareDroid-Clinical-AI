@@ -311,6 +311,53 @@ export function whiteboardPatientSummary(patient: Patient): string {
   return `${arrival.triageAcuity.code} · ${arrival.chiefComplaint}`;
 }
 
+export type WhiteboardCardOperationalMeta = {
+  waitingMinutes: number;
+  lastUpdatedAt: string;
+  assignedNurseLabel: string | null;
+  assignedPhysicianLabel: string | null;
+  statusLabel: string;
+  acuityCode: string;
+};
+
+function resolveStaffLabel(staff: Staff[], staffId?: string | null): string | null {
+  if (!staffId) return null;
+  const member = staff.find((entry) => entry.id === staffId);
+  return member?.displayName || member?.name || null;
+}
+
+function resolveLastUpdatedAt(patient: Patient): string {
+  const candidates = [
+    patient.updatedAt,
+    patient.whiteboardAutomation?.updatedAt,
+    patient.vitalsUpdatedAt,
+    patient.vitals?.at(-1)?.recordedAt,
+    patient.triageTime,
+    patient.arrivalTime,
+  ].filter(Boolean) as string[];
+  const parsed = candidates
+    .map((value) => new Date(value).getTime())
+    .filter((ms) => Number.isFinite(ms));
+  if (!parsed.length) return patient.arrivalTime;
+  return new Date(Math.max(...parsed)).toISOString();
+}
+
+export function buildWhiteboardCardOperationalMeta(
+  patient: Patient,
+  staff: Staff[] = [],
+  now = Date.now(),
+): WhiteboardCardOperationalMeta {
+  const arrival = normalizePatientArrival(patient);
+  return {
+    waitingMinutes: waitMinutesForWhiteboard(patient, now),
+    lastUpdatedAt: resolveLastUpdatedAt(patient),
+    assignedNurseLabel: resolveStaffLabel(staff, patient.assignedStaffId),
+    assignedPhysicianLabel: resolveStaffLabel(staff, patient.assignedPhysicianId),
+    statusLabel: resolveWhiteboardStateLabel(patient),
+    acuityCode: arrival.triageAcuity.code,
+  };
+}
+
 export function resolveWhiteboardStateLabel(patient: Patient): string {
   const arrival = normalizePatientArrival(patient);
 

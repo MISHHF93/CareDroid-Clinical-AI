@@ -10,7 +10,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
 const repoRoot = join(srcRoot, '..');
-const appPath = join(srcRoot, 'App.jsx');
+const appPath = join(srcRoot, 'app', 'router.jsx');
 const appSource = readFileSync(appPath, 'utf8');
 const canonicalRouteByExpression = new Map(
   Object.entries(CANONICAL_ROUTES).map(([key, value]) => [`CANONICAL_ROUTES.${key}`, value]),
@@ -135,7 +135,7 @@ function directAppRouteEntries() {
     return buildRouteEntry({
       path,
       block,
-      source: 'App.jsx',
+      source: 'app/router.jsx',
     });
   });
 
@@ -148,7 +148,7 @@ function directAppRouteEntries() {
       return buildRouteEntry({
         path,
         block: match[0],
-        source: 'App.jsx',
+        source: 'app/router.jsx',
       });
     })
     .filter(Boolean);
@@ -190,9 +190,9 @@ function mergeRouteEntries(entries) {
       ROUTE_HEALTH_STATES.ORPHANED,
     ];
     const preferred =
-      existing.source === 'App.jsx' && entry.source !== 'App.jsx'
+      existing.source === 'app/router.jsx' && entry.source !== 'app/router.jsx'
         ? existing
-        : entry.source === 'App.jsx' && existing.source !== 'App.jsx'
+        : entry.source === 'app/router.jsx' && existing.source !== 'app/router.jsx'
           ? entry
           : statusPriority.indexOf(entry.status) < statusPriority.indexOf(existing.status)
             ? entry
@@ -251,7 +251,7 @@ export function buildRouteHealthGraph() {
       ) {
         return acc;
       }
-      if (route.source !== 'App.jsx') return acc;
+      if (route.source !== 'app/router.jsx') return acc;
       acc[route.path] = acc[route.path] || [];
       acc[route.path].push(route);
       return acc;

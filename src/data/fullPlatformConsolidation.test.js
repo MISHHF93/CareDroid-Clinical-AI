@@ -18,7 +18,7 @@ import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './emergencyPageRenderInventory'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
-const appSource = readFileSync(join(srcRoot, 'App.jsx'), 'utf8');
+const appSource = readFileSync(join(srcRoot, 'app', 'router.jsx'), 'utf8');
 const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
 const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.jsx'), 'utf8');
 const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.jsx'), 'utf8');

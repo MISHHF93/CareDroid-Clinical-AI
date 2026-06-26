@@ -1,7 +1,7 @@
 /**
  * Canonical route and alias configuration.
  *
- * React Router still owns rendering in `App.jsx`; this module owns stable paths
+ * React Router still owns rendering in `src/app/router.jsx`; this module owns stable paths
  * and redirect aliases so route consumers do not define competing maps.
  */
 
@@ -163,10 +163,20 @@ export const CANONICAL_ROUTES = Object.freeze({
 });
 
 export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
-  { path: '/', type: 'redirect', to: '/emergency/reception' },
+  { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
   { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
-  { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
+  { path: '/whiteboard', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/reception', type: 'redirect', to: '/emergency/reception' },
+  { path: '/triage', type: 'redirect', to: '/emergency/reception?queue=pretriage' },
+  { path: '/charge', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/physician', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/ems', type: 'redirect', to: '/emergency/ems' },
+  { path: '/analytics', type: 'redirect', to: '/emergency/analytics' },
+  { path: '/copilot', type: 'redirect', to: '/emergency/copilot' },
+  { path: '/calculators', type: 'redirect', to: '/emergency/tools' },
+  { path: '/admin', type: 'redirect', to: '/admin' },
+  { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
   { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
   { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
@@ -183,7 +193,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
   { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
   { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
-  { path: '*', type: 'redirect', to: '/emergency/reception' },
+  { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
 ]);
 
 export const EMERGENCY_OS_TARGET_ROUTES = Object.freeze(

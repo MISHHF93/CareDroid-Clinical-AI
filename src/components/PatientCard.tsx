@@ -60,7 +60,10 @@ import PatientCardToolChips from './orchestration/PatientCardToolChips';
 import { getRecentSavedScores } from '../utils/clinicalScoreEvents';
 import { hasPatientFlag, latestPatientVitals, patientFlags } from '../utils/patientVitals';
 import WhiteboardOperationalIconStrip from './whiteboard/WhiteboardOperationalIconStrip';
-import { resolveWhiteboardStateLabel } from '../services/whiteboardViewModel';
+import {
+  buildWhiteboardCardOperationalMeta,
+  resolveWhiteboardStateLabel,
+} from '../services/whiteboardViewModel';
 import JourneyPredictionBadge from './predictive/JourneyPredictionBadge';
 import AdmissionProbabilityBadge from './predictive/AdmissionProbabilityBadge';
 import PatientDocumentArtifactsStrip from './patient-card/PatientDocumentArtifactsStrip';
@@ -233,12 +236,6 @@ function truncateComplaint(complaint: string): string {
   return complaint.length > 42 ? `${complaint.slice(0, 42)}...` : complaint;
 }
 
-function waitMinutes(arrivalTime: string): number {
-  const arrivedAt = new Date(arrivalTime).getTime();
-  if (!Number.isFinite(arrivedAt)) return 0;
-  return Math.max(0, Math.round((Date.now() - arrivedAt) / 60000));
-}
-
 function waitColor(minutes: number): string {
   if (minutes > 60) return 'var(--status-danger)';
   if (minutes > 45) return 'var(--status-warning)';
@@ -391,12 +388,16 @@ function PatientCard({
   const patientAge = formatPrivacySafeDemographic(patient.age, privacyPolicy);
   const patientSex = formatPrivacySafeDemographic(patient.sex, privacyPolicy);
   const arrival = useMemo(() => normalizePatientArrival(patient), [patient]);
+  const operationalMeta = useMemo(
+    () => buildWhiteboardCardOperationalMeta(patient, staff),
+    [patient, staff],
+  );
   const displayPriority = triageAcuityToPriority(arrival.triageAcuity);
   const patientComplaint = formatPrivacySafeComplaint(arrival.chiefComplaint, privacyPolicy);
   // Merged from src/components/EmergencyPatientCard.jsx: tolerate legacy vital field names.
   const vitals = latestVitals(patient);
-  const minutesWaiting = waitMinutes(arrival.arrivalTimestamp);
-  const whiteboardStateLabel = resolveWhiteboardStateLabel(patient);
+  const minutesWaiting = operationalMeta.waitingMinutes;
+  const whiteboardStateLabel = operationalMeta.statusLabel;
   const hasReassessmentDue = hasPatientFlag(patient, PatientFlag.ReassessmentDue);
   const hasDeteriorationRisk = hasPatientFlag(patient, PatientFlag.DeteriorationRisk);
   const hasEmsArrival =
@@ -693,7 +694,7 @@ function PatientCard({
       <div className="patient-card__priority-strip" aria-label={`${displayPriority} ${priorityLabel}`}>
         <span className="patient-card__priority-code">{displayPriority}</span>
         <span className="patient-card__priority-label">{priorityLabel}</span>
-        <span className="patient-card__state-pill">{patient.state}</span>
+        <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
         <WhiteboardOperationalIconStrip
           patient={patient}
           room={patientRoom}

@@ -34,6 +34,9 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   provincialHealth: '/api/emergency/provincial-health',
   integrations: '/api/emergency/integrations',
   copilot: '/api/emergency/copilot',
+  copilotQuery: '/api/emergency/copilot/query',
+  copilotInteractions: '/api/emergency/copilot/interactions',
+  clinicalCalculatorResults: '/api/emergency/clinical-calculators/results',
   workflowLogs: '/api/emergency/workflow-logs',
   patientWorkflowLogs: '/api/emergency/patients',
   implementationReadiness: '/api/emergency/implementation-readiness',
@@ -87,6 +90,10 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'provincialHealth',
   'integrations',
   'copilot',
+  'copilotQuery',
+  'copilotInteractions',
+  'clinicalCalculatorResults',
+  'patientOrchestration',
   'workflowLogs',
   'patientWorkflowLogs',
   'analytics',
@@ -189,6 +196,47 @@ export const fetchProvincialHealth = () =>
 export const fetchIntegrationHub = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.integrations);
 export const fetchEDCopilot = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilot);
+export const queryEmergencyCopilot = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilotQuery, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const recordCopilotInteraction = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.copilotInteractions, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const listCopilotInteractions = (patientId) => {
+  const params = patientId ? new URLSearchParams({ patientId: String(patientId) }) : null;
+  const path = params
+    ? `${EMERGENCY_OS_API_ENDPOINTS.copilotInteractions}?${params.toString()}`
+    : EMERGENCY_OS_API_ENDPOINTS.copilotInteractions;
+  return requestEmergencyJson(path);
+};
+export const recordClinicalCalculatorResult = (payload = {}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.clinicalCalculatorResults, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const listClinicalCalculatorResults = ({ patientId, calculatorId } = {}) => {
+  const params = new URLSearchParams();
+  if (patientId) params.set('patientId', String(patientId));
+  if (calculatorId) params.set('calculatorId', String(calculatorId));
+  const query = params.toString();
+  const path = query
+    ? `${EMERGENCY_OS_API_ENDPOINTS.clinicalCalculatorResults}?${query}`
+    : EMERGENCY_OS_API_ENDPOINTS.clinicalCalculatorResults;
+  return requestEmergencyJson(path);
+};
+
+/** Fire-and-forget copilot audit trail — never blocks clinical UI. */
+export function persistCopilotInteractionSafely(payload = {}) {
+  void recordCopilotInteraction({
+    requiresHumanReview: true,
+    safetyCheckPassed: true,
+    ...payload,
+  }).catch(() => undefined);
+}
 export const fetchEmergencyWorkflowLogs = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);
 export const fetchPatientWorkflowLogs = (patientId) =>
@@ -341,6 +389,13 @@ export default Object.freeze({
   fetchProvincialHealth,
   fetchIntegrationHub,
   fetchEDCopilot,
+  queryEmergencyCopilot,
+  recordCopilotInteraction,
+  listCopilotInteractions,
+  recordClinicalCalculatorResult,
+  listClinicalCalculatorResults,
+  persistCopilotInteractionSafely,
+  fetchPatientOrchestration,
   fetchEmergencyWorkflowLogs,
   fetchPatientWorkflowLogs,
   fetchCompleteImplementationReadiness,

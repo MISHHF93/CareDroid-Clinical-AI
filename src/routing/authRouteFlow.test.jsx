@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
 describe('auth canonical flow wiring', () => {

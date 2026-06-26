@@ -19,7 +19,7 @@ import { emergencyPatternGroups } from './emergencyPatternCatalog';
 import { resolveCatalogLaunch, NLU_TO_REGISTRY_ID } from './clinicalCatalogWiring';
 import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
-const appSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../App.jsx'), 'utf8');
+const appSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../app/router.jsx'), 'utf8');
 
 /** Keys in CostTrackingContext TOOL_COSTS that are phantom / non-registry tools */
 const COST_TRACKING_EXTRA_TOOL_KEYS = [
@@ -208,7 +208,7 @@ describe('sourceCodeToolDiscovery', () => {
     expect(launch.path).toBe('/tools/calculators');
     expect(launch.registryId).toBe('perc');
     expect(launch.chatSeed).toMatch(/PERC rule/i);
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../app/router.jsx');
     const appSrc = readFileSync(appPath, 'utf8');
     expect(appSrc).not.toContain("path: '/tools/calculators/perc'");
   });
@@ -219,7 +219,7 @@ describe('sourceCodeToolDiscovery', () => {
     expect(launch.registryId).toBe('wells-pe');
     expect(launch.chatSeed).toMatch(/pulmonary embolism/i);
     expect(toolRegistryById['wells-pe']?.path).toBe('/tools/calculators');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../app/router.jsx');
     const appSrc = readFileSync(appPath, 'utf8');
     expect(appSrc).not.toContain("path: '/tools/calculators/wells-pe'");
   });
@@ -238,7 +238,7 @@ describe('sourceCodeToolDiscovery', () => {
       expect(launch.chatSeed).toMatch(seedPattern);
       const fromAlias = resolveCatalogLaunch(alias);
       expect(fromAlias.chatSeed).toBe(launch.chatSeed);
-      const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+      const appPath = join(dirname(fileURLToPath(import.meta.url)), '../app/router.jsx');
       const appSrc = readFileSync(appPath, 'utf8');
       expect(appSrc).not.toContain(`path: '/tools/calculators/${id}'`);
     }

@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import { TenantContext } from '../tenant-context/tenant-context.decorator';
 import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -34,6 +35,12 @@ import {
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
+import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
+import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
+import type {
+  RecordClinicalCalculatorDto,
+  RecordCopilotInteractionDto,
+} from './clinical-decision-support.types';
 import type { EmergencyOsSettingsPatch, EmergencyPatient } from './emergency-os.types';
 import type {
   ExtractDocumentArtifactsInput,
@@ -72,6 +79,8 @@ export class EmergencyOsController {
     private readonly receptionWorkspaceService: ReceptionWorkspaceService,
     private readonly orchestrationService: PatientOrchestrationService,
     private readonly documentArtifactService: PatientDocumentArtifactService,
+    private readonly clinicalDecisionSupportService: ClinicalDecisionSupportService,
+    private readonly patientAuditService: EmergencyPatientAuditService,
   ) {}
 
   @Get('whiteboard')
@@ -133,12 +142,32 @@ export class EmergencyOsController {
   }
 
   @Get('patients/:patientId/workflow-logs')
-  getPatientWorkflowLogs(@Param('patientId') patientId: string) {
+  async getPatientWorkflowLogs(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext: TenantContextValue | undefined,
+    @Req() request: Request,
+  ) {
+    await this.patientAuditService.logPatientAccess({
+      request,
+      tenantContext,
+      patientId,
+      resource: `emergency/patients/${patientId}/workflow-logs`,
+    });
     return this.workflowActionLogService.getEnvelope(patientId);
   }
 
   @Get('patients/:patientId/document-artifacts')
-  getPatientDocumentArtifacts(@Param('patientId') patientId: string) {
+  async getPatientDocumentArtifacts(
+    @Param('patientId') patientId: string,
+    @TenantContext() tenantContext: TenantContextValue | undefined,
+    @Req() request: Request,
+  ) {
+    await this.patientAuditService.logPatientAccess({
+      request,
+      tenantContext,
+      patientId,
+      resource: `emergency/patients/${patientId}/document-artifacts`,
+    });
     return this.documentArtifactService.getEnvelope(patientId);
   }
 
@@ -163,10 +192,18 @@ export class EmergencyOsController {
   }
 
   @Get('patients/:patientId/orchestration')
-  getPatientOrchestration(
+  async getPatientOrchestration(
     @Param('patientId') patientId: string,
     @Query('role') roleQuery?: string,
+    @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
   ) {
+    await this.patientAuditService.logPatientAccess({
+      request,
+      tenantContext,
+      patientId,
+      resource: `emergency/patients/${patientId}/orchestration`,
+    });
     const allowedRoles = new Set([
       'registration_clerk',
       'triage_nurse',
@@ -376,10 +413,81 @@ export class EmergencyOsController {
   }
 
   @Post('copilot/query')
-  queryCopilot(
+  async queryCopilot(
     @Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> },
+    @TenantContext() tenantContext?: TenantContextValue,
+    @Req() request?: Request,
   ) {
-    return this.copilotService.processQuery(dto || {});
+    const response = this.copilotService.processQuery(dto || {});
+    const patientId =
+      typeof dto?.context?.patientId === 'string' ? dto.context.patientId : undefined;
+    if (patientId) {
+      await this.patientAuditService.logPatientAccess({
+        request,
+        tenantContext,
+        patientId,
+        resource: `emergency/copilot/query`,
+      });
+    }
+    const data = response.data as {
+      query?: string;
+      response?: string;
+      requires_review?: boolean;
+    };
+    this.clinicalDecisionSupportService.recordCopilotInteraction(
+      {
+        question: String(dto?.query || ''),
+        patientId,
+        userRole: dto?.user_role,
+        patientContextSummary:
+          typeof dto?.context?.summary === 'string' ? dto.context.summary : undefined,
+        draftGuidance: String(data?.response || ''),
+        requiresHumanReview: Boolean(data?.requires_review),
+      },
+      {
+        tenantId: tenantContext?.organizationId,
+        userId: tenantContext?.userId,
+      },
+    );
+    return response;
+  }
+
+  @Post('clinical-calculators/results')
+  recordClinicalCalculatorResult(
+    @Body() dto: RecordClinicalCalculatorDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.clinicalDecisionSupportService.recordCalculatorResult(dto, {
+      tenantId: tenantContext?.organizationId,
+      userId: tenantContext?.userId,
+    });
+  }
+
+  @Get('clinical-calculators/results')
+  listClinicalCalculatorResults(
+    @Query('patientId') patientId?: string,
+    @Query('calculatorId') calculatorId?: string,
+  ) {
+    return this.clinicalDecisionSupportService.listCalculatorResults({
+      patientId,
+      calculatorId: calculatorId as RecordClinicalCalculatorDto['calculatorId'] | undefined,
+    });
+  }
+
+  @Get('copilot/interactions')
+  listCopilotInteractions(@Query('patientId') patientId?: string) {
+    return this.clinicalDecisionSupportService.listCopilotInteractions({ patientId });
+  }
+
+  @Post('copilot/interactions')
+  recordCopilotInteraction(
+    @Body() dto: RecordCopilotInteractionDto,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.clinicalDecisionSupportService.recordCopilotInteraction(dto, {
+      tenantId: tenantContext?.organizationId,
+      userId: tenantContext?.userId,
+    });
   }
 
   @Get('analytics')

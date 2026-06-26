@@ -33,7 +33,7 @@ describe('mobile performance — startup deferral', () => {
 
 describe('mobile performance — routing & bundles', () => {
   it('keeps Copilot persistent instead of mounting a duplicate assistant page', () => {
-    const app = read('src/App.jsx');
+    const app = read('src/app/router.jsx');
     const appShell = read('src/components/AppShell.tsx');
     expect(app).not.toMatch(/pages\/Dashboard/);
     expect(appShell).toContain('<CopilotPanel />');
@@ -51,7 +51,7 @@ describe('mobile performance — routing & bundles', () => {
   });
 
   it('does not use artificial auth gates in the flattened app shell', () => {
-    const app = read('src/App.jsx');
+    const app = read('src/app/router.jsx');
     expect(app).not.toContain('setIsChecking(false), 500');
     expect(app).not.toContain('setIsChecking(false), 150');
   });
@@ -74,7 +74,7 @@ describe('mobile performance — CLS & images', () => {
 describe('mobile performance — render & interaction', () => {
   it('memoizes ToolCard and removes the duplicate assistant dashboard page', () => {
     expect(read('src/components/ToolCard.jsx')).toContain('React.memo');
-    const app = read('src/App.jsx');
+    const app = read('src/app/router.jsx');
     expect(app).not.toContain("import Dashboard from './pages/Dashboard'");
   });
 

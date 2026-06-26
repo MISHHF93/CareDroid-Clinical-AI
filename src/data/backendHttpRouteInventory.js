@@ -35,6 +35,18 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/emergency/integrations', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/copilot', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/copilot/query', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/copilot/interactions', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/copilot/interactions', controller: 'EmergencyOsController' },
+  {
+    method: 'GET',
+    path: '/api/emergency/clinical-calculators/results',
+    controller: 'EmergencyOsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/emergency/clinical-calculators/results',
+    controller: 'EmergencyOsController',
+  },
   { method: 'GET', path: '/api/emergency/analytics', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/upgrade-harness', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/upgrade-harness/capacity', controller: 'EmergencyOsController' },

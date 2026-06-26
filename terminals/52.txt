@@ -3,7 +3,7 @@ pid: 3708
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run dev:fullstack\""
 started_at: 2026-06-25T12:30:56.967Z
-running_for_ms: 16779999 
+running_for_ms: 34194989 
 ---
 
 > caredroid-clinical-ai@1.0.0 dev:fullstack
@@ -1357,3 +1357,1137 @@ Health:   http://localhost:3000/health
 [web] 10:01:10 AM [vite] (client) hmr update /src/components/reception/AiTriageAssistPanel.css
 [web] 10:01:10 AM [vite] (client) hmr update /src/components/native-ai/TriageExpertBadge.css
 [web] 10:01:10 AM [vite] (client) hmr update /src/components/native-ai/NativeAiRoutingBadge.css
+[web] 1:43:03 PM [vite] (client) hmr update /src/pages/tools/ToolsOverview.css
+[web] 1:43:03 PM [vite] (client) hmr update /src/components/verification/ProvisionalIdentityPanel.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/pages/emergency/emergency-whiteboard-cleanup.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/whiteboard/WhiteboardOpsDetailStrip.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/EmergencyWhiteboard.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/reception/AiTriageAssistPanel.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/profile/ProfileSettingsShell.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/offline/OfflineSupport.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/emergency/OperationalPresentationFrame.css
+[web] 1:43:45 PM [vite] (client) hmr update /src/components/copilot/PatientCardCopilot.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/whiteboard/PublicWaitingDisplay.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/whiteboard/DepartmentStatusScreen.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/whiteboard/CommandCenterThroughputScreen.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/reception/VoiceInterviewKiosk.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/reception/TriageRuleBuilder.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/reception/ReceptionEscalationPanel.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/patient-experience/WaitingRoomProcessEducation.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/patient-card/PatientDocumentArtifactsStrip.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/native-ai/NativeAiCommandSuitePanel.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/native-ai/ClinicalAcuityLeaderboard.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/emergency/CommandDashboard.css
+[web] 1:43:50 PM [vite] (client) hmr update /src/components/copilot/CopilotRiskLayerPanel.css
+[web] 1:44:15 PM [vite] (client) page reload src/data/toolRegistry.js
+[web] 1:44:15 PM [vite] (client) page reload src/data/toolInventory.js
+[web] 1:52:06 PM [vite] (client) hmr update /src/contexts/PractitionerVisibilityContext.tsx, /src/pages/emergency/index.tsx
+[web] 1:52:06 PM [vite] (client) hmr invalidate /src/contexts/PractitionerVisibilityContext.tsx Could not Fast Refresh ("usePractitionerSurfaceVisibility" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[web] 1:52:06 PM [vite] (client) hmr update /src/components/AppShell.tsx, /src/pages/emergency/emergencyRoutePages.jsx, /src/pages/emergency/emergencyRouteShared.jsx, /src/components/chrome/SessionChromeBar.tsx, /src/components/emergency/EdDataSourceBanner.tsx, /src/components/CopilotPanel.tsx, /src/components/PatientCard.tsx, /src/pages/emergency/index.tsx, /src/pages/Profile.jsx, /src/components/profile/ProfileSettingsShell.tsx, /src/pages/tools/ToolsOverview.jsx, /src/components/ClinicalCalculatorHub.tsx, /src/pages/tools/ToolPageLayout.jsx, /src/pages/emergency/ReceptionWorkspace.jsx, /src/pages/emergency/SmartIntake.jsx
+[web] 1:52:07 PM [vite] (client) hmr invalidate /src/pages/emergency/emergencyRouteShared.jsx Could not Fast Refresh ("QUEUE_MOVEMENT_STAGES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[web] 1:52:07 PM [vite] (client) hmr update /src/pages/emergency/emergencyRoutePages.jsx, /src/pages/emergency/SmartIntake.jsx
+[web] 1:52:07 PM [vite] (client) hmr invalidate /src/components/ClinicalCalculatorHub.tsx Could not Fast Refresh ("CALCULATORS" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[web] 1:52:07 PM [vite] (client) hmr update /src/pages/tools/ToolsOverview.jsx, /src/components/reception/ReceptionEmbeddedCalculator.jsx
+[web] 1:52:14 PM [vite] (client) hmr update /src/components/chrome/SessionChromeBar.css
+[web] 1:52:14 PM [vite] (client) hmr update /src/components/chrome/SessionChromeBar.tsx
+[web] 1:52:20 PM [vite] (client) hmr update /src/components/Header.tsx
+[web] 1:52:20 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 1:52:20 PM [vite] (client) hmr update /src/components/Header.css
+[web] 1:52:20 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   57 | import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 |  import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 1:52:20 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 1:52:20 PM [vite] (client) hmr update /src/components/Header.tsx
+[web] 1:52:20 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   57 | import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 |  import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 1:52:20 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   57 | import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 |  import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web] 1:52:20 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   57 | import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   56 |  import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web] 1:52:34 PM [vite] (client) hmr update /src/components/chrome/SessionChromeBar.tsx
+[web] 1:52:34 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 1:52:34 PM [vite] (client) hmr update /src/components/Header.tsx
+[web] 1:52:34 PM [vite] (client) hmr update /src/styles/card-contrast-normalization.css
+[web] 1:52:34 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 1:52:34 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 1:52:34 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 1:54:35 PM [vite] (client) hmr update /src/components/PatientDetailPanel.tsx
+[web] 1:57:40 PM [vite] (client) hmr update /src/styles/visual-consistency.css
+[web] 5:51:11 PM [vite] (client) page reload src/config/routes.config.js
+[web] 5:51:11 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:51:12 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:52:07 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 5:52:07 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 5:52:08 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 5:52:08 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:52:08 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:52:08 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:52:08 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:52:19 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 5:52:19 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:52:19 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:53:12 PM [vite] (client) hmr update /src/components/AppShell.tsx
+[web] 5:53:12 PM [vite] (client) hmr update /src/components/chrome/SessionChromeBar.tsx
+[web] 5:53:13 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:53:13 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:53:20 PM [vite] (client) hmr update /src/components/chrome/SessionChromeBar.tsx
+[web] 5:53:20 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:53:20 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:53:24 PM [vite] (client) hmr update /src/App.jsx, /src/pages/emergency/EmergencySurfaceRedirect.jsx, /src/components/TrackMindRouteGuard.jsx, /src/components/AppShell.tsx, /src/components/ProfileRouteGuard.jsx, /src/components/CopilotPanel.tsx, /src/components/orchestration/PatientCardToolChips.tsx, /src/components/orchestration/RecommendedToolsStrip.tsx, /src/components/copilot/PatientCardCopilot.tsx, /src/pages/tools/ToolsOverview.jsx, /src/pages/tools/Calculators.jsx, /src/pages/tools/ToolNotFound.jsx, /src/components/ClinicalCalculatorHub.tsx, /src/pages/emergency/ReceptionWorkspace.jsx, /src/components/reception/ReceptionEmbeddedCalculator.jsx, /src/components/Sidebar.tsx, /src/components/Header.tsx, /src/components/PilotExtensionRouteGuard.tsx, /src/contexts/PractitionerVisibilityContext.tsx, /src/pages/emergency/index.tsx, /src/components/copilot/DiagnosticSafetyDashboard.tsx, /src/components/emergency/OperationalStrip.jsx, /src/components/whiteboard/PhysicianOperationalStrip.jsx, /src/components/whiteboard/DepartmentStatusScreen.jsx, /src/components/whiteboard/ChargeNurseOperationalStrip.jsx, /src/components/whiteboard/PublicWaitingDisplay.jsx, /src/components/whiteboard/CommandCenterThroughputScreen.jsx, /src/components/emergency/OperationalPresentationFrame.jsx, /src/components/triage/TriageOperationalStrip.jsx, /src/components/reception/ReceptionOperationalStrip.jsx, /src/components/emergency/OperationalAlertRail.tsx, /src/components/reception/ArrivalDashboard.jsx
+[web] 5:53:24 PM [vite] (client) hmr update /src/components/Header.tsx
+[web] 5:53:24 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:53:25 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'useCopilotChromeAccess' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |          ^
+[web]   55 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]      |                                                             ^
+[web]   55 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:53:32 PM [vite] (client) hmr update /src/components/Header.tsx
+[web] 5:53:32 PM [vite] (client) hmr update /src/App.jsx
+[web] 5:53:32 PM [vite] (client) hmr update /src/pages/tools/ToolsOverview.jsx, /src/pages/tools/Calculators.jsx, /src/pages/tools/ToolNotFound.jsx, /src/pages/tools/calculatorPrimitives.jsx, /src/pages/tools/abcd2Calculator.jsx, /src/pages/tools/endocrineMetabolicCalculators.jsx, /src/pages/tools/psychiatryScreeningCalculators.jsx, /src/pages/tools/nextWaveCalculators.jsx, /src/components/clinical/ClinicalExecutorFeedback.jsx, /src/pages/tools/hospitalOperationsCalculators.jsx, /src/pages/tools/mentalHealthCalculators.jsx, /src/pages/tools/nephrologyCalculators.jsx, /src/pages/tools/ToolPageLayout.jsx, /src/pages/tools/cardiologyCalculators.jsx, /src/pages/tools/neurologyCalculators.jsx, /src/pages/tools/pulmonologyCalculators.jsx, /src/pages/tools/pediatricsObgynCalculators.jsx, /src/pages/tools/sourceBackedClinicalCalculators.jsx, /src/pages/tools/hepatologyGiCalculators.jsx, /src/pages/tools/emergencyCriticalCareCalculators.jsx, /src/pages/tools/pr8ClinicalBatchCalculators.jsx, /src/pages/tools/pr4aCalculators.jsx, /src/components/clinical/ClinicalDecisionSupportDisclaimer.jsx, /src/components/tools/ToolResultShare.jsx
+[web] 5:53:32 PM [vite] (client) hmr update /src/App.jsx
+[web] 5:53:32 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:53:32 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:53:37 PM [vite] (client) hmr update /src/components/ui/OperationalEmptyState.jsx
+[web] 5:53:37 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:53:37 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:55:44 PM [vite] (client) hmr update /src/pages/emergency/index.tsx
+[web] 5:55:44 PM [vite] (client) hmr update /src/components/CopilotPanel.tsx
+[web] 5:55:44 PM [vite] (client) hmr update /src/components/reception/ReceptionWorkQueues.jsx
+[web] 5:55:44 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 5:55:44 PM [vite] (client) hmr update /src/components/reception/EmsPreArrivalPanel.jsx
+[web] 5:55:44 PM [vite] (client) hmr update /src/components/reception/RecentArrivalsPanel.jsx
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:55:44 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:55:58 PM [vite] (client) hmr update /src/components/help/HelpHub.css
+[web] 5:55:58 PM [vite] (client) Pre-transform error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web] 5:55:58 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:57:34 PM [vite] Internal server error: C:\Users\borah\CareDroid-Clinical-AI\src\components\Header.tsx: Identifier 'EMERGENCY_ACTIONS' has already been declared. (54:9)
+[web] 
+[web]   52 | import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 | import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web] > 54 | import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |          ^
+[web]   55 | import HelpTrigger from './help/HelpTrigger';
+[web]   56 | import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]   57 | import { navigateProfileAware } from '../navigation/profileRouteLaunch';
+[web]   Plugin: vite:react-babel
+[web]   File: C:/Users/borah/CareDroid-Clinical-AI/src/components/Header.tsx:54:9
+[web]   52 |  import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+[web]   53 |  import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
+[web]   54 |  import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
+[web]      |                                                             ^
+[web]   55 |  import HelpTrigger from './help/HelpTrigger';
+[web]   56 |  import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+[web]       at constructor (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:365:19)
+[web]       at TypeScriptParserMixin.raise (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:6616:19)
+[web]       at TypeScriptScopeHandler.declareName (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:4878:21)
+[web]       at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7584:16)
+[web]       at TypeScriptParserMixin.checkIdentifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7580:12)
+[web]       at TypeScriptParserMixin.checkLVal (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:7517:12)
+[web]       at TypeScriptParserMixin.finishImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14283:10)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14436:17)
+[web]       at TypeScriptParserMixin.parseImportSpecifier (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10165:18)
+[web]       at TypeScriptParserMixin.parseNamedImportSpecifiers (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14415:36)
+[web]       at TypeScriptParserMixin.parseImportSpecifiersAndAfter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14259:37)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14252:17)
+[web]       at TypeScriptParserMixin.parseImport (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9370:26)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12893:27)
+[web]       at TypeScriptParserMixin.parseStatementContent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:9525:18)
+[web]       at TypeScriptParserMixin.parseStatementLike (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12784:17)
+[web]       at TypeScriptParserMixin.parseModuleItem (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12761:17)
+[web]       at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13333:36)
+[web]       at TypeScriptParserMixin.parseBlockBody (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:13326:10)
+[web]       at TypeScriptParserMixin.parseProgram (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12639:10)
+[web]       at TypeScriptParserMixin.parseTopLevel (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:12629:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14505:25)
+[web]       at TypeScriptParserMixin.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:10143:18)
+[web]       at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\parser\lib\index.js:14539:38)
+[web]       at parser (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\parser\index.js:41:34)
+[web]       at parser.next (<anonymous>)
+[web]       at normalizeFile (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\normalize-file.js:51:37)
+[web]       at normalizeFile.next (<anonymous>)
+[web]       at run (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transformation\index.js:22:50)
+[web]       at run.next (<anonymous>)
+[web]       at transform (C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\transform.js:22:33)
+[web]       at transform.next (<anonymous>)
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:261:32)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:189:28
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:113:33
+[web]       at step (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:287:14)
+[web]       at C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:273:13
+[web]       at async.call.result.err.err (C:\Users\borah\CareDroid-Clinical-AI\node_modules\gensync\index.js:223:11)
+[web] 5:58:43 PM [vite] (client) hmr update /src/components/Header.tsx

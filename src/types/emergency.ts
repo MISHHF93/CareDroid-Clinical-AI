@@ -605,6 +605,8 @@ export interface Patient {
   documentArtifacts?: PatientDocumentArtifact[];
   /** Source documents that produced patient-card artifacts. */
   documentSources?: PatientDocumentSource[];
+  /** Last operational update timestamp for whiteboard sorting and display. */
+  updatedAt?: ISODateString;
 }
 
 /** Fit-to-sit / fit-to-wait seating classification — human review required. */

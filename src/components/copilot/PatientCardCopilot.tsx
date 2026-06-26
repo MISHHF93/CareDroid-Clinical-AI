@@ -16,6 +16,7 @@ import {
   formatPatientOrchestrationForCopilot,
   formatPatientToolRecommendationsForCopilot,
 } from '../../../lib/patient-orchestration';
+import { persistCopilotInteractionSafely } from '../../services/emergencyOsApi';
 import './PatientCardCopilot.css';
 
 type CopilotMessage = {
@@ -131,6 +132,13 @@ export default function PatientCardCopilot({
             message.id === assistantId ? { ...message, content: responseText } : message,
           ),
         );
+        persistCopilotInteractionSafely({
+          question: trimmed,
+          patientId: patient.id,
+          patientContextSummary: patientContextPrompt,
+          draftGuidance: responseText,
+          requiresHumanReview: true,
+        });
       } catch {
         setMessages((current) =>
           current.map((message) =>

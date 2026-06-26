@@ -1,4 +1,5 @@
 import { dispatchAlert } from '../../engine/alertEngine';
+import { persistClinicalCalculatorResultSafely } from '../../services/clinicalCalculatorPersistence';
 import { hasRunScores, routeComplaint } from '../../engine/complaintRouter';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import type { ClinicalScoreSaveInput, Patient } from '../../types/emergency';
@@ -84,6 +85,15 @@ export function saveCalculatorResult(input: CalculatorSaveInput): boolean {
 
   const saved = store.saveClinicalScore(payload);
   if (!saved) return false;
+
+  persistClinicalCalculatorResultSafely({
+    scoreId,
+    patientId: input.patientId,
+    inputs: input.fields,
+    score: input.total,
+    riskCategory: input.band,
+    interpretation: input.recommendation || input.band,
+  });
 
   maybeClearScoreReassessmentFlag(input.patientId);
 

@@ -16,7 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const BISHOP = REGISTRY.bishopScore;
 const APGAR = REGISTRY.apgarScore;
 
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,

@@ -7,6 +7,7 @@ import {
   compareWhiteboardColumn,
   sortWhiteboardViewPatients,
   resolveWhiteboardStateLabel,
+  buildWhiteboardCardOperationalMeta,
   toggleWhiteboardSort,
 } from './whiteboardViewModel';
 import { buildPreArrivalPlaceholderPatient } from './preArrivalWorkflow';
@@ -177,6 +178,28 @@ describe('whiteboardViewModel', () => {
         }),
       ),
     ).toBe('Waiting for Triage');
+  });
+
+  it('builds operational meta for whiteboard cards', () => {
+    const now = new Date('2026-06-20T10:30:00.000Z').getTime();
+    const meta = buildWhiteboardCardOperationalMeta(
+      patient({
+        id: 'p-meta',
+        arrivalTime: '2026-06-20T08:00:00.000Z',
+        updatedAt: '2026-06-20T10:00:00.000Z',
+        assignedStaffId: 'md-1',
+        assignedPhysicianId: 'md-2',
+        state: PatientState.Assessment,
+      }),
+      staff,
+      now,
+    );
+
+    expect(meta.waitingMinutes).toBe(150);
+    expect(meta.lastUpdatedAt).toBe('2026-06-20T10:00:00.000Z');
+    expect(meta.assignedNurseLabel).toBe('Dr. Patel');
+    expect(meta.assignedPhysicianLabel).toBe('Dr. Chen');
+    expect(meta.statusLabel).toBe('Assessment');
   });
 
   it('toggles sort direction when the same column is clicked twice', () => {

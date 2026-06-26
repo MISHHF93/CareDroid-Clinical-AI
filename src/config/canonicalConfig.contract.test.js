@@ -30,7 +30,7 @@ const read = (path) => readFileSync(join(srcRoot, path), 'utf8');
 
 describe('canonical configuration contract', () => {
   it('keeps active route aliases in routes.config and consumed by App/route health', () => {
-    const appSource = read('App.jsx');
+    const appSource = read('app/router.jsx');
     const routeHealthSource = read('routing/routeHealth.js');
 
     expect(CANONICAL_ROUTES.auth).toBe('/auth');

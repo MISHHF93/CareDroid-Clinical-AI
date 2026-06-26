@@ -32,7 +32,7 @@ function readRepo(rel) {
 }
 
 function parseAppPaths() {
-  const app = readRepo('src/App.jsx');
+  const app = readRepo('src/app/router.jsx');
   return [...new Set([...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]))];
 }
 
@@ -50,7 +50,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'routes',
     title: 'Routes',
     canonical: '`src/config/routes.config.js` (`CANONICAL_ROUTES`, alias groups)',
-    secondary: '`src/App.jsx` (React Router mount table only — must not invent new paths)',
+    secondary: '`src/app/router.jsx` (React Router mount table only — must not invent new paths)',
     duplicates: [
       {
         name: 'Canonical route map vs tool launch paths',
@@ -570,7 +570,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '| Domain | Canonical source | Do not duplicate in |',
     '|--------|------------------|---------------------|',
     '| Routes | `src/config/routes.config.js` | App.jsx (paths only), TOOL_LAUNCH_PATHS |',
-    '| Router mount | `src/App.jsx` | — |',
+    '| Router mount | `src/app/router.jsx` | — |',
     '| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.jsx`, page-level shells |',
     '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
     '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',

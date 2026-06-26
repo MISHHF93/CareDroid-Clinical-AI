@@ -36,7 +36,7 @@ import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
 import { PR_FLEET_TOOL_IDS } from './prFleetTestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
 
 const ROADMAP_TIER_A_IDS = [

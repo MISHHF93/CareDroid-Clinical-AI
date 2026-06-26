@@ -7,6 +7,6 @@ export const AI_ROUTES = Object.freeze({
 
 export const LEGACY_AI_ROUTE_REDIRECTS = Object.freeze({
   chatMessage: AI_ROUTES.edCopilot,
-  chatSuggestAction: '/api/emergency/copilot/suggest-action',
-  chatAnalyzeVitals: '/api/emergency/copilot/analyze-vitals',
+  chatSuggestAction: '/api/chat/suggest-action',
+  chatAnalyzeVitals: '/api/chat/analyze-vitals',
 });

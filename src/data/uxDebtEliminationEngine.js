@@ -117,7 +117,7 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.ROUTES,
       count: Object.keys(routes).length,
-      sources: ['src/config/routes.config.js', 'src/App.jsx'],
+      sources: ['src/config/routes.config.js', 'src/app/router.jsx'],
     },
     {
       type: UX_SURFACE_TYPES.CARDS,

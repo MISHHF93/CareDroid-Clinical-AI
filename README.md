@@ -48,11 +48,32 @@ The default deployment posture is demo/manual-data-first with clear source label
 
 **Requirements:** Node `>=20.19.0 <25`, npm `>=10` (see `.node-version`).
 
+## One application architecture
+
+CareDroid is **one Vite + React application** for emergency department operations — not a bundle of separate products.
+
+| Canonical path | Purpose |
+|----------------|---------|
+| `src/main.jsx` | Single Vite entry |
+| `src/app/App.tsx` | Application root (providers + router) |
+| `src/app/router.jsx` | Unified route table (ED routes are primary) |
+| `src/layouts/DisplayShell.tsx` | Overhead / wall display chrome |
+| `src/domain/` | Shared types, permissions, constants |
+| `src/store/emergencyStore.ts` | Unified ED state (root `store/` re-exports this) |
+| `src/services/emergencyOsApi.js` | Unified backend API facade |
+| `src/config/edApplication.config.ts` | Single-app manifest + extension redirects |
+
+**Primary routes:** `/whiteboard`, `/reception`, `/triage`, `/charge`, `/physician`, `/ems`, `/copilot`, `/calculators`, `/analytics`, `/admin`, `/display/whiteboard` (aliases redirect to `/emergency/*` canonical paths).
+
+Default home is the **ED whiteboard** (`/emergency/whiteboard`). With `VITE_ED_SINGLE_APPLICATION=true` (default), legacy platform URLs (`/start`, `/fleet`, `/cosmos`, `/dashboard`, etc.) redirect into ED surfaces. Extension code remains in the repo for future entitlements but does not present as a separate app shell.
+
+The `frontend/` folder is a **compatibility shim** only — do not add new features there.
+
 ## Repository layout
 
 ```
 CareDroid-Clinical-AI/
-├── src/                  # React frontend (pages, components, services, store)
+├── src/                  # React frontend (pages, components, services, store) — THE application
 ├── lib/                  # Shared feature/suite registries and orchestration
 ├── backend/              # NestJS API, TypeORM entities, executors
 ├── scripts/              # Dev stack, audits, QA, and build utilities
@@ -147,6 +168,23 @@ npm run compose:app:ml
 ```
 
 The root `docker-compose.yml` provides the full database, cache, monitoring, and observability stack.
+
+## Security and privacy notes
+
+CareDroid is designed with audit-minded SaaS patterns, but **does not claim HIPAA, PHIPA, or regulatory certification** unless your deployment implements and validates those controls independently.
+
+| Area | Current posture |
+|------|-----------------|
+| Tenant isolation | `TenantContextInterceptor` + `TenantIsolationGuard` on protected routes; organization/workspace scoping on platform APIs |
+| RBAC | JWT auth, permission enums, emergency role matrix on the frontend |
+| Audit logging | TypeORM `audit_logs` with hash chaining; emergency patient reads logged as `phi_access` where feasible |
+| Secrets | Use `.env` / `backend/.env` — never commit credentials |
+| Frontend logs | Do not log PHI in browser consoles; demo tokens are dev-only |
+| AI / Copilot | Labeled decision support; outputs require clinician review; no autonomous diagnosis or orders |
+| Clinical calculators | Deterministic utilities with disclaimers and source labels — not diagnostic truth |
+| Display mode | Privacy-safe field masking via `useEmergencyDisplayPrivacy` for overhead screens |
+
+Before production pilot: rotate `JWT_SECRET` and `ENCRYPTION_KEY`, enable PostgreSQL, configure CORS, review entitlements (`VITE_STRICT_SAAS_ENTITLEMENTS`), and complete customer BAA/governance if required.
 
 ## Documentation
 

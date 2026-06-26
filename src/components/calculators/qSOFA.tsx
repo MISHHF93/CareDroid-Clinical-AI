@@ -4,6 +4,7 @@ import type { Patient, Vitals } from '../../types/emergency';
 import { PatientFlag } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { dispatchScoreAlert } from '../../engine/alertEngine';
+import { QSOFA_META } from '../../clinical-calculators/qsofa';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
 
@@ -322,6 +323,15 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               {savedMessage}
             </div>
           ) : null}
+
+          <p
+            className="clinical-calculator-modal__disclaimer"
+            style={{ margin: 0, fontSize: 12, color: MEDICAL_THEME.inkSubtle, lineHeight: 1.45 }}
+          >
+            {QSOFA_META.disclaimer}
+            <br />
+            <span style={{ fontStyle: 'italic' }}>Source: {QSOFA_META.sourceLabel}</span>
+          </p>
         </div>
       </div>
     </div>

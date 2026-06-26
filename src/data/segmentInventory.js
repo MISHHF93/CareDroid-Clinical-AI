@@ -113,7 +113,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     frontendOnlyType: null,
     backendOnlyType: null,
     frontendFiles: [
-      'src/App.jsx',
+      'src/app/router.jsx',
       'src/layout/AppShell.jsx',
       'src/pages/legal/PrivacyPolicy.jsx',
       'src/pages/legal/TermsOfService.jsx',
@@ -192,7 +192,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,
-    frontendFiles: ['src/pages/CommandDashboard.jsx', 'src/App.jsx'],
+    frontendFiles: ['src/pages/CommandDashboard.jsx', 'src/app/router.jsx'],
     backendFiles: ['backend/src/modules/chat', 'backend/src/modules/medical-control-plane', 'backend/src/modules/rag'],
     routes: ['/home', '/dashboard'],
     canonicalRoute: '/dashboard',

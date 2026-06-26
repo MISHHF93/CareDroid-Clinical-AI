@@ -1,0 +1,18 @@
+---
+pid: 1636
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node scripts/dev-stack.mjs"
+started_at: 2026-06-26T01:39:55.823Z
+running_for_ms: 1040005  
+---
+At line:1 char:46
++ (cd "C:\\Users\\borah\\CareDroid-Clinical-AI" ; node scripts/dev-stac ...
++                                              ~
+Missing closing ')' in expression.
+At line:1 char:75
++ ... :\\Users\\borah\\CareDroid-Clinical-AI" ; node scripts/dev-stack.mjs)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInExpression
+ 

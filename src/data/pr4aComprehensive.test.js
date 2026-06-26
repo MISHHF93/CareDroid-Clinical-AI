@@ -90,7 +90,7 @@ import {
 } from './testHelpers/pr4aTestFixtures';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
 const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 

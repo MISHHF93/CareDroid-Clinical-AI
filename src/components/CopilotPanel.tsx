@@ -51,6 +51,7 @@ import {
 } from '../config/copilotPlatform.config';
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import { MetricChip } from './ui/CareDroidPrimitives';
+import { persistCopilotInteractionSafely } from '../services/emergencyOsApi';
 
 type CopilotMessage = {
   id: string;
@@ -840,6 +841,14 @@ export function CopilotPanel() {
         safetyStatus: 'unknown',
         createdAt: assistantMessage.timestamp.toISOString(),
         raw: response.data,
+      });
+      persistCopilotInteractionSafely({
+        question: promptText,
+        patientId: selectedPatient?.id,
+        patientContextSummary: patientOrchestrationPrompt,
+        draftGuidance: responseText,
+        userRole: emergencyRole.role,
+        requiresHumanReview: true,
       });
     } catch {
       const fallbackResponse = COPILOT_PLATFORM.prompts.fallbackUnavailable.replace(

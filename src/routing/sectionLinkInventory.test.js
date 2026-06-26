@@ -82,7 +82,7 @@ describe('section link inventory and route flattening', () => {
   });
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
-    const app = read('App.jsx');
+    const app = read('app/router.jsx');
     expect(app).not.toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([

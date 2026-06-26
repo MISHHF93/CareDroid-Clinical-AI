@@ -2,7 +2,7 @@
   "name": "caredroid-clinical-ai",
   "private": true,
   "version": "1.0.0",
-  "description": "CareDroid — SaaS emergency department operating platform with embedded CareDroid Copilot",
+  "description": "CareDroid — single-application ED operations platform (Vite + React + NestJS) with embedded clinical copilot",
   "type": "module",
   "packageManager": "npm@10",
   "engines": {

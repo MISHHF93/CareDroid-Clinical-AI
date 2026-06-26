@@ -227,7 +227,7 @@ function artifactFromRoute(route, ownership) {
     type: 'route',
     category: route.navGroup,
     route: route.path,
-    sourceFile: route.componentKey ? `src/App.jsx#${route.componentKey}` : 'src/App.jsx',
+    sourceFile: route.componentKey ? `src/App.jsx#${route.componentKey}` : 'src/app/router.jsx',
     frontendStatus: 'frontend-routed',
     backendStatus: ownership?.ownerType === 'asset' ? 'asset-backed' : 'system-route',
     demoStatus: route.status === 'active' ? 'live-or-local' : 'unknown',

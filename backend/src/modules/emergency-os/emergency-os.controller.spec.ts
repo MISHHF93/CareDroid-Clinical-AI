@@ -1,4 +1,6 @@
 import { Test } from '@nestjs/testing';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { EmergencyOsController } from './emergency-os.controller';
 import {
   FederatedLearningService,
@@ -28,6 +30,10 @@ import {
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
+import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
+import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
+import { PatientOrchestrationService } from './emergency-os.orchestration.service';
+import { PatientDocumentArtifactService } from './patient-document-artifact.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
@@ -60,8 +66,36 @@ describe('EmergencyOsController', () => {
         FederatedLearningService,
         HybridDigitalTwinService,
         EmergencyOsUpgradeHarnessService,
+        ClinicalDecisionSupportService,
+        EmergencyPatientAuditService,
+        {
+          provide: PatientOrchestrationService,
+          useValue: {
+            buildPatientOrchestration: jest.fn(),
+            buildTriageAssist: jest.fn(),
+          },
+        },
+        {
+          provide: PatientDocumentArtifactService,
+          useValue: {
+            getEnvelope: jest.fn(() => ({
+              module: 'Patient Document Artifacts',
+              generatedAt: new Date().toISOString(),
+              source: 'backend-fixture',
+              status: 'active',
+              data: { artifacts: [] },
+            })),
+            extract: jest.fn(),
+            review: jest.fn(),
+          },
+        },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({ canActivate: () => true })
+      .overrideGuard(AuthorizationGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = moduleRef.get(EmergencyOsController);
   });
@@ -160,7 +194,7 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('exposes normalized workflow action logs for admin and patient timeline views', () => {
+  it('exposes normalized workflow action logs for admin and patient timeline views', async () => {
     const created = controller.createIntakePatient({
       id: 'workflow-log-patient-1',
       mrn: 'ED-WF-1',
@@ -191,7 +225,12 @@ describe('EmergencyOsController', () => {
         expect.objectContaining({ type: 'copilot_used' }),
       ]),
     );
-    expect(controller.getPatientWorkflowLogs(created.data.patient.id).data.logs).toEqual(
+    const patientLogs = await controller.getPatientWorkflowLogs(
+      created.data.patient.id,
+      undefined,
+      {} as any,
+    );
+    expect(patientLogs.data.logs).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           type: 'patient_created',
@@ -284,8 +323,8 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('handles active Emergency Copilot query requests without optional Mongoose routes', () => {
-    const result = controller.queryCopilot({
+  it('handles active Emergency Copilot query requests without optional Mongoose routes', async () => {
+    const result = await controller.queryCopilot({
       query: 'Who waited longest?',
       user_role: 'charge-nurse',
     });
@@ -308,6 +347,32 @@ describe('EmergencyOsController', () => {
         }),
       ]),
     );
+  });
+
+  it('records clinical calculator results and copilot interactions', () => {
+    const calc = controller.recordClinicalCalculatorResult({
+      calculatorId: 'qsofa',
+      patientId: 'p1',
+      inputs: { respiratoryRate: 24 },
+      score: 2,
+      riskCategory: 'qSOFA-positive (≥2)',
+      interpretation: 'Higher risk context',
+      disclaimer: 'Clinical decision support only.',
+      referenceLine: 'Sepsis-3',
+    });
+    expect(calc.data.calculatorId).toBe('qsofa');
+
+    const copilot = controller.recordCopilotInteraction({
+      question: 'Summarize reassessment needs',
+      patientId: 'p1',
+      draftGuidance: 'Review vitals and reassessment queue.',
+      requiresHumanReview: true,
+    });
+    expect(copilot.data.requiresHumanReview).toBe(true);
+    expect(copilot.data.safetyDisclaimer).toMatch(/clinician review/i);
+
+    const listed = controller.listClinicalCalculatorResults('p1');
+    expect(listed.data.count).toBeGreaterThan(0);
   });
 
   it('classifies the complete implementation prompt against the active CareDroid spine', () => {

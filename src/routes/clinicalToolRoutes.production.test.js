@@ -32,7 +32,7 @@ import {
 } from './clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 
 const PRODUCTION_CALCULATOR_PATHS = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
   p.startsWith('/tools/calculators')

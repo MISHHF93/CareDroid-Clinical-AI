@@ -232,7 +232,7 @@ export interface CapacitySnapshot {
 export interface EmergencyModuleEnvelope<T> {
   module: string;
   generatedAt: string;
-  source: 'backend-fixture';
+  source: 'backend-fixture' | 'clinical-decision-support';
   status: 'active' | 'placeholder';
   data: T;
   events?: Array<{ type: string; summary: string; affectedModules: string[]; timestamp: string }>;

@@ -12,7 +12,7 @@ const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'u
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
-const appJsx = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const appJsx = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
 const crisisModeCss = readFileSync(join(__dirname, '../components/CrisisMode.css'), 'utf8');
 const emsCriticalBroadcastJsx = readFileSync(
   join(__dirname, '../components/EMSCriticalBroadcast.jsx'),

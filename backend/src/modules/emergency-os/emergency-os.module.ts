@@ -51,6 +51,8 @@ import {
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
+import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
+import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 
 @Module({
   imports: [
@@ -123,6 +125,8 @@ import { PatientDocumentArtifactService } from './patient-document-artifact.serv
     EdgeAIAmbulanceService,
     OrganizationalDigitalTwin,
     PatientDocumentArtifactService,
+    ClinicalDecisionSupportService,
+    EmergencyPatientAuditService,
   ],
 })
 export class EmergencyOsModule {}
