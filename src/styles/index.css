@@ -1,0 +1,37 @@
+/* CareDroid unified stylesheet entry-point.
+ * Import this single file in main.jsx instead of individual layers.
+ * Order matters — tokens first, then theme, then layout, then normalization overrides.
+ */
+
+/* 1. Design tokens */
+@import './design-tokens.css';
+@import './theme-tokens.css';
+@import './emergency-tokens.css';
+
+/* 2. Medical theme layers */
+@import './medical-color-layer.css';
+@import './medical-type-layer.css';
+@import './medical-card-layer.css';
+
+/* 3. Theme surfaces & legacy bridge */
+@import './theme-surfaces.css';
+@import './theme-legacy-bridge.css';
+
+/* 4. Layout */
+@import './layout-breakpoints.css';
+@import './layout-visibility.css';
+@import './mobile-first-layout.css';
+
+/* 5. Responsive & performance */
+@import './responsive-ux.css';
+@import './mobile-performance.css';
+@import './mobile-first-recovery.css';
+@import './emergency-responsive.css';
+
+/* 6. Normalization overrides (last — intentional cascade) */
+@import './color-normalization.css';
+@import './text-normalization.css';
+@import './surface-normalization.css';
+@import './card-contrast-normalization.css';
+@import './visual-consistency.css';
+@import './practitioner-compact.css';

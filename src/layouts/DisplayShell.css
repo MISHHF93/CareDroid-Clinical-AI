@@ -1,0 +1,33 @@
+.display-shell {
+  min-height: var(--app-viewport-height, 100vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--emergency-surface-page, #0b1220);
+  color: var(--emergency-ink, #f8fafc);
+}
+
+.display-shell__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.display-shell__title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.display-shell__subtitle {
+  font-size: 0.875rem;
+  opacity: 0.72;
+}
+
+.display-shell__main {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

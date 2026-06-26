@@ -1,52 +1,11 @@
 import './theme-init.js';
-
-import './styles/medical-color-layer.css';
-import './styles/medical-type-layer.css';
-import './styles/medical-card-layer.css';
-import './styles/theme-tokens.css';
-
-import React from 'react';
-
-import ReactDOM from 'react-dom/client';
-
-import App from './App';
+import './styles/index.css';
 import './index.css';
-
-import './styles/design-tokens.css';
-
-import './styles/emergency-tokens.css';
-
-import './styles/theme-legacy-bridge.css';
-
-import './styles/theme-surfaces.css';
-
-import './styles/layout-breakpoints.css';
-
-import './styles/responsive-ux.css';
-
-import './styles/layout-visibility.css';
-
-import './styles/mobile-first-layout.css';
-
-import './styles/mobile-performance.css';
-
-import './styles/visual-consistency.css';
-
-import './styles/practitioner-compact.css';
-
-import './styles/mobile-first-recovery.css';
-
-import './styles/emergency-responsive.css';
-
 import './globals.css';
 
-import './styles/color-normalization.css';
-
-import './styles/text-normalization.css';
-
-import './styles/surface-normalization.css';
-
-import './styles/card-contrast-normalization.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './app/App';
 
 import logger from './utils/logger';
 

@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const receptionSource = readFileSync(join(__dirname, 'ReceptionWorkspace.jsx'), 'utf8');
 const headerSource = readFileSync(join(__dirname, '../../components/Header.tsx'), 'utf8');
 const appShellSource = readFileSync(join(__dirname, '../../components/AppShell.tsx'), 'utf8');
-const appSource = readFileSync(join(__dirname, '../../App.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../../app/router.jsx'), 'utf8');
 
 describe('Reception-first experience wiring', () => {
   it('exposes the arrival dashboard without duplicate page search', () => {

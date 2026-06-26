@@ -1,3 +1,8 @@
+/**
+ * @deprecated Legacy combined AppShell. The live shell is src/components/AppShell.tsx.
+ * buildSidebarItems has been moved to src/config/navigation.config.js.
+ * This file is preserved for archive reference only — do not import from it.
+ */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

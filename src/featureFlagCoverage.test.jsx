@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { FEATURE_REGISTRY, FEATURE_REGISTRY_BY_ID } from '../lib/features/featureRegistry';
 import { buildDefaultFlags } from './store/emergencyStore';
 import { APP_SHELL_NAV_ITEMS } from './config/navigation.config';
-import { buildSidebarItems } from './layout/AppShell';
+import { buildSidebarItems } from './config/navigation.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -48,7 +48,7 @@ describe('feature flag UI coverage', () => {
   });
 
   it('mounts canonical route panels through the consolidated CareDroid router', () => {
-    const appSource = readSource('App.jsx');
+    const appSource = readSource('app/router.jsx');
 
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyEms}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyQueues}');

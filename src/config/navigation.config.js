@@ -9,6 +9,7 @@ import {
   getPilotCustomerNavigationItems,
 } from './unified-navigation.config';
 import { CANONICAL_ROUTES } from './routes.config';
+import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 
 function appShellNavItemFromUnified(item) {
   return Object.freeze({
@@ -773,4 +774,21 @@ export function getPrimaryNavItemForPath(pathname) {
     ACCOUNT_UTILITY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     null
   );
+}
+
+/** Canonical sidebar builder — filters APP_SHELL_NAV_ITEMS by feature gate. */
+export function buildSidebarItems(isEnabled) {
+  return APP_SHELL_NAV_ITEMS.map((item) => {
+    const feature = FEATURE_REGISTRY_BY_ID[item.featureId];
+    if (item.featureGate && (!feature || !isEnabled(feature.id))) return null;
+    return {
+      id: item.id,
+      featureId: item.featureId,
+      label: item.label,
+      path: item.path,
+      icon: null,
+      activePaths: item.activePaths,
+      tier: feature?.tier || 'core',
+    };
+  }).filter(Boolean);
 }
