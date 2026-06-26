@@ -20,9 +20,9 @@ function createId(prefix: string): string {
 export function isPreArrivalIntegrationEvent(event: IntegrationEvent): boolean {
   const kind = String(event.kind || event.normalizedKind || '').toLowerCase();
   const family = String(event.family || event.sourceFamily || '').toLowerCase();
-  const status = String(event.status || event.payload?.status || '').toLowerCase();
+  const status = String(event.status || (event.payload as any)?.status || '').toLowerCase();
   if (kind === 'encounter' && (status === 'planned' || status === 'in-progress')) return true;
-  if (family === 'fhir' && kind === 'patient' && event.metadata?.preArrival === true) return true;
+  if (family === 'fhir' && kind === 'patient' && (event.metadata as any)?.preArrival === true) return true;
   if (family === 'hl7' && String(event.eventType || '').toUpperCase() === 'ADT') return true;
   return false;
 }
@@ -124,7 +124,7 @@ export function buildPreArrivalPatientFromIntegration(event: IntegrationEvent): 
     timeline: [],
     source: 'Integration',
     emsArrival: emsArrival ? { ...emsArrival, patientId } : undefined,
-    ...buildArrivalControlFields({
+    ...(buildArrivalControlFields as Function)({
       arrivalMode: 'transfer',
       state: PatientState.Arrival,
       presentingComplaint: complaint,
@@ -169,7 +169,7 @@ export function ingestIntegrationPreArrivalEvent(
     source: 'integration-pre-arrival',
     metadata: {
       eventId: eventId || null,
-      kind: event.kind || null,
+      kind: (event.kind as string | null) || null,
     },
   });
 

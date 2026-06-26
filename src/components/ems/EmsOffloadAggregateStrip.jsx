@@ -6,10 +6,10 @@ import {
 import './EmsOffloadAggregateStrip.css';
 
 export default function EmsOffloadAggregateStrip({
-  emsArrivals = [],
-  patients = [],
-  staff = [],
-  rooms = [],
+  emsArrivals = /** @type {any[]} */ ([]),
+  patients = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  rooms = /** @type {any[]} */ ([]),
   offloadTargetMinutes = 15,
   onOpenTracker,
   className = '',

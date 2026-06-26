@@ -8,8 +8,8 @@ import ProviderWaitBreachBadge from './ProviderWaitBreachBadge';
 import './ProviderWaitBreachBadge.css';
 
 export default function ProviderWaitBreachStrip({
-  patients = [],
-  settings = null,
+  patients = /** @type {any[]} */ ([]),
+  settings = /** @type {any} */ (null),
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,

@@ -77,8 +77,8 @@ export function updatePatients(
 function normalizeIncomingVitals(vitals: Vitals): Vitals {
   return {
     ...vitals,
-    sbp: vitals.sbp ?? vitals.bpSystolic,
-    dbp: vitals.dbp ?? vitals.bpDiastolic,
+    sbp: vitals.sbp ?? (vitals.bpSystolic as unknown as number | undefined),
+    dbp: vitals.dbp ?? (vitals.bpDiastolic as unknown as number | undefined),
     bpSystolic: vitals.bpSystolic ?? vitals.sbp,
     bpDiastolic: vitals.bpDiastolic ?? vitals.dbp,
   };
@@ -105,7 +105,7 @@ function makeEvent(
     timestamp,
     summary,
     ...extra,
-  };
+  } as JourneyEvent;
 }
 
 const ACTIVE_REASSESSMENT_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
@@ -144,7 +144,7 @@ export function ensureReminderReassessmentFlags(
     });
     return {
       ...patient,
-      flags: [...patient.flags, flag],
+      flags: [...patient.flags, flag] as import('../types/emergency').PatientFlag[],
       timeline: [
         ...patient.timeline,
         makeEvent(
@@ -162,7 +162,7 @@ export function ensureReminderReassessmentFlags(
       ],
     };
   });
-  return changed ? nextPatients : patients;
+  return changed ? nextPatients as import('../types/emergency').Patient[] : patients;
 }
 
 export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date()): Patient[] {
@@ -199,8 +199,8 @@ export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date())
         currentManagedFlags.some(
           (flag) =>
             getPatientFlagType(flag) === expected.type &&
-            (typeof flag === 'string' ? false : flag.reason === expected.reason) &&
-            (typeof flag === 'string' ? true : flag.severity === expected.severity),
+            (typeof flag === 'string' ? false : (flag as unknown as { reason?: string }).reason === expected.reason) &&
+            (typeof flag === 'string' ? true : (flag as unknown as { severity?: string }).severity === expected.severity),
         ),
       );
     if (isCurrent) return patient;
@@ -208,10 +208,10 @@ export function ensureLongWaitRescueFlags(patients: Patient[], now = new Date())
     changed = true;
     return {
       ...patient,
-      flags: [...patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)), ...expectedFlags],
+      flags: [...patient.flags.filter((flag) => !isGeneratedLongWaitFlag(flag)), ...expectedFlags] as import('../types/emergency').PatientFlag[],
     };
   });
-  return changed ? nextPatients : patients;
+  return changed ? nextPatients as import('../types/emergency').Patient[] : patients;
 }
 
 export const REASSESSMENT_MANAGED_FLAG_TYPES = new Set([
@@ -251,12 +251,12 @@ export function buildReassessmentQueueItems(patients: Patient[]) {
           patient.vitalsUpdatedAt || latestVitals?.recordedAt || patient.arrivalTime,
         ),
         reasons: reassessmentFlags.map((flag) =>
-          typeof flag === 'string' ? flag : flag.reason || getPatientFlagType(flag),
+          typeof flag === 'string' ? flag : (flag as unknown as { reason?: string }).reason || getPatientFlagType(flag),
         ),
         flaggedAt:
           (typeof reassessmentFlags[0] === 'string'
             ? undefined
-            : reassessmentFlags[0]?.detectedAt) || new Date().toISOString(),
+            : (reassessmentFlags[0] as unknown as { detectedAt?: string })?.detectedAt) || new Date().toISOString(),
         longWaitPhase: longWait.phase,
       };
     })
@@ -266,7 +266,7 @@ export function buildReassessmentQueueItems(patients: Patient[]) {
         const bEscalated = b.reasons.some((reason) => /manual escalation/i.test(reason));
         if (aEscalated !== bEscalated) return aEscalated ? -1 : 1;
         return (
-          (LONG_WAIT_PHASE_RANK[b.longWaitPhase] || 0) - (LONG_WAIT_PHASE_RANK[a.longWaitPhase] || 0) ||
+          ((LONG_WAIT_PHASE_RANK as Record<string, number>)[b.longWaitPhase] || 0) - ((LONG_WAIT_PHASE_RANK as Record<string, number>)[a.longWaitPhase] || 0) ||
           new Date(b.flaggedAt).getTime() - new Date(a.flaggedAt).getTime()
         );
       },
@@ -299,14 +299,13 @@ export function buildUpdateAlertsPatch(state: {
     const record = queue as Record<string, unknown>;
     return {
       id: String(record.id || record.type || 'queue'),
-      type: String(record.type || record.label || 'Queue'),
+      type: String(record.type || record.label || 'Queue') as import('../types/emergency').QueueType,
       name: String(record.name || record.label || record.type || 'Queue'),
       patientIds: Array.isArray(record.patientIds) ? record.patientIds.map(String) : [],
       targetWaitMinutes: Number(record.targetWaitMinutes ?? record.targetMinutes ?? 30),
       averageWaitMinutes: Number(record.averageWaitMinutes ?? 0),
       longestWaitMinutes: Number(record.longestWaitMinutes ?? record.oldestWaitMinutes ?? 0),
-      count: Number(record.count ?? 0),
-      health: (record.health as import('../types/emergency').Queue['health']) || 'green',
+      criticalCount: Number(record.criticalCount ?? record.count ?? 0),
       updatedAt: String(record.updatedAt || now.toISOString()),
     } satisfies import('../types/emergency').Queue;
   });
@@ -380,6 +379,7 @@ export function buildEscalatePatientPatch(
       title: `ESCALATION — ${patientLabel}`,
       message: `${roomName} · ${patient.chiefComplaint || patient.complaintCategory} · Escalated by ${staffName}`,
       patientId: patient.id,
+      dismissed: false,
       actionLabel: 'View Patient',
       actionType: 'VIEW_PATIENT',
     },
@@ -396,7 +396,7 @@ export function buildEscalatePatientPatch(
           ),
       ),
       ...nextFlags,
-    ],
+    ] as import('../types/emergency').PatientFlag[],
     timeline: [
       ...current.timeline,
       makeEvent(current.id, 'ESCALATION', `Manual escalation by ${staffName}.`, timestamp, {
@@ -525,6 +525,7 @@ export function buildAddVitalsPatch(
           title: `CRITICAL: ${alert.vital} ${alert.value}${alert.unit} - ${patientLabel} ${bedLabel}`,
           message: `${patientLabel} requires immediate reassessment. ${criticalReason}`,
           patientId,
+          dismissed: false,
           actionLabel: 'Go to Patient',
           actionType: 'VITALS_CRITICAL',
           autoDismissAfter: undefined,
@@ -541,6 +542,7 @@ export function buildAddVitalsPatch(
           title: `Vitals warning - ${patientLabel}`,
           message: `${warningReason}. Assigned clinician notified.`,
           patientId,
+          dismissed: false,
           actionLabel: 'Go to Patient',
           actionType: 'VITALS_WARNING',
           autoDismissAfter: 30,
@@ -602,7 +604,7 @@ export function buildAddVitalsPatch(
       vitals: [...existingVitals, nextVitals],
       vitalsUpdatedAt: timestamp,
       lastAssessedTime: timestamp,
-      flags: [...current.flags, ...pipelineFlags],
+      flags: [...current.flags, ...pipelineFlags] as import('../types/emergency').PatientFlag[],
       vitalsAlerts: [...(current.vitalsAlerts || []), ...vitalsAlerts],
       timeline: [
         ...current.timeline,

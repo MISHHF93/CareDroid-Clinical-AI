@@ -12,11 +12,11 @@ function formatCheckpointTime(timestamp) {
 }
 
 export default function PatientCommunicationStatusPanel({
-  patients = [],
-  workflowLogs = [],
-  staff = [],
-  referrals = [],
-  settings = null,
+  patients = /** @type {any[]} */ ([]),
+  workflowLogs = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  referrals = /** @type {any[]} */ ([]),
+  settings = /** @type {any} */ (null),
   className = '',
   title = 'Patient communication status',
   description = 'Internal waiting-room contact tracking — last update, reassessment, vitals, and next checkpoint.',

@@ -166,7 +166,7 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
  * @param {boolean} [context.signals.inboundEmsBanner]
  * @param {number} [context.signals.opsDetailCount]
  * @param {string} [context.screenMode]
- * @param {object} [context.densityProfile]
+ * @param {object | null} [context.densityProfile]
  * @param {object} [context.practitionerSurfaces]
  */
 export function evaluateWhiteboardDensity(context = {}) {

@@ -456,7 +456,7 @@ function patientMatchesQuery(patient, query) {
   return patientMatchesSearch(patient, query);
 }
 
-export async function searchPatientsFromBackend(query, { localPatients = [], limit = 8 } = {}) {
+export async function searchPatientsFromBackend(query, { localPatients = /** @type {any[]} */ ([]), limit = 8 } = {}) {
   const normalizedQuery = String(query || '').trim();
   if (normalizedQuery.length < 2) {
     return {

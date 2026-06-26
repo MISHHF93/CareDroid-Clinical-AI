@@ -83,7 +83,7 @@ export function useTrackMindRolePermissions() {
       summary: getTrackMindRoleSummary(role),
       setDemoRole: (nextRole: string) => {
         if (!setUser || !user) return;
-        setUser({ ...user, trackMindRole: nextRole });
+        (setUser as (u: object) => void)({ ...(user as object), trackMindRole: nextRole });
       },
     }),
     [can, canMutate, landingRoute, permissionContext, role, roleDefinition, setUser, workspace],

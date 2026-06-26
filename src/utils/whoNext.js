@@ -85,7 +85,7 @@ function isPhysicianStaff(staff) {
   return /(attending|physician|doctor|resident|consultant|md)/.test(role);
 }
 
-export function resolvePhysicianStaffId({ user, staff = [], activeShift = {} } = {}) {
+export function resolvePhysicianStaffId({ user, staff = /** @type {any[]} */ ([]), activeShift = {} } = {}) {
   const userText = [user?.id, user?.email, user?.name, user?.fullName].filter(Boolean).join(' ').toLowerCase();
   const directMatch = staff.find((member) => {
     const memberText = [member.id, member.email, member.name, member.displayName, member.firstName, member.lastName]

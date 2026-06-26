@@ -11,7 +11,7 @@ export default function DepartmentStatusScreen({
   snapshot,
   title = 'Department status',
   refreshIntervalMs = 30000,
-  refreshStatus = null,
+  refreshStatus = /** @type {any} */ (null),
   privacyLabel,
   layout = 'default',
   kioskMode = false,

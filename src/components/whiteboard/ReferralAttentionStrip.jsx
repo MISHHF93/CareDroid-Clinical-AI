@@ -4,7 +4,7 @@ import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildReferralAttentionStripMetrics } from './referralAwarenessModel';
 
 export default function ReferralAttentionStrip({
-  referrals = [],
+  referrals = /** @type {any[]} */ ([]),
   onMetricSelect,
   readOnly = false,
 }) {

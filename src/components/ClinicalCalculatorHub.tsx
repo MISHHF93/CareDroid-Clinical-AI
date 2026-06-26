@@ -376,6 +376,7 @@ export default function ClinicalCalculatorHub({
   const seedMessage = addMessage as unknown as (content: string, role: string) => void;
   const chooseTool = selectTool as unknown as (id: string) => void;
   const activateTool = setActiveTool as unknown as (id: string | null) => void;
+  const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const [search, setSearch] = useState('');
@@ -487,7 +488,6 @@ export default function ClinicalCalculatorHub({
 
   const ActiveComponent = activeCalculator?.component;
   const surfaces = usePractitionerSurfaceVisibility();
-  const emergencyRole = useEmergencyRolePermissions();
 
   return (
     <section

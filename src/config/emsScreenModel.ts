@@ -120,7 +120,7 @@ export function resolveEmsScreenCapabilities(
     showReceivingArea ? EMS_SCREEN_WIDGETS.receivingArea : null,
     showOffloadTimers ? EMS_SCREEN_WIDGETS.offloadTimers : null,
     showEmsPressure ? EMS_SCREEN_WIDGETS.emsPressure : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isEmsScreen,

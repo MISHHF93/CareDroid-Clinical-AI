@@ -21,12 +21,12 @@ export function buildQueueAuditSnapshot({
   referrals?: Referral[];
   reassessmentOverdueGraceMinutes?: number;
 } = {}): QueueAuditSnapshot {
-  const rows = auditAllQueues({
+  const rows = (auditAllQueues as Function)({
     patients,
     emsInbound,
     referrals,
     reassessmentOverdueGraceMinutes,
-  });
+  }) as ReturnType<typeof auditAllQueues>;
   return {
     rows,
     summary: summarizeQueueAudit(rows),

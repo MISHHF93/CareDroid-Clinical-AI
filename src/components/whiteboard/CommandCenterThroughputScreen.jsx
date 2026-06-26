@@ -16,10 +16,10 @@ function trendGlyph(direction) {
 
 export default function CommandCenterThroughputScreen({
   snapshot,
-  surgeSnapshot = null,
+  surgeSnapshot = /** @type {any} */ (null),
   title = 'Department Whiteboard',
   refreshIntervalMs = 30000,
-  refreshStatus = null,
+  refreshStatus = /** @type {any} */ (null),
   performanceMode = false,
   showTriageAwaiting = true,
   showLongestUntriagedWait = true,

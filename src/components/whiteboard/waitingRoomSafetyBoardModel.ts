@@ -199,7 +199,7 @@ function patientDisplayName(patient: Patient): string {
 
 function patientFlags(patient: Patient): PatientFlag[] {
   return (patient.flags || []).map((flag) =>
-    typeof flag === 'string' ? (flag as PatientFlag) : flag.type,
+    typeof flag === 'string' ? (flag as PatientFlag) : (flag as unknown as { type: PatientFlag }).type,
   );
 }
 

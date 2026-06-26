@@ -91,7 +91,7 @@ function buildPilotHeaderOperationalAlertMetrics(
   const metrics: OperationalAlertMetric[] = [];
 
   for (const key of allowedKeys.slice(0, PILOT_STATION_KPI_LIMIT)) {
-    const metric = metricsByKey.get(key);
+    const metric = metricsByKey.get(key as Parameters<typeof metricsByKey.get>[0]);
     if (!metric) continue;
     metrics.push({
       id: key,

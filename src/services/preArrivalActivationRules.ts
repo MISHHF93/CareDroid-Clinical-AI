@@ -41,7 +41,7 @@ function buildRuleContextFromForm(input: PreArrivalFormInput): RuleContext {
     return {
       mechanism: input.mist.mechanism,
       signs: input.mist.signs,
-      complaint: input.mist.injury,
+      complaint: input.mist.injuries,
       severity: input.severity,
     };
   }
@@ -59,7 +59,7 @@ function buildRuleContextFromArrival(arrival: EMSArrival): RuleContext {
     return {
       mechanism: arrival.mechanismOfInjury || notification.mist?.mechanism,
       signs: notification.mist?.signs,
-      complaint: arrival.chiefComplaint || notification.mist?.injury,
+      complaint: arrival.chiefComplaint || notification.mist?.injuries,
       severity: arrival.severity,
     };
   }

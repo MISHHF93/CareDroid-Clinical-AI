@@ -24,9 +24,9 @@ function priorityLabel(priority) {
 export default function AiTriageAssistPanel({
   patient,
   compact = false,
-  onEdit,
-  onDismissed,
-  onAccepted,
+  onEdit = /** @type {any} */ (undefined),
+  onDismissed = /** @type {any} */ (undefined),
+  onAccepted = /** @type {any} */ (undefined),
   allowWaitingReview = true,
 }) {
   const triage = useTriageScreen();

@@ -63,8 +63,8 @@ export function buildDigitalDoorSignSnapshot(
   if (patient.triagePending) reminders.push('Triage pending');
 
   const careTeam = [
-    staffName(staff, patient.assignedStaffId),
-    staffName(staff, patient.assignedPhysicianId),
+    staffName(staff, patient.assignedStaffId ?? undefined),
+    staffName(staff, patient.assignedPhysicianId ?? undefined),
   ].filter(Boolean) as string[];
 
   return {

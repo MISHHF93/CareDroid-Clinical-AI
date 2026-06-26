@@ -180,7 +180,7 @@ export function resolvePhysicianScreenCapabilities(
     showResultsPending ? PHYSICIAN_SCREEN_WIDGETS.resultsPending : null,
     showReferralsPending ? PHYSICIAN_SCREEN_WIDGETS.referralsPending : null,
     showDispositionBoarders ? PHYSICIAN_SCREEN_WIDGETS.dispositionBoarders : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isPhysicianScreen,

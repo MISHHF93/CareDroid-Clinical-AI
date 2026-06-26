@@ -33,7 +33,7 @@ export function buildDataQualitySnapshot(patients: Patient[] = []): DataQualityS
 
   const topRisks = Object.entries(summary.byPatient)
     .flatMap(([patientId, risks]) =>
-      risks.map((risk) => ({
+      risks.map((risk: Record<string, unknown>) => ({
         ...risk,
         patientId,
         patientLabel: patientLabel(patientById.get(patientId)!),

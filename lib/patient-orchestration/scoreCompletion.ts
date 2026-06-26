@@ -39,7 +39,7 @@ export function listMissingScoreIds(
   complaintRoute: ComplaintRouteSnapshot | null,
   completedScoreIds: string[],
 ): string[] {
-  if (!(complaintRoute?.scoreIds?.length ?? 0)) return [];
+  if (!complaintRoute?.scoreIds?.length) return [];
   const completed = new Set(completedScoreIds.map(normalize));
   return complaintRoute.scoreIds.filter((scoreId) => {
     const aliases = [scoreId, ...(SCORE_ALIASES[scoreId] || [])].map(normalize);

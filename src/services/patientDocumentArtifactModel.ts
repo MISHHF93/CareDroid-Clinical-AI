@@ -9,6 +9,7 @@ import type { Patient } from '../types/emergency';
 import { PatientFlag, PatientState } from '../types/emergency';
 import type {
   ArtifactReviewStatus,
+  ArtifactSourceStateLabel,
   ExtractDocumentArtifactsInput,
   PatientDocumentArtifact,
   PatientDocumentArtifactType,
@@ -170,7 +171,7 @@ function extractClinicalFactsFromText(
         sourceSpan: span,
         confidence: input.confidence ?? 0.8,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -201,7 +202,7 @@ function extractClinicalFactsFromText(
         sourceText: allergy.allergy || allergy.substance,
         confidence: input.confidence ?? 0.86,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -234,7 +235,7 @@ function extractClinicalFactsFromText(
         sourceText: medLabel,
         confidence: input.confidence ?? 0.82,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -262,7 +263,7 @@ function extractClinicalFactsFromText(
         sourceText: diagnoses,
         confidence: input.confidence ?? 0.74,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -295,7 +296,7 @@ function extractClinicalFactsFromText(
         sourceText: [vitalsHr.value, vitalsBp.value, vitalsSpo2.value].filter(Boolean).join(' · '),
         confidence: input.confidence ?? 0.7,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -325,7 +326,7 @@ function extractClinicalFactsFromText(
         sourceSpan: troponin.span,
         confidence: input.confidence ?? 0.78,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -353,7 +354,7 @@ function extractClinicalFactsFromText(
         sourceSpan: handoff.span,
         confidence: input.confidence ?? 0.75,
         isAiDerived: input.isAiDerived ?? true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
@@ -457,7 +458,7 @@ function deriveCopilotArtifactsFromText(
         value: { toolId: 'heart-score', reason: 'Chest pain documented in source text' },
         confidence: 0.68,
         isAiDerived: true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'copilot_synthesis',
@@ -477,7 +478,7 @@ function deriveCopilotArtifactsFromText(
         value: { toolId: 'ecg-checklist', reason: 'Chest pain pathway' },
         confidence: 0.65,
         isAiDerived: true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'copilot_synthesis',
@@ -502,7 +503,7 @@ function deriveCopilotArtifactsFromText(
         value: { question: 'Confirm indication, last dose, and reversal plan if applicable.' },
         confidence: 0.7,
         isAiDerived: true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'copilot_synthesis',
@@ -529,7 +530,7 @@ function deriveCopilotArtifactsFromText(
         },
         confidence: 0.62,
         isAiDerived: true,
-        sourceState: input.sourceState,
+        sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'copilot_synthesis',
@@ -684,7 +685,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
         value: {
           status: patient.referral.status,
           workflow: patient.referral.workflow,
-          destination: patient.referral.destination,
+          destination: (patient.referral as unknown as { destination?: string }).destination,
         },
         confidence: 1,
         isAiDerived: false,

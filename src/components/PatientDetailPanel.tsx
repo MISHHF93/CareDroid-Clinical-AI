@@ -1066,7 +1066,7 @@ export default function PatientDetailPanel() {
         <section className="patient-detail-panel__section">
           <ReassessmentTimerPanel
             timer={selectReassessmentTimerForPatient(selectedPatient)}
-            onOpenReassessment={(patientId) => {
+            onOpenReassessment={(patientId: string) => {
               selectPatient(patientId);
               document.dispatchEvent(new Event('open-reassessment-drawer'));
             }}

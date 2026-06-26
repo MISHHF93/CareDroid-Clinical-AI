@@ -17,8 +17,8 @@ import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
 import {
   getUserFacingToolRegistryProjection,
   resolveToolInventoryRecord,
-  type ToolInventoryRecord,
 } from '../data/toolInventory';
+type ToolInventoryRecord = ReturnType<typeof resolveToolInventoryRecord>;
 import { isRegisteredCalculatorSlug } from '../routes/clinicalToolRoutes';
 
 export const CLINICAL_TOOL_ARTIFACT_SOURCES = Object.freeze([

@@ -375,8 +375,8 @@ export function buildDeteriorationWatchAlerts(
       actionLabel: 'Review patient',
       metadata: {
         advisoryOnly: true,
-        deteriorationWatchLevel: snapshot.level,
-        factors: snapshot.factors.map((factor) => factor.id),
+        deteriorationWatchLevel: snapshot.level as string,
+        factors: snapshot.factors.map((factor) => factor.id).join(','),
       },
     }));
 }

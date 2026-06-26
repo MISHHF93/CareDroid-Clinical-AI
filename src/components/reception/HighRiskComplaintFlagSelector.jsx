@@ -9,7 +9,7 @@ import './HighRiskComplaintFlagSelector.css';
 export default function HighRiskComplaintFlagSelector({
   complaint = '',
   complaintCategory = 'Other',
-  selectedFlagIds = [],
+  selectedFlagIds = /** @type {any[]} */ ([]),
   onChange,
   disabled = false,
 }) {

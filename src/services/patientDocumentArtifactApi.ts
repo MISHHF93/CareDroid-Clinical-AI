@@ -50,7 +50,7 @@ export async function fetchPatientDocumentArtifacts(
 ): Promise<PatientDocumentArtifactEnvelope> {
   try {
     const response = await apiFetch(`/api/emergency/patients/${patientId}/document-artifacts`);
-    const parsed = await parseApiResponse<PatientDocumentArtifactEnvelope>(response);
+    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
     // Fall through to empty local envelope.
@@ -69,7 +69,7 @@ export async function extractPatientDocumentArtifacts(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
     });
-    const parsed = await parseApiResponse<PatientDocumentArtifactEnvelope>(response);
+    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts?.length) return parsed;
   } catch {
     // Fall through to local extraction.
@@ -92,7 +92,7 @@ export async function reviewPatientDocumentArtifact(
         body: JSON.stringify(reviewInput),
       },
     );
-    const parsed = await parseApiResponse<PatientDocumentArtifactEnvelope>(response);
+    const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
     // Fall through to local review.

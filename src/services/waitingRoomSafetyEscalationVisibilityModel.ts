@@ -98,21 +98,21 @@ function minutesSince(timestamp?: string | null, now = new Date()): number | nul
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-function getLatestVitals(patient: Patient) {
+function getLatestVitals(patient: Patient): import('../types/emergency').Vitals | undefined {
   if (Array.isArray(patient.vitals) && patient.vitals.length > 0) {
     return patient.vitals[patient.vitals.length - 1];
   }
-  return patient.vitals;
+  return Array.isArray(patient.vitals) ? patient.vitals[0] : undefined;
 }
 
 function hasAbnormalVitals(patient: Patient): boolean {
   if ((patient.vitalsAlerts || []).length > 0) return true;
   const vitals = getLatestVitals(patient);
   if (!vitals || typeof vitals !== 'object') return false;
-  const hr = vitals.hr || vitals.heartRate;
-  const sbp = vitals.sbp || vitals.bpSystolic;
-  const spo2 = vitals.spo2 || vitals.oxygenSaturation;
-  const rr = vitals.rr || vitals.respiratoryRate;
+  const hr = Number(vitals.hr || vitals.heartRate || 0) || undefined;
+  const sbp = Number(vitals.sbp || vitals.bpSystolic || 0) || undefined;
+  const spo2 = Number(vitals.spo2 || vitals.oxygenSaturation || 0) || undefined;
+  const rr = Number(vitals.rr || vitals.respiratoryRate || 0) || undefined;
   if (hr && (hr < 40 || hr > 130)) return true;
   if (sbp && (sbp < 80 || sbp > 180)) return true;
   if (spo2 && spo2 < 90) return true;
@@ -413,7 +413,7 @@ export function buildWaitingRoomSafetyEscalationAlerts(
       actionType: 'VIEW_PATIENT',
       actionLabel: 'Review patient',
       metadata: {
-        triggers: row.triggerIds,
+        triggers: (row.triggerIds as unknown as string[]).join(','),
         advisoryOnly: true,
       },
     }));

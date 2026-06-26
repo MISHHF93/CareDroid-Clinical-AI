@@ -23,9 +23,24 @@ function getInitials(name: string): string {
     .join('');
 }
 
+type AppUser = {
+  displayName?: string;
+  fullName?: string;
+  name?: string;
+  avatarUrl?: string;
+  role?: string;
+  [key: string]: unknown;
+};
+
+type AppAccount = {
+  displayName?: string;
+  avatarUrl?: string;
+  [key: string]: unknown;
+};
+
 export default function UserAccountMenu() {
-  const { user } = useUser();
-  const { account } = useUserIdentity();
+  const { user } = useUser() as { user: AppUser | null };
+  const { account } = useUserIdentity() as { account: AppAccount | null };
   const { accessSummary, profileCopy } = useEffectiveUserProfile();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);

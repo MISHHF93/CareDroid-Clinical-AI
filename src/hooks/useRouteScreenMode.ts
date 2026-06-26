@@ -17,7 +17,7 @@ export function useRouteScreenMode(): CareDroidScreenMode {
   const deviceContext = useEmergencyDeviceContext();
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const role = useMemo(
-    () => resolveEmergencyRoleId(user, emergencySettings),
+    () => resolveEmergencyRoleId(user as unknown as object | undefined, (emergencySettings ?? {}) as object),
     [emergencySettings, user],
   );
   const readOnly = isEmergencyReadOnlyRole(role);

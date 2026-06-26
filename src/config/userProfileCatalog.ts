@@ -45,8 +45,8 @@ export type UserProfileCatalogEntry = Readonly<{
   requiredToolIds: string[];
   restrictedToolIds?: string[];
   profileBenefits: string;
-  assignableOrganizationTypes?: string[];
-  requiredEntitlementPacks?: string[];
+  assignableOrganizationTypes?: readonly string[];
+  requiredEntitlementPacks?: readonly string[];
 }>;
 
 export type ResolvedUserProfile = UserProfileCatalogEntry &

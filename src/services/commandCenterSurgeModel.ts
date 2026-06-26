@@ -82,7 +82,7 @@ export function buildCommandCenterSurgeSnapshot(input: {
     };
   });
 
-  const capacityScore = input.capacity?.capacityScore ?? 0;
+  const capacityScore = Number(input.capacity?.capacityScore ?? 0);
   const level: CommandCenterSurgeSnapshot['level'] =
     capacityScore >= 90 || boardingCount >= 8
       ? 'crisis'

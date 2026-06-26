@@ -370,7 +370,7 @@ export function buildHighRiskComplaintAlerts(
       return {
         id: `high-risk-complaint-${patient.id}`,
         type: 'Clinical',
-        severity: needsReview ? 'Critical' : 'Warning',
+        severity: (needsReview ? 'Critical' : 'Warning') as import('../types/emergency').AlertSeverity,
         title: needsReview
           ? `Rapid review needed — ${displayName}`
           : `High-risk complaint — ${displayName}`,
@@ -381,8 +381,8 @@ export function buildHighRiskComplaintAlerts(
         source: 'high-risk-complaint-flags',
         actionType: 'triage',
         metadata: {
-          flagIds: patient.highRiskComplaintFlags?.map((record) => record.id) || [],
-          labels,
+          flagIds: (patient.highRiskComplaintFlags?.map((record) => record.id) || []).join(','),
+          labels: labels.join(','),
           needsRapidReview: needsReview,
           advisoryOnly: true,
         },

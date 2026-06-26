@@ -256,7 +256,7 @@ export function getCopilotPatientQuickActions(): readonly string[] {
 }
 
 export function getCopilotToolLaunchActions(): readonly CopilotToolLaunchAction[] {
-  return COPILOT_PLATFORM.toolActions;
+  return COPILOT_PLATFORM.toolActions as unknown as readonly CopilotToolLaunchAction[];
 }
 
 export function getCopilotWelcomeMessage(compactLayout: boolean): string {

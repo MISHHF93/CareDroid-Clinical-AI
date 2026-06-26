@@ -54,7 +54,7 @@ function countReassessmentPatients(patients = []) {
   ).length;
 }
 
-export function shouldShowChargeNurseOperationalStrip({ screenMode, roleId, displayMode = false } = {}) {
+export function shouldShowChargeNurseOperationalStrip({ screenMode = /** @type {string | undefined} */ (undefined), roleId = /** @type {string | undefined} */ (undefined), displayMode = false } = {}) {
   if (displayMode) return false;
   return (
     CHARGE_STRIP_SCREEN_MODES.has(screenMode) || roleId === EMERGENCY_ROLE_IDS.chargeNurse
@@ -67,12 +67,12 @@ export function shouldShowChargeNurseOperationalStrip({ screenMode, roleId, disp
  * Values prefer central-node snapshot; falls back to live patient board counts.
  */
 export function selectChargeNurseOperationalStrip({
-  patients = [],
+  patients = /** @type {any[]} */ ([]),
   centralSnapshot = null,
   activeEmsArrivals = 0,
-  emsArrivals = [],
-  referrals = [],
-  capacity = null,
+  emsArrivals = /** @type {any[]} */ ([]),
+  referrals = /** @type {any[]} */ ([]),
+  capacity = /** @type {any} */ (undefined),
   settings = {},
   visibleSurfaces = null,
   kpiMetricIds = null,

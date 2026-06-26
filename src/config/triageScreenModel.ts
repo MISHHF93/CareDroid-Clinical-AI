@@ -78,6 +78,7 @@ export type TriageScreenCapabilities = {
   showAiTriageAssist: boolean;
   showClinicalTriageAssist: boolean;
   showWaitingRoomSafetyBoard: boolean;
+  showWaitingRoomSafetyEscalation: boolean;
   showTriageBreach: boolean;
 };
 

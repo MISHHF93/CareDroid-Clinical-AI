@@ -206,7 +206,7 @@ export function resolveCommandCenterScreenCapabilities(
     showLwbsRisk ? COMMAND_CENTER_SCREEN_WIDGETS.lwbsRisk : null,
     showCrowdingForecast ? COMMAND_CENTER_SCREEN_WIDGETS.crowdingForecast : null,
     showSystemHealth ? COMMAND_CENTER_SCREEN_WIDGETS.systemHealth : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isCommandCenterScreen,

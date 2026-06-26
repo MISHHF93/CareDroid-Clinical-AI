@@ -601,8 +601,8 @@ export default function EmergencyWhiteboard() {
             | Array<{ date: string; count: number }>
             | undefined) || [],
         analyticsSource: emergencyAnalytics.source,
-        bragPeakBand: bragSignal?.data?.peakBand || null,
-        bragDetail: bragSignal?.data?.forecast?.slice(-1)?.[0]?.humanReviewTrigger || null,
+        bragPeakBand: (bragSignal?.data as any)?.peakBand || null,
+        bragDetail: (bragSignal?.data as any)?.forecast?.slice(-1)?.[0]?.humanReviewTrigger || null,
         updatedAt: capacity.updatedAt || whiteboardGeneratedAt,
         offloadTargetMinutes:
           Number(
@@ -633,7 +633,7 @@ export default function EmergencyWhiteboard() {
 
   const screenModeKpiSettings = useMemo(
     () => ({
-      screenModeKpiVisibility: emergencySettings.screenModeKpiVisibility,
+      screenModeKpiVisibility: emergencySettings.screenModeKpiVisibility as import('../../config/emergencyScreenKpiPolicy').ScreenModeKpiSettingsInput['screenModeKpiVisibility'],
       publicDisplayPrivacy: emergencySettings.publicDisplayPrivacy,
     }),
     [emergencySettings.publicDisplayPrivacy, emergencySettings.screenModeKpiVisibility],
@@ -1680,7 +1680,7 @@ export default function EmergencyWhiteboard() {
       />
       {showShiftHandoffStrip ? (
         <OperationalHandoffDomainBar
-          domains={operationalHandoffDomains}
+          domains={operationalHandoffDomains as any[]}
           onMetricSelect={handleOperationalStripMetricSelect}
           readOnly={display.isDisplayMode}
         />
@@ -2134,7 +2134,7 @@ export default function EmergencyWhiteboard() {
           offloadTargetMinutes={
             Number(emergencySettings?.thresholds?.emsOffloadTargetMinutes ?? 15) || 15
           }
-          onSelectPatient={(patientId) => {
+          onSelectPatient={(patientId: string) => {
             selectPatient(patientId);
             setActiveFilter('EMS');
             setQueueFilter(null);
@@ -2160,7 +2160,7 @@ export default function EmergencyWhiteboard() {
             staff={staff}
             rooms={rooms}
             compact
-            onSelectPatient={(patientId) => {
+            onSelectPatient={(patientId: string) => {
               selectPatient(patientId);
               setActiveFilter('EMS');
             }}
@@ -2556,7 +2556,7 @@ export default function EmergencyWhiteboard() {
             </strong>
             {surfaces.whiteboard.showAwarenessSubtitle ? (
               <span className="emergency-whiteboard-page__awareness-banner-subtitle">
-                {operationalLoad.primaryFocus.map((focus) => `${focus.value} ${focus.label.toLowerCase()}`).join(' · ')}
+                {operationalLoad.primaryFocus.map((focus: { value: string; label: string } | null) => focus ? `${focus.value} ${focus.label.toLowerCase()}` : '').filter(Boolean).join(' · ')}
               </span>
             ) : null}
           </div>

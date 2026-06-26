@@ -53,7 +53,7 @@ export type EmsOffloadTrackerSummary = {
   rows: EmsOffloadTrackerRow[];
 };
 
-type RoomLike = { id: string; name?: string };
+type RoomLike = { id: string; name?: string; type?: string };
 
 function activeArrivals(emsArrivals: EMSArrival[] = []): EMSArrival[] {
   return emsArrivals.filter((arrival) => !['Complete', 'Cancelled'].includes(arrival.status));
@@ -110,7 +110,7 @@ function deriveReceivingArea(
   patient: Patient | undefined,
   rooms: RoomLike[],
 ): string | null {
-  const checklist = resolveAmbulanceHandoffChecklist(arrival, { patient, rooms });
+  const checklist = resolveAmbulanceHandoffChecklist(arrival, { patient, rooms: rooms as unknown as any[] });
   if (checklist.patientDestination !== 'pending') {
     return formatAmbulanceHandoffDestination(checklist);
   }

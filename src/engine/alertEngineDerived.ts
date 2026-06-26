@@ -46,7 +46,7 @@ const DEFAULT_TOAST_SECONDS: Record<AlertSeverity, number | undefined> = {
 
 function hasPatientFlag(patient: Patient, flagType: string): boolean {
   return patient.flags.some((flag) => {
-    const value = typeof flag === 'string' ? flag : flag.type;
+    const value = typeof flag === 'string' ? flag : (flag as unknown as { type: string }).type;
     return value === flagType;
   });
 }
@@ -243,7 +243,7 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
   const alerts: Alert[] = [];
 
   referrals.forEach((referral) => {
-    const elapsed = minutesSince(referral.requestedAt, now);
+    const elapsed = minutesSince(referral.requestedAt ?? '', now);
     const patientLabel = patientName(patientById.get(referral.patientId));
     const isAwaitingAcceptance = !REFERRAL_ACCEPTANCE_CLOSED_STATUSES.has(referral.status);
     const isUnacknowledged =

@@ -4,10 +4,10 @@ import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildEmsAttentionStripMetrics, summarizeEmsAwareness } from './emsAwarenessModel';
 
 export default function EmsAttentionStrip({
-  emsArrivals = [],
-  patients = [],
-  staff = [],
-  rooms = [],
+  emsArrivals = /** @type {any[]} */ ([]),
+  patients = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  rooms = /** @type {any[]} */ ([]),
   offloadTargetMinutes = 15,
   now = Date.now(),
   onMetricSelect,

@@ -47,14 +47,14 @@ function getFlagDetectedAt(patient: Patient, flag: PatientFlag): string | null {
       if (entry === flag) return patient.triageTime || patient.arrivalTime || null;
       continue;
     }
-    if (entry?.type === flag) return entry.detectedAt || null;
+    if ((entry as unknown as { type: string })?.type === flag) return (entry as unknown as { detectedAt?: string }).detectedAt || null;
   }
   return null;
 }
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
   );
 }
 

@@ -17,7 +17,7 @@ import './native-ai-dashboard-theme.css';
 
 type NativeAiCommandSuitePanelProps = {
   patients: Patient[];
-  rooms?: Array<{ id: string; status?: string; type?: string; patientId?: string; currentPatientId?: string }>;
+  rooms?: Array<{ id: string; status?: string; type?: string; patientId?: string; currentPatientId?: string | null }>;
   capacity?: { band?: string; occupancyPercent?: number };
   onSelectPatient?: (patientId: string) => void;
   thresholds?: Partial<NativeAiThresholdConfig>;
@@ -42,7 +42,7 @@ export default function NativeAiCommandSuitePanel({
     () =>
       buildOperationalCommandDashboardSnapshot({
         patients,
-        rooms,
+        rooms: rooms as import('../../types/emergency').Room[],
         admissionAlertThreshold: localThresholds.admissionAlertPercent,
         prolongedStayAlertThreshold: localThresholds.prolongedStayAlertPercent,
         now: new Date(),

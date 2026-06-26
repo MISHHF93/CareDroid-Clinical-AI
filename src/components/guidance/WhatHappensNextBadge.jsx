@@ -4,8 +4,8 @@ import './WhatHappensNextBadge.css';
 
 export default function WhatHappensNextBadge({
   patient,
-  referrals = [],
-  staff = [],
+  referrals = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
   compact = false,
   showGuidance = false,
 }) {

@@ -369,8 +369,8 @@ export default function ReceptionQuickIntake({
               setDuplicateAcknowledged(true);
               setSubmitError('');
             }}
-            onOpenPatient={(patientId) => onOpenVerification?.(patientId)}
-            onOpenVerification={(patientId) => onOpenVerification?.(patientId)}
+            onOpenPatient={(patientId: string) => onOpenVerification?.(patientId)}
+            onOpenVerification={(patientId: string) => onOpenVerification?.(patientId)}
             onProvisionalIntake={onProvisionalIntake}
           />
         ) : null}

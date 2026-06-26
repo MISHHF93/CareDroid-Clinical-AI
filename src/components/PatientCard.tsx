@@ -949,7 +949,7 @@ function PatientCard({
       {documentArtifactsEnabled ? (
         <PatientDocumentArtifactsStrip
           patient={patient}
-          compact={cardDensity.variant !== 'expanded'}
+          compact={(densityVariant as string) !== 'expanded'}
           readOnly={readOnlyDisplay}
         />
       ) : null}

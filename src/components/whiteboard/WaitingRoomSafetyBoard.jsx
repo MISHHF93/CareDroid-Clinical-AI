@@ -47,13 +47,13 @@ function FlagList({ patient, flags = [] }) {
 }
 
 export default function WaitingRoomSafetyBoard({
-  patients = [],
-  staff = [],
-  referrals = [],
-  emsArrivals = [],
-  workflowLogs = [],
-  activeQueueFilter = null,
-  settings = null,
+  patients = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  referrals = /** @type {any[]} */ ([]),
+  emsArrivals = /** @type {any[]} */ ([]),
+  workflowLogs = /** @type {any[]} */ ([]),
+  activeQueueFilter = /** @type {any} */ (null),
+  settings = /** @type {any} */ (null),
   displayMode = false,
   readOnly = false,
   variant = 'full',

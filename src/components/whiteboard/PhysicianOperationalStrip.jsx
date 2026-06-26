@@ -5,18 +5,18 @@ import OperationalStrip from '../emergency/OperationalStrip';
 import { selectPhysicianOperationalStrip } from './physicianWorkflowModel';
 
 export default function PhysicianOperationalStrip({
-  patients = [],
-  referrals = [],
-  physicianStaffId = null,
-  settings = {},
-  visibleSurfaces = null,
+  patients = /** @type {any[]} */ ([]),
+  referrals = /** @type {any[]} */ ([]),
+  physicianStaffId = /** @type {any} */ (null),
+  settings = /** @type {any} */ ({}),
+  visibleSurfaces = /** @type {any} */ (null),
   onMetricSelect,
   readOnly = false,
-  metrics: metricsOverride = null,
-  eyebrow = null,
+  metrics: metricsOverride = /** @type {any} */ (null),
+  eyebrow = /** @type {any} */ (null),
   className = '',
-  emptyLabel = null,
-  emptyHint = null,
+  emptyLabel = /** @type {any} */ (null),
+  emptyHint = /** @type {any} */ (null),
 }) {
   const metrics = useMemo(() => {
     const selected =

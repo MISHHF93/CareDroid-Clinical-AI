@@ -151,7 +151,7 @@ function syncOperationalSurfaces(
       arrivalReason: options.arrivalReason,
       queue,
       source: options.source,
-      surfaces: ['triage-queue', 'whiteboard', 'operational-snapshot'],
+      surfaces: 'triage-queue,whiteboard,operational-snapshot',
       generatedAt: new Date().toISOString(),
     },
   });
@@ -170,11 +170,11 @@ function syncOperationalSurfaces(
       arrivalReason: options.arrivalReason,
       queue,
       targetState: PatientState.Triage,
-      surfaces: ['triage-queue', 'whiteboard', 'operational-snapshot'],
+      surfaces: 'triage-queue,whiteboard,operational-snapshot',
     },
   });
 
-  syncArrivalOperationalSurfaces(store, options.patientId, {
+  syncArrivalOperationalSurfaces(store as unknown as Parameters<typeof syncArrivalOperationalSurfaces>[0], options.patientId, {
     destination: 'triage-queue',
     source: options.source,
   });
@@ -235,13 +235,13 @@ export function completeIntakeHandoff(
     recordWorkflow: false,
   });
 
-  recordFirstContact(store, patientId, {
+  recordFirstContact(store as unknown as Parameters<typeof recordFirstContact>[0], patientId, {
     actorName,
     source: 'intake-handoff',
     note: `First contact at intake handoff (${source}).`,
   });
 
-  stampArrivalControlLayer(store, patientId, {
+  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], patientId, {
     triagePending: true,
     registrationStatus: 'complete',
     queueDestination: 'triage-queue',
@@ -312,16 +312,12 @@ export function completeIntakeHandoff(
           store.updatePatient(patientId, {
             triageAssist: backendAssist,
             triageAssistGeneratedAt: backendAssist.generatedAt,
-            handoffSyncPending: false,
-            handoffSyncError: undefined,
+            ...(({ handoffSyncPending: false, handoffSyncError: undefined } as unknown) as Partial<import('../types/emergency').Patient>),
           });
         }
       })
       .catch((error) => {
-        store.updatePatient(patientId, {
-          handoffSyncPending: true,
-          handoffSyncError: formatSyncRecoveryMessage(error),
-        });
+        store.updatePatient(patientId, ({ handoffSyncPending: true, handoffSyncError: formatSyncRecoveryMessage(error) } as unknown) as Partial<import('../types/emergency').Patient>);
       });
   }
 
@@ -337,10 +333,7 @@ export function completeIntakeHandoff(
       triageAssist,
       triageAssistGeneratedAt: triageAssist.generatedAt,
     }).catch((error) => {
-      store.updatePatient(patientId, {
-        handoffSyncPending: true,
-        handoffSyncError: formatSyncRecoveryMessage(error),
-      });
+      store.updatePatient(patientId, ({ handoffSyncPending: true, handoffSyncError: formatSyncRecoveryMessage(error) } as unknown) as Partial<import('../types/emergency').Patient>);
     });
   }
 

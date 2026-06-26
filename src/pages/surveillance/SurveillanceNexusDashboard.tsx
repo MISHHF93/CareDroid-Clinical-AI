@@ -8,6 +8,7 @@ import {
   formatSurveillanceTime,
   statusTone,
 } from '../../services/surveillanceIoTService';
+import type { SurveillanceNexusSnapshot } from '../../types/surveillanceIoT';
 import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../../config/userProfileCompiler';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 
@@ -70,9 +71,9 @@ export default function SurveillanceNexusDashboard() {
           </p>
         </div>
         <StateSourceNotice
-          sourceLabel={data.sourceLabel}
-          demo={data.demo}
-          generatedAt={data.generatedAt}
+          title={data.sourceLabel}
+          states={[data.demo ? 'demo' : 'live']}
+          details={data.generatedAt}
         />
       </header>
 

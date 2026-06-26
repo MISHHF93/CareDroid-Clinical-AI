@@ -13,16 +13,16 @@ function PhaseBadge({ phase }) {
 }
 
 export default function EmsOffloadTrackerPanel({
-  emsArrivals = [],
-  patients = [],
-  staff = [],
-  rooms = [],
+  emsArrivals = /** @type {any[]} */ ([]),
+  patients = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  rooms = /** @type {any[]} */ ([]),
   offloadTargetMinutes = 15,
   compact = false,
   title = 'EMS Offload Tracker',
   subtitle = 'Dispatch ETA, arrival, triage handoff, offload delay, bay, and owner.',
   onSelectPatient,
-  onSelectArrival,
+  onSelectArrival = /** @type {any} */ (undefined),
   className = '',
 }) {
   const summary = useMemo(

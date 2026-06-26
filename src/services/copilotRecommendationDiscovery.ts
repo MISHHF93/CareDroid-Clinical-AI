@@ -36,7 +36,7 @@ export function buildCopilotRecommendationSnapshot({
 
   return {
     recommendations,
-    audit: auditCopilotRecommendations(recommendations),
+    audit: auditCopilotRecommendations(recommendations as any[]),
   };
 }
 

@@ -7,11 +7,11 @@ import './CareDroidPrimitives.css';
 export function PageShell({
   eyebrow,
   title,
-  titleId,
+  titleId = /** @type {any} */ (undefined),
   description,
-  subtitle,
-  actions,
-  leadingIcon,
+  subtitle = /** @type {any} */ (undefined),
+  actions = /** @type {any} */ (undefined),
+  leadingIcon = /** @type {any} */ (undefined),
   children,
   className = '',
   headerClassName = '',
@@ -174,7 +174,7 @@ export function OverflowCanvas({ children, minWidth, className = '', as: Element
   );
 }
 
-export function MetricChip({ label, value, title, className = '', ...props }) {
+export function MetricChip({ label, value, title = undefined, className = '', ...props }) {
   return (
     <span
       className={['cd-metric-chip', className].filter(Boolean).join(' ')}

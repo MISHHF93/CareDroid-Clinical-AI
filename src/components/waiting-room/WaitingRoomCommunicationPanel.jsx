@@ -23,8 +23,8 @@ function formatTime(timestamp) {
 
 export default function WaitingRoomCommunicationPanel({
   patient,
-  workflowLogs = [],
-  staff = [],
+  workflowLogs = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
   title = 'Waiting-room communication',
   description = 'Staff contact events — updates, vitals, reassessments, delays, queue moves, and escalations.',
   limit = 8,

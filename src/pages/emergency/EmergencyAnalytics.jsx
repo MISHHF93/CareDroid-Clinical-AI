@@ -100,6 +100,7 @@ function signalMeta(signal) {
 
 export default function EmergencyAnalytics() {
   const surfaces = usePractitionerSurfaceVisibility();
+  const emergencyRole = useEmergencyRolePermissions();
   const { backendAvailable, activeScenarioId } = useEdRouteDataContext();
   const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);

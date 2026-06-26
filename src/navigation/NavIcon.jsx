@@ -8,7 +8,7 @@ export function NavIcon({
   size,
   className = '',
   decorative = true,
-  label,
+  label = /** @type {any} */ (undefined),
   strokeWidth = 2,
   ...rest
 }) {

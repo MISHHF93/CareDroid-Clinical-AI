@@ -302,7 +302,7 @@ const SAAS_PROFILE_COPY_BASE: Readonly<
     copilotIntro: 'Assist with cardiac risk scores and protocol selection.',
   },
   'registration-clerk': {
-    personaTitle: ED_PERSONA_LABELS.registrationClerk,
+    personaTitle: ED_PERSONA_LABELS.receptionClerk,
     workspaceEyebrow: 'Front desk',
     workspaceDescription: 'Registration, identity verification, patient search, and EMS conversion.',
     profileShellSubtitle: 'Receptionist profile — front-desk workflows without clinical mutation surfaces.',

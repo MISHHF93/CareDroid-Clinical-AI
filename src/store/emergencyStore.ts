@@ -662,6 +662,8 @@ export type EmergencyThresholds = {
   capacityOrangePct: number;
   capacityRedPct: number;
   emsOffloadTargetMin: number;
+  emsOffloadTargetMinutes?: number;
+  communicationOverdueMinutes?: number;
   reassessP1Min: number;
   reassessP2Min: number;
   reassessP3Min: number;
@@ -2376,10 +2378,10 @@ interface EmergencyStoreState {
   movePatientToState: (
     patientId: string,
     to: PatientState,
-    staffIdOrOptions?: string | { staffId?: string; note?: string; timelineEvent?: JourneyEvent },
+    staffIdOrOptions?: string | { staffId?: string; note?: string; timelineEvent?: JourneyEvent; flags?: PatientFlag[] },
     note?: string,
   ) => void;
-  dischargePatient: (patientId: string, options?: { staffId?: string; note?: string }) => void;
+  dischargePatient: (patientId: string, options?: { staffId?: string; note?: string; flags?: PatientFlag[]; timelineEvent?: JourneyEvent }) => void;
   assignStaff: (
     patientId: string,
     staffId: string,
@@ -2915,7 +2917,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     registerArrivalControl: (patientId, options = {}) => {
       const state = get();
-      return registerArrivalControlLayer(toArrivalControlStore(state), patientId, options);
+      return registerArrivalControlLayer(toArrivalControlStore(state as unknown as Parameters<typeof toArrivalControlStore>[0]), patientId, options);
     },
 
     applyHighRiskComplaintFlags: (patientId, options = {}) => {
@@ -2924,7 +2926,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         {
           patients: state.patients,
           updatePatient: state.updatePatient,
-          recordWorkflowAction: state.recordWorkflowAction,
+          recordWorkflowAction: state.recordWorkflowAction as unknown as (input: { type: string; summary: string; patientId?: string; source?: string; metadata?: Record<string, unknown> }) => void,
           dispatchWebSocketEvent: state.dispatchWebSocketEvent,
         },
         patientId,
@@ -3122,7 +3124,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           }),
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {
-              type: 'whiteboard_automation',
+              type: 'whiteboard_automation' as import('../types/emergency').WorkflowActionType,
               title: 'Diagnosis recorded',
               summary: `${input.diagnosis} — whiteboard advanced to awaiting disposition.`,
               patientId,
@@ -3199,7 +3201,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           capacity: buildCapacitySnapshot(patients, state.rooms),
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {
-              type: 'fit_to_wait_classified',
+              type: 'fit_to_wait_classified' as import('../types/emergency').WorkflowActionType,
               title: 'Fit-to-wait classification',
               summary: `${patient.firstName} ${patient.lastName}: ${fitToWaitClassificationLabel(classificationId)}.`,
               patientId,
@@ -3516,7 +3518,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               title: 'Room assigned',
               summary: `Assigned room ${roomId}.`,
               patientId,
-              actorStaffId: assignedPatient?.assignedStaffId,
+              actorStaffId: assignedPatient?.assignedStaffId ?? undefined,
               source: 'queue-assignment',
               metadata: {
                 fromRoomId,
@@ -4045,7 +4047,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               title: 'Reassessment completed',
               summary: reminder?.note || 'Reassessment reminder completed.',
               patientId,
-              actorStaffId: options.completedBy || patient?.assignedStaffId,
+              actorStaffId: (options.completedBy || patient?.assignedStaffId) ?? undefined,
               source: 'reassessment-workflow',
               metadata: {
                 reminderId,
@@ -5397,6 +5399,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
                 title: `Referral sent to ${referral.targetDepartment}`,
                 message: `${patientLabel} referral is awaiting ${referral.targetDepartment} acknowledgement.`,
                 patientId: referral.patientId,
+                dismissed: false,
                 actionLabel: 'View Patient',
                 actionType: 'VIEW_PATIENT',
               })

@@ -313,7 +313,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
   const storeAlertIds = useMemo(() => new Set(alerts.map((alert) => alert.id)), [alerts]);
   const reassessmentTimerAlerts = useMemo(
     () =>
-      buildReassessmentNotificationCenterSnapshot(patients, { thresholds }).alerts,
+      buildReassessmentNotificationCenterSnapshot(patients, { thresholds: { thresholds } }).alerts,
     [patients, thresholds],
   );
   const highRiskComplaintAlerts = useMemo(

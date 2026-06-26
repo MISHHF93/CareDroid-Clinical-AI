@@ -61,14 +61,14 @@ export function collectDisplayPhiTokens(
     for (const note of patient.notes || []) {
       const noteText = String(note.text || note.body || '').trim();
       if (noteText.length >= MIN_TOKEN_LENGTH) tokens.add(noteText);
-      const author = String(note.authorName || note.authorId || '').trim();
+      const author = String((note as unknown as Record<string, unknown>)['authorName'] || note.authorId || '').trim();
       if (author.length >= MIN_TOKEN_LENGTH) tokens.add(author);
     }
 
     for (const event of patient.timeline || []) {
       const summary = String(event.summary || event.note || '').trim();
       if (summary.length >= MIN_TOKEN_LENGTH) tokens.add(summary);
-      const actor = String(event.actorName || event.staffId || '').trim();
+      const actor = String((event as unknown as Record<string, unknown>)['actorName'] || event.staffId || '').trim();
       if (actor.length >= MIN_TOKEN_LENGTH) tokens.add(actor);
     }
   }

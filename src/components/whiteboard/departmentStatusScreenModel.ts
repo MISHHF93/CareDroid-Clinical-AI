@@ -19,8 +19,10 @@ export type DepartmentStatusTone = 'stable' | 'info' | 'watch' | 'warning' | 'cr
 export type DepartmentStatusMetricId =
   | 'waiting-count'
   | 'longest-wait'
+  | 'longest-provider-wait'
   | 'triage-pending'
   | 'triage-breached'
+  | 'provider-awaiting'
   | 'provider-wait-breached'
   | 'reassessments-due'
   | 'lwbs-elevated'

@@ -5,7 +5,7 @@ import { RECEPTION_COPY } from '../reception/receptionCopy';
 import './DuplicateReviewAlert.css';
 
 export default function DuplicateReviewAlert({
-  candidates = [],
+  candidates = /** @type {any[]} */ ([]),
   acknowledged = false,
   onAcknowledge,
   onOpenPatient,

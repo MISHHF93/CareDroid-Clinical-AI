@@ -52,7 +52,7 @@ export function countReassessmentDuePatients(patients = []) {
   return patients.filter(patientMatchesReassessmentAttention).length;
 }
 
-export function shouldShowShiftHandoffStrip({ roleId, displayMode = false, isRegistrationClerk = false } = {}) {
+export function shouldShowShiftHandoffStrip({ roleId = /** @type {string | undefined} */ (undefined), displayMode = false, isRegistrationClerk = false } = {}) {
   if (displayMode || isRegistrationClerk) return false;
   return CLINICAL_HANDOFF_ROLES.has(roleId);
 }

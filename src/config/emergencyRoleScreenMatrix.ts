@@ -170,7 +170,7 @@ export function resolveRouteScreenMode(
   queueParam?: string | null,
 ): CareDroidScreenMode | null {
   const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
-  const triageCapableRoles = new Set([
+  const triageCapableRoles = new Set<string>([
     EMERGENCY_ROLE_ID.triageNurse,
     EMERGENCY_ROLE_ID.chargeNurse,
     EMERGENCY_ROLE_ID.physician,

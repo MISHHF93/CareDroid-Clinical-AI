@@ -189,12 +189,12 @@ export function completeProvisionalIntake(
   const patient = buildProvisionalPatient(kind, options.patientOverrides);
   store.addPatient(patient);
 
-  registerArrivalControl(store, patient.id, {
+  registerArrivalControl(store as unknown as Parameters<typeof registerArrivalControl>[0], patient.id, {
     source: 'provisional-intake',
     destination: 'triage-queue',
   });
 
-  const handoff = completeIntakeHandoff(store, {
+  const handoff = completeIntakeHandoff(store as unknown as Parameters<typeof completeIntakeHandoff>[0], {
     patientId: patient.id,
     source: 'provisional-intake',
     actorName: options.actorName,

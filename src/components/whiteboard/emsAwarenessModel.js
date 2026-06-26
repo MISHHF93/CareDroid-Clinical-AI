@@ -114,7 +114,7 @@ export function summarizeEmsAwareness(emsArrivals = [], now = Date.now(), contex
   });
 }
 
-export function shouldShowEmsAttentionStrip({ displayMode = false, summary } = {}) {
+export function shouldShowEmsAttentionStrip({ displayMode = false, summary = /** @type {any} */ (undefined) } = {}) {
   if (displayMode || !summary) return false;
   return (
     summary.inboundCount > 0 ||

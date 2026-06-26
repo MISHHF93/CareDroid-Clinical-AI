@@ -111,7 +111,7 @@ function resolveCurrentProcessStepId(
   if (patient.state === PatientState.Assessment) {
     return WAITING_ROOM_PROCESS_STEP.CLINICIAN_ASSESSMENT;
   }
-  if (patient.state === PatientState.Treatment) {
+  if ((patient.state as string) === 'Treatment') {
     return WAITING_ROOM_PROCESS_STEP.TREATMENT_DISPOSITION;
   }
   if (patient.state === PatientState.Disposition || patient.state === PatientState.Discharge) {

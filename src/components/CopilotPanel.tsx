@@ -251,8 +251,8 @@ function buildDepartmentPrompt({
     getAIPrompt(COPILOT_PLATFORM.identity.promptId).prompt,
     HUMAN_REVIEW_DISCLAIMER,
     typeof backendCopilotContext?.safetyRule === 'string' ? backendCopilotContext.safetyRule : null,
-    ...COPILOT_PLATFORM.prompts.styleRules,
-    formatCopilotRecommendationsForPrompt(copilotRecommendations),
+    ...(COPILOT_PLATFORM.prompts.styleRules as string[]),
+    formatCopilotRecommendationsForPrompt(copilotRecommendations as unknown[]),
     attachmentSummary
       ? `Multimodal input attached: ${attachmentSummary}. Image bytes are retained in the browser preview only in this pass; do not claim visual interpretation or diagnosis. Ask for human review or a connected vision model contract before acting on image content.`
       : null,
@@ -378,7 +378,7 @@ function TypingIndicator() {
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: MEDICAL_THEME.surfaceCardSubtle,
+            background: MEDICAL_THEME.inkSubtle,
             animationDelay: `${index * 120}ms`,
           }}
         />

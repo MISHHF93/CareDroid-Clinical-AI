@@ -25,8 +25,8 @@ function actorLabel(log) {
 }
 
 export default function OperationalHistoryPanel({
-  logs = [],
-  patientId = null,
+  logs = /** @type {any[]} */ ([]),
+  patientId = /** @type {string | undefined} */ (undefined),
   title = 'Operational history',
   description = 'Recent workflow actions from the CareDroid audit log.',
   domains = Object.values(OPERATIONAL_AUDIT_DOMAIN),

@@ -21,11 +21,11 @@ import { useEmergencyStore } from '../store/emergencyStore';
 export type EmergencyScreenKpis = EmergencyScreenKpiSnapshot & {
   screenMode: CareDroidScreenMode;
   kpiIds: ReturnType<typeof resolveScreenModeKpiIds>;
-  receptionStripMetricIds: string[] | null;
-  triageStripMetricIds: string[] | null;
-  chargeNurseStripMetricIds: string[] | null;
-  chargeNurseStripSurfaces: string[] | null;
-  headerOperationalMetricKeys: string[] | null;
+  receptionStripMetricIds: readonly string[] | null;
+  triageStripMetricIds: readonly string[] | null;
+  chargeNurseStripMetricIds: readonly string[] | null;
+  chargeNurseStripSurfaces: readonly string[] | null;
+  headerOperationalMetricKeys: readonly string[] | null;
   publicWaitingWidgets: string[] | null;
   commandCenterMetricIds: ReturnType<typeof resolveCommandCenterMetricIds>;
   commandCenterWidgetVisibility: ReturnType<typeof resolveCommandCenterWidgetVisibility>;
@@ -53,7 +53,7 @@ export function useEmergencyScreenKpis(
 
   return useMemo(() => {
     const kpiSettings = {
-      screenModeKpiVisibility: emergencySettings.screenModeKpiVisibility,
+      screenModeKpiVisibility: emergencySettings.screenModeKpiVisibility as import('../config/emergencyScreenKpiPolicy').ScreenModeKpiSettingsInput['screenModeKpiVisibility'],
       publicDisplayPrivacy: emergencySettings.publicDisplayPrivacy,
     };
     const snapshot = buildScreenModeKpiSnapshot({

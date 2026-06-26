@@ -7,7 +7,7 @@ import './StateSourceNotice.css';
 
 export default function StateSourceNotice({
   title = 'Source state',
-  states = [],
+  states = /** @type {any[]} */ ([]),
   details,
   className = '',
 }) {

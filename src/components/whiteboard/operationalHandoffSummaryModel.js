@@ -195,11 +195,11 @@ function admissionDomainMetrics({ patients = [], boardingMetrics = null } = {}) 
  * Four-domain operational handoff summaries — one glance per workflow lane.
  */
 export function buildOperationalHandoffDomains({
-  patients = [],
-  emsArrivals = [],
-  referrals = [],
-  reassessmentDue = null,
-  boardingMetrics = null,
+  patients = /** @type {any[]} */ ([]),
+  emsArrivals = /** @type {any[]} */ ([]),
+  referrals = /** @type {any[]} */ ([]),
+  reassessmentDue = /** @type {any} */ (undefined),
+  boardingMetrics = /** @type {any} */ (undefined),
   now = Date.now(),
 } = {}) {
   const emsSummary = summarizeEmsAwareness(emsArrivals, now);

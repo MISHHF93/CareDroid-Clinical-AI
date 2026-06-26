@@ -20,6 +20,12 @@ export default function ProfileSettingsShell({
   children,
   accessSummary = null,
   profileCopy = null,
+}: {
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  children?: React.ReactNode;
+  accessSummary?: Record<string, any> | null;
+  profileCopy?: Record<string, any> | null;
 }) {
   const surfaces = usePractitionerSurfaceVisibility();
   const location = useLocation();
@@ -53,7 +59,7 @@ export default function ProfileSettingsShell({
             </span>
             {profileCopy?.primaryFunctions?.length ? (
               <ul className="profile-settings-shell__functions">
-                {profileCopy.primaryFunctions.map((fn) => (
+                {profileCopy.primaryFunctions.map((fn: { id: string; label: string; description: string }) => (
                   <li key={fn.id} title={fn.description}>
                     {fn.label}
                   </li>

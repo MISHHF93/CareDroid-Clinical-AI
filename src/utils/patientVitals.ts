@@ -18,7 +18,7 @@ export function hasPatientFlag(
   flag: string,
 ): boolean {
   return patientFlags(patient).some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
   );
 }
 

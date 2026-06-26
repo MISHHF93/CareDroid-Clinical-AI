@@ -235,7 +235,7 @@ function applyClinicalEscalationFlags(patient: Patient, reasonId: ReceptionEscal
       : [PatientFlag.HighRisk, PatientFlag.ReassessmentDue];
 
   const existing = new Set(
-    (patient.flags || []).map((flag) => (typeof flag === 'string' ? flag : flag.type)),
+    (patient.flags || []).map((flag) => (typeof flag === 'string' ? flag : (flag as unknown as { type: string }).type)),
   );
 
   return {
@@ -248,13 +248,13 @@ function applyClinicalEscalationFlags(patient: Patient, reasonId: ReceptionEscal
       ...(patient.timeline || []),
       {
         id: createId('timeline-reception-escalation'),
-        type: 'ReceptionEscalation',
+        type: 'ESCALATION' as import('../types/emergency').JourneyEventType,
         timestamp,
         to: patient.state,
         summary: `Reception escalation — ${resolveReceptionEscalationReason(reasonId)?.shortLabel || reasonId}`,
         note: reasonId,
         metadata: { reasonId },
-      },
+      } as import('../types/emergency').JourneyEvent,
     ],
   };
 }

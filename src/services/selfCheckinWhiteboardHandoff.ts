@@ -55,7 +55,7 @@ export function completeSelfCheckinWhiteboardHandoff(
   store.addPatient(result.patient, { syncToBackend: options.syncToBackend ?? false });
   const handoffStore = withPersistedPatient(store, result.patient);
 
-  registerArrivalControl(handoffStore, result.patient.id, {
+  registerArrivalControl(handoffStore as unknown as Parameters<typeof registerArrivalControl>[0], result.patient.id, {
     source: 'self-check-in',
     destination: 'triage-queue',
   });

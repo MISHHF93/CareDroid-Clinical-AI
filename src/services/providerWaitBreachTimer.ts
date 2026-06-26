@@ -216,9 +216,6 @@ export function isAwaitingProvider(patient: Patient | null | undefined): boolean
   if (!patient?.triageTime) return false;
   if (patient.state !== PatientState.Waiting) return false;
   if (patient.lastAssessedTime) return false;
-  if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) {
-    return false;
-  }
   return true;
 }
 

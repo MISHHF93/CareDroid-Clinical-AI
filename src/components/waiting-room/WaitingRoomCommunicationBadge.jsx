@@ -4,9 +4,9 @@ import './WaitingRoomCommunicationBadge.css';
 
 export default function WaitingRoomCommunicationBadge({
   patient,
-  workflowLogs = [],
-  staff = [],
-  now,
+  workflowLogs = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  now = undefined,
   compact = false,
 }) {
   if (!patient?.id) return null;

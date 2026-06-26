@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, type To } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -268,7 +268,7 @@ function AppShellFrame({ children }: AppShellProps) {
   const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const profileNavigate = useCallback(
-    (to: Parameters<typeof navigate>[0], options?: { replace?: boolean; state?: unknown }) =>
+    (to: To, options?: { replace?: boolean; state?: unknown }) =>
       navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
     [emergencyRole, navigate, saasRole],
   );

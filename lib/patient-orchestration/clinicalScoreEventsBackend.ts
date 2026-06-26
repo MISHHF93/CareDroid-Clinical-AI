@@ -4,7 +4,7 @@ const SCORE_EVENT_TYPES = new Set(['SCORE', 'ClinicalScoreSaved']);
 
 export function formatScoresForCopilot(patient: Patient | null | undefined): string {
   const scores = [...(patient?.timeline || [])]
-    .filter((event) => event && SCORE_EVENT_TYPES.has(event.type))
+    .filter((event) => event && event.type != null && SCORE_EVENT_TYPES.has(event.type))
     .slice(0, 4);
 
   if (!scores.length) return '';

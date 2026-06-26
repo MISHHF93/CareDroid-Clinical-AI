@@ -257,7 +257,7 @@ export function auditRoleActionSurfaces(
   return EMERGENCY_UI_ACTION_AUDIT.map((surface) => ({
     ...surface,
     ...presentEmergencyPermission(role, surface.permission, permissionsOverrides, context),
-  }));
+  })) as Array<EmergencyUiActionSurface & EmergencyRoleActionPresentation>;
 }
 
 export function assertUnauthorizedRolesCannotSeeDestructiveClinicalActions(

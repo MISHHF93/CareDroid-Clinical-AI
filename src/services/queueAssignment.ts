@@ -173,7 +173,7 @@ export function matchesWhiteboardQueueFilter(
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return patient.flags?.some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -388,13 +388,13 @@ export function enterTriageQueue(
     });
   }
 
-  recordFirstContact(store, options.patientId, {
+  recordFirstContact(store as unknown as Parameters<typeof recordFirstContact>[0], options.patientId, {
     actorName: options.actorName,
     source: options.source || 'queue-assignment',
     note: 'First contact recorded on triage queue entry.',
   });
 
-  stampArrivalControlLayer(store, options.patientId, {
+  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], options.patientId, {
     triagePending: true,
     registrationStatus: 'complete',
     queueDestination: 'triage-queue',
@@ -482,7 +482,7 @@ export function enterWaitingQueue(
     store.setQueueFilter(WHITEBOARD_QUEUE_FILTER.waiting);
   }
 
-  stampArrivalControlLayer(store, options.patientId, {
+  stampArrivalControlLayer(store as unknown as Parameters<typeof stampArrivalControlLayer>[0], options.patientId, {
     triagePending: false,
     registrationStatus: 'complete',
     queueDestination: 'waiting-room',

@@ -4,8 +4,8 @@ import './QueueReasonBadge.css';
 
 export default function QueueReasonBadge({
   patient,
-  referrals = [],
-  staff = [],
+  referrals = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
   compact = false,
   showAll = false,
 }) {

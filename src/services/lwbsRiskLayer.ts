@@ -85,7 +85,7 @@ function patientDisplayName(patient: Patient): string {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
   );
 }
 
@@ -130,7 +130,7 @@ function countOverdueReassessmentSignals(patient: Patient, now: Date): number {
   let count = timer.isOverdue ? 1 : 0;
 
   const overdueReminders = (patient.reassessmentReminders || []).filter(
-    (reminder) => reminder.status === 'overdue' || reminder.status === 'missed',
+    (reminder) => (reminder.status as string) === 'overdue' || (reminder.status as string) === 'missed',
   ).length;
   count = Math.max(count, overdueReminders);
 
@@ -361,8 +361,8 @@ export function buildLwbsRiskAdvisoryAlerts(
       metadata: {
         advisoryOnly: true,
         lwbsRiskScore: snapshot.score,
-        lwbsRiskLevel: snapshot.level,
-        factors: snapshot.factors.map((factor) => factor.id),
+        lwbsRiskLevel: snapshot.level as string,
+        factors: snapshot.factors.map((factor) => factor.id).join(','),
       },
     }));
 }

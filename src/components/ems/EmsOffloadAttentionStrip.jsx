@@ -13,10 +13,10 @@ function PhaseLabel({ phase }) {
 }
 
 export default function EmsOffloadAttentionStrip({
-  emsArrivals = [],
-  patients = [],
-  staff = [],
-  rooms = [],
+  emsArrivals = /** @type {any[]} */ ([]),
+  patients = /** @type {any[]} */ ([]),
+  staff = /** @type {any[]} */ ([]),
+  rooms = /** @type {any[]} */ ([]),
   offloadTargetMinutes = 15,
   onSelectPatient,
   onSelectArrival,

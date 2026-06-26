@@ -303,8 +303,8 @@ export default function QuickIntake({
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
       : [];
-    const safetyFlags =
-      priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk] : [];
+    const safetyFlags: import('../types/emergency').QuickSafetyFlag[] =
+      priority === Priority.P1 || priority === Priority.P2 ? [PatientFlag.HighRisk as import('../types/emergency').QuickSafetyFlag] : [];
     const complaintPatch = buildHighRiskComplaintPatch(
       {
         chiefComplaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
@@ -562,8 +562,8 @@ export default function QuickIntake({
                   setDuplicateAcknowledged(true);
                   setSubmitError('');
                 }}
-                onOpenPatient={(patientId) => onOpenVerification?.(patientId)}
-                onOpenVerification={(patientId) => onOpenVerification?.(patientId)}
+                onOpenPatient={(patientId: string) => onOpenVerification?.(patientId)}
+                onOpenVerification={(patientId: string) => onOpenVerification?.(patientId)}
                 onProvisionalIntake={onProvisionalIntake}
               />
             ) : null}

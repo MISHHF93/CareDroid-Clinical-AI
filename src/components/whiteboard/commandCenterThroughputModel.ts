@@ -399,8 +399,8 @@ function buildSystemHealth(input: {
   const analyticsLabel = input.analyticsSource ? ` · analytics ${input.analyticsSource}` : '';
 
   let tone: CommandCenterTone = stale ? 'warning' : 'stable';
-  if (modelHealth === 'degraded' || modelHealth === 'critical') tone = 'critical';
-  else if (modelHealth === 'watch') tone = 'watch';
+  if (modelHealth === 'degraded' || modelHealth === 'unavailable') tone = 'critical';
+  else if ((modelHealth as string) === 'watch') tone = 'watch';
 
   return {
     label: stale ? 'Data aging' : 'Data fresh',
@@ -822,9 +822,9 @@ export function buildCommandCenterThroughputSnapshot(input: {
       label: 'Boarding burden',
       value: boardingValue,
       tone:
-        longestBoarding >= 480 || medianBoarding >= 360
+        (longestBoarding ?? 0) >= 480 || medianBoarding >= 360
           ? 'critical'
-          : longestBoarding >= 240 || medianBoarding >= 180
+          : (longestBoarding ?? 0) >= 240 || medianBoarding >= 180
             ? 'warning'
             : boardingMetrics?.patientsBoarding.length
               ? 'watch'

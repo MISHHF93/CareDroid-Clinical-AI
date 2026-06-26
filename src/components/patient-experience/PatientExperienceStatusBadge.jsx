@@ -5,10 +5,10 @@ import './PatientExperienceStatusBadge.css';
 
 export default function PatientExperienceStatusBadge({
   patient,
-  referrals = [],
+  referrals = /** @type {any[]} */ ([]),
   compact = false,
   showStaffDetail = false,
-  audience,
+  audience = undefined,
 }) {
   if (!patient?.id) return null;
 

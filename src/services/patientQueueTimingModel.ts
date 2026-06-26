@@ -50,7 +50,7 @@ const ACTIVE_STATES = new Set<PatientState>([
   PatientState.Registration,
   PatientState.Triage,
   PatientState.Waiting,
-  PatientState.Treatment,
+  PatientState.Assessment,
   PatientState.Admission,
 ]);
 

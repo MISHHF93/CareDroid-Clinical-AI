@@ -82,7 +82,7 @@ export type PatientExperienceContext = {
 
 function hasFlag(patient: Patient, flag: PatientFlag): boolean {
   return (patient.flags || []).some((entry) =>
-    typeof entry === 'string' ? entry === flag : entry?.type === flag,
+    typeof entry === 'string' ? entry === flag : (entry as unknown as { type: string })?.type === flag,
   );
 }
 

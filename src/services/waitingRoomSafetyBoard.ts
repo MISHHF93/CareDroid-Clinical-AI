@@ -116,11 +116,11 @@ function formatDuration(minutes: number): string {
 /**
  * Extract latest vitals from patient record.
  */
-function getLatestVitals(patient: Patient) {
+function getLatestVitals(patient: Patient): import('../types/emergency').Vitals | undefined {
   if (Array.isArray(patient.vitals) && patient.vitals.length > 0) {
     return patient.vitals[patient.vitals.length - 1];
   }
-  return patient.vitals;
+  return Array.isArray(patient.vitals) ? patient.vitals[0] : undefined;
 }
 
 /**
@@ -193,7 +193,7 @@ export function buildWaitingRoomPatientRecord(
 
   // Extract high-risk complaint patterns
   const highRiskComplaintFlags: string[] = [];
-  const complaint = (patient.presentingComplaint || patient.chiefComplaint || '').toLowerCase();
+  const complaint = ((patient as unknown as { presentingComplaint?: string }).presentingComplaint || patient.chiefComplaint || '').toLowerCase();
   const highRiskKeywords = [
     'chest pain',
     'chest pressure',
@@ -222,10 +222,10 @@ export function buildWaitingRoomPatientRecord(
     mrn: patient.mrn,
     name: getPatientName(patient),
     arrivalTime: patient.arrivalTime,
-    presentingComplaint: patient.chiefComplaint || patient.presentingComplaint || 'No complaint recorded',
+    presentingComplaint: patient.chiefComplaint || (patient as unknown as { presentingComplaint?: string }).presentingComplaint || 'No complaint recorded',
     complaintCategory: patient.complaintCategory || 'Other',
     triageLevel: patient.priority,
-    triageTime: patient.triageTime,
+    triageTime: patient.triageTime ?? undefined,
     waitingDurationMinutes: waitingMinutes,
     waitingDurationFormatted: formatDuration(waitingMinutes),
     lastVitalsTime: vitalsTime,
@@ -233,12 +233,12 @@ export function buildWaitingRoomPatientRecord(
     vitalsAgeFormatted: formatDuration(vitalsAgeMinutes),
     currentVitals: latestVitals
       ? {
-          hr: latestVitals.hr || latestVitals.heartRate,
-          sbp: latestVitals.sbp || latestVitals.bpSystolic,
-          dbp: latestVitals.dbp || latestVitals.bpDiastolic,
-          spo2: latestVitals.spo2 || latestVitals.oxygenSaturation,
-          temp: latestVitals.temp || latestVitals.temperature,
-          rr: latestVitals.rr || latestVitals.respiratoryRate,
+          hr: latestVitals.hr ?? (latestVitals.heartRate as unknown as number | undefined),
+          sbp: latestVitals.sbp ?? (latestVitals.bpSystolic as unknown as number | undefined),
+          dbp: latestVitals.dbp ?? (latestVitals.bpDiastolic as unknown as number | undefined),
+          spo2: latestVitals.spo2 ?? (latestVitals.oxygenSaturation as unknown as number | undefined),
+          temp: latestVitals.temp ?? (latestVitals.temperature as unknown as number | undefined),
+          rr: latestVitals.rr ?? (latestVitals.respiratoryRate as unknown as number | undefined),
         }
       : undefined,
     vitalsAbnormal: hasAbnormalVitals(latestVitals),
@@ -256,9 +256,9 @@ export function buildWaitingRoomPatientRecord(
     highRiskComplaintFlags,
     activeAlerts: [],
     activeVitalsAlerts: patient.vitalsAlerts || [],
-    providerAssignedStaffId: patient.assignedStaffId,
+    providerAssignedStaffId: patient.assignedStaffId ?? undefined,
     providerAssignedStaffName: assignedStaff?.displayName || assignedStaff?.name,
-    testAwaitingResults: (patient.state === PatientStateEnum.Results && !patient.notes?.some((n) => n.type === 'Result')),
+    testAwaitingResults: ((patient.state as string) === PatientStateEnum.Results && !patient.notes?.some((n) => n.type === 'Result')),
     state: patient.state,
     priority: patient.priority,
   };

@@ -416,9 +416,7 @@ export const COMMAND_CENTER_KPI_TO_WIDGET: Readonly<
   ]),
 });
 
-export const COMMAND_CENTER_KPI_TO_METRIC_ID: Readonly<
-  Partial<Record<EmergencyScreenKpiId, readonly CommandCenterMetricId[]>>
-> = Object.freeze({
+export const COMMAND_CENTER_KPI_TO_METRIC_ID = Object.freeze({
   'triage-pending': Object.freeze(['triage-awaiting', 'avg-wait-triage']),
   'longest-untriaged-wait': Object.freeze(['longest-untriaged-wait']),
   'triage-breach-approaching': Object.freeze(['triage-approaching-breach']),
@@ -445,7 +443,7 @@ export const COMMAND_CENTER_KPI_TO_METRIC_ID: Readonly<
   boarding: Object.freeze(['boarding-duration']),
   referrals: Object.freeze(['referrals-backlog']),
   'trend-metrics': Object.freeze(['lwbs-risk']),
-});
+}) as Readonly<Partial<Record<EmergencyScreenKpiId, readonly CommandCenterMetricId[]>>>;
 
 /** Central-node operational metric keys for header strip filtering. */
 export const SCREEN_MODE_HEADER_OPERATIONAL_KEYS: Readonly<
@@ -618,7 +616,7 @@ export function resolveCommandCenterWidgetVisibility(
 
 export function resolveHeaderOperationalMetricKeys(
   screenMode: CareDroidScreenMode,
-): string[] | null {
+): readonly string[] | null {
   return (
     resolvePilotHeaderOperationalMetricKeys(screenMode) ||
     SCREEN_MODE_HEADER_OPERATIONAL_KEYS[screenMode] ||
@@ -635,7 +633,7 @@ export function filterOperationalMetricsByScreenMode<
   return metrics.filter((metric) => allowed.has(metric.key));
 }
 
-function localDateKey(value = new Date()): string {
+function localDateKey(value: Date | string = new Date()): string {
   const date = value instanceof Date ? value : new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
   return date.toISOString().slice(0, 10);
@@ -1008,6 +1006,7 @@ export function buildPublicWaitingKpiValues(input: {
   patients?: Patient[];
   capacity?: CapacitySnapshot;
   referrals?: Referral[];
+  emsArrivals?: EMSArrival[];
   now?: Date;
 }): Partial<Record<EmergencyScreenKpiId, EmergencyScreenKpi>> {
   const snapshot = buildPublicWaitingDisplaySnapshot({

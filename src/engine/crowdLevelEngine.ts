@@ -143,7 +143,7 @@ function levelFromWaitingCount(waitingCount: number): CrowdLevelId {
 }
 
 function levelFromWaitMinutes(avgWait: number, longestWait: number): CrowdLevelId {
-  let level = CROWD_LEVEL.LOW;
+  let level: CrowdLevelId = CROWD_LEVEL.LOW;
   if (avgWait >= 120 || longestWait >= 180) level = maxLevel(level, CROWD_LEVEL.CRITICAL);
   else if (avgWait >= 90 || longestWait >= 120) level = maxLevel(level, CROWD_LEVEL.VERY_BUSY);
   else if (avgWait >= 60 || longestWait >= 90) level = maxLevel(level, CROWD_LEVEL.BUSY);
@@ -152,7 +152,7 @@ function levelFromWaitMinutes(avgWait: number, longestWait: number): CrowdLevelI
 }
 
 function levelFromEmsPressure(emsInbound: number, offloadDelays: number): CrowdLevelId {
-  let level = CROWD_LEVEL.LOW;
+  let level: CrowdLevelId = CROWD_LEVEL.LOW;
   if (offloadDelays >= 3 || emsInbound >= 5) level = maxLevel(level, CROWD_LEVEL.CRITICAL);
   else if (offloadDelays >= 2 || emsInbound >= 3) level = maxLevel(level, CROWD_LEVEL.VERY_BUSY);
   else if (offloadDelays >= 1 || emsInbound >= 2) level = maxLevel(level, CROWD_LEVEL.BUSY);

@@ -20,7 +20,11 @@ export type EffectiveUserProfileState = {
 };
 
 export function useEffectiveUserProfile(): EffectiveUserProfileState {
-  const { saasProfile, operationalProfile } = useUserIdentity();
+  const { saasProfile, operationalProfile: _operationalProfile } = useUserIdentity();
+  const operationalProfile = _operationalProfile as {
+    effectiveProfile?: ResolvedUserProfile | null;
+    accessSummary?: UserProfileAccessSummary | null;
+  } | null;
 
   return useMemo(() => {
     const apiEffective = operationalProfile?.effectiveProfile;

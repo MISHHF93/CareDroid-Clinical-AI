@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
@@ -63,7 +63,8 @@ export type CommandGroup =
   | 'Patient'
   | 'Clinical'
   | 'Department'
-  | 'Settings';
+  | 'Settings'
+  | 'Help';
 
 export interface Command {
   id: string;
@@ -133,7 +134,7 @@ type GroupedResult = {
   entries: Array<{ result: PaletteResult; index: number }>;
 };
 
-type PatientLookupFields = Pick<Patient, 'firstName' | 'lastName' | 'name' | 'mrn'> &
+type PatientLookupFields = Pick<Patient, 'id' | 'firstName' | 'lastName' | 'name' | 'mrn' | 'dob'> &
   Partial<Pick<Patient, 'chiefComplaint' | 'complaint' | 'complaintCategory' | 'state' | 'priority'>>;
 
 type CommandPaletteProps = {
@@ -216,11 +217,11 @@ export function patientNameMatchScore(
   patient: PatientLookupFields,
   query: string,
 ): number {
-  return scorePatientSearch(patient, query)?.score ?? -1;
+  return scorePatientSearch(patient as unknown as Parameters<typeof scorePatientSearch>[0], query)?.score ?? -1;
 }
 
 export function searchOperationalEntitiesForPalette(
-  navigate: (path: string) => void,
+  navigate: NavigateFunction,
   {
     patients = [],
     referrals = [],
@@ -928,7 +929,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                   : 'Your role may not have access to pinned quick actions. Type to search or use the sidebar.'
               }
               nextSteps={
-                normalizeSearch(query) ? EMPTY_STATE_COPY.commandPalette.noResults.nextSteps : []
+                normalizeSearch(query) ? EMPTY_STATE_COPY.commandPalette.noResults.nextSteps : ([] as string[])
               }
             />
           ) : null}

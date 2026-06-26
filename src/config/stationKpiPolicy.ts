@@ -9,9 +9,7 @@ import type { EmergencyScreenKpiId } from './emergencyScreenKpiPolicy';
 export const PILOT_STATION_KPI_LIMIT = 2;
 
 /** Canonical two-KPI sets per frontline station during pilot. */
-export const PILOT_STATION_KPI_IDS: Readonly<
-  Partial<Record<CareDroidScreenMode, readonly EmergencyScreenKpiId[]>>
-> = Object.freeze({
+export const PILOT_STATION_KPI_IDS = Object.freeze({
   [CARE_DROID_SCREEN_MODES.reception]: Object.freeze(['arrivals-today', 'awaiting-triage']),
   [CARE_DROID_SCREEN_MODES.triage]: Object.freeze(['triage-pending', 'triage-breached']),
   [CARE_DROID_SCREEN_MODES.chargeNurse]: Object.freeze(['waiting-count', 'triage-breached']),
@@ -21,7 +19,7 @@ export const PILOT_STATION_KPI_IDS: Readonly<
   ]),
   [CARE_DROID_SCREEN_MODES.commandCenter]: Object.freeze(['triage-breached', 'crowding']),
   [CARE_DROID_SCREEN_MODES.publicWaiting]: Object.freeze(['average-wait-range', 'crowd-level']),
-});
+}) as Readonly<Partial<Record<CareDroidScreenMode, readonly EmergencyScreenKpiId[]>>>;
 
 /** Trimmed central-node header keys aligned with pilot station KPIs. */
 export const PILOT_HEADER_OPERATIONAL_KEYS: Readonly<
@@ -142,7 +140,7 @@ export function resolvePilotStationKpiIds(
 
 export function resolvePilotHeaderOperationalMetricKeys(
   screenMode: CareDroidScreenMode,
-): string[] | null {
+): readonly string[] | null {
   if (!isPilotStationKpiPolicyActive()) return null;
   return PILOT_HEADER_OPERATIONAL_KEYS[screenMode] || null;
 }

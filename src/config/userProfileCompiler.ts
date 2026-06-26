@@ -81,9 +81,9 @@ function buildSegmentationProfile(
   input: CompileUserProfileInput,
   saasRole: string,
 ): Record<string, unknown> {
-  const base = buildUserToolProfile({
-    preferences: input.userPrefs as Parameters<typeof buildUserToolProfile>[0]['preferences'],
-    activeWorkspace: input.workspaceContext as Parameters<typeof buildUserToolProfile>[0]['activeWorkspace'],
+  const base = (buildUserToolProfile as Function)({
+    preferences: input.userPrefs,
+    activeWorkspace: input.workspaceContext,
     toolPreferences: (input.userPrefs?.toolPreferences as Record<string, unknown>) || {},
   });
   return applySaasResonanceToToolProfile(base, saasRole);
@@ -119,14 +119,18 @@ export function compileUserProfile(input: CompileUserProfileInput): CompiledUser
     roleProfile: { id: saasRole, ...(input.entitlementContext?.roleProfile as object) },
   };
 
-  const withAccess = projectToolsWithAccess(rawTools, entitlementContext, saasRole);
-  const graph = buildProfileToolGraph({ tools: withAccess, profile: segmentationProfile });
+  const withAccess = projectToolsWithAccess(rawTools, entitlementContext, saasRole) as CompiledToolRecord[];
+  const graph = (buildProfileToolGraph as Function)({ tools: withAccess, profile: segmentationProfile }) as {
+    visibleTools: CompiledToolRecord[];
+    recommendedTools: CompiledToolRecord[];
+    restrictedTools: CompiledToolRecord[];
+  };
 
   const requiredIds = new Set(catalog.requiredToolIds || []);
-  const required = withAccess.filter((tool) => requiredIds.has(tool.id));
+  const required = withAccess.filter((tool: CompiledToolRecord) => requiredIds.has(tool.id));
 
   const visible = filterVisibleTools(
-    graph.visibleTools.filter((tool) => {
+    (graph.visibleTools as CompiledToolRecord[]).filter((tool: CompiledToolRecord) => {
       if (!toolMatchesProfilePackPolicy(tool, saasRole, { strict: strictPackEnforcement })) {
         return false;
       }
@@ -146,13 +150,13 @@ export function compileUserProfile(input: CompileUserProfileInput): CompiledUser
     ),
   ] as CompiledToolRecord[];
 
-  const launchable = visible.filter((tool) =>
-    [
+  const launchable = visible.filter((tool: CompiledToolRecord) =>
+    ([
       ASSET_ACCESS_STATES.ALLOWED,
       ASSET_ACCESS_STATES.BETA,
       ASSET_ACCESS_STATES.EXPERIMENTAL,
       ASSET_ACCESS_STATES.DEMO_ONLY,
-    ].includes(tool.accessState as string),
+    ] as string[]).includes(tool.accessState as string),
   );
 
   const trackMind = catalog.trackMindRoleId
@@ -216,12 +220,12 @@ export function isToolAllowedForCompiledProfile(
     { ...getPlatformEntitlementContext(), ...(entitlementContext || {}) },
     saasRole,
   );
-  return [
+  return ([
     ASSET_ACCESS_STATES.ALLOWED,
     ASSET_ACCESS_STATES.BETA,
     ASSET_ACCESS_STATES.EXPERIMENTAL,
     ASSET_ACCESS_STATES.DEMO_ONLY,
-  ].includes(access.accessState as string);
+  ] as string[]).includes(access.accessState as string);
 }
 
 export function isRouteAllowedInCompiledProfile(

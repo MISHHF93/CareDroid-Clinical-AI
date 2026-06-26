@@ -2,7 +2,7 @@ import React from 'react';
 import './OperationalHandoffDomainBar.css';
 
 export default function OperationalHandoffDomainBar({
-  domains = [],
+  domains = /** @type {any[]} */ ([]),
   onMetricSelect,
   readOnly = false,
 }) {

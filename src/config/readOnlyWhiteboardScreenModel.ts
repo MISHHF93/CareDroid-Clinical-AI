@@ -127,7 +127,7 @@ export function resolveReadOnlyWhiteboardScreenCapabilities(
     showBoarders ? READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.boarders : null,
     showReferralsPending ? READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.referralsPending : null,
     showCapacityStatus ? READ_ONLY_WHITEBOARD_SCREEN_WIDGETS.capacityStatus : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isReadOnlyWhiteboardScreen,

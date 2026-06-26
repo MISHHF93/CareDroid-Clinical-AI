@@ -50,7 +50,7 @@ export interface ToolCall {
 }
 
 export interface AIRequest {
-  messages: Message[];
+  messages?: Message[];
   systemPrompt: string;
   requestType: AIRequestType;
   stream?: boolean;
@@ -289,7 +289,7 @@ function bodyForBackendRequest(request: AIRequest): Record<string, unknown> {
   const edCopilot = isRecord(context.edCopilot) ? context.edCopilot : {};
 
   return {
-    message: request.message || latestUserContent(request.messages),
+    message: request.message || latestUserContent(request.messages ?? []),
     messages: request.messages,
     requestType: request.requestType,
     systemPrompt: request.systemPrompt,

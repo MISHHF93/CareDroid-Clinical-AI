@@ -7,9 +7,9 @@ import './DeteriorationWatchBadge.css';
 
 export default function DeteriorationWatchBadge({
   patient,
-  emsArrivals = [],
-  vitalsStaleMinutes,
-  now,
+  emsArrivals = /** @type {any[]} */ ([]),
+  vitalsStaleMinutes = undefined,
+  now = undefined,
   compact = false,
 }) {
   if (!patient?.id) return null;

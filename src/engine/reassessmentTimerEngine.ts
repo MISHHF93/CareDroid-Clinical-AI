@@ -291,7 +291,7 @@ export function deriveReassessmentSchedule(
 } {
   const resolved = { ...DEFAULT_REASSESSMENT_TIMER_THRESHOLDS, ...thresholds };
   const reminder = activeReassessmentReminders(patient).sort(
-    (left, right) => new Date(left.dueAt).getTime() - new Date(right.dueAt).getTime(),
+    (left: { dueAt: string }, right: { dueAt: string }) => new Date(left.dueAt).getTime() - new Date(right.dueAt).getTime(),
   )[0];
 
   if (reminder?.dueAt) {

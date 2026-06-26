@@ -91,7 +91,7 @@ export function resolvePublicWaitingScreenCapabilities(
     showPatientGuidance ? PUBLIC_WAITING_SCREEN_WIDGETS.patientGuidance : null,
     showSymptomEscalation ? PUBLIC_WAITING_SCREEN_WIDGETS.symptomEscalation : null,
     showEmsCrowdingImpact ? PUBLIC_WAITING_SCREEN_WIDGETS.emsCrowdingImpact : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isPublicWaitingScreen,

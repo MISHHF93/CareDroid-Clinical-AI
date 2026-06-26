@@ -160,7 +160,7 @@ export function resolveChargeNurseScreenCapabilities(
     showBoarders ? CHARGE_NURSE_SCREEN_WIDGETS.boarders : null,
     showReferralsPending ? CHARGE_NURSE_SCREEN_WIDGETS.referralsPending : null,
     showCapacityStatus ? CHARGE_NURSE_SCREEN_WIDGETS.capacityStatus : null,
-  ].filter((surface): surface is string => Boolean(surface));
+  ].filter(Boolean) as string[];
 
   return {
     isChargeNurseScreen,

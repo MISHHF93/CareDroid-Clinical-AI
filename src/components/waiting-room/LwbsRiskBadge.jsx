@@ -5,8 +5,8 @@ import './LwbsRiskBadge.css';
 export default function LwbsRiskBadge({
   patient,
   waitingPatientCount,
-  congestionThreshold,
-  now,
+  congestionThreshold = undefined,
+  now = undefined,
   compact = false,
   showScore = false,
 }) {

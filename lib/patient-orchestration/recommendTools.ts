@@ -43,7 +43,7 @@ function scoreIdsEquivalent(left: string, right: string): boolean {
 }
 
 function toolRegistryIds(tool: OrchestrationToolDefinition): string[] {
-  return [tool.id, tool.toolId, tool.registryId, ...(tool.complaintScoreIds || [])].filter(Boolean);
+  return [tool.id, tool.toolId, tool.registryId, ...(tool.complaintScoreIds || [])].filter(Boolean) as string[];
 }
 
 function toolMatchesComplaintRouteScore(
@@ -57,7 +57,7 @@ function toolMatchesComplaintRoute(
   tool: OrchestrationToolDefinition,
   complaintRoute: ComplaintRouteSnapshot | null,
 ): boolean {
-  if (!(complaintRoute?.scoreIds?.length ?? 0)) return false;
+  if (!complaintRoute?.scoreIds?.length) return false;
   return complaintRoute.scoreIds.some((scoreId) => toolMatchesComplaintRouteScore(tool, scoreId));
 }
 
