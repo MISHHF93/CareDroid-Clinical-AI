@@ -310,7 +310,7 @@ function AppShellFrame({ children }: AppShellProps) {
     bootstrapAiPlatformIntegrations();
     void (async () => {
       await ensureDevBackendSession();
-      const backendReachable = await probeBackendReachability({ force: true });
+      const backendReachable = await probeBackendReachability();
       if (backendReachable) {
         await useEmergencyStore.getState().initializeFromBackend();
       } else {
