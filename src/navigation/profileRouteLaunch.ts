@@ -102,9 +102,10 @@ export function resolveProfileAwareDestination(path, options: any = {}) {
   const permissionPath = normalizePath(path);
 
   if (emergencyRole?.canAccessRoute) {
-    target = emergencyRole.canAccessRoute(permissionPath)
-      ? path
-      : emergencyRole.nearestRoute(permissionPath);
+    if (emergencyRole.canAccessRoute(permissionPath)) {
+      return { destination: path, allowed: true, access: { allowed: true, reason: null, redirectTo: null } };
+    }
+    target = emergencyRole.nearestRoute(permissionPath);
   }
 
   const access = resolveProfileRouteLaunchAccess(target, options);

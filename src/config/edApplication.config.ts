@@ -21,6 +21,7 @@ export const ED_APPLICATION = Object.freeze({
 export type EdCoreRouteKey =
   | 'reception'
   | 'whiteboard'
+  | 'patients'
   | 'ems'
   | 'intake'
   | 'queues'
@@ -31,6 +32,9 @@ export type EdCoreRouteKey =
   | 'copilot'
   | 'tools'
   | 'analytics'
+  | 'alerts'
+  | 'pulse'
+  | 'shift'
   | 'settings'
   | 'help'
   | 'admin';
@@ -39,6 +43,7 @@ export type EdCoreRouteKey =
 export const ED_CORE_ROUTES: Readonly<Record<EdCoreRouteKey, string>> = Object.freeze({
   reception: CANONICAL_ROUTES.emergencyReception,
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
+  patients: CANONICAL_ROUTES.emergencyPatients,
   ems: CANONICAL_ROUTES.emergencyEms,
   intake: CANONICAL_ROUTES.emergencyIntake,
   queues: CANONICAL_ROUTES.emergencyQueues,
@@ -49,6 +54,9 @@ export const ED_CORE_ROUTES: Readonly<Record<EdCoreRouteKey, string>> = Object.f
   copilot: CANONICAL_ROUTES.emergencyCopilot,
   tools: CANONICAL_ROUTES.emergencyTools,
   analytics: CANONICAL_ROUTES.emergencyAnalytics,
+  alerts: CANONICAL_ROUTES.emergencyAlerts,
+  pulse: CANONICAL_ROUTES.emergencyPulse,
+  shift: CANONICAL_ROUTES.emergencyShift,
   settings: CANONICAL_ROUTES.emergencySettings,
   help: CANONICAL_ROUTES.emergencyHelp,
   admin: CANONICAL_ROUTES.adminOperations,
@@ -120,6 +128,9 @@ export function resolveEdExtensionRedirect(pathname = ''): string | null {
   }
 
   const normalized = pathname.split('?')[0].split('#')[0];
+  if (isEdCoreRoute(normalized)) {
+    return null;
+  }
   for (const entry of ED_EXTENSION_ROUTE_REDIRECTS) {
     if (normalized === entry.prefix || normalized.startsWith(`${entry.prefix}/`)) {
       return entry.to;

@@ -48,8 +48,9 @@ export function PageShell({
         actions={actions}
         leadingIcon={leadingIcon}
         className={headerClassName}
-        children={undefined}
-      />
+      >
+        {null}
+      </PageHeader>
       <div className={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}>
         {children}
       </div>

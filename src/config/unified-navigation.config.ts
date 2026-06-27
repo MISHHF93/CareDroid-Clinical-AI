@@ -34,13 +34,11 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'copilot',
   'tools',
   'analytics',
-  'alerts',
   'settings',
 ]);
 
 /** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
-  'help',
   'pulse',
   'shift',
 ]);
@@ -104,6 +102,8 @@ export type NavItem = Readonly<{
   icon: string;
   route: string;
   featureGate: string | null;
+  roles?: readonly string[];
+  activePaths?: readonly string[];
 }>;
 
 export type NavigationItem = Readonly<{
@@ -125,7 +125,7 @@ export type NavigationItem = Readonly<{
 
 const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform', 'pulse', 'shift']);
 
-export const NAV_ITEMS = Object.freeze([
+export const NAV_ITEMS: readonly NavItem[] = Object.freeze([
   {
     id: 'reception',
     label: 'Reception',
@@ -211,24 +211,10 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
-    id: 'alerts',
-    label: 'Alerts',
-    icon: 'alerts',
-    route: CANONICAL_ROUTES.emergencyAlerts,
-    featureGate: null,
-  },
-  {
     id: 'settings',
     label: 'Settings',
     icon: 'settings',
     route: CANONICAL_ROUTES.emergencySettings,
-    featureGate: null,
-  },
-  {
-    id: 'help',
-    label: 'Guide',
-    icon: 'procedures',
-    route: CANONICAL_ROUTES.emergencyHelp,
     featureGate: null,
   },
   {
@@ -329,10 +315,13 @@ const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
 const ALL_ROLES = Object.freeze(Object.values(ROLES));
 const NAV_FEATURE_IDS = Object.freeze({
   reception: 'reception_workspace',
+  'command-center': 'emergency_whiteboard',
   whiteboard: 'emergency_whiteboard',
   patients: 'emergency_patients',
   ems: 'ems_pipeline',
   intake: 'smart_intake',
+  queue: 'queue_intelligence',
+  triage: 'triage_workspace',
   queues: 'queue_intelligence',
   reassessment: 'reassessment_engine',
   capacity: 'capacity_intelligence',
@@ -342,6 +331,10 @@ const NAV_FEATURE_IDS = Object.freeze({
   tools: 'clinical_calculator_hub',
   analytics: 'emergency_analytics',
   alerts: 'clinical_alerts',
+  'ai-chief': 'ed_copilot',
+  staff: 'staff_command',
+  departments: 'department_capacity',
+  reports: 'operational_reports',
   settings: 'emergency_settings',
   integrations: 'integration_hub',
   cosmos: 'cosmos_viewer',
@@ -425,11 +418,13 @@ export const NAVIGATION_ITEMS = Object.freeze(
       path: item.route,
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
       order: index + 1,
-      roles: rolesForRoute(item.route),
+      roles: item.roles || rolesForRoute(item.route),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
-        item.id === 'reception'
+        item.activePaths
+          ? item.activePaths
+        : item.id === 'reception'
           ? getReceptionNavActivePaths()
           : item.id === 'whiteboard'
           ? [

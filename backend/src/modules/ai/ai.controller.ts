@@ -12,7 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AIService } from './ai.service';
-import { AIQueryDto, StructuredJSONDto } from './dto/ai.dto';
+import { AIQueryDto, CareDroidAINodeDto, StructuredJSONDto } from './dto/ai.dto';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
@@ -73,6 +73,27 @@ export class AIController {
       dto.prompt,
       dto.schema,
       withTenantContext(undefined, req.tenantContext),
+    );
+  }
+
+  @Post('node')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Run centralized CareDroid AI workflow intent' })
+  @ApiResponse({ status: 200, description: 'Structured CareDroid AI node response generated' })
+  async runCareDroidNode(@Req() req: any, @Body() dto: CareDroidAINodeDto) {
+    const context = withTenantContext(dto.context, req.tenantContext);
+    await this.assertAiFeatureAllowed(req, {
+      ...context,
+      assetId: context?.assetId || 'agent-clinical',
+    });
+    return this.aiService.runCareDroidAINode(
+      req.user.id,
+      {
+        intent: dto.intent as any,
+        input: dto.input,
+        context,
+      },
+      context,
     );
   }
 

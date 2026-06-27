@@ -8,7 +8,7 @@ import { AIQuery } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
-import { unifiedAIClient } from '../../../../src/lib/ai/client';
+import { unifiedAIClient } from '../../../../lib/ai/serverClient';
 
 describe('AIService', () => {
   let service: AIService;

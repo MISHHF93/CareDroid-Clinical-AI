@@ -34,6 +34,7 @@ import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
+import { RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
 import './emergency-route.css';
 import {
   SMART_INTAKE_STEP_INDEX,
@@ -243,7 +244,10 @@ export default function SmartIntake({
 
   useEffect(() => {
     if (embedded || fromReception) return;
-    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+    if (
+      RECEPTION_FIRST_UX.redirectStandaloneIntake &&
+      prefersReceptionForPatientCreate(emergencyRole.role)
+    ) {
       profileNavigate(
         getReceptionEmbeddedIntakePath({
           step: searchParams.get('step') || undefined,

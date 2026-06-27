@@ -9,6 +9,7 @@ import {
   Routes,
   useLocation,
   useNavigate,
+  useParams,
   useSearchParams,
 } from 'react-router-dom';
 import { UserIdentityProvider, useUserIdentity } from '../contexts/UserIdentityContext';
@@ -54,9 +55,10 @@ const ClinicalToolCatalog = lazyRoute(() => import('../pages/tools/ClinicalToolC
 const AdminOperationsShell = lazyRoute(() => import('../components/admin/AdminOperationsShell'));
 const AdminOperationsHome  = lazyRoute(() => import('../pages/admin/AdminOperationsHome'));
 const EdStaffWorkflowAdmin = lazyRoute(() => import('../pages/admin/EdStaffWorkflowAdmin'));
-const TeamManagement       = lazyRoute(() => import('../pages/team/TeamManagement'));
+const TeamManagement       = lazyNamed(() => import('../pages/team/TeamManagement'), 'TeamManagement');
 const SystemHealth         = lazyRoute(() => import('../pages/SystemHealth'));
 const AutomationAuditTrail = lazyRoute(() => import('../pages/AutomationAuditTrail'));
+const PlatformGovernanceWorkspace = lazyRoute(() => import('../pages/platform/PlatformGovernanceWorkspace'));
 
 // ── Physician tools ──────────────────────────────────────────────────────────
 const ClinicalDocumentationAssistant = lazyRoute(() => import('../pages/ClinicalDocumentationAssistant'));
@@ -76,6 +78,7 @@ const ProfileWorkspaces     = lazyRoute(() => import('../pages/profile/ProfileWo
 const BillingPage           = lazyRoute(() => import('../pages/BillingPage'));
 const UsagePage             = lazyRoute(() => import('../pages/UsagePage'));
 const NotificationPreferences = lazyRoute(() => import('../pages/NotificationPreferences'));
+const FeatureManagement = lazyRoute(() => import('../pages/settings/FeatureManagement'));
 
 import {
   AUTH_PATH_ALIASES,
@@ -92,7 +95,6 @@ import {
   getEmergencyRoleHomeRoute,
   EMERGENCY_ROLE_IDS,
   getReceptionEmbeddedIntakePath,
-  prefersReceptionForPatientCreate,
 } from '../config/emergencyRolePermissions';
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
@@ -226,10 +228,7 @@ function EmergencyDefaultRedirect() {
 function EmergencyIntakeEntry() {
   const emergencyRole = useEmergencyRolePermissions();
   const [searchParams] = useSearchParams();
-  if (
-    shouldRedirectEmergencySurface('intake', emergencyRole.role) ||
-    prefersReceptionForPatientCreate(emergencyRole.role)
-  ) {
+  if (shouldRedirectEmergencySurface('intake', emergencyRole.role)) {
     return (
       <Navigate
         to={getReceptionEmbeddedIntakePath({
@@ -299,9 +298,40 @@ export function buildEmergencyToolsRedirect(location) {
   } else if (pathname === CANONICAL_ROUTES.recommendations) {
     setDefault('source', 'recommendations');
     setDefault('filter', 'recommended');
-  } else if (pathname === CANONICAL_ROUTES.workflows || pathname === CANONICAL_ROUTES.automation) {
+  } else if (pathname === CANONICAL_ROUTES.discover) {
+    setDefault('source', 'discover');
+    setDefault('filter', 'recommended');
+  } else if (pathname === CANONICAL_ROUTES.knowledgeHub || pathname === CANONICAL_ROUTES.knowledgeBase || pathname === CANONICAL_ROUTES.knowledgeGraph) {
+    setDefault('source', 'knowledge');
+    setDefault('filter', 'clinical-tools');
+    setDefault('q', 'guideline-rag');
+    setDefault('open', 'guideline-rag');
+  } else if (pathname === CANONICAL_ROUTES.workflows || pathname === CANONICAL_ROUTES.automation || pathname === CANONICAL_ROUTES.workflowMining) {
     setDefault('source', 'workflows');
     setDefault('filter', 'ai-workflows');
+  } else if (
+    pathname.startsWith('/fleet/') ||
+    pathname.startsWith('/operations/') ||
+    pathname === '/maps' ||
+    pathname === '/tracking' ||
+    pathname === '/live-tracking' ||
+    pathname === '/digital-twin'
+  ) {
+    const operationsSlug =
+      pathname === '/fleet/live-map'
+        ? 'fleet-live-map'
+        : pathname === '/maps' || pathname === '/tracking' || pathname === '/live-tracking'
+        ? 'live-tracking-map'
+        : safeDecodeURIComponent(
+            pathname
+              .replace(/^\/fleet\//, '')
+              .replace(/^\/operations\//, '')
+              .replace(/^\//, ''),
+          ).replace(/\s+/g, '-');
+    setDefault('source', 'operations');
+    setDefault('filter', 'operations');
+    setDefault('q', operationsSlug);
+    setDefault('open', operationsSlug);
   } else if (pathname === CANONICAL_ROUTES.protocols || pathname.startsWith('/protocols/')) {
     setDefault('source', 'clinical-tools');
     setDefault('filter', 'clinical-tools');
@@ -320,6 +350,10 @@ export function buildEmergencyToolsRedirect(location) {
   } else if (pathname === '/radiology' || pathname.startsWith('/radiology/')) {
     setDefault('source', 'workflows');
     setDefault('filter', 'ai-workflows');
+    if (pathname.startsWith('/radiology/')) {
+      setDefault('q', 'guideline-rag');
+      setDefault('open', 'guideline-rag');
+    }
   } else if (
     pathname === CANONICAL_ROUTES.calculators ||
     pathname.startsWith(`${CANONICAL_ROUTES.calculators}/`) ||
@@ -376,9 +410,47 @@ function ToolsRedirect() {
   );
 }
 
+function NonEdWorkspaceRedirect({ moduleName }) {
+  if (['Laboratory', 'Pharmacy', 'Radiology', 'Fleet'].includes(moduleName)) {
+    return <ToolsRedirect />;
+  }
+  return <Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />;
+}
+
 function EmergencyAliasRedirect({ to }) {
   const location = useLocation();
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
+}
+
+function TriageWorkspaceRoute() {
+  const [searchParams] = useSearchParams();
+  if (!searchParams.has('queue') && !searchParams.has('filter') && !searchParams.has('queueFilter')) {
+    return <Navigate to={`${CANONICAL_ROUTES.triage}?queue=pretriage`} replace />;
+  }
+  return (
+    <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
+      <EmergencySurfaceRedirect surfaceId="queues">
+        <QueueRoute />
+      </EmergencySurfaceRedirect>
+    </EmergencyRouteGuard>
+  );
+}
+
+function PatientProfileRoute() {
+  const { patientId } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (patientId && !params.has('patientId')) params.set('patientId', patientId);
+  return (
+    <Navigate
+      to={{
+        pathname: CANONICAL_ROUTES.emergencyPatients,
+        search: params.toString() ? `?${params.toString()}` : location.search,
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
 }
 
 // ── Root layout (AppShell wraps all standard ED routes) ──────────────────────
@@ -452,14 +524,7 @@ export function AppRoutes() {
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.whiteboard}  element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyWhiteboard} />} />
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.reception}   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyReception} />} />
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.ems}         element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyEms} />} />
-      <Route path={ED_UNIFIED_PUBLIC_ROUTES.analytics}   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyAnalytics} />} />
-      <Route path={ED_UNIFIED_PUBLIC_ROUTES.copilot}     element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.calculators} element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyTools} />} />
-      <Route path={ED_UNIFIED_PUBLIC_ROUTES.admin}       element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.adminOperations} />} />
-      <Route
-        path={ED_UNIFIED_PUBLIC_ROUTES.triage}
-        element={<ScreenModeLandingRedirect mode={CARE_DROID_SCREEN_MODES.triage} />}
-      />
       <Route
         path={ED_UNIFIED_PUBLIC_ROUTES.charge}
         element={<ScreenModeLandingRedirect mode={CARE_DROID_SCREEN_MODES.chargeNurse} />}
@@ -474,7 +539,6 @@ export function AppRoutes() {
 
         {/* Entry redirects */}
         <Route path={CANONICAL_ROUTES.platformStart} element={<EdApplicationEntryRedirect />} />
-        <Route path={CANONICAL_ROUTES.dashboard}      element={<EdApplicationEntryRedirect />} />
 
         {/* ── Admin ── */}
         <Route
@@ -499,6 +563,102 @@ export function AppRoutes() {
 
         {/* ── Emergency department core ── */}
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
+
+        {/* CareDroid consolidated page architecture */}
+        <Route
+          path={CANONICAL_ROUTES.intake}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
+              <EmergencyIntakeEntry />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.queue}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
+              <EmergencySurfaceRedirect surfaceId="queues">
+                <QueueRoute />
+              </EmergencySurfaceRedirect>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route path={CANONICAL_ROUTES.triage} element={<TriageWorkspaceRoute />} />
+        <Route path="/patients/:patientId" element={<PatientProfileRoute />} />
+        <Route
+          path="/patients"
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
+              <EmergencySurfaceRedirect surfaceId="patients">
+                <PatientsRoute />
+              </EmergencySurfaceRedirect>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.alerts}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAlerts}>
+              <LazyRoute label="Loading alerts...">
+                <ClinicalAlertsPage />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiChief}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
+              <CopilotRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.staff}
+          element={
+            <LazyRoute label="Loading staff command...">
+              <TeamManagement />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.departments}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
+              <CapacityRoute />
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.analytics}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+              <LazyRoute label="Loading analytics...">
+                <EmergencyAnalytics />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.reports}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+              <LazyRoute label="Loading reports...">
+                <EmergencyAnalytics />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.settings}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
+              <LazyRoute label="Loading settings...">
+                <EmergencySettings />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
 
         <Route
           path={CANONICAL_ROUTES.emergencyWhiteboard}
@@ -717,6 +877,7 @@ export function AppRoutes() {
         <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
         <Route path="/profile/workspaces"                     element={<LazyRoute label="Loading profile workspaces..."><ProfileWorkspaces /></LazyRoute>} />
         <Route path="/notification-preferences"               element={<LazyRoute label="Loading notification preferences..."><NotificationPreferences /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.notifications}           element={<Navigate to="/notification-preferences" replace />} />
 
         {/* ── SaaS billing ── */}
         <Route path={CANONICAL_ROUTES.billing} element={<LazyRoute label="Loading billing..."><BillingPage /></LazyRoute>} />
@@ -731,6 +892,14 @@ export function AppRoutes() {
             </LazyRoute>
           }
         />
+        <Route path={CANONICAL_ROUTES.featureFlags} element={<LazyRoute label="Loading feature flags..."><FeatureManagement /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.systemHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.saasHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.audit} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.security} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.regulatory} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.aiGovernance} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.humanReview} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
 
         {/* ── Legacy emergency route redirects (from routes.config) ── */}
         {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
@@ -742,7 +911,7 @@ export function AppRoutes() {
           <Route
             key={`${path}-${moduleName}`}
             path={path}
-            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />}
+            element={<NonEdWorkspaceRedirect moduleName={moduleName} />}
           />
         ))}
 
@@ -751,19 +920,18 @@ export function AppRoutes() {
         <Route path="/cosmos/*"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/workspace"           element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/workspaces"          element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/discover"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/executive"           element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
         <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/surveillance"        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/surveillance/*"      element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/fleet"               element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/fleet/*"             element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
+        <Route path="/fleet/*"             element={<ToolsRedirect />} />
         <Route path="/vehicle"             element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
         <Route path="/vehicle/*"           element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/maps"                element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/tracking"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/live-tracking"       element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        <Route path="/maps"                element={<ToolsRedirect />} />
+        <Route path="/tracking"            element={<ToolsRedirect />} />
+        <Route path="/live-tracking"       element={<ToolsRedirect />} />
         <Route path="/operations-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/platform-learning"   element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
         <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
@@ -794,6 +962,19 @@ export function AppRoutes() {
       <Route path="/radiology"          element={<ToolsRedirect />} />
       <Route path="/radiology/*"        element={<ToolsRedirect />} />
       <Route path="/recommendations"    element={<ToolsRedirect />} />
+      <Route path="/automation"         element={<ToolsRedirect />} />
+      <Route path="/workflows"          element={<ToolsRedirect />} />
+      <Route path="/workflow-mining"    element={<ToolsRedirect />} />
+      <Route path="/discover"           element={<ToolsRedirect />} />
+      <Route path="/search"             element={<ToolsRedirect />} />
+      <Route path="/knowledge-hub"      element={<ToolsRedirect />} />
+      <Route path="/knowledge-base"     element={<ToolsRedirect />} />
+      <Route path="/knowledge-graph"    element={<ToolsRedirect />} />
+      <Route path="/laboratory"         element={<ToolsRedirect />} />
+      <Route path="/fleet/live-map"     element={<ToolsRedirect />} />
+      <Route path="/fleet/route-optimizer" element={<ToolsRedirect />} />
+      <Route path="/operations/:tool"   element={<ToolsRedirect />} />
+      <Route path="/digital-twin"       element={<ToolsRedirect />} />
 
       {/* ── Copilot / AI aliases ── */}
       <Route path="/assistant" element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
@@ -802,7 +983,7 @@ export function AppRoutes() {
       <Route path="/copilot"   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
 
       {/* ── Generic fallbacks ── */}
-      <Route path="/dashboard"          element={<EmergencyDefaultRedirect />} />
+      <Route path="/dashboard"          element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyWhiteboard} />} />
       <Route path="/home"               element={<EmergencyDefaultRedirect />} />
       <Route path="/app"                element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile"             element={<EmergencyDefaultRedirect />} />

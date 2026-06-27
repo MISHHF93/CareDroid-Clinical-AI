@@ -11,9 +11,9 @@ export const RECEPTION_FIRST_UX = Object.freeze({
   routePatientSearchThroughReception: true,
   demoteCommandCenterInNav: true,
   pipelineShellEnabled: true,
-  redirectStandaloneIntake: true,
-  redirectStandaloneQueues: true,
-  redirectStandalonePatientsForClerk: true,
+  redirectStandaloneIntake: false,
+  redirectStandaloneQueues: false,
+  redirectStandalonePatientsForClerk: false,
   deskUiEnabled: true,
 });
 

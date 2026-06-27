@@ -1,0 +1,324 @@
+.cd-ai-panel,
+.cd-ai-card {
+  border: 1px solid var(--medical-border, #dbeafe);
+  border-radius: var(--cd-radius-lg, 8px);
+  background: var(--medical-surface-card, #ffffff);
+  color: var(--medical-text, #111827);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.cd-ai-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.cd-ai-panel__header,
+.cd-ai-card__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cd-ai-panel__header p,
+.cd-ai-panel__header h2,
+.cd-ai-panel__header span,
+.cd-ai-card__title p,
+.cd-ai-card__title h3 {
+  margin: 0;
+}
+
+.cd-ai-panel__header p,
+.cd-ai-card__title p {
+  color: var(--medical-text-link, #0369a1);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cd-ai-panel__header h2,
+.cd-ai-card__title h3 {
+  color: var(--medical-text-heading, #111827);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.cd-ai-panel__header span {
+  color: var(--medical-text-muted, #6b7280);
+  display: block;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.cd-ai-panel__header strong {
+  align-items: center;
+  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #0ea5e9) 30%, #ffffff);
+  border-radius: 999px;
+  color: var(--medical-text-link, #0369a1);
+  display: inline-flex;
+  font-size: 12px;
+  justify-content: center;
+  min-height: 30px;
+  min-width: 30px;
+  padding: 4px 8px;
+}
+
+.cd-ai-panel__state {
+  border: 1px dashed var(--medical-border, #dbeafe);
+  border-radius: var(--cd-radius-md, 6px);
+  color: var(--medical-text-muted, #6b7280);
+  margin: 0;
+  padding: 12px;
+}
+
+.cd-ai-panel__state--error {
+  background: color-mix(in srgb, #ef4444 8%, #ffffff);
+  border-color: color-mix(in srgb, #ef4444 36%, #ffffff);
+  color: var(--medical-status-critical-text, #b91c1c);
+}
+
+.cd-ai-panel__list {
+  display: grid;
+  gap: 12px;
+}
+
+.cd-ai-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.cd-ai-card--compact {
+  box-shadow: none;
+}
+
+.cd-ai-card__title {
+  align-items: flex-start;
+  display: flex;
+  gap: 9px;
+}
+
+.cd-ai-card__title svg {
+  color: var(--medical-text-link, #0369a1);
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.cd-ai-card__primary {
+  color: var(--medical-text-heading, #111827);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.cd-ai-confidence {
+  border-radius: 999px;
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.cd-ai-confidence--high {
+  background: color-mix(in srgb, #22c55e 16%, #ffffff);
+  color: var(--medical-status-success-text, #15803d);
+}
+
+.cd-ai-confidence--medium {
+  background: color-mix(in srgb, #0ea5e9 14%, #ffffff);
+  color: var(--medical-text-link, #0369a1);
+}
+
+.cd-ai-confidence--low {
+  background: color-mix(in srgb, #f59e0b 18%, #ffffff);
+  color: var(--medical-status-warning-text, #b45309);
+}
+
+.cd-ai-card__facts {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  margin: 0;
+}
+
+.cd-ai-card__facts div {
+  border: 1px solid var(--medical-border, #dbeafe);
+  border-radius: var(--cd-radius-md, 6px);
+  background: var(--medical-surface-page, #f8fafc);
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.cd-ai-card__facts dt {
+  color: var(--medical-text-subtle, #64748b);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cd-ai-card__facts dd {
+  color: var(--medical-text-heading, #111827);
+  font-size: 13px;
+  font-weight: 700;
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.cd-ai-missing,
+.cd-ai-safety,
+.cd-ai-card__red-flags,
+.cd-ai-card__warnings,
+.cd-ai-card__next {
+  border-radius: var(--cd-radius-md, 6px);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.cd-ai-missing,
+.cd-ai-safety {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+
+.cd-ai-missing {
+  background: color-mix(in srgb, #f59e0b 10%, #ffffff);
+  color: var(--medical-status-warning-text, #b45309);
+}
+
+.cd-ai-missing svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.cd-ai-missing strong,
+.cd-ai-card__warnings strong,
+.cd-ai-card__next strong {
+  color: inherit;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.cd-ai-missing ul,
+.cd-ai-card__red-flags ul,
+.cd-ai-card__warnings ul,
+.cd-ai-card__next ul,
+.cd-ai-reasoning ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.cd-ai-card__red-flags {
+  background: color-mix(in srgb, #ef4444 9%, #ffffff);
+  color: var(--medical-status-critical-text, #b91c1c);
+  padding: 10px;
+}
+
+.cd-ai-card__red-flags strong {
+  color: inherit;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.cd-ai-card__warnings {
+  background: color-mix(in srgb, #f59e0b 8%, #ffffff);
+  color: var(--medical-status-warning-text, #b45309);
+  padding: 10px;
+}
+
+.cd-ai-card__next {
+  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 8%, #ffffff);
+  color: var(--medical-text-link, #0369a1);
+  padding: 10px;
+}
+
+.cd-ai-reasoning {
+  border: 1px solid var(--medical-border, #dbeafe);
+  border-radius: var(--cd-radius-md, 6px);
+  color: var(--medical-text-muted, #6b7280);
+  font-size: 12px;
+  padding: 9px 10px;
+}
+
+.cd-ai-reasoning summary {
+  color: var(--medical-text-heading, #111827);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.cd-ai-reasoning ul {
+  margin-top: 8px;
+}
+
+.cd-ai-safety {
+  background: color-mix(in srgb, #22c55e 9%, #ffffff);
+  color: var(--medical-status-success-text, #15803d);
+}
+
+.cd-ai-safety svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.cd-ai-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cd-ai-actions__button {
+  align-items: center;
+  border: 1px solid var(--medical-border, #dbeafe);
+  border-radius: var(--cd-radius-md, 6px);
+  background: #ffffff;
+  color: var(--medical-text-heading, #111827);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+}
+
+.cd-ai-actions__button:hover {
+  background: var(--medical-surface-page, #f8fafc);
+}
+
+.cd-ai-actions__button--escalate {
+  border-color: color-mix(in srgb, #ef4444 35%, #ffffff);
+  color: var(--medical-status-critical-text, #b91c1c);
+}
+
+.cd-ai-actions__button:focus-visible {
+  outline: 2px solid var(--app-focus, #0284c7);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .cd-ai-panel,
+  .cd-ai-card {
+    padding: 12px;
+  }
+
+  .cd-ai-panel__header,
+  .cd-ai-card__header {
+    display: grid;
+  }
+
+  .cd-ai-confidence {
+    justify-self: start;
+  }
+
+  .cd-ai-card__facts {
+    grid-template-columns: 1fr;
+  }
+}

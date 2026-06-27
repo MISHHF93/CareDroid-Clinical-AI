@@ -16,11 +16,16 @@ import {
   ToolDefinition,
   UNIFIED_AI_MODEL,
   unifiedAIClient,
-} from '../../../../src/lib/ai/client';
+} from '../../../../lib/ai/serverClient';
 import type { AIRequestType } from '../../../../lib/ai/types';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { promptForRequestType } from '../../../../lib/ai/promptRegistry';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
+import {
+  runCareDroidAI,
+  type CareDroidAIIntent,
+  type CareDroidAIRequest,
+} from '../../../../lib/ai/careDroidAI';
 
 interface RateLimitConfig {
   dailyLimit: number;
@@ -433,6 +438,57 @@ export class AIService {
         `Structured JSON generation failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+  }
+
+  async runCareDroidAINode(
+    userId: string,
+    request: CareDroidAIRequest,
+    context?: any,
+  ) {
+    const startTime = Date.now();
+    const mergedRequest = {
+      ...request,
+      context: {
+        ...(request.context || {}),
+        ...(context || {}),
+      },
+    };
+    const response = await runCareDroidAI(mergedRequest);
+    const latencyMs = Date.now() - startTime;
+    const intent = request.intent as CareDroidAIIntent;
+
+    await this.logQuery({
+      userId,
+      prompt: `careDroidAI:${intent}`,
+      response: response.status,
+      status: response.status === 'success' ? QueryStatus.SUCCESS : QueryStatus.ERROR,
+      model: 'careDroidAI-node-v1',
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+      cost: 0,
+      latencyMs,
+      feature: 'careDroidAI_node',
+      intentClassified: intent,
+      metadata: {
+        tenant: mergedRequest.context?.tenant,
+        sourceScreen: mergedRequest.context?.sourceScreen,
+        userRole: mergedRequest.context?.userRole || mergedRequest.context?.tenant?.role,
+        confidence: response.confidence,
+        warningCount: response.warnings.length,
+        nextActionCount: response.nextActions.length,
+        aiCommercialization: {
+          agentId: 'careDroidAI',
+          assetId: mergedRequest.context?.assetId || 'agent-clinical',
+          modelClass: 'standard',
+          modelVersion: 'careDroidAI-node-v1',
+          requiresHumanReview: response.requiresClinicianReview,
+          estimatedCost: 0,
+        },
+      },
+    });
+
+    return response;
   }
 
   async getUsage(userId: string, days: number = 30) {

@@ -1,6 +1,7 @@
 ﻿import { useMemo } from 'react';
 import type { ActiveShift, CapacitySnapshot, Patient, Room, Staff } from '../../types/emergency';
 import DepartmentStaffBar from '../whiteboard/DepartmentStaffBar';
+import { AIRecommendationCard } from '../ai';
 import type { EmergencyBoardingMetrics } from '../../store/emergencyStore';
 import {
   buildOperationalCommandDashboardSnapshot,
@@ -8,6 +9,10 @@ import {
   type OperationalDashboardMetric,
   type ZoneBedOccupancy,
 } from '../../services/operationalCommandDashboardModel';
+import {
+  CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+  type CareDroidAIResponse,
+} from '../../lib/ai/careDroidAI';
 import './CommandDashboard.css';
 
 export type CommandDashboardProps = {
@@ -73,6 +78,81 @@ function ZoneOccupancyRow({ zone }: { zone: ZoneBedOccupancy }) {
   );
 }
 
+function AiDecisionSupportQueue({ snapshot }: { snapshot: OperationalCommandDashboardSnapshot }) {
+  const recommendations = [
+    ...snapshot.pendingBedAssignments.map((assignment) => ({
+      id: `bed-${assignment.patientId}`,
+      recommendation: `Start bed coordination for ${assignment.patientLabel}`,
+      confidence: assignment.probabilityPercent,
+      rationale: `Admission probability ${assignment.probabilityPercent}% with admit score ${assignment.admitScore}/10.`,
+      action: assignment.action,
+    })),
+    ...snapshot.prolongedStayAlerts.map((alert) => ({
+      id: `stay-${alert.patientId}`,
+      recommendation: `Escalate prolonged-stay risk for ${alert.patientLabel}`,
+      confidence: alert.probabilityPercent,
+      rationale: `Projected ED stay ${alert.predictedHours}h with ${alert.probabilityPercent}% risk.`,
+      action: alert.action,
+    })),
+    ...snapshot.orientationPredictions.map((prediction) => ({
+      id: `orientation-${prediction.patientId}`,
+      recommendation: `Prepare ${prediction.orientation} pathway for ${prediction.patientLabel}`,
+      confidence: prediction.probabilityPercent,
+      rationale: `Native AI predicts ${prediction.orientation} as the most likely post-ED orientation.`,
+      action: 'Review with responsible clinician before changing disposition or bed workflow.',
+    })),
+  ]
+    .slice(0, 5)
+    .map(
+      (item): CareDroidAIResponse => ({
+        intent: 'hospital_command_insight',
+        status: 'success',
+        data: {
+          id: item.id,
+          recommendation: item.recommendation,
+          recommendedAction: item.action,
+        },
+        confidence: item.confidence / 100,
+        reasoning: [item.rationale],
+        warnings: [CLINICAL_DECISION_SUPPORT_DISCLAIMER],
+        redFlags: [],
+        nextActions: [item.action],
+        priority: item.confidence >= 90 ? 'high' : 'medium',
+        assignedRole: 'Charge nurse',
+        recommendedDepartment: 'Emergency Department',
+        requiresClinicianReview: true,
+        clinicianOverrideAvailable: true,
+        generatedAt: snapshot.updatedAt,
+        safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+      }),
+    );
+
+  if (!recommendations.length) return null;
+
+  return (
+    <section className="command-dashboard__ai" aria-label="AI decision support recommendations">
+      <div className="command-dashboard__ai-heading">
+        <div>
+          <h3>AI decision support</h3>
+          <p>Recommendations require clinician review before workflow changes.</p>
+        </div>
+        <span>Human-in-the-loop</span>
+      </div>
+      <ul className="command-dashboard__ai-list">
+        {recommendations.map((item) => (
+          <li key={String(item.data.id)}>
+            <AIRecommendationCard
+              response={item}
+              title="Command center recommendation"
+              compact
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function CommandDashboard({
   patients,
   rooms,
@@ -94,9 +174,10 @@ export default function CommandDashboard({
         rooms,
         capacity,
         boardingMetrics,
+        staff,
         now: now ? new Date(now) : new Date(),
       }),
-    [boardingMetrics, capacity, now, patients, rooms, snapshotProp],
+    [boardingMetrics, capacity, now, patients, rooms, snapshotProp, staff],
   );
 
   return (
@@ -144,6 +225,8 @@ export default function CommandDashboard({
           </ul>
         </section>
       ) : null}
+
+      <AiDecisionSupportQueue snapshot={snapshot} />
 
       {snapshot.prolongedStayAlerts?.length ? (
         <section className="command-dashboard__pending-beds" aria-label="Prolonged stay risk alerts">

@@ -682,9 +682,10 @@ export default function EmergencyWhiteboard() {
         capacity,
         boardingMetrics,
         emsArrivals,
+        staff,
         now: new Date(Math.max(clockTick, nativeAiRefreshTick)),
       }),
-    [boardingMetrics, capacity, clockTick, emsArrivals, nativeAiRefreshTick, patients, rooms],
+    [boardingMetrics, capacity, clockTick, emsArrivals, nativeAiRefreshTick, patients, rooms, staff],
   );
 
   const stablePublicWaitingSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);

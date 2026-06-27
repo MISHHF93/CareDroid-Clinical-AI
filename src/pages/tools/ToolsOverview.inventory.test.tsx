@@ -58,7 +58,7 @@ describe('ToolsOverview unified inventory', () => {
     mockToolPreferencesValue.pinned = [] as any[];
     mockToolPreferencesValue.recentTools = [] as any[];
     mockToolPreferencesValue.hiddenTools = [] as any[];
-    mockToolPreferencesValue.profileSettings: any = {};
+    (mockToolPreferencesValue as any).profileSettings = {};
   });
 
   it('renders recommended tools by default and keeps all allowed tools reachable', () => {

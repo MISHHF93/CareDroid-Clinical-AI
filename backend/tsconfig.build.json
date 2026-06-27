@@ -7,7 +7,6 @@
   "include": [
     "src/**/*",
     "../lib/**/*",
-    "../src/lib/ai/**/*",
     "../src/types/**/*",
     "../types/**/*",
     "../src/config/user-profile-catalog.data.json"
@@ -26,6 +25,8 @@
     "../src/services/**/*",
     "../src/utils/**/*",
     "../src/engine/**/*",
+    "../lib/ai/client.ts",
+    "../lib/ai/responseParser.ts",
     "../engine/**/*",
     "../store/**/*"
   ]

@@ -96,6 +96,7 @@ const ICONS: Record<string, Icon> = {
   settings: IconSettings,
   'emergency-settings': IconSettings,
   account: IconUserCircle,
+  users: IconUsers,
   platform: IconApps,
   activity: IconActivity,
   clock: IconClock,

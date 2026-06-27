@@ -4,6 +4,7 @@ import { AcuityBadge } from './AcuityBadge';
 import { WaitTimer } from './WaitTimer';
 import { PatientFlagStrip } from './PatientFlagStrip';
 import { VitalsSnapshot } from './VitalsSnapshot';
+import { PatientJourneyTracker } from './PatientJourneyTracker';
 import './patient.css';
 
 type PatientCardProps = {
@@ -47,6 +48,8 @@ export function PatientCard({ patient, onClick, showVitals = false, tabIndex = 0
         <span className="cd-patient-card__complaint">{chiefComplaint ?? complaint}</span>
         {flags.length > 0 && <PatientFlagStrip flags={flags} max={2} />}
       </div>
+
+      <PatientJourneyTracker patient={patient} variant="compact" />
 
       {showVitals && latestVitals && (
         <VitalsSnapshot vitals={latestVitals} />

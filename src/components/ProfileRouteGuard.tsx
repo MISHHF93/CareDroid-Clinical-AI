@@ -6,6 +6,7 @@ import { resolvePlatformLanding } from '../config/platformEntryModel';
 import { isStrictSaasEntitlementsEnabled, getPlatformEntitlementContext } from '../data/assetEntitlements';
 import { compileUserProfile, isRouteAllowedInCompiledProfile } from '../config/userProfileCompiler';
 import { expandEntitlementPacksToCatalogPacks } from '../config/profilePackTaxonomy';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 
 const PROFILE_ROUTE_EXEMPT_PREFIXES = Object.freeze([
   '/auth',
@@ -24,6 +25,7 @@ export default function ProfileRouteGuard({ children }) {
   const location = useLocation();
   const { authMode, saasProfile } = useUser();
   const effectiveProfile = useEffectiveUserProfile();
+  const emergencyRole = useEmergencyRolePermissions();
   const pathname = location.pathname;
   const saasRole = saasProfile?.role || saasProfile?.saasRole || effectiveProfile?.saasRole;
   const entitlementContext = getPlatformEntitlementContext();
@@ -42,7 +44,11 @@ export default function ProfileRouteGuard({ children }) {
     [entitlementContext, saasRole],
   );
 
-  if (authMode === 'open-access' || isExemptProfileRoute(pathname)) {
+  if (
+    authMode === 'open-access' ||
+    isExemptProfileRoute(pathname) ||
+    emergencyRole.canAccessRoute(pathname)
+  ) {
     return children;
   }
 

@@ -11,7 +11,7 @@ import {
   GatewayRunEnvelope,
   SelectedExpertRoute,
 } from './moe-router.types';
-import { UNIFIED_AI_MODEL } from '../../../../src/lib/ai/client';
+import { UNIFIED_AI_MODEL } from '../../../../lib/ai/serverClient';
 
 @Injectable()
 export class MoERouterService {

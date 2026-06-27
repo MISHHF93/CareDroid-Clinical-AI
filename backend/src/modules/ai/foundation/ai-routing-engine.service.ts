@@ -16,7 +16,7 @@ import {
   RouteEvidence,
   SelectedExpertRoute,
 } from './ai-foundation.types';
-import { UNIFIED_AI_MODEL } from '../../../../../src/lib/ai/client';
+import { UNIFIED_AI_MODEL } from '../../../../../lib/ai/serverClient';
 
 interface ExpertCandidate extends SelectedExpertRoute {
   evidence: RouteEvidence[];

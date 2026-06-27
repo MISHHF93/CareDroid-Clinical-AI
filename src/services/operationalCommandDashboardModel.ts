@@ -5,6 +5,7 @@ import {
   type EMSArrival,
   type Patient,
   type Room,
+  type Staff,
 } from '../types/emergency';
 import type { EmergencyBoardingMetrics } from '../store/emergencyStore';
 import { waitMinutesForWhiteboard } from '../utils/emergencyWhiteboardSorting';
@@ -26,6 +27,14 @@ export type OperationalDashboardTone = 'green' | 'amber' | 'red';
 export type OperationalDashboardMetricId =
   | 'total-patients'
   | 'waiting-room-count'
+  | 'doctors-on-duty'
+  | 'nurses-available'
+  | 'beds-available'
+  | 'critical-patients'
+  | 'admissions-today'
+  | 'discharges-today'
+  | 'average-triage-time'
+  | 'er-occupancy'
   | 'boarding-patients'
   | 'average-wait-time'
   | 'pending-bed-assignment';
@@ -159,6 +168,58 @@ function averageWaitMinutes(patients: Patient[], now: Date): number | null {
   return Math.round(values.reduce((sum, minutes) => sum + minutes, 0) / values.length);
 }
 
+function minutesBetween(start?: string | null, end?: string | null): number | null {
+  if (!start || !end) return null;
+  const startTime = new Date(start).getTime();
+  const endTime = new Date(end).getTime();
+  if (!Number.isFinite(startTime) || !Number.isFinite(endTime) || endTime < startTime) return null;
+  return Math.round((endTime - startTime) / 60000);
+}
+
+function averageTriageMinutes(patients: Patient[]): number | null {
+  const completed = patients
+    .map((patient) => minutesBetween(patient.arrivalTime, patient.triageTime))
+    .filter((minutes): minutes is number => minutes != null && minutes >= 0);
+
+  if (!completed.length) return null;
+  return Math.round(completed.reduce((sum, minutes) => sum + minutes, 0) / completed.length);
+}
+
+function countTodayByState(patients: Patient[], state: PatientState, now: Date): number {
+  const dayKey = now.toISOString().slice(0, 10);
+  return patients.filter((patient) => {
+    if (patient.state !== state) return false;
+    const referenceTime =
+      patient.updatedAt ||
+      patient.lastAssessedTime ||
+      patient.arrivalTime;
+    return Boolean(referenceTime && referenceTime.slice(0, 10) === dayKey);
+  }).length;
+}
+
+function criticalPatientCount(patients: Patient[], capacity?: CapacitySnapshot): number {
+  const activeCritical = activePatients(patients).filter(
+    (patient) =>
+      patient.priority === 'P1' ||
+      patient.priority === 'P2' ||
+      patient.flags.includes(PatientFlag.SepsisAlert) ||
+      patient.flags.includes(PatientFlag.StrokeCode) ||
+      patient.flags.includes(PatientFlag.HighRisk),
+  ).length;
+
+  return activeCritical + (capacity?.incomingEMSCriticalCount ?? 0);
+}
+
+function countAvailableStaff(staff: Staff[], roles: string[]): number {
+  const roleSet = new Set(roles.map((role) => role.toLowerCase()));
+  return staff.filter(
+    (member) =>
+      member.active &&
+      (member.status == null || member.status === 'OnShift') &&
+      roleSet.has(String(member.role).toLowerCase()),
+  ).length;
+}
+
 function toneForTotalPatients(count: number): OperationalDashboardTone {
   if (count >= 45) return 'red';
   if (count >= 30) return 'amber';
@@ -181,6 +242,44 @@ function toneForAverageWait(minutes: number | null): OperationalDashboardTone {
   if (minutes == null) return 'green';
   if (minutes >= 90) return 'red';
   if (minutes >= 45) return 'amber';
+  return 'green';
+}
+
+function toneForDoctorCoverage(count: number, activePatientCount: number): OperationalDashboardTone {
+  if (count === 0 && activePatientCount > 0) return 'red';
+  if (activePatientCount >= 30 && count < 3) return 'amber';
+  return 'green';
+}
+
+function toneForNurseCoverage(count: number, activePatientCount: number): OperationalDashboardTone {
+  if (count === 0 && activePatientCount > 0) return 'red';
+  if (activePatientCount >= 30 && count < 6) return 'amber';
+  return 'green';
+}
+
+function toneForBedsAvailable(count: number): OperationalDashboardTone {
+  if (count <= 0) return 'red';
+  if (count <= 4) return 'amber';
+  return 'green';
+}
+
+function toneForCriticalPatients(count: number): OperationalDashboardTone {
+  if (count >= 6) return 'red';
+  if (count >= 3) return 'amber';
+  return 'green';
+}
+
+function toneForAverageTriage(minutes: number | null): OperationalDashboardTone {
+  if (minutes == null) return 'green';
+  if (minutes >= 20) return 'red';
+  if (minutes >= 12) return 'amber';
+  return 'green';
+}
+
+function toneForErOccupancy(percent: number | null): OperationalDashboardTone {
+  if (percent == null) return 'green';
+  if (percent >= 95) return 'red';
+  if (percent >= 85) return 'amber';
   return 'green';
 }
 
@@ -255,6 +354,7 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   capacity?: CapacitySnapshot;
   boardingMetrics?: EmergencyBoardingMetrics;
   emsArrivals?: EMSArrival[];
+  staff?: Staff[];
   admissionAlertThreshold?: number;
   prolongedStayAlertThreshold?: number;
   now?: Date;
@@ -263,12 +363,29 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const patients = input.patients || [];
   const rooms = input.rooms || [];
   const capacity = input.capacity;
+  const staff = input.staff || [];
   const active = activePatients(patients);
   const totalPatients = capacity?.totalPatients ?? active.length;
   const waitingCount = waitingRoomCount(patients, capacity);
   const boardingCount = boardingPatients(patients, capacity, input.boardingMetrics);
   const avgWait = averageWaitMinutes(patients, now);
+  const avgTriage = averageTriageMinutes(patients);
   const zoneOccupancy = buildZoneBedOccupancy(rooms);
+  const occupiedRooms = capacity?.occupiedRooms ?? rooms.filter(isRoomOccupied).length;
+  const maxCapacity = capacity?.maxCapacity ?? rooms.length;
+  const availableBeds = capacity?.availableRoomCount ?? Math.max(0, maxCapacity - occupiedRooms);
+  const erOccupancyPercent =
+    capacity?.occupancyPercent ??
+    (maxCapacity > 0 ? Math.round(((capacity?.currentOccupancy ?? occupiedRooms) / maxCapacity) * 100) : null);
+  const doctorsOnDuty = countAvailableStaff(staff, ['MD', 'Attending', 'Resident', 'PA']);
+  const nursesAvailable = countAvailableStaff(staff, ['RN', 'Nurse', 'TriageNurse', 'ChargeNurse', 'Charge']);
+  const criticalCount = criticalPatientCount(patients, capacity);
+  const admissionsToday =
+    capacity?.admissionPendingCount ?? countTodayByState(patients, PatientState.Admission, now);
+  const dischargesToday =
+    capacity?.dischargesPast60Minutes != null || capacity?.dischargeReadyCount != null
+      ? (capacity?.dischargesPast60Minutes ?? 0) + (capacity?.dischargeReadyCount ?? 0)
+      : countTodayByState(patients, PatientState.Discharge, now);
 
   const admissionThreshold = input.admissionAlertThreshold ?? ADMISSION_PROBABILITY_ALERT_THRESHOLD;
   const elevatedAdmissions = scanPatientsForAdmissionAlerts(patients, {
@@ -343,6 +460,70 @@ export function buildOperationalCommandDashboardSnapshot(input: {
       thresholdLabel: 'Green <8 · Amber 8-14 · Red ≥15',
     },
     {
+      id: 'doctors-on-duty',
+      label: 'Doctors on duty',
+      value: doctorsOnDuty,
+      tone: toneForDoctorCoverage(doctorsOnDuty, active.length),
+      detail: 'Active physicians, residents, and PAs on the current shift',
+      thresholdLabel: 'Amber when high census has <3 providers',
+    },
+    {
+      id: 'nurses-available',
+      label: 'Nurses available',
+      value: nursesAvailable,
+      tone: toneForNurseCoverage(nursesAvailable, active.length),
+      detail: 'Active RN, triage, and charge coverage',
+      thresholdLabel: 'Amber when high census has <6 nurses',
+    },
+    {
+      id: 'beds-available',
+      label: 'Beds available',
+      value: availableBeds,
+      tone: toneForBedsAvailable(availableBeds),
+      detail: 'Open treatment spaces available for placement',
+      thresholdLabel: 'Green >4 · Amber 1-4 · Red 0',
+    },
+    {
+      id: 'critical-patients',
+      label: 'Critical patients',
+      value: criticalCount,
+      tone: toneForCriticalPatients(criticalCount),
+      detail: 'P1/P2, high-risk, sepsis, stroke, and critical EMS load',
+      thresholdLabel: 'Green <3 · Amber 3-5 · Red ≥6',
+    },
+    {
+      id: 'admissions-today',
+      label: 'Admissions today',
+      value: admissionsToday,
+      tone: toneForPendingBedAssignment(admissionsToday),
+      detail: 'Patients requiring inpatient admission or pending admission',
+      thresholdLabel: 'Green 0 · Amber 1-3 · Red ≥4',
+    },
+    {
+      id: 'discharges-today',
+      label: 'Discharges today',
+      value: dischargesToday,
+      tone: dischargesToday > 0 ? 'green' : 'amber',
+      detail: 'Recent discharges plus patients ready to leave the ED',
+      thresholdLabel: 'Green when discharge movement is active',
+    },
+    {
+      id: 'average-triage-time',
+      label: 'Average triage time',
+      value: avgTriage != null ? formatDepartmentDuration(avgTriage) : '—',
+      tone: toneForAverageTriage(avgTriage),
+      detail: 'Average door-to-triage time for completed triage events',
+      thresholdLabel: 'Green <12m · Amber 12-19m · Red ≥20m',
+    },
+    {
+      id: 'er-occupancy',
+      label: 'ER occupancy',
+      value: erOccupancyPercent != null ? `${erOccupancyPercent}%` : '—',
+      tone: toneForErOccupancy(erOccupancyPercent),
+      detail: 'Occupied treatment capacity across configured ED rooms',
+      thresholdLabel: 'Green <85% · Amber 85-94% · Red ≥95%',
+    },
+    {
       id: 'boarding-patients',
       label: 'Boarding patients',
       value: boardingCount,
@@ -383,6 +564,7 @@ export function buildOperationalCommandDashboardSnapshot(input: {
       `${totalPatients} total`,
       `${waitingCount} waiting`,
       `${boardingCount} boarding`,
+      `${availableBeds} beds available`,
       pendingBedAssignments.length
         ? `${pendingBedAssignments.length} pending bed assignment`
         : null,
@@ -404,6 +586,7 @@ export function mapOperationalDashboardPatients(input: {
   rooms: Room[];
   capacity: CapacitySnapshot;
   boardingMetrics?: EmergencyBoardingMetrics;
+  staff?: Staff[];
   now?: Date;
 }) {
   return buildOperationalCommandDashboardSnapshot(input);

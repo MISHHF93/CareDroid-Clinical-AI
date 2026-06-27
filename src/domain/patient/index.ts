@@ -8,3 +8,4 @@ export { VitalsSnapshot } from './VitalsSnapshot';
 export { PatientTimeline } from './PatientTimeline';
 export { PatientCard } from './PatientCard';
 export { PatientHeader } from './PatientHeader';
+export { PatientJourneyTracker, getPatientJourneyStage } from './PatientJourneyTracker';

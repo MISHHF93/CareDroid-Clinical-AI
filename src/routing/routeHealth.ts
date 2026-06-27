@@ -93,6 +93,8 @@ function extractOwner(block, fallback = 'GeneratedRoute') {
 function inferStatus({ path, owner, block, generatedKind }) {
   const normalized = normalizePath(path);
   if (owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
+  if (owner === 'EmergencyDefaultRedirect') return ROUTE_HEALTH_STATES.ALIAS;
+  if (owner === 'EmergencyAliasRedirect') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'LegacyProtectedRouteRedirect') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'ToolsRedirect') return ROUTE_HEALTH_STATES.ALIAS;
   if (generatedKind?.endsWith('-alias')) return ROUTE_HEALTH_STATES.ALIAS;

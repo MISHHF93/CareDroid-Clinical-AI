@@ -50,7 +50,7 @@ describe('ProfileToolPreferences', () => {
     mockToolPreferencesValue.pinned = [] as any[];
     mockToolPreferencesValue.recentTools = [] as any[];
     mockToolPreferencesValue.hiddenTools = [] as any[];
-    mockToolPreferencesValue.profileSettings: any = {};
+    (mockToolPreferencesValue as any).profileSettings = {};
   });
 
   it('allows hidden tools to be restored from profile settings', () => {

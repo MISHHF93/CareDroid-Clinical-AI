@@ -4,6 +4,7 @@ import { AcuityBadge } from './AcuityBadge';
 import { DispositionChip } from './DispositionChip';
 import { PatientFlagStrip } from './PatientFlagStrip';
 import { WaitTimer } from './WaitTimer';
+import { PatientJourneyTracker } from './PatientJourneyTracker';
 import './patient.css';
 
 type PatientHeaderProps = {
@@ -29,6 +30,7 @@ export function PatientHeader({ patient, actions, className }: PatientHeaderProp
         <p style={{ margin: 0, fontSize: 'var(--cd-text-sm)', color: 'var(--cd-text-secondary)' }}>
           {patient.chiefComplaint ?? patient.complaint}
         </p>
+        <PatientJourneyTracker patient={patient} />
       </div>
       {actions && <div className="cd-patient-header__actions">{actions}</div>}
     </header>

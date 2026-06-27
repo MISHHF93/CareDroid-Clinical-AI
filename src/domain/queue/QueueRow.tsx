@@ -3,6 +3,7 @@ import type { Patient } from '../../types/emergency';
 import { AcuityBadge } from '../patient/AcuityBadge';
 import { WaitTimer } from '../patient/WaitTimer';
 import { PatientFlagStrip } from '../patient/PatientFlagStrip';
+import { PatientJourneyTracker } from '../patient/PatientJourneyTracker';
 import './queue.css';
 
 type QueueRowProps = {
@@ -28,11 +29,16 @@ export function QueueRow({ patient, rank, onClick, className }: QueueRowProps) {
       onKeyDown={handleKey}
       aria-label={`${name}, priority ${patient.priority}`}
     >
-      {rank != null && <span className="cd-queue-row__rank">{rank}</span>}
-      <AcuityBadge priority={patient.priority} size="sm" />
-      <span className="cd-queue-row__name">{name}</span>
-      <span className="cd-queue-row__meta">{patient.chiefComplaint ?? patient.complaint}</span>
-      <div className="cd-queue-row__end">
+      <span role="cell" className="cd-queue-row__rank">{rank ?? '-'}</span>
+      <span role="cell" className="cd-queue-row__acuity">
+        <AcuityBadge priority={patient.priority} size="sm" />
+      </span>
+      <span role="cell" className="cd-queue-row__name">{name}</span>
+      <span role="cell" className="cd-queue-row__meta">{patient.chiefComplaint ?? patient.complaint}</span>
+      <span role="cell" className="cd-queue-row__journey">
+        <PatientJourneyTracker patient={patient} variant="compact" />
+      </span>
+      <div role="cell" className="cd-queue-row__end">
         {patient.flags.length > 0 && <PatientFlagStrip flags={patient.flags} max={1} />}
         <WaitTimer arrivalTime={patient.arrivalTime} />
       </div>

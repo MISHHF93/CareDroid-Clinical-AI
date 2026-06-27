@@ -92,6 +92,122 @@
 .cd-vitals__value--warning  { color: var(--cd-warning-text); }
 .cd-vitals__empty { font-size: var(--cd-text-xs); color: var(--cd-text-disabled); }
 
+/* PatientJourneyTracker */
+.cd-journey {
+  display: grid;
+  gap: var(--cd-space-2);
+  min-width: 0;
+}
+
+.cd-journey__current {
+  color: var(--cd-text-secondary);
+  font-size: var(--cd-text-xs);
+  font-weight: var(--cd-font-semibold);
+}
+
+.cd-journey__steps {
+  display: grid;
+  gap: var(--cd-space-2);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cd-journey__step {
+  align-items: center;
+  color: var(--cd-text-disabled);
+  display: grid;
+  gap: var(--cd-space-1);
+  min-width: 0;
+  position: relative;
+}
+
+.cd-journey__step:not(:last-child)::after {
+  background: var(--cd-border-subtle);
+  content: '';
+  height: 2px;
+  left: calc(var(--cd-space-4) + var(--cd-space-1));
+  position: absolute;
+  right: calc(-1 * var(--cd-space-2));
+  top: calc(var(--cd-space-2) + 1px);
+}
+
+.cd-journey__dot {
+  background: var(--cd-bg-sunken);
+  border: 2px solid var(--cd-border-default);
+  border-radius: var(--cd-radius-full);
+  display: block;
+  height: var(--cd-space-4);
+  width: var(--cd-space-4);
+  z-index: 1;
+}
+
+.cd-journey__label {
+  font-size: var(--cd-text-2xs);
+  font-weight: var(--cd-font-medium);
+  line-height: var(--cd-leading-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cd-journey__step--complete {
+  color: var(--cd-success-text);
+}
+
+.cd-journey__step--complete::after {
+  background: var(--cd-success-border);
+}
+
+.cd-journey__step--complete .cd-journey__dot {
+  background: var(--cd-success-bg-subtle);
+  border-color: var(--cd-success-border);
+}
+
+.cd-journey__step--current {
+  color: var(--cd-text-brand);
+}
+
+.cd-journey__step--current .cd-journey__dot {
+  background: var(--cd-brand-bg);
+  border-color: var(--cd-brand-bg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cd-brand-bg) 18%, transparent);
+}
+
+.cd-journey--compact {
+  gap: var(--cd-space-1);
+}
+
+.cd-journey--compact .cd-journey__current {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.cd-journey--compact .cd-journey__steps {
+  gap: var(--cd-space-1);
+}
+
+.cd-journey--compact .cd-journey__label {
+  display: none;
+}
+
+.cd-journey--compact .cd-journey__dot {
+  height: 9px;
+  width: 9px;
+}
+
+.cd-journey--compact .cd-journey__step:not(:last-child)::after {
+  left: 11px;
+  right: calc(-1 * var(--cd-space-1));
+  top: 4px;
+}
+
 /* ── PatientTimeline ─────────────────────────────────────────── */
 .cd-timeline { display: flex; flex-direction: column; }
 .cd-timeline__item {

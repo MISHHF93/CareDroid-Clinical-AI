@@ -1,9 +1,7 @@
-import React from 'react';
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, Siren, X } from 'lucide-react';
 import type { Alert } from '../../types/emergency';
 import { Button } from '../../components/primitives/Button';
 import './alerts.css';
-
-const ICONS: Record<string, string> = { Info: 'ℹ', Warning: '⚠', Critical: '🚨' };
 
 type AlertCardProps = {
   alert: Alert;
@@ -16,28 +14,73 @@ function fmtTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+function iconForSeverity(severity: Alert['severity']) {
+  if (severity === 'Critical') return <Siren size={18} strokeWidth={2.4} />;
+  if (severity === 'Warning') return <AlertTriangle size={18} strokeWidth={2.4} />;
+  return <Info size={18} strokeWidth={2.4} />;
+}
+
 export function AlertCard({ alert, onAction, onDismiss, className }: AlertCardProps) {
+  const role = alert.severity === 'Info' ? 'status' : 'alert';
+  const reviewState = alert.acknowledged || alert.read ? 'Reviewed' : 'Needs review';
+
   return (
-    <div
-      role="alert"
-      className={['cd-alert-card', `cd-alert-card--${alert.severity}`, alert.read ? 'cd-alert-card--read' : '', className ?? ''].filter(Boolean).join(' ')}
+    <article
+      role={role}
+      className={[
+        'cd-alert-card',
+        `cd-alert-card--${alert.severity}`,
+        alert.read ? 'cd-alert-card--read' : '',
+        className ?? '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label={`${alert.severity} alert: ${alert.title}. ${reviewState}.`}
     >
-      <span className={['cd-alert-card__icon', `cd-alert-card__icon--${alert.severity}`].join(' ')} aria-hidden="true">
-        {ICONS[alert.severity] ?? 'ℹ'}
+      <span className={`cd-alert-card__icon cd-alert-card__icon--${alert.severity}`} aria-hidden="true">
+        {iconForSeverity(alert.severity)}
       </span>
       <div className="cd-alert-card__body">
-        <div className="cd-alert-card__title">{alert.title}</div>
+        <div className="cd-alert-card__header">
+          <div className="cd-alert-card__title">{alert.title}</div>
+          <span className={`cd-alert-card__severity cd-alert-card__severity--${alert.severity}`}>
+            {alert.severity}
+          </span>
+        </div>
         <div className="cd-alert-card__msg">{alert.message}</div>
+        <div className="cd-alert-card__meta">
+          {alert.type ? <span>{alert.type}</span> : null}
+          {alert.source ? <span>{alert.source}</span> : null}
+          <span>{reviewState}</span>
+        </div>
         <div className="cd-alert-card__footer">
-          <span className="cd-alert-card__time">{fmtTime(alert.createdAt)}</span>
-          {alert.actionLabel && onAction && (
-            <Button variant="link" size="sm" onClick={() => onAction(alert)}>{alert.actionLabel}</Button>
-          )}
-          {onDismiss && (
-            <Button variant="ghost" size="sm" onClick={() => onDismiss(alert)}>Dismiss</Button>
-          )}
+          <time className="cd-alert-card__time" dateTime={alert.createdAt}>
+            {fmtTime(alert.createdAt)}
+          </time>
+          {alert.actionLabel && onAction ? (
+            <Button
+              variant="link"
+              size="sm"
+              iconLeft={<AlertCircle size={14} />}
+              onClick={() => onAction(alert)}
+              aria-label={`${alert.actionLabel}: ${alert.title}`}
+            >
+              {alert.actionLabel}
+            </Button>
+          ) : null}
+          {onDismiss ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              iconLeft={alert.acknowledged ? <CheckCircle2 size={14} /> : <X size={14} />}
+              onClick={() => onDismiss(alert)}
+              aria-label={`Dismiss alert: ${alert.title}`}
+            >
+              Dismiss
+            </Button>
+          ) : null}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

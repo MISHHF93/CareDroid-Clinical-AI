@@ -37,18 +37,18 @@ describe('emergency page modules smoke', () => {
     expect(QUEUE_MOVEMENT_STAGES.Triage).toEqual(['Triage']);
   });
 
-  it('redirects clerk patients route through reception when reception-first', () => {
+  it('keeps the patients route standalone when reception-first is enabled', () => {
     expect(shouldRedirectEmergencySurface('patients', EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
-      true,
+      false,
     );
     expect(shouldRedirectEmergencySurface('patients', EMERGENCY_ROLE_IDS.physician)).toBe(false);
   });
 
-  it('redirects front-desk queues route through reception when reception-first', () => {
+  it('keeps queue routes standalone when reception-first is enabled', () => {
     expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
-      true,
+      false,
     );
-    expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.triageNurse)).toBe(true);
+    expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.triageNurse)).toBe(false);
     expect(shouldRedirectEmergencySurface('queues', EMERGENCY_ROLE_IDS.physician)).toBe(false);
   });
 });
