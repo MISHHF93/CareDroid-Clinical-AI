@@ -105,14 +105,7 @@ import {
   CapacityRoute,
   CopilotRoute,
 } from '../pages/emergency/emergencyRoutePages';
-// New 7-layer architecture screens — lazy loaded, /v2/* prefix
-const V2WhiteboardScreen    = lazyRoute(() => import('../screens/WhiteboardScreen').then((m) => ({ default: m.WhiteboardScreen })));
-const V2TriageQueueScreen   = lazyRoute(() => import('../screens/TriageQueueScreen').then((m) => ({ default: m.TriageQueueScreen })));
-const V2PatientDetailScreen = lazyRoute(() => import('../screens/PatientDetailScreen').then((m) => ({ default: m.PatientDetailScreen })));
-const V2EmsScreen           = lazyRoute(() => import('../screens/EmsScreen').then((m) => ({ default: m.EmsScreen })));
-const V2CopilotScreen       = lazyRoute(() => import('../screens/CopilotScreen').then((m) => ({ default: m.CopilotScreen })));
-const V2CapacityScreen      = lazyRoute(() => import('../screens/CapacityScreen').then((m) => ({ default: m.CapacityScreen })));
-const V2AlertsCenterScreen  = lazyRoute(() => import('../screens/AlertsCenterScreen').then((m) => ({ default: m.AlertsCenterScreen })));
+
 import EmergencySurfaceRedirect from '../pages/emergency/EmergencySurfaceRedirect';
 import { shouldRedirectEmergencySurface } from '../services/navigateToEmergencySurface';
 
@@ -770,15 +763,6 @@ export function AppRoutes() {
         <Route path="/ai-command"          element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
         <Route path="/team"                element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/team`} replace />} />
 
-        {/* ── New architecture screens (7-layer design system, /v2/* prefix) ── */}
-        <Route path="/v2" element={<Navigate to="/v2/whiteboard" replace />} />
-        <Route path="/v2/whiteboard"          element={<LazyRoute label="Loading whiteboard v2..."><V2WhiteboardScreen /></LazyRoute>} />
-        <Route path="/v2/queues"              element={<LazyRoute label="Loading queues v2..."><V2TriageQueueScreen /></LazyRoute>} />
-        <Route path="/v2/patients/:patientId" element={<LazyRoute label="Loading patient v2..."><V2PatientDetailScreen /></LazyRoute>} />
-        <Route path="/v2/ems"                 element={<LazyRoute label="Loading EMS v2..."><V2EmsScreen /></LazyRoute>} />
-        <Route path="/v2/copilot"             element={<LazyRoute label="Loading copilot v2..."><V2CopilotScreen /></LazyRoute>} />
-        <Route path="/v2/capacity"            element={<LazyRoute label="Loading capacity v2..."><V2CapacityScreen /></LazyRoute>} />
-        <Route path="/v2/alerts"              element={<LazyRoute label="Loading alerts v2..."><V2AlertsCenterScreen /></LazyRoute>} />
 
       </Route>{/* end RootLayout */}
 

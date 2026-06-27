@@ -386,15 +386,6 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     return navLink;
   };
 
-  const v2NavItems: { id: string; label: string; path: string; Icon: Icon }[] = [
-    { id: 'v2-whiteboard', label: 'Whiteboard V2',  path: '/v2/whiteboard', Icon: IconLayoutDashboard },
-    { id: 'v2-queues',     label: 'Queues V2',      path: '/v2/queues',     Icon: IconListDetails },
-    { id: 'v2-ems',        label: 'EMS V2',          path: '/v2/ems',        Icon: IconAmbulance },
-    { id: 'v2-copilot',   label: 'Copilot V2',      path: '/v2/copilot',    Icon: IconRobot },
-    { id: 'v2-capacity',  label: 'Capacity V2',     path: '/v2/capacity',   Icon: IconGauge },
-    { id: 'v2-alerts',    label: 'Alerts V2',       path: '/v2/alerts',     Icon: IconShieldCheck },
-  ];
-
   return (
     <aside className="sidebar" aria-label="Emergency navigation">
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
@@ -404,30 +395,6 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             {desktopUtilityNav.map(desktopNavLink)}
           </div>
         ) : null}
-        <div
-          className="sidebar-desktop-nav__section"
-          aria-label="New architecture screens"
-        >
-          <span className="sidebar-desktop-nav__section-label">Design System V2</span>
-          {v2NavItems.map(({ id, label, path, Icon: NavIcon }) => {
-            const active = location.pathname.startsWith(path);
-            return (
-              <Link
-                key={id}
-                to={path}
-                className={['sidebar-nav-item', active ? 'sidebar-nav-item--active' : ''].filter(Boolean).join(' ')}
-                aria-label={label}
-                aria-current={active ? 'page' : undefined}
-                title={label}
-                data-nav-id={id}
-              >
-                <NavIcon size={18} stroke={2} className="sidebar-nav-item__icon" />
-                <span className="sidebar-nav-item__label">{label}</span>
-                <span className="sidebar-nav-item__tooltip">{label}</span>
-              </Link>
-            );
-          })}
-        </div>
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}

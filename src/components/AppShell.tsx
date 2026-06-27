@@ -78,12 +78,6 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
-  '/v2/whiteboard': `${EMERGENCY_OS_BRANDING.productName} - Whiteboard`,
-  '/v2/queues':     `${EMERGENCY_OS_BRANDING.productName} - Triage Queue`,
-  '/v2/ems':        `${EMERGENCY_OS_BRANDING.productName} - EMS Pipeline`,
-  '/v2/copilot':    `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
-  '/v2/capacity':   `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
-  '/v2/alerts':     `${EMERGENCY_OS_BRANDING.productName} - Alerts`,
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
@@ -108,12 +102,6 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
 };
 
 const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
-  '/v2/whiteboard': 'Patient kanban board — new design system.',
-  '/v2/queues':     'Triage queue ranked by acuity and wait time.',
-  '/v2/ems':        'Inbound EMS units and handoff workflow.',
-  '/v2/copilot':    'AI clinical decision support — always verify with clinical judgment.',
-  '/v2/capacity':   'Room occupancy, boarding load, and department flow.',
-  '/v2/alerts':     'Active clinical and operational alerts.',
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
   [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',

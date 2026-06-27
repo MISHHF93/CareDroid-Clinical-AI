@@ -167,28 +167,6 @@
   border-top: 1px solid var(--sidebar-divider, var(--nav-border, #e0f2fe));
 }
 
-/* ── V2 / new-architecture section ──────────────────────────────── */
-.sidebar-desktop-nav__section {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-  padding-top: 6px;
-  border-top: 1px solid var(--sidebar-divider, var(--nav-border, #e0f2fe));
-  margin-top: 8px;
-}
-
-.sidebar-desktop-nav__section-label {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--sidebar-fg-muted, #9ca3af);
-  padding: 4px 10px 2px;
-  pointer-events: none;
-  user-select: none;
-}
 
 /* ── Tablet: collapse to 56px icon-only ─────────────────────────── */
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -231,15 +209,6 @@
     padding-top: 4px;
   }
 
-  .sidebar-desktop-nav__section {
-    align-items: center;
-    margin-top: 4px;
-    padding-top: 4px;
-  }
-
-  .sidebar-desktop-nav__section-label {
-    display: none;
-  }
 }
 
 /* ── Mobile: bottom tab bar ─────────────────────────────────────── */
@@ -370,10 +339,6 @@
     padding-top: 0;
     border-top: 0;
     flex-direction: row;
-  }
-
-  .sidebar-desktop-nav__section {
-    display: none;
   }
 
   .sidebar-nav-item__tooltip {
