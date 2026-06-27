@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PatientFlag, PatientState, Priority, type EMSArrival, type Patient } from '../../types/emergency';
-import { useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
+import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import useCareDroidCentralNode from '../../hooks/useCareDroidCentralNode';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
@@ -53,15 +53,15 @@ function isHighRisk(patient: Patient): boolean {
   return (
     patient.priority === Priority.P1 ||
     patient.priority === Priority.P2 ||
-    patient.flags.includes(PatientFlag.HighRisk) ||
-    patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-    patient.flags.includes(PatientFlag.SepsisAlert)
+    hasPatientFlag(patient, PatientFlag.HighRisk) ||
+    hasPatientFlag(patient, PatientFlag.DeteriorationRisk) ||
+    hasPatientFlag(patient, PatientFlag.SepsisAlert)
   );
 }
 
 function isBoarding(patient: Patient): boolean {
   return (
-    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
+    patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission)
   );
 }
 
@@ -70,7 +70,7 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   if (activeFilter === 'Waiting') return patient.state === PatientState.Waiting;
   if (activeFilter === 'Assessment') return patient.state === PatientState.Assessment;
   if (activeFilter === 'High Risk') return isHighRisk(patient);
-  if (activeFilter === 'EMS') return patient.flags.includes(PatientFlag.EMSArrival);
+  if (activeFilter === 'EMS') return hasPatientFlag(patient, PatientFlag.EMSArrival);
   if (activeFilter === 'Boarding') return isBoarding(patient);
   return true;
 }
@@ -96,9 +96,9 @@ function matchesActiveQueue(
   if (filter === 'discharge') return patient.state === PatientState.Disposition;
   if (filter === 'reassessment') {
     return (
-      patient.flags.includes(PatientFlag.ReassessmentDue) ||
-      patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-      patient.flags.includes(PatientFlag.SepsisAlert)
+      hasPatientFlag(patient, PatientFlag.ReassessmentDue) ||
+      hasPatientFlag(patient, PatientFlag.DeteriorationRisk) ||
+      hasPatientFlag(patient, PatientFlag.SepsisAlert)
     );
   }
 
@@ -325,9 +325,9 @@ export default function EmergencyWhiteboard() {
       patients
         .filter(
           (patient) =>
-            patient.flags.includes(PatientFlag.ReassessmentDue) ||
-            patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-            patient.flags.includes(PatientFlag.SepsisAlert),
+            hasPatientFlag(patient, PatientFlag.ReassessmentDue) ||
+            hasPatientFlag(patient, PatientFlag.DeteriorationRisk) ||
+            hasPatientFlag(patient, PatientFlag.SepsisAlert),
         )
         .sort(sortWhiteboardPatients),
     [patients],
@@ -340,7 +340,7 @@ export default function EmergencyWhiteboard() {
     const reassessmentDue =
       capacity.reassessmentDueCount ??
       capacity.reassessmentDue ??
-      patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length;
+      patients.filter((patient) => hasPatientFlag(patient, PatientFlag.ReassessmentDue)).length;
 
     return {
       total: patients.length,

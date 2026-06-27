@@ -15,6 +15,9 @@ import {
 
 const navigateMock = vi.fn();
 const fetchToolExecutorCatalogMock = vi.fn();
+const { labInterpreterRenderState } = vi.hoisted(() => ({
+  labInterpreterRenderState: { shouldThrow: false },
+}));
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -39,11 +42,16 @@ vi.mock('./Calculators', () => ({
 }));
 
 vi.mock('./LabInterpreter', () => ({
-  default: ({ embedded }) => (
-    <div data-testid="embedded-lab-interpreter">
-      lab-interp:{embedded ? 'embedded' : 'standalone'}
-    </div>
-  ),
+  default: ({ embedded }) => {
+    if (labInterpreterRenderState.shouldThrow) {
+      throw new Error('Lab interpreter render failed');
+    }
+    return (
+      <div data-testid="embedded-lab-interpreter">
+        lab-interp:{embedded ? 'embedded' : 'standalone'}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../contexts/ConversationContext', () => ({
@@ -124,6 +132,7 @@ function expectedFilterIds(filter) {
 describe('ToolsOverview complete visibility, search, filters, and launch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    labInterpreterRenderState.shouldThrow = false;
     fetchToolExecutorCatalogMock.mockResolvedValue({
       ok: true,
       data: {
@@ -301,6 +310,19 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(within(activeSurface).queryByText(/local calculator/i)).toBeNull();
     expect(await screen.findByTestId('embedded-lab-interpreter')).toHaveTextContent('lab-interp:embedded');
     expect(screen.getByText(/continue into workflow/i)).toBeInTheDocument();
+  }, 10000);
+
+  it('keeps the catalog usable when an embedded active tool fails to render', async () => {
+    labInterpreterRenderState.shouldThrow = true;
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    renderOverview('/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp');
+
+    const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
+    expect(await within(activeSurface).findByRole('alert')).toHaveTextContent(/tool surface unavailable/i);
+    expect(screen.getByText(/continue into workflow/i)).toBeInTheDocument();
+
+    consoleErrorSpy.mockRestore();
   }, 10000);
 
   it('launches a chat-assisted active surface from a Medical Tools URL entry', () => {

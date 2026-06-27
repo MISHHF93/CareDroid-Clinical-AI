@@ -105,6 +105,12 @@ describe('single AppShell contract', () => {
     expect(appShellCss).toMatch(/\.ed-skip-link:focus[\s\S]*outline:\s*2px solid/);
   });
 
+  it('keeps shell recovery paths tolerant of partial browser and patient state', () => {
+    expect(appShellJsx).toContain('function hasSeenChargeNursePulseDefault()');
+    expect(appShellJsx).toContain('window.sessionStorage');
+    expect(appShellJsx).toContain('Array.isArray(patient?.timeline)');
+  });
+
   it('keeps required authenticated page roots from nesting main landmarks', () => {
     const requiredRouteFiles = [
       '../pages/CommandDashboard.jsx',
@@ -127,6 +133,7 @@ describe('single AppShell contract', () => {
       '../pages/RecommendationsPage.jsx',
       '../pages/platform/PlatformSystemPage.jsx',
       '../pages/settings/FeatureManagement.jsx',
+      '../pages/emergency/shift/index.tsx',
     ];
 
     for (const file of requiredRouteFiles) {

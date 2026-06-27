@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import ClinicalCalculatorHub from '../../components/ClinicalCalculatorHub';
@@ -393,6 +393,34 @@ function executionModeForTool(tool, executorCatalog) {
   };
 }
 
+class ActiveToolSurfaceErrorBoundary extends Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const { toolName, onClose } = this.props;
+      return (
+        <div className="tools-active-surface__fallback" role="alert">
+          <strong className="tools-active-surface__fallback-title">Tool surface unavailable</strong>
+          <p>
+            {toolName} could not render in this session. Return to the catalog or launch a different
+            clinical tool while the issue is reviewed.
+          </p>
+          <button type="button" className="btn-open-tool" onClick={onClose}>
+            Back to catalog
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function ActiveToolSurface({
   tool,
   executorCatalog,
@@ -474,7 +502,13 @@ function ActiveToolSurface({
         </button>
       </header>
       <Suspense fallback={<div className="tools-active-surface__loading">Loading tool surface...</div>}>
-        {body}
+        <ActiveToolSurfaceErrorBoundary
+          key={tool.id}
+          toolName={tool.label || tool.name || 'This tool'}
+          onClose={onClose}
+        >
+          {body}
+        </ActiveToolSurfaceErrorBoundary>
       </Suspense>
     </section>
   );

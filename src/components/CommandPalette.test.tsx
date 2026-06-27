@@ -103,6 +103,18 @@ describe('CommandPalette helpers', () => {
     expect(readRecentCommandIds(storage)).toEqual(['capacity', 'heart', 'qsofa', 'nihss', 'peds']);
   });
 
+  it('keeps command execution usable when browser storage writes are blocked', () => {
+    const storage = {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn(() => {
+        throw new Error('storage disabled');
+      }),
+    };
+
+    expect(() => recordRecentCommand('capacity', ['heart'], storage)).not.toThrow();
+    expect(recordRecentCommand('capacity', ['heart'], storage)).toEqual(['capacity', 'heart']);
+  });
+
   it('registers route and calculator commands against canonical Emergency OS paths', () => {
     const routePathsById = Object.fromEntries(
       EMERGENCY_OS_ROUTE_COMMANDS.map((entry) => [entry.id, entry.build().path]),

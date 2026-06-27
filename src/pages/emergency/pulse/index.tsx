@@ -54,43 +54,68 @@ type ChangeEvent = {
   text: string;
 };
 
-function readPulseSnapshot(): PulseSnapshot {
-  if (typeof localStorage === 'undefined') return { timestamp: null };
+function getPulseStorage(): Storage | null {
   try {
-    const raw = localStorage.getItem(LAST_VIEW_KEY);
+    if (typeof window === 'undefined') return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function readPulseSnapshot(): PulseSnapshot {
+  const storage = getPulseStorage();
+  if (!storage) return { timestamp: null };
+
+  try {
+    const raw = storage.getItem(LAST_VIEW_KEY);
     if (!raw) return { timestamp: null };
-    const parsed = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      const numeric = Number(raw);
+      const parsedDate = Date.parse(raw);
+      return {
+        timestamp: Number.isFinite(numeric) ? numeric : Number.isFinite(parsedDate) ? parsedDate : null,
+      };
+    }
     if (typeof parsed === 'number') return { timestamp: parsed };
-    const timestamp = Number(parsed?.timestamp);
-    const viewedAt = typeof parsed?.viewedAt === 'string' ? parsed.viewedAt : undefined;
+    const record = (parsed && typeof parsed === 'object' ? parsed : {}) as PulseSnapshot & {
+      capacityRisk?: CapacitySnapshot['band'];
+    };
+    const timestamp = Number(record.timestamp);
+    const viewedAt = typeof record.viewedAt === 'string' ? record.viewedAt : undefined;
     const viewedAtTime = viewedAt ? Date.parse(viewedAt) : Number.NaN;
     return {
       timestamp: Number.isFinite(timestamp) ? timestamp : Number.isFinite(viewedAtTime) ? viewedAtTime : null,
       viewedAt,
-      capacityBand: parsed?.capacityBand || parsed?.capacityRisk,
-      activePatientCount: Number.isFinite(Number(parsed?.activePatientCount))
-        ? Number(parsed.activePatientCount)
+      capacityBand: record.capacityBand || record.capacityRisk,
+      activePatientCount: Number.isFinite(Number(record.activePatientCount))
+        ? Number(record.activePatientCount)
         : undefined,
     };
   } catch (_error) {
-    const raw = localStorage.getItem(LAST_VIEW_KEY);
-    const numeric = Number(raw);
-    const parsedDate = raw ? Date.parse(raw) : Number.NaN;
-    return { timestamp: Number.isFinite(numeric) ? numeric : Number.isFinite(parsedDate) ? parsedDate : null };
+    return { timestamp: null };
   }
 }
 
 function writePulseSnapshot(snapshot: Required<Pick<PulseSnapshot, 'timestamp' | 'capacityBand' | 'activePatientCount'>>) {
-  if (typeof localStorage === 'undefined' || snapshot.timestamp === null) return;
-  localStorage.setItem(
-    LAST_VIEW_KEY,
-    JSON.stringify({
-      timestamp: snapshot.timestamp,
-      viewedAt: new Date(snapshot.timestamp).toISOString(),
-      capacityBand: snapshot.capacityBand,
-      activePatientCount: snapshot.activePatientCount,
-    }),
-  );
+  const storage = getPulseStorage();
+  if (!storage || snapshot.timestamp === null) return;
+  try {
+    storage.setItem(
+      LAST_VIEW_KEY,
+      JSON.stringify({
+        timestamp: snapshot.timestamp,
+        viewedAt: new Date(snapshot.timestamp).toISOString(),
+        capacityBand: snapshot.capacityBand,
+        activePatientCount: snapshot.activePatientCount,
+      }),
+    );
+  } catch {
+    // Pulse must stay renderable in clinical demo browsers that block storage.
+  }
 }
 
 function minutesSince(timestamp?: string | null, now = Date.now()): number {

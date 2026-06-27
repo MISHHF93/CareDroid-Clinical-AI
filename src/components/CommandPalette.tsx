@@ -238,7 +238,11 @@ export function writeRecentCommandIds(
   storage: StorageLike | null = getBrowserStorage(),
 ): string[] {
   const nextIds = [...new Set(commandIds.filter(Boolean))].slice(0, RECENT_COMMAND_LIMIT);
-  storage?.setItem(RECENT_COMMANDS_KEY, JSON.stringify(nextIds));
+  try {
+    storage?.setItem(RECENT_COMMANDS_KEY, JSON.stringify(nextIds));
+  } catch {
+    // Storage can be disabled in locked-down browsers; keep the palette usable.
+  }
   return nextIds;
 }
 
@@ -255,7 +259,11 @@ export function recordRecentCommand(
 
 function getBrowserStorage(): StorageLike | null {
   if (typeof window === 'undefined') return null;
-  return window.localStorage;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 }
 
 function formatPatientWait(patient: Pick<Patient, 'arrivalTime'>, now: Date): string {
