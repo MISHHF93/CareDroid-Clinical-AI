@@ -17,6 +17,7 @@ import {
   NLU_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   REGISTRY,
+  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   TOOL_LAUNCH_PATHS,
   registryToPrimaryNluToolId,
 } from './clinicalToolIdContract';
@@ -25,6 +26,7 @@ import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from './toolInventory';
 
 export * from './clinicalToolIdContract';
+export { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS };
 
 const CALCULATORS_HUB_PATH = TOOL_LAUNCH_PATHS.calculatorsHub;
 

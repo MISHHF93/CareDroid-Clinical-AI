@@ -317,6 +317,19 @@ describe('Tool Orchestrator API (e2e)', () => {
         });
     });
 
+    it('should handle an empty execute body without a controller exception', () => {
+      return request(app.getHttpServer())
+        .post('/tools/drug-interactions/execute')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.success).toBe(false);
+          expect(res.body.errorCode).toBe('VALIDATION_FAILED');
+          expect(res.body.result.errors).toEqual(
+            expect.arrayContaining([expect.stringContaining('medications')]),
+          );
+        });
+    });
+
     it('should include tool name in response', () => {
       return request(app.getHttpServer())
         .post('/tools/sofa-calculator/execute')
