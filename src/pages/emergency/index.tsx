@@ -49,20 +49,23 @@ const WHITEBOARD_COMMAND_METRIC_KEYS = new Set<EmergencyOperationalMetricKey>([
   'referralsPending',
 ]);
 
+function patientFlags(patient: Patient): PatientFlag[] {
+  return Array.isArray(patient.flags) ? patient.flags : [];
+}
+
 function isHighRisk(patient: Patient): boolean {
+  const flags = patientFlags(patient);
   return (
     patient.priority === Priority.P1 ||
     patient.priority === Priority.P2 ||
-    patient.flags.includes(PatientFlag.HighRisk) ||
-    patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-    patient.flags.includes(PatientFlag.SepsisAlert)
+    flags.includes(PatientFlag.HighRisk) ||
+    flags.includes(PatientFlag.DeteriorationRisk) ||
+    flags.includes(PatientFlag.SepsisAlert)
   );
 }
 
 function isBoarding(patient: Patient): boolean {
-  return (
-    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
-  );
+  return patient.state === PatientState.Admission || patientFlags(patient).includes(PatientFlag.PendingAdmission);
 }
 
 function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
@@ -70,7 +73,7 @@ function filterPatient(patient: Patient, activeFilter: FilterId): boolean {
   if (activeFilter === 'Waiting') return patient.state === PatientState.Waiting;
   if (activeFilter === 'Assessment') return patient.state === PatientState.Assessment;
   if (activeFilter === 'High Risk') return isHighRisk(patient);
-  if (activeFilter === 'EMS') return patient.flags.includes(PatientFlag.EMSArrival);
+  if (activeFilter === 'EMS') return patientFlags(patient).includes(PatientFlag.EMSArrival);
   if (activeFilter === 'Boarding') return isBoarding(patient);
   return true;
 }
@@ -95,10 +98,11 @@ function matchesActiveQueue(
   if (filter === 'referral') return pendingReferralPatientIds.has(patient.id);
   if (filter === 'discharge') return patient.state === PatientState.Disposition;
   if (filter === 'reassessment') {
+    const flags = patientFlags(patient);
     return (
-      patient.flags.includes(PatientFlag.ReassessmentDue) ||
-      patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-      patient.flags.includes(PatientFlag.SepsisAlert)
+      flags.includes(PatientFlag.ReassessmentDue) ||
+      flags.includes(PatientFlag.DeteriorationRisk) ||
+      flags.includes(PatientFlag.SepsisAlert)
     );
   }
 
@@ -324,10 +328,14 @@ export default function EmergencyWhiteboard() {
     () =>
       patients
         .filter(
-          (patient) =>
-            patient.flags.includes(PatientFlag.ReassessmentDue) ||
-            patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-            patient.flags.includes(PatientFlag.SepsisAlert),
+          (patient) => {
+            const flags = patientFlags(patient);
+            return (
+              flags.includes(PatientFlag.ReassessmentDue) ||
+              flags.includes(PatientFlag.DeteriorationRisk) ||
+              flags.includes(PatientFlag.SepsisAlert)
+            );
+          },
         )
         .sort(sortWhiteboardPatients),
     [patients],
@@ -340,7 +348,7 @@ export default function EmergencyWhiteboard() {
     const reassessmentDue =
       capacity.reassessmentDueCount ??
       capacity.reassessmentDue ??
-      patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length;
+      patients.filter((patient) => patientFlags(patient).includes(PatientFlag.ReassessmentDue)).length;
 
     return {
       total: patients.length,

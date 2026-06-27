@@ -631,19 +631,19 @@ function DataSourceNote({ moduleState }) {
 }
 
 function isHighRisk(patient) {
+  const flags = Array.isArray(patient.flags) ? patient.flags : [];
   return (
     patient.priority === 'P1' ||
     patient.priority === 'P2' ||
-    patient.flags.includes(PatientFlag.HighRisk) ||
-    patient.flags.includes(PatientFlag.DeteriorationRisk) ||
-    patient.flags.includes(PatientFlag.SepsisAlert)
+    flags.includes(PatientFlag.HighRisk) ||
+    flags.includes(PatientFlag.DeteriorationRisk) ||
+    flags.includes(PatientFlag.SepsisAlert)
   );
 }
 
 function isBoarding(patient) {
-  return (
-    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
-  );
+  const flags = Array.isArray(patient.flags) ? patient.flags : [];
+  return patient.state === PatientState.Admission || flags.includes(PatientFlag.PendingAdmission);
 }
 
 function displayPatientName(patient) {
@@ -673,7 +673,8 @@ const QUEUE_MOVEMENT_STAGES = Object.freeze({
 });
 
 function needsReassessmentAttention(patient) {
-  return REASSESSMENT_ATTENTION_FLAGS.some((flag) => patient.flags.includes(flag));
+  const flags = Array.isArray(patient.flags) ? patient.flags : [];
+  return REASSESSMENT_ATTENTION_FLAGS.some((flag) => flags.includes(flag));
 }
 
 function findUpgradeSignal(signals = [], capability) {
@@ -938,7 +939,9 @@ function QueueRoute() {
       },
       {
         label: 'Reassessment',
-        patients: patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)),
+        patients: patients.filter((patient) =>
+          (Array.isArray(patient.flags) ? patient.flags : []).includes(PatientFlag.ReassessmentDue),
+        ),
         target: 30,
         movementStages: QUEUE_MOVEMENT_STAGES.Reassessment,
       },
@@ -948,7 +951,11 @@ function QueueRoute() {
   const apiQueueRows = queues.data?.data?.queues;
   const visibleQueueRows = useMemo(() => {
     if (!apiQueueRows?.length) return queueRows;
-    const apiLabels = new Set(apiQueueRows.map((queue) => String(queue.label).toLowerCase()));
+    const apiLabels = new Set(
+      apiQueueRows
+        .map((queue) => String(queue.label || queue.type || queue.name || '').toLowerCase())
+        .filter(Boolean),
+    );
     const supplementalJourneyQueues = queueRows.filter(
       (queue) => !apiLabels.has(String(queue.label).toLowerCase()),
     );
@@ -1054,10 +1061,11 @@ function QueueRoute() {
       ) : null}
       <div style={{ display: 'grid', gap: 'var(--space-3, 12px)' }}>
         {filteredQueueRows.map((queue) => {
+          const queueLabel = queue.label || queue.type || queue.name || 'Queue';
           const patientsInQueue = queue.patients || [];
           const movementStages =
             queue.movementStages ||
-            QUEUE_MOVEMENT_STAGES[queue.label] ||
+            QUEUE_MOVEMENT_STAGES[queueLabel] ||
             QUEUE_MOVEMENT_STAGES[queue.type] ||
             [];
           const oldestWait =
@@ -1071,7 +1079,7 @@ function QueueRoute() {
           const breached = queue.breached ?? oldestWait > target;
           return (
             <article
-              key={queue.label}
+              key={queue.id || queueLabel}
               style={{
                 ...emergencyRouteStyles.card,
                 display: 'grid',
@@ -1083,9 +1091,9 @@ function QueueRoute() {
               }}
             >
               <div>
-                <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>{queue.label}</strong>
+                <strong style={{ color: 'var(--color-text-primary, #F9FAFB)' }}>{queueLabel}</strong>
                 <div
-                  aria-label={`${queue.label} queue patients`}
+                  aria-label={`${queueLabel} queue patients`}
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
@@ -1176,7 +1184,9 @@ function ReassessmentRoute() {
   }, [duePatients, requestedPatient]);
   const overdueCount = Math.max(
     reassessment.data?.data?.overdueCount ?? 0,
-    patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
+    patients.filter((patient) =>
+      (Array.isArray(patient.flags) ? patient.flags : []).includes(PatientFlag.ReassessmentDue),
+    ).length,
   );
 
   useEffect(() => {

@@ -46,6 +46,21 @@ function latestVitals(patient = {}) {
   return patient.vitals || {};
 }
 
+function asArray(value) {
+  if (Array.isArray(value)) return value;
+  return value ? [value] : [];
+}
+
+function normalizePatientRecord(patient = {}) {
+  return {
+    ...patient,
+    flags: Array.isArray(patient.flags) ? patient.flags : [],
+    vitals: asArray(patient.vitals),
+    notes: Array.isArray(patient.notes) ? patient.notes : [],
+    timeline: Array.isArray(patient.timeline) ? patient.timeline : [],
+  };
+}
+
 function normalizeEmsSeverity(patient = {}, offloadRisk = '') {
   if (patient.priority === 'P1' || offloadRisk === 'high') return 'Critical';
   if (patient.priority === 'P2') return 'High';
@@ -81,12 +96,35 @@ function normalizeEmsArrival(row = {}, index = 0) {
   };
 }
 
+function normalizeEmsArrivalRecord(arrival = {}, index = 0) {
+  const eta = Number(arrival.etaMinutes ?? arrival.eta ?? 0) || 0;
+  return {
+    ...arrival,
+    id: arrival.id || `ems-arrival-${arrival.patientId || index}`,
+    unitId: arrival.unitId || arrival.unitName || `EMS-${index + 1}`,
+    unitName: arrival.unitName || arrival.unitId || `EMS ${index + 1}`,
+    crewNames: Array.isArray(arrival.crewNames) ? arrival.crewNames : [],
+    vitals: latestVitals(arrival),
+    eta,
+    severity: arrival.severity || 'Moderate',
+    status: arrival.status || 'Inbound',
+    estimatedArrivalTime:
+      arrival.estimatedArrivalTime ||
+      new Date(Date.now() + Math.max(0, eta) * 60000).toISOString(),
+    chiefComplaint: arrival.chiefComplaint || arrival.prearrivalComplaint || 'EMS pre-arrival',
+  };
+}
+
 function normalizeReferralStatus(status = '') {
   const normalized = String(status).toLowerCase();
+  if (normalized.includes('acknowledg')) return 'Acknowledged';
   if (normalized.includes('accepted')) return 'Accepted';
+  if (normalized.includes('transferrequested') || normalized.includes('transfer requested')) return 'TransferRequested';
+  if (normalized.includes('transportarranged') || normalized.includes('transport arranged')) return 'TransportArranged';
+  if (normalized.includes('patientdeparted') || normalized.includes('patient departed')) return 'PatientDeparted';
   if (normalized.includes('closed') || normalized.includes('complete')) return 'Completed';
   if (normalized.includes('declined')) return 'Declined';
-  if (normalized.includes('delay')) return 'InfoRequested';
+  if (normalized.includes('delay') || normalized.includes('info')) return 'InfoRequested';
   if (normalized.includes('draft')) return 'Draft';
   return 'Sent';
 }
@@ -114,6 +152,53 @@ function normalizeReferral(row = {}, index = 0) {
     respondedAt: row.respondedAt,
     responseNote: row.responseNote,
     summary: row.summary || row.reason || patient.chiefComplaint || 'Referral requested.',
+  };
+}
+
+function normalizeQueueSummary(row = {}, index = 0) {
+  const label = row.label || row.type || row.name || `Queue ${index + 1}`;
+  const patients = asArray(row.patients).map(normalizePatientRecord);
+  return {
+    ...row,
+    id: row.id || row.type || label,
+    label,
+    type: row.type || label,
+    name: row.name || label,
+    count: row.count ?? patients.length,
+    patients,
+  };
+}
+
+function normalizeEmergencyData(data = {}) {
+  const patients = data.patients
+    ? asArray(data.patients).map(normalizePatientRecord)
+    : data.patient
+      ? [normalizePatientRecord(data.patient)]
+      : undefined;
+  const patient = data.patient ? normalizePatientRecord(data.patient) : undefined;
+  const emsArrivals = data.emsArrivals
+    ? asArray(data.emsArrivals).map(normalizeEmsArrivalRecord)
+    : data.arrivals
+      ? asArray(data.arrivals).map(normalizeEmsArrival)
+      : undefined;
+  const referrals = data.referrals ? asArray(data.referrals).map(normalizeReferral) : undefined;
+  const queues = data.queues ? asArray(data.queues).map(normalizeQueueSummary) : undefined;
+
+  return {
+    ...data,
+    ...(patients ? { patients } : {}),
+    ...(patient ? { patient } : {}),
+    ...(emsArrivals ? { emsArrivals } : {}),
+    ...(referrals ? { referrals } : {}),
+    ...(queues ? { queues } : {}),
+  };
+}
+
+function normalizeEmergencyEnvelope(envelope) {
+  if (!envelope?.data || typeof envelope.data !== 'object') return envelope;
+  return {
+    ...envelope,
+    data: normalizeEmergencyData(envelope.data),
   };
 }
 
@@ -164,21 +249,25 @@ function useEmergencyModule(fetcher, scenarioModule) {
     () => (scenarioModule && activeScenarioId ? buildEmergencyScenarioModuleEnvelope(scenarioModule, activeScenarioId) : null),
     [activeScenarioId, scenarioModule]
   );
+  const normalizedScenarioEnvelope = useMemo(
+    () => normalizeEmergencyEnvelope(scenarioEnvelope),
+    [scenarioEnvelope]
+  );
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError('');
-    if (scenarioEnvelope) {
-      setData(scenarioEnvelope);
-      const hydrationPayload = pickHydrationPayload(scenarioEnvelope);
+    if (normalizedScenarioEnvelope) {
+      setData(normalizedScenarioEnvelope);
+      const hydrationPayload = pickHydrationPayload(normalizedScenarioEnvelope);
       if (hasHydrationPayload(hydrationPayload)) {
         hydrateFromApi(hydrationPayload);
       }
       setLoading(false);
-      return scenarioEnvelope;
+      return normalizedScenarioEnvelope;
     }
     try {
-      const envelope = await fetcher();
+      const envelope = normalizeEmergencyEnvelope(await fetcher());
       setData(envelope);
       const hydrationPayload = pickHydrationPayload(envelope);
       if (hasHydrationPayload(hydrationPayload)) {
@@ -192,15 +281,15 @@ function useEmergencyModule(fetcher, scenarioModule) {
     } finally {
       setLoading(false);
     }
-  }, [fetcher, hydrateFromApi, scenarioEnvelope]);
+  }, [fetcher, hydrateFromApi, normalizedScenarioEnvelope]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError('');
-    if (scenarioEnvelope) {
-      setData(scenarioEnvelope);
-      const hydrationPayload = pickHydrationPayload(scenarioEnvelope);
+    if (normalizedScenarioEnvelope) {
+      setData(normalizedScenarioEnvelope);
+      const hydrationPayload = pickHydrationPayload(normalizedScenarioEnvelope);
       if (hasHydrationPayload(hydrationPayload)) {
         hydrateFromApi(hydrationPayload);
       }
@@ -210,6 +299,7 @@ function useEmergencyModule(fetcher, scenarioModule) {
       };
     }
     fetcher()
+      .then(normalizeEmergencyEnvelope)
       .then((envelope) => {
         if (cancelled) return;
         setData(envelope);
@@ -229,7 +319,7 @@ function useEmergencyModule(fetcher, scenarioModule) {
     return () => {
       cancelled = true;
     };
-  }, [fetcher, hydrateFromApi, scenarioEnvelope]);
+  }, [fetcher, hydrateFromApi, normalizedScenarioEnvelope]);
 
   const isEmpty = useMemo(() => {
     const payload = data?.data;
