@@ -214,6 +214,8 @@ describe('workspaceArchitecture', () => {
           'fleetMap',
           'liveMap',
           'laboratory',
+          'simulation',
+          'competencies',
         ].map((id) => [id, WORKSPACE_ROUTE_SHORTCUTS[id].path])
       )
     ).toEqual({
@@ -228,6 +230,10 @@ describe('workspaceArchitecture', () => {
       liveMap:
         '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map',
       laboratory: '/emergency/tools?source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+      simulation:
+        '/emergency/tools?source=simulation&filter=simulations&q=simulation-suite&open=simulation-suite',
+      competencies:
+        '/emergency/tools?source=simulation&filter=simulations&q=competency-platform&open=competency-platform',
     });
   });
 
