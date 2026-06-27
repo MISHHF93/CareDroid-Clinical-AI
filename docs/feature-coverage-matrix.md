@@ -13,6 +13,10 @@ Generated: 2026-06-12 (source-derived; regenerate with `npm run feature-coverage
 | Missing documentation | 1 |
 | Missing role profile preferred mapping | 282 |
 
+## Route Interpretation
+
+This matrix is source-derived from feature, asset, catalog, and inventory records. Routes listed below may be legacy launch paths or catalog/future-module paths. The current mounted Emergency OS route tree starts at `/emergency/whiteboard`; Medical Tools and calculator intent should be demonstrated through `/emergency/tools`, while ED Copilot should be demonstrated through `/emergency/copilot`.
+
 ## Highlighted gaps
 
 ### Missing or weak tests

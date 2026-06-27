@@ -18,13 +18,14 @@ Audited active Emergency OS workflow launchers across command palette, patient c
 | `src/config/commandPalette.config.js` | Open Capacity command | Command palette registry | `/emergency/capacity` | working | None | None |
 | `src/config/commandPalette.config.js` | Open Boarding command | Command palette registry | `/emergency/boarding` | working | None | None |
 | `src/config/commandPalette.config.js` | Open Referrals command | Command palette registry | `/emergency/referrals` | working | None | None |
-| `src/config/commandPalette.config.js` | Open ED Copilot command | Command palette registry | `/emergency/copilot` | fixed | Route now mounts Copilot workflow hub instead of redirecting away | None |
+| `src/config/commandPalette.config.js` | Open ED Copilot command | Command palette registry | `/emergency/copilot` | working | Opens the active Copilot support route | None |
+| `src/config/commandPalette.config.js` | Open Medical Tools command | Command palette registry | `/emergency/tools` | working | Opens the active Medical Tools route | None |
 | `src/config/commandPalette.config.js` | Open Analytics command | Command palette registry | `/emergency/analytics` | working | None | None |
 | `src/config/commandPalette.config.js` | Open Settings command | Command palette registry | `/emergency/settings` | working | None | None |
-| `src/components/CommandPalette.jsx` | Run calculator dynamic command | Command palette | Open patient/context-aware calculator workflow | fixed | AppShell launch handler now targets `/emergency/copilot` | None |
+| `src/components/CommandPalette.jsx` | Run calculator dynamic command | Command palette | Open patient/context-aware calculator workflow | fixed | AppShell launch handler now targets `/emergency/tools?source=calculators&filter=calculator` | None |
 | `src/components/CommandPalette.jsx` | Drug reference dynamic command | Command palette | Open embedded drug reference or pediatric dosing | fixed | Drug metadata now targets Copilot; pediatric remains AppShell modal | None |
-| `src/components/ChatInterface.jsx` | NLU calculator launcher | ED Copilot chat | Dispatch `ed:open-calculator` | fixed | AppShell event handler now opens `/emergency/copilot?tool=...` | None |
-| `src/components/PatientCard.jsx` | Run Score | Patient detail | Open patient-linked calculator workflow | fixed | Rewired to `/emergency/copilot` | None |
+| `src/components/ChatInterface.jsx` | NLU calculator launcher | ED Copilot chat | Dispatch `ed:open-calculator` | fixed | AppShell event handler now opens `/emergency/tools?source=calculators&filter=calculator&open=...` | None |
+| `src/components/PatientCard.jsx` | Run Score | Patient detail | Open patient-linked calculator workflow | fixed | Rewired to `/emergency/tools` with patient/calculator context | None |
 | `src/components/PatientCard.jsx` | Protocol launch | Patient complaint suggestions | Record protocol launch event | working | None | Some complaint categories need additional calculator chips |
 | `src/pages/emergency/SmartIntake.jsx` | Start Intake | Smart Intake | Try backend session, fall back to local demo | working | None | Optional backend route can be unavailable by environment |
 | `src/pages/emergency/SmartIntake.jsx` | Final intake actions | Smart Intake | Link/create/unknown/triage workflow confirmation | fixed | Added handlers and status updates | Backend persistence remains manual review |
@@ -38,4 +39,4 @@ Audited active Emergency OS workflow launchers across command palette, patient c
 | `src/pages/emergency/EmergencySettings.jsx` | Settings controls | Settings route | Update emergency thresholds/preferences | working | None | Some feature management copy remains manual review |
 
 ## Summary
-Launcher connectivity now centers on the 12 active Emergency OS routes. Calculator/workflow launchers now converge on `/emergency/copilot` or existing AppShell modals rather than an unmounted tools hub.
+Launcher connectivity now centers on the active Emergency OS route tree. Calculator launchers converge on `/emergency/tools` with calculator query parameters, chat-assisted guidance converges on `/emergency/copilot`, and common inline score actions can still use existing patient-detail modals.

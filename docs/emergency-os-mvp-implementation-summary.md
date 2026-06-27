@@ -8,16 +8,14 @@ The MVP is intentionally frontend/demo deterministic. It proves the product oper
 
 ## Implemented Application Surfaces
 
-- `/workspace/emergency/command-center` renders the ED director command center across throughput, waiting room, EMS, boarding, referrals, capacity, resources, escalations, and automations.
-- `/workspace/emergency/throughput` renders Door-to-Doctor Intelligence.
-- `/workspace/emergency/waiting-room` renders Waiting Room Intelligence and Reassessment Queue signals.
-- `/workspace/emergency/ems` renders EMS Offload Command Center data.
-- `/workspace/emergency/resources` renders Emergency Resource Board data.
-- `/workspace/emergency/escalations` renders Emergency Escalation Engine recommendations.
-- `/workspace/emergency/simulations` renders Emergency Simulation Scenarios.
-- `/workspace/emergency/demo` renders the ED demo tenant and 100+ deterministic demo patients.
-- `/workspace/emergency/analytics` renders Emergency KPI Layer and Emergency Analytics MVP signals.
-- `/workspace/emergency/deployment` renders the first-customer path, minimum sellable ED OS package, and 30/60/90 rollout plan.
+- `/emergency/whiteboard` renders the primary ED operating picture across patients, queues, EMS pressure, capacity, boarding, referrals, alerts, and demo scenario context.
+- `/emergency/patients`, `/emergency/queues`, and `/emergency/reassessment` render patient-flow, waiting-room, and reassessment support views.
+- `/emergency/ems`, `/emergency/capacity`, `/emergency/boarding`, and `/emergency/referrals` render operational bottleneck support views.
+- `/emergency/copilot` renders ED Copilot chat-assisted guidance.
+- `/emergency/tools` renders Medical Tools; calculator intent embeds the calculator hub through `source=calculators&filter=calculator`.
+- First Customer Demo Mode loads from the `/emergency/whiteboard` scenario selector or `/emergency/settings`, representing a 100-patient/day ED with 42 active visible demo patients.
+- `/emergency/analytics` renders Emergency KPI Layer, throughput, capacity, and demo analytics summaries.
+- `/emergency/settings` renders scenario controls, thresholds, and operational settings.
 
 ## Implemented Services
 

@@ -2,13 +2,19 @@
 
 ## Goal
 
-Create a demo tenant that lets prospects experience the Emergency Workspace without EHR, ADT, telemetry, protocol library, scheduling, or analytics integrations.
+Use the current First Customer Demo Mode to let prospects experience the Emergency OS without EHR, ADT, telemetry, protocol library, scheduling, or analytics integrations.
 
-Every demo-mode object must be clearly labeled as demo data.
+Every demo-mode object must be clearly labeled as demo/local data.
+
+## Current Entry Points
+
+- Open `/emergency/whiteboard` and choose `First Customer Demo Mode` from the Emergency OS scenario selector.
+- Or open `/emergency/settings` and use `First Customer Demo Mode` > `Load Demo`.
+- Use `Reset to Normal Day` or the `Normal day` scenario to leave the demo flow.
 
 ## Demo Tenant
 
-The demo tenant should represent a realistic emergency department pilot environment:
+The active demo scenario represents a realistic emergency department pilot environment:
 
 - Tenant name: CareDroid Emergency Demo Hospital.
 - Workspace: Emergency.
@@ -18,7 +24,7 @@ The demo tenant should represent a realistic emergency department pilot environm
 
 ## Demo Data To Populate
 
-Populate the demo tenant with:
+The current deterministic scenario populates:
 
 - Sample patients: waiting room, triage, high-risk review, active assessment, results pending, and disposition-ready examples.
 - Sample alerts: critical clinical alerts, workflow alerts, stale review prompts, and operational warnings.
@@ -50,9 +56,4 @@ A prospect should be able to:
 
 ## Acceptance
 
-Emergency Demo Mode is ready when:
-
-- A demo tenant exists in the frontend data model.
-- Sample patients, alerts, workflows, protocols, and analytics are available without integrations.
-- Every sample item is labeled as demo data.
-- The Emergency Workspace clearly communicates that demo mode is for product evaluation and does not use live clinical integrations.
+Emergency Demo Mode is ready when a reviewer can load First Customer Demo Mode from `/emergency/whiteboard` or `/emergency/settings`, see sample patients, alerts, workflows, protocols, and analytics without integrations, and understand that the scenario is for product evaluation only.

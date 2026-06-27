@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create a realistic emergency department demo tenant that lets prospects experience the ED operating system without EHR, ADT, EMS CAD, telemetry, bed-management, referral, or analytics integrations.
+Use the First Customer Demo Mode to present a realistic emergency department demo environment without EHR, ADT, EMS CAD, telemetry, bed-management, referral, or analytics integrations.
 
 Everything in the environment must be clearly labeled as demo data.
 
@@ -18,7 +18,7 @@ The demo environment should represent a busy emergency department with realistic
 
 ## Demo Population
 
-The tenant should include 100+ demo patients distributed across the ED journey:
+The scenario represents a 100-patient/day ED, with a stable visible census for walkthroughs. Current First Customer Demo Mode populates 42 active patients distributed across the ED journey:
 
 - Waiting room patients.
 - Triage queue patients.
@@ -71,21 +71,18 @@ The UI must avoid presenting demo patients, alerts, queues, device status, EMS a
 
 ## Emergency Workspace Coverage
 
-The demo environment should populate:
+The demo environment should be demonstrated through the currently mounted Emergency OS routes:
 
-- Emergency command center.
-- Door-to-Doctor throughput dashboard.
-- Waiting room dashboard.
-- Reassessment queue.
-- EMS Offload Command Center.
-- Emergency Resource Board.
-- Boarding and referral intelligence views.
-- Emergency KPI Layer summaries.
-- Emergency Escalation Engine recommendations.
-- Emergency simulation scenarios.
+- `/emergency/whiteboard` for the primary operating picture.
+- `/emergency/patients`, `/emergency/queues`, and `/emergency/reassessment` for patient and queue pressure.
+- `/emergency/ems`, `/emergency/capacity`, `/emergency/boarding`, and `/emergency/referrals` for operational bottlenecks.
+- `/emergency/copilot` for chat-assisted guidance.
+- `/emergency/tools?source=calculators&filter=calculator` for calculators and clinical tool support.
+- `/emergency/analytics` for demo operational summaries.
+- `/emergency/settings` for scenario loading/reset.
 
-Prospects should be able to navigate the ED OS and see how operational signals connect across dashboards without requiring integrations.
+Prospects should be able to navigate the ED OS and see how operational signals connect without requiring integrations.
 
 ## Acceptance Mapping
 
-Acceptance is met when prospects can enter the Emergency demo tenant, see 100+ clearly labeled demo patients, experience queues, boarding, EMS arrivals, referrals, and capacity issues, and understand the ED operating system without any live integrations.
+Acceptance is met when prospects can enter First Customer Demo Mode, see clearly labeled demo patients, experience queues, boarding, EMS arrivals, referrals, and capacity issues, and understand the ED operating system without any live integrations.

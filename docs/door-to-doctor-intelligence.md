@@ -61,11 +61,13 @@ Staffing pressure is inferred from active demand and completion pace:
 
 The output is operational guidance only. It does not assign staff, alter clinical priority, or make clinical decisions.
 
-## Dashboard Route
+## Current Product Route
 
-The Door-to-Doctor dashboard is mounted at:
+Door-to-Doctor signals are not mounted as a standalone workspace page in the current Emergency OS route tree. Demonstrate them through:
 
-`/workspace/emergency/throughput`
+- `/emergency/analytics` for operational KPI summaries and trends.
+- `/emergency/queues` and `/emergency/reassessment` for queue age, reassessment pressure, and delay context.
+- `/emergency/whiteboard` for the primary patient-flow operating picture.
 
 The dashboard should show:
 
@@ -78,4 +80,4 @@ The dashboard should show:
 
 ## Acceptance Mapping
 
-Acceptance is met when leadership can open `/workspace/emergency/throughput` and monitor ED throughput using arrival time, triage time, provider time, Door-to-Doctor KPI, delay detection, bottleneck detection, and staffing pressure signals.
+Acceptance is met when leadership can use the mounted Emergency OS routes above to monitor ED throughput using arrival time, triage time, provider time, Door-to-Doctor KPI, delay detection, bottleneck detection, and staffing pressure signals.

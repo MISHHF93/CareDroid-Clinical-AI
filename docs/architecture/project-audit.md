@@ -14,33 +14,31 @@ The repository contains extensive future-module work for governance, platform as
 
 Primary active routes in `src/App.jsx`:
 
-- `/` redirects to `/emergency`.
-- `/emergency` renders `EmergencyWhiteboard`.
+- `/` and `/emergency` redirect to `/emergency/whiteboard`.
+- `/emergency/whiteboard` renders `EmergencyWhiteboard`.
+- `/emergency/patients` renders the Emergency OS patient list/search support route.
 - `/emergency/ems` renders `EMSPipeline`.
-- `/emergency/pulse` renders `DepartmentPulse`; available but no longer in the main rail.
+- `/emergency/intake` renders `SmartIntake`.
+- `/emergency/queues` renders the queue support route.
+- `/emergency/reassessment` renders the reassessment support route/drawer entry.
+- `/emergency/capacity` renders capacity detail.
+- `/emergency/boarding` renders boarding detail.
 - `/emergency/referrals` renders `ReferralPanel`.
-- `/emergency/capacity` renders `EmergencyCapacityRoute`.
-- `/emergency/tools` renders `ClinicalCalculatorHub`.
-- `/emergency/shift` renders `ShiftSummary`.
-- `/settings` renders `EmergencySettings` inside `SettingsRoute`.
-- `/settings/features` renders `FeatureManagement`.
-- `*` redirects to `/emergency`.
+- `/emergency/copilot` renders the ED Copilot support route.
+- `/emergency/tools` renders `ToolsOverview`; calculator intent embeds `ClinicalCalculatorHub` with `source=calculators&filter=calculator`.
+- `/emergency/pulse` renders `EmergencyDepartmentPulse`.
+- `/emergency/shift` renders `EmergencyShiftSummary`.
+- `/emergency/analytics` renders `EmergencyAnalytics`.
+- `/emergency/settings` renders `EmergencySettingsRoute`.
+- `*` redirects to `/emergency/whiteboard`.
 
-Emergency compatibility redirects in `src/App.jsx`:
+Emergency compatibility redirects and aliases in `src/App.jsx`:
 
-- `/dashboard`, `/home`, `/assistant`, `/chat`, `/ai`, `/copilot` redirect to `/emergency`.
-- `/emergency/whiteboard`, `/emergency/patients`, `/emergency/queue`, `/emergency/queues`, `/emergency/command-center`, `/emergency/copilot` redirect to `/emergency`.
-- `/emergency/analytics` and `/emergency/boarding` redirect to `/emergency/capacity`.
-- `/workspace`, `/workspace/emergency`, `/workspace/emergency/whiteboard`, `/workspace/emergency/patients`, `/workspace/emergency/queue`, `/workspace/emergency/queues`, `/workspace/emergency/copilot`, and `/workspace/emergency/command-center` redirect to `/emergency`.
-- `/workspace/emergency/ems` redirects to `/emergency/ems`.
-- `/workspace/emergency/referrals` redirects to `/emergency/referrals`.
-- `/workspace/emergency/capacity` and `/workspace/emergency/boarding` redirect to `/emergency/capacity`.
-- `/workspace/emergency/tools` redirects to `/emergency/tools`.
-- `/workspace/emergency/shift-summary` and `/workspace/emergency/shift` redirect to `/emergency/shift`.
-- `/workspace/emergency/settings` and `/emergency/settings` redirect to `/settings`.
-- `/tools`, `/tools/calculators`, `/tools/calculators/:slug`, `/all-tools`, `/clinical-tools`, `/catalog`, and `/calculators` redirect to `/emergency/tools`.
-- `/patients` and `/patients/*` redirect to `/emergency`.
-- Settings aliases redirect to `/settings`.
+- `/dashboard`, `/home`, `/workspace`, `/app`, and broad workspace aliases redirect to `/emergency/whiteboard`.
+- `/assistant`, `/chat`, `/ai`, and `/copilot` redirect to `/emergency/copilot`.
+- `/tools`, `/tools/*`, `/calculators`, `/calculators/*`, `/scores/*`, `/all-tools`, `/clinical-tools`, `/catalog`, and `/protocols/*` redirect into `/emergency/tools`.
+- Operational legacy roots such as `/operations/*`, `/fleet/*`, `/hospital-map`, `/medical-iot`, `/devices`, and live-map aliases redirect into `/emergency/tools` with operations/map context.
+- Retired Emergency OS feature paths such as provincial health, integrations, simulation, federated learning, digital twin, and AI governance redirect to `/emergency/whiteboard` unless promoted by a later product decision.
 
 Future-release route families in `src/App.jsx`:
 
@@ -62,15 +60,21 @@ Canonical active app chrome:
 - `src/config/navigation.config.js` exports `APP_SHELL_NAV_ITEMS`, which is the active rail source.
 - `src/navigation/primaryNavigation.js` is a compatibility re-export only.
 
-Active rail items in `APP_SHELL_NAV_ITEMS`:
+Active pilot-visible rail items in `NAVIGATION_ITEMS` / `APP_SHELL_NAV_ITEMS`:
 
-- `emergency_whiteboard` -> `/emergency`
-- `ems_pipeline` -> `/emergency/ems`
-- `referral_intelligence` -> `/emergency/referrals`
-- `capacity_intelligence` -> `/emergency/capacity`
-- `clinical_calculator_hub` -> `/emergency/tools`
-- `shift_summary` -> `/emergency/shift`
-- `emergency_settings` -> `/settings`
+- `whiteboard` -> `/emergency/whiteboard`
+- `patients` -> `/emergency/patients`
+- `ems` -> `/emergency/ems`
+- `intake` -> `/emergency/intake`
+- `queues` -> `/emergency/queues`
+- `reassessment` -> `/emergency/reassessment`
+- `capacity` -> `/emergency/capacity`
+- `boarding` -> `/emergency/boarding`
+- `referrals` -> `/emergency/referrals`
+- `copilot` -> `/emergency/copilot`
+- `tools` -> `/emergency/tools`
+- `analytics` -> `/emergency/analytics`
+- `settings` -> `/emergency/settings`
 
 Remaining navigation duplication:
 

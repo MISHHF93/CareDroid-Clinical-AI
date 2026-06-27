@@ -44,7 +44,7 @@ These modules define the current development target and must receive priority.
 | Patient Journey Engine | Emergency patient journey model from arrival through discharge/admission | Core operating model. |
 | Queue Intelligence | Waiting room, triage, high-risk, referral, admission, discharge, reassessment queues | Core visibility layer. |
 | EMS Pre-Arrival / Handoff | `/workspace/emergency/pre-arrival`, `EmsPreArrivalPipelineService` | Core EMS-to-ED structured handoff visibility. |
-| Door-to-Doctor Intelligence | `DoorToDoctorIntelligenceService`, `/workspace/emergency/throughput` | Core throughput proof. |
+| Door-to-Doctor Intelligence | `DoorToDoctorIntelligenceService`, surfaced through `/emergency/analytics`, `/emergency/queues`, and `/emergency/whiteboard` | Core throughput proof. |
 | Waiting Room Intelligence | `WaitingRoomIntelligenceService`, `/workspace/emergency/waiting-room` | Core queue proof. |
 | Reassessment Queue | `ReassessmentAutomationService`, `/workspace/emergency/waiting-room` | Core safety/visibility proof. |
 | EMS Offload Command Center | `EmsOffloadCommandCenterService`, `/workspace/emergency/ems` | Core EMS pressure visibility. |
@@ -54,7 +54,7 @@ These modules define the current development target and must receive priority.
 | ED Knowledge Layer | `/workspace/emergency/knowledge` | Core search-first protocols, calculators, pathways, simulations, evidence, and workflows. |
 | Emergency Analytics / KPI Layer | `EmergencyKPILayerService`, `/workspace/emergency/analytics` | Core adoption and ROI proof. |
 | Automation ROI | `/workspace/emergency/automation-roi`, `AutomationROIService` | Core value proof for time saved, clicks reduced, queue impact, throughput impact, and adoption. |
-| Emergency Demo Environment | `EmergencyDemoEnvironmentService`, `/workspace/emergency/demo` | Core first-customer demo path. |
+| Emergency Demo Environment | First Customer Demo Mode, `/emergency/whiteboard` scenario selector, `/emergency/settings` load/reset controls | Core first-customer demo path. |
 | First Customer Path | `/workspace/emergency/deployment` | Core sales and rollout plan. |
 | ED Calculator Bundle | qSOFA, NEWS2, HEART, Wells PE, Wells DVT, Shock Index, NIHSS, trauma and ACS support where tied to ED flow | Core only when launched from Emergency context. |
 | Workspace Data Pipeline | `WorkspaceDataPipelineService` Emergency payload | Core data contract for ED OS. |
@@ -72,7 +72,7 @@ These modules stay in the repository but do not receive priority until Emergency
 
 | Module | Source / Surface | Treatment |
 | --- | --- | --- |
-| Emergency Resource Board | `EmergencyResourceBoardService`, `/workspace/emergency/resources` | Roadmap; expansion after core ED flow proof. |
+| Emergency Resource Board | `EmergencyResourceBoardService`, surfaced through `/emergency/capacity`, `/emergency/ems`, and `/emergency/analytics` | Roadmap; expansion after core ED flow proof. |
 | Emergency Escalation Engine | `EmergencyEscalationEngineService`, `/workspace/emergency/escalations` | Roadmap; human-reviewed operational escalation only. |
 | Emergency Simulation Scenarios | `EmergencySimulationScenariosService`, `/workspace/emergency/simulations` | Roadmap; training expansion after core pilot. |
 | Simulation Academy | `emergency-simulation-academy` | Roadmap add-on, not core build driver. |

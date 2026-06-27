@@ -18,13 +18,14 @@ Audited active Emergency OS route, navigation, command, search, and legacy alias
 | `src/App.jsx` | Capacity route | `AppRoutes` | `/emergency/capacity` inside `AppShell` | working | None | None |
 | `src/App.jsx` | Boarding route | `AppRoutes` | `/emergency/boarding` inside `AppShell` | fixed | Feature guard changed from `capacity_intelligence` to `boarding_intelligence` | None |
 | `src/App.jsx` | Referrals route | `AppRoutes` | `/emergency/referrals` inside `AppShell` | working | None | Missing-patient referral row remains manual review |
-| `src/App.jsx` | ED Copilot route | `EmergencyCopilotRoute` | `/emergency/copilot` inside `AppShell` | fixed | Replaced redirect-only route with mounted Copilot workflow/tool hub | None |
+| `src/App.jsx` | ED Copilot route | `EmergencyCopilotRoute` | `/emergency/copilot` inside `AppShell` | working | Active chat-assisted support route remains mounted | None |
+| `src/App.jsx` | Medical Tools route | `ToolsOverview` | `/emergency/tools` inside `AppShell` | working | Owns Medical Tools, operations/tool context, and calculator intent | None |
 | `src/App.jsx` | Analytics route | `AppRoutes` | `/emergency/analytics` inside `AppShell` | working | None | None |
 | `src/App.jsx` | Settings route | `SettingsRoute` | `/emergency/settings` inside `AppShell` | working | None | Hash tabs remain manual review |
-| `src/App.jsx` | Legacy tools aliases | `DUPLICATE_ROUTE_REDIRECTS` | Redirect to `/emergency/copilot` | fixed | `/tools`, `/catalog`, `/calculators`, `/all-tools`, `/clinical-tools`, and workspace tools aliases now target Copilot directly | `/emergency/tools` remains as backward-compatible redirect |
-| `src/config/navigation.config.js` | Clinical Tools primary nav compatibility item | `PRIMARY_NAV_ITEMS` | `/emergency/copilot` | fixed | Path changed from `CANONICAL_ROUTES.emergencyTools` to `CANONICAL_ROUTES.emergencyCopilot` | Compatibility match still recognizes old `/emergency/tools` and `/tools/calculators` |
-| `src/config/commandPalette.config.js` | Emergency route commands | `EMERGENCY_OS_ROUTE_COMMANDS` | 12 normalized `/emergency/*` routes | working | None | None |
+| `src/App.jsx` | Legacy tools aliases | `ToolsRedirect` | Redirect to `/emergency/tools` | fixed | `/tools`, `/catalog`, `/calculators`, `/scores`, `/all-tools`, `/clinical-tools`, and workspace tools aliases now target Medical Tools with intent preserved | None |
+| `src/config/navigation.config.js` | Medical Tools primary nav item | `APP_SHELL_NAV_ITEMS` | `/emergency/tools` | working | Navigation label and route match active Medical Tools ownership | Compatibility match still recognizes old `/tools/calculators` aliases |
+| `src/config/commandPalette.config.js` | Emergency route commands | `EMERGENCY_OS_ROUTE_COMMANDS` | Mounted `/emergency/*` routes | working | None | None |
 | `src/layout/AppShell.jsx` | AppShell route wrapper | `AppShellPage` | Protected pages render inside one `AppShell` | working | None | None |
 
 ## Summary
-All 12 normalized Emergency OS routes are mounted in the shared `AppShell`. Calculator and clinical tool launches no longer navigate to an unmounted tools page; active launchers land on `/emergency/copilot` with query and patient context.
+The normalized Emergency OS route tree is mounted in the shared `AppShell`. Calculator and clinical tool launches land on `/emergency/tools` with query and patient context; chat-assisted guidance lands on `/emergency/copilot`.

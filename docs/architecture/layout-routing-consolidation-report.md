@@ -4,11 +4,11 @@ Generated: 2026-06-12
 
 ## Changes Made
 
-- Created `src/config/commandPalette.config.js` as the single command-palette route registry for the 12 active Emergency OS routes.
+- Created `src/config/commandPalette.config.js` as the single command-palette route registry for the active Emergency OS route tree.
 - Updated `src/components/CommandPalette.jsx` to consume `EMERGENCY_OS_ROUTE_COMMANDS` from the new registry instead of defining route commands inline.
 - Updated `src/config/navigation.config.js` so the AppShell capacity rail item uses `CANONICAL_ROUTES.emergencyCapacity` instead of a hardcoded path.
 - Updated `src/config/routes.config.js` protected alias records so legacy dashboard, assistant, tools, calculators, and operations aliases resolve into active `/emergency/*` routes.
-- Updated `src/App.jsx` so Copilot conversation handlers navigate to `/emergency/copilot`, and old calculator routes redirect to `/emergency/copilot`.
+- Updated `src/App.jsx` so Copilot conversation handlers navigate to `/emergency/copilot`, and old calculator/tool routes redirect to `/emergency/tools` with source/filter/open query parameters where applicable.
 - Updated `src/data/workspaceArchitecture.js` so the Emergency workspace default path is `/emergency/whiteboard`, and core workspace shortcuts for assistant, command center, tools, calculators, and settings point at active Emergency OS routes.
 - Updated route/config/navigation tests to assert the normalized Emergency OS route model instead of `/workspace/emergency`, `/dashboard`, `/assistant`, and old calculator pages.
 
@@ -42,7 +42,7 @@ No file met the threshold for safe archival during this pass. The review candida
 
 ## Routes Normalized
 
-Active route target remains the 12 Emergency OS routes:
+Active route target remains the mounted Emergency OS route tree:
 
 - `/emergency/whiteboard`
 - `/emergency/patients`
@@ -54,6 +54,9 @@ Active route target remains the 12 Emergency OS routes:
 - `/emergency/boarding`
 - `/emergency/referrals`
 - `/emergency/copilot`
+- `/emergency/tools`
+- `/emergency/pulse`
+- `/emergency/shift`
 - `/emergency/analytics`
 - `/emergency/settings`
 
@@ -63,8 +66,8 @@ Legacy/default paths now redirect or resolve to active Emergency OS routes:
 - `/home` resolves through route records to `/emergency/whiteboard`.
 - `/dashboard` redirects in `src/App.jsx` to `/emergency/whiteboard`.
 - `/chat`, `/ai`, `/copilot`, and `/assistant` resolve or redirect to `/emergency/copilot`.
-- `/catalog`, `/all-tools`, `/clinical-tools`, `/tools`, `/tools/calculators`, and `/tools/calculators/:slug` resolve or redirect to `/emergency/copilot`.
-- `/operations-center` resolves through route records to `/emergency/queues`.
+- `/catalog`, `/all-tools`, `/clinical-tools`, `/tools`, `/tools/calculators`, `/tools/calculators/:slug`, `/calculators`, and `/scores/*` resolve or redirect to `/emergency/tools`.
+- `/operations`, `/operations/*`, `/operations-center`, `/fleet/*`, `/hospital-map`, `/medical-iot`, `/devices`, and live-map aliases route into `/emergency/tools` with operations/map context.
 - Emergency workspace quick-launch now opens `/emergency/whiteboard`.
 
 ## Layouts Removed

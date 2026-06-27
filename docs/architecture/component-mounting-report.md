@@ -42,10 +42,11 @@ The goal was to eliminate active Emergency OS components that existed but were n
   - Replaced the inline `EmergencySettingsRoute` stub.
   - Connected to settings, feature flags, staff, room, protocol, and integration APIs.
 
-- `src/pages/emergency/ClinicalCalculatorHub.jsx`
+- `src/pages/tools/ToolsOverview.jsx` with `src/components/ClinicalCalculatorHub.tsx`
   - Mounted at `CANONICAL_ROUTES.emergencyTools`.
   - Added the canonical route entry for `/emergency/tools`.
   - Redirected emergency tool aliases (`/tools`, `/calculators`, `/emergency/calculators`, `/emergency/clinical-tools`, and workspace emergency tool aliases) to the mounted clinical tools page instead of the whiteboard.
+  - Embeds `ClinicalCalculatorHub` when Medical Tools receives calculator intent.
 
 - `src/components/CommandPalette.jsx`
   - Mounted in the active `src/components/AppShell.tsx`.
@@ -81,16 +82,15 @@ The goal was to eliminate active Emergency OS components that existed but were n
 - `src/components/NewPatientIntake.jsx`, `src/components/QueueIntelligencePanel.jsx`, `src/components/WhoNextPanel.jsx`, `src/components/CrisisMode.jsx`, and `src/components/ClinicalScoreCalculator.jsx`
   - Classified as legacy rich-whiteboard children.
   - They are not mounted independently because their only active parent candidate is the duplicate `src/components/EmergencyWhiteboard.jsx`.
-  - `ClinicalCalculatorHub` is now the active calculator/tool surface.
+  - `ToolsOverview` is now the active Medical Tools route owner; `ClinicalCalculatorHub` is embedded for calculator intent.
 
-- `src/pages/emergency/DepartmentPulse.jsx`
-  - Classified as future/review module.
-  - The active file re-exports `src/features/future-modules/_review/pages/emergency/DepartmentPulse.jsx`.
-  - Existing `/emergency/pulse` and shift aliases remain intentionally non-active until that future module is promoted.
+- `src/pages/emergency/pulse/index.tsx`
+  - Mounted at `CANONICAL_ROUTES.emergencyPulse`.
+  - Active as the Department Pulse support route.
 
-- `src/components/ShiftSummary.jsx` and `src/pages/ShiftSummary.jsx`
-  - Classified as future/review module.
-  - `src/components/ShiftSummary.jsx` already re-exports `src/features/future-modules/_review/components/ShiftSummary.jsx`.
+- `src/pages/emergency/shift/index.tsx`
+  - Mounted at `CANONICAL_ROUTES.emergencyShift`.
+  - Active as the Shift Summary support route.
 
 - `src/components/JourneyTimeline.jsx`, `src/components/EscalateButton.jsx`, and `src/components/ProtocolSuggestion.jsx`
   - Classified as patient-detail enhancement candidates, not active route components.

@@ -51,11 +51,13 @@ The board should flag pressure when:
 
 Signals should route staff toward operational review, not make clinical placement or staffing decisions.
 
-## Dashboard Route
+## Current Product Route
 
-The Emergency Resource Board is mounted at:
+The Emergency Resource Board is not mounted as a standalone workspace page in the current Emergency OS route tree. Demonstrate resource availability through:
 
-`/workspace/emergency/resources`
+- `/emergency/capacity` for rooms, stretchers, boarding pressure, and constrained capacity.
+- `/emergency/ems` for EMS offload pressure affected by resource availability.
+- `/emergency/analytics` for operational summaries and trends.
 
 The dashboard should show:
 
@@ -67,4 +69,4 @@ The dashboard should show:
 
 ## Acceptance Mapping
 
-Acceptance is met when staff can open `/workspace/emergency/resources` and understand current availability for rooms, stretchers, monitors, telemetry units, and infusion pumps by status.
+Acceptance is met when staff can use the mounted Emergency OS support routes above to understand current availability for rooms, stretchers, monitors, telemetry units, and infusion pumps by status.

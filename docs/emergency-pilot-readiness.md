@@ -86,9 +86,9 @@ Pilot readiness:
 
 Current state:
 
-- Emergency demo environment is designed around a clearly labeled demo tenant with 100+ demo patients.
+- First Customer Demo Mode is designed around a clearly labeled deterministic demo scenario for a 100-patient/day ED, with 42 active visible patients for stable walkthroughs.
 - Demo data covers waiting room, triage, provider queue, results, referrals, boarding, discharge, EMS arrivals, and capacity issues.
-- The MVP implementation summary says `/workspace/emergency/demo` renders the ED demo tenant and deterministic demo patients.
+- The current demo entry points are `/emergency/whiteboard` via the scenario selector and `/emergency/settings` via `First Customer Demo Mode` > `Load Demo`.
 
 Pilot readiness:
 

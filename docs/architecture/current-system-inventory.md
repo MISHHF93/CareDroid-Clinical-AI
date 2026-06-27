@@ -114,8 +114,8 @@ All active Emergency OS routes use `AppShellPage -> AppShell`.
 
 | Route group | Behavior | Status |
 | --- | --- | --- |
-| `/emergency/pulse`, `/emergency/shift` | Redirect to `/emergency/analytics` | Legacy-compatible |
-| `/tools`, `/tools/calculators`, `/tools/calculators/:slug`, `/tools/drug-checker` | Redirect into `/emergency/copilot` with query preservation where needed | Legacy-compatible |
+| `/emergency/pulse`, `/emergency/shift` | Mounted active support routes | Active |
+| `/tools`, `/tools/calculators`, `/tools/calculators/:slug`, `/tools/drug-checker` | Redirect into `/emergency/tools` with query preservation where needed | Legacy-compatible |
 | `/workspace/emergency/*` | Redirects to canonical `/emergency/*` route map | Legacy-compatible |
 | `/dashboard`, `/home`, `/workspace`, `/app`, `/patients`, `/capacity`, `/boarding`, `/analytics`, `/chat`, `/assistant`, `/copilot` | Redirects to canonical Emergency OS route | Legacy-compatible |
 | Future-release route list in `App.jsx` | Redirects to `/emergency/whiteboard` | Inactive/future |

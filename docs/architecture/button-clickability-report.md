@@ -15,10 +15,10 @@ Audited active Emergency OS buttons, cards, tabs, drawer triggers, modal trigger
 | `src/layout/AppShell.jsx` | Header alert bell | `AlertDrawer` trigger | Open alert drawer | working | None | None |
 | `src/layout/AppShell.jsx` | Staff avatar | `StaffAvatar` | Open workload panel | working | None | None |
 | `src/layout/AppShell.jsx` | End Shift and Open Summary | `ShiftControls` | End current shift, then open handoff analytics | fixed | Calls `endShift()` before navigating to `/emergency/analytics?handoff=1` | None |
-| `src/layout/AppShell.jsx` | Command palette calculator commands | `executeCommand` | Open calculator workflow with optional patient context | fixed | Routes `OPEN_CALCULATOR` to `/emergency/copilot?tool=...` | None |
-| `src/layout/AppShell.jsx` | `ed:open-calculator` event | AppShell event listener | Open calculator workflow with optional patient context | fixed | Routes event to `/emergency/copilot?tool=...` | None |
-| `src/layout/AppShell.jsx` | `ed:open-clinical-tools` event | AppShell event listener | Open Copilot clinical workflow hub | fixed | Routes event to `/emergency/copilot` | None |
-| `src/components/PatientCard.jsx` | Run Score | Patient detail | Open patient-linked clinical tool workflow | fixed | Navigates to `/emergency/copilot?patientId=...&complaint=...` | None |
+| `src/App.jsx` / `src/components/AppShell.tsx` | Command palette calculator commands | command handlers | Open calculator workflow with optional patient context | fixed | Routes calculator commands to `/emergency/tools?source=calculators&filter=calculator&open=...` | None |
+| `src/App.jsx` / `src/components/AppShell.tsx` | `ed:open-calculator` event | AppShell event listener | Open calculator workflow with optional patient context | fixed | Routes event to `/emergency/tools?source=calculators&filter=calculator&open=...` | None |
+| `src/App.jsx` / `src/components/AppShell.tsx` | `ed:open-clinical-tools` event | AppShell event listener | Open Medical Tools | fixed | Routes event to `/emergency/tools` | None |
+| `src/components/PatientCard.jsx` | Run Score | Patient detail | Open patient-linked clinical tool workflow | fixed | Navigates to `/emergency/tools` with patient/calculator context | None |
 | `src/components/PatientCard.jsx` | Quick HEART/qSOFA/NIHSS buttons | Patient detail score launcher | Open inline score modal | working | None | Limited to three bedside score modals by design |
 | `src/components/PatientCard.jsx` | Pediatric drug calculator | Patient detail pediatric action | Open pediatric dosing drawer/modal | working | None | None |
 | `src/components/PatientCard.jsx` | New Order | Patient detail | Backend-gated order placement | intentionally disabled | None | Needs backend order endpoint before enabling |

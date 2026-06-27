@@ -111,7 +111,7 @@ Additional legacy and future routes are redirected to active Emergency OS routes
 ## Problems Identified
 
 1. The prompt references a `frontend/` package, but the actual frontend is root `src`; paths like `frontend/src/App.tsx` and `frontend/src/router.tsx` do not exist.
-2. The prompt's 8 root routes conflict with the current normalized 12-route `/emergency/*` architecture. The app currently supports the 8 root paths as redirects while preserving 12 active Emergency OS routes.
+2. The prompt's 8 root routes conflict with the current normalized `/emergency/*` architecture. The app currently supports the 8 root paths as redirects while preserving the active Emergency OS route tree.
 3. Non-emergency keywords (`icu`, `lab`, `research`, `education`, `fleet`, `iot`, `digital-twin`, `governance`, `enterprise`) appear in many active, tested, or future-module files. Blind deletion would remove referenced source and tests.
 4. Optional Mongoose Emergency OS routes are disabled by default unless `ENABLE_MONGOOSE_EMERGENCY_OS=true` and MongoDB env are configured.
 5. Broad platform modules are still imported in `backend/src/app.module.ts`; they are not safe to remove without a dedicated backend module retirement plan.

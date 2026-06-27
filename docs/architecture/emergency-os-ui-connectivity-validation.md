@@ -6,16 +6,16 @@ Generated: 2026-06-12
 
 | File path | UI element name | Source page/component | Intended destination/action | Current status | Fix applied | Remaining issue |
 |---|---|---|---|---|---|---|
-| `src/App.jsx` | ED Copilot route | `EmergencyCopilotRoute` | `/emergency/copilot` renders inside `AppShell` | fixed | Mounted `ClinicalCalculatorHub` under the Copilot workflow route | None |
-| `src/App.jsx` | Legacy tools aliases | `DUPLICATE_ROUTE_REDIRECTS` | Redirect directly to `/emergency/copilot` | fixed | Updated active aliases from `/emergency/tools` to `/emergency/copilot` | `/emergency/tools` remains as backward-compatible redirect |
+| `src/App.jsx` | ED Copilot route | `EmergencyCopilotRoute` | `/emergency/copilot` renders inside `AppShell` | working | Active chat-assisted support route remains mounted | None |
+| `src/App.jsx` | Medical Tools route and legacy aliases | `ToolsRedirect` / `ToolsOverview` | Redirect legacy tool and calculator paths to `/emergency/tools` | fixed | `/emergency/tools` is the active route owner for Medical Tools and calculator intent | None |
 | `src/App.jsx` | Boarding route guard | `FeatureRouteGuard` | Gate `/emergency/boarding` by boarding feature flag | fixed | Changed guard to `boarding_intelligence` | None |
 | `src/App.jsx` | Queue route collapse | `EmergencyQueueRoute` | Collapse/expand queue panel | fixed | Added route-local collapsed state | None |
-| `src/layout/AppShell.jsx` | Calculator launch commands/events | `executeCommand` and event listeners | Launch clinical workflows at `/emergency/copilot?tool=...` | fixed | Removed active `/emergency/tools` navigation from launchers | None |
+| `src/App.jsx` / `src/components/AppShell.tsx` | Calculator launch commands/events | command and event listeners | Launch calculator workflows at `/emergency/tools?source=calculators&filter=calculator&open=...` | fixed | Calculator launchers preserve route, search, and patient context through Medical Tools | None |
 | `src/layout/AppShell.jsx` | End Shift and Open Summary | Shift controls | Close active shift and open handoff analytics | fixed | Calls `endShift()` before navigation | None |
-| `src/components/PatientCard.jsx` | Run Score | Patient quick action | Launch patient-linked Copilot calculator workflow | fixed | Rewired to `/emergency/copilot?patientId=...&complaint=...` | None |
+| `src/components/PatientCard.jsx` | Run Score | Patient quick action | Launch patient-linked calculator workflow | fixed | Rewired to `/emergency/tools` with patient and calculator context | None |
 | `src/pages/emergency/SmartIntake.jsx` | Final intake actions | Smart Intake | Record link/create/unknown/triage decisions | fixed | Added handlers and status feedback | Optional backend persistence remains environment-gated |
 | `src/components/EMSPipeline.jsx` | Diversion Status | EMS visibility panel | Display status without implying a toggle | fixed | Converted no-op button to read-only status | None |
-| `src/pages/emergency/ClinicalCalculatorHub.jsx` | Drug checker | Copilot clinical workflow hub | Render reference tool inside Emergency OS shell | fixed | Embedded existing `DrugChecker` for `tool=drug-check` | Older `/tools/drug-checker` registry references remain manual review |
+| `src/pages/tools/ToolsOverview.jsx` | Calculator and tool surfaces | Medical Tools route | Render calculator hub and embedded reference tools inside Emergency OS shell | fixed | Calculator hub renders when calculator search params indicate calculator intent | Older `/tools/*` registry references remain manual review |
 | `src/utils/drugReferenceTools.js` | Drug and pediatric reference paths | Command/search metadata | Target Copilot workflow route | fixed | Updated active metadata to `/emergency/copilot` | None |
 
 ## Verification Matrix
@@ -52,4 +52,4 @@ The full frontend suite was not clean before completion. The emitted failures we
 | `src/data/searchFirstDiscovery.js` | Calculator search results | Search-first registry | Surface calculator/workflow launch results | needs manual review | None | Default search focuses Emergency OS routes; calculator-specific result design needs product decision |
 
 ## Conclusion
-The active Emergency OS route and interaction fixes are validated by targeted tests, typecheck, lint, build, backend build, and backend tests. The full frontend suite is not clean because many older platform and dedicated-tools-route contracts conflict with the current normalized Emergency OS direction.
+The active Emergency OS route and interaction fixes are validated by targeted tests, typecheck, lint, build, backend build, and backend tests. The full frontend suite was not clean at the time of this report because many older platform and dedicated-tools-route contracts conflicted with the normalized Emergency OS direction.

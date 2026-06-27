@@ -182,7 +182,7 @@ The canonical Emergency workspace route set now includes the requested core prod
 - `/workspace/emergency/automation-roi`
 - `/workspace/emergency/director`
 - `/workspace/emergency/charge-nurse`
-- `/workspace/emergency/demo`
+- First Customer Demo Mode via `/emergency/whiteboard` scenario selector and `/emergency/settings` load/reset controls
 
 All routes render inside the existing `WorkspaceHome.jsx` and shared `PageShell` workspace context. No duplicate app shell was introduced.
 

@@ -3,7 +3,7 @@
 Generated: 2026-06-12
 
 ## Actual Stack Note
-The prompt's sample paths use `frontend/src` and 8 relative routes. This repository's active frontend is `src/`, routing is in `src/App.jsx`, and the active Emergency OS navigation contains 12 canonical `/emergency/*` routes inside the unified `AppShell`.
+The prompt's sample paths use `frontend/src` and 8 relative routes. This repository's active frontend is `src/`, routing is in `src/App.jsx`, and the active Emergency OS navigation is the mounted `/emergency/*` route tree inside the unified `AppShell`.
 
 ## Navigation Items
 
@@ -18,7 +18,10 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 | Capacity | `/emergency/capacity` | Yes | Yes, `EmergencyCapacityRoute` | Yes | working |
 | Boarding | `/emergency/boarding` | Yes | Yes, `EmergencyCapacityRoute` | Yes | working |
 | Referrals | `/emergency/referrals` | Yes | Yes, `ReferralPanel` | Yes | fixed |
-| ED Copilot | `/emergency/copilot` | Yes | Yes, `EmergencyCopilotRoute` and `ClinicalCalculatorHub` | Yes | working |
+| ED Copilot | `/emergency/copilot` | Yes | Yes, `EmergencyCopilotRoute` | Yes | working |
+| Medical Tools | `/emergency/tools` | Yes | Yes, `ToolsOverview` with embedded calculator intent | Yes | working |
+| Department Pulse | `/emergency/pulse` | Yes | Yes, `EmergencyDepartmentPulse` | Yes | working |
+| Shift Summary | `/emergency/shift` | Yes | Yes, `EmergencyShiftSummary` | Yes | working |
 | Analytics | `/emergency/analytics` | Yes | Yes, `EmergencyAnalytics` | Yes | working |
 | Settings | `/emergency/settings` | Yes | Yes, `SettingsRoute` | Yes | working |
 | Global Search | `/search` | Yes, account/search surfaces | Yes, `SearchResultsPage` | Yes | fixed |
@@ -35,8 +38,8 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 | Reassessment badge | toggles reassessment drawer | working | None |
 | Alert drawer actions | select patient, open EMS/queue, dismiss/snooze | working | None |
 | Shift summary | `endShift()` then `/emergency/analytics?handoff=1` | working | Previously fixed |
-| Command palette route commands | 12 canonical Emergency OS routes | working | None |
-| Command palette calculator commands | `/emergency/copilot?tool=...` | working | Previously fixed |
+| Command palette route commands | Mounted Emergency OS routes | working | None |
+| Command palette calculator commands | `/emergency/tools?source=calculators&filter=calculator&open=...` | working | Previously fixed |
 
 ### Emergency Whiteboard / Patients
 
@@ -47,7 +50,7 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 | View/filter toggles | local/store state changes | working | None |
 | Patient cards | `selectPatient(patient.id)` | working/manual review | Dedicated details button could improve accessibility |
 | Patient detail clinical actions | vitals, notes, flags, referral, transfer, discharge | working | None |
-| Run Score | `/emergency/copilot?patientId=...&complaint=...` | working | Previously fixed |
+| Run Score | `/emergency/tools?source=calculators&filter=calculator&patientId=...` | working | Previously fixed |
 | New Order | disabled until backend order endpoint exists | intentionally disabled | None |
 
 ### EMS Pipeline
@@ -104,12 +107,13 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 | UI element | Handler/destination | Status | Fix applied |
 |---|---|---|---|
 | ED Copilot route | `/emergency/copilot` | working | Previously mounted route content |
-| Clinical tool cards | update `tool` search param | working | None |
+| Medical Tools route | `/emergency/tools` | working | Owns clinical tool catalog, operations context, and calculator intent |
+| Clinical tool cards | update Medical Tools active surface/search params | working | None |
 | Calculator forms | input/output/reset inside `CalculatorInterface` | working | None |
 | Save Score to Patient | timeline event and note | working | None |
-| Drug checker | embedded under `/emergency/copilot?tool=drug-check` | working | Previously fixed |
-| `/tools/calculators/:slug` | redirects to `/emergency/copilot?tool=:slug` | fixed | Added context-preserving redirect |
-| `/tools/drug-checker` | redirects to `/emergency/copilot?tool=drug-check` | fixed | Added context-preserving redirect |
+| Drug checker | reachable from Medical Tools and current drug metadata | working | Older Copilot metadata remains for compatibility |
+| `/tools/calculators/:slug` | redirects to `/emergency/tools?source=calculators&filter=calculator&q=:slug&open=:slug` | fixed | Added context-preserving redirect |
+| `/tools/drug-checker` | redirects through Medical Tools tool handling | fixed | Older registry paths remain for compatibility |
 | `/search` | renders `SearchResultsPage` | fixed | Mounted existing search page |
 
 ## Required Tool Accessibility
@@ -126,8 +130,8 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 | Patient search | whiteboard search, command palette, `/search` | fixed | `/search` now mounts |
 | Referral workflow | `/emergency/referrals`, sidebar, command, patient quick actions | fixed | Referral View now opens patient surface |
 | ED Copilot chat/tools | persistent panel and `/emergency/copilot` | working | None |
-| Clinical calculators | Copilot hub, command palette, patient Run Score, legacy calculator deep links | fixed | Some complaint chips need product expansion |
-| Drug interaction checker | `/emergency/copilot?tool=drug-check`, legacy `/tools/drug-checker` redirect | fixed | Older registry paths remain for compatibility |
+| Clinical calculators | Medical Tools hub, command palette, patient Run Score, legacy calculator deep links | fixed | Some complaint chips need product expansion |
+| Drug interaction checker | Medical Tools, Copilot metadata, and legacy `/tools/drug-checker` handling | fixed | Older registry paths remain for compatibility |
 | System settings | `/emergency/settings`, sidebar, command | working | None |
 | MoH data lookup | Not found as active UI/API-backed tool | needs manual review | Do not expose until a real MoH lookup component/API exists |
 
@@ -142,8 +146,8 @@ The prompt's sample paths use `frontend/src` and 8 relative routes. This reposit
 ## Fixes Applied
 
 - Mounted `/search` to the existing `SearchResultsPage`.
-- Added `LegacyCalculatorRouteRedirect` so `/tools/calculators/:slug` preserves the calculator slug as `/emergency/copilot?tool=:slug`.
-- Added `LegacyToolRouteRedirect` for `/tools/drug-checker` to `/emergency/copilot?tool=drug-check`.
+- Added legacy calculator routing so `/tools/calculators/:slug` preserves the calculator slug as `/emergency/tools?source=calculators&filter=calculator&q=:slug&open=:slug`.
+- Added legacy tool routing for `/tools/drug-checker` through the active Medical Tools handling path.
 - Added route-driven reassessment drawer opening for `/emergency/reassessment`.
 - Updated Referral row `View` to select the patient and navigate to `/emergency/patients`, with feedback for missing patient records.
 - Updated source-level route tests for the new explicit legacy tool redirects.
