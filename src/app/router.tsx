@@ -105,6 +105,7 @@ import {
   CapacityRoute,
   CopilotRoute,
 } from '../pages/emergency/emergencyRoutePages';
+import { NewScreenRoutes } from '../screens/NewScreenRoutes';
 import EmergencySurfaceRedirect from '../pages/emergency/EmergencySurfaceRedirect';
 import { shouldRedirectEmergencySurface } from '../services/navigateToEmergencySurface';
 
@@ -761,6 +762,10 @@ export function AppRoutes() {
         <Route path="/ai/command-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
         <Route path="/ai-command"          element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
         <Route path="/team"                element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/team`} replace />} />
+
+        {/* ── New architecture screens (7-layer design system, /v2/* prefix) ── */}
+        <Route path="/v2" element={<Navigate to="/v2/whiteboard" replace />} />
+        <NewScreenRoutes />
 
       </Route>{/* end RootLayout */}
 
