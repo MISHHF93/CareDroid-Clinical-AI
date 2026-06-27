@@ -275,6 +275,29 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     }
   }, 30_000);
 
+  it('keeps core medical tools visible from the canonical Emergency OS tools route', () => {
+    const { container } = renderOverview('/emergency/tools?source=tools');
+    showAllTools();
+    const renderedIds = new Set(
+      [...container.querySelectorAll('[data-tool-id]')].map((node) =>
+        node.getAttribute('data-tool-id')
+      )
+    );
+
+    for (const id of [
+      'qsofa',
+      'news2',
+      'heart-score',
+      'lab-interp',
+      'drug-check',
+      'guideline-rag',
+      'wells-dvt-calculator',
+    ]) {
+      expect(renderedIds.has(id), id).toBe(true);
+      expect(toolCard(container, id)?.querySelector('.btn-open-tool'), id).toBeTruthy();
+    }
+  }, 30_000);
+
   it('labels the library as the active workspace operating console', () => {
     mockWorkspaceValue.workspaces = [{ id: 'medical-iot', name: 'Medical IoT', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'medical-iot';
