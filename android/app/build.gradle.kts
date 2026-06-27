@@ -1,6 +1,9 @@
-// Kotlin DSL replacement for app/build.gradle
-// Compose, Hilt, Room, Retrofit, Accompanist, DataStore removed — quarantined to _deprecated-kotlin/.
-// Capacitor WebView shell only: BridgeActivity + minimal AndroidX.
+// Kotlin DSL replacement for app/build.gradle.
+// Compose, Hilt, Room, Retrofit, Accompanist, and DataStore are quarantined to _deprecated-kotlin/.
+// This module is a Capacitor WebView shell: BridgeActivity plus minimal AndroidX.
+
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -12,15 +15,10 @@ android {
     namespace = "com.caredroid.clinical"
     compileSdk = rootProject.extra["compileSdkVersion"] as Int
 
-    val apiBaseUrl: String =
-        project.findProperty("API_BASE_URL") as String?
-            ?: System.getenv("API_BASE_URL")
-            ?: "http://10.0.2.2:3000/"
-
     val keystorePropertiesFile = rootProject.file("app/keystore.properties")
-    val keystoreProperties = java.util.Properties()
+    val keystoreProperties = Properties()
     if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
     }
 
     defaultConfig {
@@ -30,7 +28,6 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     if (keystorePropertiesFile.exists()) {
@@ -73,14 +70,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 // Capacitor-generated dependency and compile-options extensions (auto-updated by `cap sync`)
-apply(from = "../capacitor.build.gradle")
+apply(from = "capacitor.build.gradle")
 
 dependencies {
     // Capacitor WebView bridge

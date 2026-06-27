@@ -98,7 +98,7 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
     "typecheck:frontend": "tsc --noEmit -p tsconfig.frontend.json",
     "test:all": "npm run test:run:frontend && cd backend && npm test",
-    "test:bundle-budget": "vitest run src/build/bundleBudget.test.js",
+    "test:bundle-budget": "vitest run src/build/bundleBudget.test.ts",
     "build:analyze": "npm run build && node scripts/analyze-bundle.mjs",
     "validate:ci": "npm run lint:all && npm run typecheck:frontend && npm run test:alias-sync && npm run test:catalog-launch && npm run test:registry-launch && npm run test:executor-mapping && npm run test:contract-matrix && npm run test:backend-exposure && npm run test:e2e-matrix && npm run test:tool-render-smoke && npm run test:safety-compliance && npm run test:visibility-matrix && npm run test:responsive-regression && npm run test:mobile-performance && vitest run src/data/toolRegistry.test.js src/data/clinicalCatalogWiring.test.js src/data/frontendApiCallsInventory.schedule.test.js src/services/apiClient.auth.test.js src/services/clinicalOrchestratorApi.registry.test.js src/components/ChatInterface.nlu.test.jsx src/test/ExportService.test.js && cd backend && npm run build && npm test && npm run test:e2e && cd .. && npm run build && npm run test:bundle-budget",
     "validate:responsive": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",

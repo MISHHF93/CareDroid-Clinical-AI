@@ -35,11 +35,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Install Babylon.js
-        run: npm install @babylonjs/core @babylonjs/materials @babylonjs/gui @babylonjs/post-processes @babylonjs/loaders
-
       - name: Build Frontend
         run: npm run build
+
+      - name: Sync Capacitor Android shell
+        run: npx --yes @capacitor/cli@5 sync android
 
       - name: Build Backend
         run: cd backend && npm install && npm run build
@@ -83,13 +83,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Install Babylon.js
-        run: npm install @babylonjs/core @babylonjs/materials @babylonjs/gui @babylonjs/post-processes @babylonjs/loaders
-
       - name: Build Frontend (Production)
         run: npm run build -- --mode production
         env:
           VITE_API_URL: https://api.caredroid.app
+
+      - name: Sync Capacitor Android shell
+        run: npx --yes @capacitor/cli@5 sync android
 
       - name: Build Backend (Production)
         run: cd backend && npm install && npm run build

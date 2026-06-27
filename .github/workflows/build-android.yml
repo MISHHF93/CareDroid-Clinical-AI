@@ -7,7 +7,7 @@ on:
       - 'android/**'
       - 'src/**'
       - 'package.json'
-      - 'capacitor.config.json'
+      - 'capacitor.config.ts'
   pull_request:
     branches: [main, develop]
   workflow_dispatch:

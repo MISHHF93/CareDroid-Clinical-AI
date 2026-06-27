@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.caredroid.clinical',
   appName: 'CareDroid',
   webDir: 'dist',
-  bundledWebRuntime: false,
   server: {
     androidScheme: 'https',
   },

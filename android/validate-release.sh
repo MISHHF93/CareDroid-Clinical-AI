@@ -50,13 +50,13 @@ echo ""
 # 2. Check build.gradle configuration
 echo "2. Build Configuration"
 echo "----------------------"
-if grep -q "signingConfigs.release" app/build.gradle; then
+if grep -q "signingConfigs" app/build.gradle.kts; then
     print_check "PASS" "Release signing configured"
 else
     print_check "FAIL" "Release signing not configured"
 fi
 
-if grep -q "minifyEnabled true" app/build.gradle; then
+if grep -q "isMinifyEnabled = true" app/build.gradle.kts; then
     print_check "PASS" "ProGuard/R8 enabled"
 else
     print_check "FAIL" "Code minification not enabled"
@@ -81,8 +81,8 @@ echo ""
 # 4. Check version information
 echo "4. Version Information"
 echo "----------------------"
-VERSION_CODE=$(grep "versionCode" app/build.gradle | head -1 | grep -o '[0-9]\+')
-VERSION_NAME=$(grep "versionName" app/build.gradle | head -1 | grep -o '"[^"]*"' | tr -d '"')
+VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | grep -o '[0-9]\+')
+VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
 print_check "INFO" "Version Code: $VERSION_CODE"
 print_check "INFO" "Version Name: $VERSION_NAME"
 echo ""

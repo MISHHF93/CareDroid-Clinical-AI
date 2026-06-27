@@ -1,40 +1,50 @@
-# Build script for Android APK
-Write-Host "🚀 Building CareDroid Android APK..." -ForegroundColor Cyan
+$ErrorActionPreference = "Stop"
 
-# Set Java Home
-$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.18.8-hotspot"
-Write-Host "✓ Java Home: $env:JAVA_HOME" -ForegroundColor Green
+Write-Host "Building CareDroid Android APK..." -ForegroundColor Cyan
 
-# Step 1: Build frontend
-Write-Host "`n📦 Step 1: Building frontend..." -ForegroundColor Cyan
+$javaHomes = @(
+    "C:\Program Files\Microsoft\jdk-17.0.18.8-hotspot",
+    "C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot"
+)
+
+foreach ($javaHome in $javaHomes) {
+    if (Test-Path "$javaHome\bin\java.exe") {
+        $env:JAVA_HOME = $javaHome
+        $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+        Write-Host "Java Home: $env:JAVA_HOME" -ForegroundColor Green
+        break
+    }
+}
+
+if (-not $env:ANDROID_HOME -and (Test-Path "$env:LOCALAPPDATA\Android\Sdk")) {
+    $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+    $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
+    Write-Host "Android SDK: $env:ANDROID_HOME" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "Step 1: Building TypeScript web app..." -ForegroundColor Cyan
 npm run build
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Frontend build failed!" -ForegroundColor Red
-    exit 1
-}
-Write-Host "✓ Frontend built successfully" -ForegroundColor Green
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-# Step 2: Sync with Capacitor
-Write-Host "`n🔄 Step 2: Syncing with Capacitor..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Step 2: Syncing Capacitor Android shell..." -ForegroundColor Cyan
 npx --yes @capacitor/cli@5 sync android
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Capacitor sync failed!" -ForegroundColor Red
-    exit 1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+Write-Host ""
+Write-Host "Step 3: Building Android APK..." -ForegroundColor Cyan
+Push-Location android
+try {
+    .\gradlew.bat assembleDebug
+    $buildResult = $LASTEXITCODE
 }
-Write-Host "✓ Capacitor sync completed" -ForegroundColor Green
-
-# Step 3: Build Android APK
-Write-Host "`n🤖 Step 3: Building Android APK..." -ForegroundColor Cyan
-Set-Location android
-.\gradlew.bat assembleDebug
-$buildResult = $LASTEXITCODE
-Set-Location ..
-
-if ($buildResult -ne 0) {
-    Write-Host "❌ Android build failed!" -ForegroundColor Red
-    exit 1
+finally {
+    Pop-Location
 }
 
-Write-Host "`n✅ Build Complete!" -ForegroundColor Green
-Write-Host "📱 APK Location: android\app\build\outputs\apk\debug\app-debug.apk" -ForegroundColor Yellow
-Write-Host "`n🎉 Ready to install on device!" -ForegroundColor Cyan
+if ($buildResult -ne 0) { exit $buildResult }
+
+Write-Host ""
+Write-Host "Build complete." -ForegroundColor Green
+Write-Host "APK Location: android\app\build\outputs\apk\debug\app-debug.apk" -ForegroundColor Yellow
