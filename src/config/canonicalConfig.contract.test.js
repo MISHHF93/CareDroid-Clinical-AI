@@ -46,9 +46,11 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/privacy')).toBeNull();
     expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
+    expect(ROUTE_ALIAS_GROUPS.dashboard.target).toBe('/emergency/whiteboard');
     expect(ROUTE_ALIAS_GROUPS.assistant.target).toBe('/emergency/copilot');
     expect(ROUTE_ALIAS_GROUPS.tools.target).toBe('/emergency/tools');
     expect(ROUTE_ALIAS_GROUPS.calculators.target).toBe('/emergency/tools');
+    expect(ROUTE_ALIAS_GROUPS.operations.target).toBe('/emergency/queues');
     expect(ROUTE_ALIAS_GROUPS.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
     expect(new Set(PROTECTED_ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)).size).toBe(
