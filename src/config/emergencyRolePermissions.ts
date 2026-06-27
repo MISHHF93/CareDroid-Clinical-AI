@@ -129,6 +129,8 @@ const ROUTES = Object.freeze({
   integrationHub: CANONICAL_ROUTES.integrationHub,
   cosmos: CANONICAL_ROUTES.cosmosViewer,
   settings: CANONICAL_ROUTES.emergencySettings,
+  help: CANONICAL_ROUTES.emergencyHelp,
+  alerts: CANONICAL_ROUTES.emergencyAlerts,
   fleet: CANONICAL_ROUTES.fleetCommand,
   surveillance: CANONICAL_ROUTES.surveillanceNexus,
   laboratory: CANONICAL_ROUTES.laboratory,
@@ -159,6 +161,8 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.integrationHub,
   ROUTES.cosmos,
   ROUTES.settings,
+  ROUTES.help,
+  ROUTES.alerts,
   ROUTES.fleet,
   ROUTES.surveillance,
   ROUTES.simulation,
@@ -187,7 +191,12 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.copilot,
   ROUTES.tools,
   ROUTES.platform,
+  ROUTES.pulse,
+  ROUTES.shift,
   ROUTES.analytics,
+  ROUTES.alerts,
+  ROUTES.settings,
+  ROUTES.help,
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
@@ -206,6 +215,9 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.platform,
   ROUTES.shift,
   ROUTES.analytics,
+  ROUTES.alerts,
+  ROUTES.settings,
+  ROUTES.help,
   ROUTES.fleet,
   ROUTES.surveillance,
   ROUTES.simulation,
@@ -334,7 +346,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Registration role for identity review and patient creation without clinical state management.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.settings, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.verifyIntake,
@@ -348,7 +360,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.settings, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -361,7 +373,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.readOnlyViewer,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.readOnlyViewer],
     description: 'Read-only hallway and departmental wall displays with no mutating actions.',
-    routes: [ROUTES.whiteboard, ROUTES.analytics],
+    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.help],
     actions: [EMERGENCY_ACTIONS.viewAnalytics, EMERGENCY_ACTIONS.displayWhiteboardReadonly],
     defaultRoute: ROUTES.whiteboard,
     readOnly: true,

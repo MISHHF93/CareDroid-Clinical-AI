@@ -36,6 +36,7 @@ const ReceptionWorkspace     = lazyRoute(() => import('../pages/emergency/Recept
 const SelfArrivalCheckIn     = lazyRoute(() => import('../pages/emergency/SelfArrivalCheckIn'));
 const PatientRoomDisplay     = lazyRoute(() => import('../pages/emergency/PatientRoomDisplay'));
 const EmergencyAnalytics     = lazyRoute(() => import('../pages/emergency/EmergencyAnalytics'));
+const ClinicalAlertsPage     = lazyRoute(() => import('../pages/ClinicalAlertsPage'));
 const EmergencySettings      = lazyRoute(() => import('../pages/emergency/EmergencySettings'));
 const HelpHubPage            = lazyRoute(() => import('../pages/emergency/HelpHubPage'));
 const EmergencyDepartmentPulse = lazyRoute(() => import('../pages/emergency/pulse'));
@@ -663,6 +664,16 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading analytics...">
                 <EmergencyAnalytics />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyAlerts}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAlerts}>
+              <LazyRoute label="Loading alerts...">
+                <ClinicalAlertsPage />
               </LazyRoute>
             </EmergencyRouteGuard>
           }

@@ -34,6 +34,7 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'copilot',
   'tools',
   'analytics',
+  'alerts',
   'settings',
 ]);
 
@@ -210,6 +211,13 @@ export const NAV_ITEMS = Object.freeze([
     featureGate: null,
   },
   {
+    id: 'alerts',
+    label: 'Alerts',
+    icon: 'alerts',
+    route: CANONICAL_ROUTES.emergencyAlerts,
+    featureGate: null,
+  },
+  {
     id: 'settings',
     label: 'Settings',
     icon: 'settings',
@@ -333,6 +341,7 @@ const NAV_FEATURE_IDS = Object.freeze({
   copilot: 'ed_copilot',
   tools: 'clinical_calculator_hub',
   analytics: 'emergency_analytics',
+  alerts: 'clinical_alerts',
   settings: 'emergency_settings',
   integrations: 'integration_hub',
   cosmos: 'cosmos_viewer',

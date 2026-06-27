@@ -58,6 +58,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   emergencyShift: '/emergency/shift',
   emergencySettings: '/emergency/settings',
   emergencyHelp: '/emergency/help',
+  emergencyAlerts: '/emergency/alerts',
   emergencyTools: '/emergency/tools',
   workspace: '/workspace',
   workspaces: '/workspaces',
@@ -192,6 +193,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency/pulse', type: 'page', componentKey: 'EmergencyDepartmentPulse' },
   { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
   { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
+  { path: '/emergency/alerts', type: 'page', componentKey: 'ClinicalAlertsPage' },
   { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
   { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
 ]);
