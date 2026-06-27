@@ -67,7 +67,7 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('keeps quick command compact against the mobile safe-area bottom', () => {
-    const quickCommand = read('components/QuickCommandLauncher.css');
+    const quickCommand = read('components/CommandPalette.css');
     expect(quickCommand).toContain('bottom: max(10px, env(safe-area-inset-bottom, 0px))');
     expect(quickCommand).not.toContain('var(--app-bottom-nav-height, 56px)');
     expect(quickCommand).toContain('var(--compact-panel-radius');

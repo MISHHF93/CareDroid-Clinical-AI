@@ -127,6 +127,13 @@
   --cd-interactive-bg-hover:  hsl(var(--cd-palette-slate-50));
   --cd-interactive-bg-active: hsl(var(--cd-palette-slate-100));
   --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-50));
+
+  /* — Semantic aliases used by domain components — */
+  --cd-bg-hover:       var(--cd-interactive-bg-hover);
+  --cd-danger-icon:    hsl(var(--cd-palette-red-600));
+  --cd-warning-icon:   hsl(var(--cd-palette-amber-600));
+  --cd-info-icon:      hsl(var(--cd-palette-sky-600));
+  --cd-transition-base: var(--cd-transition-normal);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -183,6 +190,11 @@
   --cd-interactive-bg-hover:    hsl(var(--cd-palette-slate-700));
   --cd-interactive-bg-active:   hsl(var(--cd-palette-slate-600));
   --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-900));
+
+  --cd-bg-hover:       var(--cd-interactive-bg-hover);
+  --cd-danger-icon:    hsl(var(--cd-palette-red-400));
+  --cd-warning-icon:   hsl(var(--cd-palette-amber-400));
+  --cd-info-icon:      hsl(var(--cd-palette-sky-400));
 }
 
 /* ─────────────────────────────────────────────────────────────

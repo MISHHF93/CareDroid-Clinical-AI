@@ -132,7 +132,7 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.DIALOGS,
       count: 2,
-      sources: ['src/components/QuickCommandLauncher.tsx', 'src/components/ui/Drawer.tsx'],
+      sources: ['src/components/CommandPalette.tsx', 'src/components/ui/Drawer.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.DRAWERS,
@@ -293,7 +293,7 @@ function sourceSnapshotFindings(sourceSnapshot: any = {}) {
         surface: UX_SURFACE_TYPES.DIALOGS,
         severity: 'medium',
         title: 'Quick Command still offsets above a removed bottom nav',
-        evidence: 'QuickCommandLauncher.css references --app-bottom-nav-height.',
+        evidence: 'CommandPalette.css references --app-bottom-nav-height.',
         recommendation: 'Anchor compact command UI to safe-area bottom spacing instead.',
       })
     );

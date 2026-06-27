@@ -20,7 +20,7 @@ function currentSourceSnapshot() {
   return {
     appShellJsx: read('layout/AppShell.tsx'),
     appShellCss: read('layout/AppShell.css'),
-    quickCommandCss: read('components/QuickCommandLauncher.css'),
+    quickCommandCss: read('components/CommandPalette.css'),
     drawerJsx: read('components/ui/Drawer.tsx'),
   };
 }

@@ -15,7 +15,7 @@ const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
 const quickCommandCss = readFileSync(
-  join(__dirname, '../components/QuickCommandLauncher.css'),
+  join(__dirname, '../components/CommandPalette.css'),
   'utf8'
 );
 const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
