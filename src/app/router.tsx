@@ -310,6 +310,22 @@ export function buildEmergencyToolsRedirect(location) {
     setDefault('source', 'workflows');
     setDefault('filter', 'ai-workflows');
   } else if (
+    pathname === CANONICAL_ROUTES.simulation ||
+    pathname === '/medical-simulation' ||
+    pathname === CANONICAL_ROUTES.simulationOutcomes ||
+    pathname === CANONICAL_ROUTES.competencies
+  ) {
+    const simulationSlug =
+      pathname === CANONICAL_ROUTES.simulationOutcomes
+        ? 'simulation-outcomes'
+        : pathname === CANONICAL_ROUTES.competencies
+        ? 'competency-platform'
+        : 'simulation-suite';
+    setDefault('source', 'simulation');
+    setDefault('filter', 'simulations');
+    setDefault('q', simulationSlug);
+    setDefault('open', simulationSlug);
+  } else if (
     pathname.startsWith('/fleet/') ||
     pathname.startsWith('/operations/') ||
     pathname === '/maps' ||
@@ -957,6 +973,9 @@ export function AppRoutes() {
       <Route path="/clinical-tools"     element={<ToolsRedirect />} />
       <Route path="/lab"                element={<ToolsRedirect />} />
       <Route path="/medical-simulation" element={<ToolsRedirect />} />
+      <Route path="/simulation"        element={<ToolsRedirect />} />
+      <Route path="/simulation/*"      element={<ToolsRedirect />} />
+      <Route path="/competencies"      element={<ToolsRedirect />} />
       <Route path="/pharmacy"           element={<ToolsRedirect />} />
       <Route path="/pharmacy/*"         element={<ToolsRedirect />} />
       <Route path="/radiology"          element={<ToolsRedirect />} />

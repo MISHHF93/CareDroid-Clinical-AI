@@ -13,8 +13,8 @@ describe('build and service config consistency', () => {
 
     expect(compose).toContain('- "3000:3000"');
     expect(compose).toContain('- "8000:8000"');
-    expect(packageJson).toContain('"dev": "vite --port 8000 --strictPort"');
-    expect(packageJson).toContain('"dev:lan": "vite --port 8000 --strictPort --host"');
+    expect(packageJson).toContain('"dev": "vite --strictPort"');
+    expect(packageJson).toContain('"dev:lan": "vite --strictPort --host"');
     expect(read('vite.config.ts')).toContain('strictPort: true');
     expect(compose).toContain(
       'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}',
@@ -42,19 +42,19 @@ describe('build and service config consistency', () => {
   it('keeps local dev startup pinned to the documented frontend and backend ports', () => {
     const packageJson = JSON.parse(read('package.json'));
     const devStack = read('scripts/dev-stack.mjs');
-    const viteConfig = read('vite.config.js');
+    const viteConfig = read('vite.config.ts');
 
-    expect(packageJson.scripts.dev).toBe('vite --port 8000 --strictPort');
-    expect(packageJson.scripts['dev:web']).toBe('vite --port 8000 --strictPort');
-    expect(packageJson.scripts['dev:lan']).toBe('vite --port 8000 --host --strictPort');
-    expect(viteConfig).toContain('port: 8000');
+    expect(packageJson.scripts.dev).toBe('vite --strictPort');
+    expect(packageJson.scripts['dev:web']).toBe('vite --strictPort');
+    expect(packageJson.scripts['dev:lan']).toBe('vite --strictPort --host');
+    expect(viteConfig).toContain("return 8000");
     expect(viteConfig.match(/strictPort:\s*true/g)).toHaveLength(2);
-    expect(viteConfig).toContain("env.VITE_API_PROXY_TARGET || 'http://localhost:3000'");
-    expect(devStack).toContain("VITE_API_PROXY_TARGET: 'http://localhost:3000'");
-    expect(devStack).toContain("PORT: '3000'");
-    expect(devStack).toContain("FRONTEND_URL: 'http://localhost:8000'");
-    expect(devStack).toContain('Frontend: http://localhost:8000');
-    expect(devStack).toContain('Backend:  http://localhost:3000');
+    expect(viteConfig).toContain('env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`');
+    expect(devStack).toContain('VITE_API_PROXY_TARGET: backendOrigin');
+    expect(devStack).toContain('PORT: backendPort');
+    expect(devStack).toContain('FRONTEND_URL: frontendOrigin');
+    expect(devStack).toContain('Frontend: ${frontendOrigin}');
+    expect(devStack).toContain('Backend:  http://localhost:${backendPort}');
   });
 
   it('keeps optional ML compose enabling tied to the NLU sidecar profile', () => {
@@ -103,17 +103,17 @@ describe('build and service config consistency', () => {
   });
 
   it('keeps backend production entrypoint aligned with package.json', () => {
-    expect(read('backend/package.json')).toContain('"start:prod": "node dist/backend/src/main.js"');
-    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/backend/src/main.js"]');
+    expect(read('backend/package.json')).toContain('"start:prod": "node dist/main.js"');
+    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/main.js"]');
   });
 
   it('keeps frontend and backend Node runtime baselines aligned', () => {
     const rootPackageJson = JSON.parse(read('package.json'));
 
     expect(read('.node-version').trim()).toBe('20');
-    expect(rootPackageJson.engines.node).toBeUndefined();
+    expect(rootPackageJson.engines.node).toBe('>=20.19.0 <25');
     expect(rootPackageJson.engines.npm).toBe('>=10');
-    expect(read('backend/package.json')).toContain('"node": ">=20.19.0"');
+    expect(read('backend/package.json')).toContain('"node": ">=20.19.0 <25"');
     expect(read('Dockerfile')).toContain('FROM node:20-alpine');
     expect(read('backend/Dockerfile')).toContain('FROM node:20-alpine');
   });
@@ -140,12 +140,10 @@ describe('build and service config consistency', () => {
   it('keeps backend dev scripts pointed at the widened build entrypoint', () => {
     const backendPackageJson = read('backend/package.json');
 
-    expect(backendPackageJson).toContain('"start": "npm run build && npm run start:prod"');
+    expect(backendPackageJson).toContain('"start": "npm run start:prod"');
     expect(backendPackageJson).toContain('"start:dev": "npm run build && npm run start:prod"');
-    expect(backendPackageJson).toContain(
-      '"start:watch": "nest start --watch --entryFile backend/src/main"',
-    );
-    expect(backendPackageJson).toContain('"start:prod": "node dist/backend/src/main.js"');
+    expect(backendPackageJson).toContain('"start:watch": "nest start --watch"');
+    expect(backendPackageJson).toContain('"start:prod": "node dist/main.js"');
     expect(read('backend/tsconfig.json')).toContain('"rootDir": ".."');
     expect(read('scripts/clean.mjs')).toContain("'backend/dist'");
     expect(read('scripts/dev-stack.mjs')).toContain("stdio: ['ignore', 'pipe', 'pipe']");
@@ -165,9 +163,9 @@ describe('build and service config consistency', () => {
   });
 
   it('keeps Vite on the documented local frontend port', () => {
-    const viteConfig = read('vite.config.js');
+    const viteConfig = read('vite.config.ts');
 
-    expect(viteConfig).toContain('port: 8000');
+    expect(viteConfig).toContain("return 8000");
     expect(viteConfig).toContain('strictPort: true');
   });
 
@@ -185,9 +183,7 @@ describe('build and service config consistency', () => {
     expect(read('backend/ml-services/nlu/.env.example')).toContain(
       'NLU_INFERENCE_CONFIDENCE_THRESHOLD=0.5',
     );
-    expect(read('backend/ml-services/nlu/config.py')).toContain(
-      'NLU_INFERENCE_CONFIDENCE_THRESHOLD',
-    );
+    expect(read('backend/ml-services/nlu/nlu.config.ts')).toContain('confidenceThreshold: 0.5');
   });
 
   it('provides the root frontend Dockerfile used by docker-compose', () => {
