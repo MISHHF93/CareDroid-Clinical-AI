@@ -43,21 +43,20 @@ const ANDROID_DEVICE_IDS = new Set([
 ]);
 
 const DESKTOP_ROUTES = [
-  { path: '/tools', label: 'tools overview' },
-  { path: '/tools/calculators', label: 'calculators hub' },
-  { path: '/tools/calculators/has-bled', label: 'HAS-BLED calculator' },
-  { path: '/tools/calculators/qsofa', label: 'qSOFA calculator' },
-  { path: '/tools/calculator/sofa', label: 'SOFA calculator legacy route' },
-  { path: '/tools/drug-checker', label: 'drug checker' },
-  { path: '/tools/lab-interpreter', label: 'lab interpreter' },
-  { path: '/dashboard?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
+  { path: '/emergency/tools', label: 'medical tools overview' },
+  { path: '/emergency/tools?source=calculators&filter=calculator', label: 'calculators hub' },
+  { path: '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled', label: 'HAS-BLED calculator' },
+  { path: '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa', label: 'qSOFA calculator' },
+  { path: '/emergency/tools?source=tools&filter=clinical-tools&q=drug-check&open=drug-check', label: 'drug checker' },
+  { path: '/emergency/tools?source=tools&filter=clinical-tools&q=lab-interp&open=lab-interp', label: 'lab interpreter' },
+  { path: '/emergency/copilot?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
 ];
 
 const ANDROID_ROUTES = [
-  { path: '/tools', label: 'tools overview' },
-  { path: '/tools/calculators', label: 'calculators hub' },
-  { path: '/tools/calculators/has-bled', label: 'HAS-BLED calculator' },
-  { path: '/dashboard?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
+  { path: '/emergency/tools', label: 'medical tools overview' },
+  { path: '/emergency/tools?source=calculators&filter=calculator', label: 'calculators hub' },
+  { path: '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled', label: 'HAS-BLED calculator' },
+  { path: '/emergency/copilot?tool=wells-pe', label: 'chat-assisted Wells PE launch' },
 ];
 
 function parseAuthProfile(raw) {
@@ -245,18 +244,22 @@ test.describe('production route fallback behavior', () => {
 
     await page.setViewportSize({ width: 1440, height: 900 });
     await assertProtectedRoute(page, '/tools/calculators/sofa');
-    expect(new URL(page.url()).pathname).toBe('/tools/calculator/sofa');
+    const sofaUrl = new URL(page.url());
+    expect(sofaUrl.pathname).toBe('/emergency/tools');
+    expect(sofaUrl.searchParams.get('source')).toBe('calculators');
+    expect(sofaUrl.searchParams.get('open')).toBe('sofa');
 
     await assertProtectedRoute(page, '/tools/calculators/wells-pe');
     const wellsUrl = new URL(page.url());
-    expect(wellsUrl.pathname).toBe('/dashboard');
-    expect(wellsUrl.searchParams.get('tool')).toBe('wells-pe');
+    expect(wellsUrl.pathname).toBe('/emergency/tools');
+    expect(wellsUrl.searchParams.get('source')).toBe('calculators');
+    expect(wellsUrl.searchParams.get('open')).toBe('wells-pe');
 
     await assertProtectedRoute(page, '/tools/calculators/not-a-real-calc-xyz');
-    await expect(page.getByRole('heading', { name: /calculator not found/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /tool not found/i })).toBeVisible();
 
     await assertProtectedRoute(page, '/tools/catalog/');
-    expect(new URL(page.url()).pathname).toBe('/tools/catalog');
+    expect(new URL(page.url()).pathname).toBe('/emergency/tools');
 
     await attachAndAssertRuntimeClean(audit, testInfo);
   });

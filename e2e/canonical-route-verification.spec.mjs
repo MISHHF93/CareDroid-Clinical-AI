@@ -175,12 +175,14 @@ const routeCases = [
   {
     route: '/emergency/tools',
     content: async (page) => {
-      await expect(page.getByRole('heading', { name: 'Clinical Tools' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Emergency OS (Tool )?Console/i })).toBeVisible();
       await expect(page.getByRole('region', { name: /Clinical tool cards/i })).toBeVisible();
+      await expect(page.locator('[data-tool-id="qsofa"]')).toBeVisible();
+      await expect(page.locator('[data-tool-id="lab-interp"]')).toBeVisible();
     },
     interaction: async (page) => {
-      await page.getByRole('button', { name: 'Launch' }).first().click();
-      await expect(page.getByRole('region', { name: /Calculator workspace/i })).toBeVisible();
+      await page.getByRole('button', { name: /Open qSOFA/i }).click();
+      await expect(page.getByRole('region', { name: /Active medical tools surface/i })).toBeVisible();
     },
   },
   {
@@ -243,8 +245,8 @@ test('requested cross-page interactions', async ({ page }) => {
 
   await page.goto('/emergency/tools', { waitUntil: 'commit' });
   await waitForCanonicalAppReady(page);
-  await page.getByRole('button', { name: 'Launch' }).first().click();
-  await expect(page.getByRole('region', { name: /Calculator workspace/i })).toBeVisible();
+  await page.getByRole('button', { name: /Open qSOFA/i }).click();
+  await expect(page.getByRole('region', { name: /Active medical tools surface/i })).toBeVisible();
 
   await page.goto('/emergency', { waitUntil: 'commit' });
   await waitForCanonicalAppReady(page);

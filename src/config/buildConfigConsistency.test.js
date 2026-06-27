@@ -34,6 +34,24 @@ describe('build and service config consistency', () => {
     expect(appCompose).toContain("RAG_ENABLED: 'false'");
   });
 
+  it('keeps local dev startup pinned to the documented frontend and backend ports', () => {
+    const packageJson = JSON.parse(read('package.json'));
+    const devStack = read('scripts/dev-stack.mjs');
+    const viteConfig = read('vite.config.js');
+
+    expect(packageJson.scripts.dev).toBe('vite --port 8000 --strictPort');
+    expect(packageJson.scripts['dev:web']).toBe('vite --port 8000 --strictPort');
+    expect(packageJson.scripts['dev:lan']).toBe('vite --port 8000 --host --strictPort');
+    expect(viteConfig).toContain('port: 8000');
+    expect(viteConfig.match(/strictPort:\s*true/g)).toHaveLength(2);
+    expect(viteConfig).toContain("env.VITE_API_PROXY_TARGET || 'http://localhost:3000'");
+    expect(devStack).toContain("VITE_API_PROXY_TARGET: 'http://localhost:3000'");
+    expect(devStack).toContain("PORT: '3000'");
+    expect(devStack).toContain("FRONTEND_URL: 'http://localhost:8000'");
+    expect(devStack).toContain('Frontend: http://localhost:8000');
+    expect(devStack).toContain('Backend:  http://localhost:3000');
+  });
+
   it('keeps optional ML compose enabling tied to the NLU sidecar profile', () => {
     const appCompose = read('docker-compose.app.yml');
     const mlCompose = read('docker-compose.ml.yml');
