@@ -36,6 +36,26 @@ The catalog includes emergency calculators and risk scores such as qSOFA, NEWS2,
 
 The default deployment posture is demo/manual-data-first with clear source labels and no live clinical writeback. Production integration requires customer approval, validated connectors, governance controls, and human review.
 
+## Product Readiness Snapshot
+
+The product is now one thing: a CareDroid Emergency OS demo and pilot surface, not a broad multi-app healthcare portal. The mounted app route tree is Emergency OS first:
+
+- Start here: `/emergency/whiteboard`
+- Clinical command support: `/emergency/copilot`
+- Medical Tools and calculators: `/emergency/tools`
+- Operational support routes: patients, EMS, intake, queues, reassessment, capacity, boarding, referrals, pulse, shift, analytics, and settings under `/emergency/*`
+
+Legacy roots such as `/tools`, `/calculators`, `/assistant`, `/chat`, `/workspace`, and `/app` redirect into the Emergency OS route tree. Use the canonical `/emergency/*` routes when writing demo scripts or docs.
+
+## Medical And Technical Bridge
+
+CareDroid presents clinical work as operational decision support: queue pressure, reassessment need, EMS offload, boarding, referral delay, and calculator context are shown in one shell so clinicians can decide what needs attention next. The technical model behind that is intentionally conservative:
+
+- The frontend is a Vite/React single page app with one active Emergency OS shell.
+- Local development can run without Docker or external credentials.
+- Demo and fallback data must be labeled as demo/local and must not be treated as live EHR, EMS, telemetry, or analytics truth.
+- Calculators and AI-assisted flows are clinical decision support only; they do not replace clinician judgment, local protocols, or human review.
+
 ## Stack
 
 | Layer | Technology |
@@ -118,6 +138,10 @@ Local defaults use SQLite and disable optional ML/RAG services so the app boots 
 
 ### Focused dev commands
 
+For a sales or pilot walkthrough, load the app, start at `/emergency/whiteboard`, and select `First Customer Demo Mode` from the Emergency OS scenario selector or from `/emergency/settings`. That mode uses deterministic local Emergency OS data so the walkthrough stays stable even when optional backend integrations are unavailable.
+
+Useful focused commands:
+
 ```bash
 npm run dev:web          # Frontend only (Vite on :8000)
 npm run dev:api          # Backend only (Nest on :3000)
@@ -128,6 +152,13 @@ npm run lint:all
 ```
 
 The backend build emits `backend/dist/backend/src/main.js`.
+
+Docs that are useful before a demo:
+
+- `docs/architecture/first-customer-demo-mode.md`
+- `docs/demo-live-state-reconciliation.md`
+- `docs/architecture/chat-tools-routing-audit.md`
+- `docs/feature-coverage-matrix.md`
 
 ## Environment configuration
 
