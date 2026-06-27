@@ -523,6 +523,12 @@ describe('ChatInterface NLU integration', () => {
     expect(screen.getByText('How can I help?')).toBeInTheDocument();
   });
 
+  it('marks unconnected voice input as unavailable', () => {
+    render(<ChatInterface messages={[]} onAppendMessage={onAppendMessage} />);
+
+    expect(screen.getByRole('button', { name: /voice input unavailable/i })).toBeDisabled();
+  });
+
   it('renders AI foundation metadata on assistant messages', () => {
     render(
       <ChatInterface

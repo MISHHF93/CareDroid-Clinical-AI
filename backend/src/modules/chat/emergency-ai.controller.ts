@@ -83,9 +83,14 @@ export class EmergencyAIController {
   ) {
     const userId = dto.userId || req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
+    const clientAiRequest =
+      dto.workspaceContext?.aiRequest && typeof dto.workspaceContext.aiRequest === 'object'
+        ? dto.workspaceContext.aiRequest
+        : {};
     const workspaceContext = {
       ...(dto.workspaceContext || {}),
       aiRequest: {
+        ...clientAiRequest,
         userId,
         tenantId: dto.tenantId || req?.user?.tenantId || 'default-tenant',
         patientId: dto.patientId,

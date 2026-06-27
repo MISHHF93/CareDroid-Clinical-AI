@@ -724,7 +724,7 @@ export function CopilotPanel() {
         }}
       >
         <span
-          aria-label="Copilot live"
+          aria-label="Copilot panel active"
           style={{
             width: 10,
             height: 10,

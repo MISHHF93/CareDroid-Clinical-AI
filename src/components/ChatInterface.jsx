@@ -1337,9 +1337,9 @@ const ChatInterface = ({
           <button
             type="button"
             className="chat-interface__voice"
-            aria-label="Voice input placeholder"
-            title="Voice input coming soon"
-            disabled={isLoading}
+            aria-label="Voice input unavailable"
+            title="Voice input is not connected in this chat surface yet"
+            disabled
           >
             Voice
           </button>

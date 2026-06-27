@@ -839,6 +839,59 @@ export class ChatService {
     );
   }
 
+  private sanitizeFeatureFlags(value?: Record<string, any>): Record<string, boolean> | undefined {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return undefined;
+    }
+    return Object.fromEntries(
+      Object.entries(value)
+        .slice(0, 50)
+        .map(([key, enabled]) => [key, Boolean(enabled)]),
+    );
+  }
+
+  private sanitizeEdCopilotDetectedIntent(value?: Record<string, any>): Record<string, any> | null {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+    const stringFields = [
+      'intent',
+      'score',
+      'patient',
+      'patientId',
+      'patientName',
+      'patientLocation',
+      'target',
+      'flag',
+      'complaint',
+      'value',
+    ];
+    return Object.fromEntries(
+      stringFields
+        .filter((field) => value[field] !== undefined && value[field] !== null)
+        .map((field) => [field, String(value[field]).slice(0, 500)]),
+    );
+  }
+
+  private normalizeEdCopilotIntentName(intent?: string): string {
+    const normalized = String(intent || '').trim().toUpperCase();
+    if (normalized === 'FILTER_COMPLAINT') return 'FILTER_BY_COMPLAINT';
+    if (normalized === 'ACTION_FLAG') return 'ACTION_FLAG_REASSESSMENT';
+    return normalized;
+  }
+
+  private normalizeEdCopilotCalculatorCommandId(value?: string): string {
+    const normalized = String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+score$/i, '')
+      .replace(/[^a-z0-9]+/g, '');
+    if (['heart', 'heartscore'].includes(normalized)) return 'heart';
+    if (['qsofa', 'quicksofa'].includes(normalized)) return 'qsofa';
+    if (['nihss', 'stroke'].includes(normalized)) return 'nihss';
+    return normalized;
+  }
+
   private sanitizeClientWorkspaceContext(
     context?: Record<string, any>,
   ): Record<string, any> | null {
@@ -887,6 +940,7 @@ export class ChatService {
       patientContext: context.patientContext || undefined,
       shiftSummary: context.shiftSummary || undefined,
       toolsEnabled: context.toolsEnabled !== false,
+      enabledFeatures: this.sanitizeFeatureFlags(context.enabledFeatures),
     };
   }
 
@@ -899,6 +953,14 @@ export class ChatService {
       patientCount: Number(context.patientCount) || 0,
       capacitySnapshot: context.capacitySnapshot || null,
       queueHealth: Array.isArray(context.queueHealth) ? context.queueHealth.slice(0, 12) : [],
+      bottleneckAlert: context.bottleneckAlert || null,
+      detectedIntent: this.sanitizeEdCopilotDetectedIntent(context.detectedIntent),
+      emsPressure: context.emsPressure || null,
+      emsPressureContext:
+        typeof context.emsPressureContext === 'string'
+          ? context.emsPressureContext.slice(0, 1000)
+          : null,
+      enabledFeatures: this.sanitizeFeatureFlags(context.enabledFeatures),
       flaggedReassessments: Array.isArray(context.flaggedReassessments)
         ? context.flaggedReassessments.slice(0, 20)
         : [],
@@ -1326,6 +1388,7 @@ export class ChatService {
     const lower = message.toLowerCase();
     const patients = Array.isArray(edContext.patients) ? edContext.patients : [];
     const detectedIntent = edContext.detectedIntent || null;
+    const intentName = this.normalizeEdCopilotIntentName(detectedIntent?.intent);
 
     if (/handoff|shift summary|shift handoff/i.test(message) && edContext.shiftSummary) {
       const summary = edContext.shiftSummary || {};
@@ -1358,7 +1421,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'QUERY_LONGEST_WAIT') {
+    if (intentName === 'QUERY_LONGEST_WAIT') {
       const waiting = [...patients].sort(
         (a, b) => Number(b.waitMinutes || 0) - Number(a.waitMinutes || 0),
       );
@@ -1378,7 +1441,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'FILTER_BY_COMPLAINT') {
+    if (intentName === 'FILTER_BY_COMPLAINT') {
       const complaint = String(detectedIntent.value || '').toLowerCase();
       const complaintPatients = patients.filter((patient) =>
         String(patient.complaint || '')
@@ -1407,7 +1470,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'QUERY_CAPACITY') {
+    if (intentName === 'QUERY_CAPACITY') {
       const capacity = edContext.capacitySnapshot || {};
       return this.buildEdCopilotResponse({
         text: [
@@ -1425,7 +1488,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'QUERY_EMS') {
+    if (intentName === 'QUERY_EMS') {
       const emsPressure = edContext.emsPressure || {};
       return this.buildEdCopilotResponse({
         text: [
@@ -1443,7 +1506,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'QUERY_HIGH_RISK') {
+    if (intentName === 'QUERY_HIGH_RISK') {
       const highRiskPatients = patients.filter((patient) => {
         const priority = String(patient.priority || '').toUpperCase();
         return (
@@ -1468,7 +1531,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'QUERY_REASSESSMENT_QUEUE') {
+    if (intentName === 'QUERY_REASSESSMENT_QUEUE') {
       const reassessments = Array.isArray(edContext.flaggedReassessments)
         ? edContext.flaggedReassessments
         : [];
@@ -1487,7 +1550,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'ACTION_FLAG_REASSESSMENT') {
+    if (intentName === 'ACTION_FLAG_REASSESSMENT') {
       const matchedPatient = patients.find((patient) => patient.id === detectedIntent.patientId);
       if (!matchedPatient) {
         return this.buildEdCopilotResponse({
@@ -1529,7 +1592,7 @@ export class ChatService {
       });
     }
 
-    if (detectedIntent?.intent === 'LAUNCH_CALCULATOR') {
+    if (intentName === 'LAUNCH_CALCULATOR') {
       return this.buildEdCopilotResponse({
         text: [
           '**Calculator launch suggestion**',
@@ -1542,7 +1605,7 @@ export class ChatService {
         edContext,
         whiteboardAction: {
           type: 'openCalculator',
-          calculatorId: detectedIntent.score,
+          calculatorId: this.normalizeEdCopilotCalculatorCommandId(detectedIntent.score),
           patientId: detectedIntent.patientId,
           requiresHumanReview: true,
         },
