@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-for (const rel of ['dist', 'node_modules/.vite']) {
+for (const rel of ['dist', 'backend/dist', 'node_modules/.vite']) {
   const target = path.join(root, rel);
   try {
     fs.rmSync(target, { recursive: true, force: true });

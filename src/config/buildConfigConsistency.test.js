@@ -79,6 +79,13 @@ describe('build and service config consistency', () => {
     );
   });
 
+  it('keeps Vite on the documented local frontend port', () => {
+    const viteConfig = read('vite.config.js');
+
+    expect(viteConfig).toContain('port: 8000');
+    expect(viteConfig).toContain('strictPort: true');
+  });
+
   it('normalizes NLU defaults to port 8001', () => {
     expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://localhost:8001');
     expect(read('backend/src/config/nlu.config.ts')).toContain('http://localhost:8001');

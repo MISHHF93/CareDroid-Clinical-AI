@@ -66,6 +66,20 @@ const commands = [
 const children = [];
 let stopping = false;
 
+const terminateChild = (child) => {
+  if (child.killed || child.exitCode !== null || child.signalCode !== null) return;
+
+  if (process.platform === 'win32' && child.pid) {
+    const killer = spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], {
+      stdio: 'ignore',
+    });
+    killer.on('error', () => child.kill());
+    return;
+  }
+
+  child.kill();
+};
+
 const pipeWithPrefix = (stream, name, output) => {
   let buffer = '';
   stream.on('data', (chunk) => {
@@ -87,9 +101,7 @@ const shutdown = (code = 0) => {
   if (stopping) return;
   stopping = true;
   for (const child of children) {
-    if (!child.killed) {
-      child.kill();
-    }
+    terminateChild(child);
   }
   setTimeout(() => process.exit(code), 250);
 };
@@ -110,6 +122,12 @@ for (const entry of commands) {
   children.push(child);
   pipeWithPrefix(child.stdout, entry.name, process.stdout);
   pipeWithPrefix(child.stderr, entry.name, process.stderr);
+
+  child.on('error', (error) => {
+    if (stopping) return;
+    console.error(`[${entry.name}] failed to start: ${error.message}`);
+    shutdown(1);
+  });
 
   child.on('exit', (code, signal) => {
     if (stopping) return;
