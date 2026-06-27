@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DepartmentPulse from './pulse';
 import { useEmergencyStore } from '../../../store/emergencyStore';
 
@@ -55,5 +55,26 @@ describe('DepartmentPulse', () => {
     expect(screen.queryByRole('heading', { name: /Staff snapshot/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Live\. Updated/i)).toBeInTheDocument();
     expect(document.querySelector('.emergency-pulse__stat-strip')).toBeTruthy();
+  });
+
+  it('renders when browser storage is blocked', () => {
+    const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+
+    render(
+      <MemoryRouter>
+        <DepartmentPulse />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Active patients')).toBeInTheDocument();
+    expect(screen.getByText('Capacity score')).toBeInTheDocument();
+
+    getItemSpy.mockRestore();
+    setItemSpy.mockRestore();
   });
 });

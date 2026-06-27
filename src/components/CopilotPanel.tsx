@@ -245,7 +245,8 @@ function buildDepartmentPrompt({
   const reassessmentQueue = activePatients.filter(isReassessmentDue);
   const activeAlerts = mergeActiveAlerts(alerts, centralSnapshot);
   const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
-  const breachedQueues = centralSnapshot.queueHealth.filter((queue) => queue.breached);
+  const queueHealth = Array.isArray(centralSnapshot.queueHealth) ? centralSnapshot.queueHealth : [];
+  const breachedQueues = queueHealth.filter((queue) => queue.breached);
   const attachmentSummary = attachmentPromptSummary(attachments || []);
 
   return [
@@ -528,7 +529,10 @@ export function CopilotPanel() {
     [alerts, centralSnapshot],
   );
   const breachedQueues = useMemo(
-    () => centralSnapshot.queueHealth.filter((queue) => queue.breached),
+    () =>
+      (Array.isArray(centralSnapshot.queueHealth) ? centralSnapshot.queueHealth : []).filter(
+        (queue) => queue.breached,
+      ),
     [centralSnapshot.queueHealth],
   );
   const firstBreachedQueue = breachedQueues[0];

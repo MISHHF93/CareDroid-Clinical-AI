@@ -70,4 +70,10 @@ describe('Copilot operational awareness wiring', () => {
     expect(platformSource).toContain("eventName: 'ed:open-tools'");
     expect(platformSource).toContain("eventName: 'ed:open-calculator'");
   });
+
+  it('guards Copilot clinical summaries against incomplete demo fixture arrays', () => {
+    expect(source).toContain('function patientFlags(patient: Patient)');
+    expect(source).toContain('function patientVitals(patient: Patient)');
+    expect(source).toContain('Array.isArray(centralSnapshot.queueHealth)');
+  });
 });
