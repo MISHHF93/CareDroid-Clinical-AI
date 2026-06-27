@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  ANDROID_QA_VIEWPORT_WIDTHS,
+  MOBILE_WEB_QA_VIEWPORT_WIDTHS,
   MOBILE_FIRST_VIEWPORT_WIDTHS,
   RESPONSIVE_QA_PAGES,
   RESPONSIVE_QA_VIEWPORTS,
@@ -29,7 +29,7 @@ describe('responsiveQaMatrix', () => {
       ...MOBILE_FIRST_BREAKPOINTS.phone,
       ...MOBILE_FIRST_BREAKPOINTS.tablet,
     ]);
-    expect(ANDROID_QA_VIEWPORT_WIDTHS).toBe(MOBILE_FIRST_VIEWPORT_WIDTHS);
+    expect(MOBILE_WEB_QA_VIEWPORT_WIDTHS).toBe(MOBILE_FIRST_VIEWPORT_WIDTHS);
     expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
     expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
       expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024, 1280, 1440, 1920])
@@ -38,7 +38,7 @@ describe('responsiveQaMatrix', () => {
     expect(RESPONSIVE_QA_ZOOM_LEVELS).toEqual([80, 90, 100, 110, 125, 150]);
   });
 
-  it('keeps the production viewport meta Android-safe', () => {
+  it('keeps the production viewport meta mobile-web safe', () => {
     const indexHtml = readFileSync(join(__dirname, '../../index.html'), 'utf8');
     expect(indexHtml).toContain('name="viewport"');
     expect(indexHtml).toContain('width=device-width');

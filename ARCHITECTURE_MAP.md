@@ -280,7 +280,7 @@ Composed from Layer 3 primitives only. No inline styles. No domain logic.
 |---|---|
 | `Sidebar` | Vertical nav with sections, items, icons, collapse |
 | `TopBar` | App header with logo, actions, user menu |
-| `BottomNav` | Mobile tab bar (Capacitor views) |
+| `BottomNav` | Responsive mobile-width web tab bar |
 | `Tabs` | Horizontal tab bar with content panels |
 | `Breadcrumb` | Path trail with separator |
 | `CommandPalette` | ⌘K global command search |
@@ -678,7 +678,7 @@ src/services/
 ├── copilotService.ts         AI chat, tool invocation, streaming
 ├── profileService.ts         User profile, workspace resolution
 ├── featureFlagService.ts     Feature flag evaluation
-└── notificationService.ts    Push notifications (Capacitor)
+└── notificationService.ts    Browser/backend notification orchestration
 ```
 
 Each service:

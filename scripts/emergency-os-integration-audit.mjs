@@ -12,7 +12,6 @@ const EXCLUDED_DIRS = new Set([
   'coverage',
   '.vite',
   '.vitest',
-  'android',
   'ios',
 ]);
 const TEXT_EXTENSIONS = new Set([

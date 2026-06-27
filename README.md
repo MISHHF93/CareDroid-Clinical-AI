@@ -60,10 +60,9 @@ CareDroid presents clinical work as operational decision support: queue pressure
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 18, Vite, React Router, Zustand, JS/JSX with selective TS/TSX |
+| Frontend | React 18, Vite, React Router, Zustand, TypeScript-first source |
 | Backend | NestJS 10, TypeORM, SQLite (local dev), PostgreSQL (production) |
 | Optional | Redis cache, Python NLU service, observability stack |
-| Mobile | Capacitor 5 (Android) |
 | Package manager | npm (separate locks for root, backend, and MCP) |
 
 **Requirements:** Node `>=20.19.0 <25`, npm `>=10` (see `.node-version`).
@@ -239,14 +238,15 @@ Canonical paths are defined in `src/config/routes.config.js`.
 | `/profile` | User profile & tool policy |
 | `/admin` | Platform administration (hidden in pilot nav) |
 
-## Android build
+## TypeScript platform build
 
 ```bash
-npm run android-debug     # Debug APK
-npm run android-release   # Release APK
+npm run typecheck:frontend
+npm run build
+npm run backend:build
 ```
 
-Requires Android SDK and Gradle. Capacitor config is in `capacitor.config.json`.
+The active platform is the TypeScript web application plus the NestJS backend. Native Android and Capacitor packaging have been removed to avoid maintaining a duplicate app surface.
 
 ## License
 

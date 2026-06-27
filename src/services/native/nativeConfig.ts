@@ -1,6 +1,4 @@
-// Android-specific constants that have no equivalent in the shared TypeScript config.
-// Routes, roles, and permissions live in src/config/ — this covers deep links,
-// push channels, and WebView-tuned UI timing from AppConstants.kt / Constants.kt.
+// Platform constants for browser-native APIs owned by the TypeScript app.
 
 export const NATIVE_CONFIG = {
   deepLink: {
@@ -8,13 +6,9 @@ export const NATIVE_CONFIG = {
     host: 'app',
     baseUrl: 'caredroid://app',
   },
-  push: {
-    channelId: 'caredroid_channel',
+  notifications: {
     channelName: 'CareDroid notifications',
-    channelDescription: 'Clinical alerts and updates from CareDroid',
-    alertChannelId: 'caredroid_alerts',
     alertChannelName: 'Critical Alerts',
-    alertChannelDescription: 'Critical clinical alerts requiring immediate attention',
   },
   api: {
     timeoutMs: 30_000,

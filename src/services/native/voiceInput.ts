@@ -1,8 +1,6 @@
-// TypeScript replacement for VoiceInputManager.kt
-// Uses the Web Speech API which is available in the Capacitor WebView (Chromium engine).
-// VoiceResult discriminated union mirrors the Kotlin sealed class exactly.
+// Web-first voice input helper powered by the browser SpeechRecognition API.
 
-// Inline declarations because SpeechRecognition types are not on Window in lib.dom
+// Inline declarations because SpeechRecognition types are not on Window in lib.dom.
 interface WebSpeechRecognitionEvent extends Event {
   resultIndex: number;
   results: SpeechRecognitionResultList;
@@ -37,14 +35,14 @@ type VoiceResultCallback = (result: VoiceResult) => void;
 
 function getSpeechRecognitionCtor(): WebSpeechRecognitionCtor | undefined {
   const w = window as unknown as Record<string, unknown>;
-  return (w['SpeechRecognition'] ?? w['webkitSpeechRecognition']) as
+  return (w.SpeechRecognition ?? w.webkitSpeechRecognition) as
     | WebSpeechRecognitionCtor
     | undefined;
 }
 
 function isAvailable(): boolean {
   if (typeof window === 'undefined') return false;
-  return !!getSpeechRecognitionCtor();
+  return Boolean(getSpeechRecognitionCtor());
 }
 
 function startListening(onResult: VoiceResultCallback): () => void {
@@ -79,7 +77,7 @@ function startListening(onResult: VoiceResultCallback): () => void {
       'audio-capture': 'Audio recording error',
       network: 'Network error during speech recognition',
       'not-allowed': 'Microphone permission denied',
-      'no-speech': 'No speech detected — please try again',
+      'no-speech': 'No speech detected; please try again',
       aborted: 'Speech recognition aborted',
     };
     onResult({ type: 'error', message: messages[event.error] ?? `Speech error: ${event.error}` });
@@ -91,7 +89,7 @@ function startListening(onResult: VoiceResultCallback): () => void {
     try {
       recognition.abort();
     } catch {
-      // already stopped
+      // Already stopped.
     }
   };
 }

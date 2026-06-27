@@ -1,62 +1,35 @@
-﻿// TypeScript replacement for CareDroidMessagingService.kt (Firebase FCM service)
-// Uses @capacitor/push-notifications which wraps FCM on Android.
-// Only active on native platform — silently no-ops on web.
+// Web-first notification hook. Push registration is backend/web-worker owned now.
 
-import { Capacitor } from '@capacitor/core';
-import {
-  PushNotifications,
-  type Token,
-  type ActionPerformed,
-  type PushNotificationSchema,
-} from '@capacitor/push-notifications';
+export interface WebNotificationPayload {
+  title?: string;
+  body?: string;
+  data?: Record<string, unknown>;
+}
 
 export interface PushHandler {
   onToken?: (token: string) => void | Promise<void>;
-  onNotification?: (notification: PushNotificationSchema) => void;
-  onNotificationAction?: (action: ActionPerformed) => void;
+  onNotification?: (notification: WebNotificationPayload) => void;
+  onNotificationAction?: (action: WebNotificationPayload) => void;
   onRegistrationError?: (error: string) => void;
 }
 
 async function initialize(handler: PushHandler = {}): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-
-  const { receive } = await PushNotifications.requestPermissions();
-  if (receive !== 'granted') {
-    handler.onRegistrationError?.('Push notification permission denied');
+  if (typeof Notification === 'undefined') {
+    handler.onRegistrationError?.('Browser notifications are not supported');
     return;
   }
 
-  await PushNotifications.register();
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
 
-  await PushNotifications.addListener('registration', async (token: Token) => {
-    await handler.onToken?.(token.value);
-  });
-
-  await PushNotifications.addListener(
-    'registrationError',
-    (error: { error: string }) => {
-      handler.onRegistrationError?.(error.error);
-    },
-  );
-
-  await PushNotifications.addListener(
-    'pushNotificationReceived',
-    (notification: PushNotificationSchema) => {
-      handler.onNotification?.(notification);
-    },
-  );
-
-  await PushNotifications.addListener(
-    'pushNotificationActionPerformed',
-    (action: ActionPerformed) => {
-      handler.onNotificationAction?.(action);
-    },
-  );
+  if (Notification.permission !== 'granted') {
+    handler.onRegistrationError?.('Notification permission denied');
+  }
 }
 
 async function removeAllListeners(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-  await PushNotifications.removeAllListeners();
+  // Browser notification listeners are owned by the service worker/event layer.
 }
 
 export const pushNotifications = { initialize, removeAllListeners };

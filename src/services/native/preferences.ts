@@ -1,8 +1,4 @@
-// TypeScript replacement for PreferencesManager.kt (DataStore)
-// Uses @capacitor/preferences on native Android; localStorage on web.
-
-import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
+// Web-first preference storage. Uses localStorage so the TypeScript platform owns state.
 
 const KEYS = {
   AUTH_TOKEN: 'auth_token',
@@ -17,36 +13,26 @@ const KEYS = {
   THEME_MODE: 'theme_mode',
 } as const;
 
+function storage(): Storage | undefined {
+  return typeof localStorage === 'undefined' ? undefined : localStorage;
+}
+
 async function get(key: string): Promise<string | null> {
-  if (Capacitor.isNativePlatform()) {
-    const { value } = await Preferences.get({ key });
-    return value;
-  }
-  return localStorage.getItem(key);
+  return storage()?.getItem(key) ?? null;
 }
 
 async function set(key: string, value: string): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    await Preferences.set({ key, value });
-  } else {
-    localStorage.setItem(key, value);
-  }
+  storage()?.setItem(key, value);
 }
 
 async function remove(key: string): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    await Preferences.remove({ key });
-  } else {
-    localStorage.removeItem(key);
-  }
+  storage()?.removeItem(key);
 }
 
 async function clearAll(): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    await Preferences.clear();
-  } else {
-    Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
-  }
+  const store = storage();
+  if (!store) return;
+  Object.values(KEYS).forEach((key) => store.removeItem(key));
 }
 
 export const nativePreferences = {

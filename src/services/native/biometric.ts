@@ -1,6 +1,4 @@
-﻿// TypeScript replacement for BiometricAuthManager.kt
-// Uses the WebAuthn / FIDO2 platform authenticator API which is available in
-// the Chromium-based Capacitor WebView on Android (fingerprint, face unlock).
+// Web-first biometric helper powered by WebAuthn / FIDO2 platform authenticators.
 
 export type BiometricAvailability =
   | 'available'
@@ -50,7 +48,7 @@ async function authenticate(options: BiometricPromptOptions = {}): Promise<Biome
       },
     });
     return { success: credential !== null };
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof DOMException && err.name === 'NotAllowedError') {
       return { success: false, error: 'Authentication cancelled or failed' };
     }

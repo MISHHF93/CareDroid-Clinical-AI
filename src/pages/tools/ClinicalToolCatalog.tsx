@@ -1063,7 +1063,7 @@ const ClinicalToolCatalog = () => {
           <section className="catalog-section">
             <h2>Collaboration and analytics ({collaborationCapabilities.length})</h2>
             <p className="catalog-section-desc">
-              Shared sessions, cost tracking, analytics routes, and Android client parity.
+              Shared sessions, cost tracking, analytics routes, and web platform parity.
             </p>
             <DiscoveredRowsTable
               rows={rowsForStatus('collaboration')}

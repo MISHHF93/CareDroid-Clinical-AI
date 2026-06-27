@@ -177,7 +177,7 @@ export const toolIdAliases = [
     mapsTo: 'has-bled',
     source: 'NLU alias — anticoagulation bleeding risk',
   },
-  { id: 'sofa_calculator', mapsTo: 'sofa-calculator', source: 'ai.service.ts OpenAI function name, Android' },
+  { id: 'sofa_calculator', mapsTo: 'sofa-calculator', source: 'ai.service.ts OpenAI function name' },
   { id: 'calculator', mapsTo: 'calculators', source: 'advancedRecommendationService intent map' },
   { id: 'memory', mapsTo: 'ai-memory', source: 'legacy /memory route alias for AI Memory' },
   { id: 'ai-governance-center', mapsTo: 'ai-governance', source: 'AI governance dashboard alias' },
@@ -626,15 +626,6 @@ export const collaborationCapabilities = [
     category: 'analytics',
     path: '/analytics',
     notes: 'Usage analytics dashboard.',
-  },
-  {
-    id: 'android-clinical-tools',
-    name: 'Android clinical tools client',
-    source: 'android/.../ToolsDto.kt, CareDroidApiService.kt',
-    status: 'collaboration',
-    category: 'mobile',
-    path: null,
-    notes: 'Same 3 API tools: drug check, lab interpreter, SOFA — not additional web calculators.',
   },
 ];
 

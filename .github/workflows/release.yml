@@ -17,23 +17,23 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    
+
     outputs:
       version: ${{ steps.version.outputs.version }}
       release_id: ${{ steps.create_release.outputs.id }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.19.0'
-          
+
       - name: Determine version
         id: version
         run: |
@@ -45,7 +45,7 @@ jobs:
             VERSION=$(node -p "require('./package.json').version")
             echo "version=$VERSION" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Generate changelog
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v3
@@ -54,26 +54,26 @@ jobs:
             {
               "categories": [
                 {
-                  "title": "## 🚀 Features",
+                  "title": "## Features",
                   "labels": ["feature", "enhancement"]
                 },
                 {
-                  "title": "## 🐛 Bug Fixes",
+                  "title": "## Bug Fixes",
                   "labels": ["bug", "fix"]
                 },
                 {
-                  "title": "## 📝 Documentation",
+                  "title": "## Documentation",
                   "labels": ["documentation"]
                 },
                 {
-                  "title": "## 🔒 Security",
+                  "title": "## Security",
                   "labels": ["security"]
                 }
               ]
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -84,84 +84,12 @@ jobs:
           release_name: 'CareDroid-Clinical-AI v${{ steps.version.outputs.version }}'
           body: |
             ${{ github.event.inputs.release_notes || steps.changelog.outputs.changelog }}
-            
+
             ## Installation
-            
-            ### Android
-            - Download the APK from the assets below
-            - Enable "Install from Unknown Sources"
-            - Install the APK
-            
+
+            Deploy the TypeScript web application and NestJS backend using the documented web, Docker, or Vercel paths.
+
             ## What's Changed
             ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
-          
-  build-release-android:
-    needs: create-release
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.19.0'
-          
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          
-      - name: Update version
-        run: |
-          npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Build production bundle
-        run: npm run build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_PROD_API_URL }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          
-      - name: Sync Capacitor
-        run: npx --yes @capacitor/cli@5 sync android
-        
-      - name: Build Release APK
-        run: |
-          cd android
-          ./gradlew assembleRelease --stacktrace
-          
-      - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
-          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          
-      - name: Upload APK to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: android/app/build/outputs/apk/release/app-release-signed.apk
-          asset_name: CareDroid-Clinical-AI-v${{ needs.create-release.outputs.version }}-android.apk
-          asset_content_type: application/vnd.android.package-archive
-          
-      - name: Upload to Google Play
-        if: github.ref == 'refs/heads/main'
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: com.caredroid.clinical
-          releaseFiles: android/app/build/outputs/apk/release/app-release-signed.apk
-          track: production
-          status: completed

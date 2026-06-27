@@ -1439,7 +1439,11 @@ export class EDCopilotService {
     });
   }
 
-  processQuery(input: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
+  private processQueryLegacy(input: {
+    query?: string;
+    user_role?: string;
+    context?: Record<string, unknown>;
+  }) {
     const query = String(input.query || '').trim();
     const lowerQuery = query.toLowerCase();
     const patients = this.patientService.listPatients();

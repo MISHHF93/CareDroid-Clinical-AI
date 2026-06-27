@@ -49,7 +49,7 @@ for (const dir of TARGET_DIRS) {
   }
 }
 
-for (const file of ['package.json', 'package.android.json', 'backend/package.json', 'index.html', 'capacitor.config.json', 'README.md']) {
+for (const file of ['package.json', 'backend/package.json', 'index.html', 'README.md']) {
   const full = path.join(ROOT, file);
   if (!fs.existsSync(full)) continue;
   const original = fs.readFileSync(full, 'utf8');

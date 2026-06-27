@@ -18,12 +18,11 @@ const languageSection = `## Source language harmonization
 
 | Layer | Location | Format | Status |
 |-------|----------|--------|--------|
-| Frontend application | \`src/\` | TypeScript (\`.ts\` / \`.tsx\`) | **Canonical** — no product \`.js\` / \`.jsx\` under \`src/\` |
+| Frontend application | \`src/\` | TypeScript (\`.ts\` / \`.tsx\`) | **Canonical**; no native duplicate app |
 | Backend API | \`backend/src/\` | TypeScript (NestJS) | **Canonical** |
 | Shared engines | \`engine/\`, \`store/\` | TypeScript | **Canonical** |
-| Build / QA scripts | \`scripts/\`, \`e2e/\` | Node (\`.mjs\`) | Tooling only — not product source |
+| Build / QA scripts | \`scripts/\`, \`e2e/\` | Node (\`.mjs\`) | Tooling only; not product source |
 | Service workers | \`public/sw.js\` | JavaScript | Required browser runtime |
-| Mobile shell | \`android/\` | Capacitor + minimal Kotlin Activity | Packaging only — UI in \`dist/\` |
 
 \`tsconfig.frontend.json\` sets \`allowJs: false\`; run \`npm run typecheck:frontend\` to verify.
 

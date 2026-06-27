@@ -1,5 +1,4 @@
-// TypeScript replacement for PermissionManager.kt
-// Uses the standard Permissions API — works on web and in the Capacitor WebView.
+// Web-first permission helper powered by the standard Permissions API.
 
 export type PermissionName = 'notifications' | 'camera' | 'microphone';
 export type PermissionStatus = 'granted' | 'denied' | 'prompt' | 'unavailable';

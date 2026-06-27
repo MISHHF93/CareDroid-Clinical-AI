@@ -118,23 +118,20 @@ describe('build and service config consistency', () => {
     expect(read('backend/Dockerfile')).toContain('FROM node:20-alpine');
   });
 
-  it('keeps Capacitor CLI out of normal web installs while pinning mobile sync commands', () => {
+  it('keeps Android and Capacitor packaging out of the TypeScript platform', () => {
     const packageJson = JSON.parse(read('package.json'));
     const packageLockRoot = JSON.parse(read('package-lock.json')).packages[''];
 
+    expect(packageJson.dependencies['@capacitor/core']).toBeUndefined();
+    expect(packageJson.dependencies['@capacitor/android']).toBeUndefined();
     expect(packageJson.devDependencies['@capacitor/cli']).toBeUndefined();
+    expect(packageLockRoot.dependencies?.['@capacitor/core']).toBeUndefined();
+    expect(packageLockRoot.dependencies?.['@capacitor/android']).toBeUndefined();
     expect(packageLockRoot.devDependencies['@capacitor/cli']).toBeUndefined();
-    expect(packageJson.scripts['android-debug']).toContain('npx --yes @capacitor/cli@5 sync android');
-    expect(packageJson.scripts['android-release']).toContain(
-      'npx --yes @capacitor/cli@5 sync android',
-    );
-    expect(read('.github/workflows/build-android.yml')).toContain(
-      'npx --yes @capacitor/cli@5 sync android',
-    );
-    expect(read('.github/workflows/release.yml')).toContain(
-      'npx --yes @capacitor/cli@5 sync android',
-    );
-    expect(read('build-android.ps1')).toContain('npx --yes @capacitor/cli@5 sync android');
+    expect(packageJson.scripts['android-debug']).toBeUndefined();
+    expect(packageJson.scripts['android-release']).toBeUndefined();
+    expect(read('.github/workflows/ci.yml')).not.toContain('Capacitor');
+    expect(read('.github/workflows/release.yml')).not.toContain('android');
   });
 
   it('keeps backend dev scripts pointed at the widened build entrypoint', () => {

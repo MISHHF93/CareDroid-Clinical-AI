@@ -1007,8 +1007,6 @@ export function AppRoutes() {
       <Route path="/app"                element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile"             element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile/*"           element={<EmergencyDefaultRedirect />} />
-      <Route path="/android"            element={<EmergencyDefaultRedirect />} />
-      <Route path="/android/*"          element={<EmergencyDefaultRedirect />} />
       <Route path="/general-healthcare" element={<EmergencyDefaultRedirect />} />
       <Route path="/general-healthcare/*" element={<EmergencyDefaultRedirect />} />
       <Route path="/emergency/*"        element={<EmergencyDefaultRedirect />} />

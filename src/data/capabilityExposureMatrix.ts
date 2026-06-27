@@ -153,10 +153,6 @@ const capabilityExposureMetadata = Object.freeze({
     frontendRouteStatus: 'protected + permission',
     surfaceType: 'unsupported-visible',
   },
-  'Native Android API contract': {
-    frontendRouteStatus: 'native client',
-    surfaceType: 'native-client',
-  },
 });
 
 function withExposureMetadata(row) {
@@ -447,16 +443,6 @@ export const capabilityExposureMatrix = Object.freeze([
     recommendedFrontendMechanism: 'Keep capability gate and unsupported state; do not enable invite/edit/delete until backend team APIs and audit semantics exist.',
     riskLevel: 'high',
   },
-  {
-    capability: 'Native Android API contract',
-    backendSourceFile: 'android/app/src/main/kotlin/com/caredroid/clinical/data/remote/api/CareDroidApiService.kt',
-    commandOrApiRoute: 'Stale Retrofit routes include auth refresh/logout/password routes, POST /api/chat, /api/chat/conversations*, bare POST /api/tools/{id}, GET /api/health, GET /api/config, and other non-inventory paths. The duplicate legacy Retrofit interface under android/app/src/main/kotlin/com/caredroid/clinical/network was removed.',
-    currentFrontendSurface: 'Native Android Retrofit services and Compose navigation',
-    exposureStatus: 'stale',
-    userFacingProblem: 'Native clients can call routes that do not exist in the current Nest backend contract or skip the /execute tool path.',
-    recommendedFrontendMechanism: 'Align Android services to the canonical React/Nest route inventory before exposing native-only actions.',
-    riskLevel: 'high',
-  },
 ].map(withExposureMetadata));
 
 export const recommendedCapabilityBuildOrder = Object.freeze([
@@ -501,12 +487,6 @@ export const recommendedCapabilityBuildOrder = Object.freeze([
     capability: 'Clinical content reference expansion',
     mechanism: 'Drug reference page plus protocol category/detail drawers; keep CRUD admin-deferred.',
     reason: 'Read APIs exist, while content mutation requires roles and review workflow.',
-  },
-  {
-    rank: 8,
-    capability: 'Native Android API contract alignment',
-    mechanism: 'Replace stale Retrofit endpoints with canonical React/Nest inventory routes.',
-    reason: 'Native clients currently reference routes that do not match the backend source of truth.',
   },
 ]);
 

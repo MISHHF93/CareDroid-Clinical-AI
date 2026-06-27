@@ -223,7 +223,6 @@ export default defineConfig(({ mode }) => {
         path.resolve(process.cwd(), './lib/native-ai/index.ts'),
         path.resolve(process.cwd(), './lib/patient-orchestration/index.ts'),
       ],
-      exclude: ['@capacitor/core', '@capacitor/android'],
     },
   };
 });

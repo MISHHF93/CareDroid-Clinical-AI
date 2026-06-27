@@ -112,7 +112,6 @@ describe('capabilityExposureMatrix', () => {
       'Audit my-logs and role-aware PHI access',
       'Billing portal and checkout',
       'Clinical content reference expansion',
-      'Native Android API contract alignment',
     ]);
   });
 
@@ -244,20 +243,12 @@ describe('capabilityExposureMatrix', () => {
     expect(matrixCopy.join(' ')).not.toMatch(/ready to use|fully functional|create scheduled reminder|publish now|connect any/i);
   });
 
-  it('tracks native Android API drift as a stale exposure risk', () => {
-    const android = capabilityExposureMatrix.find(
-      (row) => row.capability === 'Native Android API contract'
+  it('does not track a native Android duplicate contract', () => {
+    expect(capabilityExposureMatrix.map((row) => row.capability)).not.toContain(
+      'Native Android API contract',
     );
-
-    expect(android).toMatchObject({
-      exposureStatus: 'stale',
-      frontendRouteStatus: 'native client',
-      surfaceType: 'native-client',
-      riskLevel: 'high',
-    });
-    expect(android.commandOrApiRoute).toMatch(/POST \/api\/chat/);
-    expect(android.commandOrApiRoute).toMatch(/auth refresh\/logout\/password/i);
-    expect(android.commandOrApiRoute).toMatch(/bare POST \/api\/tools\/\{id\}/i);
-    expect(android.recommendedFrontendMechanism).toMatch(/canonical React\/Nest route inventory/i);
+    expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).not.toContain(
+      'Native Android API contract alignment',
+    );
   });
 });

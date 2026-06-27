@@ -30,8 +30,7 @@ export const MOBILE_FIRST_VIEWPORT_WIDTHS = Object.freeze([
   ...MOBILE_FIRST_BREAKPOINTS.tablet,
 ]);
 
-/** @deprecated Use MOBILE_FIRST_VIEWPORT_WIDTHS — kept for regression imports */
-export const ANDROID_QA_VIEWPORT_WIDTHS = MOBILE_FIRST_VIEWPORT_WIDTHS;
+export const MOBILE_WEB_QA_VIEWPORT_WIDTHS = MOBILE_FIRST_VIEWPORT_WIDTHS;
 
 /** @type {readonly { width: number, height: number, label: string, tier: string }[]} */
 const VIEWPORT_DEFS = [

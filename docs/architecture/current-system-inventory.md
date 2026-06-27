@@ -16,7 +16,7 @@ Repository scan summary:
 | Root/config/deployment files | 41 |
 | Frontend `src/` files | 1,215 |
 | Backend files under `backend/` | 661 |
-| Android native files | 128 |
+| Android native files | 0; native Android app removed |
 | Documentation files | 256 |
 | Scripts/automation files | 45 |
 | Backend Nest controllers/usages | 51 |
@@ -58,7 +58,7 @@ For the largest per-file listing, see the existing generated file inventory in `
 | UI library | Custom React/CSS components, Lucide icons, Recharts charts |
 | Testing tools | Vitest + Testing Library + jsdom, Playwright, Jest + ts-jest + Supertest for backend |
 | Lint/format | ESLint 9 flat config, Prettier |
-| Deployment | Vercel SPA config, Docker/Docker Compose, GitHub Actions, Capacitor/Android |
+| Deployment | Vercel SPA config, Docker/Docker Compose, GitHub Actions |
 | Observability | Sentry optional DSN, Datadog APM gated by env, Prometheus metrics, Winston logging |
 
 Configuration inventory:
@@ -74,13 +74,13 @@ Configuration inventory:
 | `backend/tsconfig*.json` | Backend Nest build/test TS configs | Active |
 | `vercel.json` | SPA deployment rewrite/header config | Active |
 | `docker-compose.yml`, `Dockerfile*` | Multi-service local/infrastructure deployment | Active/configured |
-| `capacitor.config.json`, `android/` | Native Android/Capacitor surface | Partially active/stale |
+| `android/`, `capacitor.config.*` | Removed native Android/Capacitor surface | Removed |
 | `.env.example`, `backend/.env.example`, `backend/.env.rag.example` | Env key documentation | Active examples |
 | `.env`, `.env.local`, `backend/.env` | Local env files | Present locally; values not documented here |
 
 Notable stack drift:
 
-- `@capacitor/core` and `@capacitor/android` are `5.6.x`, while `@capacitor/cli` is `8.x`.
+- Native Android/Capacitor packaging has been removed; the TypeScript platform is canonical.
 - CI uses Node 20; backend Docker uses Node 18.
 - Root `.env` mixes frontend `VITE_*` keys with backend-style secrets.
 - Tailwind config exists, but Tailwind is effectively dormant.
@@ -287,7 +287,7 @@ flowchart LR
 | Broader healthcare super-platform pages | fleet, IoT, governance, commercial marketplace, simulations, research, education pages | Future module / inactive |
 | Platform assets/product catalog | backend modules and API clients | Active backend, partially visible, future commercial module |
 | Live tracking controllers | `backend/src/modules/live-tracking/*controller.ts` | Disconnected; module has no controllers mounted |
-| Android native app | `android/` Retrofit contracts | Partially implemented/stale |
+| Android native app | Removed | Removed; no duplicate native contract |
 
 ## SECTION 9 - Integration Inventory
 
@@ -298,12 +298,12 @@ flowchart LR
 | LinkedIn OAuth | `backend/src/modules/auth/strategies/linkedin.strategy.ts` | Implemented/config-dependent |
 | SAML/OIDC/Azure/Okta | `identity-provider-registry.service.ts`, placeholder auth endpoints | Placeholder/planned |
 | Firebase notifications | backend notifications Firebase service, frontend deps | Partially implemented |
-| APNs/Android notifications | notification payload support | Partially implemented |
+| Browser/backend notifications | notification payload support | Partially implemented |
 | FHIR/HL7/EHR | `PlatformSystemsController`, interoperability module | Demo/readiness only |
 | Provincial APIs/OHIP/HIE | Docs/marketplace concepts | Not implemented |
 | Apple HealthKit | No concrete runtime found | Not implemented |
 | Samsung Health | No concrete runtime found | Not implemented |
-| Android native | `android/` app | Partially implemented/stale contracts |
+| Android native | Removed | Removed; no duplicate native app |
 | IoT/fleet/device telemetry | telemetry/fleet/hospital map modules | Demo data / partial |
 | Stripe billing | subscriptions backend | Partially implemented |
 | Anthropic/AI provider | `lib/ai/client.ts`, backend AI module | Implemented/config-dependent |
