@@ -1206,6 +1206,98 @@ export class EDCopilotService {
       quickActions: ['Who needs attention?', 'Capacity status', 'EMS update', 'Reassessment queue'],
     });
   }
+
+  processQuery(input: {
+    query?: string;
+    user_role?: string;
+    context?: Record<string, unknown>;
+  }) {
+    const query = String(input.query || '').trim();
+    const lowerQuery = query.toLowerCase();
+    const patients = this.patientService.listPatients();
+    const capacity = this.patientService.computeCapacity();
+    const reassessmentPatients = patients.filter(
+      (patient) => patient.flags.includes('ReassessmentDue') || requiresReassessment(patient),
+    );
+    const emsPatients = patients.filter(
+      (patient) =>
+        patient.flags.includes('EMSArrival') || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
+    );
+    let response =
+      'Ask about longest wait, reassessment queue, EMS inbound, current capacity, or major clinical workflows.';
+    let data: Record<string, unknown> = {
+      supportedQueries: ['longest wait', 'reassessment', 'ems inbound', 'capacity', 'bottleneck'],
+    };
+    let requiresReview = false;
+
+    if (lowerQuery.includes('waited longest') || lowerQuery.includes('longest wait')) {
+      const longestWait = [...patients].sort(
+        (left, right) => minutesSince(right.arrivalTime) - minutesSince(left.arrivalTime),
+      )[0];
+      response = longestWait
+        ? `${longestWait.firstName} ${longestWait.lastName} has waited ${minutesSince(
+            longestWait.arrivalTime,
+          )} minutes and is currently in ${longestWait.state}.`
+        : 'No active patients are available in the Emergency OS fixture.';
+      data = { patient: longestWait || null };
+    } else if (lowerQuery.includes('reassessment') || lowerQuery.includes('needs attention')) {
+      response = `${reassessmentPatients.length} patient(s) need reassessment or high-priority review.`;
+      data = { patients: reassessmentPatients };
+      requiresReview = reassessmentPatients.length > 0;
+    } else if (lowerQuery.includes('ems') || lowerQuery.includes('ambulance')) {
+      response = `${emsPatients.length} EMS/pre-arrival patient(s) are represented in the current ED board.`;
+      data = { patients: emsPatients };
+    } else if (lowerQuery.includes('capacity') || lowerQuery.includes('bottleneck')) {
+      const waitingCount = patients.filter((patient) => patient.state === 'Waiting').length;
+      const boardingCount = patients.filter(isBoarding).length;
+      response = `Current capacity is ${capacity.band} at ${capacity.occupancyPercent}% occupancy with ${waitingCount} waiting and ${boardingCount} boarding.`;
+      data = {
+        capacity,
+        waitingCount,
+        boardingCount,
+        reassessmentDue: reassessmentPatients.length,
+      };
+      requiresReview = capacity.band !== 'Green';
+    } else if (lowerQuery.includes('chest pain')) {
+      response = `Chest pain workflow: ECG within 10 minutes, troponin, aspirin if not contraindicated, and clinician-directed risk stratification. ${HUMAN_REVIEW_DISCLAIMER}`;
+      data = { protocol: 'chest_pain', steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'] };
+      requiresReview = true;
+    } else if (lowerQuery.includes('sepsis')) {
+      response = `Sepsis workflow: lactate, blood cultures before antibiotics, broad-spectrum antibiotics, fluids as appropriate, and escalation for shock. ${HUMAN_REVIEW_DISCLAIMER}`;
+      data = { protocol: 'sepsis', steps: ['Lactate', 'Cultures', 'Antibiotics', 'Fluids'] };
+      requiresReview = true;
+    } else if (lowerQuery.includes('stroke')) {
+      response = `Stroke workflow: last-known-well, NIHSS, non-contrast CT, CTA when indicated, and time-window review by the stroke team. ${HUMAN_REVIEW_DISCLAIMER}`;
+      data = { protocol: 'stroke', steps: ['Last-known-well', 'NIHSS', 'CT', 'CTA'] };
+      requiresReview = true;
+    }
+
+    this.workflowLogService.record({
+      type: 'copilot_used',
+      title: 'Copilot query processed',
+      summary: query || 'Empty Copilot query received.',
+      source: 'ed-copilot-query',
+      metadata: {
+        userRole: input.user_role || 'unknown',
+        requiresReview,
+      },
+    });
+
+    return envelope('ED Copilot Query', {
+      id: createId('copilot-query'),
+      query,
+      response,
+      answer: response,
+      message: response,
+      data,
+      requires_review: requiresReview,
+      safetyStatus: requiresReview ? 'review-required' : 'safe',
+      safety_check_passed: true,
+      safetyNotice: HUMAN_REVIEW_DISCLAIMER,
+      userRole: input.user_role || 'unknown',
+      createdAt: new Date().toISOString(),
+    });
+  }
 }
 
 @Injectable()

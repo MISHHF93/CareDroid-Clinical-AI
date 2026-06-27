@@ -200,6 +200,11 @@ export class EmergencyOsController {
     return this.copilotService.getCopilotContext();
   }
 
+  @Post('copilot/query')
+  queryCopilot(@Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
+    return this.copilotService.processQuery(dto || {});
+  }
+
   @Get('analytics')
   getAnalytics() {
     return this.analyticsService.getAnalytics();
