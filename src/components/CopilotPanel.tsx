@@ -925,6 +925,11 @@ export function CopilotPanel() {
           {COPILOT_PLATFORM.prompts.backendContextDegraded}
         </div>
       ) : null}
+      {!backendCopilot.error && backendSafetyRule ? (
+        <div role="status" className="ed-copilot-panel__policy">
+          Backend safety policy: {backendSafetyRule}
+        </div>
+      ) : null}
       {messages.map((message) => (
         <div key={message.id} className="ed-copilot-panel__message" data-role={message.role}>
           <div className="ed-copilot-panel__bubble">
