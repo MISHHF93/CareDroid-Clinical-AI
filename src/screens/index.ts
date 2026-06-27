@@ -5,4 +5,3 @@ export { EmsScreen }           from './EmsScreen';
 export { CopilotScreen }       from './CopilotScreen';
 export { CapacityScreen }      from './CapacityScreen';
 export { AlertsCenterScreen }  from './AlertsCenterScreen';
-export { NewScreenRoutes }     from './NewScreenRoutes';
