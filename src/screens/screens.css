@@ -1,0 +1,66 @@
+/* ── Screen shell ────────────────────────────────────────────── */
+.cd-screen {
+  display: flex; flex-direction: column;
+  height: 100%; min-height: 0;
+  background: var(--cd-bg-base);
+}
+
+.cd-screen__header {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: var(--cd-space-3);
+  padding: var(--cd-space-3) var(--cd-space-5);
+  background: var(--cd-bg-surface);
+  border-bottom: 1px solid var(--cd-border-subtle);
+  min-height: 52px;
+}
+.cd-screen__title {
+  font-size: var(--cd-text-lg); font-weight: var(--cd-font-bold);
+  color: var(--cd-text-primary);
+}
+.cd-screen__subtitle {
+  font-size: var(--cd-text-sm); color: var(--cd-text-secondary);
+}
+.cd-screen__actions { margin-left: auto; display: flex; align-items: center; gap: var(--cd-space-2); }
+.cd-screen__body { flex: 1; min-height: 0; overflow: hidden; }
+
+/* ── Split layout (queue + detail) ──────────────────────────── */
+.cd-split {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+.cd-split--right-heavy { grid-template-columns: 300px 1fr; }
+.cd-split__pane { overflow-y: auto; }
+.cd-split__pane--left { border-right: 1px solid var(--cd-border-subtle); }
+
+/* ── Whiteboard ──────────────────────────────────────────────── */
+.cd-whiteboard {
+  display: flex; gap: 0;
+  height: 100%; overflow-x: auto; overflow-y: hidden;
+}
+.cd-wb-col {
+  display: flex; flex-direction: column;
+  min-width: 240px; max-width: 280px; flex-shrink: 0;
+  border-right: 1px solid var(--cd-border-subtle);
+  height: 100%;
+}
+.cd-wb-col__header {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--cd-space-2) var(--cd-space-3);
+  background: var(--cd-bg-sunken);
+  border-bottom: 1px solid var(--cd-border-subtle);
+}
+.cd-wb-col__name  { font-size: var(--cd-text-sm); font-weight: var(--cd-font-semibold); color: var(--cd-text-secondary); text-transform: capitalize; }
+.cd-wb-col__count {
+  font-family: var(--cd-font-mono); font-size: var(--cd-text-xs); font-weight: var(--cd-font-bold);
+  min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--cd-radius-full); background: var(--cd-bg-surface); color: var(--cd-text-secondary);
+}
+.cd-wb-col__body  { flex: 1; overflow-y: auto; padding: var(--cd-space-2); display: flex; flex-direction: column; gap: var(--cd-space-2); }
+
+/* ── Full-page panel screens (copilot, alerts) ───────────────── */
+.cd-panel-screen {
+  height: 100%; display: flex; flex-direction: column; overflow: hidden;
+}

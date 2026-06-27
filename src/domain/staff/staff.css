@@ -1,0 +1,35 @@
+/* ── RoleBadge ───────────────────────────────────────────────── */
+.cd-role-badge {
+  display: inline-flex; align-items: center;
+  font-size: var(--cd-text-2xs); font-weight: var(--cd-font-bold);
+  padding: 1px var(--cd-space-1-5);
+  border-radius: var(--cd-radius-sm);
+  text-transform: uppercase; letter-spacing: var(--cd-tracking-wider);
+  white-space: nowrap;
+}
+.cd-role-badge--physician   { background: hsl(200 60% 92%); color: hsl(200 70% 30%); }
+.cd-role-badge--nurse       { background: hsl(150 50% 90%); color: hsl(150 60% 25%); }
+.cd-role-badge--charge      { background: hsl(270 50% 92%); color: hsl(270 60% 30%); }
+.cd-role-badge--registration{ background: hsl(30  50% 92%); color: hsl(30  70% 28%); }
+.cd-role-badge--paramedic   { background: hsl(0   50% 92%); color: hsl(0   60% 30%); }
+.cd-role-badge--default     { background: var(--cd-bg-sunken); color: var(--cd-text-secondary); }
+
+/* ── StaffChip ───────────────────────────────────────────────── */
+.cd-staff-chip { display: inline-flex; align-items: center; gap: var(--cd-space-1-5); }
+.cd-staff-chip__name { font-size: var(--cd-text-sm); font-weight: var(--cd-font-medium); color: var(--cd-text-primary); }
+
+/* ── ShiftHeader ─────────────────────────────────────────────── */
+.cd-shift-header {
+  display: flex; align-items: center; gap: var(--cd-space-4);
+  padding: var(--cd-space-2) var(--cd-space-4);
+  background: var(--cd-bg-surface);
+  border-bottom: 1px solid var(--cd-border-subtle);
+}
+.cd-shift-header__time  { font-family: var(--cd-font-mono); font-size: var(--cd-text-sm); color: var(--cd-text-secondary); }
+.cd-shift-header__label { font-size: var(--cd-text-sm); font-weight: var(--cd-font-medium); color: var(--cd-text-primary); }
+.cd-shift-header__staff { display: flex; align-items: center; gap: var(--cd-space-2); flex: 1; flex-wrap: wrap; }
+.cd-shift-header__action{ margin-left: auto; }
+
+/* ── KPIStrip ────────────────────────────────────────────────── */
+.cd-kpi-strip { display: flex; gap: var(--cd-space-3); overflow-x: auto; padding: var(--cd-space-1) 0; }
+.cd-kpi-strip > * { flex-shrink: 0; }

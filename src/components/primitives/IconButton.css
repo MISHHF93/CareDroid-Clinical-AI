@@ -1,0 +1,102 @@
+/* ── IconButton primitive ───────────────────────────────────── */
+.cd-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--cd-font-sans);
+  border: 1px solid transparent;
+  border-radius: var(--cd-radius-md);
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--cd-transition-fast),
+    border-color var(--cd-transition-fast),
+    color var(--cd-transition-fast),
+    box-shadow var(--cd-transition-fast);
+}
+
+.cd-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--cd-shadow-focus);
+}
+
+.cd-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Sizes (square) ── */
+.cd-icon-btn--sm {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--cd-radius-sm);
+  font-size: var(--cd-icon-sm);
+}
+
+.cd-icon-btn--md {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--cd-radius-md);
+  font-size: var(--cd-icon-md);
+}
+
+.cd-icon-btn--lg {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--cd-radius-lg);
+  font-size: var(--cd-icon-lg);
+}
+
+/* ── Variant: ghost ── */
+.cd-icon-btn--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--cd-text-primary);
+}
+.cd-icon-btn--ghost:hover:not(:disabled) {
+  background-color: var(--cd-interactive-bg-hover);
+}
+.cd-icon-btn--ghost:active:not(:disabled) {
+  background-color: var(--cd-interactive-bg-active);
+}
+
+/* ── Variant: outline ── */
+.cd-icon-btn--outline {
+  background-color: transparent;
+  border-color: var(--cd-border-default);
+  color: var(--cd-text-primary);
+}
+.cd-icon-btn--outline:hover:not(:disabled) {
+  background-color: var(--cd-interactive-bg-hover);
+  border-color: var(--cd-border-strong);
+}
+.cd-icon-btn--outline:active:not(:disabled) {
+  background-color: var(--cd-interactive-bg-active);
+}
+
+/* ── Variant: primary ── */
+.cd-icon-btn--primary {
+  background-color: var(--cd-brand-bg);
+  border-color: var(--cd-brand-bg);
+  color: var(--cd-brand-fg);
+}
+.cd-icon-btn--primary:hover:not(:disabled) {
+  background-color: var(--cd-brand-bg-hover);
+  border-color: var(--cd-brand-bg-hover);
+}
+.cd-icon-btn--primary:active:not(:disabled) {
+  background-color: var(--cd-brand-bg-active);
+  border-color: var(--cd-brand-bg-active);
+}
+
+/* ── Icon slot ── */
+.cd-icon-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}

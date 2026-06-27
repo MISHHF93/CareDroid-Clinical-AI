@@ -1,0 +1,181 @@
+/* ── Button primitive ───────────────────────────────────────── */
+.cd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cd-space-2);
+  font-family: var(--cd-font-sans);
+  font-weight: var(--cd-font-medium);
+  font-size: var(--cd-text-sm);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--cd-radius-md);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--cd-transition-fast),
+    border-color var(--cd-transition-fast),
+    color var(--cd-transition-fast),
+    box-shadow var(--cd-transition-fast),
+    opacity var(--cd-transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.cd-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--cd-shadow-focus);
+}
+
+.cd-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Size variants ── */
+.cd-btn--sm {
+  height: var(--cd-control-height-sm);
+  padding: 0 var(--cd-control-px-sm);
+  font-size: var(--cd-text-xs);
+  border-radius: var(--cd-radius-sm);
+}
+
+.cd-btn--md {
+  height: var(--cd-control-height-md);
+  padding: 0 var(--cd-control-px-md);
+  font-size: var(--cd-text-sm);
+}
+
+.cd-btn--lg {
+  height: var(--cd-control-height-lg);
+  padding: 0 var(--cd-control-px-lg);
+  font-size: var(--cd-text-md);
+  border-radius: var(--cd-radius-lg);
+}
+
+/* ── Variant: primary ── */
+.cd-btn--primary {
+  background-color: var(--cd-brand-bg);
+  border-color: var(--cd-brand-bg);
+  color: var(--cd-brand-fg);
+}
+.cd-btn--primary:hover:not(:disabled) {
+  background-color: var(--cd-brand-bg-hover);
+  border-color: var(--cd-brand-bg-hover);
+}
+.cd-btn--primary:active:not(:disabled) {
+  background-color: var(--cd-brand-bg-active);
+  border-color: var(--cd-brand-bg-active);
+}
+
+/* ── Variant: secondary ── */
+.cd-btn--secondary {
+  background-color: var(--cd-bg-sunken);
+  border-color: var(--cd-border-default);
+  color: var(--cd-text-primary);
+}
+.cd-btn--secondary:hover:not(:disabled) {
+  background-color: var(--cd-interactive-bg-hover);
+  border-color: var(--cd-border-strong);
+}
+.cd-btn--secondary:active:not(:disabled) {
+  background-color: var(--cd-interactive-bg-active);
+}
+
+/* ── Variant: ghost ── */
+.cd-btn--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--cd-text-primary);
+}
+.cd-btn--ghost:hover:not(:disabled) {
+  background-color: var(--cd-interactive-bg-hover);
+}
+.cd-btn--ghost:active:not(:disabled) {
+  background-color: var(--cd-interactive-bg-active);
+}
+
+/* ── Variant: outline ── */
+.cd-btn--outline {
+  background-color: transparent;
+  border-color: var(--cd-border-default);
+  color: var(--cd-text-primary);
+}
+.cd-btn--outline:hover:not(:disabled) {
+  background-color: var(--cd-interactive-bg-hover);
+  border-color: var(--cd-border-strong);
+}
+.cd-btn--outline:active:not(:disabled) {
+  background-color: var(--cd-interactive-bg-active);
+}
+
+/* ── Variant: danger ── */
+.cd-btn--danger {
+  background-color: var(--cd-danger-bg);
+  border-color: var(--cd-danger-bg);
+  color: hsl(0 0% 100%);
+}
+.cd-btn--danger:hover:not(:disabled) {
+  background-color: hsl(0 72% 45%);
+  border-color: hsl(0 72% 45%);
+}
+.cd-btn--danger:active:not(:disabled) {
+  background-color: hsl(0 74% 38%);
+  border-color: hsl(0 74% 38%);
+}
+.cd-btn--danger:focus-visible {
+  box-shadow: var(--cd-shadow-focus-danger);
+}
+
+/* ── Variant: link ── */
+.cd-btn--link {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--cd-text-brand);
+  padding-left: 0;
+  padding-right: 0;
+}
+.cd-btn--link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.cd-btn--link:active:not(:disabled) {
+  opacity: 0.75;
+}
+
+/* ── Width ── */
+.cd-btn--full-width {
+  width: 100%;
+}
+
+/* ── Loading spinner ── */
+.cd-btn__spinner {
+  width: 1em;
+  height: 1em;
+  animation: cd-btn-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes cd-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cd-btn--loading {
+  pointer-events: none;
+}
+
+/* ── Icon slots ── */
+.cd-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: var(--cd-icon-sm);
+  line-height: 0;
+}
+
+/* ── Label ── */
+.cd-btn__label {
+  min-width: 0;
+}

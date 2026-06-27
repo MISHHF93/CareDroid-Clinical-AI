@@ -1,0 +1,38 @@
+/* ── AlertCard ───────────────────────────────────────────────── */
+.cd-alert-card {
+  display: flex; gap: var(--cd-space-3);
+  padding: var(--cd-space-3) var(--cd-space-4);
+  border-radius: var(--cd-radius-lg);
+  border: 1px solid transparent;
+  background: var(--cd-bg-surface);
+}
+.cd-alert-card--Info     { background: var(--cd-info-bg-subtle);    border-color: var(--cd-info-border); }
+.cd-alert-card--Warning  { background: var(--cd-warning-bg-subtle); border-color: var(--cd-warning-border); }
+.cd-alert-card--Critical { background: var(--cd-danger-bg-subtle);  border-color: var(--cd-danger-border); }
+
+.cd-alert-card__icon   { flex-shrink: 0; font-size: 18px; line-height: 0; margin-top: 1px; }
+.cd-alert-card__body   { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cd-alert-card__title  { font-size: var(--cd-text-sm); font-weight: var(--cd-font-semibold); color: var(--cd-text-primary); }
+.cd-alert-card__msg    { font-size: var(--cd-text-sm); color: var(--cd-text-secondary); }
+.cd-alert-card__footer { display: flex; align-items: center; gap: var(--cd-space-3); margin-top: var(--cd-space-2); }
+.cd-alert-card__time   { font-size: var(--cd-text-xs); color: var(--cd-text-disabled); }
+
+.cd-alert-card__icon--Info     { color: var(--cd-info-icon); }
+.cd-alert-card__icon--Warning  { color: var(--cd-warning-icon); }
+.cd-alert-card__icon--Critical { color: var(--cd-danger-icon); }
+
+/* ── AlertRail ───────────────────────────────────────────────── */
+.cd-alert-rail { display: flex; flex-direction: column; gap: var(--cd-space-2); }
+
+/* ── AlertBadge ──────────────────────────────────────────────── */
+.cd-alert-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--cd-text-2xs); font-weight: var(--cd-font-bold);
+  min-width: 18px; height: 18px;
+  padding: 0 4px;
+  background: var(--cd-danger-icon); color: #fff;
+  border-radius: var(--cd-radius-full);
+  font-family: var(--cd-font-mono);
+}
+.cd-alert-badge--warning { background: var(--cd-warning-icon); }
+.cd-alert-badge--info    { background: var(--cd-info-icon); }

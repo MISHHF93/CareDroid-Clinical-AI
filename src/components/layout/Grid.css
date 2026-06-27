@@ -1,0 +1,11 @@
+.cd-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 12), minmax(0, 1fr));
+  gap: var(--grid-gap, 0);
+  row-gap: var(--grid-row-gap, var(--grid-gap, 0));
+  column-gap: var(--grid-col-gap, var(--grid-gap, 0));
+}
+
+.cd-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}

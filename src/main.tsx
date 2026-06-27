@@ -1,4 +1,5 @@
 ﻿import './theme-init';
+import './styles/tokens.css';
 import './styles/index.css';
 import './index.css';
 import './globals.css';

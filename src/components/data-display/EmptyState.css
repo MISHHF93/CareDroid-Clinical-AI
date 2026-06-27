@@ -1,0 +1,11 @@
+.cd-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--cd-space-3);
+  padding: var(--cd-space-12) var(--cd-space-8);
+  text-align: center;
+  color: var(--cd-text-secondary);
+}
+.cd-empty__icon        { color: var(--cd-text-disabled); line-height: 0; }
+.cd-empty__title       { font-size: var(--cd-text-md); font-weight: var(--cd-font-semibold); color: var(--cd-text-primary); margin: 0; }
+.cd-empty__description { font-size: var(--cd-text-sm); color: var(--cd-text-secondary); margin: 0; max-width: 40ch; }
+.cd-empty__action      { margin-top: var(--cd-space-1); }

@@ -1,0 +1,427 @@
+/**
+ * CareDroid Design Tokens — single source of truth
+ * Namespace: --cd-*
+ *
+ * Layer structure:
+ *   1. Primitive palette  (raw hsl values, not used directly in UI)
+ *   2. Semantic tokens    (what components reference)
+ *   3. Clinical tokens    (ED-specific: acuity, breach, capacity)
+ *
+ * Usage: reference --cd-* in component CSS. Never use raw palette values in components.
+ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. PRIMITIVE PALETTE  (hsl channels — compose with hsl())
+───────────────────────────────────────────────────────────── */
+:root {
+  /* Sky / Brand ramp */
+  --cd-palette-sky-50:  199 100% 97%;
+  --cd-palette-sky-100: 199 100% 93%;
+  --cd-palette-sky-200: 198  98% 85%;
+  --cd-palette-sky-300: 199  89% 74%;
+  --cd-palette-sky-400: 200  85% 62%;
+  --cd-palette-sky-500: 200  98% 48%;   /* --color-primary */
+  --cd-palette-sky-600: 201  96% 40%;
+  --cd-palette-sky-700: 201  90% 32%;
+  --cd-palette-sky-800: 201  84% 24%;
+  --cd-palette-sky-900: 202  80% 16%;
+
+  /* Neutral / Slate ramp */
+  --cd-palette-slate-50:  210  40% 98%;
+  --cd-palette-slate-100: 210  40% 96%;
+  --cd-palette-slate-200: 214  32% 91%;
+  --cd-palette-slate-300: 213  27% 84%;
+  --cd-palette-slate-400: 215  20% 65%;
+  --cd-palette-slate-500: 215  16% 47%;
+  --cd-palette-slate-600: 215  19% 35%;
+  --cd-palette-slate-700: 215  25% 27%;
+  --cd-palette-slate-800: 217  33% 17%;
+  --cd-palette-slate-900: 222  47% 11%;
+
+  /* Functional palette */
+  --cd-palette-green-400: 142  71% 45%;
+  --cd-palette-green-500: 142  72% 29%;
+  --cd-palette-green-600: 142  76% 23%;
+
+  --cd-palette-amber-400: 43  96% 56%;
+  --cd-palette-amber-500: 38  92% 50%;
+  --cd-palette-amber-600: 32  95% 44%;
+
+  --cd-palette-orange-400: 21  90% 58%;
+  --cd-palette-orange-500: 21  90% 48%;
+
+  --cd-palette-red-400:   0  84% 60%;
+  --cd-palette-red-500:   0  72% 51%;
+  --cd-palette-red-600:   0  74% 42%;
+  --cd-palette-red-700:   0  74% 34%;
+
+  --cd-palette-violet-500: 250  76% 62%;
+  --cd-palette-violet-600: 250  76% 52%;
+
+  --cd-palette-white: 0 0% 100%;
+  --cd-palette-black: 0 0% 0%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. SEMANTIC TOKENS — light mode (default)
+───────────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+
+  /* — Background — */
+  --cd-bg-base:     hsl(var(--cd-palette-sky-50));      /* page */
+  --cd-bg-surface:  hsl(var(--cd-palette-white));       /* card, panel */
+  --cd-bg-elevated: hsl(var(--cd-palette-white));       /* modal, popover */
+  --cd-bg-sunken:   hsl(var(--cd-palette-slate-100));   /* input, code block */
+  --cd-bg-overlay:  hsl(var(--cd-palette-black) / .45);
+
+  /* — Foreground — */
+  --cd-text-primary:   hsl(var(--cd-palette-slate-900));
+  --cd-text-secondary: hsl(var(--cd-palette-slate-500));
+  --cd-text-disabled:  hsl(var(--cd-palette-slate-400));
+  --cd-text-inverse:   hsl(var(--cd-palette-white));
+  --cd-text-brand:     hsl(var(--cd-palette-sky-600));
+  --cd-text-danger:    hsl(var(--cd-palette-red-600));
+
+  /* — Border — */
+  --cd-border-subtle:  hsl(var(--cd-palette-sky-100));
+  --cd-border-default: hsl(var(--cd-palette-slate-200));
+  --cd-border-strong:  hsl(var(--cd-palette-slate-300));
+  --cd-border-brand:   hsl(var(--cd-palette-sky-400));
+  --cd-border-danger:  hsl(var(--cd-palette-red-400));
+  --cd-border-focus:   hsl(var(--cd-palette-sky-500));
+
+  /* — Brand — */
+  --cd-brand-bg:          hsl(var(--cd-palette-sky-500));
+  --cd-brand-bg-hover:    hsl(var(--cd-palette-sky-600));
+  --cd-brand-bg-active:   hsl(var(--cd-palette-sky-700));
+  --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-50));
+  --cd-brand-fg:          hsl(var(--cd-palette-white));
+  --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-600));
+
+  /* — Status: Info — */
+  --cd-info-bg:     hsl(var(--cd-palette-sky-500));
+  --cd-info-bg-subtle: hsl(var(--cd-palette-sky-50));
+  --cd-info-border: hsl(var(--cd-palette-sky-200));
+  --cd-info-text:   hsl(var(--cd-palette-sky-700));
+
+  /* — Status: Success — */
+  --cd-success-bg:        hsl(var(--cd-palette-green-400));
+  --cd-success-bg-subtle: hsl(142 72% 95%);
+  --cd-success-border:    hsl(142 71% 80%);
+  --cd-success-text:      hsl(var(--cd-palette-green-600));
+
+  /* — Status: Warning — */
+  --cd-warning-bg:        hsl(var(--cd-palette-amber-400));
+  --cd-warning-bg-subtle: hsl(43 96% 95%);
+  --cd-warning-border:    hsl(43 96% 78%);
+  --cd-warning-text:      hsl(var(--cd-palette-amber-600));
+
+  /* — Status: Danger — */
+  --cd-danger-bg:        hsl(var(--cd-palette-red-500));
+  --cd-danger-bg-subtle: hsl(0 72% 96%);
+  --cd-danger-border:    hsl(0 84% 82%);
+  --cd-danger-text:      hsl(var(--cd-palette-red-600));
+
+  /* — Interactive states — */
+  --cd-interactive-bg-hover:  hsl(var(--cd-palette-slate-50));
+  --cd-interactive-bg-active: hsl(var(--cd-palette-slate-100));
+  --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-50));
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2b. SEMANTIC TOKENS — dark mode
+───────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --cd-bg-base:     hsl(var(--cd-palette-slate-900));
+  --cd-bg-surface:  hsl(var(--cd-palette-slate-800));
+  --cd-bg-elevated: hsl(var(--cd-palette-slate-700));
+  --cd-bg-sunken:   hsl(222 47% 8%);
+  --cd-bg-overlay:  hsl(var(--cd-palette-black) / .65);
+
+  --cd-text-primary:   hsl(var(--cd-palette-slate-50));
+  --cd-text-secondary: hsl(var(--cd-palette-slate-400));
+  --cd-text-disabled:  hsl(var(--cd-palette-slate-600));
+  --cd-text-inverse:   hsl(var(--cd-palette-slate-900));
+  --cd-text-brand:     hsl(var(--cd-palette-sky-300));
+  --cd-text-danger:    hsl(var(--cd-palette-red-400));
+
+  --cd-border-subtle:  hsl(var(--cd-palette-slate-700));
+  --cd-border-default: hsl(var(--cd-palette-slate-600));
+  --cd-border-strong:  hsl(var(--cd-palette-slate-500));
+  --cd-border-brand:   hsl(var(--cd-palette-sky-500));
+  --cd-border-danger:  hsl(var(--cd-palette-red-500));
+  --cd-border-focus:   hsl(var(--cd-palette-sky-400));
+
+  --cd-brand-bg:          hsl(var(--cd-palette-sky-500));
+  --cd-brand-bg-hover:    hsl(var(--cd-palette-sky-400));
+  --cd-brand-bg-active:   hsl(var(--cd-palette-sky-300));
+  --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-900));
+  --cd-brand-fg:          hsl(var(--cd-palette-white));
+  --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-300));
+
+  --cd-info-bg:           hsl(var(--cd-palette-sky-500));
+  --cd-info-bg-subtle:    hsl(var(--cd-palette-sky-900));
+  --cd-info-border:       hsl(var(--cd-palette-sky-700));
+  --cd-info-text:         hsl(var(--cd-palette-sky-300));
+
+  --cd-success-bg:        hsl(var(--cd-palette-green-400));
+  --cd-success-bg-subtle: hsl(142 72% 8%);
+  --cd-success-border:    hsl(142 71% 22%);
+  --cd-success-text:      hsl(142 71% 55%);
+
+  --cd-warning-bg:        hsl(var(--cd-palette-amber-400));
+  --cd-warning-bg-subtle: hsl(43 96% 8%);
+  --cd-warning-border:    hsl(43 96% 22%);
+  --cd-warning-text:      hsl(var(--cd-palette-amber-400));
+
+  --cd-danger-bg:        hsl(var(--cd-palette-red-500));
+  --cd-danger-bg-subtle: hsl(0 72% 8%);
+  --cd-danger-border:    hsl(0 74% 22%);
+  --cd-danger-text:      hsl(var(--cd-palette-red-400));
+
+  --cd-interactive-bg-hover:    hsl(var(--cd-palette-slate-700));
+  --cd-interactive-bg-active:   hsl(var(--cd-palette-slate-600));
+  --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-900));
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. CLINICAL TOKENS — ED-specific (mode-independent base)
+───────────────────────────────────────────────────────────── */
+:root {
+  /* Acuity / Priority */
+  --cd-acuity-p1:         hsl(0   74% 42%);   /* Immediate   — deep red */
+  --cd-acuity-p1-bg:      hsl(0   74% 96%);
+  --cd-acuity-p1-border:  hsl(0   74% 78%);
+
+  --cd-acuity-p2:         hsl(21  90% 45%);   /* Emergent    — orange */
+  --cd-acuity-p2-bg:      hsl(21  90% 96%);
+  --cd-acuity-p2-border:  hsl(21  90% 75%);
+
+  --cd-acuity-p3:         hsl(38  92% 44%);   /* Urgent      — amber */
+  --cd-acuity-p3-bg:      hsl(43  96% 95%);
+  --cd-acuity-p3-border:  hsl(43  96% 72%);
+
+  --cd-acuity-p4:         hsl(142 72% 29%);   /* Semi-urgent — green */
+  --cd-acuity-p4-bg:      hsl(142 72% 95%);
+  --cd-acuity-p4-border:  hsl(142 71% 72%);
+
+  --cd-acuity-p5:         hsl(var(--cd-palette-sky-600));   /* Non-urgent  — blue */
+  --cd-acuity-p5-bg:      hsl(var(--cd-palette-sky-50));
+  --cd-acuity-p5-border:  hsl(var(--cd-palette-sky-200));
+
+  /* Breach / Timer states */
+  --cd-breach-safe:     hsl(142 72% 29%);
+  --cd-breach-watch:    hsl(38  92% 44%);
+  --cd-breach-warning:  hsl(21  90% 45%);
+  --cd-breach-imminent: hsl(0   74% 42%);
+  --cd-breach-breached: hsl(0   74% 34%);
+
+  /* Capacity states */
+  --cd-capacity-normal:   hsl(142 72% 29%);   /* < 70% */
+  --cd-capacity-elevated: hsl(38  92% 44%);   /* 70–85% */
+  --cd-capacity-high:     hsl(21  90% 45%);   /* 85–95% */
+  --cd-capacity-crisis:   hsl(0   74% 42%);   /* > 95% */
+
+  /* Sepsis / flags */
+  --cd-flag-sepsis:      hsl(0   74% 42%);
+  --cd-flag-lwbs:        hsl(21  90% 45%);
+  --cd-flag-highRisk:    hsl(250 76% 52%);
+  --cd-flag-boarding:    hsl(215 19% 35%);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. SPACING SCALE  (4px grid)
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-space-px:  1px;
+  --cd-space-0:   0;
+  --cd-space-0-5: 2px;
+  --cd-space-1:   4px;
+  --cd-space-1-5: 6px;
+  --cd-space-2:   8px;
+  --cd-space-2-5: 10px;
+  --cd-space-3:   12px;
+  --cd-space-3-5: 14px;
+  --cd-space-4:   16px;
+  --cd-space-5:   20px;
+  --cd-space-6:   24px;
+  --cd-space-7:   28px;
+  --cd-space-8:   32px;
+  --cd-space-10:  40px;
+  --cd-space-12:  48px;
+  --cd-space-14:  56px;
+  --cd-space-16:  64px;
+  --cd-space-20:  80px;
+  --cd-space-24:  96px;
+  --cd-space-32:  128px;
+
+  /* Fluid spacing (clamped for responsive layouts) */
+  --cd-space-fluid-sm:  clamp(8px,  1.5vw, 12px);
+  --cd-space-fluid-md:  clamp(12px, 2vw,   20px);
+  --cd-space-fluid-lg:  clamp(16px, 2.5vw, 28px);
+  --cd-space-fluid-xl:  clamp(24px, 3.5vw, 40px);
+  --cd-space-fluid-2xl: clamp(32px, 5vw,   64px);
+
+  /* Page layout */
+  --cd-layout-gutter:        clamp(12px, 2.5vw, 24px);
+  --cd-layout-max-content:   72rem;    /* 1152px */
+  --cd-layout-max-wide:      88rem;    /* 1408px */
+  --cd-layout-sidebar-width: 240px;
+  --cd-layout-topbar-height: 56px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. TYPOGRAPHY SCALE
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cd-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  /* Size scale */
+  --cd-text-2xs:  10px;
+  --cd-text-xs:   11px;
+  --cd-text-sm:   13px;
+  --cd-text-md:   15px;   /* base */
+  --cd-text-lg:   17px;
+  --cd-text-xl:   20px;
+  --cd-text-2xl:  24px;
+  --cd-text-3xl:  30px;
+  --cd-text-4xl:  36px;
+  --cd-text-5xl:  48px;
+
+  /* Line heights */
+  --cd-leading-tight:   1.2;
+  --cd-leading-snug:    1.3;
+  --cd-leading-normal:  1.5;
+  --cd-leading-relaxed: 1.6;
+
+  /* Font weights */
+  --cd-font-regular:  400;
+  --cd-font-medium:   500;
+  --cd-font-semibold: 600;
+  --cd-font-bold:     700;
+
+  /* Letter spacing */
+  --cd-tracking-tight:  -0.02em;
+  --cd-tracking-normal:  0;
+  --cd-tracking-wide:    0.025em;
+  --cd-tracking-wider:   0.05em;
+  --cd-tracking-widest:  0.1em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. BORDER RADIUS
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-radius-none: 0;
+  --cd-radius-xs:   2px;
+  --cd-radius-sm:   4px;
+  --cd-radius-md:   6px;
+  --cd-radius-lg:   8px;
+  --cd-radius-xl:   12px;
+  --cd-radius-2xl:  16px;
+  --cd-radius-3xl:  24px;
+  --cd-radius-full: 9999px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. SHADOWS / ELEVATION
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-shadow-none: none;
+  --cd-shadow-xs:   0 1px 2px hsl(var(--cd-palette-slate-900) / .05);
+  --cd-shadow-sm:   0 1px 3px hsl(var(--cd-palette-slate-900) / .07),
+                    0 1px 2px hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-md:   0 4px 6px  hsl(var(--cd-palette-slate-900) / .07),
+                    0 2px 4px  hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-lg:   0 10px 15px hsl(var(--cd-palette-slate-900) / .08),
+                    0  4px  6px hsl(var(--cd-palette-slate-900) / .05);
+  --cd-shadow-xl:   0 20px 25px hsl(var(--cd-palette-slate-900) / .10),
+                    0  8px 10px hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-2xl:  0 25px 50px hsl(var(--cd-palette-slate-900) / .18);
+
+  /* Focus ring — consistent across all interactive elements */
+  --cd-shadow-focus: 0 0 0 3px hsl(var(--cd-palette-sky-500) / .35);
+  --cd-shadow-focus-danger: 0 0 0 3px hsl(var(--cd-palette-red-500) / .30);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. MOTION / ANIMATION
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-duration-instant: 0ms;
+  --cd-duration-fast:    80ms;
+  --cd-duration-normal:  150ms;
+  --cd-duration-slow:    250ms;
+  --cd-duration-slower:  400ms;
+
+  --cd-ease-standard:  cubic-bezier(.4,  0,   .2, 1);   /* material ease */
+  --cd-ease-decelerate: cubic-bezier(0,  0,   .2, 1);   /* enter */
+  --cd-ease-accelerate: cubic-bezier(.4, 0,    1, 1);   /* exit */
+  --cd-ease-spring:    cubic-bezier(.34, 1.56, .64, 1); /* spring overshoot */
+  --cd-ease-bounce:    cubic-bezier(.68, -.55, .265, 1.55);
+
+  --cd-transition-fast:   var(--cd-duration-fast)   var(--cd-ease-standard);
+  --cd-transition-normal: var(--cd-duration-normal) var(--cd-ease-standard);
+  --cd-transition-slow:   var(--cd-duration-slow)   var(--cd-ease-standard);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cd-duration-fast:   0ms;
+    --cd-duration-normal: 0ms;
+    --cd-duration-slow:   0ms;
+    --cd-duration-slower: 0ms;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. Z-INDEX SCALE
+───────────────────────────────────────────────────────────── */
+:root {
+  --cd-z-base:      0;
+  --cd-z-raised:    10;
+  --cd-z-dropdown:  100;
+  --cd-z-sticky:    200;
+  --cd-z-overlay:   300;
+  --cd-z-modal:     400;
+  --cd-z-popover:   500;
+  --cd-z-toast:     600;
+  --cd-z-tooltip:   700;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. COMPONENT SIZE CONTRACTS
+───────────────────────────────────────────────────────────── */
+:root {
+  /* Touch targets (WCAG 2.5.5) */
+  --cd-touch-min:         44px;
+  --cd-touch-comfortable: 48px;
+
+  /* Control heights */
+  --cd-control-height-xs: 24px;
+  --cd-control-height-sm: 32px;
+  --cd-control-height-md: 40px;
+  --cd-control-height-lg: 48px;
+
+  /* Control padding (horizontal) */
+  --cd-control-px-sm: 10px;
+  --cd-control-px-md: 14px;
+  --cd-control-px-lg: 18px;
+
+  /* Icon sizes */
+  --cd-icon-xs: 12px;
+  --cd-icon-sm: 16px;
+  --cd-icon-md: 20px;
+  --cd-icon-lg: 24px;
+  --cd-icon-xl: 32px;
+
+  /* Breakpoints (reference only — use literal px in @media queries) */
+  --cd-bp-sm:   480px;
+  --cd-bp-md:   768px;
+  --cd-bp-lg:  1024px;
+  --cd-bp-xl:  1280px;
+  --cd-bp-2xl: 1536px;
+}
