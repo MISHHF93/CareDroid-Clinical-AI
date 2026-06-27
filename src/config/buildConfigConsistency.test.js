@@ -17,6 +17,7 @@ describe('build and service config consistency', () => {
     expect(compose).toContain(
       'DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}',
     );
+    expect(compose).not.toContain('- ./backend:/app');
     expect(read('backend/src/config/database.config.ts')).toContain('buildPostgresOptions');
     expect(read('backend/src/data-source.ts')).toContain('buildPostgresOptions');
   });
@@ -46,6 +47,16 @@ describe('build and service config consistency', () => {
     expect(packageJson).toContain(
       '-f docker-compose.app.yml -f docker-compose.ml.yml --profile ml',
     );
+  });
+
+  it('keeps orphaned anomaly detection sidecar opt-in until it has a deployable service', () => {
+    const compose = read('docker-compose.yml');
+    const anomalyConfig = read('backend/src/config/anomaly-detection.config.ts');
+
+    expect(compose).toContain('ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-false}');
+    expect(compose).not.toContain('context: ./backend/ml-services/anomaly-detection');
+    expect(compose).not.toContain('container_name: caredroid-anomaly-detection');
+    expect(anomalyConfig).toContain("process.env.ANOMALY_DETECTION_ENABLED === 'true'");
   });
 
   it('does not allow Vercel same-origin /api unless a proxy is verified', () => {

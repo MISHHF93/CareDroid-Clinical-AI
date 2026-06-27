@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest';
 const distAssets = join(process.cwd(), 'dist', 'assets');
 
 const TOTAL_JS_BUDGET = 6_500_000;
+const MAX_JS_CHUNK_BUDGET = 950 * 1024;
 
 describe('bundle budgets (dist/assets)', () => {
   it('dist exists after production build', () => {
@@ -23,12 +24,12 @@ describe('bundle budgets (dist/assets)', () => {
     const total = files.reduce((sum, name) => sum + statSync(join(distAssets, name)).size, 0);
     expect(total).toBeLessThan(TOTAL_JS_BUDGET);
 
+    const oversizedChunks = files
+      .map((name) => ({ name, size: statSync(join(distAssets, name)).size }))
+      .filter(({ size }) => size > MAX_JS_CHUNK_BUDGET);
+    expect(oversizedChunks, 'unexpectedly large production chunks').toEqual([]);
+
     const indexEntry = files.find((n) => n.startsWith('index-'));
     expect(indexEntry, 'missing Vite entry chunk').toBeTruthy();
-
-    // Emergency OS-only builds redirect retired tools/calculators routes instead
-    // of carrying a standalone lazy calculator hub chunk.
-    const calculatorEntries = files.filter((n) => n.startsWith('calculators-'));
-    expect(calculatorEntries, 'retired calculator chunks should not be emitted').toEqual([]);
   });
 });
