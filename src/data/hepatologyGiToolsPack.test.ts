@@ -92,7 +92,7 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       const navigation = getRegistryToolNavigation(registryId);
       expect(record?.tier, registryId).toBe('C');
       expect(record?.launchType, registryId).toBe(TOOL_LAUNCH_TYPES.CLINICAL_PAGE);
-      expect(record?.component, registryId).toBe('src/pages/tools/GastroenterologyAssistantPage.jsx');
+      expect(record?.component, registryId).toBe('src/pages/tools/GastroenterologyAssistantPage.tsx');
       expect(record?.orchestratorToolId, registryId).toBeNull();
       expect(clinicalIntentToolsById[registryId]?.chatSeed, registryId).toMatch(/do not recommend|does not recommend/i);
       expect(navigation.mode, registryId).toBe('tool-page');

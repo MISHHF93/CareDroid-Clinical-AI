@@ -47,7 +47,7 @@ vi.mock('../engine/simulation', () => ({
 }));
 
 const emergencyRoleMock = vi.hoisted(() => {
-  const { PERMISSIVE_EMERGENCY_ROLE_MOCK } = require('../test/permissiveEmergencyRoleMock.js');
+  const { PERMISSIVE_EMERGENCY_ROLE_MOCK } = require('../test/permissiveEmergencyRoleMock.ts');
   return PERMISSIVE_EMERGENCY_ROLE_MOCK;
 });
 

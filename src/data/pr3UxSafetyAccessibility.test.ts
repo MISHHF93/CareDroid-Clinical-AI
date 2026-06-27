@@ -28,7 +28,7 @@ import { canadianCSpineChatConfig } from './chatAssistedCalculators/canadianCSpi
 import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 
 const ABSOLUTE_DIAGNOSIS_PATTERN =
@@ -208,7 +208,7 @@ describe('PR3 launch flow — hub path without dashboard fallback for PR3', () =
 
   it('catalog launch uses resolveNavigationPathForLaunch for hub chat tools', () => {
     const catalogSource = readFileSync(
-      join(__dirname, '../pages/tools/ClinicalToolCatalog.jsx'),
+      join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'),
       'utf8'
     );
     expect(catalogSource).toContain('resolveNavigationPathForLaunch(launch)');

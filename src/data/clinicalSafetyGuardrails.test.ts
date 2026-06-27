@@ -89,7 +89,7 @@ describe('clinicalSafetyGuardrails — anticoagulation', () => {
   });
 
   it('Calculators.jsx CHA2DS2-VASc avoids anticoagulation mandate language', () => {
-    const src = readSrc('src/pages/tools/Calculators.jsx');
+    const src = readSrc('src/pages/tools/Calculators.tsx');
     const block = src.slice(src.indexOf('CHA2DS2-VASc Calculator'));
     expect(block).not.toMatch(/Anticoagulation strongly recommended/);
     expect(block).not.toMatch(/No anticoagulation recommended/);
@@ -126,7 +126,7 @@ describe('clinicalSafetyGuardrails — AI documentation', () => {
   });
 
   it('ToolPageLayout includes decision-support disclaimer component', () => {
-    const src = readSrc('src/pages/tools/ToolPageLayout.jsx');
+    const src = readSrc('src/pages/tools/ToolPageLayout.tsx');
     expect(src).toMatch(/ClinicalDecisionSupportDisclaimer/);
     expect(src).toMatch(/disclaimerVariantForTool/);
   });
@@ -243,7 +243,7 @@ describe('clinicalSafetyGuardrails — page-only tools metadata', () => {
 
 describe('clinicalSafetyGuardrails — SOFA calculator UI', () => {
   it('SOFA form includes decision-support disclaimer block', () => {
-    const src = readSrc('src/pages/tools/Calculators.jsx');
+    const src = readSrc('src/pages/tools/Calculators.tsx');
     const block = src.slice(src.indexOf('const SOFACalculator'));
     expect(block).toMatch(/Clinical decision support only/i);
     expect(block).not.toMatch(/diagnos(e|is) sepsis with certainty/i);

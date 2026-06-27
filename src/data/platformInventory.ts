@@ -1,6 +1,6 @@
 ﻿/**
  * Reverse-engineered platform inventory — counts and lists derived from shipped source.
- * Used by README audit section and drift tests (`platformInventory.test.js`).
+ * Used by README audit section and drift tests (`platformInventory.test.ts`).
  */
 
 import toolRegistry, { toolRegistryById } from './toolRegistry';
@@ -183,18 +183,18 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
 
 | Layer | Count | Primary source |
 |-------|------:|----------------|
-| Sidebar registry tools | ${c.registryTools} | \`src/data/toolRegistry.js\` |
-| NLU / AI clinical profiles | ${c.nluClinicalProfiles} | \`src/data/clinicalIntentToolCatalog.js\` |
+| Sidebar registry tools | ${c.registryTools} | \`src/data/toolRegistry.ts\` |
+| NLU / AI clinical profiles | ${c.nluClinicalProfiles} | \`src/data/clinicalIntentToolCatalog.ts\` |
 | Dedicated calculator UI forms | ${c.builtinCalculatorForms} | \`builtinUiCalculators\` in catalog |
-| Calculator SPA routes | ${c.calculatorSpaRoutes} | \`src/routes/clinicalToolRoutes.js\` |
+| Calculator SPA routes | ${c.calculatorSpaRoutes} | \`src/routes/clinicalToolRoutes.ts\` |
 | Unified catalog rows (search) | ${c.catalogSearchableRows} | \`/tools/catalog\` index |
 | Known tool-area paths | ${c.knownToolAreaPaths} | \`KNOWN_TOOL_AREA_PATHS\` |
 | Backend POST executors | ${c.backendPostExecutors} | SOFA, drug interactions, lab interpreter |
-| E2E validation matrix rows | ${c.e2eMatrixRows} | \`e2eToolValidationMatrix.js\` |
+| E2E validation matrix rows | ${c.e2eMatrixRows} | \`e2eToolValidationMatrix.ts\` |
 
 ### Medical tools by delivery tier
 
-Registry tools group into disjoint tiers (see \`clinicalToolIdContract.js\`):
+Registry tools group into disjoint tiers (see \`clinicalToolIdContract.ts\`):
 
 | Tier | Count | Shipped tools |
 |------|------:|---------------|
@@ -202,7 +202,7 @@ ${tierRows}
 
 **Tier semantics**
 
-- **A** — Dedicated calculator form in \`Calculators.jsx\` (client-side scoring).
+- **A** — Dedicated calculator form in \`Calculators.tsx\` (client-side scoring).
 - **B** — Chat-assisted from calculators hub (structured chat seed, no standalone form).
 - **C** — Full page + registered POST \`/api/tools/:id/execute\` (SOFA, drug checker, lab interpreter).
 - **clinical-page** — Protocols, diagnosis assistant, procedure guide (chat via \`POST /api/chat/message\`).
@@ -237,7 +237,7 @@ ${spaAreas}
 
 ### Marketing / discovery feature inventory (${c.marketingFeatureInventory})
 
-Six clinical tool prompts plus ten platform capability entries in \`src/data/featureInventory.js\`:
+Six clinical tool prompts plus ten platform capability entries in \`src/data/featureInventory.ts\`:
 
 ${marketing}
 

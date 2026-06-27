@@ -41,7 +41,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 const emergencyRoleMock = vi.hoisted(() => {
-  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.js');
+  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.ts');
   return withEmergencyRoleMock({ role: 'physician', nearestRoute: () => '/emergency/whiteboard' });
 });
 
@@ -111,9 +111,9 @@ vi.mock('../components/ReassessmentDrawer', () => ({
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellSource = readFileSync(join(__dirname, '../components/AppShell.tsx'), 'utf8');
-const navigationConfig = readFileSync(join(__dirname, '../config/navigation.config.js'), 'utf8');
+const navigationConfig = readFileSync(join(__dirname, '../config/navigation.config.ts'), 'utf8');
 const commandPaletteSource = readFileSync(
-  join(__dirname, '../config/commandPalette.config.js'),
+  join(__dirname, '../config/commandPalette.config.ts'),
   'utf8',
 );
 

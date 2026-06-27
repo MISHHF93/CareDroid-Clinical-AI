@@ -104,7 +104,7 @@ function buildFromRegistry(reg) {
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || reg.initialCalc || null,
     chatOnlyForm: false,
     accessSummary: null as any,
-    source: matchedNlu ? 'toolRegistry + NLU' : 'toolRegistry.js',
+    source: matchedNlu ? 'toolRegistry + NLU' : 'toolRegistry.ts',
     registryOnly: !matchedNlu,
   };
 }

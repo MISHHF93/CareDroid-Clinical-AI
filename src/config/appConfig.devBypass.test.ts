@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appConfigSource = readFileSync(join(__dirname, 'appConfig.js'), 'utf8');
+const appConfigSource = readFileSync(join(__dirname, 'appConfig.ts'), 'utf8');
 
 describe('dev auth bypass production guard', () => {
   it('defaults on for local dev and allows explicit hosted demo exposure', () => {

@@ -38,7 +38,7 @@ import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInve
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..');
-const appSource = readFileSync(join(repoRoot, 'src', 'app', 'router.jsx'), 'utf8');
+const appSource = readFileSync(join(repoRoot, 'src', 'app', 'router.tsx'), 'utf8');
 const activeAppShellSource = readFileSync(join(repoRoot, 'src', 'components', 'AppShell.tsx'), 'utf8');
 
 const PRIMARY_SCREEN_MODES = Object.freeze([

@@ -19,7 +19,7 @@ import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
 import { PR1_ALL_ALIAS_PAIRS, PR1_CALC_QUERY_BY_REGISTRY_ID } from './pr1TestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 
 describe('PR1 coverage — catalog & discovery', () => {
   it('includes each PR1 tool in catalog rows with NLU source and chat affordances', () => {

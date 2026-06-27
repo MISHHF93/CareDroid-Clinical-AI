@@ -122,7 +122,7 @@ describe('canonical tool inventory', () => {
       expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
       expect(record.requestDto, record.id).toContain('ExecuteToolDto');
       expect(record.responseDto, record.id).toContain('ToolExecutionResponseDto');
-      expect(record.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+      expect(record.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.ts');
     }
   });
 
@@ -184,18 +184,18 @@ describe('canonical tool inventory', () => {
         if (record.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) {
           expect(record.orchestratorToolId, record.id).toBeTruthy();
           expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
-          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.ts');
         } else {
           expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.PLATFORM);
           expect(record.orchestratorToolId, record.id).toBeFalsy();
-          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.js');
+          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.ts');
         }
       }
 
       if (record.hasDedicatedForm) {
         expect(record.calculatorSlug, record.id).toBeTruthy();
         expect(calculatorRoutes.has(record.route), record.id).toBe(true);
-        expect(record.component, record.id).toBe('src/pages/tools/Calculators.jsx');
+        expect(record.component, record.id).toBe('src/pages/tools/Calculators.tsx');
       }
 
       if (
@@ -250,7 +250,7 @@ describe('canonical tool inventory', () => {
     expect(resolveToolInventoryRecord('qsofa', records)).toMatchObject({
       id: 'qsofa',
       calculatorSlug: 'qsofa',
-      component: 'src/pages/tools/Calculators.jsx',
+      component: 'src/pages/tools/Calculators.tsx',
     });
     expect(getUserFacingToolInventory(records).find((record) => record.id === 'qsofa')).toMatchObject({
       id: 'qsofa',
@@ -317,7 +317,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/ambient-scribe/generate',
-      component: 'src/pages/tools/AmbientScribe.jsx',
+      component: 'src/pages/tools/AmbientScribe.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       permissionPolicy: {
         permissions: ['READ_PHI', 'USE_AI_CHAT'],
@@ -334,7 +334,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'calculator-recommender-ai',
       route: '/tools/calculator-recommender',
-      component: 'src/pages/tools/CalculatorRecommender.jsx',
+      component: 'src/pages/tools/CalculatorRecommender.tsx',
       nluToolId: 'calculator-recommender-ai',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       executorStatus: TOOL_EXECUTOR_STATUS.UNSUPPORTED,
@@ -349,7 +349,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/guideline-rag/query',
-      component: 'src/pages/tools/GuidelineRag.jsx',
+      component: 'src/pages/tools/GuidelineRag.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       permissionPolicy: {
         permissions: ['USE_AI_CHAT'],
@@ -369,7 +369,7 @@ describe('canonical tool inventory', () => {
       nluToolId: 'differential-ai',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/differential-ai/generate',
-      component: 'src/pages/tools/DifferentialAi.jsx',
+      component: 'src/pages/tools/DifferentialAi.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       riskLevel: 'high',
     });
@@ -383,7 +383,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/timeline-ai/generate',
-      component: 'src/pages/tools/TimelineAi.jsx',
+      component: 'src/pages/tools/TimelineAi.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       riskLevel: 'high',
     });
@@ -397,7 +397,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/patient-summary-ai/generate',
-      component: 'src/pages/tools/PatientSummaryAi.jsx',
+      component: 'src/pages/tools/PatientSummaryAi.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       riskLevel: 'high',
     });
@@ -411,7 +411,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/order-set-ai/generate',
-      component: 'src/pages/tools/OrderSetAi.jsx',
+      component: 'src/pages/tools/OrderSetAi.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       riskLevel: 'high',
     });
@@ -425,7 +425,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/ai-explainability/trace',
-      component: 'src/pages/tools/AiExplainability.jsx',
+      component: 'src/pages/tools/AiExplainability.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       riskLevel: 'high',
     });
@@ -439,7 +439,7 @@ describe('canonical tool inventory', () => {
       tier: 'C',
       launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/clinical-audit/execution-logs',
-      component: 'src/pages/tools/ClinicalAudit.jsx',
+      component: 'src/pages/tools/ClinicalAudit.tsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
       permissionPolicy: {
         permissions: ['VIEW_AUDIT_LOGS'],

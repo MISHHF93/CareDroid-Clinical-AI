@@ -10,7 +10,7 @@
  *   method: string,
  *   path: string,
  *   client: string,
- *   capability?: keyof import('../config/backendApiCapabilities.js').BACKEND_API_CAPABILITIES,
+ *   capability?: keyof import('../config/backendApiCapabilities.ts').BACKEND_API_CAPABILITIES,
  *   notes?: string
  * }} FrontendApiCall */
 

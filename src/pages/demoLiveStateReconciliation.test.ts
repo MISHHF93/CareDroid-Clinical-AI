@@ -19,7 +19,7 @@ const clinicalAiAnalyticsPages = [
   './SimulationScenarioPlayer.jsx',
   './SimulationOutcomes.jsx',
   './LaboratoryDashboard.jsx',
-  './tools/LabInterpreter.jsx',
+  './tools/LabInterpreter.tsx',
   './Medical3DViewer.jsx',
   './AiCommandCenterDashboard.jsx',
   './AiEvaluationDashboard.jsx',
@@ -27,7 +27,7 @@ const clinicalAiAnalyticsPages = [
   './AnalyticsDashboard.jsx',
   './CostAnalyticsDashboard.jsx',
   './GovernanceRegistry.jsx',
-  './platform/PlatformGovernanceWorkspace.jsx',
+  './platform/PlatformGovernanceWorkspace.tsx',
 ];
 
 describe('demo/live state reconciliation coverage', () => {
@@ -56,10 +56,10 @@ describe('demo/live state reconciliation coverage', () => {
       './HospitalMapDashboard.jsx',
       './DeviceFleetManagement.jsx',
       './LiveTrackingMap.jsx',
-      './tools/LabInterpreter.jsx',
+      './tools/LabInterpreter.tsx',
       './Medical3DViewer.jsx',
       './PredictiveAnalyticsDashboard.jsx',
-      './platform/PlatformGovernanceWorkspace.jsx',
+      './platform/PlatformGovernanceWorkspace.tsx',
     ].map(readPage).join('\n');
 
     expect(source).toContain('DEMO_LIVE_STATES.BACKEND_UNAVAILABLE');

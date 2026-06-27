@@ -56,15 +56,15 @@ const MERGE_DUPLICATES = Object.freeze([
   },
   {
     id: 'notification-services-dual',
-    primary: 'src/services/NotificationService.js',
-    duplicate: 'src/services/notifications/NotificationService.js',
+    primary: 'src/services/NotificationService.ts',
+    duplicate: 'src/services/notifications/NotificationService.ts',
     route: '—',
     note: 'Nested service is legacy queue-style compatibility only; active app client is src/services/NotificationService.js.',
   },
 ]);
 
 const EXPECTED_LEGACY_NON_ROUTE_FILES = new Set([
-  'src/pages/tools/Calculators.jsx',
+  'src/pages/tools/Calculators.tsx',
   'src/pages/CommandDashboard.jsx',
   'src/pages/fleet/FleetDashboardWidgets.jsx',
   'src/pages/SimulationLaboratoryViewer.css',
@@ -106,7 +106,7 @@ function buildProductionCorpus() {
 }
 
 function parseAppRoutePaths() {
-  const app = readRepoFile('src/app/router.jsx');
+  const app = readRepoFile('src/app/router.tsx');
   const directPaths = [...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
   const jsxLiteralPaths = [...app.matchAll(/<Route\b[^>]*\spath=["']([^"']+)["']/g)].map((m) => m[1]);
   const jsxCanonicalRoutePaths = [...app.matchAll(/path=\{CANONICAL_ROUTES\.([A-Za-z0-9_]+)\}/g)]
@@ -204,7 +204,7 @@ function classifyItem({ referenced, inAppRoutes, inNav, inInventory, isRedirectA
 
 function collectCanonicalNavPaths() {
   const paths: Set<any> = new Set(Object.values(CANONICAL_ROUTES));
-  const nav = readRepoFile('src/config/navigation.config.js');
+  const nav = readRepoFile('src/config/navigation.config.ts');
   for (const m of nav.matchAll(/['"](\/[^'"]+)['"]/g)) {
     paths.add(m[1]);
   }
@@ -765,7 +765,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '- Prior manual scan: [unwired-orphan-code-scan.md](./unwired-orphan-code-scan.md)',
     '- Backend-only exposure: [orphaned-backend-functions.md](./orphaned-backend-functions.md)',
-    '- Generator: `src/data/orphanDetectionAudit.js`',
+    '- Generator: `src/data/orphanDetectionAudit.ts`',
     ''
   );
 

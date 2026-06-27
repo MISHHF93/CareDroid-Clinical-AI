@@ -13,7 +13,7 @@ import {
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 
 const PR2_TIER_A_COMPONENTS = Object.freeze({

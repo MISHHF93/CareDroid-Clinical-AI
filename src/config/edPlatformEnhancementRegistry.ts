@@ -36,7 +36,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
       'src/pages/emergency/SelfArrivalCheckIn.tsx',
       'src/services/selfCheckinService.ts',
       'src/engine/selfArrivalTriageEngine.ts',
-      'src/services/smartIntakeApi.js',
+      'src/services/smartIntakeApi.ts',
     ],
     gapSummary: 'Patient-facing capture exists; live EHR write-back and kiosk device enrollment remain tenant-configured.',
   },
@@ -71,7 +71,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     maturity: 'partial',
     humanReviewRequired: false,
     primarySurfaces: ['/emergency/boarding', '/emergency/capacity'],
-    implementationHooks: ['backend/src/services/boarding.service.ts', 'src/layout/AppShell.jsx'],
+    implementationHooks: ['backend/src/services/boarding.service.ts', 'src/layout/AppShell.tsx'],
     gapSummary: 'Backend boarding APIs are live; frontend intelligence layer still uses demo fixtures in places.',
   },
   {
@@ -106,7 +106,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     primarySurfaces: ['/emergency/reception', '/emergency/whiteboard', '/emergency/ems'],
     implementationHooks: [
       'src/services/preArrivalWorkflow.ts',
-      'src/pages/emergency/ReceptionWorkspace.jsx',
+      'src/pages/emergency/ReceptionWorkspace.tsx',
     ],
     gapSummary: 'Placeholder registration and arrival check-in normalized; live CAD/FHIR EMS feed still integration-dependent.',
   },
@@ -133,7 +133,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     primarySurfaces: ['/emergency/ems', '/emergency/reception'],
     implementationHooks: [
       'src/services/preArrivalNotification.ts',
-      'src/components/ems/PreArrivalNotificationForm.jsx',
+      'src/components/ems/PreArrivalNotificationForm.tsx',
       'src/services/preArrivalWorkflow.ts',
     ],
     gapSummary: 'Electronic MIST/SBAR forms and placeholder cards implemented; live CAD/ePCR auto-population remains integration-dependent.',
@@ -160,7 +160,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     primarySurfaces: ['/emergency/ems'],
     implementationHooks: [
       'src/services/handoffClose.ts',
-      'src/components/ems/HandoffClosePanel.jsx',
+      'src/components/ems/HandoffClosePanel.tsx',
     ],
     gapSummary: 'Receiving clinician confirmation checkpoint added; EHR documentation write-back is planned.',
   },

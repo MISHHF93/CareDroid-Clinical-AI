@@ -12,7 +12,7 @@ import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const mentalHealthUiSource = readFileSync(
-  join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'),
+  join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
 

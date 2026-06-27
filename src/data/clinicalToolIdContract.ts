@@ -4,14 +4,14 @@
  * ## Canonical layers (one direction of truth)
  * | Layer | Constant | Used in |
  * |-------|----------|---------|
- * | Sidebar / workspace | `REGISTRY.*` | `toolRegistry.js`, App routes, catalog `sidebarToolId` |
+ * | Sidebar / workspace | `REGISTRY.*` | `toolRegistry.ts`, App routes, catalog `sidebarToolId` |
  * | NLU / backend patterns | `NLU.*` | `clinicalIntentTools`, `tool.patterns.ts` |
  * | Calculator UI slug | `BUILTIN_CALC.*` | `Calculators.jsx`, `?calc=`, `builtinUiCalculators` |
  *
  * ## Migration (new tool)
  * 1. Add `REGISTRY.*` and, if NLU id differs, `NLU.*` here.
  * 2. Append to the correct `CANONICAL_TOOL_GROUPS` tier list below.
- * 3. Update `toolRegistry.js`, `clinicalIntentToolCatalog.js`, `tool.patterns.ts`.
+ * 3. Update `toolRegistry.ts`, `clinicalIntentToolCatalog.ts`, `tool.patterns.ts`.
  * 4. Add phrase aliases to `NLU_TO_REGISTRY_ID` only when needed for catalog/cost-tracking.
  * 5. If POST `/api/tools/:id/execute` — add `registerTool()` backend + `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS`.
  *
@@ -64,7 +64,7 @@ export const TOOL_LAUNCH_PATHS = Object.freeze({
   routeOptimizer: '/fleet/route-optimizer',
 });
 
-/** Canonical sidebar / registry ids (`toolRegistry.js`). */
+/** Canonical sidebar / registry ids (`toolRegistry.ts`). */
 export const REGISTRY = Object.freeze({
   drugCheck: 'drug-check',
   labInterp: 'lab-interp',
@@ -1869,7 +1869,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
   backendExecutors: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 });
 
-/** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
+/** Every `toolRegistry.ts` id — must match registry file exactly (drift tests). */
 export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.aiSystems,
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,

@@ -28,7 +28,7 @@ import { PR2_DISCOVERY_ALIAS_PAIRS } from './pr2TestConstants';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const HUB = '/tools/calculators';
 
 const EMPTY_LAUNCH = {

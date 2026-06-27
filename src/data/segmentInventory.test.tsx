@@ -38,7 +38,7 @@ import { PRIMARY_NAV_BY_ID, getPrimaryNavItemForPath } from '../navigation/prima
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
-const appSource = readFileSync(join(srcRoot, 'App.jsx'), 'utf8');
+const appSource = readFileSync(join(srcRoot, 'App.tsx'), 'utf8');
 
 const requiredFields = [
   'id',

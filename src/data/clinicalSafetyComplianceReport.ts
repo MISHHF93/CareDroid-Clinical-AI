@@ -23,7 +23,7 @@ function defaultReadFile(relPath) {
 
 /**
  * @param {object} [options]
- * @param {import('./clinicalIntentToolCatalog.js').clinicalIntentTools} [options.tools]
+ * @param {import('./clinicalIntentToolCatalog.ts').clinicalIntentTools} [options.tools]
  * @param {(relPath: string) => string} [options.readFile]
  * @param {string[]} [options.launchToolIds]
  */

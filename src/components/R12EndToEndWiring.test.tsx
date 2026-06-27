@@ -32,7 +32,7 @@ vi.mock('sonner', () => ({
 }));
 
 const emergencyRoleMock = vi.hoisted(() => {
-  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.js');
+  const { withEmergencyRoleMock } = require('../test/permissiveEmergencyRoleMock.ts');
   return withEmergencyRoleMock({ switchDemoRole: vi.fn() });
 });
 

@@ -17,9 +17,9 @@ const tokenFiles = [
   'styles/surface-normalization.css',
   'styles/medical-card-layer.css',
   'styles/card-contrast-normalization.css',
-  'config/theme.tokens.js',
+  'config/theme.tokens.ts',
   'config/medicalTheme.constants.ts',
-  'main.jsx',
+  'main.tsx',
 ].map((file) => readFileSync(join(srcRoot, file), 'utf8'));
 
 const cssBundle = globSync('src/**/*.css', {

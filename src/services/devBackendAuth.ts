@@ -70,6 +70,9 @@ export function readDevTenantContext() {
 /**
  * In local dev, replace the static bypass token with a real backend JWT + tenant context.
  * Safe no-op when not in dev or when a JWT is already stored.
+ *
+ * When VITE_ALLOW_LOCAL_DEMO_AUTH=true and no backend URL is configured,
+ * skips the network call entirely to prevent ERR_CONNECTION_REFUSED in the browser.
  */
 export async function ensureDevBackendSession({ force = false }: any = {}) {
   if (!isDev) return { token: readStoredToken(), source: 'production' };
@@ -79,6 +82,14 @@ export async function ensureDevBackendSession({ force = false }: any = {}) {
     const tenantContext = readDevTenantContext();
     if (tenantContext) setTenantContext(tenantContext);
     return { token: existingToken, source: 'cached-jwt' };
+  }
+
+  // When local demo auth is allowed and no backend API URL is configured,
+  // skip the network request — it will fail with ECONNREFUSED since there's no backend.
+  const localDemoAllowed = appConfig.features.allowLocalDemoAuth;
+  const hasBackendUrl = Boolean(appConfig.api.baseUrl);
+  if (localDemoAllowed && !hasBackendUrl && !force) {
+    return { token: existingToken || BYPASS_TOKEN, source: 'local-demo-bypass' };
   }
 
   try {

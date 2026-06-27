@@ -23,10 +23,10 @@ const mobilePrCss = readFileSync(
   join(__dirname, '../../styles/calculators-mobile-pr.css'),
   'utf8'
 );
-const calculatorsJsx = readFileSync(join(__dirname, 'Calculators.jsx'), 'utf8');
-const calculatorPrimitivesJsx = readFileSync(join(__dirname, 'calculatorPrimitives.jsx'), 'utf8');
-const pr4aJsx = readFileSync(join(__dirname, 'pr4aCalculators.jsx'), 'utf8');
-const mentalJsx = readFileSync(join(__dirname, 'mentalHealthCalculators.jsx'), 'utf8');
+const calculatorsJsx = readFileSync(join(__dirname, 'Calculators.tsx'), 'utf8');
+const calculatorPrimitivesJsx = readFileSync(join(__dirname, 'calculatorPrimitives.tsx'), 'utf8');
+const pr4aJsx = readFileSync(join(__dirname, 'pr4aCalculators.tsx'), 'utf8');
+const mentalJsx = readFileSync(join(__dirname, 'mentalHealthCalculators.tsx'), 'utf8');
 
 /** User-scoped Tier A calculators (forms in Calculators / PR4A / mental health modules). */
 export const TIER_A_FORM_CALCULATOR_IDS = Object.freeze([

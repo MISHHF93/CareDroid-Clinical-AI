@@ -7,9 +7,9 @@ import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInve
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
-const appSource = readFileSync(join(srcRoot, 'app', 'router.jsx'), 'utf8');
+const appSource = readFileSync(join(srcRoot, 'app', 'router.tsx'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
-const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
+const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.tsx'), 'utf8');
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 
 const routeNamesByPath = Object.entries(CANONICAL_ROUTES).reduce((map, [name, path]) => {

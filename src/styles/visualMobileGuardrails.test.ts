@@ -9,7 +9,7 @@ const read = (path) => readFileSync(join(srcRoot, path), 'utf8');
 
 describe('visual and mobile entropy guardrails', () => {
   it('keeps legacy public notices shell-safe without 100vw viewport overflow', () => {
-    ['pages/GDPRNotice.jsx', 'pages/HIPAANotice.jsx', 'pages/HelpCenter.jsx'].forEach((path) => {
+    ['pages/GDPRNotice.tsx', 'pages/HIPAANotice.tsx', 'pages/HelpCenter.tsx'].forEach((path) => {
       const source = read(path);
 
       expect(source).not.toContain("width: '100vw'");

@@ -87,7 +87,7 @@ export function formatRegressionMarkdown() {
   const lines = [
     '# Regression checklist — production promotion',
     '',
-    'Canonical source: `src/data/e2eRegressionChecklist.js`.',
+    'Canonical source: `src/data/e2eRegressionChecklist.ts`.',
     '',
   ];
   for (const group of E2E_REGRESSION_CHECKLIST) {

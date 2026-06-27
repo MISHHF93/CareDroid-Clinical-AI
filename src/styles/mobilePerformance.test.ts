@@ -16,7 +16,7 @@ function read(rel) {
 
 describe('mobile performance — startup deferral', () => {
   it('main.jsx schedules deferred startup instead of sync service imports', () => {
-    const main = read('src/main.jsx');
+    const main = read('src/main.tsx');
     expect(main).toContain('scheduleDeferredStartupTasks');
     expect(main).not.toMatch(/import\s+.*from\s+['"].*offlineService/);
     expect(main).not.toMatch(/import\s+.*from\s+['"].*crashReportingService/);
@@ -24,7 +24,7 @@ describe('mobile performance — startup deferral', () => {
   });
 
   it('deferStartupTasks dynamically imports heavy services', () => {
-    const defer = read('src/utils/deferStartupTasks.js');
+    const defer = read('src/utils/deferStartupTasks.ts');
     expect(defer).toContain("import('../services/offlineService')");
     expect(defer).toContain("import('../services/crashReportingService')");
     expect(defer).toMatch(/runAfterFirstPaint/);
@@ -33,7 +33,7 @@ describe('mobile performance — startup deferral', () => {
 
 describe('mobile performance — routing & bundles', () => {
   it('keeps Copilot persistent instead of mounting a duplicate assistant page', () => {
-    const app = read('src/app/router.jsx');
+    const app = read('src/app/router.tsx');
     const appShell = read('src/components/AppShell.tsx');
     expect(app).not.toMatch(/pages\/Dashboard/);
     expect(appShell).toContain('<CopilotPanel />');
@@ -42,7 +42,7 @@ describe('mobile performance — routing & bundles', () => {
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
-    const vite = read('vite.config.js');
+    const vite = read('vite.config.ts');
     expect(vite).toContain("'calculators'");
     expect(vite).toContain("'clinical-catalog'");
     expect(vite).toContain("'dashboard'");
@@ -51,7 +51,7 @@ describe('mobile performance — routing & bundles', () => {
   });
 
   it('does not use artificial auth gates in the flattened app shell', () => {
-    const app = read('src/app/router.jsx');
+    const app = read('src/app/router.tsx');
     expect(app).not.toContain('setIsChecking(false), 500');
     expect(app).not.toContain('setIsChecking(false), 150');
   });
@@ -66,15 +66,15 @@ describe('mobile performance — CLS & images', () => {
   });
 
   it('images use lazy loading where avatars are rendered', () => {
-    const workloadPanel = read('src/components/WorkloadBalancePanel.jsx');
+    const workloadPanel = read('src/components/WorkloadBalancePanel.tsx');
     expect(workloadPanel).toContain('loading="lazy"');
   });
 });
 
 describe('mobile performance — render & interaction', () => {
   it('memoizes ToolCard and removes the duplicate assistant dashboard page', () => {
-    expect(read('src/components/ToolCard.jsx')).toContain('React.memo');
-    const app = read('src/app/router.jsx');
+    expect(read('src/components/ToolCard.tsx')).toContain('React.memo');
+    const app = read('src/app/router.tsx');
     expect(app).not.toContain("import Dashboard from './pages/Dashboard'");
   });
 

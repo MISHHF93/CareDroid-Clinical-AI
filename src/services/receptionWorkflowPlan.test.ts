@@ -12,10 +12,10 @@ function read(relativePath) {
 
 describe('reception architecture plan execution', () => {
   it('wires duplicate prevention across reception surfaces', () => {
-    const reception = read('pages/emergency/ReceptionWorkspace.jsx');
-    const smartIntake = read('pages/emergency/SmartIntake.jsx');
+    const reception = read('pages/emergency/ReceptionWorkspace.tsx');
+    const smartIntake = read('pages/emergency/SmartIntake.tsx');
     const quickIntake = read('components/QuickIntake.tsx');
-    const verification = read('components/verification/PatientVerificationExperience.jsx');
+    const verification = read('components/verification/PatientVerificationExperience.tsx');
 
     expect(reception).toContain('DuplicatePatientBanner');
     expect(reception).toContain('openVerificationFromDuplicate');
@@ -35,7 +35,7 @@ describe('reception architecture plan execution', () => {
   it('wires encounter automation after intake', () => {
     const handoff = read('services/receptionHandoff.ts');
     const intakeEncounter = read('services/intakeEncounter.ts');
-    const settings = read('pages/emergency/EmergencySettings.jsx');
+    const settings = read('pages/emergency/EmergencySettings.tsx');
 
     expect(handoff).toContain('completeIntakeHandoff');
     expect(handoff).toContain('ensureEncounterAfterIntake');
@@ -51,7 +51,7 @@ describe('reception architecture plan execution', () => {
     const queueAssignment = read('services/queueAssignment.ts');
     const patientCard = read('components/PatientCard.tsx');
     const whiteboard = read('pages/emergency/index.tsx');
-    const smartIntake = read('pages/emergency/SmartIntake.jsx');
+    const smartIntake = read('pages/emergency/SmartIntake.tsx');
 
     expect(handoff).toContain('enterTriageQueue');
     expect(handoff).toContain('completeIntakeHandoff');
@@ -67,11 +67,11 @@ describe('reception architecture plan execution', () => {
   });
 
   it('keeps smart intake promotion paths', () => {
-    const permissions = read('config/emergencyRolePermissions.js');
-    const reception = read('pages/emergency/ReceptionWorkspace.jsx');
+    const permissions = read('config/emergencyRolePermissions.ts');
+    const reception = read('pages/emergency/ReceptionWorkspace.tsx');
     const header = read('components/Header.tsx');
-    const smartIntake = read('pages/emergency/SmartIntake.jsx');
-    const queueModel = read('components/reception/receptionQueueModel.js');
+    const smartIntake = read('pages/emergency/SmartIntake.tsx');
+    const queueModel = read('components/reception/receptionQueueModel.ts');
 
     expect(permissions).toContain('getReceptionEmbeddedIntakePath');
     expect(reception).toContain('RECEPTION_COPY');
@@ -100,7 +100,7 @@ describe('reception architecture plan execution', () => {
     const search = read('utils/patientSearch.ts');
     const header = read('components/Header.tsx');
     const commandPalette = read('components/CommandPalette.tsx');
-    const queueModel = read('components/reception/receptionQueueModel.js');
+    const queueModel = read('components/reception/receptionQueueModel.ts');
 
     expect(search).toContain('rankPatientsBySearch');
     expect(header).toContain('PatientSearchResults');

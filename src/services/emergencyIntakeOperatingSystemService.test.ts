@@ -156,9 +156,9 @@ describe('EmergencyIntakeOperatingSystemService', () => {
           '/workspace/emergency/triage',
         ]),
         tests: expect.arrayContaining([
-          'src/services/emergencyIntakeOperatingSystemService.test.js',
-          'src/services/emergencyOperatingSystemService.test.js',
-          'src/services/workspaceDataPipelineService.test.js',
+          'src/services/emergencyIntakeOperatingSystemService.test.ts',
+          'src/services/emergencyOperatingSystemService.test.ts',
+          'src/services/workspaceDataPipelineService.test.ts',
           'src/pages/WorkspaceHome.test.jsx',
         ]),
       })

@@ -46,7 +46,7 @@ import {
 } from './wiringAuditTestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -54,9 +54,9 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const mentalHealthSource = readFileSync(
-  join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'),
+  join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
 const _hubIdx = appSource.indexOf("path: '/tools/calculators', element:");

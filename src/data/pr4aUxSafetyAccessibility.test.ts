@@ -17,7 +17,7 @@ import {
 } from './clinicalIntentToolCatalog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pr4aCalculatorsSource = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.jsx'), 'utf8');
+const pr4aCalculatorsSource = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.tsx'), 'utf8');
 
 const CERTAINTY_PATTERN =
   /\b(confirmed diagnosis|definitely has|diagnosis established|rules out ckd|ruled out|excluded osa|has alcohol use disorder)\b/i;

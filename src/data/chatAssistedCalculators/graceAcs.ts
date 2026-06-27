@@ -1,7 +1,7 @@
 /**
  * Tier-B chat-assisted configuration for GRACE ACS (no dedicated Calculators.jsx form).
  *
- * Scoring logic: `src/utils/graceAcsCalculator.js` (GRACE 2.0 admission logistic models).
+ * Scoring logic: `src/utils/graceAcsCalculator.ts` (GRACE 2.0 admission logistic models).
  * Tier C (`grace-acs-calculator` executor): deferred — evaluate if server attestation or API
  * integrators require POST /tools/:id/execute; client utils are sufficient for validated math.
  */

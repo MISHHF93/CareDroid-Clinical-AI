@@ -13,9 +13,9 @@ import { interpretChildPughClass } from '../utils/childPughCalculator';
 import { interpretHasBled } from '../utils/hasBledCalculator';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
-const calculatorPrimitivesSource = readFileSync(join(__dirname, '../pages/tools/calculatorPrimitives.jsx'), 'utf8');
+const calculatorPrimitivesSource = readFileSync(join(__dirname, '../pages/tools/calculatorPrimitives.tsx'), 'utf8');
 
 const CERTAINTY_PATTERN =
   /\b(definitely has|confirmed diagnosis|diagnosis established|rules out|ruled out|diagnostic certainty)\b/i;

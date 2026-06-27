@@ -15,8 +15,8 @@ import {
 import { ROADMAP_FRONTEND_REGISTRY_IDS } from '../../data/frontendRenderingInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, 'Calculators.jsx'), 'utf8');
-const appSource = readFileSync(join(__dirname, '../../app/router.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, 'Calculators.tsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../../app/router.tsx'), 'utf8');
 
 const ROADMAP_TIER_A_REGISTRY_IDS = [
   ...PR1_CALCULATOR_REGISTRY_IDS,

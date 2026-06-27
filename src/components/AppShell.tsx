@@ -8,7 +8,7 @@ import { useEmergencyStore, type EmergencyWebSocketStatus } from '../store/emerg
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
-import { probeBackendReachability } from '../services/backendReachability';
+import { probeBackendReachability, isBackendKnownOffline } from '../services/backendReachability';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
 import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
@@ -310,8 +310,13 @@ function AppShellFrame({ children }: AppShellProps) {
     bootstrapAiPlatformIntegrations();
     void (async () => {
       await ensureDevBackendSession();
-      await probeBackendReachability({ force: true });
-      await useEmergencyStore.getState().initializeFromBackend();
+      const backendReachable = await probeBackendReachability({ force: true });
+      if (backendReachable) {
+        await useEmergencyStore.getState().initializeFromBackend();
+      } else {
+        // No backend — stay on local/simulation data; no network calls needed
+        useEmergencyStore.setState({ backendAvailable: false, persistenceMode: 'local' });
+      }
       useEmergencyStore.getState().updateAlerts();
     })();
 
@@ -324,6 +329,9 @@ function AppShellFrame({ children }: AppShellProps) {
       },
       onPoll: async () => {
         if (isSimulationModeActive()) return;
+        // Re-probe backend; skip all network calls if still unreachable
+        const reachable = await probeBackendReachability();
+        if (!reachable || isBackendKnownOffline()) return;
         const store = useEmergencyStore.getState();
         await store.refreshAllData();
         try {

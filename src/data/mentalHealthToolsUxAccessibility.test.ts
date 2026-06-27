@@ -12,10 +12,10 @@ import {
 } from './chatAssistedHubGroups';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const chatHubGroupsSource = readFileSync(join(__dirname, './chatAssistedHubGroups.js'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const chatHubGroupsSource = readFileSync(join(__dirname, './chatAssistedHubGroups.ts'), 'utf8');
 const mentalHealthUiSource = readFileSync(
-  join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'),
+  join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
 const calculatorsCssSource = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');

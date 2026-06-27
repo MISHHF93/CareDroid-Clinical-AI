@@ -1,7 +1,7 @@
 /**
  * Tier-B chat-assisted configuration for Ottawa Ankle / Foot Rules.
  *
- * Rule logic: `src/utils/ottawaAnkleCalculator.js` (ankle + foot radiograph criteria, applicability).
+ * Rule logic: `src/utils/ottawaAnkleCalculator.ts` (ankle + foot radiograph criteria, applicability).
  * Tier B chat-assisted only — not fracture clearance; hard stops override the rule.
  */
 

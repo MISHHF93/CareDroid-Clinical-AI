@@ -66,7 +66,7 @@ import {
 } from './testHelpers/clinicalToolsTestFixtures';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -74,7 +74,7 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const _hubRouteIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
 const BACKEND_KEYWORDS_BY_TOOL = Object.freeze({

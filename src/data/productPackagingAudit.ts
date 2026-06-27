@@ -520,7 +520,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '',
     '- Validation service: `ProductCatalogValidationService` (post-seed reference checks)',
     '- Related: [solution-packs.md](./solution-packs.md), [saas-compliance-audit.md](./saas-compliance-audit.md)',
-    '- Generator: `src/data/productPackagingAudit.js`',
+    '- Generator: `src/data/productPackagingAudit.ts`',
     ''
   );
 

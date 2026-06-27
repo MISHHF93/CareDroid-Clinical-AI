@@ -30,7 +30,7 @@ describe('NotificationService', () => {
   it('is retained as a legacy queue-style compatibility client', () => {
     expect(LEGACY_NOTIFICATION_SERVICE_STATUS).toMatchObject({
       activeClient: false,
-      replacement: 'src/services/NotificationService.js',
+      replacement: 'src/services/NotificationService.ts',
       blockedCapability: 'notificationSendChannel',
     });
   });

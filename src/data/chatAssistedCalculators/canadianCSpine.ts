@@ -2,7 +2,7 @@
  * Tier-B chat-assisted configuration for Canadian C-Spine Rule (CCR).
  * No dedicated Calculators.jsx form — guided workflow only.
  *
- * Rule logic: `src/utils/canadianCSpineCalculator.js` (high/low-risk, ROM 45°, applicability).
+ * Rule logic: `src/utils/canadianCSpineCalculator.ts` (high/low-risk, ROM 45°, applicability).
  * Informational chat-assisted only unless local governance approves executable trauma workflow.
  */
 

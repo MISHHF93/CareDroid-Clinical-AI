@@ -10,31 +10,31 @@ const WIRED_SURFACE_FILES = [
   'src/components/Header.tsx',
   'src/components/CopilotPanel.tsx',
   'src/components/CommandPalette.tsx',
-  'src/components/EMSCriticalBroadcast.jsx',
-  'src/components/ReferralPanel.jsx',
+  'src/components/EMSCriticalBroadcast.tsx',
+  'src/components/ReferralPanel.tsx',
   'src/components/account/DemoPersonaPanel.tsx',
-  'src/pages/emergency/ReceptionWorkspace.jsx',
+  'src/pages/emergency/ReceptionWorkspace.tsx',
   'src/pages/emergency/pulse/index.tsx',
-  'src/pages/tools/ToolsOverview.jsx',
-  'src/pages/tools/Calculators.jsx',
-  'src/pages/tools/ToolPageLayout.jsx',
+  'src/pages/tools/ToolsOverview.tsx',
+  'src/pages/tools/Calculators.tsx',
+  'src/pages/tools/ToolPageLayout.tsx',
   'src/pages/Operations.jsx',
   'src/pages/CommandDashboard.jsx',
-  'src/pages/Patients.jsx',
+  'src/pages/Patients.tsx',
   'src/pages/commercial/CommercialPages.jsx',
   'src/pages/PlatformOSPages.jsx',
-  'src/pages/tools/ClinicalToolCatalog.jsx',
-  'src/pages/emergency/SmartIntake.jsx',
+  'src/pages/tools/ClinicalToolCatalog.tsx',
+  'src/pages/emergency/SmartIntake.tsx',
   'src/pages/HospitalMapDashboard.jsx',
-  'src/pages/platform/PlatformSystemPage.jsx',
+  'src/pages/platform/PlatformSystemPage.tsx',
   'src/pages/fleet/FleetPageChrome.jsx',
-  'src/components/reception/ArrivalMetricsPanel.jsx',
-  'src/components/EMSPipeline.jsx',
+  'src/components/reception/ArrivalMetricsPanel.tsx',
+  'src/components/EMSPipeline.tsx',
   'src/pages/emergency/index.tsx',
-  'src/pages/tools/ToolNotFound.jsx',
-  'src/pages/tools/CardiologyAssistantPage.jsx',
-  'src/navigation/registryToolLaunch.js',
-  'src/services/navigateToEmergencySurface.js',
+  'src/pages/tools/ToolNotFound.tsx',
+  'src/pages/tools/CardiologyAssistantPage.tsx',
+  'src/navigation/registryToolLaunch.ts',
+  'src/services/navigateToEmergencySurface.ts',
 ];
 
 describe('profileNavigateCoverage', () => {
@@ -49,7 +49,7 @@ describe('profileNavigateCoverage', () => {
     });
     expect(wired.length).toBeGreaterThanOrEqual(15);
     expect(wired).toContain('src/components/AppShell.tsx');
-    expect(wired).toContain('src/pages/emergency/ReceptionWorkspace.jsx');
+    expect(wired).toContain('src/pages/emergency/ReceptionWorkspace.tsx');
     expect(wired).toContain('src/pages/commercial/CommercialPages.jsx');
   });
 });

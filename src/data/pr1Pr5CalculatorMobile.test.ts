@@ -20,9 +20,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 const mobilePrCss = readFileSync(join(__dirname, '../styles/calculators-mobile-pr.css'), 'utf8');
 const mobileFirstCss = readFileSync(join(__dirname, '../styles/mobile-first-layout.css'), 'utf8');
-const calculatorsJsx = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const pr4aJsx = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.jsx'), 'utf8');
-const mentalJsx = readFileSync(join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'), 'utf8');
+const calculatorsJsx = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const pr4aJsx = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.tsx'), 'utf8');
+const mentalJsx = readFileSync(join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'), 'utf8');
 
 /** Registry ids → built-in form slugs for PR1–PR5 Tier-A forms */
 export const PR1_PR5_TIER_A_FORM_SLUGS = Object.freeze([

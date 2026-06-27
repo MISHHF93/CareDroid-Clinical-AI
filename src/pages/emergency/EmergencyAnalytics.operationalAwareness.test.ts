@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const source = readFileSync(join(process.cwd(), 'src/pages/emergency/EmergencyAnalytics.jsx'), 'utf8');
+const source = readFileSync(join(process.cwd(), 'src/pages/emergency/EmergencyAnalytics.tsx'), 'utf8');
 
 describe('Emergency Analytics operational awareness wiring', () => {
   it('surfaces central-node awareness cards for leadership review', () => {

@@ -43,8 +43,8 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('keeps /tools canonical and removes duplicate developer catalog shortcuts', () => {
-    const toolsOverview = read('pages/tools/ToolsOverview.jsx');
-    const appShell = read('layout/AppShell.jsx');
+    const toolsOverview = read('pages/tools/ToolsOverview.tsx');
+    const appShell = read('layout/AppShell.tsx');
     expect(toolsOverview).not.toContain("navigate('/tools/catalog')");
     expect(appShell).not.toContain("navigate('/tools/catalog')");
     expect(appShell).not.toContain('Browse All Tools');

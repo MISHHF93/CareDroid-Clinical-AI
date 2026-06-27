@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
+const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const recoveryCss = readFileSync(join(__dirname, 'mobile-first-recovery.css'), 'utf8');
 
 describe('mobile-first recovery layer', () => {

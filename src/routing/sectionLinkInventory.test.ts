@@ -20,7 +20,7 @@ const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8')
 const visibleLinkInventory = [
   ...APP_SHELL_NAV_ITEMS.map((item) => [
     `Primary ${item.label} nav`,
-    'config/navigation.config.js',
+    'config/navigation.config.ts',
     item.path,
   ]),
 ];
@@ -35,14 +35,14 @@ const canonicalRoutes = new Set([
 ]);
 
 const userFacingLinkFiles = [
-  'layout/AppShell.jsx',
+  'layout/AppShell.tsx',
   'pages/PlatformEntryHub.jsx',
-  'pages/Profile.jsx',
-  'pages/ProfileSettings.jsx',
-  'pages/Settings.jsx',
-  'pages/tools/ToolsOverview.jsx',
-  'pages/tools/ToolNotFound.jsx',
-  'pages/tools/ToolsAreaFallback.jsx',
+  'pages/Profile.tsx',
+  'pages/ProfileSettings.tsx',
+  'pages/Settings.tsx',
+  'pages/tools/ToolsOverview.tsx',
+  'pages/tools/ToolNotFound.tsx',
+  'pages/tools/ToolsAreaFallback.tsx',
 ];
 
 const navigationConfigPaths = [
@@ -55,7 +55,7 @@ const navigationConfigPaths = [
 describe('section link inventory and route flattening', () => {
   it.each(visibleLinkInventory)('%s uses canonical route %s', (_label, file, route) => {
     expect(canonicalRoutes.has(route), `${file} -> ${route}`).toBe(true);
-    if (file === 'config/navigation.config.js') {
+    if (file === 'config/navigation.config.ts') {
       expect(navigationConfigPaths, route).toContain(route);
     } else {
       expect(read(file), file).toContain(route);
@@ -68,12 +68,12 @@ describe('section link inventory and route flattening', () => {
         expect.objectContaining({ path: '/catalog', to: '/emergency/tools' }),
       ]),
     );
-    expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
-    expect(read('layout/AppShell.jsx')).not.toContain("navigate('/tools/catalog')");
+    expect(read('pages/tools/ToolsOverview.tsx')).not.toContain("navigate('/tools/catalog')");
+    expect(read('layout/AppShell.tsx')).not.toContain("navigate('/tools/catalog')");
   });
 
   it('keeps user-facing calculator registry paths on plural canonical routes', () => {
-    const registry = read('data/toolRegistry.js');
+    const registry = read('data/toolRegistry.ts');
     expect(registry).toContain("path: '/tools/calculators/sofa'");
     expect(registry).toContain("path: '/tools/calculators/gfr'");
     expect(registry).toContain("path: '/tools/calculators/bmi'");
@@ -82,7 +82,7 @@ describe('section link inventory and route flattening', () => {
   });
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
-    const app = read('app/router.jsx');
+    const app = read('app/router.tsx');
     expect(app).not.toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([

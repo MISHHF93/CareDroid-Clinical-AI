@@ -19,22 +19,22 @@ export const PLATFORM_CAPABILITY_MATRIX_STATUSES = Object.freeze({
 });
 
 const DEFAULT_PLATFORM_TEST_COVERAGE = Object.freeze([
-  'src/data/platformSystemsExpansionPlan.test.js',
-  'src/data/backendFrontendExposure.test.js',
+  'src/data/platformSystemsExpansionPlan.test.ts',
+  'src/data/backendFrontendExposure.test.ts',
   'backend/src/modules/platform-systems/platform-systems.controller.spec.ts',
 ]);
 
 const DASHBOARD_TEST_COVERAGE = Object.freeze([
-  'src/data/platformOperatingSystem.test.js',
-  'src/test/routePagesSmoke.test.jsx',
-  'src/routing/routeHealth.test.js',
+  'src/data/platformOperatingSystem.test.ts',
+  'src/test/routePagesSmoke.test.tsx',
+  'src/routing/routeHealth.test.ts',
 ]);
 
 const TEST_COVERAGE_PATH_ALIASES = Object.freeze({
-  'platformSystemsExpansionPlan.test.js': 'src/data/platformSystemsExpansionPlan.test.js',
-  'routePagesSmoke.test.jsx': 'src/test/routePagesSmoke.test.jsx',
-  'App.permissions.test.jsx': 'src/App.permissions.test.jsx',
-  'platformResponsive.test.jsx': 'src/styles/responsiveUx.test.js',
+  'platformSystemsExpansionPlan.test.ts': 'src/data/platformSystemsExpansionPlan.test.ts',
+  'routePagesSmoke.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'App.permissions.test.tsx': 'src/App.permissions.test.tsx',
+  'platformResponsive.test.jsx': 'src/styles/responsiveUx.test.ts',
 });
 
 const FOUNDATION_CAPABILITIES = Object.freeze([
@@ -46,7 +46,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'open command center',
     backendService: 'PersonalizationService',
     apiEndpoint: 'GET /api/personalization/me/recommendations',
-    testCoverage: ['src/pages/CommandDashboard.test.jsx', 'src/data/commandDashboardModel.test.js'],
+    testCoverage: ['src/pages/CommandDashboard.test.jsx', 'src/data/commandDashboardModel.test.ts'],
   },
   {
     id: 'assistant',
@@ -56,7 +56,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'ask caredroid',
     backendService: 'ChatService',
     apiEndpoint: 'POST /api/chat/message',
-    testCoverage: ['src/components/ChatInterface.nlu.test.jsx', 'src/utils/chatCapabilitySuggestions.test.js'],
+    testCoverage: ['src/components/ChatInterface.nlu.test.tsx', 'src/utils/chatCapabilitySuggestions.test.ts'],
   },
   {
     id: 'hospital-map',
@@ -66,7 +66,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show map',
     backendService: 'FloorService / RoomService / DeviceLocationService',
     apiEndpoint: 'GET /api/hospital-map/floors',
-    testCoverage: ['src/pages/HospitalMapDashboard.test.jsx', 'src/services/hospitalMapService.test.js'],
+    testCoverage: ['src/pages/HospitalMapDashboard.test.jsx', 'src/services/hospitalMapService.test.ts'],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -77,7 +77,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show telemetry',
     backendService: 'TelemetryService / DeviceRegistryService / AlertService',
     apiEndpoint: 'GET /api/telemetry/live',
-    testCoverage: ['src/pages/MedicalIotDashboard.test.jsx', 'src/services/medicalIotService.test.js'],
+    testCoverage: ['src/pages/MedicalIotDashboard.test.jsx', 'src/services/medicalIotService.test.ts'],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -88,7 +88,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show devices',
     backendService: 'DeviceRegistryService',
     apiEndpoint: 'GET /api/devices/live',
-    testCoverage: ['src/pages/DeviceFleetManagement.test.jsx', 'src/services/medicalIotService.test.js'],
+    testCoverage: ['src/pages/DeviceFleetManagement.test.jsx', 'src/services/medicalIotService.test.ts'],
   },
   {
     id: 'live-tracking-map',
@@ -98,7 +98,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show live tracking',
     backendService: 'FleetService / VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/vehicles/live',
-    testCoverage: ['src/pages/LiveTrackingMaps.test.jsx', 'src/services/liveTrackingApi.test.js'],
+    testCoverage: ['src/pages/LiveTrackingMaps.test.jsx', 'src/services/liveTrackingApi.test.ts'],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -109,7 +109,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show fleet map',
     backendService: 'FleetService / VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/vehicles/live',
-    testCoverage: ['src/pages/fleet/FleetLiveMap.test.jsx', 'src/services/liveTrackingApi.test.js'],
+    testCoverage: ['src/pages/fleet/FleetLiveMap.test.jsx', 'src/services/liveTrackingApi.test.ts'],
     status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
@@ -120,7 +120,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show fleet command',
     backendService: 'FleetService',
     apiEndpoint: 'GET /api/fleet/snapshot',
-    testCoverage: ['src/pages/fleet/FleetDashboard.test.jsx', 'src/data/fleetCommandWiring.test.js'],
+    testCoverage: ['src/pages/fleet/FleetDashboard.test.jsx', 'src/data/fleetCommandWiring.test.ts'],
   },
   {
     id: 'predictive-maintenance',
@@ -130,7 +130,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show maintenance risk',
     backendService: 'FleetService',
     apiEndpoint: 'GET /api/fleet/alerts',
-    testCoverage: ['src/pages/fleet/PredictiveMaintenance.test.jsx', 'src/data/predictiveMaintenanceWiring.test.js'],
+    testCoverage: ['src/pages/fleet/PredictiveMaintenance.test.jsx', 'src/data/predictiveMaintenanceWiring.test.ts'],
   },
   {
     id: 'route-optimizer',
@@ -140,7 +140,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'optimize route',
     backendService: 'VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/routes/active',
-    testCoverage: ['src/pages/fleet/RouteOptimizer.test.jsx', 'src/services/routeOptimizationService.test.js'],
+    testCoverage: ['src/pages/fleet/RouteOptimizer.test.jsx', 'src/services/routeOptimizationService.test.ts'],
   },
   {
     id: 'digital-twin',
@@ -170,7 +170,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'build workflow',
     backendService: 'ClinicalIntelligenceService',
     apiEndpoint: 'POST /api/clinical-intelligence/workflow-builder/generate',
-    testCoverage: ['src/pages/PlatformOSPages.test.jsx', 'src/data/platformSystemsExpansionPlan.test.js'],
+    testCoverage: ['src/pages/PlatformOSPages.test.jsx', 'src/data/platformSystemsExpansionPlan.test.ts'],
   },
   {
     id: 'search',
@@ -200,7 +200,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show notifications',
     backendService: 'NotificationService',
     apiEndpoint: 'GET /api/notifications',
-    testCoverage: ['src/test/routePagesSmoke.test.jsx', 'src/test/NotificationService.test.js'],
+    testCoverage: ['src/test/routePagesSmoke.test.tsx', 'src/test/NotificationService.test.ts'],
   },
   {
     id: 'workspaces',
@@ -210,7 +210,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show workspaces',
     backendService: 'WorkspacesService',
     apiEndpoint: 'GET /api/workspaces',
-    testCoverage: ['src/pages/WorkspaceHome.test.jsx', 'src/data/workspaceArchitecture.test.js'],
+    testCoverage: ['src/pages/WorkspaceHome.test.jsx', 'src/data/workspaceArchitecture.test.ts'],
   },
   {
     id: 'system-health',
@@ -220,7 +220,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show system health',
     backendService: 'ObservabilityService',
     apiEndpoint: 'GET /api/system-health',
-    testCoverage: ['src/services/platformGovernanceApi.test.js', 'src/test/routePagesSmoke.test.jsx'],
+    testCoverage: ['src/services/platformGovernanceApi.test.ts', 'src/test/routePagesSmoke.test.tsx'],
   },
   {
     id: 'artifacts',
@@ -250,7 +250,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show training',
     backendService: 'TrainingService',
     apiEndpoint: 'GET /api/training/dashboard',
-    testCoverage: ['src/pages/TrainingDashboard.test.jsx', 'src/data/fullPlatformConsolidation.test.js'],
+    testCoverage: ['src/pages/TrainingDashboard.test.tsx', 'src/data/fullPlatformConsolidation.test.js'],
   },
   {
     id: 'ai-evaluation',
@@ -260,7 +260,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show evaluations',
     backendService: 'EvaluationService',
     apiEndpoint: 'GET /api/evaluation/dashboard',
-    testCoverage: ['src/pages/AiEvaluationDashboard.test.jsx', 'src/services/evaluationApi.test.js'],
+    testCoverage: ['src/pages/AiEvaluationDashboard.test.jsx', 'src/services/evaluationApi.test.ts'],
   },
   {
     id: 'ai-command-center',
@@ -270,7 +270,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show ai command center',
     backendService: 'RoutingOptimizerService',
     apiEndpoint: 'GET /api/cost-optimizer/dashboard',
-    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.js'],
+    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.ts'],
   },
   {
     id: 'costs',
@@ -280,7 +280,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show costs',
     backendService: 'CostPredictionService / RoutingOptimizerService',
     apiEndpoint: 'GET /api/cost-optimizer/dashboard',
-    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.js'],
+    testCoverage: ['src/pages/AiCommandCenterDashboard.test.jsx', 'src/services/aiCommandCenterApi.test.ts'],
   },
 ]);
 
@@ -449,7 +449,7 @@ export function formatPlatformCapabilityMatrixDocument(rows = platformCapability
   const lines = [
     '# Platform Capability Matrix',
     '',
-    'This matrix is generated from `src/data/platformCapabilityMatrix.js`, which is the source of truth for end-to-end platform feature traceability.',
+    'This matrix is generated from `src/data/platformCapabilityMatrix.ts`, which is the source of truth for end-to-end platform feature traceability.',
     '',
     '## Summary',
     '',
@@ -476,11 +476,11 @@ export function formatPlatformCapabilityMatrixDocument(rows = platformCapability
     '',
     '## Source Inputs',
     '',
-    '- `src/data/platformOperatingSystem.js` for platform dashboards and workspace surfaces.',
+    '- `src/data/platformOperatingSystem.ts` for platform dashboards and workspace surfaces.',
     '- `src/data/platformSystems.js` for platform system capability contracts.',
     '- `src/data/toolInventory.js` for inventory entries, routes, aliases, endpoints, and lifecycle status.',
-    '- `src/data/backendHttpRouteInventory.js` for backend HTTP endpoint registration.',
-    '- `src/data/frontendApiCallsInventory.js` for client API call coverage.',
+    '- `src/data/backendHttpRouteInventory.ts` for backend HTTP endpoint registration.',
+    '- `src/data/frontendApiCallsInventory.ts` for client API call coverage.',
     '- Focused frontend/backend test files listed per row.',
     '',
   ];

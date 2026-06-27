@@ -39,11 +39,11 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const toolPageLayoutSource = readFileSync(join(__dirname, '../pages/tools/ToolPageLayout.jsx'), 'utf8');
-const catalogSource = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.jsx'), 'utf8');
-const toolNotFoundSource = readFileSync(join(__dirname, '../pages/tools/ToolNotFound.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const toolPageLayoutSource = readFileSync(join(__dirname, '../pages/tools/ToolPageLayout.tsx'), 'utf8');
+const catalogSource = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'), 'utf8');
+const toolNotFoundSource = readFileSync(join(__dirname, '../pages/tools/ToolNotFound.tsx'), 'utf8');
 const fleetPageChromeSource = readFileSync(join(__dirname, '../pages/fleet/FleetPageChrome.jsx'), 'utf8');
 
 /** User-facing roadmap scope (PR1–PR5 calculators + PR5/6 chat + fleet PR6). */

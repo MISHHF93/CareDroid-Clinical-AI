@@ -52,18 +52,18 @@ const REGISTRY_ID_TO_BUILTIN_SLUG = Object.freeze(
 const HUB_GROUP_TOOL_IDS = new Set(CHAT_ASSISTED_HUB_GROUPS.flatMap((g) => g.toolIds));
 
 const REGISTRY_PAGE_COMPONENT = Object.freeze({
-  [REGISTRY.drugCheck]: 'src/pages/tools/DrugChecker.jsx',
-  [REGISTRY.labInterp]: 'src/pages/tools/LabInterpreter.jsx',
-  [REGISTRY.protocols]: 'src/pages/tools/Protocols.jsx',
-  [REGISTRY.diagnosis]: 'src/pages/tools/DiagnosisAssistant.jsx',
-  [REGISTRY.procedures]: 'src/pages/tools/ProcedureGuide.jsx',
-  [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
-  [REGISTRY.sofaScore]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.drugCheck]: 'src/pages/tools/DrugChecker.tsx',
+  [REGISTRY.labInterp]: 'src/pages/tools/LabInterpreter.tsx',
+  [REGISTRY.protocols]: 'src/pages/tools/Protocols.tsx',
+  [REGISTRY.diagnosis]: 'src/pages/tools/DiagnosisAssistant.tsx',
+  [REGISTRY.procedures]: 'src/pages/tools/ProcedureGuide.tsx',
+  [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.tsx',
+  [REGISTRY.sofaScore]: 'src/pages/tools/Calculators.tsx',
 });
 
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.tsx'), 'utf8');
 
 function readPatternIds() {
   return new Set(
@@ -117,7 +117,7 @@ function resolveFrontendComponent(registryId, tier, builtinSlug, canonicalId) {
     return `src/pages/fleet/${PR_FLEET_TOOL_SPECS[registryId].appComponent}.jsx`;
   }
   if (tier === 'A' && builtinSlug) {
-    return 'src/pages/tools/Calculators.jsx';
+    return 'src/pages/tools/Calculators.tsx';
   }
   if (tier === 'C' && REGISTRY_PAGE_COMPONENT[registryId]) {
     return REGISTRY_PAGE_COMPONENT[registryId];
@@ -483,7 +483,7 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     '| Route | Primary SPA path from registry or NLU catalog |',
     '| Calc slug | `Calculators.jsx` / `?calc=` slug when applicable |',
     '| Registry / Catalog / Discovery | Row present in respective indexes |',
-    '| Sidebar | Listed in `toolRegistry.js` (workspace may filter) |',
+    '| Sidebar | Listed in `toolRegistry.ts` (workspace may filter) |',
     '| NLU / Pattern / Executor | Chat profile, `tool.patterns.ts`, POST execute |',
     '| Component / Renders | Frontend module and user-visible UI |',
     '| Launch OK | Catalog/sidebar launch resolves to a real destination |',
@@ -505,10 +505,10 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     '',
     '## Recommended code fixes (priority order)',
     '',
-    '1. **NLU hub-only sidebar rows** — Add `toolRegistry.js` entries (or a collapsible “More calculators” group) for `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator` mapped to hub + chat launch (`applyRegistryToolLaunch`).',
+    '1. **NLU hub-only sidebar rows** — Add `toolRegistry.ts` entries (or a collapsible “More calculators” group) for `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator` mapped to hub + chat launch (`applyRegistryToolLaunch`).',
     '2. **Secondary NLU profiles** — Optional dedicated sidebar rows for ACLS/ATLS, ABG, dose calculator, antibiotic guide (currently catalog + parent page only).',
     '3. **`dispatch-ai` catalog flag** — use `backendRouted` for NLU/chat support and `postExecutable` for POST `/api/tools/:id/execute` badges.',
-    '4. **Duplicate shortcut labels** — Deduplicate `shortcut` strings in `toolRegistry.js` (PERC/PHQ-9, GRACE/GAD-7, etc.) even if global hotkeys are not wired yet.',
+    '4. **Duplicate shortcut labels** — Deduplicate `shortcut` strings in `toolRegistry.ts` (PERC/PHQ-9, GRACE/GAD-7, etc.) even if global hotkeys are not wired yet.',
     '5. **Account route discoverability** — Link `Profile` → `/profile-settings`, `Settings` → `/notifications`; expose `/gdpr` and `/hipaa` from AppShell/header-help navigation if they need authenticated discovery.',
     '6. **Cost analytics nav** — Add sidebar or Analytics sub-link to `/costs` for `VIEW_ANALYTICS` users.',
     '7. **Onboarding / biometric routes** — Link from `ProfileSettings` or `Settings` to `/onboarding` and `/biometric-setup` when product-ready.',

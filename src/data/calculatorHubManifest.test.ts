@@ -20,7 +20,7 @@ import {
 } from './calculatorHubManifest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
 describe('calculatorHubManifest', () => {
   it('lists every builtinUiCalculators slug for forms', () => {

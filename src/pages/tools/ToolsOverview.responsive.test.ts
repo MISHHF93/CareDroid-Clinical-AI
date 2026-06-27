@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const toolsOverviewCss = readFileSync(join(__dirname, 'ToolsOverview.css'), 'utf8');
-const toolsOverviewJsx = readFileSync(join(__dirname, 'ToolsOverview.jsx'), 'utf8');
+const toolsOverviewJsx = readFileSync(join(__dirname, 'ToolsOverview.tsx'), 'utf8');
 
 describe('ToolsOverview responsive layout', () => {
   it('wraps cards and prevents tool metadata overflow', () => {

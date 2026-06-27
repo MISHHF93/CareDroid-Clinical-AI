@@ -1,7 +1,7 @@
 /**
  * Canonical workspace configuration projection.
  *
- * Workspace data remains in `data/workspaceArchitecture.js` because existing
+ * Workspace data remains in `data/workspaceArchitecture.ts` because existing
  * inventory/report code imports it directly. New active UI consumers should use
  * this module.
  */

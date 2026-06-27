@@ -32,7 +32,7 @@ function readRepo(rel) {
 }
 
 function parseAppPaths() {
-  const app = readRepo('src/app/router.jsx');
+  const app = readRepo('src/app/router.tsx');
   return [...new Set([...app.matchAll(/path:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]))];
 }
 
@@ -49,8 +49,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'routes',
     title: 'Routes',
-    canonical: '`src/config/routes.config.js` (`CANONICAL_ROUTES`, alias groups)',
-    secondary: '`src/app/router.jsx` (React Router mount table only — must not invent new paths)',
+    canonical: '`src/config/routes.config.ts` (`CANONICAL_ROUTES`, alias groups)',
+    secondary: '`src/app/router.tsx` (React Router mount table only — must not invent new paths)',
     duplicates: [
       {
         name: 'Canonical route map vs tool launch paths',
@@ -116,11 +116,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'layouts',
     title: 'Layouts',
     canonical: '`src/components/AppShell.tsx` (active CareDroid app chrome)',
-    secondary: '`src/layout/AppShell.jsx` (legacy/manual-review shell helper, not runtime-mounted)',
+    secondary: '`src/layout/AppShell.tsx` (legacy/manual-review shell helper, not runtime-mounted)',
     duplicates: [
       {
         name: 'Shell variants',
-        instances: ['src/components/AppShell.tsx', 'src/layout/AppShell.jsx'],
+        instances: ['src/components/AppShell.tsx', 'src/layout/AppShell.tsx'],
         overlap: null,
         risk: 'Legacy shell is not mounted but retained for tests/manual migration review.',
         action: 'legacy',
@@ -142,7 +142,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     title: 'Sidebars',
     canonical:
       '`src/components/AppShell.tsx` + `NAVIGATION_ITEMS` from unified-navigation.config.ts',
-    secondary: '`src/config/navigation.config.js` compatibility projections',
+    secondary: '`src/config/navigation.config.ts` compatibility projections',
     duplicates: [
       {
         name: 'Sidebar nav item sources',
@@ -159,7 +159,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Tool list in sidebar',
-        instances: ['sidebarToolPresentation.js', 'historical getSidebarToolRegistryProjection in tests'],
+        instances: ['sidebarToolPresentation.ts', 'historical getSidebarToolRegistryProjection in tests'],
         overlap: null,
         risk: 'Tests may reference removed sidebar tool partition API',
         action: 'legacy',
@@ -170,8 +170,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'navigation',
     title: 'Navigation',
-    canonical: '`src/config/navigation.config.js`',
-    secondary: '`src/navigation/primaryNavigation.js` (re-export shim only)',
+    canonical: '`src/config/navigation.config.ts`',
+    secondary: '`src/navigation/primaryNavigation.ts` (re-export shim only)',
     duplicates: [
       {
         name: 'Primary nav vs quick command',
@@ -192,7 +192,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Compatibility re-export',
-        instances: ['navigation/primaryNavigation.js', 'navigation.config.js'],
+        instances: ['navigation/primaryNavigation.ts', 'navigation.config.js'],
         overlap: null,
         risk: 'Low if re-export only',
         action: 'legacy',
@@ -204,16 +204,16 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'inventories',
     title: 'Inventories',
     canonical:
-      'Pipeline: `clinicalToolIdContract.js` → `toolRegistry.js` → `toolInventory.js` (canonical launch records)',
+      'Pipeline: `clinicalToolIdContract.ts` → `toolRegistry.ts` → `toolInventory.js` (canonical launch records)',
     secondary: null,
     duplicates: [
       {
         name: 'Tool metadata layers',
         instances: [
-          'toolRegistry.js',
-          'clinicalIntentToolCatalog.js',
+          'toolRegistry.ts',
+          'clinicalIntentToolCatalog.ts',
           'toolInventory.js',
-          'segmentInventory.js',
+          'segmentInventory.ts',
           'toolVisibilityMatrix.js',
         ],
         overlap: null,
@@ -248,7 +248,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'calculators',
     title: 'Calculators',
     canonical:
-      '`toolInventory.js` (calculator records) + `calculatorHubManifest.js` (hub cards/forms projection)',
+      '`toolInventory.js` (calculator records) + `calculatorHubManifest.ts` (hub cards/forms projection)',
     secondary: '`Calculators.jsx` + `CalculatorInterface` for UI',
     duplicates: [
       {
@@ -291,7 +291,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'dashboards',
     title: 'Dashboards',
-    canonical: '`/dashboard` → CommandDashboard.jsx + `commandDashboardModel.js`',
+    canonical: '`/dashboard` → CommandDashboard.jsx + `commandDashboardModel.ts`',
     secondary: null,
     duplicates: [
       {
@@ -338,8 +338,8 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'auth-configs',
     title: 'Auth configs',
-    canonical: '`src/config/auth.config.js` + `src/config/routes.config.js` (auth paths)',
-    secondary: '`src/config/api.config.js` (endpoints), `env.config.js` + `featureFlags.config.js` (gates)',
+    canonical: '`src/config/auth.config.ts` + `src/config/routes.config.ts` (auth paths)',
+    secondary: '`src/config/api.config.ts` (endpoints), `env.config.js` + `featureFlags.config.js` (gates)',
     duplicates: [
       {
         name: 'Auth path aliases',
@@ -427,7 +427,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Frontend projections',
-        instances: ['assetInventory.js', 'assetAccess.js', 'assetEntitlements.js', 'buildAssetRegistry() demo'],
+        instances: ['assetInventory.ts', 'assetAccess.ts', 'assetEntitlements.ts', 'buildAssetRegistry() demo'],
         overlap: null,
         risk: 'Projection must continue to include pack/product/workspace/role metadata for every user-facing asset',
         action: 'wire',
@@ -559,7 +559,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '### Top consolidation priorities',
     '',
     '1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
-    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.js` mounts it into product/pack/workspace/role metadata.',
+    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.ts` mounts it into product/pack/workspace/role metadata.',
     '3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
     '4. **Dashboards** — Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
     '5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
@@ -569,24 +569,24 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '',
     '| Domain | Canonical source | Do not duplicate in |',
     '|--------|------------------|---------------------|',
-    '| Routes | `src/config/routes.config.js` | App.jsx (paths only), TOOL_LAUNCH_PATHS |',
-    '| Router mount | `src/app/router.jsx` | — |',
-    '| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.jsx`, page-level shells |',
+    '| Routes | `src/config/routes.config.ts` | App.jsx (paths only), TOOL_LAUNCH_PATHS |',
+    '| Router mount | `src/app/router.tsx` | — |',
+    '| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.tsx`, page-level shells |',
     '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
     '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',
     '| Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |',
-    '| Tool ids / NLU | `src/data/clinicalToolIdContract.js` | Random string ids in components |',
-    '| NLU catalog | `src/data/clinicalIntentToolCatalog.js` | Duplicate registry rows |',
-    '| Calculator hub | `src/data/calculatorHubManifest.js` | Calculators.jsx card arrays |',
-    '| Calculator routes | `src/routes/clinicalToolRoutes.js` | App.jsx one-off paths |',
-    '| Command home | `src/pages/CommandDashboard.jsx` + `commandDashboardModel.js` | platformOperatingSystem tiles |',
-    '| Assistant UI | `src/components/ChatInterface.jsx` (ED Copilot panel) | Removed `Dashboard.jsx` assistant page |',
-    '| Auth | `src/config/auth.config.js` + `routes.config.js` | Inline token keys |',
-    '| API paths | `src/config/api.config.js` | Hard-coded `/api/...` strings |',
+    '| Tool ids / NLU | `src/data/clinicalToolIdContract.ts` | Random string ids in components |',
+    '| NLU catalog | `src/data/clinicalIntentToolCatalog.ts` | Duplicate registry rows |',
+    '| Calculator hub | `src/data/calculatorHubManifest.ts` | Calculators.jsx card arrays |',
+    '| Calculator routes | `src/routes/clinicalToolRoutes.ts` | App.jsx one-off paths |',
+    '| Command home | `src/pages/CommandDashboard.jsx` + `commandDashboardModel.ts` | platformOperatingSystem tiles |',
+    '| Assistant UI | `src/components/ChatInterface.tsx` (ED Copilot panel) | Removed `Dashboard.jsx` assistant page |',
+    '| Auth | `src/config/auth.config.ts` + `routes.config.js` | Inline token keys |',
+    '| API paths | `src/config/api.config.ts` | Hard-coded `/api/...` strings |',
     '| Workspace (server) | `GET/POST /api/workspaces` | localStorage-only gating |',
-    '| Workspace (UX) | `src/data/workspaceArchitecture.js` via `workspace.config.js` | Duplicate CARE_WORKSPACES |',
+    '| Workspace (UX) | `src/data/workspaceArchitecture.ts` via `workspace.config.js` | Duplicate CARE_WORKSPACES |',
     '| Asset entitlements | `backend/.../platform-asset-seed.data.ts` + DB | `buildAssetRegistry()` demo |',
-    '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.js` | Empty pack/product projections |',
+    '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.ts` | Empty pack/product projections |',
     '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | — |',
     '| Executors | `backend/.../tool-orchestrator.registry.ts` | Extra REGISTERED lists in frontend |',
     '',
@@ -641,8 +641,8 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '## Appendix',
     '',
     '- Related: [orphan-detection-report.md](./orphan-detection-report.md), [saas-compliance-audit.md](./saas-compliance-audit.md)',
-    '- Contract tests: `src/config/canonicalConfig.contract.test.js`, `src/data/executorMappingAudit.test.js`',
-    '- Generator: `src/data/duplicateSystemAudit.js`',
+    '- Contract tests: `src/config/canonicalConfig.contract.test.ts`, `src/data/executorMappingAudit.test.ts`',
+    '- Generator: `src/data/duplicateSystemAudit.ts`',
     ''
   );
 

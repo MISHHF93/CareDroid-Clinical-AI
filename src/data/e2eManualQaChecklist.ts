@@ -162,7 +162,7 @@ export function formatManualQaMarkdown() {
   const lines = [
     '# Manual QA checklist — wired clinical & fleet tools',
     '',
-    'Run after automated `npm run test:e2e-matrix` passes. Canonical source: `src/data/e2eManualQaChecklist.js`.',
+    'Run after automated `npm run test:e2e-matrix` passes. Canonical source: `src/data/e2eManualQaChecklist.ts`.',
     '',
   ];
   for (const section of E2E_MANUAL_QA_SECTIONS) {

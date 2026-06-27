@@ -18,10 +18,10 @@ function read(relativePath) {
 
 function currentSourceSnapshot() {
   return {
-    appShellJsx: read('layout/AppShell.jsx'),
+    appShellJsx: read('layout/AppShell.tsx'),
     appShellCss: read('layout/AppShell.css'),
     quickCommandCss: read('components/QuickCommandLauncher.css'),
-    drawerJsx: read('components/ui/Drawer.jsx'),
+    drawerJsx: read('components/ui/Drawer.tsx'),
   };
 }
 

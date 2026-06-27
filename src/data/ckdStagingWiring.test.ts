@@ -16,7 +16,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,

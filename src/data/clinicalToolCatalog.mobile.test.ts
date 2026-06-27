@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const catalogJsx = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.jsx'), 'utf8');
+const catalogJsx = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'), 'utf8');
 const catalogCss = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.css'), 'utf8');
 const catalogMobileCss = readFileSync(join(__dirname, '../styles/catalog-mobile.css'), 'utf8');
 

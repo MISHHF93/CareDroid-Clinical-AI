@@ -7,10 +7,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
 const responsiveCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
-const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
+const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.tsx'), 'utf8');
 const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 const primitivesSource = readFileSync(
-  join(__dirname, '../components/ui/CareDroidPrimitives.jsx'),
+  join(__dirname, '../components/ui/CareDroidPrimitives.tsx'),
   'utf8'
 );
 const primitivesCss = readFileSync(

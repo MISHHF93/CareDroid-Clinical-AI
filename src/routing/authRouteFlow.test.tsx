@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
-const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
+const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.ts'), 'utf8');
 
 describe('auth canonical flow wiring', () => {
   it('redirects legacy auth paths instead of mounting sign-in pages', () => {

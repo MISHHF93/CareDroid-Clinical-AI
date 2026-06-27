@@ -118,7 +118,7 @@ async function bootstrapDevSessionIfNeeded(path) {
   if (looksLikeJwt(getStoredAccessToken())) return;
 
   if (!devSessionBootstrapPromise) {
-    devSessionBootstrapPromise = import('./devBackendAuth.js')
+    devSessionBootstrapPromise = import('./devBackendAuth')
       .then(({ ensureDevBackendSession }) => ensureDevBackendSession())
       .catch(() => undefined)
       .finally(() => {

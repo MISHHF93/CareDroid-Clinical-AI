@@ -15,7 +15,7 @@ export const ED_APPLICATION = Object.freeze({
   defaultHomeRoute: CANONICAL_ROUTES.emergencyWhiteboard,
   viteEntry: 'src/app/App.tsx',
   canonicalStore: 'src/store/emergencyStore.ts',
-  canonicalApiFacade: 'src/services/emergencyOsApi.js',
+  canonicalApiFacade: 'src/services/emergencyOsApi.ts',
 });
 
 export type EdCoreRouteKey =

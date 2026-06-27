@@ -29,7 +29,7 @@ export const BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS = Object.freeze({
 });
 
 /**
- * @returns {import('./frontendApiCallsInventory.js').FrontendApiCall & {
+ * @returns {import('./frontendApiCallsInventory.ts').FrontendApiCall & {
  *   hasBackendRoute: boolean,
  *   capabilityEnabled: boolean|null,
  *   exposure: 'wired'|'gated-stub'|'unguarded-missing'
@@ -224,7 +224,7 @@ function readVitePortFallback(source, blockName) {
 }
 
 export function readViteDevConfig() {
-  const vitePath = join(repoRoot, 'vite.config.js');
+  const vitePath = join(repoRoot, 'vite.config.ts');
   const source = readFileSync(vitePath, 'utf8');
   const proxyMatch = source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*`http:\/\/localhost:\$\{backendPort\}`/) ||
     source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*['"]([^'"]+)['"]/);

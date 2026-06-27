@@ -51,7 +51,7 @@ import {
 } from './newClinicalToolsAuditConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -66,7 +66,7 @@ const orchestratorSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
 describe('New clinical tools — frozen audit lists', () => {
   it('includes PR10 Tier A and PR9 Tier B in conversation batch', () => {

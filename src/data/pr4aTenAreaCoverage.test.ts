@@ -63,7 +63,7 @@ import {
 } from './testHelpers/pr4aCoverageMatrix';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 const ALIAS_CTX = {

@@ -38,7 +38,7 @@ import { flattenManualQaChecklist } from './e2eManualQaChecklist';
 import { flattenRegressionChecklist } from './e2eRegressionChecklist';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 
 function parseBackendExecutorIds() {
   const src = readFileSync(
@@ -83,7 +83,7 @@ describe('e2e matrix — per-registry row facts', () => {
     expect(row.route).toBeTruthy();
     expect(row.registryPresence).toBe(true);
     expect(row.testCoverage.length).toBeGreaterThan(0);
-    expect(row.testCoverage).toContain('e2eToolValidationMatrix.test.js');
+    expect(row.testCoverage).toContain('e2eToolValidationMatrix.test.ts');
   });
 
   it.each(Object.keys(REGISTRY_ID_TO_ORCHESTRATOR_TOOL))(

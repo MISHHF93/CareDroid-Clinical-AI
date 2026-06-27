@@ -48,7 +48,7 @@ describe('feature flag UI coverage', () => {
   });
 
   it('mounts canonical route panels through the consolidated CareDroid router', () => {
-    const appSource = readSource('app/router.jsx');
+    const appSource = readSource('app/router.tsx');
 
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyEms}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyQueues}');
@@ -68,9 +68,9 @@ describe('feature flag UI coverage', () => {
   });
 
   it('guards audit log, simulation autostart, and Copilot tool actions', () => {
-    const settingsSource = readSource('pages/Settings.jsx');
+    const settingsSource = readSource('pages/Settings.tsx');
     const appShellSource = readSource('components/AppShell.tsx');
-    const chatSource = readSource('components/ChatInterface.jsx');
+    const chatSource = readSource('components/ChatInterface.tsx');
 
     expect(settingsSource).toContain('<FeatureGate feature="audit_log">');
     expect(appShellSource).toContain('startReassessmentEngine()');

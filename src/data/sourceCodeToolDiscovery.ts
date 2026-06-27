@@ -374,7 +374,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'compute-risk-score',
     name: 'Risk score engine',
-    source: 'src/utils/riskScoring.js',
+    source: 'src/utils/riskScoring.ts',
     status: 'client',
     category: 'clinical',
     path: '/tools',
@@ -383,7 +383,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'generate-clinical-alerts',
     name: 'Clinical alerts generator',
-    source: 'src/utils/riskScoring.js',
+    source: 'src/utils/riskScoring.ts',
     status: 'client',
     category: 'clinical',
     path: '/tools',
@@ -392,7 +392,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'build-clinical-insights',
     name: 'Clinical insights builder',
-    source: 'src/utils/clinicalInsights.js',
+    source: 'src/utils/clinicalInsights.ts',
     status: 'client',
     category: 'clinical',
     path: '/tools',
@@ -401,7 +401,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-drug-interaction',
     name: 'Visualization: drug interaction',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -410,7 +410,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-calculator',
     name: 'Visualization: calculator',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -419,7 +419,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-protocol',
     name: 'Visualization: protocol',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -428,7 +428,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-lab-order',
     name: 'Visualization: lab order',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -437,7 +437,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-vitals',
     name: 'Visualization: vitals',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -446,7 +446,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'viz-anomaly-detection',
     name: 'Visualization: anomaly detection',
-    source: 'src/components/ToolVisualization.jsx',
+    source: 'src/components/ToolVisualization.tsx',
     status: 'client',
     category: 'clinical',
     path: '/assistant',
@@ -455,7 +455,7 @@ export const clientClinicalCapabilities = [
   {
     id: 'tool-result-share',
     name: 'Tool result share / export',
-    source: 'src/components/tools/ToolResultShare.jsx',
+    source: 'src/components/tools/ToolResultShare.tsx',
     status: 'client',
     category: 'collaboration',
     path: '/tools',
@@ -603,7 +603,7 @@ export const collaborationCapabilities = [
   {
     id: 'shared-tool-session',
     name: 'Shared tool session',
-    source: 'src/pages/tools/SharedToolSession.jsx',
+    source: 'src/pages/tools/SharedToolSession.tsx',
     status: 'collaboration',
     category: 'collaboration',
     path: '/shared/tools/:shareId',
@@ -693,7 +693,7 @@ function platformRows() {
     ...platformFeatures.map((item) => ({
       id: item.id,
       name: item.name,
-      source: 'src/data/featureInventory.js',
+      source: 'src/data/featureInventory.ts',
       status: 'platform',
       category: item.category?.toLowerCase() || 'platform',
       type: item.type,
@@ -747,7 +747,7 @@ function registryRows() {
   return toolRegistry.map((t) => ({
     id: t.id,
     name: t.name,
-    source: 'src/data/toolRegistry.js',
+    source: 'src/data/toolRegistry.ts',
     status: t.path?.includes('/calculator/') ? 'shipped-calculator' : 'shipped-page',
     category: t.category?.toLowerCase() || 'tool',
     path: t.path,
@@ -759,7 +759,7 @@ function calculatorRows() {
   return builtinUiCalculators.map((c) => ({
     id: c.id,
     name: c.name,
-    source: 'src/pages/tools/Calculators.jsx',
+    source: 'src/pages/tools/Calculators.tsx',
     status: c.orchestratorId ? 'shipped-calculator' : 'shipped-calculator',
     category: 'calculator',
     path: c.path,
@@ -897,20 +897,20 @@ export const SOURCE_SCAN_LOCATIONS = [
   },
   {
     label: 'Calculator UI slugs',
-    path: 'src/pages/tools/Calculators.jsx',
+    path: 'src/pages/tools/Calculators.tsx',
     count: builtinUiCalculators.length,
   },
-  { label: 'Sidebar registry', path: 'src/data/toolRegistry.js', count: toolRegistry.length },
-  { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.js', count: emergencyPatternGroups.length },
+  { label: 'Sidebar registry', path: 'src/data/toolRegistry.ts', count: toolRegistry.length },
+  { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.ts', count: emergencyPatternGroups.length },
   { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: truePhantomToolReferences.length },
   { label: 'API-only source-audit IDs', path: 'backend route exposure policy', count: apiOnlyToolReferences.length },
   { label: 'Alias-only source-audit IDs', path: 'CostTrackingContext, OfflineProvider', count: aliasOnlyToolReferences.length },
   { label: 'Client clinical helpers', path: 'riskScoring.js, clinicalInsights.js, ToolVisualization.jsx', count: clientClinicalCapabilities.length },
   { label: 'Orchestrator API endpoints', path: 'tool-orchestrator.controller.ts', count: orchestratorApiCapabilities.length },
-  { label: 'Platform features', path: 'src/data/featureInventory.js', count: platformFeatures.length },
+  { label: 'Platform features', path: 'src/data/featureInventory.ts', count: platformFeatures.length },
   {
     label: 'Category packs 2-10',
-    path: 'src/data/clinicalToolIdContract.js',
+    path: 'src/data/clinicalToolIdContract.ts',
     count: MEDICAL_EXPANSION_CATEGORY_PACKS.length,
   },
   { label: 'ID aliases', path: 'sourceCodeToolDiscovery.toolIdAliases', count: toolIdAliases.length },

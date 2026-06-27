@@ -30,8 +30,8 @@ const read = (path) => readFileSync(join(srcRoot, path), 'utf8');
 
 describe('canonical configuration contract', () => {
   it('keeps active route aliases in routes.config and consumed by App/route health', () => {
-    const appSource = read('app/router.jsx');
-    const routeHealthSource = read('routing/routeHealth.js');
+    const appSource = read('app/router.tsx');
+    const routeHealthSource = read('routing/routeHealth.ts');
 
     expect(CANONICAL_ROUTES.auth).toBe('/auth');
     expect(AUTH_CONFIG.canonicalRoute).toBe(CANONICAL_ROUTES.auth);
@@ -139,7 +139,7 @@ describe('canonical configuration contract', () => {
   });
 
   it('keeps calculator manifest as a toolInventory projection', () => {
-    const manifestSource = read('data/calculatorHubManifest.js');
+    const manifestSource = read('data/calculatorHubManifest.ts');
     const calculatorRoutes = new Set(CALCULATOR_ROUTE_DEFS.map((route) => route.path));
 
     expect(manifestSource).toContain("from './toolInventory'");
@@ -163,17 +163,17 @@ describe('canonical configuration contract', () => {
     expect(API_ROUTES.tools.execute('sofa-calculator')).toBe('/api/tools/sofa-calculator/execute');
     expect(normalizeApiPath('/users/profile')).toBe('/api/users/profile');
 
-    expect(read('services/configService.js')).toContain("from '../config/api.config'");
-    expect(read('services/apiClient.js')).toContain("from '../config/auth.config'");
-    expect(read('services/clinicalOrchestratorApi.js')).toContain('API_ROUTES.tools.execute');
-    expect(read('services/clinicalToolsApi.js')).toContain('AUTH_CONFIG.tokenStorageKey');
+    expect(read('services/configService.ts')).toContain("from '../config/api.config'");
+    expect(read('services/apiClient.ts')).toContain("from '../config/auth.config'");
+    expect(read('services/clinicalOrchestratorApi.ts')).toContain('API_ROUTES.tools.execute');
+    expect(read('services/clinicalToolsApi.ts')).toContain('AUTH_CONFIG.tokenStorageKey');
   });
 
   it('projects feature flags through featureFlags.config before env/auth consumers', () => {
     expect(FEATURE_FLAGS).toHaveProperty('enableDemoMode');
     expect(FEATURE_FLAGS).toHaveProperty('enableDevAuthBypass');
-    expect(read('config/env.config.js')).toContain("from './featureFlags.config'");
-    expect(read('config/auth.config.js')).toContain("from './env.config'");
+    expect(read('config/env.config.ts')).toContain("from './featureFlags.config'");
+    expect(read('config/auth.config.ts')).toContain("from './env.config'");
   });
 
   it('normalizes frontend environment config and deployment metadata', () => {
@@ -199,12 +199,12 @@ describe('canonical configuration contract', () => {
 
   it('centralizes theme and layout contracts without page-owned viewport shells', () => {
     expect(THEME_CONFIG.cssTokenSources).toContain('src/styles/theme-tokens.css');
-    expect(read('contexts/ThemeContext.jsx')).toContain("from '../config/theme.tokens'");
+    expect(read('contexts/ThemeContext.tsx')).toContain("from '../config/theme.tokens'");
 
     expect(LAYOUT_SCROLL_CONTRACT.viewportOwner).toBe('AppShell');
     expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-main-content');
     expect(LAYOUT_SCROLL_CONTRACT.normalPagesCreateViewportScrollShells).toBe(false);
-    expect(read('layout/AppShell.jsx')).toContain("from '../config/layout.config'");
+    expect(read('layout/AppShell.tsx')).toContain("from '../config/layout.config'");
     expect(read('components/app-shell.css')).toContain('.app-shell-main-content');
     expect(read('layout/AppShell.css')).toContain("@import '../components/app-shell.css'");
   });

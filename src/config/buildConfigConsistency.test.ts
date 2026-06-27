@@ -15,7 +15,7 @@ describe('build and service config consistency', () => {
     expect(compose).toContain('- "8000:8000"');
     expect(packageJson).toContain('"dev": "vite --port 8000 --strictPort"');
     expect(packageJson).toContain('"dev:lan": "vite --port 8000 --strictPort --host"');
-    expect(read('vite.config.js')).toContain('strictPort: true');
+    expect(read('vite.config.ts')).toContain('strictPort: true');
     expect(compose).toContain(
       'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}',
     );
@@ -174,7 +174,7 @@ describe('build and service config consistency', () => {
 
   it('keeps provider API keys out of browser config', () => {
     expect(read('.env.example')).not.toContain('VITE_ANTHROPIC_API_KEY=');
-    expect(read('src/config/appConfig.js')).not.toContain('VITE_ANTHROPIC_API_KEY');
-    expect(read('src/services/clinicalChatService.js')).toContain('/api/chat/message');
+    expect(read('src/config/appConfig.ts')).not.toContain('VITE_ANTHROPIC_API_KEY');
+    expect(read('src/services/clinicalChatService.ts')).toContain('/api/chat/message');
   });
 });

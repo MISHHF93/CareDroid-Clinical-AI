@@ -2,7 +2,7 @@
  * Tier-B chat-assisted configuration for NEXUS C-Spine Rule.
  * No dedicated Calculators.jsx form — guided workflow only.
  *
- * Rule logic: `src/utils/nexusCSpineCalculator.js`.
+ * Rule logic: `src/utils/nexusCSpineCalculator.ts`.
  * Informational only — does not clear the c-spine or mandate imaging.
  */
 

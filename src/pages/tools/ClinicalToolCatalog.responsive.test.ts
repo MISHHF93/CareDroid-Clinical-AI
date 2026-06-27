@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const catalogJsx = readFileSync(join(__dirname, 'ClinicalToolCatalog.jsx'), 'utf8');
+const catalogJsx = readFileSync(join(__dirname, 'ClinicalToolCatalog.tsx'), 'utf8');
 const catalogCss = readFileSync(join(__dirname, 'ClinicalToolCatalog.css'), 'utf8');
 
 describe('ClinicalToolCatalog responsive layout', () => {

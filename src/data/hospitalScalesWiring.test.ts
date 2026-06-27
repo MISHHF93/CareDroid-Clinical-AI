@@ -16,7 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const BRADEN = REGISTRY.bradenScale;
 const MORSE = REGISTRY.morseFallScale;
 
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -24,10 +24,10 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.jsx'), 'utf8');
-const bradenUtilSource = readFileSync(join(__dirname, '../utils/bradenScaleCalculator.js'), 'utf8');
-const morseUtilSource = readFileSync(join(__dirname, '../utils/morseFallScaleCalculator.js'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'), 'utf8');
+const bradenUtilSource = readFileSync(join(__dirname, '../utils/bradenScaleCalculator.ts'), 'utf8');
+const morseUtilSource = readFileSync(join(__dirname, '../utils/morseFallScaleCalculator.ts'), 'utf8');
 
 describe.each([
   ['Braden scale', BRADEN, 'BRADEN_HOSPITAL_DISCLAIMER', 'Braden subscales'],

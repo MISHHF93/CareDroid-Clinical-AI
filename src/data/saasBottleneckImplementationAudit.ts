@@ -77,19 +77,19 @@ function implementationChecks() {
     'strictEntitlements',
     /!\(strictEntitlements && hasOrganizationScope\)/,
   ]);
-  const strictFrontend = hasAll('src/config/appConfig.js', [
+  const strictFrontend = hasAll('src/config/appConfig.ts', [
     'VITE_STRICT_SAAS_ENTITLEMENTS',
     'VITE_ASSET_AWARE_NAVIGATION',
     'VITE_ORG_SCOPED_PLATFORM_READS',
-  ]) && hasAll('src/config/featureFlags.config.js', [
+  ]) && hasAll('src/config/featureFlags.config.ts', [
     'strictSaasEntitlements',
     'assetAwareNavigation',
     'orgScopedPlatformReads',
   ]);
-  const strictAccessProjection = hasAll('src/data/assetEntitlements.js', [
+  const strictAccessProjection = hasAll('src/data/assetEntitlements.ts', [
     'isStrictSaasEntitlementsEnabled',
     'return !isStrictSaasEntitlementsEnabled(context)',
-  ]) && hasAll('src/data/assetAccess.js', [
+  ]) && hasAll('src/data/assetAccess.ts', [
     'isStrictSaasEntitlementsEnabled',
     'strictEntitlements',
     "reasons: ['workspace']",
@@ -141,17 +141,17 @@ function implementationChecks() {
     'pricingTier',
   ]);
 
-  const centralizedLaunch = hasAll('src/navigation/registryToolLaunch.js', [
+  const centralizedLaunch = hasAll('src/navigation/registryToolLaunch.ts', [
     'resolveRegistryToolLaunchAccess',
     'resolveAssetAccessState',
     'ASSET_ACCESS_STATES.ALLOWED',
     'entitlement=denied',
   ]);
 
-  const tests = hasAll('src/data/assetAccess.test.js', [
+  const tests = hasAll('src/data/assetAccess.test.ts', [
     'strict SaaS mode',
     'active workspace',
-  ]) && hasAll('src/data/assetEntitlements.test.js', [
+  ]) && hasAll('src/data/assetEntitlements.test.ts', [
     'strict SaaS mode',
   ]) && hasAll('backend/src/modules/platform-assets/platform-assets.service.spec.ts', [
     'strict organization entitlements',
@@ -231,7 +231,7 @@ function implementationChecks() {
       'Frontend access projection honors strict entitlements and workspace scope',
       'Phase 3',
       statusFromBoolean(strictFrontend && strictAccessProjection),
-      '`assetEntitlements.js` and `assetAccess.js` expose strict and workspace-restricted access behavior',
+      '`assetEntitlements.ts` and `assetAccess.ts` expose strict and workspace-restricted access behavior',
       'Route more commercial/product launch actions through the same access projection.',
     ),
     check(

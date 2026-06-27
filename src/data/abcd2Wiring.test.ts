@@ -18,7 +18,7 @@ import { CALCULATOR_ROUTE_DEFS, matchCalculatorRoute } from '../routes/clinicalT
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const id = REGISTRY.abcd2;
 
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -26,8 +26,8 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const utilSource = readFileSync(join(__dirname, '../utils/abcd2Calculator.js'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const utilSource = readFileSync(join(__dirname, '../utils/abcd2Calculator.ts'), 'utf8');
 
 describe('ABCD² score (abcd2) wiring', () => {
   it('is listed in PR10 Tier A audit list', () => {

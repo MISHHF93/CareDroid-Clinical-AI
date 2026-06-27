@@ -11,11 +11,11 @@ const shellCssBundle = `${appShellCss}\n${canonicalAppShellCss}`;
 const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
-const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
-const appJsx = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appShellJsx = readFileSync(join(__dirname, 'AppShell.tsx'), 'utf8');
+const appJsx = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const crisisModeCss = readFileSync(join(__dirname, '../components/CrisisMode.css'), 'utf8');
 const emsCriticalBroadcastJsx = readFileSync(
-  join(__dirname, '../components/EMSCriticalBroadcast.jsx'),
+  join(__dirname, '../components/EMSCriticalBroadcast.tsx'),
   'utf8'
 );
 const emsCriticalBroadcastCss = readFileSync(
@@ -113,7 +113,7 @@ describe('single AppShell contract', () => {
     const requiredRouteFiles = [
       '../pages/CommandDashboard.jsx',
       '../pages/Operations.jsx',
-      '../pages/Profile.jsx',
+      '../pages/Profile.tsx',
       '../pages/HospitalMapDashboard.jsx',
       '../pages/MedicalIotDashboard.jsx',
       '../pages/DeviceFleetManagement.jsx',
@@ -122,15 +122,15 @@ describe('single AppShell contract', () => {
       '../pages/SimulationScenarioPlayer.jsx',
       '../pages/LaboratoryDashboard.jsx',
       '../pages/Medical3DViewer.jsx',
-      '../pages/profile/ProfileActivity.jsx',
-      '../pages/profile/ProfilePreferences.jsx',
-      '../pages/profile/ProfileSecurity.jsx',
-      '../pages/profile/ProfileToolPreferences.jsx',
-      '../pages/profile/ProfileWorkspaces.jsx',
+      '../pages/profile/ProfileActivity.tsx',
+      '../pages/profile/ProfilePreferences.tsx',
+      '../pages/profile/ProfileSecurity.tsx',
+      '../pages/profile/ProfileToolPreferences.tsx',
+      '../pages/profile/ProfileWorkspaces.tsx',
       '../pages/Artifacts.jsx',
       '../pages/RecommendationsPage.jsx',
-      '../pages/platform/PlatformSystemPage.jsx',
-      '../pages/settings/FeatureManagement.jsx',
+      '../pages/platform/PlatformSystemPage.tsx',
+      '../pages/settings/FeatureManagement.tsx',
     ];
 
     for (const file of requiredRouteFiles) {

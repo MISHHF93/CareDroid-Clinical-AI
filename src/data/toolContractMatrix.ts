@@ -115,7 +115,7 @@ export function formatToolContractMatrixMarkdown(
     '',
     `**Generated:** ${generatedAt}`,
     '',
-    '> **Source:** `src/data/toolContractMatrix.js` (derived from `backendFrontendToolContract.js`)',
+    '> **Source:** `src/data/toolContractMatrix.ts` (derived from `backendFrontendToolContract.ts`)',
     '> **Regenerate:** `npm run contract:write-docs`',
     '',
     '## Summary',

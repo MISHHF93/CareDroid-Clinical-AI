@@ -1,7 +1,7 @@
 ﻿/**
  * Legacy queue-style notification service.
  *
- * The active app-facing notification client is `src/services/NotificationService.js`.
+ * The active app-facing notification client is `src/services/NotificationService.ts`.
  * This compatibility service is retained for cost/recommendation queue tests and must not be
  * used for new product notification routing until `/api/notifications/send/:channel` exists.
  */
@@ -16,7 +16,7 @@ const getDefaultApiBaseUrl = () => resolveApiRoot();
 
 export const LEGACY_NOTIFICATION_SERVICE_STATUS = Object.freeze({
   activeClient: false,
-  replacement: 'src/services/NotificationService.js',
+  replacement: 'src/services/NotificationService.ts',
   blockedCapability: 'notificationSendChannel',
 });
 

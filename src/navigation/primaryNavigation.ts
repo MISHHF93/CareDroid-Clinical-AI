@@ -1,6 +1,6 @@
 /**
  * Compatibility re-export for older imports.
- * Active navigation definitions live in `config/navigation.config.js`.
+ * Active navigation definitions live in `config/navigation.config.ts`.
  */
 export {
   ACCOUNT_UTILITY_NAV_ITEMS,

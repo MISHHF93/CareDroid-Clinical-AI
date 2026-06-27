@@ -45,8 +45,8 @@ import {
 } from './parseToolPatterns';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 const PR1_PATH_SET = new Set(Object.values(PR1_ROUTE_BY_REGISTRY_ID));

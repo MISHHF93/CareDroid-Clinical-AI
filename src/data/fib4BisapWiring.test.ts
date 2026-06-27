@@ -16,7 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIB4 = REGISTRY.fib4;
 const BISAP = REGISTRY.bisapScore;
 
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -24,10 +24,10 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.jsx'), 'utf8');
-const fib4UtilSource = readFileSync(join(__dirname, '../utils/fib4Calculator.js'), 'utf8');
-const bisapUtilSource = readFileSync(join(__dirname, '../utils/bisapScoreCalculator.js'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const pr8Source = readFileSync(join(__dirname, '../pages/tools/pr8ClinicalBatchCalculators.tsx'), 'utf8');
+const fib4UtilSource = readFileSync(join(__dirname, '../utils/fib4Calculator.ts'), 'utf8');
+const bisapUtilSource = readFileSync(join(__dirname, '../utils/bisapScoreCalculator.ts'), 'utf8');
 
 describe.each([
   ['FIB-4', FIB4, 'FIB4_SAFETY_DISCLAIMER', 'validateFib4Inputs'],

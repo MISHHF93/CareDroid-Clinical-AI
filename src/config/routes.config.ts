@@ -1,7 +1,7 @@
 /**
  * Canonical route and alias configuration.
  *
- * React Router still owns rendering in `src/app/router.jsx`; this module owns stable paths
+ * React Router still owns rendering in `src/app/router.tsx`; this module owns stable paths
  * and redirect aliases so route consumers do not define competing maps.
  */
 

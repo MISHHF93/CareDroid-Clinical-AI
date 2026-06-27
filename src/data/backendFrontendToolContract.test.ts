@@ -71,14 +71,14 @@ describe('backendFrontendToolContract', () => {
     )) {
       if (record.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM) {
         expect(record.endpoint, record.id).toMatch(/^\/api\/clinical-intelligence\//);
-        expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.js');
+        expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.ts');
         continue;
       }
 
       expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, record.id).toContain(record.orchestratorToolId);
       expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
       expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
-      expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+      expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.ts');
     }
   });
 

@@ -32,10 +32,10 @@ import { parseClinicalToolPatterns } from './parseToolPatterns';
 import { resolveToolInventoryRecord } from './toolInventory';
 
 const MATRIX_BASE_TESTS = [
-  'e2eToolValidationMatrix.test.js',
-  'clinicalToolIdContract.test.js',
-  'clinicalToolAliasSync.test.js',
-  'medicalToolsCatalogIndex.test.js',
+  'e2eToolValidationMatrix.test.ts',
+  'clinicalToolIdContract.test.ts',
+  'clinicalToolAliasSync.test.ts',
+  'medicalToolsCatalogIndex.test.ts',
 ];
 
 const EXECUTOR_DTO = {
@@ -62,18 +62,18 @@ const EXECUTOR_API = {
 };
 
 const REGISTRY_COMPONENT = Object.freeze({
-  [REGISTRY.drugCheck]: 'src/pages/tools/DrugChecker.jsx',
-  [REGISTRY.labInterp]: 'src/pages/tools/LabInterpreter.jsx',
-  [REGISTRY.protocols]: 'src/pages/tools/Protocols.jsx',
-  [REGISTRY.diagnosis]: 'src/pages/tools/DiagnosisAssistant.jsx',
-  [REGISTRY.procedures]: 'src/pages/tools/ProcedureGuide.jsx',
-  [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.drugCheck]: 'src/pages/tools/DrugChecker.tsx',
+  [REGISTRY.labInterp]: 'src/pages/tools/LabInterpreter.tsx',
+  [REGISTRY.protocols]: 'src/pages/tools/Protocols.tsx',
+  [REGISTRY.diagnosis]: 'src/pages/tools/DiagnosisAssistant.tsx',
+  [REGISTRY.procedures]: 'src/pages/tools/ProcedureGuide.tsx',
+  [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.tsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
   [REGISTRY.digitalOperationsCenter]: 'src/pages/Operations.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
   [REGISTRY.researchEvidenceHub]: 'src/pages/ResearchEvidenceHub.jsx',
-  [REGISTRY.clinicalDocumentationAssistant]: 'src/pages/ClinicalDocumentationAssistant.jsx',
+  [REGISTRY.clinicalDocumentationAssistant]: 'src/pages/ClinicalDocumentationAssistant.tsx',
   [REGISTRY.clinicalKnowledgeGraph]: 'src/pages/ClinicalKnowledgeGraph.jsx',
   [REGISTRY.predictiveAnalyticsDashboard]: 'src/pages/PredictiveAnalyticsDashboard.jsx',
   [REGISTRY.clinicalDecisionSupport]: 'src/pages/ClinicalDecisionSupport.jsx',
@@ -154,7 +154,7 @@ function testFilesFor(registryId, nluToolId) {
     registryId === nluToolId
       ? []
       : clinicalIntentTools.some((t) => t.toolId === nluToolId)
-        ? ['clinicalCatalogLaunch.test.js']
+        ? ['clinicalCatalogLaunch.test.ts']
         : [];
   return [...new Set([...MATRIX_BASE_TESTS, ...specific, ...nluSpecific])].sort();
 }
@@ -380,7 +380,7 @@ function buildPhantomRows() {
     requestDto: '—',
     responseDto: '—',
     frontendApiClient: p.source || '—',
-    testCoverage: 'sourceCodeToolDiscovery.test.js',
+    testCoverage: 'sourceCodeToolDiscovery.test.ts',
     tier: 'phantom',
     notes: p.notes,
     brokenReasons: [],
@@ -396,7 +396,7 @@ function buildPlatformRows() {
       canonicalId: 'tools-list-api',
       displayName: 'List orchestrator tools',
       frontendRoute: '—',
-      frontendComponent: 'src/pages/tools/ClinicalToolCatalog.jsx',
+      frontendComponent: 'src/pages/tools/ClinicalToolCatalog.tsx',
       registryEntry: '—',
       catalogEntry: '—',
       discoveryEntry: 'yes',
@@ -419,7 +419,7 @@ function buildPlatformRows() {
       canonicalId: 'tools-share-results',
       displayName: 'Share tool results (client)',
       frontendRoute: '—',
-      frontendComponent: 'src/components/tools/ToolResultShare.jsx',
+      frontendComponent: 'src/components/tools/ToolResultShare.tsx',
       registryEntry: '—',
       catalogEntry: '—',
       discoveryEntry: 'no',
@@ -557,7 +557,7 @@ export function formatBackendFrontendContractMarkdown(
     '',
     `Generated: ${generatedAt}`,
     '',
-    '> **Source:** `src/data/backendFrontendToolContract.js` — regenerate with `npm run contract:write-docs`.',
+    '> **Source:** `src/data/backendFrontendToolContract.ts` — regenerate with `npm run contract:write-docs`.',
     '> **Related:** [clinical-tool-executors.md](./clinical-tool-executors.md), [e2e-tool-validation-matrix.md](./e2e-tool-validation-matrix.md).',
     '',
     '## Summary',
@@ -641,7 +641,7 @@ export function formatBackendFrontendContractMarkdown(
   lines.push(
     '### Manual follow-ups (not auto-flagged)',
     '',
-    '- **Keyboard shortcuts:** duplicate `Ctrl+Shift+*` bindings in `toolRegistry.js` (PERC/PHQ-9, GRACE/GAD-7, etc.).',
+    '- **Keyboard shortcuts:** duplicate `Ctrl+Shift+*` bindings in `toolRegistry.ts` (PERC/PHQ-9, GRACE/GAD-7, etc.).',
     '- **Route duality:** legacy `/tools/calculator/*` vs `/tools/calculators/*` — both valid; keep redirects in `clinicalToolRoutes.js`.',
     '- **Env:** align `backend/.env.example` `FRONTEND_URL` with Vite port **8000** when using default dev proxy.',
     '- **dispatch-ai:** fleet Tier-B chat; `backendRouted: true` marks NLU/chat routing, while `postExecutable: false` keeps it out of POST execute.',

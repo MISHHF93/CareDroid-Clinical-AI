@@ -18,7 +18,7 @@ import NIHSS from './calculators/NIHSS';
 import NEWS2 from './calculators/NEWS2';
 import PediatricDrugCalc from './calculators/PediatricDrugCalc';
 import QSOFA from './calculators/qSOFA';
-import Calculators from '../pages/tools/Calculators.jsx';
+import Calculators from '../pages/tools/Calculators';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';

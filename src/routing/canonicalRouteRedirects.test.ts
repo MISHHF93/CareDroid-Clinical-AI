@@ -11,7 +11,7 @@ import {
 } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 
 function expectRoutePath(path) {
   const routeNames = Object.entries(CANONICAL_ROUTES)

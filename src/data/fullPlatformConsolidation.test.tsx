@@ -18,17 +18,17 @@ import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './emergencyPageRenderInventory'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
-const appSource = readFileSync(join(srcRoot, 'app', 'router.jsx'), 'utf8');
-const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
-const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.jsx'), 'utf8');
+const appSource = readFileSync(join(srcRoot, 'app', 'router.tsx'), 'utf8');
+const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.tsx'), 'utf8');
+const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.tsx'), 'utf8');
 const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.jsx'), 'utf8');
-const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.js'), 'utf8');
-const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.js'), 'utf8');
+const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.ts'), 'utf8');
+const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.ts'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeTokensCss = readFileSync(join(srcRoot, 'styles/theme-tokens.css'), 'utf8');
-const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.js'), 'utf8');
-const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 'utf8');
+const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.ts'), 'utf8');
+const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.ts'), 'utf8');
 
 const REQUIRED_LEGACY_REDIRECT_SNIPPETS = Object.freeze([
   'LEGACY_EMERGENCY_ROUTE_REDIRECTS.map',

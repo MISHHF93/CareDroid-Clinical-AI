@@ -24,7 +24,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
-const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
+const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');

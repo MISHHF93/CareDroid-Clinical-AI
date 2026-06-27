@@ -16,7 +16,7 @@ import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery'
 import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -83,7 +83,7 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
   });
 
   it('includes Calculators.jsx switch case for stop-bang', () => {
-    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
     expect(calculatorsSource).toContain("case 'stop-bang':");
     expect(calculatorsSource).toContain('StopBangCalculator');
   });

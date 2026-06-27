@@ -51,7 +51,7 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'provider-wait-breach-timer',
     label: 'Provider wait breach timer',
-    surfaces: ['ProviderWaitBreachPanel', 'ProviderWaitBreachStrip', 'WaitingRoomSafetyBoard', 'chargeNurseWorkflowModel.js', 'providerWaitBreachTimer.ts'],
+    surfaces: ['ProviderWaitBreachPanel', 'ProviderWaitBreachStrip', 'WaitingRoomSafetyBoard', 'chargeNurseWorkflowModel.ts', 'providerWaitBreachTimer.ts'],
     mechanism: 'resolveProviderWaitBreachTimer from triage-to-provider elapsed time, CTAS thresholds, and high-risk wait exceptions',
   }),
   Object.freeze({

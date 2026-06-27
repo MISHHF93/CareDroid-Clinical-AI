@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const visualConsistencyCss = readFileSync(join(__dirname, 'visual-consistency.css'), 'utf8');
-const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
+const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 
 describe('visual consistency sweep', () => {
   it('loads the visual consistency layer after existing responsive and mobile layers', () => {

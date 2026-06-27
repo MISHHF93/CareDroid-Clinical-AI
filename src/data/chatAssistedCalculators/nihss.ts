@@ -2,7 +2,7 @@
  * Tier-B chat-assisted configuration for NIHSS (no dedicated Calculators.jsx form).
  * Structured domain-by-domain collection — not a single-page checkbox calculator.
  *
- * Scoring reference: `src/utils/nihssCalculator.js` (item validation, total 0–42, severity bands).
+ * Scoring reference: `src/utils/nihssCalculator.ts` (item validation, total 0–42, severity bands).
  * No Calculators.jsx wizard — remain chat-assisted unless institution governs server-side scoring.
  */
 

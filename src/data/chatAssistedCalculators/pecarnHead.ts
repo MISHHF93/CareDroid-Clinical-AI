@@ -2,7 +2,7 @@
  * Tier-B chat-assisted configuration for PECARN pediatric head injury rule.
  * No dedicated Calculators.jsx form — guided workflow only.
  *
- * Rule logic: `src/utils/pecarnHeadCalculator.js`.
+ * Rule logic: `src/utils/pecarnHeadCalculator.ts`.
  * Informational only — does not recommend CT or override clinical judgment.
  */
 

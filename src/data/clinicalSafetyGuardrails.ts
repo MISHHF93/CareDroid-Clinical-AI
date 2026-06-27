@@ -305,7 +305,7 @@ export function auditChatSeed(row) {
 }
 
 /**
- * @param {import('./clinicalIntentToolCatalog.js').clinicalIntentTools} tools
+ * @param {import('./clinicalIntentToolCatalog.ts').clinicalIntentTools} tools
  */
 export function runClinicalSafetyComplianceAudit(tools) {
   const chatSeedFindings = tools.filter((t) => t.chatSeed).map((t) => auditChatSeed(t));
@@ -336,34 +336,34 @@ export function runClinicalSafetyComplianceAudit(tools) {
 export const PRODUCTION_UI_SURFACE_RULES = Object.freeze([
   {
     surfaceId: 'calculators-hub-lead',
-    path: 'src/pages/tools/Calculators.jsx',
+    path: 'src/pages/tools/Calculators.tsx',
     required: [/Decision support only/i],
     forbidden: [/Anticoagulation strongly recommended/i, /\bNo anticoagulation recommended\b/i],
   },
   {
     surfaceId: 'mental-health-forms',
-    path: 'src/pages/tools/mentalHealthCalculators.jsx',
+    path: 'src/pages/tools/mentalHealthCalculators.tsx',
     required: [/988|crisis/i, /screening only|do not diagnose/i],
   },
   {
     surfaceId: 'pr4a-calculators',
-    path: 'src/pages/tools/pr4aCalculators.jsx',
+    path: 'src/pages/tools/pr4aCalculators.tsx',
     required: [/decision support|does not diagnose|does not recommend/i],
     forbidden: [/Anticoagulation strongly recommended/i],
   },
   {
     surfaceId: 'tool-page-layout',
-    path: 'src/pages/tools/ToolPageLayout.jsx',
+    path: 'src/pages/tools/ToolPageLayout.tsx',
     required: [/ClinicalDecisionSupportDisclaimer/, /disclaimerVariantForTool/],
   },
   {
     surfaceId: 'clinical-tool-catalog',
-    path: 'src/pages/tools/ClinicalToolCatalog.jsx',
+    path: 'src/pages/tools/ClinicalToolCatalog.tsx',
     required: [/ClinicalDecisionSupportDisclaimer|Decision support only/i],
   },
   {
     surfaceId: 'lab-interpreter',
-    path: 'src/pages/tools/LabInterpreter.jsx',
+    path: 'src/pages/tools/LabInterpreter.tsx',
     required: [/decision support|not a substitute|does not establish a diagnosis|educational/i],
   },
   {
@@ -511,7 +511,7 @@ export function auditToolMetadata(row) {
 /**
  * Full production audit: NLU chat seeds, UI surfaces, launch seeds, metadata.
  * @param {object} options
- * @param {import('./clinicalIntentToolCatalog.js').clinicalIntentTools} options.tools
+ * @param {import('./clinicalIntentToolCatalog.ts').clinicalIntentTools} options.tools
  * @param {(relPath: string) => string} [options.readFile]
  * @param {(toolId: string) => { chatSeed?: string }} [options.resolveLaunch]
  * @param {string[]} [options.launchToolIds]

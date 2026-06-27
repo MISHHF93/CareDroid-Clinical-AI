@@ -43,7 +43,7 @@ import {
 } from './pr4aTestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appSource = readFileSync(join(__dirname, '../app/router.jsx'), 'utf8');
+const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -51,7 +51,7 @@ const patternsSource = readFileSync(
   ),
   'utf8'
 );
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
 
 const ALL_PR4A_ALIAS_PAIRS = [...PR4A_REQUIRED_NLU_ALIAS_PAIRS, ...PR4A_DISCOVERY_ALIAS_PAIRS];
 

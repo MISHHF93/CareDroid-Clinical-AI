@@ -12,7 +12,7 @@ const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
-const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
+const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
 const quickCommandCss = readFileSync(
   join(__dirname, '../components/QuickCommandLauncher.css'),

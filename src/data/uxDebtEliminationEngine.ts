@@ -112,32 +112,32 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.NAVIGATION,
       count: navItems.length,
-      sources: ['src/config/navigation.config.js', 'src/layout/AppShell.jsx'],
+      sources: ['src/config/navigation.config.ts', 'src/layout/AppShell.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.ROUTES,
       count: Object.keys(routes).length,
-      sources: ['src/config/routes.config.js', 'src/app/router.jsx'],
+      sources: ['src/config/routes.config.ts', 'src/app/router.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.CARDS,
       count: tools.length,
-      sources: ['src/data/toolInventory.js', 'src/data/toolRegistry.js', 'src/components/ToolCard.jsx'],
+      sources: ['src/data/toolInventory.js', 'src/data/toolRegistry.ts', 'src/components/ToolCard.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.FORMS,
       count: calculators.length,
-      sources: ['src/pages/tools/Calculators.jsx', 'src/data/clinicalIntentToolCatalog.js'],
+      sources: ['src/pages/tools/Calculators.tsx', 'src/data/clinicalIntentToolCatalog.ts'],
     },
     {
       type: UX_SURFACE_TYPES.DIALOGS,
       count: 2,
-      sources: ['src/components/QuickCommandLauncher.jsx', 'src/components/ui/Drawer.jsx'],
+      sources: ['src/components/QuickCommandLauncher.tsx', 'src/components/ui/Drawer.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.DRAWERS,
       count: 2,
-      sources: ['src/layout/AppShell.jsx', 'src/components/ui/Drawer.jsx'],
+      sources: ['src/layout/AppShell.tsx', 'src/components/ui/Drawer.tsx'],
     },
     {
       type: UX_SURFACE_TYPES.TABLES,
@@ -152,17 +152,17 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.CALCULATORS,
       count: calculators.length,
-      sources: ['src/pages/tools/Calculators.jsx', 'src/data/responsiveQaMatrix.js'],
+      sources: ['src/pages/tools/Calculators.tsx', 'src/data/responsiveQaMatrix.js'],
     },
     {
       type: UX_SURFACE_TYPES.DASHBOARDS,
       count: countDashboards(tools),
-      sources: ['src/pages/CommandDashboard.jsx', 'src/components/ChatInterface.jsx', 'src/data/toolRegistry.js'],
+      sources: ['src/pages/CommandDashboard.jsx', 'src/components/ChatInterface.tsx', 'src/data/toolRegistry.ts'],
     },
     {
       type: 'manual QA',
       count: manualQaSections.length,
-      sources: ['src/data/e2eManualQaChecklist.js'],
+      sources: ['src/data/e2eManualQaChecklist.ts'],
     },
   ];
 }
