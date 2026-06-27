@@ -282,7 +282,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
-          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+          <IconComponent size={18} stroke={2} className="sidebar-nav-item__icon" />
+          <span className="sidebar-nav-item__label">{item.label}</span>
           <span className="sidebar-nav-item__tooltip">{item.label}</span>
         </button>
       );
@@ -306,7 +307,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         data-nav-id={item.id}
         data-icon-key={item.icon}
       >
-        <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+        <IconComponent size={18} stroke={2} className="sidebar-nav-item__icon" />
+        <span className="sidebar-nav-item__label">{item.label}</span>
         {alertCount > 0 ? (
           <span
             className="sidebar-nav-item__badge"
@@ -403,24 +405,25 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           </div>
         ) : null}
         <div
-          className="sidebar-desktop-nav__utility"
-          aria-label="New UI screens"
-          style={{ borderTop: '1px solid var(--cd-border-subtle, rgba(255,255,255,.12))', paddingTop: 4 }}
+          className="sidebar-desktop-nav__section"
+          aria-label="New architecture screens"
         >
+          <span className="sidebar-desktop-nav__section-label">Design System V2</span>
           {v2NavItems.map(({ id, label, path, Icon: NavIcon }) => {
             const active = location.pathname.startsWith(path);
             return (
               <Link
                 key={id}
                 to={path}
-                className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
+                className={['sidebar-nav-item', active ? 'sidebar-nav-item--active' : ''].filter(Boolean).join(' ')}
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 title={label}
                 data-nav-id={id}
               >
-                <NavIcon size={20} stroke={2} className="sidebar-nav-item__icon" />
-                <label>{label}</label>
+                <NavIcon size={18} stroke={2} className="sidebar-nav-item__icon" />
+                <span className="sidebar-nav-item__label">{label}</span>
+                <span className="sidebar-nav-item__tooltip">{label}</span>
               </Link>
             );
           })}

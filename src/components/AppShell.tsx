@@ -34,6 +34,7 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { useSimulationMode } from '../contexts/SimulationModeContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
@@ -77,6 +78,12 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 }
 
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
+  '/v2/whiteboard': `${EMERGENCY_OS_BRANDING.productName} - Whiteboard`,
+  '/v2/queues':     `${EMERGENCY_OS_BRANDING.productName} - Triage Queue`,
+  '/v2/ems':        `${EMERGENCY_OS_BRANDING.productName} - EMS Pipeline`,
+  '/v2/copilot':    `${EMERGENCY_OS_BRANDING.productName} - Copilot`,
+  '/v2/capacity':   `${EMERGENCY_OS_BRANDING.productName} - Capacity`,
+  '/v2/alerts':     `${EMERGENCY_OS_BRANDING.productName} - Alerts`,
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
@@ -101,6 +108,12 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
 };
 
 const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
+  '/v2/whiteboard': 'Patient kanban board — new design system.',
+  '/v2/queues':     'Triage queue ranked by acuity and wait time.',
+  '/v2/ems':        'Inbound EMS units and handoff workflow.',
+  '/v2/copilot':    'AI clinical decision support — always verify with clinical judgment.',
+  '/v2/capacity':   'Room occupancy, boarding load, and department flow.',
+  '/v2/alerts':     'Active clinical and operational alerts.',
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
   [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
@@ -222,6 +235,7 @@ export function AppShell({ children }: AppShellProps) {
 function AppShellFrame({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { effectiveProfile: backendEffectiveProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
   const surfaces = usePractitionerSurfaceVisibility();
@@ -272,9 +286,12 @@ function AppShellFrame({ children }: AppShellProps) {
       navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
     [emergencyRole, navigate, saasRole],
   );
+  // effectiveProfile is non-null only with real backend auth (null in demo/offline).
+  // Skip the saasRole nav path in demo so the emergency-role dropdown drives the sidebar.
+  const navSaasRole = backendEffectiveProfile ? saasRole : undefined;
   const visibleNavigationItems = useMemo(
-    () => getVisibleNavigation(emergencyRole.role, { saasRole }),
-    [emergencyRole.role, saasRole],
+    () => getVisibleNavigation(emergencyRole.role, { saasRole: navSaasRole }),
+    [emergencyRole.role, navSaasRole],
   );
   const currentPage = useMemo(() => {
     const surface = getEmergencySurface(location.pathname);
