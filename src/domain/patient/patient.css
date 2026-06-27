@@ -145,6 +145,7 @@
 .cd-patient-card--p3 { border-left: 3px solid var(--cd-acuity-p3); }
 .cd-patient-card--p4 { border-left: 3px solid var(--cd-acuity-p4); }
 .cd-patient-card--p5 { border-left: 3px solid var(--cd-acuity-p5); }
+.cd-patient-card--selected { box-shadow: var(--cd-shadow-focus); border-color: var(--cd-border-brand); }
 
 /* ── PatientHeader ───────────────────────────────────────────── */
 .cd-patient-header {
