@@ -34,6 +34,42 @@
   color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
+/* Stat value inherits tone colour for stronger at-a-glance emphasis */
+.emergency-whiteboard-page__stat--tone-critical .emergency-whiteboard-page__stat-value {
+  color: var(--status-critical, #ef4444);
+}
+.emergency-whiteboard-page__stat--tone-warning .emergency-whiteboard-page__stat-value {
+  color: var(--status-warning, #f59e0b);
+}
+.emergency-whiteboard-page__stat--tone-success .emergency-whiteboard-page__stat-value {
+  color: var(--status-stable, #16a34a);
+}
+.emergency-whiteboard-page__stat--tone-info .emergency-whiteboard-page__stat-value {
+  color: var(--app-accent-interactive, #0ea5e9);
+}
+
+/* Tone-specific emphasized state overrides (extends base warning emphasis from part-03) */
+.emergency-whiteboard-page__stat--emphasized.emergency-whiteboard-page__stat--tone-critical {
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 10%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  box-shadow: inset 0 3px 0 color-mix(in srgb, var(--status-critical, #ef4444) 72%, transparent);
+}
+.emergency-whiteboard-page__stat--emphasized.emergency-whiteboard-page__stat--tone-critical.emergency-whiteboard-page__stat--interactive {
+  border: 1px solid color-mix(in srgb, var(--status-critical, #ef4444) 34%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+}
+
+/* Interactive stat hover and keyboard focus ring */
+.emergency-whiteboard-page__stat--interactive {
+  transition: background-color 110ms ease;
+}
+.emergency-whiteboard-page__stat--interactive:hover {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, var(--color-surface, var(--app-surface-1, #ffffff)));
+}
+.emergency-whiteboard-page__stat--interactive:focus-visible {
+  outline: 2px solid var(--app-accent-interactive, #0ea5e9);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
 /* Operational command layer */
 .emergency-whiteboard-page__command-layer {
   background: var(--color-surface, var(--app-surface-1, #ffffff));
@@ -232,7 +268,7 @@
 }
 
 .emergency-whiteboard-page__arrival-title {
-  color: var(--color-text-primary, #e0f2fe);
+  color: var(--color-text-primary, #111827);
   font-size: 13px;
 }
 
@@ -251,7 +287,7 @@
   background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
   border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 8px;
-  color: #bae6fd;
+  color: var(--medical-status-info-text, #0369a1);
   cursor: pointer;
   font-weight: 800;
   padding: 5px 7px;
@@ -328,7 +364,7 @@
   border: 1px solid color-mix(in srgb, var(--color-accent, #a78bfa) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--color-accent, #a78bfa);
-  color: #ede9fe;
+  color: var(--color-text-primary, #111827);
   cursor: pointer;
   display: grid;
   gap: 2px;
@@ -338,7 +374,7 @@
 
 .emergency-whiteboard-page__referral-task-detail,
 .emergency-whiteboard-page__reassess-task-detail {
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-secondary, #6b7280);
   font-size: 12px;
 }
 
@@ -460,7 +496,7 @@
 }
 
 .emergency-whiteboard-page__inbound-banner-title {
-  color: #bae6fd;
+  color: var(--medical-status-info-text, #0369a1);
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.06em;
@@ -478,7 +514,7 @@
   border: 1px solid color-mix(in srgb, var(--color-secondary, #38bdf8) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 12px;
   box-shadow: inset 3px 0 0 var(--color-secondary, #38bdf8);
-  color: #e0f2fe;
+  color: var(--color-text-primary, #111827);
   cursor: pointer;
   display: grid;
   gap: 4px;
@@ -505,7 +541,7 @@
 }
 
 .emergency-whiteboard-page__inbound-rail-title {
-  color: #bae6fd;
+  color: var(--medical-status-info-text, #0369a1);
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.06em;

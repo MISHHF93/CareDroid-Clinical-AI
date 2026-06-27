@@ -23,6 +23,49 @@
   display: none;
 }
 
+/* ── Brand / identity section ───────────────────────────────────── */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 6px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.sidebar__brand-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    var(--app-accent-interactive, #0ea5e9) 0%,
+    var(--app-accent-hover, #0284c7) 100%
+  );
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 30%, transparent);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.sidebar__brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #111827);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
 /* ── Desktop nav wrapper ────────────────────────────────────────── */
 .sidebar-desktop-nav {
   display: flex;
@@ -176,6 +219,16 @@
     align-items: center;
   }
 
+  .sidebar__brand {
+    justify-content: center;
+    padding: 8px 0 6px;
+    gap: 0;
+  }
+
+  .sidebar__brand-name {
+    display: none;
+  }
+
   .sidebar-desktop-nav {
     align-items: center;
     gap: 0;
@@ -213,6 +266,10 @@
 
 /* ── Mobile: bottom tab bar ─────────────────────────────────────── */
 @media (max-width: 768px) {
+  .sidebar__brand {
+    display: none;
+  }
+
   .sidebar {
     bottom: 0;
     left: 0;

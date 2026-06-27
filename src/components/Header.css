@@ -83,6 +83,15 @@
   background: var(--app-surface-1, #ffffff);
   color: var(--medical-text-subtle, #9ca3af);
   cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+}
+
+.caredroid-header__palette-trigger:not(:disabled):hover,
+.caredroid-header__palette-trigger:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
+  color: var(--medical-ink, #111827);
+  outline: none;
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
 }
 
 .caredroid-header__workload-trigger {
@@ -204,12 +213,30 @@ button.caredroid-header__copilot-pill:focus-visible {
   font-weight: 850;
   padding: 0 9px;
   white-space: nowrap;
+  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.caredroid-header__action:not(:disabled):hover,
+.caredroid-header__action:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 52%, transparent);
+  color: var(--medical-ink, #111827);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
+  outline: none;
 }
 
 .caredroid-header__action--primary {
   border-color: color-mix(in srgb, var(--app-accent-interactive) 74%, transparent);
   background: var(--app-accent-interactive);
   color: var(--app-on-solid, #f9fafb);
+}
+
+.caredroid-header__action--primary:not(:disabled):hover,
+.caredroid-header__action--primary:not(:disabled):focus-visible {
+  background: var(--app-accent-hover, #0284c7);
+  border-color: var(--app-accent-hover, #0284c7);
+  color: var(--app-on-solid, #f9fafb);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, transparent);
 }
 
 .caredroid-header__action:disabled {

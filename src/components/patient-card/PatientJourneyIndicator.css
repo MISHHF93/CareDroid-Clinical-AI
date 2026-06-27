@@ -1,0 +1,158 @@
+/* Patient Journey Indicator — horizontal stage stepper */
+
+.patient-journey {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.patient-journey::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Stage pill ─────────────────────────────────────────────────── */
+.patient-journey__stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.patient-journey__stage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--journey-border, var(--color-border-subtle, #e0f2fe));
+  background: var(--journey-bg, transparent);
+  color: var(--journey-fg, var(--color-text-muted, #9ca3af));
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: default;
+  transition: none;
+}
+
+/* Connector line between stages */
+.patient-journey__connector {
+  width: 14px;
+  height: 1px;
+  background: var(--color-border-subtle, #e0f2fe);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.patient-journey__connector--done {
+  background: var(--status-stable, #22c55e);
+  opacity: 0.55;
+}
+
+/* ── Stage states ───────────────────────────────────────────────── */
+
+/* Past stages (completed) */
+.patient-journey__stage--done .patient-journey__stage-btn {
+  --journey-border: color-mix(in srgb, var(--status-stable, #22c55e) 30%, transparent);
+  --journey-bg: color-mix(in srgb, var(--status-stable, #22c55e) 8%, var(--color-card, #ffffff));
+  --journey-fg: var(--medical-status-success-text, #15803d);
+}
+
+/* Current active stage */
+.patient-journey__stage--active .patient-journey__stage-btn {
+  --journey-border: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
+  --journey-bg: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, var(--color-card, #ffffff));
+  --journey-fg: var(--medical-status-info-text, #0369a1);
+  font-weight: 750;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, transparent);
+}
+
+/* Critical active stage (e.g., triage for P1 patient) */
+.patient-journey__stage--active-critical .patient-journey__stage-btn {
+  --journey-border: color-mix(in srgb, var(--status-critical, #ef4444) 55%, transparent);
+  --journey-bg: color-mix(in srgb, var(--status-critical, #ef4444) 10%, var(--color-card, #ffffff));
+  --journey-fg: var(--medical-status-critical-text, #b91c1c);
+  font-weight: 750;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-critical, #ef4444) 18%, transparent);
+  animation: journey-critical-pulse 2s ease-in-out infinite;
+}
+
+@keyframes journey-critical-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-critical, #ef4444) 18%, transparent); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-critical, #ef4444) 8%, transparent); }
+}
+
+/* Future stages (upcoming) */
+.patient-journey__stage--upcoming .patient-journey__stage-btn {
+  --journey-border: var(--color-border-subtle, #e0f2fe);
+  --journey-bg: transparent;
+  --journey-fg: var(--color-text-muted, #c4cdd6);
+}
+
+/* Discharge (terminal stage) */
+.patient-journey__stage--discharge-done .patient-journey__stage-btn {
+  --journey-border: color-mix(in srgb, var(--status-stable, #22c55e) 40%, transparent);
+  --journey-bg: color-mix(in srgb, var(--status-stable, #22c55e) 12%, var(--color-card, #ffffff));
+  --journey-fg: var(--medical-status-success-text, #15803d);
+  font-weight: 750;
+}
+
+/* ── Stage dot ──────────────────────────────────────────────────── */
+.patient-journey__dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Compact variant (for tight spaces like patient cards) ──────── */
+.patient-journey--compact .patient-journey__stage-btn {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.patient-journey--compact .patient-journey__connector {
+  width: 8px;
+}
+
+.patient-journey--compact .patient-journey__dot {
+  width: 5px;
+  height: 5px;
+}
+
+/* ── Mini variant (just dots for very tight spaces) ─────────────── */
+.patient-journey--mini {
+  gap: 4px;
+  align-items: center;
+}
+
+.patient-journey--mini .patient-journey__stage-btn {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  font-size: 0;
+  gap: 0;
+}
+
+.patient-journey--mini .patient-journey__dot {
+  display: none;
+}
+
+.patient-journey--mini .patient-journey__connector {
+  width: 6px;
+  height: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-journey__stage--active-critical .patient-journey__stage-btn {
+    animation: none;
+  }
+}

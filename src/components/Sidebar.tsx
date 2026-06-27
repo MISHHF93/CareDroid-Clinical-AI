@@ -388,6 +388,10 @@ export function Sidebar({ navigationItems }: SidebarProps) {
 
   return (
     <aside className="sidebar" aria-label="Emergency navigation">
+      <div className="sidebar__brand" aria-hidden="true">
+        <div className="sidebar__brand-mark">C</div>
+        <span className="sidebar__brand-name">CareDroid</span>
+      </div>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
         {desktopPrimaryNav.map(desktopNavLink)}
         {desktopUtilityNav.length ? (

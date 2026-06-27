@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ApiStateBanner from '../components/ApiStateBanner';
 import {
   isBackendCapabilityEnabled,
@@ -10,7 +10,29 @@ import {
 } from '../services/clinicalAlertsApi';
 import './ClinicalAlertsPage.css';
 
-const buildSampleAlerts = () => [
+type AlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
+type AlertStatus = 'unacknowledged' | 'acknowledged';
+
+interface ClinicalAlert {
+  id: string;
+  timestamp: Date;
+  severity: AlertSeverity;
+  title: string;
+  description: string;
+  source: string;
+  status: AlertStatus;
+  findings: string[];
+}
+
+const SEVERITY_FILTERS: { value: AlertSeverity | 'all'; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'critical', label: 'Critical' },
+  { value: 'high', label: 'High' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'low', label: 'Low' },
+];
+
+const buildSampleAlerts = (): ClinicalAlert[] => [
   {
     id: 'alert-1',
     timestamp: new Date(Date.now() - 3600000),
@@ -39,15 +61,27 @@ const buildSampleAlerts = () => [
     description: 'GFR indicates moderate to severe kidney disease',
     source: 'GFR Calculator',
     status: 'acknowledged',
-    findings: ['GFR: 28 mL/min/1.73m2', 'CKD Stage: 3b'],
+    findings: ['GFR: 28 mL/min/1.73m²', 'CKD Stage: 3b'],
   },
 ];
 
+function formatTime(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - new Date(date).getTime();
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(date).toLocaleDateString();
+}
+
 const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
-  const [alerts, setAlerts] = useState<any[]>([]);
-  const [filteredAlerts, setFilteredAlerts] = useState<any[]>([]);
-  const [selectedSeverity, setSelectedSeverity] = useState('all');
+  const [alerts, setAlerts] = useState<ClinicalAlert[]>([]);
+  const [filteredAlerts, setFilteredAlerts] = useState<ClinicalAlert[]>([]);
+  const [selectedSeverity, setSelectedSeverity] = useState<AlertSeverity | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
   const [apiNotice, setApiNotice] = useState('');
@@ -84,79 +118,74 @@ const ClinicalAlertsPage = () => {
     }
 
     loadAlerts();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [alertsApiEnabled]);
 
-  // Filter alerts
   useEffect(() => {
     let filtered = alerts;
-
     if (selectedSeverity !== 'all') {
-      filtered = filtered.filter(a => a.severity === selectedSeverity);
+      filtered = filtered.filter((a) => a.severity === selectedSeverity);
     }
-
     if (searchTerm) {
+      const lc = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        a =>
-          a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          a.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          a.source.toLowerCase().includes(searchTerm.toLowerCase())
+        (a) =>
+          a.title.toLowerCase().includes(lc) ||
+          a.description.toLowerCase().includes(lc) ||
+          a.source.toLowerCase().includes(lc),
       );
     }
-
     setFilteredAlerts(filtered);
   }, [selectedSeverity, searchTerm, alerts]);
 
-  const handleAcknowledge = async (alertId) => {
+  const handleAcknowledge = async (alertId: string) => {
     if (alertsApiEnabled) {
       const result = await acknowledgeClinicalAlertApi(alertId, {
         acknowledgedAt: new Date().toISOString(),
       });
       if (!result.ok) {
-        setApiNotice(`${result.message || 'Unable to acknowledge alert on the server.'} Updated locally only.`);
+        setApiNotice(
+          `${result.message || 'Unable to acknowledge alert on the server.'} Updated locally only.`,
+        );
       }
     }
-
-    setAlerts(alerts =>
-      alerts.map(a =>
-        a.id === alertId ? { ...a, status: 'acknowledged' } : a
-      )
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === alertId ? { ...a, status: 'acknowledged' } : a)),
     );
   };
 
-  const getSeverityIcon = (severity) => {
-    const icons = {
-      critical: '🔴',
-      high: '🟠',
-      moderate: '🟡',
-      low: '🟢',
-      warning: '⚠️'
-    };
-    return icons[severity] || '■';
-  };
-
-  const formatTime = (date) => {
-    const now = new Date();
-    const diff = (now as any) - (new Date(date) as any);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (hours < 1) return 'Just now';
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return new Date(date).toLocaleDateString();
-  };
-
-  const unacknowledgedCount = alerts.filter(a => a.status === 'unacknowledged').length;
+  const unacknowledgedCount = alerts.filter((a) => a.status === 'unacknowledged').length;
+  const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
 
   return (
-    <div className="clinical-alerts-page">
-      <div className="alerts-header">
-        <h1>Clinical Alerts Management</h1>
-        <p>Track and manage all clinical alerts from your tools</p>
+    <div className="clinical-alerts-page" aria-label="Clinical Alerts Management">
+      <div className="alerts-page-header">
+        <div className="alerts-page-header__copy">
+          <p className="alerts-page-header__eyebrow">Clinical Operations</p>
+          <h1 className="alerts-page-header__title">Clinical Alerts</h1>
+          <p className="alerts-page-header__subtitle">
+            Review and acknowledge active clinical alerts generated by CareDroid tools
+          </p>
+        </div>
+      </div>
+
+      <div className="alerts-summary-strip" role="status" aria-label="Alert summary">
+        <span className="alerts-summary-chip">
+          Total <strong>{alerts.length}</strong>
+        </span>
+        {criticalCount > 0 && (
+          <span className="alerts-summary-chip alerts-summary-chip--critical">
+            Critical <strong>{criticalCount}</strong>
+          </span>
+        )}
+        {unacknowledgedCount > 0 && (
+          <span className="alerts-summary-chip alerts-summary-chip--pending">
+            Pending review <strong>{unacknowledgedCount}</strong>
+          </span>
+        )}
+        <span className="alerts-summary-chip alerts-summary-chip--cleared">
+          Acknowledged <strong>{alerts.length - unacknowledgedCount}</strong>
+        </span>
       </div>
 
       {!alertsApiEnabled ? (
@@ -164,117 +193,168 @@ const ClinicalAlertsPage = () => {
           unsupportedMessage={`${UNSUPPORTED_CAPABILITY_MESSAGE} Showing sample alerts on this device only.` as any}
         />
       ) : null}
-      {alertsApiEnabled && isLoadingAlerts ? (
-        <ApiStateBanner loading loadingMessage={"Loading clinical alerts..." as any} />
-      ) : null}
-      {apiNotice ? <ApiStateBanner unsupportedMessage={apiNotice as any} /> : null}
+      {apiNotice ? <div className="alerts-api-notice" role="status">{apiNotice}</div> : null}
 
       <div className="alerts-controls">
-        <div className="control-group">
-          <label htmlFor="search">Search Alerts</label>
+        <div className="alerts-controls__search">
+          <span className="alerts-controls__search-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
           <input
-            id="search"
-            type="text"
-            placeholder="Search by title, description, or source..."
+            type="search"
+            className="alerts-controls__search-input"
+            placeholder="Search by title, description, or source…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            aria-label="Search clinical alerts"
           />
         </div>
 
-        <div className="control-group">
-          <label htmlFor="severity">Filter by Severity</label>
-          <select
-            id="severity"
-            value={selectedSeverity}
-            onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="severity-select"
-          >
-            <option value="all">All Severities</option>
-            <option value="critical">Critical</option>
-            <option value="high">High</option>
-            <option value="moderate">Moderate</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-
-        <div className="control-group">
-          <label>Summary</label>
-          <div className="summary-badges">
-            <span className="summary-badge total">
-              Total: <strong>{alerts.length}</strong>
-            </span>
-            <span className="summary-badge unacknowledged">
-              Pending: <strong>{unacknowledgedCount}</strong>
-            </span>
-            <span className="summary-badge acknowledged">
-              Acknowledged: <strong>{alerts.length - unacknowledgedCount}</strong>
-            </span>
-          </div>
+        <div className="alerts-controls__filter-group" role="group" aria-label="Filter by severity">
+          {SEVERITY_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              className={[
+                'alerts-filter-chip',
+                f.value !== 'all' ? `alerts-filter-chip--${f.value}` : '',
+                selectedSeverity === f.value ? 'alerts-filter-chip--active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => setSelectedSeverity(f.value as AlertSeverity | 'all')}
+              aria-pressed={selectedSeverity === f.value}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="alerts-timeline">
-        <div className="timeline-title">Alert Timeline</div>
-        {filteredAlerts.length > 0 ? (
-          <div className="alerts-list">
-            {filteredAlerts.map((alert) => (
-              <div key={alert.id} className={`alert-card severity-${alert.severity} status-${alert.status}`}>
-                <div className="card-header">
-                  <div className="alert-meta">
-                    <span className="severity-icon">{getSeverityIcon(alert.severity)}</span>
-                    <div className="alert-info">
-                      <h3 className="alert-title">{alert.title}</h3>
-                      <p className="alert-description">{alert.description}</p>
-                      <div className="alert-source">
-                        <span className="badge-source">{alert.source}</span>
-                        <span className="badge-time">{formatTime(alert.timestamp)}</span>
+      {isLoadingAlerts ? (
+        <div className="alerts-loading" role="status">Loading clinical alerts…</div>
+      ) : null}
+
+      <div className="alerts-list-section">
+        {!isLoadingAlerts && filteredAlerts.length > 0 ? (
+          <>
+            <p className="alerts-list-label">
+              {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''}
+            </p>
+            <ul className="alerts-list" role="list">
+              {filteredAlerts.map((alert) => (
+                <li key={alert.id}>
+                  <article
+                    className={[
+                      'alert-card',
+                      `alert-card--severity-${alert.severity}`,
+                      alert.status === 'acknowledged' ? 'alert-card--acknowledged' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    aria-label={`${alert.severity} alert: ${alert.title}`}
+                  >
+                    <div className="alert-card__header">
+                      <span
+                        className="alert-card__severity-dot"
+                        aria-label={`Severity: ${alert.severity}`}
+                        role="img"
+                      />
+                      <div className="alert-card__body">
+                        <h3 className="alert-card__title">{alert.title}</h3>
+                        <p className="alert-card__description">{alert.description}</p>
+                        <div className="alert-card__meta">
+                          <span className="alert-card__source-badge">{alert.source}</span>
+                          <time className="alert-card__time" dateTime={new Date(alert.timestamp).toISOString()}>
+                            {formatTime(alert.timestamp)}
+                          </time>
+                        </div>
+                      </div>
+                      <div
+                        className={[
+                          'alert-card__status-indicator',
+                          alert.status === 'acknowledged'
+                            ? 'alert-card__status-indicator--ack'
+                            : 'alert-card__status-indicator--pending',
+                        ].join(' ')}
+                        aria-label={alert.status === 'acknowledged' ? 'Acknowledged' : 'Pending review'}
+                        role="img"
+                      >
+                        {alert.status === 'acknowledged' ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <line x1="12" y1="5" x2="12" y2="13"/><circle cx="12" cy="17" r="1" fill="currentColor"/>
+                          </svg>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <div className="alert-status-badge" title={alert.status}>
-                    {alert.status === 'acknowledged' ? '✓' : '!'}
-                  </div>
-                </div>
 
-                {alert.findings && alert.findings.length > 0 && (
-                  <div className="card-findings">
-                    <div className="findings-label">Key Findings</div>
-                    <ul className="findings-list">
-                      {alert.findings.map((finding, idx) => (
-                        <li key={idx}>{finding}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                    {alert.findings.length > 0 && (
+                      <div className="alert-card__findings">
+                        <p className="alert-card__findings-label">Key Findings</p>
+                        <ul className="alert-card__findings-list">
+                          {alert.findings.map((finding, idx) => (
+                            <li key={idx} className="alert-card__finding">{finding}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                <div className="card-actions">
-                  {alert.status === 'unacknowledged' && (
-                    <button
-                      className="btn-acknowledge"
-                      onClick={() => handleAcknowledge(alert.id)}
-                      title="Mark as reviewed"
-                    >
-                      ✓ Acknowledge
-                    </button>
-                  )}
-                  {alert.status === 'acknowledged' && (
-                    <span className="status-text">Acknowledged</span>
-                  )}
-                  <button type="button" className="btn-export" title="Export alert details">
-                    📥 Export
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <div className="alert-card__actions">
+                      {alert.status === 'unacknowledged' ? (
+                        <button
+                          type="button"
+                          className="alert-card__btn-acknowledge"
+                          onClick={() => handleAcknowledge(alert.id)}
+                          aria-label={`Acknowledge alert: ${alert.title}`}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          Acknowledge
+                        </button>
+                      ) : (
+                        <span className="alert-card__acknowledged-label">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          Reviewed
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        className="alert-card__btn-export"
+                        aria-label={`Export details for alert: ${alert.title}`}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export
+                      </button>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : !isLoadingAlerts ? (
+          <div className="alerts-empty-state" role="status">
+            <div className="alerts-empty-state__icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h3 className="alerts-empty-state__title">All clear</h3>
+            <p className="alerts-empty-state__description">
+              No clinical alerts match your current filters.
+            </p>
           </div>
-        ) : (
-          <div className="empty-state">
-            <div className="empty-icon">✓</div>
-            <h3>All clear</h3>
-            <p>Great! No clinical alerts match your current filters.</p>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -116,6 +116,34 @@
   padding: var(--space-3);
 }
 
+.emergency-analytics__state--loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emergency-analytics__state--loading::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border: 2px solid var(--color-border-subtle, #e0f2fe);
+  border-top-color: var(--app-accent-interactive, #0ea5e9);
+  border-radius: 50%;
+  animation: app-shell-loading-spin 0.7s linear infinite;
+}
+
+@keyframes app-shell-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergency-analytics__state--loading::before {
+    animation: none;
+  }
+}
+
 .emergency-analytics__state--empty,
 .emergency-analytics__empty {
   background: var(--color-surface);
@@ -136,6 +164,11 @@
   gap: var(--component-card-gap);
 }
 
+/* KPI metrics use a denser 5-column grid */
+.emergency-analytics__grid--kpi {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+
 .emergency-analytics__card {
   display: grid;
   gap: var(--space-3);
@@ -147,6 +180,67 @@
 .emergency-analytics__card:hover {
   background: color-mix(in srgb, var(--status-info) 5%, var(--color-card));
   transform: translateY(-1px);
+}
+
+/* Metric value inside KPI cards */
+.emergency-analytics__card > strong {
+  display: block;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 750;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--color-text-primary);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Source label under metric value */
+.emergency-analytics__source {
+  display: block;
+  margin-top: var(--space-1, 4px);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+/* KPI strip (compact mode) */
+.emergency-analytics__kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: var(--color-card);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+}
+
+.emergency-analytics__kpi-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+  padding: var(--space-3) var(--space-4);
+  border-right: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  gap: var(--space-1);
+  min-width: 96px;
+}
+
+.emergency-analytics__kpi-strip-item:last-child {
+  border-right: none;
+}
+
+.emergency-analytics__kpi-strip-item strong {
+  font-size: var(--font-size-xl);
+  font-weight: 750;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.emergency-analytics__kpi-strip-item span {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
 }
 
 .emergency-analytics__link {

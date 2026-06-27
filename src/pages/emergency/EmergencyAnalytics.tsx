@@ -170,11 +170,22 @@ export default function EmergencyAnalytics() {
       ? 'Loading'
       : analyticsSourceLabel(emergencyAnalytics.source);
   const useCompactKpis = !surfaces.analytics.showKpiCards;
+
+  const erOccupancyLabel = centralSnapshot.capacityStatus.occupiedRooms != null && centralSnapshot.capacityStatus.occupiedRooms > 0
+    ? `${centralSnapshot.capacityStatus.occupiedRooms} / ${Math.max(centralSnapshot.capacityStatus.occupiedRooms, centralSnapshot.capacityStatus.totalPatients)}`
+    : `${centralSnapshot.capacityStatus.totalPatients}`;
+
+  const avgTriageMins = triageBreachAnalytics.summary.longestElapsedLabel
+    ? triageBreachAnalytics.summary.longestElapsedLabel
+    : `${triageBreachAnalytics.summary.targetMinutes}m target`;
+
   const shiftKpis = [
     { label: 'Patients seen', value: shift.patientsSeen ?? 0 },
     { label: 'Discharges', value: shift.dischargeCount ?? 0 },
     { label: 'Daily volume', value: totalDailyVolume },
     { label: 'Avg wait', value: `${shift.averageWaitMinutes ?? 0}m` },
+    { label: 'ER occupancy', value: erOccupancyLabel },
+    { label: 'Triage breaches', value: triageBreachAnalytics.summary.breachedCount },
     { label: 'Boarding', value: shift.boardingCount ?? 0 },
     { label: 'High risk', value: shift.highRiskCount ?? 0 },
     { label: 'Reassess due', value: shift.reassessmentDueCount ?? 0 },
@@ -214,8 +225,8 @@ export default function EmergencyAnalytics() {
       />
 
       {emergencyAnalytics.status === 'loading' ? (
-        <p className="emergency-analytics__state" role="status">
-          Loading CareDroid analytics...
+        <p className="emergency-analytics__state emergency-analytics__state--loading" role="status" aria-live="polite">
+          Loading analytics…
         </p>
       ) : null}
       {statusMessage && surfaces.analytics.showDescriptions ? (
@@ -406,7 +417,7 @@ export default function EmergencyAnalytics() {
           ))}
         </div>
       ) : (
-        <div className="emergency-analytics__grid" aria-label="Emergency analytics KPIs">
+        <div className="emergency-analytics__grid emergency-analytics__grid--kpi" aria-label="Emergency analytics KPIs">
           <ChartCard title="Patients Seen" subtitle="Current shift">
             <strong>{shift.patientsSeen ?? 0}</strong>
           </ChartCard>
@@ -430,6 +441,19 @@ export default function EmergencyAnalytics() {
           </ChartCard>
           <ChartCard title="Reassessment Due" subtitle="Safety queue">
             <strong>{shift.reassessmentDueCount ?? 0}</strong>
+          </ChartCard>
+          <ChartCard title="ER Occupancy" subtitle="Rooms occupied vs. total active">
+            <strong>{erOccupancyLabel}</strong>
+            <small className="emergency-analytics__source">
+              {centralSnapshot.capacityStatus.band ? `Capacity band: ${centralSnapshot.capacityStatus.band}` : 'Capacity band pending'}
+            </small>
+          </ChartCard>
+          <ChartCard title="Avg Triage Time" subtitle="Arrival-to-triage target tracking">
+            <strong>{avgTriageMins}</strong>
+            <small className="emergency-analytics__source">
+              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ·{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk · target {triageBreachAnalytics.summary.targetMinutes}m
+            </small>
           </ChartCard>
         </div>
       )}

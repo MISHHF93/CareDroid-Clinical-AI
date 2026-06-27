@@ -201,7 +201,8 @@
 }
 
 .patient-detail-journey__connector--complete {
-  background: var(--status-info, var(--app-accent-interactive));
+  background: var(--status-stable, #22c55e);
+  opacity: 0.7;
 }
 
 .patient-detail-journey__dot {
@@ -209,32 +210,66 @@
   height: 16px;
   margin: 0 auto;
   border-radius: 999px;
-  border: 2px solid var(--color-text-muted, #6b7280);
-  background: transparent;
+  border: 2px solid var(--color-border-subtle, #e0f2fe);
+  background: var(--color-card, #ffffff);
   position: relative;
   z-index: 1;
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
 }
 
-.patient-detail-journey__dot--active,
+/* Completed stages — green fill */
 .patient-detail-journey__dot--complete {
-  border-color: var(--status-info, var(--app-accent-interactive));
-  background: var(--status-info, var(--app-accent-interactive));
+  border-color: var(--status-stable, #22c55e);
+  background: var(--status-stable, #22c55e);
+}
+
+/* Current active stage — blue accent with pulse ring */
+.patient-detail-journey__dot--active,
+.patient-detail-timeline-dot--current {
+  border-color: var(--app-accent-interactive, #0ea5e9);
+  background: var(--app-accent-interactive, #0ea5e9);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
+  animation: journey-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes journey-dot-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, transparent),
+      0 0 0 6px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, transparent),
+      0 0 0 9px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, transparent);
+  }
 }
 
 .patient-detail-journey__label {
   margin-top: var(--ed-space-2);
   font-size: var(--ed-type-meta);
   color: var(--ed-text-secondary);
+  font-weight: 500;
 }
 
 .patient-detail-journey__label--current {
-  color: var(--ed-text-primary);
+  color: var(--app-accent-interactive, #0ea5e9);
+  font-weight: 700;
 }
 
 .patient-detail-journey__time {
   margin-top: 3px;
   font-size: var(--ed-type-meta);
   color: var(--ed-text-meta);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-detail-journey__dot--active,
+  .patient-detail-timeline-dot--current {
+    animation: none;
+  }
 }
 
 .patient-detail-vitals-grid {
