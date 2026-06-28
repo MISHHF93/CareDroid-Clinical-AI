@@ -30,6 +30,9 @@ describe('copilotPlatform.config', () => {
       'Capacity status',
       'Boarding pressure',
       'Reassessment queue',
+      'What is slowing care right now?',
+      'Recommend bottleneck fallbacks',
+      'Will we breach the 3-minute target?',
     ]);
     const tools = getCopilotToolLaunchActions();
     expect(tools.some((action) => action.eventName === 'ed:open-calculator')).toBe(true);
@@ -40,7 +43,7 @@ describe('copilotPlatform.config', () => {
     const contract = describeCopilotPlatformContract();
     expect(contract.inputs.contextSourceCount).toBeGreaterThan(10);
     expect(contract.outputs.channelCount).toBeGreaterThan(8);
-    expect(contract.quickActions.operational.length).toBe(4);
+    expect(contract.quickActions.operational.length).toBe(7);
     expect(contract.limits.maxQuickActions).toBeGreaterThan(0);
     expect(resolveCopilotRuntimeLimits().maxRecommendations).toBe(contract.limits.maxRecommendations);
   });

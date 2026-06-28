@@ -45,6 +45,11 @@ Supported CareDroid AI intents:
 - `hospital_command_insight`
 - `escalation_recommendation`
 - `handoff_summary`
+- `service_bottleneck_analysis` — analyze active SaaS/service bottlenecks and recommend mitigations
+- `workflow_delay_analysis` — identify root causes of clinical workflow delays
+- `fallback_recommendation` — recommend fallback actions when a service is degraded or unavailable
+- `three_minute_risk_projection` — project whether the 3-minute response target is at risk given active bottlenecks
+- `operational_root_cause_summary` — summarize operational root causes across services, queues, and clinical workflows
 
 Universal AI response shape:
 
@@ -162,3 +167,57 @@ Component aliases at `src/components/auth/`:
 - "Export" button: gated on `can(CAREDROID_PERMISSIONS.REPORTS_EXPORT)`. Hidden for roles that lack this permission.
 - Read-only banner: shown when `isReadOnly` is true (demo_observer, security_officer, social_worker, lab_technician, radiology_technician).
 - Every acknowledgement attaches `AuditMetadata` with `acknowledgedBy` (employeeId), `userRole`, and `timestamp`. Never include PHI fields.
+- Bottleneck alerts from `useOperationalIntelligence()` are merged with clinical alerts and displayed in the same list. Bottleneck IDs are prefixed `bottleneck-`.
+
+## SaaS Service Bottleneck Detection System
+
+CareDroid detects not only patient risk but also service and workflow bottlenecks that delay care. The system runs on every operational snapshot cycle (30-second poll).
+
+### Core types (`src/services/bottleneckRegistry.ts`)
+
+- `BottleneckEvent` — a detected service or workflow delay: `id`, `category` (`clinical_workflow | operational | saas_backend | interoperability | frontend`), `serviceName`, `severity` (`critical | high | medium | low`), `impactsThreeMinuteTarget`, `fallbackAction`, `ownerRole`, `responseDeadline`, `status`
+- `ServiceHealth` — per-service health rollup: `serviceName`, `status` (`healthy | degraded | down | unknown`), `latencyMs`, `errorRate`, `fallbackAvailable`, `currentBottlenecks`
+- `ThreeMinuteRiskProjection` — risk projection: `status` (`on_track | at_risk | breach_likely`), `criticalBottlenecks`, `highRiskPatientsAffected`, `nextOwnerRole`, `fallbackAction`, `summary`
+- `BottleneckRegistrySnapshot` — complete snapshot: `activeBottlenecks`, `serviceHealth`, `threeMinuteRiskProjection`, `rootCauseSummary`, `currentServiceMap`, `analytics`
+- `CURRENT_SERVICE_MAP` — 44-service current service map documenting all frontend and backend services
+
+### Key functions
+
+- `detectBottleneckEvents(input)` — derives `BottleneckEvent[]` from queue health, capacity band, sync status, AI Chief availability, reassessment overdue count, unacknowledged critical alerts, and existing service signals
+- `buildThreeMinuteRiskProjection(events)` — builds risk projection from impacting events
+- `buildBottleneckRegistrySnapshot(input)` — entry point: calls detect + serviceHealth + projection + analytics
+- `bottleneckEventsToAlerts(events, previousAlerts)` — converts high/critical bottleneck events to `Alert[]` for the clinical alerts surface
+- `adaptExistingServiceSignalsToBottlenecks(signals)` — adapts flow engine, escalation engine, queue, capacity, reassessment, and referral signals to `BottleneckEvent[]`
+
+### UI components (`src/components/bottlenecks/BottleneckPanels.tsx`)
+
+All bottleneck UI is colocated in this file. Available exports:
+- `BottleneckSeverityBadge` — severity chip (critical/high/medium/low)
+- `ThreeMinuteRiskIndicator` — on_track / at_risk / breach_likely status pill with summary
+- `FallbackActionCard` — shows fallback action for the primary bottleneck event
+- `ServiceHealthCard` — per-service status card (status, latency, error rate, fallback)
+- `BottleneckImpactCard` — full bottleneck event card with severity, category, owner, deadline
+- `BottleneckList` — list of `BottleneckImpactCard` items with empty state
+- `RootCauseSummaryPanel` — AI Chief root cause summary + primary fallback action
+- `ServiceDependencyMap` — grid of `ServiceHealthCard` items (first 6 services)
+- `BottleneckCommandPanel` — composed command panel: ThreeMinuteRiskIndicator + BottleneckList + ServiceDependencyMap + RootCauseSummaryPanel
+
+### Data flow
+
+```
+bottleneckRegistry.buildBottleneckRegistrySnapshot(input)
+  → careDroidCentralNode.ts (centralSnapshot.bottleneckRegistry)
+  → useOperationalIntelligence (30-second poll)
+  → ClinicalAlertsPage (bottleneck alerts merged with clinical alerts)
+  → CommandDashboard (BottleneckCommandPanel)
+  → EmergencyAnalytics (BottleneckList + ThreeMinuteRiskIndicator, shown when surfaces.analytics.showPlatformLayers = true)
+  → CopilotPanel (bottleneck context in system prompt, quick actions include "Will we breach the 3-minute target?")
+```
+
+### Safety rules for bottleneck data
+
+- Never include patient PHI in `BottleneckEvent` fields. Use `affectedPatientId` (opaque ID) not name/DOB/MRN.
+- Use `profile.employeeId` for audit metadata when a bottleneck is acknowledged.
+- Never allow a bottleneck registry failure to crash the app or block emergency read-only workflow.
+- If `buildBottleneckRegistrySnapshot` throws, callers must catch and return an empty/safe snapshot.
+- `impactsThreeMinuteTarget: true` events must always have a non-empty `fallbackAction`.
