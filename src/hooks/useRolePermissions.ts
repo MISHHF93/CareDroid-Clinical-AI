@@ -7,6 +7,7 @@ import {
 } from '../lib/users/permissions';
 import { isReadOnlyRole, isClinicalRole, isAdminRole } from '../lib/users/roleAccess';
 import { useCareDroidUser } from './useCareDroidUser';
+import { compileCareDroidAccessProfile, type CompiledCareDroidAccessProfile } from '../lib/users/canonicalAccess';
 
 export type UseRolePermissionsResult = {
   role: HospitalRole;
@@ -17,11 +18,13 @@ export type UseRolePermissionsResult = {
   isReadOnly: boolean;
   isClinical: boolean;
   isAdmin: boolean;
+  compiledProfile: CompiledCareDroidAccessProfile;
 };
 
 export function useRolePermissions(): UseRolePermissionsResult {
   const { profile } = useCareDroidUser();
   const role = profile.role;
+  const compiledProfile = useMemo(() => compileCareDroidAccessProfile(profile), [profile]);
 
   const permissions = useMemo(() => getPermissionsForRole(role), [role]);
 
@@ -55,6 +58,7 @@ export function useRolePermissions(): UseRolePermissionsResult {
     isReadOnly: isReadOnlyRole(role),
     isClinical: isClinicalRole(role),
     isAdmin: isAdminRole(role),
+    compiledProfile,
   };
 }
 

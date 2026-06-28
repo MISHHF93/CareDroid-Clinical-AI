@@ -278,8 +278,12 @@ function AppShellFrame({ children }: AppShellProps) {
   // Skip the saasRole nav path in demo so the emergency-role dropdown drives the sidebar.
   const navSaasRole = backendEffectiveProfile ? saasRole : undefined;
   const visibleNavigationItems = useMemo(
-    () => getVisibleNavigation(emergencyRole.role, { saasRole: navSaasRole }),
-    [emergencyRole.role, navSaasRole],
+    () =>
+      getVisibleNavigation(emergencyRole.role, {
+        saasRole: navSaasRole,
+        compiledProfile: emergencyRole.compiledProfile,
+      }),
+    [emergencyRole.compiledProfile, emergencyRole.role, navSaasRole],
   );
   const currentPage = useMemo(() => {
     const surface = getEmergencySurface(location.pathname);
@@ -507,6 +511,18 @@ function AppShellFrame({ children }: AppShellProps) {
         return;
       }
 
+      if (e.shiftKey && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        profileNavigate(emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyWhiteboard));
+        return;
+      }
+
+      if (e.shiftKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        profileNavigate(emergencyRole.nearestRoute(CANONICAL_ROUTES.emergencyPulse));
+        return;
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         document.dispatchEvent(new Event('open-command-palette'));
@@ -523,6 +539,22 @@ function AppShellFrame({ children }: AppShellProps) {
       ) {
         e.preventDefault();
         store.toggleCopilot();
+        return;
+      }
+
+      if (e.key.toLowerCase() === 'a' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
+        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyAlerts)) {
+          e.preventDefault();
+          profileNavigate(CANONICAL_ROUTES.emergencyAlerts);
+        }
+        return;
+      }
+
+      if (e.key.toLowerCase() === 'd' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
+        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyDocumentation)) {
+          e.preventDefault();
+          profileNavigate(CANONICAL_ROUTES.emergencyDocumentation);
+        }
         return;
       }
 

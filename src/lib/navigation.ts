@@ -1,6 +1,6 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import type { HospitalRole } from './users/userTypes';
-import { CAREDROID_PERMISSIONS } from './users/permissions';
+import { CAREDROID_PERMISSIONS, getPermissionsForRole } from './users/permissions';
 
 const P = CAREDROID_PERMISSIONS;
 
@@ -220,7 +220,11 @@ export function getRouteAccess(path: string): RouteAccessEntry | undefined {
 export function canRoleAccessRoute(role: HospitalRole, path: string): boolean {
   const entry = getRouteAccess(path);
   if (!entry) return true;
-  return (entry.allowedRoles as HospitalRole[]).includes(role);
+  const permissions = getPermissionsForRole(role) as readonly string[];
+  return (
+    (entry.allowedRoles as HospitalRole[]).includes(role) &&
+    entry.requiredPermissions.every((permission) => permissions.includes(permission))
+  );
 }
 
 export function getNavVisibleRoutes(role: HospitalRole): RouteAccessEntry[] {

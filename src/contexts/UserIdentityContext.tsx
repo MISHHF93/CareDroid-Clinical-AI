@@ -132,6 +132,7 @@ export const useUserIdentity = () => {
 function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themePreference, toolPrefs }) {
   const clientProfile = readLocalClientProfile();
   const profile = user?.profile || {};
+  const caredroidProfile = user?.caredroidProfile || {};
   const workspaces = (localWorkspaces || []).map((workspace) => ({
     id: workspace.id,
     type: workspace.id === 'fleet' ? 'fleet' : workspace.id === 'hospital-operations' ? 'hospital' : 'personal',
@@ -148,13 +149,13 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
   const saasProfile = {
     ...DEFAULT_SAAS_PROFILE,
     userId: user?.id || '',
-    organizationId: clientProfile?.organizationId || profile.organizationId || null,
+    organizationId: clientProfile?.organizationId || caredroidProfile.organizationId || profile.organizationId || null,
     organizationType: clientProfile?.organizationType || profile.organizationType || DEFAULT_SAAS_PROFILE.organizationType,
-    displayName: user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
+    displayName: caredroidProfile.fullName || user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
     email: user?.email || '',
-    role: profile.roleProfileId || user?.role || DEFAULT_SAAS_PROFILE.role,
-    specialty: profile.specialty || '',
-    department: profile.department || '',
+    role: caredroidProfile.saasRole || profile.saasRole || profile.roleProfileId || user?.role || DEFAULT_SAAS_PROFILE.role,
+    specialty: profile.specialty || caredroidProfile.specialties?.[0] || '',
+    department: caredroidProfile.department || profile.department || '',
     defaultWorkspace:
       clientProfile?.defaultWorkspace || activeWorkspace?.id || activeWorkspaceId || DEFAULT_SAAS_PROFILE.defaultWorkspace,
     allowedWorkspaces: clientProfile?.enabledWorkspaces || workspaces.map((workspace) => workspace.id),
@@ -173,14 +174,18 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
     saasProfile,
     account: {
       userId: user?.id || '',
-      displayName: user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
+      displayName: caredroidProfile.fullName || user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
       email: user?.email || '',
-      avatarUrl: profile.avatarUrl,
-      profession: profile.profession || 'Clinician',
-      specialty: profile.specialty,
-      organization: user?.institution || profile.institution,
-      department: profile.department,
-      role: user?.role || 'student',
+      avatarUrl: caredroidProfile.avatarUrl || profile.avatarUrl,
+      profession: profile.profession || caredroidProfile.title || 'Clinician',
+      specialty: profile.specialty || caredroidProfile.specialties?.[0],
+      organization: user?.institution || profile.institution || caredroidProfile.networkId,
+      department: caredroidProfile.department || profile.department,
+      role: caredroidProfile.backendRole || user?.role || 'student',
+      hospitalRole: caredroidProfile.role,
+      emergencyRoleId: caredroidProfile.emergencyRoleId,
+      saasRole: caredroidProfile.saasRole,
+      roleProfileId: caredroidProfile.roleProfileId || profile.roleProfileId,
       country: profile.country,
       timezone: profile.timezone,
       language: profile.languagePreference,
@@ -188,9 +193,9 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
       trustScore: profile.trustScore || 0,
     },
     professional: {
-      credentials: [],
+      credentials: caredroidProfile.credentials || [],
       certifications: [],
-      specialties: profile.specialty ? [profile.specialty] : [],
+      specialties: caredroidProfile.specialties || (profile.specialty ? [profile.specialty] : []),
       experienceLevel: 'mid',
       clinicalInterests: [],
     },

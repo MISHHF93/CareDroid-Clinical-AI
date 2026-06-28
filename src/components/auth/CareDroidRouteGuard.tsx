@@ -1,20 +1,21 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
-import { canRoleAccessRoute, getUnauthorizedFallback } from '../../lib/navigation';
+import { getUnauthorizedFallback } from '../../lib/navigation';
 import { getRoleLabel } from '../../lib/users/roleAccess';
 import { useRolePermissions } from '../../hooks/useRolePermissions';
+import { canAccessRoute } from '../../lib/users/canonicalAccess';
 
 type CareDroidRouteGuardProps = {
   children: React.ReactNode;
 };
 
 export function CareDroidRouteGuard({ children }: CareDroidRouteGuardProps) {
-  const { role } = useRolePermissions();
+  const { role, compiledProfile } = useRolePermissions();
   const { pathname } = useLocation();
 
   // Pass through: unknown paths (not in ROUTE_ACCESS_CONFIG) or permitted roles
-  if (canRoleAccessRoute(role, pathname)) {
+  if (canAccessRoute(compiledProfile, pathname)) {
     return <>{children}</>;
   }
 

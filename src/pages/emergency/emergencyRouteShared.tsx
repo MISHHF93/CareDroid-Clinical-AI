@@ -1,4 +1,5 @@
 ﻿import PatientCard from '../../components/PatientCard';
+import HelpTrigger from '../../components/help/HelpTrigger';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
@@ -76,6 +77,7 @@ export function EmergencyRoutePage({
   const headerActions = (
     <>
       {actions}
+      <HelpTrigger variant="button" className="emergency-route-help-trigger" label="Guide" />
       <MaturityChip maturity={maturity} />
     </>
   );
@@ -87,7 +89,7 @@ export function EmergencyRoutePage({
       title={title}
       titleId={titleId}
       description={showDescription ? description : undefined}
-      actions={actions || maturity ? headerActions : null}
+      actions={headerActions}
       className={`emergency-route-page cd-page-shell${
         compactLayout ? ' emergency-route-page--practitioner-compact' : ''
       }`}

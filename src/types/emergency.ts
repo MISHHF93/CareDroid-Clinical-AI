@@ -705,6 +705,9 @@ export type StaffStatus = 'OnShift' | 'Break' | 'Unavailable' | 'OffShift';
 
 export interface Staff {
   id: EntityId;
+  profileId?: EntityId;
+  canonicalProfileId?: EntityId;
+  employeeId?: string;
   name: string;
   firstName?: string;
   lastName?: string;
@@ -712,6 +715,16 @@ export interface Staff {
   email?: string;
   avatarUrl?: string;
   role: StaffRole;
+  hospitalRole?: string;
+  emergencyRoleId?: string;
+  saasRole?: string;
+  backendRole?: string;
+  departmentId?: string;
+  hospitalSiteId?: string;
+  unitId?: string;
+  specialtyCoverage?: string[];
+  escalationLevel?: string;
+  availabilityStatus?: string;
   roleLabel?: string;
   active: boolean;
   status?: StaffStatus;

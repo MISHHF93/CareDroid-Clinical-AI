@@ -501,3 +501,20 @@ Generated from this report:
 18. `docs/users/developer-guide.md`
 19. `docs/users/quality-safety-guide.md`
 20. `docs/gap-analysis.md`
+
+---
+
+## 10. Reforging Addendum - 2026-06-28
+
+This pass closed several documentation and implementation gaps discovered above:
+
+- Added `docs/DOCUMENTATION_INVENTORY.md` as the current documentation map.
+- Added missing role manuals for specialist, patient flow coordinator, IT administrator, developer, AI Chief, and quality/safety.
+- Added workflow manuals for three-minute response, critical alerts, escalation, department routing, staff assignment, patient handoff, discharge, and analytics.
+- Added operations, deployment, training, troubleshooting, release-note, and improvement-plan documents.
+- Added a canonical Clinical Documentation Assistant route constant and aligned router/manual references to it.
+- Added the documentation route to clinical and operations role access so the mounted page is reachable by the roles described in the manual.
+- Added contextual Guide access to shared emergency route pages.
+- Implemented documented shortcuts for Alerts, Documentation, Whiteboard, and Pulse.
+
+Remaining known gap: several route tests contain historical expectations for labels and redirects that no longer match the current application state. Lint, frontend typecheck, and production build pass.

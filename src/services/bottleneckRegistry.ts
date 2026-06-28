@@ -1,4 +1,9 @@
 import type { Alert, CapacitySnapshot } from '../types/emergency';
+import {
+  getCanonicalRoleMapping,
+  resolveHospitalRole,
+} from '../lib/users/canonicalAccess';
+import type { HospitalRole } from '../lib/users/userTypes';
 
 export type BottleneckCategory =
   | 'clinical_workflow'
@@ -26,6 +31,11 @@ export type BottleneckEvent = {
   resolvedAt?: string;
   ownerRole: string;
   ownerUserId?: string;
+  owningDepartment?: string;
+  owningSite?: string;
+  backupRole?: string;
+  escalationChain?: readonly string[];
+  acknowledgementAuthority?: readonly string[];
   responseDeadline?: string;
   impactsThreeMinuteTarget: boolean;
   fallbackAction: string;
@@ -156,6 +166,45 @@ type BuildBottleneckRegistryInput = {
   };
   existingServiceSignals?: ExistingServiceBottleneckSignals;
 };
+
+const ALERT_BACKUP_ROLES: Readonly<Partial<Record<HospitalRole, HospitalRole>>> = Object.freeze({
+  triage_nurse: 'charge_nurse',
+  registered_nurse: 'charge_nurse',
+  charge_nurse: 'emergency_physician',
+  emergency_physician: 'attending_physician',
+  attending_physician: 'ed_director',
+  patient_flow_coordinator: 'charge_nurse',
+  lab_technician: 'patient_flow_coordinator',
+  radiology_technician: 'patient_flow_coordinator',
+  pharmacist: 'emergency_physician',
+  specialist: 'emergency_physician',
+  security_officer: 'charge_nurse',
+  it_admin: 'hospital_admin',
+});
+
+function canonicalAlertOwnership(input: {
+  ownerRole?: string;
+  ownerUserId?: string;
+  affectedDepartment?: string;
+  owningDepartment?: string;
+  owningSite?: string;
+  responseDeadline?: string;
+}) {
+  const hospitalRole = resolveHospitalRole(input.ownerRole || 'charge_nurse');
+  const mapping = getCanonicalRoleMapping(hospitalRole);
+  const backupRole = ALERT_BACKUP_ROLES[hospitalRole] || mapping.hospitalRole;
+  const escalationRole = ALERT_BACKUP_ROLES[backupRole] || 'ed_director';
+  return {
+    ownerRole: mapping.hospitalRole,
+    ownerUserId: input.ownerUserId,
+    owningDepartment: input.owningDepartment || input.affectedDepartment || 'Emergency Department',
+    owningSite: input.owningSite || 'site-central-city',
+    backupRole,
+    escalationChain: Object.freeze([mapping.hospitalRole, backupRole, escalationRole]),
+    acknowledgementAuthority: Object.freeze([mapping.hospitalRole, backupRole]),
+    responseDeadline: input.responseDeadline,
+  };
+}
 
 export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.freeze([
   {
@@ -701,8 +750,10 @@ function isCriticalPatient(patient?: PatientReferenceInput): boolean {
 }
 
 function bottleneck(input: Omit<BottleneckEvent, 'detectedAt' | 'status'>, detectedAt: string): BottleneckEvent {
+  const ownership = canonicalAlertOwnership(input);
   return {
     ...input,
+    ...ownership,
     detectedAt,
     status: 'active',
   };
@@ -1264,9 +1315,15 @@ export function bottleneckEventsToAlerts(events: BottleneckEvent[], previousAler
           category: event.category,
           serviceName: event.serviceName,
           ownerRole: event.ownerRole,
+          ownerUserId: event.ownerUserId,
+          owningDepartment: event.owningDepartment,
+          owningSite: event.owningSite,
+          backupRole: event.backupRole,
+          escalationChain: event.escalationChain,
+          acknowledgementAuthority: event.acknowledgementAuthority,
           responseDeadline: event.responseDeadline,
           impactsThreeMinuteTarget: event.impactsThreeMinuteTarget,
-        },
+        } as any,
       };
     });
 }

@@ -410,6 +410,41 @@ describe('bottleneckEventsToAlerts', () => {
     expect(alerts[0].dismissed).toBe(false);
   });
 
+  it('carries canonical alert ownership metadata', () => {
+    const events = [
+      makeEvent({
+        id: 'bn-owner',
+        ownerRole: 'triage_nurse',
+        ownerUserId: 'demo-sofia-alvarez',
+        owningDepartment: 'dept-triage',
+        owningSite: 'site-central-city',
+        backupRole: 'charge_nurse',
+        escalationChain: ['triage_nurse', 'charge_nurse', 'emergency_physician'],
+        acknowledgementAuthority: ['triage_nurse', 'charge_nurse'],
+      }),
+    ];
+    const alerts = bottleneckEventsToAlerts(events);
+
+    expect(alerts[0].metadata).toMatchObject({
+      ownerRole: 'triage_nurse',
+      ownerUserId: 'demo-sofia-alvarez',
+      owningDepartment: 'dept-triage',
+      owningSite: 'site-central-city',
+      backupRole: 'charge_nurse',
+      responseDeadline: undefined,
+      impactsThreeMinuteTarget: true,
+    });
+    expect(alerts[0].metadata?.escalationChain).toEqual([
+      'triage_nurse',
+      'charge_nurse',
+      'emergency_physician',
+    ]);
+    expect(alerts[0].metadata?.acknowledgementAuthority).toEqual([
+      'triage_nurse',
+      'charge_nurse',
+    ]);
+  });
+
   it('includes critical severity events as Critical alerts', () => {
     const events = [makeEvent({ id: 'bn-critical', severity: 'critical', impactsThreeMinuteTarget: true })];
     const alerts = bottleneckEventsToAlerts(events);

@@ -1,13 +1,36 @@
 import type { CareDroidUserProfile } from './userTypes';
 import { HOSPITAL_SITES, CITY_ZONES, DEPARTMENTS } from './hospitalNetwork';
 import { getPermissionsForRole, canRoleReceiveCriticalAlerts, canRoleUseAIChief } from './permissions';
+import { normalizeCareDroidProfile } from './canonicalAccess';
 
 const now = new Date().toISOString();
 
 function makeDemoUser(
-  partial: Omit<CareDroidUserProfile, 'permissions' | 'assignedPatients' | 'currentLoad' | 'lastActiveAt' | 'canReceiveCriticalAlerts' | 'canUseAIChief'>
+  partial: Partial<CareDroidUserProfile> &
+    Pick<
+      CareDroidUserProfile,
+      | 'id'
+      | 'employeeId'
+      | 'fullName'
+      | 'preferredName'
+      | 'email'
+      | 'phone'
+      | 'avatarUrl'
+      | 'role'
+      | 'title'
+      | 'department'
+      | 'hospitalSite'
+      | 'cityZone'
+      | 'shiftStatus'
+      | 'shiftStart'
+      | 'shiftEnd'
+      | 'licenseNumber'
+      | 'specialties'
+      | 'availabilityStatus'
+      | 'escalationLevel'
+    >
 ): CareDroidUserProfile {
-  return Object.freeze({
+  return normalizeCareDroidProfile({
     ...partial,
     permissions: getPermissionsForRole(partial.role),
     assignedPatients: [],

@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
-import type { CareDroidUserProfile, HospitalRole } from '../lib/users/userTypes';
+import type { CareDroidUserProfile } from '../lib/users/userTypes';
 import { DEMO_USERS, getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
-import { toEmergencyRoleId } from '../lib/users/roleAccess';
 import { applyDemoRoleView } from '../config/demoPersonaModel';
+import { compileCareDroidAccessProfile } from '../lib/users/canonicalAccess';
 
 const STORAGE_KEY = 'cd_demo_user_id';
 
@@ -53,20 +53,44 @@ export function useCareDroidUser(): UseCareDroidUserResult {
   const switchDemoUser = useCallback(
     (userId: string) => {
       const next = getDemoUserById(userId) ?? getDefaultDemoUser();
+      const compiled = compileCareDroidAccessProfile(next);
       setProfile(next);
       writeStoredDemoUserId(next.id);
 
-      const emergencyRoleId = toEmergencyRoleId(next.role as HospitalRole);
-      setUser(
-        applyDemoRoleView(
-          {
-            id: next.id,
-            email: next.email,
-            authMode: 'open-access',
+      const emergencyRoleId = compiled.role.emergencyRoleId;
+      const nextUser = applyDemoRoleView(
+        {
+          id: next.id,
+          email: next.email,
+          name: next.fullName,
+          displayName: next.fullName,
+          authMode: 'open-access',
+          permissions: compiled.permissions,
+          caredroidProfile: compiled.user,
+          compiledAccessProfile: compiled,
+          profile: {
+            roleProfileId: compiled.role.roleProfileId,
+            hospitalRole: compiled.role.hospitalRole,
+            emergencyRoleId,
+            saasRole: compiled.role.saasRole,
+            backendRole: compiled.role.backendRole,
+            organizationId: next.organizationId,
+            networkId: next.networkId,
+            hospitalSiteId: next.hospitalSiteId,
+            departmentId: next.departmentId,
+            unitId: next.unitId,
+            department: next.department,
+            hospitalSite: next.hospitalSite,
           },
-          emergencyRoleId,
-        ),
+        },
+        emergencyRoleId,
       );
+      setUser(nextUser);
+      try {
+        window.dispatchEvent(new CustomEvent('caredroid:demo-user-switched', { detail: compiled }));
+      } catch {
+        // no window/event target in tests
+      }
     },
     [setUser],
   );

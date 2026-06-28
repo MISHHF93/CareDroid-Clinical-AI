@@ -200,7 +200,7 @@ export function getDashboardWidgets(role: HospitalRole): DashboardWidgets {
 export function isReadOnlyRole(role: HospitalRole): boolean {
   const readOnlyRoles: HospitalRole[] = [
     'demo_observer', 'security_officer', 'social_worker', 'lab_technician',
-    'radiology_technician',
+    'radiology_technician', 'quality_safety_officer',
   ];
   return readOnlyRoles.includes(role);
 }

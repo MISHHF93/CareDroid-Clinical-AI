@@ -7,7 +7,10 @@ import {
   getSuggestedOwnerForScenario,
   getVisibleScenariosForRole,
   filterAiRecommendationsByRole,
+  filterAiRecommendationsByProfile,
+  getCanonicalAiRecommendationRoute,
 } from './aiChiefRouting';
+import { getDemoUserById } from './demoUsers';
 
 describe('AI_CHIEF_ROUTING', () => {
   it('every scenario has visibleToRoles, suggestedOwnerRole, and escalationRole', () => {
@@ -92,5 +95,31 @@ describe('filterAiRecommendationsByRole', () => {
     expect(forTriage.some((r) => r.scenario === 'critical_chest_pain')).toBe(true);
     expect(forTriage.some((r) => r.scenario === 'bed_capacity_breach')).toBe(false);
     expect(forTriage.some((r) => r.scenario === 'security_incident')).toBe(false);
+  });
+});
+
+describe('canonical AI Chief routing', () => {
+  it('includes owner/site/department metadata for a compiled profile', () => {
+    const profile = getDemoUserById('demo-sofia-alvarez');
+    expect(profile).toBeTruthy();
+    const route = getCanonicalAiRecommendationRoute('critical_chest_pain', profile);
+
+    expect(route.ownerRole).toBe('triage_nurse');
+    expect(route.owningDepartment).toBe(profile?.departmentId);
+    expect(route.owningSite).toBe(profile?.hospitalSiteId);
+    expect(route.visibleToUsers).toContain(profile?.id);
+    expect(route.fallbackOwnerRole).toBe('charge_nurse');
+  });
+
+  it('filters by canonical profile and excludes read-only demo observers', () => {
+    const physician = getDemoUserById('demo-maya-chen');
+    const viewer = getDemoUserById('demo-viewer');
+    const recommendations = [
+      { scenario: 'critical_chest_pain' as const, text: 'Chest pain alert' },
+      { scenario: 'bed_capacity_breach' as const, text: 'Capacity alert' },
+    ];
+
+    expect(filterAiRecommendationsByProfile(recommendations, physician!)).toHaveLength(1);
+    expect(filterAiRecommendationsByProfile(recommendations, viewer!)).toHaveLength(0);
   });
 });

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T04:57:33.783Z",
+  "generatedAt": "2026-06-28T17:02:50.180Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -43,6 +43,7 @@
       "/emergency/boarding",
       "/emergency/referrals",
       "/emergency/copilot",
+      "/emergency/documentation",
       "/emergency/tools",
       "/emergency/pulse",
       "/emergency/shift",
@@ -135,6 +136,10 @@
       }
     ],
     "orphans": [
+      {
+        "route": "/emergency/documentation",
+        "reason": "No surface registry entry"
+      },
       {
         "route": "/emergency/alerts",
         "reason": "No surface registry entry"

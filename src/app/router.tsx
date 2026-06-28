@@ -94,7 +94,6 @@ import TrackMindRouteGuard from '../components/TrackMindRouteGuard';
 import ProfileRouteGuard from '../components/ProfileRouteGuard';
 import {
   getEmergencyRoleHomeRoute,
-  EMERGENCY_ROLE_IDS,
   getReceptionEmbeddedIntakePath,
 } from '../config/emergencyRolePermissions';
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
@@ -198,12 +197,6 @@ function EmergencyAccessDenied({ requestedPath }) {
 
 function EmergencyRouteGuard({ path, children }) {
   const emergencyRole = useEmergencyRolePermissions();
-  if (
-    path === CANONICAL_ROUTES.emergencyWhiteboard &&
-    emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk
-  ) {
-    return <Navigate to={CANONICAL_ROUTES.emergencyReception} replace />;
-  }
   if (!emergencyRole.canAccessRoute(path)) {
     return <EmergencyAccessDenied requestedPath={path} />;
   }
@@ -798,9 +791,9 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/emergency/documentation"
+          path={CANONICAL_ROUTES.emergencyDocumentation}
           element={
-            <EmergencyRouteGuard path="/emergency/documentation">
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDocumentation}>
               <LazyRoute label="Loading documentation assistant...">
                 <ClinicalDocumentationAssistant />
               </LazyRoute>

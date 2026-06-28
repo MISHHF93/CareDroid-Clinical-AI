@@ -1,13 +1,25 @@
 import type { HospitalRole } from './userTypes';
+import {
+  compileCareDroidAccessProfile,
+  type CompiledCareDroidAccessProfile,
+} from './canonicalAccess';
+import type { CareDroidUserProfile } from './userTypes';
 
 export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
 
 export type AiRecommendationRoute = {
   visibleToRoles: readonly HospitalRole[];
   suggestedOwnerRole: HospitalRole;
+  ownerRole?: HospitalRole;
+  ownerUserId?: string | null;
+  owningDepartment?: string | null;
+  owningSite?: string | null;
   escalationRole: HospitalRole;
+  escalationUserId?: string | null;
+  visibleToUsers?: readonly string[];
   requiresClinicianReview: boolean;
   clinicianOverrideAvailable: boolean;
+  fallbackOwnerRole?: HospitalRole;
 };
 
 export type AlertScenario =
@@ -32,6 +44,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'specialist', 'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'emergency_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -42,6 +55,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
       ],
       suggestedOwnerRole: 'charge_nurse',
+      fallbackOwnerRole: 'triage_nurse',
       escalationRole: 'emergency_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -53,6 +67,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'emergency_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -63,6 +78,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
       ],
       suggestedOwnerRole: 'triage_nurse',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'attending_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -74,6 +90,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'paramedic', 'registered_nurse',
       ],
       suggestedOwnerRole: 'charge_nurse',
+      fallbackOwnerRole: 'emergency_physician',
       escalationRole: 'attending_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -85,6 +102,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'registered_nurse',
       ],
       suggestedOwnerRole: 'triage_nurse',
+      fallbackOwnerRole: 'social_worker',
       escalationRole: 'emergency_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -95,6 +113,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'emergency_physician', 'attending_physician', 'pharmacist', 'charge_nurse',
       ],
       suggestedOwnerRole: 'pharmacist',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'emergency_physician',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: true,
@@ -105,7 +124,8 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'emergency_physician', 'attending_physician', 'charge_nurse', 'lab_technician',
       ],
       suggestedOwnerRole: 'lab_technician',
-      escalationRole: 'emergency_physician',
+      escalationRole: 'patient_flow_coordinator',
+      fallbackOwnerRole: 'charge_nurse',
       requiresClinicianReview: true,
       clinicianOverrideAvailable: false,
     },
@@ -115,7 +135,8 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'charge_nurse', 'patient_flow_coordinator', 'ed_director', 'hospital_admin',
       ],
       suggestedOwnerRole: 'patient_flow_coordinator',
-      escalationRole: 'ed_director',
+      escalationRole: 'charge_nurse',
+      fallbackOwnerRole: 'hospital_admin',
       requiresClinicianReview: false,
       clinicianOverrideAvailable: false,
     },
@@ -125,6 +146,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'triage_nurse', 'charge_nurse', 'ed_director',
       ],
       suggestedOwnerRole: 'triage_nurse',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'charge_nurse',
       requiresClinicianReview: false,
       clinicianOverrideAvailable: false,
@@ -136,6 +158,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'registration_clerk',
       ],
       suggestedOwnerRole: 'paramedic',
+      fallbackOwnerRole: 'triage_nurse',
       escalationRole: 'charge_nurse',
       requiresClinicianReview: false,
       clinicianOverrideAvailable: false,
@@ -146,6 +169,7 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
         'security_officer', 'charge_nurse', 'ed_director', 'hospital_admin',
       ],
       suggestedOwnerRole: 'security_officer',
+      fallbackOwnerRole: 'charge_nurse',
       escalationRole: 'ed_director',
       requiresClinicianReview: false,
       clinicianOverrideAvailable: false,
@@ -154,6 +178,45 @@ export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRo
 
 export function getAiRecommendationRoute(scenario: AlertScenario): AiRecommendationRoute {
   return AI_CHIEF_ROUTING[scenario];
+}
+
+function compileInputProfile(
+  profile?: CareDroidUserProfile | CompiledCareDroidAccessProfile | null,
+): CompiledCareDroidAccessProfile | null {
+  if (!profile) return null;
+  return 'navigationAccess' in profile ? profile : compileCareDroidAccessProfile(profile);
+}
+
+export function getCanonicalAiRecommendationRoute(
+  scenario: AlertScenario,
+  profile?: CareDroidUserProfile | CompiledCareDroidAccessProfile | null,
+): AiRecommendationRoute {
+  const base = AI_CHIEF_ROUTING[scenario];
+  const compiled = compileInputProfile(profile);
+  return Object.freeze({
+    ...base,
+    ownerRole: base.suggestedOwnerRole,
+    ownerUserId:
+      compiled && compiled.role.hospitalRole === base.suggestedOwnerRole ? compiled.user.id : null,
+    owningDepartment: compiled?.user.departmentId || null,
+    owningSite: compiled?.user.hospitalSiteId || null,
+    escalationUserId:
+      compiled && compiled.role.hospitalRole === base.escalationRole ? compiled.user.id : null,
+    visibleToUsers:
+      compiled && isAlertVisibleToCompiledProfile(scenario, compiled) ? Object.freeze([compiled.user.id]) : Object.freeze([]),
+    fallbackOwnerRole: base.fallbackOwnerRole || base.escalationRole,
+  });
+}
+
+export function isAlertVisibleToCompiledProfile(
+  scenario: AlertScenario,
+  profile: CareDroidUserProfile | CompiledCareDroidAccessProfile,
+): boolean {
+  const compiled = compileInputProfile(profile);
+  if (!compiled || compiled.readOnly || !compiled.aiCapabilities.canUseAIChief) return false;
+  return (AI_CHIEF_ROUTING[scenario]?.visibleToRoles as HospitalRole[]).includes(
+    compiled.role.hospitalRole,
+  );
 }
 
 export function isAlertVisibleToRole(scenario: AlertScenario, role: HospitalRole): boolean {
@@ -179,4 +242,11 @@ export function filterAiRecommendationsByRole<T extends { scenario: AlertScenari
   role: HospitalRole,
 ): T[] {
   return recommendations.filter((r) => isAlertVisibleToRole(r.scenario, role));
+}
+
+export function filterAiRecommendationsByProfile<T extends { scenario: AlertScenario }>(
+  recommendations: T[],
+  profile: CareDroidUserProfile | CompiledCareDroidAccessProfile,
+): T[] {
+  return recommendations.filter((r) => isAlertVisibleToCompiledProfile(r.scenario, profile));
 }

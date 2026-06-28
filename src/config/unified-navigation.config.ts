@@ -18,6 +18,11 @@ import {
   getSuiteById,
   type CareDroidSuiteId,
 } from '../../lib/features/suiteRegistry';
+import {
+  canAccessRoute,
+  type CompiledCareDroidAccessProfile,
+} from '../lib/users/canonicalAccess';
+import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
@@ -116,6 +121,12 @@ export type NavigationItem = Readonly<{
   featureId: string;
   order: number;
   roles: readonly string[];
+  allowedRoles?: readonly string[];
+  requiredPermissions: readonly string[];
+  visibleToProfiles: readonly string[];
+  priority: number;
+  emergencySafe: boolean;
+  readOnlyAllowed: boolean;
   isEmergencyCore: boolean;
   suiteId?: CareDroidSuiteId;
   suiteLabel?: string;
@@ -351,6 +362,29 @@ const NAV_FEATURE_IDS = Object.freeze({
   admin: 'admin_console',
 } as const);
 
+const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  reception: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  whiteboard: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  patients: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  intake: [CAREDROID_PERMISSIONS.PATIENT_CREATE],
+  ems: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  queues: [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.TRIAGE_READ],
+  reassessment: [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.TRIAGE_READ],
+  capacity: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
+  referrals: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  copilot: [CAREDROID_PERMISSIONS.AI_READ],
+  tools: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  analytics: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
+  settings: [CAREDROID_PERMISSIONS.SETTINGS_READ],
+  pulse: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
+  shift: [CAREDROID_PERMISSIONS.STAFF_READ],
+  laboratory: [CAREDROID_PERMISSIONS.LABS_READ],
+  audit: [CAREDROID_PERMISSIONS.AUDIT_READ],
+  admin: [CAREDROID_PERMISSIONS.SETTINGS_READ],
+});
+
+const READ_ONLY_NAV_ITEM_IDS = new Set(['whiteboard', 'alerts', 'analytics', 'help', 'audit', 'laboratory']);
+
 export const FEATURE_GATE_ALIASES = Object.freeze({
   referral_intel: 'referral_intelligence',
   capacity_intel: 'capacity_intelligence',
@@ -370,6 +404,9 @@ function navigationItem(item: NavigationItem): NavigationItem {
     suiteId,
     suiteLabel: suite?.label,
     roles: Object.freeze([...item.roles]),
+    allowedRoles: Object.freeze([...(item.allowedRoles || item.roles)]),
+    requiredPermissions: Object.freeze([...(item.requiredPermissions || [])]),
+    visibleToProfiles: Object.freeze([...(item.visibleToProfiles || [])]),
     activePaths: Object.freeze(item.activePaths ? [...item.activePaths] : [item.path]),
   });
 }
@@ -419,6 +456,12 @@ export const NAVIGATION_ITEMS = Object.freeze(
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
       order: index + 1,
       roles: item.roles || rolesForRoute(item.route),
+      allowedRoles: item.roles || rolesForRoute(item.route),
+      requiredPermissions: NAV_REQUIRED_PERMISSIONS[item.id] || [],
+      visibleToProfiles: rolesForRoute(item.route),
+      priority: index + 1,
+      emergencySafe: item.route.startsWith('/emergency') || item.route === CANONICAL_ROUTES.workspace,
+      readOnlyAllowed: READ_ONLY_NAV_ITEM_IDS.has(item.id),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
@@ -460,8 +503,18 @@ export function getPilotCustomerNavigationItems(
 
 export function getVisibleNavigation(
   userRole: string | null | undefined,
-  options: { saasRole?: string | null } = {},
+  options: { saasRole?: string | null; compiledProfile?: CompiledCareDroidAccessProfile | null } = {},
 ): readonly NavigationItem[] {
+  if (options.compiledProfile) {
+    const visibleItems = getPilotCustomerNavigationItems(
+      NAVIGATION_ITEMS.filter(
+        (item) =>
+          canAccessRoute(options.compiledProfile as CompiledCareDroidAccessProfile, item.route) &&
+          (!options.compiledProfile?.readOnly || item.readOnlyAllowed),
+      ),
+    );
+    return sortNavigationItemsForRole(visibleItems, options.compiledProfile.role.emergencyRoleId);
+  }
   if (options.saasRole && (SAAS_USER_ROLES as readonly string[]).includes(options.saasRole)) {
     return getVisibleNavigationForSaasRole(options.saasRole);
   }

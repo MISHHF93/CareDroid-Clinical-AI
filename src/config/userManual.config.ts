@@ -378,7 +378,7 @@ export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([
     title: 'Clinical Documentation Assistant',
     eyebrow: 'Ambient scribe · AI-assisted notes',
     purpose: 'Generate AI-drafted clinical notes from patient context, vitals, and chief complaint — reviewed and signed by the clinician.',
-    route: '/emergency/documentation',
+    route: CANONICAL_ROUTES.emergencyDocumentation,
     roles: [EMERGENCY_ROLE_IDS.physician, EMERGENCY_ROLE_IDS.chargeNurse, EMERGENCY_ROLE_IDS.triageNurse],
     whenToUse: 'After assessment or at any point a clinical note is needed. Open from the patient card or directly from the sidebar.',
     procedure: [
