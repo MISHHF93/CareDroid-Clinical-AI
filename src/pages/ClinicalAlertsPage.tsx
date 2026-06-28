@@ -8,6 +8,10 @@ import {
   acknowledgeClinicalAlertApi,
   fetchClinicalAlerts,
 } from '../services/clinicalAlertsApi';
+import { useRolePermissions } from '../hooks/useRolePermissions';
+import { useCareDroidUser } from '../hooks/useCareDroidUser';
+import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
+import type { AuditMetadata } from '../lib/users/userTypes';
 import './ClinicalAlertsPage.css';
 
 type AlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
@@ -79,6 +83,10 @@ function formatTime(date: Date): string {
 
 const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
+  const { can, isReadOnly } = useRolePermissions();
+  const { profile } = useCareDroidUser();
+  const canAcknowledge = can(CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE);
+  const canExport = can(CAREDROID_PERMISSIONS.REPORTS_EXPORT);
   const [alerts, setAlerts] = useState<ClinicalAlert[]>([]);
   const [filteredAlerts, setFilteredAlerts] = useState<ClinicalAlert[]>([]);
   const [selectedSeverity, setSelectedSeverity] = useState<AlertSeverity | 'all'>('all');
@@ -139,10 +147,19 @@ const ClinicalAlertsPage = () => {
   }, [selectedSeverity, searchTerm, alerts]);
 
   const handleAcknowledge = async (alertId: string) => {
+    const audit: AuditMetadata = {
+      createdBy: profile.employeeId,
+      updatedBy: profile.employeeId,
+      acknowledgedBy: profile.employeeId,
+      timestamp: new Date().toISOString(),
+      userRole: profile.role,
+    };
+
     if (alertsApiEnabled) {
       const result = await acknowledgeClinicalAlertApi(alertId, {
-        acknowledgedAt: new Date().toISOString(),
-      });
+        acknowledgedAt: audit.timestamp,
+        audit,
+      } as any);
       if (!result.ok) {
         setApiNotice(
           `${result.message || 'Unable to acknowledge alert on the server.'} Updated locally only.`,
@@ -187,6 +204,17 @@ const ClinicalAlertsPage = () => {
           Acknowledged <strong>{alerts.length - unacknowledgedCount}</strong>
         </span>
       </div>
+
+      {isReadOnly && (
+        <div
+          className="alerts-readonly-banner"
+          role="status"
+          aria-live="polite"
+          aria-label="Read-only mode active"
+        >
+          Read-only mode — {profile.role} cannot acknowledge or export alerts.
+        </div>
+      )}
 
       {!alertsApiEnabled ? (
         <ApiStateBanner
@@ -307,17 +335,26 @@ const ClinicalAlertsPage = () => {
 
                     <div className="alert-card__actions">
                       {alert.status === 'unacknowledged' ? (
-                        <button
-                          type="button"
-                          className="alert-card__btn-acknowledge"
-                          onClick={() => handleAcknowledge(alert.id)}
-                          aria-label={`Acknowledge alert: ${alert.title}`}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          Acknowledge
-                        </button>
+                        canAcknowledge ? (
+                          <button
+                            type="button"
+                            className="alert-card__btn-acknowledge"
+                            onClick={() => handleAcknowledge(alert.id)}
+                            aria-label={`Acknowledge alert: ${alert.title}`}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Acknowledge
+                          </button>
+                        ) : (
+                          <span
+                            className="alert-card__readonly-label"
+                            aria-label="Acknowledgement not available for your role"
+                          >
+                            View only
+                          </span>
+                        )
                       ) : (
                         <span className="alert-card__acknowledged-label">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -326,16 +363,18 @@ const ClinicalAlertsPage = () => {
                           Reviewed
                         </span>
                       )}
-                      <button
-                        type="button"
-                        className="alert-card__btn-export"
-                        aria-label={`Export details for alert: ${alert.title}`}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Export
-                      </button>
+                      {canExport && (
+                        <button
+                          type="button"
+                          className="alert-card__btn-export"
+                          aria-label={`Export details for alert: ${alert.title}`}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                          </svg>
+                          Export
+                        </button>
+                      )}
                     </div>
                   </article>
                 </li>

@@ -1,4 +1,5 @@
 .emergency-pulse {
+  align-content: start;
   background: var(--medical-surface-page, #f0f9ff);
   color: var(--medical-ink, #111827);
   display: grid;

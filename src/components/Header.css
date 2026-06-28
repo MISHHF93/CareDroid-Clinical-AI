@@ -11,6 +11,7 @@
   box-sizing: border-box;
   display: grid;
   grid-template-rows: 48px;
+  overflow: hidden;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
   background: var(--app-surface-1, #ffffff);
 }
@@ -19,7 +20,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  height: 48px;
   min-width: 0;
+  overflow: hidden;
   padding: 0 16px;
 }
 
@@ -42,7 +45,9 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
+  height: 48px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .caredroid-header--pilot-metrics .caredroid-header__center {
@@ -127,8 +132,38 @@
 }
 
 .caredroid-header__central-status {
+  align-items: center;
+  height: 32px;
   min-width: 0;
   overflow: hidden;
+}
+
+.caredroid-header__central-status .operational-alert-rail__strip.operational-strip--compact {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  height: 32px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.caredroid-header__central-status .operational-strip__metric {
+  align-items: baseline;
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: 4px;
+  max-width: 128px;
+  min-height: 24px;
+  min-width: 0;
+  padding: 2px 7px;
+}
+
+.caredroid-header__central-status .operational-strip__metric strong,
+.caredroid-header__central-status .operational-strip__metric span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @keyframes emergency-os-sync-pulse {

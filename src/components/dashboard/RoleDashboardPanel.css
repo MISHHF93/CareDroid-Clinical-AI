@@ -1,0 +1,70 @@
+/* RoleDashboardPanel — role-contextual widget cards */
+
+.cd-role-dashboard-panel {
+  padding: clamp(16px, 2vw, 24px);
+  display: grid;
+  gap: 20px;
+}
+
+.cd-role-dashboard-panel__header {
+  border-bottom: 1px solid var(--app-panel-border, var(--color-border, #e5e7eb));
+  padding-bottom: 12px;
+}
+
+.cd-role-dashboard-panel__context {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-fg-muted, var(--color-text-muted, #6b7280));
+  margin: 0;
+}
+
+.cd-role-dashboard-panel__section {
+  display: grid;
+  gap: 12px;
+}
+
+.cd-role-dashboard-panel__section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-fg-muted, var(--color-text-muted, #6b7280));
+  margin: 0;
+}
+
+.cd-role-dashboard-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+/* Widget card */
+.cd-role-widget-card {
+  background: var(--app-surface-1, var(--color-surface, #ffffff));
+  border: 1px solid var(--app-panel-border, var(--color-border, #e5e7eb));
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: default;
+  outline: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.cd-role-widget-card:focus-visible {
+  box-shadow: 0 0 0 2px var(--app-accent, #2563eb);
+  border-color: var(--app-accent, #2563eb);
+}
+
+.cd-role-widget-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--app-fg, var(--color-text-primary, #111827));
+  margin: 0 0 4px;
+}
+
+.cd-role-widget-card__body {
+  font-size: 12px;
+  color: var(--app-fg-muted, var(--color-text-muted, #6b7280));
+  margin: 0;
+}

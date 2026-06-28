@@ -15,6 +15,7 @@ import {
 import { UserIdentityProvider, useUserIdentity } from '../contexts/UserIdentityContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 import PilotExtensionRouteGuard from '../components/PilotExtensionRouteGuard';
+import CareDroidRouteGuard from '../components/auth/CareDroidRouteGuard';
 import EdApplicationEntryRedirect from '../components/EdApplicationEntryRedirect';
 import { getEdApplicationHomeRoute } from '../config/edApplication.config';
 import { AppShell } from '../components/AppShell';
@@ -560,9 +561,11 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.adminOperations}
           element={
-            <LazyRoute label="Loading admin console...">
-              <AdminOperationsShell />
-            </LazyRoute>
+            <CareDroidRouteGuard>
+              <LazyRoute label="Loading admin console...">
+                <AdminOperationsShell />
+              </LazyRoute>
+            </CareDroidRouteGuard>
           }
         >
           <Route index element={<LazyRoute label="Loading admin overview..."><AdminOperationsHome /></LazyRoute>} />
@@ -911,7 +914,7 @@ export function AppRoutes() {
         <Route path={CANONICAL_ROUTES.featureFlags} element={<LazyRoute label="Loading feature flags..."><FeatureManagement /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.systemHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.saasHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.audit} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
+        <Route path={CANONICAL_ROUTES.audit} element={<CareDroidRouteGuard><LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute></CareDroidRouteGuard>} />
         <Route path={CANONICAL_ROUTES.security} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.regulatory} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.aiGovernance} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />

@@ -123,3 +123,42 @@ Use `src/lib/users/aiChiefRouting.ts` to resolve visibility and escalation by al
 Where supported, attach `AuditMetadata` from `src/lib/users/userTypes.ts` to mutations:
 - `createdBy`, `updatedBy`, `acknowledgedBy`, `reviewedBy`, `escalatedBy`, `timestamp`, `userRole`
 - Never log PHI. Log only role, intent, field names, status, and timestamps.
+- Use `profile.employeeId` (not `fullName`, `email`, or `phone`) for `createdBy`/`updatedBy`/`acknowledgedBy`.
+
+### Hook and component aliases
+
+Two hook aliases reduce naming friction for consumers who prefer more explicit names:
+- `useCurrentUser()` from `src/hooks/useCurrentUser.ts` — named wrapper over `useCareDroidUser()`, same return type.
+- `usePermissions()` from `src/hooks/usePermissions.ts` — named wrapper over `useRolePermissions()`, same return type.
+
+localStorage utilities for the current demo user session live in `src/lib/auth/currentUser.ts`:
+- `readCurrentDemoUserId()`, `writeCurrentDemoUserId(id)`, `clearCurrentDemoUser()`, `resolveCurrentDemoUser()`
+
+Component aliases at `src/components/auth/`:
+- `RoleBadge.tsx` — re-exports `RoleBadge` from `src/domain/staff/RoleBadge`.
+- `UserSwitcher.tsx` — re-exports `DemoUserSwitcher` as `UserSwitcher`.
+
+### CareDroidRouteGuard
+
+`src/components/auth/CareDroidRouteGuard.tsx` enforces CareDroid-level route access for routes defined in `src/lib/navigation.ts` that are NOT covered by `EmergencyRouteGuard`:
+- Uses `useRolePermissions()` to get the active role.
+- Calls `canRoleAccessRoute(role, pathname)` — passes through unknown paths (safe for any future routes).
+- Shows an "Access denied" view with a link to `getUnauthorizedFallback()` if the role is not in `allowedRoles`.
+- Applied in `router.tsx` to `/admin/operations` and `/audit` routes.
+- Do NOT apply to `emergency/*` routes — those are handled by `EmergencyRouteGuard`.
+
+### RoleDashboardPanel
+
+`src/components/dashboard/RoleDashboardPanel.tsx` renders role-specific widget cards for the active user:
+- Reads `getDashboardWidgets(role)` from `roleAccess.ts` to get `{ primary, secondary }` widget IDs.
+- Renders titled widget cards in "Primary" and "Secondary" groups.
+- Shows the active role, department, and hospital site from the current demo user profile.
+- Use this component on landing or dashboard pages to provide role-contextual content without hardcoding role checks in page files.
+
+### ClinicalAlertsPage role gating
+
+`src/pages/ClinicalAlertsPage.tsx` enforces RBAC on alert actions:
+- "Acknowledge" button: gated on `can(CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE)`. Roles without this permission see a "View only" label instead.
+- "Export" button: gated on `can(CAREDROID_PERMISSIONS.REPORTS_EXPORT)`. Hidden for roles that lack this permission.
+- Read-only banner: shown when `isReadOnly` is true (demo_observer, security_officer, social_worker, lab_technician, radiology_technician).
+- Every acknowledgement attaches `AuditMetadata` with `acknowledgedBy` (employeeId), `userRole`, and `timestamp`. Never include PHI fields.
