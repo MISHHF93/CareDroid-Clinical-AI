@@ -28,6 +28,7 @@ import { advancePatientJourneyState, advancePatientToBoarding, getDefaultNextPat
 import { arrivalModeLabel } from '../services/arrivalControlLayer';
 import { normalizePatientArrival, triageAcuityToPriority } from '../services/patientArrivalModel';
 import ReassessmentTimerBadge from './reassessment/ReassessmentTimerBadge';
+import ThreeMinuteTimer from './emergency/ThreeMinuteTimer';
 import ReassessmentTimerStrip from './reassessment/ReassessmentTimerStrip';
 import HighRiskComplaintFlagBadge from './reception/HighRiskComplaintFlagBadge';
 import FitToWaitBadge from './waiting-room/FitToWaitBadge';
@@ -432,6 +433,13 @@ function PatientCard({
   const scores = scoreBadges(patient);
   const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
   const priorityLabel = PriorityLabel[displayPriority] || String(displayPriority);
+  const showThreeMinuteTimer =
+    (displayPriority === 'P1' || displayPriority === 'P2') &&
+    (patient.state === PatientState.Arrival ||
+      patient.state === PatientState.Registration ||
+      patient.state === PatientState.Triage ||
+      patient.state === PatientState.Waiting) &&
+    Boolean(patient.arrivalTime);
   const signalBadges = getSignalBadges({
     patient,
     arrival,
@@ -695,6 +703,9 @@ function PatientCard({
         <span className="patient-card__priority-code">{displayPriority}</span>
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
+        {showThreeMinuteTimer && (
+          <ThreeMinuteTimer startTime={patient.arrivalTime} compact />
+        )}
         <WhiteboardOperationalIconStrip
           patient={patient}
           room={patientRoom}

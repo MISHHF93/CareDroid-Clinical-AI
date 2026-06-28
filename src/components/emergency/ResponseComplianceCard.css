@@ -1,0 +1,74 @@
+.response-compliance-card {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: var(--medical-surface-page, #f0f9ff);
+}
+
+.response-compliance-card--green {
+  background: color-mix(in srgb, #22c55e 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, #22c55e 25%, transparent);
+}
+
+.response-compliance-card--amber {
+  background: color-mix(in srgb, #f59e0b 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, #f59e0b 25%, transparent);
+}
+
+.response-compliance-card--red {
+  background: color-mix(in srgb, #ef4444 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, #ef4444 25%, transparent);
+}
+
+.response-compliance-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.response-compliance-card__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--medical-text-subtle, #9ca3af);
+}
+
+.response-compliance-card__rag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.response-compliance-card__rag--green  { background: #dcfce7; color: #15803d; }
+.response-compliance-card__rag--amber  { background: #fef3c7; color: #b45309; }
+.response-compliance-card__rag--red    { background: #fee2e2; color: #dc2626; }
+
+.response-compliance-card__rate {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--medical-text-heading, #111827);
+}
+
+.response-compliance-card__detail {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-subtle, #9ca3af);
+}
+
+.response-compliance-card__pending {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
+  padding: 4px 8px;
+  background: #fee2e2;
+  border-radius: 4px;
+  margin-top: 2px;
+}

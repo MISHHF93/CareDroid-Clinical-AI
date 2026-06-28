@@ -114,6 +114,7 @@ import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
 import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/whiteboardOperationalLoadModel';
 import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import CriticalAlertBanner from '../../components/emergency/CriticalAlertBanner';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import { mergePractitionerDensityProfile, shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
 import {
@@ -431,6 +432,12 @@ export default function EmergencyWhiteboard() {
     [centralSnapshot.operationalSummary.metrics],
   );
   const breachedQueueCount = centralSnapshot.queueHealth.filter((queue) => queue.breached).length;
+  const unacknowledgedCriticalAlertCount = centralSnapshot.bottleneckRegistry.activeBottlenecks.filter(
+    (e) => e.severity === 'critical' && e.status === 'active',
+  ).length;
+  const unacknowledgedHighAlertCount = centralSnapshot.bottleneckRegistry.activeBottlenecks.filter(
+    (e) => e.severity === 'high' && e.status === 'active',
+  ).length;
   const canUseCentralIntake =
     canMutateWhiteboard &&
     !isRegistrationClerk &&
@@ -1601,6 +1608,10 @@ export default function EmergencyWhiteboard() {
       ) : null}
       {!whiteboardDensity.surfaces.departmentStatusScreen.visible ? (
       <>
+      <CriticalAlertBanner
+        criticalCount={unacknowledgedCriticalAlertCount}
+        highCount={unacknowledgedHighAlertCount}
+      />
       <div className="emergency-whiteboard-page__hero emergency-whiteboard-page__hero--compact">
         <div>
           {surfaces.whiteboard.showHeroChrome ? (

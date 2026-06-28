@@ -18,11 +18,13 @@ import {
   buildBottleneckRegistrySnapshot,
   type BottleneckRegistrySnapshot,
 } from '../../services/bottleneckRegistry';
+import ResponseComplianceCard, { type ComplianceAlert } from './ResponseComplianceCard';
 import './CommandDashboard.css';
 
 export type CommandDashboardProps = {
   patients: Patient[];
   rooms: Room[];
+  complianceAlerts?: ComplianceAlert[];
   staff?: Staff[];
   activeShift?: ActiveShift | null;
   capacity: CapacitySnapshot;
@@ -170,6 +172,7 @@ export default function CommandDashboard({
   subtitle = 'Live department metrics from the emergency whiteboard',
   snapshot: snapshotProp,
   bottleneckRegistry: bottleneckRegistryProp,
+  complianceAlerts,
   now,
   className = '',
 }: CommandDashboardProps) {
@@ -335,6 +338,13 @@ export default function CommandDashboard({
           </ul>
         </section>
       ) : null}
+
+      {complianceAlerts && complianceAlerts.length > 0 && (
+        <ResponseComplianceCard
+          alerts={complianceAlerts}
+          className="command-dashboard__compliance"
+        />
+      )}
 
       <div className="command-dashboard__metrics" aria-label="Department operational metrics">
         {snapshot.metrics.map((metric) => (
