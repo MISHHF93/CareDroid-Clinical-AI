@@ -163,6 +163,8 @@ describe('CareDroid store shim', () => {
     store.dispatchWebSocketEvent({
       type: 'patient_created',
       payload: {
+        id: 'wf-rt-patient-created',
+        patientId: patient.id,
         patient,
         summary: 'Realtime patient created.',
       },
@@ -171,6 +173,8 @@ describe('CareDroid store shim', () => {
     useEmergencyStore.getState().dispatchWebSocketEvent({
       type: 'referral_created',
       payload: {
+        id: 'wf-rt-referral-created',
+        patientId: patient.id,
         referral: {
           id: 'realtime-referral-created-test',
           patientId: patient.id,

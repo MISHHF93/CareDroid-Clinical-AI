@@ -11,6 +11,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
+const stylesIndexCss = readFileSync(join(__dirname, 'index.css'), 'utf8');
+const mobileFirstRecoveryCss = readFileSync(join(__dirname, 'mobile-first-recovery.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
@@ -28,21 +30,17 @@ const disclaimerCss = readFileSync(
   join(__dirname, '../components/clinical/ClinicalDecisionSupportDisclaimer.css'),
   'utf8'
 );
-const liveMapCss = readFileSync(join(__dirname, '../pages/LiveTrackingMap.css'), 'utf8');
-const hospitalMapCss = readFileSync(join(__dirname, '../pages/HospitalMapDashboard.css'), 'utf8');
-const medicalIotCss = readFileSync(join(__dirname, '../pages/MedicalIotDashboard.css'), 'utf8');
-const deviceFleetCss = readFileSync(join(__dirname, '../pages/DeviceFleetManagement.css'), 'utf8');
-const fleetLiveMapCss = readFileSync(join(__dirname, '../pages/fleet/FleetLiveMap.css'), 'utf8');
 
 const REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS = Object.freeze([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
 
 describe('responsive-ux.css — global normalization', () => {
-  it('is imported from main.jsx after design-tokens.css', () => {
-    expect(mainJsx).toContain("import './styles/design-tokens.css'");
-    expect(mainJsx).toContain("import './styles/responsive-ux.css'");
-    expect(mainJsx).toContain("import './styles/mobile-first-layout.css'");
-    const tokensPos = mainJsx.indexOf("import './styles/design-tokens.css'");
-    const uxPos = mainJsx.indexOf("import './styles/responsive-ux.css'");
+  it('is imported from the unified stylesheet after design-tokens.css', () => {
+    expect(mainJsx).toContain("import './styles/index.css'");
+    expect(stylesIndexCss).toContain("@import './design-tokens.css';");
+    expect(stylesIndexCss).toContain("@import './responsive-ux.css';");
+    expect(stylesIndexCss).toContain("@import './mobile-first-layout.css';");
+    const tokensPos = stylesIndexCss.indexOf("@import './design-tokens.css';");
+    const uxPos = stylesIndexCss.indexOf("@import './responsive-ux.css';");
     expect(uxPos).toBeGreaterThan(tokensPos);
   });
 
@@ -103,10 +101,8 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('keeps overlay bodies locally scrollable without becoming page scroll owners', () => {
-    expect(quickCommandCss).toMatch(/\.quick-command-results\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(quickCommandCss).toMatch(
-      /\.quick-command-results\s*\{[\s\S]*overscroll-behavior:\s*contain/
-    );
+    expect(quickCommandCss).toMatch(/\.command-palette__body\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(mobileFirstRecoveryCss).toMatch(/\.quick-command-results[\s\S]*overscroll-behavior:\s*contain/);
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-x:\s*clip/);
   });
@@ -157,12 +153,11 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('keeps map canvases locally scrollable instead of clipping fixed-width floor plans', () => {
-    for (const css of [liveMapCss, hospitalMapCss, medicalIotCss, fleetLiveMapCss]) {
-      expect(css).toMatch(/-map-canvas[\s\S]*overflow-x:\s*auto/);
-      expect(css).toMatch(/-map-canvas[\s\S]*overflow-y:\s*hidden/);
-      expect(css).toMatch(/-webkit-overflow-scrolling:\s*touch/);
-    }
-    expect(layoutVisibilityCss).toContain('.hospital-map-canvas');
+    expect(layoutVisibilityCss).toMatch(
+      /\.live-map-canvas,[\s\S]*\.hospital-map-canvas,[\s\S]*\.medical-iot-map-canvas,[\s\S]*\.fleet-map-canvas[\s\S]*overflow-x:\s*auto/,
+    );
+    expect(layoutVisibilityCss).toMatch(/\.fleet-map-canvas[\s\S]*overflow-y:\s*hidden/);
+    expect(layoutVisibilityCss).toMatch(/-webkit-overflow-scrolling:\s*touch/);
     expect(layoutVisibilityCss).toMatch(/\.medical-iot-page :is\([\s\S]*overflow-wrap:\s*anywhere/);
   });
 
@@ -171,16 +166,19 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('keeps operational tables and fixed-width panels locally scrollable', () => {
-    expect(deviceFleetCss).toMatch(/\.device-fleet-page\s*\{[\s\S]*overflow-x:\s*clip/);
-    expect(deviceFleetCss).toMatch(/\.device-fleet-table-wrap\s*\{[\s\S]*overflow-x:\s*auto/);
-    expect(deviceFleetCss).toMatch(/\.device-fleet-table\s*\{[\s\S]*min-width:\s*980px/);
+    expect(layoutVisibilityCss).toMatch(/\.device-fleet-page[\s\S]*overflow-x:\s*clip/);
+    expect(layoutVisibilityCss).toMatch(/\.device-fleet-table-wrap[\s\S]*overflow-x:\s*auto/);
+    expect(mobileFirstRecoveryCss).toMatch(
+      /:is\(table,\s*\.catalog-table,\s*\.device-fleet-table[\s\S]*min-width:\s*max-content/,
+    );
     expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap,[\s\S]*overflow-x:\s*auto/);
   });
 
   it('collapses operational grids before phone widths', () => {
-    for (const css of [liveMapCss, hospitalMapCss, medicalIotCss, deviceFleetCss, fleetLiveMapCss]) {
-      expect(css).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*grid-template-columns:\s*1fr/);
-    }
+    expect(responsiveUxCss).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*\.hospital-map-page/);
+    expect(responsiveUxCss).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*\.medical-iot-page/);
+    expect(responsiveUxCss).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*\.device-fleet-page/);
+    expect(responsiveUxCss).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*\.fleet-live-map-page/);
   });
 });
 

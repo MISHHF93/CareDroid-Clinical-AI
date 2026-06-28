@@ -472,25 +472,25 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     openTool(container, 'qsofa');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa&open=qsofa' },
+      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=qsofa&open=qsofa&calc=qsofa' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'drug-check');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=tools&filter=clinical-tools&q=drug-check' },
+      { pathname: '/emergency/tools', search: '?source=tools&filter=clinical-tools&q=drug-check&open=drug-check' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'fleet-command');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=operations&filter=operations&q=fleet-command' },
+      { pathname: '/emergency/tools', search: '?source=operations&filter=operations&q=fleet-command&open=fleet-command' },
       expect.objectContaining({ replace: true })
     );
 
     openTool(container, 'calculators');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator' },
+      { pathname: '/emergency/tools', search: '?source=calculators&filter=calculator&q=calculators&open=calculators' },
       expect.objectContaining({ replace: true })
     );
 

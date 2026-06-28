@@ -531,8 +531,8 @@ export const SEGMENT_INVENTORY = Object.freeze([
     launchBehavior: 'Fleet Map nav, dashboard cards, or registry launch open dedicated fleet pages.',
     layoutShell: 'AppShellPage main + FleetPageChrome content region',
     auth: appShellAuth,
-    mobile: { readiness: 'covered for fleet', tests: ['src/pages/fleet/fleet.responsive.test.js'] },
-    testCoverage: ['src/pages/fleet/FleetDashboard.test.jsx', 'src/pages/fleet/RouteOptimizer.test.jsx', 'src/pages/fleet/PredictiveMaintenance.test.jsx', 'src/pages/fleet/fleet.responsive.test.js'],
+    mobile: { readiness: 'covered by shared responsive QA matrix', tests: ['src/data/responsiveQaMatrix.test.ts'] },
+    testCoverage: ['src/data/pr6FleetComprehensive.test.tsx', 'src/data/prFleetConsistency.test.ts', 'src/data/fleetCommandWiring.test.ts'],
     bridges: bridge({
       userReach: 'Fleet Map nav, dashboard cards, Tools fleet category, and direct fleet routes.',
       assistant: 'Dispatch AI is separate; fleet pages do not embed Assistant handoff.',

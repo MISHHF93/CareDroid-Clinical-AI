@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import ProfilePreferences from './ProfilePreferences';
 
 const mocks = vi.hoisted(() => {
@@ -41,7 +42,7 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
 
 describe('ProfilePreferences', () => {
   it('persists profile preference changes', async () => {
-    render(<ProfilePreferences />);
+    render(<MemoryRouter><ProfilePreferences /></MemoryRouter>);
 
     fireEvent.change(screen.getByLabelText(/theme/i), { target: { value: 'dark' } });
     fireEvent.change(screen.getByLabelText(/density/i), { target: { value: 'compact' } });

@@ -141,4 +141,57 @@ export function getHiddenNavItemIdsForRole(role, options: any = {}) {
   return hidden;
 }
 
+/** Paths that belong conceptually to another nav section when their own item is absent. */
+const NAV_PARENT_FALLBACK: Record<string, string> = {
+  '/emergency/intake': 'reception',
+  '/emergency/register': 'reception',
+  '/emergency/smart-intake': 'reception',
+};
+
+/**
+ * Resolve which nav item id is "active" for a given pathname.
+ * Picks the most specific (longest) route match so broad catch-all activePaths
+ * (e.g. whiteboard's "/emergency") don't shadow specific items.
+ * When no item directly matches (e.g. intake is hidden), falls back to the
+ * canonical parent section defined in NAV_PARENT_FALLBACK.
+ */
+export function resolveActiveNavigationItemId(
+  items: readonly { id: string; route?: string; path?: string; activePaths?: readonly string[] }[],
+  pathname: string,
+  _search?: string,
+): string | null {
+  // Pass 1: primary route match (most specific wins)
+  let bestId: string | null = null;
+  let bestLen = -1;
+  for (const item of items) {
+    const primaryRoute = item.route || item.path;
+    if (primaryRoute && (pathname === primaryRoute || pathname.startsWith(primaryRoute + '/'))) {
+      if (primaryRoute.length > bestLen) {
+        bestId = item.id;
+        bestLen = primaryRoute.length;
+      }
+    }
+  }
+  if (bestId) return bestId;
+
+  // Pass 2: explicit parent fallback for paths whose own item may be hidden
+  const parentId = NAV_PARENT_FALLBACK[pathname];
+  if (parentId && items.some((item) => item.id === parentId)) return parentId;
+
+  // Pass 3: activePaths (broad catch-alls like whiteboard's "/emergency")
+  for (const item of items) {
+    if (item.activePaths) {
+      for (const p of item.activePaths) {
+        if (pathname === p || pathname.startsWith(p + '/')) {
+          if (p.length > bestLen) {
+            bestId = item.id;
+            bestLen = p.length;
+          }
+        }
+      }
+    }
+  }
+  return bestId;
+}
+
 export { ROLE_NAV_ORDER_OVERRIDES, ROLE_NAV_EXCLUDED_OVERRIDES, RECEPTION_FIRST_NAV_ORDER };

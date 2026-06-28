@@ -346,7 +346,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Registration role for identity review and patient creation without clinical state management.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.settings, ROUTES.help],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.verifyIntake,
@@ -360,7 +360,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.settings, ROUTES.help],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,

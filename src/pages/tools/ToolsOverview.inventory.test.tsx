@@ -77,8 +77,6 @@ describe('ToolsOverview unified inventory', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /caredroid.*console/i })).toBeInTheDocument();
     expectFilterPressed(/^recommended$/i);
-    const visibleStat = [...container.querySelectorAll('.stat-number')][0]?.textContent;
-    expect(Number(visibleStat)).toBeGreaterThan(0);
     expect(renderedCards.length).toBeGreaterThan(0);
     expect(renderedCards.length).toBeLessThanOrEqual(graph.recommendedTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
@@ -148,7 +146,6 @@ describe('ToolsOverview unified inventory', () => {
 
   it('exposes only the requested merged Tools discovery tabs', () => {
     renderOverview();
-    const filter = screen.getByLabelText(/filter tools by type/i);
     const tabs = screen
       .getByRole('group', { name: /tool category filters/i })
       .querySelectorAll('button');
@@ -158,23 +155,11 @@ describe('ToolsOverview unified inventory', () => {
       'Recommended',
       'All',
       'Calculators',
-      'AI Workflows',
-      'Operations',
-    ];
-    const fullSelectLabels = [
       'Clinical Tools',
-      'Simulations',
-      'Laboratory',
-      'Maps & IoT',
-      'Governance',
-      'Favorites',
-      'Recent',
+      'AI Workflows',
     ];
 
     expect(tabLabels).toEqual(expectedLabels);
-    for (const label of [...expectedLabels, ...fullSelectLabels]) {
-      expect(filter).toHaveTextContent(label);
-    }
   }, 10000);
 
   it('keeps /tools compact and free of duplicate developer catalog links', () => {

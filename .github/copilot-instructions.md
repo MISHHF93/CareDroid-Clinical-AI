@@ -77,3 +77,49 @@ Frontend AI display rules:
 Testing expectations:
 - Add focused tests for AI schema validation, response shape, error handling, fallback behavior, and AI card rendering.
 - Keep the app buildable with frontend typecheck and Vite build.
+
+## User profiles and role-based access control
+
+CareDroid models realistic hospital roles for the CareDroid Virtual City Health Network.
+
+### Role system
+
+Use `src/lib/users/` as the single source of truth for roles, permissions, and demo users:
+- `userTypes.ts` — `CareDroidUserProfile` type and `HospitalRole` union
+- `hospitalNetwork.ts` — hospital sites, city zones, departments
+- `permissions.ts` — `CAREDROID_PERMISSIONS`, `ROLE_PERMISSIONS` map, permission helpers
+- `roleAccess.ts` — role labels, descriptions, emergency role mapping, dashboard config
+- `demoUsers.ts` — seeded demo users (`DEMO_USERS`)
+- `aiChiefRouting.ts` — AI recommendation routing by role and alert scenario
+
+### RBAC rules
+
+- Do not hardcode role checks inside UI components. Use `useRolePermissions()` or `hasCareDroidPermission()`.
+- All permission checks must go through the centralized helpers in `permissions.ts`.
+- Demo users live only in `demoUsers.ts`. Never scatter mock users in component files.
+- Clinical permissions follow least privilege. Non-clinical roles cannot edit clinical decisions.
+- Permissions cascade from role definitions — never copy-paste permission arrays into components.
+- Use `toEmergencyRoleId()` from `roleAccess.ts` to map a `HospitalRole` to an existing emergency role ID for navigation compatibility.
+
+### Demo user switcher
+
+`src/components/auth/DemoUserSwitcher.tsx` allows switching the active demo user during demo or dev mode.
+- Only render it in demo/dev contexts. Never expose it in production.
+- Switching a demo user updates both `useCareDroidUser` state and the existing `UserContext` role for nav routing.
+
+### AI Chief routing
+
+When AI recommendations are generated, include:
+- `assignedRole` — the hospital role responsible for this recommendation
+- `visibleToRoles` — which roles can see this alert/recommendation
+- `escalationRole` — role to escalate to if unacknowledged
+- `requiresClinicianReview` — must be `true` for all clinical recommendations
+- `clinicianOverrideAvailable` — whether a clinician can dismiss/modify the AI output
+
+Use `src/lib/users/aiChiefRouting.ts` to resolve visibility and escalation by alert scenario.
+
+### Audit metadata
+
+Where supported, attach `AuditMetadata` from `src/lib/users/userTypes.ts` to mutations:
+- `createdBy`, `updatedBy`, `acknowledgedBy`, `reviewedBy`, `escalatedBy`, `timestamp`, `userRole`
+- Never log PHI. Log only role, intent, field names, status, and timestamps.

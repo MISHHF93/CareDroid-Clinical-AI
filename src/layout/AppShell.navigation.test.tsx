@@ -62,6 +62,10 @@ vi.mock('../store/emergencyStore', () => {
   const useEmergencyStore = (selector) =>
     typeof selector === 'function' ? selector(emergencyStoreState) : emergencyStoreState;
   useEmergencyStore.getState = () => emergencyStoreState;
+  useEmergencyStore.setState = vi.fn((partial) => {
+    const nextState = typeof partial === 'function' ? partial(emergencyStoreState) : partial;
+    Object.assign(emergencyStoreState, nextState);
+  });
   return { useEmergencyStore };
 });
 
@@ -171,7 +175,7 @@ describe('AppShell navigation surfaces', () => {
   });
 
   it('renders required header and content regions once', () => {
-    expect(appShellSource).toContain('<Header pageTitle={currentPage.label}');
+    expect(appShellSource).toContain('pageTitle={currentPage.label}');
     expect(appShellSource.match(/role="main"/g)).toHaveLength(1);
     expect(appShellSource).toContain('<CopilotPanel />');
     expect(appShellSource).toContain('<PatientDetailPanel />');
@@ -210,7 +214,7 @@ describe('AppShell navigation surfaces', () => {
       );
     });
     expect(navigateMock.mock.lastCall?.[0]).toBe(
-      '/emergency/tools?source=chat&filter=clinical-tools&q=drug-check',
+      '/emergency/tools?source=chat&filter=clinical-tools&q=drug-check&open=drug-check',
     );
 
     await act(async () => {
@@ -221,7 +225,7 @@ describe('AppShell navigation surfaces', () => {
       );
     });
     expect(navigateMock.mock.lastCall?.[0]).toBe(
-      '/emergency/tools?source=calculators&filter=calculator&q=heart-score&open=heart-score&patientId=patient-123',
+      '/emergency/tools?source=calculators&filter=calculator&q=heart-score&open=heart-score&calc=heart-score&patientId=patient-123',
     );
   });
 });

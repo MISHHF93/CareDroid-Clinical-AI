@@ -1,5 +1,6 @@
 ﻿import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import ProfileToolPreferences from './ProfileToolPreferences';
 import {
   mockToolPreferencesValue,
@@ -34,6 +35,7 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
     preferences: {},
     activeWorkspace: { id: 'all', name: 'All Tools' },
     workspaceState: { activeWorkspaceId: 'all', effectivePermissions: [] },
+    accessSummary: { allowedWorkspaces: [] },
   }),
 }));
 
@@ -57,7 +59,7 @@ describe('ProfileToolPreferences', () => {
     const hiddenTool = getUserFacingToolRegistryProjection().find((tool) => tool.category === 'Calculator');
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
 
-    render(<ProfileToolPreferences />);
+    render(<MemoryRouter><ProfileToolPreferences /></MemoryRouter>);
 
     const row = screen.getByText(hiddenTool.name).closest('.profile-identity-row');
     expect(row).toHaveTextContent(/hidden/i);
@@ -65,15 +67,13 @@ describe('ProfileToolPreferences', () => {
     expect(mockToolPreferencesValue.toggleHidden).toHaveBeenCalledWith(hiddenTool.id);
   });
 
-  it('saves role, specialty, workspace, and compact view choices', () => {
-    render(<ProfileToolPreferences />);
+  it('saves specialty, workspace, and compact view choices', () => {
+    render(<MemoryRouter><ProfileToolPreferences /></MemoryRouter>);
 
-    fireEvent.change(screen.getByLabelText(/role/i), { target: { value: 'cardiologist' } });
     fireEvent.change(screen.getByLabelText(/specialty/i), { target: { value: 'cardiology' } });
     fireEvent.change(screen.getByLabelText(/default workspace/i), { target: { value: 'all' } });
     fireEvent.click(screen.getByLabelText(/compact tool view/i));
 
-    expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ role: 'cardiologist' });
     expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ specialty: 'cardiology' });
     expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ defaultWorkspace: 'all' });
     expect(mockToolPreferencesValue.updateProfileSettings).toHaveBeenCalledWith({ compactToolView: true });

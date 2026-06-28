@@ -9,6 +9,7 @@ import {
   filterOperationalMetrics,
   getOperationalMetricRoute,
   groupOperationalAlertsByMetric,
+  OPERATIONAL_METRIC_REGISTRY,
   resolveOperationalAlertRoute,
 } from '../config/operationalMetricsModel';
 
@@ -1169,6 +1170,27 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             </button>
           ) : null}
         </div>
+      </div>
+
+      <div
+        className="caredroid-header__command-context"
+        aria-label="Operational command context"
+      >
+        {OPERATIONAL_METRIC_REGISTRY.map((metricDef) => {
+          const metric = operationalSummary.metrics.find((m) => m.key === metricDef.key);
+          return (
+            <div
+              key={metricDef.key}
+              className="caredroid-header__command-metric"
+              data-tone={metric?.tone}
+            >
+              <span className="caredroid-header__command-metric-value">
+                {metric !== undefined ? String(metric.value) : '--'}
+              </span>
+              <span className="caredroid-header__command-metric-label">{metricDef.label}</span>
+            </div>
+          );
+        })}
       </div>
 
       {alertDrawerOpen ? (

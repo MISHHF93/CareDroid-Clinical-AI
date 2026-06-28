@@ -217,6 +217,16 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     movementStages: PATIENT_MOVEMENT_STAGES,
   }),
   page({
+    id: 'emergency-alerts',
+    label: 'Emergency Alerts',
+    path: CANONICAL_ROUTES.emergencyAlerts,
+    componentKey: 'EmergencyAlerts',
+    navId: 'emergency_alerts',
+    screenshotSlug: '19-emergency-alerts',
+    loadEndpoints: ['/api/emergency/alerts'],
+    movementStages: PATIENT_MOVEMENT_STAGES,
+  }),
+  page({
     id: 'emergency-settings',
     label: 'Emergency Settings',
     path: CANONICAL_ROUTES.emergencySettings,

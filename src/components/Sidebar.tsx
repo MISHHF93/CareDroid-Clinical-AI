@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import appConfig from '../config/appConfig';
+import DemoUserSwitcher from './auth/DemoUserSwitcher';
 import {
   IconActivity,
   IconAmbulance,
@@ -266,7 +268,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
 
     if (item.id === 'copilot') {
-      if (!canUseCopilot) return null;
+      if (!canUseCopilot && !navigationItems) return null;
       return (
         <button
           key={item.id}
@@ -339,7 +341,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
 
     if (item.id === 'copilot') {
-      if (!canUseCopilot) return null;
+      if (!canUseCopilot && !navigationItems) return null;
       return (
         <button
           key={item.id}
@@ -400,6 +402,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         {desktopUtilityNav.length ? (
           <div className="sidebar-desktop-nav__utility" aria-label="Emergency utility navigation">
             {desktopUtilityNav.map(desktopNavLink)}
+          </div>
+        ) : null}
+        {(appConfig.features.enableDevAuthBypass || appConfig.features.enableDemoMode) ? (
+          <div className="sidebar-desktop-nav__demo-switcher" aria-label="Demo user switcher">
+            <DemoUserSwitcher variant="compact" />
           </div>
         ) : null}
       </nav>

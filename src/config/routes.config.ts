@@ -339,6 +339,16 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/settings/integrations', CANONICAL_ROUTES.emergencySettings],
     ['/settings/features', CANONICAL_ROUTES.featureFlags],
     ['/anatomy-viewer', CANONICAL_ROUTES.medical3dViewer],
+    ['/hospital-map', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/hospital-map/*', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/medical-iot', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/medical-iot/*', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/devices', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/devices/*', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/live-map', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/live-map/*', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/operations', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/operations/*', CANONICAL_ROUTES.emergencyWhiteboard],
   ].map(([path, to]) =>
     Object.freeze({
       path,

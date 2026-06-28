@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-26T04:03:50.986Z",
+  "generatedAt": "2026-06-28T00:25:43.314Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -47,6 +47,7 @@
       "/emergency/pulse",
       "/emergency/shift",
       "/emergency/analytics",
+      "/emergency/alerts",
       "/emergency/settings"
     ]
   },
@@ -133,13 +134,18 @@
         "via": "sidebar"
       }
     ],
-    "orphans": [],
+    "orphans": [
+      {
+        "route": "/emergency/alerts",
+        "reason": "No surface registry entry"
+      }
+    ],
     "navNotInPalette": [],
-    "passesAudit": true,
+    "passesAudit": false,
     "receptionFirstEnabled": true
   },
   "palette": {
-    "commandCount": 18,
+    "commandCount": 17,
     "navItemIds": [
       "reception",
       "whiteboard",
@@ -153,7 +159,6 @@
       "tools",
       "analytics",
       "settings",
-      "help",
       "pulse",
       "shift",
       "boarding"
@@ -161,5 +166,5 @@
     "missingFromPalette": []
   },
   "receptionImportIssues": [],
-  "passesAudit": true
+  "passesAudit": false
 }

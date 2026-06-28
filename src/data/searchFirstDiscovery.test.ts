@@ -17,9 +17,9 @@ describe('search-first discovery index', () => {
     );
 
     expect([...emergencyOsPaths].sort()).toEqual([...PILOT_VISIBLE_PATHS].sort());
-    expect(buildSearchFirstResults({ query: 'boarding boarders' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'tools calculators scores' })).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: 'destination', sourceId: 'emergency-boarding', path: '/emergency/boarding' }),
+        expect.objectContaining({ kind: 'destination', sourceId: 'emergency-tools', path: '/emergency/tools' }),
       ])
     );
   });
@@ -32,12 +32,12 @@ describe('search-first discovery index', () => {
     expect([...paths].sort()).toEqual([...PILOT_VISIBLE_PATHS].sort());
     expect(entries.map((entry) => entry.path)).toHaveLength(paths.size);
     expect([...kinds]).toEqual(['destination']);
-    expect(buildSearchFirstResults({ query: 'analytics throughput' })).not.toEqual(
+    expect(buildSearchFirstResults({ query: 'analytics throughput' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ sourceId: 'emergency-analytics', path: '/emergency/analytics' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'settings thresholds' })).not.toEqual(
+    expect(buildSearchFirstResults({ query: 'settings thresholds' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ sourceId: 'emergency-settings', path: '/emergency/settings' }),
       ])

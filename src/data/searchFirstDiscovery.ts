@@ -411,6 +411,24 @@ const EMERGENCY_OS_DESTINATIONS = Object.freeze([
     aliases: ['copilot', 'assistant', 'ai', 'chat'],
   },
   {
+    id: 'emergency-tools',
+    title: 'Clinical Tools',
+    path: CANONICAL_ROUTES.emergencyTools,
+    aliases: ['tools', 'calculators', 'scores', 'risk scores', 'clinical calculators'],
+  },
+  {
+    id: 'emergency-pulse',
+    title: 'Department Pulse',
+    path: CANONICAL_ROUTES.emergencyPulse,
+    aliases: ['pulse', 'department pulse', 'ops metrics', 'department overview'],
+  },
+  {
+    id: 'emergency-shift',
+    title: 'Shift Handoff',
+    path: CANONICAL_ROUTES.emergencyShift,
+    aliases: ['shift', 'handoff', 'shift management', 'shift summary'],
+  },
+  {
     id: 'emergency-analytics',
     title: 'Analytics',
     path: CANONICAL_ROUTES.emergencyAnalytics,

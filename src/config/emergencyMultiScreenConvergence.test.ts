@@ -33,6 +33,7 @@ import {
 import { canMutateEmergencySurface } from './emergencyRolePermissions';
 import { resolveEmergencyDisplayPrivacyPolicy } from './emergencyDisplayPrivacyPolicy';
 import { resolveOperationalPresentation } from './emergencyOperationalPresentationModel';
+import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 import { resolveWhiteboardDisplayProfile } from '../hooks/useWhiteboardDisplayMode';
 import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
 
@@ -96,7 +97,11 @@ describe('emergencyMultiScreenConvergence', () => {
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard)).toBe('wall');
     expect(getScreenModeDensity(CARE_DROID_SCREEN_MODES.commandCenter)).toBe('wall');
     PRIMARY_SCREEN_MODES.forEach((mode) => {
-      expect(resolveOperationalPresentation(mode).density).toBe(getScreenModeDensity(mode));
+      const baseDensity = getScreenModeDensity(mode);
+      const expectedDensity = isPractitionerCleanupEnabled()
+        ? baseDensity === 'wall' ? baseDensity : 'compact'
+        : baseDensity;
+      expect(resolveOperationalPresentation(mode).density).toBe(expectedDensity);
     });
   });
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import ProfileWorkspaces from './ProfileWorkspaces';
 
 const switchWorkspace = vi.fn();
@@ -49,7 +50,7 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
 
 describe('ProfileWorkspaces', () => {
   it('renders workspace switching and effective permissions', async () => {
-    render(<ProfileWorkspaces />);
+    render(<MemoryRouter><ProfileWorkspaces /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: /workspaces/i })).toBeInTheDocument();
     expect(screen.getAllByText('Hospital Operations').length).toBeGreaterThan(0);

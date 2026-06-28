@@ -46,6 +46,15 @@ vi.mock('../engine/simulation', () => ({
   stopSimulation: mocks.stopSimulation,
 }));
 
+vi.mock('../services/backendReachability', () => ({
+  probeBackendReachability: vi.fn().mockResolvedValue(true),
+  isBackendKnownOffline: vi.fn().mockReturnValue(false),
+}));
+
+vi.mock('../services/devBackendSession', () => ({
+  ensureDevBackendSession: vi.fn().mockResolvedValue(undefined),
+}));
+
 const emergencyRoleMock = vi.hoisted(() => {
   const { PERMISSIVE_EMERGENCY_ROLE_MOCK } = require('../test/permissiveEmergencyRoleMock.ts');
   return PERMISSIVE_EMERGENCY_ROLE_MOCK;

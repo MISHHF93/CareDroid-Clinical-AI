@@ -9,7 +9,7 @@ const catalogSource = readFileSync(join(__dirname, 'ClinicalToolCatalog.tsx'), '
 describe('ClinicalToolCatalog chat launch wiring', () => {
   it('delegates registry launches to the central launcher without adding a duplicate seed', () => {
     const handler = catalogSource.match(
-      /const handleTryInChat = \(sidebarToolId, chatSeed\) => \{([\s\S]*?)\n {2}\};/
+      /const handleTryInChat = \(sidebarToolId, chatSeed[^)]*\) => \{([\s\S]*?)\n {2}\};/
     )?.[1];
 
     expect(handler).toContain('launchCatalogItem(sidebarToolId)');

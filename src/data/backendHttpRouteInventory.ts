@@ -948,6 +948,46 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   },
 
   { method: 'GET', path: '/api/metrics', controller: 'MetricsController' },
+
+  { method: 'GET', path: '/api/auth/magic-link/verify', controller: 'AuthController' },
+  { method: 'POST', path: '/api/auth/forgot-password', controller: 'AuthController' },
+  { method: 'POST', path: '/api/auth/reset-password', controller: 'AuthController' },
+
+  { method: 'POST', path: '/api/ai/node', controller: 'AIController' },
+
+  { method: 'GET', path: '/api/emergency/operational-intelligence/alerts', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/operational-intelligence/model-health', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/operational-intelligence/snapshot', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/operational-intelligence/evaluate', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/patients/:patientId/document-artifacts', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/patients/:patientId/document-artifacts/extract', controller: 'EmergencyOsController' },
+  { method: 'PATCH', path: '/api/emergency/patients/:patientId/document-artifacts/:artifactId/review', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/patients/:patientId/orchestration', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/reception/snapshot', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/reception/handoff', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/triage/assist', controller: 'EmergencyOsController' },
+
+  { method: 'GET', path: '/api/native-ai/drift', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/drift/evaluate', controller: 'NativeAiController' },
+  { method: 'GET', path: '/api/native-ai/registry', controller: 'NativeAiController' },
+  { method: 'GET', path: '/api/native-ai/triage-rules', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/triage-rules', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/triage-rules/evaluate', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/clinical-acuity', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/route', controller: 'NativeAiController' },
+  { method: 'POST', path: '/api/native-ai/specialists/infer', controller: 'NativeAiController' },
+
+  { method: 'GET', path: '/api/surveillance/alerts', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/cameras/registry', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/health', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/incidents', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/integrations', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/iot/registry', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/nexus/snapshot', controller: 'SurveillanceController' },
+  { method: 'GET', path: '/api/surveillance/zones', controller: 'SurveillanceController' },
+
+  { method: 'GET', path: '/api/workspaces/invitations/:token', controller: 'WorkspaceInvitationsController' },
+  { method: 'POST', path: '/api/workspaces/invitations/:token/accept', controller: 'WorkspaceInvitationsController' },
 ]);
 
 /** @typedef {BackendHttpRoute & { runtime: 'mongoose-emergency-os', mountFlag: string }} OptionalRuntimeBackendRoute */

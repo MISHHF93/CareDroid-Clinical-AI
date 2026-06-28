@@ -963,7 +963,7 @@ export function AppRoutes() {
 
       {/* ── Tool URL shortcuts (outside shell, handled by ToolsRedirect) ── */}
       <Route path="/tools"              element={<ToolsRedirect />} />
-      <Route path="/tools/*"            element={<ToolsRedirect />} />
+      <Route path="/tools/*" element={<ToolsRedirect />} />
       <Route path="/calculators"        element={<ToolsRedirect />} />
       <Route path="/calculators/*"      element={<ToolsRedirect />} />
       <Route path="/scores"             element={<ToolsRedirect />} />

@@ -1,0 +1,182 @@
+import type { HospitalRole } from './userTypes';
+
+export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+export type AiRecommendationRoute = {
+  visibleToRoles: readonly HospitalRole[];
+  suggestedOwnerRole: HospitalRole;
+  escalationRole: HospitalRole;
+  requiresClinicianReview: boolean;
+  clinicianOverrideAvailable: boolean;
+};
+
+export type AlertScenario =
+  | 'critical_chest_pain'
+  | 'stroke_alert'
+  | 'sepsis_alert'
+  | 'pediatric_emergency'
+  | 'trauma_activation'
+  | 'mental_health_crisis'
+  | 'medication_interaction'
+  | 'lab_critical_value'
+  | 'bed_capacity_breach'
+  | 'triage_breach'
+  | 'ems_incoming'
+  | 'security_incident';
+
+export const AI_CHIEF_ROUTING: Readonly<Record<AlertScenario, AiRecommendationRoute>> =
+  Object.freeze({
+    critical_chest_pain: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
+        'specialist', 'registered_nurse',
+      ],
+      suggestedOwnerRole: 'triage_nurse',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    stroke_alert: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
+      ],
+      suggestedOwnerRole: 'charge_nurse',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    sepsis_alert: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
+        'registered_nurse',
+      ],
+      suggestedOwnerRole: 'triage_nurse',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    pediatric_emergency: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'specialist',
+      ],
+      suggestedOwnerRole: 'triage_nurse',
+      escalationRole: 'attending_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    trauma_activation: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician',
+        'paramedic', 'registered_nurse',
+      ],
+      suggestedOwnerRole: 'charge_nurse',
+      escalationRole: 'attending_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    mental_health_crisis: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'emergency_physician', 'social_worker',
+        'registered_nurse',
+      ],
+      suggestedOwnerRole: 'triage_nurse',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    medication_interaction: {
+      visibleToRoles: [
+        'emergency_physician', 'attending_physician', 'pharmacist', 'charge_nurse',
+      ],
+      suggestedOwnerRole: 'pharmacist',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: true,
+    },
+
+    lab_critical_value: {
+      visibleToRoles: [
+        'emergency_physician', 'attending_physician', 'charge_nurse', 'lab_technician',
+      ],
+      suggestedOwnerRole: 'lab_technician',
+      escalationRole: 'emergency_physician',
+      requiresClinicianReview: true,
+      clinicianOverrideAvailable: false,
+    },
+
+    bed_capacity_breach: {
+      visibleToRoles: [
+        'charge_nurse', 'patient_flow_coordinator', 'ed_director', 'hospital_admin',
+      ],
+      suggestedOwnerRole: 'patient_flow_coordinator',
+      escalationRole: 'ed_director',
+      requiresClinicianReview: false,
+      clinicianOverrideAvailable: false,
+    },
+
+    triage_breach: {
+      visibleToRoles: [
+        'triage_nurse', 'charge_nurse', 'ed_director',
+      ],
+      suggestedOwnerRole: 'triage_nurse',
+      escalationRole: 'charge_nurse',
+      requiresClinicianReview: false,
+      clinicianOverrideAvailable: false,
+    },
+
+    ems_incoming: {
+      visibleToRoles: [
+        'paramedic', 'triage_nurse', 'charge_nurse', 'emergency_physician',
+        'registration_clerk',
+      ],
+      suggestedOwnerRole: 'paramedic',
+      escalationRole: 'charge_nurse',
+      requiresClinicianReview: false,
+      clinicianOverrideAvailable: false,
+    },
+
+    security_incident: {
+      visibleToRoles: [
+        'security_officer', 'charge_nurse', 'ed_director', 'hospital_admin',
+      ],
+      suggestedOwnerRole: 'security_officer',
+      escalationRole: 'ed_director',
+      requiresClinicianReview: false,
+      clinicianOverrideAvailable: false,
+    },
+  });
+
+export function getAiRecommendationRoute(scenario: AlertScenario): AiRecommendationRoute {
+  return AI_CHIEF_ROUTING[scenario];
+}
+
+export function isAlertVisibleToRole(scenario: AlertScenario, role: HospitalRole): boolean {
+  return (AI_CHIEF_ROUTING[scenario]?.visibleToRoles as HospitalRole[]).includes(role);
+}
+
+export function getEscalationRoleForScenario(scenario: AlertScenario): HospitalRole {
+  return AI_CHIEF_ROUTING[scenario]?.escalationRole;
+}
+
+export function getSuggestedOwnerForScenario(scenario: AlertScenario): HospitalRole {
+  return AI_CHIEF_ROUTING[scenario]?.suggestedOwnerRole;
+}
+
+export function getVisibleScenariosForRole(role: HospitalRole): AlertScenario[] {
+  return (Object.keys(AI_CHIEF_ROUTING) as AlertScenario[]).filter((scenario) =>
+    isAlertVisibleToRole(scenario, role),
+  );
+}
+
+export function filterAiRecommendationsByRole<T extends { scenario: AlertScenario }>(
+  recommendations: T[],
+  role: HospitalRole,
+): T[] {
+  return recommendations.filter((r) => isAlertVisibleToRole(r.scenario, role));
+}

@@ -61,6 +61,12 @@ export interface CareDroidAIResponse<
   clinicianOverrideAvailable: boolean;
   generatedAt: string;
   safetyDisclaimer: string;
+  /** Roles that should receive and act on this recommendation. */
+  visibleToRoles?: string[];
+  /** Role to escalate to if this recommendation is not acknowledged. */
+  escalationRole?: string;
+  /** Suggested owner role for this recommendation. */
+  suggestedOwnerRole?: string;
 }
 
 export interface CareDroidAIValidationIssue {

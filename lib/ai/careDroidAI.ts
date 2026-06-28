@@ -44,6 +44,9 @@ type HandlerResult = {
   priority?: CareDroidAIResponse['priority'];
   assignedRole?: string;
   recommendedDepartment?: string;
+  visibleToRoles?: string[];
+  escalationRole?: string;
+  suggestedOwnerRole?: string;
 };
 
 const OPERATIONAL_REVIEW_WARNING =
@@ -175,6 +178,11 @@ function handleCriticalAlertAssessment(input: Record<string, unknown>): HandlerR
     priority,
     assignedRole: owner,
     recommendedDepartment,
+    visibleToRoles: priority === 'critical'
+      ? ['triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'registered_nurse']
+      : ['triage_nurse', 'charge_nurse', 'emergency_physician'],
+    escalationRole: priority === 'critical' ? 'attending_physician' : 'emergency_physician',
+    suggestedOwnerRole: priority === 'critical' ? 'charge_nurse' : 'triage_nurse',
   };
 }
 
@@ -320,6 +328,9 @@ function handleTriageRecommendation(input: Record<string, unknown>): HandlerResu
     priority: inferPriority(input, redFlags),
     assignedRole: recommendedTriageLevel === 'P1' ? 'ED physician and charge nurse' : 'Triage nurse',
     recommendedDepartment: suggestedDepartment,
+    visibleToRoles: ['triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician'],
+    escalationRole: 'emergency_physician',
+    suggestedOwnerRole: recommendedTriageLevel === 'P1' ? 'charge_nurse' : 'triage_nurse',
   };
 }
 
@@ -611,6 +622,11 @@ function handleEscalationRecommendation(input: Record<string, unknown>): Handler
     priority: escalationRequired ? 'critical' : 'medium',
     assignedRole: owner,
     recommendedDepartment: 'Emergency Department',
+    visibleToRoles: escalationRequired
+      ? ['triage_nurse', 'charge_nurse', 'emergency_physician', 'attending_physician', 'ed_director']
+      : ['charge_nurse', 'emergency_physician'],
+    escalationRole: 'ed_director',
+    suggestedOwnerRole: severity === 'critical' ? 'emergency_physician' : 'charge_nurse',
   };
 }
 
@@ -658,6 +674,9 @@ function buildSuccessResponse(
     clinicianOverrideAvailable: true,
     generatedAt: new Date().toISOString(),
     safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+    ...(result.visibleToRoles ? { visibleToRoles: result.visibleToRoles } : {}),
+    ...(result.escalationRole ? { escalationRole: result.escalationRole } : {}),
+    ...(result.suggestedOwnerRole ? { suggestedOwnerRole: result.suggestedOwnerRole } : {}),
   };
 }
 
