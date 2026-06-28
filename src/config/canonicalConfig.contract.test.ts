@@ -57,7 +57,7 @@ describe('canonical configuration contract', () => {
       PROTECTED_ROUTE_ALIAS_REDIRECTS.length
     );
 
-    expect(appSource).toContain("from './config/routes.config'");
+    expect(appSource).toContain("from '../config/routes.config'");
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(appSource).not.toMatch(/const\s+ASSISTANT_ROUTE_ALIASES\s*=\s*\[/);
     expect(appSource).not.toMatch(/const\s+TOOLS_ROUTE_ALIASES\s*=\s*\[/);

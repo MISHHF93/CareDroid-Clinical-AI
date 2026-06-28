@@ -16,9 +16,6 @@ describe('pilotExtensionRouteGuard', () => {
     expect(resolvePilotExtensionRedirect('/fleet/command')).toBe(CANONICAL_ROUTES.emergencyEms);
     expect(resolvePilotExtensionRedirect('/cosmos')).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
     expect(resolvePilotExtensionRedirect('/workspace')).toBe(CANONICAL_ROUTES.emergencySettings);
-    expect(resolvePilotExtensionRedirect('/emergency/intake')).toBe(
-      CANONICAL_ROUTES.emergencyReception,
-    );
     expect(resolvePilotExtensionRedirect('/tools/catalog')).toBe(CANONICAL_ROUTES.emergencyTools);
   });
 
@@ -28,5 +25,7 @@ describe('pilotExtensionRouteGuard', () => {
     expect(resolvePilotExtensionRedirect('/emergency/reception')).toBeNull();
     expect(resolvePilotExtensionRedirect('/emergency/copilot')).toBeNull();
     expect(resolvePilotExtensionRedirect('/emergency/analytics')).toBeNull();
+    // /emergency/intake is a core ED route (SmartIntake page), not an extension redirect
+    expect(resolvePilotExtensionRedirect('/emergency/intake')).toBeNull();
   });
 });

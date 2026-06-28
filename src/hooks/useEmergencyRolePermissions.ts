@@ -28,6 +28,7 @@ import {
   canAccessRoute as canAccessCanonicalRoute,
   canMutateWithCompiledProfile,
   compileCareDroidAccessProfile,
+  getCanonicalRoleMapping,
   normalizeCareDroidProfile,
   normalizeCanonicalEmergencyRole,
 } from '../lib/users/canonicalAccess';
@@ -195,14 +196,47 @@ export function useEmergencyRolePermissions() {
         }).readOnly,
       switchDemoRole: (nextRole) => {
         const normalizedRole = normalizeEmergencyRole(nextRole);
+        const nextMapping = getCanonicalRoleMapping(nextRole);
+        const nextProfile = normalizeCareDroidProfile({
+          ...compiledProfile.user,
+          role: nextMapping.hospitalRole,
+          emergencyRoleId: nextMapping.emergencyRoleId,
+          saasRole: nextMapping.saasRole,
+          backendRole: nextMapping.backendRole,
+          roleProfileId: nextMapping.roleProfileId,
+        });
+        const nextCompiledProfile = compileCareDroidAccessProfile(nextProfile);
         const nextUser = isDemoPersonaUser(user)
-          ? applyDemoRoleView(user, normalizedRole)
+          ? applyDemoRoleView(
+              {
+                ...user,
+                caredroidProfile: nextProfile,
+                compiledAccessProfile: nextCompiledProfile,
+                permissions: nextCompiledProfile.permissions,
+                profile: {
+                  ...(user?.profile || {}),
+                  hospitalRole: nextMapping.hospitalRole,
+                  roleProfileId: nextMapping.roleProfileId,
+                  emergencyRoleId: nextMapping.emergencyRoleId,
+                  saasRole: nextMapping.saasRole,
+                  backendRole: nextMapping.backendRole,
+                },
+              },
+              normalizedRole,
+            )
           : {
               ...user,
               role: normalizedRole,
+              caredroidProfile: nextProfile,
+              compiledAccessProfile: nextCompiledProfile,
+              permissions: nextCompiledProfile.permissions,
               profile: {
                 ...(user?.profile || {}),
-                roleProfileId: normalizedRole,
+                hospitalRole: nextMapping.hospitalRole,
+                roleProfileId: nextMapping.roleProfileId,
+                emergencyRoleId: nextMapping.emergencyRoleId,
+                saasRole: nextMapping.saasRole,
+                backendRole: nextMapping.backendRole,
               },
             };
         setUser(nextUser);

@@ -19,7 +19,7 @@ import {
   type CareDroidSuiteId,
 } from '../../lib/features/suiteRegistry';
 import {
-  canAccessRoute,
+  canSeeNavigationItem,
   type CompiledCareDroidAccessProfile,
 } from '../lib/users/canonicalAccess';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
@@ -508,9 +508,7 @@ export function getVisibleNavigation(
   if (options.compiledProfile) {
     const visibleItems = getPilotCustomerNavigationItems(
       NAVIGATION_ITEMS.filter(
-        (item) =>
-          canAccessRoute(options.compiledProfile as CompiledCareDroidAccessProfile, item.route) &&
-          (!options.compiledProfile?.readOnly || item.readOnlyAllowed),
+        (item) => canSeeNavigationItem(options.compiledProfile as CompiledCareDroidAccessProfile, item),
       ),
     );
     return sortNavigationItemsForRole(visibleItems, options.compiledProfile.role.emergencyRoleId);

@@ -11,6 +11,7 @@ import {
 import { useRolePermissions } from '../hooks/useRolePermissions';
 import { useCareDroidUser } from '../hooks/useCareDroidUser';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
+import { canOwnAlert, getCompiledRoleLabel } from '../lib/users/canonicalAccess';
 import type { AuditMetadata } from '../lib/users/userTypes';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import './ClinicalAlertsPage.css';
@@ -84,7 +85,7 @@ function formatTime(date: Date): string {
 
 const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
-  const { can, isReadOnly } = useRolePermissions();
+  const { can, isReadOnly, compiledProfile } = useRolePermissions();
   const { profile } = useCareDroidUser();
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
   const canAcknowledge = can(CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE);
@@ -98,33 +99,39 @@ const ClinicalAlertsPage = () => {
   const [acknowledgedBottleneckIds, setAcknowledgedBottleneckIds] = useState<Set<string>>(() => new Set());
   const bottleneckAlerts = useMemo<ClinicalAlert[]>(
     () =>
-      operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks.map((event) => ({
-        id: `bottleneck-${event.id}`,
-        timestamp: new Date(event.detectedAt),
-        severity:
-          event.severity === 'critical'
-            ? 'critical'
-            : event.severity === 'high'
-              ? 'high'
-              : event.severity === 'medium'
-                ? 'moderate'
-                : 'low',
-        title: event.title,
-        description: `${event.description} Fallback: ${event.fallbackAction}`,
-        source: `${event.serviceName} / ${event.category.replace(/_/g, ' ')}`,
-        status:
-          event.status === 'acknowledged' || acknowledgedBottleneckIds.has(`bottleneck-${event.id}`)
-            ? 'acknowledged'
-            : 'unacknowledged',
-        findings: [
-          `Owner: ${event.ownerRole.replace(/_/g, ' ')}`,
-          event.responseDeadline
-            ? `Deadline: ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-            : '',
-          event.impactsThreeMinuteTarget ? '3-minute target at risk' : '',
-        ].filter(Boolean),
-      })),
-    [acknowledgedBottleneckIds, operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks],
+      operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks.map((event) => {
+        const ownerLabel = getCompiledRoleLabel(event.ownerRole);
+        const backupLabel = event.backupRole ? getCompiledRoleLabel(event.backupRole) : null;
+        const isAssignedOwner = canOwnAlert(compiledProfile, event.ownerRole);
+        return {
+          id: `bottleneck-${event.id}`,
+          timestamp: new Date(event.detectedAt),
+          severity:
+            event.severity === 'critical'
+              ? 'critical'
+              : event.severity === 'high'
+                ? 'high'
+                : event.severity === 'medium'
+                  ? 'moderate'
+                  : 'low',
+          title: event.title,
+          description: `${event.description} Fallback: ${event.fallbackAction}`,
+          source: `${event.serviceName} / ${event.category.replace(/_/g, ' ')}`,
+          status:
+            event.status === 'acknowledged' || acknowledgedBottleneckIds.has(`bottleneck-${event.id}`)
+              ? 'acknowledged'
+              : 'unacknowledged',
+          findings: [
+            isAssignedOwner ? `You are the designated owner (${ownerLabel})` : `Owner: ${ownerLabel}`,
+            backupLabel ? `Backup: ${backupLabel}` : '',
+            event.responseDeadline
+              ? `Deadline: ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+              : '',
+            event.impactsThreeMinuteTarget ? '3-minute target at risk' : '',
+          ].filter(Boolean),
+        };
+      }),
+    [acknowledgedBottleneckIds, compiledProfile, operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks],
   );
   const displayAlerts = useMemo(
     () => [...bottleneckAlerts, ...alerts],

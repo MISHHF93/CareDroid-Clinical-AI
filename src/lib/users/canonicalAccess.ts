@@ -542,6 +542,46 @@ export function canAccessRoute(
   return required.every((permission) => profile.permissions.includes(permission));
 }
 
+export function hasPermission(
+  compiledProfile: CompiledCareDroidAccessProfile | CareDroidUserProfile,
+  permission: string,
+): boolean {
+  const profile =
+    'navigationAccess' in compiledProfile
+      ? compiledProfile
+      : compileCareDroidAccessProfile(compiledProfile);
+  return profile.permissions.includes(permission);
+}
+
+export function hasAnyPermission(
+  compiledProfile: CompiledCareDroidAccessProfile | CareDroidUserProfile,
+  permissions: readonly string[],
+): boolean {
+  return permissions.some((permission) => hasPermission(compiledProfile, permission));
+}
+
+export function hasAllPermissions(
+  compiledProfile: CompiledCareDroidAccessProfile | CareDroidUserProfile,
+  permissions: readonly string[],
+): boolean {
+  return permissions.every((permission) => hasPermission(compiledProfile, permission));
+}
+
+export function canSeeNavigationItem(
+  compiledProfile: CompiledCareDroidAccessProfile,
+  item: {
+    route?: string;
+    path?: string;
+    requiredPermissions?: readonly string[];
+    readOnlyAllowed?: boolean;
+  },
+): boolean {
+  const route = item.route || item.path;
+  if (!route || !canAccessRoute(compiledProfile, route)) return false;
+  if (compiledProfile.readOnly && item.readOnlyAllowed === false) return false;
+  return hasAllPermissions(compiledProfile, item.requiredPermissions || []);
+}
+
 export function canMutateWithCompiledProfile(
   compiledProfile: CompiledCareDroidAccessProfile,
   action?: string,
@@ -559,6 +599,36 @@ export function canMutateWithCompiledProfile(
     return compiledProfile.role.clinical && compiledProfile.emergencyAccess.allowedActions.includes(action);
   }
   return compiledProfile.emergencyAccess.allowedActions.includes(action);
+}
+
+export function canPerformClinicalAction(
+  compiledProfile: CompiledCareDroidAccessProfile,
+  action: string,
+): boolean {
+  return compiledProfile.role.clinical && canMutateWithCompiledProfile(compiledProfile, action);
+}
+
+export function canReviewAI(compiledProfile: CompiledCareDroidAccessProfile): boolean {
+  return !compiledProfile.readOnly && compiledProfile.aiCapabilities.canReview;
+}
+
+export function canOwnAlert(
+  compiledProfile: CompiledCareDroidAccessProfile,
+  ownerRole?: string,
+): boolean {
+  if (compiledProfile.readOnly || !compiledProfile.alertCapabilities.canAcknowledge) return false;
+  if (!ownerRole) return true;
+  return resolveHospitalRole(ownerRole) === compiledProfile.role.hospitalRole;
+}
+
+export function canMutatePatient(compiledProfile: CompiledCareDroidAccessProfile): boolean {
+  if (compiledProfile.readOnly) return false;
+  return hasAnyPermission(compiledProfile, [
+    P.PATIENT_CREATE,
+    P.PATIENT_UPDATE,
+    P.PATIENT_ASSIGN,
+    P.PATIENT_DISCHARGE,
+  ]);
 }
 
 export function getCompiledRoleLabel(roleLike: unknown): string {

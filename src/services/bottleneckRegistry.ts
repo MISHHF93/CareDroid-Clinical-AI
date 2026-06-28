@@ -1078,7 +1078,7 @@ export function detectBottleneckEvents(input: BuildBottleneckRegistryInput): Bot
           affectedWorkflow: 'Command center situational awareness',
           affectedPatientId: criticalPatients[0]?.id,
           affectedDepartment: 'Emergency Department',
-          ownerRole: 'platform_admin',
+          ownerRole: 'it_admin',
           responseDeadline: plusMinutes(detectedAt, 3),
           impactsThreeMinuteTarget: criticalPatients.length > 0,
           fallbackAction: 'Use the local intake snapshot and persistent in-app critical banner; do not block emergency read-only workflow.',

@@ -23,7 +23,7 @@ describe('WorkspaceDataPipelineService', () => {
       'Reports',
     ]);
     expect(data.workspace.id).toBe('emergency');
-    expect(data.mode.modeName).toMatch(/Emergency/);
+    expect(data.mode.modeName).toMatch(/CareDroid/);
     expect(data.recommendations.some((item) => item.assetId === 'qsofa')).toBe(true);
     expect(data.analytics.counts.automations).toBe(10);
     expect(data.analytics.solutionPackage.title).toBe('Emergency Flow Intelligence Platform');

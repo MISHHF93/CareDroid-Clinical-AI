@@ -63,7 +63,7 @@ describe('reception architecture plan execution', () => {
     expect(whiteboard).toContain('completeIntakeHandoff');
     expect(smartIntake).toContain('applyIntakeArrivalContext');
     expect(whiteboard).toContain('matchesWhiteboardQueueFilter');
-    expect(whiteboard).toContain('enterEmsRegistrationQueue');
+    expect(queueAssignment).toContain('enterEmsRegistrationQueue');
   });
 
   it('keeps smart intake promotion paths', () => {

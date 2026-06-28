@@ -1,5 +1,6 @@
 import React from 'react';
 import { useUser } from '../contexts/UserContext';
+import { resolveHospitalRole } from '../lib/users/canonicalAccess';
 import logger from '../utils/logger';
 
 /**
@@ -162,9 +163,12 @@ export const RoleGate = ({ role, children, fallback = null }) => {
     return <>{fallback}</>;
   }
 
+  const hospitalRole = resolveHospitalRole(
+    (user as any).compiledAccessProfile?.role?.hospitalRole ?? user.role,
+  );
   const hasRole = Array.isArray(role)
-    ? role.includes(user.role)
-    : user.role === role;
+    ? role.map(resolveHospitalRole).includes(hospitalRole)
+    : resolveHospitalRole(role) === hospitalRole;
 
   return hasRole ? <>{children}</> : <>{fallback}</>;
 };

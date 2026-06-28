@@ -81,7 +81,7 @@ describe('receptionEscalationWorkflow', () => {
     expect(submission?.workflowLog.source).toBe(RECEPTION_ESCALATION_ALERT_SOURCE);
     expect(submission?.communicationLog?.metadata?.communicationKind).toBe('concern-escalated');
     expect(submission?.patients[0].flags).toContain('HighRisk');
-    expect(submission?.patients[0].timeline.at(-1)?.type).toBe('ReceptionEscalation');
+    expect(submission?.patients[0].timeline.at(-1)?.type).toBe('ESCALATION');
   });
 
   it('summarizes active reception escalations for charge and triage workflows', () => {

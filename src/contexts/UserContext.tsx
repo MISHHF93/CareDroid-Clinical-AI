@@ -7,6 +7,11 @@ import {
   hydrateStoredDemoUser,
   OPEN_ACCESS_USER_ID,
 } from '../config/demoPersonaModel';
+import {
+  hasAllPermissions as hasAllCanonicalPermissions,
+  hasAnyPermission as hasAnyCanonicalPermission,
+  hasPermission as hasCanonicalPermission,
+} from '../lib/users/canonicalAccess';
 import logger from '../utils/logger';
 
 /**
@@ -283,9 +288,9 @@ export const UserProvider = ({ children }) => {
    */
   const hasPermission = (permission) => {
     if (!user || !user.role) return false;
+    const compiledProfile = (user as any).compiledAccessProfile;
+    if (compiledProfile?.user && hasCanonicalPermission(compiledProfile, permission)) return true;
     if (Array.isArray(user.permissions) && user.permissions.includes(permission)) return true;
-    const compiledPermissions = (user as any).compiledAccessProfile?.permissions;
-    if (Array.isArray(compiledPermissions) && compiledPermissions.includes(permission)) return true;
     const rolePermissions = (RolePermissions as any)[user.role as any] || [];
     return rolePermissions.includes(permission);
   };
@@ -295,11 +300,10 @@ export const UserProvider = ({ children }) => {
    */
   const hasAnyPermission = (permissions) => {
     if (!user || !user.role) return false;
+    const compiledProfile = (user as any).compiledAccessProfile;
+    if (compiledProfile?.user && hasAnyCanonicalPermission(compiledProfile, permissions)) return true;
     const userPermissions = [
       ...(Array.isArray(user.permissions) ? user.permissions : []),
-      ...(Array.isArray((user as any).compiledAccessProfile?.permissions)
-        ? (user as any).compiledAccessProfile.permissions
-        : []),
     ];
     if (permissions.some((permission) => userPermissions.includes(permission))) return true;
     const rolePermissions = (RolePermissions as any)[user.role as any] || [];
@@ -311,11 +315,10 @@ export const UserProvider = ({ children }) => {
    */
   const hasAllPermissions = (permissions) => {
     if (!user || !user.role) return false;
+    const compiledProfile = (user as any).compiledAccessProfile;
+    if (compiledProfile?.user && hasAllCanonicalPermissions(compiledProfile, permissions)) return true;
     const userPermissions = [
       ...(Array.isArray(user.permissions) ? user.permissions : []),
-      ...(Array.isArray((user as any).compiledAccessProfile?.permissions)
-        ? (user as any).compiledAccessProfile.permissions
-        : []),
     ];
     if (permissions.every((permission) => userPermissions.includes(permission))) return true;
     const rolePermissions = (RolePermissions as any)[user.role as any] || [];

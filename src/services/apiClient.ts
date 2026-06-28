@@ -100,7 +100,9 @@ const isPublicApiPath = (apiPath) =>
 
 // In development, reduce console noise from expected degraded/disabled services and 401s
 // when running with the local dev-stack (many backends features are intentionally off).
-const isDev = typeof window !== 'undefined' &&
+// Disabled in Vitest so auth and offline-intercept behaviour can be unit-tested against real fetch.
+const isDev = !import.meta.env.VITEST &&
+  typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
 
 const looksLikeJwt = (token) => {

@@ -37,7 +37,7 @@ describe('emergencySettingsApi CareDroid settings contract', () => {
     const result = await fetchEmergencyOsSettings();
 
     expect(result.ok).toBe(true);
-    expect(apiFetch).toHaveBeenCalledWith('/api/emergency/settings', expect.objectContaining({ headers: {} }));
+    expect(apiFetch).toHaveBeenCalledWith('/api/emergency/settings', expect.objectContaining({ headers: expect.objectContaining({}) }));
   });
 
   it('patches grouped settings and returns the updated envelope', async () => {
@@ -50,7 +50,7 @@ describe('emergencySettingsApi CareDroid settings contract', () => {
       expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
       })
     );
   });

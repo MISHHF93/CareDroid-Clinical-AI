@@ -3,6 +3,9 @@
 CareDroid is the AI Chief of Staff for emergency department and hospital operations. Its highest-priority mission is: "Help save a human life in the first 3 minutes of any critical alert or patient arrival." Always refine the current codebase first. Do not create a new app, replace working routes, or remove existing functionality unless explicitly requested.
 
 Core engineering rules:
+- Work in the current codebase only. Do not create a new app, replacement shell, quarantined service, isolated demo, orphan component, or disconnected "new architecture".
+- New helpers/components/services are allowed only when immediately imported by real app consumers.
+- Consolidate duplicate role/user/access logic into the canonical identity layer instead of adding parallel systems.
 - Follow the existing React, Vite, Nest, TypeScript, routing, state, and styling patterns.
 - Prefer incremental refactoring over rewrites.
 - Keep AI calls centralized through the CareDroid AI node/service in `lib/ai/careDroidAI.ts`.
@@ -14,6 +17,18 @@ Core engineering rules:
 - Maintain WCAG AA intent: semantic HTML, keyboard focus, labels, and status regions.
 - Never hardcode secrets or expose provider keys to frontend code.
 - Never log protected health information. Log only operational metadata such as intent, field names, status, timing, and confidence.
+
+Canonical identity and access rules:
+- `src/lib/users/canonicalAccess.ts` is the canonical identity/access compiler.
+- Use `CareDroidUserProfile`, `CompiledCareDroidAccessProfile`, `CANONICAL_ROLE_CATALOG`, and `compileCareDroidAccessProfile(user)` for role-aware work.
+- HospitalRole, EmergencyRoleId, SaaS profile role, and backend UserRole must compile into one `CompiledCareDroidAccessProfile`; do not introduce another role system.
+- Use canonical helpers for access decisions: `hasPermission`, `hasAnyPermission`, `hasAllPermissions`, `canAccessRoute`, `canSeeNavigationItem`, `canPerformClinicalAction`, `canReviewAI`, `canOwnAlert`, and `canMutatePatient`.
+- Route guards and navigation must share canonical access logic. No nav item should point to a route that direct URL access denies.
+- Fail safely: when profile compilation or role resolution is uncertain, deny mutation and prefer emergency-safe read-only visibility.
+- Preserve backend compatibility with `physician`, `nurse`, `student`, and `admin`; put richer CareDroid role identity in profile metadata/`roleProfileId`.
+- Follow least privilege. Generic `nurse` must not become `charge_nurse`; registration clerks must not override clinical AI; demo observers remain read-only; IT admins must not edit clinical data unless explicitly permitted; hospital admins should see operational data with minimized clinical detail.
+- Demo switching must update the active user, canonical profile, compiled profile, permissions, navigation, dashboard widgets, AI Chief routing, alert ownership, and staff assignment identity together.
+- Staff assignment records should reference canonical profile IDs when available.
 
 AI safety rules:
 - AI is clinical decision support, not a replacement for clinicians.
@@ -89,6 +104,8 @@ CareDroid models realistic hospital roles for the CareDroid Virtual City Health 
 
 ### Role system
 
+Current canonical rule: use `src/lib/users/canonicalAccess.ts` as the identity/access compiler for all role-aware work. HospitalRole, EmergencyRoleId, SaaS profile role, and backend UserRole must compile into one `CompiledCareDroidAccessProfile` via `compileCareDroidAccessProfile(user)`. Do not add a parallel role system.
+
 Use `src/lib/users/` as the single source of truth for roles, permissions, and demo users:
 - `userTypes.ts` — `CareDroidUserProfile` type and `HospitalRole` union
 - `hospitalNetwork.ts` — hospital sites, city zones, departments
@@ -99,20 +116,26 @@ Use `src/lib/users/` as the single source of truth for roles, permissions, and d
 
 ### RBAC rules
 
+Canonical access helpers in `canonicalAccess.ts` are the preferred surface: `hasPermission`, `hasAnyPermission`, `hasAllPermissions`, `canAccessRoute`, `canSeeNavigationItem`, `canPerformClinicalAction`, `canReviewAI`, `canOwnAlert`, and `canMutatePatient`.
+
 - Do not hardcode role checks inside UI components. Use `useRolePermissions()` or `hasCareDroidPermission()`.
 - All permission checks must go through the centralized helpers in `permissions.ts`.
+- New route, navigation, AI, alert, staff assignment, and mutation checks must use `CompiledCareDroidAccessProfile` and the canonical helpers.
 - Demo users live only in `demoUsers.ts`. Never scatter mock users in component files.
 - Clinical permissions follow least privilege. Non-clinical roles cannot edit clinical decisions.
 - Permissions cascade from role definitions — never copy-paste permission arrays into components.
-- Use `toEmergencyRoleId()` from `roleAccess.ts` to map a `HospitalRole` to an existing emergency role ID for navigation compatibility.
+- Use `compileCareDroidAccessProfile()` to map a `HospitalRole` to emergency role, SaaS role, backend compatibility role, routes, permissions, dashboard widgets, AI capabilities, and alert ownership.
 
 ### Demo user switcher
 
 `src/components/auth/DemoUserSwitcher.tsx` allows switching the active demo user during demo or dev mode.
 - Only render it in demo/dev contexts. Never expose it in production.
 - Switching a demo user updates both `useCareDroidUser` state and the existing `UserContext` role for nav routing.
+- Switching must also carry `caredroidProfile`, `compiledAccessProfile`, permissions, emergency role, SaaS role, backend compatibility role, route/navigation access, dashboard personalization, AI routing, alert ownership, and staff assignment identity together.
 
 ### AI Chief routing
+
+AI Chief routing must consume canonical profiles where available. Recommendations should include `ownerRole`, `ownerUserId`, `owningDepartment`, `owningSite`, `visibleToRoles`, `visibleToUsers`, `escalationRole`, `escalationUserId`, `requiresClinicianReview`, `clinicianOverrideAvailable`, and `fallbackOwnerRole`. Clinical recommendations always require clinician review.
 
 When AI recommendations are generated, include:
 - `assignedRole` — the hospital role responsible for this recommendation
@@ -122,6 +145,22 @@ When AI recommendations are generated, include:
 - `clinicianOverrideAvailable` — whether a clinician can dismiss/modify the AI output
 
 Use `src/lib/users/aiChiefRouting.ts` to resolve visibility and escalation by alert scenario.
+
+**React hook:** Use `useAiChiefRouting()` from `src/hooks/useAiChiefRouting.ts` to get the current user's visible scenarios, `canSeeScenario(scenario)`, `getRoutingFor(scenario)`, and `filterByProfile(recommendations)` — all bound to the current `compiledProfile`. Do NOT call `filterAiRecommendationsByProfile` or `isAlertVisibleToCompiledProfile` directly in components; use the hook instead.
+
+### Alert ownership
+
+Alerts and bottlenecks must use canonical ownership metadata:
+- `ownerRole`, `ownerUserId`, `owningDepartment`, `owningSite`
+- `backupRole`, `escalationChain`, `acknowledgementAuthority`
+- `responseDeadline`, `impactsThreeMinuteTarget`
+
+Do not scatter hardcoded alert owner literals when a canonical resolver/helper can be used.
+
+- All `BottleneckEvent` objects are constructed via the `bottleneck()` helper in `bottleneckRegistry.ts`, which calls `canonicalAlertOwnership()`. This helper resolves `ownerRole` to a canonical `HospitalRole` via `resolveHospitalRole()` and enriches ownership with `backupRole`, `escalationChain`, and `acknowledgementAuthority`.
+- `ownerRole` values passed to `bottleneck()` must be canonical `HospitalRole` strings (e.g., `'charge_nurse'`, `'it_admin'`) — never SaaS role or alias strings.
+- In components, use `canOwnAlert(compiledProfile, event.ownerRole)` from `canonicalAccess.ts` to determine if the current user is the designated alert owner. Use `getCompiledRoleLabel(event.ownerRole)` for human-readable role display.
+- Acknowledgement permission is controlled by `CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE` (set on `compiledProfile.alertCapabilities.canAcknowledge`). Role-specific ownership check is `canOwnAlert(compiledProfile, ownerRole)`, which is a narrower check than acknowledgement permission alone.
 
 ### Audit metadata
 
@@ -143,11 +182,15 @@ Component aliases at `src/components/auth/`:
 - `RoleBadge.tsx` — re-exports `RoleBadge` from `src/domain/staff/RoleBadge`.
 - `UserSwitcher.tsx` — re-exports `DemoUserSwitcher` as `UserSwitcher`.
 
+### RoleGate
+
+`RoleGate` in `src/components/PermissionGate.tsx` gates children by hospital role. It resolves the active role via `resolveHospitalRole()` from `canonicalAccess.ts`, so comparisons are always against canonical `HospitalRole` names regardless of whether `user.role` is an emergency-role string, alias, or SaaS role. Pass canonical `HospitalRole` values (e.g., `'charge_nurse'`, `'emergency_physician'`) not emergency aliases (e.g., `'physician'`, `'nurse'`). Prefer `PermissionGate` with a `CAREDROID_PERMISSIONS` constant over `RoleGate` wherever a permission-based check is more semantically correct.
+
 ### CareDroidRouteGuard
 
 `src/components/auth/CareDroidRouteGuard.tsx` enforces CareDroid-level route access for routes defined in `src/lib/navigation.ts` that are NOT covered by `EmergencyRouteGuard`:
 - Uses `useRolePermissions()` to get the active role.
-- Calls `canRoleAccessRoute(role, pathname)` — passes through unknown paths (safe for any future routes).
+- Calls canonical `canAccessRoute(compiledProfile, pathname)` so direct route access and navigation share the same decision.
 - Shows an "Access denied" view with a link to `getUnauthorizedFallback()` if the role is not in `allowedRoles`.
 - Applied in `router.tsx` to `/admin/operations` and `/audit` routes.
 - Do NOT apply to `emergency/*` routes — those are handled by `EmergencyRouteGuard`.
