@@ -99,6 +99,37 @@ type PatientReferenceInput = {
   flags?: string[];
 };
 
+export type ExistingServiceBottleneckSignals = {
+  emergencyOperatingSystem?: Record<string, unknown>;
+  flowEngine?: {
+    detections?: readonly Record<string, unknown>[];
+    nextRecommendedActions?: readonly Record<string, unknown>[];
+  };
+  escalationDashboard?: {
+    escalations?: readonly Record<string, unknown>[];
+    recommendations?: readonly Record<string, unknown>[];
+  };
+  queueDashboard?: {
+    bottlenecks?: readonly Record<string, unknown>[];
+    recommendations?: readonly Record<string, unknown>[];
+  };
+  capacityDashboard?: {
+    score?: number;
+    riskLevel?: string;
+    recommendations?: readonly Record<string, unknown>[];
+  };
+  reassessmentDashboard?: {
+    queue?: {
+      items?: readonly Record<string, unknown>[];
+    };
+    metrics?: Record<string, unknown>;
+  };
+  referralDashboard?: {
+    delays?: readonly Record<string, unknown>[];
+    metrics?: Record<string, unknown>;
+  };
+};
+
 type BuildBottleneckRegistryInput = {
   generatedAt?: string;
   queueHealth?: QueueHealthInput[];
@@ -123,9 +154,29 @@ type BuildBottleneckRegistryInput = {
   referralStatus?: {
     pending?: number;
   };
+  existingServiceSignals?: ExistingServiceBottleneckSignals;
 };
 
 export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.freeze([
+  {
+    serviceName: 'Emergency Operating System Service',
+    filePath: 'src/services/emergencyOperatingSystemService.ts',
+    purpose: 'Composes the ED SaaS service backbone: intake, queue, flow, escalation, capacity, EMS, reassessment, referral, resource, analytics, automation, and copilot signals.',
+    inputs: ['workspace automations', 'demo/live ED service outputs', 'patient journey state'],
+    outputs: ['operating system dashboard', 'leadership summary', 'service-specific dashboards'],
+    dependencies: [
+      'EmergencyFlowEngineService',
+      'EmergencyEscalationEngineService',
+      'QueueIntelligenceService',
+      'EmergencyCapacityIntelligenceService',
+      'EmergencyIntakeOperatingSystemService',
+    ],
+    consumers: ['Emergency OS route', 'workspace dashboards', 'analytics/command surfaces'],
+    failureModes: ['downstream service demo/live source mismatch', 'stale composed dashboard'],
+    latencyRisks: ['composed dashboard aggregation across many services'],
+    duplicationConflicts: ['must remain the composition layer instead of duplicating child service logic'],
+    affectsThreeMinuteLoop: true,
+  },
   {
     serviceName: 'CareDroid Central Node',
     filePath: 'src/central-node/careDroidCentralNode.ts',
@@ -179,6 +230,32 @@ export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.fre
     affectsThreeMinuteLoop: true,
   },
   {
+    serviceName: 'Emergency Flow Engine Service',
+    filePath: 'src/services/emergencyFlowEngineService.ts',
+    purpose: 'Detects stalled patients, delayed referrals, delayed reassessments, queue bottlenecks, excessive waits, and boarding pressure.',
+    inputs: ['demo/live patient flow', 'queue dashboard', 'referral dashboard', 'reassessment dashboard', 'boarding dashboard', 'capacity dashboard'],
+    outputs: ['flow detections', 'stage metrics', 'next recommended actions'],
+    dependencies: ['QueueAssignment', 'ReferralHub', 'ReassessmentAutomationService', 'BoardingIntelligenceEngine', 'EmergencyCapacityIntelligenceService'],
+    consumers: ['EmergencyOperatingSystemService', 'flow screens', 'bottleneck registry adapter'],
+    failureModes: ['demo defaults mistaken for live state', 'stale patient journey stage'],
+    latencyRisks: ['local synchronous patient-flow scan'],
+    duplicationConflicts: ['overlaps with queue/alert derivations if not normalized'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Emergency Escalation Engine Service',
+    filePath: 'src/services/emergencyEscalationEngineService.ts',
+    purpose: 'Escalates capacity, boarding, EMS congestion, high-risk queue growth, and critical device outage risks.',
+    inputs: ['capacity dashboard', 'boarding dashboard', 'EMS offload dashboard', 'queue dashboard', 'resource board'],
+    outputs: ['active escalations', 'escalation metrics', 'recommendations'],
+    dependencies: ['EmergencyCapacityIntelligenceService', 'BoardingIntelligenceEngine', 'EmsOffloadCommandCenterService', 'QueueIntelligenceService', 'EmergencyResourceBoardService'],
+    consumers: ['EmergencyOperatingSystemService', 'command/escalation surfaces', 'bottleneck registry adapter'],
+    failureModes: ['dependency dashboard stale', 'critical device state missing'],
+    latencyRisks: ['local synchronous aggregation'],
+    duplicationConflicts: ['overlaps with operational alert engine if not deduped'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
     serviceName: 'Queue Intelligence Service',
     filePath: 'src/services/queueIntelligenceService.ts',
     purpose: 'Normalizes ED queues and detects queue bottlenecks before downstream degradation.',
@@ -192,6 +269,84 @@ export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.fre
     affectsThreeMinuteLoop: true,
   },
   {
+    serviceName: 'Emergency Intake Operating System Service',
+    filePath: 'src/services/emergencyIntakeOperatingSystemService.ts',
+    purpose: 'Coordinates arrival/intake automation, registration completion, smart arrival, and triage-ready handoff state.',
+    inputs: ['intake artifacts', 'patient answers', 'registration state', 'automation feed'],
+    outputs: ['intake command center', 'smart arrival snapshot', 'triage-ready state'],
+    dependencies: ['smart intake services', 'reception intake bridge', 'arrival control layer'],
+    consumers: ['EmergencyOperatingSystemService', 'intake surfaces'],
+    failureModes: ['incomplete intake packet', 'triage handoff not acknowledged'],
+    latencyRisks: ['manual registration completion delay'],
+    duplicationConflicts: ['reception/intake bridge can overlap with central patient intake state'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Reassessment Automation Service',
+    filePath: 'src/services/reassessmentAutomationService.ts',
+    purpose: 'Builds reassessment queues and recommended reassessment actions.',
+    inputs: ['patient wait/vitals state', 'reassessment rules'],
+    outputs: ['reassessment dashboard', 'queue items', 'recommended actions'],
+    dependencies: ['ReassessmentEngine'],
+    consumers: ['EmergencyFlowEngineService', 'EmergencyOperatingSystemService', 'central node reassessment status'],
+    failureModes: ['overdue reassessment not acknowledged', 'patient risk not updated'],
+    latencyRisks: ['manual bedside reassessment delay'],
+    duplicationConflicts: ['alert engine also derives reassessment alerts'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Referral Hub',
+    filePath: 'src/services/referralHub.ts',
+    purpose: 'Tracks referral delays, acknowledgement, and external handoff state.',
+    inputs: ['referral records', 'specialty/department status'],
+    outputs: ['referral dashboard', 'delayed referrals', 'handoff recommendations'],
+    dependencies: ['referral workflow data'],
+    consumers: ['EmergencyFlowEngineService', 'EmergencyOperatingSystemService', 'central node referral status'],
+    failureModes: ['external handoff unacknowledged', 'specialty owner unavailable'],
+    latencyRisks: ['external receiving-service delay'],
+    duplicationConflicts: ['EHR/FHIR sync and local referral snapshot can diverge'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Boarding Intelligence Engine',
+    filePath: 'src/services/boardingIntelligenceEngine.ts',
+    purpose: 'Scores boarding pressure and inpatient bed-management blockers.',
+    inputs: ['boarding patients', 'pending beds', 'bed pressure state'],
+    outputs: ['boarding dashboard', 'boarding score', 'boarding recommendations'],
+    dependencies: ['boarding signals'],
+    consumers: ['EmergencyFlowEngineService', 'EmergencyEscalationEngineService', 'EmergencyOperatingSystemService'],
+    failureModes: ['pending bed state stale', 'longest boarder not escalated'],
+    latencyRisks: ['inpatient handoff/bed assignment delay'],
+    duplicationConflicts: ['capacity service also scores boarding pressure'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'EMS Offload Command Center Service',
+    filePath: 'src/services/emsOffloadCommandCenterService.ts',
+    purpose: 'Tracks EMS handoff pressure, offload delays, and incoming ambulance congestion.',
+    inputs: ['EMS arrivals', 'handoff state', 'room readiness'],
+    outputs: ['EMS offload dashboard', 'pressure metrics', 'recommendations'],
+    dependencies: ['emsOffloadTracker', 'pre-arrival services'],
+    consumers: ['EmergencyEscalationEngineService', 'EmergencyOperatingSystemService'],
+    failureModes: ['handoff owner missing', 'incoming ETA stale'],
+    latencyRisks: ['EMS-to-bed handoff delay'],
+    duplicationConflicts: ['EMS pre-arrival pipeline and offload tracker can overlap'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Emergency Resource Board Service',
+    filePath: 'src/services/emergencyResourceBoardService.ts',
+    purpose: 'Surfaces resource/device shortages that can block ED flow.',
+    inputs: ['room/device/resource availability'],
+    outputs: ['resource board', 'shortages', 'resource metrics'],
+    dependencies: ['resource inventory state'],
+    consumers: ['EmergencyEscalationEngineService', 'EmergencyOperatingSystemService'],
+    failureModes: ['critical device shortage not visible', 'resource turnover stale'],
+    latencyRisks: ['manual device/room turnover delay'],
+    duplicationConflicts: ['capacity model may partially count room pressure'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
     serviceName: 'Emergency Capacity Intelligence Service',
     filePath: 'src/services/emergencyCapacityIntelligenceService.ts',
     purpose: 'Scores ED capacity from occupancy, boarding, admissions, EMS pressure, and discharges.',
@@ -202,6 +357,84 @@ export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.fre
     failureModes: ['missing live capacity feed', 'demo defaults used as live context'],
     latencyRisks: ['none significant; local synchronous scoring'],
     duplicationConflicts: ['capacity model overlaps with central node capacityStatus'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Patient Management API',
+    filePath: 'src/services/patientManagementApi.ts',
+    purpose: 'Frontend patient management API boundary.',
+    inputs: ['patient API requests', 'patient identifiers'],
+    outputs: ['patient records and mutations'],
+    dependencies: ['apiClient'],
+    consumers: ['patient management surfaces'],
+    failureModes: ['patient API unavailable', 'mutation rejected'],
+    latencyRisks: ['patient fetch/update round trip'],
+    duplicationConflicts: ['local emergency store may temporarily diverge'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Emergency Analytics API',
+    filePath: 'src/services/emergencyAnalyticsApi.ts',
+    purpose: 'Reads ED analytics and reporting payloads.',
+    inputs: ['analytics route requests', 'date/department filters'],
+    outputs: ['operational analytics and reporting data'],
+    dependencies: ['apiClient'],
+    consumers: ['EmergencyAnalytics'],
+    failureModes: ['analytics endpoint unavailable', 'report data stale'],
+    latencyRisks: ['analytics query latency'],
+    duplicationConflicts: ['local central-node analytics can differ from backend analytics'],
+    affectsThreeMinuteLoop: false,
+  },
+  {
+    serviceName: 'Emergency Staffing API',
+    filePath: 'src/services/emergencyStaffingApi.ts',
+    purpose: 'Provides staff routing and staffing state for emergency operations.',
+    inputs: ['staffing API requests', 'department identifiers'],
+    outputs: ['staff assignments and availability'],
+    dependencies: ['apiClient'],
+    consumers: ['emergency staffing/command surfaces'],
+    failureModes: ['staff API unavailable', 'assignment state stale'],
+    latencyRisks: ['staff routing round trip'],
+    duplicationConflicts: ['local staff state may diverge from backend'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Config Service',
+    filePath: 'src/services/configService.ts',
+    purpose: 'Reads and normalizes frontend configuration.',
+    inputs: ['environment/config values'],
+    outputs: ['runtime config'],
+    dependencies: ['env/app config'],
+    consumers: ['frontend service clients and feature gates'],
+    failureModes: ['bad env value', 'missing endpoint'],
+    latencyRisks: ['none significant'],
+    duplicationConflicts: ['multiple config files must stay consistent'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'User Identity API',
+    filePath: 'src/services/userIdentityApi.ts',
+    purpose: 'Frontend user identity and profile API boundary.',
+    inputs: ['identity route requests', 'auth/session context'],
+    outputs: ['user identity/profile payloads'],
+    dependencies: ['apiClient', 'auth config'],
+    consumers: ['identity/profile surfaces'],
+    failureModes: ['auth failure', 'profile fetch unavailable'],
+    latencyRisks: ['identity round trip'],
+    duplicationConflicts: ['backend auth/users modules own source of truth'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'System Health Service',
+    filePath: 'src/services/systemHealthService.ts',
+    purpose: 'Frontend system health probe/read model.',
+    inputs: ['health checks', 'runtime/service status'],
+    outputs: ['system health state'],
+    dependencies: ['platform health routes'],
+    consumers: ['health/status surfaces'],
+    failureModes: ['probe unavailable', 'false healthy/degraded state'],
+    latencyRisks: ['health probe timeout'],
+    duplicationConflicts: ['SaaS Health API also reports health'],
     affectsThreeMinuteLoop: true,
   },
   {
@@ -282,6 +515,84 @@ export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.fre
     duplicationConflicts: ['frontend notification queue can diverge from backend push state'],
     affectsThreeMinuteLoop: true,
   },
+  {
+    serviceName: 'Backend Auth Service',
+    filePath: 'backend/src/modules/auth/auth.service.ts',
+    purpose: 'Backend authentication, token, and access-control service.',
+    inputs: ['login/register/token requests', 'provider identity'],
+    outputs: ['JWT/session identity', 'authorization context'],
+    dependencies: ['users service', 'identity provider registry', 'two-factor/biometric services'],
+    consumers: ['backend auth controller', 'protected API modules'],
+    failureModes: ['token invalid', 'provider unavailable', 'permission denial'],
+    latencyRisks: ['identity provider and token validation latency'],
+    duplicationConflicts: ['frontend auth config must match backend contract'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Backend Users Service',
+    filePath: 'backend/src/modules/users/users.service.ts',
+    purpose: 'Backend user account and profile service.',
+    inputs: ['user queries/mutations'],
+    outputs: ['user entities and profile state'],
+    dependencies: ['database repositories'],
+    consumers: ['auth module', 'profile/workspace modules'],
+    failureModes: ['user lookup fails', 'profile stale'],
+    latencyRisks: ['database query latency'],
+    duplicationConflicts: ['frontend identity cache can diverge'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Backend Clinical Alerts Service',
+    filePath: 'backend/src/modules/clinical-alerts/clinical-alerts.service.ts',
+    purpose: 'Backend clinical alert lifecycle and acknowledgement service.',
+    inputs: ['clinical alert queries', 'acknowledgement requests'],
+    outputs: ['clinical alerts', 'acknowledgement state'],
+    dependencies: ['database repositories', 'auth context'],
+    consumers: ['clinical alerts controller', 'ClinicalAlertsApi'],
+    failureModes: ['acknowledgement write fails', 'alert query unavailable'],
+    latencyRisks: ['database/API round trip'],
+    duplicationConflicts: ['frontend/store operational alerts are separate'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Backend Emergency OS Operational Intelligence Service',
+    filePath: 'backend/src/modules/emergency-os/emergency-os.operational-intelligence.service.ts',
+    purpose: 'Backend operational intelligence for emergency OS workflows.',
+    inputs: ['emergency OS state', 'patient/arrival/queue signals'],
+    outputs: ['operational intelligence payloads'],
+    dependencies: ['emergency OS services', 'patient arrival sync', 'clinical decision support'],
+    consumers: ['emergency OS API/controllers', 'frontend operational intelligence'],
+    failureModes: ['backend intelligence unavailable', 'state projection stale'],
+    latencyRisks: ['backend aggregation latency'],
+    duplicationConflicts: ['frontend operational intelligence can overlap'],
+    affectsThreeMinuteLoop: true,
+  },
+  {
+    serviceName: 'Backend Analytics Service',
+    filePath: 'backend/src/modules/analytics/services/analytics.service.ts',
+    purpose: 'Backend analytics event and reporting service.',
+    inputs: ['analytics events', 'reporting queries'],
+    outputs: ['analytics records and reports'],
+    dependencies: ['database/event store'],
+    consumers: ['analytics controller', 'EmergencyAnalyticsApi'],
+    failureModes: ['event write/query unavailable'],
+    latencyRisks: ['report query latency'],
+    duplicationConflicts: ['frontend local analytics summaries can differ'],
+    affectsThreeMinuteLoop: false,
+  },
+  {
+    serviceName: 'Backend Interoperability Integration Hub Service',
+    filePath: 'backend/src/modules/interoperability/integration-hub.service.ts',
+    purpose: 'Backend integration hub for external systems and automation routing.',
+    inputs: ['integration requests/events'],
+    outputs: ['integration status, events, routed automation'],
+    dependencies: ['external systems', 'integration event registry'],
+    consumers: ['interoperability controllers/modules'],
+    failureModes: ['external system timeout', 'routing failure'],
+    latencyRisks: ['external EHR/lab/radiology latency'],
+    duplicationConflicts: ['frontend interoperability readiness is only a view'],
+    affectsThreeMinuteLoop: true,
+  },
 ]);
 
 const SERVICE_DEPENDENCIES: Record<string, string[]> = Object.freeze({
@@ -289,6 +600,27 @@ const SERVICE_DEPENDENCIES: Record<string, string[]> = Object.freeze({
   'API Client': ['Backend API', 'Auth/session', 'Tenant context'],
   'CareDroid Central Node': ['Emergency store', 'Backend snapshot', 'Websocket sync'],
   'Clinical Alerts API': ['API Client', 'Backend alerts'],
+  'Emergency Escalation Engine Service': [
+    'Emergency Capacity Intelligence Service',
+    'Boarding Intelligence Engine',
+    'EMS Offload Command Center Service',
+    'Queue Intelligence Service',
+    'Emergency Resource Board Service',
+  ],
+  'Emergency Flow Engine Service': [
+    'Queue Intelligence Service',
+    'Referral Hub',
+    'Reassessment Automation Service',
+    'Boarding Intelligence Engine',
+    'Emergency Capacity Intelligence Service',
+  ],
+  'Emergency Operating System Service': [
+    'Emergency Flow Engine Service',
+    'Emergency Escalation Engine Service',
+    'Queue Intelligence Service',
+    'Emergency Capacity Intelligence Service',
+    'Emergency Intake Operating System Service',
+  ],
   'EHR/FHIR Sync': ['API Client', 'Interoperability API', 'External EHR'],
   'Lab Integration': ['API Client', 'External lab system'],
   'Notification Service': ['API Client', 'Firebase/browser notifications'],
@@ -335,6 +667,246 @@ function bottleneck(input: Omit<BottleneckEvent, 'detectedAt' | 'status'>, detec
     detectedAt,
     status: 'active',
   };
+}
+
+function readString(value: unknown, fallback = ''): string {
+  return typeof value === 'string' && value.trim() ? value : fallback;
+}
+
+function readNumber(value: unknown, fallback = 0): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function normalizeBottleneckSeverity(value: unknown): BottleneckSeverity {
+  const severity = String(value || '').toLowerCase();
+  if (severity === 'critical') return 'critical';
+  if (severity === 'urgent' || severity === 'high') return 'high';
+  if (severity === 'watch' || severity === 'low') return 'low';
+  return 'medium';
+}
+
+function dedupeBottleneckEvents(events: BottleneckEvent[]): BottleneckEvent[] {
+  const byId = new Map<string, BottleneckEvent>();
+  events.forEach((event) => {
+    const existing = byId.get(event.id);
+    if (!existing || severityRank(event.severity) > severityRank(existing.severity)) {
+      byId.set(event.id, event);
+    }
+  });
+  return Array.from(byId.values());
+}
+
+function flowStageOwner(stage: string): string {
+  const normalized = stage.toLowerCase();
+  if (normalized.includes('triage')) return 'triage_nurse';
+  if (normalized.includes('referral') || normalized.includes('disposition')) return 'specialist';
+  if (normalized.includes('reassessment') || normalized.includes('waiting')) return 'registered_nurse';
+  return 'charge_nurse';
+}
+
+function adaptFlowEngineDetections(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  return (signals.flowEngine?.detections || []).map((detection) => {
+    const id = readString(detection.id, readString(detection.title, 'flow-detection'));
+    const stage = readString(detection.stage, 'Emergency flow');
+    const severity = normalizeBottleneckSeverity(detection.severity);
+    return bottleneck(
+      {
+        id: `bn-flow-engine-${id}`,
+        category: 'clinical_workflow',
+        serviceName: 'Emergency Flow Engine Service',
+        source: 'EmergencyFlowEngineService.getFlowEngine',
+        severity,
+        title: readString(detection.title, `${stage} flow delay`),
+        description: readString(detection.reason, 'Emergency flow engine detected a workflow delay.'),
+        affectedWorkflow: stage,
+        affectedPatientId: readString(detection.patientId) || undefined,
+        affectedDepartment: 'Emergency Department',
+        ownerRole: flowStageOwner(stage),
+        responseDeadline: plusMinutes(detectedAt, severity === 'critical' || severity === 'high' ? 3 : 10),
+        impactsThreeMinuteTarget: severity === 'critical' || severity === 'high',
+        fallbackAction: readString(
+          detection.nextRecommendedAction,
+          'Assign a human workflow owner and document the next care step manually.',
+        ),
+        recommendedFix: 'Use the existing Emergency Flow Engine next action before adding any new workflow logic.',
+      },
+      detectedAt,
+    );
+  });
+}
+
+function adaptEscalationEngineSignals(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  return (signals.escalationDashboard?.escalations || []).map((escalation) => {
+    const id = readString(escalation.id, readString(escalation.trigger, 'escalation'));
+    const severity = normalizeBottleneckSeverity(escalation.severity);
+    return bottleneck(
+      {
+        id: `bn-escalation-engine-${id}`,
+        category: 'operational',
+        serviceName: 'Emergency Escalation Engine Service',
+        source: 'EmergencyEscalationEngineService.getEscalationDashboard',
+        severity,
+        title: readString(escalation.trigger, 'Operational escalation'),
+        description: readString(escalation.reason, 'Emergency escalation engine detected operational risk.'),
+        affectedWorkflow: readString(escalation.affectedWorkflow, 'Emergency operations'),
+        affectedDepartment: 'Emergency Department',
+        ownerRole: 'charge_nurse',
+        responseDeadline: plusMinutes(detectedAt, severity === 'critical' || severity === 'high' ? 3 : 10),
+        impactsThreeMinuteTarget: severity === 'critical' || severity === 'high',
+        fallbackAction: readString(
+          escalation.recommendedAction,
+          'Open command huddle and assign an accountable operational owner.',
+        ),
+        recommendedFix: 'Resolve the existing escalation engine dependency before adding replacement escalation logic.',
+      },
+      detectedAt,
+    );
+  });
+}
+
+function adaptQueueDashboardSignals(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  return (signals.queueDashboard?.bottlenecks || []).map((queue) => {
+    const id = readString(queue.queueId, readString(queue.id, readString(queue.label, 'queue')));
+    const severity = normalizeBottleneckSeverity(queue.severity);
+    return bottleneck(
+      {
+        id: `bn-queue-service-${id}`,
+        category: 'clinical_workflow',
+        serviceName: 'Queue Intelligence Service',
+        source: 'QueueIntelligenceService.getQueueDashboard',
+        severity,
+        title: `${readString(queue.label, 'Queue')} bottleneck`,
+        description: readString(queue.reason, 'Queue intelligence detected an overloaded queue.'),
+        affectedWorkflow: readString(queue.label, 'Queue flow'),
+        affectedDepartment: 'Emergency Department',
+        ownerRole: 'charge_nurse',
+        responseDeadline: plusMinutes(detectedAt, severity === 'critical' || severity === 'high' ? 3 : 10),
+        impactsThreeMinuteTarget: severity === 'critical' || severity === 'high',
+        fallbackAction: 'Use the existing queue recommendation, assign a queue owner, and pull highest-risk oldest waits forward.',
+        recommendedFix: 'Reuse Queue Intelligence queue recommendations and align central queue schema to that service.',
+      },
+      detectedAt,
+    );
+  });
+}
+
+function adaptCapacityDashboardSignals(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  const dashboard = signals.capacityDashboard;
+  if (!dashboard || readNumber(dashboard.score) < 75) return [];
+  const severity = readNumber(dashboard.score) >= 85 ? 'critical' : 'high';
+  return [
+    bottleneck(
+      {
+        id: 'bn-capacity-service-dashboard',
+        category: 'operational',
+        serviceName: 'Emergency Capacity Intelligence Service',
+        source: 'EmergencyCapacityIntelligenceService.getCapacityDashboard',
+        severity,
+        title: 'Capacity dashboard pressure',
+        description: `Existing capacity service reports score ${dashboard.score} with ${dashboard.riskLevel || 'elevated'} risk.`,
+        affectedWorkflow: 'Capacity and provider throughput',
+        affectedDepartment: 'Emergency Department',
+        ownerRole: 'patient_flow_coordinator',
+        responseDeadline: plusMinutes(detectedAt, 3),
+        impactsThreeMinuteTarget: true,
+        fallbackAction:
+          readString(dashboard.recommendations?.[0]?.action) ||
+          'Use existing capacity recommendations, escalate bed management, and protect urgent reassessment flow.',
+        recommendedFix: 'Extend Emergency Capacity Intelligence Service thresholds rather than creating a parallel capacity scorer.',
+      },
+      detectedAt,
+    ),
+  ];
+}
+
+function adaptReassessmentSignals(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  return (signals.reassessmentDashboard?.queue?.items || []).map((item) => {
+    const id = readString(item.patientId, readString(item.id, 'reassessment'));
+    const severity = normalizeBottleneckSeverity(item.priority);
+    return bottleneck(
+      {
+        id: `bn-reassessment-service-${id}`,
+        category: 'clinical_workflow',
+        serviceName: 'Reassessment Automation Service',
+        source: 'ReassessmentAutomationService.getDashboard',
+        severity,
+        title: 'Existing reassessment queue item',
+        description: readString(item.triggerReason, 'Reassessment automation service flagged a patient for review.'),
+        affectedWorkflow: readString(item.currentLocation, 'Reassessment'),
+        affectedPatientId: id,
+        affectedDepartment: 'Emergency Department',
+        ownerRole: 'registered_nurse',
+        responseDeadline: plusMinutes(detectedAt, severity === 'critical' || severity === 'high' ? 3 : 10),
+        impactsThreeMinuteTarget: severity === 'critical' || severity === 'high',
+        fallbackAction: readString(
+          item.recommendedAction,
+          'Assign bedside reassessment manually and document vitals while automation is reviewed.',
+        ),
+        recommendedFix: 'Reuse reassessment automation queue state and alert only once through the bottleneck adapter.',
+      },
+      detectedAt,
+    );
+  });
+}
+
+function adaptReferralSignals(
+  signals: ExistingServiceBottleneckSignals,
+  detectedAt: string,
+): BottleneckEvent[] {
+  return (signals.referralDashboard?.delays || []).map((delay) => {
+    const id = readString(delay.referralId, readString(delay.id, readString(delay.department, 'referral')));
+    const severity = normalizeBottleneckSeverity(delay.priority);
+    return bottleneck(
+      {
+        id: `bn-referral-service-${id}`,
+        category: 'interoperability',
+        serviceName: 'Referral Hub',
+        source: 'ReferralHub.getReferralDashboard',
+        severity,
+        title: `${readString(delay.department, 'Referral')} delayed`,
+        description: readString(delay.reason, 'Referral hub detected an external handoff delay.'),
+        affectedWorkflow: 'Referral and external handoff',
+        affectedPatientId: readString(delay.patientLabel) || undefined,
+        affectedDepartment: 'Emergency Department',
+        ownerRole: 'specialist',
+        responseDeadline: plusMinutes(detectedAt, severity === 'critical' || severity === 'high' ? 3 : 10),
+        impactsThreeMinuteTarget: severity === 'critical' || severity === 'high',
+        fallbackAction: 'Use local referral snapshot, call receiving service, and mark external data unavailable if sync is delayed.',
+        recommendedFix: 'Reuse Referral Hub delay state as the source of truth for referral bottlenecks.',
+      },
+      detectedAt,
+    );
+  });
+}
+
+export function adaptExistingServiceSignalsToBottlenecks(
+  signals: ExistingServiceBottleneckSignals | undefined,
+  detectedAt = new Date().toISOString(),
+): BottleneckEvent[] {
+  if (!signals) return [];
+  return dedupeBottleneckEvents([
+    ...adaptFlowEngineDetections(signals, detectedAt),
+    ...adaptEscalationEngineSignals(signals, detectedAt),
+    ...adaptQueueDashboardSignals(signals, detectedAt),
+    ...adaptCapacityDashboardSignals(signals, detectedAt),
+    ...adaptReassessmentSignals(signals, detectedAt),
+    ...adaptReferralSignals(signals, detectedAt),
+  ]);
 }
 
 export function detectBottleneckEvents(input: BuildBottleneckRegistryInput): BottleneckEvent[] {
@@ -528,7 +1100,9 @@ export function detectBottleneckEvents(input: BuildBottleneckRegistryInput): Bot
     );
   }
 
-  return events.sort(
+  events.push(...adaptExistingServiceSignalsToBottlenecks(input.existingServiceSignals, detectedAt));
+
+  return dedupeBottleneckEvents(events).sort(
     (a, b) =>
       Number(b.impactsThreeMinuteTarget) - Number(a.impactsThreeMinuteTarget) ||
       severityRank(b.severity) - severityRank(a.severity) ||

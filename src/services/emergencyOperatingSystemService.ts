@@ -30,6 +30,7 @@ import { getLiveQueueDashboard } from './queueAssignment';
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
 import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
+import { buildBottleneckRegistrySnapshot } from './bottleneckRegistry';
 
 function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarketplace }) {
   const dischargeQueue = queueDashboard.queues.find((queue) => queue.id === 'discharge-queue') || null;
@@ -82,6 +83,20 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const knowledgeLayer = EmergencyKnowledgeLayer.getDashboard();
     const patientPath = EmergencyPatientPathService.getPatientPathDashboard();
     const intakeOperatingSystem = EmergencyIntakeOperatingSystemService.getOperatingSystem();
+    const bottleneckRegistry = buildBottleneckRegistrySnapshot({
+      existingServiceSignals: {
+        emergencyOperatingSystem: {
+          serviceId: 'emergency-department-operating-system',
+          status: 'standalone-saas-ready',
+        },
+        flowEngine,
+        escalationDashboard: escalationEngine,
+        queueDashboard: queueFlow,
+        capacityDashboard: capacityFlow,
+        reassessmentDashboard: reassessment,
+        referralDashboard: referralFlow,
+      },
+    });
     const dischargeFlow = buildDischargeFlow({
       queueDashboard: queueFlow,
       capacityDashboard: capacityFlow,
@@ -124,6 +139,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       boardingFlow,
       resourceBoard,
       escalationEngine,
+      bottleneckRegistry,
       kpiLayer,
       simulationScenarios,
       demoEnvironment,
