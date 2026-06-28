@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ApiStateBanner from '../components/ApiStateBanner';
 import {
   isBackendCapabilityEnabled,
@@ -12,6 +12,7 @@ import { useRolePermissions } from '../hooks/useRolePermissions';
 import { useCareDroidUser } from '../hooks/useCareDroidUser';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 import type { AuditMetadata } from '../lib/users/userTypes';
+import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import './ClinicalAlertsPage.css';
 
 type AlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
@@ -85,6 +86,7 @@ const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
   const { can, isReadOnly } = useRolePermissions();
   const { profile } = useCareDroidUser();
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
   const canAcknowledge = can(CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE);
   const canExport = can(CAREDROID_PERMISSIONS.REPORTS_EXPORT);
   const [alerts, setAlerts] = useState<ClinicalAlert[]>([]);
@@ -93,6 +95,41 @@ const ClinicalAlertsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
   const [apiNotice, setApiNotice] = useState('');
+  const [acknowledgedBottleneckIds, setAcknowledgedBottleneckIds] = useState<Set<string>>(() => new Set());
+  const bottleneckAlerts = useMemo<ClinicalAlert[]>(
+    () =>
+      operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks.map((event) => ({
+        id: `bottleneck-${event.id}`,
+        timestamp: new Date(event.detectedAt),
+        severity:
+          event.severity === 'critical'
+            ? 'critical'
+            : event.severity === 'high'
+              ? 'high'
+              : event.severity === 'medium'
+                ? 'moderate'
+                : 'low',
+        title: event.title,
+        description: `${event.description} Fallback: ${event.fallbackAction}`,
+        source: `${event.serviceName} / ${event.category.replace(/_/g, ' ')}`,
+        status:
+          event.status === 'acknowledged' || acknowledgedBottleneckIds.has(`bottleneck-${event.id}`)
+            ? 'acknowledged'
+            : 'unacknowledged',
+        findings: [
+          `Owner: ${event.ownerRole.replace(/_/g, ' ')}`,
+          event.responseDeadline
+            ? `Deadline: ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            : '',
+          event.impactsThreeMinuteTarget ? '3-minute target at risk' : '',
+        ].filter(Boolean),
+      })),
+    [acknowledgedBottleneckIds, operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks],
+  );
+  const displayAlerts = useMemo(
+    () => [...bottleneckAlerts, ...alerts],
+    [alerts, bottleneckAlerts],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -130,7 +167,7 @@ const ClinicalAlertsPage = () => {
   }, [alertsApiEnabled]);
 
   useEffect(() => {
-    let filtered = alerts;
+    let filtered = displayAlerts;
     if (selectedSeverity !== 'all') {
       filtered = filtered.filter((a) => a.severity === selectedSeverity);
     }
@@ -144,7 +181,7 @@ const ClinicalAlertsPage = () => {
       );
     }
     setFilteredAlerts(filtered);
-  }, [selectedSeverity, searchTerm, alerts]);
+  }, [selectedSeverity, searchTerm, displayAlerts]);
 
   const handleAcknowledge = async (alertId: string) => {
     const audit: AuditMetadata = {
@@ -155,7 +192,7 @@ const ClinicalAlertsPage = () => {
       userRole: profile.role,
     };
 
-    if (alertsApiEnabled) {
+    if (alertsApiEnabled && !alertId.startsWith('bottleneck-')) {
       const result = await acknowledgeClinicalAlertApi(alertId, {
         acknowledgedAt: audit.timestamp,
         audit,
@@ -166,13 +203,17 @@ const ClinicalAlertsPage = () => {
         );
       }
     }
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === alertId ? { ...a, status: 'acknowledged' } : a)),
-    );
+    if (!alertId.startsWith('bottleneck-')) {
+      setAlerts((prev) =>
+        prev.map((a) => (a.id === alertId ? { ...a, status: 'acknowledged' } : a)),
+      );
+    } else {
+      setAcknowledgedBottleneckIds((prev) => new Set(prev).add(alertId));
+    }
   };
 
-  const unacknowledgedCount = alerts.filter((a) => a.status === 'unacknowledged').length;
-  const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
+  const unacknowledgedCount = displayAlerts.filter((a) => a.status === 'unacknowledged').length;
+  const criticalCount = displayAlerts.filter((a) => a.severity === 'critical').length;
 
   return (
     <div className="clinical-alerts-page" aria-label="Clinical Alerts Management">
@@ -188,7 +229,7 @@ const ClinicalAlertsPage = () => {
 
       <div className="alerts-summary-strip" role="status" aria-label="Alert summary">
         <span className="alerts-summary-chip">
-          Total <strong>{alerts.length}</strong>
+          Total <strong>{displayAlerts.length}</strong>
         </span>
         {criticalCount > 0 && (
           <span className="alerts-summary-chip alerts-summary-chip--critical">
@@ -201,7 +242,7 @@ const ClinicalAlertsPage = () => {
           </span>
         )}
         <span className="alerts-summary-chip alerts-summary-chip--cleared">
-          Acknowledged <strong>{alerts.length - unacknowledgedCount}</strong>
+          Acknowledged <strong>{displayAlerts.length - unacknowledgedCount}</strong>
         </span>
       </div>
 

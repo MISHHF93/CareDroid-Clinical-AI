@@ -22,6 +22,16 @@ export const CARE_DROID_AI_PROMPTS: Record<CareDroidAIIntent, string> = {
     'Identify staffing and capacity pressure, overloaded areas, and practical reallocation options for administrators.',
   hospital_command_insight:
     'Summarize command-center risks, bottlenecks, and recommended operational actions from hospital telemetry.',
+  service_bottleneck_analysis:
+    'Analyze SaaS/backend service bottlenecks, affected workflows, owner roles, fallbacks, and three-minute response impact.',
+  workflow_delay_analysis:
+    'Analyze clinical, operational, frontend, and interoperability workflow delays with accountable owner and next action.',
+  fallback_recommendation:
+    'Recommend safe fallback actions when AI, notifications, EHR/FHIR, labs, radiology, auth, analytics, or backend services fail.',
+  three_minute_risk_projection:
+    'Project whether active bottlenecks can breach the three-minute response target and name the owner and fallback.',
+  operational_root_cause_summary:
+    'Summarize the root cause of active operational bottlenecks across patients, departments, services, and workflows.',
   escalation_recommendation:
     'Recommend whether a critical/high alert or operational delay requires escalation, who owns it, and what acknowledgement action is needed.',
   handoff_summary:

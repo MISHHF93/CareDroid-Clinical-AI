@@ -138,6 +138,11 @@ const HANDLERS: Record<
   wait_time_prediction: handleWaitTimePrediction,
   staff_resource_insight: handleStaffResourceInsight,
   hospital_command_insight: handleHospitalCommandInsight,
+  service_bottleneck_analysis: handleServiceBottleneckAnalysis,
+  workflow_delay_analysis: handleWorkflowDelayAnalysis,
+  fallback_recommendation: handleFallbackRecommendation,
+  three_minute_risk_projection: handleThreeMinuteRiskProjection,
+  operational_root_cause_summary: handleOperationalRootCauseSummary,
   escalation_recommendation: handleEscalationRecommendation,
   handoff_summary: handleHandoffSummary,
 };
@@ -583,6 +588,175 @@ function handleHospitalCommandInsight(input: Record<string, unknown>): HandlerRe
     priority: severity === 'red' ? 'critical' : severity === 'amber' ? 'high' : 'low',
     assignedRole: severity === 'red' ? 'Hospital command lead' : 'Charge nurse',
     recommendedDepartment: 'Emergency Department',
+  };
+}
+
+function readObjectArray(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value.filter(isPlainObject) : [];
+}
+
+function handleServiceBottleneckAnalysis(input: Record<string, unknown>): HandlerResult {
+  const bottlenecks = readObjectArray(input.activeBottlenecks);
+  const serviceHealth = readObjectArray(input.serviceHealth);
+  const failedServices = serviceHealth
+    .filter((service) => ['down', 'degraded'].includes(readString(service.status).toLowerCase()))
+    .map((service) => readString(service.serviceName))
+    .filter(Boolean);
+  const criticalEvents = bottlenecks.filter((event) => readString(event.severity) === 'critical');
+  const primary = criticalEvents[0] || bottlenecks[0] || {};
+
+  return {
+    data: {
+      slowingCareNow: bottlenecks.map((event) => readString(event.title)).filter(Boolean).slice(0, 5),
+      affectedPatients: bottlenecks.map((event) => readString(event.affectedPatientId)).filter(Boolean),
+      failedServices,
+      fallbackActions: bottlenecks.map((event) => readString(event.fallbackAction)).filter(Boolean).slice(0, 4),
+      ownerRole: readString(primary.ownerRole) || 'charge_nurse',
+      threeMinuteTargetRisk: criticalEvents.length ? 'breach_likely' : bottlenecks.length ? 'at_risk' : 'on_track',
+    },
+    confidence: bottlenecks.length || serviceHealth.length ? 0.78 : 0.55,
+    reasoning: [
+      `${bottlenecks.length} active bottleneck events and ${serviceHealth.length} service health rows were reviewed.`,
+      failedServices.length ? `Degraded services: ${failedServices.join(', ')}.` : 'No degraded services were reported.',
+    ],
+    warnings: criticalEvents.length ? ['Critical service/workflow bottleneck may affect the three-minute target.'] : [],
+    redFlags: criticalEvents.map((event) => readString(event.title)).filter(Boolean),
+    nextActions: [
+      readString(primary.fallbackAction) || 'Continue standard clinical workflow and monitor service health.',
+      `Assign owner: ${readString(primary.ownerRole) || 'charge_nurse'}.`,
+    ],
+    priority: criticalEvents.length ? 'critical' : bottlenecks.length ? 'high' : 'low',
+    assignedRole: readString(primary.ownerRole) || 'Charge nurse',
+    recommendedDepartment: readString(primary.affectedDepartment) || 'Emergency Department',
+  };
+}
+
+function handleWorkflowDelayAnalysis(input: Record<string, unknown>): HandlerResult {
+  const bottlenecks = readObjectArray(input.activeBottlenecks);
+  const delayed = bottlenecks
+    .map((event) => readString(event.affectedWorkflow) || readString(event.title))
+    .filter(Boolean);
+  const ownerRoles = uniqueStrings(
+    bottlenecks.map((event) => readString(event.ownerRole)).filter(Boolean),
+  );
+  const critical = bottlenecks.some((event) => readString(event.severity) === 'critical');
+
+  return {
+    data: {
+      delayedWorkflows: delayed,
+      ownerRoles,
+      recommendedActions: bottlenecks
+        .map((event) => readString(event.recommendedFix) || readString(event.fallbackAction))
+        .filter(Boolean)
+        .slice(0, 5),
+    },
+    confidence: bottlenecks.length ? 0.76 : 0.54,
+    reasoning: [
+      delayed.length
+        ? `Delayed workflows: ${delayed.slice(0, 4).join(', ')}.`
+        : 'No delayed workflows were supplied.',
+    ],
+    warnings: critical ? ['At least one workflow delay is critical.'] : [],
+    redFlags: critical ? delayed.slice(0, 3) : [],
+    nextActions: ownerRoles.length
+      ? [`Confirm accountable owner: ${ownerRoles[0]}.`, 'Document acknowledgement and mitigation.']
+      : ['Continue monitoring queue and service health.'],
+    priority: critical ? 'critical' : bottlenecks.length ? 'high' : 'low',
+    assignedRole: ownerRoles[0] || 'Charge nurse',
+    recommendedDepartment: 'Emergency Department',
+  };
+}
+
+function handleFallbackRecommendation(input: Record<string, unknown>): HandlerResult {
+  const serviceName = readString(input.serviceName) || 'service';
+  const service = serviceName.toLowerCase();
+  const fallbackAction =
+    service.includes('ai')
+      ? 'Continue standard clinical workflow and manual triage.'
+      : service.includes('notification')
+        ? 'Show persistent in-app critical banner and require manual call/page.'
+        : service.includes('ehr') || service.includes('fhir')
+          ? 'Use local intake snapshot and mark external data unavailable.'
+          : service.includes('lab')
+            ? 'Show pending lab status and notify lab owner.'
+            : service.includes('auth')
+              ? 'Fail closed for admin actions while preserving emergency read-only workflow.'
+              : service.includes('analytics')
+                ? 'Do not block clinical workflow; continue local command-center monitoring.'
+                : 'Continue emergency workflow locally and assign a human owner while service health is checked.';
+
+  return {
+    data: {
+      fallbackAction,
+      ownerRole: service.includes('auth') || service.includes('api') ? 'platform_admin' : 'charge_nurse',
+      blockingClinicalWorkflow: !service.includes('analytics'),
+    },
+    confidence: 0.74,
+    reasoning: [`Fallback selected for ${serviceName} failure mode: ${readString(input.failureMode) || 'unavailable'}.`],
+    warnings: ['Never allow SaaS failure to crash the app or block emergency response.'],
+    redFlags: [],
+    nextActions: [fallbackAction, 'Document fallback use and retry service health check.'],
+    priority: service.includes('notification') || service.includes('ehr') || service.includes('auth') ? 'high' : 'medium',
+    assignedRole: service.includes('auth') || service.includes('api') ? 'Platform admin' : 'Charge nurse',
+    recommendedDepartment: 'Emergency Department',
+  };
+}
+
+function handleThreeMinuteRiskProjection(input: Record<string, unknown>): HandlerResult {
+  const projection = readObject(input.projection);
+  const status = readString(projection.status) || 'unknown';
+  const isBreachLikely = status === 'breach_likely';
+  const isAtRisk = status === 'at_risk' || isBreachLikely;
+
+  return {
+    data: {
+      riskStatus: status,
+      nextOwnerRole: readString(projection.nextOwnerRole) || 'charge_nurse',
+      fallbackAction: readString(projection.fallbackAction) || 'Continue standard clinical workflow.',
+      breachReason: readString(projection.summary) || 'No three-minute projection summary supplied.',
+    },
+    confidence: status === 'unknown' ? 0.52 : 0.8,
+    reasoning: [readString(projection.summary) || 'Projection used active bottleneck registry state.'],
+    warnings: isAtRisk ? ['Three-minute response target is at risk from active bottlenecks.'] : [],
+    redFlags: isBreachLikely ? ['Three-minute breach likely'] : [],
+    nextActions: [
+      readString(projection.fallbackAction) || 'Continue standard clinical workflow.',
+      `Assign owner: ${readString(projection.nextOwnerRole) || 'charge_nurse'}.`,
+    ],
+    priority: isBreachLikely ? 'critical' : isAtRisk ? 'high' : 'low',
+    assignedRole: readString(projection.nextOwnerRole) || 'Charge nurse',
+    recommendedDepartment: 'Emergency Department',
+  };
+}
+
+function handleOperationalRootCauseSummary(input: Record<string, unknown>): HandlerResult {
+  const bottlenecks = readObjectArray(input.activeBottlenecks);
+  const departments = uniqueStrings(
+    bottlenecks.map((event) => readString(event.affectedDepartment)).filter(Boolean),
+  );
+  const rootCauses = bottlenecks
+    .map((event) => `${readString(event.serviceName) || 'Service'}: ${readString(event.title)}`)
+    .filter((item) => !item.endsWith(': '))
+    .slice(0, 5);
+  const critical = bottlenecks.some((event) => readString(event.severity) === 'critical');
+
+  return {
+    data: {
+      rootCauses: rootCauses.length ? rootCauses : [readString(input.rootCauseSummary) || 'No active root cause detected.'],
+      affectedDepartments: departments,
+      recommendedActions: bottlenecks
+        .map((event) => readString(event.recommendedFix) || readString(event.fallbackAction))
+        .filter(Boolean)
+        .slice(0, 5),
+    },
+    confidence: bottlenecks.length ? 0.78 : 0.56,
+    reasoning: [readString(input.rootCauseSummary) || `${bottlenecks.length} bottlenecks reviewed.`],
+    warnings: critical ? ['Critical bottleneck root cause requires command-center acknowledgement.'] : [],
+    redFlags: critical ? rootCauses.slice(0, 3) : [],
+    nextActions: ['Review root cause with the accountable owner.', 'Track acknowledgement and mitigation status.'],
+    priority: critical ? 'critical' : bottlenecks.length ? 'high' : 'low',
+    assignedRole: 'Charge nurse',
+    recommendedDepartment: departments[0] || 'Emergency Department',
   };
 }
 

@@ -1,0 +1,177 @@
+.bottleneck-command-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border-subtle, #d7dee8);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--surface-raised, #ffffff);
+}
+
+.bottleneck-command-panel > header,
+.root-cause-summary-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bottleneck-command-panel h3,
+.bottleneck-command-panel h4,
+.root-cause-summary-panel h3 {
+  margin: 0;
+}
+
+.bottleneck-command-panel span,
+.root-cause-summary-panel span,
+.fallback-action-card span {
+  color: var(--text-muted, #526173);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bottleneck-command-panel__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 12px;
+}
+
+.bottleneck-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.bottleneck-list__empty {
+  margin: 8px 0 0;
+  color: var(--text-muted, #526173);
+}
+
+.bottleneck-impact-card,
+.fallback-action-card,
+.root-cause-summary-panel,
+.service-health-card,
+.bottleneck-risk {
+  border: 1px solid var(--border-subtle, #d7dee8);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--surface, #f8fafc);
+}
+
+.bottleneck-impact-card {
+  display: grid;
+  gap: 6px;
+}
+
+.bottleneck-impact-card p,
+.fallback-action-card p,
+.root-cause-summary-panel p {
+  margin: 0;
+  color: var(--text-muted, #526173);
+}
+
+.bottleneck-impact-card__head,
+.service-health-card div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bottleneck-severity {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.bottleneck-severity--critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.bottleneck-severity--high {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.bottleneck-severity--medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.bottleneck-severity--low {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.service-dependency-map {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.service-health-card {
+  display: grid;
+  gap: 4px;
+}
+
+.service-health-card--down {
+  border-color: #fecaca;
+}
+
+.service-health-card--degraded {
+  border-color: #fed7aa;
+}
+
+.service-health-card--healthy {
+  border-color: #bbf7d0;
+}
+
+.bottleneck-risk {
+  min-width: 190px;
+  display: grid;
+  gap: 3px;
+}
+
+.bottleneck-risk strong {
+  text-transform: capitalize;
+}
+
+.bottleneck-risk--breach_likely {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.bottleneck-risk--at_risk {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.bottleneck-risk--on_track {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.root-cause-summary-panel {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 860px) {
+  .bottleneck-command-panel > header,
+  .root-cause-summary-panel > header {
+    display: grid;
+  }
+
+  .bottleneck-command-panel__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottleneck-risk {
+    min-width: 0;
+  }
+}
+

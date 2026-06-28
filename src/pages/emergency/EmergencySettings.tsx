@@ -48,6 +48,12 @@ import IntegrationStatusBadge from '../../components/integrations/IntegrationSta
 import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
 import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
 import DeviceContextPanel from '../../components/emergency/DeviceContextPanel';
+import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
+import {
+  BottleneckList,
+  ServiceDependencyMap,
+  ThreeMinuteRiskIndicator,
+} from '../../components/bottlenecks/BottleneckPanels';
 import './EmergencySettings.css';
 
 const SEVERITIES = ['Info', 'Warning', 'Critical'];
@@ -297,6 +303,8 @@ export default function EmergencySettings() {
   );
   const setThreshold = useEmergencyStore((state) => state.setThreshold);
   const resetThresholds = useEmergencyStore((state) => state.resetThresholds);
+  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
+  const bottleneckRegistry = operationalIntelligence.centralSnapshot.bottleneckRegistry;
 
   const [draft, setDraft] = useState(() => mergeSettings(storeSettings));
   const [loading, setLoading] = useState(true);
@@ -1651,6 +1659,24 @@ export default function EmergencySettings() {
       </Section>
       </>
       ) : null}
+
+      <Section
+        id="service-bottlenecks"
+        title="Service Bottleneck Rules"
+        subtitle="Centralized service health, fallback guidance, and three-minute response risk."
+      >
+        <div className="emergency-settings__bottleneck-admin">
+          <ThreeMinuteRiskIndicator registry={bottleneckRegistry} />
+          <div>
+            <h3>Integration health</h3>
+            <ServiceDependencyMap services={bottleneckRegistry.serviceHealth} />
+          </div>
+          <div>
+            <h3>Fallback rules in effect</h3>
+            <BottleneckList events={bottleneckRegistry.activeBottlenecks} limit={4} />
+          </div>
+        </div>
+      </Section>
 
       <Section
         id="notifications"

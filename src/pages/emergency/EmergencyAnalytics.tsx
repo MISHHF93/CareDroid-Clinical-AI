@@ -29,6 +29,10 @@ import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { MaturityChip } from './emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
+import {
+  BottleneckList,
+  ThreeMinuteRiskIndicator,
+} from '../../components/bottlenecks/BottleneckPanels';
 import './EmergencyAnalytics.css';
 
 const CHART_COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
@@ -133,6 +137,9 @@ export default function EmergencyAnalytics() {
   );
   const firstBreachedQueue = breachedQueues[0];
   const firstAlert = activeAlerts[0];
+  const bottleneckRegistry = centralSnapshot.bottleneckRegistry;
+  const activeBottlenecks = bottleneckRegistry.activeBottlenecks;
+  const breachCauses = Object.entries(bottleneckRegistry.analytics.threeMinuteTargetBreachesByCause);
   const upgradeHarness = useAdvancedEmergencyOsUpgradeHarness();
   const data = (emergencyAnalytics.data?.operationalCommand || {}) as any;
   const shift = (emergencyAnalytics.data?.shift || {}) as any;
@@ -327,6 +334,26 @@ export default function EmergencyAnalytics() {
                 : ''}
             </small>
           </ChartCard>
+          <ChartCard title="Bottlenecks" subtitle="Active service/workflow causes">
+            <strong>{bottleneckRegistry.analytics.activeCount}</strong>
+            <small className="emergency-analytics__source">
+              {bottleneckRegistry.rootCauseSummary}
+            </small>
+          </ChartCard>
+          <ChartCard title="Service Latency" subtitle="Average service health latency">
+            <strong>{bottleneckRegistry.analytics.averageServiceLatencyMs}ms</strong>
+            <small className="emergency-analytics__source">
+              {bottleneckRegistry.serviceHealth.filter((service) => service.status !== 'healthy').length} degraded services
+            </small>
+          </ChartCard>
+          <ChartCard title="3-Minute Breach Causes" subtitle="By bottleneck category">
+            <strong>{breachCauses.reduce((sum, [, count]) => sum + count, 0)}</strong>
+            <small className="emergency-analytics__source">
+              {breachCauses.length
+                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' · ')
+                : 'No projected breach causes'}
+            </small>
+          </ChartCard>
           {intelligenceSnapshot.modelHealth ? (
             <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
               <strong>{intelligenceSnapshot.modelHealth.status}</strong>
@@ -337,6 +364,20 @@ export default function EmergencyAnalytics() {
             </ChartCard>
           ) : null}
         </div>
+      </section>
+
+      <section
+        className="emergency-analytics__command-layer"
+        aria-label="Bottleneck analytics and three-minute risk"
+      >
+        <header>
+          <div>
+            <span>Bottleneck Trends</span>
+            <h2>Response Impact</h2>
+          </div>
+          <ThreeMinuteRiskIndicator registry={bottleneckRegistry} />
+        </header>
+        <BottleneckList events={activeBottlenecks} limit={4} />
       </section>
       </>
       ) : null}

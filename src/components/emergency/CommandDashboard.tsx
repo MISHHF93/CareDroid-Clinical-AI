@@ -13,6 +13,11 @@ import {
   CLINICAL_DECISION_SUPPORT_DISCLAIMER,
   type CareDroidAIResponse,
 } from '../../lib/ai/careDroidAI';
+import { BottleneckCommandPanel } from '../bottlenecks/BottleneckPanels';
+import {
+  buildBottleneckRegistrySnapshot,
+  type BottleneckRegistrySnapshot,
+} from '../../services/bottleneckRegistry';
 import './CommandDashboard.css';
 
 export type CommandDashboardProps = {
@@ -25,6 +30,7 @@ export type CommandDashboardProps = {
   title?: string;
   subtitle?: string;
   snapshot?: OperationalCommandDashboardSnapshot;
+  bottleneckRegistry?: BottleneckRegistrySnapshot;
   now?: number;
   className?: string;
 };
@@ -163,6 +169,7 @@ export default function CommandDashboard({
   title = 'Operational command dashboard',
   subtitle = 'Live department metrics from the emergency whiteboard',
   snapshot: snapshotProp,
+  bottleneckRegistry: bottleneckRegistryProp,
   now,
   className = '',
 }: CommandDashboardProps) {
@@ -178,6 +185,40 @@ export default function CommandDashboard({
         now: now ? new Date(now) : new Date(),
       }),
     [boardingMetrics, capacity, now, patients, rooms, snapshotProp, staff],
+  );
+  const bottleneckRegistry = useMemo(
+    () =>
+      bottleneckRegistryProp ||
+      buildBottleneckRegistrySnapshot({
+        generatedAt: snapshot.updatedAt,
+        capacityStatus: capacity,
+        activePatients: patients.map((patient) => ({
+          id: patient.id,
+          priority: patient.priority,
+          waitMinutes: 0,
+          flags: patient.flags.map((flag) => String(flag)),
+        })),
+        criticalPatients: patients
+          .filter((patient) =>
+            ['P1', 'P2'].includes(String(patient.priority)) ||
+            patient.flags.some((flag) =>
+              ['HighRisk', 'DeteriorationRisk', 'SepsisAlert', 'StrokeCode'].includes(String(flag)),
+            ),
+          )
+          .map((patient) => ({
+            id: patient.id,
+            priority: patient.priority,
+            waitMinutes: 0,
+            flags: patient.flags.map((flag) => String(flag)),
+          })),
+        sync: {
+          status: 'dashboard-local',
+          source: 'CommandDashboard',
+          stale: false,
+          message: 'Command dashboard local snapshot.',
+        },
+      }),
+    [bottleneckRegistryProp, capacity, patients, snapshot.updatedAt],
   );
 
   return (
@@ -211,6 +252,8 @@ export default function CommandDashboard({
       <p className="command-dashboard__bottleneck" role="status">
         {snapshot.bottleneckLabel}
       </p>
+
+      <BottleneckCommandPanel registry={bottleneckRegistry} />
 
       {snapshot.chargeNurseAlerts.length ? (
         <section className="command-dashboard__alerts" aria-label="Charge nurse predictive alerts">

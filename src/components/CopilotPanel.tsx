@@ -247,6 +247,11 @@ function buildDepartmentPrompt({
   const longWaitAttention = formatLongWaitAttentionForCopilot(activePatients, new Date(), emergencySettings);
   const queueHealth = Array.isArray(centralSnapshot.queueHealth) ? centralSnapshot.queueHealth : [];
   const breachedQueues = queueHealth.filter((queue) => queue.breached);
+  const bottleneckRegistry = centralSnapshot.bottleneckRegistry;
+  const activeBottlenecks = bottleneckRegistry?.activeBottlenecks || [];
+  const degradedServices = (bottleneckRegistry?.serviceHealth || []).filter((service) =>
+    ['degraded', 'down'].includes(service.status),
+  );
   const attachmentSummary = attachmentPromptSummary(attachments || []);
 
   return [
@@ -265,6 +270,19 @@ function buildDepartmentPrompt({
     `EMS pressure: ${centralSnapshot.emsPressure.status}; ${centralSnapshot.emsPressure.inbound} inbound, ${centralSnapshot.emsPressure.criticalInbound} critical inbound`,
     `Boarding pressure: ${centralSnapshot.boardingStatus.risk}; ${centralSnapshot.boardingStatus.boarders} boarders`,
     `Queue health: ${breachedQueues.length} breached queues. ${formatQueueHealthForPrompt(centralSnapshot)}`,
+    `Active bottlenecks: ${activeBottlenecks.length}. ${bottleneckRegistry?.rootCauseSummary || 'No root cause summary available.'}`,
+    `3-minute risk projection: ${bottleneckRegistry?.threeMinuteRiskProjection?.status || 'unknown'} - ${bottleneckRegistry?.threeMinuteRiskProjection?.summary || 'No projection available.'}`,
+    `Degraded services: ${degradedServices.length ? degradedServices.map((service) => `${service.serviceName} (${service.status})`).join('; ') : 'None'}`,
+    'Bottleneck loop intents available: service_bottleneck_analysis, workflow_delay_analysis, fallback_recommendation, three_minute_risk_projection, operational_root_cause_summary.',
+    activeBottlenecks.length
+      ? [
+          'Active bottleneck details:',
+          ...activeBottlenecks.slice(0, 5).map(
+            (event) =>
+              `- ${event.severity} ${event.category}: ${event.title}; service ${event.serviceName}; owner ${event.ownerRole}; fallback ${event.fallbackAction}`,
+          ),
+        ].join('\n')
+      : null,
     `Reassessment queue count: ${centralSnapshot.reassessmentStatus.due}; overdue ${centralSnapshot.reassessmentStatus.overdue}`,
     `Active operational alerts: ${activeAlerts.length}`,
     longWaitAttention || null,
@@ -562,6 +580,11 @@ export function CopilotPanel() {
       value: `${activeOperationalAlerts.length}`,
       detail: activeOperationalAlerts[0]?.title || 'None',
     },
+    {
+      label: 'Bottlenecks',
+      value: `${centralSnapshot.bottleneckRegistry.analytics.activeCount}`,
+      detail: centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection.status.replace(/_/g, ' '),
+    },
   ];
 
   useEffect(() => {
@@ -812,6 +835,12 @@ export function CopilotPanel() {
             emsPressure: centralSnapshot.emsPressure,
             boardingStatus: centralSnapshot.boardingStatus,
             queueHealth: centralSnapshot.queueHealth,
+            bottleneckRegistry: {
+              activeBottlenecks: centralSnapshot.bottleneckRegistry.activeBottlenecks,
+              serviceHealth: centralSnapshot.bottleneckRegistry.serviceHealth,
+              threeMinuteRiskProjection: centralSnapshot.bottleneckRegistry.threeMinuteRiskProjection,
+              rootCauseSummary: centralSnapshot.bottleneckRegistry.rootCauseSummary,
+            },
             reassessmentStatus: centralSnapshot.reassessmentStatus,
             reassessmentQueueCount: centralSnapshot.reassessmentStatus.due,
             activeAlerts: activeOperationalAlerts.length,

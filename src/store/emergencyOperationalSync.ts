@@ -20,6 +20,7 @@ import {
 } from '../utils/longWaitRescue';
 import { evaluateVitalsAlerts } from '../utils/vitalsAlertPipeline';
 import { applyWhiteboardAutomationToPatients } from '../services/whiteboardAutomationEngine';
+import { buildBottleneckRegistrySnapshot } from '../services/bottleneckRegistry';
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -309,6 +310,46 @@ export function buildUpdateAlertsPatch(state: {
       updatedAt: String(record.updatedAt || now.toISOString()),
     } satisfies import('../types/emergency').Queue;
   });
+  const bottleneckRegistry = buildBottleneckRegistrySnapshot({
+    generatedAt: now.toISOString(),
+    queueHealth: normalizedQueues.map((queue) => ({
+      id: queue.id,
+      label: queue.name,
+      count: queue.patientIds.length || queue.criticalCount,
+      oldestWaitMinutes: queue.longestWaitMinutes,
+      targetMinutes: queue.targetWaitMinutes,
+      breached: queue.longestWaitMinutes > queue.targetWaitMinutes,
+    })),
+    capacityStatus: capacity,
+    operationalAlerts: state.alerts,
+    activePatients: patients.map((patient) => ({
+      id: patient.id,
+      priority: patient.priority,
+      waitMinutes: 0,
+      flags: patient.flags.map((flag) => String(flag)),
+    })),
+    criticalPatients: patients
+      .filter(
+        (patient) =>
+          patient.priority === 'P1' ||
+          patient.priority === 'P2' ||
+          patient.flags.some((flag) =>
+            ['HighRisk', 'DeteriorationRisk', 'SepsisAlert', 'StrokeCode'].includes(String(flag)),
+          ),
+      )
+      .map((patient) => ({
+        id: patient.id,
+        priority: patient.priority,
+        waitMinutes: 0,
+        flags: patient.flags.map((flag) => String(flag)),
+      })),
+    sync: {
+      status: 'store',
+      source: 'emergencyStore.updateAlerts',
+      stale: false,
+      message: 'Store alert derivation cycle active.',
+    },
+  });
   const derivedAlerts = deriveAlerts(
     {
       patients,
@@ -317,6 +358,7 @@ export function buildUpdateAlertsPatch(state: {
       referrals: state.referrals,
       queues: normalizedQueues,
       bottleneckAlert: state.bottleneckAlert || null,
+      bottleneckEvents: bottleneckRegistry.activeBottlenecks,
     },
     state.alerts,
     now,

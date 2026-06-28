@@ -31,6 +31,10 @@ import {
   shouldRedactSensitiveEmergencyData,
   type CentralNodeRedactionLevel,
 } from '../config/emergencyDisplayPrivacyPolicy';
+import {
+  buildBottleneckRegistrySnapshot,
+  type BottleneckRegistrySnapshot,
+} from '../services/bottleneckRegistry';
 
 export type CareDroidPressure = 'normal' | 'watch' | 'strained' | 'critical';
 
@@ -138,6 +142,7 @@ export type CareDroidCentralNodeSnapshot = {
     pending: number;
   };
   operationalAlerts: Alert[];
+  bottleneckRegistry: BottleneckRegistrySnapshot;
   screenContext: {
     mode: CareDroidScreenMode;
     config: (typeof CARE_DROID_SCREEN_MODE_CONFIG)[CareDroidScreenMode];
@@ -181,7 +186,8 @@ export type CareDroidCentralNodeSnapshot = {
         | 'arrivalControlPending'
         | 'emsOffload'
         | 'triageBreached'
-        | 'providerBreached';
+        | 'providerBreached'
+        | 'bottlenecksActive';
       label: string;
       value: string | number;
       source: string;
@@ -543,6 +549,18 @@ function buildOperationalSummary(snapshot: Omit<CareDroidCentralNodeSnapshot, 'o
           snapshot.providerWaitBreachSummary.breachedCount >= 3
             ? ('critical' as const)
             : snapshot.providerWaitBreachSummary.breachedCount
+              ? ('warning' as const)
+              : ('success' as const),
+      },
+      {
+        key: 'bottlenecksActive' as const,
+        label: 'Active Bottlenecks',
+        value: snapshot.bottleneckRegistry.analytics.activeCount,
+        source: `${CARE_DROID_CENTRAL_NODE_ID}.bottleneckRegistry`,
+        tone:
+          snapshot.bottleneckRegistry.analytics.criticalCount > 0
+            ? ('critical' as const)
+            : snapshot.bottleneckRegistry.analytics.activeCount > 0
               ? ('warning' as const)
               : ('success' as const),
       },
@@ -929,12 +947,59 @@ export function buildCareDroidCentralNodeSnapshot(
     providerWaitBreachSummary: summarizeProviderWaitBreachBoard(source.patients, {
       settings: source.emergencySettings,
     }),
+    bottleneckRegistry: buildBottleneckRegistrySnapshot({
+      generatedAt,
+      queueHealth: buildQueueHealth(source),
+      capacityStatus: source.capacity,
+      operationalAlerts: activeAlerts,
+      activePatients: active.map((patient) => toPatientReference(patient, source.referrals)),
+      criticalPatients: active.filter(isHighRisk).map((patient) => toPatientReference(patient, source.referrals)),
+      sync: {
+        status: source.websocket.status || (source.backendAvailable ? 'connected' : 'local'),
+        source: options.source || 'store',
+        stale: !lastSyncedAt || minutesSince(lastSyncedAt) > 2,
+        message:
+          source.websocket.message ||
+          (source.backendAvailable ? 'Central node synced.' : 'Local snapshot active.'),
+      },
+      aiCopilotContext: {
+        enabled: Boolean(source.emergencySettings.aiSettings?.enabled),
+        recentMessages: source.copilotMessages.length,
+      },
+      reassessmentStatus: {
+        due: reassessmentDue,
+        overdue: active.filter(
+          (patient) =>
+            patientFlags(patient).includes(PatientFlag.ReassessmentDue) &&
+            minutesSince(patient.arrivalTime) >
+              Number(source.emergencySettings.thresholds?.reassessmentIntervals?.P3 || 60),
+        ).length,
+      },
+      referralStatus: {
+        pending: source.referrals.filter(isReferralPending).length,
+      },
+    }),
   };
 
   const wiredSnapshot = applyBackendCentralNodePayload(baseSnapshot, options.backendSnapshot);
-  const snapshot = {
+  const snapshotWithBottlenecks = {
     ...wiredSnapshot,
-    operationalSummary: buildOperationalSummary(wiredSnapshot),
+    bottleneckRegistry: buildBottleneckRegistrySnapshot({
+      generatedAt: wiredSnapshot.generatedAt,
+      queueHealth: wiredSnapshot.queueHealth,
+      capacityStatus: wiredSnapshot.capacityStatus,
+      operationalAlerts: wiredSnapshot.operationalAlerts,
+      activePatients: wiredSnapshot.activePatientFlow.patients,
+      criticalPatients: wiredSnapshot.activePatientFlow.criticalPatients,
+      sync: wiredSnapshot.sync,
+      aiCopilotContext: wiredSnapshot.aiCopilotContext,
+      reassessmentStatus: wiredSnapshot.reassessmentStatus,
+      referralStatus: wiredSnapshot.referralStatus,
+    }),
+  };
+  const snapshot = {
+    ...snapshotWithBottlenecks,
+    operationalSummary: buildOperationalSummary(snapshotWithBottlenecks),
   };
 
   return snapshot.screenContext.sensitiveDataRedacted
@@ -1009,6 +1074,26 @@ export function redactCentralNodeSnapshotForScreenMode(
             : level === 'identifiers' && row.handoffOwner
               ? 'Assigned staff'
               : row.handoffOwner,
+      })),
+    },
+    bottleneckRegistry: {
+      ...snapshot.bottleneckRegistry,
+      activeBottlenecks: snapshot.bottleneckRegistry.activeBottlenecks.map((event) => ({
+        ...event,
+        affectedPatientId: event.affectedPatientId
+          ? pseudonymizePatientId(event.affectedPatientId)
+          : event.affectedPatientId,
+        description: level === 'full' ? event.title : event.description,
+      })),
+      serviceHealth: snapshot.bottleneckRegistry.serviceHealth.map((service) => ({
+        ...service,
+        currentBottlenecks: service.currentBottlenecks.map((event) => ({
+          ...event,
+          affectedPatientId: event.affectedPatientId
+            ? pseudonymizePatientId(event.affectedPatientId)
+            : event.affectedPatientId,
+          description: level === 'full' ? event.title : event.description,
+        })),
       })),
     },
     screenContext: {

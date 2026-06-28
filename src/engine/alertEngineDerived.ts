@@ -11,6 +11,7 @@
 } from '../types/emergency';
 import { getLongWaitPatients } from '../utils/longWaitRescue';
 import { triageOperationalAlerts } from './alertClassificationModel';
+import { bottleneckEventsToAlerts, type BottleneckEvent } from '../services/bottleneckRegistry';
 
 export interface AlertEngineInputs {
   patients: Patient[];
@@ -19,6 +20,7 @@ export interface AlertEngineInputs {
   referrals: Referral[];
   queues: Queue[];
   bottleneckAlert: BottleneckAlert | null;
+  bottleneckEvents?: BottleneckEvent[];
 }
 
 export type AlertDispatchInput = Omit<Alert, 'id' | 'createdAt' | 'type' | 'severity'> &
@@ -112,7 +114,7 @@ export function normalizeAlert(input: AlertDispatchInput, now = new Date()): Ale
 }
 
 export function isDerivedAlertId(alertId: string): boolean {
-  return /^alert-(reassessment|capacity|ems|referral|long-wait|queue|bottleneck)-/.test(alertId);
+  return /^alert-(reassessment|capacity|ems|referral|long-wait|queue|bottleneck|bottleneck-event)-/.test(alertId);
 }
 
 function deriveReassessmentAlerts(patients: Patient[], now: Date): Alert[] {
@@ -441,6 +443,7 @@ export function deriveAlerts(
     ...deriveReferralAlerts(inputs.referrals, inputs.patients, now),
     ...deriveLongWaitAlerts(inputs.patients, now),
     ...deriveQueueAlerts(inputs.queues, inputs.bottleneckAlert, now),
+    ...bottleneckEventsToAlerts(inputs.bottleneckEvents || [], previousAlerts),
   ].map((alert) => preserveAlertState(alert, previousAlerts));
 
   return triageOperationalAlerts(nextAlerts).visible;

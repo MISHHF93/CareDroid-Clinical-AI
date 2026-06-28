@@ -8,6 +8,11 @@ export const CARE_DROID_AI_INTENTS = [
   'wait_time_prediction',
   'staff_resource_insight',
   'hospital_command_insight',
+  'service_bottleneck_analysis',
+  'workflow_delay_analysis',
+  'fallback_recommendation',
+  'three_minute_risk_projection',
+  'operational_root_cause_summary',
   'escalation_recommendation',
   'handoff_summary',
 ] as const;

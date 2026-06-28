@@ -39,6 +39,7 @@ export type CopilotContextInputKey =
   | 'emergencyStore.selectedPatientId'
   | 'emergencyStore.copilotMessages'
   | 'operationalIntelligence.centralSnapshot'
+  | 'operationalIntelligence.centralSnapshot.bottleneckRegistry'
   | 'operationalIntelligence.snapshot'
   | 'patientOrchestration.selected'
   | 'patientAiContext.artifacts'
@@ -112,6 +113,7 @@ export const COPILOT_PLATFORM = Object.freeze({
       'emergencyStore.emergencySettings',
       'emergencyStore.selectedPatientId',
       'operationalIntelligence.centralSnapshot',
+      'operationalIntelligence.centralSnapshot.bottleneckRegistry',
       'operationalIntelligence.snapshot',
       'patientOrchestration.selected',
       'patientAiContext.artifacts',
@@ -177,6 +179,9 @@ export const COPILOT_PLATFORM = Object.freeze({
       'Capacity status',
       'Boarding pressure',
       'Reassessment queue',
+      'What is slowing care right now?',
+      'Recommend bottleneck fallbacks',
+      'Will we breach the 3-minute target?',
     ]),
     patient: Object.freeze([
       "Summarize this patient's current status based on the provided data.",
@@ -261,9 +266,9 @@ export function getCopilotToolLaunchActions(): readonly CopilotToolLaunchAction[
 
 export function getCopilotWelcomeMessage(compactLayout: boolean): string {
   if (compactLayout) {
-    return `Ask about patients, queues, or capacity. ${COPILOT_PLATFORM.safety.disclaimer}`;
+    return `Ask about patients, queues, capacity, or bottlenecks. ${COPILOT_PLATFORM.safety.disclaimer}`;
   }
-  return `${COPILOT_PLATFORM.identity.name} is ready. Ask about patients, queues, capacity, or boarding.`;
+  return `${COPILOT_PLATFORM.identity.name} is ready. Ask about patients, queues, capacity, boarding, or service bottlenecks.`;
 }
 
 /** Machine-readable I/O contract for audits, user manual, and integration tests. */

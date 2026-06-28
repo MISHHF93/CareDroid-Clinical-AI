@@ -243,6 +243,82 @@ export const CARE_DROID_AI_SCHEMAS: Record<CareDroidAIIntent, CareDroidAIIntentS
       confidence: field('number', 'Confidence from 0 to 1', true),
     },
   },
+  service_bottleneck_analysis: {
+    intent: 'service_bottleneck_analysis',
+    purpose: 'Analyze service health bottlenecks and their care-delay impact.',
+    clinical: false,
+    inputFields: {
+      activeBottlenecks: field('array', 'Active bottleneck events', true),
+      serviceHealth: field('array', 'Current service health rows', true),
+      criticalPatients: field('number', 'Critical patients potentially affected'),
+    },
+    outputFields: {
+      slowingCareNow: field('array', 'Services or workflows slowing care', true),
+      affectedPatients: field('array', 'Affected patient identifiers when available'),
+      failedServices: field('array', 'Degraded or down services', true),
+      fallbackActions: field('array', 'Safe fallback actions', true),
+      ownerRole: field('string', 'Primary owner role', true),
+      threeMinuteTargetRisk: field('string', 'Three-minute risk status', true),
+    },
+  },
+  workflow_delay_analysis: {
+    intent: 'workflow_delay_analysis',
+    purpose: 'Analyze delayed workflows and map them to owner roles and fixes.',
+    clinical: false,
+    inputFields: {
+      activeBottlenecks: field('array', 'Active bottleneck events', true),
+      queueHealth: field('array', 'Queue health rows'),
+    },
+    outputFields: {
+      delayedWorkflows: field('array', 'Delayed workflows', true),
+      ownerRoles: field('array', 'Owner roles', true),
+      recommendedActions: field('array', 'Recommended operational actions', true),
+    },
+  },
+  fallback_recommendation: {
+    intent: 'fallback_recommendation',
+    purpose: 'Recommend safe fallback workflow for service failure.',
+    clinical: false,
+    inputFields: {
+      serviceName: field('string', 'Failing or degraded service', true),
+      failureMode: field('string', 'Observed failure mode'),
+      affectedWorkflow: field('string', 'Affected workflow'),
+    },
+    outputFields: {
+      fallbackAction: field('string', 'Safe fallback action', true),
+      ownerRole: field('string', 'Owner role', true),
+      blockingClinicalWorkflow: field('boolean', 'Whether clinical workflow may be blocked', true),
+    },
+  },
+  three_minute_risk_projection: {
+    intent: 'three_minute_risk_projection',
+    purpose: 'Project whether bottlenecks can breach the three-minute response target.',
+    clinical: false,
+    inputFields: {
+      projection: field('object', 'Bottleneck registry three-minute projection', true),
+      activeBottlenecks: field('array', 'Active bottleneck events'),
+    },
+    outputFields: {
+      riskStatus: field('string', 'on_track, at_risk, or breach_likely', true),
+      nextOwnerRole: field('string', 'Owner role for next action', true),
+      fallbackAction: field('string', 'Fallback action', true),
+      breachReason: field('string', 'Reason for breach risk', true),
+    },
+  },
+  operational_root_cause_summary: {
+    intent: 'operational_root_cause_summary',
+    purpose: 'Summarize operational bottleneck root causes for AI Chief.',
+    clinical: false,
+    inputFields: {
+      rootCauseSummary: field('string', 'Registry root cause summary', true),
+      activeBottlenecks: field('array', 'Active bottleneck events', true),
+    },
+    outputFields: {
+      rootCauses: field('array', 'Root cause summaries', true),
+      affectedDepartments: field('array', 'Affected departments', true),
+      recommendedActions: field('array', 'Recommended actions', true),
+    },
+  },
   escalation_recommendation: {
     intent: 'escalation_recommendation',
     purpose: 'Recommend whether and how to escalate a clinical or operational delay.',
