@@ -123,6 +123,8 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
   CANONICAL_ROUTES.emergencyAnalytics,
   CANONICAL_ROUTES.emergencySettings,
   CANONICAL_ROUTES.emergencyHelp,
+  CANONICAL_ROUTES.emergencyDispatch,
+  CANONICAL_ROUTES.emergencyEdReadiness,
   CANONICAL_ROUTES.workspace,
   CANONICAL_ROUTES.laboratory,
   CANONICAL_ROUTES.audit,
@@ -181,6 +183,14 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
     paramedic: role('paramedic', 'ems_user', 'ems-user', 'nurse', {
       clinical: true,
       aliases: ['ems', 'ems-user'],
+    }),
+    dispatcher: role('dispatcher', 'dispatcher', 'dispatcher', 'student', {
+      dataMinimizationLevel: 'operational',
+      aliases: ['call-taker', '911-operator', 'cad-operator'],
+    }),
+    ems_coordinator: role('ems_coordinator', 'ems_coordinator', 'ems-coordinator', 'nurse', {
+      dataMinimizationLevel: 'operational',
+      aliases: ['ems-coordinator', 'ems-operations-manager'],
     }),
     registration_clerk: role('registration_clerk', 'registration_clerk', 'registration-clerk', 'student', {
       dataMinimizationLevel: 'clinical',
@@ -270,6 +280,8 @@ const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPerm
     [CANONICAL_ROUTES.emergencyPulse]: [P.ANALYTICS_READ],
     [CANONICAL_ROUTES.emergencyShift]: [P.STAFF_READ],
     [CANONICAL_ROUTES.emergencySettings]: [P.SETTINGS_READ],
+    [CANONICAL_ROUTES.emergencyDispatch]: [P.PATIENT_CREATE],
+    [CANONICAL_ROUTES.emergencyEdReadiness]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.laboratory]: [P.LABS_READ],
     [CANONICAL_ROUTES.audit]: [P.AUDIT_READ],
     [CANONICAL_ROUTES.adminOperations]: [P.SETTINGS_READ],

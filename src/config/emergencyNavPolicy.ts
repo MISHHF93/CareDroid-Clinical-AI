@@ -97,7 +97,7 @@ const ROLE_NAV_ORDER_OVERRIDES = Object.freeze({
     'audit',
   ],
   physician: PHYSICIAN_NAV_ORDER,
-  ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'platform'],
+  ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'help', 'platform'],
   registration_clerk: ['reception', 'patients', 'pulse', 'shift'],
 });
 

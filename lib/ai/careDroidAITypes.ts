@@ -15,6 +15,8 @@ export const CARE_DROID_AI_INTENTS = [
   'operational_root_cause_summary',
   'escalation_recommendation',
   'handoff_summary',
+  'emergency_call_risk_summary',
+  'ems_prearrival_risk_summary',
 ] as const;
 
 export type CareDroidAIIntent = (typeof CARE_DROID_AI_INTENTS)[number];

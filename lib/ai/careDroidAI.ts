@@ -145,6 +145,8 @@ const HANDLERS: Record<
   operational_root_cause_summary: handleOperationalRootCauseSummary,
   escalation_recommendation: handleEscalationRecommendation,
   handoff_summary: handleHandoffSummary,
+  emergency_call_risk_summary: handleEmergencyCallRiskSummary,
+  ems_prearrival_risk_summary: handleEmsPrearrivalRiskSummary,
 };
 
 function handleCriticalAlertAssessment(input: Record<string, unknown>): HandlerResult {
@@ -1204,6 +1206,128 @@ function detectRedFlags(input: Record<string, unknown>): string[] {
     flags.push('High-risk pregnancy emergency concern');
   }
   return uniqueStrings(flags);
+}
+
+function handleEmergencyCallRiskSummary(input: Record<string, unknown>): HandlerResult {
+  const complaint = readString(input.chiefComplaint || input.complaint || input.symptoms);
+  const priority = readString(input.callPriority || input.priority);
+  const conscious = input.patientConscious !== false;
+  const breathing = input.patientBreathing !== false;
+  const age = readNumber(input.patientAge || input.age);
+  const redFlags: string[] = [];
+
+  if (!conscious) redFlags.push('Patient unconscious — ALS response required');
+  if (!breathing) redFlags.push('Patient not breathing — immediate ALS dispatch');
+  if (/chest pain|cardiac arrest|stemi|heart attack/.test(complaint.toLowerCase())) redFlags.push('Cardiac complaint — STEMI protocol possible');
+  if (/stroke|facial droop|arm weakness|slurred|sudden/.test(complaint.toLowerCase())) redFlags.push('Stroke symptoms — stroke alert protocol');
+  if (/trauma|crash|fall|stabbing|shooting|blunt/.test(complaint.toLowerCase())) redFlags.push('Traumatic mechanism — trauma activation possible');
+  if (/sepsis|fever|altered|confused/.test(complaint.toLowerCase())) redFlags.push('Sepsis / altered mental status concern');
+  if (/breathing|dyspnea|shortness|respiratory/.test(complaint.toLowerCase())) redFlags.push('Respiratory distress — oxygen support readiness');
+  if (age !== undefined && age < 5) redFlags.push('Pediatric patient — ALS crew preferred');
+  if (/pregnancy|labour|labor|obstetric/.test(complaint.toLowerCase())) redFlags.push('Obstetric emergency — OB alert possible');
+
+  const highRisk = redFlags.length >= 2 || !conscious || !breathing || priority === 'Echo' || priority === 'Delta';
+  const suggestedDispatchLevel = !conscious || !breathing || priority === 'Echo' ? 'ALS — Priority Echo' : redFlags.length >= 1 ? 'ALS — Priority Delta' : 'BLS — Priority Charlie or lower';
+
+  return {
+    data: {
+      complaint,
+      callPriority: priority || 'Unknown',
+      highRisk,
+      redFlags,
+      suggestedDispatchLevel,
+      preArrivalInstructions: !breathing
+        ? ['Start CPR instructions immediately', 'Confirm AED location']
+        : !conscious
+        ? ['Keep patient still', 'Monitor breathing status every 30 seconds']
+        : ['Keep caller calm', 'Do not give food or water', 'Unlock door for EMS'],
+      hospitalNotificationRecommended: highRisk,
+      resourceActivationSuggested: redFlags.filter((f) => /stemi|stroke|trauma|obstetric/.test(f.toLowerCase())),
+    },
+    confidence: redFlags.length ? 0.81 : 0.65,
+    reasoning: [
+      'Risk assessment based on chief complaint, patient consciousness, breathing status, call priority, and age.',
+      'AI output is decision support only. Dispatcher must apply local medical protocols and clinical judgment.',
+    ],
+    warnings: highRisk ? ['High-risk call — consider hospital pre-notification now.'] : [],
+    redFlags,
+    nextActions: highRisk
+      ? ['Dispatch ALS immediately', 'Issue pre-arrival instructions to caller', 'Notify receiving ED if Echo/Delta']
+      : ['Dispatch appropriate unit', 'Continue telephone triage'],
+    priority: highRisk ? 'critical' : 'medium',
+    assignedRole: 'Dispatcher',
+  };
+}
+
+function handleEmsPrearrivalRiskSummary(input: Record<string, unknown>): HandlerResult {
+  const complaint = readString(input.chiefComplaint || input.complaint);
+  const vitals = readObject(input.currentVitals || input.vitals || {});
+  const interventions = readArray(input.interventions || input.treatments || input.medications);
+  const traumaActivation = Boolean(input.traumaActivation);
+  const strokeAlert = Boolean(input.strokeAlert);
+  const stemiAlert = Boolean(input.stemiAlert);
+  const sepsis = Boolean(input.sepsisConcern || input.sepsis);
+  const pediatric = Boolean(input.pediatricPatient || (readNumber(input.patientAge) ?? 99) < 16);
+  const obstetric = Boolean(input.obstetricConcern);
+
+  const hr = readNumber(vitals.hr);
+  const sbp = readNumber(vitals.sbp || vitals.systolic);
+  const spo2 = readNumber(vitals.spo2 || vitals.oxygenSaturation);
+  const gcs = readNumber(vitals.gcs);
+  const etaMinutes = readNumber(input.etaMinutes || input.estimatedArrivalMinutes);
+
+  const redFlags: string[] = [];
+  if (hr !== undefined && (hr > 130 || hr < 45)) redFlags.push(`Abnormal HR: ${hr} bpm`);
+  if (sbp !== undefined && sbp < 90) redFlags.push(`Hypotensive: SBP ${sbp} mmHg`);
+  if (spo2 !== undefined && spo2 < 92) redFlags.push(`Low SpO2: ${spo2}%`);
+  if (gcs !== undefined && gcs <= 8) redFlags.push(`Critically low GCS: ${gcs}`);
+  if (traumaActivation) redFlags.push('Trauma activation in progress');
+  if (strokeAlert) redFlags.push('Stroke alert — ED stroke team prep required');
+  if (stemiAlert) redFlags.push('STEMI alert — cath lab notification required');
+  if (sepsis) redFlags.push('Sepsis concern — sepsis bundle initiation recommended');
+  if (obstetric) redFlags.push('Obstetric emergency — OB team standby');
+  if (pediatric) redFlags.push('Pediatric patient — pediatric team readiness');
+
+  const criticalVitals = redFlags.filter((f) => /HR|SBP|SpO2|GCS/.test(f)).length;
+  const priority = redFlags.length >= 3 || traumaActivation || stemiAlert || strokeAlert || criticalVitals >= 2 ? 'critical' : redFlags.length >= 1 ? 'high' : 'medium';
+
+  const resusRecommended = priority === 'critical' || !gcs || gcs <= 8 || (sbp !== undefined && sbp < 90);
+  const recommendedBay = resusRecommended ? 'Resuscitation Bay — immediate' : priority === 'high' ? 'Major treatment area — priority' : 'Standard assessment bay';
+
+  return {
+    data: {
+      complaint,
+      vitals: { hr, sbp, spo2, gcs },
+      redFlags,
+      interventions,
+      priority,
+      recommendedBay,
+      resusRecommended,
+      edPreparationActions: [
+        ...(stemiAlert ? ['Activate cath lab / STEMI protocol'] : []),
+        ...(strokeAlert ? ['Assemble stroke team at receiving bay'] : []),
+        ...(traumaActivation ? ['Activate trauma team — level determined by mechanism'] : []),
+        ...(sepsis ? ['Initiate sepsis bundle — blood cultures, fluids, antibiotics ready'] : []),
+        ...(obstetric ? ['OB/GYN team to standby'] : []),
+        ...(pediatric ? ['Pediatric team / equipment at bay'] : []),
+        ...(resusRecommended ? ['Clear resuscitation bay — all hands available'] : []),
+        ...(etaMinutes !== undefined ? [`ETA ${etaMinutes} min — begin bay prep now`] : []),
+      ],
+      etaMinutes,
+    },
+    confidence: redFlags.length ? 0.87 : 0.7,
+    reasoning: [
+      'Pre-arrival risk based on transmitted field vitals, EMS interventions, crew-reported alerts, and estimated ETA.',
+      'AI output is decision support only. ED charge nurse and physician must confirm resource activation.',
+    ],
+    warnings: priority === 'critical' ? ['Critical pre-arrival — ED must be notified and prepared before EMS arrival.'] : [],
+    redFlags,
+    nextActions: priority === 'critical'
+      ? ['Activate receiving team now', 'Prepare resuscitation bay', 'Confirm ETA with EMS crew']
+      : ['Brief charge nurse', 'Prepare assigned bay', 'Stand by for EMS arrival'],
+    priority,
+    assignedRole: 'Charge Nurse / ED Physician',
+  };
 }
 
 function readBloodPressureSystolic(vitals: Record<string, unknown>): number | undefined {

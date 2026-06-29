@@ -5,16 +5,19 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const visualConsistencyCss = readFileSync(join(__dirname, 'visual-consistency.css'), 'utf8');
-const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
+const visualResponsiveStandardsCss = readFileSync(join(__dirname, 'visual-responsive-standards.css'), 'utf8');
+const stylesIndexCss = readFileSync(join(__dirname, 'index.css'), 'utf8');
 
 describe('visual consistency sweep', () => {
   it('loads the visual consistency layer after existing responsive and mobile layers', () => {
-    const responsivePos = mainJsx.indexOf("import './styles/responsive-ux.css'");
-    const mobilePerformancePos = mainJsx.indexOf("import './styles/mobile-performance.css'");
-    const consistencyPos = mainJsx.indexOf("import './styles/visual-consistency.css'");
+    const responsivePos = stylesIndexCss.indexOf("@import './responsive-ux.css';");
+    const mobilePerformancePos = stylesIndexCss.indexOf("@import './mobile-performance.css';");
+    const consistencyPos = stylesIndexCss.indexOf("@import './visual-consistency.css';");
+    const standardsPos = stylesIndexCss.indexOf("@import './visual-responsive-standards.css';");
 
     expect(consistencyPos).toBeGreaterThan(responsivePos);
     expect(consistencyPos).toBeGreaterThan(mobilePerformancePos);
+    expect(standardsPos).toBeGreaterThan(consistencyPos);
   });
 
   it('normalizes the requested visual categories in one shared app-shell layer', () => {
@@ -49,7 +52,9 @@ describe('visual consistency sweep', () => {
 
   it('keeps the sweep scoped to the authenticated app shell', () => {
     expect(visualConsistencyCss).toContain(':is(.app-shell, .emergency-app-shell)');
+    expect(visualResponsiveStandardsCss).toContain(':is(.app-shell, .emergency-app-shell)');
     expect(visualConsistencyCss).toContain('@media (max-width: 768px)');
+    expect(visualResponsiveStandardsCss).toContain('@media (max-width: 768px)');
   });
 
   it('does not emit invalid :is()-suffix class selectors', () => {

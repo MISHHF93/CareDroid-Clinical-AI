@@ -1116,3 +1116,200 @@ export interface PatientJourneyAuditEvent {
 }
 
 export type EmergencyFeatureFlags = Record<string, boolean>;
+
+// ── Pre-Hospital / Dispatch Journey ─────────────────────────────────────────
+
+export type CallPriority = 'Echo' | 'Delta' | 'Charlie' | 'Bravo' | 'Alpha';
+export const CallPriorityLabel: Record<CallPriority, string> = {
+  Echo: 'Life Threatening (Echo)',
+  Delta: 'Emergent (Delta)',
+  Charlie: 'Urgent (Charlie)',
+  Bravo: 'Semi-Urgent (Bravo)',
+  Alpha: 'Non-Urgent (Alpha)',
+};
+
+export type EmergencyCallStatus =
+  | 'received'
+  | 'triaged'
+  | 'dispatched'
+  | 'ems_en_route'
+  | 'ems_on_scene'
+  | 'ems_transporting'
+  | 'hospital_notified'
+  | 'patient_arrived'
+  | 'closed';
+
+export interface EmergencyCall {
+  id: EntityId;
+  callNumber: string;
+  receivedAt: ISODateString;
+  callPriority: CallPriority;
+  status: EmergencyCallStatus;
+  callerName?: string;
+  callerPhone?: string;
+  location: {
+    address: string;
+    crossStreet?: string;
+    coordinates?: { lat: number; lng: number };
+    landmark?: string;
+  };
+  chiefComplaint: string;
+  patientAge?: number;
+  patientSex?: 'male' | 'female' | 'unknown';
+  patientConscious?: boolean;
+  patientBreathing?: boolean;
+  dispatcherId: EntityId;
+  dispatcherName: string;
+  callDurationSeconds?: number;
+  cadEventId?: string;
+  linkedPatientId?: EntityId;
+  linkedEmsArrivalId?: EntityId;
+  notes?: string;
+  updatedAt: ISODateString;
+}
+
+export interface DispatcherAssessment {
+  id: EntityId;
+  callId: EntityId;
+  dispatcherId: EntityId;
+  assessedAt: ISODateString;
+  determinedPriority: CallPriority;
+  dispatchProtocol?: string;
+  preArrivalInstructions?: string[];
+  keySymptoms: string[];
+  medicalHistoryFlags: string[];
+  requiresALS: boolean;
+  requiresBLS: boolean;
+  requiresAir: boolean;
+  hazmatConcern: boolean;
+  multiCasualtyIncident: boolean;
+  notes?: string;
+}
+
+export interface DispatchAssignment {
+  id: EntityId;
+  callId: EntityId;
+  assignedAt: ISODateString;
+  unit: {
+    id: EntityId;
+    callSign: string;
+    type: 'ALS' | 'BLS' | 'Air' | 'Hazmat' | 'MCI';
+    crewSize: number;
+    baseLocation: string;
+  };
+  dispatchedBy: EntityId;
+  estimatedResponseMinutes?: number;
+  specialInstructions?: string;
+  status: 'assigned' | 'en_route' | 'on_scene' | 'transporting' | 'at_hospital' | 'available';
+  acknowledgedAt?: ISODateString;
+}
+
+export type PrehospitalAssessmentStatus = 'in_progress' | 'complete' | 'transmitted';
+
+export interface PrehospitalVitals {
+  capturedAt: ISODateString;
+  hr?: number;
+  sbp?: number;
+  dbp?: number;
+  spo2?: number;
+  rr?: number;
+  gcs?: number;
+  temp?: number;
+  glucoseLevel?: number;
+  painScore?: number;
+}
+
+export interface PrehospitalAssessment {
+  id: EntityId;
+  callId: EntityId;
+  assignmentId: EntityId;
+  crewLeadId: EntityId;
+  crewLeadName: string;
+  status: PrehospitalAssessmentStatus;
+  sceneArrivalAt?: ISODateString;
+  sceneDepartureAt?: ISODateString;
+  mechanism: string;
+  chiefComplaint: string;
+  vitalsHistory: PrehospitalVitals[];
+  currentVitals?: PrehospitalVitals;
+  interventions: string[];
+  medicationsAdministered: Array<{ name: string; dose: string; route: string; time: ISODateString }>;
+  ivAccess: boolean;
+  airwayManagement?: string;
+  traumaActivation: boolean;
+  strokeAlert: boolean;
+  stemiAlert: boolean;
+  sepsisConcern: boolean;
+  pediatricPatient: boolean;
+  obstetricConcern: boolean;
+  estimatedArrivalAt?: ISODateString;
+  narrative?: string;
+  transmittedAt?: ISODateString;
+}
+
+export interface EmsCrewUpdate {
+  id: EntityId;
+  assessmentId: EntityId;
+  timestamp: ISODateString;
+  updateType:
+    | 'vitals_update'
+    | 'intervention'
+    | 'medication'
+    | 'status_change'
+    | 'notification'
+    | 'note';
+  content: string;
+  vitals?: PrehospitalVitals;
+  crewMemberId: EntityId;
+}
+
+export interface EDReadinessPlan {
+  id: EntityId;
+  callId: EntityId;
+  linkedEmsArrivalId?: EntityId;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+  preparedBy: EntityId;
+  expectedArrivalAt: ISODateString;
+  assignedRoom?: string;
+  assignedBay?: string;
+  activatedResources: string[];
+  notifiedStaff: Array<{ roleId: string; name: string; notifiedAt: ISODateString }>;
+  equipmentChecklist: Array<{ item: string; ready: boolean }>;
+  specialtyTeamCalled: boolean;
+  specialtyTeams: string[];
+  bloodProductsOrdered: boolean;
+  imagingPreOrdered: boolean;
+  status: 'pending' | 'ready' | 'patient_arrived' | 'cancelled';
+  notes?: string;
+}
+
+export interface CareOutcome {
+  id: EntityId;
+  patientId: EntityId;
+  callId?: EntityId;
+  emsArrivalId?: EntityId;
+  encounterId?: EntityId;
+  recordedAt: ISODateString;
+  recordedBy: EntityId;
+  dispositionDecision:
+    | 'admitted'
+    | 'discharged'
+    | 'transferred'
+    | 'deceased'
+    | 'ama'
+    | 'left_without_being_seen';
+  admissionUnit?: string;
+  dischargeDestination?: string;
+  transferDestination?: string;
+  primaryDiagnosis?: string;
+  secondaryDiagnoses?: string[];
+  lengthOfStayMinutes?: number;
+  doorToPhysicianMinutes?: number;
+  doorToDispositionMinutes?: number;
+  threeMinuteBreachOccurred: boolean;
+  threeMinuteBreachDurationMinutes?: number;
+  aiChiefRecommendationsFollowed?: boolean;
+  qualityFlags?: string[];
+  notes?: string;
+}

@@ -10,6 +10,8 @@ export type HospitalRole =
   | 'resident_physician'
   | 'specialist'
   | 'paramedic'
+  | 'dispatcher'
+  | 'ems_coordinator'
   | 'registration_clerk'
   | 'patient_flow_coordinator'
   | 'lab_technician'

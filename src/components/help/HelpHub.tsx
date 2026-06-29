@@ -5,8 +5,8 @@ import { useContextualHelp } from '../../hooks/useContextualHelp';
 import useEmergencyRolePermissions from '../../hooks/useEmergencyRolePermissions';
 import {
   MANUAL_DEMO_JOURNEY,
+  MANUAL_ALL_TOPICS,
   MANUAL_PATIENT_JOURNEY,
-  MANUAL_TOPICS,
   getManualTopicById,
 } from '../../config/userManual.config';
 import { resolveDemoRoleLandingRoute } from '../../config/demoPersonaModel';
@@ -203,7 +203,7 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
             </>
           ) : (
             <div className="help-hub__topic-list">
-              {MANUAL_TOPICS.map((topic) => (
+              {MANUAL_ALL_TOPICS.map((topic) => (
                 <button
                   key={topic.id}
                   type="button"

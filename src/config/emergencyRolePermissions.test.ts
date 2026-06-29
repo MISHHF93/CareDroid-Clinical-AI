@@ -68,6 +68,8 @@ describe('CareDroid role-based views', () => {
       'Physician',
       'Registration Clerk',
       'EMS User',
+      'Dispatcher',
+      'EMS Coordinator',
       'Read-Only Display',
       'Public Display',
     ]);
@@ -110,7 +112,7 @@ describe('CareDroid role-based views', () => {
     ).toBe(false);
 
     const emsNavIds = getVisibleNavigation(EMERGENCY_ROLE_IDS.emsUser).map((item) => item.id);
-    expect(emsNavIds).toEqual(['ems', 'whiteboard', 'patients', 'capacity', 'tools']);
+    expect(emsNavIds).toEqual(['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'help']);
     expect(emsNavIds).not.toContain('settings');
   });
 

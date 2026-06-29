@@ -36,6 +36,10 @@ export const CARE_DROID_AI_PROMPTS: Record<CareDroidAIIntent, string> = {
     'Recommend whether a critical/high alert or operational delay requires escalation, who owns it, and what acknowledgement action is needed.',
   handoff_summary:
     'Generate a concise SBAR-style handoff summary with red flags, missing information, next actions, and required clinician review.',
+  emergency_call_risk_summary:
+    'Assess risk from a 911 call — chief complaint, patient status, priority, pre-arrival instructions, and whether to notify the receiving ED.',
+  ems_prearrival_risk_summary:
+    'Summarize prehospital risk from EMS field data — vitals, interventions, alerts, ETA — and recommend ED bay prep and resource activation.',
 };
 
 export function getCareDroidAIPrompt(intent: CareDroidAIIntent): string {

@@ -37,6 +37,13 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'dispatch',
+    label: 'Dispatch',
+    icon: 'ambulance',
+    route: '/emergency/dispatch',
+    featureGate: null,
+  },
+  {
     id: 'ems',
     label: 'EMS',
     icon: 'ambulance',
@@ -139,6 +146,13 @@ const REQUESTED_ITEMS = [
     label: 'Shift',
     icon: 'clock',
     route: '/emergency/shift',
+    featureGate: null,
+  },
+  {
+    id: 'help',
+    label: 'Help',
+    icon: 'help-circle',
+    route: '/emergency/help',
     featureGate: null,
   },
   {
@@ -266,7 +280,7 @@ describe('unified navigation config', () => {
     expect(adminLabels).not.toContain('Fleet');
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
-    expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics']);
+    expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics', 'Help']);
     expect(readOnlyLabels).toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
   });
@@ -280,7 +294,7 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift']);
+    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'help']);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -317,7 +331,7 @@ describe('unified navigation config', () => {
       expect(item?.suiteId, `${navId} missing suiteId`).toBeTruthy();
       expect(item?.suiteLabel, `${navId} missing suiteLabel`).toBeTruthy();
     }
-    expect(PILOT_UTILITY_NAV_ITEM_IDS).toEqual(['pulse', 'shift']);
+    expect(PILOT_UTILITY_NAV_ITEM_IDS).toEqual(['pulse', 'shift', 'help']);
     for (const extensionId of ['intake', 'integrations']) {
       expect(PILOT_EXTENSION_NAV_ITEM_IDS).toContain(extensionId);
       expect(PILOT_CORE_NAV_ITEM_IDS).not.toContain(extensionId);
@@ -326,7 +340,7 @@ describe('unified navigation config', () => {
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
-    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics']);
+    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'help']);
     expect(physicianNavIds).not.toContain('reception');
     expect(physicianNavIds).not.toContain('queues');
     expect(physicianNavIds).not.toContain('reassessment');

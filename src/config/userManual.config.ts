@@ -123,6 +123,52 @@ export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([
     notFor: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
   },
   {
+    id: 'dispatch-console',
+    title: 'Dispatch Console',
+    eyebrow: 'Pre-hospital · 911 call intake',
+    purpose: 'Log emergency calls, perform telephone triage, assign EMS units, and notify the ED of inbound critical patients.',
+    route: CANONICAL_ROUTES.emergencyDispatch,
+    roles: [EMERGENCY_ROLE_IDS.dispatcher, EMERGENCY_ROLE_IDS.emsCoordinator, EMERGENCY_ROLE_IDS.admin],
+    whenToUse: 'When a 911 call is received and must be triaged, prioritized, and dispatched to an EMS unit.',
+    procedure: [
+      { order: 1, action: 'Log the incoming call', detail: 'Enter chief complaint, address, caller name if available, and critical safety flags (conscious/breathing).' },
+      { order: 2, action: 'Assign initial call priority', detail: 'Use Echo (life threatening) through Alpha (non-urgent) based on determinant codes.' },
+      { order: 3, action: 'Issue pre-arrival instructions', detail: 'Keep caller on the line and guide bystander response (CPR, bleeding control, positioning).' },
+      { order: 4, action: 'Dispatch the appropriate unit', detail: 'Assign ALS or BLS based on call priority. Echo/Delta calls require ALS response.' },
+      { order: 5, action: 'Track unit status', detail: 'Update status from Dispatched → En Route → On Scene → Transporting as crew confirms.' },
+      { order: 6, action: 'Notify the receiving ED for Echo/Delta patients', detail: 'Critical patients trigger a pre-arrival notification to the charge nurse. Use the Notify Hospital action.' },
+    ],
+    tips: [
+      'Echo and Delta calls (life threatening/emergent) must trigger hospital pre-notification.',
+      'AI call risk summary is available for Echo/Delta calls — dispatcher must confirm and apply local protocol.',
+      'Do not close a call until the patient is confirmed arrived at hospital or call is cancelled.',
+    ],
+    relatedTopicIds: ['ems', 'three-minute-response'],
+  },
+  {
+    id: 'prehospital-coordination',
+    title: 'Prehospital Coordination',
+    eyebrow: 'EMS en route · pre-arrival relay',
+    purpose: 'Coordinate EMS field assessment data, relay critical findings to the ED, and activate pre-arrival readiness protocols.',
+    route: CANONICAL_ROUTES.emergencyEms,
+    roles: [EMERGENCY_ROLE_IDS.emsCoordinator, EMERGENCY_ROLE_IDS.chargeNurse, EMERGENCY_ROLE_IDS.emsUser],
+    whenToUse: 'When an EMS unit is en route with a critical patient and the ED must be prepared before arrival.',
+    procedure: [
+      { order: 1, action: 'Receive prehospital assessment from crew', detail: 'Field vitals, mechanism of injury, interventions, and current patient status.' },
+      { order: 2, action: 'Identify critical alerts', detail: 'Stroke alert, STEMI, trauma activation, sepsis, OB emergency, pediatric arrest.' },
+      { order: 3, action: 'Submit pre-arrival notification (MIST/SBAR)', detail: 'Use the EMS screen to send structured notification to receiving ED. MIST: Mechanism, Injuries, Signs, Treatment.' },
+      { order: 4, action: 'Activate the ED Readiness Plan', detail: 'ED charge nurse and coordinator prepare the receiving bay, specialty teams, and equipment per the pre-arrival data.' },
+      { order: 5, action: 'Relay ETA updates', detail: 'Update estimated arrival time as scene or route conditions change.' },
+      { order: 6, action: 'Handoff at arrival', detail: 'Crew completes the ambulance handoff checklist and transfers care to the ED team.' },
+    ],
+    tips: [
+      'A 3-minute response timer may start from EMS pre-arrival for Echo-priority patients even before arrival.',
+      'AI prehospital risk summary can assist the charge nurse — licensed staff must confirm before resource activation.',
+      'All resource activations (trauma team, cath lab) require a licensed clinician to authorize.',
+    ],
+    relatedTopicIds: ['dispatch-console', 'ems', 'three-minute-response'],
+  },
+  {
     id: 'ems',
     title: 'EMS coordination',
     eyebrow: 'Ambulance · offload · handoff',
@@ -438,7 +484,7 @@ export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([
     ],
     tips: [
       'Critical alerts must be acknowledged within 3 minutes — this is the 3-minute response target.',
-      'Unacknowledged critical alerts escalate to the charge nurse after 90 seconds.',
+      'At 0:30: charge nurse receives an awareness notification. At 2:00: alert escalates to charge nurse. At 3:00: breach fires to physician and patient flow coordinator.',
       'Filter by patient, alert type, or severity using the top toolbar.',
     ],
     relatedTopicIds: ['whiteboard', 'queues', 'reassessment'],
@@ -462,6 +508,114 @@ export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([
     ],
     relatedTopicIds: ['whiteboard', 'patient-detail'],
     notFor: 'Reception area — use Public Waiting Display for patient-facing screens.',
+  },
+]);
+
+export const MANUAL_RESPONSE_TOPICS: readonly ManualTopic[] = Object.freeze([
+  {
+    id: 'three-minute-response',
+    title: '3-minute response procedure',
+    eyebrow: 'Critical alert - first 3 minutes',
+    purpose: 'Capture red flags, notify the accountable role, route the patient, and escalate if no one acknowledges.',
+    route: CANONICAL_ROUTES.emergencyAlerts,
+    roles: Object.values(EMERGENCY_ROLE_IDS),
+    whenToUse: 'Any critical/high-risk patient, unacknowledged severe alert, deterioration signal, EMS red flag, or reassessment breach.',
+    procedure: [
+      { order: 1, action: '0:00 — timer starts automatically', detail: 'A new critical alert triggers the 3-minute response engine. The assigned owner is the triage or registered nurse.' },
+      { order: 2, action: '0:30 — awareness notification', detail: 'Charge nurse receives an in-app awareness alert. No owner change yet — this is informational.' },
+      { order: 3, action: '1:00-2:00 — confirm routing and handoff', detail: 'Charge nurse or physician routes the patient and confirms the escalation plan.' },
+      { order: 4, action: '2:00 — escalation L1', detail: 'Charge nurse becomes the accountable owner. A new critical alert fires to the charge nurse if the alert is still unacknowledged.' },
+      { order: 5, action: '3:00 — BREACH', detail: 'Alert escalates to ED physician and patient flow coordinator. Breach is recorded in analytics.' },
+      { order: 6, action: '5:00 — extended breach', detail: 'Hospital administrator receives notification. Breach duration is tracked until resolution.' },
+      { order: 7, action: 'Acknowledge at any point', detail: 'Click Acknowledge in the Alerts Center or patient panel. This stops the escalation chain and logs your name and timestamp.' },
+    ],
+    tips: [
+      'The timer starts automatically when a Critical alert is dispatched — you do not need to start it manually.',
+      'Acknowledging the alert stops the escalation chain immediately.',
+      'Breach events appear in Analytics → 3-Minute Response for quality review.',
+    ],
+    relatedTopicIds: ['alerts', 'copilot', 'staff-routing'],
+  },
+  {
+    id: 'staff-routing',
+    title: 'Staff routing and assignment',
+    eyebrow: 'Ownership - who acts next',
+    purpose: 'Assign accountable staff by role, department, load, availability, and alert ownership.',
+    route: CANONICAL_ROUTES.emergencyShift,
+    roles: [
+      EMERGENCY_ROLE_IDS.chargeNurse,
+      EMERGENCY_ROLE_IDS.physician,
+      EMERGENCY_ROLE_IDS.edManager,
+      'patient_flow_coordinator',
+      'hospital_admin',
+    ],
+    whenToUse: 'During surge, handoff, critical alert acknowledgement, patient movement, or staffing gaps.',
+    procedure: [
+      { order: 1, action: 'Confirm the patient owner', detail: 'Use the compiled CareDroid profile and assigned care team IDs.' },
+      { order: 2, action: 'Check role capability', detail: 'Only users with staff assignment scope can reassign clinical ownership.' },
+      { order: 3, action: 'Route to the least loaded available owner', detail: 'Prefer on-shift staff in the same department and hospital site.' },
+      { order: 4, action: 'Escalate gaps', detail: 'If no owner is available, notify charge nurse and patient flow coordinator.' },
+    ],
+    relatedTopicIds: ['whiteboard', 'three-minute-response'],
+  },
+  {
+    id: 'department-routing',
+    title: 'Department routing',
+    eyebrow: 'Destination - right service next',
+    purpose: 'Route patients to ED zones, labs, imaging, pharmacy, specialty consult, admission, or transfer.',
+    route: CANONICAL_ROUTES.emergencyCapacity,
+    roles: [
+      EMERGENCY_ROLE_IDS.chargeNurse,
+      EMERGENCY_ROLE_IDS.physician,
+      EMERGENCY_ROLE_IDS.edManager,
+      'patient_flow_coordinator',
+    ],
+    whenToUse: 'After triage, at provider assessment, when diagnostics are needed, or when capacity changes.',
+    procedure: [
+      { order: 1, action: 'Review current patient status', detail: 'Acuity, complaint, vitals, alerts, orders, and wait time.' },
+      { order: 2, action: 'Review bottlenecks', detail: 'Use Flow & Capacity and AI Chief bottleneck context before choosing destination.' },
+      { order: 3, action: 'Select destination and owner', detail: 'Department routing must include a handoff owner and expected next action.' },
+      { order: 4, action: 'Document exceptions', detail: 'Override AI suggestions only with a staff reason and audit trail.' },
+    ],
+    relatedTopicIds: ['capacity', 'referrals', 'copilot'],
+  },
+  {
+    id: 'service-bottlenecks',
+    title: 'Service bottleneck loop',
+    eyebrow: 'Operations - slow service recovery',
+    purpose: 'Detect degraded services and convert them into dashboard, alert, AI Chief, analytics, and settings actions.',
+    route: CANONICAL_ROUTES.emergencyAnalytics,
+    roles: [
+      EMERGENCY_ROLE_IDS.edManager,
+      EMERGENCY_ROLE_IDS.admin,
+      'it_admin',
+      'quality_safety_officer',
+      'patient_flow_coordinator',
+    ],
+    whenToUse: 'When AI, auth, patient, triage, alerts, notifications, database, lab, radiology, pharmacy, analytics, reporting, EHR/FHIR, frontend, or performance signals degrade.',
+    procedure: [
+      { order: 1, action: 'Identify the affected service', detail: 'Use the bottleneck registry and service health indicators.' },
+      { order: 2, action: 'Choose fallback action', detail: 'Continue manual care workflow while technical recovery proceeds.' },
+      { order: 3, action: 'Notify impacted roles', detail: 'Dashboard and Alerts show affected workflows; AI Chief explains safe alternatives.' },
+      { order: 4, action: 'Track recovery and outcome', detail: 'Analytics records duration, affected patients, and operational impact.' },
+    ],
+    relatedTopicIds: ['analytics', 'settings', 'copilot'],
+  },
+  {
+    id: 'downtime-fallback',
+    title: 'Downtime and fallback procedure',
+    eyebrow: 'Safety - AI unavailable',
+    purpose: 'Continue safe ED operations when AI, integrations, or backend services are degraded.',
+    route: CANONICAL_ROUTES.emergencyHelp,
+    roles: Object.values(EMERGENCY_ROLE_IDS),
+    whenToUse: 'Any time a service banner, failed request, missing feed, or staff judgment says automation is unreliable.',
+    procedure: [
+      { order: 1, action: 'Keep clinical care moving', detail: 'Use standard hospital policy and licensed clinician judgment.' },
+      { order: 2, action: 'Switch to manual documentation', detail: 'Record triage, reassessment, orders, and handoffs in approved downtime tools.' },
+      { order: 3, action: 'Use phone, pager, or radio for critical alerts', detail: 'Do not wait for in-app notification delivery when patient safety is at risk.' },
+      { order: 4, action: 'Back-enter only verified facts', detail: 'When systems recover, reconcile records with audit notes.' },
+    ],
+    relatedTopicIds: ['three-minute-response', 'service-bottlenecks'],
   },
 ]);
 
@@ -607,6 +761,256 @@ export const MANUAL_ROLE_PLAYBOOKS: readonly RolePlaybook[] = Object.freeze([
       'Review AI governance report weekly',
     ],
   },
+  {
+    roleId: 'registered_nurse',
+    label: 'Registered Nurse',
+    startHere: CANONICAL_ROUTES.emergencyWhiteboard,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyWhiteboard,
+      CANONICAL_ROUTES.emergencyPatients,
+      CANONICAL_ROUTES.emergencyReassessment,
+      CANONICAL_ROUTES.emergencyAlerts,
+    ],
+    canDo: ['Update assigned patient status', 'Acknowledge alerts', 'Complete reassessments', 'Use AI Chief request support'],
+    cannotDo: ['Assign triage acuity', 'Override AI recommendations', 'Discharge patients', 'Manage settings'],
+    dailyFlow: [
+      'Start on assigned patients',
+      'Check alerts and reassessment timers',
+      'Document bedside updates',
+      'Escalate deterioration to charge nurse or physician',
+    ],
+  },
+  {
+    roleId: 'specialist',
+    label: 'Specialist',
+    startHere: CANONICAL_ROUTES.emergencyPatients,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyPatients,
+      CANONICAL_ROUTES.emergencyReferrals,
+      CANONICAL_ROUTES.emergencyTools,
+      CANONICAL_ROUTES.emergencyCopilot,
+    ],
+    canDo: ['Review consult patients', 'Write specialist recommendations', 'Review AI Chief summaries', 'Acknowledge assigned alerts'],
+    cannotDo: ['Run front desk intake', 'Manage ED staffing', 'Change system settings'],
+    dailyFlow: [
+      'Open referred patients',
+      'Review handoff and diagnostics',
+      'Document consult recommendation',
+      'Close the loop with ED physician',
+    ],
+  },
+  {
+    roleId: 'patient_flow_coordinator',
+    label: 'Patient Flow Coordinator',
+    startHere: CANONICAL_ROUTES.emergencyCapacity,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyCapacity,
+      CANONICAL_ROUTES.emergencyQueues,
+      CANONICAL_ROUTES.emergencyAnalytics,
+      CANONICAL_ROUTES.emergencyShift,
+    ],
+    canDo: ['Monitor bottlenecks', 'Coordinate bed and department routing', 'Escalate flow delays', 'Assign non-clinical routing ownership'],
+    cannotDo: ['Diagnose or prescribe', 'Assign clinical acuity', 'Override clinician decisions'],
+    dailyFlow: [
+      'Review capacity and queue health',
+      'Identify stalled patients',
+      'Coordinate destination owners',
+      'Feed unresolved delays to shift handoff',
+    ],
+  },
+  {
+    roleId: 'lab_technician',
+    label: 'Lab Technician',
+    startHere: CANONICAL_ROUTES.laboratory,
+    primaryRoutes: [
+      CANONICAL_ROUTES.laboratory,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: ['View lab-related patient context', 'Acknowledge lab workflow alerts', 'Use downtime fallback steps'],
+    cannotDo: ['Edit clinical triage', 'Assign staff', 'Review AI recommendations as clinician'],
+    dailyFlow: [
+      'Open lab work queue',
+      'Prioritize critical values',
+      'Acknowledge lab alerts',
+      'Notify ED owner by fallback channel when systems degrade',
+    ],
+  },
+  {
+    roleId: 'radiology_technician',
+    label: 'Radiology Technician',
+    startHere: CANONICAL_ROUTES.emergencyPatients,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyPatients,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: ['View imaging-related context', 'Acknowledge imaging workflow alerts', 'Coordinate imaging readiness'],
+    cannotDo: ['Assign acuity', 'Order medications', 'Override AI recommendations'],
+    dailyFlow: [
+      'Review patients awaiting imaging',
+      'Prioritize critical imaging requests',
+      'Update imaging readiness',
+      'Escalate unavailable imaging capacity',
+    ],
+  },
+  {
+    roleId: 'pharmacist',
+    label: 'Pharmacist',
+    startHere: CANONICAL_ROUTES.emergencyPatients,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyPatients,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyTools,
+      CANONICAL_ROUTES.emergencyCopilot,
+    ],
+    canDo: ['Review medication context', 'Acknowledge medication alerts', 'Use medication safety tools', 'Escalate medication risk'],
+    cannotDo: ['Assign ED acuity', 'Discharge patients', 'Manage role settings'],
+    dailyFlow: [
+      'Check medication-related alerts',
+      'Review patient medication context',
+      'Document pharmacy recommendation',
+      'Escalate high-risk medication issues',
+    ],
+  },
+  {
+    roleId: 'hospital_admin',
+    label: 'Hospital Administrator',
+    startHere: CANONICAL_ROUTES.emergencyAnalytics,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyAnalytics,
+      CANONICAL_ROUTES.emergencyCapacity,
+      CANONICAL_ROUTES.emergencyShift,
+      CANONICAL_ROUTES.emergencySettings,
+    ],
+    canDo: ['Review operational performance', 'Acknowledge operational alerts', 'Review reports', 'Manage hospital configuration'],
+    cannotDo: ['Perform clinical actions unless separately licensed and provisioned'],
+    dailyFlow: [
+      'Review command center metrics',
+      'Inspect bottleneck loop',
+      'Support surge decisions',
+      'Review reports and settings',
+    ],
+  },
+  {
+    roleId: 'it_admin',
+    label: 'IT Administrator',
+    startHere: CANONICAL_ROUTES.emergencySettings,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencySettings,
+      CANONICAL_ROUTES.systemHealth,
+      CANONICAL_ROUTES.audit,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: ['Configure integrations', 'Review audit/system health', 'Manage users', 'Support downtime recovery'],
+    cannotDo: ['View more clinical detail than metadata policy allows', 'Perform patient care actions'],
+    dailyFlow: [
+      'Check system health',
+      'Review integration bottlenecks',
+      'Support failed auth or notification paths',
+      'Coordinate recovery with operations',
+    ],
+  },
+  {
+    roleId: 'quality_safety_officer',
+    label: 'Quality & Safety Officer',
+    startHere: CANONICAL_ROUTES.emergencyAnalytics,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyAnalytics,
+      CANONICAL_ROUTES.audit,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: ['Review 3-minute breaches', 'Audit alerts and AI review', 'Export reports', 'Inspect safety trends'],
+    cannotDo: ['Mutate active patient care', 'Assign clinical owners'],
+    dailyFlow: [
+      'Review critical alert breaches',
+      'Inspect AI override and review logs',
+      'Track bottleneck outcomes',
+      'Prepare safety reports',
+    ],
+  },
+  {
+    roleId: EMERGENCY_ROLE_IDS.dispatcher,
+    label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.dispatcher],
+    startHere: CANONICAL_ROUTES.emergencyDispatch,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyDispatch,
+      CANONICAL_ROUTES.emergencyEms,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: [
+      'Log 911 calls and assign call priority',
+      'Issue pre-arrival instructions to callers',
+      'Dispatch EMS units (ALS/BLS)',
+      'Track unit status from dispatch through hospital arrival',
+      'Trigger ED pre-arrival notifications for Echo/Delta patients',
+    ],
+    cannotDo: [
+      'Make clinical diagnoses or treatment decisions',
+      'Assign triage acuity inside the ED',
+      'Override licensed clinician decisions',
+    ],
+    dailyFlow: [
+      'Open Dispatch Console at shift start',
+      'Log all incoming calls immediately',
+      'Assign and update EMS unit status',
+      'For Echo/Delta: notify ED before unit arrives',
+      'Close calls when patient is confirmed at hospital',
+    ],
+  },
+  {
+    roleId: EMERGENCY_ROLE_IDS.emsCoordinator,
+    label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsCoordinator],
+    startHere: CANONICAL_ROUTES.emergencyEms,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyDispatch,
+      CANONICAL_ROUTES.emergencyEms,
+      CANONICAL_ROUTES.emergencyEdReadiness,
+      CANONICAL_ROUTES.emergencyCapacity,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: [
+      'Coordinate EMS unit deployment and prehospital data relay',
+      'Submit pre-arrival MIST/SBAR notifications to the ED',
+      'Activate ED Readiness Plans for inbound critical patients',
+      'Monitor unit status from dispatch through handoff',
+      'View department capacity and bottlenecks',
+    ],
+    cannotDo: [
+      'Make clinical diagnoses or treatment decisions',
+      'Authorize resource activations without a licensed clinician',
+      'Override ED triage or disposition decisions',
+    ],
+    dailyFlow: [
+      'Review active EMS units and ETAs at shift start',
+      'Monitor inbound critical patients via EMS screen',
+      'Submit pre-arrival notifications for Echo/Delta patients',
+      'Confirm ED readiness plan is active before arrival',
+      'Oversee handoff completion and offload times',
+    ],
+  },
+  {
+    roleId: 'demo_observer',
+    label: 'Demo Observer',
+    startHere: CANONICAL_ROUTES.emergencyWhiteboard,
+    primaryRoutes: [
+      CANONICAL_ROUTES.emergencyWhiteboard,
+      CANONICAL_ROUTES.emergencyAlerts,
+      CANONICAL_ROUTES.emergencyAnalytics,
+      CANONICAL_ROUTES.emergencyHelp,
+    ],
+    canDo: ['View demo workflows', 'Open the manual', 'Follow guided walkthroughs'],
+    cannotDo: ['Edit patients', 'Acknowledge production alerts', 'Override AI', 'Change settings'],
+    dailyFlow: [
+      'Open Help and follow the demo journey',
+      'View the command center',
+      'Observe alerts and analytics',
+      'Switch roles only through demo controls',
+    ],
+  },
 ]);
 
 export const MANUAL_SHORTCUTS = Object.freeze([
@@ -624,7 +1028,12 @@ export const MANUAL_SHORTCUTS = Object.freeze([
   { keys: '/', action: 'Focus reception search (on Reception) or open palette' },
 ]);
 
-const TOPIC_BY_ID = new Map(MANUAL_TOPICS.map((t) => [t.id, t]));
+export const MANUAL_ALL_TOPICS: readonly ManualTopic[] = Object.freeze([
+  ...MANUAL_TOPICS,
+  ...MANUAL_RESPONSE_TOPICS,
+]);
+
+const TOPIC_BY_ID = new Map(MANUAL_ALL_TOPICS.map((t) => [t.id, t]));
 
 export function getManualTopicById(id: string): ManualTopic | undefined {
   return TOPIC_BY_ID.get(id);
@@ -632,7 +1041,7 @@ export function getManualTopicById(id: string): ManualTopic | undefined {
 
 export function resolveManualTopicForPath(pathname: string): ManualTopic | undefined {
   const normalized = pathname.split('?')[0];
-  const exact = MANUAL_TOPICS.find((t) => t.route === normalized);
+  const exact = MANUAL_ALL_TOPICS.find((t) => t.route === normalized);
   if (exact) return exact;
   if (normalized.startsWith(CANONICAL_ROUTES.emergencyTools) || normalized.startsWith('/tools')) {
     return getManualTopicById('tools');
@@ -646,7 +1055,7 @@ export function resolveManualTopicForPath(pathname: string): ManualTopic | undef
   if (normalized === CANONICAL_ROUTES.emergencyHelp) {
     return undefined;
   }
-  return MANUAL_TOPICS.find((t) => normalized.startsWith(t.route));
+  return MANUAL_ALL_TOPICS.find((t) => normalized.startsWith(t.route));
 }
 
 export function resolveRolePlaybook(roleId: string): RolePlaybook | undefined {
@@ -654,7 +1063,7 @@ export function resolveRolePlaybook(roleId: string): RolePlaybook | undefined {
 }
 
 export function listTopicsForRole(roleId: string): ManualTopic[] {
-  return MANUAL_TOPICS.filter((t) => t.roles.includes(roleId) || t.roles.length === Object.values(EMERGENCY_ROLE_IDS).length);
+  return MANUAL_ALL_TOPICS.filter((t) => t.roles.includes(roleId) || t.roles.length === Object.values(EMERGENCY_ROLE_IDS).length);
 }
 
 export { DEMO_JOURNEY_STEPS as MANUAL_DEMO_JOURNEY };

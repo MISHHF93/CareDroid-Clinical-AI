@@ -46,6 +46,7 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
+  'help',
 ]);
 
 /** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
@@ -159,6 +160,13 @@ export const NAV_ITEMS: readonly NavItem[] = Object.freeze([
     featureGate: null,
   },
   {
+    id: 'dispatch',
+    label: 'Dispatch',
+    icon: 'ambulance',
+    route: CANONICAL_ROUTES.emergencyDispatch,
+    featureGate: null,
+  },
+  {
     id: 'ems',
     label: 'EMS',
     icon: 'ambulance',
@@ -263,6 +271,13 @@ export const NAV_ITEMS: readonly NavItem[] = Object.freeze([
     route: CANONICAL_ROUTES.emergencyShift,
     featureGate: null,
   },
+  {
+    id: 'help',
+    label: 'Help',
+    icon: 'help-circle',
+    route: CANONICAL_ROUTES.emergencyHelp,
+    featureGate: null,
+  },
   // Additional pages brought in for full navigation normalization
   {
     id: 'fleet',
@@ -352,6 +367,7 @@ const NAV_FEATURE_IDS = Object.freeze({
   platform: 'platform_navigation',
   pulse: 'department_pulse',
   shift: 'shift_summary',
+  help: 'user_manual',
   fleet: 'fleet_management',
   surveillance: 'surveillance_nexus',
   simulation: 'simulation_academy',

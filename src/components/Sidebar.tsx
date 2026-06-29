@@ -14,6 +14,7 @@ import {
   IconClock,
   IconDots,
   IconGauge,
+  IconHelpCircle,
   IconLayoutDashboard,
   IconListDetails,
   IconNotes,
@@ -102,6 +103,7 @@ const ICONS: Record<string, Icon> = {
   platform: IconApps,
   activity: IconActivity,
   clock: IconClock,
+  'help-circle': IconHelpCircle,
   // Additional for full nav
   fleet: IconAmbulance,
   surveillance: IconActivity,
@@ -412,7 +414,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}
-        {canUseCopilot && !screenCapabilities.isRegistrationScreen ? (
+        {canUseCopilot && !screenCapabilities.isRegistrationScreen && !mobilePrimaryIds.includes('copilot') ? (
         <button
           type="button"
           className={['sidebar-item', copilotOpen ? 'sidebar-item--active' : '']

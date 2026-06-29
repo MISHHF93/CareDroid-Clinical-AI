@@ -274,6 +274,13 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
       whiteboardLink: 'board_workflow_panel',
       route: '/emergency/shift',
     },
+    user_manual: {
+      suiteId: 'charge_nurse_command',
+      layer: 'core',
+      maturity: 'live',
+      whiteboardLink: 'role_view',
+      route: '/emergency/help',
+    },
     shift_analytics: { suiteId: 'charge_nurse_command', layer: 'core', maturity: 'demo', whiteboardLink: 'role_view' },
 
     emergency_analytics: {
@@ -452,6 +459,7 @@ export const NAV_SUITE_ASSIGNMENTS: Readonly<Record<string, CareDroidSuiteId>> =
   platform: 'platform_admin_saas',
   pulse: 'charge_nurse_command',
   shift: 'charge_nurse_command',
+  help: 'charge_nurse_command',
   fleet: 'fleet_ambulance_extension',
   surveillance: 'telemetry_iot_digital_twin',
   simulation: 'analytics_simulation_qa',

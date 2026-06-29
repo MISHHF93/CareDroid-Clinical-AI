@@ -12,7 +12,7 @@
   z-index: calc(var(--z-modal, 1100) + 1);
   display: flex;
   flex-direction: column;
-  width: min(100%, 520px);
+  width: min(100%, 680px);
   border-inline-start: 1px solid var(--medical-border, #e0f2fe);
   background: var(--medical-surface-card, #ffffff);
   color: var(--medical-text-body, #111827);
@@ -22,7 +22,7 @@
 .help-hub--page {
   position: static;
   width: 100%;
-  max-width: var(--app-visual-page-max, 960px);
+  max-width: min(100%, 1120px);
   margin-inline: auto;
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: var(--ed-radius-lg, 12px);
@@ -35,7 +35,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 16px 12px;
+  padding: 24px 24px 18px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
   background: var(--medical-surface-page, #f0f9ff);
 }
@@ -55,7 +55,7 @@
 
 .help-hub__title {
   margin: 4px 0 0;
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -63,7 +63,7 @@
 .help-hub__subtitle {
   margin: 6px 0 0;
   color: var(--medical-text-muted, #6b7280);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -76,7 +76,9 @@
   cursor: pointer;
   font-size: 18px;
   line-height: 1;
-  padding: 4px 10px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
 }
 
 .help-hub__tabs {
@@ -84,7 +86,7 @@
   flex-shrink: 0;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 10px 12px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
 }
 
@@ -95,9 +97,10 @@
   color: var(--medical-text-muted, #6b7280);
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 5px 10px;
+  min-height: 40px;
+  padding: 8px 12px;
 }
 
 .help-hub__tab[data-active='true'] {
@@ -110,13 +113,13 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 16px;
+  padding: 22px 24px;
   overscroll-behavior: contain;
 }
 
 .help-hub__intro {
   margin-bottom: 16px;
-  padding: 12px;
+  padding: 16px;
   border: 1px solid var(--medical-card-accent-border, rgba(14, 165, 233, 0.35));
   border-radius: 10px;
   background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
@@ -124,14 +127,14 @@
 
 .help-hub__intro p {
   margin: 0 0 8px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.45;
 }
 
 .help-hub__intro ul {
   margin: 0;
   padding-left: 18px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -143,7 +146,7 @@
 }
 
 .help-hub__role-card {
-  padding: 12px;
+  padding: 18px;
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
   background: var(--medical-surface-page, #f0f9ff);
@@ -151,12 +154,12 @@
 
 .help-hub__role-card h3 {
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .help-hub__role-card h4 {
   margin: 12px 0 6px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -166,7 +169,7 @@
 .help-hub__role-card ul {
   margin: 0;
   padding-left: 18px;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.45;
 }
 
@@ -176,8 +179,8 @@
 
 .help-hub__journey-step {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
-  gap: 10px;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: start;
   padding: 10px 0;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
@@ -187,8 +190,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   background: var(--medical-card-accent-bg, rgba(14, 165, 233, 0.12));
   color: var(--app-accent-interactive, #0ea5e9);
@@ -198,13 +201,13 @@
 
 .help-hub__journey-body strong {
   display: block;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .help-hub__journey-body p {
   margin: 4px 0 0;
   color: var(--medical-text-muted, #6b7280);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.35;
 }
 
@@ -215,15 +218,16 @@
   color: var(--app-accent-interactive, #0ea5e9);
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 6px 10px;
+  min-height: 40px;
+  padding: 8px 12px;
   white-space: nowrap;
 }
 
 .help-hub__topic-list {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .help-hub__topic-btn {
@@ -236,24 +240,24 @@
   color: inherit;
   cursor: pointer;
   font: inherit;
-  padding: 10px 12px;
+  padding: 16px;
   text-align: left;
 }
 
 .help-hub__topic-btn strong {
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .help-hub__topic-btn span {
   color: var(--medical-text-muted, #6b7280);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.35;
 }
 
 .help-hub__shortcut-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .help-hub__shortcut-table th,
@@ -294,7 +298,7 @@
 
 .help-topic__title {
   margin: 4px 0 0;
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 800;
 }
 
@@ -302,7 +306,7 @@
 .help-topic__when,
 .help-topic__not-for {
   margin: 8px 0 0;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.45;
 }
 
@@ -312,7 +316,7 @@
 
 .help-topic__section h4 {
   margin: 0 0 8px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -322,7 +326,7 @@
 .help-topic__steps {
   margin: 0;
   padding-left: 20px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.45;
 }
 
@@ -336,11 +340,11 @@
 
 .help-topic__queue-row {
   display: grid;
-  grid-template-columns: 100px 1fr;
+  grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .help-topic__queue-row dt {
@@ -355,7 +359,7 @@
 .help-topic__tips {
   margin: 0;
   padding-left: 18px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -370,7 +374,7 @@
 
 .help-topic__route-link {
   color: var(--app-accent-interactive, #0ea5e9);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -380,7 +384,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .help-topic__related-btn {
@@ -389,20 +393,21 @@
   background: var(--medical-surface-page, #f0f9ff);
   cursor: pointer;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 4px 8px;
+  min-height: 36px;
+  padding: 7px 10px;
 }
 
 .help-hub__footer {
   border-top: 1px solid var(--medical-border, #e0f2fe);
   margin-top: auto;
-  padding: 10px 14px 12px;
+  padding: 14px 20px 16px;
 }
 
 .help-hub__footer p {
   color: var(--medical-text-muted, #64748b);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.45;
   margin: 0;
 }
@@ -412,11 +417,21 @@
 }
 
 .help-hub-page {
-  padding: 12px 16px 24px;
+  padding: 20px 24px 32px;
 }
 
 @media (max-width: 768px) {
   .help-hub {
     width: 100%;
+  }
+
+  .help-hub__header,
+  .help-hub__body {
+    padding-inline: 16px;
+  }
+
+  .help-hub__journey-step,
+  .help-topic__queue-row {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

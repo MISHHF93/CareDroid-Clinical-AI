@@ -231,6 +231,22 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.STAFF_READ,
     ]),
 
+    dispatcher: Object.freeze([
+      P.PATIENT_READ, P.PATIENT_CREATE,
+      P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
+      P.STAFF_READ,
+      P.ANALYTICS_READ,
+    ]),
+
+    ems_coordinator: Object.freeze([
+      P.PATIENT_READ,
+      P.TRIAGE_READ,
+      P.AI_READ, P.AI_REQUEST,
+      P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
+      P.STAFF_READ, P.STAFF_ASSIGN,
+      P.ANALYTICS_READ,
+    ]),
+
     demo_observer: Object.freeze([
       P.PATIENT_READ,
       P.TRIAGE_READ,

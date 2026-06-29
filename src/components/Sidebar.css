@@ -1,11 +1,11 @@
 /* ── Sidebar shell ───────────────────────────────────────────────── */
 .sidebar {
-  width: 200px;
+  width: 232px;
   height: var(--app-viewport-height, 100dvh);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  padding: 6px 8px;
+  padding: 12px 10px;
   overflow-x: hidden;
   overflow-y: auto;
   background: linear-gradient(
@@ -28,8 +28,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 10px 6px;
-  margin-bottom: 4px;
+  padding: 12px 10px 10px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .sidebar__brand-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--medical-ink, #111827);
   letter-spacing: -0.01em;
@@ -74,7 +74,7 @@
   align-items: stretch;
   width: 100%;
   min-height: 0;
-  gap: 2px;
+  gap: 5px;
 }
 
 .sidebar-mobile-nav,
@@ -85,13 +85,13 @@
 /* ── Individual nav item (desktop) ──────────────────────────────── */
 .sidebar-nav-item {
   width: 100%;
-  height: 40px;
+  min-height: 46px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
-  padding: 0 10px;
+  padding: 8px 10px;
   color: var(--sidebar-fg-muted, var(--nav-fg, #6b7280));
   text-decoration: none;
   border: 1px solid transparent;
@@ -139,13 +139,13 @@
 /* Label — visible on desktop */
 .sidebar-nav-item__label {
   flex: 1;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
   color: currentColor;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 /* Tooltip — hidden on desktop (label replaces it); shown on tablet */
@@ -277,7 +277,7 @@
     z-index: 50;
     flex-direction: row !important;
     width: 100% !important;
-    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    height: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
     padding: 0 !important;
     border-top: 1px solid var(--nav-border, #e0f2fe) !important;
     border-right: none !important;
@@ -288,7 +288,7 @@
 
   aside[aria-label='Emergency navigation'] {
     flex-direction: row !important;
-    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    height: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
     justify-content: stretch;
     overflow: visible !important;
     padding: 0 !important;
@@ -307,14 +307,14 @@
     flex: 1;
     width: 100%;
     min-width: 0;
-    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    height: calc(72px + env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .sidebar-item {
     position: relative;
     flex: 1;
-    height: 60px;
+    height: 72px;
     min-width: 0;
     border: 0;
     border-top: 2px solid transparent;
@@ -326,7 +326,7 @@
     justify-content: center;
     gap: 2px;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.5px;
     font-weight: 700;
     line-height: 1;
     text-decoration: none;
@@ -343,7 +343,8 @@
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.15;
     pointer-events: none;
   }
 
@@ -404,7 +405,7 @@
 
   .sidebar-more-backdrop {
     position: fixed;
-    inset: 0 0 60px;
+    inset: 0 0 72px;
     z-index: 49;
     display: block;
     background: rgba(0, 0, 0, 0.42);

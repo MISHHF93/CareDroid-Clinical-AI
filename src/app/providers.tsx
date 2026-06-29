@@ -13,6 +13,12 @@ import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import OfflineProvider from '../contexts/OfflineProvider';
 import { SimulationModeProvider } from '../contexts/SimulationModeContext';
+import { useThreeMinuteTimerEngine } from '../hooks/useThreeMinuteTimerEngine';
+
+function ThreeMinuteTimerEngineMount() {
+  useThreeMinuteTimerEngine();
+  return null;
+}
 
 type AppProvidersProps = Readonly<{
   children: ReactNode;
@@ -34,7 +40,10 @@ export function AppProviders({ children }: AppProvidersProps) {
                         <ConversationProvider>
                           <SystemConfigProvider>
                             <OfflineProvider>
-                              <SimulationModeProvider>{children}</SimulationModeProvider>
+                              <SimulationModeProvider>
+                                <ThreeMinuteTimerEngineMount />
+                                {children}
+                              </SimulationModeProvider>
                             </OfflineProvider>
                           </SystemConfigProvider>
                         </ConversationProvider>

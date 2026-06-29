@@ -13,6 +13,8 @@ export const CAREDROID_ROLE_LABELS: Readonly<Record<HospitalRole, string>> = Obj
   resident_physician: 'Resident Physician',
   specialist: 'Specialist',
   paramedic: 'Paramedic',
+  dispatcher: 'Dispatcher',
+  ems_coordinator: 'EMS Coordinator',
   registration_clerk: 'Registration Clerk',
   patient_flow_coordinator: 'Patient Flow Coordinator',
   lab_technician: 'Lab Technician',
@@ -37,6 +39,8 @@ export const CAREDROID_ROLE_DESCRIPTIONS: Readonly<Record<HospitalRole, string>>
   resident_physician: 'Physician trainee with supervised clinical access.',
   specialist: 'Consulting specialist for referred patients in their clinical domain.',
   paramedic: 'Pre-arrival handoff, ambulance intake, and EMS coordination.',
+  dispatcher: '911 call intake, telephone triage, CAD dispatch, and ED pre-notification.',
+  ems_coordinator: 'Prehospital operations, EMS unit coordination, and pre-arrival relay to ED.',
   registration_clerk: 'Patient registration, insurance, demographics, and consent.',
   patient_flow_coordinator: 'Bed management, queue routing, and department coordination.',
   lab_technician: 'Lab order workflow and result documentation.',
@@ -87,6 +91,8 @@ export const ROLE_TO_EMERGENCY_ROLE: Readonly<Record<HospitalRole, string>> = Ob
   resident_physician: 'physician',
   specialist: 'physician',
   paramedic: 'ems_user',
+  dispatcher: 'dispatcher',
+  ems_coordinator: 'ems_coordinator',
   registration_clerk: 'registration_clerk',
   patient_flow_coordinator: 'ed_manager',
   lab_technician: 'read_only_viewer',
@@ -145,6 +151,14 @@ export const ROLE_DASHBOARD_CONFIG: Readonly<Record<HospitalRole, DashboardWidge
     paramedic: {
       primary: ['ems-queue', 'bay-status', 'incoming-units'],
       secondary: ['handoff-checklist'],
+    },
+    dispatcher: {
+      primary: ['active-calls', 'unit-status', 'priority-queue'],
+      secondary: ['call-log', 'pre-arrival-sent'],
+    },
+    ems_coordinator: {
+      primary: ['ems-units', 'inbound-critical', 'ed-readiness'],
+      secondary: ['prehospital-data', 'offload-times'],
     },
     registration_clerk: {
       primary: ['intake-queue', 'missing-demographics', 'pending-consent'],

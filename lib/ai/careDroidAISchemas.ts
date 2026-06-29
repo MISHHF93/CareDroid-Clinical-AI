@@ -361,6 +361,46 @@ export const CARE_DROID_AI_SCHEMAS: Record<CareDroidAIIntent, CareDroidAIIntentS
       suggestedNextActions: field('array', 'Suggested next workflow steps', true),
     },
   },
+  emergency_call_risk_summary: {
+    intent: 'emergency_call_risk_summary',
+    purpose: 'Assess risk from a 911 call and recommend dispatch level and pre-arrival actions.',
+    clinical: false,
+    inputFields: {
+      chiefComplaint: field('string', 'Chief complaint', true),
+      callPriority: field('string', 'Initial call priority'),
+      patientConscious: field('boolean', 'Is patient conscious'),
+      patientBreathing: field('boolean', 'Is patient breathing'),
+      patientAge: field('number', 'Patient age'),
+    },
+    outputFields: {
+      highRisk: field('boolean', 'Is this a high-risk call', true),
+      redFlags: field('array', 'Identified risk flags', true),
+      suggestedDispatchLevel: field('string', 'ALS or BLS recommendation', true),
+      preArrivalInstructions: field('array', 'Instructions for caller', true),
+      hospitalNotificationRecommended: field('boolean', 'Should ED be notified now', true),
+    },
+  },
+  ems_prearrival_risk_summary: {
+    intent: 'ems_prearrival_risk_summary',
+    purpose: 'Summarize prehospital EMS data and recommend ED bay preparation.',
+    clinical: true,
+    inputFields: {
+      chiefComplaint: field('string', 'Chief complaint', true),
+      currentVitals: field('object', 'Most recent prehospital vitals'),
+      interventions: field('array', 'EMS interventions performed'),
+      traumaActivation: field('boolean', 'Trauma activation requested'),
+      strokeAlert: field('boolean', 'Stroke alert declared'),
+      stemiAlert: field('boolean', 'STEMI alert declared'),
+      sepsisConcern: field('boolean', 'Sepsis concern noted'),
+      etaMinutes: field('number', 'Estimated arrival in minutes'),
+    },
+    outputFields: {
+      redFlags: field('array', 'Critical prehospital findings', true),
+      recommendedBay: field('string', 'Recommended receiving bay', true),
+      resusRecommended: field('boolean', 'Resuscitation bay recommended', true),
+      edPreparationActions: field('array', 'Recommended ED prep steps', true),
+    },
+  },
 };
 
 export function isCareDroidAIIntent(value: unknown): value is CareDroidAIIntent {

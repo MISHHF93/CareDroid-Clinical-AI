@@ -70,6 +70,8 @@ export const CANONICAL_ROUTES = Object.freeze({
   emergencyHelp: '/emergency/help',
   emergencyAlerts: '/emergency/alerts',
   emergencyTools: '/emergency/tools',
+  emergencyDispatch: '/emergency/dispatch',
+  emergencyEdReadiness: '/emergency/ed-readiness',
   workspace: '/workspace',
   workspaces: '/workspaces',
   operationsCenter: '/operations-center',

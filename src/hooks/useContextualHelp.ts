@@ -20,8 +20,11 @@ export function useContextualHelp(topicIdOverride?: string | null) {
     const pageTopic =
       (topicIdOverride ? getManualTopicById(topicIdOverride) : undefined) ||
       resolveManualTopicForPath(location.pathname);
-    const rolePlaybook = resolveRolePlaybook(emergencyRole.role);
-    const roleTopics = listTopicsForRole(emergencyRole.role);
+    const hospitalRole = emergencyRole.compiledProfile?.role?.hospitalRole;
+    const rolePlaybook =
+      (hospitalRole ? resolveRolePlaybook(hospitalRole) : undefined) ||
+      resolveRolePlaybook(emergencyRole.role);
+    const roleTopics = listTopicsForRole(hospitalRole || emergencyRole.role);
 
     return {
       intro: MANUAL_PLATFORM_INTRO,
@@ -30,11 +33,17 @@ export function useContextualHelp(topicIdOverride?: string | null) {
       pageTopic,
       rolePlaybook,
       roleTopics,
-      roleId: emergencyRole.role,
+      roleId: hospitalRole || emergencyRole.role,
       roleLabel: emergencyRole.roleLabel,
       pathname: location.pathname,
     };
-  }, [emergencyRole.role, emergencyRole.roleLabel, location.pathname, topicIdOverride]);
+  }, [
+    emergencyRole.compiledProfile?.role?.hospitalRole,
+    emergencyRole.role,
+    emergencyRole.roleLabel,
+    location.pathname,
+    topicIdOverride,
+  ]);
 }
 
 export type ContextualHelp = ReturnType<typeof useContextualHelp>;

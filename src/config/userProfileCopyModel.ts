@@ -261,6 +261,8 @@ export const EMERGENCY_ROLE_FUNCTION_IDS: Readonly<
     'reassessment',
   ],
   [EMERGENCY_ROLE_IDS.emsUser]: ['ems-handoff', 'register-patient', 'copilot-capture'],
+  [EMERGENCY_ROLE_IDS.dispatcher]: ['register-patient', 'ems-handoff', 'copilot-capture'],
+  [EMERGENCY_ROLE_IDS.emsCoordinator]: ['ems-handoff', 'register-patient', 'analytics-view', 'copilot-capture'],
   [EMERGENCY_ROLE_IDS.edManager]: [
     'command-throughput',
     'capacity-boarding',
@@ -501,6 +503,20 @@ const EMERGENCY_PROFILE_COPY_BASE: Readonly<
     workspaceDescription: 'Patient-facing queue status without PHI.',
     profileShellSubtitle: 'Public display — aggregate wait messaging only.',
     copilotIntro: 'Not available on public displays.',
+  },
+  [EMERGENCY_ROLE_IDS.dispatcher]: {
+    personaTitle: 'Dispatcher',
+    workspaceEyebrow: 'Dispatch console',
+    workspaceDescription: '911 call intake, telephone triage, and EMS unit dispatch.',
+    profileShellSubtitle: 'Dispatcher — call triage, CAD dispatch, and ED pre-notification.',
+    copilotIntro: 'AI call risk assessment is available for Echo/Delta calls. Dispatcher must confirm.',
+  },
+  [EMERGENCY_ROLE_IDS.emsCoordinator]: {
+    personaTitle: 'EMS Coordinator',
+    workspaceEyebrow: 'EMS operations',
+    workspaceDescription: 'Coordinate EMS units, relay prehospital data, and manage ED pre-arrival readiness.',
+    profileShellSubtitle: 'EMS coordinator — prehospital operations and pre-arrival handoff.',
+    copilotIntro: 'AI prehospital risk summary assists ED prep. Licensed staff must confirm resource activation.',
   },
 });
 

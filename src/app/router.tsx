@@ -44,6 +44,7 @@ const HelpHubPage            = lazyRoute(() => import('../pages/emergency/HelpHu
 const EmergencyDepartmentPulse = lazyRoute(() => import('../pages/emergency/pulse'));
 const EmergencyShiftSummary  = lazyRoute(() => import('../pages/emergency/shift'));
 const EMSPipeline            = lazyRoute(() => import('../components/EMSPipeline'));
+const DispatchConsole        = lazyRoute(() => import('../pages/emergency/DispatchConsole'));
 const ReferralPanel          = lazyRoute(() => import('../components/ReferralPanel'));
 const IntegrationHubPage     = lazyRoute(() => import('../pages/integrations/IntegrationHubPage'));
 const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedToolSession'));
@@ -700,6 +701,16 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
               <LazyRoute label="Loading EMS pipeline...">
                 <EMSPipeline />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyDispatch}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDispatch}>
+              <LazyRoute label="Loading dispatch console...">
+                <DispatchConsole />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
