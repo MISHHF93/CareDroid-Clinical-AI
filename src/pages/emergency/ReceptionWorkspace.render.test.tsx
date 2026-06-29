@@ -14,12 +14,21 @@ vi.mock('../../hooks/useEmergencyOs', () => ({
 
 vi.mock('../../hooks/useEmergencyRolePermissions', () => ({
   useEmergencyRolePermissions: () => ({
-    role: 'registration-clerk',
+    role: 'registration_clerk',
     roleLabel: 'Registration Clerk',
     staffId: 'staff-1',
     can: () => true,
+    canMutate: () => true,
     canAccessRoute: () => true,
     nearestRoute: (path) => path,
+    canonicalProfile: {
+      id: 'staff-1',
+      employeeId: 'staff-1',
+      preferredName: 'Reception Test',
+      fullName: 'Reception Test',
+      hospitalSite: 'Test Hospital',
+      shiftStatus: 'On shift',
+    },
   }),
 }));
 

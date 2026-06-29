@@ -166,7 +166,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
 
     registration_clerk: Object.freeze([
       P.PATIENT_READ, P.PATIENT_CREATE, P.PATIENT_UPDATE,
-      P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
+      P.ALERT_READ,
       P.STAFF_READ,
       P.SETTINGS_READ,
     ]),

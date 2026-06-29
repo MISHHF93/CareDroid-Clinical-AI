@@ -80,7 +80,7 @@ export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.fre
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
   Object.freeze({
-    'registration-clerk': Object.freeze(['reception', 'patients', 'pulse', 'shift']),
+    'registration-clerk': Object.freeze(['reception', 'patients', 'queues', 'help']),
     student: Object.freeze(['tools', 'platform', 'pulse']),
     steward: Object.freeze(['platform']),
     'racetrack-admin': Object.freeze(['platform']),
@@ -440,7 +440,7 @@ const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Ob
   patients: [CAREDROID_PERMISSIONS.PATIENT_READ],
   intake: [CAREDROID_PERMISSIONS.PATIENT_CREATE],
   ems: [CAREDROID_PERMISSIONS.PATIENT_READ],
-  queues: [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.TRIAGE_READ],
+  queues: [CAREDROID_PERMISSIONS.PATIENT_READ],
   reassessment: [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.TRIAGE_READ],
   capacity: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
   referrals: [CAREDROID_PERMISSIONS.PATIENT_READ],

@@ -80,7 +80,7 @@
     "toolPolicy": { "allowedPacks": ["core-platform", "reception-desk"], "restrictedToolIds": ["simulation-suite", "fleet-command", "medical-iot-dashboard", "protocols", "differential-ai"] },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["simulation-suite", "fleet-command", "medical-iot-dashboard", "protocols", "differential-ai", "route-optimizer"],
-    "profileBenefits": "Front-desk registration, identity verification, patient search, EMS conversion, and shift utilities.",
+    "profileBenefits": "Emergency reception command desk, life-critical intake capture, patient search, queue handoff, EMS conversion, and limited patient profile handoff.",
     "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "long-term-care", "telehealth", "government"],
     "requiredEntitlementPacks": ["reception-desk"]
   },

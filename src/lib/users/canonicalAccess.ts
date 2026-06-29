@@ -274,7 +274,7 @@ const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPerm
     [CANONICAL_ROUTES.emergencyPatients]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyJourney]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyIntake]: [P.PATIENT_CREATE],
-    [CANONICAL_ROUTES.emergencyQueues]: [P.PATIENT_READ, P.TRIAGE_READ],
+    [CANONICAL_ROUTES.emergencyQueues]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyReassessment]: [P.PATIENT_READ, P.TRIAGE_READ],
     [CANONICAL_ROUTES.emergencyEms]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyCapacity]: [P.ANALYTICS_READ],

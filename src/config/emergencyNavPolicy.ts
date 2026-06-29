@@ -98,11 +98,11 @@ const ROLE_NAV_ORDER_OVERRIDES = Object.freeze({
   ],
   physician: PHYSICIAN_NAV_ORDER,
   ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'help', 'platform'],
-  registration_clerk: ['reception', 'patients', 'pulse', 'shift'],
+  registration_clerk: ['reception', 'patients', 'queues', 'help'],
 });
 
 const ROLE_NAV_EXCLUDED_OVERRIDES = Object.freeze({
-  registration_clerk: ['queues', 'tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot', 'intake', 'whiteboard'],
+  registration_clerk: ['tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot', 'intake', 'whiteboard', 'pulse', 'shift', 'alerts'],
   physician: PHYSICIAN_NAV_EXCLUDED_IDS,
 });
 

@@ -377,10 +377,12 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.registrationClerk,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
-      'Registration role for identity review and patient creation without clinical state management.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.help],
+      'Emergency reception role for fast arrival capture, intake drafts, demographics, queue handoff, and critical staff notification without clinical override authority.',
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.queues, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
+      EMERGENCY_ACTIONS.editPatientDemographics,
+      EMERGENCY_ACTIONS.createEncounter,
       EMERGENCY_ACTIONS.verifyIntake,
       EMERGENCY_ACTIONS.convertEmsArrival,
       EMERGENCY_ACTIONS.receptionEscalate,
@@ -481,6 +483,8 @@ const ROLE_ALIASES = Object.freeze({
   'physician assistant': EMERGENCY_ROLE_IDS.physician,
   'registration clerk': EMERGENCY_ROLE_IDS.registrationClerk,
   registration_clerk: EMERGENCY_ROLE_IDS.registrationClerk,
+  emergency_receptionist: EMERGENCY_ROLE_IDS.registrationClerk,
+  'emergency receptionist': EMERGENCY_ROLE_IDS.registrationClerk,
   clerk: EMERGENCY_ROLE_IDS.registrationClerk,
   registrar: EMERGENCY_ROLE_IDS.registrationClerk,
   'ed clerk': EMERGENCY_ROLE_IDS.registrationClerk,

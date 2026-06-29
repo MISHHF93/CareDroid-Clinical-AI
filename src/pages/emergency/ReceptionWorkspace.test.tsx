@@ -5,57 +5,48 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const receptionSource = readFileSync(join(__dirname, 'ReceptionWorkspace.tsx'), 'utf8');
-const headerSource = readFileSync(join(__dirname, '../../components/Header.tsx'), 'utf8');
-const appShellSource = readFileSync(join(__dirname, '../../components/AppShell.tsx'), 'utf8');
+const orchestratorSource = readFileSync(join(__dirname, '../../services/receptionIntakeOrchestrator.ts'), 'utf8');
+const navSource = readFileSync(join(__dirname, '../../config/emergencyNavPolicy.ts'), 'utf8');
+const permissionsSource = readFileSync(join(__dirname, '../../config/emergencyRolePermissions.ts'), 'utf8');
 const appSource = readFileSync(join(__dirname, '../../app/router.tsx'), 'utf8');
 
-describe('Reception-first experience wiring', () => {
-  it('exposes the arrival dashboard without duplicate page search', () => {
-    expect(receptionSource).toContain('ArrivalDashboard');
-    expect(receptionSource).toContain('ReceptionOperationalStrip');
-    expect(receptionSource).toContain('handleProvisionalIntake');
-    expect(receptionSource).toContain('useReceptionSnapshotPolling');
-    expect(receptionSource).toContain('PreparePatientChooser');
-    expect(receptionSource).toContain('onQuickCreate');
-    expect(receptionSource).toContain('open-reception-quick-create');
-    expect(receptionSource).toContain('DuplicatePatientBanner');
-    expect(receptionSource).toContain('convertEmsArrivalForReception');
-    expect(receptionSource).toContain('findDuplicateCandidatesFromQuery');
-    expect(receptionSource).toContain('ReceptionSearchHint');
-    expect(receptionSource).toContain('ReceptionDeskToolbar');
-    expect(receptionSource).toContain('reception-desk-theme.css');
-    expect(receptionSource).toContain('RECEPTION_COPY');
-    expect(receptionSource).toContain('registerWalkIn');
-    expect(receptionSource).toContain('checkIdentity');
-    expect(receptionSource).toContain('useReceptionScreen');
-    expect(receptionSource).toContain('reception.showWidget');
-    expect(receptionSource).toContain('canOpenSmartIntake');
-    expect(receptionSource).toContain('buildPostHandoffNavigationPaths');
+describe('Reception Command Desk wiring', () => {
+  it('mounts one command-desk workflow on the active reception route', () => {
+    expect(receptionSource).toContain('Reception Command Desk');
+    expect(receptionSource).toContain('Fast Arrival Capture');
+    expect(receptionSource).toContain('Minimum Life-Critical Intake');
+    expect(receptionSource).toContain('AI Intake Assist');
+    expect(receptionSource).toContain('Reception Queue');
+    expect(receptionSource).toContain('Critical Reception Alerts');
+    expect(receptionSource).toContain('Start 3-Minute Response');
+    expect(receptionSource).toContain('Create Patient & Route');
+    expect(receptionSource).not.toContain('ReceptionQuickIntake');
+    expect(receptionSource).not.toContain('QuickIntake');
+    expect(receptionSource).not.toContain('PreparePatientChooser');
   });
 
-  it('uses header lookup as the primary reception search surface', () => {
-    expect(headerSource).toContain('useScreenModeCapabilities');
-    expect(headerSource).toContain('syncPatientLookupQuery');
-    expect(headerSource).toContain('focus-reception-search');
-    expect(headerSource).toContain('open-reception-intake');
-    expect(headerSource).toContain('PatientSearchResults');
-    expect(headerSource).toContain('Operational search');
-    expect(headerSource).toContain('screenCapabilities.productLabel');
+  it('uses the unified reception intake orchestrator from the UI', () => {
+    expect(receptionSource).toContain('createPatientAndRouteFromReception');
+    expect(orchestratorSource).toContain('runReceptionAiIntakeAssist');
+    expect(orchestratorSource).toContain('completeReceptionHandoff');
+    expect(orchestratorSource).toContain('startResponseTimer');
+    expect(orchestratorSource).toContain('reception-critical-intake');
+    expect(orchestratorSource).toContain('canReceptionPerformClinicalOverride');
   });
 
-  it('gates clinical overlays for registration screen mode', () => {
-    expect(appShellSource).toContain('useScreenModeCapabilities');
-    expect(appShellSource).toContain('showEmsCriticalOverlay');
-    expect(appShellSource).toContain('getReceptionPrimaryCreatePath');
+  it('defines the reception profile around reception, patients, queues, intake support, and help', () => {
+    expect(permissionsSource).toContain('emergency_receptionist');
+    expect(permissionsSource).toContain('ROUTES.queues');
+    expect(permissionsSource).toContain('ROUTES.help');
+    expect(navSource).toContain("registration_clerk: ['reception', 'patients', 'queues', 'help']");
+    expect(navSource).toContain("'intake'");
+    expect(navSource).toContain("'settings'");
+    expect(navSource).toContain("'analytics'");
   });
 
-  it('redirects registration clerk away from whiteboard routes', () => {
-    expect(appSource).toContain('EMERGENCY_ROLE_IDS.registrationClerk');
-    expect(appSource).toContain('CANONICAL_ROUTES.emergencyReception');
-  });
-
-  it('routes standalone intake through reception for arrival-first roles', () => {
+  it('keeps standalone intake routed through reception for front-door roles', () => {
     expect(appSource).toContain('EmergencyIntakeEntry');
     expect(appSource).toContain('getReceptionEmbeddedIntakePath');
+    expect(appSource).toContain('<ReceptionWorkspace />');
   });
 });

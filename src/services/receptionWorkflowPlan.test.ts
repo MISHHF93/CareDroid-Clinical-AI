@@ -17,11 +17,9 @@ describe('reception architecture plan execution', () => {
     const quickIntake = read('components/QuickIntake.tsx');
     const verification = read('components/verification/PatientVerificationExperience.tsx');
 
-    expect(reception).toContain('DuplicatePatientBanner');
-    expect(reception).toContain('openVerificationFromDuplicate');
-    expect(reception).toContain('handleProvisionalIntake');
-    expect(reception).toContain('completeProvisionalIntake');
-    expect(reception).toContain('findDuplicateCandidatesFromQuery');
+    expect(reception).toContain('Unknown allowed');
+    expect(reception).toContain('Open Patient Profile');
+    expect(reception).toContain('createPatientAndRouteFromReception');
     expect(smartIntake).toContain('PatientVerificationExperience');
     expect(smartIntake).toContain('mergeDuplicateCandidates');
     expect(smartIntake).toContain('findDuplicateCandidates');
@@ -71,21 +69,17 @@ describe('reception architecture plan execution', () => {
     const reception = read('pages/emergency/ReceptionWorkspace.tsx');
     const header = read('components/Header.tsx');
     const smartIntake = read('pages/emergency/SmartIntake.tsx');
-    const queueModel = read('components/reception/receptionQueueModel.ts');
+    const orchestrator = read('services/receptionIntakeOrchestrator.ts');
 
     expect(permissions).toContain('getReceptionEmbeddedIntakePath');
-    expect(reception).toContain('RECEPTION_COPY');
-    expect(reception).toContain('registerWalkIn');
-    expect(reception).toContain('checkIdentity');
-    expect(reception).toContain('ArrivalDashboard');
-    expect(reception).toContain('ReceptionOperationalStrip');
-    expect(queueModel).toContain('selectArrivalDashboardMetrics');
-    expect(queueModel).toContain('selectReceptionOperationalStripMetrics');
-    expect(reception).toContain('open-reception-smart-intake');
+    expect(reception).toContain('Reception Command Desk');
+    expect(reception).toContain('Run AI Intake Assist');
+    expect(reception).toContain('Create Patient & Route');
+    expect(orchestrator).toContain('createPatientAndRouteFromReception');
+    expect(orchestrator).toContain('completeReceptionHandoff');
+    expect(orchestrator).toContain('buildClientTriageAssist');
+    expect(orchestrator).toContain('startResponseTimer');
     expect(smartIntake).toContain('embedded');
-    expect(reception).toContain('autostart');
-    expect(reception).toContain('open-reception-prepare');
-    expect(reception).toContain('open-reception-quick-create');
     expect(header).toContain('open-reception-intake');
     expect(header).toContain('PatientSearchResults');
     expect(header).toContain('patientSearchActions');

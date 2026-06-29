@@ -41,7 +41,7 @@ export const CAREDROID_ROLE_DESCRIPTIONS: Readonly<Record<HospitalRole, string>>
   paramedic: 'Pre-arrival handoff, ambulance intake, and EMS coordination.',
   dispatcher: '911 call intake, telephone triage, CAD dispatch, and ED pre-notification.',
   ems_coordinator: 'Prehospital operations, EMS unit coordination, and pre-arrival relay to ED.',
-  registration_clerk: 'Patient registration, insurance, demographics, and consent.',
+  registration_clerk: 'Emergency reception, life-critical intake capture, queue handoff, demographics, insurance, and consent.',
   patient_flow_coordinator: 'Bed management, queue routing, and department coordination.',
   lab_technician: 'Lab order workflow and result documentation.',
   radiology_technician: 'Imaging workflow and result documentation.',
@@ -161,8 +161,8 @@ export const ROLE_DASHBOARD_CONFIG: Readonly<Record<HospitalRole, DashboardWidge
       secondary: ['prehospital-data', 'offload-times'],
     },
     registration_clerk: {
-      primary: ['intake-queue', 'missing-demographics', 'pending-consent'],
-      secondary: ['insurance-status', 'registration-queue'],
+      primary: ['active-reception-queue', 'critical-arrivals', 'missing-critical-info'],
+      secondary: ['incomplete-registration', 'insurance-status', 'pending-consent'],
     },
     patient_flow_coordinator: {
       primary: ['queue', 'beds', 'departments', 'bottlenecks'],
