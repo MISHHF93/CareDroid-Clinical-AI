@@ -6,17 +6,6 @@ import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edData
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './emergency-route.css';
 
-/** @deprecated Use emergency-route.css classes instead */
-export const emergencyRouteStyles = {
-  page: {},
-  hero: {},
-  eyebrow: {},
-  title: {},
-  description: {},
-  card: {},
-  muted: {},
-};
-
 const MATURITY_CHIP_LABELS = {
   demo: 'Demo',
   preview: 'Preview',

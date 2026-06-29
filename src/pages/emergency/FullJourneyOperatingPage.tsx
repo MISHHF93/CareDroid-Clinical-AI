@@ -4,13 +4,25 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { buildFullEmergencyCareJourneySnapshot } from '../../services/fullEmergencyCareJourneyService';
-import { getActivePlans, getReadinessSummary } from '../../services/edReadinessService';
+import {
+  getActivePlans,
+  getReadinessSummary,
+  createReadinessPlan,
+  checkEquipmentItem,
+  markReady,
+  notifyStaff,
+  type ReadinessTrigger,
+} from '../../services/edReadinessService';
 import { getDiagnosticsBoard, getDiagnosticsSummary, DIAGNOSTIC_TYPE_LABELS, DIAGNOSTIC_PRIORITY_LABELS } from '../../services/diagnosticsCoordinationService';
 import { getStaffRoutingSummary } from '../../services/staffRoutingService';
 import { getCADSystemSummary } from '../../services/cadIntegrationService';
 import { getPrehospitalSummary, getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
 import { EmergencyRoutePage, MetricGrid } from './emergencyRouteShared';
-import type { DiagnosticOrder } from '../../types/emergency';
+import type { DiagnosticOrder, EDReadinessPlan } from '../../types/emergency';
+import {
+  buildCommandCenterWorkflowActions,
+  type OperationalWorkflowAction,
+} from '../../config/operationalWorkflow.config';
 
 type ViewId = 'journey' | 'ed-readiness' | 'diagnostics' | 'handoffs' | 'reports';
 
@@ -122,6 +134,75 @@ function MetricChip({ label, value, warn }: { label: string; value: string | num
   );
 }
 
+function ActionToneDot({ tone }: { tone: OperationalWorkflowAction['tone'] }) {
+  const color =
+    tone === 'critical'
+      ? MEDICAL_TYPE.statusCritical
+      : tone === 'warning'
+        ? '#F59E0B'
+        : tone === 'success'
+          ? '#10B981'
+          : MEDICAL_THEME.accent;
+
+  return (
+    <span
+      className={`emergency-command-action__tone emergency-command-action__tone--${tone}`}
+      style={{ backgroundColor: color }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function CommandCenterActionPanel({
+  actions,
+}: {
+  actions: readonly OperationalWorkflowAction[];
+}) {
+  const activeCount = actions.filter((action) => action.active).length;
+
+  return (
+    <SectionCard
+      title="Top Critical Actions"
+      lead="Sorted from live dispatch, readiness, alerts, AI review, bottleneck, and staff-routing signals."
+      badge={activeCount ? `${activeCount} active` : 'clear'}
+    >
+      <div className="emergency-command-action-grid">
+        {actions.map((action) => (
+          <article
+            key={action.id}
+            className={`emergency-route-card emergency-command-action emergency-command-action--${action.tone}${
+              action.active ? ' emergency-command-action--active' : ''
+            }`}
+          >
+            <div className="emergency-command-action__header">
+              <ActionToneDot tone={action.tone} />
+              <strong>{action.label}</strong>
+              <span className="emergency-command-action__count">{action.count}</span>
+            </div>
+            <p>{action.reason}</p>
+            <dl className="emergency-command-action__meta">
+              <div>
+                <dt>Owner</dt>
+                <dd>{action.owner}</dd>
+              </div>
+              <div>
+                <dt>Target</dt>
+                <dd>{action.deadlineLabel}</dd>
+              </div>
+            </dl>
+            <div className="emergency-command-action__footer">
+              <span>{action.nextAction}</span>
+              <Link to={action.route} className="emergency-route-filter-banner__btn">
+                Open
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
 // ── Journey view ─────────────────────────────────────────────────────────────
 
 function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot> }) {
@@ -129,6 +210,13 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
   const prehospitalSummary = snapshot.liveServiceSummaries.prehospital;
   const staffSummary = snapshot.liveServiceSummaries.staffRouting;
   const dxSummary = snapshot.liveServiceSummaries.diagnostics;
+  const commandActions = buildCommandCenterWorkflowActions({
+    dispatch: snapshot.liveServiceSummaries.dispatch,
+    readiness: snapshot.liveServiceSummaries.readiness,
+    metrics: snapshot.metrics,
+    staffRouting: snapshot.liveServiceSummaries.staffRouting,
+    bottlenecks: snapshot.liveServiceSummaries.bottlenecks,
+  });
 
   return (
     <>
@@ -136,6 +224,8 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         <strong>{snapshot.principle}</strong>
         <p>{snapshot.mission} {snapshot.safety}</p>
       </article>
+
+      <CommandCenterActionPanel actions={commandActions} />
 
       {/* Prehospital tier */}
       <SectionCard
@@ -235,11 +325,239 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
 
 // ── ED Readiness view ────────────────────────────────────────────────────────
 
+function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
+  const [bay, setBay] = useState('');
+  const [etaMinutes, setEtaMinutes] = useState('8');
+  const [resources, setResources] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  const resourceOptions = ['STEMI protocol', 'Stroke protocol', 'Trauma bay', 'Sepsis protocol', 'Airway kit', 'Blood products'];
+
+  function toggle(r: string) {
+    setResources((prev) => prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]);
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    const eta = new Date(Date.now() + Number(etaMinutes) * 60_000).toISOString();
+    createReadinessPlan({
+      callId: `manual-${Date.now()}`,
+      preparedBy: 'charge-nurse-current',
+      expectedArrivalAt: eta,
+      activatedResources: resources,
+      assignedBay: bay.trim() || undefined,
+    });
+    setSubmitting(false);
+    setBay('');
+    setEtaMinutes('8');
+    setResources([]);
+    onCreated();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 3 }}>Bay / Room</label>
+          <input
+            style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink, fontSize: 13, boxSizing: 'border-box' }}
+            value={bay}
+            onChange={(e) => setBay(e.target.value)}
+            placeholder="e.g. Resus 1, Trauma Bay..."
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 3 }}>ETA (minutes)</label>
+          <input
+            style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink, fontSize: 13, boxSizing: 'border-box' }}
+            type="number"
+            value={etaMinutes}
+            onChange={(e) => setEtaMinutes(e.target.value)}
+            min={1}
+            max={60}
+          />
+        </div>
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 4 }}>Activate resources:</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {resourceOptions.map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => toggle(r)}
+              style={{
+                padding: '3px 8px',
+                borderRadius: 20,
+                border: `1px solid ${resources.includes(r) ? MEDICAL_THEME.accent : MEDICAL_THEME.border}`,
+                background: resources.includes(r) ? `color-mix(in srgb, ${MEDICAL_THEME.accent} 15%, transparent)` : 'transparent',
+                color: resources.includes(r) ? MEDICAL_THEME.ink : MEDICAL_THEME.inkSubtle,
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      </div>
+      <button
+        type="submit"
+        disabled={submitting}
+        style={{
+          padding: '8px 14px',
+          borderRadius: 8,
+          background: MEDICAL_THEME.accent,
+          color: MEDICAL_THEME.onAccent,
+          fontWeight: 700,
+          fontSize: 13,
+          border: 'none',
+          cursor: submitting ? 'not-allowed' : 'pointer',
+          alignSelf: 'flex-start',
+        }}
+      >
+        Create Readiness Plan
+      </button>
+    </form>
+  );
+}
+
+function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdated: () => void }) {
+  const checkedItems = plan.equipmentChecklist.filter((e) => e.ready).length;
+  const totalItems = plan.equipmentChecklist.length;
+  const overdue = new Date(plan.expectedArrivalAt).getTime() < Date.now() && plan.status === 'pending';
+  const allChecked = checkedItems === totalItems && totalItems > 0;
+
+  function handleCheckItem(item: string) {
+    checkEquipmentItem(plan.id, item);
+    onUpdated();
+  }
+
+  function handleMarkReady() {
+    markReady(plan.id);
+    onUpdated();
+  }
+
+  function handleNotifyStaff() {
+    notifyStaff(plan.id, { roleId: 'charge_nurse', name: 'Charge Nurse (Current)' });
+    onUpdated();
+  }
+
+  return (
+    <article
+      style={{
+        padding: 14,
+        borderRadius: 10,
+        border: `1px solid ${overdue ? MEDICAL_TYPE.statusCritical : plan.status === 'ready' ? '#10B981' : MEDICAL_THEME.border}`,
+        background: plan.status === 'ready' ? 'rgba(16,185,129,0.05)' : MEDICAL_THEME.surfaceCard,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <strong style={{ fontSize: 13 }}>{plan.assignedRoom ?? plan.assignedBay ?? 'Bay TBD'}</strong>
+          <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+            ETA: {new Date(plan.expectedArrivalAt).toLocaleTimeString()}
+            {plan.specialtyTeamCalled && ` · Specialty: ${plan.specialtyTeams.join(', ')}`}
+          </div>
+          <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>
+            Equipment: {checkedItems}/{totalItems} · Staff notified: {plan.notifiedStaff.length}
+          </div>
+        </div>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: 4,
+            background: overdue ? 'rgba(239,68,68,0.12)' : plan.status === 'ready' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+            color: overdue ? MEDICAL_TYPE.statusCritical : plan.status === 'ready' ? '#059669' : '#b45309',
+          }}
+        >
+          {overdue ? 'OVERDUE' : plan.status.toUpperCase()}
+        </span>
+      </div>
+
+      {/* Equipment checklist */}
+      {plan.equipmentChecklist.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {plan.equipmentChecklist.map((item) => (
+            <label
+              key={item.item}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 12,
+                cursor: item.ready ? 'default' : 'pointer',
+                color: item.ready ? '#10B981' : MEDICAL_THEME.ink,
+                textDecoration: item.ready ? 'line-through' : 'none',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={item.ready}
+                disabled={item.ready}
+                onChange={() => !item.ready && handleCheckItem(item.item)}
+                style={{ accentColor: '#10B981' }}
+              />
+              {item.item}
+            </label>
+          ))}
+        </div>
+      )}
+
+      {/* Actions */}
+      {plan.status === 'pending' && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+          {plan.notifiedStaff.length === 0 && (
+            <button
+              type="button"
+              onClick={handleNotifyStaff}
+              style={{ padding: '5px 10px', borderRadius: 6, background: 'transparent', color: MEDICAL_THEME.accent, border: `1px solid ${MEDICAL_THEME.accent}`, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Notify Charge Nurse
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleMarkReady}
+            disabled={!allChecked && totalItems > 0}
+            style={{
+              padding: '5px 10px',
+              borderRadius: 6,
+              background: allChecked ? '#10B981' : 'transparent',
+              color: allChecked ? '#fff' : MEDICAL_THEME.inkSubtle,
+              border: `1px solid ${allChecked ? '#10B981' : MEDICAL_THEME.border}`,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: allChecked ? 'pointer' : 'not-allowed',
+              opacity: allChecked ? 1 : 0.6,
+            }}
+            title={allChecked ? 'Mark bay as ready' : `Check all ${totalItems - checkedItems} remaining items first`}
+          >
+            ✓ Mark Bay Ready
+          </button>
+        </div>
+      )}
+
+      {plan.status === 'ready' && (
+        <div style={{ fontSize: 12, color: '#10B981', fontWeight: 700 }}>✓ Bay ready for patient arrival</div>
+      )}
+    </article>
+  );
+}
+
 function EdReadinessView() {
   const [plans, setPlans] = useState(getActivePlans());
   const [summary, setSummary] = useState(getReadinessSummary());
   const [cadSummary, setCadSummary] = useState(getCADSystemSummary());
   const [activeAssessments, setActiveAssessments] = useState(getAllActiveAssessments());
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const refresh = useCallback(() => {
     setPlans(getActivePlans());
@@ -265,6 +583,15 @@ function EdReadinessView() {
         <MetricChip label="Inbound EMS" value={cadSummary.enRouteUnits + cadSummary.transportingUnits} warn />
         <MetricChip label="Active prehospital" value={activeAssessments.length} />
       </div>
+
+      {/* Overdue alert */}
+      {summary.overdueCount > 0 && (
+        <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', border: `2px solid ${MEDICAL_TYPE.statusCritical}` }}>
+          <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13 }}>
+            ⚡ {summary.overdueCount} readiness plan{summary.overdueCount > 1 ? 's' : ''} overdue — patient arrival expected. Check equipment now.
+          </strong>
+        </div>
+      )}
 
       {/* Alert flags from prehospital */}
       {activeAssessments.length > 0 && (
@@ -303,6 +630,27 @@ function EdReadinessView() {
                         · BP {assessment.currentVitals.sbp ?? '?'}/{assessment.currentVitals.dbp ?? '?'}
                       </div>
                     )}
+                    {flags.length > 0 && (
+                      <div style={{ marginTop: 6 }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const resources = flags.map((f) =>
+                              f === 'TRAUMA ACTIVATION' ? 'Trauma bay'
+                              : f === 'STEMI ALERT' ? 'STEMI protocol'
+                              : f === 'STROKE ALERT' ? 'Stroke protocol'
+                              : 'Sepsis protocol',
+                            );
+                            const eta = new Date(Date.now() + 8 * 60_000).toISOString();
+                            createReadinessPlan({ callId: assessment.id, preparedBy: 'charge-nurse-current', expectedArrivalAt: eta, activatedResources: resources });
+                            refresh();
+                          }}
+                          style={{ padding: '4px 10px', borderRadius: 6, background: MEDICAL_TYPE.statusCritical, color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                        >
+                          ⚡ Activate ED Protocols
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <span
                     className="emergency-route-queue-row__oldest"
@@ -317,52 +665,47 @@ function EdReadinessView() {
         </SectionCard>
       )}
 
-      {/* Readiness plans */}
+      {/* Readiness plans with actions */}
       <SectionCard
         title="ED Readiness Plans"
-        lead="Active bay/room preparation plans triggered by EMS pre-arrival notifications."
+        lead="Active bay/room preparation plans. Check equipment, notify staff, and mark bay ready before patient arrival."
         badge={plans.length}
       >
-        {plans.length === 0 ? (
+        <div style={{ display: 'flex', gap: 8, marginTop: 10, marginBottom: plans.length > 0 ? 12 : 0 }}>
+          <button
+            type="button"
+            onClick={() => setShowCreateForm((v) => !v)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 7,
+              background: showCreateForm ? MEDICAL_THEME.border : MEDICAL_THEME.accent,
+              color: showCreateForm ? MEDICAL_THEME.ink : MEDICAL_THEME.onAccent,
+              border: 'none',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {showCreateForm ? 'Cancel' : '+ Create Readiness Plan'}
+          </button>
+          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip" style={{ fontSize: 12 }}>
+            Dispatch Console
+          </Link>
+        </div>
+
+        {showCreateForm && (
+          <CreateReadinessPlanForm onCreated={() => { setShowCreateForm(false); refresh(); }} />
+        )}
+
+        {plans.length === 0 && !showCreateForm ? (
           <p style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 10 }}>
-            No active readiness plans. Plans are created when EMS issues a pre-arrival notification for a critical patient.
+            No active readiness plans. Create a plan manually above, or send a pre-alert from the Dispatch Console.
           </p>
         ) : (
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
-            {plans.map((plan) => {
-              const checkedItems = plan.equipmentChecklist.filter((e) => e.ready).length;
-              const totalItems = plan.equipmentChecklist.length;
-              const overdue = new Date(plan.expectedArrivalAt).getTime() < Date.now() && plan.status === 'pending';
-
-              return (
-                <article key={plan.id} className="emergency-route-queue-row">
-                  <div style={{ flex: 1 }}>
-                    <strong style={{ fontSize: 13 }}>
-                      {plan.assignedRoom ?? plan.assignedBay ?? 'Bay TBD'}
-                    </strong>
-                    <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
-                      Expected: {new Date(plan.expectedArrivalAt).toLocaleTimeString()}
-                      {plan.specialtyTeamCalled && ` · Specialty: ${plan.specialtyTeams.join(', ')}`}
-                    </div>
-                    <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
-                      Equipment: {checkedItems}/{totalItems} checked ·
-                      Staff notified: {plan.notifiedStaff.length}
-                    </div>
-                    {plan.activatedResources.length > 0 && (
-                      <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>
-                        Resources: {plan.activatedResources.join(', ')}
-                      </div>
-                    )}
-                  </div>
-                  <span
-                    className="emergency-route-queue-row__oldest"
-                    style={{ color: overdue ? MEDICAL_TYPE.statusCritical : STATUS_COLORS[plan.status] ?? MEDICAL_THEME.inkSubtle }}
-                  >
-                    {overdue ? 'OVERDUE' : plan.status}
-                  </span>
-                </article>
-              );
-            })}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+            {plans.map((plan) => (
+              <ReadinessPlanCard key={plan.id} plan={plan} onUpdated={refresh} />
+            ))}
           </div>
         )}
       </SectionCard>
@@ -700,6 +1043,65 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
   );
 }
 
+// ── Sticky critical action banner ─────────────────────────────────────────────
+
+function StickyActionBanner({ snapshot }: { snapshot: ReturnType<typeof buildFullEmergencyCareJourneySnapshot> }) {
+  const dispatch = snapshot.liveServiceSummaries.dispatch;
+  const readiness = snapshot.liveServiceSummaries.readiness;
+  const metrics = snapshot.metrics;
+
+  const criticalPending = (dispatch?.echoCount ?? 0) + (dispatch?.deltaCount ?? 0);
+  const readinessOverdue = readiness?.overdueCount ?? 0;
+  const unackedAlerts = metrics.criticalAlerts ?? 0;
+
+  const topIssue =
+    criticalPending > 0
+      ? { label: `${criticalPending} Echo/Delta call${criticalPending > 1 ? 's' : ''} need dispatch`, route: CANONICAL_ROUTES.emergencyDispatch, action: 'Dispatch Now →' }
+      : readinessOverdue > 0
+        ? { label: `${readinessOverdue} ED readiness plan${readinessOverdue > 1 ? 's' : ''} overdue`, route: CANONICAL_ROUTES.emergencyEdReadiness, action: 'Prepare Bay →' }
+        : unackedAlerts > 0
+          ? { label: `${unackedAlerts} critical alert${unackedAlerts > 1 ? 's' : ''} unacknowledged`, route: CANONICAL_ROUTES.emergencyAlerts, action: 'Acknowledge →' }
+          : null;
+
+  if (!topIssue) return null;
+
+  return (
+    <div
+      style={{
+        padding: '10px 16px',
+        borderRadius: 8,
+        background: 'rgba(239,68,68,0.1)',
+        border: `2px solid ${MEDICAL_TYPE.statusCritical}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 16 }}>⚡</span>
+        <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13 }}>{topIssue.label}</strong>
+        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>— 3-minute response target</span>
+      </div>
+      <Link
+        to={topIssue.route}
+        style={{
+          padding: '6px 12px',
+          borderRadius: 6,
+          background: MEDICAL_TYPE.statusCritical,
+          color: '#fff',
+          fontWeight: 700,
+          fontSize: 12,
+          textDecoration: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {topIssue.action}
+      </Link>
+    </div>
+  );
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourneyOperatingPageProps) {
@@ -725,6 +1127,9 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
 
   return (
     <EmergencyRoutePage eyebrow={copy.eyebrow} title={copy.title} description={copy.description}>
+      {/* Sticky critical action banner — only shown when there's something urgent */}
+      <StickyActionBanner snapshot={snapshot} />
+
       <MetricGrid
         metrics={[
           { label: 'Active patients', value: snapshot.metrics.activePatients },

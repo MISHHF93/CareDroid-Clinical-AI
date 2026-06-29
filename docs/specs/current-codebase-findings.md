@@ -209,3 +209,32 @@ Vite build: ✅ success (pre-existing chunk size warning on data-navigation chun
 | Full suite pre-existing failures | emergencyMultiScreenConvergence, emergencyOperationalPresentationModel (2), userProfileCatalog, userProfileIsolation (3) |
 
 Pre-existing failures confirmed by running test suite on base commit before any changes — same 4 test files fail identically on prior commit.
+
+---
+
+## Optimization Pass — 2026-06-29 Continuation
+
+**Goal:** Optimize CareDroid for faster SaaS task execution. "It takes 3 minutes to save someone's life."
+
+### Workflow Gaps Fixed
+
+| Gap | File | What Changed |
+|---|---|---|
+| DispatchConsole creates call but never dispatches unit | src/pages/emergency/DispatchConsole.tsx | Full rewrite — auto-priority from vitals, CAD unit board, inline Dispatch Unit panel, ED pre-alert form with resource + specialty team selection |
+| No hospital pre-alert from Dispatch | DispatchConsole.tsx + edReadinessService.ts | "Send Hospital Pre-Alert" step wired after CAD dispatch — calls `createReadinessPlan()` with ETA, resources, bay |
+| EdReadinessView was read-only | src/pages/emergency/FullJourneyOperatingPage.tsx | Added "Create Readiness Plan" inline form, `ReadinessPlanCard` with equipment checklist toggle (per-item `checkEquipmentItem()`), "Mark Bay Ready" and "Notify Charge Nurse" buttons, "Activate ED Protocols" one-click button from prehospital flags |
+| No sticky critical action banner | FullJourneyOperatingPage.tsx | `StickyActionBanner` component added — shows top urgent action (dispatch / ED readiness / alerts) with direct link |
+| Queue rows had no escalation actions | src/pages/emergency/emergencyRoutePages.tsx | Per-patient "⚡ Escalate" button on breached patients — calls `escalatePatient()` from store with local "✓ Escalated" confirmation |
+| CopilotRoute showed static hint only | emergencyRoutePages.tsx | `AIChiefPanel` component added — derives live recommendations from patient flags/acuity/wait, renders Accept/Dismiss per recommendation |
+
+### Dead Code Removed
+
+| Item | Location | Action |
+|---|---|---|
+| `emergencyRouteStyles` deprecated stub | emergencyRouteShared.tsx | Deleted — was only declared, never imported anywhere |
+
+### Build Validation (post-optimization)
+
+TypeScript: ✅ 0 errors  
+ESLint: ✅ 0 warnings  
+Vite build: ✅ success (pre-existing data-navigation chunk warning unchanged)
