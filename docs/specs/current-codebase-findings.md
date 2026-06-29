@@ -150,8 +150,62 @@ Emergency roles: `dispatcher`, `ems_coordinator` also active.
 
 ---
 
+## Fixes Applied (2026-06-29 continuation)
+
+### Route Redirect Cleanup — src/config/routes.config.ts
+
+6 stale entries removed or corrected:
+
+| Fix | Before | After |
+|---|---|---|
+| LEGACY_EMERGENCY_ROUTE_REDIRECTS `/emergency/command-center` | Redirected to emergencyWhiteboard (dead code — explicit route exists) | Removed |
+| LEGACY_EMERGENCY_ROUTE_REDIRECTS `/emergency/journey` | Redirected to emergencyPatients (dead code — explicit route exists) | Removed |
+| LEGACY_EMERGENCY_ROUTE_REDIRECTS `/workspace/emergency/journey` | → emergencyPatients | → emergencyJourney |
+| LEGACY_EMERGENCY_ROUTE_REDIRECTS `/workspace/emergency/command-center` | → emergencyWhiteboard | → emergencyCommandCenter |
+| WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS `journey` | → emergencyPatients | → emergencyJourney |
+| WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS `command-center` | → emergencyWhiteboard | → emergencyCommandCenter |
+
+### Surface Registry Additions — src/config/emergencyPipelineModel.ts
+
+10 new entries added to `EMERGENCY_SURFACE_REGISTRY` (were orphans in nav coverage audit):
+
+| Surface | Route | Zone | Nav |
+|---|---|---|---|
+| command-center | /emergency/command-center | CLINICAL | sidebar: command-center |
+| journey | /emergency/journey | CLINICAL | sidebar: command-center (shared) |
+| dispatch | /emergency/dispatch | PIPELINE | sidebar: dispatch |
+| ed-readiness | /emergency/ed-readiness | PIPELINE | sidebar: ed-readiness |
+| documentation | /emergency/documentation | RETAINED | no sidebar (AI Copilot link) |
+| diagnostics | /emergency/diagnostics | CLINICAL | sidebar: diagnostics |
+| handoffs | /emergency/handoffs | CLINICAL | sidebar: handoffs |
+| reports | /emergency/reports | UTILITY | sidebar: reports |
+| alerts | /emergency/alerts | CLINICAL | sidebar: alerts |
+| help | /emergency/help | RETAINED | sidebar: help |
+
+### Nav Coverage Audit — qa/emergency-nav-coverage-report.json
+
+Before: `passesAudit: false` — 10 orphan routes  
+After: `passesAudit: true` — 0 orphans, all routes covered
+
+`src/config/emergencyNavCoverageAudit.test.ts` — 1 passed ✅  
+`src/config/emergencyPipelineModel.test.ts` — 5 passed ✅
+
+---
+
 ## Build Validation
 
-TypeScript: clean  
-Vite build: success (pre-existing chunk size warning on data-navigation chunk only)  
-Tests: pre-existing passing state maintained
+TypeScript: ✅ clean (0 errors)  
+ESLint: ✅ clean  
+Vite build: ✅ success (pre-existing chunk size warning on data-navigation chunk only)  
+
+### Test Suite Summary
+
+| Suite | Status |
+|---|---|
+| src/config/emergencyPipelineModel.test.ts | ✅ 5 passed |
+| src/config/emergencyNavCoverageAudit.test.ts | ✅ 1 passed |
+| src/services/ (all new services) | ✅ passed |
+| src/config/ overall | 4 pre-existing failures, 79 passed |
+| Full suite pre-existing failures | emergencyMultiScreenConvergence, emergencyOperationalPresentationModel (2), userProfileCatalog, userProfileIsolation (3) |
+
+Pre-existing failures confirmed by running test suite on base commit before any changes — same 4 test files fail identically on prior commit.

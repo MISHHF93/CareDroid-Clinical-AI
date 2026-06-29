@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T04:32:08.329Z",
+  "generatedAt": "2026-06-29T19:36:34.251Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -27,14 +27,28 @@
       "cosmos",
       "platform",
       "pulse",
-      "shift"
+      "shift",
+      "command-center",
+      "journey",
+      "dispatch",
+      "ed-readiness",
+      "documentation",
+      "diagnostics",
+      "handoffs",
+      "reports",
+      "alerts",
+      "help"
     ],
     "targetRoutes": [
       "/auth-callback",
       "/shared/tools/:shareId",
+      "/emergency/command-center",
       "/emergency/whiteboard",
       "/emergency/patients",
+      "/emergency/journey",
+      "/emergency/dispatch",
       "/emergency/ems",
+      "/emergency/ed-readiness",
       "/emergency/reception",
       "/emergency/intake",
       "/emergency/queues",
@@ -48,12 +62,21 @@
       "/emergency/pulse",
       "/emergency/shift",
       "/emergency/analytics",
+      "/emergency/diagnostics",
+      "/emergency/handoffs",
+      "/emergency/reports",
       "/emergency/alerts",
-      "/emergency/settings"
+      "/emergency/settings",
+      "/emergency/help"
     ]
   },
   "coverage": {
     "covered": [
+      {
+        "route": "/emergency/command-center",
+        "surfaceId": "command-center",
+        "via": "sidebar"
+      },
       {
         "route": "/emergency/whiteboard",
         "surfaceId": "whiteboard",
@@ -65,8 +88,23 @@
         "via": "sidebar"
       },
       {
+        "route": "/emergency/journey",
+        "surfaceId": "journey",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/dispatch",
+        "surfaceId": "dispatch",
+        "via": "sidebar"
+      },
+      {
         "route": "/emergency/ems",
         "surfaceId": "ems",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/ed-readiness",
+        "surfaceId": "ed-readiness",
         "via": "sidebar"
       },
       {
@@ -110,6 +148,11 @@
         "via": "sidebar"
       },
       {
+        "route": "/emergency/documentation",
+        "surfaceId": "documentation",
+        "via": "retained"
+      },
+      {
         "route": "/emergency/tools",
         "surfaceId": "tools",
         "via": "sidebar"
@@ -130,30 +173,53 @@
         "via": "sidebar"
       },
       {
-        "route": "/emergency/settings",
-        "surfaceId": "settings",
+        "route": "/emergency/diagnostics",
+        "surfaceId": "diagnostics",
         "via": "sidebar"
-      }
-    ],
-    "orphans": [
+      },
       {
-        "route": "/emergency/documentation",
-        "reason": "No surface registry entry"
+        "route": "/emergency/handoffs",
+        "surfaceId": "handoffs",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/reports",
+        "surfaceId": "reports",
+        "via": "sidebar"
       },
       {
         "route": "/emergency/alerts",
-        "reason": "No surface registry entry"
+        "surfaceId": "alerts",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/settings",
+        "surfaceId": "settings",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/help",
+        "surfaceId": "help",
+        "via": "sidebar"
       }
     ],
+    "orphans": [],
     "navNotInPalette": [],
-    "passesAudit": false,
+    "passesAudit": true,
     "receptionFirstEnabled": true
   },
   "palette": {
-    "commandCount": 18,
+    "commandCount": 25,
     "navItemIds": [
       "reception",
       "whiteboard",
+      "command-center",
+      "dispatch",
+      "ed-readiness",
+      "alerts",
+      "diagnostics",
+      "handoffs",
+      "reports",
       "ems",
       "patients",
       "queues",
@@ -172,5 +238,5 @@
     "missingFromPalette": []
   },
   "receptionImportIssues": [],
-  "passesAudit": false
+  "passesAudit": true
 }
