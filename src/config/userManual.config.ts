@@ -51,13 +51,26 @@ export const MANUAL_PLATFORM_INTRO = Object.freeze({
 });
 
 export const MANUAL_PATIENT_JOURNEY = Object.freeze([
-  { step: 1, label: 'Arrive', where: 'Reception / EMS', outcome: 'Patient record created or EMS unit tracked' },
-  { step: 2, label: 'Verify', where: 'Reception verification queue', outcome: 'Identity and documents checked' },
-  { step: 3, label: 'Pretriage', where: 'Reception pretriage queue', outcome: 'Ready for nurse triage' },
-  { step: 4, label: 'Triage', where: 'Reception or Whiteboard', outcome: 'Acuity assigned, vitals recorded' },
-  { step: 5, label: 'Wait / reassess', where: 'Whiteboard + Reassess', outcome: 'Timers and flags monitored' },
-  { step: 6, label: 'Provider', where: 'Whiteboard', outcome: 'Assessment, orders, notes' },
-  { step: 7, label: 'Disposition', where: 'Patient panel / Referrals', outcome: 'Admit, transfer, or discharge' },
+  { step: 1, label: 'Emergency Event', where: 'Caller / bystander / facility', outcome: 'Emergency signal and immediate risk captured' },
+  { step: 2, label: 'Emergency Call / 911 Contact', where: 'Dispatch Console', outcome: 'Location, callback, complaint, hazards, and life-risk indicators recorded' },
+  { step: 3, label: 'Dispatcher Triage', where: 'Dispatch Console', outcome: 'Priority, protocol, and pre-arrival instructions documented' },
+  { step: 4, label: 'Ambulance Dispatch', where: 'Dispatch + EMS Board', outcome: 'Unit assigned with ETA, crew, and special instructions' },
+  { step: 5, label: 'EMS En Route', where: 'EMS Board', outcome: 'Crew receives suspected condition, location, hazards, and risk summary' },
+  { step: 6, label: 'EMS Arrival / Scene Assessment', where: 'EMS Board', outcome: 'Scene safety, ABCs, vitals, history, medications, allergies, and red flags captured' },
+  { step: 7, label: 'Prehospital Care', where: 'EMS Board', outcome: 'Interventions, severity updates, and transport decision recorded' },
+  { step: 8, label: 'Hospital Pre-Arrival Notification', where: 'EMS + Alerts', outcome: 'MIST/SBAR packet alerts ED, triage, charge nurse, and physician' },
+  { step: 9, label: 'ED Readiness', where: 'ED Readiness', outcome: 'Bed, staff, equipment, specialty team, lab, radiology, and pharmacy prepared' },
+  { step: 10, label: 'Patient Arrival', where: 'Reception / EMS', outcome: 'Ambulance, walk-in, transfer, or referral enters the ED workflow' },
+  { step: 11, label: 'Rapid Intake', where: 'Intake / Reception', outcome: 'Minimum life-critical data captured or confirmed' },
+  { step: 12, label: 'Triage', where: 'Reception / Triage queue', outcome: 'ESI-style five-level acuity support with clinician confirmation' },
+  { step: 13, label: 'AI Chief Review', where: 'AI Chief', outcome: 'Risk, missing data, routing, next action, and escalation summarized for human review' },
+  { step: 14, label: 'Clinical Action', where: 'Whiteboard', outcome: 'Nurse or physician reviews, accepts, modifies, or dismisses recommendation and begins care' },
+  { step: 15, label: 'Diagnostics', where: 'Diagnostics', outcome: 'Labs, imaging, ECG, medication review, and consult workflows coordinated' },
+  { step: 16, label: 'Treatment / Observation', where: 'Whiteboard', outcome: 'Care plan, monitoring, reassessment, interventions, and observation tracked' },
+  { step: 17, label: 'Disposition', where: 'Referrals / Capacity', outcome: 'Discharge, admit, transfer, observation, ICU, OR, or specialty care decision recorded' },
+  { step: 18, label: 'Handoff / Reporting', where: 'Handoffs / Shift Summary', outcome: 'Structured handoff generated for the next team or department' },
+  { step: 19, label: 'Outcome Tracking', where: 'Reports', outcome: 'Response, triage, treatment, delay, bottleneck, and patient-flow outcomes tracked' },
+  { step: 20, label: 'Analytics Feedback', where: 'Analytics', outcome: 'Operational data improves staffing, routing, bottleneck detection, and 3-minute compliance' },
 ]);
 
 export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([

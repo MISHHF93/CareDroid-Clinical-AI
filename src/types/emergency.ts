@@ -1247,6 +1247,22 @@ export interface PrehospitalAssessment {
   transmittedAt?: ISODateString;
 }
 
+export type EMSAssessment = PrehospitalAssessment;
+
+export interface PrehospitalPacket {
+  id: EntityId;
+  callId: EntityId;
+  assessmentId: EntityId;
+  createdAt: ISODateString;
+  transmittedAt?: ISODateString;
+  destinationHospitalId?: EntityId;
+  priority: Priority | CallPriority;
+  summary: string;
+  assessment: PrehospitalAssessment;
+  notification?: PreArrivalNotification;
+  requiresClinicianReview: true;
+}
+
 export interface EmsCrewUpdate {
   id: EntityId;
   assessmentId: EntityId;
@@ -1312,4 +1328,164 @@ export interface CareOutcome {
   aiChiefRecommendationsFollowed?: boolean;
   qualityFlags?: string[];
   notes?: string;
+}
+
+export interface PatientSignal {
+  id: EntityId;
+  patientId?: EntityId;
+  callId?: EntityId;
+  source: '911' | 'ems' | 'walk-in' | 'transfer' | 'referral' | 'staff-alert' | 'system';
+  detectedAt: ISODateString;
+  summary: string;
+  severity: 'info' | 'watch' | 'urgent' | 'critical';
+  linkedAlertId?: EntityId;
+}
+
+export interface TriageAssessment {
+  id: EntityId;
+  patientId: EntityId;
+  assessedAt: ISODateString;
+  assessedBy: EntityId;
+  esiLevel?: 1 | 2 | 3 | 4 | 5;
+  priority: Priority;
+  chiefComplaint: string;
+  vitals?: Vitals;
+  redFlags: string[];
+  expectedResources?: string[];
+  clinicianOverride?: {
+    from?: Priority | string;
+    to: Priority | string;
+    reason: string;
+    overriddenBy: EntityId;
+    overriddenAt: ISODateString;
+  };
+  requiresHumanReview: true;
+}
+
+export type CriticalAlert = Alert & {
+  severity: 'Critical';
+  ownerRole?: string;
+  escalationLevel?: 'identify' | 'notify' | 'route' | 'escalate' | 'breach';
+  resolvedAt?: ISODateString;
+};
+
+export interface ThreeMinuteResponse {
+  id: EntityId;
+  triggerSource: 'critical_911_call' | 'ems_pre_alert' | 'ambulance_arrival' | 'walk_in_critical_intake' | 'staff_alert';
+  patientId?: EntityId;
+  callId?: EntityId;
+  alertId?: EntityId;
+  startedAt: ISODateString;
+  phase:
+    | 'identify_owner_0_30'
+    | 'notify_staff_30_60'
+    | 'route_next_action_60_120'
+    | 'escalate_120_180'
+    | 'breach_after_180'
+    | 'acknowledged'
+    | 'resolved';
+  ownerRole: string;
+  acknowledgedAt?: ISODateString;
+  acknowledgedBy?: EntityId;
+  breachedAt?: ISODateString;
+}
+
+export interface AIChiefRecommendation {
+  id: EntityId;
+  patientId?: EntityId;
+  callId?: EntityId;
+  generatedAt: ISODateString;
+  context:
+    | 'emergency_call'
+    | 'ems_prearrival'
+    | 'triage'
+    | 'department_routing'
+    | 'staff_routing'
+    | 'handoff'
+    | 'bottleneck'
+    | 'fallback';
+  summary: string;
+  riskLevel: 'low' | 'moderate' | 'high' | 'critical';
+  missingData: string[];
+  recommendedRouting: string[];
+  nextActions: string[];
+  requiresHumanReview: true;
+  reviewedAt?: ISODateString;
+  reviewedBy?: EntityId;
+  reviewDecision?: 'accepted' | 'modified' | 'dismissed';
+}
+
+export interface StaffAssignment {
+  id: EntityId;
+  patientId?: EntityId;
+  alertId?: EntityId;
+  role: string;
+  staffId?: EntityId;
+  assignedAt: ISODateString;
+  assignedBy: EntityId | 'system';
+  status: 'pending' | 'accepted' | 'completed' | 'reassigned' | 'cancelled';
+  reason: string;
+}
+
+export interface DepartmentCapacity {
+  id: EntityId;
+  departmentId: EntityId;
+  capturedAt: ISODateString;
+  staffedBeds: number;
+  occupiedBeds: number;
+  waitingPatients: number;
+  boardingPatients: number;
+  capacityBand: CapacityBand;
+  bottlenecks: string[];
+}
+
+export interface DiagnosticOrder {
+  id: EntityId;
+  patientId: EntityId;
+  orderedAt: ISODateString;
+  orderedBy: EntityId;
+  type: 'lab' | 'imaging' | 'ecg' | 'pharmacy-review' | 'consult';
+  priority: 'routine' | 'urgent' | 'stat';
+  status: 'ordered' | 'in_progress' | 'resulted' | 'cancelled';
+  targetDepartment?: string;
+  resultSummary?: string;
+}
+
+export interface HandoffSummary {
+  id: EntityId;
+  patientId?: EntityId;
+  callId?: EntityId;
+  fromTeam: string;
+  toTeam: string;
+  createdAt: ISODateString;
+  createdBy: EntityId;
+  situation: string;
+  background: string;
+  assessment: string;
+  recommendation: string;
+  pendingActions: string[];
+  acknowledgedAt?: ISODateString;
+  acknowledgedBy?: EntityId;
+}
+
+export interface BottleneckEvent {
+  id: EntityId;
+  detectedAt: ISODateString;
+  sourceService: string;
+  category: 'workflow' | 'saas' | 'frontend' | 'interoperability' | 'operational';
+  severity: 'info' | 'warning' | 'critical';
+  summary: string;
+  affectedStageIds: string[];
+  ownerRole?: string;
+  resolvedAt?: ISODateString;
+}
+
+export interface ServiceHealth {
+  id: EntityId;
+  serviceId: string;
+  checkedAt: ISODateString;
+  status: 'healthy' | 'degraded' | 'down' | 'unknown';
+  latencyMs?: number;
+  lastError?: string;
+  fallbackAvailable: boolean;
 }

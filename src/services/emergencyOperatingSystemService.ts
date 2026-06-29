@@ -31,6 +31,7 @@ import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
 import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
 import { buildBottleneckRegistrySnapshot } from './bottleneckRegistry';
+import { buildFullEmergencyCareJourneySnapshot } from './fullEmergencyCareJourneyService';
 
 function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarketplace }) {
   const dischargeQueue = queueDashboard.queues.find((queue) => queue.id === 'discharge-queue') || null;
@@ -82,6 +83,9 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const digitalWhiteboard = EmergencyWhiteboardService.getWhiteboard();
     const knowledgeLayer = EmergencyKnowledgeLayer.getDashboard();
     const patientPath = EmergencyPatientPathService.getPatientPathDashboard();
+    const fullEmergencyCareJourney = buildFullEmergencyCareJourneySnapshot({
+      patients: demoEnvironment.patients as any,
+    });
     const intakeOperatingSystem = EmergencyIntakeOperatingSystemService.getOperatingSystem();
     const bottleneckRegistry = buildBottleneckRegistrySnapshot({
       existingServiceSignals: {
@@ -144,6 +148,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       simulationScenarios,
       demoEnvironment,
       digitalWhiteboard,
+      fullEmergencyCareJourney,
       patientPath,
       intakeOperatingSystem,
       smartArrival: intakeOperatingSystem.smartArrival,

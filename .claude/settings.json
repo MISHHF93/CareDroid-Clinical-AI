@@ -4,7 +4,9 @@
       "PowerShell(cd \"c:\\\\Users\\\\borah\\\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Select-String \"error TS\\(\\\\d+\\):\" | ForEach-Object { \\($_ -match \"error \\(TS\\\\d+\\):\"\\) | Out-Null; $Matches[1] } | Group-Object | Sort-Object Count -Descending | Select-Object -First 10 | Format-Table Name, Count -AutoSize; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"type 'never'\" } | Measure-Object | Select-Object Count)",
       "PowerShell(cd \"c:\\\\Users\\\\borah\\\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"NotificationService\" } | Select-Object -First 10; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"RealTimeCostService\" } | Select-Object -First 8)",
       "PowerShell(cd \"c:\\\\Users\\\\borah\\\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"organizationIntelligenceProfile\" } | Select-Object -First 5; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"artifactKnowledgeGraph\" } | Select-Object -First 5)",
-      "PowerShell(cd \"c:\\\\Users\\\\borah\\\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"TS2741\" } | ForEach-Object { \\($_ -match \"^\\(src/[^\\(]+\\)\"\\) | Out-Null; $Matches[1] } | Group-Object | Sort-Object Count -Descending | Select-Object -First 10 | Format-Table -AutoSize)"
+      "PowerShell(cd \"c:\\\\Users\\\\borah\\\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Where-Object { $_ -match \"TS2741\" } | ForEach-Object { \\($_ -match \"^\\(src/[^\\(]+\\)\"\\) | Out-Null; $Matches[1] } | Group-Object | Sort-Object Count -Descending | Select-Object -First 10 | Format-Table -AutoSize)",
+      "Bash(npx vitest *)",
+      "Bash(git push *)"
     ]
   }
 }

@@ -45,6 +45,7 @@ const EmergencyDepartmentPulse = lazyRoute(() => import('../pages/emergency/puls
 const EmergencyShiftSummary  = lazyRoute(() => import('../pages/emergency/shift'));
 const EMSPipeline            = lazyRoute(() => import('../components/EMSPipeline'));
 const DispatchConsole        = lazyRoute(() => import('../pages/emergency/DispatchConsole'));
+const FullJourneyOperatingPage = lazyRoute(() => import('../pages/emergency/FullJourneyOperatingPage'));
 const ReferralPanel          = lazyRoute(() => import('../components/ReferralPanel'));
 const IntegrationHubPage     = lazyRoute(() => import('../pages/integrations/IntegrationHubPage'));
 const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedToolSession'));
@@ -711,6 +712,66 @@ export function AppRoutes() {
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDispatch}>
               <LazyRoute label="Loading dispatch console...">
                 <DispatchConsole />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyCommandCenter}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
+              <LazyRoute label="Loading command center...">
+                <FullJourneyOperatingPage view="journey" />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyJourney}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
+              <LazyRoute label="Loading journey...">
+                <FullJourneyOperatingPage view="journey" />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyEdReadiness}
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
+              <LazyRoute label="Loading ED readiness...">
+                <FullJourneyOperatingPage view="ed-readiness" />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path="/emergency/diagnostics"
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+              <LazyRoute label="Loading diagnostics...">
+                <FullJourneyOperatingPage view="diagnostics" />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path="/emergency/handoffs"
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+              <LazyRoute label="Loading handoffs...">
+                <FullJourneyOperatingPage view="handoffs" />
+              </LazyRoute>
+            </EmergencyRouteGuard>
+          }
+        />
+        <Route
+          path="/emergency/reports"
+          element={
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+              <LazyRoute label="Loading reports...">
+                <FullJourneyOperatingPage view="reports" />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
