@@ -37,10 +37,52 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'command-center',
+    label: 'Command Center',
+    icon: 'journey',
+    route: '/emergency/command-center',
+    featureGate: null,
+  },
+  {
     id: 'dispatch',
     label: 'Dispatch',
-    icon: 'ambulance',
+    icon: 'send',
     route: '/emergency/dispatch',
+    featureGate: null,
+  },
+  {
+    id: 'ed-readiness',
+    label: 'ED Readiness',
+    icon: 'shield-check',
+    route: '/emergency/ed-readiness',
+    featureGate: null,
+  },
+  {
+    id: 'alerts',
+    label: 'Critical Alerts',
+    icon: 'alerts',
+    route: '/emergency/alerts',
+    featureGate: null,
+  },
+  {
+    id: 'diagnostics',
+    label: 'Diagnostics',
+    icon: 'stethoscope',
+    route: '/emergency/diagnostics',
+    featureGate: null,
+  },
+  {
+    id: 'handoffs',
+    label: 'Handoffs',
+    icon: 'notes',
+    route: '/emergency/handoffs',
+    featureGate: null,
+  },
+  {
+    id: 'reports',
+    label: 'Reports',
+    icon: 'report',
+    route: '/emergency/reports',
     featureGate: null,
   },
   {
@@ -294,7 +336,7 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'help']);
+    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'help']);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -340,7 +382,7 @@ describe('unified navigation config', () => {
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
-    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'help']);
+    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center', 'alerts', 'diagnostics', 'handoffs', 'reports', 'help']);
     expect(physicianNavIds).not.toContain('reception');
     expect(physicianNavIds).not.toContain('queues');
     expect(physicianNavIds).not.toContain('reassessment');

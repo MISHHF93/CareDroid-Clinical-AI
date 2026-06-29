@@ -28,17 +28,24 @@ export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
 /** Primary ED operating nav shown during pilot customer mode. */
 export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'command-center',
   'reception',
   'whiteboard',
+  'dispatch',
   'ems',
+  'ed-readiness',
   'patients',
   'queues',
   'reassessment',
+  'alerts',
   'capacity',
   'referrals',
+  'diagnostics',
+  'handoffs',
   'copilot',
   'tools',
   'analytics',
+  'reports',
   'settings',
 ]);
 
@@ -160,10 +167,52 @@ export const NAV_ITEMS: readonly NavItem[] = Object.freeze([
     featureGate: null,
   },
   {
+    id: 'command-center',
+    label: 'Command Center',
+    icon: 'journey',
+    route: CANONICAL_ROUTES.emergencyCommandCenter,
+    featureGate: null,
+  },
+  {
     id: 'dispatch',
     label: 'Dispatch',
-    icon: 'ambulance',
+    icon: 'send',
     route: CANONICAL_ROUTES.emergencyDispatch,
+    featureGate: null,
+  },
+  {
+    id: 'ed-readiness',
+    label: 'ED Readiness',
+    icon: 'shield-check',
+    route: CANONICAL_ROUTES.emergencyEdReadiness,
+    featureGate: null,
+  },
+  {
+    id: 'alerts',
+    label: 'Critical Alerts',
+    icon: 'alerts',
+    route: CANONICAL_ROUTES.emergencyAlerts,
+    featureGate: null,
+  },
+  {
+    id: 'diagnostics',
+    label: 'Diagnostics',
+    icon: 'stethoscope',
+    route: CANONICAL_ROUTES.emergencyDiagnostics,
+    featureGate: null,
+  },
+  {
+    id: 'handoffs',
+    label: 'Handoffs',
+    icon: 'notes',
+    route: CANONICAL_ROUTES.emergencyHandoffs,
+    featureGate: null,
+  },
+  {
+    id: 'reports',
+    label: 'Reports',
+    icon: 'report',
+    route: CANONICAL_ROUTES.emergencyReports,
     featureGate: null,
   },
   {
@@ -343,6 +392,8 @@ const NAV_FEATURE_IDS = Object.freeze({
   reception: 'reception_workspace',
   'command-center': 'emergency_whiteboard',
   whiteboard: 'emergency_whiteboard',
+  dispatch: 'dispatch_console',
+  'ed-readiness': 'ed_readiness',
   patients: 'emergency_patients',
   ems: 'ems_pipeline',
   intake: 'smart_intake',
@@ -357,10 +408,12 @@ const NAV_FEATURE_IDS = Object.freeze({
   tools: 'clinical_calculator_hub',
   analytics: 'emergency_analytics',
   alerts: 'clinical_alerts',
+  diagnostics: 'diagnostics_coordination',
+  handoffs: 'handoff_service',
+  reports: 'operational_reports',
   'ai-chief': 'ed_copilot',
   staff: 'staff_command',
   departments: 'department_capacity',
-  reports: 'operational_reports',
   settings: 'emergency_settings',
   integrations: 'integration_hub',
   cosmos: 'cosmos_viewer',
@@ -380,7 +433,10 @@ const NAV_FEATURE_IDS = Object.freeze({
 
 const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({
   reception: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  'command-center': [CAREDROID_PERMISSIONS.PATIENT_READ],
   whiteboard: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  dispatch: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  'ed-readiness': [CAREDROID_PERMISSIONS.PATIENT_READ],
   patients: [CAREDROID_PERMISSIONS.PATIENT_READ],
   intake: [CAREDROID_PERMISSIONS.PATIENT_CREATE],
   ems: [CAREDROID_PERMISSIONS.PATIENT_READ],
@@ -388,6 +444,10 @@ const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Ob
   reassessment: [CAREDROID_PERMISSIONS.PATIENT_READ, CAREDROID_PERMISSIONS.TRIAGE_READ],
   capacity: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
   referrals: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  alerts: [CAREDROID_PERMISSIONS.ALERT_READ],
+  diagnostics: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  handoffs: [CAREDROID_PERMISSIONS.PATIENT_READ],
+  reports: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
   copilot: [CAREDROID_PERMISSIONS.AI_READ],
   tools: [CAREDROID_PERMISSIONS.PATIENT_READ],
   analytics: [CAREDROID_PERMISSIONS.ANALYTICS_READ],
@@ -399,7 +459,7 @@ const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Ob
   admin: [CAREDROID_PERMISSIONS.SETTINGS_READ],
 });
 
-const READ_ONLY_NAV_ITEM_IDS = new Set(['whiteboard', 'alerts', 'analytics', 'help', 'audit', 'laboratory']);
+const READ_ONLY_NAV_ITEM_IDS = new Set(['command-center', 'whiteboard', 'alerts', 'analytics', 'reports', 'help', 'audit', 'laboratory', 'diagnostics']);
 
 export const FEATURE_GATE_ALIASES = Object.freeze({
   referral_intel: 'referral_intelligence',

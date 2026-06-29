@@ -1,75 +1,157 @@
-# Current Codebase Findings
+# CareDroid — Current Codebase Findings
 
-Date: 2026-06-29
+**Audit date:** 2026-06-29  
+**Branch:** codex/unified-caredroid-access  
+**Build status:** ✅ Clean (TypeScript clean, Vite build success)
+
+---
 
 ## Summary
 
-CareDroid is already a unified Vite + React emergency operations app with a Nest/backend-capable fullstack wrapper. The current source does not only model hospital intake: it already contains dispatch, EMS, reception, whiteboard, queue, triage, alert, capacity, AI copilot, analytics, and help/manual foundations. The rebuild work therefore extends and connects existing modules instead of creating an isolated second app.
+The CareDroid codebase implements the full 20-stage emergency care lifecycle from
+emergency signal and 911 call through EMS, ED care, disposition, and analytics. The prior
+session (2026-06-28) built the prehospital tier, dispatcher and EMS coordinator roles, all data
+models, the journey service, and the dispatch console.
 
-## Pages And Routes Audited
+**This session (2026-06-29)** fills remaining gaps:
+- 4 missing standalone service files (CAD, Prehospital, Staff Routing, Diagnostics)
+- Navigation — missing journey pages added to the sidebar
+- FullJourneyOperatingPage enriched with real functional content per view
+- Validation
 
-- `src/app/router.tsx` is the active route tree.
-- Existing emergency surfaces include `/emergency/whiteboard`, `/emergency/dispatch`, `/emergency/ems`, `/emergency/reception`, `/emergency/intake`, `/emergency/queues`, `/emergency/reassessment`, `/emergency/capacity`, `/emergency/boarding`, `/emergency/referrals`, `/emergency/copilot`, `/emergency/analytics`, `/emergency/alerts`, `/emergency/settings`, and `/emergency/help`.
-- Newly wired full-journey surfaces are `/emergency/command-center`, `/emergency/journey`, `/emergency/ed-readiness`, `/emergency/diagnostics`, `/emergency/handoffs`, and `/emergency/reports`.
-- Top-level canonical aliases already map several required pages: `/staff`, `/departments`, `/analytics`, `/reports`, `/settings`, `/intake`, `/triage`, and `/alerts`.
+---
 
-## Services And SaaS Modules Audited
+## Phase 0 — What Exists
 
-Reusable services already present:
+### Routes (src/app/router.tsx)
 
-- `EmergencySignalService`: `src/services/emergencySignalService.ts`
-- `DispatchIntakeService`: `src/services/dispatchIntakeService.ts`
-- `PreArrivalNotificationService`: `src/services/preArrivalNotification.ts`
-- `EDReadinessService`: `src/services/edReadinessService.ts`
-- `ThreeMinuteResponseService`: `src/engine/threeMinuteTimerEngine.ts`, mounted in `src/app/providers.tsx`
-- `BottleneckRegistryService`: `src/services/bottleneckRegistry.ts`
-- `AnalyticsService`: `src/services/analyticsService.ts`, `src/services/emergencyAnalyticsApi.ts`
-- ED OS aggregator: `src/services/emergencyOperatingSystemService.ts`
-- EMS pre-arrival flow: `src/services/emsPreArrivalPipelineService.ts`
-- Intake, queue, capacity, reassessment, referral, boarding, and whiteboard services under `src/services`
+All 20+ journey routes are wired:
 
-New connecting service:
+| Route | Component | Status |
+|---|---|---|
+| `/emergency/dispatch` | DispatchConsole | ✅ |
+| `/emergency/ems` | EMSPipeline | ✅ |
+| `/emergency/ed-readiness` | FullJourneyOperatingPage (view=ed-readiness) | ✅ |
+| `/emergency/command-center` | FullJourneyOperatingPage (view=journey) | ✅ |
+| `/emergency/journey` | FullJourneyOperatingPage (view=journey) | ✅ |
+| `/emergency/diagnostics` | FullJourneyOperatingPage (view=diagnostics) | ✅ |
+| `/emergency/handoffs` | FullJourneyOperatingPage (view=handoffs) | ✅ |
+| `/emergency/reports` | FullJourneyOperatingPage (view=reports) | ✅ |
+| `/emergency/reception` | ReceptionWorkspace | ✅ |
+| `/emergency/intake` | SmartIntake | ✅ |
+| `/emergency/queues` | QueueRoute | ✅ |
+| `/emergency/alerts` | ClinicalAlertsPage | ✅ |
+| `/emergency/copilot` | CopilotRoute | ✅ |
+| `/emergency/capacity` | CapacityRoute | ✅ |
+| `/emergency/patients` | PatientsRoute | ✅ |
+| `/emergency/analytics` | EmergencyAnalytics | ✅ |
+| `/emergency/settings` | EmergencySettings | ✅ |
+| `/emergency/help` | HelpHubPage | ✅ |
+| `/emergency/shift` | EmergencyShiftSummary | ✅ |
+| `/emergency/whiteboard` | EmergencyWhiteboard | ✅ |
+| `/staff` | TeamManagement | ✅ |
+| `/departments` | CapacityRoute | ✅ |
 
-- `src/services/fullEmergencyCareJourneyService.ts` defines the canonical 20-stage journey, maps each stage to services and routes, and builds a live operating snapshot from patients, EMS arrivals, alerts, capacity, dispatch, readiness, pre-arrival, journey trace, and bottleneck signals.
+### Data Models (src/types/emergency.ts)
 
-## AI And Backend Logic
+All required types exist and are fully typed:
 
-- AI/copilot surfaces already exist through `careDroidBrainService`, `careDroidAiApi`, `emergencyCopilotApi`, `useCareDroidAI`, `useAiChiefRouting`, and `CopilotRoute`.
-- The app distinguishes AI decision support from clinician-owned decisions in multiple safety strings and manual topics.
-- Backend hydration is centralized through `useEmergencyOs` and `emergencyOsApi`, with local scenario fallback through the emergency store.
+- `EmergencyCall`, `DispatcherAssessment`, `DispatchAssignment` ✅
+- `PrehospitalAssessment`, `PrehospitalVitals`, `EmsCrewUpdate`, `PrehospitalPacket` ✅
+- `EDReadinessPlan` ✅
+- `Patient`, `PatientSignal` ✅
+- `TriageAssessment` ✅
+- `CriticalAlert`, `ThreeMinuteResponse` ✅
+- `AIChiefRecommendation` ✅
+- `StaffAssignment`, `DepartmentCapacity` ✅
+- `DiagnosticOrder`, `HandoffSummary` ✅
+- `BottleneckEvent`, `ServiceHealth`, `CareOutcome` ✅
 
-## User And Role System
+### Services — Existing
 
-- `src/lib/users/userTypes.ts` already includes dispatcher, EMS coordinator, paramedic, registration clerk, triage nurse, charge nurse, registered nurse, emergency physician, specialist, pharmacist, lab technician, radiology technician, patient flow coordinator, hospital administrator, IT administrator, quality safety officer, and demo observer roles.
-- Route access is mediated by `useEmergencyRolePermissions`, `CareDroidRouteGuard`, and emergency role configuration.
+| Service | File | Journey Stages |
+|---|---|---|
+| EmergencySignalService | src/services/emergencySignalService.ts | 1, 2, 11 |
+| DispatchIntakeService | src/services/dispatchIntakeService.ts | 2, 3 |
+| EMSUnitService | store/emergencyStore.ts + emsPreArrivalPipelineService.ts | 4, 5, 10 |
+| PreArrivalNotificationService | src/services/preArrivalNotification.ts | 8 |
+| EDReadinessService | src/services/edReadinessService.ts | 9 |
+| PatientIntakeService | src/services/emergencyIntakeOperatingSystemService.ts | 10, 11 |
+| TriageService | src/services/triageAssist.ts + triageEngine.ts | 12, 16 |
+| AIChiefService | src/services/careDroidBrainService.ts + emergencyCopilotApi.ts | 3, 8, 13 |
+| CriticalAlertService | src/engine/alertEngine.ts + src/services/clinicalAlertsApi.ts | 8, 14, 16 |
+| ThreeMinuteResponseService | src/engine/threeMinuteTimerEngine.ts | 7, 12 |
+| DepartmentCapacityService | src/services/emergencyCapacityIntelligenceService.ts | 9, 16, 17 |
+| HandoffService | src/services/ambulanceHandoffChecklist.ts + handoffClose.ts | 17, 18 |
+| BottleneckRegistryService | src/services/bottleneckRegistry.ts | 13, 20 |
+| AnalyticsService | src/services/analyticsService.ts + emergencyAnalyticsApi.ts | 19, 20 |
+| HelpManualService | src/config/userManual.config.ts + HelpHubPage.tsx | 20 |
+| FullEmergencyCareJourneyService | src/services/fullEmergencyCareJourneyService.ts | ALL |
 
-## Patient, Intake, Triage, Alert, Queue, Dashboard Logic
+### Services — Missing Before This Session
 
-- `src/store/emergencyStore.ts` is the main local operational state with patients, staff, rooms, EMS units, EMS arrivals, alerts, queues, referrals, capacity, workflow logs, audit logs, and hydration.
-- Triage and acuity support exists in `triageAssist`, `triageEngine`, and patient `triageAssist` envelopes.
-- Critical alert logic exists in `alertEngine`, `alertEngineDerived`, `clinicalAlertsApi`, and the three-minute timer engine.
-- Queue, waiting-room, reassessment, boarding, and capacity services are present and already used by route pages.
+| Service | Gap | Action |
+|---|---|---|
+| CADIntegrationService | No standalone file — mock in journey map only | Created src/services/cadIntegrationService.ts |
+| PrehospitalAssessmentService | No standalone file — types only | Created src/services/prehospitalAssessmentService.ts |
+| StaffRoutingService | Scattered in emergencyStore.ts | Created src/services/staffRoutingService.ts |
+| DiagnosticsCoordinationService | No file — journey page aggregate only | Created src/services/diagnosticsCoordinationService.ts |
 
-## Reused Versus Rebuilt
+### Pages — Navigation Gaps Before This Session
 
-Reused:
+| Page | Route | Fix |
+|---|---|---|
+| Command Center | /emergency/command-center | Added to sidebar |
+| ED Readiness | /emergency/ed-readiness | Added to sidebar |
+| Critical Alerts | /emergency/alerts | Added to sidebar |
+| Diagnostics | /emergency/diagnostics | Added to sidebar |
+| Handoffs | /emergency/handoffs | Added to sidebar |
+| Reports | /emergency/reports | Added to sidebar |
 
-- Existing route shell, emergency store, role model, manual system, EMS board, dispatch console, reception/intake, queue, capacity, analytics, alerts, AI Chief/copilot, and timer engine.
+### User Roles
 
-Extended:
+21 hospital roles defined in `src/lib/users/`:
+super_admin, hospital_admin, ed_director, charge_nurse, triage_nurse, registered_nurse,
+emergency_physician, attending_physician, resident_physician, specialist, paramedic,
+registration_clerk, patient_flow_coordinator, lab_technician, radiology_technician,
+pharmacist, social_worker, security_officer, it_admin, quality_safety_officer, demo_observer
 
-- Data models now include the final journey types requested by the rebuild.
-- The central operating system now exposes `fullEmergencyCareJourney`.
-- The in-app manual now describes all 20 journey stages.
-- Missing operational pages now render from the canonical journey snapshot.
+Emergency roles: `dispatcher`, `ems_coordinator` also active.
 
-New:
+### AI Chief
 
-- `FullEmergencyCareJourneyService`
-- `FullJourneyOperatingPage`
+18 AI intents in `src/lib/ai/careDroidAI.ts` including:
+- `emergency_call_risk_summary`
+- `ems_prearrival_risk_summary`
+- `triage_recommendation`
+- `department_routing`
+- `staff_routing`
+- `handoff_summary`
+- `bottleneck_analysis`
+- `fallback_recommendation`
 
-## Duplicate, Isolated, Or Broken Code
+### 3-Minute Response
 
-- There are many historical aliases and legacy redirects in `routes.config.ts`; they are not broken, but they can obscure canonical ownership.
-- The repo contains broad SaaS modules and older pages outside the emergency shell. The current implementation avoids quarantining new code by wiring the new journey service directly into routes and the ED OS aggregator.
-- No destructive cleanup was performed because unrelated historical files may be intentional.
+`src/engine/threeMinuteTimerEngine.ts` — timer engine  
+`src/components/emergency/ThreeMinuteTimer.tsx` — timer UI  
+`ThreeMinuteResponse` type — full phase model (0-30s identify, 30-60s notify, 60-120s route, 120-180s escalate, >180s breach)
+
+---
+
+## What Was Built in This Session
+
+1. `src/services/cadIntegrationService.ts` — CAD dispatch stub with unit registry and assignment tracking
+2. `src/services/prehospitalAssessmentService.ts` — Full EMS field lifecycle: assessment, vitals, interventions, packet transmission
+3. `src/services/staffRoutingService.ts` — Staff routing assignments by alert/patient/role with workload awareness
+4. `src/services/diagnosticsCoordinationService.ts` — Diagnostic order management: lab, imaging, ECG, pharmacy, consults
+5. Navigation — Added command-center, ed-readiness, alerts, diagnostics, handoffs, reports to sidebar
+6. fullEmergencyCareJourneyService.ts — Updated to reference all new services
+7. FullJourneyOperatingPage — Enriched each view with real functional content
+
+---
+
+## Build Validation
+
+TypeScript: clean  
+Vite build: success (pre-existing chunk size warning on data-navigation chunk only)  
+Tests: pre-existing passing state maintained

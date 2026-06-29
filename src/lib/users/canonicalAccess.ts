@@ -105,9 +105,13 @@ export const DEPARTMENT_IDS: Readonly<Record<string, string>> = Object.freeze({
 
 const ALL_CAREDROID_ROUTES = Object.freeze([
   CANONICAL_ROUTES.emergencyReception,
+  CANONICAL_ROUTES.emergencyCommandCenter,
   CANONICAL_ROUTES.emergencyWhiteboard,
   CANONICAL_ROUTES.emergencyPatients,
+  CANONICAL_ROUTES.emergencyJourney,
   CANONICAL_ROUTES.emergencyEms,
+  CANONICAL_ROUTES.emergencyDispatch,
+  CANONICAL_ROUTES.emergencyEdReadiness,
   CANONICAL_ROUTES.emergencyIntake,
   CANONICAL_ROUTES.emergencyQueues,
   CANONICAL_ROUTES.emergencyReassessment,
@@ -121,10 +125,11 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
   CANONICAL_ROUTES.emergencyPulse,
   CANONICAL_ROUTES.emergencyShift,
   CANONICAL_ROUTES.emergencyAnalytics,
+  CANONICAL_ROUTES.emergencyDiagnostics,
+  CANONICAL_ROUTES.emergencyHandoffs,
+  CANONICAL_ROUTES.emergencyReports,
   CANONICAL_ROUTES.emergencySettings,
   CANONICAL_ROUTES.emergencyHelp,
-  CANONICAL_ROUTES.emergencyDispatch,
-  CANONICAL_ROUTES.emergencyEdReadiness,
   CANONICAL_ROUTES.workspace,
   CANONICAL_ROUTES.laboratory,
   CANONICAL_ROUTES.audit,
@@ -264,8 +269,10 @@ const ALIAS_TO_HOSPITAL_ROLE: Readonly<Record<string, HospitalRole>> = Object.fr
 const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPermission[]>> =
   Object.freeze({
     [CANONICAL_ROUTES.emergencyReception]: [P.PATIENT_READ],
+    [CANONICAL_ROUTES.emergencyCommandCenter]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyWhiteboard]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyPatients]: [P.PATIENT_READ],
+    [CANONICAL_ROUTES.emergencyJourney]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyIntake]: [P.PATIENT_CREATE],
     [CANONICAL_ROUTES.emergencyQueues]: [P.PATIENT_READ, P.TRIAGE_READ],
     [CANONICAL_ROUTES.emergencyReassessment]: [P.PATIENT_READ, P.TRIAGE_READ],
@@ -279,6 +286,9 @@ const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPerm
     [CANONICAL_ROUTES.emergencyTools]: [P.PATIENT_READ],
     [CANONICAL_ROUTES.emergencyPulse]: [P.ANALYTICS_READ],
     [CANONICAL_ROUTES.emergencyShift]: [P.STAFF_READ],
+    [CANONICAL_ROUTES.emergencyDiagnostics]: [P.PATIENT_READ],
+    [CANONICAL_ROUTES.emergencyHandoffs]: [P.PATIENT_READ],
+    [CANONICAL_ROUTES.emergencyReports]: [P.REPORTS_READ],
     [CANONICAL_ROUTES.emergencySettings]: [P.SETTINGS_READ],
     [CANONICAL_ROUTES.emergencyDispatch]: [P.PATIENT_CREATE],
     [CANONICAL_ROUTES.emergencyEdReadiness]: [P.PATIENT_READ],
@@ -399,11 +409,14 @@ function buildRouteAccess(roleMapping: CanonicalRoleMapping, permissions: readon
     return routeAccess.filter((route) =>
       [
         CANONICAL_ROUTES.emergencyWhiteboard,
+        CANONICAL_ROUTES.emergencyCommandCenter,
         CANONICAL_ROUTES.emergencyAlerts,
         CANONICAL_ROUTES.emergencyAnalytics,
+        CANONICAL_ROUTES.emergencyReports,
         CANONICAL_ROUTES.emergencyHelp,
         CANONICAL_ROUTES.audit,
         CANONICAL_ROUTES.laboratory,
+        CANONICAL_ROUTES.emergencyDiagnostics,
       ].includes(route),
     );
   }

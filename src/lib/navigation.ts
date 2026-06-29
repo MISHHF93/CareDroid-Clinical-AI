@@ -34,6 +34,14 @@ const ALL_ROLES: readonly HospitalRole[] = [
 
 export const ROUTE_ACCESS_CONFIG: readonly RouteAccessEntry[] = Object.freeze([
   {
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    label: 'Command Center',
+    allowedRoles: ALL_ROLES,
+    requiredPermissions: [P.PATIENT_READ],
+    navVisible: true,
+    priority: 5,
+  },
+  {
     path: CANONICAL_ROUTES.emergencyReception,
     label: 'Reception',
     allowedRoles: ALL_ROLES,
@@ -77,6 +85,15 @@ export const ROUTE_ACCESS_CONFIG: readonly RouteAccessEntry[] = Object.freeze([
     priority: 35,
   },
   {
+    path: CANONICAL_ROUTES.emergencyDispatch,
+    label: 'Emergency Call Intake',
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'dispatcher',
+      'ems_coordinator', 'charge_nurse'],
+    requiredPermissions: [P.PATIENT_CREATE],
+    navVisible: true,
+    priority: 38,
+  },
+  {
     path: CANONICAL_ROUTES.emergencyEms,
     label: 'EMS',
     allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse',
@@ -84,6 +101,15 @@ export const ROUTE_ACCESS_CONFIG: readonly RouteAccessEntry[] = Object.freeze([
     requiredPermissions: [P.PATIENT_READ],
     navVisible: true,
     priority: 40,
+  },
+  {
+    path: CANONICAL_ROUTES.emergencyEdReadiness,
+    label: 'ED Readiness',
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse',
+      'ems_coordinator', 'patient_flow_coordinator'],
+    requiredPermissions: [P.PATIENT_READ],
+    navVisible: true,
+    priority: 42,
   },
   {
     path: CANONICAL_ROUTES.emergencyCapacity,
@@ -95,6 +121,28 @@ export const ROUTE_ACCESS_CONFIG: readonly RouteAccessEntry[] = Object.freeze([
     priority: 45,
   },
   {
+    path: CANONICAL_ROUTES.emergencyDiagnostics,
+    label: 'Diagnostics',
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse',
+      'registered_nurse', 'emergency_physician', 'attending_physician', 'resident_physician',
+      'specialist', 'lab_technician', 'radiology_technician', 'pharmacist',
+      'quality_safety_officer', 'demo_observer'],
+    requiredPermissions: [P.PATIENT_READ],
+    navVisible: true,
+    priority: 57,
+  },
+  {
+    path: CANONICAL_ROUTES.emergencyHandoffs,
+    label: 'Handoffs',
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse',
+      'triage_nurse', 'registered_nurse', 'emergency_physician', 'attending_physician',
+      'resident_physician', 'specialist', 'paramedic', 'ems_coordinator',
+      'patient_flow_coordinator'],
+    requiredPermissions: [P.PATIENT_READ],
+    navVisible: true,
+    priority: 58,
+  },
+  {
     path: CANONICAL_ROUTES.emergencyBoarding,
     label: 'Boarding',
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse',
@@ -102,6 +150,16 @@ export const ROUTE_ACCESS_CONFIG: readonly RouteAccessEntry[] = Object.freeze([
     requiredPermissions: [P.ANALYTICS_READ],
     navVisible: true,
     priority: 50,
+  },
+  {
+    path: CANONICAL_ROUTES.emergencyReports,
+    label: 'Reports',
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse',
+      'emergency_physician', 'attending_physician', 'patient_flow_coordinator',
+      'quality_safety_officer', 'demo_observer'],
+    requiredPermissions: [P.REPORTS_READ],
+    navVisible: true,
+    priority: 66,
   },
   {
     path: CANONICAL_ROUTES.emergencyReferrals,

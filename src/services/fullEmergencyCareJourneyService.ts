@@ -4,6 +4,11 @@ import { getJourneyMetrics } from './emergencySignalService';
 import { getReadinessSummary } from './edReadinessService';
 import { getPreArrivalDashboard } from './emsPreArrivalPipelineService';
 import { buildBottleneckRegistrySnapshot } from './bottleneckRegistry';
+import { getCADSystemSummary } from './cadIntegrationService';
+import { getPrehospitalSummary } from './prehospitalAssessmentService';
+import { getStaffRoutingSummary } from './staffRoutingService';
+import { getDiagnosticsSummary } from './diagnosticsCoordinationService';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 export type EmergencyJourneyStageId =
   | 'emergency-event'
@@ -75,9 +80,9 @@ export const FULL_EMERGENCY_CARE_JOURNEY: readonly EmergencyJourneyStage[] = Obj
 export const SAAS_SERVICE_JOURNEY_MODULES: readonly ServiceJourneyModule[] = Object.freeze([
   { id: 'EmergencySignalService', label: 'Emergency Signal Service', stageIds: ['emergency-event', 'emergency-call', 'rapid-intake'], reuseStatus: 'existing', implementation: 'src/services/emergencySignalService.ts', connectedRoutes: ['/emergency/dispatch', '/emergency/patients'] },
   { id: 'DispatchIntakeService', label: 'Dispatch Intake Service', stageIds: ['emergency-call', 'dispatcher-triage'], reuseStatus: 'existing', implementation: 'src/services/dispatchIntakeService.ts', connectedRoutes: ['/emergency/dispatch'] },
-  { id: 'CADIntegrationService', label: 'CAD Integration Service', stageIds: ['ambulance-dispatch'], reuseStatus: 'new-runtime-map', implementation: 'Mock/stub represented through DispatchIntakeService assignments until external CAD exists.', connectedRoutes: ['/emergency/dispatch', '/emergency/ems'] },
+  { id: 'CADIntegrationService', label: 'CAD Integration Service', stageIds: ['ambulance-dispatch'], reuseStatus: 'existing', implementation: 'src/services/cadIntegrationService.ts — unit registry, dispatch assignment, status tracking', connectedRoutes: ['/emergency/dispatch', '/emergency/ems'] },
   { id: 'EMSUnitService', label: 'EMS Unit Service', stageIds: ['ambulance-dispatch', 'ems-en-route', 'patient-arrival'], reuseStatus: 'extended', implementation: 'src/store/emergencyStore.ts EMS units plus src/services/emsPreArrivalPipelineService.ts', connectedRoutes: ['/emergency/ems'] },
-  { id: 'PrehospitalAssessmentService', label: 'Prehospital Assessment Service', stageIds: ['ems-arrival-scene', 'prehospital-care'], reuseStatus: 'extended', implementation: 'src/types/emergency.ts PrehospitalAssessment and EMSArrival surfaces', connectedRoutes: ['/emergency/ems'] },
+  { id: 'PrehospitalAssessmentService', label: 'Prehospital Assessment Service', stageIds: ['ems-arrival-scene', 'prehospital-care'], reuseStatus: 'existing', implementation: 'src/services/prehospitalAssessmentService.ts — vitals, interventions, medications, packet transmission', connectedRoutes: ['/emergency/ems'] },
   { id: 'PreArrivalNotificationService', label: 'Pre-Arrival Notification Service', stageIds: ['hospital-pre-arrival'], reuseStatus: 'existing', implementation: 'src/services/preArrivalNotification.ts', connectedRoutes: ['/emergency/ems', '/emergency/ed-readiness'] },
   { id: 'EDReadinessService', label: 'ED Readiness Service', stageIds: ['ed-readiness'], reuseStatus: 'existing', implementation: 'src/services/edReadinessService.ts', connectedRoutes: ['/emergency/ed-readiness', '/emergency/capacity'] },
   { id: 'PatientIntakeService', label: 'Patient Intake Service', stageIds: ['patient-arrival', 'rapid-intake'], reuseStatus: 'extended', implementation: 'src/services/emergencyIntakeOperatingSystemService.ts and SmartIntake route', connectedRoutes: ['/emergency/intake', '/emergency/reception'] },
@@ -85,9 +90,9 @@ export const SAAS_SERVICE_JOURNEY_MODULES: readonly ServiceJourneyModule[] = Obj
   { id: 'AIChiefService', label: 'AI Chief Service', stageIds: ['dispatcher-triage', 'hospital-pre-arrival', 'ai-chief-review'], reuseStatus: 'extended', implementation: 'src/services/careDroidBrainService.ts, src/services/emergencyCopilotApi.ts, src/hooks/useAiChiefRouting.ts', connectedRoutes: ['/emergency/copilot'] },
   { id: 'CriticalAlertService', label: 'Critical Alert Service', stageIds: ['hospital-pre-arrival', 'clinical-action', 'treatment-observation'], reuseStatus: 'extended', implementation: 'src/engine/alertEngine.ts and src/services/clinicalAlertsApi.ts', connectedRoutes: ['/emergency/alerts', '/emergency/whiteboard'] },
   { id: 'ThreeMinuteResponseService', label: 'Three-Minute Response Service', stageIds: ['prehospital-care', 'triage'], reuseStatus: 'existing', implementation: 'src/engine/threeMinuteTimerEngine.ts mounted in src/app/providers.tsx', connectedRoutes: ['/emergency/alerts', '/emergency/whiteboard'] },
-  { id: 'StaffRoutingService', label: 'Staff Routing Service', stageIds: ['ambulance-dispatch', 'ed-readiness', 'clinical-action'], reuseStatus: 'extended', implementation: 'src/store/emergencyStore.ts staff assignment actions and role permissions', connectedRoutes: ['/staff', '/emergency/whiteboard'] },
+  { id: 'StaffRoutingService', label: 'Staff Routing Service', stageIds: ['ambulance-dispatch', 'ed-readiness', 'clinical-action'], reuseStatus: 'existing', implementation: 'src/services/staffRoutingService.ts — routing rules, assignment tracking, workload awareness', connectedRoutes: ['/staff', '/emergency/whiteboard'] },
   { id: 'DepartmentCapacityService', label: 'Department Capacity Service', stageIds: ['ed-readiness', 'treatment-observation', 'disposition'], reuseStatus: 'existing', implementation: 'src/services/emergencyCapacityIntelligenceService.ts and src/engine/capacityEngine.ts', connectedRoutes: ['/emergency/capacity', '/departments'] },
-  { id: 'DiagnosticsCoordinationService', label: 'Diagnostics Coordination Service', stageIds: ['diagnostics'], reuseStatus: 'new-runtime-map', implementation: 'Journey page aggregates lab/radiology/pharmacy workflows until dedicated API is connected.', connectedRoutes: ['/emergency/diagnostics', '/lab', '/radiology', '/pharmacy'] },
+  { id: 'DiagnosticsCoordinationService', label: 'Diagnostics Coordination Service', stageIds: ['diagnostics'], reuseStatus: 'existing', implementation: 'src/services/diagnosticsCoordinationService.ts — orders, status, results, STAT escalation', connectedRoutes: ['/emergency/diagnostics', '/lab', '/radiology', '/pharmacy'] },
   { id: 'HandoffService', label: 'Handoff Service', stageIds: ['disposition', 'handoff-reporting'], reuseStatus: 'extended', implementation: 'src/services/ambulanceHandoffChecklist.ts, src/services/handoffClose.ts, shift summary', connectedRoutes: ['/emergency/handoffs', '/emergency/shift'] },
   { id: 'BottleneckRegistryService', label: 'Bottleneck Registry Service', stageIds: ['ai-chief-review', 'analytics-feedback'], reuseStatus: 'existing', implementation: 'src/services/bottleneckRegistry.ts', connectedRoutes: ['/emergency/analytics', '/emergency/copilot'] },
   { id: 'AnalyticsService', label: 'Analytics Service', stageIds: ['outcome-tracking', 'analytics-feedback'], reuseStatus: 'existing', implementation: 'src/services/analyticsService.ts and src/services/emergencyAnalyticsApi.ts', connectedRoutes: ['/emergency/analytics', '/emergency/reports'] },
@@ -126,6 +131,10 @@ export function buildFullEmergencyCareJourneySnapshot(context: {
   const dispatch = getDispatchSummary();
   const readiness = getReadinessSummary();
   const journeyMetrics = getJourneyMetrics();
+  const cad = getCADSystemSummary();
+  const prehospital = getPrehospitalSummary();
+  const staffRouting = getStaffRoutingSummary();
+  const diagnostics = getDiagnosticsSummary();
   const bottlenecks = buildBottleneckRegistrySnapshot({
     existingServiceSignals: {
       emergencyOperatingSystem: {
@@ -163,9 +172,13 @@ export function buildFullEmergencyCareJourneySnapshot(context: {
     }),
     liveServiceSummaries: Object.freeze({
       dispatch,
+      cad,
+      prehospital,
       preArrival,
       readiness,
       journeyMetrics,
+      staffRouting,
+      diagnostics,
       bottlenecks,
     }),
   });

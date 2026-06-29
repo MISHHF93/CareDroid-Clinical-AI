@@ -747,7 +747,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/emergency/diagnostics"
+          path={CANONICAL_ROUTES.emergencyDiagnostics}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
               <LazyRoute label="Loading diagnostics...">
@@ -757,7 +757,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/emergency/handoffs"
+          path={CANONICAL_ROUTES.emergencyHandoffs}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
               <LazyRoute label="Loading handoffs...">
@@ -767,7 +767,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/emergency/reports"
+          path={CANONICAL_ROUTES.emergencyReports}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading reports...">
