@@ -1,7 +1,7 @@
 /**
  * Unified profile compiler — routes, tools, and launch policy per SaaS role.
  */
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, getDefaultRouteForProfile } from './routes.config';
 import {
   buildNavigationRoutes,
   resolveUserProfileFromSaasRole,
@@ -68,8 +68,7 @@ export type CompileUserProfileInput = Readonly<{
 
 function resolveProfileHome(catalog: ResolvedUserProfile): string {
   if (catalog.emergencyRoleId) {
-    const definition = getEmergencyRoleDefinition(catalog.emergencyRoleId);
-    return definition?.defaultRoute || CANONICAL_ROUTES.emergencyReception;
+    return getDefaultRouteForProfile(catalog.emergencyRoleId);
   }
   if (catalog.trackMindRoleId) {
     return CANONICAL_ROUTES.trackMindWorkspace;

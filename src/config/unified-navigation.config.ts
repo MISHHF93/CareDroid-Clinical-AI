@@ -1,4 +1,5 @@
 ﻿import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTE_MAP } from './routes.config';
 import {
   EMERGENCY_ROLE_IDS,
   getEmergencyRoleDefinition,
@@ -36,6 +37,7 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'ed-readiness',
   'patients',
   'queues',
+  'triage',
   'reassessment',
   'alerts',
   'capacity',
@@ -144,247 +146,20 @@ export type NavigationItem = Readonly<{
 
 const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform', 'pulse', 'shift']);
 
-export const NAV_ITEMS: readonly NavItem[] = Object.freeze([
-  {
-    id: 'reception',
-    label: 'Reception',
-    icon: 'user-check',
-    route: CANONICAL_ROUTES.emergencyReception,
-    featureGate: null,
-  },
-  {
-    id: 'whiteboard',
-    label: 'Whiteboard',
-    icon: 'layout-dashboard',
-    route: CANONICAL_ROUTES.emergencyWhiteboard,
-    featureGate: null,
-  },
-  {
-    id: 'intake',
-    label: 'Intake',
-    icon: 'intake',
-    route: CANONICAL_ROUTES.emergencyIntake,
-    featureGate: null,
-  },
-  {
-    id: 'command-center',
-    label: 'Command Center',
-    icon: 'journey',
-    route: CANONICAL_ROUTES.emergencyCommandCenter,
-    featureGate: null,
-  },
-  {
-    id: 'dispatch',
-    label: 'Dispatch',
-    icon: 'send',
-    route: CANONICAL_ROUTES.emergencyDispatch,
-    featureGate: null,
-  },
-  {
-    id: 'ed-readiness',
-    label: 'ED Readiness',
-    icon: 'shield-check',
-    route: CANONICAL_ROUTES.emergencyEdReadiness,
-    featureGate: null,
-  },
-  {
-    id: 'alerts',
-    label: 'Critical Alerts',
-    icon: 'alerts',
-    route: CANONICAL_ROUTES.emergencyAlerts,
-    featureGate: null,
-  },
-  {
-    id: 'diagnostics',
-    label: 'Diagnostics',
-    icon: 'stethoscope',
-    route: CANONICAL_ROUTES.emergencyDiagnostics,
-    featureGate: null,
-  },
-  {
-    id: 'handoffs',
-    label: 'Handoffs',
-    icon: 'notes',
-    route: CANONICAL_ROUTES.emergencyHandoffs,
-    featureGate: null,
-  },
-  {
-    id: 'reports',
-    label: 'Reports',
-    icon: 'report',
-    route: CANONICAL_ROUTES.emergencyReports,
-    featureGate: null,
-  },
-  {
-    id: 'ems',
-    label: 'EMS',
-    icon: 'ambulance',
-    route: CANONICAL_ROUTES.emergencyEms,
-    featureGate: 'ems_pipeline',
-  },
-  {
-    id: 'patients',
-    label: 'Patients',
-    icon: 'emergency-patients',
-    route: CANONICAL_ROUTES.emergencyPatients,
-    featureGate: null,
-  },
-  {
-    id: 'queues',
-    label: 'Queues',
-    icon: 'queues',
-    route: CANONICAL_ROUTES.emergencyQueues,
-    featureGate: null,
-  },
-  {
-    id: 'reassessment',
-    label: 'Reassess',
-    icon: 'reassessment',
-    route: CANONICAL_ROUTES.emergencyReassessment,
-    featureGate: null,
-  },
-  {
-    id: 'capacity',
-    label: 'Flow & Capacity',
-    icon: 'capacity',
-    route: CANONICAL_ROUTES.emergencyCapacity,
-    featureGate: 'capacity_intel',
-  },
-  {
-    id: 'referrals',
-    label: 'Referrals',
-    icon: 'referrals',
-    route: CANONICAL_ROUTES.emergencyReferrals,
-    featureGate: 'referral_intel',
-  },
-  {
-    id: 'copilot',
-    label: 'Copilot',
-    icon: 'ed-copilot',
-    route: CANONICAL_ROUTES.emergencyCopilot,
-    featureGate: null,
-  },
-  {
-    id: 'tools',
-    label: 'Medical Tools',
-    icon: 'clinical-tools',
-    route: CANONICAL_ROUTES.emergencyTools,
-    featureGate: null,
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: 'emergency-analytics',
-    route: CANONICAL_ROUTES.emergencyAnalytics,
-    featureGate: null,
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    route: CANONICAL_ROUTES.emergencySettings,
-    featureGate: null,
-  },
-  {
-    id: 'integrations',
-    label: 'Integrations',
-    icon: 'integrations',
-    route: CANONICAL_ROUTES.integrationHub,
-    featureGate: null,
-  },
-  {
-    id: 'cosmos',
-    label: 'Cosmos',
-    icon: 'chart-bar',
-    route: CANONICAL_ROUTES.cosmosViewer,
-    featureGate: null,
-  },
-  {
-    id: 'platform',
-    label: 'Platform',
-    icon: 'platform',
-    route: CANONICAL_ROUTES.workspace,
-    featureGate: null,
-  },
-  {
-    id: 'pulse',
-    label: 'Pulse',
-    icon: 'activity',
-    route: CANONICAL_ROUTES.emergencyPulse,
-    featureGate: null,
-  },
-  {
-    id: 'shift',
-    label: 'Shift',
-    icon: 'clock',
-    route: CANONICAL_ROUTES.emergencyShift,
-    featureGate: null,
-  },
-  {
-    id: 'help',
-    label: 'Help',
-    icon: 'help-circle',
-    route: CANONICAL_ROUTES.emergencyHelp,
-    featureGate: null,
-  },
-  // Additional pages brought in for full navigation normalization
-  {
-    id: 'fleet',
-    label: 'Fleet',
-    icon: 'ambulance',
-    route: CANONICAL_ROUTES.fleetCommand,
-    featureGate: null,
-  },
-  {
-    id: 'surveillance',
-    label: 'Surveillance',
-    icon: 'activity',
-    route: CANONICAL_ROUTES.surveillanceNexus,
-    featureGate: null,
-  },
-  {
-    id: 'simulation',
-    label: 'Simulation',
-    icon: 'list-check',
-    route: CANONICAL_ROUTES.simulation,
-    featureGate: null,
-  },
-  {
-    id: 'laboratory',
-    label: 'Laboratory',
-    icon: 'stethoscope',
-    route: CANONICAL_ROUTES.laboratory,
-    featureGate: null,
-  },
-  {
-    id: 'knowledge',
-    label: 'Knowledge Graph',
-    icon: 'chart-bar',
-    route: CANONICAL_ROUTES.knowledgeGraph,
-    featureGate: null,
-  },
-  {
-    id: 'audit',
-    label: 'Audit',
-    icon: 'report',
-    route: CANONICAL_ROUTES.audit,
-    featureGate: null,
-  },
-  {
-    id: 'ai-center',
-    label: 'AI Center',
-    icon: 'robot',
-    route: CANONICAL_ROUTES.aiCommandCenter,
-    featureGate: null,
-  },
-  {
-    id: 'admin',
-    label: 'Admin',
-    icon: 'settings',
-    route: CANONICAL_ROUTES.adminOperations,
-    featureGate: null,
-  },
-] satisfies readonly NavItem[]);
+export const NAV_ITEMS: readonly NavItem[] = Object.freeze(
+  CANONICAL_ROUTE_MAP.filter((route) => route.showInNav).map((route) => {
+    const item = {
+      id: route.id,
+      label: route.label,
+      icon: route.icon || 'layout-dashboard',
+      route: route.path,
+      featureGate: route.featureGate || null,
+    } as NavItem;
+    if (route.emergencyRoles?.length) (item as any).roles = route.emergencyRoles;
+    if (route.activePaths?.length) (item as any).activePaths = route.activePaths;
+    return Object.freeze(item);
+  }),
+) satisfies readonly NavItem[];
 
 const ROLES = EMERGENCY_ROLE_IDS as Record<string, string>;
 const ALL_ROLES = Object.freeze(Object.values(ROLES));
@@ -525,24 +300,30 @@ export function getVisibleNavigationForSaasRole(
 }
 
 export const NAVIGATION_ITEMS = Object.freeze(
-  NAV_ITEMS.map((item, index) =>
-    navigationItem({
+  NAV_ITEMS.map((item, index) => {
+    const routeRecord = CANONICAL_ROUTE_MAP.find((route) => route.id === item.id);
+    const routeRoles = item.roles || routeRecord?.emergencyRoles || rolesForRoute(item.route);
+    const priority = routeRecord?.priority ?? index + 1;
+    return navigationItem({
       ...item,
       path: item.route,
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
-      order: index + 1,
-      roles: item.roles || rolesForRoute(item.route),
-      allowedRoles: item.roles || rolesForRoute(item.route),
-      requiredPermissions: NAV_REQUIRED_PERMISSIONS[item.id] || [],
-      visibleToProfiles: rolesForRoute(item.route),
-      priority: index + 1,
-      emergencySafe: item.route.startsWith('/emergency') || item.route === CANONICAL_ROUTES.workspace,
-      readOnlyAllowed: READ_ONLY_NAV_ITEM_IDS.has(item.id),
+      order: priority,
+      roles: routeRoles,
+      allowedRoles: routeRoles,
+      requiredPermissions: routeRecord?.requiredPermissions || NAV_REQUIRED_PERMISSIONS[item.id] || [],
+      visibleToProfiles: routeRecord?.userProfileVisibility || rolesForRoute(item.route),
+      priority,
+      emergencySafe:
+        routeRecord?.emergencySafe ?? (item.route.startsWith('/emergency') || item.route === CANONICAL_ROUTES.workspace),
+      readOnlyAllowed: routeRecord?.readOnlyAllowed ?? READ_ONLY_NAV_ITEM_IDS.has(item.id),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
       activePaths:
-        item.activePaths
-          ? item.activePaths
+        routeRecord?.activePaths
+          ? routeRecord.activePaths
+          : item.activePaths
+            ? item.activePaths
         : item.id === 'reception'
           ? getReceptionNavActivePaths()
           : item.id === 'whiteboard'
@@ -555,8 +336,8 @@ export const NAVIGATION_ITEMS = Object.freeze(
             : item.id === 'platform'
               ? [CANONICAL_ROUTES.workspace, CANONICAL_ROUTES.workspaces, '/app']
             : undefined,
-    }),
-  ),
+    });
+  }),
 ) satisfies readonly NavigationItem[];
 
 export function isPilotCustomerVisibleNavItemId(id: string, saasRole?: string | null): boolean {

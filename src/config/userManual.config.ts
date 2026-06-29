@@ -2,7 +2,7 @@
  * Embedded user manual — processes, procedures, and role playbooks.
  * Single source of truth for in-app HelpHub content.
  */
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, getRouteByPath } from './routes.config';
 import { CAREDROID_PRODUCT } from './caredroidProduct.config';
 import { DEMO_JOURNEY_STEPS } from './demoPersonaModel';
 import { EMERGENCY_ROLE_IDS, EMERGENCY_ROLE_LABELS } from './emergencyRolePermissions';
@@ -1054,6 +1054,11 @@ export function getManualTopicById(id: string): ManualTopic | undefined {
 
 export function resolveManualTopicForPath(pathname: string): ManualTopic | undefined {
   const normalized = pathname.split('?')[0];
+  const routeTopicId = getRouteByPath(normalized)?.helpTopicId;
+  if (routeTopicId) {
+    const routeTopic = getManualTopicById(routeTopicId);
+    if (routeTopic) return routeTopic;
+  }
   const exact = MANUAL_ALL_TOPICS.find((t) => t.route === normalized);
   if (exact) return exact;
   if (normalized.startsWith(CANONICAL_ROUTES.emergencyTools) || normalized.startsWith('/tools')) {

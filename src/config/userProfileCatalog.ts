@@ -2,7 +2,7 @@
  * Canonical user profile catalog — maps admin-assigned SaaS roles to domain access.
  */
 import catalogData from './user-profile-catalog.data.json';
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, getDefaultRouteForProfile } from './routes.config';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 import {
   EMERGENCY_ROLE_IDS,
@@ -70,13 +70,12 @@ export type UserProfileAccessSummary = Readonly<{
 
 function resolveProfileHomeRoute(entry: UserProfileCatalogEntry): string {
   if (entry.emergencyRoleId) {
-    const definition = getEmergencyRoleDefinition(entry.emergencyRoleId);
-    return definition?.defaultRoute || getPlatformHomeRoute();
+    return getDefaultRouteForProfile(entry.emergencyRoleId);
   }
   if (entry.trackMindRoleId) {
     return CANONICAL_ROUTES.trackMindWorkspace;
   }
-  return getPlatformHomeRoute();
+  return CANONICAL_ROUTES.platformStart;
 }
 
 function getBaseProfileRoutes(entry?: UserProfileCatalogEntry): string[] {

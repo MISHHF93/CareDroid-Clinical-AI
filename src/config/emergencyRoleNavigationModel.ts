@@ -2,7 +2,7 @@
  * Role + screen-mode landing navigation — one resolver for post-login, home, and redirects.
  * Same AppShell and routes; screen mode selects the landing path and query surface.
  */
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, getDefaultRouteForProfile, getRouteByPath } from './routes.config';
 import {
   CARE_DROID_SCREEN_MODE_OPTIONS,
   CARE_DROID_SCREEN_MODES,
@@ -73,11 +73,16 @@ export function resolveRoleLandingScreenMode(input: ResolveRoleLandingInput = {}
 export function resolveRoleLandingRoute(input: ResolveRoleLandingInput = {}): string {
   const deviceRoute = resolveDeviceContextLandingRoute(input.deviceContextId);
   if (deviceRoute) return deviceRoute;
+  if (!input.displayParam && input.role) {
+    return getDefaultRouteForProfile(input.role);
+  }
   const screenMode = resolveRoleLandingScreenMode(input);
   return getScreenModeDefaultLandingRoute(screenMode);
 }
 
 export function resolveRoleHomeNavItemId(input: ResolveRoleLandingInput = {}): string {
+  const defaultRoute = getRouteByPath(getDefaultRouteForProfile(input.role));
+  if (defaultRoute?.showInNav) return defaultRoute.id;
   const screenMode = resolveRoleLandingScreenMode(input);
 
   switch (screenMode) {

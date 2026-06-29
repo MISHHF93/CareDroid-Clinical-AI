@@ -213,7 +213,7 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]',
         },
       },
-      chunkSizeWarningLimit: 1300,
+      chunkSizeWarningLimit: 1600,
     },
     optimizeDeps: {
       include: [

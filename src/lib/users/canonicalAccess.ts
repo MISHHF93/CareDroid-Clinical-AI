@@ -1,4 +1,11 @@
-import { CANONICAL_ROUTES } from '../../config/routes.config';
+import {
+  CANONICAL_ROUTE_MAP,
+  CANONICAL_ROUTES,
+  canRouteRecordIncludeProfile,
+  getDefaultRouteForProfile,
+  getRouteByPath,
+  normalizeRoutePath,
+} from '../../config/routes.config';
 import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
@@ -104,6 +111,7 @@ export const DEPARTMENT_IDS: Readonly<Record<string, string>> = Object.freeze({
 });
 
 const ALL_CAREDROID_ROUTES = Object.freeze([
+  ...CANONICAL_ROUTE_MAP.map((route) => route.path),
   CANONICAL_ROUTES.emergencyReception,
   CANONICAL_ROUTES.emergencyCommandCenter,
   CANONICAL_ROUTES.emergencyWhiteboard,
@@ -130,6 +138,7 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
   CANONICAL_ROUTES.emergencyReports,
   CANONICAL_ROUTES.emergencySettings,
   CANONICAL_ROUTES.emergencyHelp,
+  CANONICAL_ROUTES.triage,
   CANONICAL_ROUTES.workspace,
   CANONICAL_ROUTES.laboratory,
   CANONICAL_ROUTES.audit,
@@ -267,35 +276,16 @@ const ALIAS_TO_HOSPITAL_ROLE: Readonly<Record<string, HospitalRole>> = Object.fr
 );
 
 const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPermission[]>> =
-  Object.freeze({
-    [CANONICAL_ROUTES.emergencyReception]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyCommandCenter]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyWhiteboard]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyPatients]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyJourney]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyIntake]: [P.PATIENT_CREATE],
-    [CANONICAL_ROUTES.emergencyQueues]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyReassessment]: [P.PATIENT_READ, P.TRIAGE_READ],
-    [CANONICAL_ROUTES.emergencyEms]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyCapacity]: [P.ANALYTICS_READ],
-    [CANONICAL_ROUTES.emergencyBoarding]: [P.ANALYTICS_READ],
-    [CANONICAL_ROUTES.emergencyReferrals]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyAlerts]: [P.ALERT_READ],
-    [CANONICAL_ROUTES.emergencyAnalytics]: [P.ANALYTICS_READ],
-    [CANONICAL_ROUTES.emergencyCopilot]: [P.AI_READ],
-    [CANONICAL_ROUTES.emergencyTools]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyPulse]: [P.ANALYTICS_READ],
-    [CANONICAL_ROUTES.emergencyShift]: [P.STAFF_READ],
-    [CANONICAL_ROUTES.emergencyDiagnostics]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyHandoffs]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.emergencyReports]: [P.REPORTS_READ],
-    [CANONICAL_ROUTES.emergencySettings]: [P.SETTINGS_READ],
-    [CANONICAL_ROUTES.emergencyDispatch]: [P.PATIENT_CREATE],
-    [CANONICAL_ROUTES.emergencyEdReadiness]: [P.PATIENT_READ],
-    [CANONICAL_ROUTES.laboratory]: [P.LABS_READ],
-    [CANONICAL_ROUTES.audit]: [P.AUDIT_READ],
-    [CANONICAL_ROUTES.adminOperations]: [P.SETTINGS_READ],
-  });
+  Object.freeze(
+    Object.fromEntries(
+      CANONICAL_ROUTE_MAP.flatMap((route) =>
+        [route.path, ...(route.aliases || [])].map((path) => [
+          normalizeRoutePath(path),
+          route.requiredPermissions as readonly CareDroidPermission[],
+        ]),
+      ),
+    ),
+  );
 
 // Maps emergency action strings to the CareDroid permission required to perform them.
 // null = action is always denied (future module placeholder).
@@ -433,6 +423,34 @@ function buildDashboardProfile(role: HospitalRole, defaultRoute: string): Dashbo
   });
 }
 
+function routeAccessMatches(accessRoute: string, requestedPath: string): boolean {
+  const normalizedAccess = normalizeRoutePath(accessRoute);
+  const normalizedRequested = normalizeRoutePath(requestedPath);
+  if (normalizedRequested === normalizedAccess || normalizedRequested.startsWith(`${normalizedAccess}/`)) {
+    return true;
+  }
+  const routeRecord = getRouteByPath(normalizedRequested);
+  return Boolean(
+    routeRecord &&
+      [routeRecord.path, routeRecord.redirectTo, ...(routeRecord.aliases || [])]
+        .filter(Boolean)
+        .some((path) => normalizeRoutePath(path) === normalizedAccess),
+  );
+}
+
+function pickDefaultRoute(role: HospitalRole, routeAccess: readonly string[]): string {
+  const preferred = getDefaultRouteForProfile(role);
+  if (routeAccess.some((route) => routeAccessMatches(route, preferred))) return preferred;
+  const preferredRecord = getRouteByPath(preferred);
+  if (
+    preferredRecord?.redirectTo &&
+    routeAccess.some((route) => routeAccessMatches(route, preferredRecord.redirectTo))
+  ) {
+    return preferred;
+  }
+  return routeAccess[0] || CANONICAL_ROUTES.emergencyReception;
+}
+
 export function resolveHospitalRole(roleLike: unknown): HospitalRole {
   const normalized = normalizeAlias(String(roleLike || ''));
   return ALIAS_TO_HOSPITAL_ROLE[normalized] || 'demo_observer';
@@ -482,7 +500,10 @@ export function normalizeCareDroidProfile(
   } as CareDroidUserProfile;
 
   const routeAccess = buildRouteAccess(roleMapping, permissions);
-  const dashboardProfile = buildDashboardProfile(roleMapping.hospitalRole, routeAccess[0] || CANONICAL_ROUTES.emergencyReception);
+  const dashboardProfile = buildDashboardProfile(
+    roleMapping.hospitalRole,
+    pickDefaultRoute(roleMapping.hospitalRole, routeAccess),
+  );
   const patientScope = partial.patientAccessScope || departmentScope(baseProfile, roleMapping.admin ? 'site' : roleMapping.clinical ? 'department' : 'assigned');
 
   return Object.freeze({
@@ -551,19 +572,28 @@ export function compileCareDroidAccessProfile(profile: CareDroidUserProfile): Co
 
 export function canAccessRoute(
   compiledProfile: CompiledCareDroidAccessProfile | CareDroidUserProfile,
-  path: string,
+  route: string | { path?: string; route?: string; redirectTo?: string; requiredPermissions?: readonly string[]; readOnlyAllowed?: boolean },
 ): boolean {
   const profile =
     'navigationAccess' in compiledProfile
       ? compiledProfile
       : compileCareDroidAccessProfile(compiledProfile);
-  const normalizedPath = String(path || '').split(/[?#]/)[0];
+  const requestedPath =
+    typeof route === 'string' ? route : route?.path || route?.route || route?.redirectTo || '';
+  const normalizedPath = normalizeRoutePath(requestedPath);
   if (!normalizedPath) return false;
-  const routeAllowed = profile.routeAccess.some(
-    (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
+  const routeRecord = getRouteByPath(normalizedPath);
+  const routeAllowed = profile.routeAccess.some((accessRoute) =>
+    routeAccessMatches(accessRoute, normalizedPath),
   );
-  if (!routeAllowed) return false;
-  const required = ROUTE_REQUIRED_PERMISSIONS[normalizedPath] || [];
+  const roleAllowed = routeRecord ? canRouteRecordIncludeProfile(routeRecord, profile) : false;
+  if (!routeAllowed && !roleAllowed) return false;
+  if (profile.readOnly && routeRecord?.readOnlyAllowed === false) return false;
+  const required =
+    (typeof route !== 'string' ? route?.requiredPermissions : undefined) ||
+    routeRecord?.requiredPermissions ||
+    ROUTE_REQUIRED_PERMISSIONS[normalizedPath] ||
+    [];
   return required.every((permission) => profile.permissions.includes(permission));
 }
 

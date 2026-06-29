@@ -485,6 +485,7 @@ export const NAV_SUITE_ASSIGNMENTS: Readonly<Record<string, CareDroidSuiteId>> =
   ems: 'ems_referral_boarding',
   patients: 'emergency_whiteboard',
   queues: 'emergency_whiteboard',
+  triage: 'triage_reassessment_clinical_flow',
   reassessment: 'triage_reassessment_clinical_flow',
   capacity: 'ems_referral_boarding',
   boarding: 'ems_referral_boarding',

@@ -449,10 +449,11 @@ function TriageWorkspaceRoute() {
 }
 
 function PatientProfileRoute() {
-  const { patientId } = useParams();
+  const { patientId, id } = useParams();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  if (patientId && !params.has('patientId')) params.set('patientId', patientId);
+  const resolvedPatientId = patientId || id;
+  if (resolvedPatientId && !params.has('patientId')) params.set('patientId', resolvedPatientId);
   return (
     <Navigate
       to={{
@@ -598,17 +599,8 @@ export function AppRoutes() {
           }
         />
         <Route path={CANONICAL_ROUTES.triage} element={<TriageWorkspaceRoute />} />
-        <Route path="/patients/:patientId" element={<PatientProfileRoute />} />
-        <Route
-          path="/patients"
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
-              <EmergencySurfaceRedirect surfaceId="patients">
-                <PatientsRoute />
-              </EmergencySurfaceRedirect>
-            </EmergencyRouteGuard>
-          }
-        />
+        <Route path={CANONICAL_ROUTES.patientProfile} element={<PatientProfileRoute />} />
+        <Route path="/patients" element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyPatients} />} />
         <Route
           path={CANONICAL_ROUTES.alerts}
           element={

@@ -19,7 +19,7 @@ export function CareDroidRouteGuard({ children }: CareDroidRouteGuardProps) {
     return <>{children}</>;
   }
 
-  const fallback = getUnauthorizedFallback();
+  const fallback = getUnauthorizedFallback(role);
 
   return (
     <section

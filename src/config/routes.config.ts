@@ -345,6 +345,18 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/workspace/emergency/department-pulse', CANONICAL_ROUTES.emergencyPulse],
     ['/patients', CANONICAL_ROUTES.emergencyPatients],
     ['/patients/*', CANONICAL_ROUTES.emergencyPatients],
+    ['/emergency/calls', CANONICAL_ROUTES.emergencyDispatch],
+    ['/emergency/pre-arrival', CANONICAL_ROUTES.emergencyEms],
+    ['/emergency/readiness', CANONICAL_ROUTES.emergencyEdReadiness],
+    ['/alerts', CANONICAL_ROUTES.emergencyAlerts],
+    ['/ai-chief', CANONICAL_ROUTES.emergencyCopilot],
+    ['/staff', CANONICAL_ROUTES.emergencyShift],
+    ['/departments', CANONICAL_ROUTES.emergencyCapacity],
+    ['/diagnostics', CANONICAL_ROUTES.emergencyDiagnostics],
+    ['/handoffs', CANONICAL_ROUTES.emergencyHandoffs],
+    ['/analytics', CANONICAL_ROUTES.emergencyAnalytics],
+    ['/reports', CANONICAL_ROUTES.emergencyReports],
+    ['/help', CANONICAL_ROUTES.emergencyHelp],
     ['/settings', CANONICAL_ROUTES.emergencySettings],
     ['/settings/general', CANONICAL_ROUTES.emergencySettings],
     ['/settings/thresholds', CANONICAL_ROUTES.emergencySettings],
@@ -425,6 +437,956 @@ export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
   copilot: CANONICAL_ROUTES.emergencyCopilot,
   'ai-governance': CANONICAL_ROUTES.emergencyWhiteboard,
 });
+
+const P = Object.freeze({
+  PATIENT_READ: 'patient:read',
+  PATIENT_CREATE: 'patient:create',
+  PATIENT_UPDATE: 'patient:update',
+  PATIENT_ASSIGN: 'patient:assign',
+  PATIENT_DISCHARGE: 'patient:discharge',
+  TRIAGE_READ: 'triage:read',
+  TRIAGE_CREATE: 'triage:create',
+  TRIAGE_UPDATE: 'triage:update',
+  AI_READ: 'ai:read',
+  AI_REQUEST: 'ai:request',
+  AI_REVIEW: 'ai:review',
+  ALERT_READ: 'alert:read',
+  ALERT_ACKNOWLEDGE: 'alert:acknowledge',
+  ALERT_ESCALATE: 'alert:escalate',
+  STAFF_READ: 'staff:read',
+  STAFF_ASSIGN: 'staff:assign',
+  ANALYTICS_READ: 'analytics:read',
+  REPORTS_READ: 'reports:read',
+  SETTINGS_READ: 'settings:read',
+  AUDIT_READ: 'audit:read',
+  LABS_READ: 'labs:read',
+  IMAGING_READ: 'imaging:read',
+  MEDICATION_READ: 'medication:read',
+});
+
+export const CANONICAL_NAVIGATION_GROUPS = Object.freeze([
+  'Command',
+  'Emergency',
+  'Patients',
+  'Clinical',
+  'Operations',
+  'Intelligence',
+  'Administration',
+  'Help',
+]);
+
+export const CAREDROID_USER_PROFILE_IDS = Object.freeze([
+  'dispatcher',
+  'ems_coordinator',
+  'paramedic',
+  'registration_clerk',
+  'triage_nurse',
+  'charge_nurse',
+  'registered_nurse',
+  'emergency_physician',
+  'attending_physician',
+  'resident_physician',
+  'specialist',
+  'pharmacist',
+  'lab_technician',
+  'radiology_technician',
+  'patient_flow_coordinator',
+  'hospital_admin',
+  'it_admin',
+  'quality_safety_officer',
+  'demo_observer',
+  'ed_director',
+  'super_admin',
+]);
+
+const ALL_USER_PROFILES = CAREDROID_USER_PROFILE_IDS;
+const CLINICAL_PROFILES = Object.freeze([
+  'super_admin',
+  'ed_director',
+  'charge_nurse',
+  'triage_nurse',
+  'registered_nurse',
+  'emergency_physician',
+  'attending_physician',
+  'resident_physician',
+  'specialist',
+  'paramedic',
+]);
+const PHYSICIAN_PROFILES = Object.freeze([
+  'ed_director',
+  'emergency_physician',
+  'attending_physician',
+  'resident_physician',
+  'specialist',
+]);
+const OPS_PROFILES = Object.freeze([
+  'super_admin',
+  'hospital_admin',
+  'ed_director',
+  'charge_nurse',
+  'patient_flow_coordinator',
+  'ems_coordinator',
+]);
+const READ_ONLY_OPERATIONAL_PROFILES = Object.freeze([
+  'lab_technician',
+  'radiology_technician',
+  'pharmacist',
+  'quality_safety_officer',
+  'demo_observer',
+]);
+const NON_NAV_PROFILE_ROUTES = Object.freeze([
+  CANONICAL_ROUTES.profile,
+  CANONICAL_ROUTES.profileSettings,
+  CANONICAL_ROUTES.profileToolPreferences,
+  '/profile/activity',
+  '/profile/preferences',
+  '/profile/security',
+  '/profile/workspaces',
+]);
+
+export const USER_PROFILE_ROUTE_DEFAULTS = Object.freeze({
+  dispatcher: CANONICAL_ROUTES.emergencyDispatch,
+  ems_coordinator: CANONICAL_ROUTES.emergencyEms,
+  paramedic: CANONICAL_ROUTES.emergencyEms,
+  registration_clerk: CANONICAL_ROUTES.emergencyReception,
+  triage_nurse: CANONICAL_ROUTES.triage,
+  charge_nurse: CANONICAL_ROUTES.emergencyWhiteboard,
+  registered_nurse: CANONICAL_ROUTES.emergencyQueues,
+  emergency_physician: CANONICAL_ROUTES.emergencyWhiteboard,
+  attending_physician: CANONICAL_ROUTES.emergencyWhiteboard,
+  resident_physician: CANONICAL_ROUTES.emergencyWhiteboard,
+  specialist: CANONICAL_ROUTES.emergencyPatients,
+  pharmacist: CANONICAL_ROUTES.emergencyDiagnostics,
+  lab_technician: CANONICAL_ROUTES.emergencyDiagnostics,
+  radiology_technician: CANONICAL_ROUTES.emergencyDiagnostics,
+  patient_flow_coordinator: CANONICAL_ROUTES.emergencyQueues,
+  hospital_admin: CANONICAL_ROUTES.emergencyAnalytics,
+  it_admin: CANONICAL_ROUTES.emergencySettings,
+  quality_safety_officer: CANONICAL_ROUTES.emergencyReports,
+  demo_observer: CANONICAL_ROUTES.emergencyWhiteboard,
+  ed_director: CANONICAL_ROUTES.emergencyWhiteboard,
+  super_admin: CANONICAL_ROUTES.emergencySettings,
+  admin: CANONICAL_ROUTES.emergencySettings,
+  ed_manager: CANONICAL_ROUTES.emergencyAnalytics,
+  physician: CANONICAL_ROUTES.emergencyWhiteboard,
+  ems_user: CANONICAL_ROUTES.emergencyEms,
+  read_only_viewer: CANONICAL_ROUTES.emergencyWhiteboard,
+  public_display: CANONICAL_ROUTES.emergencyWhiteboard,
+});
+
+export const USER_PROFILE_ROUTE_POLICIES = Object.freeze(
+  Object.fromEntries(
+    Object.entries(USER_PROFILE_ROUTE_DEFAULTS).map(([profileId, defaultRoute]) => [
+      profileId,
+      Object.freeze({
+        profileId,
+        defaultRoute,
+        dashboardVariant:
+          profileId === 'hospital_admin' || profileId === 'quality_safety_officer'
+            ? 'administrative'
+            : profileId === 'dispatcher' || profileId === 'ems_coordinator' || profileId === 'paramedic'
+              ? 'prehospital'
+              : profileId === 'registration_clerk'
+                ? 'reception'
+                : profileId === 'triage_nurse'
+                  ? 'triage'
+                  : profileId === 'demo_observer'
+                    ? 'read-only'
+                    : 'clinical',
+        patientDataScope:
+          profileId === 'dispatcher' || profileId === 'demo_observer'
+            ? 'operational-summary'
+            : profileId === 'lab_technician' || profileId === 'radiology_technician'
+              ? 'diagnostic-orders'
+              : profileId === 'hospital_admin' || profileId === 'quality_safety_officer'
+                ? 'aggregate-audit'
+                : profileId === 'registration_clerk'
+                  ? 'registration-demographics'
+                  : 'department-clinical',
+        allowedAlertActions:
+          profileId === 'demo_observer'
+            ? []
+            : profileId === 'dispatcher' || profileId === 'ems_coordinator'
+              ? ['view', 'escalate']
+              : profileId === 'quality_safety_officer'
+                ? ['view']
+                : ['view', 'acknowledge', 'escalate'],
+        allowedAiChiefActions:
+          profileId === 'demo_observer' || profileId === 'dispatcher'
+            ? ['view']
+            : profileId === 'quality_safety_officer'
+              ? ['view', 'review']
+              : profileId === 'it_admin'
+                ? ['view', 'configure']
+                : ['view', 'request', 'review'],
+      }),
+    ]),
+  ),
+);
+
+function freezeArray(value) {
+  return Object.freeze([...(value || [])]);
+}
+
+function normalizeProfileId(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+}
+
+function profileIdFromSubject(subject) {
+  if (!subject) return 'demo_observer';
+  if (typeof subject === 'string') return normalizeProfileId(subject);
+  return normalizeProfileId(
+    subject.role?.hospitalRole ||
+      subject.user?.role ||
+      subject.hospitalRole ||
+      subject.roleProfileId ||
+      subject.saasRole ||
+      subject.role,
+  );
+}
+
+function route(record) {
+  const normalized = {
+    aliases: [],
+    allowedRoles: ALL_USER_PROFILES,
+    breadcrumbs: ['CareDroid'],
+    description: '',
+    emergencySafe: true,
+    featureGate: null,
+    icon: 'layout-dashboard',
+    layout: 'app',
+    parentRoute: null,
+    readOnlyAllowed: false,
+    redirectTo: null,
+    requiredPermissions: [],
+    showInNav: true,
+    userProfileVisibility: record.allowedRoles || ALL_USER_PROFILES,
+    workflowOwner: 'CareDroid',
+    ...record,
+  };
+
+  return Object.freeze({
+    ...normalized,
+    aliases: freezeArray(normalized.aliases),
+    allowedRoles: freezeArray(normalized.allowedRoles),
+    breadcrumbs: freezeArray(normalized.breadcrumbs),
+    requiredPermissions: freezeArray(normalized.requiredPermissions),
+    userProfileVisibility: freezeArray(normalized.userProfileVisibility),
+    activePaths: normalized.activePaths ? freezeArray(normalized.activePaths) : undefined,
+    emergencyRoles: normalized.emergencyRoles ? freezeArray(normalized.emergencyRoles) : undefined,
+  });
+}
+
+export const CANONICAL_ROUTE_MAP = Object.freeze([
+  route({
+    id: 'command-center',
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    label: 'Command Center',
+    description: 'Cross-role ED command surface for journey, flow, and escalation awareness.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...OPS_PROFILES, ...PHYSICIAN_PROFILES, 'registered_nurse', 'demo_observer'],
+    navigationGroup: 'Command',
+    priority: 5,
+    icon: 'journey',
+    readOnlyAllowed: true,
+    breadcrumbs: ['Command', 'Command Center'],
+    helpTopicId: 'command-center',
+    workflowOwner: 'Charge nurse / ED command',
+  }),
+  route({
+    id: 'reception',
+    path: CANONICAL_ROUTES.emergencyReception,
+    label: 'Reception',
+    description: 'Emergency reception desk for arrival capture, identity verification, and queue handoff.',
+    pageComponent: 'ReceptionWorkspace',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registration_clerk', 'registered_nurse', 'emergency_physician', 'attending_physician', 'resident_physician'],
+    navigationGroup: 'Emergency',
+    priority: 10,
+    icon: 'user-check',
+    readOnlyAllowed: false,
+    breadcrumbs: ['Emergency', 'Reception'],
+    helpTopicId: 'reception',
+    workflowOwner: 'Registration clerk / emergency receptionist',
+  }),
+  route({
+    id: 'whiteboard',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
+    label: 'Dashboard',
+    description: 'Role-aware operational dashboard and emergency whiteboard.',
+    pageComponent: 'EmergencyWhiteboard',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, ...READ_ONLY_OPERATIONAL_PROFILES],
+    navigationGroup: 'Command',
+    priority: 20,
+    icon: 'layout-dashboard',
+    readOnlyAllowed: true,
+    aliases: [CANONICAL_ROUTES.dashboard],
+    activePaths: [CANONICAL_ROUTES.emergencyWhiteboard, '/emergency', CANONICAL_ROUTES.dashboard],
+    breadcrumbs: ['Command', 'Dashboard'],
+    helpTopicId: 'whiteboard',
+    workflowOwner: 'ED operations',
+  }),
+  route({
+    id: 'dispatch',
+    path: CANONICAL_ROUTES.emergencyDispatch,
+    label: 'Calls',
+    description: 'Emergency call intake and dispatch coordination.',
+    pageComponent: 'DispatchConsole',
+    requiredPermissions: [P.PATIENT_CREATE],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'dispatcher', 'ems_coordinator', 'charge_nurse'],
+    navigationGroup: 'Emergency',
+    priority: 25,
+    icon: 'send',
+    aliases: ['/emergency/calls'],
+    breadcrumbs: ['Emergency', 'Calls'],
+    helpTopicId: 'dispatcher',
+    workflowOwner: 'Dispatcher',
+  }),
+  route({
+    id: 'ems',
+    path: CANONICAL_ROUTES.emergencyEms,
+    label: 'EMS',
+    description: 'EMS arrivals, pre-arrival notifications, bay readiness, and handoff completion.',
+    pageComponent: 'EMSPipeline',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'emergency_physician', 'attending_physician', 'resident_physician', 'paramedic', 'registration_clerk', 'ems_coordinator', 'dispatcher'],
+    navigationGroup: 'Emergency',
+    priority: 30,
+    icon: 'ambulance',
+    featureGate: 'ems_pipeline',
+    aliases: ['/emergency/pre-arrival'],
+    breadcrumbs: ['Emergency', 'EMS'],
+    helpTopicId: 'ems',
+    workflowOwner: 'EMS coordinator / paramedic',
+  }),
+  route({
+    id: 'ed-readiness',
+    path: CANONICAL_ROUTES.emergencyEdReadiness,
+    label: 'Readiness',
+    description: 'ED readiness board for inbound critical arrivals and operational preparedness.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'ems_coordinator', 'patient_flow_coordinator'],
+    navigationGroup: 'Emergency',
+    priority: 35,
+    icon: 'shield-check',
+    aliases: ['/emergency/readiness'],
+    breadcrumbs: ['Emergency', 'Readiness'],
+    helpTopicId: 'ems-readiness',
+    workflowOwner: 'EMS coordinator',
+  }),
+  route({
+    id: 'intake',
+    path: CANONICAL_ROUTES.emergencyIntake,
+    label: 'Intake',
+    description: 'Structured patient intake flow; reception remains the preferred embedded entry.',
+    pageComponent: 'SmartIntake',
+    requiredPermissions: [P.PATIENT_CREATE],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse', 'emergency_physician', 'attending_physician', 'resident_physician', 'registration_clerk', 'paramedic'],
+    navigationGroup: 'Patients',
+    showInNav: false,
+    priority: 40,
+    icon: 'intake',
+    aliases: [CANONICAL_ROUTES.intake],
+    breadcrumbs: ['Patients', 'Intake'],
+    helpTopicId: 'smart-intake',
+    workflowOwner: 'Reception / triage',
+  }),
+  route({
+    id: 'patients',
+    path: CANONICAL_ROUTES.emergencyPatients,
+    label: 'Patients',
+    description: 'Patient list and journey overview.',
+    pageComponent: 'PatientsRoute',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registration_clerk', 'pharmacist', 'quality_safety_officer', 'demo_observer'],
+    navigationGroup: 'Patients',
+    priority: 45,
+    icon: 'emergency-patients',
+    aliases: ['/patients'],
+    breadcrumbs: ['Patients'],
+    helpTopicId: 'patients',
+    workflowOwner: 'Clinical team',
+  }),
+  route({
+    id: 'patient-detail',
+    path: CANONICAL_ROUTES.patientProfile,
+    label: 'Patient Profile',
+    description: 'Patient-specific detail route for direct chart review.',
+    pageComponent: 'PatientProfileRoute',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registration_clerk', 'pharmacist'],
+    navigationGroup: 'Patients',
+    showInNav: false,
+    priority: 46,
+    icon: 'emergency-patients',
+    parentRoute: CANONICAL_ROUTES.emergencyPatients,
+    breadcrumbs: ['Patients', 'Patient Profile'],
+    helpTopicId: 'patients',
+    workflowOwner: 'Clinical team',
+  }),
+  route({
+    id: 'queues',
+    path: CANONICAL_ROUTES.emergencyQueues,
+    label: 'Queue',
+    description: 'Waiting, triage, reassessment, and treatment queue coordination.',
+    pageComponent: 'QueueRoute',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registration_clerk', 'ems_coordinator'],
+    navigationGroup: 'Patients',
+    priority: 50,
+    icon: 'queues',
+    aliases: [CANONICAL_ROUTES.queue],
+    breadcrumbs: ['Patients', 'Queue'],
+    helpTopicId: 'queue',
+    workflowOwner: 'Charge nurse / patient flow coordinator',
+  }),
+  route({
+    id: 'triage',
+    path: CANONICAL_ROUTES.triage,
+    label: 'Triage',
+    description: 'Triage nurse entry point focused on pretriage and acuity workflow.',
+    pageComponent: 'TriageWorkspaceRoute',
+    requiredPermissions: [P.PATIENT_READ, P.TRIAGE_READ],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse'],
+    emergencyRoles: ['admin', 'ed_manager', 'charge_nurse', 'triage_nurse'],
+    navigationGroup: 'Clinical',
+    priority: 55,
+    icon: 'stethoscope',
+    breadcrumbs: ['Clinical', 'Triage'],
+    helpTopicId: 'triage',
+    workflowOwner: 'Triage nurse',
+  }),
+  route({
+    id: 'reassessment',
+    path: CANONICAL_ROUTES.emergencyReassessment,
+    label: 'Reassess',
+    description: 'Reassessment timers and overdue clinical review.',
+    pageComponent: 'ReassessmentRoute',
+    requiredPermissions: [P.PATIENT_READ, P.TRIAGE_READ],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse', 'emergency_physician', 'attending_physician', 'resident_physician'],
+    navigationGroup: 'Clinical',
+    priority: 60,
+    icon: 'reassessment',
+    breadcrumbs: ['Clinical', 'Reassessment'],
+    helpTopicId: 'reassessment',
+    workflowOwner: 'Nursing',
+  }),
+  route({
+    id: 'alerts',
+    path: CANONICAL_ROUTES.emergencyAlerts,
+    label: 'Alerts',
+    description: 'Critical alerts, escalation status, and acknowledgement workflow.',
+    pageComponent: 'ClinicalAlertsPage',
+    requiredPermissions: [P.ALERT_READ],
+    allowedRoles: ALL_USER_PROFILES,
+    navigationGroup: 'Emergency',
+    priority: 65,
+    icon: 'alerts',
+    aliases: [CANONICAL_ROUTES.alerts],
+    readOnlyAllowed: true,
+    breadcrumbs: ['Emergency', 'Alerts'],
+    helpTopicId: 'alerts',
+    workflowOwner: 'Charge nurse / safety officer',
+  }),
+  route({
+    id: 'diagnostics',
+    path: CANONICAL_ROUTES.emergencyDiagnostics,
+    label: 'Diagnostics',
+    description: 'Diagnostic coordination for lab, radiology, medication, and order review.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, 'pharmacist', 'lab_technician', 'radiology_technician', 'quality_safety_officer', 'demo_observer'],
+    navigationGroup: 'Clinical',
+    priority: 70,
+    icon: 'stethoscope',
+    aliases: ['/diagnostics'],
+    readOnlyAllowed: true,
+    breadcrumbs: ['Clinical', 'Diagnostics'],
+    helpTopicId: 'diagnostics',
+    workflowOwner: 'Diagnostics team',
+  }),
+  route({
+    id: 'handoffs',
+    path: CANONICAL_ROUTES.emergencyHandoffs,
+    label: 'Handoffs',
+    description: 'Shift, EMS, referral, and patient movement handoff coordination.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registered_nurse', 'ems_coordinator', 'patient_flow_coordinator'],
+    navigationGroup: 'Operations',
+    priority: 75,
+    icon: 'notes',
+    aliases: ['/handoffs'],
+    breadcrumbs: ['Operations', 'Handoffs'],
+    helpTopicId: 'handoffs',
+    workflowOwner: 'Charge nurse / patient flow coordinator',
+  }),
+  route({
+    id: 'capacity',
+    path: CANONICAL_ROUTES.emergencyCapacity,
+    label: 'Flow & Capacity',
+    description: 'Capacity, boarding, bed pressure, and department throughput management.',
+    pageComponent: 'CapacityRoute',
+    requiredPermissions: [P.ANALYTICS_READ],
+    allowedRoles: [...OPS_PROFILES, 'quality_safety_officer'],
+    navigationGroup: 'Operations',
+    priority: 80,
+    icon: 'capacity',
+    featureGate: 'capacity_intel',
+    aliases: [CANONICAL_ROUTES.departments],
+    breadcrumbs: ['Operations', 'Flow & Capacity'],
+    helpTopicId: 'capacity',
+    workflowOwner: 'Charge nurse / patient flow coordinator',
+  }),
+  route({
+    id: 'referrals',
+    path: CANONICAL_ROUTES.emergencyReferrals,
+    label: 'Referrals',
+    description: 'Referral, consult, and transfer coordination.',
+    pageComponent: 'ReferralPanel',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...PHYSICIAN_PROFILES, 'super_admin', 'charge_nurse'],
+    navigationGroup: 'Clinical',
+    priority: 85,
+    icon: 'referrals',
+    featureGate: 'referral_intel',
+    breadcrumbs: ['Clinical', 'Referrals'],
+    helpTopicId: 'referrals',
+    workflowOwner: 'Physician / charge nurse',
+  }),
+  route({
+    id: 'copilot',
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    label: 'AI Chief',
+    description: 'Docked AI Chief navigation item.',
+    pageComponent: 'CopilotRoute',
+    requiredPermissions: [P.AI_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'quality_safety_officer', 'demo_observer'],
+    navigationGroup: 'Intelligence',
+    priority: 91,
+    icon: 'ed-copilot',
+    aliases: [CANONICAL_ROUTES.aiChief, '/copilot', '/assistant', '/chat', '/ai'],
+    readOnlyAllowed: true,
+    breadcrumbs: ['Intelligence', 'AI Chief'],
+    helpTopicId: 'copilot',
+    workflowOwner: 'Clinical leadership',
+  }),
+  route({
+    id: 'tools',
+    path: CANONICAL_ROUTES.emergencyTools,
+    label: 'Medical Tools',
+    description: 'Clinical calculators, protocols, and supporting medical tools.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'pharmacist', 'lab_technician', 'radiology_technician', 'demo_observer'],
+    navigationGroup: 'Clinical',
+    priority: 95,
+    icon: 'clinical-tools',
+    breadcrumbs: ['Clinical', 'Medical Tools'],
+    helpTopicId: 'tools',
+    workflowOwner: 'Clinical team',
+  }),
+  route({
+    id: 'analytics',
+    path: CANONICAL_ROUTES.emergencyAnalytics,
+    label: 'Analytics',
+    description: 'Operational and clinical analytics for throughput, safety, and compliance review.',
+    pageComponent: 'EmergencyAnalytics',
+    requiredPermissions: [P.ANALYTICS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'patient_flow_coordinator', 'quality_safety_officer', 'demo_observer', 'ems_coordinator'],
+    navigationGroup: 'Intelligence',
+    priority: 100,
+    icon: 'emergency-analytics',
+    aliases: [CANONICAL_ROUTES.analytics],
+    readOnlyAllowed: true,
+    breadcrumbs: ['Intelligence', 'Analytics'],
+    helpTopicId: 'analytics',
+    workflowOwner: 'Hospital administrator / quality safety officer',
+  }),
+  route({
+    id: 'reports',
+    path: CANONICAL_ROUTES.emergencyReports,
+    label: 'Reports',
+    description: 'Operational reporting, quality review, and safety evidence.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.REPORTS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'patient_flow_coordinator', 'quality_safety_officer', 'demo_observer'],
+    navigationGroup: 'Intelligence',
+    priority: 105,
+    icon: 'report',
+    aliases: [CANONICAL_ROUTES.reports],
+    readOnlyAllowed: true,
+    breadcrumbs: ['Intelligence', 'Reports'],
+    helpTopicId: 'reports',
+    workflowOwner: 'Quality safety officer',
+  }),
+  route({
+    id: 'staff',
+    path: CANONICAL_ROUTES.staff,
+    label: 'Staff',
+    description: 'Staffing and shift coordination entry; routed to handoff/shift surfaces in the current app.',
+    pageComponent: 'EmergencyShiftSummary',
+    requiredPermissions: [P.STAFF_READ],
+    allowedRoles: [...OPS_PROFILES, ...CLINICAL_PROFILES, 'registered_nurse'],
+    navigationGroup: 'Operations',
+    showInNav: false,
+    priority: 110,
+    icon: 'users',
+    redirectTo: CANONICAL_ROUTES.emergencyShift,
+    breadcrumbs: ['Operations', 'Staff'],
+    helpTopicId: 'shift',
+    workflowOwner: 'Charge nurse',
+  }),
+  route({
+    id: 'pulse',
+    path: CANONICAL_ROUTES.emergencyPulse,
+    label: 'Pulse',
+    description: 'Live ED pulse and status summary.',
+    pageComponent: 'EmergencyDepartmentPulse',
+    requiredPermissions: [P.ANALYTICS_READ],
+    allowedRoles: [...OPS_PROFILES, ...CLINICAL_PROFILES, 'demo_observer'],
+    navigationGroup: 'Intelligence',
+    priority: 115,
+    icon: 'activity',
+    showInNav: true,
+    readOnlyAllowed: true,
+    breadcrumbs: ['Intelligence', 'Pulse'],
+    helpTopicId: 'pulse',
+    workflowOwner: 'ED operations',
+  }),
+  route({
+    id: 'shift',
+    path: CANONICAL_ROUTES.emergencyShift,
+    label: 'Shift',
+    description: 'Shift summary and handoff readiness.',
+    pageComponent: 'EmergencyShiftSummary',
+    requiredPermissions: [P.STAFF_READ],
+    allowedRoles: [...OPS_PROFILES, ...CLINICAL_PROFILES, 'registered_nurse'],
+    navigationGroup: 'Operations',
+    priority: 120,
+    icon: 'clock',
+    breadcrumbs: ['Operations', 'Shift'],
+    helpTopicId: 'shift',
+    workflowOwner: 'Charge nurse',
+  }),
+  route({
+    id: 'settings',
+    path: CANONICAL_ROUTES.emergencySettings,
+    label: 'Settings',
+    description: 'Role-aware ED settings and platform configuration.',
+    pageComponent: 'EmergencySettings',
+    requiredPermissions: [P.SETTINGS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'registration_clerk', 'it_admin'],
+    navigationGroup: 'Administration',
+    priority: 125,
+    icon: 'settings',
+    aliases: [CANONICAL_ROUTES.settings],
+    breadcrumbs: ['Administration', 'Settings'],
+    helpTopicId: 'settings',
+    workflowOwner: 'IT administrator',
+  }),
+  route({
+    id: 'help',
+    path: CANONICAL_ROUTES.emergencyHelp,
+    label: 'Help',
+    description: 'Route-aware and role-aware CareDroid user manual.',
+    pageComponent: 'HelpHubPage',
+    requiredPermissions: [],
+    allowedRoles: ALL_USER_PROFILES,
+    navigationGroup: 'Help',
+    priority: 130,
+    icon: 'help-circle',
+    aliases: ['/help'],
+    emergencySafe: true,
+    readOnlyAllowed: true,
+    breadcrumbs: ['Help'],
+    helpTopicId: 'help',
+    workflowOwner: 'CareDroid support',
+  }),
+  route({
+    id: 'fleet',
+    path: CANONICAL_ROUTES.fleetCommand,
+    label: 'Fleet',
+    description: 'Fleet operations entry retained as an extension route; ED users are redirected to EMS when fleet is not mounted.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'it_admin', 'ems_coordinator', 'dispatcher'],
+    navigationGroup: 'Operations',
+    priority: 140,
+    icon: 'ambulance',
+    emergencySafe: false,
+    breadcrumbs: ['Operations', 'Fleet'],
+    helpTopicId: 'ems',
+    workflowOwner: 'EMS operations',
+  }),
+  route({
+    id: 'surveillance',
+    path: CANONICAL_ROUTES.surveillanceNexus,
+    label: 'Surveillance',
+    description: 'Surveillance and device-awareness extension route.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.SETTINGS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'it_admin', 'quality_safety_officer'],
+    navigationGroup: 'Operations',
+    priority: 145,
+    icon: 'activity',
+    emergencySafe: false,
+    breadcrumbs: ['Operations', 'Surveillance'],
+    helpTopicId: 'settings',
+    workflowOwner: 'IT administrator',
+  }),
+  route({
+    id: 'simulation',
+    path: CANONICAL_ROUTES.simulation,
+    label: 'Simulation',
+    description: 'Simulation and training route redirected into the current tools surface.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.ANALYTICS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'quality_safety_officer'],
+    navigationGroup: 'Intelligence',
+    priority: 150,
+    icon: 'list-check',
+    emergencySafe: false,
+    redirectTo: CANONICAL_ROUTES.emergencyTools,
+    breadcrumbs: ['Intelligence', 'Simulation'],
+    helpTopicId: 'tools',
+    workflowOwner: 'Education / quality',
+  }),
+  route({
+    id: 'laboratory',
+    path: CANONICAL_ROUTES.laboratory,
+    label: 'Laboratory',
+    description: 'Laboratory route represented through Diagnostics in the current ED workflow.',
+    pageComponent: 'FullJourneyOperatingPage',
+    requiredPermissions: [P.LABS_READ],
+    allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'resident_physician', 'lab_technician', 'pharmacist'],
+    navigationGroup: 'Clinical',
+    priority: 155,
+    icon: 'stethoscope',
+    readOnlyAllowed: true,
+    redirectTo: CANONICAL_ROUTES.emergencyDiagnostics,
+    breadcrumbs: ['Clinical', 'Laboratory'],
+    helpTopicId: 'diagnostics',
+    workflowOwner: 'Laboratory',
+  }),
+  route({
+    id: 'knowledge',
+    path: CANONICAL_ROUTES.knowledgeGraph,
+    label: 'Knowledge Graph',
+    description: 'Knowledge graph extension route redirected to tools and guidance surfaces when not mounted.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.AI_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'it_admin', 'quality_safety_officer'],
+    navigationGroup: 'Intelligence',
+    priority: 160,
+    icon: 'chart-bar',
+    emergencySafe: false,
+    breadcrumbs: ['Intelligence', 'Knowledge Graph'],
+    helpTopicId: 'tools',
+    workflowOwner: 'Platform intelligence',
+  }),
+  route({
+    id: 'ai-center',
+    path: CANONICAL_ROUTES.aiCommandCenter,
+    label: 'AI Center',
+    description: 'AI command extension route redirected to AI Chief in the ED app.',
+    pageComponent: 'ToolsOverview',
+    requiredPermissions: [P.AI_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'it_admin', 'quality_safety_officer'],
+    navigationGroup: 'Intelligence',
+    priority: 165,
+    icon: 'robot',
+    emergencySafe: false,
+    redirectTo: CANONICAL_ROUTES.emergencyCopilot,
+    breadcrumbs: ['Intelligence', 'AI Center'],
+    helpTopicId: 'copilot',
+    workflowOwner: 'AI governance',
+  }),
+  route({
+    id: 'cosmos',
+    path: CANONICAL_ROUTES.cosmosViewer,
+    label: 'Cosmos',
+    description: 'Retired visual extension route redirected to the operational dashboard.',
+    pageComponent: 'EmergencyWhiteboard',
+    requiredPermissions: [P.PATIENT_READ],
+    allowedRoles: ALL_USER_PROFILES,
+    navigationGroup: 'Intelligence',
+    priority: 170,
+    icon: 'chart-bar',
+    emergencySafe: false,
+    redirectTo: CANONICAL_ROUTES.emergencyWhiteboard,
+    breadcrumbs: ['Intelligence', 'Cosmos'],
+    helpTopicId: 'whiteboard',
+    workflowOwner: 'CareDroid platform',
+  }),
+  route({
+    id: 'admin',
+    path: CANONICAL_ROUTES.adminOperations,
+    label: 'Admin',
+    description: 'Administrative operations, staff workflows, tenant settings, and audit views.',
+    pageComponent: 'AdminOperationsShell',
+    requiredPermissions: [P.SETTINGS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'it_admin', 'quality_safety_officer'],
+    navigationGroup: 'Administration',
+    priority: 200,
+    icon: 'settings',
+    emergencySafe: false,
+    breadcrumbs: ['Administration', 'Admin'],
+    helpTopicId: 'admin',
+    workflowOwner: 'Hospital administrator / IT administrator',
+  }),
+  route({
+    id: 'audit',
+    path: CANONICAL_ROUTES.audit,
+    label: 'Audit',
+    description: 'Governance and audit workspace.',
+    pageComponent: 'PlatformGovernanceWorkspace',
+    requiredPermissions: [P.AUDIT_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'it_admin', 'quality_safety_officer'],
+    navigationGroup: 'Administration',
+    showInNav: false,
+    priority: 210,
+    icon: 'report',
+    emergencySafe: false,
+    readOnlyAllowed: true,
+    breadcrumbs: ['Administration', 'Audit'],
+    helpTopicId: 'audit',
+    workflowOwner: 'Quality safety officer / IT administrator',
+  }),
+  route({
+    id: 'integrations',
+    path: CANONICAL_ROUTES.integrationHub,
+    label: 'Integrations',
+    description: 'Integration hub for connected systems and external handoffs.',
+    pageComponent: 'IntegrationHubPage',
+    requiredPermissions: [P.SETTINGS_READ],
+    allowedRoles: ['super_admin', 'hospital_admin', 'it_admin', 'ed_director'],
+    navigationGroup: 'Administration',
+    showInNav: false,
+    priority: 220,
+    icon: 'integrations',
+    emergencySafe: false,
+    breadcrumbs: ['Administration', 'Integrations'],
+    helpTopicId: 'integrations',
+    workflowOwner: 'IT administrator',
+  }),
+  route({
+    id: 'platform',
+    path: CANONICAL_ROUTES.workspace,
+    label: 'Platform',
+    description: 'Platform entry route retained for compatibility.',
+    pageComponent: 'EdApplicationEntryRedirect',
+    requiredPermissions: [],
+    allowedRoles: ALL_USER_PROFILES,
+    navigationGroup: 'Administration',
+    showInNav: false,
+    priority: 230,
+    icon: 'platform',
+    emergencySafe: false,
+    redirectTo: CANONICAL_ROUTES.emergencyWhiteboard,
+    breadcrumbs: ['Administration', 'Platform'],
+    helpTopicId: 'platform-start',
+    workflowOwner: 'CareDroid platform',
+  }),
+]);
+
+export const CANONICAL_ROUTE_MAP_BY_ID = Object.freeze(
+  Object.fromEntries(CANONICAL_ROUTE_MAP.map((record) => [record.id, record])),
+);
+
+function normalizePathPattern(path) {
+  return String(path || '').replace(/\/+$/, '') || '/';
+}
+
+export function normalizeRoutePath(path) {
+  const [pathname] = String(path || '/').split(/[?#]/);
+  return normalizePathPattern(pathname);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function routePatternMatches(pattern, pathname, allowPrefix = true) {
+  const normalizedPattern = normalizePathPattern(pattern);
+  const normalizedPath = normalizeRoutePath(pathname);
+  if (normalizedPattern === normalizedPath) return true;
+  if (
+    allowPrefix &&
+    !normalizedPattern.includes(':') &&
+    normalizedPath.startsWith(`${normalizedPattern}/`)
+  ) {
+    return true;
+  }
+  if (!allowPrefix && !normalizedPattern.includes(':')) return false;
+  const expression = `^${normalizedPattern
+    .split('/')
+    .map((segment) => (segment.startsWith(':') ? '[^/]+' : escapeRegExp(segment)))
+    .join('/')}(?:/.*)?$`;
+  return new RegExp(expression).test(normalizedPath);
+}
+
+export function getRouteByPath(path) {
+  const normalizedPath = normalizeRoutePath(path);
+  return (
+    CANONICAL_ROUTE_MAP.find((record) => routePatternMatches(record.path, normalizedPath)) ||
+    CANONICAL_ROUTE_MAP.find((record) =>
+      (record.aliases || []).some((alias) => routePatternMatches(alias, normalizedPath, false)),
+    ) ||
+    null
+  );
+}
+
+export function getRouteById(id) {
+  return CANONICAL_ROUTE_MAP_BY_ID[id] || null;
+}
+
+export function getBreadcrumbsForRoute(pathOrId) {
+  const routeRecord =
+    CANONICAL_ROUTE_MAP_BY_ID[pathOrId] || getRouteByPath(pathOrId) || null;
+  return routeRecord ? routeRecord.breadcrumbs : Object.freeze(['CareDroid']);
+}
+
+export function getDefaultRouteForProfile(profile) {
+  const profileId = profileIdFromSubject(profile);
+  return (
+    USER_PROFILE_ROUTE_DEFAULTS[profileId] ||
+    USER_PROFILE_ROUTE_DEFAULTS[profileId.replace(/-/g, '_')] ||
+    CANONICAL_ROUTES.emergencyWhiteboard
+  );
+}
+
+export function getAccessibleRoutesForProfile(profile) {
+  const profileId = profileIdFromSubject(profile);
+  const explicitAccess =
+    profile?.routeAccess ||
+    profile?.navigationAccess ||
+    profile?.routes?.allowed ||
+    profile?.catalog?.navigationRoutes ||
+    null;
+
+  if (explicitAccess?.length) {
+    const access = new Set(explicitAccess.map((path) => normalizeRoutePath(path)));
+    return CANONICAL_ROUTE_MAP.filter((record) =>
+      [record.path, ...(record.aliases || [])].some((path) => access.has(normalizeRoutePath(path))),
+    );
+  }
+
+  return CANONICAL_ROUTE_MAP.filter((record) =>
+    (record.allowedRoles || []).map(normalizeProfileId).includes(profileId),
+  );
+}
+
+export function canRouteRecordIncludeProfile(routeRecord, profile) {
+  const profileId = profileIdFromSubject(profile);
+  return (routeRecord?.allowedRoles || []).map(normalizeProfileId).includes(profileId);
+}
 
 export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
