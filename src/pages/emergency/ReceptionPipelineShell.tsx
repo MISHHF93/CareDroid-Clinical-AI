@@ -1,13 +1,22 @@
 import React from 'react';
-import { RECEPTION_PIPELINE_STAGES } from '../../config/emergencyPipelineModel';
+import { RECEPTION_PIPELINE_STAGES, RECEPTION_PIPELINE_STAGE } from '../../config/emergencyPipelineModel';
 import './ReceptionPipelineShell.css';
+
+type ReceptionPipelineStageId = typeof RECEPTION_PIPELINE_STAGE[keyof typeof RECEPTION_PIPELINE_STAGE];
+
+type ReceptionPipelineShellProps = {
+  activeStage?: ReceptionPipelineStageId;
+  onStageChange?: (stage: ReceptionPipelineStageId) => void;
+  showStageRail?: boolean;
+  children: React.ReactNode;
+};
 
 export default function ReceptionPipelineShell({
   activeStage,
   onStageChange,
   showStageRail = true,
   children,
-}) {
+}: ReceptionPipelineShellProps) {
   if (!showStageRail) {
     return <div className="reception-pipeline-shell">{children}</div>;
   }

@@ -214,9 +214,13 @@ export default function ReceptionWorkspace() {
   const clinicalOverride = assertReceptionMutationAllowed(emergencyRole.role, EMERGENCY_ACTIONS.triage);
   const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
   const liveRedFlags = detectReceptionRedFlags(draft);
-  const criticalNeeded =
-    aiAssist?.urgencySuggestion === 'critical' ||
-    runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical';
+  const criticalNeeded = useMemo(
+    () =>
+      aiAssist?.urgencySuggestion === 'critical' ||
+      runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical',
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [aiAssist?.urgencySuggestion, draft.chiefComplaint, draft.redFlagSymptoms, draft.consciousnessStatus, draft.breathingStatus, draft.visibleDistress, draft.painLevel, draft.arrivalType],
+  );
 
   const receptionQueue = useMemo(
     () =>
@@ -551,6 +555,15 @@ export default function ReceptionWorkspace() {
                 <option value="deferred">Deferred</option>
               </select>
             </label>
+            <label className="reception-command-field reception-command-field--wide">
+              <span>Reception notes</span>
+              <textarea
+                value={draft.notes || ''}
+                onChange={(event) => updateDraft({ notes: event.target.value })}
+                placeholder="Additional observations for handoff (optional)"
+                rows={2}
+              />
+            </label>
           </div>
         </section>
 
@@ -587,9 +600,19 @@ export default function ReceptionWorkspace() {
               <p className="reception-command-ai__notice">{aiAssist.safetyNotice}</p>
             </div>
           ) : (
-            <div className="reception-command-empty">
-              <Sparkles size={20} aria-hidden="true" />
-              <span>Run assist after critical fields are started.</span>
+            <div className="reception-command-ai-empty">
+              <div className="reception-command-empty">
+                <Sparkles size={20} aria-hidden="true" />
+                <span>Run assist after critical fields are started.</span>
+              </div>
+              <button
+                type="button"
+                className="reception-command-ai-fallback"
+                onClick={() => runAiAssist({ aiUnavailable: true })}
+                title="Use when AI is unavailable — activates manual intake fallback"
+              >
+                Manual fallback (AI unavailable)
+              </button>
             </div>
           )}
         </aside>
