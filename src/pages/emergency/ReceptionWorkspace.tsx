@@ -218,7 +218,6 @@ export default function ReceptionWorkspace() {
     () =>
       aiAssist?.urgencySuggestion === 'critical' ||
       runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical',
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [aiAssist?.urgencySuggestion, draft.chiefComplaint, draft.redFlagSymptoms, draft.consciousnessStatus, draft.breathingStatus, draft.visibleDistress, draft.painLevel, draft.arrivalType],
   );
 
