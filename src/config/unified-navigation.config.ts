@@ -49,6 +49,12 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'analytics',
   'reports',
   'settings',
+  // Extended platform pages (visible to roles that have access)
+  'hospital-map',
+  'executive',
+  'predictive-analytics',
+  'ai-center',
+  'medical-iot',
 ]);
 
 /** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
@@ -56,6 +62,8 @@ export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
   'help',
+  'admin',
+  'audit',
 ]);
 
 /** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
@@ -69,9 +77,7 @@ export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'simulation',
   'laboratory',
   'knowledge',
-  'audit',
   'ai-center',
-  'admin',
 ]);
 
 export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
@@ -204,6 +210,10 @@ const NAV_FEATURE_IDS = Object.freeze({
   audit: 'audit',
   'ai-center': 'ai_command_center',
   admin: 'admin_console',
+  'hospital-map': 'hospital_map',
+  executive: 'executive_command_center',
+  'predictive-analytics': 'predictive_analytics',
+  'medical-iot': 'medical_iot',
 } as const);
 
 const NAV_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({
@@ -363,12 +373,15 @@ export function getVisibleNavigation(
   options: { saasRole?: string | null; compiledProfile?: CompiledCareDroidAccessProfile | null } = {},
 ): readonly NavigationItem[] {
   if (options.compiledProfile) {
+    const profile = options.compiledProfile as CompiledCareDroidAccessProfile;
+    const hospitalRole: string = (profile.role.hospitalRole as string) || profile.role.emergencyRoleId;
+    const hiddenForRole = getHiddenNavItemIdsForRole(hospitalRole);
     const visibleItems = getPilotCustomerNavigationItems(
       NAVIGATION_ITEMS.filter(
-        (item) => canSeeNavigationItem(options.compiledProfile as CompiledCareDroidAccessProfile, item),
+        (item) => canSeeNavigationItem(profile, item) && !hiddenForRole.has(item.id),
       ),
     );
-    return sortNavigationItemsForRole(visibleItems, options.compiledProfile.role.emergencyRoleId);
+    return sortNavigationItemsForRole(visibleItems, hospitalRole);
   }
   if (options.saasRole && (SAAS_USER_ROLES as readonly string[]).includes(options.saasRole)) {
     return getVisibleNavigationForSaasRole(options.saasRole);

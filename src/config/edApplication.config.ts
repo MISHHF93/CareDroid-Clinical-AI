@@ -72,40 +72,42 @@ export type EdExtensionRedirect = Readonly<{
  * Non-ED extension paths fold back into the ED application (longest-prefix wins).
  */
 export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Object.freeze([
-  { prefix: '/start', to: ED_APPLICATION.defaultHomeRoute, reason: 'platform-entry-hub' },
-  { prefix: '/dashboard', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'legacy-dashboard' },
-  { prefix: '/app', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'legacy-app-alias' },
-  { prefix: '/integrations/hub', to: `${CANONICAL_ROUTES.emergencySettings}#integrations`, reason: 'integration-hub' },
-  { prefix: '/tools/catalog', to: CANONICAL_ROUTES.emergencyTools, reason: 'developer-catalog' },
-  { prefix: '/emergency/intake', to: CANONICAL_ROUTES.emergencyReception, reason: 'intake-through-reception' },
-  { prefix: '/fleet', to: CANONICAL_ROUTES.emergencyEms, reason: 'fleet-extension' },
-  { prefix: '/vehicle', to: CANONICAL_ROUTES.emergencyEms, reason: 'fleet-extension' },
-  { prefix: '/surveillance', to: CANONICAL_ROUTES.emergencySettings, reason: 'surveillance-extension' },
-  { prefix: '/simulation', to: CANONICAL_ROUTES.emergencyAnalytics, reason: 'simulation-extension' },
-  { prefix: '/cosmos', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'cosmos-extension' },
-  { prefix: '/workspaces', to: CANONICAL_ROUTES.emergencySettings, reason: 'workspace-platform' },
-  { prefix: '/workspace', to: CANONICAL_ROUTES.emergencySettings, reason: 'workspace-platform' },
-  { prefix: '/discover', to: CANONICAL_ROUTES.emergencySettings, reason: 'discovery-platform' },
-  { prefix: '/executive', to: CANONICAL_ROUTES.emergencyAnalytics, reason: 'executive-platform' },
-  { prefix: '/ai-command-center', to: CANONICAL_ROUTES.emergencyCopilot, reason: 'ai-command-center' },
-  { prefix: '/laboratory', to: CANONICAL_ROUTES.emergencySettings, reason: 'laboratory-extension' },
-  { prefix: '/knowledge-graph', to: CANONICAL_ROUTES.emergencyTools, reason: 'knowledge-extension' },
-  { prefix: '/knowledge-hub', to: CANONICAL_ROUTES.emergencyTools, reason: 'knowledge-extension' },
-  { prefix: '/knowledge-base', to: CANONICAL_ROUTES.emergencyTools, reason: 'knowledge-extension' },
-  { prefix: '/digital-twin-intelligence', to: CANONICAL_ROUTES.emergencySettings, reason: 'digital-twin' },
-  { prefix: '/digital-twin', to: CANONICAL_ROUTES.emergencySettings, reason: 'digital-twin' },
-  { prefix: '/hospital-map', to: CANONICAL_ROUTES.emergencyWhiteboard, reason: 'hospital-map' },
-  { prefix: '/medical-iot', to: CANONICAL_ROUTES.emergencySettings, reason: 'iot-extension' },
-  { prefix: '/devices', to: CANONICAL_ROUTES.emergencySettings, reason: 'device-fleet' },
-  { prefix: '/live-map', to: CANONICAL_ROUTES.emergencyEms, reason: 'live-map' },
-  { prefix: '/operations-center', to: CANONICAL_ROUTES.emergencyAnalytics, reason: 'operations-center' },
-  { prefix: '/operations', to: CANONICAL_ROUTES.emergencyAnalytics, reason: 'operations-platform' },
-  { prefix: '/platform-intelligence', to: CANONICAL_ROUTES.emergencySettings, reason: 'platform-intelligence' },
-  { prefix: '/platform-admin', to: CANONICAL_ROUTES.emergencySettings, reason: 'platform-admin' },
-  { prefix: '/enterprise-platform', to: CANONICAL_ROUTES.emergencySettings, reason: 'enterprise-platform' },
-  { prefix: '/trackmind', to: CANONICAL_ROUTES.emergencySettings, reason: 'trackmind-extension' },
-  { prefix: '/customer-portal', to: CANONICAL_ROUTES.emergencySettings, reason: 'customer-portal' },
-  { prefix: '/marketplace', to: CANONICAL_ROUTES.emergencySettings, reason: 'marketplace' },
+  { prefix: '/start',                     to: ED_APPLICATION.defaultHomeRoute,           reason: 'platform-entry-hub' },
+  { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-dashboard' },
+  { prefix: '/app',                       to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-app-alias' },
+  { prefix: '/integrations/hub',          to: `${CANONICAL_ROUTES.emergencySettings}#integrations`, reason: 'integration-hub' },
+  { prefix: '/tools/catalog',             to: CANONICAL_ROUTES.emergencyTools,           reason: 'developer-catalog' },
+  { prefix: '/emergency/intake',          to: CANONICAL_ROUTES.emergencyReception,       reason: 'intake-through-reception' },
+  { prefix: '/vehicle',                   to: CANONICAL_ROUTES.emergencyEms,             reason: 'fleet-extension' },
+  { prefix: '/surveillance',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'surveillance-extension' },
+  { prefix: '/cosmos',                    to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'cosmos-extension' },
+  { prefix: '/workspaces',                to: CANONICAL_ROUTES.emergencySettings,        reason: 'workspace-platform' },
+  { prefix: '/workspace',                 to: CANONICAL_ROUTES.emergencySettings,        reason: 'workspace-platform' },
+  { prefix: '/discover',                  to: CANONICAL_ROUTES.emergencySettings,        reason: 'discovery-platform' },
+  { prefix: '/knowledge-graph',           to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
+  { prefix: '/knowledge-hub',             to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
+  { prefix: '/knowledge-base',            to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
+  { prefix: '/digital-twin-intelligence', to: CANONICAL_ROUTES.emergencySettings,        reason: 'digital-twin' },
+  { prefix: '/digital-twin',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'digital-twin' },
+  { prefix: '/live-map',                  to: CANONICAL_ROUTES.emergencyEms,             reason: 'live-map-fallback' },
+  { prefix: '/operations-center',         to: CANONICAL_ROUTES.emergencyAnalytics,       reason: 'operations-center' },
+  { prefix: '/platform-intelligence',     to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-intelligence' },
+  { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
+  { prefix: '/enterprise-platform',       to: CANONICAL_ROUTES.emergencySettings,        reason: 'enterprise-platform' },
+  { prefix: '/trackmind',                 to: CANONICAL_ROUTES.emergencySettings,        reason: 'trackmind-extension' },
+  { prefix: '/customer-portal',           to: CANONICAL_ROUTES.emergencySettings,        reason: 'customer-portal' },
+  // ── Removed redirects (real pages now exist for these paths) ───────────────
+  // /executive          → ExecutiveCommandCenter
+  // /ai-command-center  → AiCommandCenterDashboard
+  // /hospital-map       → HospitalMapDashboard
+  // /medical-iot        → MedicalIotDashboard
+  // /devices            → DeviceFleetManagement
+  // /fleet              → FleetDashboard / FleetLiveMap
+  // /simulation         → MedicalSimulationSuite (training domain)
+  // /laboratory         → LaboratoryDashboard
+  // /operations         → Operations page
+  // /predictive-analytics → PredictiveAnalyticsDashboard
+  // /marketplace        → PluginMarketplace
 ]);
 
 function readEnvFlag(value: string | undefined, defaultWhenUnset: boolean): boolean {

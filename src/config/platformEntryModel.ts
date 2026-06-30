@@ -5,6 +5,7 @@ import { CANONICAL_ROUTES } from './routes.config';
 import { getEmergencyRoleHomeRoute } from './emergencyRolePermissions';
 import { getPlatformHomeRoute } from './receptionFirstUx.config';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
+import { getHomeRouteForRole } from './roleClusterNav.config';
 
 export const ADMIN_SAAS_ROLES = Object.freeze([
   'hospital-administrator',
@@ -35,7 +36,12 @@ export function resolveAdminHomeRoute(): string {
 }
 
 export function resolveClinicalHomeRoute(role: string | null | undefined): string {
-  return getEmergencyRoleHomeRoute(role) || getPlatformHomeRoute() || CANONICAL_ROUTES.emergencyReception;
+  return (
+    getHomeRouteForRole(role) ||
+    getEmergencyRoleHomeRoute(role) ||
+    getPlatformHomeRoute() ||
+    CANONICAL_ROUTES.emergencyReception
+  );
 }
 
 export type PlatformLandingInput = {

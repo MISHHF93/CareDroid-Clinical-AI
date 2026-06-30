@@ -1,12 +1,12 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
-import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS } from '../navigation/iconRegistry';
-import { DashboardGrid, MetricCard, PageShell } from '../components/ui/CareDroidPrimitives';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS } from '../../navigation/iconRegistry';
+import { DashboardGrid, MetricCard, PageShell } from '../../components/ui/CareDroidPrimitives';
 import {
   LOCAL_TRAINING_DASHBOARD,
   createTrainingRun,
   fetchTrainingDashboard,
-} from '../services/trainingApi';
+} from '../../services/trainingApi';
 import './TrainingDashboard.css';
 
 const CAPABILITY_LABELS = {

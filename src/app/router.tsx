@@ -53,6 +53,32 @@ const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedTool
 // ── Clinical tools ───────────────────────────────────────────────────────────
 const ToolsOverview       = lazyRoute(() => import('../pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazyRoute(() => import('../pages/tools/ClinicalToolCatalog'));
+// Specialty clinical assistant pages — routed at /emergency/tools/<specialty>/:toolId
+const CardiologyAssistantPage         = lazyRoute(() => import('../pages/tools/CardiologyAssistantPage'));
+const NephrologyAssistantPage         = lazyRoute(() => import('../pages/tools/NephrologyAssistantPage'));
+const NeurologyAssistantPage          = lazyRoute(() => import('../pages/tools/NeurologyAssistantPage'));
+const GastroenterologyAssistantPage   = lazyRoute(() => import('../pages/tools/GastroenterologyAssistantPage'));
+const EndocrineMetabolicAssistantPage = lazyRoute(() => import('../pages/tools/EndocrineMetabolicAssistantPage'));
+const PediatricsObgynAssistantPage    = lazyRoute(() => import('../pages/tools/PediatricsObgynAssistantPage'));
+const PsychiatryAssistantPage         = lazyRoute(() => import('../pages/tools/PsychiatryAssistantPage'));
+const PulmonologyAssistantPage        = lazyRoute(() => import('../pages/tools/PulmonologyAssistantPage'));
+
+// ── Extended platform pages — domain-organised ───────────────────────────────
+// Operations
+const HospitalMapDashboard         = lazyRoute(() => import('../pages/operations/HospitalMapDashboard'));
+const MedicalIotDashboard          = lazyRoute(() => import('../pages/operations/MedicalIotDashboard'));
+const DeviceFleetManagement        = lazyRoute(() => import('../pages/operations/DeviceFleetManagement'));
+// Executive
+const ExecutiveCommandCenter       = lazyRoute(() => import('../pages/executive/ExecutiveCommandCenter'));
+// AI
+const AiCommandCenterDashboard     = lazyRoute(() => import('../pages/ai/AiCommandCenterDashboard'));
+// Analytics
+const PredictiveAnalyticsDashboard = lazyRoute(() => import('../pages/analytics/PredictiveAnalyticsDashboard'));
+// Fleet
+const FleetDashboard               = lazyRoute(() => import('../pages/fleet/FleetDashboard'));
+const FleetLiveMap                 = lazyRoute(() => import('../pages/fleet/FleetLiveMap'));
+// Clinical
+const Medical3DViewer              = lazyRoute(() => import('../pages/clinical/Medical3DViewer'));
 
 // ── Admin ────────────────────────────────────────────────────────────────────
 const AdminOperationsShell = lazyRoute(() => import('../components/admin/AdminOperationsShell'));
@@ -389,6 +415,19 @@ export function buildEmergencyToolsRedirect(location) {
   } else if (pathname === '/all-tools') {
     setDefault('source', 'all-tools');
     setDefault('filter', 'all');
+  } else if (pathname.startsWith('/tools/cardiology/') || pathname.startsWith('/tools/nephrology/') ||
+             pathname.startsWith('/tools/neurology/') || pathname.startsWith('/tools/gastroenterology/') ||
+             pathname.startsWith('/tools/endocrine/') || pathname.startsWith('/tools/pediatrics/') ||
+             pathname.startsWith('/tools/psychiatry/') || pathname.startsWith('/tools/pulmonology/')) {
+    // Specialty shortcut deep-links → canonical /emergency/tools/<specialty>/:toolId routes
+    const specialty = pathname.replace(/^\/tools\//, '').split('/')[0];
+    const toolId = pathname.split('/').filter(Boolean)[2] || '';
+    const search = params.toString();
+    return {
+      pathname: `/emergency/tools/${specialty}/${toolId}`,
+      search: search ? `?${search}` : '',
+      hash: location.hash || '',
+    };
   } else if (pathname.startsWith('/tools/')) {
     const slug =
       pathname
@@ -856,6 +895,15 @@ export function AppRoutes() {
             </EmergencyRouteGuard>
           }
         />
+        {/* ── Specialty clinical tool detail pages (/emergency/tools/<specialty>/:toolId) ── */}
+        <Route path="/emergency/tools/cardiology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading cardiology assistant..."><CardiologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/nephrology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading nephrology assistant..."><NephrologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/neurology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading neurology assistant..."><NeurologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/gastroenterology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading GI assistant..."><GastroenterologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/endocrine/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading endocrine assistant..."><EndocrineMetabolicAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/pediatrics/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pediatrics assistant..."><PediatricsObgynAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/psychiatry/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading psychiatry assistant..."><PsychiatryAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/pulmonology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pulmonology assistant..."><PulmonologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
         <Route
           path={CANONICAL_ROUTES.emergencyPulse}
           element={
@@ -959,6 +1007,60 @@ export function AppRoutes() {
         <Route path={CANONICAL_ROUTES.aiGovernance} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.humanReview} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
 
+        {/* ── Extended platform pages (real pages — placed before legacy redirects so they win) ── */}
+        <Route
+          path={CANONICAL_ROUTES.hospitalMap}
+          element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard /></LazyRoute>}
+        />
+        <Route
+          path="/hospital-map/*"
+          element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.medicalIot}
+          element={<LazyRoute label="Loading Medical IoT..."><MedicalIotDashboard /></LazyRoute>}
+        />
+        <Route
+          path="/medical-iot/*"
+          element={<LazyRoute label="Loading Medical IoT..."><MedicalIotDashboard /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.devices}
+          element={<LazyRoute label="Loading Device Fleet..."><DeviceFleetManagement /></LazyRoute>}
+        />
+        <Route
+          path="/devices/*"
+          element={<LazyRoute label="Loading Device Fleet..."><DeviceFleetManagement /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.executive}
+          element={<LazyRoute label="Loading Executive Command Center..."><ExecutiveCommandCenter /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.aiCommandCenter}
+          element={<LazyRoute label="Loading AI Command Center..."><AiCommandCenterDashboard /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.predictiveAnalytics}
+          element={<LazyRoute label="Loading Predictive Analytics..."><PredictiveAnalyticsDashboard /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.medical3dViewer}
+          element={<LazyRoute label="Loading 3D Anatomy Viewer..."><Medical3DViewer /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.fleetCommand}
+          element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard /></LazyRoute>}
+        />
+        <Route
+          path={CANONICAL_ROUTES.fleetMap}
+          element={<LazyRoute label="Loading Fleet Live Map..."><FleetLiveMap /></LazyRoute>}
+        />
+        <Route
+          path="/fleet/live-map"
+          element={<LazyRoute label="Loading Fleet Live Map..."><FleetLiveMap /></LazyRoute>}
+        />
+
         {/* ── Legacy emergency route redirects (from routes.config) ── */}
         {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
           <Route key={`${path}-${to}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
@@ -978,7 +1080,6 @@ export function AppRoutes() {
         <Route path="/cosmos/*"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/workspace"           element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/workspaces"          element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/executive"           element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
         <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/surveillance"        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
@@ -1030,7 +1131,6 @@ export function AppRoutes() {
       <Route path="/knowledge-base"     element={<ToolsRedirect />} />
       <Route path="/knowledge-graph"    element={<ToolsRedirect />} />
       <Route path="/laboratory"         element={<ToolsRedirect />} />
-      <Route path="/fleet/live-map"     element={<ToolsRedirect />} />
       <Route path="/fleet/route-optimizer" element={<ToolsRedirect />} />
       <Route path="/operations/:tool"   element={<ToolsRedirect />} />
       <Route path="/digital-twin"       element={<ToolsRedirect />} />

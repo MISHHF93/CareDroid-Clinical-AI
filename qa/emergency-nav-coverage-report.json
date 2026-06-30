@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T19:36:34.251Z",
+  "generatedAt": "2026-06-30T03:56:45.031Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -209,30 +209,37 @@
     "receptionFirstEnabled": true
   },
   "palette": {
-    "commandCount": 25,
+    "commandCount": 32,
     "navItemIds": [
+      "command-center",
       "reception",
       "whiteboard",
-      "command-center",
       "dispatch",
+      "ems",
       "ed-readiness",
+      "patients",
+      "queues",
+      "triage",
+      "reassessment",
       "alerts",
       "diagnostics",
       "handoffs",
-      "reports",
-      "ems",
-      "patients",
-      "queues",
-      "reassessment",
       "capacity",
       "referrals",
       "copilot",
       "tools",
       "analytics",
-      "settings",
+      "reports",
       "pulse",
       "shift",
+      "settings",
       "help",
+      "hospital-map",
+      "executive",
+      "predictive-analytics",
+      "medical-iot",
+      "ai-center",
+      "admin",
       "boarding"
     ],
     "missingFromPalette": []

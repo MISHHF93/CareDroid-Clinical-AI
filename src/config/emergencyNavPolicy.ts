@@ -1,6 +1,6 @@
 ﻿import { normalizeEmergencyRole } from './emergencyRolePermissions';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from './receptionFirstUx.config';
-import { PHYSICIAN_NAV_EXCLUDED_IDS, PHYSICIAN_NAV_ORDER } from '../components/whiteboard/physicianWorkflowModel';
+import { getNavItemIdsForRole, HOSPITAL_ROLE_NAV_IDS } from './roleClusterNav.config';
 
 const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
   'reception',
@@ -10,10 +10,15 @@ const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
   'whiteboard',
   'reassessment',
   'capacity',
+  'hospital-map',
   'referrals',
   'copilot',
   'tools',
   'analytics',
+  'predictive-analytics',
+  'executive',
+  'ai-center',
+  'medical-iot',
   'settings',
   'integrations',
   'cosmos',
@@ -26,85 +31,22 @@ const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
   'laboratory',
   'knowledge',
   'audit',
-  'ai-center',
 ]);
 
-const ROLE_NAV_ORDER_OVERRIDES = Object.freeze({
-  triage_nurse: ['reception', 'whiteboard', 'patients', 'queues', 'reassessment', 'copilot', 'tools', 'platform', 'ems'],
-  charge_nurse: [
-    'reception',
-    'whiteboard',
-    'patients',
-    'queues',
-    'reassessment',
-    'capacity',
-    'referrals',
-    'copilot',
-    'tools',
-    'analytics',
-    'platform',
-    'ems',
-    'fleet',
-    'surveillance',
-    'simulation',
-    'laboratory',
-    'knowledge',
-    'audit',
-    'ai-center',
-  ],
-  ed_manager: [
-    'reception',
-    'whiteboard',
-    'patients',
-    'queues',
-    'reassessment',
-    'capacity',
-    'referrals',
-    'copilot',
-    'tools',
-    'analytics',
-    'platform',
-    'ems',
-    'fleet',
-    'surveillance',
-    'simulation',
-    'laboratory',
-    'knowledge',
-    'audit',
-    'ai-center',
-    'admin',
-  ],
-  read_only_viewer: [
-    'whiteboard',
-    'reception',
-    'patients',
-    'queues',
-    'reassessment',
-    'capacity',
-    'referrals',
-    'copilot',
-    'tools',
-    'analytics',
-    'integrations',
-    'cosmos',
-    'platform',
-    'ems',
-    'fleet',
-    'surveillance',
-    'simulation',
-    'laboratory',
-    'knowledge',
-    'audit',
-  ],
-  physician: PHYSICIAN_NAV_ORDER,
-  ems_user: ['ems', 'whiteboard', 'patients', 'capacity', 'tools', 'help', 'platform'],
-  registration_clerk: ['reception', 'patients', 'queues', 'help'],
+// Derived from cluster config — all 21 hospital roles + legacy emergency role aliases.
+// Exported for backward compatibility with existing tests.
+const ROLE_NAV_ORDER_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  ...HOSPITAL_ROLE_NAV_IDS,
+  physician:        HOSPITAL_ROLE_NAV_IDS.emergency_physician,
+  ems_user:         HOSPITAL_ROLE_NAV_IDS.paramedic,
+  ed_manager:       HOSPITAL_ROLE_NAV_IDS.ed_director,
+  admin:            HOSPITAL_ROLE_NAV_IDS.hospital_admin,
+  read_only_viewer: HOSPITAL_ROLE_NAV_IDS.demo_observer,
+  public_display:   HOSPITAL_ROLE_NAV_IDS.demo_observer,
 });
 
-const ROLE_NAV_EXCLUDED_OVERRIDES = Object.freeze({
-  registration_clerk: ['tools', 'platform', 'settings', 'integrations', 'analytics', 'cosmos', 'copilot', 'intake', 'whiteboard', 'pulse', 'shift', 'alerts'],
-  physician: PHYSICIAN_NAV_EXCLUDED_IDS,
-});
+// Hiding is now handled entirely by getHiddenNavItemIdsForRole via the cluster allowlist.
+const ROLE_NAV_EXCLUDED_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({});
 
 export function getRoleNavOrder(role) {
   const normalizedRole = normalizeEmergencyRole(role);
@@ -120,23 +62,35 @@ export function getRoleNavExcludedIds(role) {
   return ROLE_NAV_EXCLUDED_OVERRIDES[normalizeEmergencyRole(role)] || [];
 }
 
-export function sortNavigationItemsForRole(items, role) {
-  const override = getRoleNavOrder(role);
-  if (!override?.length) {
-    return [...items].sort((first, second) => first.order - second.order);
-  }
-
-  const orderIndex = new Map(override.map((id, index) => [id, index]));
-  return [...items].sort((first, second) => {
-    const firstIndex = orderIndex.get(first.id) ?? Number.MAX_SAFE_INTEGER;
-    const secondIndex = orderIndex.get(second.id) ?? Number.MAX_SAFE_INTEGER;
-    if (firstIndex !== secondIndex) return (firstIndex as number) - (secondIndex as number);
-    return (first as any).order - (second as any).order;
+export function sortNavigationItemsForRole(items: readonly any[], role: string): readonly any[] {
+  const orderedIds = getNavItemIdsForRole(role);
+  const orderIndex = new Map(orderedIds.map((id, i) => [id, i]));
+  return [...items].sort((a, b) => {
+    const ai = orderIndex.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+    const bi = orderIndex.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+    if (ai !== bi) return ai - bi;
+    return (a.order ?? 0) - (b.order ?? 0);
   });
 }
 
-export function getHiddenNavItemIdsForRole(role, options: any = {}) {
-  const hidden = new Set(getRoleNavExcludedIds(role));
+// Full list of known sidebar item IDs — used to compute the hidden set from a role's allowlist.
+const ALL_KNOWN_NAV_ITEM_IDS: readonly string[] = Object.freeze([
+  'command-center', 'reception', 'whiteboard', 'dispatch', 'ems', 'ed-readiness',
+  'patients', 'queues', 'triage', 'reassessment', 'alerts', 'capacity', 'referrals',
+  'diagnostics', 'handoffs', 'copilot', 'tools', 'analytics', 'reports', 'settings',
+  'pulse', 'shift', 'help', 'admin', 'audit',
+  'intake', 'integrations', 'cosmos', 'platform', 'fleet', 'surveillance',
+  'simulation', 'laboratory', 'knowledge', 'ai-center',
+  // Extended platform pages
+  'hospital-map', 'executive', 'predictive-analytics', 'medical-iot',
+]);
+
+export function getHiddenNavItemIdsForRole(role: string, options: any = {}): Set<string> {
+  const allowedIds = new Set(getNavItemIdsForRole(role));
+  const hidden = new Set<string>();
+  for (const id of ALL_KNOWN_NAV_ITEM_IDS) {
+    if (!allowedIds.has(id)) hidden.add(id);
+  }
   if (options.hideStandaloneIntake) hidden.add('intake');
   return hidden;
 }
