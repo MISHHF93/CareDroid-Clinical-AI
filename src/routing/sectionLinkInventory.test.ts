@@ -35,7 +35,7 @@ const canonicalRoutes = new Set([
 ]);
 
 const userFacingLinkFiles = [
-  'layout/AppShell.tsx',
+  'components/AppShell.tsx',
   'pages/PlatformEntryHub.jsx',
   'pages/Profile.tsx',
   'pages/ProfileSettings.tsx',
@@ -69,7 +69,7 @@ describe('section link inventory and route flattening', () => {
       ]),
     );
     expect(read('pages/tools/ToolsOverview.tsx')).not.toContain("navigate('/tools/catalog')");
-    expect(read('layout/AppShell.tsx')).not.toContain("navigate('/tools/catalog')");
+    expect(read('components/AppShell.tsx')).not.toContain("navigate('/tools/catalog')");
   });
 
   it('keeps user-facing calculator registry paths on plural canonical routes', () => {

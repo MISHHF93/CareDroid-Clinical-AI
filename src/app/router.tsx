@@ -620,14 +620,6 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={CANONICAL_ROUTES.staff}
-          element={
-            <LazyRoute label="Loading staff command...">
-              <TeamManagement />
-            </LazyRoute>
-          }
-        />
-        <Route
           path={CANONICAL_ROUTES.departments}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
@@ -640,16 +632,6 @@ export function AppRoutes() {
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading analytics...">
-                <EmergencyAnalytics />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.reports}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
-              <LazyRoute label="Loading reports...">
                 <EmergencyAnalytics />
               </LazyRoute>
             </EmergencyRouteGuard>
@@ -1010,9 +992,7 @@ export function AppRoutes() {
         <Route path="/live-tracking"       element={<ToolsRedirect />} />
         <Route path="/operations-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/platform-learning"   element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
-        <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
-        <Route path="/security"            element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
-        <Route path="/regulatory"          element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
+        <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.audit} replace />} />
         <Route path="/ai/evaluation"       element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
         <Route path="/ai/command-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
         <Route path="/ai-command"          element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
