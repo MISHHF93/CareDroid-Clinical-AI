@@ -120,7 +120,7 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
     'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'alerts', 'pulse', 'shift', 'help',
   ]),
   hospital_admin: Object.freeze([
-    'analytics', 'whiteboard', 'capacity', 'hospital-map', 'patients', 'handoffs', 'pulse',
+    'whiteboard', 'analytics', 'capacity', 'hospital-map', 'patients', 'handoffs', 'pulse',
     'executive', 'predictive-analytics', 'reports', 'audit', 'alerts', 'copilot', 'admin', 'settings', 'help',
   ]),
   ed_director: Object.freeze([

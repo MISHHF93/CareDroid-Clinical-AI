@@ -24,9 +24,9 @@ export const DEMO_PERSONA = Object.freeze({
   profession: 'Emergency Medicine',
   specialty: 'Emergency Medicine',
   saasRole: 'emergency-physician',
-  defaultEmergencyRole: EMERGENCY_ROLE_IDS.registrationClerk,
+  defaultEmergencyRole: EMERGENCY_ROLE_IDS.chargeNurse,
   tagline:
-    'CareDroid accompanies Dr. George across ED 18 — starting at reception, then triage, charge, provider, and command views.',
+    'CareDroid accompanies Dr. George across ED 18 — starting at the dashboard, then triage, provider, command, and reception views.',
 });
 
 export type DemoRoleView = Readonly<{
