@@ -68,6 +68,19 @@
   display: grid;
   min-width: 0;
   justify-items: center;
+  gap: 2px;
+}
+
+.caredroid-header__page-title strong {
+  font-size: var(--app-type-page-title, 1rem);
+  font-weight: 600;
+  line-height: var(--type-heading-line-height, 1.3);
+}
+
+.caredroid-header__page-title span {
+  font-size: var(--app-type-caption, 0.75rem);
+  color: var(--medical-ink-muted, #6b7280);
+  line-height: var(--type-caption-line-height, 1.45);
 }
 
 .caredroid-header__actions {

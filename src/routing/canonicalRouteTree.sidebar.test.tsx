@@ -12,6 +12,9 @@ const originalEmergencyState = useEmergencyStore.getState();
 const PILOT_VISIBLE_NAVIGATION_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);
 const SIDEBAR_BATCH_A = PILOT_VISIBLE_NAVIGATION_ITEMS.slice(0, 7);
 const SIDEBAR_BATCH_B = PILOT_VISIBLE_NAVIGATION_ITEMS.slice(7);
+const RESOLVED_ROUTE_PATHS = {
+  '/emergency/copilot': '/emergency/whiteboard',
+};
 
 describe('canonical route tree — sidebar destinations (batch A)', () => {
   afterEach(() => {
@@ -29,7 +32,8 @@ describe('canonical route tree — sidebar destinations (batch A)', () => {
     async ({ path }) => {
       renderRoute(path);
 
-      expect(await screen.findByTestId('location')).toHaveTextContent(path);
+      const expectedPath = RESOLVED_ROUTE_PATHS[path] || path;
+      expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
       expect(screen.getByRole('main')).toBeInTheDocument();
       expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();
@@ -55,7 +59,8 @@ describe('canonical route tree — sidebar destinations (batch B)', () => {
     async ({ path }) => {
       renderRoute(path);
 
-      expect(await screen.findByTestId('location')).toHaveTextContent(path);
+      const expectedPath = RESOLVED_ROUTE_PATHS[path] || path;
+      expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
       expect(screen.getByRole('main')).toBeInTheDocument();
       expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();

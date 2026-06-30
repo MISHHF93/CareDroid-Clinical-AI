@@ -1,7 +1,9 @@
 /**
  * Emergency operational presentation — one design system, role-specific payloads.
  * Same AppShell and components; screen modes supply emphasis, copy, and strip layout.
+ * Guided by CAREDROID_PRODUCT.oneScreenOneDecision — one primary decision per screen.
  */
+import { CAREDROID_PRODUCT } from './caredroidProduct.config';
 import {
   CARE_DROID_SCREEN_MODES,
   getScreenModeDensity,
@@ -208,6 +210,8 @@ export function resolveOperationalStripAccentClass(
   if (accent === 'default') return '';
   return `operational-strip--accent-${accent}`;
 }
+
+export const OPERATIONAL_DESIGN_PRINCIPLE = CAREDROID_PRODUCT.oneScreenOneDecision;
 
 export function normalizeOperationalStripMetrics(
   metrics: Array<{

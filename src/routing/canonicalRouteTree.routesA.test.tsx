@@ -15,7 +15,7 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
   it('/emergency/whiteboard renders the active CareDroid whiteboard', async () => {
     renderRoute('/emergency/whiteboard');
 
-    expect(await screen.findByRole('link', { name: 'Whiteboard' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Dashboard' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -26,8 +26,9 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
     renderRoute('/emergency/patients');
 
-    expect(await screen.findByRole('heading', { name: 'Emergency Patients' })).toBeInTheDocument();
-    expect(screen.getByText('Total patients')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Department Patients' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Department Patients')).toBeInTheDocument();
+    expect(screen.getByLabelText('Search patients')).toBeInTheDocument();
   });
 
   it('/emergency/patients consumes patientId context without another lookup', async () => {
@@ -35,7 +36,7 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
 
     renderRoute(`/emergency/patients?patientId=${encodeURIComponent(patient.id)}`);
 
-    expect(await screen.findByRole('heading', { name: 'Emergency Patients' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Department Patients' })).toBeInTheDocument();
     await waitFor(() => {
       expect(useEmergencyStore.getState().selectedPatientId).toBe(patient.id);
     });

@@ -2,7 +2,7 @@ export { Text } from './Text';
 export { Icon } from './Icon';
 export { Button } from './Button';
 export { IconButton } from './IconButton';
-export { Badge } from './Badge';
+export { default as Badge } from './Badge';
 export { Input } from './Input';
 export { Textarea } from './Textarea';
 export { Checkbox } from './Checkbox';

@@ -20,7 +20,7 @@ describe('canonical route tree — tools, pulse, shift, analytics, settings', ()
       expect(
         await screen.findByRole(
           'heading',
-          { level: 1, name: /careDroid tool console/i },
+          { level: 1, name: /medical tools/i },
           { timeout: 45000 },
         ),
       ).toBeInTheDocument();

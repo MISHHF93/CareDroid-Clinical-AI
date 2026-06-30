@@ -1,0 +1,62 @@
+.role-operational-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--app-space-md, 12px);
+  margin: 0 0 var(--app-space-md, 12px);
+}
+
+.role-operational-summary--single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 420px;
+}
+
+.role-operational-summary__card {
+  padding: var(--app-space-md, 12px) var(--app-space-lg, 16px);
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: var(--app-radius-md, 10px);
+  background: var(--medical-surface-card, #ffffff);
+  box-shadow: var(--app-elevation-subtle, none);
+}
+
+.role-operational-summary__card--critical {
+  border-color: var(--semantic-critical, #b91c1c);
+  background: var(--semantic-critical-bg, #fef2f2);
+}
+
+.role-operational-summary__card--warning {
+  border-color: var(--semantic-attention, #b45309);
+  background: var(--semantic-attention-bg, #fffbeb);
+}
+
+.role-operational-summary__card--healthy {
+  border-color: color-mix(in srgb, var(--semantic-healthy, #15803d) 35%, var(--medical-border));
+}
+
+.role-operational-summary__title {
+  margin: 0 0 var(--app-space-sm, 8px);
+  font-size: var(--app-type-small, 0.8125rem);
+  font-weight: 600;
+  line-height: var(--type-small-line-height, 1.45);
+  color: var(--medical-ink, #111827);
+  letter-spacing: 0.01em;
+}
+
+.role-operational-summary__lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.role-operational-summary__lines li {
+  font-size: var(--app-type-caption, 0.75rem);
+  line-height: var(--type-caption-line-height, 1.45);
+  color: var(--medical-ink-muted, #6b7280);
+}
+
+@media (max-width: 1100px) {
+  .role-operational-summary {
+    grid-template-columns: 1fr;
+  }
+}

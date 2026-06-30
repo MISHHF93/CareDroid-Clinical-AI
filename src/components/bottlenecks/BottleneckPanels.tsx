@@ -44,17 +44,53 @@ export function FallbackActionCard({ event }: { event?: BottleneckEvent }) {
   );
 }
 
-export function ServiceHealthCard({ service }: { service: ServiceHealth }) {
+export function ServiceHealthCard({
+  service,
+  compact = true,
+}: {
+  service: ServiceHealth;
+  compact?: boolean;
+}) {
+  const statusLabel =
+    service.status === 'down'
+      ? 'Offline'
+      : service.status === 'degraded'
+        ? 'Degraded'
+        : service.status === 'unknown'
+          ? 'Warning'
+          : 'Healthy';
+
   return (
-    <article className={`service-health-card service-health-card--${service.status}`}>
-      <div>
-        <span>{service.status}</span>
-        <strong>{service.serviceName}</strong>
+    <article
+      className={[
+        'service-health-card',
+        `service-health-card--${service.status}`,
+        compact ? 'service-health-card--compact' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      title={`${service.serviceName} · ${service.latencyMs ?? 0}ms · ${Math.round((service.errorRate ?? 0) * 100)}% errors`}
+    >
+      <div className="service-health-card__head">
+        <span className="service-health-card__status">{statusLabel}</span>
+        <strong className="service-health-card__name">{service.serviceName}</strong>
       </div>
-      <small>
-        {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}% errors
-      </small>
-      <small>{service.fallbackAvailable ? 'Fallback available' : 'Fallback missing'}</small>
+      {!compact ? (
+        <>
+          <small>
+            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}% errors
+          </small>
+          <small>{service.fallbackAvailable ? 'Fallback available' : 'Fallback missing'}</small>
+        </>
+      ) : (
+        <details className="service-health-card__details">
+          <summary>Technical details</summary>
+          <small>
+            {service.latencyMs ?? 0}ms latency · {Math.round((service.errorRate ?? 0) * 100)}% errors
+          </small>
+          <small>{service.fallbackAvailable ? 'Fallback available' : 'Fallback missing'}</small>
+        </details>
+      )}
     </article>
   );
 }

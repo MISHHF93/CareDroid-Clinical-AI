@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES } from './routes.config';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 import {
+  COMMAND_CENTER_PRIMARY_WIDGETS,
   COMMAND_CENTER_SCREEN_WIDGETS,
   getCommandCenterWhiteboardPath,
   resolveCommandCenterScreenCapabilities,
 } from './commandCenterScreenModel';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
+import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 
 describe('commandCenterScreenModel', () => {
   const commandCan = (action: string) =>
@@ -32,35 +34,52 @@ describe('commandCenterScreenModel', () => {
     });
 
     expect(command.isCommandCenterScreen).toBe(true);
-    expect(command.showTriageAwaiting).toBe(true);
-    expect(command.showLongestUntriagedWait).toBe(true);
-    expect(command.showTriageApproachingBreach).toBe(true);
-    expect(command.showTriageBreached).toBe(true);
-    expect(command.showRapidReviewFlags).toBe(true);
-    expect(command.showProviderAwaiting).toBe(true);
-    expect(command.showLongestProviderWait).toBe(true);
-    expect(command.showProviderApproachingBreach).toBe(true);
-    expect(command.showProviderBreached).toBe(true);
-    expect(command.showArrivalsByHour).toBe(true);
-    expect(command.showWaitingCount).toBe(true);
-    expect(command.showLongestWait).toBe(true);
-    expect(command.showAvgWaitTriage).toBe(true);
-    expect(command.showAvgWaitProvider).toBe(true);
-    expect(command.showEmsInbound).toBe(true);
-    expect(command.showEmsOffloadDelays).toBe(true);
-    expect(command.showOffloadDuration).toBe(true);
-    expect(command.showHandoffPending).toBe(true);
-    expect(command.showBoardingDuration).toBe(true);
-    expect(command.showReferralsBacklog).toBe(true);
-    expect(command.showCapacityScore).toBe(true);
-    expect(command.showCrowdLevel).toBe(true);
-    expect(command.showTrendIndicators).toBe(true);
-    expect(command.showLwbsRisk).toBe(true);
-    expect(command.showCrowdingForecast).toBe(true);
-    expect(command.showSystemHealth).toBe(true);
+
+    if (isPractitionerCleanupEnabled()) {
+      expect(command.showTriageBreached).toBe(true);
+      expect(command.showWaitingCount).toBe(true);
+      expect(command.showCapacityScore).toBe(true);
+      expect(command.showEmsInbound).toBe(true);
+      expect(command.showProviderBreached).toBe(true);
+      expect(command.showReferralsBacklog).toBe(true);
+      expect(command.showSystemHealth).toBe(true);
+      expect(command.showTriageAwaiting).toBe(false);
+      expect(command.showArrivalsByHour).toBe(false);
+      expect(command.visibleOperationalSurfaces).toHaveLength(
+        COMMAND_CENTER_PRIMARY_WIDGETS.length,
+      );
+    } else {
+      expect(command.showTriageAwaiting).toBe(true);
+      expect(command.showLongestUntriagedWait).toBe(true);
+      expect(command.showTriageApproachingBreach).toBe(true);
+      expect(command.showTriageBreached).toBe(true);
+      expect(command.showRapidReviewFlags).toBe(true);
+      expect(command.showProviderAwaiting).toBe(true);
+      expect(command.showLongestProviderWait).toBe(true);
+      expect(command.showProviderApproachingBreach).toBe(true);
+      expect(command.showProviderBreached).toBe(true);
+      expect(command.showArrivalsByHour).toBe(true);
+      expect(command.showWaitingCount).toBe(true);
+      expect(command.showLongestWait).toBe(true);
+      expect(command.showAvgWaitTriage).toBe(true);
+      expect(command.showAvgWaitProvider).toBe(true);
+      expect(command.showEmsInbound).toBe(true);
+      expect(command.showEmsOffloadDelays).toBe(true);
+      expect(command.showOffloadDuration).toBe(true);
+      expect(command.showHandoffPending).toBe(true);
+      expect(command.showBoardingDuration).toBe(true);
+      expect(command.showReferralsBacklog).toBe(true);
+      expect(command.showCapacityScore).toBe(true);
+      expect(command.showCrowdLevel).toBe(true);
+      expect(command.showTrendIndicators).toBe(true);
+      expect(command.showLwbsRisk).toBe(true);
+      expect(command.showCrowdingForecast).toBe(true);
+      expect(command.showSystemHealth).toBe(true);
+      expect(command.visibleOperationalSurfaces).toHaveLength(26);
+    }
+
     expect(command.hidePatientGrid).toBe(true);
     expect(command.hideCommandLayer).toBe(true);
-    expect(command.visibleOperationalSurfaces).toHaveLength(26);
     expect(command.defaultFocus).toBe(COMMAND_CENTER_SCREEN_WIDGETS.arrivalsByHour);
     expect(command.analyticsPath).toBe(CANONICAL_ROUTES.emergencyAnalytics);
     expect(command.canPerform('central-review')).toBe(true);

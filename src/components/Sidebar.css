@@ -74,7 +74,28 @@
   align-items: stretch;
   width: 100%;
   min-height: 0;
-  gap: 5px;
+  gap: 8px;
+}
+
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-group__label {
+  padding: 8px 10px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--medical-ink-subtle, #9ca3af);
+}
+
+.sidebar-nav-group__items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .sidebar-mobile-nav,
@@ -85,13 +106,13 @@
 /* ── Individual nav item (desktop) ──────────────────────────────── */
 .sidebar-nav-item {
   width: 100%;
-  min-height: 46px;
+  min-height: 40px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px 10px;
   color: var(--sidebar-fg-muted, var(--nav-fg, #6b7280));
   text-decoration: none;
   border: 1px solid transparent;

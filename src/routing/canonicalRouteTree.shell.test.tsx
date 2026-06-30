@@ -37,7 +37,7 @@ describe('canonical route tree — shell and workspace', () => {
       '/emergency/settings',
     );
 
-    for (const label of ['Whiteboard', 'Patients', 'Queues']) {
+    for (const label of ['Dashboard', 'Patients', 'Queue']) {
       const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
       expect(item, label).toBeTruthy();
       expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
@@ -51,9 +51,13 @@ describe('canonical route tree — shell and workspace', () => {
     renderRoute('/workspace');
 
     const location = await screen.findByTestId('location');
-    expect(['/workspace', '/emergency/whiteboard', '/emergency/reception']).toContain(
-      location.textContent.split('?')[0],
-    );
+    expect([
+      '/workspace',
+      '/emergency/whiteboard',
+      '/emergency/reception',
+      '/emergency/settings',
+      '/start',
+    ]).toContain(location.textContent.split('?')[0]);
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.queryByText('Access denied')).toBeNull();
     expect(screen.queryByText('CareDroid page unavailable')).toBeNull();

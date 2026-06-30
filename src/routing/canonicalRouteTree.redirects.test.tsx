@@ -18,7 +18,10 @@ describe('canonical route tree — legacy redirects', () => {
     ['/tools/calculator/sofa', '/emergency/tools?source=calculators&filter=calculator&q=sofa&open=sofa'],
     ['/tools/lab-interpreter', '/emergency/tools?source=tools&filter=clinical-tools&q=lab-interp&open=lab-interp'],
     ['/calculators', '/emergency/tools?source=calculators&filter=calculator'],
-    ['/fleet/map', '/emergency/tools?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map'],
+    ['/maps', '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map'],
+    ['/operations/fleet-command', '/emergency/tools?source=operations&filter=operations&q=fleet-command&open=fleet-command'],
+    ['/workflows', '/emergency/tools?source=workflows&filter=ai-workflows'],
+    ['/recommendations', '/emergency/tools?source=recommendations&filter=recommended'],
   ])('%s redirects to Medical Tools with intent preserved', async (legacyPath, expectedPath) => {
     renderRoute(legacyPath);
 
@@ -30,18 +33,13 @@ describe('canonical route tree — legacy redirects', () => {
   }, ROUTE_LOAD_TIMEOUT);
 
   it.each([
-    ['/fleet/command', '/emergency/tools?source=operations&filter=operations&q=fleet-command&open=fleet-command'],
-    ['/operations/fleet-command', '/emergency/tools?source=operations&filter=operations&q=fleet-command&open=fleet-command'],
-    ['/maps', '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map'],
-    ['/workflows', '/emergency/tools?source=workflows&filter=ai-workflows'],
-    ['/recommendations', '/emergency/tools?source=recommendations&filter=recommended'],
-  ])('%s redirects to Medical Tools with intent preserved', async (legacyPath, expectedPath) => {
+    ['/fleet/command', '/fleet/command'],
+    ['/fleet/map', '/fleet/map'],
+  ])('%s mounts the canonical fleet route', async (legacyPath, expectedPath) => {
     renderRoute(legacyPath);
 
     expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
-    expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    expect(document.getElementById('main-content')).toBeInTheDocument();
+    expect(screen.queryByText('Access denied')).toBeNull();
   }, ROUTE_LOAD_TIMEOUT);
 });

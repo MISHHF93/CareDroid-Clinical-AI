@@ -47,6 +47,7 @@ import CapacityCrisisMode from '../../components/CapacityCrisisMode';
 import QueueIntelligencePanel from '../../components/QueueIntelligencePanel';
 import ChargeNurseOperationalStrip from '../../components/whiteboard/ChargeNurseOperationalStrip';
 import PhysicianOperationalStrip from '../../components/whiteboard/PhysicianOperationalStrip';
+import RoleOperationalSummaryStrip from '../../components/whiteboard/RoleOperationalSummaryStrip';
 import OperationalHandoffDomainBar from '../../components/whiteboard/OperationalHandoffDomainBar';
 import WhiteboardOpsDetailStrip from '../../components/whiteboard/WhiteboardOpsDetailStrip';
 import { evaluateWhiteboardDensity } from '../../config/whiteboardDensityModel';
@@ -1932,6 +1933,15 @@ export default function EmergencyWhiteboard() {
       </section>
       ) : null}
       {whiteboardDensity.surfaces.primaryStats.visible ? (
+      <>
+      {!display.isDisplayMode && surfaces.compactLayout && !commandCenter.isCommandCenterScreen ? (
+        <RoleOperationalSummaryStrip
+          roleId={emergencyRole.role}
+          waitingCount={stats.waiting}
+          escalationCount={stats.reassessmentDue + stats.highRisk}
+          capacityLabel={`${capacity.score} ${capacity.band}`}
+        />
+      ) : null}
       <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
         <StatCard value={stats.waiting} label="Waiting" emphasized={prioritizeAwareness && stats.waiting > 0} />
         {surfaces.compactLayout ? (
@@ -2102,6 +2112,7 @@ export default function EmergencyWhiteboard() {
         </>
         ) : null}
       </div>
+      </>
       ) : null}
 
       {whiteboardDensity.surfaces.emsAttention.visible ? (
@@ -2120,6 +2131,7 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {!display.isDisplayMode &&
+      !whiteboardDensity.surfaces.emsAttention.visible &&
       !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
       (!charge.isChargeNurseScreen || charge.showEmsOffloadAggregate) ? (
         <EmsOffloadAggregateStrip

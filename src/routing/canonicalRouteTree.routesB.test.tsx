@@ -22,20 +22,17 @@ describe('canonical route tree — intake, capacity, queues', () => {
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
     renderRoute('/emergency/capacity');
 
-    expect(await screen.findByRole('heading', { name: 'Capacity' })).toBeInTheDocument();
-    expect(screen.getByText('Capacity score')).toBeInTheDocument();
-    expect(screen.getByText('Available rooms')).toBeInTheDocument();
-    expect(screen.getByText('Boarding patients')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Capacity' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tablist', { name: 'Flow and capacity views' })).toBeInTheDocument();
   });
 
   it('/emergency/queues renders queue intelligence from store state', async () => {
     renderRoute('/emergency/queues');
 
-    expect(
-      (await screen.findAllByRole('heading', { name: 'Queues' })).length,
-    ).toBeGreaterThan(0);
+    expect(await screen.findByRole('heading', { name: 'Department Queues' })).toBeInTheDocument();
     expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
-    expect(screen.getByText('Triage')).toBeInTheDocument();
+    expect(screen.getAllByText('Triage').length).toBeGreaterThan(0);
     expect(screen.getByText('Movement stage: Waiting')).toBeInTheDocument();
   });
 

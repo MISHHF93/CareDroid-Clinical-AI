@@ -16,7 +16,7 @@ describe('workspace subpage routes', () => {
       whiteboard: '/emergency/whiteboard',
       patients: '/emergency/patients',
       queues: '/emergency/queues',
-      'command-center': '/emergency/whiteboard',
+      'command-center': '/emergency/command-center',
       copilot: '/emergency/copilot',
     });
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
@@ -34,6 +34,6 @@ describe('workspace subpage routes', () => {
   it('keeps automation analytics unmounted from the active CareDroid app', () => {
     expect(appSource).not.toContain('path={CANONICAL_ROUTES.automationAnalytics}');
     expect(appSource).not.toContain("path=\"/automation-analytics\"");
-    expect(appSource).toContain('<Route path="*" element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />');
+    expect(appSource).toMatch(/<Route path="\*"\s+element=\{<EmergencyDefaultRedirect \/>\}/);
   });
 });

@@ -76,7 +76,7 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-dashboard' },
   { prefix: '/app',                       to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-app-alias' },
   { prefix: '/integrations/hub',          to: `${CANONICAL_ROUTES.emergencySettings}#integrations`, reason: 'integration-hub' },
-  { prefix: '/tools/catalog',             to: CANONICAL_ROUTES.emergencyTools,           reason: 'developer-catalog' },
+
   { prefix: '/emergency/intake',          to: CANONICAL_ROUTES.emergencyReception,       reason: 'intake-through-reception' },
   { prefix: '/vehicle',                   to: CANONICAL_ROUTES.emergencyEms,             reason: 'fleet-extension' },
   { prefix: '/surveillance',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'surveillance-extension' },

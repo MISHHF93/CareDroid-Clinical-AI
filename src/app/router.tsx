@@ -52,7 +52,6 @@ const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedTool
 
 // ── Clinical tools ───────────────────────────────────────────────────────────
 const ToolsOverview       = lazyRoute(() => import('../pages/tools/ToolsOverview'));
-const ClinicalToolCatalog = lazyRoute(() => import('../pages/tools/ClinicalToolCatalog'));
 // Specialty clinical assistant pages — routed at /emergency/tools/<specialty>/:toolId
 const CardiologyAssistantPage         = lazyRoute(() => import('../pages/tools/CardiologyAssistantPage'));
 const NephrologyAssistantPage         = lazyRoute(() => import('../pages/tools/NephrologyAssistantPage'));
@@ -576,7 +575,7 @@ export function AppRoutes() {
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.whiteboard}  element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyWhiteboard} />} />
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.reception}   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyReception} />} />
       <Route path={ED_UNIFIED_PUBLIC_ROUTES.ems}         element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyEms} />} />
-      <Route path={ED_UNIFIED_PUBLIC_ROUTES.calculators} element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyTools} />} />
+      <Route path={ED_UNIFIED_PUBLIC_ROUTES.calculators} element={<ToolsRedirect />} />
       <Route
         path={ED_UNIFIED_PUBLIC_ROUTES.charge}
         element={<ScreenModeLandingRedirect mode={CARE_DROID_SCREEN_MODES.chargeNurse} />}
@@ -990,14 +989,7 @@ export function AppRoutes() {
         <Route path={CANONICAL_ROUTES.usage}   element={<LazyRoute label="Loading usage..."><UsagePage /></LazyRoute>} />
 
         {/* ── Developer / tools catalog ── */}
-        <Route
-          path={CANONICAL_ROUTES.developerCatalog}
-          element={
-            <LazyRoute label="Loading developer catalog...">
-              <ClinicalToolCatalog />
-            </LazyRoute>
-          }
-        />
+        <Route path={CANONICAL_ROUTES.developerCatalog} element={<ToolsRedirect />} />
         <Route path={CANONICAL_ROUTES.featureFlags} element={<LazyRoute label="Loading feature flags..."><FeatureManagement /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.systemHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
         <Route path={CANONICAL_ROUTES.saasHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
@@ -1078,7 +1070,10 @@ export function AppRoutes() {
         {/* ── Retired extension routes → whiteboard ── */}
         <Route path="/cosmos"              element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/cosmos/*"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/workspace"           element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        <Route
+          path={CANONICAL_ROUTES.workspace}
+          element={<EdApplicationEntryRedirect />}
+        />
         <Route path="/workspaces"          element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />

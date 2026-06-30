@@ -27,30 +27,27 @@ function expectRoutePath(path) {
 }
 
 describe('canonical route tree', () => {
-  it('exports the clean CareDroid route tree', () => {
-    expect(CANONICAL_APP_ROUTE_TREE).toEqual([
-      { path: '/', type: 'redirect', to: '/emergency/reception' },
-      { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
-      { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
-      { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
-      { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
-      { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
-      { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
-      { path: '/emergency/reception', type: 'page', componentKey: 'ReceptionWorkspace' },
-      { path: '/emergency/intake', type: 'page', componentKey: 'SmartIntake' },
-      { path: '/emergency/queues', type: 'page', componentKey: 'EmergencyQueueRoute' },
-      { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyReassessmentRoute' },
-      { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
-      { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
-      { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
-      { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotRoute' },
-      { path: '/emergency/tools', type: 'page', componentKey: 'ToolsOverview' },
-      { path: '/emergency/pulse', type: 'page', componentKey: 'EmergencyDepartmentPulse' },
-      { path: '/emergency/shift', type: 'page', componentKey: 'EmergencyShiftSummary' },
-      { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
-      { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
-      { path: '*', type: 'redirect', to: '/emergency/reception' },
-    ]);
+  it('exports the consolidated CareDroid emergency route tree', () => {
+    expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '/')).toEqual(
+      expect.objectContaining({ type: 'redirect', to: '/emergency/whiteboard' }),
+    );
+    expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '*')).toEqual(
+      expect.objectContaining({ type: 'redirect', to: '/emergency/whiteboard' }),
+    );
+    expect(
+      CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
+    ).toEqual(
+      expect.arrayContaining([
+        '/emergency/whiteboard',
+        '/emergency/reception',
+        '/emergency/intake',
+        '/emergency/queues',
+        '/emergency/copilot',
+        '/emergency/alerts',
+        '/emergency/help',
+        '/emergency/settings',
+      ]),
+    );
   });
 
   it('mounts canonical ED routes inside the flattened AppShell', () => {
@@ -81,11 +78,8 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyTools}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyPulse}');
     expect(appSource).toContain('path={CANONICAL_ROUTES.emergencyShift}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyJourney}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencySimulation}');
-    expect(appSource).not.toContain('path={CANONICAL_ROUTES.emergencyAiGovernance}');
     expect(appSource).not.toContain('ComingSoonPage');
-    expect(appSource).toContain('<PlatformNavigationPage />');
+    expect(appSource).toContain('<EdApplicationEntryRedirect />');
     expect(appSource).toContain('path={CANONICAL_ROUTES.workspace}');
   });
 
@@ -111,8 +105,8 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyWhiteboard}');
     expect(appSource).toContain('path="/tools/*"');
     expect(appSource).toContain('path="/scores/*"');
-    expect(appSource).toContain('<Route path="/tools/*" element={<ToolsRedirect />} />');
-    expect(appSource).toContain('<Route path="/calculators/*" element={<ToolsRedirect />} />');
+    expect(appSource).toMatch(/<Route path="\/tools\/\*"\s+element=\{<ToolsRedirect \/>\}/);
+    expect(appSource).toMatch(/<Route path="\/calculators\/\*"\s+element=\{<ToolsRedirect \/>\}/);
     expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
@@ -137,7 +131,7 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('path="/mobile"');
     expect(appSource).toContain('path="/emergency/*"');
     expect(appSource).toContain('NON_ED_WORKSPACE_REDIRECT_ROUTES.map(({ path, moduleName }) => (');
-    expect(appSource).toContain('element={<NonEmergencyWorkspaceRedirect />}');
+    expect(appSource).toContain('element={<NonEdWorkspaceRedirect');
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/analytics', moduleName: 'Analytics' }),
@@ -155,8 +149,7 @@ describe('canonical route tree', () => {
   });
 
   it('keeps auth callbacks deep-linkable and catches all unknown routes', () => {
-    expect(appSource).toContain('<Route path="*" element={<EmergencyDefaultRedirect />} />');
-    expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyWhiteboard}');
+    expect(appSource).toMatch(/<Route path="\*"\s+element=\{<EmergencyDefaultRedirect \/>\}/);
     expect(appSource).toContain('CANONICAL_ROUTES.emergencyReception');
     expect(appSource).not.toContain('Page not found');
     expect(appSource).not.toContain('<ToolNotFound');

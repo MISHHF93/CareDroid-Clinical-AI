@@ -6,7 +6,7 @@ import {
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from '../config/routes.config';
-import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
+import { getCanonicalAppPagePaths } from '../data/emergencyPageRenderInventory';
 
 const appSource = readFileSync(join(__dirname, '..', 'app', 'router.tsx'), 'utf8');
 const redirectsByPath = Object.fromEntries(
@@ -32,25 +32,27 @@ describe('canonical route/auth architecture', () => {
     expect(appSource.match(/<AppShell>/g)).toHaveLength(1);
     expect(
       CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
-    ).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
+    ).toEqual(getCanonicalAppPagePaths());
   });
 
   it('uses redirects for retired assistant aliases', () => {
     for (const path of ['/assistant', '/chat', '/ai', '/copilot']) {
       expect(appSource).toContain(`path="${path}"`);
-      expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
+      expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
     }
   });
 
-  it('keeps fleet and operations routes wired in App.jsx', () => {
-    expect(appSource).toContain('path="/tools/*"');
+  it('keeps fleet and operations routes wired in router.tsx', () => {
+    expect(appSource).toMatch(/<Route path="\/tools\/\*"\s+element=\{<ToolsRedirect \/>\}/);
     expect(appSource).toContain('CANONICAL_ROUTES.fleetCommand');
-    expect(appSource).toContain('path="/fleet" element={<Navigate to={CANONICAL_ROUTES.fleetCommand}');
+    expect(appSource).toMatch(
+      /path="\/fleet"\s+element=\{<Navigate to=\{CANONICAL_ROUTES\.emergencyEms\}/,
+    );
     expect(appSource).toContain('CANONICAL_ROUTES.hospitalMap');
   });
 
-  it('ensures unknown protected routes redirect to the Emergency Whiteboard', () => {
-    expect(appSource).toContain('path="*"');
-    expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
+  it('ensures unknown protected routes use role-aware default redirect', () => {
+    expect(appSource).toMatch(/<Route path="\*"\s+element=\{<EmergencyDefaultRedirect \/>\}/);
+    expect(appSource).toContain('CANONICAL_ROUTES.emergencyReception');
   });
 });

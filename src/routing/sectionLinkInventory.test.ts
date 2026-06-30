@@ -36,10 +36,9 @@ const canonicalRoutes = new Set([
 
 const userFacingLinkFiles = [
   'components/AppShell.tsx',
-  'pages/PlatformEntryHub.jsx',
+  'components/EdApplicationEntryRedirect.tsx',
   'pages/Profile.tsx',
   'pages/ProfileSettings.tsx',
-  'pages/Settings.tsx',
   'pages/tools/ToolsOverview.tsx',
   'pages/tools/ToolNotFound.tsx',
   'pages/tools/ToolsAreaFallback.tsx',

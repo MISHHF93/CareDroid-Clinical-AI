@@ -270,13 +270,14 @@ vi.mock('../components/Sidebar', async () => {
   const React = await import('react');
   const { Link, useLocation } = await import('react-router-dom');
   const items = [
-    { label: 'Whiteboard', path: '/emergency/whiteboard' },
+    { label: 'Dashboard', path: '/emergency/whiteboard' },
     { label: 'EMS', path: '/emergency/ems' },
     { label: 'Medical Tools', path: '/emergency/tools' },
     { label: 'Analytics', path: '/emergency/analytics' },
     { label: 'Settings', path: '/emergency/settings' },
     { label: 'Patients', path: '/emergency/patients' },
-    { label: 'Queues', path: '/emergency/queues' },
+    { label: 'Queue', path: '/emergency/queues' },
+    { label: 'AI Chief', path: '/emergency/copilot' },
   ];
 
   function Sidebar() {
@@ -346,6 +347,19 @@ vi.mock('../engine/capacityEngine', () => ({
     maxCapacity: 15,
     occupancyPercent: 0,
   }),
+  deriveCapacityCrisisState: () => ({
+    active: false,
+    level: 'normal',
+    headline: 'Capacity stable',
+    occupancyPercent: 0,
+    boardingCount: 0,
+    reassessmentDue: 0,
+    triggerReasons: [],
+  }),
+}));
+
+vi.mock('../components/CapacityCrisisMode', () => ({
+  default: () => null,
 }));
 
 vi.mock('../engine/reassessmentEngine', () => ({

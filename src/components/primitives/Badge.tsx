@@ -1,36 +1,32 @@
-import React from 'react';
+import type React from 'react';
 import './Badge.css';
 
-type BadgeVariant = 'neutral' | 'brand' | 'info' | 'success' | 'warning' | 'danger';
-type BadgeSize = 'sm' | 'md';
+const TONES = new Set(['neutral', 'accent', 'success', 'warning', 'danger', 'info']);
 
 type BadgeProps = {
-  variant?: BadgeVariant;
-  size?: BadgeSize;
-  dot?: boolean;
-  children?: React.ReactNode;
+  tone?: string;
+  size?: string;
+  compact?: boolean;
   className?: string;
+  children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
-export function Badge({
-  variant = 'neutral',
+export default function Badge({
+  tone = 'neutral',
   size = 'md',
-  dot,
+  compact = false,
+  className = '',
   children,
-  className,
   ...props
 }: BadgeProps) {
+  const resolvedTone = TONES.has(tone) ? tone : 'neutral';
   return (
     <span
-      className={[
-        'cd-badge',
-        `cd-badge--${variant}`,
-        `cd-badge--${size}`,
-        className ?? '',
-      ].filter(Boolean).join(' ')}
+      className={['cd-badge', `cd-badge--${resolvedTone}`, `cd-badge--${size}`, compact ? 'cd-badge--compact' : '', className]
+        .filter(Boolean)
+        .join(' ')}
       {...props}
     >
-      {dot && <span className="cd-badge__dot" aria-hidden="true" />}
       {children}
     </span>
   );

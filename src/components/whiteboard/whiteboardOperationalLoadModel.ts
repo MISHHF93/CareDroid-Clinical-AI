@@ -62,7 +62,7 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
         : 'normal';
 
   const prioritizeAwareness =
-    loadLevel !== 'normal' || attentionSignals >= 3;
+    loadLevel !== 'normal' || attentionSignals >= 2;
 
   const issues = [] as any[];
   if (waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated) {

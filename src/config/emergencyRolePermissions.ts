@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from './routes.config';
+﻿import { CANONICAL_ROUTES, getDefaultRouteForProfile } from './routes.config';
 import {
   canAccessEmergencyRoutePermission,
   canPerformEmergencyMutation,
@@ -268,7 +268,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       'Full CareDroid administration, settings, governance, and clinical operations access.',
     routes: ALL_ROUTES,
     actions: ALL_ACTIONS,
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.admin),
   }),
   [EMERGENCY_ROLE_IDS.edManager]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.edManager,
@@ -289,7 +289,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.viewAnalytics,
       EMERGENCY_ACTIONS.runSimulation,
     ],
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.edManager),
   }),
   [EMERGENCY_ROLE_IDS.chargeNurse]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.chargeNurse,
@@ -318,7 +318,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
     ],
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.chargeNurse),
   }),
   [EMERGENCY_ROLE_IDS.triageNurse]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.triageNurse,
@@ -351,7 +351,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.completeEmsHandoff,
       EMERGENCY_ACTIONS.useCopilot,
     ],
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.triageNurse),
   }),
   [EMERGENCY_ROLE_IDS.physician]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.physician,
@@ -371,7 +371,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.useCopilot,
       EMERGENCY_ACTIONS.viewAnalytics,
     ],
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.physician),
   }),
   [EMERGENCY_ROLE_IDS.registrationClerk]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.registrationClerk,
@@ -387,7 +387,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.convertEmsArrival,
       EMERGENCY_ACTIONS.receptionEscalate,
     ],
-    defaultRoute: ROUTES.reception,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.registrationClerk),
   }),
   [EMERGENCY_ROLE_IDS.emsUser]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.emsUser,
@@ -401,7 +401,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.completeEmsHandoff,
       EMERGENCY_ACTIONS.createPatient,
     ],
-    defaultRoute: ROUTES.ems,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.emsUser),
   }),
   [EMERGENCY_ROLE_IDS.dispatcher]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.dispatcher,
@@ -413,7 +413,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.prepareEmsBay,
     ],
-    defaultRoute: ROUTES.dispatch,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.dispatcher),
   }),
   [EMERGENCY_ROLE_IDS.emsCoordinator]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.emsCoordinator,
@@ -428,7 +428,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.completeEmsHandoff,
       EMERGENCY_ACTIONS.viewAnalytics,
     ],
-    defaultRoute: ROUTES.ems,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.emsCoordinator),
   }),
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.readOnlyViewer,
@@ -436,7 +436,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description: 'Read-only hallway and departmental wall displays with no mutating actions.',
     routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.help],
     actions: [EMERGENCY_ACTIONS.viewAnalytics, EMERGENCY_ACTIONS.displayWhiteboardReadonly],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.readOnlyViewer),
     readOnly: true,
   }),
   [EMERGENCY_ROLE_IDS.publicDisplay]: Object.freeze({
@@ -445,7 +445,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     description: 'Public waiting-room display — aggregate status only, no staff actions.',
     routes: [ROUTES.whiteboard],
     actions: [EMERGENCY_ACTIONS.displayPublicWaitboard, EMERGENCY_ACTIONS.displayPublicPublish],
-    defaultRoute: ROUTES.whiteboard,
+    defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.publicDisplay),
     readOnly: true,
   }),
 });

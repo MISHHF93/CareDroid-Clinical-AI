@@ -30,7 +30,7 @@ describe('auth canonical flow wiring', () => {
       "export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])",
     );
     expect(routeConfigSource).toContain('aliases: CALCULATORS_ROUTE_ALIASES');
-    expect(appSource).toContain('path="/calculators" element={<ToolsRedirect />}');
-    expect(appSource).toContain('path="/calculators/*" element={<ToolsRedirect />}');
+    expect(appSource).toMatch(/<Route path="\/calculators"\s+element=\{<ToolsRedirect \/>\}/);
+    expect(appSource).toMatch(/<Route path="\/calculators\/\*"\s+element=\{<ToolsRedirect \/>\}/);
   });
 });

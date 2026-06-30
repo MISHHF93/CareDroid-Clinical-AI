@@ -192,7 +192,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
   { path: '/whiteboard', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/reception', type: 'redirect', to: '/emergency/reception' },
-  { path: '/triage', type: 'redirect', to: '/emergency/reception?queue=pretriage' },
+  { path: '/triage', type: 'redirect', to: '/triage?queue=pretriage' },
   { path: '/charge', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/physician', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/ems', type: 'redirect', to: '/emergency/ems' },

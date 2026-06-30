@@ -4,6 +4,7 @@ import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
+import { metricColorForTone } from '../../config/semanticColorSystem';
 import './emergency-route.css';
 
 const MATURITY_CHIP_LABELS = {
@@ -103,7 +104,10 @@ export function MetricGrid({ metrics }) {
         <article
           key={metric.label}
           className="emergency-route-card emergency-route-metric-card"
-          style={metric.color ? { '--metric-color': metric.color } as any : undefined}
+          style={(() => {
+            const accent = metric.tone ? metricColorForTone(metric.tone) : metric.color;
+            return accent ? ({ '--metric-color': accent } as any) : undefined;
+          })()}
         >
           <strong className="emergency-route-metric-card__value">{metric.value}</strong>
           <span className="emergency-route-metric-card__label">{metric.label}</span>

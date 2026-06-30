@@ -2,6 +2,7 @@
  * COMMAND_CENTER_SCREEN workflow model — manager / director throughput surfaces.
  */
 import { CANONICAL_ROUTES } from './routes.config';
+import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 import {
   CARE_DROID_SCREEN_MODES,
   getScreenModeActionPermission,
@@ -40,6 +41,17 @@ export const COMMAND_CENTER_SCREEN_WIDGETS = Object.freeze({
   crowdingForecast: 'crowding-forecast',
   systemHealth: 'system-health',
 });
+
+/** Operationally essential command-center metrics — drill-down for everything else. */
+export const COMMAND_CENTER_PRIMARY_WIDGETS = Object.freeze([
+  COMMAND_CENTER_SCREEN_WIDGETS.triageBreached,
+  COMMAND_CENTER_SCREEN_WIDGETS.waitingCount,
+  COMMAND_CENTER_SCREEN_WIDGETS.capacityScore,
+  COMMAND_CENTER_SCREEN_WIDGETS.emsInbound,
+  COMMAND_CENTER_SCREEN_WIDGETS.providerBreached,
+  COMMAND_CENTER_SCREEN_WIDGETS.referralsBacklog,
+  COMMAND_CENTER_SCREEN_WIDGETS.systemHealth,
+]);
 
 export const COMMAND_CENTER_HIDDEN_CONTROLS = Object.freeze({
   patientGrid: 'patient-grid',
@@ -140,6 +152,12 @@ export function resolveCommandCenterScreenCapabilities(
   const showWidget = (widgetId: string) => {
     if (!isCommandCenterScreen) return false;
     const normalized = normalizeCommandCenterWidgetId(widgetId);
+    if (
+      isPractitionerCleanupEnabled() &&
+      !COMMAND_CENTER_PRIMARY_WIDGETS.includes(normalized as (typeof COMMAND_CENTER_PRIMARY_WIDGETS)[number])
+    ) {
+      return false;
+    }
     return isScreenWidgetVisible(CARE_DROID_SCREEN_MODES.commandCenter, normalized);
   };
 

@@ -15,6 +15,7 @@ import {
 
 import {
   getAlertClassificationTier,
+  resolveOperationalAlertEnvelope,
   sortAlertsByClassification,
   triageOperationalAlerts,
 } from '../engine/alertClassificationModel';
@@ -855,19 +856,26 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
     return () => document.removeEventListener('close-all-panels', closePanels);
   }, []);
 
+  const toastedAlertIdsRef = useRef(new Set<string>());
+
   useEffect(() => {
     const handleReceptionEscalation = (event: Event) => {
       if (!isClinicalEscalationRecipientRole(emergencyRole.role)) return;
       const alert = (event as CustomEvent<{ alert?: Alert }>).detail?.alert;
-      if (!alert) return;
+      if (!alert?.id) return;
 
       const targets = escalationAlertTargets(alert);
       if (emergencyRole.role === 'triage_nurse' && !targets.includes('triage')) return;
       if (emergencyRole.role === 'charge_nurse' && !targets.includes('charge')) return;
 
-      toast.error(alert.title, {
+      const envelope = resolveOperationalAlertEnvelope(alert);
+      if (!envelope.showToast || toastedAlertIdsRef.current.has(alert.id)) return;
+      toastedAlertIdsRef.current.add(alert.id);
+
+      const toastFn = envelope.semantic === 'critical' ? toast.error : toast.warning;
+      toastFn(alert.title, {
         description: alert.message,
-        duration: alert.severity === 'Critical' ? Infinity : 12000,
+        duration: envelope.state === 'critical' ? Infinity : 12000,
         action: alert.patientId
           ? {
               label: 'View patient',
@@ -993,8 +1001,8 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             >
               {isReceptionRoute ? RECEPTION_COPY.header.register : 'Create'}
             </button>
-            <HelpTrigger variant="icon" tab="page" />
-            {screenCapabilities.showReassessAction ? (
+            {!PILOT_CUSTOMER_MODE.enabled ? <HelpTrigger variant="icon" tab="page" /> : null}
+            {!PILOT_CUSTOMER_MODE.enabled && screenCapabilities.showReassessAction ? (
             <button
               type="button"
               className="caredroid-header__action"
@@ -1007,7 +1015,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
             {!screenCapabilities.isRegistrationScreen ? (
             <>
-            {createReferralAction.visible ? (
+            {!PILOT_CUSTOMER_MODE.enabled && createReferralAction.visible ? (
             <button
               type="button"
               className="caredroid-header__action"
@@ -1100,7 +1108,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
             ) : null}
           </div>
 
-          {!screenCapabilities.isRegistrationScreen ? (
+          {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen ? (
           <button
             type="button"
             className="caredroid-header__palette-trigger"
@@ -1172,6 +1180,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
         </div>
       </div>
 
+      {!PILOT_CUSTOMER_MODE.enabled ? (
       <div
         className="caredroid-header__command-context"
         aria-label="Operational command context"
@@ -1192,6 +1201,7 @@ export function Header({ pageTitle, pageSubtitle }: HeaderProps) {
           );
         })}
       </div>
+      ) : null}
 
       {alertDrawerOpen ? (
         <div

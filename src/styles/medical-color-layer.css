@@ -34,4 +34,18 @@
   --nav-item-hover-bg: color-mix(in srgb, var(--medical-accent) 10%, var(--medical-white));
   --nav-item-active-bg: color-mix(in srgb, var(--medical-accent) 14%, var(--medical-sky-50));
   --nav-item-active-border: var(--medical-accent);
+
+  /* Semantic operational colors — use only with clinical meaning */
+  --semantic-critical: #b91c1c;
+  --semantic-critical-bg: #fef2f2;
+  --semantic-urgent: #c2410c;
+  --semantic-urgent-bg: #fff7ed;
+  --semantic-attention: #b45309;
+  --semantic-attention-bg: #fffbeb;
+  --semantic-healthy: #15803d;
+  --semantic-healthy-bg: #ecfdf5;
+  --semantic-information: #0284c7;
+  --semantic-information-bg: rgba(14, 165, 233, 0.12);
+  --semantic-inactive: #6b7280;
+  --semantic-inactive-bg: #f0f9ff;
 }

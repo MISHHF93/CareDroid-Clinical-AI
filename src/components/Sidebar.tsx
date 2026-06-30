@@ -45,6 +45,7 @@ import { isAdminSaasRole } from '../config/platformEntryModel';
 import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
+import { groupSidebarNavItems } from '../config/sidebarNavigationGroups';
 import './Sidebar.css';
 
 type SidebarNavItem = {
@@ -181,6 +182,10 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const desktopPrimaryNav = useMemo(
     () => visibleNav.filter((item) => item.isEmergencyCore !== false),
     [visibleNav],
+  );
+  const groupedDesktopPrimaryNav = useMemo(
+    () => groupSidebarNavItems(desktopPrimaryNav),
+    [desktopPrimaryNav],
   );
   const desktopUtilityNav = useMemo(() => {
     const utility = visibleNav.filter((item) => item.isEmergencyCore === false);
@@ -400,7 +405,12 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         <span className="sidebar__brand-name">CareDroid</span>
       </div>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
-        {desktopPrimaryNav.map(desktopNavLink)}
+        {groupedDesktopPrimaryNav.map(({ group, items }) => (
+          <div key={group} className="sidebar-nav-group" role="group" aria-label={group}>
+            <span className="sidebar-nav-group__label">{group}</span>
+            <div className="sidebar-nav-group__items">{items.map(desktopNavLink)}</div>
+          </div>
+        ))}
         {desktopUtilityNav.length ? (
           <div className="sidebar-desktop-nav__utility" aria-label="Emergency utility navigation">
             {desktopUtilityNav.map(desktopNavLink)}

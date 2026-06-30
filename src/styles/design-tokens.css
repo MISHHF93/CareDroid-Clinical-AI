@@ -79,6 +79,12 @@
   --type-small-line-height: 1.45;
   --type-caption-line-height: 1.45;
 
+  /* Operational shell — calmer hierarchy for ED command surfaces */
+  --app-type-page-title: clamp(0.95rem, 0.4vw + 0.85rem, 1.05rem);
+  --app-type-section-title: clamp(0.875rem, 0.3vw + 0.8rem, 0.95rem);
+  --app-type-metric-value: clamp(1.125rem, 0.5vw + 1rem, 1.35rem);
+  --app-type-metric-label: 0.6875rem;
+
   /* Aliases used by responsive-ux.css and tool surfaces */
   --app-type-title: var(--text-title-fluid);
 

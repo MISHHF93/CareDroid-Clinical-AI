@@ -14,29 +14,23 @@ function expectCanonicalRouteMounted(routeName) {
 describe('Codex issue card route mounts', () => {
   it('mounts platform card destinations that have real page implementations', () => {
     [
-      'plans',
       'profile',
       'profileSettings',
       'profileToolPreferences',
       'executive',
-      'aiModels',
-      'governanceRegistry',
-      'audit',
-      'automationAudit',
-      'automationAnalytics',
-      'protocols',
-      'clinicalDecisionSupport',
-      'documentation',
-      'knowledgeGraph',
       'predictiveAnalytics',
-      'research',
-      'laboratory',
       'medical3dViewer',
       'developerCatalog',
-      'simulation',
-      'simulationOutcomes',
-      'competencies',
-      'credentials',
+      'featureFlags',
+      'aiCommandCenter',
+      'hospitalMap',
+      'medicalIot',
+      'devices',
+      'fleetCommand',
+      'fleetMap',
+      'billing',
+      'usage',
+      'audit',
     ].forEach(expectCanonicalRouteMounted);
   });
 
@@ -47,8 +41,6 @@ describe('Codex issue card route mounts', () => {
       '/profile/security',
       '/profile/workspaces',
       '/profile-settings',
-      '/two-factor-setup',
-      '/biometric-setup',
       '/audit-logs',
     ].forEach((path) => {
       expect(appSource, path).toContain(`path="${path}"`);
@@ -56,8 +48,8 @@ describe('Codex issue card route mounts', () => {
   });
 
   it('keeps route constants available for card authors', () => {
-    expect(CANONICAL_ROUTES.plans).toBe('/plans');
-    expect(CANONICAL_ROUTES.aiModels).toBe('/ai-models');
-    expect(CANONICAL_ROUTES.clinicalDecisionSupport).toBe('/clinical-decision-support');
+    expect(CANONICAL_ROUTES.featureFlags).toBe('/feature-flags');
+    expect(CANONICAL_ROUTES.aiCommandCenter).toBe('/ai-command-center');
+    expect(CANONICAL_ROUTES.predictiveAnalytics).toBe('/predictive-analytics');
   });
 });

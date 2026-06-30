@@ -116,6 +116,40 @@
 .service-health-card {
   display: grid;
   gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 8px;
+  background: var(--medical-surface-card, #ffffff);
+}
+
+.service-health-card--compact {
+  gap: 2px;
+  padding: 6px 10px;
+}
+
+.service-health-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.service-health-card__status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.service-health-card__name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.service-health-card__details summary {
+  font-size: 10px;
+  color: var(--medical-ink-muted, #6b7280);
+  cursor: pointer;
 }
 
 .service-health-card--down {

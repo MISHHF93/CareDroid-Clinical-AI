@@ -32,7 +32,9 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
   it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
     renderRoute('/emergency/boarding');
 
-    expect(await screen.findByRole('heading', { name: 'Boarding' })).toBeInTheDocument();
+    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/capacity?view=boarding');
+    expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Boarding' })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('/emergency/referrals renders referral candidates from the active patient list', async () => {

@@ -29,6 +29,15 @@ export const CAREDROID_PRODUCT = Object.freeze({
     'CareDroid Copilot supports routing, context, evidence, and workflow prompts without making autonomous clinical decisions.',
   copilotRole:
     'Embedded CareDroid Copilot workflow layer — not an autonomous clinician.',
+  /** One Screen, One Decision — each surface optimizes for a single primary decision. */
+  oneScreenOneDecision:
+    'Every screen helps the user make one primary decision quickly. Secondary information is available but must not compete with the primary task.',
+  designMission: Object.freeze({
+    clarity: 'Signal over noise — only elements that speed safer decisions stay visible.',
+    speed: 'First three minutes — reception, triage, and charge paths stay uncluttered.',
+    safety: 'Semantic color, unified alerts, human-reviewed AI.',
+    cognitiveLoad: 'Progressive disclosure under department pressure.',
+  }),
   notPositionedAs: Object.freeze([
     'autonomous diagnosis',
     'prescribing',

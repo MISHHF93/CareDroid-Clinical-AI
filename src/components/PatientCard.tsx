@@ -904,42 +904,44 @@ function PatientCard({
         </div>
       ) : null}
 
-      <div className="patient-card__flags" aria-label="Patient flags and statuses">
-        {(() => {
-          const visibleFlags = patientFlags(patient).filter(
-            (flag) => flagColors[flag] && flagLabels[flag],
-          );
-          const overflow = visibleFlags.length - maxPatientCardBadges;
-          return (
-            <>
-              {visibleFlags.slice(0, maxPatientCardBadges).map((flag) => (
-                <span
-                  key={flag}
-                  title={flag}
-                  aria-label={flagLabels[flag]}
-                  style={{
-                    '--patient-flag-color': flagColors[flag],
-                  } as CSSProperties}
-                  className="patient-card__flag"
-                >
-                  {flagLabels[flag]}
-                </span>
-              ))}
-              {overflow > 0 ? (
-                <span
-                  className="patient-card__flag patient-card__flag--overflow"
-                  title={visibleFlags
-                    .slice(maxPatientCardBadges)
-                    .map((flag) => flagLabels[flag])
-                    .join(' · ')}
-                >
-                  +{overflow}
-                </span>
-              ) : null}
-            </>
-          );
-        })()}
-      </div>
+      {!cardDensity.showSignalsRow ? (
+        <div className="patient-card__flags" aria-label="Patient flags and statuses">
+          {(() => {
+            const visibleFlags = patientFlags(patient).filter(
+              (flag) => flagColors[flag] && flagLabels[flag],
+            );
+            const overflow = visibleFlags.length - maxPatientCardBadges;
+            return (
+              <>
+                {visibleFlags.slice(0, maxPatientCardBadges).map((flag) => (
+                  <span
+                    key={flag}
+                    title={flag}
+                    aria-label={flagLabels[flag]}
+                    style={{
+                      '--patient-flag-color': flagColors[flag],
+                    } as CSSProperties}
+                    className="patient-card__flag"
+                  >
+                    {flagLabels[flag]}
+                  </span>
+                ))}
+                {overflow > 0 ? (
+                  <span
+                    className="patient-card__flag patient-card__flag--overflow"
+                    title={visibleFlags
+                      .slice(maxPatientCardBadges)
+                      .map((flag) => flagLabels[flag])
+                      .join(' · ')}
+                  >
+                    +{overflow}
+                  </span>
+                ) : null}
+              </>
+            );
+          })()}
+        </div>
+      ) : null}
 
       {patientCardSurfaces.showToolChips ? (
         <PatientCardToolChips patient={patient} readOnlyDisplay={readOnlyDisplay} />
