@@ -857,7 +857,14 @@ function AppShellFrame({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      <Toaster richColors closeButton position="top-right" />
+      <Toaster
+        richColors
+        closeButton
+        position="bottom-right"
+        visibleToasts={2}
+        duration={4000}
+        gap={8}
+      />
     </div>
   );
 }

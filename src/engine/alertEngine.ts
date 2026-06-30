@@ -57,16 +57,7 @@ export function dispatchAlert(input: AlertInput): string {
   if (tier === 'critical' || alert.severity === 'Critical') {
     toast.error(alert.title, {
       description: alert.message,
-      duration: Infinity,
-      action,
-    });
-    return alert.id;
-  }
-
-  if (tier === 'high' || alert.severity === 'Warning') {
-    toast.warning(alert.title, {
-      description: alert.message,
-      duration: 10000,
+      duration: 7000,
       action,
     });
     return alert.id;
@@ -74,7 +65,7 @@ export function dispatchAlert(input: AlertInput): string {
 
   toast(alert.title, {
     description: alert.message,
-    duration: 5000,
+    duration: 4000,
     action,
   });
 

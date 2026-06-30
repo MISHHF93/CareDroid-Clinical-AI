@@ -217,7 +217,8 @@ export function classifyOperationalAlert(alert) {
 export function shouldToastOperationalAlert(alert, classification = classifyOperationalAlert(alert)) {
   if (alert?.metadata?.advisoryOnly) return false;
   if (alert?.metadata?.suppressToast) return false;
-  return classification === 'critical' || classification === 'high';
+  // Only critical-tier alerts pop a toast; high/warning stays in the alert rail
+  return classification === 'critical';
 }
 
 export function shouldRetainDerivedAlert(alert, classification = classifyOperationalAlert(alert)) {
