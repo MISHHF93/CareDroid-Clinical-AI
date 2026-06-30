@@ -423,7 +423,7 @@ src/features/
 ├── ems/              Ambulance tracker, handoff, pre-arrival
 ├── command/          ED manager analytics, capacity, boarding
 ├── copilot/          AI chat interface, context injection, citations
-├── tools/            Clinical tool catalog + 81 tool pages
+├── tools/            Clinical tool catalog + 46 tool page files
 ├── calculators/      15 calculator hubs
 ├── shift/            Shift summary, handoff notes, audit
 ├── admin/            Staff management, role assignment
@@ -448,6 +448,8 @@ export { featureRoute }             from './route'
 ## Layer 7 — Screens & Flows
 
 Every screen mapped by role and entry point.
+
+Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, including 46 under `src/pages/tools` (see `pages-map.txt`).
 
 ### ED Operating System Screens
 
@@ -476,7 +478,7 @@ Every screen mapped by role and entry point.
 | Copilot Chat | `/emergency/copilot` | Full-session AI assistant |
 | Shared Tool Session | `/tools/shared/:id` | Shareable tool result URL |
 
-### Clinical Tool Screens (81 pages)
+### Clinical Tool Screens (46 source files)
 
 ```
 /tools                    Tool catalog (filter, search, launch)

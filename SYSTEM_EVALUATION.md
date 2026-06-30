@@ -88,7 +88,9 @@ The core product. Covers the complete clinical workflow:
 | Shift Summary | Shift-close assistant, handoff notes | Live demo |
 | Department Pulse | Real-time KPI strip | Live demo |
 
-### 4.2 Clinical AI Tools (81 tool pages)
+### 4.2 Clinical AI Tools (46 tool page/source files)
+
+Generated page inventory (2026-06-30): 184 non-test files under `src/pages`, including 46 under `src/pages/tools` (see `pages-map.txt`).
 
 | Category | Examples |
 |---|---|

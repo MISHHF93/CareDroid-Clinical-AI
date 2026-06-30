@@ -11,10 +11,11 @@ import {
   Priority,
   QueueType,
   type EMSArrival,
-  type EMSUnit,
+  type EmsUnit,
   type JourneyEvent,
   type Patient,
   type PatientFlagType,
+  type QueueSummary,
   type Sex,
   type Vitals,
 } from '../types/emergency';
@@ -404,6 +405,32 @@ const fluctuate = (
   return precision ? Number(nextValue.toFixed(precision)) : Math.round(nextValue);
 };
 
+const vitalNumber = (value: Vitals[keyof Vitals], fallback: number): number =>
+  numericVital(value) ?? fallback;
+
+const fluctuateNumber = (
+  value: number,
+  deltaMin: number,
+  deltaMax: number,
+  min: number,
+  max: number,
+  precision = 0
+): number => fluctuate(value, deltaMin, deltaMax, min, max, precision) ?? value;
+
+const createVitalsReading = (
+  vitals: Omit<Vitals, 'recordedAt'>,
+  recordedAt: string
+): Vitals => ({
+  ...vitals,
+  recordedAt,
+});
+
+const latestVitalsForPatient = (patient: Patient): Vitals | null =>
+  patient.currentVitals ?? patient.vitals.at(-1) ?? null;
+
+const numericQueueValue = (value: QueueSummary[keyof QueueSummary]): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null;
+
 const addOccasionalAbnormalSignal = (vitals: Vitals): Vitals => {
   if (Math.random() > 0.14) return vitals;
 
@@ -415,19 +442,41 @@ const addOccasionalAbnormalSignal = (vitals: Vitals): Vitals => {
   return { ...vitals, bpSystolic: randomInt(181, 198) };
 };
 
-const varyVitals = (vitals: Vitals): Vitals =>
-  addOccasionalAbnormalSignal({
+const varyVitals = (vitals: Vitals): Vitals => {
+  const hr = vitalNumber(vitals.hr ?? vitals.heartRate, 88);
+  const bpSystolic = vitalNumber(vitals.bpSystolic ?? vitals.sbp, 122);
+  const bpDiastolic = vitalNumber(vitals.bpDiastolic ?? vitals.dbp, 76);
+  const spo2 = vitalNumber(vitals.spo2 ?? vitals.oxygenSaturation, 98);
+  const temp = vitalNumber(vitals.temp ?? vitals.temperature, 36.9);
+  const rr = vitalNumber(vitals.rr ?? vitals.respiratoryRate, 16);
+  const pain = vitalNumber(vitals.pain ?? vitals.painScore, 3);
+
+  const nextBpSystolic = fluctuateNumber(bpSystolic, -6, 6, 80, 220);
+  const nextBpDiastolic = fluctuateNumber(bpDiastolic, -4, 4, 40, 130);
+  const nextSpo2 = fluctuateNumber(spo2, -1, 1, 88, 100);
+  const nextTemp = fluctuateNumber(temp, -2, 2, 35.4, 40.5, 1);
+  const nextRr = fluctuateNumber(rr, -2, 2, 10, 32);
+  const nextPain = fluctuateNumber(pain, -1, 1, 0, 10);
+
+  return addOccasionalAbnormalSignal({
     ...vitals,
-    hr: fluctuate(vitals.hr, -4, 5, 45, 150),
-    bpSystolic: fluctuate(vitals.bpSystolic, -6, 6, 80, 220),
-    bpDiastolic: fluctuate(vitals.bpDiastolic, -4, 4, 40, 130),
-    spo2: fluctuate(vitals.spo2, -1, 1, 88, 100),
-    temp: fluctuate(vitals.temp, -2, 2, 35.4, 40.5, 1),
-    rr: fluctuate(vitals.rr, -2, 2, 10, 32),
+    hr: fluctuateNumber(hr, -4, 5, 45, 150),
+    bpSystolic: nextBpSystolic,
+    bpDiastolic: nextBpDiastolic,
+    sbp: nextBpSystolic,
+    dbp: nextBpDiastolic,
+    spo2: nextSpo2,
+    oxygenSaturation: nextSpo2,
+    temp: nextTemp,
+    temperature: nextTemp,
+    rr: nextRr,
+    respiratoryRate: nextRr,
     gcs: vitals.gcs,
-    pain: fluctuate(vitals.pain, -1, 1, 0, 10),
+    pain: nextPain,
+    painScore: nextPain,
     recordedAt: nowIso(),
-  } as any);
+  });
+};
 
 const updateRandomVitals = (): void => {
   const store = useEmergencyStore.getState();
@@ -435,7 +484,10 @@ const updateRandomVitals = (): void => {
   const selected = [...candidates].sort(() => Math.random() - 0.5).slice(0, 2);
 
   selected.forEach((patient) => {
-    store.addVitals(patient.id, varyVitals(patient.vitals as any));
+    const latestVitals = latestVitalsForPatient(patient);
+    if (latestVitals) {
+      store.addVitals(patient.id, varyVitals(latestVitals));
+    }
   });
 };
 
@@ -458,7 +510,7 @@ const createArrivalPatient = (template: ArrivalTemplate): Patient => {
     complaintCategory: template.complaintCategory,
     state: PatientState.Arrival,
     priority: template.priority,
-    vitals: [{ ...template.vitals, recordedAt: createdAt }] as any,
+    vitals: [createVitalsReading(template.vitals, createdAt)],
     assignedStaffId: null,
     roomId: null,
     flags: [],
@@ -480,7 +532,7 @@ const addRandomArrival = (): void => {
 
 const addFlagIfMissing = (patient: Patient, flag: PatientFlagType, reason: string): void => {
   if (!hasPatientFlag(patient, flag)) {
-    useEmergencyStore.getState().addFlag(patient.id, flag, { reason } as any);
+    useEmergencyStore.getState().addFlag(patient.id, flag);
   }
 };
 
@@ -511,7 +563,7 @@ const createEMSPreArrival = (template: EMSPreArrivalTemplate): EMSArrival => {
     patientSex: randomItem(['Female', 'Male', 'Unknown']),
     chiefComplaint: template.complaint,
     mechanismOfInjury: template.category === 'Trauma' ? 'Reported traumatic mechanism' : undefined,
-    vitals: [{ ...template.vitals, recordedAt: createdAt }] as any,
+    vitals: createVitalsReading(template.vitals, createdAt),
     eta: etaMinutes,
     severity: template.severity,
     dispatchTime: new Date(Date.now() - randomInt(4, 14) * 60_000).toISOString(),
@@ -532,44 +584,37 @@ const createEMSPreArrival = (template: EMSPreArrivalTemplate): EMSArrival => {
 const addEMSPreArrivalNotification = (): void => {
   const template = randomItem(EMS_TEMPLATES);
   const arrival = createEMSPreArrival(template);
-  const unit: EMSUnit = {
+  const unit: EmsUnit = {
     id: arrival.unitId,
-    callSign: arrival.unitName,
-    agency: 'Toronto Paramedic Services',
+    unitNumber: arrival.unitName,
+    etaMinutes: arrival.eta,
     status: 'Inbound',
-    crewStaffIds: [],
-    activeArrivalId: arrival.id,
-    lastKnownLocation: randomItem([
-      'Gardiner Expressway eastbound',
-      'Bloor Street West approaching Spadina',
-      'Danforth Avenue near Broadview',
-      'University Avenue southbound',
-    ]),
+    acuity: arrival.priority,
   };
 
   useEmergencyStore.setState((state) => ({
     emsUnits: [...state.emsUnits, unit],
-  }) as any);
+  }));
   useEmergencyStore.getState().addEMSArrival(arrival);
 };
 
 const triggerBottleneckAlert = (): void => {
   const store = useEmergencyStore.getState();
-  const queues = store.queues.filter((queue) => (queue.patientIds as any)?.length > 0);
+  const queues = store.queues.filter((queue) => Number(queue.patientCount ?? queue.count ?? 0) > 0);
   const queue = queues.length
-    ? [...queues].sort((a, b) => ((b.longestWaitMinutes as any) ?? 0) - ((a.longestWaitMinutes as any) ?? 0))[0]
+    ? [...queues].sort(
+        (a, b) =>
+          (numericQueueValue(b.oldestWaitMinutes) ?? 0) -
+          (numericQueueValue(a.oldestWaitMinutes) ?? 0)
+      )[0]
     : null;
   const queueType = queue?.type ?? QueueType.Waiting;
-  const patientCount = (queue?.patientIds as any)?.length ?? randomInt(4, 8);
-  const averageWait = Math.max((queue?.averageWaitMinutes as any) ?? 0, randomInt(32, 58));
-  const detectedAt = nowIso();
-
-  (store as any).setBottleneckAlert({
-    queue: queueType,
-    reason: `${queue?.name ?? queueType} queue pressure building: ${patientCount} patients, avg ${averageWait}min.`,
-    severity: averageWait >= 45 ? 'Red' : 'Yellow',
-    detectedAt,
-  });
+  const patientCount =
+    numericQueueValue(queue?.patientCount) ?? numericQueueValue(queue?.count) ?? randomInt(4, 8);
+  const averageWait = Math.max(
+    numericQueueValue(queue?.oldestWaitMinutes) ?? 0,
+    randomInt(32, 58)
+  );
 
   dispatchAlert({
     id: `alert-simulation-bottleneck-${queueType}`,
@@ -606,8 +651,11 @@ const triggerDeteriorationSignalAlert = (): void => {
   const store = useEmergencyStore.getState();
   const patient = randomItem(pickActivePatients(store.patients));
   if (!patient) return;
+  const latestVitals = latestVitalsForPatient(patient);
+  if (!latestVitals) return;
+
   const abnormalVitals = {
-    ...varyVitals(patient.vitals as any),
+    ...varyVitals(latestVitals),
     hr: randomInt(124, 136),
     spo2: randomInt(90, 93),
     recordedAt: nowIso(),
