@@ -11,7 +11,7 @@ import { dismissOverlays, installQaNetworkStubs, seedQaAuth } from '../e2e/respo
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
-const baseUrl = process.env.QA_BASE_URL || 'http://localhost:4173';
+const baseUrl = (process.env.QA_BASE_URL || 'http://localhost:4173').trim().replace(/\/$/, '');
 const outputDir = process.env.SHELL_RESPONSIVE_DIR || join(root, 'qa', 'shell-ux-audit', 'responsive');
 const previewDir = join(outputDir, 'previews');
 
@@ -50,6 +50,45 @@ async function waitForRenderablePage(page) {
     .first()
     .waitFor({ timeout: 45_000 });
   await page.waitForTimeout(Number(process.env.SHELL_SCREENSHOT_STABILIZE_MS || 600));
+}
+
+async function assertServerRenderable(page) {
+  const probePath = '/emergency/whiteboard';
+  const probeUrl = new URL(probePath, baseUrl).toString();
+
+  let response;
+  try {
+    response = await page.goto(probeUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } catch (error) {
+    throw new Error(
+      `Cannot reach ${baseUrl}. Start preview first: npm run build && npm run preview -- --port 4173 --strictPort\n` +
+        `Original error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+
+  if (!response || !response.ok()) {
+    throw new Error(
+      `Probe ${probeUrl} returned HTTP ${response?.status() ?? 'unknown'}. ` +
+        'Use production preview (port 4173), not Vite dev (port 8000) while CSS is rebuilding.',
+    );
+  }
+
+  try {
+    await waitForRenderablePage(page);
+  } catch (error) {
+    const shellPresent = await page.locator('.emergency-app-shell').count();
+    throw new Error(
+      `App shell did not render at ${probeUrl} (shell nodes: ${shellPresent}). ` +
+        'Rebuild and restart preview before running qa:shell-responsive.\n' +
+        `Original error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+
+  if (baseUrl.includes(':8000')) {
+    console.warn(
+      'Warning: QA_BASE_URL points at Vite dev (:8000). Prefer preview (:4173) for stable screenshots.',
+    );
+  }
 }
 
 async function captureTarget(page, target, viewport) {
@@ -133,26 +172,40 @@ mkdirSync(outputDir, { recursive: true });
 mkdirSync(previewDir, { recursive: true });
 
 const browser = await chromium.launch();
-const context = await browser.newContext();
-const page = await context.newPage();
-await seedQaAuth(page);
-await installQaNetworkStubs(page);
+let results = [];
 
-const results = [];
-for (const target of TARGETS) {
-  for (const viewport of VIEWPORTS) {
-    console.log(`Capturing ${target.id} @ ${viewport.id}`);
-    const result = await captureTarget(page, target, viewport);
-    if (!result.ok) {
-      console.error(`  failed: ${result.error}`);
-    } else if (result.docOverflowPx > 2) {
-      console.warn(`  horizontal overflow: ${result.docOverflowPx}px`);
+try {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await seedQaAuth(page);
+  await installQaNetworkStubs(page);
+
+  console.log(`QA base URL: ${baseUrl}`);
+  await assertServerRenderable(page);
+
+  for (const target of TARGETS) {
+    for (const viewport of VIEWPORTS) {
+      console.log(`Capturing ${target.id} @ ${viewport.id}`);
+      const result = await captureTarget(page, target, viewport);
+      if (!result.ok) {
+        console.error(`  failed: ${result.error}`);
+      } else if (result.docOverflowPx > 2) {
+        console.warn(`  horizontal overflow: ${result.docOverflowPx}px`);
+      }
+      results.push(result);
     }
-    results.push(result);
   }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
+  results = [];
+} finally {
+  await browser.close();
 }
 
-await browser.close();
+if (results.length === 0) {
+  process.exit(process.exitCode || 1);
+}
 
 const report = {
   generatedAt: new Date().toISOString(),
