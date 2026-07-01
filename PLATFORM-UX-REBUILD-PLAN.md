@@ -111,5 +111,5 @@ Dev server: `http://localhost:8000`
 | 6 | pass | AppShell.navigation — 8/8 |
 | 7 | pass | emergencyPagesSmoke — 4/4 |
 | 8 | skip | backend spec not run in this pass |
-| 9 | pending | production build |
-| 10 | pending | git commit + push |
+| 9 | pass | `npm run build` — 21.75s |
+| 10 | pass | commit `2ed49443` pushed to origin/main |
