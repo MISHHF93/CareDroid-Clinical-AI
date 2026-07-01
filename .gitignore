@@ -1,3 +1,6 @@
+# Claude Code session artifacts
+agent-tools/
+
 # Logs
 logs
 *.log
