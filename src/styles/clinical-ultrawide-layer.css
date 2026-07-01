@@ -1,0 +1,107 @@
+/**
+ * Ultrawide / large desktop — 34" QHD (2560), UWQHD (3440), and 4K canvases.
+ * Sorts page zones, caps grid columns, and centers the operational canvas.
+ */
+
+@media (min-width: 2560px) {
+  :root {
+    --app-layout-content-max: min(100%, 2100px);
+    --app-visual-page-max: min(100%, 2100px);
+    --app-layout-page-gutter-inline: clamp(32px, 2.4vw, 48px);
+    --app-grid-card-min: 17rem;
+    --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
+    --ed-whiteboard-card-min-ultrawide: 320px;
+    --app-ultrawide-metric-columns: 4;
+    --app-ultrawide-action-columns: 2;
+  }
+
+  .emergency-app-shell .app-shell-main-content {
+    align-items: center;
+  }
+
+  .emergency-app-shell .app-shell-main-content > :is(
+      .cd-page-shell,
+      .emergency-route-page,
+      .emergency-whiteboard-page,
+      .hospital-command-center,
+      .ems-pipeline,
+      .reception-workspace,
+      .dispatch-console
+    ) {
+    width: 100%;
+    max-width: var(--app-layout-content-max);
+    margin-inline: auto;
+  }
+
+  .emergency-app-shell .app-shell-main-content :is(
+      .emergency-route-metric-grid,
+      .emergency-route-situation-brief__list--graphic,
+      .hospital-command-center__metric-grid,
+      .hospital-command-center__panels
+    ) {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, calc((100% - (var(--app-ultrawide-metric-columns) - 1) * var(--app-layout-panel-gap)) / var(--app-ultrawide-metric-columns)), 1fr)
+    );
+  }
+
+  .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
+    grid-template-columns: repeat(var(--app-ultrawide-action-columns), minmax(0, 1fr));
+  }
+
+  .emergency-app-shell .app-shell-main-content .emergency-route-patient-grid,
+  .emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__grid {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--ed-whiteboard-card-min-ultrawide, 320px), 1fr)
+    ) !important;
+  }
+
+  .emergency-whiteboard-page__command-layer-grid,
+  .emergency-whiteboard-page__awareness-grid,
+  .emergency-whiteboard-page__inbound-banner-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)) !important;
+  }
+
+  .emergency-route-page__content {
+    display: grid;
+    gap: var(--app-layout-section-gap);
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 3440px) {
+  :root {
+    --app-layout-content-max: min(100%, 2400px);
+    --app-visual-page-max: min(100%, 2400px);
+    --app-grid-card-min: 18rem;
+    --ed-whiteboard-card-min-ultrawide: 340px;
+    --app-ultrawide-metric-columns: 5;
+    --app-ultrawide-action-columns: 2;
+  }
+
+  .emergency-app-shell .app-shell-main-content .emergency-route-situation-brief__list--graphic {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .emergency-app-shell .app-shell-main-content .hospital-command-center__metric-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .emergency-whiteboard-page__mission {
+    grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.1fr) minmax(320px, 0.9fr) !important;
+  }
+
+  .shell-route-tab,
+  .caredroid-header--slim {
+    padding-inline: clamp(24px, 2vw, 56px);
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --app-layout-content-max: min(100%, 2600px);
+    --app-visual-page-max: min(100%, 2600px);
+    --app-ultrawide-metric-columns: 6;
+  }
+}

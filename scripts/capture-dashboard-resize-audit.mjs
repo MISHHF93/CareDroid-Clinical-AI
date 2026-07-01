@@ -39,6 +39,8 @@ const VIEWPORTS = [
   { id: '1280x720', width: 1280, height: 720, tier: 'desktop' },
   { id: '1440x900', width: 1440, height: 900, tier: 'desktop' },
   { id: '1920x1080', width: 1920, height: 1080, tier: 'wide' },
+  { id: '2560x1440', width: 2560, height: 1440, tier: 'qhd-34' },
+  { id: '3440x1440', width: 3440, height: 1440, tier: 'ultrawide-34' },
 ];
 
 const MAX_CAPTURE_ATTEMPTS = Number(process.env.DASHBOARD_RESIZE_RETRIES || 3);

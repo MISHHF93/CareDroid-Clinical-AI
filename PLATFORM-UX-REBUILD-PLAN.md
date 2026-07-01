@@ -94,8 +94,9 @@
 
 ## QA artifacts
 
-Screenshots (optional): `qa/shell-ux-audit/after-v2/`  
-Dev server: `http://localhost:8000`
+Responsive screenshots: `qa/shell-ux-audit/responsive/` (full + `previews/` at 1280×720)  
+Capture command: `npm run build && npm run preview -- --port 4173 --strictPort` then `QA_BASE_URL=http://localhost:4173 npm run qa:shell-responsive`  
+Dev server: `http://localhost:8000` · Preview: `http://localhost:4173`
 
 ---
 

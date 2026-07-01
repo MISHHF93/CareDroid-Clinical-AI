@@ -99,6 +99,23 @@
   }
 }
 
+@media (min-width: 2560px) {
+  :root {
+    --app-visual-page-max: min(100%, 2100px);
+    --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
+    --app-visual-section-gap: 28px;
+  }
+}
+
+@media (min-width: 3440px) {
+  :root {
+    --app-visual-page-max: min(100%, 2400px);
+    --app-visual-grid-min: minmax(min(100%, 320px), 1fr);
+    --app-readable-title-size: 36px;
+    --app-readable-heading-size: 26px;
+  }
+}
+
 :is(.app-shell, .emergency-app-shell) {
   font-size: var(--app-readable-body-size);
   line-height: var(--app-readable-line-height);

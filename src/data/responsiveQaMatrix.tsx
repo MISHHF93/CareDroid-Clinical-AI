@@ -1,5 +1,5 @@
 /**
- * Responsive QA matrix — pages, viewports, and browsers for Playwright runs.
+ * Responsive QA matrix ï¿½ pages, viewports, and browsers for Playwright runs.
  * Paths are static so Node/Playwright can import without Vite resolution.
  * @see e2e/responsive-qa.spec.mjs
  * @see scripts/run-responsive-qa.mjs
@@ -47,6 +47,8 @@ const VIEWPORT_DEFS = [
   { width: 1280, height: 720, label: 'Desktop (1280)', tier: 'desktop' },
   { width: 1440, height: 900, label: 'Desktop (1440)', tier: 'desktop' },
   { width: 1920, height: 1080, label: 'Desktop wide (1920)', tier: 'desktop' },
+  { width: 2560, height: 1440, label: 'QHD 34" (2560)', tier: 'ultrawide' },
+  { width: 3440, height: 1440, label: 'UWQHD 34" (3440)', tier: 'ultrawide' },
 ];
 
 export const RESPONSIVE_QA_VIEWPORTS = Object.freeze(
@@ -668,7 +670,7 @@ export function groupResponsiveQaPagesByPath() {
 }
 
 /**
- * Full matrix cell count (pages × viewports × browsers).
+ * Full matrix cell count (pages ï¿½ viewports ï¿½ browsers).
  */
 export function countResponsiveQaCells() {
   return (
@@ -685,7 +687,7 @@ export function formatResponsiveQaMatrixMarkdown() {
   const lines = [
     '# Responsive QA matrix',
     '',
-    `Generated from \`src/data/responsiveQaMatrix.js\`. Total cells: **${countResponsiveQaCells()}** (${RESPONSIVE_QA_PAGES.length} pages × ${RESPONSIVE_QA_VIEWPORTS.length} viewports × ${RESPONSIVE_QA_BROWSER_PROJECTS.length} browsers). Zoom acceptance levels: ${RESPONSIVE_QA_ZOOM_LEVELS.join('%, ')}%.`,
+    `Generated from \`src/data/responsiveQaMatrix.js\`. Total cells: **${countResponsiveQaCells()}** (${RESPONSIVE_QA_PAGES.length} pages ï¿½ ${RESPONSIVE_QA_VIEWPORTS.length} viewports ï¿½ ${RESPONSIVE_QA_BROWSER_PROJECTS.length} browsers). Zoom acceptance levels: ${RESPONSIVE_QA_ZOOM_LEVELS.join('%, ')}%.`,
     '',
     '## Browsers',
     '',
@@ -697,7 +699,7 @@ export function formatResponsiveQaMatrixMarkdown() {
     '',
     '| ID | Size | Label |',
     '| --- | --- | --- |',
-    ...RESPONSIVE_QA_VIEWPORTS.map((v) => `| ${v.id} | ${v.width}×${v.height} | ${v.label} |`),
+    ...RESPONSIVE_QA_VIEWPORTS.map((v) => `| ${v.id} | ${v.width}ï¿½${v.height} | ${v.label} |`),
     '',
     '## Zoom',
     '',

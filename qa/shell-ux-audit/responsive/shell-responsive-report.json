@@ -1,0 +1,1172 @@
+{
+  "generatedAt": "2026-07-01T07:28:22.188Z",
+  "baseUrl": "http://localhost:4173",
+  "outputDir": "qa/shell-ux-audit/responsive",
+  "previewDir": "qa/shell-ux-audit/responsive/previews",
+  "previewViewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "viewports": [
+    {
+      "id": "390x844",
+      "width": 390,
+      "height": 844,
+      "tier": "phone",
+      "preview": true
+    },
+    {
+      "id": "768x1024",
+      "width": 768,
+      "height": 1024,
+      "tier": "tablet",
+      "preview": true
+    },
+    {
+      "id": "1440x900",
+      "width": 1440,
+      "height": 900,
+      "tier": "laptop",
+      "preview": true
+    },
+    {
+      "id": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "tier": "desktop",
+      "preview": true
+    },
+    {
+      "id": "2560x1440",
+      "width": 2560,
+      "height": 1440,
+      "tier": "qhd-34",
+      "preview": true
+    },
+    {
+      "id": "3440x1440",
+      "width": 3440,
+      "height": 1440,
+      "tier": "ultrawide-34",
+      "preview": true
+    }
+  ],
+  "targets": [
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard"
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center"
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems"
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception"
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot"
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools"
+    }
+  ],
+  "total": 36,
+  "captured": 36,
+  "failed": 0,
+  "overflowIssues": [],
+  "results": [
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:21.881Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 357,
+        "pageLeft": 12,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:23.302Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 728,
+        "pageLeft": 16,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:24.627Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 1208,
+        "shellLeft": 232,
+        "pageWidth": 1144,
+        "pageLeft": 260,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:25.957Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1688,
+        "shellLeft": 232,
+        "pageWidth": 1616,
+        "pageLeft": 264,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:27.251Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2328,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 452,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:28.577Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/whiteboard--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 3208,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 892,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:29.970Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 357,
+        "pageLeft": 12,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:31.323Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 728,
+        "pageLeft": 16,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:32.754Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 1208,
+        "shellLeft": 232,
+        "pageWidth": 1144,
+        "pageLeft": 260,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:34.088Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1688,
+        "shellLeft": 232,
+        "pageWidth": 1616,
+        "pageLeft": 264,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:35.516Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2328,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 452,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:36.920Z",
+      "finalUrl": "http://localhost:4173/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/shell-ux-audit/responsive/command-center--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/command-center--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 3208,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 892,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:38.368Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 357,
+        "pageLeft": 12,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:41.154Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 728,
+        "pageLeft": 16,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:44.469Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 1208,
+        "shellLeft": 232,
+        "pageWidth": 1144,
+        "pageLeft": 260,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:48.024Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1688,
+        "shellLeft": 232,
+        "pageWidth": 1616,
+        "pageLeft": 264,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:51.038Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2328,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 452,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "path": "/emergency/ems",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:53.784Z",
+      "finalUrl": "http://localhost:4173/emergency/ems",
+      "heading": "EMS Coordination",
+      "screenshotPath": "qa/shell-ux-audit/responsive/ems--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/ems--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 3208,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 892,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:56.822Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 357,
+        "pageLeft": 12,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:58.516Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 728,
+        "pageLeft": 16,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:27:59.702Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 1208,
+        "shellLeft": 232,
+        "pageWidth": 1144,
+        "pageLeft": 260,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:00.974Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1688,
+        "shellLeft": 232,
+        "pageWidth": 1616,
+        "pageLeft": 264,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:02.336Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2328,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 452,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "path": "/emergency/reception",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:03.708Z",
+      "finalUrl": "http://localhost:4173/emergency/reception",
+      "heading": "Arrival Dashboard",
+      "screenshotPath": "qa/shell-ux-audit/responsive/reception--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/reception--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 3208,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 892,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:05.069Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 357,
+        "pageLeft": 12,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:06.593Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 728,
+        "pageLeft": 16,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:07.970Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 908,
+        "shellLeft": 232,
+        "pageWidth": 844,
+        "pageLeft": 260,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:09.510Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1388,
+        "shellLeft": 232,
+        "pageWidth": 1316,
+        "pageLeft": 264,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:11.050Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2028,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 302,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "path": "/emergency/copilot",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:12.685Z",
+      "finalUrl": "http://localhost:4173/emergency/whiteboard",
+      "heading": "Board",
+      "screenshotPath": "qa/shell-ux-audit/responsive/copilot--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/copilot--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 2908,
+        "shellLeft": 232,
+        "pageWidth": 1880,
+        "pageLeft": 742,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "390x844",
+        "width": 390,
+        "height": 844,
+        "tier": "phone",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:14.220Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--390x844.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--390x844--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 390,
+        "docScrollWidth": 390,
+        "shellWidth": 390,
+        "shellLeft": 0,
+        "pageWidth": 333,
+        "pageLeft": 24,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "12.48px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:15.578Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--768x1024.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--768x1024--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellWidth": 768,
+        "shellLeft": 0,
+        "pageWidth": 704,
+        "pageLeft": 28,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "16px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "laptop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:16.801Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--1440x900.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--1440x900--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellWidth": 1208,
+        "shellLeft": 232,
+        "pageWidth": 1120,
+        "pageLeft": 272,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "28px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "desktop",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:18.112Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--1920x1080.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--1920x1080--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellWidth": 1688,
+        "shellLeft": 232,
+        "pageWidth": 1592,
+        "pageLeft": 276,
+        "pageMaxWidth": "min(100%, 1680px)",
+        "shellPaddingInline": "32px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "2560x1440",
+        "width": 2560,
+        "height": 1440,
+        "tier": "qhd-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:19.382Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--2560x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--2560x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 2560,
+        "docScrollWidth": 2560,
+        "shellWidth": 2328,
+        "shellLeft": 232,
+        "pageWidth": 1856,
+        "pageLeft": 464,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "path": "/tools",
+      "viewport": {
+        "id": "3440x1440",
+        "width": 3440,
+        "height": 1440,
+        "tier": "ultrawide-34",
+        "preview": true
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T07:28:20.745Z",
+      "finalUrl": "http://localhost:4173/emergency/tools",
+      "heading": "Medical Tools",
+      "screenshotPath": "qa/shell-ux-audit/responsive/tools--3440x1440.png",
+      "previewPath": "qa/shell-ux-audit/responsive/previews/tools--3440x1440--preview.png",
+      "layoutMetrics": {
+        "docClientWidth": 3440,
+        "docScrollWidth": 3440,
+        "shellWidth": 3208,
+        "shellLeft": 232,
+        "pageWidth": 1856,
+        "pageLeft": 904,
+        "pageMaxWidth": "min(100%, 1880px)",
+        "shellPaddingInline": "40px"
+      },
+      "docOverflowPx": 0,
+      "error": ""
+    }
+  ]
+}

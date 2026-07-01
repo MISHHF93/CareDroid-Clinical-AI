@@ -44,6 +44,20 @@
   }
 }
 
+@media (min-width: 2560px) {
+  :root {
+    --app-layout-content-max: min(100%, 2100px);
+    --app-layout-page-gutter-inline: clamp(32px, 2.4vw, 48px);
+  }
+}
+
+@media (min-width: 3440px) {
+  :root {
+    --app-layout-content-max: min(100%, 2400px);
+    --app-layout-page-gutter-inline: clamp(36px, 2.6vw, 56px);
+  }
+}
+
 /* —— App shell main column: owns page gutters —— */
 .emergency-app-shell .app-shell-main-content {
   display: flex;
